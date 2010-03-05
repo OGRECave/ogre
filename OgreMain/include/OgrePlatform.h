@@ -146,7 +146,8 @@ namespace Ogre {
 #   	define _OgrePrivate
 #	endif
 // Win32 compilers use _DEBUG for specifying debug builds.
-#   ifdef _DEBUG
+// for MinGW, we set DEBUG
+#   if defined(_DEBUG) || defined(DEBUG)
 #       define OGRE_DEBUG_MODE 1
 #   else
 #       define OGRE_DEBUG_MODE 0

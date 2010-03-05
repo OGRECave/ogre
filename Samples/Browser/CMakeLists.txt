@@ -151,7 +151,6 @@ if (APPLE)
     set (OGRE_SAMPLE_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/SampleBrowser.app)
     add_custom_command(TARGET SampleBrowser POST_BUILD
       COMMAND cp ARGS ${OGRE_BINARY_DIR}/bin/*.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
-      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/Icon.png ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/Default.png ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/plugins.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
@@ -159,16 +158,44 @@ if (APPLE)
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/samples.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/bin/quakemap.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
     )
+    if(OGRE_SDK_BUILD)
+	    add_custom_command(TARGET SampleBrowser POST_BUILD
+             COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/media ${OGRE_SAMPLE_CONTENTS_PATH}/
+	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+	    )
+	elseif(OGRE_INSTALL_SAMPLES_SOURCE)
+        add_custom_command(TARGET SampleBrowser POST_BUILD
+      	  COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/
+	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+        )
+    endif(OGRE_SDK_BUILD)
   else()
 
+    # Add the path where the Ogre framework was found, if it has been found somewhere
+    if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "" AND OGRE_SDK_BUILD)
+      set_target_properties(SampleBrowser PROPERTIES
+        COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH} -framework IOKit -framework Cocoa -framework Carbon"
+      )
+    endif()
 	# also, symlink frameworks so .app is standalone
 	# NOTE: $(CONFIGURATION) is not resolvable at CMake run time, it's only 
 	# valid at build time (hence parenthesis rather than braces)
+	
+	if(OGRE_SDK_BUILD)
+	  set(OGRE_OSX_BUILD_CONFIGURATION "")
+	  set(OGRE_BUILT_FRAMEWORK "Release/")
+	else()
+	  set(OGRE_OSX_BUILD_CONFIGURATION "$(CONFIGURATION)/")
+	  set(OGRE_BUILT_FRAMEWORK "$(CONFIGURATION)/")
+	endif()
 	set (OGRE_SAMPLE_CONTENTS_PATH 
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}Ogre.framework 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Dependencies/Cg.framework 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
@@ -191,69 +218,69 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Components)
-	if (OGRE_BUILD_RENDERSYSTEM_GL)
+	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/RenderSystem_GL.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif ()
-	if (OGRE_BUILD_PLUGIN_BSP)
+	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_BSPSceneManager.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_BSPSceneManager.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_CG)
+	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_CgProgramManager.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_CgProgramManager.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_OCTREE)
+	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeSceneManager.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeSceneManager.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_PCZ)
+	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_PCZSceneManager.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_PCZSceneManager.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/    
 			)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_OctreeZone.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeZone.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif()
-	if (OGRE_BUILD_PLUGIN_PFX)
+	if (OGRE_BUILD_PLUGIN_PFX OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Plugin_ParticleFX.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_ParticleFX.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 			)
 	endif()
 	
 	# Components
-	if (OGRE_BUILD_COMPONENT_PAGING)
+	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgrePaging.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgrePaging.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_PROPERTY)
+	if (OGRE_BUILD_COMPONENT_PROPERTY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreProperty.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreProperty.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreRTShaderSystem.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreRTShaderSystem.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()
-	if (OGRE_BUILD_COMPONENT_TERRAIN)
+	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/libOgreTerrain.dylib 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreTerrain.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()

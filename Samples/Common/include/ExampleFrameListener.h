@@ -296,7 +296,7 @@ public:
 
 		if(mKeyboard->isKeyDown(OIS::KC_SYSRQ) && mTimeUntilNextToggle <= 0)
 		{
-			Ogre::StringStream ss;
+			std::ostringstream ss;
 			ss << "screenshot_" << ++mNumScreenShots << ".png";
 			mWindow->writeContentsToFile(ss.str());
 			mTimeUntilNextToggle = 0.5;

@@ -129,12 +129,15 @@ MACRO(findpkg_framework fwk)
       /System/Library/Frameworks
       /Network/Library/Frameworks
       /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk/System/Library/Frameworks/
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/Release
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug
     )
     FOREACH(dir ${${fwk}_FRAMEWORK_PATH})
       SET(fwkpath ${dir}/${fwk}.framework)
       IF(EXISTS ${fwkpath})
         SET(${fwk}_FRAMEWORK_INCLUDES ${${fwk}_FRAMEWORK_INCLUDES}
           ${fwkpath}/Headers ${fwkpath}/PrivateHeaders)
+        SET(${fwk}_FRAMEWORK_PATH ${dir})
         if (NOT ${fwk}_LIBRARY_FWK)
           SET(${fwk}_LIBRARY_FWK "-framework ${fwk}")
         endif ()

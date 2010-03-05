@@ -53,7 +53,7 @@ include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
 
 # setup target
 add_library(OgrePaging ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
-set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_VERSION})
+set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_SOVERSION})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(OgrePaging ${Boost_LIBRARIES})

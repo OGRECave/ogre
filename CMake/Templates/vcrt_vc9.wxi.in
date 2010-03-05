@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <Fragment>
+      <DirectoryRef Id="TARGETDIR">
+        <!-- VC runtimes -->
+        <Merge Id='CRT' Language='0' SourceFile='C:\Program Files\Common Files\Merge Modules\Microsoft_VC90_CRT_x86.msm' DiskId='1' />
+        <Merge Id='CRT Policy' Language='0' SourceFile='C:\Program Files\Common Files\Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm' DiskId='1' />
+      </DirectoryRef>
+    </Fragment>
+</Include>

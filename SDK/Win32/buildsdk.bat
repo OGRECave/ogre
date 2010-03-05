@@ -2,18 +2,27 @@
 if "%1" == "" goto paramErr
 if "%VSINSTALLDIR%" == "" goto envErr
 
+set COMPILER=%1
+
 rem Determine CMake generator
-if "%1" == "vc71" set GENERATOR="Visual Studio 7 .NET 2003"
-if "%1" == "vc8" set GENERATOR="Visual Studio 8 2005"
-if "%1" == "vc8_x64" set GENERATOR="Visual Studio 8 2005 Win64"
-if "%1" == "vc9" set GENERATOR="Visual Studio 9 2008"
-if "%1" == "vc9_x64" set GENERATOR="Visual Studio 9 2008 Win64"
-if "%1" == "vc10" set GENERATOR="Visual Studio 10"
-if "%1" == "vc10_x64" set GENERATOR="Visual Studio 10 Win64"
+if "%COMPILER%" == "vc71" set GENERATOR="Visual Studio 7 .NET 2003"
+if "%COMPILER%" == "vc8" set GENERATOR="Visual Studio 8 2005"
+if "%COMPILER%" == "vc8_x64" set GENERATOR="Visual Studio 8 2005 Win64"
+if "%COMPILER%" == "vc9" set GENERATOR="Visual Studio 9 2008"
+if "%COMPILER%" == "vc9_x64" set GENERATOR="Visual Studio 9 2008 Win64"
+if "%COMPILER%" == "vc10" set GENERATOR="Visual Studio 10"
+if "%COMPILER%" == "vc10_x64" set GENERATOR="Visual Studio 10 Win64"
 
 if %GENERATOR% == "" goto paramErr
 
-set BUILD_DIR=%1
+rem check 7z and dot
+7z > NUL
+if errorlevel 1 goto 7zerror
+dot -V > NUL
+if errorlevel 1 goto doterror
+
+
+set BUILD_DIR=%COMPILER%
 
 if "%2" == "clean" rmdir /Q/S %BUILD_DIR%
 mkdir %BUILD_DIR%
@@ -22,8 +31,11 @@ rem call CMake
 cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G%GENERATOR% ..\..\..
 if errorlevel 1 goto cmakeerror
 
+rem Read OGRE version
+set /p OGREVERSION=<version.txt
+
 rem Detect whether we're using full version of VStudio or Express
-devenv /?
+devenv /? > NUL
 
 if errorlevel 1 goto tryexpress
 set DEVENV=devenv
@@ -34,6 +46,8 @@ set DEVENV=VCExpress
 
 rem build docs explicitly since INSTALL doesn't include it
 %DEVENV% OGRE.sln /build "Release" /project "doc"
+
+if errorlevel 1 goto msvcerror
 
 rem Delete unnecessary doc files
 pushd api\html
@@ -61,9 +75,17 @@ cscript //nologo ..\..\removeabsolutepaths.vbs "%%f"
 del /Q/F filestopatch.txt
 popd
 
-
 popd
 
+rem Package up
+set SDKNAME=OgreSDK_%COMPILER%_v%OGREVERSION%
+rmdir /S/Q %SDKNAME%
+move %BUILD_DIR%\sdk %SDKNAME%
+del /Q/F %SDKNAME%.exe
+rem create self-extracting 7zip archive
+7z a -r -y -sfx7z.sfx %SDKNAME%.exe %SDKNAME%
+
+echo Done! Test %SDKNAME%.exe and then release
 goto end
 
 :paramErr
@@ -79,5 +101,20 @@ goto end
 :cmakeerror
 popd
 echo CMake not found on your path or CMake error - see above and correct
+goto end
+
+:7zerror
+echo 7z.exe not found on your path, please add
+goto end
+
+:doterror
+echo dot.exe not found on your path, please add
+goto end
+
+:msvcerror
+popd
+echo Neither devenv.exe nor VCExpress are on your path, use vcvars32.bat
+goto end
+
 :end
 

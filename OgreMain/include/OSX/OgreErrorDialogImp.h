@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OSXErrorDialog_H__
 #define __OSXErrorDialog_H__
 
-#include "OgrePrerequisites.h"
+#include "../OgrePrerequisites.h"
 
 namespace Ogre
 {

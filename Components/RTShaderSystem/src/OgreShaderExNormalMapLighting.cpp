@@ -465,7 +465,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 			return false;	
 
 		// Resolve inverse world rotation matrix.
-		mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
+		mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
 		if (mWorldInvRotMatrix.get() == NULL)		
 			return false;	
 		
@@ -489,7 +489,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 		switch (mLightParamsList[i].mType)
 		{
 		case Light::LT_DIRECTIONAL:
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
 			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
@@ -522,7 +522,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition.get() == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
+			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_position_world_space");
 			if (mLightParamsList[i].mPosition.get() == NULL)
 				return false;
 
@@ -580,7 +580,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve inverse world rotation matrix.
 			if (mWorldInvRotMatrix.get() == NULL)
 			{				
-				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_GLOBAL, "inv_world_rotation_matrix");
+				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
 				if (mWorldInvRotMatrix.get() == NULL)		
 					return false;	
 			}				
@@ -591,7 +591,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mVSInPosition.get() == NULL)
 				return false;
 
-			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_world_space");
+			mLightParamsList[i].mPosition = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_position_world_space");
 			if (mLightParamsList[i].mPosition.get() == NULL)
 				return false;
 
@@ -617,7 +617,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			if (mLightParamsList[i].mPSInToLightDir.get() == NULL)
 				return false;
 
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_obj_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS|GPV_PER_OBJECT, "light_direction_obj_space");
 			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
@@ -679,7 +679,7 @@ bool NormalMapLighting::resolvePerLightParameters(ProgramSet* programSet)
 			// Resolve inverse world rotation matrix.
 			if (mWorldInvRotMatrix.get() == NULL)
 			{				
-				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "gMatInvRotation");
+				mWorldInvRotMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "inv_world_rotation_matrix");
 				if (mWorldInvRotMatrix.get() == NULL)		
 					return false;	
 			}						

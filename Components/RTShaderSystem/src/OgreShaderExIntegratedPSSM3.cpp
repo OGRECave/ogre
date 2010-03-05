@@ -241,7 +241,7 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 
 	while(it != mShadowTextureParamsList.end())
 	{
-		it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_GLOBAL, "world_texture_view_proj");		
+		it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj");		
 		if (it->mWorldViewProjMatrix.get() == NULL)
 			return false;
 

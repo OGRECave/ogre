@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="473b6488-10a0-4ecc-8521-88478e4117ad" 
+   Name="OGRE Demos @OGRE_VERSION@" Language="1033" Version="@OGRE_VERSION@" 
+   Manufacturer="OGRE Team" UpgradeCode="5fde4847-ecfa-453b-8026-d5d354db5992">
+
+
+	<Package InstallerVersion="300" Compressed="yes" />
+
+	<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+	<WixVariable Id="WixUILicenseRtf" Value="DemoLicense.rtf" />
+	
+	<Directory Id="TARGETDIR" Name="SourceDir">
+
+      <Directory Id="ProgramFilesFolder">
+		<Directory Id="INSTALLLOCATION" Name="Ogre Demos @OGRE_VERSION@">
+          <Component Id='OgreDemosComp' Guid='41AA9D3F-80EF-420c-BDC8-EF631628AE68'>
+            <File Source='..\bin\release\OgreMain.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_BSPSceneManager.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_CgProgramManager.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_OctreeSceneManager.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_ParticleFX.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_PCZSceneManager.dll' Vital='yes' />
+            <File Source='..\bin\release\Plugin_OctreeZone.dll' Vital='yes' />
+            <File Source='..\bin\release\RenderSystem_Direct3D9.dll' Vital='yes' />
+            <File Source='..\bin\release\RenderSystem_GL.dll' Vital='yes' />
+            <File Source='..\bin\release\OgrePaging.dll' Vital='yes' />
+            <File Source='..\bin\release\OgreTerrain.dll' Vital='yes' />
+            <File Source='..\bin\release\OgreProperty.dll' Vital='yes' />
+            <File Source='..\bin\release\OgreRTShaderSystem.dll' Vital='yes' />
+			
+			<!--
+            <File Source='..\..\Readme.html' Vital='yes'>
+              <Shortcut Id="ReadmeShortcut" Directory="OGREProgramMenuDir" Name="Readme"/>
+            </File>
+			-->
+            <File Source='..\bin\release\plugins.cfg' Vital='yes' />
+            <File Source='..\bin\release\samples.cfg' Vital='yes' />
+            <!-- Following config files are tweaked locally -->
+            <File Source='.\resources.cfg' Vital='yes' />
+            <File Source='.\quakemap.cfg' Vital='yes' />
+
+            <File Source="..\bin\release\SampleBrowser.exe" />
+            <File Source='..\bin\release\Sample_BezierPatch.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_BSP.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_CameraTrack.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_CelShading.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Character.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Compositor.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_CubeMapping.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_DeferredShading.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Dot3Bump.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_DynTex.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_FacialAnimation.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Fresnel.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Grass.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Instancing.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Isosurf.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Lighting.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Ocean.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_ParticleFX.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_ParticleGS.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_ShaderSystem.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Shadows.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_SkeletalAnimation.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_SkyBox.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_SkyDome.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_SkyPlane.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Smoke.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_SphereMapping.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Terrain.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_TextureFX.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Transparency.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_VolumeTex.dll' Vital='yes' />
+            <File Source='..\bin\release\Sample_Water.dll' Vital='yes' />
+			
+            <File Source='..\bin\release\OIS.dll' Vital='yes' />
+            <File Source='..\bin\release\cg.dll' Vital='yes' />
+
+          </Component>
+        </Directory>
+
+		<!-- Start menu -->
+		<Directory Id="ProgramMenuFolder">
+		  <Directory Id="OGREProgramMenuDir" Name='OGRE Demos @OGRE_VERSION@'>
+		  </Directory>
+		</Directory>
+
+      </Directory>
+		</Directory>
+
+	<DirectoryRef Id="OGREProgramMenuDir">
+		<Component Id="SampleBrowserShortcutComp" Guid="{B090B62F-222D-4a42-B106-6BB9F8174AC7}">
+			<Shortcut Id="SampleBrowserShortcut" 
+			  Name="Sample Browser"
+			  Description="Browser to allow you to run the OGRE samples"
+			  Target="[INSTALLLOCATION]SampleBrowser.exe"
+			  WorkingDirectory="INSTALLLOCATION"/>
+			<RemoveFolder Id="OGREProgramMenuDir" On="uninstall"/>
+			<RegistryValue Root="HKCU" Key="Software\OGRE\Demos@OGRE_VERSION@" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+		</Component>
+	</DirectoryRef>
+
+    <Feature Id='DemosFeature' Level='1' ConfigurableDirectory="INSTALLLOCATION" Title='Demos'
+      Description='OGRE Demos'
+      Absent='disallow' AllowAdvertise='no' >
+      <ComponentRef Id='OgreDemosComp' />
+      <ComponentRef Id='SampleBrowserShortcutComp' />
+      <ComponentGroupRef Id='OgreMedia' />
+      <MergeRef Id='CRT' />
+      <MergeRef Id='CRT Policy' />
+    </Feature>
+	
+	<Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+	<UIRef Id="WixUI_InstallDir" />
+
+  </Product>
+  <?include vcrt.wxi ?>
+  <?include demomedia.wxi ?>
+
+</Wix>

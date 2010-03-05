@@ -42,7 +42,6 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   clear_if_changed(DirectX_PREFIX_PATH
     DirectX_LIBRARY
 	DirectX_INCLUDE_DIR
-	DirectX_ROOT_DIR
   )
   
   find_path(DirectX_INCLUDE_DIR NAMES d3d9.h HINTS ${DirectX_INC_SEARCH_PATH})
@@ -65,16 +64,15 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
   # look for d3dcompiler (needed by 11)
   find_library(DirectX_D3DCOMPILER_LIBRARY NAMES d3dcompiler HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
 
-  if(DirectX_INCLUDE_DIR)
-    set(DirectX_ROOT_DIR "${DirectX_INCLUDE_DIR}/..") 
-  endif(DirectX_INCLUDE_DIR)
-
   findpkg_finish(DirectX)
   set(DirectX_LIBRARIES ${DirectX_LIBRARIES} 
     ${DirectX_D3DX9_LIBRARY}
     ${DirectX_DXERR_LIBRARY}
     ${DirectX_DXGUID_LIBRARY}
   )
+  
+  mark_as_advanced(DirectX_D3DX9_LIBRARY DirectX_DXERR_LIBRARY DirectX_DXGUID_LIBRARY
+    DirectX_DXGI_LIBRARY DirectX_D3DCOMPILER_LIBRARY)
   
 
   # look for D3D10 and D3D10.1 components
@@ -95,6 +93,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
         ${DirectX_DXGUID_LIBRARY}	  
       )
 	endif ()
+	mark_as_advanced(DirectX_D3D10_LIBRARY DirectX_D3DX10_LIBRARY DirectX_D3D10_INCLUDE_DIR)
   endif ()
 
   # look for D3D11 components
@@ -116,6 +115,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
         ${DirectX_D3DCOMPILER_LIBRARY}        	  
       )	
     endif ()
+	mark_as_advanced(DirectX_D3D11_INCLUDE_DIR DirectX_D3D11_LIBRARY DirectX_D3DX11_LIBRARY)
   endif ()
   
 endif(WIN32)

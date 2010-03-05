@@ -31,7 +31,9 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
-    v1.7.0 [Cthugha] (RC1 issued 31 December 2009) - MAJOR RELEASE</p>
+    v1.7.0 [Cthugha] (28 February 2010) - MAJOR RELEASE</p>
+	    <a href="#changessince1.7.0RC1">[View changes since RC1]</a>
+
 <ul><li> <b>License changes</b>
 	<ul><li>OGRE 1.7 is now released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></li></ul>
 </li><li> <b>Compositor changes</b>
@@ -182,6 +184,38 @@ Engine)</p>
 </li></ul>
 </li></ul>
 
+<p><a name="changessince1.7.0RC1">Changes since 1.7.0 RC1 (highlights only)</a></p>
+<ul>
+<li>Fix GPU-extruded stencil shadows on Dx9</li>
+<li>Allow Terrain to have layers inserted / removed at any point in the stack</li>
+<li>Fix bug 254: DXTn volume texture size calculation crash</li>
+<li>Samples tidied up, and some fixes to unloading behaviour in Compositor, Instancing and VolumeTex samples</li>
+<li>Many fixes to FindOGRE.cmake, now much more reliable and compatible with 1.6 and 1.7. Reference SDKs with OGRE_SDK, or source builds via OGRE_SOURCE and OGRE_BUILD paths.</li>
+<li>New SDKs for Windows and OS X created</li>
+<li>Fill in some missed PVRTC rendersystem caps</li>
+<li>Fix resolving some types in OS X 10.5 SDK</li>
+<li>Added validateConfigOptions() call in Root::restoreConfig(). Solves a crash when moving cfg file from one machine to another.</li>
+<li>RTSS: some refactoring and bug fixing</li>
+<li>Terrain: fixed several bugs</li>
+<li>GLES rendersystem bugfixes</li>
+<li>Fix Codec compile when using OGRE_STRING_USE_CUSTOM_MEMORY_ALLOCATOR</li>
+<li>HashedVector::mListHashDirty was not initialised correctly in a few cases</li>
+<li>Null shadow textures should not be dynamic since that means after a device lost they lost their contents, and there is no handler to manage this. </li>
+<li>Prevent excessive logging when texture load failed in ensureloaded/ensurePrepared</li>
+<li>Windows 64-bit compatibility fixes</li>
+<li>Fix problems when using logical GPU parameter indexes which end up needing more space than originally thought</li>
+<li>Fix a problem with .hdr introduced by new FreeImage</li>
+<li>Fix a bug in ResourceGroupManager::loadResourceGroup when a resource changes group</li>
+<li>Added a Character sample featuring the Sinbad character model.</li>
+<li>Add CMake option corresponding to OGRE_PROFILING</li>
+<li>Fix a large number of problems on Windows with establishing the max size of a window and switching between fullscreen and windowed modes</li>
+<li>WorkQueue::addRequestHandler and WorkQueue::removeRequestHandler no longer block until existing background requests are processed, leading to better parallelism</li>
+<li>Fix no grass displayed on ATI cards on GL in grass demo</li>
+<li>Static build now works including all sample browser plugins</li>
+<li>Fix RGBA colours in custom GLSL attributes</li>
+<li>Reduce compiler warnings</li>
+<li>Lots & lots of other bugfixes and tweaks!</li>
+</ul>
 
 <p class="mainheader">
     v1.6.5 [Shoggoth] (27 December 2009) - Maintenance Release</p>

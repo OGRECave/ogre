@@ -10,20 +10,13 @@
 #####################################################
 # Install dependencies 
 #####################################################
-
-if (UNIX)
+if ((NOT APPLE) AND (NOT WIN32))
   return()
 endif()
 
-# determine if we have a common dependencies folder to install from.
-# this is not a fool-proof test, but it should be good enough.
-get_filename_component(OGRE_DEP1_DIR ${FREETYPE_INCLUDE_DIR}/../ ABSOLUTE)
-get_filename_component(OGRE_DEP2_DIR ${ZLIB_INCLUDE_DIR}/../ ABSOLUTE)
-if (OGRE_DEP1_DIR STREQUAL OGRE_DEP2_DIR)
-  set(OGRE_DEP_DIR ${OGRE_DEP1_DIR})
-else ()
-  return()
-endif ()
+# TODO - most of this file assumes a common dependencies root folder
+# This is not robust, we should instead source dependencies from their individual locations
+get_filename_component(OGRE_DEP_DIR ${OIS_INCLUDE_DIR}/../../ ABSOLUTE)
 
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
@@ -37,25 +30,32 @@ endmacro()
 macro(install_release INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/release/${INPUT})
     install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
-	install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+    install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
 	install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
   endif ()
 endmacro()
 
 macro(copy_debug INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/debug/${INPUT})
-    configure_file(${OGRE_DEP_DIR}/bin/debug/${INPUT} ${OGRE_BINARY_DIR}/bin/debug/${INPUT} COPYONLY)
+    if (MINGW OR NMAKE)
+      configure_file(${OGRE_DEP_DIR}/bin/debug/${INPUT} ${OGRE_BINARY_DIR}/bin/${INPUT} COPYONLY)
+	else ()
+      configure_file(${OGRE_DEP_DIR}/bin/debug/${INPUT} ${OGRE_BINARY_DIR}/bin/debug/${INPUT} COPYONLY)
+	endif ()
   endif ()
 endmacro()
 
 macro(copy_release INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/release/${INPUT})
-    configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/release/${INPUT} COPYONLY)
-    configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/relwithdebinfo/${INPUT} COPYONLY)
-    configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/minsizerel/${INPUT} COPYONLY)
+    if (MINGW OR NMAKE)
+      configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/${INPUT} COPYONLY)
+	else ()
+      configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/release/${INPUT} COPYONLY)
+      configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/relwithdebinfo/${INPUT} COPYONLY)
+      configure_file(${OGRE_DEP_DIR}/bin/release/${INPUT} ${OGRE_BINARY_DIR}/bin/minsizerel/${INPUT} COPYONLY)
+	endif ()
   endif ()
 endmacro ()
-
 
 if (OGRE_INSTALL_DEPENDENCIES)
   if (OGRE_STATIC)
@@ -66,40 +66,43 @@ if (OGRE_INSTALL_DEPENDENCIES)
 	if (EXISTS ${OGRE_DEP_DIR}/lib/)
       install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
 	endif ()
-    
   else ()
-    # for non-static builds, we only need OIS for the samples
+	    # for non-static builds, we only need OIS for the samples
 	if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
-      install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
+	      install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
 	endif ()
 	if(WIN32)
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
-      install(FILES
-        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
-        DESTINATION lib/debug CONFIGURATIONS Debug
-      )
+	      install(FILES
+	        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
+	        DESTINATION lib/debug CONFIGURATIONS Debug
+	      )
 	  endif ()
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
-      install(FILES
-        ${OGRE_DEP_DIR}/lib/release/OIS.lib
-        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-      )
+	      install(FILES
+	        ${OGRE_DEP_DIR}/lib/release/OIS.lib
+	        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+	      )
+	  endif ()
+	  if (MINGW)
+		install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
+		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
 	  endif ()
 	elseif(APPLE)
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/libOIS.a)
-        install(FILES
-          ${OGRE_DEP_DIR}/lib/debug/libOIS.a
-          DESTINATION lib/debug CONFIGURATIONS Debug
-        )
+	        install(FILES
+	          ${OGRE_DEP_DIR}/lib/debug/libOIS.a
+	          DESTINATION lib/debug CONFIGURATIONS Debug
+	        )
 	  endif ()
 	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/libOIS.a)
-        install(FILES
-          ${OGRE_DEP_DIR}/lib/release/libOIS.a
-          DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-        )
+	        install(FILES
+	          ${OGRE_DEP_DIR}/lib/release/libOIS.a
+	          DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+	        )
 	  endif ()
 	endif ()
-  endif ()
+	  endif ()
     
   if(WIN32)
     # copy the dependency DLLs to the right places
@@ -119,6 +122,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
     # copy the dependency libs to the right places
     install_debug(libOIS.a)
     install_release(libOIS.a)
+
     if (OGRE_BUILD_PLUGIN_CG)
       install_debug(Cg.framework)
 	  install_release(Cg.framework)
@@ -177,7 +181,6 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		PATTERN "system" EXCLUDE
 		PATTERN "test" EXCLUDE
 		PATTERN "tr1" EXCLUDE
-		PATTERN "tuple" EXCLUDE
 		PATTERN "typeof" EXCLUDE
 		PATTERN "units" EXCLUDE
 		PATTERN "unordered" EXCLUDE

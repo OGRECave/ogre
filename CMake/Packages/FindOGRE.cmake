@@ -58,8 +58,8 @@ getenv_path(OGRE_HOME)
 getenv_path(OGRE_SDK)
 getenv_path(OGRE_SOURCE)
 getenv_path(OGRE_BUILD)
+getenv_path(OGRE_DEPENDENCIES_DIR)
 getenv_path(PROGRAMFILES)
-
 
 # Determine whether to search for a dynamic or static build
 if (OGRE_STATIC)
@@ -99,6 +99,7 @@ create_search_paths(OGRE)
 # If both OGRE_BUILD and OGRE_SOURCE are set, prepare to find Ogre in a build dir
 set(OGRE_PREFIX_SOURCE ${OGRE_SOURCE} ${ENV_OGRE_SOURCE})
 set(OGRE_PREFIX_BUILD ${OGRE_BUILD} ${ENV_OGRE_BUILD})
+set(OGRE_PREFIX_DEPENDENCIES_DIR ${OGRE_DEPENDENCIES_DIR} ${ENV_OGRE_DEPENDENCIES_DIR})
 if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
   foreach(dir ${OGRE_PREFIX_SOURCE})
     set(OGRE_INC_SEARCH_PATH ${dir}/OgreMain/include ${dir}/Dependencies/include ${dir}/iPhoneDependencies/include ${OGRE_INC_SEARCH_PATH})
@@ -111,6 +112,12 @@ if (OGRE_PREFIX_SOURCE AND OGRE_PREFIX_BUILD)
     set(OGRE_BIN_SEARCH_PATH ${dir}/bin ${OGRE_BIN_SEARCH_PATH})
 	set(OGRE_BIN_SEARCH_PATH ${dir}/Samples/Common/bin ${OGRE_BIN_SEARCH_PATH})
   endforeach(dir)
+  
+  if (OGRE_PREFIX_DEPENDENCIES_DIR)
+    set(OGRE_INC_SEARCH_PATH ${OGRE_PREFIX_DEPENDENCIES_DIR}/include ${OGRE_INC_SEARCH_PATH})
+    set(OGRE_LIB_SEARCH_PATH ${OGRE_PREFIX_DEPENDENCIES_DIR}/lib ${OGRE_LIB_SEARCH_PATH})
+    set(OGRE_BIN_SEARCH_PATH ${OGRE_PREFIX_DEPENDENCIES_DIR}/bin ${OGRE_BIN_SEARCH_PATH})
+  endif()
 else()
   set(OGRE_PREFIX_SOURCE "NOTFOUND")
   set(OGRE_PREFIX_BUILD "NOTFOUND")
@@ -136,8 +143,13 @@ clear_if_changed(OGRE_PREFIX_WATCH ${OGRE_RESET_VARS})
 
 # try to locate Ogre via pkg-config
 use_pkgconfig(OGRE_PKGC "OGRE${OGRE_LIB_SUFFIX}")
-# try to find framework on OSX
-findpkg_framework(OGRE)
+
+if(NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # try to find framework on OSX
+  findpkg_framework(OGRE)
+else()
+	set(OGRE_LIBRARY_FWK "")
+endif()
 
 # locate Ogre include files
 find_path(OGRE_CONFIG_INCLUDE_DIR NAMES OgreBuildSettings.h HINTS ${OGRE_INC_SEARCH_PATH} ${OGRE_FRAMEWORK_INCLUDES} ${OGRE_PKGC_INCLUDE_DIRS} PATH_SUFFIXES "OGRE")
@@ -192,7 +204,7 @@ find_library(OGRE_LIBRARY_DBG NAMES ${OGRE_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIB_S
 make_library_set(OGRE_LIBRARY)
 
 if(APPLE)
-set(OGRE_LIBRARY_DBG ${OGRE_LIB_SEARCH_PATH})
+  set(OGRE_LIBRARY_DBG ${OGRE_LIB_SEARCH_PATH})
 endif()
 if (OGRE_INCOMPATIBLE)
   set(OGRE_LIBRARY "NOTFOUND")
@@ -233,10 +245,16 @@ if (OGRE_STATIC)
       set(X11_FOUND FALSE)
     endif ()
   endif ()
-  if (APPLE)
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     find_package(Cocoa QUIET)
     find_package(Carbon QUIET)
     if (NOT Cocoa_FOUND OR NOT Carbon_FOUND)
+      set(OGRE_DEPS_FOUND FALSE)
+    endif ()
+  endif ()
+  if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+    find_package(iPhoneSDK QUIET)
+    if (NOT iPhoneSDK_FOUND)
       set(OGRE_DEPS_FOUND FALSE)
     endif ()
   endif ()
@@ -260,7 +278,7 @@ if (OGRE_STATIC)
       set(OGRE_DEPS_FOUND FALSE)
 	endif ()
   endif ()
-  
+
   if (OGRE_CONFIG_THREADS)
     if (OGRE_CONFIG_THREAD_PROVIDER EQUAL 1)
       find_package(Boost COMPONENTS thread QUIET)
@@ -501,6 +519,7 @@ endif ()
 
 # look for the media directory
 set(OGRE_MEDIA_SEARCH_PATH
+  ${OGRE_SOURCE}
   ${OGRE_LIBRARY_DIR_REL}/..
   ${OGRE_LIBRARY_DIR_DBG}/..
   ${OGRE_LIBRARY_DIR_REL}/../..
@@ -508,12 +527,13 @@ set(OGRE_MEDIA_SEARCH_PATH
   ${OGRE_PREFIX_SOURCE}
 )
 set(OGRE_MEDIA_SEARCH_SUFFIX
+  Samples/Media
   Media
   media
   share/OGRE/media
-  Samples/Media
 )
+
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)
-find_path(OGRE_MEDIA_DIR NAMES packs/OgreCore.zip HINTS ${OGRE_MEDIA_SEARCH_PATH}
+find_path(OGRE_MEDIA_DIR NAMES packs/cubemapsJS.zip HINTS ${OGRE_MEDIA_SEARCH_PATH}
   PATHS ${OGRE_PREFIX_PATH} PATH_SUFFIXES ${OGRE_MEDIA_SEARCH_SUFFIX})
 

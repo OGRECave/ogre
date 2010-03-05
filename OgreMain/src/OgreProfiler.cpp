@@ -323,6 +323,16 @@ namespace Ogre {
 			return;
 		}
 
+
+		// we only process this profile if isn't disabled
+		DisabledProfileMap::iterator dIter;
+		dIter = mDisabledProfiles.find(profileName);
+		if ( dIter != mDisabledProfiles.end() ) {
+
+			return;
+
+		}
+
         // empty string is reserved for the root
         assert ((profileName != "") && ("Profile name can't be an empty string"));
 
@@ -334,20 +344,11 @@ namespace Ogre {
                 break;
 
             }
-
         }
 
         // make sure this profile isn't being used more than once
         assert ((iter == mProfiles.end()) && ("This profile name is already being used"));
 
-        // we only process this profile if isn't disabled
-        DisabledProfileMap::iterator dIter;
-        dIter = mDisabledProfiles.find(profileName);
-        if ( dIter != mDisabledProfiles.end() ) {
-
-            return;
-
-        }
 
         ProfileInstance p;
 		p.hierarchicalLvl = static_cast<uint>(mProfiles.size());
@@ -440,12 +441,26 @@ namespace Ogre {
 
 		}
 
-     // if the profiler is enabled
+		// if the profiler is enabled
         if(!mEnabled) {
 
             return;
-
         }
+
+		// mask groups
+		if ((groupID & mProfileMask) == 0)
+		{
+			return;
+		}
+
+		// we only process this profile if isn't disabled
+		DisabledProfileMap::iterator dIter;
+		dIter = mDisabledProfiles.find(profileName);
+		if ( dIter != mDisabledProfiles.end() ) {
+
+			return;
+
+		}
 
         // need a timer to profile!
         assert (mTimer && "Timer not set!");
@@ -457,16 +472,7 @@ namespace Ogre {
 
         // empty string is reserved for designating an empty parent
         assert ((profileName != "") && ("Profile name can't be an empty string"));
-
-        // we only process this profile if isn't disabled
-        DisabledProfileMap::iterator dIter;
-        dIter = mDisabledProfiles.find(profileName);
-        if ( dIter != mDisabledProfiles.end() ) {
-
-            return;
-
-        }
-
+      
         // stack shouldnt be empty
         assert (!mProfiles.empty());
 
@@ -478,7 +484,7 @@ namespace Ogre {
         // calculate the elapsed time of this profile
         ulong timeElapsed = endTime - bProfile.currTime;
 
-        // update parent's accumalator if it isn't the root
+        // update parent's accumulator if it isn't the root
         if (bProfile.parent != "") {
 
             // find the parent

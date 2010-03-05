@@ -1,0 +1,1797 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="OgreMedia">
+            <ComponentRef Id="cmpC2CB6B8C87419510F0F0329081C439C1" />
+            <ComponentRef Id="cmp0855D43C55EF10C779CF0126A73A7B16" />
+            <ComponentRef Id="cmpFA8CDDDCD52A1A1FBDBA90230F22FBBA" />
+            <ComponentRef Id="cmp9CE13C69A2CD2639B51CF7C62FC60F89" />
+            <ComponentRef Id="cmpF797C7B48EA71CAA57BF88A4379EDC96" />
+            <ComponentRef Id="cmpADC3336495EB19AFA9D03ACB87DCEC51" />
+            <ComponentRef Id="cmp632E91937B11FE1089929DF3BF0E12DB" />
+            <ComponentRef Id="cmpCC662452D02EAB0C606673BA9C31B1D0" />
+            <ComponentRef Id="cmp61255FD004AB0387BEA94270F330D7CA" />
+            <ComponentRef Id="cmp3E9AEFD6EED9A280E1DAC69C311F1543" />
+            <ComponentRef Id="cmpFCBC8C8AE3B2BAE1A07E0B640746CF6F" />
+            <ComponentRef Id="cmpAD89A8BA60C9CE93FC33B975E35D3FB6" />
+            <ComponentRef Id="cmpA82FC2A9D95D89159F4F5D9DE1C53488" />
+            <ComponentRef Id="cmp6567F32E7C6EAE6F231A76BD8544E466" />
+            <ComponentRef Id="cmpF7313EFAA2F2441E7743D95060AB673F" />
+            <ComponentRef Id="cmp08B325894D11EA76B5BD5F793B63060C" />
+            <ComponentRef Id="cmp842B5EB6EF8264AAFCEEF600ECF554D9" />
+            <ComponentRef Id="cmp16119DC564FD3C2E62652E9D0E7737F1" />
+            <ComponentRef Id="cmp6F5E19BF4ED678343CBAE7C798BBB61A" />
+            <ComponentRef Id="cmp764268D5539404D12DEB8DB5AF10E7DD" />
+            <ComponentRef Id="cmp0ABA63F62BF62F388D4F9B8351F555EC" />
+            <ComponentRef Id="cmp4621D5464C60B6EC67D1A13C1F87EFEB" />
+            <ComponentRef Id="cmp811B7C8167D970098318F47DBEA00931" />
+            <ComponentRef Id="cmpC47919F66B5BA067388F77AD2CF62247" />
+            <ComponentRef Id="cmp1812DDB955E56D69740F752404C35CBF" />
+            <ComponentRef Id="cmpCE86BF3E276D5BBE6B921A16C6713EC0" />
+            <ComponentRef Id="cmpC29B049E7A9CBA460757522AA47FC4D2" />
+            <ComponentRef Id="cmpA65574B70C8AF45EB3CBB1A9DF0B5122" />
+            <ComponentRef Id="cmp47FE7A711F61A8AC62C6F7FD1571C908" />
+            <ComponentRef Id="cmp00A5E2F5074CEEA545728BA4C9E5C45B" />
+            <ComponentRef Id="cmp977022F72DFB32FA16DC0D9CDDFFB652" />
+            <ComponentRef Id="cmpAB60176DCD5D8A4284F07DD66B1172A4" />
+            <ComponentRef Id="cmp8DBFF889A3D1609E295182EB6E5AF91C" />
+            <ComponentRef Id="cmpB8E185672AA28FA93DADC7D3ABCD1FA3" />
+            <ComponentRef Id="cmp28739FECE0368E8F1B36C4432644134F" />
+            <ComponentRef Id="cmp7E1937A9EA3171CB56328437B9144C73" />
+            <ComponentRef Id="cmp18102BF9884CCAF28C71B98316147F8B" />
+            <ComponentRef Id="cmp29EB2132BED692222E4AF464AB4A7DDC" />
+            <ComponentRef Id="cmpB23F61EA75549FD92F786394B44FF8B6" />
+            <ComponentRef Id="cmp199EAE6869FD94BCCDE629BBDD2EA0BF" />
+            <ComponentRef Id="cmp0DC33BB3AEA504926794C47742F261AF" />
+            <ComponentRef Id="cmp563ED415B0A4BEFD893B6DFD84DEB03A" />
+            <ComponentRef Id="cmpD3FBED5D3241DC39DDFF4B55F5AFC4EC" />
+            <ComponentRef Id="cmp62788A4141CD8F778165AAE773E593E2" />
+            <ComponentRef Id="cmp9E41F5D0292E58041D8CA1614712D392" />
+            <ComponentRef Id="cmp78E66384B9CEB71D975979F96B58C027" />
+            <ComponentRef Id="cmpED502F336BDCC45A92BE1307016BFBD6" />
+            <ComponentRef Id="cmp17B2A92B1E4AFB247CB3D5EEBB86ACDA" />
+            <ComponentRef Id="cmp51195F92E878D816DFF40ECC0E95FA0F" />
+            <ComponentRef Id="cmpA46A3D31F3256C7F88B1947CEEC409FF" />
+            <ComponentRef Id="cmp8AE8BA47C985F8AC1E0FA37B23F3CE04" />
+            <ComponentRef Id="cmp4A5938DA04BB211BE93F256844D832A7" />
+            <ComponentRef Id="cmp4BE1953A63D757E1843E1A9E269F4B56" />
+            <ComponentRef Id="cmp0DCEE094E99BC362F28895BFFE94BFD0" />
+            <ComponentRef Id="cmpC20FF1F653BE805685785E046DCE8471" />
+            <ComponentRef Id="cmpBDE64F6FA189982F1EAA6FA745E8A6EB" />
+            <ComponentRef Id="cmp68B80B1A4029ABDB91E21906736FF8C9" />
+            <ComponentRef Id="cmp78B7701269B718131FDBA0F8A040E795" />
+            <ComponentRef Id="cmp97B14D134A03000258AFF103A583A107" />
+            <ComponentRef Id="cmpF8A26CC44B31386D57511CA16C09B0D6" />
+            <ComponentRef Id="cmp79C47A1DE336CE0C763F6984D5A916D5" />
+            <ComponentRef Id="cmpD12E5EA8F4492A9ED59A09D05CB32F26" />
+            <ComponentRef Id="cmpC726822992A005770DEBE9DF9526696E" />
+            <ComponentRef Id="cmpD9A6E287D2660C59384971ED4B062BF8" />
+            <ComponentRef Id="cmp1CC60C4FE6035BB1BE6A8A0F0EFFB315" />
+            <ComponentRef Id="cmp39A0EC380027197E1239BB5DEAC82928" />
+            <ComponentRef Id="cmp027F7964CE0D817DB764EEB166797BB9" />
+            <ComponentRef Id="cmp829F14E6ED1683448C4F370A67F16DF7" />
+            <ComponentRef Id="cmp2DE4924A96D6FB7EA4E215FC20AE1CC8" />
+            <ComponentRef Id="cmp7A7AFE6101C7B4F807FC2DEFD2AB0585" />
+            <ComponentRef Id="cmp719CA6921F8FB71B753173CEDBC3D71D" />
+            <ComponentRef Id="cmp2137FA6B769495F9E134D3540971AD50" />
+            <ComponentRef Id="cmp10A9349551027EE0183696B9ED5D70E9" />
+            <ComponentRef Id="cmp4E6BECE980FF9AF3789664BB0526E123" />
+            <ComponentRef Id="cmp5167DE5D3E2B7EED602AA2C03C5D2E76" />
+            <ComponentRef Id="cmp9C312354DE1CFB220F18AA3727EF2C24" />
+            <ComponentRef Id="cmpF875F462BA0C1C564E5B5F30EFDAB150" />
+            <ComponentRef Id="cmpC8B8CC43347C64367FCC98E2635E211B" />
+            <ComponentRef Id="cmp6A4B37C8208FA6EE5B22951C487F2C59" />
+            <ComponentRef Id="cmpE2127B8A921CE1076D5E5797909EA5F3" />
+            <ComponentRef Id="cmp7607110498E8729589E6F9175E5ED234" />
+            <ComponentRef Id="cmpB5BAFA249FCD6800B3DE658F5D4466FA" />
+            <ComponentRef Id="cmpAC873FC2196D7A8813641C5DDF00BDEE" />
+            <ComponentRef Id="cmp329F6EB6F241C075845F210493C7ACCD" />
+            <ComponentRef Id="cmpFECCA9C432AF0FFEB52D4B0CB790FE84" />
+            <ComponentRef Id="cmp762E35C9D9C9F5DA1FE62816E756717A" />
+            <ComponentRef Id="cmp9BC55705D6C5839BCE4606E0733CB9E9" />
+            <ComponentRef Id="cmp41E3631EA7CCE1E278D0072667B088EE" />
+            <ComponentRef Id="cmpE2D6813B390AAB693AF55BEB581B0086" />
+            <ComponentRef Id="cmp4A1D3546B3EA66606D7353CD0671BD3C" />
+            <ComponentRef Id="cmpD97FCB30AFB526628119557243D39D74" />
+            <ComponentRef Id="cmp4C38107E9CC0666D136311CC7403B401" />
+            <ComponentRef Id="cmpF3785DE9566BB926CA1CA50B77DE4BF3" />
+            <ComponentRef Id="cmpC04C605ABE399D3E7050588A0C778BF6" />
+            <ComponentRef Id="cmp7D475A50ECF047182B27C99EB018B001" />
+            <ComponentRef Id="cmp35C70FBAA2B3FFC59E8B35C35700097C" />
+            <ComponentRef Id="cmp7E0C9BE65D3CE2A724F51D1E252AA4E4" />
+            <ComponentRef Id="cmp44FDB41773D374F3BCE7786FCEF023B3" />
+            <ComponentRef Id="cmp46374A8B4268F8C7A7C641F92F6F3BFB" />
+            <ComponentRef Id="cmp7FCEAF27923F8F28FE6387B93B27897C" />
+            <ComponentRef Id="cmp17ED174BDEB06A06B597690E56B8166F" />
+            <ComponentRef Id="cmp77A7133ECC9CDEBD1DD29A3A9B2924F0" />
+            <ComponentRef Id="cmpFC506D24C33B061A95F65F95E0D0B85B" />
+            <ComponentRef Id="cmpB31C4C374F6BD98796875F767AD9C93D" />
+            <ComponentRef Id="cmp986CAAD31D58C129C5B151227B209A9B" />
+            <ComponentRef Id="cmp6F6E36B847D2CE83928FBBE3F95D1214" />
+            <ComponentRef Id="cmp8B5021911B07082275EEF1FD21CF18CE" />
+            <ComponentRef Id="cmp88A12B10F06558804CC1CA708FE88180" />
+            <ComponentRef Id="cmpF44A31D008D3AC29402AB69F69405120" />
+            <ComponentRef Id="cmpA12F968100502AB9609C989FAD526411" />
+            <ComponentRef Id="cmp09E026F515127A3AC62B2FCF1DE762AD" />
+            <ComponentRef Id="cmp1AF316AAF136C5929E3D755C699B9D1E" />
+            <ComponentRef Id="cmp6C85631280A832A6BBA5A5186032368F" />
+            <ComponentRef Id="cmp355E68CC29AD915F8D1E3A40BFF63FF7" />
+            <ComponentRef Id="cmp4F5EF09A9753A78179E5D47782276D7F" />
+            <ComponentRef Id="cmpF2FD0671417337727A24DA4A7BFC8A43" />
+            <ComponentRef Id="cmp147A7720AE6B30215394987D168E2077" />
+            <ComponentRef Id="cmp32E63FE3732FE757F2F77AC9BFDDB0F9" />
+            <ComponentRef Id="cmp52333B2817232B5B0971967B47032C96" />
+            <ComponentRef Id="cmpFE213B295D673D402D446D3B4F4EE046" />
+            <ComponentRef Id="cmpA8236F1ED5AD0506E7A6587566D4E85D" />
+            <ComponentRef Id="cmpDC6B3402B6D78D3774AAEA1B2BF0ECAD" />
+            <ComponentRef Id="cmpB13764263301559EF3E6E8C09BB94DAE" />
+            <ComponentRef Id="cmp4D7651DB9F00D6D8B90D28AEBA8AC95F" />
+            <ComponentRef Id="cmpB9EBA5DA9A5931E15A8A50E047106F8D" />
+            <ComponentRef Id="cmp530611AAC2ACFC5C3454B8B127449EB5" />
+            <ComponentRef Id="cmp28E07C7558D0BFA430C638A21069F959" />
+            <ComponentRef Id="cmp30A470F0D54DC09385AB50C8904C3A13" />
+            <ComponentRef Id="cmpA5EC028F9DB43DB6F12CD2D5C590EAF4" />
+            <ComponentRef Id="cmp258FD011D605CBA7D1A93F1FD678A5D0" />
+            <ComponentRef Id="cmp22DA3876036DBC808B7CFA143B711C6C" />
+            <ComponentRef Id="cmpA8C76CDD5885A8D5D8090A646CEBEBE4" />
+            <ComponentRef Id="cmp67CAB35C1C3A01A1BDA16AFB85744B7D" />
+            <ComponentRef Id="cmp0E92117BE9898983FAC4C06D119F4E17" />
+            <ComponentRef Id="cmp03EBA166EE563BD07FA7B9EAB2595D0E" />
+            <ComponentRef Id="cmpD3DF6BD103EA99830529B6C4AD0440DE" />
+            <ComponentRef Id="cmpE10826F3DA99CA65F4A19AD26EC1D777" />
+            <ComponentRef Id="cmp63C0AFEAC750C6D823436C45112B09E2" />
+            <ComponentRef Id="cmpCAE081F6A1A20E99AEC60BAAC678A92E" />
+            <ComponentRef Id="cmp49F5C6C1ADBE5FDF2ECECC8DF23C9F22" />
+            <ComponentRef Id="cmp921E916F3E0EE780A5EA7F792B8BEAEE" />
+            <ComponentRef Id="cmp99FA3B2E39764823137FCFF9003FC60C" />
+            <ComponentRef Id="cmpF451E0D5BE16A50815DB517E007FEE7A" />
+            <ComponentRef Id="cmpD20963389E412E2DBCD27221A8D48820" />
+            <ComponentRef Id="cmp38889AA9C6273FC5E2E673D388227A0B" />
+            <ComponentRef Id="cmpFF2A1E1173F33C3B362DA161C90A9073" />
+            <ComponentRef Id="cmp7E131119121A5F91762CD8AC95B0DA67" />
+            <ComponentRef Id="cmpAA9B9763654D599CA9E3170944921EC8" />
+            <ComponentRef Id="cmp4C4992048C5BC3F3A8DF145D27D7D16A" />
+            <ComponentRef Id="cmp980A15A626E830742A58ABBA40B9AFF8" />
+            <ComponentRef Id="cmp4CBB12AB895F02E97DA1F13B914CB7D1" />
+            <ComponentRef Id="cmpA2BC66B82FD1212E978D1B458F303EFB" />
+            <ComponentRef Id="cmpD4C26089342C5C9D441A3D01C8B2DBA0" />
+            <ComponentRef Id="cmp1A0EA570FE1DF117EC671EA8096A981B" />
+            <ComponentRef Id="cmp69DAACF0D25463504E2800A25A7F978A" />
+            <ComponentRef Id="cmp3A8CCFB17D893FC1CFB6C8089BA6CFE8" />
+            <ComponentRef Id="cmp42264D7EBA4D2E1E0888B7949BC2CF7B" />
+            <ComponentRef Id="cmp65A8C0CC3C48A8FC7AB098096ADB2945" />
+            <ComponentRef Id="cmp5D12A03C101FF3BDC680348660DFBA4D" />
+            <ComponentRef Id="cmpAD4E416BC5700EEA47FF1AD833E9E35C" />
+            <ComponentRef Id="cmpF3AFD96C7D599ED989C86C40D4B60870" />
+            <ComponentRef Id="cmpA7BDE90BEBBB2D626EFF974CC15824BE" />
+            <ComponentRef Id="cmp8FA1B9C1F261491C1DE31BCB7B2B8C40" />
+            <ComponentRef Id="cmpCB31D91AD01527211C4CE680ABCCF608" />
+            <ComponentRef Id="cmp3C8F4F6670D93DE81D3C2D6D65CAFAA3" />
+            <ComponentRef Id="cmp3E5026A8815A01C180548E6B263E4CB9" />
+            <ComponentRef Id="cmp7CF8B3E9CC1996D18F15D220725735D3" />
+            <ComponentRef Id="cmpD474C3CB2DD3D568B377D45ECF261028" />
+            <ComponentRef Id="cmp51A8CB7FB6A256E869F0CDD7D6C899B3" />
+            <ComponentRef Id="cmpAEE7B353FE355152E38F31890A3624BF" />
+            <ComponentRef Id="cmpC9A4BABD7201A7F5BB918D32F8C5A681" />
+            <ComponentRef Id="cmp7A3D1B8B75FABAC67393696D7AC78AB2" />
+            <ComponentRef Id="cmp858012A5B7A44D1A5B1EC3F9C99B5881" />
+            <ComponentRef Id="cmpDCC0A0D7ACB634500F0FA8793E67E710" />
+            <ComponentRef Id="cmpBCB8FB2CBD399E1AC63248E231D634FC" />
+            <ComponentRef Id="cmp704B413D2339B03120E769CC3B95925A" />
+            <ComponentRef Id="cmpEC04E3D31520DF001B657240B47AB597" />
+            <ComponentRef Id="cmp3D600B5EB6EE21430C3FA3C90B276563" />
+            <ComponentRef Id="cmp3269D7C424EF4E6484F8CF0407F3B9A2" />
+            <ComponentRef Id="cmp458103426261D34B685E384A5B2A96B5" />
+            <ComponentRef Id="cmp4E339749E83018C92785511FB076DDE6" />
+            <ComponentRef Id="cmp13B44E77FDCA2A8955F2E1AE7520AD3E" />
+            <ComponentRef Id="cmpB7DB2C9BA82943A9094121E18A48A2E8" />
+            <ComponentRef Id="cmp869BE1CE3F926342E171D8CE6164AE16" />
+            <ComponentRef Id="cmp688D65C1747ECF50A29D9F0A66BF166B" />
+            <ComponentRef Id="cmp209014EAF3A7565891098867156E2CD3" />
+            <ComponentRef Id="cmpBEEFF8BF7C33E5F492DBC0B4EF85362B" />
+            <ComponentRef Id="cmpB7B123AA5E1C5C64A87D4144A6D98551" />
+            <ComponentRef Id="cmpCD3349C98B37199C8314DA249AD04676" />
+            <ComponentRef Id="cmp65F4048760E63847EBDB58ED711BD044" />
+            <ComponentRef Id="cmpB4B7D4D08B609CCD43924EA7DE1CA2D1" />
+            <ComponentRef Id="cmp0BA67F205BA11CCFEBCD535F13D47E3B" />
+            <ComponentRef Id="cmpE22A396854F794A8622735A91E040CCE" />
+            <ComponentRef Id="cmpC3F46D12D4A21045239681DD1BD4EF47" />
+            <ComponentRef Id="cmp57A31469AA2451095CB0F050B38A5B53" />
+            <ComponentRef Id="cmpF58EE1C29A42604ECA7BACC6B2365860" />
+            <ComponentRef Id="cmp3FFC367D40FCF573ABCF7AE3B1B6F160" />
+            <ComponentRef Id="cmp131D04711A8392DB84F1033301F548A9" />
+            <ComponentRef Id="cmp1825443EB77B6ADCC29FFEE5A1AEE98D" />
+            <ComponentRef Id="cmp9A83E759944EC2C071A9B39E8789A80F" />
+            <ComponentRef Id="cmp197EC8FFA7C50B67D77E732AF91A662B" />
+            <ComponentRef Id="cmp622D31C33C792A8E6BE039DCD120E780" />
+            <ComponentRef Id="cmpAB93B3686DCD708639E0F63BD101879F" />
+            <ComponentRef Id="cmpB58C2CD4D6692C2B9CF6CFEF5187A4C6" />
+            <ComponentRef Id="cmpD0A0EB9190A604CA800E8C7607D58290" />
+            <ComponentRef Id="cmp33C15323B16CB2DB14AE413441FF3B32" />
+            <ComponentRef Id="cmp6F7730727121D2091601B43F18E6FFF0" />
+            <ComponentRef Id="cmp9EC21C10E4824E87C3D3BEF5DA03C3F8" />
+            <ComponentRef Id="cmpE9EABB0C15FC1D01E66F325C368F06D7" />
+            <ComponentRef Id="cmp6E177F93942735496B99020BE33B49C8" />
+            <ComponentRef Id="cmp87689FB3DB9C34D4FBB59C7D9B11A9F9" />
+            <ComponentRef Id="cmp0CF2231389A9E8578B3F452B56C22819" />
+            <ComponentRef Id="cmpDBD3EC6EEAD5C79C9A43BCBFAF519E08" />
+            <ComponentRef Id="cmp6805629B7E37ECDBB0D4DA1910AF562C" />
+            <ComponentRef Id="cmpF2B3A9F3AF40C6C5121E50E69010A79B" />
+            <ComponentRef Id="cmp1077EC60141D19E2D3CF72F500118514" />
+            <ComponentRef Id="cmpA2D1E2E71D4B91CCA6769EE9FE62253B" />
+            <ComponentRef Id="cmp4345011893AB49BD5001D8A39BF88163" />
+            <ComponentRef Id="cmp84284D1EE1D80E5DCFD4DD56C7BCF711" />
+            <ComponentRef Id="cmp325B25C8244635D341453BB056AB2710" />
+            <ComponentRef Id="cmp5A0AF54DC5CA25DC19B69A138B3FD6B6" />
+            <ComponentRef Id="cmpA5F2056B51D7C079F9B4CD301BF43070" />
+            <ComponentRef Id="cmpAF07ACD6FBC79D5FBBD5618E497D5E48" />
+            <ComponentRef Id="cmp7CCDF70380CF542EB0C191271023DAE1" />
+            <ComponentRef Id="cmp2DB7F5BB2DEFEA7F8471D2F554A2D05F" />
+            <ComponentRef Id="cmpE3B02E65052382E59DB93E84CC1B7144" />
+            <ComponentRef Id="cmpA7D324954C1B33AAA71C5FE23ADC11E8" />
+            <ComponentRef Id="cmpAB45AA6B35967F996A1DD2E316061E1C" />
+            <ComponentRef Id="cmpD9BE67E5C2437E2651DD6945F39295B4" />
+            <ComponentRef Id="cmp11836E1AE8BC9198F92AFA11A39AE2EA" />
+            <ComponentRef Id="cmp71EE5E116258DC1864A9CBC39098C2EC" />
+            <ComponentRef Id="cmp00248EA621AE8E6AD8D58F3B1DA1EB90" />
+            <ComponentRef Id="cmp942018BCDA4D69AEF7BB49022A3AA13D" />
+            <ComponentRef Id="cmp96CC75BFB22434F5AEB544174C369954" />
+            <ComponentRef Id="cmp5D973844C5CB2FF074B46145AFE7B06A" />
+            <ComponentRef Id="cmpA661F89724844D9501A9829A8DDB873C" />
+            <ComponentRef Id="cmpAF0843023507932D61749A08391B77CF" />
+            <ComponentRef Id="cmp19F4AF8EBE0E7C83BDE6F97498C0F333" />
+            <ComponentRef Id="cmp52A1714980284B07E50892B450FB8B37" />
+            <ComponentRef Id="cmpFA458124B4D99B299D5244ED8D509B57" />
+            <ComponentRef Id="cmp68D47246065FB56D2BF5A2B297647944" />
+            <ComponentRef Id="cmpB0E26088520506B8A88448D30EB152CD" />
+            <ComponentRef Id="cmpFCD35DCEE3417D6D411720EC9F417B32" />
+            <ComponentRef Id="cmp13852CFBD1B6B0255B182B7F33E3A10F" />
+            <ComponentRef Id="cmpB543D61F3B9E4FDE2A48BC40A1D26D14" />
+            <ComponentRef Id="cmp786FBBEFA295F5C7B81AEC170CAADF9E" />
+            <ComponentRef Id="cmpFC590B49261D1272724ABF293D3C1F09" />
+            <ComponentRef Id="cmp160157F60CF5AC43DE77107D2F71ED4D" />
+            <ComponentRef Id="cmp429190D1E53D85C0EE0D4CAB0E847CA2" />
+            <ComponentRef Id="cmp90453E49FE60FE70BAC8E04FA68204BB" />
+            <ComponentRef Id="cmpB70F2E3CDED5CCE5ABA44BCC2E5CBEAA" />
+            <ComponentRef Id="cmp6070FC27498ED11A1863B544AB45BF2B" />
+            <ComponentRef Id="cmp7790C05B1A9712BFB1389CB288D6812E" />
+            <ComponentRef Id="cmp131EF445C4A8DCE9B4348DC72E011F89" />
+            <ComponentRef Id="cmpBDBE79597767EAAFC2D201C8330A73A0" />
+            <ComponentRef Id="cmpD913A7A4B2A2E985104565106C719952" />
+            <ComponentRef Id="cmpF961A328F263EF1D74BC33226284F738" />
+            <ComponentRef Id="cmp6D9F1991E12DBFB7DC663D860CFFBDBB" />
+            <ComponentRef Id="cmpBA063C7E0F14EC498A39EA79EC205A94" />
+            <ComponentRef Id="cmpD5148F7FE3F5A67BE7968CB45230E969" />
+            <ComponentRef Id="cmpC4F21E006C94E948501670FF3536CA78" />
+            <ComponentRef Id="cmp2618C752CEB66CBA20855D31200855C2" />
+            <ComponentRef Id="cmp5D173BA3B642D043280FF39DE8C59808" />
+            <ComponentRef Id="cmpDC5CE124AEC540B93C886862E9C015DB" />
+            <ComponentRef Id="cmp5A894E32D6D94D59883FDB94D702F502" />
+            <ComponentRef Id="cmpBF04D2DFEFB0CF9A949740744E568D1D" />
+            <ComponentRef Id="cmp8725B936ED21F923502ABE9F3DEE75D5" />
+            <ComponentRef Id="cmpF1F851EF20518BBCBDF1C5B1CCFA63B6" />
+            <ComponentRef Id="cmp87B0AC5AEE32EDC99A1189B460712623" />
+            <ComponentRef Id="cmpF91F3CD1DEBD9B52FBCC97E5621B1C91" />
+            <ComponentRef Id="cmpCEAA7A02CA1D97A299559E98C5E7192C" />
+            <ComponentRef Id="cmp099C96103E9BD492189511DEF9B26F2B" />
+            <ComponentRef Id="cmpC1FC205F5F8EFC3A292735C35C022796" />
+            <ComponentRef Id="cmpF3A889022B1C7628CB26D3D9A23B3A34" />
+            <ComponentRef Id="cmp56E1BD31CA1A11574239564D4E056371" />
+            <ComponentRef Id="cmpF62582187A4AF1312C74EC0BC3095514" />
+            <ComponentRef Id="cmp6E7A3B9A70734B9ECCA62444F704A535" />
+            <ComponentRef Id="cmp15A45BC6F74A82166819DC50C40CB62B" />
+            <ComponentRef Id="cmp99F70134A0D19B67985A3F104263D7AD" />
+            <ComponentRef Id="cmp021CC59A6181B763AD88EB13CDCB3075" />
+            <ComponentRef Id="cmpF86C6A7A81ED2EB38800A851AF8742CC" />
+            <ComponentRef Id="cmp7DC45D7AE69963CD5D8A8C8666EAB64F" />
+            <ComponentRef Id="cmp224A3945C533D1FD51E1F234449AD694" />
+            <ComponentRef Id="cmpF971948D51969611E07DFD91B48C79F8" />
+            <ComponentRef Id="cmp8DC14C4C64230A7DF98A7BECA1636A31" />
+            <ComponentRef Id="cmpE7C6A9DBFFF17D3246BB6E057A6C024B" />
+            <ComponentRef Id="cmpDF3FBE4FB997F03EA8576708AC7FF61B" />
+            <ComponentRef Id="cmp00AD9284686B4BC65D42A3AA09E7AC76" />
+            <ComponentRef Id="cmp0AA2550269BF59FA6C1D885424EE3B3C" />
+            <ComponentRef Id="cmpD55DCF782D94981A1DE932935B9D8A62" />
+            <ComponentRef Id="cmpA1FEB51B0386689568AAFC22E0D71B6B" />
+            <ComponentRef Id="cmpA3F7363F0553143ABF1CA52A2FD433D6" />
+            <ComponentRef Id="cmp0344A18C23958D312C044A6E8443CD9D" />
+            <ComponentRef Id="cmp30B19313C1A692A69AC9C275E4E5D5CC" />
+            <ComponentRef Id="cmp376B3837DF007338AC14AB58C726A8B1" />
+            <ComponentRef Id="cmp02B151F3B587EAF5AF116E6A3B09E247" />
+            <ComponentRef Id="cmpFA2310874B7C3D5229AF9BEACAF6746A" />
+            <ComponentRef Id="cmpB11E2174087D0D3FC791806231C1DBF5" />
+            <ComponentRef Id="cmpF00ABD2DB6C6A8D718E0E4B5CD6B1C09" />
+            <ComponentRef Id="cmpA603C50287BBE370F0BDF5FBE7A3233F" />
+            <ComponentRef Id="cmpEA39DA48CA01586DF3412795541AD2FC" />
+            <ComponentRef Id="cmp50C3E068724D3C32847EEB132308B147" />
+            <ComponentRef Id="cmp78D10E140133F6977C74A8F912B2B217" />
+            <ComponentRef Id="cmpE7FF67F76AB4186500355A0726471B33" />
+            <ComponentRef Id="cmp37287274685D4190B1FEA6E423623F35" />
+            <ComponentRef Id="cmp50FE0EAB4E901283578DB360006479AE" />
+            <ComponentRef Id="cmpC3F7642C07E5FF9AC0B1171D944AD4A2" />
+            <ComponentRef Id="cmp0BEDFF91A2CEC1FB2A5299F085CCBB6A" />
+            <ComponentRef Id="cmp8E32CD5D31223B9F7129FD2938C371FB" />
+            <ComponentRef Id="cmpDFAD872E9FE84F54DDB37E8B0117DFBD" />
+            <ComponentRef Id="cmp589B2E8204248F02129BD7836A82412D" />
+            <ComponentRef Id="cmp0819BF68559FDECA3AFB0D7D258E06DA" />
+            <ComponentRef Id="cmp511C73A49ABFF4BD3B78BFCD9B05F088" />
+            <ComponentRef Id="cmp64F5436EA1DDD327D8DE06EBB8C2970E" />
+            <ComponentRef Id="cmpAA7FA9AB7CF9DED4D0531C78ABDB8DA3" />
+            <ComponentRef Id="cmpE4CAD3C36063B729397FDD1E4F284331" />
+            <ComponentRef Id="cmp1D6E48360762CC7FB6B7AFD50FAB037D" />
+            <ComponentRef Id="cmp27B53348C2B3DCC9F4D7CB92CE87B81D" />
+            <ComponentRef Id="cmp52750AB1F051B11DAC1C0D8B6AE509EF" />
+            <ComponentRef Id="cmp7D5725827F9E8389198F99B794C555EA" />
+            <ComponentRef Id="cmpD3F043520D9130982BE3DA8E7846F196" />
+            <ComponentRef Id="cmpD6BB38CE1402C2D40E8E63A0733C7BF0" />
+            <ComponentRef Id="cmp9E61D362040DC13AF103013A093377A5" />
+            <ComponentRef Id="cmpDFD58144C55506C82E22CF1AC14714B8" />
+            <ComponentRef Id="cmp9BF13256D468C8147B7050A93B09C032" />
+            <ComponentRef Id="cmp86F908FD9E8E5FFAD0C2D9A37A098E4C" />
+            <ComponentRef Id="cmpDEED3FE7C35E18D0FA59B8BB3DF42244" />
+            <ComponentRef Id="cmp98499D3076FA7324AFE1F9F8D10FB421" />
+            <ComponentRef Id="cmp532E67011B733ACE674692F6ED52775D" />
+            <ComponentRef Id="cmp572AE70CCC0D85E8DA35F87B45768634" />
+            <ComponentRef Id="cmp013036935784DEC9BAE62831C93EFA18" />
+            <ComponentRef Id="cmpCE929A7FB9AED25EFACCF874682CF6CA" />
+            <ComponentRef Id="cmp34D92ABB7879D3222F18544B21656DEA" />
+            <ComponentRef Id="cmp79B8F8BF1A145DEAEC5CB378211B26ED" />
+            <ComponentRef Id="cmp33B73CBD0D8189BB209EECBBC028100E" />
+            <ComponentRef Id="cmpF787B9590E7A16DC6EB9EFB2018B7F52" />
+            <ComponentRef Id="cmpE0F99AA8E03B1BBCBC8685F0B9B39FBC" />
+            <ComponentRef Id="cmp3AC85553CBB9970D795D5B8E507FBC6A" />
+            <ComponentRef Id="cmp7984E19157DF1C14A9A552654DA4D91A" />
+            <ComponentRef Id="cmp8BD3A12ADBBB897138826480695251A8" />
+            <ComponentRef Id="cmp47B74EDC229F01F14AAFF5CC4F50466C" />
+            <ComponentRef Id="cmp5A8B603914D3AA08DEBD512A6C91393A" />
+            <ComponentRef Id="cmpC9DC219F449E49E64508AE42F4BC4793" />
+            <ComponentRef Id="cmp0302D3E70C4326369EA5BEC172CA4E85" />
+            <ComponentRef Id="cmpF4749D54A3A874DE91D55EF99BEDAE95" />
+            <ComponentRef Id="cmpBCDB2BC551AB22948C44D15F2DAFF835" />
+            <ComponentRef Id="cmp0B1CF4A5B41DEC9548E6C4221895C32F" />
+            <ComponentRef Id="cmp4D110A1DA73885152E881768CA514E09" />
+            <ComponentRef Id="cmp8D1301614F99F4AC36FEEB27ACC8CFFD" />
+            <ComponentRef Id="cmpE3F7B24C1ABE0832302DBA5938CA5324" />
+            <ComponentRef Id="cmp705466434B20554ED5BC75D0F532F1DF" />
+            <ComponentRef Id="cmp4F3B455BAB661441634C16337B9BEDDB" />
+            <ComponentRef Id="cmp59913ED4955BBF3AB092DBCF926439BF" />
+            <ComponentRef Id="cmp9CA89FB27BE8C98580D86F3ED5D583D6" />
+            <ComponentRef Id="cmpB3A4DF88B167589C979E46C356A951B6" />
+            <ComponentRef Id="cmpA4C556C81A63CEEE6DB5B97A6533E3DA" />
+            <ComponentRef Id="cmp2791A26943506B246085F1AC92BB55AF" />
+            <ComponentRef Id="cmpC44401D62CA8E029B83A3A6BFAE6678B" />
+            <ComponentRef Id="cmp7361DD609440CA6E7B054FBA8A7324B6" />
+            <ComponentRef Id="cmpC7C961329AB7EAE8D77192CE75C60758" />
+            <ComponentRef Id="cmp05D249D10562F5C5C10887264CF93A07" />
+            <ComponentRef Id="cmpAEC3BBD87E09C923CFBED4D3B9838AA2" />
+            <ComponentRef Id="cmp427483E8EF1CC17E3FAB1F5596B3A261" />
+            <ComponentRef Id="cmp2817F4BF8A4FE169EF164E09EE3DA178" />
+            <ComponentRef Id="cmpC84C027F62895C00E5C3041EED5EDC53" />
+            <ComponentRef Id="cmp40C3C9A8D813E909DF452B3D434633DD" />
+            <ComponentRef Id="cmp6EAE30B5C3E9E32D1DD3A55DB8FE6941" />
+            <ComponentRef Id="cmp517D5A44CF44F5425DA14D8BAEC68DF4" />
+            <ComponentRef Id="cmp24A33C5A0D5A2FC40EFD77537BFB1CF7" />
+            <ComponentRef Id="cmpC3DB07B975995DEF02FFFBE335DD2106" />
+            <ComponentRef Id="cmp9EC5A912704186E3EEAB59851A37D984" />
+            <ComponentRef Id="cmp02619F8AA1574FCDA5067332B449B6C7" />
+            <ComponentRef Id="cmpC28FEBC877D88F957881D16375A9AA3F" />
+            <ComponentRef Id="cmpEB22C55C582617975688FD4DA8380742" />
+            <ComponentRef Id="cmp5461196C717C05B12F74D2DA58630BC8" />
+            <ComponentRef Id="cmp4AFD44779547CB7E31ED23D6E8C8209B" />
+            <ComponentRef Id="cmp5070BC96F08A05F96D403DF8A20B309F" />
+            <ComponentRef Id="cmp6F0BCFB7C5472A044D733139C88B58A8" />
+            <ComponentRef Id="cmpFDE9E57440F1036A2A4EF2CA4803F137" />
+            <ComponentRef Id="cmp8EA15C556F1AFB4EB8374BAFC93F4827" />
+            <ComponentRef Id="cmp1EB4259B0CF3EB4509217F346ADADD5E" />
+            <ComponentRef Id="cmp7DD1095774951BB25E03614F61FD2B8E" />
+            <ComponentRef Id="cmp50AD5B6DC37E36897CBF7B8DA95CB0B4" />
+            <ComponentRef Id="cmpC5360903907525A54FF97364011E1682" />
+            <ComponentRef Id="cmp3493B9CD28BDEFA171A313C0F1436417" />
+            <ComponentRef Id="cmp6DC26468A158B74DFEE4952BE801A21E" />
+            <ComponentRef Id="cmp653FC5BF225F161C9B10421C66AF81E0" />
+            <ComponentRef Id="cmp886787CDA02848D02E9D4664B9BB1169" />
+            <ComponentRef Id="cmp0E8D3CDA913B341ED6A33F4CBBE4592E" />
+            <ComponentRef Id="cmp2706850425BFC78EFEE993C81D04B80D" />
+            <ComponentRef Id="cmp7026F694677602EE20C74343704D7BF3" />
+            <ComponentRef Id="cmpB5E9EC68B055E256BC2F1661A0B9D0F9" />
+            <ComponentRef Id="cmpF10F9F532AADA63663F3183AD8865057" />
+            <ComponentRef Id="cmp5086FC39B8C1543170A8C3F65214208A" />
+            <ComponentRef Id="cmp5E97F9A3C6A8762409ACBF6135E28FBB" />
+            <ComponentRef Id="cmpAEBA120773F6107AD3F6A81AE37A429C" />
+            <ComponentRef Id="cmpE4AA3E16C4F0370A884DF256E4A7BD65" />
+            <ComponentRef Id="cmp7E7CBF0FB289CC6C9BDCA4284A16E57A" />
+            <ComponentRef Id="cmp26ADB52C486D30CEB261FA2CE60ACE9C" />
+            <ComponentRef Id="cmp3E22F803253DAA27EC5425149520CBF5" />
+            <ComponentRef Id="cmpC775E8984648A33699D3DC880D9FEEF8" />
+            <ComponentRef Id="cmpE4BBDB34DF6D807332A899582239E729" />
+            <ComponentRef Id="cmpCA2C6187BD8F749AD8036686481EE76A" />
+            <ComponentRef Id="cmpD965705D323F9172AA80E20523DFCD0D" />
+            <ComponentRef Id="cmp8ED6AE0EBB754E84501CCF6CA4E9D52F" />
+            <ComponentRef Id="cmpBC0FB0E1F1BEE4AD1E6A650790CFD5D6" />
+            <ComponentRef Id="cmp6D4293E821504530EAC3B0C7CBB7E9F0" />
+            <ComponentRef Id="cmp48A16CCDE2AF36A361872912CD9BB4A9" />
+            <ComponentRef Id="cmpE81F10BB60189F8C025DBCE48D372035" />
+            <ComponentRef Id="cmpDD520BBB977A8147FE45728A4C8D5764" />
+            <ComponentRef Id="cmp096E9DF755E7D1E32BC18461BA90D90F" />
+            <ComponentRef Id="cmp2AECC3BFD5DF142ED0FA34841B6D73AB" />
+            <ComponentRef Id="cmp49B2AACB77152192A7D2BD514C050455" />
+            <ComponentRef Id="cmp16726783D8211FD5A308D29FA2EFA0DF" />
+            <ComponentRef Id="cmp6E6DC153CC74A2B7A53316671D8617F3" />
+            <ComponentRef Id="cmpC09D7A2D083141BA0F25A0A6C86CC8E0" />
+            <ComponentRef Id="cmp2833134FADC41D7352F63115C6B9AD85" />
+            <ComponentRef Id="cmpB94BFB1720AE582E1E038A04E9582493" />
+            <ComponentRef Id="cmp06B8BF9C7CF8924FE211E6E7289CB969" />
+            <ComponentRef Id="cmp35D2648E9F14EED6A2B91694AC8DF2F6" />
+            <ComponentRef Id="cmp7732398F3C98597797B77A81F40C5AA5" />
+            <ComponentRef Id="cmp4FA80707FFCDCDE0981B97AA94ECB162" />
+            <ComponentRef Id="cmpEEB5B89D023C28A8BE5DA85F039AB29D" />
+            <ComponentRef Id="cmpE187B27A5186BB3DEE560FC7C7E8C456" />
+            <ComponentRef Id="cmp42896781E8EAD912258DDFDB1399525E" />
+            <ComponentRef Id="cmp90D76F1F9096FA06C766A3366B32B605" />
+            <ComponentRef Id="cmp3B3543FDF727FBD89166C8C3A9DC7238" />
+            <ComponentRef Id="cmp90B194EE93F1254D872033409B4A592A" />
+            <ComponentRef Id="cmp7AE8FB6C37BF565B90B36EB476D8DAA1" />
+            <ComponentRef Id="cmp791C0C01F755B1079B27BAE2749647B5" />
+            <ComponentRef Id="cmp50992A7415E9598E63B64AD38FA78982" />
+            <ComponentRef Id="cmpC4F2D1CF15FD695650BE991FE642E2D6" />
+            <ComponentRef Id="cmp29EF6AE264E3575486F9E5DD793A9E73" />
+            <ComponentRef Id="cmp1CA9DDC76B20902AF44270B30FA4772D" />
+            <ComponentRef Id="cmp459F829D9AF111D679C4AC2E384D1341" />
+            <ComponentRef Id="cmpFF771FA0697C295F5B180D38849AEFC2" />
+            <ComponentRef Id="cmpAFE5841BBCBD741460EA3E6FCC9CF5C8" />
+            <ComponentRef Id="cmpECE28D778AD314ECD8D1107D325C3ED4" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="INSTALLLOCATION">
+            <Directory Id="dirF3B44A98D93AFD8BDA4A55D24CFFA6D3" Name="Media">
+                <Component Id="cmpC2CB6B8C87419510F0F0329081C439C1" Guid="{06F9B7B4-5AF0-4C11-AA4A-F05901FC321A}">
+                    <File Id="fil5C8C59E4172D402F06165EF31F64E8C7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\CMakeLists.txt" />
+                </Component>
+                <Component Id="cmp0855D43C55EF10C779CF0126A73A7B16" Guid="{A5DD6CA0-1ECF-495C-97F0-54601E23B1E4}">
+                    <File Id="fil04C305DF83388B7A29AC338EC73821D5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\terrain.cfg" />
+                </Component>
+                <Directory Id="dir4ECB3F0D3B2D2EA103E5984D819BEE04" Name="DeferredShadingMedia">
+                    <Component Id="cmpFA8CDDDCD52A1A1FBDBA90230F22FBBA" Guid="{8926DD47-20C4-4A01-A432-FC5C9378817F}">
+                        <File Id="fil92C38EA6B153F26378DDFDFC6B4E055D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\COPYING" />
+                    </Component>
+                    <Component Id="cmp9CE13C69A2CD2639B51CF7C62FC60F89" Guid="{5D1275DC-212D-4ACC-9C69-FFD35EB13DFD}">
+                        <File Id="filD5F06A34D3AF8D2B0AD8D5CA298E732B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\deferred.compositor" />
+                    </Component>
+                    <Component Id="cmpF797C7B48EA71CAA57BF88A4379EDC96" Guid="{328040EE-BF36-4025-9750-DCE243C02E65}">
+                        <File Id="fil4056210C8A38C23E1AF9330570993F46" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\deferreddemo.material" />
+                    </Component>
+                    <Component Id="cmpADC3336495EB19AFA9D03ACB87DCEC51" Guid="{2A6B67F0-F0F9-47E0-97F4-34F9C8F61A52}">
+                        <File Id="fil8B39F94D2897A315F56D1A91B6CEDAAA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\deferred_post.material" />
+                    </Component>
+                    <Component Id="cmp632E91937B11FE1089929DF3BF0E12DB" Guid="{0A6342BC-25F2-4F2E-AD6F-BB665E437315}">
+                        <File Id="filEF1952A3E279BCA53F8C3799ECF9C1F1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\deferred_post.program" />
+                    </Component>
+                    <Component Id="cmpCC662452D02EAB0C606673BA9C31B1D0" Guid="{D6BB056B-E6D6-4391-B9C4-3B529D798F31}">
+                        <File Id="fil3B1876559C3A97442DED5AFE9AF1CDA8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\deferred_post_minilight.material" />
+                    </Component>
+                    <Component Id="cmp61255FD004AB0387BEA94270F330D7CA" Guid="{D6251DA0-5EEB-4D59-A080-648AACF68433}">
+                        <File Id="filC5945E78075EE22F527FB950BF62EFDD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ShadowCaster.cg" />
+                    </Component>
+                    <Component Id="cmp3E9AEFD6EED9A280E1DAC69C311F1543" Guid="{DA3F5641-FEAA-48E9-96C3-F7BB6718355B}">
+                        <File Id="fil48E71F2DE62B5120605F59830E0CC92C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ShadowCaster.material" />
+                    </Component>
+                    <Component Id="cmpFCBC8C8AE3B2BAE1A07E0B640746CF6F" Guid="{9F5E8205-7714-4B4C-9F30-90C0C0F2C56E}">
+                        <File Id="filA0049CF01F51F19987452AE4DE0D88BF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ShadowCaster.program" />
+                    </Component>
+                    <Component Id="cmpAD89A8BA60C9CE93FC33B975E35D3FB6" Guid="{8559C51C-1482-4E64-B38E-5387892D0499}">
+                        <File Id="fil1CCD16E4601422130B957B84A921CEC1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ssao.cg" />
+                    </Component>
+                    <Component Id="cmpA82FC2A9D95D89159F4F5D9DE1C53488" Guid="{C3EA8C67-2CE4-46BB-A263-4DB368CCC1C5}">
+                        <File Id="fil673BFE30B37EC50738863762E713287F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ssao.compositor" />
+                    </Component>
+                    <Component Id="cmp6567F32E7C6EAE6F231A76BD8544E466" Guid="{A2012DCF-0DC9-487C-9B39-3FE7976A6403}">
+                        <File Id="filADBED7087463D6608107B050C5C8CE9D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\ssao.material" />
+                    </Component>
+                    <Directory Id="dir63B2D59EB5BF7A41DE4E15103B958420" Name="DeferredShading">
+                        <Directory Id="dirCEC2B1C839CA8C6DC6267FB0D9E59858" Name="post">
+                            <Component Id="cmpF7313EFAA2F2441E7743D95060AB673F" Guid="{67A694D8-700F-4751-BFDA-AEB7D85DB4BC}">
+                                <File Id="fil110BBE86A1FEC74454F7EAF9EADEA19E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\Ambient_ps.cg" />
+                            </Component>
+                            <Component Id="cmp08B325894D11EA76B5BD5F793B63060C" Guid="{1E40C734-1BED-43BF-8B74-663FE547799F}">
+                                <File Id="filCF3A6AA1E27B51618DF2CDEBD5F453BA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\LightMaterial_ps.cg" />
+                            </Component>
+                            <Component Id="cmp842B5EB6EF8264AAFCEEF600ECF554D9" Guid="{651BCF9A-BD7F-40C8-BE00-DD4FDC171632}">
+                                <File Id="filEE25A482AF22C8B5618172794DE33FF4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\LightMaterial_vs.cg" />
+                            </Component>
+                            <Component Id="cmp16119DC564FD3C2E62652E9D0E7737F1" Guid="{D9D67811-072B-4A67-9D03-2D2229749E64}">
+                                <File Id="fil8B0E9CD44D0BB562DAB1DFBE5014E038" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\ShowColour_ps.cg" />
+                            </Component>
+                            <Component Id="cmp6F5E19BF4ED678343CBAE7C798BBB61A" Guid="{2E01E6F1-9EF8-4DB2-A6FB-F908830FCF86}">
+                                <File Id="filEA6D9778B6F1D38A6594371261696F40" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\ShowDS_ps.cg" />
+                            </Component>
+                            <Component Id="cmp764268D5539404D12DEB8DB5AF10E7DD" Guid="{0A8ADE32-ADEC-4FAF-94FF-39BA5570BB28}">
+                                <File Id="fil83D0A14C4FC2B234D7D4029F791D957A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\ShowNormal_ps.cg" />
+                            </Component>
+                            <Component Id="cmp0ABA63F62BF62F388D4F9B8351F555EC" Guid="{694F5F78-F270-4EAF-AAC9-11749A4045D4}">
+                                <File Id="fil40EFE836787942732DC87025A8D6B9F3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\DeferredShadingMedia\DeferredShading\post\vs.cg" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+                <Directory Id="dir3E019B66FE5C81E922F64A4250BF11F8" Name="fonts">
+                    <Component Id="cmp4621D5464C60B6EC67D1A13C1F87EFEB" Guid="{0285D708-3566-47F4-8472-F006A92E5BB4}">
+                        <File Id="fil127444CE45FD6A97C482A231734B141D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluebold.ttf" />
+                    </Component>
+                    <Component Id="cmp811B7C8167D970098318F47DBEA00931" Guid="{12483F8F-FAF2-4F3C-BD74-E52BC799AD8F}">
+                        <File Id="fil8481E0B3528DBD494FFC8EA7E9D6A4E3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluecond.ttf" />
+                    </Component>
+                    <Component Id="cmpC47919F66B5BA067388F77AD2CF62247" Guid="{89793212-6E59-40FC-B8E2-4AB11E2DFF9B}">
+                        <File Id="filA23BD3A3FE6204BF0C281EE72A832415" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluehigh.ttf" />
+                    </Component>
+                    <Component Id="cmp1812DDB955E56D69740F752404C35CBF" Guid="{4D41FBED-31E5-4931-95ED-DAEF7B9D7DE9}">
+                        <File Id="fil430B7191DCE251BA309996B5FB3275F2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluehighway-10.font" />
+                    </Component>
+                    <Component Id="cmpCE86BF3E276D5BBE6B921A16C6713EC0" Guid="{3910A060-DE1D-4105-9258-1F5B0EAF8EF2}">
+                        <File Id="fil20AA7BD02F4EB48118C3DF42996E7D65" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluehighway-12.font" />
+                    </Component>
+                    <Component Id="cmpC29B049E7A9CBA460757522AA47FC4D2" Guid="{0347A020-4500-4155-8323-BAFE45558C31}">
+                        <File Id="fil662268399A17FF6E0765EB80305C1507" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\bluehighway-8.font" />
+                    </Component>
+                    <Component Id="cmpA65574B70C8AF45EB3CBB1A9DF0B5122" Guid="{8E829E36-EC07-4AFC-AE6D-1233F50AECB2}">
+                        <File Id="fil974FD2134B9494A3CFFB651EA3D75E1A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\read_me.html" />
+                    </Component>
+                    <Component Id="cmp47FE7A711F61A8AC62C6F7FD1571C908" Guid="{11860775-D2E2-43DA-9B7E-6B535F398210}">
+                        <File Id="fil811746E494D3326970EB51C3364FAF60" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\sample.fontdef" />
+                    </Component>
+                    <Component Id="cmp00A5E2F5074CEEA545728BA4C9E5C45B" Guid="{34DCC61D-ED52-42DA-851F-D8795EBFC7CC}">
+                        <File Id="filA9046462AC74E4F47F984EBB351654B0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\fonts\solo5.ttf" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir4A88F8D0C057D7A26F0F4E40D1B6673D" Name="materials">
+                    <Directory Id="dirE94AEEAD9DA6C21769E7527F3D0B99CF" Name="programs">
+                        <Component Id="cmp977022F72DFB32FA16DC0D9CDDFFB652" Guid="{BDD30B6A-569E-4F89-B1CB-82C5DFD01F25}">
+                            <File Id="fil6D18F927290E7004C8D1500593B5DA0B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\AmbientOneTexture.glsl" />
+                        </Component>
+                        <Component Id="cmpAB60176DCD5D8A4284F07DD66B1172A4" Guid="{BAC0A737-B6AE-47B0-A4DB-34C1AA52DABF}">
+                            <File Id="filDFA0B5AF356C676391EC3543B053C29C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\ASCIIFP.cg" />
+                        </Component>
+                        <Component Id="cmp8DBFF889A3D1609E295182EB6E5AF91C" Guid="{0F70EE26-59F1-467E-8A24-314A360715AA}">
+                            <File Id="filD72C22B260C6C645B47602177A2DC796" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Bloom2_ps20.glsl" />
+                        </Component>
+                        <Component Id="cmpB8E185672AA28FA93DADC7D3ABCD1FA3" Guid="{A2FA597B-6F97-415C-A006-8711FC2B6E4C}">
+                            <File Id="fil882E11F9C8C2A800CF3334F2DAD550ED" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Bloom2_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp28739FECE0368E8F1B36C4432644134F" Guid="{66267318-D87D-487E-BF71-D20CBF099974}">
+                            <File Id="fil0ACBEA4CE541AD09596DEC051E0FCB48" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Bloom_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp7E1937A9EA3171CB56328437B9144C73" Guid="{3F615797-A3CA-49FE-9D29-7ADDAFB4CC03}">
+                            <File Id="fil1206CCC717146045763CE856CE624478" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Bloom_vs11.hlsl" />
+                        </Component>
+                        <Component Id="cmp18102BF9884CCAF28C71B98316147F8B" Guid="{43209342-BF35-4C18-A140-869667B82738}">
+                            <File Id="fil672C09836D3E0DE6632079AE4F38E47F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur0_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp29EB2132BED692222E4AF464AB4A7DDC" Guid="{CD0D46FF-7F02-494A-A782-AE0FD9F8287D}">
+                            <File Id="fil1D62F4D6603E19256579C7DB1883D133" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur0_vs.glsl" />
+                        </Component>
+                        <Component Id="cmpB23F61EA75549FD92F786394B44FF8B6" Guid="{0758ED6D-613E-4BFA-8B65-A9AC95FAAD2B}">
+                            <File Id="fil11AB6D8C6657A99529B069FB8817C9D9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur0_vs11.hlsl" />
+                        </Component>
+                        <Component Id="cmp199EAE6869FD94BCCDE629BBDD2EA0BF" Guid="{260C57B7-E3CA-412B-9C84-B672866C7C43}">
+                            <File Id="fil9104360EEA37DA062DA7C67C0C33BF0E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur1_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp0DC33BB3AEA504926794C47742F261AF" Guid="{6C56FC21-6032-4846-8BBC-D854DE595BCD}">
+                            <File Id="filEEE789A663005EA4735D7B1EA72C008C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur1_vs.glsl" />
+                        </Component>
+                        <Component Id="cmp563ED415B0A4BEFD893B6DFD84DEB03A" Guid="{5079D5D1-1E4B-487D-99F6-0B36CF641AC2}">
+                            <File Id="fil0541EF8267DDD9D9A7D12E82AA24FEE6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur1_vs11.hlsl" />
+                        </Component>
+                        <Component Id="cmpD3FBED5D3241DC39DDFF4B55F5AFC4EC" Guid="{AA5D6E67-81B3-48FF-8754-24795878825D}">
+                            <File Id="fil17154B1B76377350840A21432529ADC3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BlurH_ps20.glsl" />
+                        </Component>
+                        <Component Id="cmp62788A4141CD8F778165AAE773E593E2" Guid="{FCE6AD3A-AD64-4D53-BAB0-E5EDCFA287EA}">
+                            <File Id="fil93A9B036835FF34AE9F4756CC13E17AF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BlurH_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp9E41F5D0292E58041D8CA1614712D392" Guid="{D10CCA36-2002-4DF7-AA89-ADAE64F8CCF7}">
+                            <File Id="filA99B17FEB62734B174468477C0015295" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BlurV_ps20.glsl" />
+                        </Component>
+                        <Component Id="cmp78E66384B9CEB71D975979F96B58C027" Guid="{4CDDAAF8-9BAB-400C-BD2A-F295D10C9B91}">
+                            <File Id="fil4A46EF5B9A206EE9F9344044C4D8BE20" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BlurV_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmpED502F336BDCC45A92BE1307016BFBD6" Guid="{098BA4B8-B4F6-43F2-8517-E57DB690A902}">
+                            <File Id="fil07CA7D68AEE23989E8AA574669808D7C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur_ps.glsl" />
+                        </Component>
+                        <Component Id="cmp17B2A92B1E4AFB247CB3D5EEBB86ACDA" Guid="{0F72DF36-1FF2-4CF5-98C7-95D3D74ACDF7}">
+                            <File Id="fil7FD9BDF75591744DF1B18EB547EED1EC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur_vs.glsl" />
+                        </Component>
+                        <Component Id="cmp51195F92E878D816DFF40ECC0E95FA0F" Guid="{35EC6597-B7B6-4762-8D79-14069AAE76E1}">
+                            <File Id="fil58EDDA74E2708CC02A2D3D8C7D5DC5DA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Blur_vs11.hlsl" />
+                        </Component>
+                        <Component Id="cmpA46A3D31F3256C7F88B1947CEEC409FF" Guid="{E7D4CB11-700A-41B1-979E-2DB8586476D2}">
+                            <File Id="filB997282F7966EC929D04B8BD1FF918B5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BrightBloom2_ps20.glsl" />
+                        </Component>
+                        <Component Id="cmp8AE8BA47C985F8AC1E0FA37B23F3CE04" Guid="{39252C3D-C7CB-4E54-8F76-B4F93CCF7A09}">
+                            <File Id="fil44C9AF002C27DDD9A4A80EA905E1AE6A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\BrightBloom2_ps20.hlsl" />
+                        </Component>
+                        <Component Id="cmp4A5938DA04BB211BE93F256844D832A7" Guid="{D11389F4-6EC1-49DA-B814-39C382E69A84}">
+                            <File Id="fil89A22C653BECF74ED1898B177B0B0906" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Combine_fp.cg" />
+                        </Component>
+                        <Component Id="cmp4BE1953A63D757E1843E1A9E269F4B56" Guid="{6219AA9B-207E-402C-B66D-CB40DD179490}">
+                            <File Id="fil056D7DE5CFE819E431B5BFAA11A7F7FE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Common.cg" />
+                        </Component>
+                        <Component Id="cmp0DCEE094E99BC362F28895BFFE94BFD0" Guid="{D7868450-5EF8-40B8-BFB2-31FC127ED087}">
+                            <File Id="fil8B4CEC0AE6E206395067F7E0B51C5963" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\crowdVp.glsl" />
+                        </Component>
+                        <Component Id="cmpC20FF1F653BE805685785E046DCE8471" Guid="{81F0E809-1285-4B8E-9DA3-1EDE35673756}">
+                            <File Id="fil2F6D6C580AEE2AF7111E8F03B6805123" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmap.hlsl" />
+                        </Component>
+                        <Component Id="cmpBDE64F6FA189982F1EAA6FA745E8A6EB" Guid="{D377E108-FDAA-45BA-B3DB-A3B156411472}">
+                            <File Id="filC9F72CA5066F9E1DA1ECD7E0871887C1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapCasterFp.glsl" />
+                        </Component>
+                        <Component Id="cmp68B80B1A4029ABDB91E21906736FF8C9" Guid="{E49FD699-E63D-4A0A-9071-4313B6D62C16}">
+                            <File Id="fil5B8C2C8787A232CFB2229F02D40EAA7B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapCasterVp.glsl" />
+                        </Component>
+                        <Component Id="cmp78B7701269B718131FDBA0F8A040E795" Guid="{25F68298-996A-4080-AED1-467F649A54CE}">
+                            <File Id="fil0C49B04FF82493DDE9F1820851BF5576" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapNormalMapReceiverFp.glsl" />
+                        </Component>
+                        <Component Id="cmp97B14D134A03000258AFF103A583A107" Guid="{FDDCF9F5-249D-49A1-8C16-E790E90033D9}">
+                            <File Id="fil7CC48B4DCCB1B8CB7565AC8B3E32F328" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapNormalMapReceiverVp.glsl" />
+                        </Component>
+                        <Component Id="cmpF8A26CC44B31386D57511CA16C09B0D6" Guid="{0AD581D6-B589-43A0-A725-5693559B4EAE}">
+                            <File Id="fil01A29E48FDC6C77AF6B5763B6C023210" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapReceiverFp.glsl" />
+                        </Component>
+                        <Component Id="cmp79C47A1DE336CE0C763F6984D5A916D5" Guid="{E0B07C12-D754-4C2C-B759-7BB84937D1DA}">
+                            <File Id="filE9F828B549C77A0C6ADE4CBB4EA1E110" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DepthShadowmapReceiverVp.glsl" />
+                        </Component>
+                        <Component Id="cmpD12E5EA8F4492A9ED59A09D05CB32F26" Guid="{61C2CAC2-0DE1-4557-8934-05E94AA4FBEF}">
+                            <File Id="filF2CF63C31CD2BFC1234B25BA067AF669" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\depthshadowobject.cg" />
+                        </Component>
+                        <Component Id="cmpC726822992A005770DEBE9DF9526696E" Guid="{D466210E-4795-40F7-8A57-C7B18E79676B}">
+                            <File Id="filC96E68569B4A2579678DF6F63A5863E9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DitherFP.cg" />
+                        </Component>
+                        <Component Id="cmpD9A6E287D2660C59384971ED4B062BF8" Guid="{0A106D46-36EC-4D59-BEB7-3865B24A6998}">
+                            <File Id="filB27AFDAADA96DD63B16AE205738FAEAA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\DOF_ps.cg" />
+                        </Component>
+                        <Component Id="cmp1CC60C4FE6035BB1BE6A8A0F0EFFB315" Guid="{571F7F7F-B0B0-4382-8F43-9CBA56D6C775}">
+                            <File Id="fil912BFD3230AE1501E9D080F0CF544B23" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_Basic.cg" />
+                        </Component>
+                        <Component Id="cmp39A0EC380027197E1239BB5DEAC82928" Guid="{C546B69D-C880-4B89-BE66-890C1A51DBAD}">
+                            <File Id="fil238050658276C454A944A677C8BD188D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_Basic.hlsl" />
+                        </Component>
+                        <Component Id="cmp027F7964CE0D817DB764EEB166797BB9" Guid="{D7DA8CFB-A205-4B1C-A9BC-83AC7AFB2B96}">
+                            <File Id="filBCF405A9914AA593BACDB5090D04F8F5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_BumpMapping.cg" />
+                        </Component>
+                        <Component Id="cmp829F14E6ED1683448C4F370A67F16DF7" Guid="{01033417-4192-4483-9468-016BFD192821}">
+                            <File Id="filC0243817C891229751BACE58884C2339" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_CelShading.cg" />
+                        </Component>
+                        <Component Id="cmp2DE4924A96D6FB7EA4E215FC20AE1CC8" Guid="{C7E4771D-8885-4B37-8CF8-614C764DFC35}">
+                            <File Id="fil7B5A5E3B2632C50ABF6559E7A768C4F5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_Fresnel.cg" />
+                        </Component>
+                        <Component Id="cmp7A7AFE6101C7B4F807FC2DEFD2AB0585" Guid="{D50D5B52-ECD4-4E61-8622-132E275436FD}">
+                            <File Id="filC787C8A6EBBCC2F024A82E3314199F21" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_FresnelPS.asm" />
+                        </Component>
+                        <Component Id="cmp719CA6921F8FB71B753173CEDBC3D71D" Guid="{E4F7A848-08D3-4989-9C6F-654DEED27EC6}">
+                            <File Id="fil8478EEDA134FF0D56AABE43AC72388EF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Example_Projection.cg" />
+                        </Component>
+                        <Component Id="cmp2137FA6B769495F9E134D3540971AD50" Guid="{CC5934BE-8AA2-43DE-83CF-583C6D063C4A}">
+                            <File Id="filF70694120A4E46BFD1FFCBF52668E11E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\GlassFP.cg" />
+                        </Component>
+                        <Component Id="cmp10A9349551027EE0183696B9ED5D70E9" Guid="{03DAAD11-AEE2-416E-999C-2CB3D9928379}">
+                            <File Id="filEA3DAB2DBD187E9956573B715F3ADA36" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Grass.cg" />
+                        </Component>
+                        <Component Id="cmp4E6BECE980FF9AF3789664BB0526E123" Guid="{D787665C-6A44-419C-B838-91CDABFD7109}">
+                            <File Id="fil8A6A22396F05BC467C2557E9F1CA1D72" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\GrayScale.cg" />
+                        </Component>
+                        <Component Id="cmp5167DE5D3E2B7EED602AA2C03C5D2E76" Guid="{26DD8E64-A3FA-4DF0-92F0-D27A2FC8DB8B}">
+                            <File Id="fil51586307B98FC82FD308349E841D6A17" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\HalftoneFP.cg" />
+                        </Component>
+                        <Component Id="cmp9C312354DE1CFB220F18AA3727EF2C24" Guid="{EE281226-0FB9-4A23-B8FA-34895E28639A}">
+                            <File Id="filCC8B4E88C70540C9A29AA02190707B33" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr.cg" />
+                        </Component>
+                        <Component Id="cmpF875F462BA0C1C564E5B5F30EFDAB150" Guid="{F9A4D3B9-C7B7-4537-94CF-8FA6F447D4FF}">
+                            <File Id="fil70ABBF14923680F3F2572E2C5CEDC46B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr.hlsl" />
+                        </Component>
+                        <Component Id="cmpC8B8CC43347C64367FCC98E2635E211B" Guid="{2C8C0C35-FBCC-485B-8129-4783FAFD79AB}">
+                            <File Id="fil8A8C7FAB951998361C178FB6638A717D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdrutils.hlsl" />
+                        </Component>
+                        <Component Id="cmp6A4B37C8208FA6EE5B22951C487F2C59" Guid="{B84153A1-C2DF-44C7-A6BD-68B00544D9F6}">
+                            <File Id="fil451679FED8C274A1715BDD700C0D39A7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_bloom.glsl" />
+                        </Component>
+                        <Component Id="cmpE2127B8A921CE1076D5E5797909EA5F3" Guid="{7B61E2CB-43DA-4FB6-AD19-ABCB3C69CBEF}">
+                            <File Id="filAA3EEEA0DB27C9328D2E8194B9243A26" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_downscale2x2luminence.glsl" />
+                        </Component>
+                        <Component Id="cmp7607110498E8729589E6F9175E5ED234" Guid="{2DFCDAF6-B224-43B1-BF4C-7DB3593F2482}">
+                            <File Id="fil914F846EEA5F89A5265FA0B1485AF622" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_downscale3x3.glsl" />
+                        </Component>
+                        <Component Id="cmpB5BAFA249FCD6800B3DE658F5D4466FA" Guid="{6CD26CDD-39F0-4173-8775-2E726DBD9745}">
+                            <File Id="fil046775013E51181B4E02F9F725A05218" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_downscale3x3brightpass.glsl" />
+                        </Component>
+                        <Component Id="cmpAC873FC2196D7A8813641C5DDF00BDEE" Guid="{8CAA8060-14B6-4A70-B7C7-5D1DAC71DABC}">
+                            <File Id="fil5340FC5C6FE3E40DAB8977C42DCF003D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_finalToneMapping.glsl" />
+                        </Component>
+                        <Component Id="cmp329F6EB6F241C075845F210493C7ACCD" Guid="{0A1EEE04-EE11-4004-9B3C-C1E4F583474C}">
+                            <File Id="fil820365678031F232284030420679B4B1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\hdr_tonemap_util.glsl" />
+                        </Component>
+                        <Component Id="cmpFECCA9C432AF0FFEB52D4B0CB790FE84" Guid="{79E142F0-B0B6-4B8D-BB73-E604237E0AAC}">
+                            <File Id="filAF1077F86309E3B9F48B672187FAA836" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\HeatVision.cg" />
+                        </Component>
+                        <Component Id="cmp762E35C9D9C9F5DA1FE62816E756717A" Guid="{00D2CC57-7C10-46C2-AA43-AE75A24FF456}">
+                            <File Id="fil2B91D1CD72BDEFA3987C0E9CBF21055E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\instancing.cg" />
+                        </Component>
+                        <Component Id="cmp9BC55705D6C5839BCE4606E0733CB9E9" Guid="{2788AD47-665D-4086-B683-E89285A03C40}">
+                            <File Id="filFF23A878172BBB685CFDAA2FB06AD2CC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\instancingVp.glsl" />
+                        </Component>
+                        <Component Id="cmp41E3631EA7CCE1E278D0072667B088EE" Guid="{58FC37FA-4508-4AC4-9123-2F4CC4B53E69}">
+                            <File Id="fil133F2C9EF27019CBCB5E052CA35854C8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\InvertFP.cg" />
+                        </Component>
+                        <Component Id="cmpE2D6813B390AAB693AF55BEB581B0086" Guid="{A2B6EF55-A35C-4E3C-BEE7-141CEAC7023B}">
+                            <File Id="fil5103FF70B2034B56B271505B165B74F3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\isosurf.cg" />
+                        </Component>
+                        <Component Id="cmp4A1D3546B3EA66606D7353CD0671BD3C" Guid="{3E86B7A0-9E5A-40A7-9A81-66E7C306EC33}">
+                            <File Id="filBE8953544A63C8C8531B72DB48AFD0DE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\LaplaceFP.cg" />
+                        </Component>
+                        <Component Id="cmpD97FCB30AFB526628119557243D39D74" Guid="{F7C493C7-A7DA-46D1-903F-D04FFCB92D3D}">
+                            <File Id="filE1B6C954F476D896A4FB6502A54CB8FC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\mrttestfp.hlsl" />
+                        </Component>
+                        <Component Id="cmp4C38107E9CC0666D136311CC7403B401" Guid="{613CB548-EF30-462A-8306-3F97F5D5B6E0}">
+                            <File Id="fil081E6E1E22354B8C24B5EDAE61B86CAB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\mrttestfp_quad.glsl" />
+                        </Component>
+                        <Component Id="cmpF3785DE9566BB926CA1CA50B77DE4BF3" Guid="{08BD0673-7ABD-4D4F-9C30-D311EF4BA0CE}">
+                            <File Id="fil6E9D19D763C8BD92FDB52BEC490009F0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\mrttestfp_scene.glsl" />
+                        </Component>
+                        <Component Id="cmpC04C605ABE399D3E7050588A0C778BF6" Guid="{30B20E42-22C2-4D6F-AD7D-F442F7108FC1}">
+                            <File Id="filD98BCACB45AEA82F4087AD193C7880EF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\NightVisionFP.cg" />
+                        </Component>
+                        <Component Id="cmp7D475A50ECF047182B27C99EB018B001" Guid="{084882A0-1175-45FC-B436-4110F82E8A0D}">
+                            <File Id="filB850653E0845918C99FBBC77CB71FB64" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Ocean2GLSL.frag" />
+                        </Component>
+                        <Component Id="cmp35C70FBAA2B3FFC59E8B35C35700097C" Guid="{819B6A14-4EF8-4664-A9B3-9D841C693EB9}">
+                            <File Id="filE65F05D32B8344D120B0BFB11614C5A3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Ocean2GLSL.vert" />
+                        </Component>
+                        <Component Id="cmp7E0C9BE65D3CE2A724F51D1E252AA4E4" Guid="{B4729F1E-E0F3-4264-93E2-0B5B4571B7FE}">
+                            <File Id="filB9E9AE63DCE92263487DE4DF149F84E4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Ocean2HLSL_Cg.frag" />
+                        </Component>
+                        <Component Id="cmp44FDB41773D374F3BCE7786FCEF023B3" Guid="{DED9A726-BAEA-4785-841F-EF30425C99D9}">
+                            <File Id="filC3F55621F1E4304C9D1285B614AF557E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Ocean2HLSL_Cg.vert" />
+                        </Component>
+                        <Component Id="cmp46374A8B4268F8C7A7C641F92F6F3BFB" Guid="{39044175-3B6F-406D-9B9C-CF98000B4070}">
+                            <File Id="fil1B4E00F324BCEC71A036B4D57E83705A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\oceanGLSL.frag" />
+                        </Component>
+                        <Component Id="cmp7FCEAF27923F8F28FE6387B93B27897C" Guid="{3738A04E-07BA-468C-A4E0-DFD330201E1E}">
+                            <File Id="fil1BA478440130A7312157A632BB5D259F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\oceanGLSL.vert" />
+                        </Component>
+                        <Component Id="cmp17ED174BDEB06A06B597690E56B8166F" Guid="{8F873C4C-C8AB-4DD6-8DF2-6CDE0FF237AB}">
+                            <File Id="fil7AC2E088BFD87ACC858B64E199FF9521" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\oceanHLSL_Cg.frag" />
+                        </Component>
+                        <Component Id="cmp77A7133ECC9CDEBD1DD29A3A9B2924F0" Guid="{A3132554-6F95-4528-AD5F-EC6E9D2D6F24}">
+                            <File Id="fil0ECC6026DC301D69F464F26A6C1079BF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\oceanHLSL_Cg.vert" />
+                        </Component>
+                        <Component Id="cmpFC506D24C33B061A95F65F95E0D0B85B" Guid="{904FD180-B8DE-4ACE-8182-3E0EE92E841D}">
+                            <File Id="filD46C13314D0A70A1E98E5BB8C4A96F3D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OffsetMapping.cg" />
+                        </Component>
+                        <Component Id="cmpB31C4C374F6BD98796875F767AD9C93D" Guid="{F37A3C70-0189-4AAA-9CE1-F1802B090768}">
+                            <File Id="fil1C083DED6A496B68C92099A5A3B65915" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OffsetMapping.hlsl" />
+                        </Component>
+                        <Component Id="cmp986CAAD31D58C129C5B151227B209A9B" Guid="{2F13E186-C94A-4407-96EA-6B5610E28212}">
+                            <File Id="fil223FB9E676F655392E3FB3C315EF4DA6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OffsetMappingFp.glsl" />
+                        </Component>
+                        <Component Id="cmp6F6E36B847D2CE83928FBBE3F95D1214" Guid="{A843EFBC-A5B4-45D5-9DD4-43250AD4259B}">
+                            <File Id="fil0305126F9CB34D06D9E1F807989E4720" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OffsetMappingVp.glsl" />
+                        </Component>
+                        <Component Id="cmp8B5021911B07082275EEF1FD21CF18CE" Guid="{DB679ED8-9460-49AF-B666-298B1E2AACA9}">
+                            <File Id="filB3DE4EEE0DD06A744166058E599B02C3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OffsetMapping_specular.asm" />
+                        </Component>
+                        <Component Id="cmp88A12B10F06558804CC1CA708FE88180" Guid="{BF54E2E3-E210-41CD-8C03-71E91D56B705}">
+                            <File Id="fil16B8D033B185E5CD99D2FB50D47B9364" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OldMovieFP.cg" />
+                        </Component>
+                        <Component Id="cmpF44A31D008D3AC29402AB69F69405120" Guid="{DF22F07B-4C3F-4C20-A69F-A0F09BE7533B}">
+                            <File Id="fil2A0C4772BAE4069900718692BF2EAF57" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\OldTV.cg" />
+                        </Component>
+                        <Component Id="cmpA12F968100502AB9609C989FAD526411" Guid="{C6AC775D-201F-4802-ACC7-64F0A53F53DB}">
+                            <File Id="fil86BC4DF3DA42D07E518B8EBC294220A7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\ParticleGS.cg" />
+                        </Component>
+                        <Component Id="cmp09E026F515127A3AC62B2FCF1DE762AD" Guid="{52E36643-7B27-4650-988A-6691643CB2A1}">
+                            <File Id="fil3C7E55937B11D5E433CEE0D920D1F9BA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\PassthroughVP.glsl" />
+                        </Component>
+                        <Component Id="cmp1AF316AAF136C5929E3D755C699B9D1E" Guid="{F80EF9A8-FA13-4859-AEA4-09AA3784403F}">
+                            <File Id="fil3AAA34F8C79B289D692E51E96724F3E4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\PosterizeFP.cg" />
+                        </Component>
+                        <Component Id="cmp6C85631280A832A6BBA5A5186032368F" Guid="{2A67A27D-F82E-4A1D-B865-1A7387D636F2}">
+                            <File Id="filCFF9C80AF249891A164B250A06E6DF09" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\pssm.cg" />
+                        </Component>
+                        <Component Id="cmp355E68CC29AD915F8D1E3A40BFF63FF7" Guid="{51F58606-60CB-481B-A38C-39CA4DE4C689}">
+                            <File Id="fil7BD0C636026F8676E29AC5E34D0FF3A0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\pssm.hlsl" />
+                        </Component>
+                        <Component Id="cmp4F5EF09A9753A78179E5D47782276D7F" Guid="{A2DD07D7-17F4-4842-81DB-47148A3C86CC}">
+                            <File Id="filA5FA45AAAFD0BD5CEDA9C82779996CD1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Radial_Blur_FP.cg" />
+                        </Component>
+                        <Component Id="cmpF2FD0671417337727A24DA4A7BFC8A43" Guid="{CE300B95-14D8-4B08-8C43-80CA0808D221}">
+                            <File Id="filF28519F613FA95A6574623CE46899220" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Radial_Blur_FP.hlsl" />
+                        </Component>
+                        <Component Id="cmp147A7720AE6B30215394987D168E2077" Guid="{FDE0AB6D-356B-4545-81CB-D4CDF52BA105}">
+                            <File Id="filBA000D0FCEBDEC2E406DC5F26CFB91E8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\shadows.cg" />
+                        </Component>
+                        <Component Id="cmp32E63FE3732FE757F2F77AC9BFDDB0F9" Guid="{712D073E-F988-4CDA-AA67-8171AC2CEEC8}">
+                            <File Id="filC1BB4D9441EBCB30FB49DD1A3B2341D6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\SharpenEdgesFP.cg" />
+                        </Component>
+                        <Component Id="cmp52333B2817232B5B0971967B47032C96" Guid="{3957C1FB-FD04-49FA-B2EB-234F8E6EC58D}">
+                            <File Id="fil93D3BAB34AAD4FB1F98DF5A21B3B298D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\skinningTwoWeightsShadowCasterVp.glsl" />
+                        </Component>
+                        <Component Id="cmpFE213B295D673D402D446D3B4F4EE046" Guid="{8991D209-89BE-4629-9E86-983DA04EC740}">
+                            <File Id="fil9DDF35296B1D08FE097F0C8ED09ABCE3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\skinningTwoWeightsVp.glsl" />
+                        </Component>
+                        <Component Id="cmpA8236F1ED5AD0506E7A6587566D4E85D" Guid="{D3152166-4A6E-41D5-B7FD-0851F28865AB}">
+                            <File Id="fil57FAFD5F2D6F1DBFFE1651ACDCFD07BE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\StdQuad_vp.cg" />
+                        </Component>
+                        <Component Id="cmpDC6B3402B6D78D3774AAEA1B2BF0ECAD" Guid="{2FCB4E61-C638-41CB-80F8-45C1D2B2D7C3}">
+                            <File Id="filD81AF27C392584972EEE2DF3CC5B7CEC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\StdQuad_vp.glsl" />
+                        </Component>
+                        <Component Id="cmpB13764263301559EF3E6E8C09BB94DAE" Guid="{1E7FB6DD-9EA5-4E8A-8E92-29E6292F9AAC}">
+                            <File Id="fil31323DB7B1EA01EA2A93E463DE2BBFE0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\Swizzle.gp" />
+                        </Component>
+                        <Component Id="cmp4D7651DB9F00D6D8B90D28AEBA8AC95F" Guid="{566572A2-819E-4C8D-8185-21996DFCEE0D}">
+                            <File Id="fil179431D8881A91F4CD8620A1D68DA799" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\SwizzleGP.cg" />
+                        </Component>
+                        <Component Id="cmpB9EBA5DA9A5931E15A8A50E047106F8D" Guid="{667C110D-1AB0-4D08-9627-8AFDA788A8AA}">
+                            <File Id="fil77723173B2E6AAADDD947D480AF9D72E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\SwizzleGP.glsl" />
+                        </Component>
+                        <Component Id="cmp530611AAC2ACFC5C3454B8B127449EB5" Guid="{181E7B32-18BC-4814-8EF3-63E53071608C}">
+                            <File Id="fil8A4D357F67323FB5E4D5CF1285765601" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\TilingFP.cg" />
+                        </Component>
+                        <Component Id="cmp28E07C7558D0BFA430C638A21069F959" Guid="{87FDBEE2-A81C-41CA-ACDE-E6C1366A089E}">
+                            <File Id="filCF8066000CAAACA3FDD72CCDC4EC2DFC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\varianceshadowcasterfp.cg" />
+                        </Component>
+                        <Component Id="cmp30A470F0D54DC09385AB50C8904C3A13" Guid="{BC6C71C4-9C73-4E95-BF38-38129823C0F4}">
+                            <File Id="fil1CACBDD1CC3EFDA120E6842FD68F2BF6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\varianceshadowcastervp.cg" />
+                        </Component>
+                        <Component Id="cmpA5EC028F9DB43DB6F12CD2D5C590EAF4" Guid="{161B13F6-984D-4107-8190-E83786AB3B48}">
+                            <File Id="filA5C1E19483E5973743B8F8A5D5C281DD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\varianceshadowreceiverfp.cg" />
+                        </Component>
+                        <Component Id="cmp258FD011D605CBA7D1A93F1FD678A5D0" Guid="{4DED3477-5208-41C1-BA47-DAC7E806ECA8}">
+                            <File Id="fil7DBBBB72E7476DE60213750CDC4E757E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\programs\varianceshadowreceivervp.cg" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="dir6B0DE20B75E0A3EFFAF5176FDAEB0529" Name="scripts">
+                        <Component Id="cmp22DA3876036DBC808B7CFA143B711C6C" Guid="{13F534F4-4BCB-4FA6-AE1B-D2AC42F5813A}">
+                            <File Id="fil5A77368B08D433587A50AF1BE9261DF5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\ASCII.material" />
+                        </Component>
+                        <Component Id="cmpA8C76CDD5885A8D5D8090A646CEBEBE4" Guid="{B1A5484A-001B-479D-B07A-874FFE5551B9}">
+                            <File Id="filCF3B4D4B066620B39234103CAF615C01" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\ASMSwizzle.material" />
+                        </Component>
+                        <Component Id="cmp67CAB35C1C3A01A1BDA16AFB85744B7D" Guid="{D5F3B4EE-E6E4-405E-BAB1-219BDC4619F7}">
+                            <File Id="filE3F3EEE626F9DD97A4FBE2D690DD727C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\BlackAndWhite.material" />
+                        </Component>
+                        <Component Id="cmp0E92117BE9898983FAC4C06D119F4E17" Guid="{B44EBA53-6100-4305-B86B-527F15173DA0}">
+                            <File Id="fil0C3C484BC08EA192BA201DBDEF34CB74" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Bloom.material" />
+                        </Component>
+                        <Component Id="cmp03EBA166EE563BD07FA7B9EAB2595D0E" Guid="{046083EA-9AFF-4CAA-B8C2-1F7DBB02986C}">
+                            <File Id="filDB6EBBC0001FBF80388DEDB6326CE6B3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Bloom2.material" />
+                        </Component>
+                        <Component Id="cmpD3DF6BD103EA99830529B6C4AD0440DE" Guid="{A9EE0F80-0A43-4474-A620-A26F5EDE3CD1}">
+                            <File Id="fil4BA4DAE78230822CAD05066C965DF09E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\CGSwizzle.material" />
+                        </Component>
+                        <Component Id="cmpE10826F3DA99CA65F4A19AD26EC1D777" Guid="{EBB2DB87-9858-4C1E-8100-C24E1DE2D7C4}">
+                            <File Id="fil729469059F0E62AD5E9645BEC0580BF6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\CompositorDemo.material" />
+                        </Component>
+                        <Component Id="cmp63C0AFEAC750C6D823436C45112B09E2" Guid="{D97DD021-B3CA-478F-9428-EE072B77C9A9}">
+                            <File Id="fil6FD8285DC659647818C91F4F166EF6A8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\DepthShadowmap.material" />
+                        </Component>
+                        <Component Id="cmpCAE081F6A1A20E99AEC60BAAC678A92E" Guid="{8445F75C-419D-4952-BA7B-1084E544FB46}">
+                            <File Id="filFC1C24169A9E3760336DFCF21D60BEE7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Dither.material" />
+                        </Component>
+                        <Component Id="cmp49F5C6C1ADBE5FDF2ECECC8DF23C9F22" Guid="{EF9A35D8-B139-4699-A6B8-B5B64ABBB2BD}">
+                            <File Id="fil61826910E3E7E3CBDAA5418440845F57" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\DOF.material" />
+                        </Component>
+                        <Component Id="cmp921E916F3E0EE780A5EA7F792B8BEAEE" Guid="{E6AE914E-945D-439C-946A-CD1C905CAC4E}">
+                            <File Id="fil75049DF514C2E994D7565D427574EDB8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Embossed.material" />
+                        </Component>
+                        <Component Id="cmp99FA3B2E39764823137FCFF9003FC60C" Guid="{B3C4E0E5-55D0-4B0A-9798-91A101865EB0}">
+                            <File Id="fil9E8CAF3B0106A0233B7D02DE58EE4C83" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Example-Water.material" />
+                        </Component>
+                        <Component Id="cmpF451E0D5BE16A50815DB517E007FEE7A" Guid="{D89212AE-B26D-49E2-8168-033F296E3142}">
+                            <File Id="filBD2144472FA1C6C2C33F2EC3C38A41E4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples-Advanced.material" />
+                        </Component>
+                        <Component Id="cmpD20963389E412E2DBCD27221A8D48820" Guid="{7C72F245-ACA7-42DC-BDC6-DA57BFF3F0FA}">
+                            <File Id="filEA85F5FDA61A2C8AAD18CB30445CBE42" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples-DynTex.material" />
+                        </Component>
+                        <Component Id="cmp38889AA9C6273FC5E2E673D388227A0B" Guid="{717F4769-C99A-460B-9476-C38091407568}">
+                            <File Id="fil41DAE1646DACF9E4CB3470378AB2E7E9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples-Water.material" />
+                        </Component>
+                        <Component Id="cmpFF2A1E1173F33C3B362DA161C90A9073" Guid="{54516B4E-AE8D-4A3D-8793-629BA77AC61A}">
+                            <File Id="filFFC04CC71C51C638D2BB777E247DB57C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples.compositor" />
+                        </Component>
+                        <Component Id="cmp7E131119121A5F91762CD8AC95B0DA67" Guid="{C7D63429-767F-4519-B6C6-9FB01BE49E7E}">
+                            <File Id="fil674A0ADCBCA766A2ECC510653E50FC44" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples.material" />
+                        </Component>
+                        <Component Id="cmpAA9B9763654D599CA9E3170944921EC8" Guid="{52D14B80-D044-445D-B77B-24DE53B4A510}">
+                            <File Id="filE12879CF10D92D7273E6D6B2F963C7E7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Examples.program" />
+                        </Component>
+                        <Component Id="cmp4C4992048C5BC3F3A8DF145D27D7D16A" Guid="{70AE1FFA-7FA3-4E51-8D03-0768CD87B00A}">
+                            <File Id="filEFEAB3D9C0F09323A2B8707C22075300" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\facial.material" />
+                        </Component>
+                        <Component Id="cmp980A15A626E830742A58ABBA40B9AFF8" Guid="{C14D7A76-7BF3-427D-9F40-DDA76FF78E6B}">
+                            <File Id="fil4CFB2519E8DEDCA0AC928921559867F0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Glass.material" />
+                        </Component>
+                        <Component Id="cmp4CBB12AB895F02E97DA1F13B914CB7D1" Guid="{23FA9DF1-C91A-4E8F-812E-C8ED1AE97B21}">
+                            <File Id="fil6B836C28C3EC9328D8A60D834D92478B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\GLSLSwizzle.material" />
+                        </Component>
+                        <Component Id="cmpA2BC66B82FD1212E978D1B458F303EFB" Guid="{56D54A26-4623-44C2-A07C-64561A106646}">
+                            <File Id="fil924BDE681BD4F15FE1194D1CF9D0801C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Halftone.material" />
+                        </Component>
+                        <Component Id="cmpD4C26089342C5C9D441A3D01C8B2DBA0" Guid="{05BAF8DD-C9DF-46D5-A8D0-DF084CB56ABB}">
+                            <File Id="filA07A4F264E18D83CA6B97D8C1A98CB2E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\hdr.material" />
+                        </Component>
+                        <Component Id="cmp1A0EA570FE1DF117EC671EA8096A981B" Guid="{D47517E3-D22B-4518-80F8-38B9E3A4B515}">
+                            <File Id="fil1BC08CAD43687B6F361631FB5664F3AC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\HeatVision.material" />
+                        </Component>
+                        <Component Id="cmp69DAACF0D25463504E2800A25A7F978A" Guid="{39A40881-D0FE-468B-B422-BCC65DF09EC4}">
+                            <File Id="fil4AB5E6F2C5EDE479156E9A4CD44F6197" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Hurt.material" />
+                        </Component>
+                        <Component Id="cmp3A8CCFB17D893FC1CFB6C8089BA6CFE8" Guid="{BB3A2BFF-02F8-46FC-AD1A-029837741628}">
+                            <File Id="fil677CD1CC0361DC6F30997B24EB6BC9BC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\instancing.material" />
+                        </Component>
+                        <Component Id="cmp42264D7EBA4D2E1E0888B7949BC2CF7B" Guid="{CE6F036D-AC89-4CFC-8BC0-5C9A97873A3D}">
+                            <File Id="fil5129FEC84009C2741FBB4227797E09FA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Invert.material" />
+                        </Component>
+                        <Component Id="cmp65A8C0CC3C48A8FC7AB098096ADB2945" Guid="{A35C613C-DDDC-4D3B-8503-BE46BB2DE428}">
+                            <File Id="fil59A6EB8210E07493E010A592EB01DC1B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\IsoSurf.material" />
+                        </Component>
+                        <Component Id="cmp5D12A03C101FF3BDC680348660DFBA4D" Guid="{29C854FF-2F02-4662-88D2-28B0ECC5859B}">
+                            <File Id="fil4F9D95388C339C90DDC3537A62C9BEA5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Laplace.material" />
+                        </Component>
+                        <Component Id="cmpAD4E416BC5700EEA47FF1AD833E9E35C" Guid="{B164B78B-7C8C-402C-AA99-D69216AB3C33}">
+                            <File Id="fil5FE6FE8B09C264DC909A5BD76123DB82" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\MotionBlur.material" />
+                        </Component>
+                        <Component Id="cmpF3AFD96C7D599ED989C86C40D4B60870" Guid="{BE36CBF4-9FA1-4CB1-910A-229EFF8252A0}">
+                            <File Id="filD5A595B86F395829CA2A637CA1561E1A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\MRTtest.material" />
+                        </Component>
+                        <Component Id="cmpA7BDE90BEBBB2D626EFF974CC15824BE" Guid="{1E993777-CFD1-47FE-887F-412014155FE4}">
+                            <File Id="filBB3279338433C3287E89A6EF94518A12" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\NightVision.material" />
+                        </Component>
+                        <Component Id="cmp8FA1B9C1F261491C1DE31BCB7B2B8C40" Guid="{A3DD273F-6EE5-4841-BB2C-1C378749CE5B}">
+                            <File Id="fil2072FF7E5221477A4B309D0640841783" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Ocean.controls" />
+                        </Component>
+                        <Component Id="cmpCB31D91AD01527211C4CE680ABCCF608" Guid="{2F853089-BA12-45B8-B2D6-D4EACE30419A}">
+                            <File Id="fil122508C09A80059E7C5D999E182E5EC9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Ocean.material" />
+                        </Component>
+                        <Component Id="cmp3C8F4F6670D93DE81D3C2D6D65CAFAA3" Guid="{FFD43B37-D37A-48EE-B9CF-6BF294B81534}">
+                            <File Id="fil85B72514AEA4968DFDECEAA089977397" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\OffsetMapping.material" />
+                        </Component>
+                        <Component Id="cmp3E5026A8815A01C180548E6B263E4CB9" Guid="{50E999ED-9BFF-472B-90D9-E335F1A7DC29}">
+                            <File Id="fil353D0C54485B8434CEF4067A3B56D503" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Ogre.material" />
+                        </Component>
+                        <Component Id="cmp7CF8B3E9CC1996D18F15D220725735D3" Guid="{DE9E16AC-3F99-4A02-A599-2504DD6B966A}">
+                            <File Id="filF6B1D93FD3CA85534491960D40E3B5DF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\OldMovie.material" />
+                        </Component>
+                        <Component Id="cmpD474C3CB2DD3D568B377D45ECF261028" Guid="{4FB77014-2DE7-4D25-B59A-D41AB79DBB2F}">
+                            <File Id="filD41D67A8BBC2FCFBCE98A454EC844EC7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\OldTV.material" />
+                        </Component>
+                        <Component Id="cmp51A8CB7FB6A256E869F0CDD7D6C899B3" Guid="{1C4E9479-0D7F-4BFF-910B-DE2453F63078}">
+                            <File Id="fil196A619FB0361C2B4CC9A4B273C880AC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\ParticleGS.material" />
+                        </Component>
+                        <Component Id="cmpAEE7B353FE355152E38F31890A3624BF" Guid="{92B7EDC3-9EE2-4C81-B0C5-7F46DE6C76FB}">
+                            <File Id="fil7D693D6F4BE48A62D487F0C472024D71" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Penguin.material" />
+                        </Component>
+                        <Component Id="cmpC9A4BABD7201A7F5BB918D32F8C5A681" Guid="{F55B5E12-8217-48EF-B997-E32EC431D66F}">
+                            <File Id="fil178D669F17C052C19D0B52D8AA2F588F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Posterize.material" />
+                        </Component>
+                        <Component Id="cmp7A3D1B8B75FABAC67393696D7AC78AB2" Guid="{D5CB5CAA-943D-4D51-B98F-AAEB851C1187}">
+                            <File Id="fil5A2620AA0B6D91EC96F0CC4D627A7960" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\pssm.material" />
+                        </Component>
+                        <Component Id="cmp858012A5B7A44D1A5B1EC3F9C99B5881" Guid="{489B553F-8135-45DC-A9FD-9C482469F3B4}">
+                            <File Id="fil44F9E039C23CDA78F3C0833BFEAD162E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\RadialBlur.material" />
+                        </Component>
+                        <Component Id="cmpDCC0A0D7ACB634500F0FA8793E67E710" Guid="{A23BE94E-0E16-48A2-8229-7D8FDA68714A}">
+                            <File Id="fil6794896599CEDEC16C01D65721C1BFE5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\RZR-002.material" />
+                        </Component>
+                        <Component Id="cmpBCB8FB2CBD399E1AC63248E231D634FC" Guid="{483AEB50-E755-432E-9AA2-DEDE4027FE04}">
+                            <File Id="filB6C7F26007152D49FE33AE70F8669040" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\ShaderSystem.material" />
+                        </Component>
+                        <Component Id="cmp704B413D2339B03120E769CC3B95925A" Guid="{5492899F-C5A0-4F99-9A2E-297D5406285F}">
+                            <File Id="filF278A526A3BD383111532796B876049C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\shadows.material" />
+                        </Component>
+                        <Component Id="cmpEC04E3D31520DF001B657240B47AB597" Guid="{2A7BAC58-204D-4E9F-AA0F-B905750C0699}">
+                            <File Id="fil676E80FE73E783F529D6798B1EC631F1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\SharpenEdges.material" />
+                        </Component>
+                        <Component Id="cmp3D600B5EB6EE21430C3FA3C90B276563" Guid="{E4767F1C-7AB8-489F-BABE-2AF871A0932C}">
+                            <File Id="fil18168B11CF5FED44C7CCEA0E4CEBB541" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\sibenik.material" />
+                        </Component>
+                        <Component Id="cmp3269D7C424EF4E6484F8CF0407F3B9A2" Guid="{84AC5318-A54E-4564-B5DE-CDCC3F3A63E7}">
+                            <File Id="fil3C0B6D819609BE85297065F1733829A2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\smoke.material" />
+                        </Component>
+                        <Component Id="cmp458103426261D34B685E384A5B2A96B5" Guid="{E5F19003-3043-4142-A6CD-7145DFD56850}">
+                            <File Id="fil07AE10AAD87465E1655AD0336EC00513" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\StdQuad_vp.program" />
+                        </Component>
+                        <Component Id="cmp4E339749E83018C92785511FB076DDE6" Guid="{6D8A1D0A-FEBD-47B4-8CF0-A625106318FE}">
+                            <File Id="fil80DCF6CA2145207A18924547EABDBC69" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\Tiling.material" />
+                        </Component>
+                        <Component Id="cmp13B44E77FDCA2A8955F2E1AE7520AD3E" Guid="{3CB62106-CF54-4B6B-87DF-757FBCDFBF5A}">
+                            <File Id="fil810568DA8A74653DA7798E0767C23BC5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\scripts\VarianceShadowmap.material" />
+                        </Component>
+                    </Directory>
+                    <Directory Id="dir3B3040AB04B4C327D1E1AC20D81C45B7" Name="textures">
+                        <Component Id="cmpB7DB2C9BA82943A9094121E18A48A2E8" Guid="{17033575-CDE9-4D2C-AB16-9A79E47526B7}">
+                            <File Id="fil35E2C851AEC4655938DBEE153E87EAE7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\10points.png" />
+                        </Component>
+                        <Component Id="cmp869BE1CE3F926342E171D8CE6164AE16" Guid="{BD692EC9-AF74-43F2-AF47-DE0ADFD216B0}">
+                            <File Id="filDFD154FDA116B212773E06DFADA93B02" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\1D_Noise.png" />
+                        </Component>
+                        <Component Id="cmp688D65C1747ECF50A29D9F0A66BF166B" Guid="{56853E58-FF7C-4254-A04F-87D42FED46C6}">
+                            <File Id="fil19B45CF45E630F94FC43292A462006D7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\1D_Noise2.png" />
+                        </Component>
+                        <Component Id="cmp209014EAF3A7565891098867156E2CD3" Guid="{68DCE4BA-C5C1-4001-8B5B-425CAAF5B85B}">
+                            <File Id="filFD0FC78FB324F7E1C983467F8AC7DFB4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\8x8PagesSplotches2.png" />
+                        </Component>
+                        <Component Id="cmpBEEFF8BF7C33E5F492DBC0B4EF85362B" Guid="{02E11986-3869-49CB-9757-5EEE9490CF3E}">
+                            <File Id="fil7B50190A75EB3D7296A8482A42B91CF8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ASCII.dds" />
+                        </Component>
+                        <Component Id="cmpB7B123AA5E1C5C64A87D4144A6D98551" Guid="{F17FD9EC-39B2-4A6A-927E-474C2AEBC5BD}">
+                            <File Id="fil3F3298AA09103884FCE53BAEFAE8156D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\atheneNormalMap.png" />
+                        </Component>
+                        <Component Id="cmpCD3349C98B37199C8314DA249AD04676" Guid="{2C145D42-124B-439E-A089-1FD7A74F7CBE}">
+                            <File Id="fil1B001EBBA4031CD08A6C9F397E739A88" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\aureola.png" />
+                        </Component>
+                        <Component Id="cmp65F4048760E63847EBDB58ED711BD044" Guid="{0EF32668-24D1-4408-B837-81B5611CD38B}">
+                            <File Id="fil5D46AC6D102CED0840DD8BDA02011A6B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\basic_droplet.png" />
+                        </Component>
+                        <Component Id="cmpB4B7D4D08B609CCD43924EA7DE1CA2D1" Guid="{524BDA7C-3F04-4D16-81CA-0984463C3378}">
+                            <File Id="filD833AF513220AE20B6DC9C141E2E4D9D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\BeachStones.jpg" />
+                        </Component>
+                        <Component Id="cmp0BA67F205BA11CCFEBCD535F13D47E3B" Guid="{94575C54-5DBC-4000-8803-A6BBAA06F0ED}">
+                            <File Id="fil2FBB69CC81DC1FF581B58851776278F6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\blue_jaiqua.jpg" />
+                        </Component>
+                        <Component Id="cmpE22A396854F794A8622735A91E040CCE" Guid="{9D0A0E11-5F9D-4E4A-A14C-9787F58C2F7B}">
+                            <File Id="fil3AF787A3A4FB5FA05D00C5312E26B2B9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\BumpyMetal.jpg" />
+                        </Component>
+                        <Component Id="cmpC3F46D12D4A21045239681DD1BD4EF47" Guid="{C791F693-2E16-409D-8392-6019D4571BC8}">
+                            <File Id="filF09B1337A32F1671A05ED6748E130836" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\cel_shading_diffuse.png" />
+                        </Component>
+                        <Component Id="cmp57A31469AA2451095CB0F050B38A5B53" Guid="{E97BA99F-D2AE-4956-9871-464F8F6E2F51}">
+                            <File Id="filCE73C9D28417C0868DC11CB45F5F5509" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\cel_shading_edge.png" />
+                        </Component>
+                        <Component Id="cmpF58EE1C29A42604ECA7BACC6B2365860" Guid="{108FD4A7-BA82-4073-8AD8-DBCD1BFFC58B}">
+                            <File Id="fil5E7C1BCF27984E8C52F6375FB64EF1DD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\cel_shading_specular.png" />
+                        </Component>
+                        <Component Id="cmp3FFC367D40FCF573ABCF7AE3B1B6F160" Guid="{899D3C8E-0191-4190-B9F7-DD7EEBD61374}">
+                            <File Id="fil4BDB788E4EA48AC663D87AB2D38B89AF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Chrome.jpg" />
+                        </Component>
+                        <Component Id="cmp131D04711A8392DB84F1033301F548A9" Guid="{3E2DA223-DA8E-4FE5-8845-AF289542476E}">
+                            <File Id="fil5CA729C4ACC6B4BBD16377796ABC2C20" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\clouds.jpg" />
+                        </Component>
+                        <Component Id="cmp1825443EB77B6ADCC29FFEE5A1AEE98D" Guid="{332ED073-D202-4CE6-BF93-785063EA5226}">
+                            <File Id="fil7E073F53BE8A94D7F61B61250E812929" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\cursor.png" />
+                        </Component>
+                        <Component Id="cmp9A83E759944EC2C071A9B39E8789A80F" Guid="{895FEFE2-CEC1-4AD9-96E8-A06BB723EED4}">
+                            <File Id="fil714991FD0E56DCB1969AAF960CBE024D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\dark_grid.png" />
+                        </Component>
+                        <Component Id="cmp197EC8FFA7C50B67D77E732AF91A662B" Guid="{E5EBB09B-8C4C-4823-8B4B-8679086C3FA7}">
+                            <File Id="fil6C12DDEEA6556876D6B68953944B0DBF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Dirt.jpg" />
+                        </Component>
+                        <Component Id="cmp622D31C33C792A8E6BE039DCD120E780" Guid="{A3865C44-5EC9-4562-9244-98A55F19F33E}">
+                            <File Id="filFF5E4128A1F8119F4784BF176787AC92" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\dirt01.jpg" />
+                        </Component>
+                        <Component Id="cmpAB93B3686DCD708639E0F63BD101879F" Guid="{91BC8B63-8D4E-430B-916F-19E84C298F79}">
+                            <File Id="fil1608AFAC3B2C3E013D69873206B8BFE5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\dkyellow.png" />
+                        </Component>
+                        <Component Id="cmpB58C2CD4D6692C2B9CF6CFEF5187A4C6" Guid="{1C80E343-3227-4309-81FD-71D8B34040A4}">
+                            <File Id="fil56BFBD2BFA2B75A280C3E681B17FB3A5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\droplet.png" />
+                        </Component>
+                        <Component Id="cmpD0A0EB9190A604CA800E8C7607D58290" Guid="{E8A16D99-A878-4D38-84AF-6DAF89A8E5ED}">
+                            <File Id="filCB594B41D86066B099046A6DF990EE1F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Dr_Bunsen_Head.jpg" />
+                        </Component>
+                        <Component Id="cmp33C15323B16CB2DB14AE413441FF3B32" Guid="{E956FCD0-5D5B-4186-94A1-D3F62B0A54A3}">
+                            <File Id="filB9125D6C96291BC30774111FD754696B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\egyptrockyfull.jpg" />
+                        </Component>
+                        <Component Id="cmp6F7730727121D2091601B43F18E6FFF0" Guid="{080FB0C8-9807-493C-BB85-0A044B03B656}">
+                            <File Id="fil4B017371078FF2265263B6A2B14CA897" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\flare.png" />
+                        </Component>
+                        <Component Id="cmp9EC21C10E4824E87C3D3BEF5DA03C3F8" Guid="{BE4D3695-DB3F-4EB5-83B2-B66CDEF5248C}">
+                            <File Id="filDE3B2F917C3152AE8BD16ABD0C33D04D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\flaretrail.png" />
+                        </Component>
+                        <Component Id="cmpE9EABB0C15FC1D01E66F325C368F06D7" Guid="{CDBFBFDB-D005-46FF-B2F4-0A4A80799040}">
+                            <File Id="fil67D8CD8517CFDBBE414BE7455974BA96" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\flare_alpha.dds" />
+                        </Component>
+                        <Component Id="cmp6E177F93942735496B99020BE33B49C8" Guid="{F62721ED-FFD5-423D-BECD-E8EBF330676A}">
+                            <File Id="fil444F2EA8AFAE6517050B4BDBF7BE9422" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\frost.png" />
+                        </Component>
+                        <Component Id="cmp87689FB3DB9C34D4FBB59C7D9B11A9F9" Guid="{5D26F22A-D921-4BDF-BF62-EE987DBE6FF8}">
+                            <File Id="filC412AB72EA246D3974E6DA2EB8E13179" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\fw12b.jpg" />
+                        </Component>
+                        <Component Id="cmp0CF2231389A9E8578B3F452B56C22819" Guid="{D2A8330D-B7BC-4EFB-83CA-D28F95F9C727}">
+                            <File Id="fil27317B34C9D45FFA94FDC8D7DF730605" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\GLX_icon.png" />
+                        </Component>
+                        <Component Id="cmpDBD3EC6EEAD5C79C9A43BCBFAF519E08" Guid="{18442E0E-8167-4295-9B1F-BD44DF8D225F}">
+                            <File Id="fil89868439BF545AE2DF66DA53690564C3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\grassWalpha.tga" />
+                        </Component>
+                        <Component Id="cmp6805629B7E37ECDBB0D4DA1910AF562C" Guid="{09C5314B-9AB0-493E-B7AE-294BDB1EF7CD}">
+                            <File Id="filA1ACD8A04EAEBACCD7F035F2A69396E4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\grass_1024.jpg" />
+                        </Component>
+                        <Component Id="cmpF2B3A9F3AF40C6C5121E50E69010A79B" Guid="{D445D41D-056F-40B9-A588-D3654E64E997}">
+                            <File Id="filB25187998FB853084BE3CF073F403049" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\gras_02.png" />
+                        </Component>
+                        <Component Id="cmp1077EC60141D19E2D3CF72F500118514" Guid="{87E74F5A-9722-4A26-BF9E-9A69DE1E2B36}">
+                            <File Id="filC30DC0787D8604949F65BA57014E6B64" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\GreenSkin.jpg" />
+                        </Component>
+                        <Component Id="cmpA2D1E2E71D4B91CCA6769EE9FE62253B" Guid="{D207B8A1-22FC-4AAD-A646-7349A97A58CD}">
+                            <File Id="fil03EE848B795EE6ED09D61927C82A00A0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\HeatLookup.tga" />
+                        </Component>
+                        <Component Id="cmp4345011893AB49BD5001D8A39BF88163" Guid="{E01A9C2B-B27F-4A9D-ADC3-2A9B03D9C7DC}">
+                            <File Id="fil714F20E6A936093BBA37A4F09D44D952" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\HeatNoise.tga" />
+                        </Component>
+                        <Component Id="cmp84284D1EE1D80E5DCFD4DD56C7BCF711" Guid="{1CCED123-6F54-40E6-BCAC-95B32554DD9F}">
+                            <File Id="filF763DBD3D9DE176435CD325071104986" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\KAMEN-stup.jpg" />
+                        </Component>
+                        <Component Id="cmp325B25C8244635D341453BB056AB2710" Guid="{2EC2CFB8-B72C-4700-B3B4-7028E2871881}">
+                            <File Id="fil8569D416E01AFB5FD7C5CE77BC9505FD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\KAMEN320x240-bump.jpg" />
+                        </Component>
+                        <Component Id="cmp5A0AF54DC5CA25DC19B69A138B3FD6B6" Guid="{005422C8-D4B3-4BE8-83FE-F15EB4136925}">
+                            <File Id="fil38D2AAD47AFF918AF182A22FFD1F7BDA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\KAMEN320x240.jpg" />
+                        </Component>
+                        <Component Id="cmpA5F2056B51D7C079F9B4CD301BF43070" Guid="{BB458360-C5A1-4FDA-9ABE-A25AC3976D1A}">
+                            <File Id="fil8ED12313906F9F41743DC8BD10B8D683" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\leaf.png" />
+                        </Component>
+                        <Component Id="cmpAF07ACD6FBC79D5FBBD5618E497D5E48" Guid="{3C1CB068-AE4C-4964-8A9E-19647854B03F}">
+                            <File Id="filC08A14D8166148122D881B6B09CF13C1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\MRAMOR-bump.jpg" />
+                        </Component>
+                        <Component Id="cmp7CCDF70380CF542EB0C191271023DAE1" Guid="{A9437D9E-DBAC-4A2A-828D-7DC051F8198D}">
+                            <File Id="fil77DE1E2AFFEFE15877002D931580E8D0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\MRAMOR6X6.jpg" />
+                        </Component>
+                        <Component Id="cmp2DB7F5BB2DEFEA7F8471D2F554A2D05F" Guid="{56CDD9CE-EE99-41A9-8145-2256D3EFF745}">
+                            <File Id="filAB73A2ADC88690E9DE980E00EC63254B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\MtlPlat2.jpg" />
+                        </Component>
+                        <Component Id="cmpE3B02E65052382E59DB93E84CC1B7144" Guid="{E37DD536-1F47-4400-AD06-FA2202A54F1A}">
+                            <File Id="fil0153FD66850F6CD4321CA6B2E162E06F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NMBalls.png" />
+                        </Component>
+                        <Component Id="cmpA7D324954C1B33AAA71C5FE23ADC11E8" Guid="{BE4CE56A-DDA3-4317-8B46-BA0F8AFC3C3A}">
+                            <File Id="fil89DA5C93B2406F69CB96B0A4C4FD504E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NMBumpsOut.png" />
+                        </Component>
+                        <Component Id="cmpAB45AA6B35967F996A1DD2E316061E1C" Guid="{7CD7C57C-3B26-4835-A951-FDD2DEDCC926}">
+                            <File Id="filD36E1F94B608E54976B11996C9791954" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NMHollyBumps.png" />
+                        </Component>
+                        <Component Id="cmpD9BE67E5C2437E2651DD6945F39295B4" Guid="{01609A60-D6BF-4629-9F6A-EE55F95DF8BD}">
+                            <File Id="fil40D10B9499C739D7229829461283C9AA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NMStripes.png" />
+                        </Component>
+                        <Component Id="cmp11836E1AE8BC9198F92AFA11A39AE2EA" Guid="{5593D7AC-5210-4407-BB89-7070B08E708B}">
+                            <File Id="fil4144877D5862A757CF4154CC08B80BBD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_bk.png" />
+                        </Component>
+                        <Component Id="cmp71EE5E116258DC1864A9CBC39098C2EC" Guid="{7FBD201D-5C45-4D51-8FAB-36E86B8CD242}">
+                            <File Id="fil6F951AF2E91C7975DF9AA3A57CA05E61" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_dn.png" />
+                        </Component>
+                        <Component Id="cmp00248EA621AE8E6AD8D58F3B1DA1EB90" Guid="{08E974D8-1D64-424A-BE92-82722F9EDD64}">
+                            <File Id="filC00D3BDB703ED2B1AC8503E7BF7D3C89" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_fr.png" />
+                        </Component>
+                        <Component Id="cmp942018BCDA4D69AEF7BB49022A3AA13D" Guid="{3C513FB9-DF72-42CC-B797-C5D0DC55ADBB}">
+                            <File Id="filA764F70B15D68C60557A919021A903F5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_lf.png" />
+                        </Component>
+                        <Component Id="cmp96CC75BFB22434F5AEB544174C369954" Guid="{6D5CCAF0-3636-4D7D-9D1E-63F49151ABF7}">
+                            <File Id="fil0B14700F9725E9FBBE6A5AC236891F34" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_rt.png" />
+                        </Component>
+                        <Component Id="cmp5D973844C5CB2FF074B46145AFE7B06A" Guid="{29BC0301-7B8E-4563-89B0-ABFD2BE70522}">
+                            <File Id="filD591F9559F9239230596CC9E4ABE6753" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nm_up.png" />
+                        </Component>
+                        <Component Id="cmpA661F89724844D9501A9829A8DDB873C" Guid="{52959C69-BB6B-4CAB-956C-9CAEFD222E5E}">
+                            <File Id="filC6E93DE7A0A9F632AF36E7F7FAAF32E6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NoiseVolume.dds" />
+                        </Component>
+                        <Component Id="cmpAF0843023507932D61749A08391B77CF" Guid="{5EA08009-1EA9-4F56-8C27-AE4C10FE5380}">
+                            <File Id="filE74DFFA0E1B2C70F2C184C58718B65D1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\normalNoiseColor.png" />
+                        </Component>
+                        <Component Id="cmp19F4AF8EBE0E7C83BDE6F97498C0F333" Guid="{7C5C18E5-12BB-41CA-A2AF-0871189CDA19}">
+                            <File Id="fil27A5F7FDDDA1865925921B60C9FF08B9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\NPRMetallic.tga" />
+                        </Component>
+                        <Component Id="cmp52A1714980284B07E50892B450FB8B37" Guid="{EBD978D2-9DB2-4B5C-8945-ECB09CB00395}">
+                            <File Id="filFAE0C59609A0BFCC88A41BAFA0B2A190" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nskingr.jpg" />
+                        </Component>
+                        <Component Id="cmpFA458124B4D99B299D5244ED8D509B57" Guid="{0C39FF83-8916-4902-A491-CA4331F04DF8}">
+                            <File Id="fil1EDB20B5BB6FC0A9C020DCC2591AC68F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogreborder.png" />
+                        </Component>
+                        <Component Id="cmp68D47246065FB56D2BF5A2B297647944" Guid="{70035334-6666-40B6-8912-387D572C2145}">
+                            <File Id="filA231519A78397966A41D683FE57F038E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogrebordercenter.png" />
+                        </Component>
+                        <Component Id="cmpB0E26088520506B8A88448D30EB152CD" Guid="{67151D57-2853-462E-9C1C-D69F988225E9}">
+                            <File Id="fil5D8BE15092F8FFF863D2E60C5DEE4496" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogreborderUp.png" />
+                        </Component>
+                        <Component Id="cmpFCD35DCEE3417D6D411720EC9F417B32" Guid="{BD155244-B6D1-4821-B870-F5C75A033337}">
+                            <File Id="fil45A056B9627C4B5D434D85F9BFF988C9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogregui.tga" />
+                        </Component>
+                        <Component Id="cmp13852CFBD1B6B0255B182B7F33E3A10F" Guid="{A1082E17-26E1-4C79-ADA5-1FD96DCA6C6D}">
+                            <File Id="fil0FA626D0C4956B19290E35DE3F7DEF44" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogrelogo-small.jpg" />
+                        </Component>
+                        <Component Id="cmpB543D61F3B9E4FDE2A48BC40A1D26D14" Guid="{449F6FB6-5DB7-4BFC-887A-164414BE6EE3}">
+                            <File Id="filE7D1323C23057CE7966429A302E57F5D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ogrelogo.png" />
+                        </Component>
+                        <Component Id="cmp786FBBEFA295F5C7B81AEC170CAADF9E" Guid="{CAF967E6-B9B3-446B-A5E6-6F19CA774A96}">
+                            <File Id="filDEF9850148FB52E16AD47CAE408B2D83" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Panels_Diffuse.png" />
+                        </Component>
+                        <Component Id="cmpFC590B49261D1272724ABF293D3C1F09" Guid="{F4E52061-F9AE-4B04-B33E-6DE6D51A87FE}">
+                            <File Id="fil1093BA37C7E6B02B92B4A43A63917E09" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Panels_Normal_Obj.png" />
+                        </Component>
+                        <Component Id="cmp160157F60CF5AC43DE77107D2F71ED4D" Guid="{F03DE286-1705-42B2-908A-F4F7613B67C1}">
+                            <File Id="fil17DEA1A716014653D49B4340B8A6E2D4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Panels_Normal_Tangent.png" />
+                        </Component>
+                        <Component Id="cmp429190D1E53D85C0EE0D4CAB0E847CA2" Guid="{B107F749-44A0-45DB-9DB9-BA2A088CDD78}">
+                            <File Id="filA760667ED15143FDD9D5EDE988440A50" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Panels_reflection.png" />
+                        </Component>
+                        <Component Id="cmp90453E49FE60FE70BAC8E04FA68204BB" Guid="{E1C5A975-CC61-428E-AE05-70E7BE09EE83}">
+                            <File Id="fil8F2FE264B20BC94BF36F8050A4FD0957" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Panels_refmask.png" />
+                        </Component>
+                        <Component Id="cmpB70F2E3CDED5CCE5ABA44BCC2E5CBEAA" Guid="{1C11869F-1D37-4040-B71C-1FF0010E68F4}">
+                            <File Id="filE102462C4B724E0A1961B8A3677E4A63" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\particle.dds" />
+                        </Component>
+                        <Component Id="cmp6070FC27498ED11A1863B544AB45BF2B" Guid="{AEBFC5D8-F8DA-4816-B1DF-79BC95127D87}">
+                            <File Id="filC9A47479D3A56E1372064C94503C6979" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\penguin.jpg" />
+                        </Component>
+                        <Component Id="cmp7790C05B1A9712BFB1389CB288D6812E" Guid="{E4230EF1-8A3C-4DB3-9D61-631DA07D44E1}">
+                            <File Id="filAB1ABC24060EBD44CD8D68B41650C6B2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\perlinvolume.dds" />
+                        </Component>
+                        <Component Id="cmp131EF445C4A8DCE9B4348DC72E011F89" Guid="{B06842B7-1746-43D1-A602-89339C68EE92}">
+                            <File Id="fil7F69B033CF176D3FD0133F88688901D8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\r2skin.jpg" />
+                        </Component>
+                        <Component Id="cmpBDBE79597767EAAFC2D201C8330A73A0" Guid="{BA6829DE-57CB-409A-9CEE-8D2D576D6D39}">
+                            <File Id="fil1AF2571B46E3651DC367404BB835EF08" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\random.png" />
+                        </Component>
+                        <Component Id="cmpD913A7A4B2A2E985104565106C719952" Guid="{B4E9D20D-25B9-4FA3-94B4-CBAC680FFB07}">
+                            <File Id="fil81FB76A87339B715E7E271B1E4BDEA4D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Random3D.dds" />
+                        </Component>
+                        <Component Id="cmpF961A328F263EF1D74BC33226284F738" Guid="{BCA0626D-0E0F-4A2E-A9CC-3EE66B0AC622}">
+                            <File Id="fil6939E412BA750E76734FDC21BFF8FE12" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\ribbonband.png" />
+                        </Component>
+                        <Component Id="cmp6D9F1991E12DBFB7DC663D860CFFBDBB" Guid="{F3BABD9E-A598-4167-A529-C29096FF6BAD}">
+                            <File Id="fil216484473972777ABE176E43B7FA88E9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\rockwall.tga" />
+                        </Component>
+                        <Component Id="cmpBA063C7E0F14EC498A39EA79EC205A94" Guid="{10B68DE4-A8C9-4AA7-9381-886DA481E2E4}">
+                            <File Id="filE4CD69E37E0B71BF30B99A502E6B3CA2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\rockwall_NH.tga" />
+                        </Component>
+                        <Component Id="cmpD5148F7FE3F5A67BE7968CB45230E969" Guid="{1AE56988-F49D-401D-803F-0AFC534099AD}">
+                            <File Id="filAD15F46DBF4BB7FFBDB60B90700DDC08" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\RustedMetal.jpg" />
+                        </Component>
+                        <Component Id="cmpC4F21E006C94E948501670FF3536CA78" Guid="{2A10F3EF-8079-4BF7-B1D3-751ACAAC5431}">
+                            <File Id="fil9292CCDABB08F43201F611CE4972E4D4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\RustyBarrel.png" />
+                        </Component>
+                        <Component Id="cmp2618C752CEB66CBA20855D31200855C2" Guid="{D11E7ED4-ACD0-4551-9091-9CCF37CCAF7F}">
+                            <File Id="fil0BD5FEEC843E03E0B4364E3E57584B62" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\RustySteel.jpg" />
+                        </Component>
+                        <Component Id="cmp5D173BA3B642D043280FF39DE8C59808" Guid="{DD661AB6-FF9F-4A08-B6C0-60175F4F12DA}">
+                            <File Id="fil28C30FDD4A1F4A03615CC86775F227C2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\RZR-002.png" />
+                        </Component>
+                        <Component Id="cmpDC5CE124AEC540B93C886862E9C015DB" Guid="{3D59F1F1-BF3C-466A-9428-B9CEA28C9582}">
+                            <File Id="fil7D8B9459F007199393A2FD32EE326D77" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-back.png" />
+                        </Component>
+                        <Component Id="cmp5A894E32D6D94D59883FDB94D702F502" Guid="{9BA90CE8-5791-4551-A9A0-332D295B0615}">
+                            <File Id="filDD35DF2A3C061C78268D26B5ED87D1C8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-down-p.png" />
+                        </Component>
+                        <Component Id="cmpBF04D2DFEFB0CF9A949740744E568D1D" Guid="{12F1C0FF-D2E3-4FE3-BBCB-962E058A63CD}">
+                            <File Id="fil30AEA571DA4BAB8601E998775C21F6D5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-down.png" />
+                        </Component>
+                        <Component Id="cmp8725B936ED21F923502ABE9F3DEE75D5" Guid="{865F4F12-687C-42F9-A705-6E7C4E6F2C34}">
+                            <File Id="fil5044EC9F7925889859C9DB978BE17761" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-thumb.png" />
+                        </Component>
+                        <Component Id="cmpF1F851EF20518BBCBDF1C5B1CCFA63B6" Guid="{F26831EB-2362-4885-A6A5-FBBD9F68EAF7}">
+                            <File Id="fil96E7471901A03D74E9439CDA2F68E235" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-up-p.png" />
+                        </Component>
+                        <Component Id="cmp87B0AC5AEE32EDC99A1189B460712623" Guid="{85E14679-CD1D-4267-A80F-373DF28C5D42}">
+                            <File Id="fil770B692929407708B9476C6508950B31" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\scr-up.png" />
+                        </Component>
+                        <Component Id="cmpF91F3CD1DEBD9B52FBCC97E5621B1C91" Guid="{839E477B-8819-4E1F-B856-86CF6CAAD7B9}">
+                            <File Id="fil843C0909C01A85B5BECCCF9C0B7C463A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Sepia1D.tga" />
+                        </Component>
+                        <Component Id="cmpCEAA7A02CA1D97A299559E98C5E7192C" Guid="{5FD55821-66B4-44E6-A0AC-B63102F64FA9}">
+                            <File Id="filD1B1A698712FBACA762582D383F6D5BE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\smoke.png" />
+                        </Component>
+                        <Component Id="cmp099C96103E9BD492189511DEF9B26F2B" Guid="{CE2BEEC4-D08D-4DB1-9082-CB5A69760E50}">
+                            <File Id="filFE2ACB684CDB6D5E12A6D2207D46A6C8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\smokecolors.png" />
+                        </Component>
+                        <Component Id="cmpC1FC205F5F8EFC3A292735C35C022796" Guid="{B084B583-78D0-4B7E-B2A3-297D4F655E23}">
+                            <File Id="fil832611A6A37EF6CBF18E55A3A5B7FF3F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\snow_1024.jpg" />
+                        </Component>
+                        <Component Id="cmpF3A889022B1C7628CB26D3D9A23B3A34" Guid="{8AC1CB90-6DBD-4CCB-9A49-C17659001AAD}">
+                            <File Id="filB6231B09E8091556889CB258C1D4581D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\spacesky.jpg" />
+                        </Component>
+                        <Component Id="cmp56E1BD31CA1A11574239564D4E056371" Guid="{081470CF-185F-4C4B-9527-9D657CDF0537}">
+                            <File Id="filD771784878B1EED29D15DB9E4643A6FE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\spheremap.png" />
+                        </Component>
+                        <Component Id="cmpF62582187A4AF1312C74EC0BC3095514" Guid="{1DA9D7B7-F271-4D21-BCB2-592D24296901}">
+                            <File Id="fil07A0F8B4FA2708D4ED33E97A6F9AA34A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\steelhead.png" />
+                        </Component>
+                        <Component Id="cmp6E7A3B9A70734B9ECCA62444F704A535" Guid="{76C9ECD2-911E-48A9-8D4A-924F21A06FD7}">
+                            <File Id="fil38068CA4AB819751D0B9B369ABD99BA2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\strugotine.jpg" />
+                        </Component>
+                        <Component Id="cmp15A45BC6F74A82166819DC50C40CB62B" Guid="{DBEFA31C-09C1-47B4-BC04-5F2A274906C5}">
+                            <File Id="fil137DECC4C6F95ACBDBE4D890CBE59C6E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terrain.png" />
+                        </Component>
+                        <Component Id="cmp99F70134A0D19B67985A3F104263D7AD" Guid="{72777E14-1BDF-4D65-8252-2213F767CF29}">
+                            <File Id="fil55685686095730082C98B55827FFEE87" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terrain_detail.jpg" />
+                        </Component>
+                        <Component Id="cmp021CC59A6181B763AD88EB13CDCB3075" Guid="{0F9961A6-6181-41DE-93BB-F2CF73792631}">
+                            <File Id="fil89732044FB408F1A53146F785CDA6AC3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terrain_texture.jpg" />
+                        </Component>
+                        <Component Id="cmpF86C6A7A81ED2EB38800A851AF8742CC" Guid="{1A94695A-FF65-4CCD-8518-174271744913}">
+                            <File Id="fil7AC0626CC5DFDC5E3684AFF6F2763F13" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terr_dirt-grass.jpg" />
+                        </Component>
+                        <Component Id="cmp7DC45D7AE69963CD5D8A8C8666EAB64F" Guid="{91108BDB-DC10-4C24-BBD0-354B777BA389}">
+                            <File Id="fil264E0462285CD2DE7E2DB66D192EE89A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terr_rock-dirt.jpg" />
+                        </Component>
+                        <Component Id="cmp224A3945C533D1FD51E1F234449AD694" Guid="{0B163DA7-804D-4F3D-90B2-711EFB1A7420}">
+                            <File Id="filB17852457AB0A91E1BFCAB41A6641452" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\terr_rock6.jpg" />
+                        </Component>
+                        <Component Id="cmpF971948D51969611E07DFD91B48C79F8" Guid="{EA8285B1-8EE9-4B6F-88E9-A79EE3B826EA}">
+                            <File Id="fil32269F8C2180140902AB8B53D968FCE5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\texmap2.jpg" />
+                        </Component>
+                        <Component Id="cmp8DC14C4C64230A7DF98A7BECA1636A31" Guid="{317FCDE0-8D6B-4C93-91AF-412568E90BB3}">
+                            <File Id="fil7B1BC8FE9583ED6A7A2336273371C0AF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\tusk.jpg" />
+                        </Component>
+                        <Component Id="cmpE7C6A9DBFFF17D3246BB6E057A6C024B" Guid="{4C61B3F8-3093-4746-AFD7-11E27ACDF0AA}">
+                            <File Id="fil045CCD7F6F3394D3847632DE88026919" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Water01.jpg" />
+                        </Component>
+                        <Component Id="cmpDF3FBE4FB997F03EA8576708AC7FF61B" Guid="{2B64D20C-420B-4128-885E-DC7D9A0947BF}">
+                            <File Id="fil1958A7D947D6F64F2FD52073C20BFD76" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\Water02.jpg" />
+                        </Component>
+                        <Component Id="cmp00AD9284686B4BC65D42A3AA09E7AC76" Guid="{52D30ED5-01AC-4A18-9C0A-69E2370057EC}">
+                            <File Id="fil1262DFF85BC2CD10700FAA794BE7BEE2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\WaterNormal1.tga" />
+                        </Component>
+                        <Component Id="cmp0AA2550269BF59FA6C1D885424EE3B3C" Guid="{CA7FB533-8334-4CDC-8FAD-8021B2E67390}">
+                            <File Id="filF7C45A5251A7B266CC0E3D04146ADC76" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\WaterNormal2.tga" />
+                        </Component>
+                        <Component Id="cmpD55DCF782D94981A1DE932935B9D8A62" Guid="{78B756BC-B991-4A28-BC41-6EFD2166158C}">
+                            <File Id="fil3FEA88BED510CBD76D00C8A8DE0F93F8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\waveNM.png" />
+                        </Component>
+                        <Component Id="cmpA1FEB51B0386689568AAFC22E0D71B6B" Guid="{A656184A-989E-4811-A730-31999A225D1B}">
+                            <File Id="fil5C9D5B21D6B6F690631CB1461D7562E6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\waves2.dds" />
+                        </Component>
+                        <Component Id="cmpA3F7363F0553143ABF1CA52A2FD433D6" Guid="{D014D5C4-74FB-42C7-B1C7-E08F0363A727}">
+                            <File Id="filE0AEB789AC5BC610192E24BD00AE6F0C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\white.bmp" />
+                        </Component>
+                        <Component Id="cmp0344A18C23958D312C044A6E8443CD9D" Guid="{E47FE6B7-B6BD-4FCA-A903-87281A6B8CEB}">
+                            <File Id="fil39C72570EB0CBAC9AF4FF900C2D5D525" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\WoodPallet.png" />
+                        </Component>
+                        <Directory Id="dir11696C93BEAB38C45931BCBDDB2A6789" Name="nvidia">
+                            <Component Id="cmp30B19313C1A692A69AC9C275E4E5D5CC" Guid="{68CA4BF9-5A51-400F-B5C2-701A4DA8D331}">
+                                <File Id="fil40BA6B2C4D12AD2C5710179390B9D2DB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\dirt_grayrocky_diffusespecular.dds" />
+                            </Component>
+                            <Component Id="cmp376B3837DF007338AC14AB58C726A8B1" Guid="{CF5BBEF1-4E44-46E9-8373-4FF589D19F6F}">
+                                <File Id="fil6A9EC7DE38E4F700741187344AAB9A4C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\dirt_grayrocky_normalheight.dds" />
+                            </Component>
+                            <Component Id="cmp02B151F3B587EAF5AF116E6A3B09E247" Guid="{EB6D162E-A67A-4CD1-948D-66B84457AFBD}">
+                                <File Id="fil30FFE3069E40D44C734E168BEB336DA0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\grass_green-01_diffusespecular.dds" />
+                            </Component>
+                            <Component Id="cmpFA2310874B7C3D5229AF9BEACAF6746A" Guid="{C6E468AC-67EE-44C6-9F01-69D369D966FC}">
+                                <File Id="fil4C7A93A8C53E76F5F5ED65D1F52659DD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\grass_green-01_normalheight.dds" />
+                            </Component>
+                            <Component Id="cmpB11E2174087D0D3FC791806231C1DBF5" Guid="{3A30B7B3-6D8D-4475-B31E-5626B54DD65B}">
+                                <File Id="fil909FAC7A36B3EA5B9F4660701BEC09F5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\growth_weirdfungus-03_diffusespecular.dds" />
+                            </Component>
+                            <Component Id="cmpF00ABD2DB6C6A8D718E0E4B5CD6B1C09" Guid="{EE4979FF-6320-432A-98B2-F183BCAC197A}">
+                                <File Id="fil23D0DB8C9CA160970B9C29DD8F77B5CF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\growth_weirdfungus-03_normalheight.dds" />
+                            </Component>
+                            <Component Id="cmpA603C50287BBE370F0BDF5FBE7A3233F" Guid="{E8AD7243-C2F2-4C00-AE8E-DC38E20927FA}">
+                                <File Id="fil6A4613F0DA3B5B562C5C68C05DFF0171" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\materials\textures\nvidia\TextureUsageAgreement.txt" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+                <Directory Id="dir01544E63CCE21518F3D56A0A93D1DC4A" Name="models">
+                    <Component Id="cmpEA39DA48CA01586DF3412795541AD2FC" Guid="{CBC85B97-8E26-4104-83A0-B0EABEFD955B}">
+                        <File Id="fil8FA60B76C86B50906D8EEFEE99A6ECB6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\athene.mesh" />
+                    </Component>
+                    <Component Id="cmp50C3E068724D3C32847EEB132308B147" Guid="{D9D55CC4-A065-4C46-94E0-EEDAB02516A2}">
+                        <File Id="filD19D6F1412936504C551E428AAF9AE2F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\Barrel.mesh" />
+                    </Component>
+                    <Component Id="cmp78D10E140133F6977C74A8F912B2B217" Guid="{11B0719F-90AE-4390-A020-8B193AA97EC5}">
+                        <File Id="fil11020C8E93B20B524D02F9FD2F80ED70" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\column.mesh" />
+                    </Component>
+                    <Component Id="cmpE7FF67F76AB4186500355A0726471B33" Guid="{4E9EE2B2-8320-4C2F-B7C6-635066CF2547}">
+                        <File Id="filCEDC17060099BDB3EBA4934B58FCBABB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\cube.mesh" />
+                    </Component>
+                    <Component Id="cmp37287274685D4190B1FEA6E423623F35" Guid="{A68E5C4C-E691-4A97-A74E-22AF35CF34CB}">
+                        <File Id="fil485B1ED402A33680ECB95C5268F5A9E4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\facial.mesh" />
+                    </Component>
+                    <Component Id="cmp50FE0EAB4E901283578DB360006479AE" Guid="{E4BB97B5-9F80-4CB0-A3DC-F0B1492BE5ED}">
+                        <File Id="filC2F6E9186AE72B0FF159DFB56BB75BE3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\fish.mesh" />
+                    </Component>
+                    <Component Id="cmpC3F7642C07E5FF9AC0B1171D944AD4A2" Guid="{98F67786-1210-4FD2-A770-13A772C42D16}">
+                        <File Id="filC9C1C83ED92D480C8786523E56047409" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\fish.skeleton" />
+                    </Component>
+                    <Component Id="cmp0BEDFF91A2CEC1FB2A5299F085CCBB6A" Guid="{F7DD089A-052B-4F06-B565-4DA89D0C1F68}">
+                        <File Id="fil5FA9076F84A9972C33F21842535E821F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\geosphere4500.mesh" />
+                    </Component>
+                    <Component Id="cmp8E32CD5D31223B9F7129FD2938C371FB" Guid="{2191EC62-B44F-4073-B7F1-7F523B84B752}">
+                        <File Id="fil568633034F3E39F9BF4096E770B8C2AF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\geosphere8000.mesh" />
+                    </Component>
+                    <Component Id="cmpDFAD872E9FE84F54DDB37E8B0117DFBD" Guid="{B314DDAB-D66D-450D-84DE-1D7BCBE336F7}">
+                        <File Id="fil4541DACF19E515DC41C10745A25C29EA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\jaiqua.mesh" />
+                    </Component>
+                    <Component Id="cmp589B2E8204248F02129BD7836A82412D" Guid="{0D6E5975-4236-46D6-BD7C-A9CACB19A9AD}">
+                        <File Id="fil333F0C9291480A1BD93D326850EF4AAC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\jaiqua.skeleton" />
+                    </Component>
+                    <Component Id="cmp0819BF68559FDECA3AFB0D7D258E06DA" Guid="{13109108-D3DF-452A-8F55-948996E5B8DD}">
+                        <File Id="fil8DAB543CB2480FB3ED831332104A0CB4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\knot.mesh" />
+                    </Component>
+                    <Component Id="cmp511C73A49ABFF4BD3B78BFCD9B05F088" Guid="{080D19C4-7BFE-4426-AF49-63778B7E8567}">
+                        <File Id="filE07D06C91FED1FA59D77E986981092AF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\ninja.mesh" />
+                    </Component>
+                    <Component Id="cmp64F5436EA1DDD327D8DE06EBB8C2970E" Guid="{F25A579A-15B8-46C6-A526-E8912E5D0A8F}">
+                        <File Id="fil86157504F1B1C9B475A90CF63DA782B9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\ninja.skeleton" />
+                    </Component>
+                    <Component Id="cmpAA7FA9AB7CF9DED4D0531C78ABDB8DA3" Guid="{D837BA7B-209E-4556-80BC-78594B78808A}">
+                        <File Id="filECF3EBC26B8759A636F39CE8A8606195" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\ogrehead.mesh" />
+                    </Component>
+                    <Component Id="cmpE4CAD3C36063B729397FDD1E4F284331" Guid="{B3064E88-E467-4AFF-9F9F-286F601AE22E}">
+                        <File Id="fil735DA4F96DFD917F198D2E20B715D225" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\penguin.mesh" />
+                    </Component>
+                    <Component Id="cmp1D6E48360762CC7FB6B7AFD50FAB037D" Guid="{5E917631-B880-4EF7-B15A-1EB74AE6F7BE}">
+                        <File Id="filCB7411E6BDEB3651A3F25CBF40246C8A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\penguin.skeleton" />
+                    </Component>
+                    <Component Id="cmp27B53348C2B3DCC9F4D7CB92CE87B81D" Guid="{AC87E3D2-044F-4B78-9FCE-DC2A3F4C4ADE}">
+                        <File Id="filBAF7DD3E7A90BCA9268558C4B3E614B1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\razor.mesh" />
+                    </Component>
+                    <Component Id="cmp52750AB1F051B11DAC1C0D8B6AE509EF" Guid="{71D55DC9-BA7E-452E-A79E-8C76049CC4EE}">
+                        <File Id="filE4B057674919E1D7664FB8DEE336958D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\robot.mesh" />
+                    </Component>
+                    <Component Id="cmp7D5725827F9E8389198F99B794C555EA" Guid="{C97DA813-E71F-40DE-907A-854ABFB1302B}">
+                        <File Id="filAC2940A3564FC424A2793A8BBEBB7872" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\robot.skeleton" />
+                    </Component>
+                    <Component Id="cmpD3F043520D9130982BE3DA8E7846F196" Guid="{099228F1-2453-4D3E-9EF5-ED56FF5BAA64}">
+                        <File Id="fil91D57A711C37E8BCC18A165D20350EFD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\RZR-002.mesh" />
+                    </Component>
+                    <Component Id="cmpD6BB38CE1402C2D40E8E63A0733C7BF0" Guid="{759FD86A-0DA2-45C9-BA24-9BF552B47464}">
+                        <File Id="fil0CBFAC6EA4778309302BD2E194AAB998" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\ShaderSystem.mesh" />
+                    </Component>
+                    <Component Id="cmp9E61D362040DC13AF103013A093377A5" Guid="{A9C1B6D7-0CF3-47C3-9B8B-F5DFE391DC0A}">
+                        <File Id="filD5ADA617184397025DADE88EC997A4C3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\sibenik.mesh" />
+                    </Component>
+                    <Component Id="cmpDFD58144C55506C82E22CF1AC14714B8" Guid="{0A8394B2-D37E-4A41-BED6-80EBE95A14F5}">
+                        <File Id="fil8BBF52B26135D3B5F0E2704C067DA6A3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\sphere.mesh" />
+                    </Component>
+                    <Component Id="cmp9BF13256D468C8147B7050A93B09C032" Guid="{76C683B5-67CB-4B81-B17F-8C9AC4AC13A3}">
+                        <File Id="filD8BE8F31A94761F1E33E01CBEA3FA75C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\tudorhouse.mesh" />
+                    </Component>
+                    <Component Id="cmp86F908FD9E8E5FFAD0C2D9A37A098E4C" Guid="{E1A27E07-B1AB-4B7B-A07E-53759F8A81F6}">
+                        <File Id="fil153AC2186B70B9C88D85185CD25B3335" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\models\WoodPallet.mesh" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir4ABFE5E33570C5CDD587CDA5FEC53CBC" Name="packs">
+                    <Component Id="cmpDEED3FE7C35E18D0FA59B8BB3DF42244" Guid="{5B8E1BED-1BC5-4A20-BA09-9699D0AF7BFC}">
+                        <File Id="fil43F38AE712D50BF0076D8C8E08E3264C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\chiropteraDM.pk3" />
+                    </Component>
+                    <Component Id="cmp98499D3076FA7324AFE1F9F8D10FB421" Guid="{38CA3EF3-96E4-47D1-8B4C-682BCCF91E99}">
+                        <File Id="fil98BCB56BE20EF36A4F72F07CDADC63DE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\chiropteraDM.txt" />
+                    </Component>
+                    <Component Id="cmp532E67011B733ACE674692F6ED52775D" Guid="{9AC3FA7E-FBDC-4448-A61B-615EF43EB923}">
+                        <File Id="filC6E116063CEC1DFBE1D6B452FD089931" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\cubemap.zip" />
+                    </Component>
+                    <Component Id="cmp572AE70CCC0D85E8DA35F87B45768634" Guid="{EE614585-655F-4802-9EB7-F8B65C4E9179}">
+                        <File Id="fil1699EB897C0C81E448FBE0D028124F9B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\cubemapsJS.zip" />
+                    </Component>
+                    <Component Id="cmp013036935784DEC9BAE62831C93EFA18" Guid="{5C469262-3198-4B2C-9A1B-D322590449CF}">
+                        <File Id="fil002725EC3D3AE19C14A2BCB61BA6DDAF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\dragon.zip" />
+                    </Component>
+                    <Component Id="cmpCE929A7FB9AED25EFACCF874682CF6CA" Guid="{1719A6D8-A104-498D-B55A-1D7FD21FCD15}">
+                        <File Id="filA4773E54AEADA6F67F638D414BB3FCCE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\fresneldemo.zip" />
+                    </Component>
+                    <Component Id="cmp34D92ABB7879D3222F18544B21656DEA" Guid="{0F6A8BAF-9DF1-4C9B-B06E-4F75DC9E61A1}">
+                        <File Id="fil627F4F8C444C84C6DCCEFF0F60B63E1B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\ogredance.zip" />
+                    </Component>
+                    <Component Id="cmp79B8F8BF1A145DEAEC5CB378211B26ED" Guid="{9C806FAC-8A28-4072-AF63-7194970721F1}">
+                        <File Id="fil44329186AA89F486973DC9A4153D7B66" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\ogretestmap.zip" />
+                    </Component>
+                    <Component Id="cmp33B73CBD0D8189BB209EECBBC028100E" Guid="{5654F3E4-3B9D-4B11-B52A-49B61E08028B}">
+                        <File Id="filDB8A3351A3B806A1C09694299F3801B5" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\SdkTrays.zip" />
+                    </Component>
+                    <Component Id="cmpF787B9590E7A16DC6EB9EFB2018B7F52" Guid="{DD8E8974-031D-4B0A-996C-7DCAAED405DC}">
+                        <File Id="fil58C2CA5456CE97E67224FFE04966FC5D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\Sinbad.zip" />
+                    </Component>
+                    <Component Id="cmpE0F99AA8E03B1BBCBC8685F0B9B39FBC" Guid="{E6E16D3A-0F92-43AC-8D97-5DE950CBEAE9}">
+                        <File Id="filCAC9219DBD30A455003CA797421F2FB0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\packs\skybox.zip" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir52C59F4D91BBF2A0B3DBC5ACDCFEC32F" Name="particle">
+                    <Component Id="cmp3AC85553CBB9970D795D5B8E507FBC6A" Guid="{C8493B60-69A7-4412-AFA5-002E9A43388B}">
+                        <File Id="fil60EADDE9B192FBBB2C57FAA9BD9D27DC" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\particle\emitted_emitter.particle" />
+                    </Component>
+                    <Component Id="cmp7984E19157DF1C14A9A552654DA4D91A" Guid="{5245757B-410E-4DC1-9F7A-6C46D7AD3B78}">
+                        <File Id="filC8D042ED43DC5939903191B20470D547" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\particle\Examples-Water.particle" />
+                    </Component>
+                    <Component Id="cmp8BD3A12ADBBB897138826480695251A8" Guid="{AF07BB1C-249E-4401-AD49-BA5D80A1BE79}">
+                        <File Id="filB3449646BC470E5F4C87CC122A5F0897" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\particle\Examples.particle" />
+                    </Component>
+                    <Component Id="cmp47B74EDC229F01F14AAFF5CC4F50466C" Guid="{0828170A-DCBE-4DA6-A38C-9E042B57C262}">
+                        <File Id="filDDF54770196C3C9037A5A6A45208EB16" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\particle\smoke.particle" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir9563A73380AAF8D0BF7E9C065552A34A" Name="PCZAppMedia">
+                    <Component Id="cmp5A8B603914D3AA08DEBD512A6C91393A" Guid="{77411AE6-8C10-4629-9526-B9CAB5D59DF4}">
+                        <File Id="fil236D3C575998E64A210A04631C801094" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\building_exterior.mesh" />
+                    </Component>
+                    <Component Id="cmpC9DC219F449E49E64508AE42F4BC4793" Guid="{D314C6DF-64BC-4943-AD17-1A5A5E31E72B}">
+                        <File Id="filE1C4907AF547234EF02ECC92234B72F1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Carpet_Diamond_Olive.jpg" />
+                    </Component>
+                    <Component Id="cmp0302D3E70C4326369EA5BEC172CA4E85" Guid="{B680D404-9631-421E-9724-38EC6B22C3AD}">
+                        <File Id="fil74B3DF31F9604A8896E149D507391FD0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Brass_Ceiling.jpg" />
+                    </Component>
+                    <Component Id="cmpF4749D54A3A874DE91D55EF99BEDAE95" Guid="{CDEBABD4-EFAB-46DA-8972-72289BED088D}">
+                        <File Id="fil6524ECE493EB28F4F8AA6F63DAF5D7C8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Embossed.jpg" />
+                    </Component>
+                    <Component Id="cmpBCDB2BC551AB22948C44D15F2DAFF835" Guid="{014A498F-FBF4-4506-A733-5885A07C3213}">
+                        <File Id="filE91D9719C252AA1D63FB707D96560198" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Rusted.jpg" />
+                    </Component>
+                    <Component Id="cmp0B1CF4A5B41DEC9548E6C4221895C32F" Guid="{2249C57F-2CB2-4EF3-AEE9-126B18199F5E}">
+                        <File Id="fil62DB4D0A938E0A236624FF5EC271757A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Rusted1.jpg" />
+                    </Component>
+                    <Component Id="cmp4D110A1DA73885152E881768CA514E09" Guid="{ECD33352-655E-4EAD-8011-38B27B75C40A}">
+                        <File Id="filA78D0DC2AD4B31F862696BA80D62E803" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Steel_Textured.jpg" />
+                    </Component>
+                    <Component Id="cmp8D1301614F99F4AC36FEEB27ACC8CFFD" Guid="{D10B0652-F269-4AC6-9773-1094A42E26B6}">
+                        <File Id="fil306423897E1EBC167A7CB902AFB895D3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Metal_Steel_Textured_White.jpg" />
+                    </Component>
+                    <Component Id="cmpE3F7B24C1ABE0832302DBA5938CA5324" Guid="{7598C4FE-CBF4-4AF9-B69A-3FE38A6662E3}">
+                        <File Id="fil9D8A2445E6BBA12A6BD127C668F36352" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Roofing_Tile_Spanish.jpg" />
+                    </Component>
+                    <Component Id="cmp705466434B20554ED5BC75D0F532F1DF" Guid="{696BA73C-5224-4418-BCAB-D54B2F71D8AA}">
+                        <File Id="filCD59E6B887FBFFFD10503A8F86089616" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM.material" />
+                    </Component>
+                    <Component Id="cmp4F3B455BAB661441634C16337B9BEDDB" Guid="{CF9923B8-C3D0-4DD0-B59E-92AC41BE545D}">
+                        <File Id="fil0C37038A5DD837C9E491C7BBD8FA8B63" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_NX.mesh" />
+                    </Component>
+                    <Component Id="cmp59913ED4955BBF3AB092DBCF926439BF" Guid="{651DA0FA-B621-49D6-89EE-11414069FB0B}">
+                        <File Id="fil9C7E4FDE2E7ADE843F28FAB6993F7C59" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxnynz.mesh" />
+                    </Component>
+                    <Component Id="cmp9CA89FB27BE8C98580D86F3ED5D583D6" Guid="{1C95A10D-A83A-44E0-BF0E-5B23C33F69A5}">
+                        <File Id="fil528B0C6BCB909A1ED2C87CAF1E54B424" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpx.mesh" />
+                    </Component>
+                    <Component Id="cmpB3A4DF88B167589C979E46C356A951B6" Guid="{E62152D3-D6FD-4847-8C6A-DE859F4B3222}">
+                        <File Id="fil9EFAA31510F03D3DDD43C9C4D2D16579" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpxnypynzpz.mesh" />
+                    </Component>
+                    <Component Id="cmpA4C556C81A63CEEE6DB5B97A6533E3DA" Guid="{7EB84512-3A32-4DDE-9AA8-25A203208E88}">
+                        <File Id="fil53AB9D940D5C3BF64653C0231489B115" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpxnz.mesh" />
+                    </Component>
+                    <Component Id="cmp2791A26943506B246085F1AC92BB55AF" Guid="{F5457A01-7791-45FA-B089-6E9A3124963C}">
+                        <File Id="fil3F63A5C7059A01C11E1589B6717BAF09" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpxnzpz.mesh" />
+                    </Component>
+                    <Component Id="cmpC44401D62CA8E029B83A3A6BFAE6678B" Guid="{6D500200-08E9-4AF2-9C6A-BBF96C2F9A51}">
+                        <File Id="filE878E168EAC28DEBBAC9FB7F7E7D5612" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpxpz.mesh" />
+                    </Component>
+                    <Component Id="cmp7361DD609440CA6E7B054FBA8A7324B6" Guid="{771E482F-0698-4D08-9BD5-10D40B2D3FCC}">
+                        <File Id="filE73223C0795DAD0828F5D5A035C03ED3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpynz.mesh" />
+                    </Component>
+                    <Component Id="cmpC7C961329AB7EAE8D77192CE75C60758" Guid="{F7927E7D-83C8-4EEF-B720-E6AA25BB4CC2}">
+                        <File Id="filE6872D6265CED60A2D50E88DBD1A105F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nxpz.mesh" />
+                    </Component>
+                    <Component Id="cmp05D249D10562F5C5C10887264CF93A07" Guid="{BFFA470B-129C-4D3B-9E21-B50C3A50ED2F}">
+                        <File Id="filB42C5F73C7B75F0960B1C607714BFE20" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_NY.mesh" />
+                    </Component>
+                    <Component Id="cmpAEC3BBD87E09C923CFBED4D3B9838AA2" Guid="{C29B9DA6-E6B4-4E1D-B2FC-AFF9C47B9300}">
+                        <File Id="filE4B1FEE265B2AA1E7A565E6B673CDB7A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nypy.mesh" />
+                    </Component>
+                    <Component Id="cmp427483E8EF1CC17E3FAB1F5596B3A261" Guid="{0532D16C-B05C-4A75-A9F8-895F69C04C6A}">
+                        <File Id="fil8FB8BBFB5EF52DFF66D2068376E7D352" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nypy_4y.mesh" />
+                    </Component>
+                    <Component Id="cmp2817F4BF8A4FE169EF164E09EE3DA178" Guid="{3DA969FA-E975-48E5-9790-5E4C23867C1C}">
+                        <File Id="filE4CAB0EB91924B5174AE717302385A23" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_NZ.mesh" />
+                    </Component>
+                    <Component Id="cmpC84C027F62895C00E5C3041EED5EDC53" Guid="{52BE8783-1E2B-4875-AB26-4020E9E2C986}">
+                        <File Id="fil393857E4FAF7A31A7F9ADA0A49B80F69" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_nzpz.mesh" />
+                    </Component>
+                    <Component Id="cmp40C3C9A8D813E909DF452B3D434633DD" Guid="{F72D834C-69D7-48F1-A638-A6D8E7B745BC}">
+                        <File Id="filB5C1F125265265E63205747BB04E1BB4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_PX.mesh" />
+                    </Component>
+                    <Component Id="cmp6EAE30B5C3E9E32D1DD3A55DB8FE6941" Guid="{DD242BCF-6119-45F2-85DD-275BD7716257}">
+                        <File Id="filF232865725033825C764F6ACF3C4F86A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_pxnynz.mesh" />
+                    </Component>
+                    <Component Id="cmp517D5A44CF44F5425DA14D8BAEC68DF4" Guid="{02896C34-459A-43D2-9F74-86FD7B15097B}">
+                        <File Id="filE8421AFAAC1A0FAF906BDA3B9BE25FA8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_pxpynz.mesh" />
+                    </Component>
+                    <Component Id="cmp24A33C5A0D5A2FC40EFD77537BFB1CF7" Guid="{F54C1D19-E602-49F9-A96B-EFA2EDA73A06}">
+                        <File Id="fil0181E2ABEAE031E9299C6C95C32B3766" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\room_pxpz.mesh" />
+                    </Component>
+                    <Component Id="cmpC3DB07B975995DEF02FFFBE335DD2106" Guid="{FB5A1532-DD23-464A-9C53-3C52C58A7779}">
+                        <File Id="filD8B3EFE1082B56EC799B97325F636D9F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_PY.mesh" />
+                    </Component>
+                    <Component Id="cmp9EC5A912704186E3EEAB59851A37D984" Guid="{20E91A4A-0FC4-4728-9BBA-C456DE7AF439}">
+                        <File Id="filD97C123FDB8460F5B770762D42CACC99" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\ROOM_PZ.mesh" />
+                    </Component>
+                    <Component Id="cmp02619F8AA1574FCDA5067332B449B6C7" Guid="{1E8B711B-74B9-4186-BE15-EC0D72AF0AA6}">
+                        <File Id="fil047C11D042D989770C261FE04BB907C7" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\terrain2.cfg" />
+                    </Component>
+                    <Component Id="cmpC28FEBC877D88F957881D16375A9AA3F" Guid="{31534613-A017-42F2-BFF9-B2BE101DE82C}">
+                        <File Id="filCA1E68590E9324FC85DFBD8935160895" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\terrain2.png" />
+                    </Component>
+                    <Component Id="cmpEB22C55C582617975688FD4DA8380742" Guid="{5FA5D8D3-7121-46F2-8F3B-8670129F3FC6}">
+                        <File Id="fil9C3E88DFE68A3EC70E28168D5CDCA58C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Translucent_Glass_Tinted.jpg" />
+                    </Component>
+                    <Component Id="cmp5461196C717C05B12F74D2DA58630BC8" Guid="{EA25080C-7609-4358-9D91-6DFFB335CF38}">
+                        <File Id="fil6458CC57626A2959219A1D442C297F5E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Translucent_Glass_Tinted1.jpg" />
+                    </Component>
+                    <Component Id="cmp4AFD44779547CB7E31ED23D6E8C8209B" Guid="{EA531FAC-A3C6-4CCC-9193-3EAF98A27F61}">
+                        <File Id="filED9EF1DB492453D5ABB3BD3D808E9178" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\PCZAppMedia\Wood_Floor.jpg" />
+                    </Component>
+                </Directory>
+                <Directory Id="dir619CC0B084B3AB8739AE80B9ECEA25E2" Name="RTShaderLib">
+                    <Component Id="cmp5070BC96F08A05F96D403DF8A20B309F" Guid="{76C1B073-C8FB-4B64-BB2E-BE875315B3EC}">
+                        <File Id="fil68A3081549C6BB772E0B3348385462DB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Common.cg" />
+                    </Component>
+                    <Component Id="cmp6F0BCFB7C5472A044D733139C88B58A8" Guid="{50FC6962-A720-4699-A945-510D6BF3C22F}">
+                        <File Id="fil48DC0F8A483617BE8BB75881CCB936EA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Common.glsl" />
+                    </Component>
+                    <Component Id="cmpFDE9E57440F1036A2A4EF2CA4803F137" Guid="{6105B653-8250-45BC-98A5-3F552546DF24}">
+                        <File Id="fil523FE1958BA431E0157EF96AB949B0CB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Common.hlsl" />
+                    </Component>
+                    <Component Id="cmp8EA15C556F1AFB4EB8374BAFC93F4827" Guid="{7DD11005-E8D5-4400-A61B-B7C6176274F8}">
+                        <File Id="fil0C7318B44305FB9969088F70927C4DC1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Fog.cg" />
+                    </Component>
+                    <Component Id="cmp1EB4259B0CF3EB4509217F346ADADD5E" Guid="{7759F83D-32F2-423D-8945-C382C3926B3A}">
+                        <File Id="fil3FCD323BFAF5273E15E569BD90337B7B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Fog.glsl" />
+                    </Component>
+                    <Component Id="cmp7DD1095774951BB25E03614F61FD2B8E" Guid="{0154C3F5-0362-41A8-AF6E-5A189A0CDB43}">
+                        <File Id="fil56743559FD37E55515C10CE1647A72C3" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Fog.hlsl" />
+                    </Component>
+                    <Component Id="cmp50AD5B6DC37E36897CBF7B8DA95CB0B4" Guid="{3E84C9E6-5475-43A0-BDEC-111FE2F2092B}">
+                        <File Id="filCA91B78C6FD37FD8BD0F930F5283D3FA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Lighting.cg" />
+                    </Component>
+                    <Component Id="cmpC5360903907525A54FF97364011E1682" Guid="{577877EE-5499-4E89-93C2-20EDC215C4E6}">
+                        <File Id="filCAFA3E9A3A9BE43AE267A62A22E5D367" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Lighting.glsl" />
+                    </Component>
+                    <Component Id="cmp3493B9CD28BDEFA171A313C0F1436417" Guid="{76264D79-D1FF-4475-8322-B4774C14922E}">
+                        <File Id="filC00E5AE012D3A764B7312FC34B3875A1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Lighting.hlsl" />
+                    </Component>
+                    <Component Id="cmp6DC26468A158B74DFEE4952BE801A21E" Guid="{5F775006-8D6F-4075-9473-52C31731764F}">
+                        <File Id="filEA497556AE8D2178570B72E5D798CD5A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Texturing.cg" />
+                    </Component>
+                    <Component Id="cmp653FC5BF225F161C9B10421C66AF81E0" Guid="{289E1217-640A-42C6-BE7D-C998AAC74A63}">
+                        <File Id="filF47FB602256D5604EBD8E5D6ABBF7B99" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Texturing.glsl" />
+                    </Component>
+                    <Component Id="cmp886787CDA02848D02E9D4664B9BB1169" Guid="{5B0A9B5A-DC16-4631-AC5D-8063D4A35609}">
+                        <File Id="fil4649F2EF3EA93ED53FE0AB435B83C723" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Texturing.hlsl" />
+                    </Component>
+                    <Component Id="cmp0E8D3CDA913B341ED6A33F4CBBE4592E" Guid="{361D8D78-59A7-450F-A6C4-24C6454CF1A1}">
+                        <File Id="fil2F74DDA61788FFA9EDEE6FD4B77F7D20" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Transform.cg" />
+                    </Component>
+                    <Component Id="cmp2706850425BFC78EFEE993C81D04B80D" Guid="{AF0D6BEE-6ED3-48DA-B1D9-699B40753840}">
+                        <File Id="fil6B87CA68355B440586696C3E9E4CD1B8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Transform.glsl" />
+                    </Component>
+                    <Component Id="cmp7026F694677602EE20C74343704D7BF3" Guid="{D988F16B-4F05-41EA-8C16-02B80919AC99}">
+                        <File Id="filFFA99C445A745946A3B337DF7328E709" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\FFPLib_Transform.hlsl" />
+                    </Component>
+                    <Component Id="cmpB5E9EC68B055E256BC2F1661A0B9D0F9" Guid="{79A48613-8882-4057-B1D4-5ADF68C32F9D}">
+                        <File Id="fil5C6CFE38CC01B30A36E047731A0F4E3C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SampleLib_ReflectionMap.cg" />
+                    </Component>
+                    <Component Id="cmpF10F9F532AADA63663F3183AD8865057" Guid="{6F10BF84-4877-4BA8-9201-0B0EEC05B9E3}">
+                        <File Id="fil7ADDC86C695E815F84E6DE9C48DE82CE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SampleLib_ReflectionMap.glsl" />
+                    </Component>
+                    <Component Id="cmp5086FC39B8C1543170A8C3F65214208A" Guid="{02C40981-4AF7-4352-9610-E779F80EC508}">
+                        <File Id="fil4558FF0300CC0FBEAB39393541CA75F4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SampleLib_ReflectionMap.hlsl" />
+                    </Component>
+                    <Component Id="cmp5E97F9A3C6A8762409ACBF6135E28FBB" Guid="{5000D41C-5962-4EE0-9517-FD639EA081CF}">
+                        <File Id="fil70B2F9AA9C5CD00BEF5E5E3A95220BBB" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_IntegratedPSSM.cg" />
+                    </Component>
+                    <Component Id="cmpAEBA120773F6107AD3F6A81AE37A429C" Guid="{DD0C2EE4-0EA8-46A9-9D33-35E0F957F165}">
+                        <File Id="filE37D5C5EB5D36212AC7A14512CF50203" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_IntegratedPSSM.glsl" />
+                    </Component>
+                    <Component Id="cmpE4AA3E16C4F0370A884DF256E4A7BD65" Guid="{54ADF858-D961-4DE9-AE00-8987175B7545}">
+                        <File Id="fil5387D48C49E9288F2AABC5C73787B3DF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_IntegratedPSSM.hlsl" />
+                    </Component>
+                    <Component Id="cmp7E7CBF0FB289CC6C9BDCA4284A16E57A" Guid="{5090DB6C-7FF5-4264-82CA-F15EB4540B50}">
+                        <File Id="filDA5CD57C42B302F4BA44C5BB911A544A" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_NormalMapLighting.cg" />
+                    </Component>
+                    <Component Id="cmp26ADB52C486D30CEB261FA2CE60ACE9C" Guid="{0AEA8F9C-10A9-412C-A33D-775D93E6F9D7}">
+                        <File Id="fil493B6FF166840108B9F419B8F4C392D8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_NormalMapLighting.glsl" />
+                    </Component>
+                    <Component Id="cmp3E22F803253DAA27EC5425149520CBF5" Guid="{E4D9268B-9156-4814-A364-B7AF5A163B78}">
+                        <File Id="fil7F07F2791E4DCA653876C1DB2BDCDFB1" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_NormalMapLighting.hlsl" />
+                    </Component>
+                    <Component Id="cmpC775E8984648A33699D3DC880D9FEEF8" Guid="{5A9530C8-817A-4092-8CAA-986D0C81D60B}">
+                        <File Id="fil76292CCDFA1856FFF93387BF23892003" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_PerPixelLighting.cg" />
+                    </Component>
+                    <Component Id="cmpE4BBDB34DF6D807332A899582239E729" Guid="{739DEEFD-7952-4731-A7F5-836D363FEFF2}">
+                        <File Id="fil92B26CD097152EA4801C3DDE5A8C05D9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_PerPixelLighting.glsl" />
+                    </Component>
+                    <Component Id="cmpCA2C6187BD8F749AD8036686481EE76A" Guid="{EB5BAD5C-BBCF-47AE-82FD-BC899C2AC0CF}">
+                        <File Id="fil1D87A70BC85366074231C2086ADB5C0D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\SGXLib_PerPixelLighting.hlsl" />
+                    </Component>
+                    <Directory Id="dirE50672BB64824B2983EE78E1E2603840" Name="materials">
+                        <Component Id="cmpD965705D323F9172AA80E20523DFCD0D" Guid="{BB83B7A8-55CB-4BAA-83B5-919E7B6CE26D}">
+                            <File Id="fil732C35DD8BC95496E0AEE69514586944" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\RTShaderLib\materials\RTShaderSystem.material" />
+                        </Component>
+                    </Directory>
+                </Directory>
+                <Directory Id="dirD2207B9EE0662B6410F0221BCA28E887" Name="thumbnails">
+                    <Component Id="cmp8ED6AE0EBB754E84501CCF6CA4E9D52F" Guid="{E8D02EB4-45E0-4430-BF8E-F9D6E37E2C8F}">
+                        <File Id="filAD1945E3A9FAB81808B91C06FAAAE4F2" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_bezier.png" />
+                    </Component>
+                    <Component Id="cmpBC0FB0E1F1BEE4AD1E6A650790CFD5D6" Guid="{66FB3B1A-1465-4840-9AA3-B09AE411D951}">
+                        <File Id="fil777FB9C51E91C300C1E597F4DF694341" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_bsp.png" />
+                    </Component>
+                    <Component Id="cmp6D4293E821504530EAC3B0C7CBB7E9F0" Guid="{AA05550E-BE07-4841-A6FE-6E31BC7F8788}">
+                        <File Id="fil04241D9B382E66F6722509AA67AA5DCA" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_bump.png" />
+                    </Component>
+                    <Component Id="cmp48A16CCDE2AF36A361872912CD9BB4A9" Guid="{D7E81530-46F5-4B66-B8A0-ECBF4814C00A}">
+                        <File Id="filE4D8A92AFC562FD6F7BDB5170C907CD8" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_camtrack.png" />
+                    </Component>
+                    <Component Id="cmpE81F10BB60189F8C025DBCE48D372035" Guid="{77EE3A8B-9D17-415C-B3F0-E65954E5AC33}">
+                        <File Id="fil30A7BD4BF8130A4BF94B23206E56D82D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_cel.png" />
+                    </Component>
+                    <Component Id="cmpDD520BBB977A8147FE45728A4C8D5764" Guid="{310A6586-B8CB-4E1A-9DCF-EB0A88B0BBDB}">
+                        <File Id="fil3D48F8FA9968D27F959A38DF36017C23" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_char.png" />
+                    </Component>
+                    <Component Id="cmp096E9DF755E7D1E32BC18461BA90D90F" Guid="{09EECEB0-F13A-4869-845F-3BE89F060544}">
+                        <File Id="fil1C87D4BCBB579D408C2FD8F09981FDFE" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_comp.png" />
+                    </Component>
+                    <Component Id="cmp2AECC3BFD5DF142ED0FA34841B6D73AB" Guid="{903579B5-81BB-4265-B861-32EB3EDE3D51}">
+                        <File Id="filA3B5C3103D6EBAECC5CA494D293A6869" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_cubemap.png" />
+                    </Component>
+                    <Component Id="cmp49B2AACB77152192A7D2BD514C050455" Guid="{6201A1BC-7610-4DC5-B472-120326179181}">
+                        <File Id="filD3CA38BA7DF084A6540278D7DEC36EB9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_deferred.png" />
+                    </Component>
+                    <Component Id="cmp16726783D8211FD5A308D29FA2EFA0DF" Guid="{E98E6652-044A-408F-9142-C2AD2D4DAF5F}">
+                        <File Id="fil5CE487CF3A6FDB2C9A8339B045B204C9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_dyntex.png" />
+                    </Component>
+                    <Component Id="cmp6E6DC153CC74A2B7A53316671D8617F3" Guid="{6C2541F7-5C51-4503-B821-301B29139ECA}">
+                        <File Id="fil8B3E24F2F716CFCF9BBD2553CD62D109" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_error.png" />
+                    </Component>
+                    <Component Id="cmpC09D7A2D083141BA0F25A0A6C86CC8E0" Guid="{E9D2D739-8B3E-4D20-BE9A-A8CAC38B7308}">
+                        <File Id="fil97D717829B769EEB79FC3A95A7021F9C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_facial.png" />
+                    </Component>
+                    <Component Id="cmp2833134FADC41D7352F63115C6B9AD85" Guid="{E5537CF0-CB29-4F59-8B3E-C31B9CFA2F8B}">
+                        <File Id="fil05B4C128030A269250FD341AFE89DEB4" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_fresnel.png" />
+                    </Component>
+                    <Component Id="cmpB94BFB1720AE582E1E038A04E9582493" Guid="{42729158-8E10-4A9B-A73F-FCC4FBD65F66}">
+                        <File Id="filB5F46D67BF41F59348C0564438A79178" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_grass.png" />
+                    </Component>
+                    <Component Id="cmp06B8BF9C7CF8924FE211E6E7289CB969" Guid="{C7B86334-E2A7-4C9E-A2BA-9376D1A5EE9D}">
+                        <File Id="fil4ABDA28D13A1E69837B62C996499CF1C" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_instancing.png" />
+                    </Component>
+                    <Component Id="cmp35D2648E9F14EED6A2B91694AC8DF2F6" Guid="{43AE1B5B-465E-4175-9859-711E9DD3EBA4}">
+                        <File Id="filECDC0DC8D16CD848BD2978FC18FE8785" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_isosurf.png" />
+                    </Component>
+                    <Component Id="cmp7732398F3C98597797B77A81F40C5AA5" Guid="{5B059B87-681F-4C75-8F18-B9668D19CD2D}">
+                        <File Id="fil8E4975ED97DC82ACE53A7D2A2E89601E" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_lighting.png" />
+                    </Component>
+                    <Component Id="cmp4FA80707FFCDCDE0981B97AA94ECB162" Guid="{F3B58D22-028B-425A-94D6-5614DF82BBC8}">
+                        <File Id="filB0ADC263E9AC6FD69D8BC3C9A694E92F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_ocean.png" />
+                    </Component>
+                    <Component Id="cmpEEB5B89D023C28A8BE5DA85F039AB29D" Guid="{72A29345-01C0-43CA-A988-E36FE0882C2E}">
+                        <File Id="fil35F2BDC9004B5BD3EFD7ED431ABECC13" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_particlegs.png" />
+                    </Component>
+                    <Component Id="cmpE187B27A5186BB3DEE560FC7C7E8C456" Guid="{B4904700-5C93-4E4C-84D9-C6DD11D348E2}">
+                        <File Id="fil3D248D789729F897264DAE7A64953D80" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_particles.png" />
+                    </Component>
+                    <Component Id="cmp42896781E8EAD912258DDFDB1399525E" Guid="{18E38359-934E-47C5-980F-3CD39611A988}">
+                        <File Id="filCC6E55BD9E2F49A983C85811D8CF3DAD" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_playpen.png" />
+                    </Component>
+                    <Component Id="cmp90D76F1F9096FA06C766A3366B32B605" Guid="{48E3E0ED-F298-4A0D-9DB8-D827C34E2780}">
+                        <File Id="filCF93F9A56DD68977020524CB3E658A57" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_shadersystem.png" />
+                    </Component>
+                    <Component Id="cmp3B3543FDF727FBD89166C8C3A9DC7238" Guid="{F13A0968-6BCA-4A02-8E08-ED38BC0A2D8F}">
+                        <File Id="fil909E875F5EB55A8027B859EA36555736" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_shadows.png" />
+                    </Component>
+                    <Component Id="cmp90B194EE93F1254D872033409B4A592A" Guid="{0294F942-790F-4AFA-9E8D-1EB20BA5988B}">
+                        <File Id="fil4F953F9BFA63A85DCC19E68D9DD90D8D" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_skelanim.png" />
+                    </Component>
+                    <Component Id="cmp7AE8FB6C37BF565B90B36EB476D8DAA1" Guid="{829C1527-C77F-47AE-B138-BF5C9F848675}">
+                        <File Id="fil7714716E2C54EDF5F530E7FD04BDBDF6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_skybox.png" />
+                    </Component>
+                    <Component Id="cmp791C0C01F755B1079B27BAE2749647B5" Guid="{69CE5DF5-5146-4FED-8730-890156CF5437}">
+                        <File Id="fil28F6E5F262E036A3CC519597EE521ED6" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_skydome.png" />
+                    </Component>
+                    <Component Id="cmp50992A7415E9598E63B64AD38FA78982" Guid="{0EDEC55F-D375-4E7F-902A-28273AFE89D1}">
+                        <File Id="filE487EA91EE1FF0BF67CB415CD9AF21B0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_skyplane.png" />
+                    </Component>
+                    <Component Id="cmpC4F2D1CF15FD695650BE991FE642E2D6" Guid="{BB582F8D-0426-4DC3-84E6-61C9DB7247D8}">
+                        <File Id="fil48ABE1C9595E1699595621E5CD8712A0" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_smoke.png" />
+                    </Component>
+                    <Component Id="cmp29EF6AE264E3575486F9E5DD793A9E73" Guid="{7FDD24FA-153C-4FB1-AC96-81B28A9B308F}">
+                        <File Id="filD2D37F66E85FA40D45EA305649AAE4BF" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_spheremap.png" />
+                    </Component>
+                    <Component Id="cmp1CA9DDC76B20902AF44270B30FA4772D" Guid="{32640DDC-590E-40A0-82FF-AB0FBCCCB73E}">
+                        <File Id="filFFF64FAA8BE5C161B26584A6EBEA4C6B" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_terrain.png" />
+                    </Component>
+                    <Component Id="cmp459F829D9AF111D679C4AC2E384D1341" Guid="{E3C66CAF-721F-4C5E-A458-0394E434844F}">
+                        <File Id="fil1840B1F11E52A9A3D795E05FF8DA51E9" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_texfx.png" />
+                    </Component>
+                    <Component Id="cmpFF771FA0697C295F5B180D38849AEFC2" Guid="{DB47AD50-1092-40B0-9A84-65EC5DB2EC6B}">
+                        <File Id="fil0645CD3FB3D7783E8AB8BA61252C0090" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_trans.png" />
+                    </Component>
+                    <Component Id="cmpAFE5841BBCBD741460EA3E6FCC9CF5C8" Guid="{DD796139-A423-4835-9A8B-DE8A9F697A37}">
+                        <File Id="filFE28C12D3FA6AB3458DE13EE73DC4864" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_voltex.png" />
+                    </Component>
+                    <Component Id="cmpECE28D778AD314ECD8D1107D325C3ED4" Guid="{3627AA55-786D-4915-AC6D-57CCFE04739D}">
+                        <File Id="filA55276138E678887CF3A723DF9E6AD1F" KeyPath="yes" Source="@OGRE_MEDIA_DIR_REL@\thumbnails\thumb_water.png" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+    </Fragment>
+</Include>

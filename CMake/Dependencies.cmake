@@ -114,33 +114,39 @@ endif (NOT OGRE_BUILD_PLATFORM_IPHONE)
 
 # Find Boost
 # Prefer static linking in all cases
-if (NOT OGRE_BUILD_PLATFORM_IPHONE)
-	if (WIN32 OR APPLE)
-		set(Boost_USE_STATIC_LIBS TRUE)
-	else ()
-		# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
-		set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
-	endif ()
-	if (APPLE)
+if (WIN32 OR APPLE)
+	set(Boost_USE_STATIC_LIBS TRUE)
+else ()
+	# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
+	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
+endif ()
+if (APPLE)
+	if(OGRE_BUILD_PLATFORM_IPHONE)
+		set(Boost_COMPILER "-xgcc42")
+	else()
 	    # Boost tries to detect the gcc compiler version by calling the command-line
 	    # However we build with gcc 4.0 for OS X 10.4 compatibility, command-line default might be different
 		set(Boost_COMPILER "-xgcc40")
 	endif()
-	set(Boost_ADDITIONAL_VERSIONS "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
-	# Components that need linking (NB does not include header-only components like bind)
-	set(OGRE_BOOST_COMPONENTS thread date_time)
-	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-	if (NOT Boost_FOUND)
-		# Try again with the other type of libs
-		set(Boost_USE_STATIC_LIBS NOT ${Boost_USE_STATIC_LIBS})
-		find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+endif()
+set(Boost_ADDITIONAL_VERSIONS "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
+# Components that need linking (NB does not include header-only components like bind)
+set(OGRE_BOOST_COMPONENTS thread date_time)
+find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+if (NOT Boost_FOUND)
+	# Try again with the other type of libs
+	if(Boost_USE_STATIC_LIBS)
+		set(Boost_USE_STATIC_LIBS)
+	else()
+		set(Boost_USE_STATIC_LIBS ON)
 	endif()
-	find_package(Boost QUIET)
-	# Optional Boost libs (Boost_${COMPONENT}_FOUND
-	macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
-	macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
-	macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading support" "http://boost.org" FALSE "" "")
-endif(NOT OGRE_BUILD_PLATFORM_IPHONE)
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+endif()
+find_package(Boost QUIET)
+# Optional Boost libs (Boost_${COMPONENT}_FOUND
+macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
+macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
+macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading support" "http://boost.org" FALSE "" "")
 
 # POCO
 find_package(POCO)
