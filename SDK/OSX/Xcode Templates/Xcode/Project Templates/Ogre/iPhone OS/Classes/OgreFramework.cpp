@@ -63,7 +63,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 #ifndef OGRE_STATIC_LIB
       pluginsPath = m_ResourcePath + "plugins.cfg";
 #endif
-      
+
     m_pRoot = new Ogre::Root(pluginsPath, Ogre::macBundlePath() + "/ogre.cfg");
 
 #ifdef OGRE_STATIC_LIB
@@ -74,6 +74,11 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
         return false;
 
 	m_pRenderWnd = m_pRoot->initialise(true, wndTitle);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+    m_pRenderWnd->reposition(0, 0);
+    m_pRenderWnd->resize(320, 480);
+#endif
 
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));
@@ -106,9 +111,6 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pMouse->getMouseState().width	 = m_pRenderWnd->getWidth();
 #else
 	m_pMouse = static_cast<OIS::MultiTouch*>(m_pInputMgr->createInputObject(OIS::OISMultiTouch, true));
-
-	m_pMouse->getMultiTouchStates()[0].height = m_pRenderWnd->getHeight();
-	m_pMouse->getMultiTouchStates()[0].width  = m_pRenderWnd->getWidth();
 #endif
     
 #if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE

@@ -69,13 +69,13 @@
 		9C4991E4105B462300CD2FB6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		9C4991E8105B462300CD2FB6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		9C4991F2105B46AC00CD2FB6 /* Cg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cg.framework; path = _OGRESDK_ROOT_/Dependencies/Cg.framework; sourceTree = "<absolute>"; };
-		9C4991F3105B46AC00CD2FB6 /* Ogre.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogre.framework; path = _OGRESDK_ROOT_/Dependencies/Ogre.framework; sourceTree = "<absolute>"; };
+		9C4991F3105B46AC00CD2FB6 /* Ogre.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Ogre.framework; path = _OGRESDK_ROOT_/lib/release/Ogre.framework; sourceTree = "<absolute>"; };
 		9C49939E105B46B700CD2FB6 /* libois.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libois.a; path = _OGRESDK_ROOT_/Dependencies/lib/Release/libois.a; sourceTree = "<absolute>"; };
 		9C98EE42105B6E3F007B4280 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		9CB3F742106D837B00C72815 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = Classes/main.cpp; sourceTree = "<group>"; };
-		9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_CgProgramManager.dylib; path = _OGRESDK_ROOT_/Dependencies/Plugin_CgProgramManager.dylib; sourceTree = "<absolute>"; };
-		9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_OctreeSceneManager.dylib; path = _OGRESDK_ROOT_/Dependencies/Plugin_OctreeSceneManager.dylib; sourceTree = "<absolute>"; };
-		9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = RenderSystem_GL.dylib; path = _OGRESDK_ROOT_/Dependencies/RenderSystem_GL.dylib; sourceTree = "<absolute>"; };
+		9CB3F7B0106D8B0000C72815 /* Plugin_CgProgramManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_CgProgramManager.dylib; path = _OGRESDK_ROOT_/lib/Plugin_CgProgramManager.dylib; sourceTree = "<absolute>"; };
+		9CB3F7B1106D8B0000C72815 /* Plugin_OctreeSceneManager.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = Plugin_OctreeSceneManager.dylib; path = _OGRESDK_ROOT_/lib/Plugin_OctreeSceneManager.dylib; sourceTree = "<absolute>"; };
+		9CB3F7B2106D8B0000C72815 /* RenderSystem_GL.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = RenderSystem_GL.dylib; path = _OGRESDK_ROOT_/lib/RenderSystem_GL.dylib; sourceTree = "<absolute>"; };
 		9CB3F866106DABDD00C72815 /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
 		9CB3F88B106DAF3900C72815 /* plugins.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = plugins.cfg; path = Resources/plugins.cfg; sourceTree = "<group>"; };
 		9CE2F60310E06BCB0099B92A /* DemoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoApp.cpp; path = Classes/DemoApp.cpp; sourceTree = "<group>"; };
@@ -296,7 +296,7 @@
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					_OGRESDK_ROOT_/Dependencies,
+					_OGRESDK_ROOT_/lib/release,
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -305,7 +305,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					_OGRESDK_ROOT_/Dependencies/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers/OSX,
 					_OGRESDK_ROOT_/Dependencies/include,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
@@ -314,6 +315,7 @@
 					"$(inherited)",
 					_OGRESDK_ROOT_/Dependencies/lib/Release,
 					_OGRESDK_ROOT_/Dependencies,
+					_OGRESDK_ROOT_/lib,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};
@@ -326,13 +328,14 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					_OGRESDK_ROOT_/Dependencies,
+					_OGRESDK_ROOT_/lib/release,
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
 				HEADER_SEARCH_PATHS = (
-					_OGRESDK_ROOT_/Dependencies/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers,
+					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers/OSX,
 					_OGRESDK_ROOT_/Dependencies/include,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
@@ -341,6 +344,7 @@
 					"$(inherited)",
 					_OGRESDK_ROOT_/Dependencies/lib/Release,
 					_OGRESDK_ROOT_/Dependencies,
+					_OGRESDK_ROOT_/lib,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};

@@ -84,87 +84,93 @@
                           contextInfo:nil];
 }
 
-// Method to validate directories
-// Just check if Ogre.h 
-//- (BOOL)panel:(id)sender shouldShowFilename:(NSString *)filename
-//{
-//    BOOL isDir;
-//
-//    if([[NSFileManager defaultManager] fileExistsAtPath:filename isDirectory:&isDir] && isDir) {
-//        NSMutableString *depsPath = [NSMutableString stringWithFormat:@"%@%@", filename, @"/Dependencies"];
-////        [filename appendString:@"/Dependencies"];
-//        if([[NSFileManager defaultManager] fileExistsAtPath:depsPath isDirectory:&isDir] && isDir)
-//            return YES;
-////        NSArray *array = [[NSFileManager defaultManager] directoryContentsAtPath:filename];
-////        if(([array indexOfObjectIdenticalTo:@"Dependencies"] != NSNotFound) || 
-////           ([array indexOfObjectIdenticalTo:@"iPhoneDependencies"] != NSNotFound))
-////            return YES;
-//    }
-//    return NO;
-//}
-
 - (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo
 {
     if(NSOKButton == returnCode) {
         NSString *ogreDirectory = [[panel filenames] objectAtIndex:0];
 
-        // Pull the version info out of config.h
-        NSMutableString *configFilePath = [ogreDirectory mutableCopy];
-        NSString *fileContents = nil;
-        NSArray *lines = nil;
-        [configFilePath appendString:@"/Dependencies/Ogre.framework/Headers/config.h"];
-        fileContents = [NSString stringWithContentsOfFile:configFilePath];
-        lines = [fileContents componentsSeparatedByString:@"\n"];
+        // Validate that this folder contains a valid SDK
         
-        for(int i = 0; i < [lines count]; i++)
-        {
-            if([[lines objectAtIndex:i] rangeOfString:@"#define VERSION"].length > 0)
-            {
-                NSArray *components = [[lines objectAtIndex:i] componentsSeparatedByString:@"\""];
+        // Files/folders to look for:
+        //
+        // OS X:
+        // lib/release/Ogre.framework
+        //
+        // iPhone:
+        // lib/release/libOgreMainStatic.a
+        // include/OGRE/Ogre.h
+        BOOL isDir;
+        NSString *frameworkPath = [ogreDirectory stringByAppendingString:@"/lib/release/Ogre.framework"];
+        NSString *iPhoneLibPath = [ogreDirectory stringByAppendingString:@"/lib/release/libOgreMainStatic.a"];
+        NSString *iPhoneHeaderPath = [ogreDirectory stringByAppendingString:@"/include/OGRE/Ogre.h"];
 
-                [ogreInfoLabel setStringValue:[NSString stringWithFormat:@"%@%@", @"Found Ogre version ", [components objectAtIndex:1]]];
-            }
+        if(([[NSFileManager defaultManager] fileExistsAtPath:frameworkPath isDirectory:&isDir] && isDir) ||
+            ([[NSFileManager defaultManager] fileExistsAtPath:iPhoneLibPath]) ||
+            ([[NSFileManager defaultManager] fileExistsAtPath:iPhoneHeaderPath])) {
+            // Set the flag to show that will be ok to move on to the next installer section
+            validSDKChosen = YES;
         }
-        
-        // Update the GUI
-        [ogreLocationLabel setStringValue:ogreDirectory];
+        else
+        {
+            validSDKChosen = NO;
+        }
 
-        // Set the flag to show that will be ok to move on to the next installer section
-        validSDKChosen = YES;
+        if(validSDKChosen)
+        {
+            // Pull the version info out of config.h
+            NSMutableString *configFilePath = [ogreDirectory mutableCopy];
+            NSString *fileContents = nil;
+            NSArray *lines = nil;
+            [configFilePath appendString:@"/lib/release/Ogre.framework/Headers/config.h"];
+            fileContents = [NSString stringWithContentsOfFile:configFilePath];
+            lines = [fileContents componentsSeparatedByString:@"\n"];
+            
+            for(int i = 0; i < [lines count]; i++)
+            {
+                if([[lines objectAtIndex:i] rangeOfString:@"#define VERSION"].length > 0)
+                {
+                    NSArray *components = [[lines objectAtIndex:i] componentsSeparatedByString:@"\""];
 
-        // Replace the placeholder string in the project files with the SDK root chosen by the user
-        NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"];
-        [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
-                                             withString:ogreDirectory
-                                                options:NSLiteralSearch
-                                                  range:NSMakeRange(0, [projectFileContents length])];
-        [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
+                    [ogreInfoLabel setStringValue:[NSString stringWithFormat:@"%@%@", @"Found Ogre version ", [components objectAtIndex:1]]];
+                }
+            }
+            
+            // Update the GUI
+            [ogreLocationLabel setStringValue:ogreDirectory];
 
-        projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"];
-        [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
-                                             withString:ogreDirectory
-                                                options:NSLiteralSearch
-                                                  range:NSMakeRange(0, [projectFileContents length])];
-        [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
+            // Replace the placeholder string in the project files with the SDK root chosen by the user
+            NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"];
+            [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
+                                                 withString:ogreDirectory
+                                                    options:NSLiteralSearch
+                                                      range:NSMakeRange(0, [projectFileContents length])];
+            [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
 
-        // Register the file type from extension.  Create a Uniform Type Identifier for each one
-        CFStringRef particleUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("particle"), kUTTypePlainText);
-        CFStringRef materialUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("material"), kUTTypePlainText);
-        CFStringRef compositorUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("compositor"), kUTTypePlainText);
-        CFStringRef fontdefUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("fontdef"), kUTTypePlainText);
-        CFStringRef overlayUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("overlay"), kUTTypePlainText);
-        CFStringRef programUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("program"), kUTTypePlainText);
-        CFStringRef genericScriptUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("os"), kUTTypePlainText);
+            projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"];
+            [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
+                                                 withString:ogreDirectory
+                                                    options:NSLiteralSearch
+                                                      range:NSMakeRange(0, [projectFileContents length])];
+            [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
 
-        // Register Xcode as the default editor
-        LSSetDefaultRoleHandlerForContentType(particleUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(materialUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(compositorUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(fontdefUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(overlayUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(programUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
-        LSSetDefaultRoleHandlerForContentType(genericScriptUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            // Register the file type from extension.  Create a Uniform Type Identifier for each one
+            CFStringRef particleUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("particle"), kUTTypePlainText);
+            CFStringRef materialUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("material"), kUTTypePlainText);
+            CFStringRef compositorUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("compositor"), kUTTypePlainText);
+            CFStringRef fontdefUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("fontdef"), kUTTypePlainText);
+            CFStringRef overlayUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("overlay"), kUTTypePlainText);
+            CFStringRef programUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("program"), kUTTypePlainText);
+            CFStringRef genericScriptUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, CFSTR("os"), kUTTypePlainText);
 
+            // Register Xcode as the default editor
+            LSSetDefaultRoleHandlerForContentType(particleUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(materialUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(compositorUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(fontdefUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(overlayUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(programUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+            LSSetDefaultRoleHandlerForContentType(genericScriptUTI, (kLSRolesEditor | kLSRolesViewer), CFSTR("com.apple.Xcode"));
+        }
         [panel close];
     }
 }
