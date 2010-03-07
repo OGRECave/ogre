@@ -1,4 +1,5 @@
 #include "SamplePlugin.h"
+#include "OgreShaderSubRenderState.h"
 #include "ShaderSystem.h"
 #include "ShaderExReflectionMap.h"
 
