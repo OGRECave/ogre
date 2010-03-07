@@ -90,7 +90,6 @@ namespace Ogre {
 
 
 		mClosed = false;		
-		mIsDepthBuffered = true;
 		mColourDepth = 32;
 
 
