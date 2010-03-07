@@ -48,6 +48,7 @@ namespace Ogre
 
 	/** A TerrainMaterialGenerator which can cope with normal mapped, specular mapped
 		terrain. 
+		@note Requires the Cg plugin to render correctly
 	*/
 	class _OgreTerrainExport TerrainMaterialGeneratorA : public TerrainMaterialGenerator
 	{
