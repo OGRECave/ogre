@@ -95,7 +95,7 @@ namespace Ogre {
         }
         else
         {
-#if GL_GLEXT_PROTOTYPES
+#if defined(GL_GLEXT_PROTOTYPES)
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
             
 			if(!glUnmapBufferOES( GL_ELEMENT_ARRAY_BUFFER ))
@@ -153,7 +153,7 @@ namespace Ogre {
                         "GLESHardwareIndexBuffer::lock");
         }
 
-#if GL_GLEXT_PROTOTYPES
+#if defined(GL_GLEXT_PROTOTYPES)
         if (!retPtr)
 		{
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
