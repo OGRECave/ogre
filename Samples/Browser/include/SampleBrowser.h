@@ -50,21 +50,23 @@
 #include "Fresnel.h"
 #include "Grass.h"
 #include "Lighting.h"
-#include "OceanDemo.h"
 #include "ParticleFX.h"
 #if USE_RTSHADER_SYSTEM
 #include "ShaderSystem.h"
 #endif
-#include "Shadows.h"
-#include "SkeletalAnimation.h"
 #include "SkyBox.h"
 #include "SkyDome.h"
 #include "SkyPlane.h"
 #include "Smoke.h"
 #include "SphereMapping.h"
-#include "Terrain.h"
 #include "TextureFX.h"
 #include "Transparency.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
+#include "Shadows.h"
+#include "Terrain.h"
+#include "OceanDemo.h"
+#include "SkeletalAnimation.h"
+#endif
 #  if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
      PlayPenPlugin* playPenPlugin = 0;
@@ -116,10 +118,26 @@ namespace OgreBites
 			mDescBox = 0;
 			mRendererMenu = 0;
 			mCarouselPlace = 0.0f;
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+			mNativeWindow = 0;
+			mNativeControl = 0;
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 			mGestureView = 0;
 #endif
 		}
+
+		/*-----------------------------------------------------------------------------
+		| init data members needed only by Symbian
+		-----------------------------------------------------------------------------*/
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+		void initAppForSymbian( RWindow * nativeWindow, CCoeControl * nativeControl )
+		{
+			mNativeWindow = nativeWindow;
+			mNativeControl = nativeControl;
+		}
+#endif
 
 		/*-----------------------------------------------------------------------------
 		| Extends runSample to handle creation and destruction of dummy scene.
@@ -812,21 +830,23 @@ namespace OgreBites
             mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
-            mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
-#if USE_RTSHADER_SYSTEM
+#   if USE_RTSHADER_SYSTEM
             mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
-#endif
-            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
-            mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
+#   endif
             mPluginNameMap["Sample_SkyBox"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyBox();
             mPluginNameMap["Sample_SkyDome"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyDome();
             mPluginNameMap["Sample_SkyPlane"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyPlane();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
-            mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
+#   if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
+            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
+            mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
+            mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
+            mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
+#   endif
 #endif
             
 			createWindow();
@@ -868,6 +888,14 @@ namespace OgreBites
 			// if this is our first time running, and there's a startup sample, run it
 			if (startupSample && mFirstRun) runSample(startupSample);
 		}
+
+		/*-----------------------------------------------------------------------------
+		| Notify the window size changed or it was moved
+		-----------------------------------------------------------------------------*/
+		virtual void windowMovedOrResized()
+		{
+			mWindow->windowMovedOrResized();
+		}
         
 	protected:
 
@@ -886,7 +914,16 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void createWindow()
 		{
-			mWindow = mRoot->initialise(true, "OGRE Sample Browser");
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+			mWindow = mRoot->initialise(mNativeWindow == NULL, "OGRE Sample Browser");
+			NameValuePairList miscParams;
+			miscParams["NativeWindow"] = StringConverter::toString((unsigned long)mNativeWindow);
+			miscParams["NativeControl"] = StringConverter::toString((unsigned long)mNativeControl);
+			mWindow = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Size().iWidth, mNativeWindow->Size().iHeight, false, &miscParams);
+
+#else
+			mWindow = mRoot->initialise(true, "OGRE Sample Browser");			
+#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             mGestureView = [[SampleBrowserGestureView alloc] init];
@@ -1317,6 +1354,10 @@ namespace OgreBites
 		int mLastViewTitle;                            // last sample title viewed
 		int mLastViewCategory;                         // last sample category viewed
 		int mLastSampleIndex;                          // index of last sample running
+#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+		RWindow * mNativeWindow;
+		CCoeControl * mNativeControl;
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
     public:
         SampleBrowserGestureView *mGestureView;
