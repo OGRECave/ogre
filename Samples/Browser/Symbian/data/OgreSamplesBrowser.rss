@@ -1,0 +1,136 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2009 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+/*
+ * ==============================================================================
+ *  Name        : OgreSamplesBrowser.rss
+ *  Part of     : OgreSamplesBrowser
+ *
+ * ==============================================================================
+ */
+
+//  RESOURCE IDENTIFIER
+NAME    AWIZ // 4 letter ID
+
+//  INCLUDES
+#include <eikon.rh>
+#include "ogresamplesbrowser.hrh"
+#include "ogresamplesbrowser.rls"
+#include <avkon.rsg>
+#include <avkon.rh>
+#include <avkon.mbg>
+#include <appinfo.rh>
+
+//  RESOURCE DEFINITIONS
+RESOURCE RSS_SIGNATURE { }
+RESOURCE TBUF { buf="OgreSamplesBrowser"; }
+RESOURCE EIK_APP_INFO
+    {
+    hotkeys=r_ogresamplesbrowser_hotkeys;
+    menubar=r_ogresamplesbrowser_menubar;
+    cba=R_AVKON_SOFTKEYS_OPTIONS_BACK;
+    }
+
+//----------------------------------------------------
+//
+//    r_ogresamplesbrowser_hotkeys
+//    ?description
+//
+//----------------------------------------------------
+//
+RESOURCE HOTKEYS r_ogresamplesbrowser_hotkeys
+    {
+    control=
+        {
+        HOTKEY { command=EAknCmdExit; key='e'; }
+        };
+    }
+
+//----------------------------------------------------
+//
+//    r_ogresamplesbrowser_menubar
+//    ?description
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_BAR r_ogresamplesbrowser_menubar
+    {
+    titles=
+        {
+        MENU_TITLE { menu_pane=r_ogresamplesbrowser_menu; txt="File"; }
+        };
+    }
+
+//----------------------------------------------------
+//
+//    r_ogresamplesbrowser_menu
+//    ?description
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_PANE r_ogresamplesbrowser_menu
+    {
+    items=
+        {
+        MENU_ITEM { command=EAknCmdExit; txt="Exit"; }
+        };
+    }
+
+//----------------------------------------------------
+//
+//    r_ogresamplesbrowser_app_menu
+//    ?description
+//
+//----------------------------------------------------
+//
+RESOURCE MENU_PANE r_ogresamplesbrowser_app_menu
+    {
+    items=
+        {
+        MENU_ITEM { command=EAknCmdExit; txt="Exit"; }
+        };
+    }
+
+//----------------------------------------------------
+//
+//    r_ogresamplesbrowser_localisable_app_info
+//
+//----------------------------------------------------
+//
+RESOURCE LOCALISABLE_APP_INFO r_ogresamplesbrowser_localisable_app_info
+    {
+    short_caption = STRING_r_app_short_caption_string;
+    caption_and_icon =
+    CAPTION_AND_ICON_INFO
+        {
+        caption         = STRING_r_app_caption_string;
+        number_of_icons = 1;
+        icon_file       = "\\resource\\apps\\ogresamplesbrowser_icon.mif";
+        };
+    }
+
+// End of File

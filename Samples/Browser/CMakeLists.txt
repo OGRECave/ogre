@@ -22,6 +22,39 @@ else ()
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
 endif ()
 
+if (SYMBIAN)
+  set(SOURCE_FILES ${SOURCE_FILES}
+  Symbian/src/OgreSamplesBrowserApp.cpp
+  Symbian/src/OgreSamplesBrowserAppUi.cpp
+  Symbian/src/OgreSamplesBrowserContainer.cpp
+  Symbian/src/OgreSamplesBrowserDocument.cpp       
+  )
+
+  set(HEADER_FILES ${HEADER_FILES}
+  Symbian/inc/OgreSamplesBrowser.hrh
+  Symbian/inc/OgreSamplesBrowser.rls
+  Symbian/inc/OgreSamplesBrowserApp.h
+  Symbian/inc/OgreSamplesBrowserAppUi.h
+  Symbian/inc/OgreSamplesBrowserContainer.h
+  Symbian/inc/OgreSamplesBrowserDocument.h
+  )
+
+  set(RESOURCE_FILES ${RESOURCE_FILES}
+  Symbian/data/OgreSamplesBrowser.rss
+  Symbian/data/OgreSamplesBrowser_reg.rss
+  Symbian/group/icons_scalable_dc.mk
+  )
+
+
+  include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Symbian/inc
+  )
+
+
+
+	
+
+endif (SYMBIAN)
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
