@@ -553,6 +553,20 @@ elseif (UNIX)
   )
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread dl)
   set(PLATFORM_HEADER_INSTALL "GLX")
+elseif (SYMBIAN)
+  include_directories(include/symbian)
+  set(PLATFORM_HEADER_FILES
+    include/GLX/OgreTimerImp.h
+    include/symbian/OgreConfigDialogImp.h
+    include/symbian/OgreErrorDialogImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/OgreSearchOps.cpp
+    src/GLX/OgreTimer.cpp
+    src/symbian/OgreConfigDialog.cpp
+    src/symbian/OgreErrorDialog.cpp
+  )
+  set(PLATFORM_HEADER_INSTALL "SYMBIAN")
 
 endif(WIN32)
 

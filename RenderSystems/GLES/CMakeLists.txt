@@ -83,6 +83,32 @@ if (WIN32)
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
   link_directories(${OPENGLES_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "WIN32")
+# Add system specific settings
+elseif (SYMBIAN)
+  set(PLATFORM_HEADERS 
+    include/EGL/SYMBIAN/OgreSYMBIANEGLContext.h
+    include/EGL/SYMBIAN/OgreSYMBIANEGLSupport.h
+    include/EGL/SYMBIAN/OgreSYMBIANEGLRenderTexture.h
+    include/EGL/SYMBIAN/OgreSYMBIANEGLWindow.h
+    include/EGL/SYMBIAN/OgreGLESUtil.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/EGL/SYMBIAN/OgreSYMBIANEGLSupport.cpp
+    src/EGL/SYMBIAN/OgreSYMBIANEGLRenderTexture.cpp
+    src/EGL/SYMBIAN/OgreSYMBIANEGLWindow.cpp
+    src/EGL/SYMBIAN/OgreSYMBIANEGLContext.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
+  )
+  include_directories(src/EGL/SYMBIAN include/EGL/SYMBIAN)
+  link_directories(${OPENGLES_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "SYMBIAN")
 elseif (APPLE)
   set(PLATFORM_HEADERS 
     include/EAGL/OgreEAGLESContext.h
