@@ -172,19 +172,26 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Symbian Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+#   define _OgreExport 
 #	define OGRE_UNICODE_SUPPORT 1
 #   define OGRE_DEBUG_MODE 0
-#   define _OgreExport
 #   define _OgrePrivate
-#	define CLOCKS_PER_SEC  1000
-// pragma def were found here: http://www.inf.pucrs.br/~eduardob/disciplinas/SistEmbarcados/Mobile/Nokia/Tools/Carbide_vs/WINSCW/Help/PDF/C_Compilers_Reference_3.2.pdf
-#	pragma warn_unusedarg off
-#	pragma warn_emptydecl off
-#	pragma warn_possunwant off
+#	  define CLOCKS_PER_SEC  1000
+//  pragma def were found here: http://www.inf.pucrs.br/~eduardob/disciplinas/SistEmbarcados/Mobile/Nokia/Tools/Carbide_vs/WINSCW/Help/PDF/C_Compilers_Reference_3.2.pdf
+#	  pragma warn_unusedarg off
+#	  pragma warn_emptydecl off
+#	  pragma warn_possunwant off
+// A quick define to overcome different names for the same function
+#   define stricmp strcasecmp
+#   ifdef DEBUG
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
 #endif
 //----------------------------------------------------------------------------
 // Linux/Apple/Symbian Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE 
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
