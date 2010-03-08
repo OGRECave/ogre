@@ -32,12 +32,12 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLESPrerequisites.h"
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLES2RenderSystem.h"
 
-#include "OgreGtkEGLSupport.h"
-#include "OgreGtkEGLWindow.h"
-#include "OgreGtkEGLContext.h"
+#include "OgreX11EGLSupport.h"
+#include "OgreX11EGLWindow.h"
+#include "OgreX11EGLContext.h"
 
 #include <iostream>
 #include <algorithm>
@@ -57,7 +57,7 @@ extern "C"
 
 
 namespace Ogre {
-	GtkEGLWindow::GtkEGLWindow(GtkEGLSupport *glsupport)
+	X11EGLWindow::X11EGLWindow(X11EGLSupport *glsupport)
 		: EGLWindow(glsupport) 
 		//, mParentWindow(glsupport)   todo
 	{
@@ -65,7 +65,7 @@ namespace Ogre {
 		mNativeDisplay = glsupport->getNativeDisplay();
 	}
 
-	GtkEGLWindow::~GtkEGLWindow()
+	X11EGLWindow::~X11EGLWindow()
 	{
 
 		mNativeDisplay = mGLSupport->getNativeDisplay();
@@ -82,7 +82,7 @@ namespace Ogre {
 
 	}
 
-	void GtkEGLWindow::getCustomAttribute( const String& name, void* pData )
+	void X11EGLWindow::getCustomAttribute( const String& name, void* pData )
 	{
 		EGLWindow::getCustomAttribute(name, pData);
 		if (name == "ATOM")
@@ -103,19 +103,19 @@ namespace Ogre {
 
 	}
 
-	EGLContext * GtkEGLWindow::createEGLContext() const
+	EGLContext * X11EGLWindow::createEGLContext() const
 	{
-		return new GtkEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
+		return new X11EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
 	}
 
-	void GtkEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
+	void X11EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
 	{
 		NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
 		left = DisplayWidth((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay))/2 - width/2;
 		top  = DisplayHeight((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay))/2 - height/2;
 	}
 
-	void GtkEGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
+	void X11EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
 	{
 		if (miscParams)
 		{
@@ -210,7 +210,7 @@ namespace Ogre {
 
 	}
 
-	void GtkEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
+	void X11EGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
 	{
 		mEglDisplay = mGLSupport->getGLDisplay();//todo
 		XSetWindowAttributes attr;
@@ -309,7 +309,7 @@ namespace Ogre {
 		WindowEventUtilities::_addRenderWindow(this);
 	}
 
-	void GtkEGLWindow::setFullscreen( bool fullscreen, uint width, uint height )
+	void X11EGLWindow::setFullscreen( bool fullscreen, uint width, uint height )
 	{
 		if (mIsFullScreen != fullscreen && &mGLSupport->mAtomFullScreen == None)
 		{
@@ -320,7 +320,7 @@ namespace Ogre {
 		EGLWindow::setFullscreen(fullscreen, width, height);
 	}
 
-	void GtkEGLWindow::reposition( int left, int top )
+	void X11EGLWindow::reposition( int left, int top )
 	{
 		if (mClosed || ! mIsTopLevel)
 		{
@@ -330,7 +330,7 @@ namespace Ogre {
 		XMoveWindow((Display*)mGLSupport->getNativeDisplay(), (Window)mWindow, left, top);
 	}
 
-	void GtkEGLWindow::resize(uint width, uint height)
+	void X11EGLWindow::resize(uint width, uint height)
 	{
 		if (mClosed)
 		{
@@ -361,7 +361,7 @@ namespace Ogre {
 		}
 	}
 
-	void GtkEGLWindow::windowMovedOrResized()
+	void X11EGLWindow::windowMovedOrResized()
 	{
 		if (mClosed || !mWindow)
 		{
@@ -403,7 +403,7 @@ namespace Ogre {
 			(*it).second->_updateDimensions();
 		}
 	}
-	void GtkEGLWindow::switchFullScreen(bool fullscreen)
+	void X11EGLWindow::switchFullScreen(bool fullscreen)
 	{ 
 		if (&mGLSupport->mAtomFullScreen != None)
 		{
@@ -430,7 +430,7 @@ namespace Ogre {
 
 
 	//Moved EGLWindow::create to native source because it has native calls in it
-    void GtkEGLWindow::create(const String& name, uint width, uint height,
+    void X11EGLWindow::create(const String& name, uint width, uint height,
                            bool fullScreen, const NameValuePairList *miscParams)
     {
         String title = name;

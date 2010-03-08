@@ -1,4 +1,4 @@
-/*
+X11/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -27,28 +27,22 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLESRenderSystem.h"
+#ifndef __X11EGLContext_H__
+#define __X11EGLContext_H__
 
-#include "OgreEGLSupport.h"
-#include "OgreGtkEGLContext.h"
-
-#include "OgreRoot.h"
+#include "OgreEGLContext.h"
 
 namespace Ogre {
-    GtkEGLContext::GtkEGLContext(EGLDisplay eglDisplay,
-							const EGLSupport* glsupport,
-                           ::EGLConfig glconfig,
-                           ::EGLSurface drawable)
-        : EGLContext(eglDisplay, glsupport, glconfig, drawable)
-    {
-    }
+    class EGLSupport;
 
-    GtkEGLContext::~GtkEGLContext()
+    class _OgrePrivate X11EGLContext: public EGLContext
     {
-    }
+        public:
+            X11EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
+            virtual ~X11EGLContext();
 
-    GLESContext* GtkEGLContext::clone() const
-    {
-        return new GtkEGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
-    }
+            GLES2Context* clone() const;
+    };
 }
+
+#endif

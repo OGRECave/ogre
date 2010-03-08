@@ -27,22 +27,36 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GtkEGLContext_H__
-#define __GtkEGLContext_H__
+#include "OgreStableHeaders.h"
 
-#include "OgreEGLContext.h"
+#include "OgreException.h"
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreStringConverter.h"
+
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLES2RenderSystem.h"
+
+#include "OgreX11EGLRenderTexture.h"
+#include "OgreX11EGLContext.h"
+#include "OgreX11EGLSupport.h"
+
+#include <iostream>
+#include <climits>
 
 namespace Ogre {
-    class EGLSupport;
 
-    class _OgrePrivate GtkEGLContext: public EGLContext
-    {
-        public:
-            GtkEGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
-            virtual ~GtkEGLContext();
+	X11EGLPBuffer::X11EGLPBuffer( X11EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+		: EGLPBuffer(glsupport, format, width, height)
+	{
+		mGlDisplay = glsupport->getGLDisplay();
+		mGLSupport = glsupport;
+		initEGLPBuffer();
+	}
 
-            GLESContext* clone() const;
-    };
+	X11EGLPBuffer::~X11EGLPBuffer()
+	{
+
+	}
+
 }
-
-#endif

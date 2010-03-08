@@ -128,28 +128,28 @@ elseif (APPLE)
   set(PLATFORM_HEADER_INSTALL "APPLE")
 elseif (UNIX)
   set(PLATFORM_HEADERS
-    include/EGL/GTK/OgreGtkEGLContext.h
-    include/EGL/GTK/OgreGtkEGLSupport.h
-    include/EGL/GTK/OgreGtkEGLRenderTexture.h
-    include/EGL/GTK/OgreGtkEGLWindow.h
-    include/EGL/GTK/OgreGLESUtil.h
+    include/EGL/X11/OgreX11EGLContext.h
+    include/EGL/X11/OgreX11EGLSupport.h
+    include/EGL/X11/OgreX11EGLRenderTexture.h
+    include/EGL/X11/OgreX11EGLWindow.h
+    include/EGL/X11/OgreGLESUtil.h
     include/EGL/OgreEGLContext.h
     include/EGL/OgreEGLRenderTexture.h
     include/EGL/OgreEGLSupport.h
     include/EGL/OgreEGLWindow.h
   )
   set(PLATFORM_SOURCES
-    src/EGL/GTK/OgreGtkEGLContext.cpp
-    src/EGL/GTK/OgreGtkEGLSupport.cpp
-    src/EGL/GTK/OgreGtkEGLRenderTexture.cpp
-    src/EGL/GTK/OgreGtkEGLWindow.cpp
+    src/EGL/X11/OgreX11EGLContext.cpp
+    src/EGL/X11/OgreX11EGLSupport.cpp
+    src/EGL/X11/OgreX11EGLRenderTexture.cpp
+    src/EGL/X11/OgreX11EGLWindow.cpp
     src/EGL/OgreEGLContext.cpp
     src/EGL/OgreEGLRenderTexture.cpp
     src/EGL/OgreEGLSupport.cpp
     src/EGL/OgreEGLWindow.cpp
   )
-  include_directories(src/EGL/GTK include/EGL/GTK)
-  set(PLATFORM_HEADER_INSTALL "GTK")
+  include_directories(src/EGL/X11 include/EGL/X11)
+  set(PLATFORM_HEADER_INSTALL "X11")
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 

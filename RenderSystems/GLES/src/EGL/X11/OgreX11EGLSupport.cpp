@@ -35,10 +35,10 @@ THE SOFTWARE.
 #include "OgreGLESPrerequisites.h"
 #include "OgreGLESRenderSystem.h"
 
-#include "OgreGtkEGLSupport.h"
-#include "OgreGtkEGLWindow.h"
-#include "OgreGtkEGLRenderTexture.h"
-#include "OgreGtkEGLContext.h"
+#include "OgreX11EGLSupport.h"
+#include "OgreX11EGLWindow.h"
+#include "OgreX11EGLRenderTexture.h"
+#include "OgreX11EGLContext.h"
 
 
 #if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX)
@@ -56,7 +56,7 @@ THE SOFTWARE.
 	int DisplayHeight(Display* nativeDisplayType, int screen){return 0;};
 	Display* XOpenDisplay(int num){return NULL;};
 	void XCloseDisplay(Display* nativeDisplayType){};
-	Atom XInternAtom(Display* nativeDisplayType, char * name, GtkBool isTrue) {return Atom();};
+	Atom XInternAtom(Display* nativeDisplayType, char * name, X11Bool isTrue) {return Atom();};
 	char * DisplayString(NativeDisplayType nativeDisplayType){return 0;};
 	const char * XDisplayName(char * name){return 0;};
 	Visual * DefaultVisual(Display* nativeDisplayType,  int screen){return 0;};
@@ -84,7 +84,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    GtkEGLSupport::GtkEGLSupport()
+    X11EGLSupport::X11EGLSupport()
     {
 	mNativeDisplay = getNativeDisplay();
         mGLDisplay = getGLDisplay();
@@ -164,19 +164,19 @@ namespace Ogre {
     }
 
 
-	//Removed this because it was easier to call new GtkEGLWindow directly
+	//Removed this because it was easier to call new X11EGLWindow directly
 	//to get the native version
-//	EGLWindow* GtkEGLSupport::createEGLWindow( EGLSupport * support )
+//	EGLWindow* X11EGLSupport::createEGLWindow( EGLSupport * support )
 //	{
-//		return new GtkEGLWindow((GtkEGLSupport*)support);
+//		return new X11EGLWindow((X11EGLSupport*)support);
 //	}
 
-	GLESPBuffer* GtkEGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
+	GLESPBuffer* X11EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
 	{
-		return new GtkEGLPBuffer(this, format, width, height);
+		return new X11EGLPBuffer(this, format, width, height);
 	}
 
-    GtkEGLSupport::~GtkEGLSupport()
+    X11EGLSupport::~X11EGLSupport()
     {
         if (mNativeDisplay)
         {
@@ -192,7 +192,7 @@ namespace Ogre {
 
 
 
-	NativeDisplayType GtkEGLSupport::getNativeDisplay()
+	NativeDisplayType X11EGLSupport::getNativeDisplay()
 	{
         if (!mNativeDisplay)
         {
@@ -213,13 +213,13 @@ namespace Ogre {
         return mNativeDisplay;
     }
 
-    String GtkEGLSupport::getDisplayName(void)
+    String X11EGLSupport::getDisplayName(void)
     {
 		return String((const char*)XDisplayName(DisplayString(mNativeDisplay)));
 	}
 
 
-    void GtkEGLSupport::switchMode(uint& width, uint& height, short& frequency)
+    void X11EGLSupport::switchMode(uint& width, uint& height, short& frequency)
     {
         if (!mRandr)
             return;
@@ -276,7 +276,7 @@ namespace Ogre {
 
 
 
-    XVisualInfo *GtkEGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
+    XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
     {
         XVisualInfo *vi, tmp;
         int vid, n;
@@ -316,21 +316,21 @@ namespace Ogre {
         return vi;
     }
 
-    RenderWindow* GtkEGLSupport::newWindow(const String &name,
+    RenderWindow* X11EGLSupport::newWindow(const String &name,
                                         unsigned int width, unsigned int height,
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
 //        EGLWindow* window = createEGLWindow(this);
-	EGLWindow* window = new GtkEGLWindow(this);
+	EGLWindow* window = new X11EGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
         return window;
     }
 
-	//GtkEGLSupport::getGLDisplay sets up the native variable
+	//X11EGLSupport::getGLDisplay sets up the native variable
 	//then calls EGLSupport::getGLDisplay
-    EGLDisplay GtkEGLSupport::getGLDisplay()
+    EGLDisplay X11EGLSupport::getGLDisplay()
     {
 	if (!mGLDisplay)
 	{

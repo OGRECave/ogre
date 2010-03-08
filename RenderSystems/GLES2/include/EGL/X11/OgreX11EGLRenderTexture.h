@@ -27,26 +27,26 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GtkEGLRenderTexture_H__
-#define __GtkEGLRenderTexture_H__
+#ifndef __X11EGLRenderTexture_H__
+#define __X11EGLRenderTexture_H__
 
 #include "OgrePrerequisites.h"
 #include "OgreEGLRenderTexture.h"
-#include "OgreGtkEGLSupport.h"
+#include "OgreX11EGLSupport.h"
 
 namespace Ogre
 {
-    class GLESContext;
+    class GLES2Context;
     class EGLSupport;
     class EGLContext;
 
-    class _OgrePrivate GtkEGLPBuffer : public EGLPBuffer
+    class _OgrePrivate X11EGLPBuffer : public EGLPBuffer
     {
 		protected:
 
         public:
-            GtkEGLPBuffer(GtkEGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
-            virtual ~GtkEGLPBuffer();
+            X11EGLPBuffer(X11EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height);
+            virtual ~X11EGLPBuffer();
     };
 }
 

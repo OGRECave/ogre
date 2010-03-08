@@ -1,9 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
+Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,16 +27,28 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESUtil_H__
-#define __GLESUtil_H__
+#include "OgreGLESRenderSystem.h"
 
-#include "OgreGtkEGLSupport.h"
+#include "OgreEGLSupport.h"
+#include "OgreX11EGLContext.h"
+
+#include "OgreRoot.h"
 
 namespace Ogre {
-    inline GLESSupport* getGLSupport()
+    X11EGLContext::X11EGLContext(EGLDisplay eglDisplay,
+							const EGLSupport* glsupport,
+                           ::EGLConfig glconfig,
+                           ::EGLSurface drawable)
+        : EGLContext(eglDisplay, glsupport, glconfig, drawable)
     {
-        return new GtkEGLSupport();
     }
-};
 
-#endif
+    X11EGLContext::~X11EGLContext()
+    {
+    }
+
+    GLESContext* X11EGLContext::clone() const
+    {
+        return new X11EGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
+    }
+}

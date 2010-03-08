@@ -27,8 +27,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GTKEGLSupport_H__
-#define __GTKEGLSupport_H__
+#ifndef __X11EGLSupport_H__
+#define __X11EGLSupport_H__
 
 
 #include "OgreEGLSupport.h"
@@ -65,7 +65,7 @@ THE SOFTWARE.
 	#define VisualIDMask 0
 	#define AllocNone 0
 
-	enum GtkBool
+	enum X11Bool
 	{
 		False
 		,
@@ -108,7 +108,7 @@ THE SOFTWARE.
 	int DisplayHeight(Display* nativeDisplayType, int screen);
 	Display* XOpenDisplay(int num);
 	void XCloseDisplay(Display* nativeDisplayType);
-	Atom XInternAtom(Display* nativeDisplayType, char * name, GtkBool isTrue);;
+	Atom XInternAtom(Display* nativeDisplayType, char * name, X11Bool isTrue);;
 	char * DisplayString(NativeDisplayType nativeDisplayType);
 	const char * XDisplayName(char * name);
 	Visual * DefaultVisual(Display* nativeDisplayType,  int screen);
@@ -136,17 +136,17 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-    class _OgrePrivate GtkEGLSupport : public EGLSupport
+    class _OgrePrivate X11EGLSupport : public EGLSupport
     {
 		protected:
 
 			//removed createEGLWindow because it was easier to just use
-			// new GtkEGLWindow in the code to get the native version.
+			// new X11EGLWindow in the code to get the native version.
 			//virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
         public:
-            GtkEGLSupport();
-            virtual ~GtkEGLSupport();
+            X11EGLSupport();
+            virtual ~X11EGLSupport();
 
 			virtual GLESPBuffer* createPBuffer(PixelComponentType format,
 				size_t width, size_t height);

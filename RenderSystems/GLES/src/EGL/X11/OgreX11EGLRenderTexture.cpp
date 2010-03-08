@@ -37,16 +37,16 @@ THE SOFTWARE.
 #include "OgreGLESPrerequisites.h"
 #include "OgreGLESRenderSystem.h"
 
-#include "OgreGtkEGLRenderTexture.h"
-#include "OgreGtkEGLContext.h"
-#include "OgreGtkEGLSupport.h"
+#include "OgreX11EGLRenderTexture.h"
+#include "OgreX11EGLContext.h"
+#include "OgreX11EGLSupport.h"
 
 #include <iostream>
 #include <climits>
 
 namespace Ogre {
 
-	GtkEGLPBuffer::GtkEGLPBuffer( GtkEGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
+	X11EGLPBuffer::X11EGLPBuffer( X11EGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
 		: EGLPBuffer(glsupport, format, width, height)
 	{
 		mGlDisplay = glsupport->getGLDisplay();
@@ -54,7 +54,7 @@ namespace Ogre {
 		initEGLPBuffer();
 	}
 
-	GtkEGLPBuffer::~GtkEGLPBuffer()
+	X11EGLPBuffer::~X11EGLPBuffer()
 	{
 
 	}

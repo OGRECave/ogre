@@ -1,10 +1,9 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,36 +26,16 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStableHeaders.h"
+#ifndef __GLESUtil_H__
+#define __GLESUtil_H__
 
-#include "OgreException.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreStringConverter.h"
-
-#include "OgreGLESPrerequisites.h"
-#include "OgreGLESRenderSystem.h"
-
-#include "OgreGtkEGLRenderTexture.h"
-#include "OgreGtkEGLContext.h"
-#include "OgreGtkEGLSupport.h"
-
-#include <iostream>
-#include <climits>
+#include "OgreX11EGLSupport.h"
 
 namespace Ogre {
+    inline GLESSupport* getGLSupport()
+    {
+        return new X11EGLSupport();
+    }
+};
 
-	GtkEGLPBuffer::GtkEGLPBuffer( GtkEGLSupport* glsupport, PixelComponentType format, size_t width, size_t height )
-		: EGLPBuffer(glsupport, format, width, height)
-	{
-		mGlDisplay = glsupport->getGLDisplay();
-		mGLSupport = glsupport;
-		initEGLPBuffer();
-	}
-
-	GtkEGLPBuffer::~GtkEGLPBuffer()
-	{
-
-	}
-
-}
+#endif

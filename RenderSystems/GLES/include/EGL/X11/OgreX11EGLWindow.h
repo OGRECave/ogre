@@ -27,17 +27,17 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GtkEGLWindow_H__
-#define __GtkEGLWindow_H__
+#ifndef __X11EGLWindow_H__
+#define __X11EGLWindow_H__
 
 #include "OgreEGLWindow.h"
-#include "OgreGtkEGLSupport.h"
+#include "OgreX11EGLSupport.h"
 
 namespace Ogre {
-    class _OgrePrivate GtkEGLWindow : public EGLWindow
+    class _OgrePrivate X11EGLWindow : public EGLWindow
     {
 	protected:
-		GtkEGLSupport* mGLSupport;
+		X11EGLSupport* mGLSupport;
 
 		//Changed these variables back to Window type because
 		//it seems they are not used outside this class.
@@ -54,8 +54,8 @@ namespace Ogre {
 
 
 	public:
-            GtkEGLWindow(GtkEGLSupport* glsupport);
-           virtual  ~GtkEGLWindow();
+            X11EGLWindow(X11EGLSupport* glsupport);
+           virtual  ~X11EGLWindow();
 
 			/**
 			@remarks
