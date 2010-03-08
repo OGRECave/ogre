@@ -22,6 +22,39 @@ else ()
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
 endif ()
 
+if (SYMBIAN)
+  set(SOURCE_FILES ${SOURCE_FILES}
+  Symbian/src/OgreSamplesBrowserApp.cpp
+  Symbian/src/OgreSamplesBrowserAppUi.cpp
+  Symbian/src/OgreSamplesBrowserContainer.cpp
+  Symbian/src/OgreSamplesBrowserDocument.cpp       
+  )
+
+  set(HEADER_FILES ${HEADER_FILES}
+  Symbian/inc/OgreSamplesBrowser.hrh
+  Symbian/inc/OgreSamplesBrowser.rls
+  Symbian/inc/OgreSamplesBrowserApp.h
+  Symbian/inc/OgreSamplesBrowserAppUi.h
+  Symbian/inc/OgreSamplesBrowserContainer.h
+  Symbian/inc/OgreSamplesBrowserDocument.h
+  )
+
+  set(RESOURCE_FILES ${RESOURCE_FILES}
+  Symbian/data/OgreSamplesBrowser.rss
+  Symbian/data/OgreSamplesBrowser_reg.rss
+  Symbian/group/icons_scalable_dc.mk
+  )
+
+
+  include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Symbian/inc
+  )
+
+
+
+	
+
+endif (SYMBIAN)
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
@@ -53,7 +86,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
        ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_TextureFX.a
        ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Transparency.a
   )
-  if(OGRE_BUILD_RENDERSYSTEM_GLES)
+  if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
     list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BezierPatch.a)
     list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BSP.a)
     list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CelShading.a)
@@ -160,7 +193,7 @@ if (APPLE)
     )
     if(OGRE_SDK_BUILD)
 	    add_custom_command(TARGET SampleBrowser POST_BUILD
-             COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+          COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
 	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/media ${OGRE_SAMPLE_CONTENTS_PATH}/
 	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
 	    )
@@ -169,6 +202,11 @@ if (APPLE)
       	  COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
 	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/
 	      COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+        )
+    else()
+        add_custom_command(TARGET SampleBrowser POST_BUILD
+          COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
+          COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude CVS -exclude .svn -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/
         )
     endif(OGRE_SDK_BUILD)
   else()
