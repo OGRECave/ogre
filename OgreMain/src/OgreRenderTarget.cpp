@@ -448,6 +448,23 @@ namespace Ogre {
             ++i;
         return i->second;
     }
+	//-----------------------------------------------------------------------
+    Viewport* RenderTarget::getViewportByZOrder(int ZOrder)
+    {
+		ViewportList::iterator i = mViewportList.find(ZOrder);
+		if(i == mViewportList.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,"No viewport with given zorder : "
+				+ StringConverter::toString(ZOrder), "RenderTarget::getViewportByZOrder");
+		}
+        return i->second;
+    }
+	//-----------------------------------------------------------------------
+    bool RenderTarget::hasViewportWithZOrder(int ZOrder)
+    {
+		ViewportList::iterator i = mViewportList.find(ZOrder);
+		return i != mViewportList.end();
+    }
     //-----------------------------------------------------------------------
     bool RenderTarget::isActive() const
     {

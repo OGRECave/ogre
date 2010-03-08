@@ -210,6 +210,14 @@ namespace Ogre {
         /** Retrieves a pointer to the viewport with the given index. */
         virtual Viewport* getViewport(unsigned short index);
 
+		/** Retrieves a pointer to the viewport with the given zorder. 
+			@remarks throws if not found.
+		*/
+        virtual Viewport* getViewportByZOrder(int ZOrder);
+
+		/** Returns true if and only if a viewport exists at the given ZOrder. */
+		virtual bool hasViewportWithZOrder(int ZOrder);
+
         /** Removes a viewport at a given ZOrder.
         */
         virtual void removeViewport(int ZOrder);
