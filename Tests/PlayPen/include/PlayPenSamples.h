@@ -49,6 +49,25 @@ protected:
 	ManualObject* mScissorRect;
 	void setupContent();
 };
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testCameraSetDirection : public PlayPenBase
+{
+public:
+	PlayPen_testCameraSetDirection();
+
+	void buttonHit(OgreBites::Button* button);
+	void checkBoxToggled(OgreBites::CheckBox* box);
+protected:
+	bool mUseParentNode;
+	bool mUseFixedYaw;
+	SceneNode* mParentNode;
+	Vector3 mFocus;
+	void setupContent();
+	void toggleParentNode();
+	void toggleFixedYaw();
+	void track();
+
+};
 
 
 
