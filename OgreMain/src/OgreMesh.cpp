@@ -448,24 +448,22 @@ namespace Ogre {
     void Mesh::_setBounds(const AxisAlignedBox& bounds, bool pad)
     {
         mAABB = bounds;
-        Vector3 max = mAABB.getMaximum();
-        Vector3 min = mAABB.getMinimum();
 		mBoundRadius = Math::boundingRadiusFromAABB(mAABB);
 
-        if (pad)
-        {
-            // Pad out the AABB a little, helps with most bounds tests
-            Vector3 scaler = (max - min) * MeshManager::getSingleton().getBoundsPaddingFactor();
-            mAABB.setExtents(min  - scaler, max + scaler);
-            // Pad out the sphere a little too
-            mBoundRadius = mBoundRadius + (mBoundRadius * MeshManager::getSingleton().getBoundsPaddingFactor());
-        }
-        else
-        {
-            mAABB.setExtents(min, max);
-            mBoundRadius = mBoundRadius;
-        }
+		if( mAABB.isFinite() )
+		{
+			Vector3 max = mAABB.getMaximum();
+			Vector3 min = mAABB.getMinimum();
 
+			if (pad)
+			{
+				// Pad out the AABB a little, helps with most bounds tests
+				Vector3 scaler = (max - min) * MeshManager::getSingleton().getBoundsPaddingFactor();
+				mAABB.setExtents(min  - scaler, max + scaler);
+				// Pad out the sphere a little too
+				mBoundRadius = mBoundRadius + (mBoundRadius * MeshManager::getSingleton().getBoundsPaddingFactor());
+			}
+		}
     }
     //-----------------------------------------------------------------------
     void Mesh::_setBoundingSphereRadius(Real radius)
