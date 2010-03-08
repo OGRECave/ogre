@@ -151,6 +151,10 @@ inline void LogOgreAndXSI(const XSI::CString& msg)
 
 }
 
+inline void LogOgreAndXSI(const char *msg)
+{
+	LogOgreAndXSI(Ogre::String(msg));
+}
 
 namespace Ogre {
 
