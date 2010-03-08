@@ -142,6 +142,8 @@ endif ()
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
+set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/media")
+set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/media")
 if (WIN32)
   set(OGRE_PLUGIN_DIR_REL ".")
   set(OGRE_PLUGIN_DIR_DBG ".")
