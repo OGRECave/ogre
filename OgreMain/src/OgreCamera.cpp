@@ -179,6 +179,8 @@ namespace Ogre {
         Vector3 zAdjustVec = -vec;
         zAdjustVec.normalise();
 
+		Quaternion targetWorldOrientation;
+
 
         if( mYawFixed )
         {
@@ -188,7 +190,7 @@ namespace Ogre {
             Vector3 yVec = zAdjustVec.crossProduct( xVec );
             yVec.normalise();
 
-            mOrientation.FromAxes( xVec, yVec, zAdjustVec );
+            targetWorldOrientation.FromAxes( xVec, yVec, zAdjustVec );
         }
         else
         {
@@ -210,15 +212,19 @@ namespace Ogre {
                 rotQuat = axes[2].getRotationTo(zAdjustVec);
 
             }
-            mOrientation = rotQuat * mOrientation;
+            targetWorldOrientation = rotQuat * mRealOrientation;
         }
 
         // transform to parent space
         if (mParentNode)
         {
             mOrientation =
-                mParentNode->_getDerivedOrientation().Inverse() * mOrientation;
+                mParentNode->_getDerivedOrientation().Inverse() * targetWorldOrientation;
         }
+		else
+		{
+			mOrientation = targetWorldOrientation;
+		}
 
         // TODO If we have a fixed yaw axis, we mustn't break it by using the
         // shortest arc because this will sometimes cause a relative yaw

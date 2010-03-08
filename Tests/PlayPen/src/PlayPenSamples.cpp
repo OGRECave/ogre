@@ -148,6 +148,64 @@ bool PlayPen_testProjectSphere::frameStarted(const Ogre::FrameEvent& evt)
 
 }
 
+//---------------------------------------------------------------------
+PlayPen_testCameraSetDirection::PlayPen_testCameraSetDirection()
+: mUseParentNode(false)
+, mUseFixedYaw(true)
+, mFocus(100,200,-300)
+{
+	mInfo["Title"] = "PlayPen: Camera Set Direction";
+	mInfo["Description"] = "Testing various settings for Camera::setDirection";
+
+}
+void PlayPen_testCameraSetDirection::setupContent()
+{
+	mSceneMgr->setAmbientLight(ColourValue::White);
+
+	Entity* e = mSceneMgr->createEntity("1", "knot.mesh");
+	mSceneMgr->getRootSceneNode()->createChildSceneNode(mFocus)->attachObject(e);
+
+
+	mCamera->setPosition(200,1000,1000);
+	mCamera->lookAt(mFocus);
+
+	mTrayMgr->createButton(OgreBites::TL_BOTTOM, "Look At", "Look At");
+	mTrayMgr->createCheckBox(OgreBites::TL_BOTTOM, "tglParent", "Use Parent Node");
+	OgreBites::CheckBox* chk = mTrayMgr->createCheckBox(OgreBites::TL_BOTTOM, "tglFixedYaw", "Use Fixed Yaw");
+	chk->setChecked(true, false);
+	mTrayMgr->showCursor();
+	setDragLook(true);
+
+	mParentNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(1000, 2000, -1000));
+
+}
+void PlayPen_testCameraSetDirection::buttonHit(OgreBites::Button* button)
+{
+	mCamera->lookAt(mFocus);
+}
+
+void PlayPen_testCameraSetDirection::checkBoxToggled(OgreBites::CheckBox* box)
+{
+	if (box->getName() == "tglParent")
+	{
+		mUseParentNode = !mUseParentNode;
+
+		if (mUseParentNode)
+			mParentNode->attachObject(mCamera);
+		else
+			mParentNode->detachAllObjects();
+	}
+	else if (box->getName() == "tglFixedYaw")
+	{
+		mUseFixedYaw = !mUseFixedYaw;
+		if (mUseFixedYaw)
+			mCamera->setFixedYawAxis(true);
+		else
+			mCamera->setFixedYawAxis(false);
+
+	}
+}
+
 
 
 

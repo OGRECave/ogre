@@ -1363,7 +1363,7 @@ namespace Ogre {
         if (mParentNode)
         {
             const Vector3& s = mParentNode->_getDerivedScale();
-            rad *= std::max(s.x, std::max(s.y, s.z));
+			rad *=  std::max(Ogre::Math::Abs(s.x), std::max(Ogre::Math::Abs(s.y), Ogre::Math::Abs(s.z)));
         }
         return rad;
     }

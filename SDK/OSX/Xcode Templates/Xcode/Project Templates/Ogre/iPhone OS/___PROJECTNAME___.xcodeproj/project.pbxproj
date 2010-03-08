@@ -40,18 +40,18 @@
 		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9C3648C0106DE694006B0F4F /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.cpp; path = Classes/main.cpp; sourceTree = SOURCE_ROOT; };
 		9C3648C6106DE706006B0F4F /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
-		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_date_time.a; sourceTree = "<absolute>"; };
-		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libboost_thread.a; sourceTree = "<absolute>"; };
-		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libFreeImage.a; sourceTree = "<absolute>"; };
-		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libFreeType.a; sourceTree = "<absolute>"; };
-		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libOIS.a; sourceTree = "<absolute>"; };
-		9C364925106DEAFC006B0F4F /* libzzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzzip.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/Release/libzzip.a; sourceTree = "<absolute>"; };
-		9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOgreMainStatic.a; path = _OGRESDK_ROOT_/lib/libOgreMainStatic.a; sourceTree = "<absolute>"; };
-		9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRenderSystem_GLESStatic.a; path = _OGRESDK_ROOT_/lib/libRenderSystem_GLESStatic.a; sourceTree = "<absolute>"; };
+		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = "_OGRESDK_ROOT_/lib/release/libboost_date_time.a"; sourceTree = "<absolute>"; };
+		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libboost_thread.a"; sourceTree = "<absolute>"; };
+		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeImage.a"; sourceTree = "<absolute>"; };
+		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeType.a"; sourceTree = "<absolute>"; };
+		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libOIS.a"; sourceTree = "<absolute>"; };
+		9C364925106DEAFC006B0F4F /* libzzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzzip.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libzzip.a"; sourceTree = "<absolute>"; };
+		9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOgreMainStatic.a; path = _OGRESDK_ROOT_/lib/Release/libOgreMainStatic.a; sourceTree = "<absolute>"; };
+		9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRenderSystem_GLESStatic.a; path = _OGRESDK_ROOT_/lib/Release/libRenderSystem_GLESStatic.a; sourceTree = "<absolute>"; };
 		9C364973106DF319006B0F4F /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = "<group>"; };
-		9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_BSPSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_BSPSceneManagerStatic.a; sourceTree = "<absolute>"; };
-		9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_OctreeSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_OctreeSceneManagerStatic.a; sourceTree = "<absolute>"; };
-		9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_ParticleFXStatic.a; path = _OGRESDK_ROOT_/lib/libPlugin_ParticleFXStatic.a; sourceTree = "<absolute>"; };
+		9C3649E5106DF9F3006B0F4F /* libPlugin_BSPSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_BSPSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/Release/libPlugin_BSPSceneManagerStatic.a; sourceTree = "<absolute>"; };
+		9C3649E6106DF9F3006B0F4F /* libPlugin_OctreeSceneManagerStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_OctreeSceneManagerStatic.a; path = _OGRESDK_ROOT_/lib/Release/libPlugin_OctreeSceneManagerStatic.a; sourceTree = "<absolute>"; };
+		9C3649E7106DF9F3006B0F4F /* libPlugin_ParticleFXStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libPlugin_ParticleFXStatic.a; path = _OGRESDK_ROOT_/lib/Release/libPlugin_ParticleFXStatic.a; sourceTree = "<absolute>"; };
 		9CE2F62910E06C830099B92A /* DemoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DemoApp.cpp; sourceTree = "<group>"; };
 		9CE2F62A10E06C830099B92A /* DemoApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoApp.h; sourceTree = "<group>"; };
 		9CE2F62B10E06C830099B92A /* OgreFramework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OgreFramework.cpp; sourceTree = "<group>"; };
@@ -255,13 +255,20 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/iPhoneDependencies/include,
-					_OGRESDK_ROOT_/include,
-					_OGRESDK_ROOT_/include/iPhone,
+					_OGRESDK_ROOT_/include/OGRE,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/BSPSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/OctreeSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/OctreeZone,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/ParticleFX,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/PCZSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/iPhone,
+					_OGRESDK_ROOT_/include/OGRE/RenderSystems/GLES,
+					_OGRESDK_ROOT_/include/OGRE/RenderSystems/GLES/APPLE,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/lib,
-					"_OGRESDK_ROOT_/iPhoneDependencies/lib/$(CONFIGURATION)",
+					"_OGRESDK_ROOT_/iPhoneDependencies/lib/release",
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};
@@ -278,13 +285,20 @@
 				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/iPhoneDependencies/include,
-					_OGRESDK_ROOT_/include,
-					_OGRESDK_ROOT_/include/iPhone,
+					_OGRESDK_ROOT_/include/OGRE,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/BSPSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/OctreeSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/OctreeZone,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/ParticleFX,
+					_OGRESDK_ROOT_/include/OGRE/Plugins/PCZSceneManager,
+					_OGRESDK_ROOT_/include/OGRE/iPhone,
+					_OGRESDK_ROOT_/include/OGRE/RenderSystems/GLES,
+					_OGRESDK_ROOT_/include/OGRE/RenderSystems/GLES/APPLE,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/lib,
-					"_OGRESDK_ROOT_/iPhoneDependencies/lib/$(CONFIGURATION)",
+					"_OGRESDK_ROOT_/iPhoneDependencies/lib/release",
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};

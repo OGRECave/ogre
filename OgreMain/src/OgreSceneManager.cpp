@@ -6900,8 +6900,10 @@ void SceneManager::useLightsGpuProgram(const Pass* pass, const LightList* lights
 //---------------------------------------------------------------------
 void SceneManager::bindGpuProgram(GpuProgram* prog)
 {
-	// need to reset the light hash, and paarams that need resetting, since program params will have been invalidated
-	mLastLightHashGpuProgram = 0;
+	// need to dirty the light hash, and paarams that need resetting, since program params will have been invalidated
+	// Use 1 to guarantee changing it (using 0 could result in no change if list is empty)
+	// Hash == 1 is almost impossible to achieve otherwise
+	mLastLightHashGpuProgram = 1;
 	mGpuParamsDirty = (uint16)GPV_ALL;
 	mDestRenderSystem->bindGpuProgram(prog);
 }

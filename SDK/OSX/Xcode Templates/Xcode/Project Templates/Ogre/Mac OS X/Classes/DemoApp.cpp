@@ -64,7 +64,7 @@ void DemoApp::runDemo()
 	{
 		if(OgreFramework::getSingletonPtr()->m_pRenderWnd->isClosed())m_bShutdown = true;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		Ogre::WindowEventUtilities::messagePump();
 #endif	
 		if(OgreFramework::getSingletonPtr()->m_pRenderWnd->isActive())

@@ -60,7 +60,7 @@ namespace Ogre {
 
 		struct LodData
 		{
-			Mesh::LodDistanceList distances;
+			Mesh::LodValueList distances;
 			ProgressiveMesh::VertexReductionQuota quota;
 			Real reductionValue;
 		};

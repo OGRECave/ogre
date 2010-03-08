@@ -89,9 +89,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Quaternion::ToRotationMatrix (Matrix3& kRot) const
     {
-        Real fTx  = 2.0f*x;
-        Real fTy  = 2.0f*y;
-        Real fTz  = 2.0f*z;
+        Real fTx  = x+x;
+        Real fTy  = y+y;
+        Real fTz  = z+z;
         Real fTwx = fTx*w;
         Real fTwy = fTy*w;
         Real fTwz = fTz*w;

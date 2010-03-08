@@ -64,6 +64,7 @@ THE SOFTWARE.
 #include "OgreSkeletonManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMaterialManager.h"
+#include "OgreLodStrategyManager.h"
 
 using namespace XSI;
 
@@ -361,6 +362,7 @@ XSI::CStatus OnOgreMeshExportMenu( XSI::CRef& in_ref )
 			Ogre::SkeletonManager skelMgr;
 			Ogre::MaterialManager matMgr;
 			Ogre::DefaultHardwareBufferManager hardwareBufMgr;
+			Ogre::LodStrategyManager lodStrategyBufMgr;
 
 			
 			// determine number of exportsteps
