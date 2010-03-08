@@ -206,16 +206,13 @@ namespace Ogre
         //    2. Rotate
         //    3. Translate
 
-        Matrix3 rot3x3, scale3x3;
+        Matrix3 rot3x3;
         orientation.ToRotationMatrix(rot3x3);
-        scale3x3 = Matrix3::ZERO;
-        scale3x3[0][0] = scale.x;
-        scale3x3[1][1] = scale.y;
-        scale3x3[2][2] = scale.z;
 
         // Set up final matrix with scale, rotation and translation
-        *this = rot3x3 * scale3x3;
-        this->setTrans(position);
+        m[0][0] = scale.x * rot3x3[0][0]; m[0][1] = scale.y * rot3x3[0][1]; m[0][2] = scale.z * rot3x3[0][2]; m[0][3] = position.x;
+        m[1][0] = scale.x * rot3x3[1][0]; m[1][1] = scale.y * rot3x3[1][1]; m[1][2] = scale.z * rot3x3[1][2]; m[1][3] = position.y;
+        m[2][0] = scale.x * rot3x3[2][0]; m[2][1] = scale.y * rot3x3[2][1]; m[2][2] = scale.z * rot3x3[2][2]; m[2][3] = position.z;
 
         // No projection term
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
@@ -233,17 +230,14 @@ namespace Ogre
         invTranslate *= invScale; // scale
         invTranslate = invRot * invTranslate; // rotate
 
-        // Next, make a 3x3 rotation matrix and apply inverse scale
-        Matrix3 rot3x3, scale3x3;
+        // Next, make a 3x3 rotation matrix
+        Matrix3 rot3x3;
         invRot.ToRotationMatrix(rot3x3);
-        scale3x3 = Matrix3::ZERO;
-        scale3x3[0][0] = invScale.x;
-        scale3x3[1][1] = invScale.y;
-        scale3x3[2][2] = invScale.z;
 
         // Set up final matrix with scale, rotation and translation
-        *this = scale3x3 * rot3x3;
-        this->setTrans(invTranslate);
+        m[0][0] = invScale.x * rot3x3[0][0]; m[0][1] = invScale.x * rot3x3[0][1]; m[0][2] = invScale.x * rot3x3[0][2]; m[0][3] = invTranslate.x;
+        m[1][0] = invScale.y * rot3x3[1][0]; m[1][1] = invScale.y * rot3x3[1][1]; m[1][2] = invScale.y * rot3x3[1][2]; m[1][3] = invTranslate.y;
+        m[2][0] = invScale.z * rot3x3[2][0]; m[2][1] = invScale.z * rot3x3[2][1]; m[2][2] = invScale.z * rot3x3[2][2]; m[2][3] = invTranslate.z;		
 
         // No projection term
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
