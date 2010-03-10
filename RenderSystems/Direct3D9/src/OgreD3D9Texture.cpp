@@ -795,7 +795,7 @@ namespace Ogre
 				d3d9Device,
 				(*loadedStreams)[0]->getPtr(),
 				static_cast<UINT>((*loadedStreams)[0]->size()),
-				D3DX_DEFAULT, D3DX_DEFAULT, // dims
+				D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, // dims
 				numMips,
 				usage,
 				D3DFMT_UNKNOWN,
