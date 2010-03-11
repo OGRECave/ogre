@@ -1813,7 +1813,7 @@ namespace Ogre
 		mHeightData = 0;
 
 		OGRE_FREE(mDeltaData, MEMCATEGORY_GEOMETRY);
-		mHeightData = 0;
+		mDeltaData = 0;
 
 		OGRE_DELETE mQuadTree;
 		mQuadTree = 0;
