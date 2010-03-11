@@ -791,11 +791,14 @@ namespace Ogre
 
 			HRESULT hr;
 
+			UINT autoWidthHeight = Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ? 
+				D3DX_DEFAULT_NONPOW2 : D3DX_DEFAULT;
+
 			hr = D3DXCreateTextureFromFileInMemoryEx(
 				d3d9Device,
 				(*loadedStreams)[0]->getPtr(),
 				static_cast<UINT>((*loadedStreams)[0]->size()),
-				D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, // dims
+				autoWidthHeight, autoWidthHeight, // dims
 				numMips,
 				usage,
 				D3DFMT_UNKNOWN,
