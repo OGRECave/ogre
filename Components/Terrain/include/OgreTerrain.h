@@ -950,12 +950,21 @@ namespace Ogre
 		Alignment getAlignment() const;
 		/// Get the size of the terrain in vertices along one side
 		uint16 getSize() const;
+		/** Set the size of terrain in vertices along one side. 
+		@note The existing height data will be bilinear filtered to fill the new size
+		@param newSize the new size of the terrain
+		*/
+        void setSize(uint16 newSize);
 		/// Get the maximum size in vertices along one side of a batch 
 		uint16 getMaxBatchSize() const;
 		/// Get the minimum size in vertices along one side of a batch 
 		uint16 getMinBatchSize() const;
 		/// Get the size of the terrain in world units
 		Real getWorldSize() const;
+		/** Set the world size of terrain. 
+		@param newWorldSize the new world size of the terrain
+		*/
+        void setWorldSize(Real newWorldSize);
 
 		/** Get the number of layers in this terrain. */
 		uint8 getLayerCount() const { return static_cast<uint8>(mLayers.size()); }

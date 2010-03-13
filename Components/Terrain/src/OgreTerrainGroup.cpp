@@ -66,6 +66,7 @@ namespace Ogre
 		, mAlignment(Terrain::ALIGN_X_Z)
 		, mTerrainSize(0)
 		, mTerrainWorldSize(0)
+		, mOrigin(Vector3::ZERO)
 		, mFilenamePrefix("terrain")
 		, mFilenameExtension("dat")
 		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
@@ -877,6 +878,37 @@ namespace Ogre
 
 
 	}
+	//---------------------------------------------------------------------
+    void TerrainGroup::setTerrainWorldSize(Real newWorldSize)
+    {
+		if (newWorldSize != mTerrainWorldSize)
+		{
+			mTerrainWorldSize = newWorldSize;
+			for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
+			{
+				if (i->second->instance)
+				{
+					i->second->instance->setWorldSize(newWorldSize);
+					i->second->instance->setPosition(getTerrainSlotPosition(i->second->x, i->second->y));
+				}
+			}
+		}
+    }
+	//---------------------------------------------------------------------
+    void TerrainGroup::setTerrainSize(uint16 newTerrainSize)
+    {
+		if (newTerrainSize != mTerrainSize)
+		{
+			mTerrainSize = newTerrainSize;
+			for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
+			{
+				if (i->second->instance)
+				{
+					i->second->instance->setSize(newTerrainSize);
+				}
+			}
+		}
+    }
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	TerrainGroup::TerrainSlotDefinition::~TerrainSlotDefinition()

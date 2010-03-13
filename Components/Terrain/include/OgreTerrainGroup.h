@@ -117,10 +117,23 @@ namespace Ogre
 		*/
 		virtual Terrain::Alignment getAlignment() const { return mAlignment; }
 
-		/** Retrieve the world size of each terrain instance (cannot be modified after construction).
+		/** Retrieve the world size of each terrain instance 
 		*/
 		virtual Real getTerrainWorldSize() const { return mTerrainWorldSize; }
-
+		/** Set the world size of terrain. 
+		@note This will cause the terrains to change position due to their size change
+		@param newWorldSize the new world size of each terrain instance 
+		*/
+        virtual void setTerrainWorldSize(Real newWorldSize);
+		/** Retrieve the size of each terrain instance in number of vertices down one side
+		*/
+		virtual uint16 getTerrainSize() const { return mTerrainSize; }
+		/** Set the size of each terrain instance in number of vertices down one side. 
+		@note This will cause the height data in each nested terrain to be bilinear
+			filtered to fit the new data size.
+		@param newTerrainSize the new map size of each terrain instance 
+		*/
+        virtual void setTerrainSize(uint16 newTerrainSize);
 		/** Retrieve the SceneManager being used for this group.
 		*/
 		virtual SceneManager* getSceneManager() const { return mSceneManager; }

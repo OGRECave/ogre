@@ -4241,6 +4241,85 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Terrain::setWorldSize(Real newWorldSize)
+	{
+		if(mWorldSize != newWorldSize)
+		{
+			waitForDerivedProcesses();
+
+			mWorldSize = newWorldSize;
+
+			updateBaseScale();
+
+			deriveUVMultipliers();
+
+			mMaterialParamsDirty = true;
+
+			if(mIsLoaded)
+			{
+				Rect dRect(0, 0, mSize, mSize);
+				dirtyRect(dRect);
+				update();
+			}
+
+			mModified = true;
+		}
+	}
+	//---------------------------------------------------------------------
+	void Terrain::setSize(uint16 newSize)
+	{
+		if(mSize != newSize)
+		{
+			waitForDerivedProcesses();
+
+			size_t numVertices = newSize * newSize;
+
+			PixelBox src(mSize, mSize, 1, Ogre::PF_FLOAT32_R, (void*)getHeightData());
+
+			float* tmpData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GENERAL);
+
+			PixelBox dst(newSize, newSize, 1, Ogre::PF_FLOAT32_R, tmpData);
+
+			Image::scale(src, dst, Image::FILTER_BILINEAR);
+
+			freeCPUResources();
+
+			mSize = newSize;
+
+			determineLodLevels();
+
+			updateBaseScale();
+
+			deriveUVMultipliers();
+
+			mMaterialParamsDirty = true;
+
+			mHeightData = tmpData;
+			mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+			memset(mDeltaData, 0, sizeof(float) * numVertices);
+
+			mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+			mQuadTree->prepare();
+
+			// calculate entire terrain
+			Rect rect;
+			rect.top = 0; rect.bottom = mSize;
+			rect.left = 0; rect.right = mSize;
+			calculateHeightDeltas(rect);
+			finaliseHeightDeltas(rect, true);
+
+			distributeVertexData();
+
+			if(mIsLoaded)
+			{
+				if (mQuadTree)
+					mQuadTree->load();
+			}
+
+			mModified = true;
+		}
+	}
+	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	Terrain::DefaultGpuBufferAllocator::DefaultGpuBufferAllocator()
 	{

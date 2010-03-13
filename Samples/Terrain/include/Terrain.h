@@ -307,6 +307,22 @@ public:
 				}
 			}
 			break;
+			/*
+		case OIS::KC_F7:
+			// change terrain size
+			if (mTerrainGroup->getTerrainSize() == 513)
+				mTerrainGroup->setTerrainSize(1025);
+			else
+				mTerrainGroup->setTerrainSize(513);
+			break;
+		case OIS::KC_F8:
+			// change terrain world size
+			if (mTerrainGroup->getTerrainWorldSize() == TERRAIN_WORLD_SIZE)
+				mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE * 2);
+			else
+				mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE);
+			break;
+			*/
 		default:
 			return SdkSample::keyPressed(e);
 		}
