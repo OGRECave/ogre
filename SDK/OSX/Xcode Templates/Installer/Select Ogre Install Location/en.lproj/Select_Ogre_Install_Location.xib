@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1040</int>
-		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.SystemVersion">10D567</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.25</string>
-		<string key="IBDocument.HIToolboxVersion">458.00</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
@@ -56,7 +56,7 @@
 Y3VzdG9taXplIHRoZSBwcm9qZWN0IHRlbXBsYXRlcyB0byBlbnN1cmUgdGhhdCBpbmNsdWRlIHBhdGhz
 IGFyZSBjb3JyZWN0IGZvciB5b3VyIHBhcnRpY3VsYXIgaW5zdGFsbGF0aW9uLgoKTm90ZTogVGhlc2Ug
 dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
-							<object class="NSFont" key="NSSupport" id="851176159">
+							<object class="NSFont" key="NSSupport">
 								<string key="NSName">LucidaGrande</string>
 								<double key="NSSize">13</double>
 								<int key="NSfFlags">16</int>
@@ -82,6 +82,67 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 							</object>
 						</object>
 					</object>
+					<object class="NSTextField" id="797870806">
+						<reference key="NSNextResponder" ref="878039515"/>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{17, 50}, {384, 44}}</string>
+						<reference key="NSSuperview" ref="878039515"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="67434269">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">272764928</int>
+							<string key="NSContents"/>
+							<object class="NSFont" key="NSSupport" id="26">
+								<string key="NSName">LucidaGrande</string>
+								<double key="NSSize">11</double>
+								<int key="NSfFlags">3100</int>
+							</object>
+							<string key="NSPlaceholderString">Path to iPhone Ogre SDK</string>
+							<reference key="NSControlView" ref="797870806"/>
+							<reference key="NSBackgroundColor" ref="108267856"/>
+							<reference key="NSTextColor" ref="998676297"/>
+						</object>
+					</object>
+					<object class="NSButton" id="987237101">
+						<reference key="NSNextResponder" ref="878039515"/>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{302, 90}, {102, 32}}</string>
+						<reference key="NSSuperview" ref="878039515"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSButtonCell" key="NSCell" id="235162570">
+							<int key="NSCellFlags">67239424</int>
+							<int key="NSCellFlags2">134217728</int>
+							<string key="NSContents">Find Ogre</string>
+							<object class="NSFont" key="NSSupport" id="398622067">
+								<string key="NSName">LucidaGrande</string>
+								<double key="NSSize">13</double>
+								<int key="NSfFlags">1044</int>
+							</object>
+							<reference key="NSControlView" ref="987237101"/>
+							<int key="NSButtonFlags">-2038284033</int>
+							<int key="NSButtonFlags2">1</int>
+							<string key="NSAlternateContents"/>
+							<string key="NSKeyEquivalent"/>
+							<int key="NSPeriodicDelay">200</int>
+							<int key="NSPeriodicInterval">25</int>
+						</object>
+					</object>
+					<object class="NSTextField" id="34634635">
+						<reference key="NSNextResponder" ref="878039515"/>
+						<int key="NSvFlags">268</int>
+						<string key="NSFrame">{{17, 100}, {233, 17}}</string>
+						<reference key="NSSuperview" ref="878039515"/>
+						<bool key="NSEnabled">YES</bool>
+						<object class="NSTextFieldCell" key="NSCell" id="760465017">
+							<int key="NSCellFlags">68288064</int>
+							<int key="NSCellFlags2">272630784</int>
+							<string key="NSContents">iPhone Ogre Installation Location:</string>
+							<reference key="NSSupport" ref="398622067"/>
+							<reference key="NSControlView" ref="34634635"/>
+							<reference key="NSBackgroundColor" ref="108267856"/>
+							<reference key="NSTextColor" ref="998676297"/>
+						</object>
+					</object>
 					<object class="NSTextField" id="874604315">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
@@ -92,12 +153,8 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272764928</int>
 							<string key="NSContents"/>
-							<object class="NSFont" key="NSSupport">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">11</double>
-								<int key="NSfFlags">3100</int>
-							</object>
-							<string key="NSPlaceholderString">Path to Ogre SDK</string>
+							<reference key="NSSupport" ref="26"/>
+							<string key="NSPlaceholderString">Path to Mac OS X Ogre SDK</string>
 							<reference key="NSControlView" ref="874604315"/>
 							<reference key="NSBackgroundColor" ref="108267856"/>
 							<reference key="NSTextColor" ref="998676297"/>
@@ -113,11 +170,7 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">134217728</int>
 							<string key="NSContents">Find Ogre</string>
-							<object class="NSFont" key="NSSupport" id="398622067">
-								<string key="NSName">LucidaGrande</string>
-								<double key="NSSize">13</double>
-								<int key="NSfFlags">1044</int>
-							</object>
+							<reference key="NSSupport" ref="398622067"/>
 							<reference key="NSControlView" ref="260586914"/>
 							<int key="NSButtonFlags">-2038284033</int>
 							<int key="NSButtonFlags2">1</int>
@@ -127,32 +180,16 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 							<int key="NSPeriodicInterval">25</int>
 						</object>
 					</object>
-					<object class="NSTextField" id="843604456">
-						<reference key="NSNextResponder" ref="878039515"/>
-						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 76}, {384, 42}}</string>
-						<reference key="NSSuperview" ref="878039515"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="302857011">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">272629760</int>
-							<string key="NSContents"/>
-							<reference key="NSSupport" ref="851176159"/>
-							<reference key="NSControlView" ref="843604456"/>
-							<reference key="NSBackgroundColor" ref="108267856"/>
-							<reference key="NSTextColor" ref="998676297"/>
-						</object>
-					</object>
 					<object class="NSTextField" id="120735260">
 						<reference key="NSNextResponder" ref="878039515"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 176}, {171, 17}}</string>
+						<string key="NSFrame">{{17, 176}, {233, 17}}</string>
 						<reference key="NSSuperview" ref="878039515"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="752150237">
 							<int key="NSCellFlags">68288064</int>
 							<int key="NSCellFlags2">272630784</int>
-							<string key="NSContents">Ogre Installation Location:</string>
+							<string key="NSContents">Mac OS X Ogre Installation Location:</string>
 							<reference key="NSSupport" ref="398622067"/>
 							<reference key="NSControlView" ref="120735260"/>
 							<reference key="NSBackgroundColor" ref="108267856"/>
@@ -199,28 +236,36 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 					<int key="connectionID">9</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">ogreInfoLabel</string>
-						<reference key="source" ref="521373648"/>
-						<reference key="destination" ref="843604456"/>
-					</object>
-					<int key="connectionID">21</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">ogreLocationLabel</string>
-						<reference key="source" ref="521373648"/>
-						<reference key="destination" ref="874604315"/>
-					</object>
-					<int key="connectionID">23</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">chooseOgreSDKLocation:</string>
+						<string key="label">chooseOSXOgreSDKLocation:</string>
 						<reference key="source" ref="521373648"/>
 						<reference key="destination" ref="260586914"/>
 					</object>
-					<int key="connectionID">24</int>
+					<int key="connectionID">34</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">chooseiPhoneOgreSDKLocation:</string>
+						<reference key="source" ref="521373648"/>
+						<reference key="destination" ref="987237101"/>
+					</object>
+					<int key="connectionID">35</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ogreOSXLocationLabel</string>
+						<reference key="source" ref="521373648"/>
+						<reference key="destination" ref="874604315"/>
+					</object>
+					<int key="connectionID">37</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">ogreiPhoneLocationLabel</string>
+						<reference key="source" ref="521373648"/>
+						<reference key="destination" ref="797870806"/>
+					</object>
+					<int key="connectionID">38</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -256,10 +301,12 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="120735260"/>
-							<reference ref="843604456"/>
 							<reference ref="260586914"/>
 							<reference ref="874604315"/>
 							<reference ref="463632495"/>
+							<reference ref="34634635"/>
+							<reference ref="987237101"/>
+							<reference ref="797870806"/>
 						</object>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">View</string>
@@ -283,20 +330,6 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 						<int key="objectID">12</int>
 						<reference key="object" ref="752150237"/>
 						<reference key="parent" ref="120735260"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">15</int>
-						<reference key="object" ref="843604456"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="302857011"/>
-						</object>
-						<reference key="parent" ref="878039515"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">16</int>
-						<reference key="object" ref="302857011"/>
-						<reference key="parent" ref="843604456"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">17</int>
@@ -340,6 +373,48 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 						<reference key="object" ref="407045746"/>
 						<reference key="parent" ref="463632495"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">27</int>
+						<reference key="object" ref="34634635"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="760465017"/>
+						</object>
+						<reference key="parent" ref="878039515"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">28</int>
+						<reference key="object" ref="987237101"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="235162570"/>
+						</object>
+						<reference key="parent" ref="878039515"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">29</int>
+						<reference key="object" ref="797870806"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="67434269"/>
+						</object>
+						<reference key="parent" ref="878039515"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">30</int>
+						<reference key="object" ref="67434269"/>
+						<reference key="parent" ref="797870806"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">31</int>
+						<reference key="object" ref="235162570"/>
+						<reference key="parent" ref="987237101"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">32</int>
+						<reference key="object" ref="760465017"/>
+						<reference key="parent" ref="34634635"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -349,14 +424,18 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 					<string>-3.IBPluginDependency</string>
 					<string>11.IBPluginDependency</string>
 					<string>12.IBPluginDependency</string>
-					<string>15.IBPluginDependency</string>
-					<string>16.IBPluginDependency</string>
 					<string>17.IBPluginDependency</string>
 					<string>18.IBPluginDependency</string>
 					<string>19.IBPluginDependency</string>
 					<string>20.IBPluginDependency</string>
 					<string>25.IBPluginDependency</string>
 					<string>26.IBPluginDependency</string>
+					<string>27.IBPluginDependency</string>
+					<string>28.IBPluginDependency</string>
+					<string>29.IBPluginDependency</string>
+					<string>30.IBPluginDependency</string>
+					<string>31.IBPluginDependency</string>
+					<string>32.IBPluginDependency</string>
 					<string>5.ImportedFromIB2</string>
 					<string>8.IBEditorWindowLastContentRect</string>
 					<string>8.IBPluginDependency</string>
@@ -365,6 +444,10 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -399,7 +482,7 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">26</int>
+			<int key="maxID">38</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -408,15 +491,24 @@ dGVtcGxhdGVzIGFyZSBkZXNpZ25lZCBmb3IgT0dSRSAxLjcuA</string>
 					<string key="className">Select_Ogre_Install_LocationPane</string>
 					<string key="superclassName">InstallerPane</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">chooseOgreSDKLocation:</string>
-						<string key="NS.object.0">id</string>
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>chooseOSXOgreSDKLocation:</string>
+							<string>chooseiPhoneOgreSDKLocation:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
+							<string>id</string>
+						</object>
 					</object>
 					<object class="NSMutableDictionary" key="outlets">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>ogreInfoLabel</string>
-							<string>ogreLocationLabel</string>
+							<string>ogreOSXLocationLabel</string>
+							<string>ogreiPhoneLocationLabel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>

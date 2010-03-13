@@ -43,7 +43,7 @@ if (OGRE_BUILD_TESTS)
 		OgreMain/src/VectorTests.cpp
 		src/main.cpp
 	)
-	if (NOT OGRE_CONFIG_DISABLE_ZIP)
+	if (OGRE_CONFIG_ENABLE_ZIP)
 	  set(HEADER_FILES ${HEADER_FILES} OgreMain/include/ZipArchiveTests.h)
 	  set(SOURCE_FILES ${SOURCE_FILES} OgreMain/src/ZipArchiveTests.cpp)
 	endif ()

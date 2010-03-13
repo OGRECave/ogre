@@ -40,12 +40,12 @@
 		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9C3648C0106DE694006B0F4F /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.cpp; path = Classes/main.cpp; sourceTree = SOURCE_ROOT; };
 		9C3648C6106DE706006B0F4F /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
-		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = "_OGRESDK_ROOT_/lib/release/libboost_date_time.a"; sourceTree = "<absolute>"; };
-		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libboost_thread.a"; sourceTree = "<absolute>"; };
-		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeImage.a"; sourceTree = "<absolute>"; };
-		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeType.a"; sourceTree = "<absolute>"; };
-		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libOIS.a"; sourceTree = "<absolute>"; };
-		9C364925106DEAFC006B0F4F /* libzzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzzip.a; path = "_OGRESDK_ROOT_/iPhoneDependencies/lib/release/libzzip.a"; sourceTree = "<absolute>"; };
+		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/lib/release/libboost_date_time.a; sourceTree = "<absolute>"; };
+		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libboost_thread.a; sourceTree = "<absolute>"; };
+		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeImage.a; sourceTree = "<absolute>"; };
+		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeType.a; sourceTree = "<absolute>"; };
+		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libOIS.a; sourceTree = "<absolute>"; };
+		9C364925106DEAFC006B0F4F /* libzzip.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libzzip.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libzzip.a; sourceTree = "<absolute>"; };
 		9C364940106DEF8B006B0F4F /* libOgreMainStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOgreMainStatic.a; path = _OGRESDK_ROOT_/lib/Release/libOgreMainStatic.a; sourceTree = "<absolute>"; };
 		9C364942106DEF8F006B0F4F /* libRenderSystem_GLESStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRenderSystem_GLESStatic.a; path = _OGRESDK_ROOT_/lib/Release/libRenderSystem_GLESStatic.a; sourceTree = "<absolute>"; };
 		9C364973106DF319006B0F4F /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = "<group>"; };
@@ -267,8 +267,8 @@
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					_OGRESDK_ROOT_/lib,
-					"_OGRESDK_ROOT_/iPhoneDependencies/lib/release",
+					_OGRESDK_ROOT_/lib/release,
+					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};
@@ -297,8 +297,8 @@
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					_OGRESDK_ROOT_/lib,
-					"_OGRESDK_ROOT_/iPhoneDependencies/lib/release",
+					_OGRESDK_ROOT_/lib/release,
+					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};

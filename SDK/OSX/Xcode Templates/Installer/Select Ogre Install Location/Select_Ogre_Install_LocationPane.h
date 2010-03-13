@@ -29,11 +29,15 @@
 #import <InstallerPlugins/InstallerPlugins.h>
 
 @interface Select_Ogre_Install_LocationPane : InstallerPane {
-    IBOutlet NSTextField *ogreLocationLabel;
-    IBOutlet NSTextField *ogreInfoLabel;
-    BOOL validSDKChosen;
+    IBOutlet NSTextField *ogreOSXLocationLabel;
+    IBOutlet NSTextField *ogreiPhoneLocationLabel;
+    BOOL validOSXSDKChosen;
+    BOOL validiPhoneSDKChosen;
+    BOOL isChoosingiPhoneSDK;
 }
 
-- (IBAction)chooseOgreSDKLocation:(id)sender;
+- (IBAction)chooseOSXOgreSDKLocation:(id)sender;
+- (IBAction)chooseiPhoneOgreSDKLocation:(id)sender;
+- (NSString *)extractOGREVersionFromLines:(NSArray *)lines;
 
 @end

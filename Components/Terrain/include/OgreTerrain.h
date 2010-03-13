@@ -1838,7 +1838,7 @@ namespace Ogre
 		virtual ~TerrainGlobalOptions() {}
 
 
-		/** Static method - the default size of 'skirts' used to hide terrain cracks
+		/** The default size of 'skirts' used to hide terrain cracks
 		(default 10)
 		*/
 		Real getSkirtSize() { return mSkirtSize; }

@@ -177,7 +177,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for iPhone" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
-  set(OGRE_CONFIG_DISABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
+  set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
 
   add_definitions(-fno-regmove)
   remove_definitions(-msse)
@@ -206,7 +206,7 @@ endif ()
 
 # Enable the PVRTC codec if OpenGL ES is being built
 if(OGRE_BUILD_RENDERSYSTEM_GLES)
-  set(OGRE_CONFIG_DISABLE_PVRTC FALSE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
+  set(OGRE_CONFIG_ENABLE_PVRTC TRUE CACHE BOOL "Forcing PVRTC codec for OpenGL ES" FORCE)
 endif()
 
 ######################################################################
