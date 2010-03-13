@@ -320,7 +320,7 @@ namespace Ogre {
             mShaderGenerator->setShaderCachePath(mGLSupport->getShaderCachePath());
             mShaderGenerator->setTargetLanguage("glsles");		
 
-            mMaterialMgrListener = OGRE_NEW ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
+            mMaterialMgrListener = OGRE_NEW_FIX_FOR_WIN32 ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
             MaterialManager::getSingleton().addListener(mMaterialMgrListener);
 
             // Add the shader libs and cached resource location.

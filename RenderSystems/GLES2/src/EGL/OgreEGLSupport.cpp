@@ -32,8 +32,8 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLESPrerequisites.h"
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLES2RenderSystem.h"
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLWindow.h"
@@ -45,17 +45,13 @@ namespace Ogre {
 
     EGLSupport::EGLSupport()
         : mGLDisplay(0),
-          //mNativeDisplay(0),
 		  mRandr(false)
     {
-//        mGLDisplay = getGLDisplay();
-//		mNativeDisplay = getNativeDisplay();
-
     }
 
     EGLSupport::~EGLSupport()
     {
-	}
+    }
 
     void EGLSupport::addConfig(void)
     {
@@ -161,7 +157,7 @@ namespace Ogre {
 
     void EGLSupport::setConfigOption(const String &name, const String &value)
     {
-        GLESSupport::setConfigOption(name, value);
+        GLES2Support::setConfigOption(name, value);
         if (name == "Video Mode")
         {
             refreshConfig();
@@ -174,18 +170,11 @@ namespace Ogre {
         return StringUtil::BLANK;
     }
 
-	//Moved to native.
-//	NativeDisplayType EGLSupport::getNativeDisplay()
-//	{
-//		return EGL_DEFAULT_DISPLAY; // TODO
-//	}
-
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
         EGLint major, minor;
 
-
-		mGLDisplay = eglGetDisplay(mNativeDisplay);
+	mGLDisplay = eglGetDisplay(mNativeDisplay);
 
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
@@ -200,14 +189,14 @@ namespace Ogre {
                         "Couldn`t initialize EGLDisplay ",
                         "EGLSupport::getGLDisplay");
         }
-		return mGLDisplay;
+	return mGLDisplay;
     }
 
 
     String EGLSupport::getDisplayName(void)
     {
 		return "todo";
-	}
+    }
 
     EGLConfig* EGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
     {
@@ -215,25 +204,24 @@ namespace Ogre {
 
         if (eglChooseConfig(mGLDisplay, attribList, NULL, 0, nElements) == EGL_FALSE)
         {
-            assert(false);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to chosse config",
+                        "Failed to choose config",
                         __FUNCTION__);
 
             *nElements = 0;
             return 0;
-		}
+	}
 
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
         if (eglChooseConfig(mGLDisplay, attribList, configs, *nElements, nElements) == EGL_FALSE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to chosse config",
+                        "Failed to choose config",
                         __FUNCTION__);
 
             *nElements = 0;
             free(configs);
-			return 0;
+	    return 0;
         }
 
         return configs;
@@ -401,7 +389,7 @@ namespace Ogre {
     }
 
     RenderWindow* EGLSupport::createWindow(bool autoCreateWindow,
-                                           GLESRenderSystem* renderSystem,
+                                           GLES2RenderSystem* renderSystem,
                                            const String& windowTitle)
     {
         RenderWindow *window = 0;
@@ -448,33 +436,25 @@ namespace Ogre {
         return window;
     }
 
-//    RenderWindow* EGLSupport::newWindow(const String &name,
-//                                        unsigned int width, unsigned int height,
-//                                        bool fullScreen,
-//                                        const NameValuePairList *miscParams)
-//    {
-//        EGLWindow* window = createEGLWindow(this);
-//
-//        window->create(name, width, height, fullScreen, miscParams);
-//
-//        return window;
-//    }
-
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
 											  ::EGLConfig glconfig,
                                               ::EGLContext shareList) const 
     {
-		::EGLContext context = ((::EGLContext) 0);
-		if (eglDisplay == ((EGLDisplay) 0))
-		{
-			context = eglCreateContext(mGLDisplay, glconfig, shareList, 0);
-		}
-		else
-		{
-			context = eglCreateContext(eglDisplay, glconfig, 0, 0);
-		}
+        EGLint contextAttrs[] = {
+            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_NONE
+        };
+	::EGLContext context = ((::EGLContext) 0);
+	if (eglDisplay == ((EGLDisplay) 0))
+	{
+		context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
+	}
+	else
+	{
+		context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
+	}
 
-		if (context == ((::EGLContext) 0))
+	if (context == ((::EGLContext) 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Fail to create New context",
@@ -493,8 +473,8 @@ namespace Ogre {
     {
     }
 
-	void EGLSupport::setGLDisplay( EGLDisplay val )
-	{
-		mGLDisplay = val;
-	}
+    void EGLSupport::setGLDisplay( EGLDisplay val )
+    {
+        mGLDisplay = val;
+    }
 }

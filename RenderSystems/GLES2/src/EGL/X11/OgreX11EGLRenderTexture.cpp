@@ -27,6 +27,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#if 0
 #include "OgreStableHeaders.h"
 
 #include "OgreException.h"
@@ -60,3 +61,5 @@ namespace Ogre {
 	}
 
 }
+#endif
+

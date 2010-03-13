@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2RenderSystem.h"
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLContext.h"
@@ -45,8 +45,8 @@ namespace Ogre {
 		  mEglDisplay(eglDisplay)
     {
 		assert(drawable);
-        GLESRenderSystem* renderSystem =
-            static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLES2RenderSystem* renderSystem =
+            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
         EGLContext* mainContext =
             static_cast<EGLContext*>(renderSystem->_getMainContext());
         ::EGLContext shareContext = (::EGLContext) 0;
@@ -55,7 +55,6 @@ namespace Ogre {
         {
             shareContext = mainContext->mContext;
         }
-
         mContext = mGLSupport->createNewContext(eglDisplay, mConfig, shareContext);
 
         if (!mContext)
@@ -68,8 +67,8 @@ namespace Ogre {
 
     EGLContext::~EGLContext()
     {
-        GLESRenderSystem *rs =
-            static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLES2RenderSystem *rs =
+            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
 
         eglDestroyContext(mEglDisplay, mContext);
         rs->_unregisterContext(this);

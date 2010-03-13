@@ -101,8 +101,10 @@ namespace Ogre {
     {
         GL_NONE,
         GL_DEPTH_COMPONENT16,
-        GL_DEPTH_COMPONENT24_OES,   // Prefer 24 bit depth
-        GL_DEPTH24_STENCIL8_OES     // Packed depth / stencil
+        GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
+#if GL_OES_packed_depth_stencil        
+        , GL_DEPTH24_STENCIL8_OES  // Packed depth / stencil
+#endif
     };
     static const size_t depthBits[] =
     {

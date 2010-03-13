@@ -56,12 +56,6 @@ THE SOFTWARE.
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
 #else
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define  GL_GLEXT_PROTOTYPES
-#	endif
-#	ifndef GL_OES_mapbuffer
-#		define  GL_OES_mapbuffer 0
-#	endif
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
 #   include <EGL/egl.h>

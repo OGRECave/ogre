@@ -30,12 +30,12 @@ THE SOFTWARE.
 #ifndef __EGLContext_H__
 #define __EGLContext_H__
 
-#include "OgreGLESContext.h"
+#include "OgreGLES2Context.h"
 
 namespace Ogre {
     class EGLSupport;
 
-    class _OgrePrivate EGLContext: public GLESContext
+    class _OgrePrivate EGLContext: public GLES2Context
     {
         protected:
             ::EGLConfig    mConfig;
@@ -51,7 +51,7 @@ namespace Ogre {
 
             virtual void setCurrent();
             virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
+            virtual GLES2Context* clone() const = 0;
 
 			EGLSurface getDrawable() const;
 
