@@ -91,9 +91,11 @@ Your configuration file should include at least the following:
 
 ------------------------------------------------------------
 [extensions]
+progress=
 rebase=
 transplant=
 ------------------------------------------------------------
+The Progress extension just gives you more feedback on the progress of operations. 
 
 The Rebase extension allows you re-apply your commits on top of changes in the master repository, when someone else
 has pushed their changes to the master before you have. This avoids having to explicitly merge your changes with theirs, keeping a 
@@ -136,14 +138,17 @@ Hopefully you're familiar with the basic principles of using Mercurial already; 
 http://mercurial.selenic.com/wiki/Tutorial[the official Mercurial tutorials]. However, Mercurial is very flexible 
 so some ground rules need to be established in order for the team to stay organised.
 
+General Points
+~~~~~~~~~~~~~~
+
 Master Repository
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 The ''master'' repository is located on BitBucket here: http://bitbucket.org/sinbad/ogre/ . I recommend that developers
 use the SSH link (with SSH keys if you like) rather than https, because it's more reliable when doing large transactions
 because the timeout is far larger.
 
 Official Branches
-~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 The master repository will use branches 'only' for official development streams, which in practice means one branch per major stable version, 
 plus the default branch (which is considered "unstable"). For example, this might be the list of branches in the master repository:
 
@@ -160,11 +165,32 @@ branches. If these clones need to be public, then a fork should be created on Bi
 Later on if the work in these forks is to be reintegrated into the master repository, the changes can be either 
 submitted as a patch or (preferably) the changes pulled across with the full commit history, if that makes sense. 
 
-Committing
-~~~~~~~~~~
+Everyday Tasks
+~~~~~~~~~~~~~~
 
-Bugfixes
-^^^^^^^^
+Committing
+^^^^^^^^^^
+
+General Principles
+++++++++++++++++++
+
+*Testing:* Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes
+to the master, you should still try to ensure that all your commits are consistent in themselves, that is that evey point in the history
+of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if
+you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, *do* commit
+often, because a rich history is always best, but do at least check that everything compiles and runs before creating a new commit. 
+
+*Cohesive commits:* Your commits should be as focussed as possible on a single subject. Try not to commit changes for multiple purposes at once, it
+makes it much more difficult to pick apart those changes later if needed. And most importantly, never 'ever' commit a bugfix and a feature 
+change in one commit, unless changing the feature was the only way to fix the bug (in which case it can only be fixed in the unstable default branch). 
+
+*Unnecessary changes:* Although it can be tempting to "tidy" code, fix indenting, standardise etc, you should generally avoid doing this for its own sake. 
+If you're changing the code anyway, by all means fix any formatting and standardisation issues in the area in question while you're at it. But purely 
+aesthetic changes should never be committed on their own, because all of them can potentially make merging 'real' changes - across branches and
+accepting patches - far more difficult because of conflicts caused simply by trivial formatting changes. 
+
+Committing Bugfixes
++++++++++++++++++++
 
 Bugfixes should always be committed to the 'current stable branch' (assuming they affect it) first. So for example at the time of writing
 bugfixes should be committed to the v1-7 branch. These bugfixes will be merged forwards into the default branch periodically. The reasons for 
@@ -174,22 +200,10 @@ stable branch, are many:
 * Merge conflicts always happen in the unstable branch, not the stable branch. This is better again because the stable branch is the most important to keep as clean as possible
 * Merging is automatic. You always want to merge ALL changes from the stable branch into the default branch, there is no human error involved in selecting what changes to merge. If you cherry-pick fixes to port to the stable branch, you have to make sure you don't miss anything, make sure you don't accidentally include an interface change, etc. And if someone has committed a combined fix and an API change in one commit (see below) it's a mess.
 
+Committing New Features and Breaking Changes
+++++++++++++++++++++++++++++++++++++++++++++
 
-Testing Requirements
-^^^^^^^^^^^^^^^^^^^^
-Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes
-to the master, you should still try to ensure that all your commits are consistent in themselves, that is that evey point in the history
-of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if
-you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, commit
-often, but do at least check that everything compiles and runs first. 
-
-Cohesiveness
-^^^^^^^^^^^^
-
-Your commits should be as focussed as possible on a single subject. Try not to commit changes for multiple purposes at once, it
-makes it much more difficult to pick apart those changes later if needed. And most importantly, never 'ever' commit a bugfix and a feature 
-change in one commit, unless changing the feature was the only way to fix the bug (in which case it can only be fixed in the unstable default branch). 
-
+Any new feature, or a change which changes either the API or the behaviour within the existing API, must always be committed to the default branch (often referred to as 'unstable'). 
 
 Pushing / Pulling
 ~~~~~~~~~~~~~~~~~
