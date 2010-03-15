@@ -7,8 +7,11 @@ This document sets out the principles under which OGRE development will be under
 and is designed to be used as an introduction for new developers, and a reference for
 existing developers. 
 
-Mercurial Configuration
------------------------
+NOTE: While this document is primarily aimed at core developers and other contributors to OGRE, 
+regular users might find it interesting too, particularly if they aspire to contribute code eventually.
+
+Recommended Mercurial Configuration
+-----------------------------------
 OGRE uses Mercurial for source control, this is a Distributed Version Control System (DVCS), which means that
 while there is a central repository which is considered 'authorative', in fact everyone is able to clone their own
 copy of the repository and commit to it themselves too, with changes being exchanged by 'pushing' and 'pulling' changesets
@@ -99,10 +102,23 @@ The Progress extension just gives you more feedback on the progress of operation
 
 The Rebase extension allows you re-apply your commits on top of changes in the master repository, when someone else
 has pushed their changes to the master before you have. This avoids having to explicitly merge your changes with theirs, keeping a 
-messy history; it effectively looks as if you had applied your changes on top of their in the first place.
+messy history; it effectively looks as if you had applied your changes on top of their in the first place. See <<Pulling,Pulling Changesets>>.
 
 The Transplant extension allows you to pull individual commits from one branch to another, should you need to.
 Typically changes are merged between branches but occasionally there are cases where you need to transplant individual ones.
+
+[[HgCfgDiff]]
+Diff settings
+^^^^^^^^^^^^^
+
+Mercurial can generate patches in 2 different forms:- the default patch format is compatible with the GNU patch utilities and any other tools that understand them, and is
+therefore very portable; however it cannot deal with binary files, and can't cope with renames. To resolve this, Mercurial also
+supports the Git patch format, which embeds more information and can also handle binaries. This is the *recommended* patch format for OGRE since it is far more functional, although it
+means you have to use Mercurial itself to apply the patches. 
+------------------------------------------------------------
+[diff]
+git = True
+------------------------------------------------------------
 
 Windows Text Handling
 ^^^^^^^^^^^^^^^^^^^^^
@@ -117,7 +133,7 @@ hgext.win32text=
 [decode]
 ** = cleverdecode:
 [hooks]
-# Reject commits which would introduce windows-style text" files
+# Reject commits which would introduce windows-style text files
 pretxncommit.crlf = python:hgext.win32text.forbidcrlf
 ------------------------------------------------------------
 
@@ -130,6 +146,19 @@ there are any NUL characters in the file; if there are none, it is assumed to be
 more NULs then it's considered to be binary.
 
 The hook defined at the bottom is included to prevent accidental committing of files with remaining Windows line feeds. 
+
+[[THGConfig]]
+TortoiseHg Specific
+^^^^^^^^^^^^^^^^^^^
+
+If you're using http://tortoisehg.bitbucket.org/[TortoiseHg], you definitely want to set the following option:
+------------------------------------------------------------
+[tortoisehg]
+postpull = rebase
+------------------------------------------------------------
+
+This sets the default action after pulling changesets to rebase your own outstanding changesets on top of it. You can 
+also find it in the Global Options under Synchronize > After Pull Operation.
 
 Using Mercurial
 ---------------
@@ -158,9 +187,9 @@ v1-7
 v1-6
 -----------------------------------------
 
-When we were using Subversion, we used branches for other purposes too such as experimental work by a core team member which was uncertain 
+NOTE: When we were using Subversion, we used branches for other purposes too such as experimental work by a core team member which was uncertain 
 for official inclusion, or a student project on Google Summer of Code - we will no longer use branches for these things. 
-Instead all other divergences in the code will be handled by making clones of the repository and not by 
+Instead all other divergences in the code will be handled by making 'clones' of the repository and not by 
 branches. If these clones need to be public, then a fork should be created on BitBucket, and all those interested can use that. 
 Later on if the work in these forks is to be reintegrated into the master repository, the changes can be either 
 submitted as a patch or (preferably) the changes pulled across with the full commit history, if that makes sense. 
@@ -208,52 +237,156 @@ Any new feature, or a change which changes either the API or the behaviour withi
 Pushing / Pulling
 ~~~~~~~~~~~~~~~~~
 
-Pushing and pulling is how you get commits to and from remote repositories, respectively. This is mostly covered in the Mercurial tutorials.
+Pushing and pulling is how you get commits to and from remote repositories, respectively. This is mostly covered in the Mercurial tutorials & documentation. 
+This section is concerned with the recommended approach to common issues.
 
-However, a common occurrence is that you try to push your commits to the master, but find that you get an error saying "abort: push creates new remote heads!". 
-This is a bit of a confusing message, but basically it means that someone else pushed their commits before you did, and you're not allowed to push your
-changes until you've resolved this. 
+Pushing Changesets
+^^^^^^^^^^^^^^^^^^
 
-The http://hginit.com[HG Init] tutorials suggest resolving this by pulling and then merging the changes with your own, which is indeed the standard way
-to handle this, but it has one major drawback - every time it happens, in the history you have a permanent record of this divergence in the form of a 
-branch and merge of the 2 developers changes. This is extremely distracting when trying to decipher the history. 
+This is very easy to do, you can use 'hg outgoing' and 'hg push' (or the GUI equivalent) to send the changesets (commits) you've already made to the master - the default remote will be
+the master if you cloned from it originally, otherwise you can define other aliases in REPO_ROOT/.hg/.hgrc.
 
-So, it is at this point that the Rebase extension comes into play, which is why I advised you to enable it. With this, after pulling the changes from 
-the master (and ending up with 2 heads on your branch), instead of merging them, you 'rebase' your own commits so that they are re-applied on top of the 
-head you pulled from the master, essentially flattening the history, eliminating the branch and removing the need for a merge. 
+However, a common occurrence is that you try to push your commits to the master, but find that you get an error saying:
+------------------------------------------------------------------
+abort: push creates new remote heads!
+(did you forget to merge? use push -f to force)
+------------------------------------------------------------------
 
-It's generally best to do this when you pull:
+This is a bit of a confusing message, but the most common reason it means that someone else pushed their commits before you did, and you're not allowed to push your
+changes until you've resolved this. The 'new remote heads' refers to the fact that you would effectively create 2 different parallel streams of development on the
+branch in question, and you can't (or rather, shouldn't) push that, although you might do it locally. 
 
+The advice "(did you forget to merge? use push -f to force)" is not a great tip either. You almost never want to use push -f, and actually in the most common case
+of being out of date with upstream changes, there's a better option than merging - see <<Pulling>> below for details. 
+
+If you've actually created multiple heads for a branch locally - which you may have done deliberately by committing 2 sets of parallel changes from the same base, 
+or because you've pulled or imported someone elses changes which were based on an earlier revision, your choices are how to unify those before pushing. See <<ParallelDev,Parallel Development>>
+for more details. 
+
+[[Pulling]]
+Pulling Changesets
+^^^^^^^^^^^^^^^^^^
+
+Pulling changesets from the master (usually the default) or other repositories is easy to do (hg incoming to preview, hg pull to do it), but it's
+important to understand the effects of parallel development. 
+
+For now, let's just say that you always want to use the rebase extension when you pull:
 --------------------------------------
 hg pull --rebase
 --------------------------------------
 
-But, if you forget and you've already pulled the changes you can use the explicit rebase command:
+If you forget to use --rebase, it's no big deal because you can rebase later too, but definitely try to remember to use it because it's simpler. 
+In TortoiseHg you can set is as the default option, see <<THGConfig,TortoiseHg config options>> for details.
 
---------------------------------------
-hg rebase 
---------------------------------------
+For more on this, see <<ParallelDev,Parallel Development>>.
 
-If you're using TortoiseHg, you can make Rebase the default option to use when pulling, which is highly recommended, by 
-doing this in your configuration file:
+Dealing With Patches
+~~~~~~~~~~~~~~~~~~~~
 
---------------------------------------
-[tortoisehg]
-postpull = rebase
---------------------------------------
+Although you can pull changes directly from other people's repositories too, and this may the best way to handle very large external contributions such as reintegrating 
+forks, generally external contributions are still handled via patches. There's a difference between patches in Mercurial and patches for Subversion or CVS though, because patches 
+in centralised systems are always a one-shot deal of a working copy compared against a single upstream version. In Mercurial, because contributors can commit locally, patches are actually exported 
+changesets, with a full commit history. This fine grained change information can make patches easier to integrate, but it also comes with some added considerations. We'll 
+talk about generating and consuming patches in this section.
 
-It's possible for the rebase to fail, for example if there are conflicting changes. If this happens, you essentially have to resolve the conflicts 
-in your working copy and commit them.
+Generating Patches
+^^^^^^^^^^^^^^^^^^
+
+As mentioned above, in Mercurial you generate patches from your local commits. This is quite simple:
+-------------------------------------------------------------
+hg export --git -o %b_patch%nof%N_%h.patch REVS
+-------------------------------------------------------------
+
+Replace REVS with a list of revisions, or a range such as REV1:REV2. It will create one file per changeset named something like ogre_patch1of2_f0c47360a828.diff. You should zip them 
+up and send them to the patch list. 
+
+NOTE: Although it's possible to just pipe the output from hg export to a single file for multiple changesets, and this does work, this is generally not recommended, because a failure to import one
+of the patches will cause the entire file to fail. 
+
+NOTE: If you've configured Mercurial the way we recommended in the <<HgCfgDiff,Mercurial configuration section>>, the --git is unecessary because it's the default,
+but it's included for completeness. 
+
+NOTE: The PatchBomb extension can be used to email many patches at once, but its reliance on email (and thus mailing lists) makes it not that useful to us, since
+we use a dedicated patch list.
+
+NOTE: Mercurial Queues (MQ) allows vastly more complex handling of patches, particularly for those wanting to keep track of non-core alterations and to consolidate
+sets of commits into a smaller list for submission upstream. You can read about them in the http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html[Mercurial Manual].
+We won't talk about MQ here because it isn't needed unless your requirements are fairly complex.
+
+Applying Patches
+^^^^^^^^^^^^^^^^
+
+Applying patches is also fairly simple in itself, but there are a couple of nuances. Here's the standard command:
+-------------------------------------------------------------
+hg import PATCH_FILES...
+-------------------------------------------------------------
+It doesn't matter whether the patch file is in GNU style or Git style, it will work either way. But it's important to understand what this does - each patch file (usually) contains
+a single commit, and those commits are applied on top of your current repository, on to your current branch. Unlike a patch for Subversion, which applies to your working copy which 
+you then need to commit, this actually transfers commits directly, including the original author names & emails. 
+
+Because it tries to apply the commits in the patch to the current base, failures are possible if conflicting changes have occurred. In this case, hg import just aborts. A good way to 
+deal with this is to use the --exact parameter, which then applies the changes to the revision that is listed as the base in the patch file (which should therefore always succeed unless
+the patch is broken). This will create one or more new heads on the branch in question which you should then merge or rebase into your own branch, resolving the conflicts as appropriate. 
+See <<ParallelDev,Parallel Development>> for more information.
+
+
+[[ParallelDev]]
+Parallel Development
+~~~~~~~~~~~~~~~~~~~~~
+
+Because a commit in Mercurial always knows what changeset it was parented from, if you pull changes into your local repository (or import a patch using the --exact option), they are by default applied
+as differences against the base changeset they were originally made against. If you already have changes on the branch in question after this parent changeset, this effectively
+creates a divergence in the history:
+ 
+image:images/hgmultipleheads1.png[height=200]
+
+In this case the green revisions are your changes, and the orange ones are those you have just pulled from the master (in the case of hg import --exact, the green revisions would be the contents of the patch). 
+
+The http://hginit.com[HG Init] tutorials suggest resolving this by merging the changes with your own, which is indeed the standard no-extension way
+to handle this, but it has one major drawback - every time it happens, in the history you have a permanent record of this divergence in the form of a 
+split and merge of the 2 developers changes. This is extremely distracting when trying to decipher the history. 
+
+Instead, by using the Rebase extension, after pulling changes you 'rebase' your own commits so that they are re-applied on top of the 
+head you pulled from the master, essentially flattening the history, like this: 
+
+image:images/hgmultipleheads2.png[height=300]
+
+You can do this during the pull by appending the --rebase command (or selecting it in TortoiseHg):
+-------------------------------------------------------------
+hg pull --rebase
+-------------------------------------------------------------
+However if you've already got the divergence in your repository, you can rebase specifically:
+-------------------------------------------------------------
+hg rebase --continue
+-------------------------------------------------------------
+The "--continue" means that any conflicts will be resolved in your working copy, which will then need committing.
+
+Rebase is usually automatic in the common case where the divergence has been caused by pulling from the master, but if they've occurred for another reason (e.g. hg import --exact) then you may need to explictly specify the rebase options. For example, in the example image, the specific command for performing the rebase is:
+-------------------------------------------------------------
+hg rebase -s492385cab361 -da638fcd23823 --continue
+-------------------------------------------------------------
+You could use the Mercurial short revision numbers instead of the "short" hashes there, but the principle is that you're moving the base of the green revisions to the top of the orange ones. You very rarely need to use this explicit form, but that's how you do it if you need to.
 
 Merging Bugfixes
 ~~~~~~~~~~~~~~~~
 
-TODO
+The case where you will want to use the merge command is when merging bugfixes in the stable branch (currently v1-7) into the default (unstable) branch. This is very simple in Mercurial; if we assume we're in a working copy which is on the head of the default branch:
+-------------------------------------------------------------
+hg merge v1-7
+-------------------------------------------------------------
+If there are no conflicts, changes will be merged and committed automatically. If there are conflicts, you'll have to resolve them first and commit the merge manually as a specific changeset. 
 
 Transplanting Individual Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 TODO
 
+Backing out a change
+~~~~~~~~~~~~~~~~~~~~
 
+TODO
 
+Using Bisect to Track Down Breakages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
