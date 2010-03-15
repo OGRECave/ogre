@@ -128,6 +128,9 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 	case LB_BlendHardLight:
 		funcName = "blend_hardLight";						
 		break;
+	case LB_BlendSoftLight:
+		funcName = "blend_softLight";						
+		break;
 	case LB_BlendColorDodge:
 		funcName = "blend_colorDodge";						
 		break;
@@ -326,6 +329,10 @@ LayeredBlending::PLayeredBlendingMode LayeredBlendingFactory::stringToPBMEnum(co
 	else if (strValue == "blend_hardLight")
 	{
 		mode = LayeredBlending::LB_BlendHardLight;
+	}
+	else if (strValue == "blend_softLight")
+	{
+		mode = LayeredBlending::LB_BlendSoftLight;
 	}
 	else if (strValue == "blend_colorDodge")
 	{

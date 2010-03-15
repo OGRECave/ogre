@@ -157,7 +157,7 @@ protected:
 	/** 
 	@Converts string to Enum
 	*/
-	LayeredBlending::PLayeredBlendingMode LayeredBlendingFactory::stringToPBMEnum(const String &strValue);
+	LayeredBlending::PLayeredBlendingMode stringToPBMEnum(const String &strValue);
 };
 
 
