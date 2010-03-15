@@ -169,7 +169,7 @@ protected:
 	*/
 	bool					addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
 
-	void					addPSArgumentInvocations(Function* psMain, 
+	virtual void					addPSArgumentInvocations(Function* psMain, 
 													 ParameterPtr arg,
 													 ParameterPtr texel,
 													 int samplerIndex,
@@ -180,7 +180,7 @@ protected:
 													 const int groupOrder, 
 													 int& internalCounter);
 
-	void					addPSBlendInvocations(Function* psMain, 
+	virtual void					addPSBlendInvocations(Function* psMain, 
 												ParameterPtr arg1,
 												ParameterPtr arg2,
 												ParameterPtr texel,
@@ -230,7 +230,7 @@ public:
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.

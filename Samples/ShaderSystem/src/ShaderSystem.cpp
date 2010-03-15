@@ -304,6 +304,12 @@ void Sample_ShaderSystem::setupContent()
 	childNode->setPosition(0.0, 200.0, -200.0);
 	childNode->attachObject(entity);
 
+	entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
+	entity->setMaterialName("RTSS/Example-LayeredBlending");
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(300.0, 200.0, -200.0);
+	childNode->attachObject(entity);
+
 	// Create secondary entities that will be using custom RT Shader materials.
 	entity = mSceneMgr->createEntity("PerPixelEntity", "knot.mesh");
 	entity->setMaterialName("RTSS/PerPixel_SinglePass");

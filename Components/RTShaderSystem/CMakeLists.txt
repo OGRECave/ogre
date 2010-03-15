@@ -48,6 +48,8 @@ set (HEADER_FILES
   include/OgreShaderHLSLProgramWriter.h
   include/OgreShaderGLSLESProgramWriter.h
   include/OgreShaderGLSLESProgramProcessor.h
+  include/OgreShaderExLayeredBlending.h
+
 )
 
 set (SOURCE_FILES
@@ -84,7 +86,9 @@ set (SOURCE_FILES
   src/OgreShaderHLSLProgramWriter.cpp
   src/OgreShaderGLSLESProgramWriter.cpp
   src/OgreShaderGLSLESProgramProcessor.cpp
+  src/OgreShaderExLayeredBlending.cpp
 )
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 

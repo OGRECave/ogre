@@ -908,7 +908,7 @@ const String& FFPTexturingFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPTexturingFactory::createInstance(ScriptCompiler* compiler, 
-												 PropertyAbstractNode* prop, Pass* pass)
+												 PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "texturing_stage")
 	{

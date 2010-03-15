@@ -252,7 +252,7 @@ public:
 	@param prop The abstract property node.
 	@param pass The pass that is the parent context of this node.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass) { return NULL; }
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) { return NULL; }
 
 	/** Destroy the given instance.	
 	@param subRenderState The instance to destroy.

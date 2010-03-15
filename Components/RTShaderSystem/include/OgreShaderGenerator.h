@@ -710,8 +710,9 @@ protected:
 	@param compiler The compiler instance.
 	@param prop The abstract property node.
 	@param pass The pass that is the parent context of this node.
+	@param the translator for the specific SubRenderState
 	*/
-	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	Add custom script translator. 

@@ -45,7 +45,55 @@ void SGScriptTranslator::translate(ScriptCompiler* compiler, const AbstractNodeP
 	{
 		translatePass(compiler, node);
 	}
+	if (parent->cls == "texture_unit")
+	{
+		translateTextureUnit(compiler, node);
+	}
 }
+	
+//-----------------------------------------------------------------------------
+SGScriptTranslator::TexturesParamCollection SGScriptTranslator::getParamCollection()
+{
+	return mParamCollection;
+}
+
+//-----------------------------------------------------------------------------
+void SGScriptTranslator::clearParamCollection()
+{
+	mParamCollection.clear();
+}
+
+//-----------------------------------------------------------------------------
+/*
+note: we can know the texture unit index by getting parent then finding it in the list of children
+*/
+void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const AbstractNodePtr &node)
+{
+	ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+	TextureUnitState* textureUnitState = any_cast<TextureUnitState*>(obj->parent->context);	
+	String strValue = "";
+	
+	Properties properties;
+	for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+	{
+		if((*i)->type == ANT_PROPERTY)
+		{
+			PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+			AbstractNodeList::const_iterator it = prop->values.begin();
+			PropertyValues popertyValues;
+			for( ;it != prop->values.end(); ++it)
+			{
+				if(true == SGScriptTranslator::getString(*it, &strValue))
+				{
+					popertyValues.push_back(strValue);
+				}
+			}
+			properties[prop->name] = popertyValues;
+		}
+	}
+	mParamCollection[textureUnitState] = properties;
+}
+
 
 //-----------------------------------------------------------------------------
 void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractNodePtr &node)
@@ -109,7 +157,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 				// Handle the rest of the custom properties.
 				else
 				{
-					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass);
+					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass, this);
 					if (subRenderState != NULL)
 					{
 						shaderGenerator->createScheme(dstTechniqueSchemeName);

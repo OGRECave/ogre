@@ -387,7 +387,7 @@ void ShaderGenerator::destroySubRenderState(SubRenderState* subRenderState)
 
 //-----------------------------------------------------------------------------
 SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler, 
-													  PropertyAbstractNode* prop, Pass* pass)
+													  PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
@@ -397,7 +397,7 @@ SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
 
 	while (it != itEnd)
 	{
-		subRenderState = it->second->createInstance(compiler, prop, pass);
+		subRenderState = it->second->createInstance(compiler, prop, pass, translator);
 		if (subRenderState != NULL)		
 			break;				
 		++it;

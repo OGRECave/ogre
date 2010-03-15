@@ -86,15 +86,40 @@ public:
 	*@see ScriptTranslator::getColour.
 	*/
 	ScriptTranslator::getColour;
-	
-protected:
 
+	typedef std::vector<String> PropertyValues;
+	typedef std::map<String, PropertyValues> Properties;
+	typedef std::map<TextureUnitState*, Properties> TexturesParamCollection;
+	
+	TexturesParamCollection mParamCollection; // holds all properties from all texture units in the pass
+
+	/**
+	* Returns mParamCollection.
+	*/	
+	TexturesParamCollection getParamCollection();
+
+	/**
+	* Clears the mParamCollection.
+	*/	
+	void clearParamCollection();
+
+
+
+protected:
 	/**
 	* Translates RT Shader System section within a pass context.
 	* @param compiler The compiler invoking this translator
 	* @param node The current AST node to be translated
 	*/
 	void translatePass(ScriptCompiler *compiler, const AbstractNodePtr &node);
+
+	/**
+	* Translates RT Shader System section within a texture_unit context.
+	* @param compiler The compiler invoking this translator
+	* @param node The current AST node to be translated
+	*/
+	void translateTextureUnit(ScriptCompiler *compiler, const AbstractNodePtr &node);
+
 };
 
 }
