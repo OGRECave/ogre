@@ -36,10 +36,10 @@ THE SOFTWARE.
 #include "OgreShaderExPerPixelLighting.h"
 #include "OgreShaderExNormalMapLighting.h"
 #include "OgreShaderExIntegratedPSSM3.h"
+#include "OgreShaderExLayeredBlending.h"
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-
 
 namespace Ogre {
 
@@ -198,6 +198,10 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
 	curFactory = OGRE_NEW IntegratedPSSM3Factory;	
+	addSubRenderStateFactory(curFactory);
+	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+
+	curFactory = OGRE_NEW LayeredBlendingFactory;	
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 

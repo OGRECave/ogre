@@ -28,19 +28,23 @@ THE SOFTWARE.
 #include "OgreShaderExLayeredBlending.h"
 #include "OgreShaderProgram.h"
 
+namespace Ogre {
+namespace RTShader {
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 
+String LayeredBlending::Type = "LayeredBlendRTSSEx";
 
-Ogre::String LayeredBlending::mSubRenderType = "LayeredBlendRTSSEx";
-
-LayeredBlending::LayeredBlending(void)
+//-----------------------------------------------------------------------
+LayeredBlending::LayeredBlending()
 {
+
 }
 
 //-----------------------------------------------------------------------
 const Ogre::String& LayeredBlending::getType() const
 {
-	return mSubRenderType;
+	return Type;
 }
 
 //-----------------------------------------------------------------------
@@ -49,7 +53,7 @@ bool LayeredBlending::resolveDependencies(ProgramSet* programSet)
 	FFPTexturing::resolveDependencies(programSet);
 	Program* psProgram = programSet->getCpuFragmentProgram();
 
-	psProgram->addDependency("FFPLib_LayeredBlending");
+	psProgram->addDependency("SGXLib_LayeredBlending");
 
 	return true;
 }
@@ -77,7 +81,7 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 	FunctionInvocation* curFuncInvocation = NULL;
 
 	String funcName;
-	PLayeredBlendingMode mode = LB_FFPBlend;
+	BlendMode mode = LB_FFPBlend;
 	
 	if (((size_t)samplerIndex < mBlendModes.size()) && (samplerIndex >= 0))
 	{
@@ -90,88 +94,88 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 		FFPTexturing::addPSBlendInvocations(psMain, arg1, arg2, texel, samplerIndex, blendMode, groupOrder, internalCounter, targetChannels);
 		break;
 	case LB_BlendNormal:
-		funcName = "blend_normal";
+		funcName = "SGX_blend_normal";
 		break;
 	case LB_BlendLighten:
-		funcName = "blend_lighten";						
+		funcName = "SGX_blend_lighten";						
 		break;
 	case LB_BlendDarken:
-		funcName = "blend_darken";
+		funcName = "SGX_blend_darken";
 		break;
 	case LB_BlendMultiply:
-		funcName = "blend_multiply";
+		funcName = "SGX_blend_multiply";
 		break;
 	case LB_BlendAverage:
-		funcName = "blend_average";						
+		funcName = "SGX_blend_average";						
 		break;
 	case LB_BlendAdd:
-		funcName = "blend_add";						
+		funcName = "SGX_blend_add";						
 		break;
 	case LB_BlendSubtract:
-		funcName = "blend_subtract";						
+		funcName = "SGX_blend_subtract";						
 		break;
 	case LB_BlendDifference:
-		funcName = "blend_difference";						
+		funcName = "SGX_blend_difference";						
 		break;
 	case LB_BlendNegation:
-		funcName = "blend_negation";						
+		funcName = "SGX_blend_negation";						
 		break;
 	case LB_BlendExclusion:
-		funcName = "blend_exclusion";						
+		funcName = "SGX_blend_exclusion";						
 		break;
 	case LB_BlendScreen:
-		funcName = "blend_screen";						
+		funcName = "SGX_blend_screen";						
 		break;
 	case LB_BlendOverlay:
-		funcName = "blend_overlay";						
+		funcName = "SGX_blend_overlay";						
 		break;
 	case LB_BlendHardLight:
-		funcName = "blend_hardLight";						
+		funcName = "SGX_blend_hardLight";						
 		break;
 	case LB_BlendSoftLight:
-		funcName = "blend_softLight";						
+		funcName = "SGX_blend_softLight";						
 		break;
 	case LB_BlendColorDodge:
-		funcName = "blend_colorDodge";						
+		funcName = "SGX_blend_colorDodge";						
 		break;
 	case LB_BlendColorBurn:
-		funcName = "blend_colorBurn";						
+		funcName = "SGX_blend_colorBurn";						
 		break;	
 	case LB_BlendLinearDodge:
-		funcName = "blend_linearDodge";						
+		funcName = "SGX_blend_linearDodge";						
 		break;
 	case LB_BlendLinearBurn:
-		funcName = "blend_linearBurn";						
+		funcName = "SGX_blend_linearBurn";						
 		break;
 	case LB_BlendLinearLight:
-		funcName = "blend_linearLight";						
+		funcName = "SGX_blend_linearLight";						
 		break;
 	case LB_BlendVividLight:
-		funcName = "blend_vividLight";						
+		funcName = "SGX_blend_vividLight";						
 		break;
 	case LB_BlendPinLight:
-		funcName = "blend_pinLight";						
+		funcName = "SGX_blend_pinLight";						
 		break;
 	case LB_BlendHardMix:
-		funcName = "blend_hardMix";						
+		funcName = "SGX_blend_hardMix";						
 		break;
 	case LB_BlendReflect:
-		funcName = "blend_reflect";						
+		funcName = "SGX_blend_reflect";						
 		break;
 	case LB_BlendGlow:
-		funcName = "blend_glow";						
+		funcName = "SGX_blend_glow";						
 		break;
 	case LB_BlendPhoenix:
-		funcName = "blend_phoenix";						
+		funcName = "SGX_blend_phoenix";						
 		break;
 	case LB_BlendSaturation:
-		funcName = "blend_saturation";						
+		funcName = "SGX_blend_saturation";						
 		break;
 	case LB_BlendColor:
-		funcName = "blend_color";						
+		funcName = "SGX_blend_color";						
 		break;
 	case LB_BlendLuminosity:
-		funcName = "blend_luminosity";						
+		funcName = "SGX_blend_luminosity";						
 		break;
 	}
 
@@ -186,7 +190,7 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 }
 
 //-----------------------------------------------------------------------
-void LayeredBlending::addBlendType(int index, LayeredBlending::PLayeredBlendingMode mode)
+void LayeredBlending::setBlendMode(int index, BlendMode mode)
 {
 	if(mBlendModes.size() < index + 1)
 	{
@@ -195,22 +199,45 @@ void LayeredBlending::addBlendType(int index, LayeredBlending::PLayeredBlendingM
 	mBlendModes[index]= mode;
 }
 
+//-----------------------------------------------------------------------
+LayeredBlending::BlendMode LayeredBlending::getBlendMode(int index) const
+{
+	if(index < mBlendModes.size())
+	{
+		return mBlendModes[index];
+	}
+	
+	return LB_FFPBlend;
+}
+
 
 //----------------------Factory Implementation---------------------------
 //-----------------------------------------------------------------------
 const String& LayeredBlendingFactory::getType() const
 {
-	return LayeredBlending::mSubRenderType;
+	return LayeredBlending::Type;
 }
 
 //-----------------------------------------------------------------------
 SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler, 
 													PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
-	if (prop->name == "layered_blend")
+	if (prop->name == "texturing_stage")
 	{
-		SGScriptTranslator::TexturesParamCollection paramCollection = translator->getParamCollection();
+		String modelType;
 
+		if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+		{
+			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+			return NULL;
+		}
+
+		// Case mode type is not layered -> return NULL.
+		if (modelType != "layered_blend")
+			return NULL;
+			
+				
+		SGScriptTranslator::TexturesParamCollection paramCollection = translator->getParamCollection();
 		SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
 		LayeredBlending* LayeredBlendState = static_cast<LayeredBlending*>(subRenderState);
 		
@@ -245,7 +272,7 @@ SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
 					strValue = propValues[0];
 				}
 			}
-			LayeredBlendState->addBlendType(index, stringToPBMEnum(strValue));
+			LayeredBlendState->setBlendMode(index, stringToBlendMode(strValue));
 		}
 		translator->clearParamCollection();
 		return subRenderState;								
@@ -259,8 +286,7 @@ SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
 void LayeredBlendingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
 										Pass* srcPass, Pass* dstPass)
 {
-	ser->writeAttribute(4, "layered_blend");
-	//ser->writeValue("layered_blend");
+	ser->writeAttribute(4, "layered_blend");	
 }
 
 //-----------------------------------------------------------------------
@@ -270,9 +296,9 @@ SubRenderState*	LayeredBlendingFactory::createInstanceImpl()
 }
 
 //-----------------------------------------------------------------------
-LayeredBlending::PLayeredBlendingMode LayeredBlendingFactory::stringToPBMEnum(const String &strValue)
+LayeredBlending::BlendMode LayeredBlendingFactory::stringToBlendMode(const String &strValue)
 {
-	LayeredBlending::PLayeredBlendingMode mode;
+	LayeredBlending::BlendMode mode;
 
 	if (strValue == "blend_default")
 	{
@@ -390,7 +416,10 @@ LayeredBlending::PLayeredBlendingMode LayeredBlendingFactory::stringToPBMEnum(co
 	{
 		mode = LayeredBlending::LB_BlendLuminosity;
 	}
+	
 	return mode;
 }
 
+}
+}
 #endif

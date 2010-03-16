@@ -191,3 +191,37 @@ material RTSS/NormalMapping_MultiPass_2lights : RTSS/NormalMapping_MultiPass
 	}
 }
 		
+// This material demonstrates the texture blending extension.
+material RTSS/LayeredBlending
+{
+	technique
+	{
+		pass
+		{		
+		lighting off	
+			texture_unit
+			{
+				scale 0.1 0.1
+				texture rockwall.tga
+			}
+
+			texture_unit
+			{
+				// RT Shader system section - required by the comming layered blend extension.
+				rtshader_system
+				{
+					layered_blend blend_luminosity
+				}
+				texture ogrelogo.png
+			}
+			
+			// RT Shader system section.
+			rtshader_system
+			{
+				// Override texturing stage with extended texture layered blend model.
+				texturing_stage layered_blend
+			}
+		}
+	}
+}
+

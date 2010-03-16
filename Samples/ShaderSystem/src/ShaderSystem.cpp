@@ -18,6 +18,7 @@ const String REFLECTIONMAP_POWER_SLIDER	= "ReflectionPowerSlider";
 const String MAIN_ENTITY_NAME			= "MainEntity";
 const String EXPORT_BUTTON_NAME			= "ExportMaterial";
 const String FLUSH_BUTTON_NAME			= "FlushShaderCache";
+const String LAYERBLEND_BUTTON_NAME		= "ChangeLayerBlendType";
 const String SAMPLE_MATERIAL_GROUP		= "RTShaderSystemMaterialsGroup";
 const int MESH_ARRAY_SIZE = 2;
 const String MESH_ARRAY[MESH_ARRAY_SIZE] =
@@ -155,6 +156,13 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 	{				
 		mShaderGenerator->flushShaderCache();
 	}
+
+	// Case the blend layer type modified.
+	else if (b->getName() == LAYERBLEND_BUTTON_NAME && mLayerBlendSubRS != NULL)
+	{	
+		changeTextureLayerBlendMode();
+		
+	}
 }
 
 //--------------------------------------------------------------------------
@@ -231,12 +239,14 @@ void Sample_ShaderSystem::setupView()
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::setupContent()
 {
+	
 	// Setup default effects values.
 	mCurLightingModel 		= SSLM_PerVertexLighting;
 	mPerPixelFogEnable		= false;
 	mSpecularEnable   		= false;
 	mReflectionMapEnable	= false;
-	mReflectionMapSubRS  = NULL;
+	mReflectionMapSubRS		= NULL;
+	mLayerBlendSubRS		= NULL;
 
 	mRayQuery = mSceneMgr->createRayQuery(Ray());
 	mTargetObj = NULL;
@@ -304,20 +314,47 @@ void Sample_ShaderSystem::setupContent()
 	childNode->setPosition(0.0, 200.0, -200.0);
 	childNode->attachObject(entity);
 
-	entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
-	entity->setMaterialName("RTSS/Example-LayeredBlending");
-	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	childNode->setPosition(300.0, 200.0, -200.0);
-	childNode->attachObject(entity);
+	// Create texture layer blending demonstration entity.
+	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
+	{
+		entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
+		entity->setMaterialName("RTSS/LayeredBlending");
+		childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+		childNode->setPosition(300.0, 200.0, -200.0);
+		childNode->attachObject(entity);
 
-	// Create secondary entities that will be using custom RT Shader materials.
+		// Grab the render state of the material.
+		RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending", 0);
+
+		if (renderState != NULL)
+		{			
+			const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
+			SubRenderStateListConstIterator it = subRenderStateList.begin();
+			SubRenderStateListConstIterator itEnd = subRenderStateList.end();
+
+			// Search for the texture layer blend sub state.
+			for (; it != itEnd; ++it)
+			{
+				SubRenderState* curSubRenderState = *it;
+
+				if (curSubRenderState->getType() == LayeredBlending::Type)
+				{
+					mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
+					break;
+				}
+			}
+		}
+	}
+	
+
+	// Create per pixel lighting demonstration entity.
 	entity = mSceneMgr->createEntity("PerPixelEntity", "knot.mesh");
 	entity->setMaterialName("RTSS/PerPixel_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
 
-	// Create secondary entities that will be using custom RT Shader materials.
+	// Create normal map lighting demonstration entity.
 	entity = mSceneMgr->createEntity("NormalMapEntity", "knot.mesh");
 	entity->setMaterialName("RTSS/NormalMapping_SinglePass");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -434,6 +471,15 @@ void Sample_ShaderSystem::setupUI()
 
 	mTrayMgr->createButton(TL_BOTTOM, EXPORT_BUTTON_NAME, "Export Material", 240);
 	
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	mLayerBlendLabel = mTrayMgr->createLabel(TL_RIGHT, "Blend Type", "Blend Type", 240);
+	mTrayMgr->createButton(TL_RIGHT, LAYERBLEND_BUTTON_NAME, "Change Blend Type", 220);
+
+	// Update the caption.
+	updateLayerBlendingCaption(mLayerBlendSubRS->getBlendMode(1));
+
+#endif
+
 	mTrayMgr->showCursor();
 }
 
@@ -1134,6 +1180,154 @@ void Sample_ShaderSystem::updateTargetObjInfo()
 	}
 }
 
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::changeTextureLayerBlendMode()
+{
+	LayeredBlending::BlendMode curBlendMode = mLayerBlendSubRS->getBlendMode(1);
+	LayeredBlending::BlendMode nextBlendMode;
+
+	// Update the next blend layer mode.
+	if (curBlendMode == LayeredBlending::LB_BlendLuminosity)
+	{
+		nextBlendMode = LayeredBlending::LB_FFPBlend;
+	}
+	else
+	{
+		nextBlendMode = (LayeredBlending::BlendMode)(curBlendMode + 1);
+	}
+
+	mLayerBlendSubRS->setBlendMode(1, nextBlendMode);			
+	mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending");
+
+	// Update the caption.
+	updateLayerBlendingCaption(nextBlendMode);
+
+}
+
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode nextBlendMode )
+{
+	switch (nextBlendMode)
+	{
+	case LayeredBlending::LB_FFPBlend:
+		mLayerBlendLabel->setCaption("FFP Blend");
+		break;
+
+	case LayeredBlending::LB_BlendNormal:
+		mLayerBlendLabel->setCaption("Normal");
+		break;
+
+	case LayeredBlending::LB_BlendLighten:	
+		mLayerBlendLabel->setCaption("Lighten");
+		break;
+
+	case LayeredBlending::LB_BlendDarken:
+		mLayerBlendLabel->setCaption("Darken");
+		break;
+
+	case LayeredBlending::LB_BlendMultiply:
+		mLayerBlendLabel->setCaption("Multiply");
+		break;
+
+	case LayeredBlending::LB_BlendAverage:
+		mLayerBlendLabel->setCaption("Average");
+		break;
+
+	case LayeredBlending::LB_BlendAdd:
+		mLayerBlendLabel->setCaption("Add");
+		break;
+
+	case LayeredBlending::LB_BlendSubtract:
+		mLayerBlendLabel->setCaption("Subtract");
+		break;
+
+	case LayeredBlending::LB_BlendDifference:
+		mLayerBlendLabel->setCaption("Difference");
+		break;
+
+	case LayeredBlending::LB_BlendNegation:
+		mLayerBlendLabel->setCaption("Negation");
+		break;
+
+	case LayeredBlending::LB_BlendExclusion:
+		mLayerBlendLabel->setCaption("Exclusion");
+		break;
+
+	case LayeredBlending::LB_BlendScreen:
+		mLayerBlendLabel->setCaption("Screen");
+		break;
+
+	case LayeredBlending::LB_BlendOverlay:
+		mLayerBlendLabel->setCaption("Overlay");
+		break;
+
+	case LayeredBlending::LB_BlendSoftLight:
+		mLayerBlendLabel->setCaption("SoftLight");
+		break;
+
+	case LayeredBlending::LB_BlendHardLight:
+		mLayerBlendLabel->setCaption("HardLight");
+		break;
+
+	case LayeredBlending::LB_BlendColorDodge:
+		mLayerBlendLabel->setCaption("ColorDodge");
+		break;
+
+	case LayeredBlending::LB_BlendColorBurn: 
+		mLayerBlendLabel->setCaption("ColorBurn");
+		break;
+
+	case LayeredBlending::LB_BlendLinearDodge:
+		mLayerBlendLabel->setCaption("LinearDodge");
+		break;
+
+	case LayeredBlending::LB_BlendLinearBurn:
+		mLayerBlendLabel->setCaption("LinearBurn");
+		break;
+
+	case LayeredBlending::LB_BlendLinearLight:
+		mLayerBlendLabel->setCaption("LinearLight");
+		break;
+
+	case LayeredBlending::LB_BlendVividLight:
+		mLayerBlendLabel->setCaption("VividLight");
+		break;
+
+	case LayeredBlending::LB_BlendPinLight:
+		mLayerBlendLabel->setCaption("PinLight");
+		break;
+
+	case LayeredBlending::LB_BlendHardMix:
+		mLayerBlendLabel->setCaption("HardMix");
+		break;
+
+	case LayeredBlending::LB_BlendReflect:
+		mLayerBlendLabel->setCaption("Reflect");
+		break;
+
+	case LayeredBlending::LB_BlendGlow:
+		mLayerBlendLabel->setCaption("Glow");
+		break;
+
+	case LayeredBlending::LB_BlendPhoenix:
+		mLayerBlendLabel->setCaption("Phoenix");
+		break;
+
+	case LayeredBlending::LB_BlendSaturation:
+		mLayerBlendLabel->setCaption("Saturation");
+		break;
+
+	case LayeredBlending::LB_BlendColor:
+		mLayerBlendLabel->setCaption("Color");
+		break;
+
+	case LayeredBlending::LB_BlendLuminosity:
+		mLayerBlendLabel->setCaption("Luminosity");
+		break;
+	}
+}
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 
 //-----------------------------------------------------------------------
@@ -1205,4 +1399,6 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 
 	return true;
 }
+
+
 #endif

@@ -34,16 +34,16 @@ THE SOFTWARE.
 #include "OgreShaderFunction.h"
 #include "OgreShaderSubRenderState.h"
 
-using namespace Ogre;
-using namespace Ogre::RTShader;
+namespace Ogre {
+namespace RTShader {
 
 /** Texturing sub render state implementation of layered blending.
 Derives from FFPTexturing class which derives from SubRenderState class.
 */
-class LayeredBlending : public Ogre::RTShader::FFPTexturing
+class _OgreRTSSExport LayeredBlending : public FFPTexturing
 {
 public:
-	enum PLayeredBlendingMode
+	enum BlendMode
 	{
 		LB_FFPBlend,
 		LB_BlendNormal,
@@ -73,10 +73,9 @@ public:
 		LB_BlendPhoenix,
 		LB_BlendSaturation,
 		LB_BlendColor,
-		LB_BlendLuminosity
+		LB_BlendLuminosity,
+		LB_MaxBlendModes
 	};
-
-	static Ogre::String mSubRenderType;
 
 	/** Class default constructor */
 	LayeredBlending();
@@ -88,17 +87,23 @@ public:
 
 
 	/** 
-	@Adds a layered blending mode to the list of texture parameters (mTextureUnitParamsList).
+	Set the blend mode of the given texture unit layer with the previous layer.
+	@param index The texture unit texture. Textures units (index-1) and (index) will be blended.
+	@param mode The blend mode to apply.
 	*/
-	void addBlendType(int index, LayeredBlending::PLayeredBlendingMode mode);
+	void setBlendMode(int index, BlendMode mode);
+
+	/** 
+	Return the blend mode of the given texture unit index.
+	*/
+	BlendMode getBlendMode(int index) const;
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom				(const SubRenderState& rhs);
 
-
-	vector<PLayeredBlendingMode>::type mBlendModes;
+	static String Type;
 
 // Protected methods
 protected:
@@ -106,19 +111,23 @@ protected:
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(Ogre::RTShader::ProgramSet* programSet);
+	virtual bool resolveDependencies		(Ogre::RTShader::ProgramSet* programSet);
 
 
-	virtual void					addPSBlendInvocations(Function* psMain, 
-													ParameterPtr arg1,
-													ParameterPtr arg2,
-													ParameterPtr texel,
-													int samplerIndex,
-													const LayerBlendModeEx& blendMode,
-													const int groupOrder, 
-													int& internalCounter,
-													int targetChannels);
-	
+	virtual void addPSBlendInvocations(Function* psMain, 
+									ParameterPtr arg1,
+									ParameterPtr arg2,
+									ParameterPtr texel,
+									int samplerIndex,
+									const LayerBlendModeEx& blendMode,
+									const int groupOrder, 
+									int& internalCounter,
+									int targetChannels);
+
+	// Attributes.
+protected:
+	vector<BlendMode>::type mBlendModes;
+
 };
 
 
@@ -157,8 +166,10 @@ protected:
 	/** 
 	@Converts string to Enum
 	*/
-	LayeredBlending::PLayeredBlendingMode stringToPBMEnum(const String &strValue);
+	LayeredBlending::BlendMode stringToBlendMode(const String &strValue);
 };
 
+}
+}
 
 #endif

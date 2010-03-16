@@ -307,399 +307,392 @@ float4 BlendLuminosity4(float4 base, float4 blend)
 // Interface for RTShader
 //------------------------------------
 
-void blend_normal(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_normal(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendNormal(basePixel, blendPixel);
 }
-void blend_normal(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_normal(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendNormal(basePixel, blendPixel);
 }
-void blend_normal(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_normal(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendNormal(basePixel, blendPixel);
 }
 
 
-void blend_lighten(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_lighten(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendLighten(basePixel, blendPixel);
 }
-void blend_lighten(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_lighten(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendLighten(basePixel, blendPixel);
 }
-void blend_lighten(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_lighten(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendLighten(basePixel, blendPixel);
 }
 
-void blend_darken(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_darken(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendDarken(basePixel, blendPixel);
 }
-void blend_darken(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_darken(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendDarken(basePixel, blendPixel);
 }
-void blend_darken(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_darken(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendDarken(basePixel, blendPixel);
 }
 
 
-void blend_multiply(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_multiply(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendMultiply(basePixel, blendPixel);
 }
-void blend_multiply(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_multiply(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendMultiply(basePixel, blendPixel);
 }
-void blend_multiply(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_multiply(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendMultiply(basePixel, blendPixel);
 }
 
 
-void blend_average(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_average(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendAverage(basePixel, blendPixel);
 }
-void blend_average(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_average(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendAverage(basePixel, blendPixel);
 }
-void blend_average(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_average(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendAverage(basePixel, blendPixel);
 }
 
 
-void blend_add(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_add(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendAdd(basePixel, blendPixel);
 }
-void blend_add(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_add(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendAdd(basePixel, blendPixel);
 }
-void blend_add(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_add(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendAdd(basePixel, blendPixel);
 }
 
 
-void blend_subtract(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_subtract(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendSubtract(basePixel, blendPixel);
 }
-void blend_subtract(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_subtract(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendSubtract(basePixel, blendPixel);
 }
-void blend_subtract(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_subtract(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendSubtract(basePixel, blendPixel);
 }
 
 
-void blend_difference(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_difference(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendDifference(basePixel, blendPixel);
 }
-void blend_difference(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_difference(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendDifference(basePixel, blendPixel);
 }
-void blend_difference(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_difference(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendDifference(basePixel, blendPixel);
 }
 
 
-void blend_negation(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_negation(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendNegation(basePixel, blendPixel);
 }
-void blend_negation(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_negation(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendNegation(basePixel, blendPixel);
 }
-void blend_negation(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_negation(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendNegation(basePixel, blendPixel);
 }
 
 
-void blend_exclusion(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_exclusion(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendExclusion(basePixel, blendPixel);
 }
-void blend_exclusion(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_exclusion(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendExclusion(basePixel, blendPixel);
 }
-void blend_exclusion(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_exclusion(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendExclusion(basePixel, blendPixel);
 }
 
 
-void blend_screen(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendScreen4(basePixel, blendPixel);
+void SGX_blend_screen(float4 basePixel, float4 blendPixel, out float4 oColor)
+{	
+	oColor = Blend4(basePixel, blendPixel, BlendScreenf);
 }
-void blend_screen(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_screen(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendScreen3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendScreenf);
 }
-void blend_screen(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_screen(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendScreen1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendScreenf);
+}
+
+void SGX_blend_overlay(float4 basePixel, float4 blendPixel, out float4 oColor)
+{
+	oColor = Blend4(basePixel, blendPixel, BlendOverlayf);
+}
+void SGX_blend_overlay(float3 basePixel, float3 blendPixel, out float3 oColor)
+{
+	oColor = Blend3(basePixel, blendPixel, BlendOverlayf);
+}
+void SGX_blend_overlay(float basePixel, float blendPixel, out float oColor)
+{
+	oColor = Blend1(basePixel, blendPixel, BlendOverlayf);
+}
+
+void SGX_blend_softLight(float4 basePixel, float4 blendPixel, out float4 oColor)
+{
+	oColor = Blend4(basePixel, blendPixel, BlendSoftLightf);
+}
+void SGX_blend_softLight(float3 basePixel, float3 blendPixel, out float3 oColor)
+{
+	oColor = Blend3(basePixel, blendPixel, BlendSoftLightf);
+}
+void SGX_blend_softLight(float basePixel, float blendPixel, out float oColor)
+{
+	oColor = Blend1(basePixel, blendPixel, BlendSoftLightf);
 }
 
 
-
-void blend_overlay(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_hardLight(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendOverlay4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendOverlayf);
 }
-void blend_overlay(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_hardLight(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendOverlay3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendOverlayf);
 }
-void blend_overlay(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_hardLight(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendOverlay1(basePixel, blendPixel);
-}
-
-
-
-void blend_softLight(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendSoftLight4(basePixel, blendPixel);
-}
-void blend_softLight(float3 basePixel, float3 blendPixel, out float3 oColor)
-{
-	oColor = BlendSoftLight3(basePixel, blendPixel);
-}
-void blend_softLight(float basePixel, float blendPixel, out float oColor)
-{
-	oColor = BlendSoftLight1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendOverlayf);
 }
 
 
-void blend_hardLight(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_colorDodge(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendHardLight4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendColorDodgef);
 }
-void blend_hardLight(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_colorDodge(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendHardLight3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendColorDodgef);
 }
-void blend_hardLight(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_colorDodge(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendHardLight1(basePixel, blendPixel);
-}
-
-
-
-void blend_colorDodge(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendColorDodge4(basePixel, blendPixel);
-}
-void blend_colorDodge(float3 basePixel, float3 blendPixel, out float3 oColor)
-{
-	oColor = BlendColorDodge3(basePixel, blendPixel);
-}
-void blend_colorDodge(float basePixel, float blendPixel, out float oColor)
-{
-	oColor = BlendColorDodge1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendColorDodgef);
 }
 
 
-
-void blend_colorBurn(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_colorBurn(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendColorBurn4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendColorBurnf);
 }
-void blend_colorBurn(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_colorBurn(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendColorBurn3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendColorBurnf);
 }
-void blend_colorBurn(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_colorBurn(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendColorBurn1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendColorBurnf);
 }
 
 
-void blend_linearDodge(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_linearDodge(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendLinearDodge(basePixel, blendPixel);
 }
-void blend_linearDodge(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_linearDodge(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendLinearDodge(basePixel, blendPixel);
 }
-void blend_linearDodge(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_linearDodge(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendLinearDodge(basePixel, blendPixel);
 }
 
 
-void blend_linearBurn(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_linearBurn(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendLinearBurn(basePixel, blendPixel);
 }
-void blend_linearBurn(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_linearBurn(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendLinearBurn(basePixel, blendPixel);
 }
-void blend_linearBurn(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_linearBurn(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendLinearBurn(basePixel, blendPixel);
 }
 
 
-void blend_linearLight(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_linearLight(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendLinearLight4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendLinearLightf);
 }
-void blend_linearLight(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_linearLight(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendLinearLight3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendLinearLightf);
 }
-void blend_linearLight(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_linearLight(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendLinearLight1(basePixel, blendPixel);
-}
-
-
-void blend_vividLight(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendVividLight4(basePixel, blendPixel);
-}
-void blend_vividLight(float3 basePixel, float3 blendPixel, out float3 oColor)
-{
-	oColor = BlendVividLight3(basePixel, blendPixel);
-}
-void blend_vividLight(float basePixel, float blendPixel, out float oColor)
-{
-	oColor = BlendVividLight1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendLinearLightf);
 }
 
 
-void blend_pinLight(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_vividLight(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendPinLight4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendVividLightf);
 }
-void blend_pinLight(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_vividLight(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendPinLight3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendVividLightf);
 }
-void blend_pinLight(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_vividLight(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendPinLight1(basePixel, blendPixel);
-}
-
-
-void blend_hardMix(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendHardMix4(basePixel, blendPixel);
-}
-void blend_hardMix(float3 basePixel, float3 blendPixel, out float3 oColor)
-{
-	oColor = BlendHardMix3(basePixel, blendPixel);
-}
-void blend_hardMix(float basePixel, float blendPixel, out float oColor)
-{
-	oColor = BlendHardMix1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendVividLightf);
 }
 
 
-void blend_reflect(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_pinLight(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
-	oColor = BlendReflect4(basePixel, blendPixel);
+	oColor = Blend4(basePixel, blendPixel, BlendPinLightf);
 }
-void blend_reflect(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_pinLight(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
-	oColor = BlendReflect3(basePixel, blendPixel);
+	oColor = Blend3(basePixel, blendPixel, BlendPinLightf);
 }
-void blend_reflect(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_pinLight(float basePixel, float blendPixel, out float oColor)
 {
-	oColor = BlendReflect1(basePixel, blendPixel);
-}
-
-void blend_glow(float4 basePixel, float4 blendPixel, out float4 oColor)
-{
-	oColor = BlendGlow4(basePixel, blendPixel);
-}
-void blend_glow(float3 basePixel, float3 blendPixel, out float3 oColor)
-{
-	oColor = BlendGlow3(basePixel, blendPixel);
-}
-void blend_glow(float basePixel, float blendPixel, out float oColor)
-{
-	oColor = BlendGlow1(basePixel, blendPixel);
+	oColor = Blend1(basePixel, blendPixel, BlendPinLightf);
 }
 
 
-void blend_phoenix(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_hardMix(float4 basePixel, float4 blendPixel, out float4 oColor)
+{
+	oColor = Blend4(basePixel, blendPixel, BlendHardMixf);
+}
+void SGX_blend_hardMix(float3 basePixel, float3 blendPixel, out float3 oColor)
+{
+	oColor = Blend3(basePixel, blendPixel, BlendHardMixf);
+}
+void SGX_blend_hardMix(float basePixel, float blendPixel, out float oColor)
+{
+	oColor = Blend1(basePixel, blendPixel, BlendHardMixf);
+}
+
+
+void SGX_blend_reflect(float4 basePixel, float4 blendPixel, out float4 oColor)
+{
+	oColor = Blend4(basePixel, blendPixel, BlendReflectf);
+}
+void SGX_blend_reflect(float3 basePixel, float3 blendPixel, out float3 oColor)
+{
+	oColor = Blend3(basePixel, blendPixel, BlendReflectf);
+}
+void SGX_blend_reflect(float basePixel, float blendPixel, out float oColor)
+{
+	oColor = Blend1(basePixel, blendPixel, BlendReflectf);
+}
+
+void SGX_blend_glow(float4 basePixel, float4 blendPixel, out float4 oColor)
+{
+	oColor = Blend4(basePixel, blendPixel, BlendReflectf);
+}
+void SGX_blend_glow(float3 basePixel, float3 blendPixel, out float3 oColor)
+{
+	oColor = Blend3(basePixel, blendPixel, BlendReflectf);
+}
+void SGX_blend_glow(float basePixel, float blendPixel, out float oColor)
+{
+	oColor = Blend1(basePixel, blendPixel, BlendReflectf);
+}
+
+
+void SGX_blend_phoenix(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendPhoenix(basePixel, blendPixel);
 }
-void blend_phoenix(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_phoenix(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendPhoenix(basePixel, blendPixel);
 }
-void blend_phoenix(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_phoenix(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendPhoenix(basePixel, blendPixel);
 }
 
 
-void blend_saturation(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_saturation(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendSaturation4(basePixel, blendPixel);
 }
-void blend_saturation(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_saturation(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendSaturation3(basePixel, blendPixel);
 }
-void blend_saturation(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_saturation(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendSaturation1(basePixel, blendPixel);
 }
 
 
-void blend_color(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_color(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendColor4(basePixel, blendPixel);
 }
-void blend_color(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_color(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendColor3(basePixel, blendPixel);
 }
-void blend_color(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_color(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendColor1(basePixel, blendPixel);
 }
 
 
-void blend_luminosity(float4 basePixel, float4 blendPixel, out float4 oColor)
+void SGX_blend_luminosity(float4 basePixel, float4 blendPixel, out float4 oColor)
 {
 	oColor = BlendLuminosity4(basePixel, blendPixel);
 }
-void blend_luminosity(float3 basePixel, float3 blendPixel, out float3 oColor)
+void SGX_blend_luminosity(float3 basePixel, float3 blendPixel, out float3 oColor)
 {
 	oColor = BlendLuminosity3(basePixel, blendPixel);
 }
-void blend_luminosity(float basePixel, float blendPixel, out float oColor)
+void SGX_blend_luminosity(float basePixel, float blendPixel, out float oColor)
 {
 	oColor = BlendLuminosity1(basePixel, blendPixel);
 }
-
 
 
 
