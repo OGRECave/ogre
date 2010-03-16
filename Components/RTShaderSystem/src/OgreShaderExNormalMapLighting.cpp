@@ -67,6 +67,11 @@ NormalMapLighting::NormalMapLighting()
 	mVSTexCoordSetIndex				= 0;
 	mSpecularEnable					= false;
 	mNormalMapSpace					= NMS_TANGENT;
+	mNormalMapMinFilter				= FO_LINEAR;
+	mNormalMapMagFilter				= FO_LINEAR;
+	mNormalMapMipFilter				= FO_POINT;
+	mNormalMapAnisotropy			= 1;
+	mNormalMapMipBias				= -1.0;
 
 	msBlankLight.setDiffuseColour(ColourValue::Black);
 	msBlankLight.setSpecularColour(ColourValue::Black);
@@ -1171,6 +1176,10 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 	mSpecularEnable = rhsLighting.mSpecularEnable;
 	mNormalMapSpace = rhsLighting.mNormalMapSpace;
 	mNormalMapTextureName = rhsLighting.mNormalMapTextureName;
+	mNormalMapMinFilter = rhsLighting.mNormalMapMinFilter;
+	mNormalMapMagFilter = rhsLighting.mNormalMapMagFilter;
+	mNormalMapMipFilter = rhsLighting.mNormalMapMipFilter;
+	mNormalMapMipBias = rhsLighting.mNormalMapMipBias;
 }
 
 //-----------------------------------------------------------------------
@@ -1186,7 +1195,9 @@ bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcP
 	TextureUnitState* normalMapTexture = dstPass->createTextureUnitState();
 
 	normalMapTexture->setTextureName(mNormalMapTextureName);	
-	normalMapTexture->setTextureMipmapBias(-1.0);
+	normalMapTexture->setTextureFiltering(mNormalMapMinFilter, mNormalMapMagFilter, mNormalMapMipFilter);
+	normalMapTexture->setTextureAnisotropy(mNormalMapAnisotropy);
+	normalMapTexture->setTextureMipmapBias(mNormalMapMipBias);
 	mNormalMapSamplerIndex = dstPass->getNumTextureUnitStates() - 1;
 
 	setTrackVertexColourType(srcPass->getVertexColourTracking());			
@@ -1319,7 +1330,7 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 					return NULL;
 				}
 
-				unsigned int textureCoordinateIndex = 0;
+				
 				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
 				NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 				
@@ -1351,11 +1362,68 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 
 				// Read texture coordinate index.
 				if (prop->values.size() >= 4)
-				{					
+				{	
+					unsigned int textureCoordinateIndex = 0;
+
 					++it;
 					if (SGScriptTranslator::getUInt(*it, &textureCoordinateIndex))
 					{
 						normalMapSubRenderState->setTexCoordIndex(textureCoordinateIndex);
+					}
+				}
+
+				// Read texture filtering format.
+				if (prop->values.size() >= 5)
+				{					
+					++it;
+					if (false == SGScriptTranslator::getString(*it, &strValue))
+					{
+						compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+						return NULL;
+					}
+
+					if (strValue == "none")
+					{
+						normalMapSubRenderState->setNormalMapFiltering(FO_POINT, FO_POINT, FO_NONE);
+					}
+
+					else if (strValue == "bilinear")
+					{
+						normalMapSubRenderState->setNormalMapFiltering(FO_LINEAR, FO_LINEAR, FO_POINT);
+					}
+
+					else if (strValue == "trilinear")
+					{
+						normalMapSubRenderState->setNormalMapFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
+					}
+
+					else if (strValue == "anisotropic")
+					{
+						normalMapSubRenderState->setNormalMapFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
+					}
+				}
+
+				// Read max anisotropy value.
+				if (prop->values.size() >= 6)
+				{	
+					unsigned int maxAnisotropy = 0;
+
+					++it;
+					if (SGScriptTranslator::getUInt(*it, &maxAnisotropy))
+					{
+						normalMapSubRenderState->setNormalMapAnisotropy(maxAnisotropy);
+					}
+				}
+
+				// Read mip bias value.
+				if (prop->values.size() >= 7)
+				{	
+					Real mipBias = 0;
+
+					++it;
+					if (SGScriptTranslator::getReal(*it, &mipBias))
+					{
+						normalMapSubRenderState->setNormalMapMipBias(mipBias);
 					}
 				}
 								

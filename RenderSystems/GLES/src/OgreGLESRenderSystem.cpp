@@ -65,6 +65,8 @@ THE SOFTWARE.
 	PFNGLBLENDEQUATIONOESPROC glBlendEquationOES;
 	PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
 	PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
+    PFNGLMAPBUFFEROESPROC glMapBufferOES;
+    PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
 #	endif
 
 #endif
@@ -107,6 +109,8 @@ namespace Ogre {
 			::glBlendEquationOES = (PFNGLBLENDEQUATIONOESPROC)eglGetProcAddress("glBlendEquationOES");
 			::glBlendFuncSeparateOES = (PFNGLBLENDFUNCSEPARATEOESPROC)eglGetProcAddress("glBlendFuncSeparateOES");
 			::glBlendEquationSeparateOES = (PFNGLBLENDEQUATIONSEPARATEOESPROC)eglGetProcAddress("glBlendEquationSeparateOES");
+            ::glMapBufferOES = (PFNGLMAPBUFFEROESPROC)eglGetProcAddress("glMapBufferOES");
+            ::glUnmapBufferOES = (PFNGLUNMAPBUFFEROESPROC)eglGetProcAddress("glUnmapBufferOES");
 #endif
         GL_CHECK_ERROR;
         size_t i;

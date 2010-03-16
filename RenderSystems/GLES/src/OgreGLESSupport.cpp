@@ -122,6 +122,9 @@ namespace Ogre {
 		typedef void (GL_APIENTRY *PFNGLBLENDFUNCSEPARATEOES)(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha);
 		typedef void (GL_APIENTRY *PFNGLBLENDEQUATIONSEPARATEOES)(GLenum modeRGB, GLenum modeAlpha);
 
+        typedef void* (GL_APIENTRY *PFNGLMAPBUFFEROES)(GLenum target, GLenum access);
+        typedef GLboolean (GL_APIENTRY *PFNGLUNMAPBUFFEROES)(GLenum target);
+
 		// GL_OES_point_size_array
 		typedef void (GL_APIENTRY *PFNGLPOINTSIZEPOINTEROES)(GLenum type, GLsizei stride, const void *ptr );
 #	endif
@@ -145,6 +148,9 @@ namespace Ogre {
 		glBlendEquationOES = (PFNGLBLENDEQUATIONOES)getProcAddress("glBlendEquationOES");
 		glBlendFuncSeparateOES = (PFNGLBLENDFUNCSEPARATEOES)getProcAddress("glBlendFuncSeparateOES");
 		glBlendEquationSeparateOES = (PFNGLBLENDEQUATIONSEPARATEOES)getProcAddress("glBlendEquationSeparateOES");
+
+        glMapBufferOES = (PFNGLMAPBUFFEROES)getProcAddress("glMapBufferOES");
+        glUnmapBufferOES = (PFNGLUNMAPBUFFEROES)getProcAddress("glUnmapBufferOES");
 #endif
     }
 

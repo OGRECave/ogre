@@ -83,24 +83,70 @@ int main(int argc, char **argv)
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
     DemoApp demo;
+    NSTimer *mTimer;
+	double timeSinceLastFrame;
+	double startTime;
 }
 
 - (void)go;
+- (void)renderOneFrame:(id)sender;
+
+@property (retain) NSTimer *mTimer;
 
 @end
 
 @implementation AppDelegate
 
+@synthesize mTimer;
+
 - (void)go {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     try {
-		demo.startDemo();
+        timeSinceLastFrame = 0;
+        startTime = 0;
+
+        new OgreFramework();
+        if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", &demo, 0))
+            return;
+        
+        demo.setShutdown(false);
+
+        OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
+
+        demo.setupDemoScene();
+        OgreFramework::getSingletonPtr()->m_pRenderWnd->resetStatistics();
+
+        mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f)
+                                          target:self
+                                        selector:@selector(renderOneFrame:)
+                                        userInfo:nil
+                                         repeats:YES];
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
     }
+
+    [pool release];
+}
+
+- (void)renderOneFrame:(id)sender
+{
+#pragma unused(sender)
+    if(OgreFramework::getSingletonPtr()->m_pRenderWnd->isActive())
+    {
+        startTime = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU();
+                
+        OgreFramework::getSingletonPtr()->m_pMouse->capture();
+
+        OgreFramework::getSingletonPtr()->updateOgre(timeSinceLastFrame);
+        OgreFramework::getSingletonPtr()->m_pRoot->renderOneFrame();
+    
+        timeSinceLastFrame = OgreFramework::getSingletonPtr()->m_pTimer->getMillisecondsCPU() - startTime;
+    }
 }
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {
+#pragma unused(application)
     // Hide the status bar
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
     
@@ -124,10 +170,13 @@ int main(int argc, char **argv)
     [imageView release];
     [indicator release];
     
-    [NSThread detachNewThreadSelector:@selector(go) toTarget:self withObject:nil];
+    [self go];
+    
+    [window release];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+#pragma unused(application)
     Ogre::Root::getSingleton().queueEndRendering();
 }
 

@@ -52,7 +52,7 @@ material RTSS/NormalMapping_SinglePass
  			rtshader_system
  			{	 	
  				// Override lighting stage with normal map lighting.
- 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0
+ 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0 bilinear 1 -1.0
  			}			
 		}				
 	}
@@ -110,7 +110,7 @@ material RTSS/NormalMapping_MultiPass
  			rtshader_system
  			{	 	
  				// Override lighting stage with normal map lighting.
- 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	
+ 				lighting_stage normal_map Panels_Normal_Tangent.png tangent_space 0	bilinear 1 -1.0
  			}			
 		}	
 		
@@ -145,7 +145,7 @@ material RTSS/Athene/NormalMapping_SinglePass : RTSS/NormalMapping_SinglePass
 			// Override the normal map.
  			rtshader_system
  			{	 	 						
- 				lighting_stage normal_map atheneNormalMap.png tangent_space 0	
+ 				lighting_stage normal_map atheneNormalMap.png tangent_space 0 bilinear 1 -1.0	
  			}
 		}				
 	}
@@ -161,7 +161,7 @@ material RTSS/Athene/NormalMapping_MultiPass : RTSS/NormalMapping_MultiPass
 			// Override the normal map.
  			rtshader_system
  			{	 	 						
- 				lighting_stage normal_map atheneNormalMap.png tangent_space 0	
+ 				lighting_stage normal_map atheneNormalMap.png tangent_space 0 bilinear 1 -1.0
  			}
 		}
 		

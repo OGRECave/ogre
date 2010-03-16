@@ -53,7 +53,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
 #endif
 {
-    Ogre::LogManager* logMgr = new Ogre::LogManager();
+    new Ogre::LogManager();
 
 	m_pLog = Ogre::LogManager::getSingleton().createLog("OgreLogfile.log", true, true, false);
 	m_pLog->setDebugOutputEnabled(true);
@@ -248,7 +248,7 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
 {
     OIS::MultiTouchState state = evt.state;
-    float origTransX = 0, origTransY = 0;
+    int origTransX = 0, origTransY = 0;
     switch(m_pCamera->getViewport()->getOrientationMode())
     {
         case Ogre::OR_LANDSCAPELEFT:
@@ -280,6 +280,7 @@ bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
 
 bool OgreFramework::touchPressed(const OIS:: MultiTouchEvent &evt)
 {
+#pragma unused(evt)
 	return true;
 }
 
@@ -287,11 +288,13 @@ bool OgreFramework::touchPressed(const OIS:: MultiTouchEvent &evt)
 
 bool OgreFramework::touchReleased(const OIS:: MultiTouchEvent &evt)
 {
+#pragma unused(evt)
 	return true;
 }
 
 bool OgreFramework::touchCancelled(const OIS:: MultiTouchEvent &evt)
 {
+#pragma unused(evt)
 	return true;
 }
 #else

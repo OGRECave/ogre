@@ -110,8 +110,9 @@ public:
 							// in terms of local space rotations and translations.
 	};
 
-	/** Set the normal map space.
-	@param
+	/** 
+	Set the normal map space.
+	@param normalMapSpace The normal map space.
 	*/
 	void					setNormalMapSpace			(NormalMapSpace normalMapSpace) { mNormalMapSpace = normalMapSpace; }
 
@@ -127,6 +128,44 @@ public:
 	Return the normal map texture name.
 	*/
 	const String&			getNormalMapTextureName		() const { return mNormalMapTextureName; }
+
+	/** 
+	Set the normal map filtering attributes.
+	@param minFilter The desired min filter.
+	@param magFilter The desired mag filter.
+	@param mipFilter The desired mip filter.
+	*/
+	void					setNormalMapFiltering			(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
+	{ mNormalMapMinFilter = minFilter; mNormalMapMagFilter = magFilter; mNormalMapMipFilter = mipFilter; }
+
+	/** 
+	Return the normal map filtering attributes.
+	@param minFilter The desired min filter.
+	@param magFilter The desired mag filter.
+	@param mipFilter The desired mip filter.
+	*/
+	void					getNormalMapFiltering			(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
+	{ minFilter = mNormalMapMinFilter; magFilter = mNormalMapMagFilter ; mipFilter = mNormalMapMipFilter; }
+
+	/** Setup the normal map anisotropy value. 
+	@param anisotropy The anisotropy value.
+	*/
+	void			setNormalMapAnisotropy		(unsigned int anisotropy) { mNormalMapAnisotropy = anisotropy; }
+
+
+	/** Return the normal map anisotropy value. */
+	unsigned int	getNormalMapAnisotropy		() const { return mNormalMapAnisotropy; }
+
+	
+	/** Setup the normal map anisotropy value. 
+	@param anisotropy The anisotropy value.
+	*/
+	void			setNormalMapMipBias		(Real mipBias) { mNormalMapMipBias = mipBias; }
+
+
+	/** Return the normal map mip bias value. */
+	Real			getNormalMapMipBias		() const { return mNormalMapMipBias; }
+
 
 
 // Protected types:
@@ -255,6 +294,11 @@ protected:
 	LightParamsList			mLightParamsList;				// Light list.
 	unsigned short			mNormalMapSamplerIndex;			// Normal map texture sampler index.
 	unsigned int			mVSTexCoordSetIndex;			// Vertex shader input texture coordinate set index.
+	FilterOptions			mNormalMapMinFilter;			// The normal map min filter.
+	FilterOptions			mNormalMapMagFilter;			// The normal map mag filter.
+	FilterOptions			mNormalMapMipFilter;			// The normal map mip filter.
+	unsigned int			mNormalMapAnisotropy;			// The normal map max anisotropy value.
+	Real					mNormalMapMipBias;				// The normal map mip map bias.
 	NormalMapSpace			mNormalMapSpace;				// The normal map space.
 	UniformParameterPtr		mWorldMatrix;					// World matrix parameter.
 	UniformParameterPtr		mWorldInvRotMatrix;				// World matrix inverse rotation matrix parameter.

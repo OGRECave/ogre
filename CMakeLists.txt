@@ -26,6 +26,23 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+# Assign compiler for Mac OS X-based systems
+# NOTE: This logic is order-dependent and must occur here because the
+# configuration phase of CMake projects will fall into an infinite loop
+# if compiler assignments are modified after issuing a project(...) command.
+#
+if (OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.2 on iPhone
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
+elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
+  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
+endif ()
+
 project(OGRE)
 
 # Include necessary submodules
@@ -160,11 +177,6 @@ endif(WIN32 OR APPLE)
 
 # Set up iPhone overrides.
 if (OGRE_BUILD_PLATFORM_IPHONE)
-  # Force gcc <= 4.2 on iPhone
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
-
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
@@ -182,10 +194,6 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   add_definitions(-fno-regmove)
   remove_definitions(-msse)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
-  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
 
   # Set 10.4 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)

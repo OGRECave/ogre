@@ -30,6 +30,8 @@ THE SOFTWARE.
 #ifndef __GLESPrerequisites_H__
 #define __GLESPrerequisites_H__
 
+#include "OgrePrerequisites.h"
+#include "OgreMath.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN)
 #	undef _WIN32
@@ -48,9 +50,6 @@ THE SOFTWARE.
 #else
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
-
-#include "OgrePrerequisites.h"
-#include "OgreMath.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
 #   include <OpenGLES/ES1/gl.h>
@@ -100,6 +99,8 @@ extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
 extern PFNGLBLENDEQUATIONOESPROC glBlendEquationOES;
 extern PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
 extern PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
+extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
+extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
 #	endif
 
 #endif
