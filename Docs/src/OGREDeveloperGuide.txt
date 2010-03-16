@@ -244,7 +244,7 @@ Pushing Changesets
 ^^^^^^^^^^^^^^^^^^
 
 This is very easy to do, you can use 'hg outgoing' and 'hg push' (or the GUI equivalent) to send the changesets (commits) you've already made to the master - the default remote will be
-the master if you cloned from it originally, otherwise you can define other aliases in REPO_ROOT/.hg/.hgrc.
+the master if you cloned from it originally, otherwise you can define other aliases in REPO_ROOT/.hg/hgrc.
 
 However, a common occurrence is that you try to push your commits to the master, but find that you get an error saying:
 ------------------------------------------------------------------
@@ -374,7 +374,11 @@ The case where you will want to use the merge command is when merging bugfixes i
 -------------------------------------------------------------
 hg merge v1-7
 -------------------------------------------------------------
-If there are no conflicts, changes will be merged and committed automatically. If there are conflicts, you'll have to resolve them first and commit the merge manually as a specific changeset. 
+Changes will be merged into your working copy along with parent metadata tracking the merge. If there are conflicts, you'll have to resolve them in your working copy before you commit. 
+Once you've done this and tested the merge, you should commit it. You don't need to specify much detail in the merge commit (just 'Merged from v1-7' or similar) because the 
+changeset metadata gives enough information to track which changesets are included in the merge.
+
+TIP: Even on Windows, I strongly recommend using KDiff3 (included with TortoiseHg) to resolve conflicts and not WinMerge or TortoiseMerge. The reason is that when using a graphical diff tool, conflicts are handled in Mercurial by keeping separate files rather than embedding the "chevron markers" inside the main file. When Mercurial delegates the merge to the GUI tool, it assumes you resolved the problem when you exit - and the problem with WinMerge is that it doesn't give you any warning if you exit without resolving the problem (often leaving you with a file which has not merged either of the conflicting changes into it, so you lose changes!). KDiff3 however warns you if you try to exit without resolving every conflict. 
 
 Transplanting Individual Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
