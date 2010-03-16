@@ -16,12 +16,13 @@ public:
 	~DemoApp();
 
 	void startDemo();
+	void setupDemoScene();
+    void setShutdown(bool flag) { m_bShutdown = flag; }
 	
 	bool keyPressed(const OIS::KeyEvent &keyEventRef);
 	bool keyReleased(const OIS::KeyEvent &keyEventRef);
 
 private:
-	void setupDemoScene();
 	void runDemo();
 
 	Ogre::SceneNode*			m_pCubeNode;
