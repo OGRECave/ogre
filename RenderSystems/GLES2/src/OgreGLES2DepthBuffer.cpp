@@ -37,10 +37,10 @@ namespace Ogre
 									uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
 									bool isManual ) :
 				DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+				mMultiSampleQuality( multiSampleQuality ),
 				mCreatorContext( creatorContext ),
 				mDepthBuffer( depth ),
 				mStencilBuffer( stencil ),
-				mMultiSampleQuality( multiSampleQuality ),
 				mRenderSystem( renderSystem )
 	{
 		if( mDepthBuffer )
@@ -52,6 +52,9 @@ namespace Ogre
 				break;
 #if GL_OES_depth24
 			case GL_DEPTH_COMPONENT24_OES:
+#if GL_OES_packed_depth_stencil
+            case GL_DEPTH24_STENCIL8_OES:  // Packed depth / stencil
+#endif
 				mBitDepth = 32;
 				break;
 #endif
@@ -123,10 +126,13 @@ namespace Ogre
 
 				bool bSameStencil = false;
 
-				if( !mStencilBuffer || mStencilBuffer == mDepthBuffer )
-					bSameStencil = stencilFormat == GL_NONE;
-				else if( bSameStencil )
-					bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
+                if( !mStencilBuffer || mStencilBuffer == mDepthBuffer )
+                   bSameStencil = stencilFormat == GL_NONE;
+                else
+                {
+                    if( mStencilBuffer )
+                        bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
+                }
 
 				retVal = bSameDepth && bSameStencil;
 			}
