@@ -207,7 +207,7 @@ General Principles
 ^^^^^^^^^^^^^^^^^^
 
 *Testing*::
-  Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes to the master, you should still try to ensure that all your commits are consistent in themselves, that is that evey point in the history of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, *do* commit often, because a rich history is always best, but do at least check that everything compiles and runs before creating a new commit. 
+  Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes to the master, you should still try to ensure that all your commits are consistent in themselves, that is that every point in the history of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, *do* commit often, because a rich history is always best, but do at least check that everything compiles and runs before creating a new commit. 
 
 *Cohesive commits*::
   Your commits should be as focussed as possible on a single subject. Try not to commit changes for multiple purposes at once, it makes it much more difficult to pick apart those changes later if needed. And most importantly, never 'ever' commit a bugfix and a feature change in one commit, unless changing the feature was the only way to fix the bug (in which case it can only be fixed in the unstable default branch).  
@@ -223,7 +223,7 @@ bugfixes should be committed to the v1-7 branch. These bugfixes will be merged f
 committing to the stable branch first and merging forward, as opposed to committing to the default branch and picking commits to transplant back to the 
 stable branch, are many:
 
-* It encourages primary testing and early committing on the stable branch, which is where fixes are most needed most urgently anyway.
+* It encourages primary testing and early committing on the stable branch, which is where fixes are needed most urgently anyway.
 * Merge conflicts always happen in the unstable branch, not the stable branch. This is better again because the stable branch is the most important to keep as clean as possible
 * Merging is automatic. You always want to merge ALL changes from the stable branch into the default branch, there is no human error involved in selecting what changes to merge. If you cherry-pick fixes to port to the stable branch, you have to make sure you don't miss anything, make sure you don't accidentally include an interface change, etc. And if someone has committed a combined fix and an API change in one commit (see below) it's a mess.
 
@@ -241,8 +241,7 @@ This section is concerned with the recommended approach to common issues.
 Pushing Changesets
 ^^^^^^^^^^^^^^^^^^
 
-This is very easy to do, you can use 'hg outgoing' and 'hg push' (or the GUI equivalent) to send the changesets (commits) you've already made to the master - the default remote will be
-the master if you cloned from it originally, otherwise you can define other aliases in REPO_ROOT/.hg/hgrc.
+This is very easy to do, you can use 'hg outgoing' and 'hg push' (or the GUI equivalent) to send the changesets (commits) you've already made to the master.
 
 TIP: By default the target of push and pull is where you cloned the repository from. If you make a *local clone* of your repository, remember that the
 default push/pull location will be the local origin, not the master. Edit .hg/hgrc to change where the default points to (or to add aliases).
@@ -253,7 +252,7 @@ abort: push creates new remote heads!
 (did you forget to merge? use push -f to force)
 ------------------------------------------------------------------
 
-This is a bit of a confusing message, but the most common reason it means that someone else pushed their commits before you did, and you're not allowed to push your
+This is a bit of a confusing message, but the most common reason is that someone else pushed their commits before you did, and you're not allowed to push your
 changes until you've resolved this. The 'new remote heads' refers to the fact that you would effectively create 2 different parallel streams of development on the
 branch in question, and you can't (or rather, shouldn't) push that, although you might do it locally. 
 
@@ -268,7 +267,7 @@ for more details.
 Pulling Changesets
 ^^^^^^^^^^^^^^^^^^
 
-Pulling changesets from the master (usually the default) or other repositories is easy to do (hg incoming to preview, hg pull to do it), but it's
+Pulling changesets from the master (usually the default) or other repositories is easy to do ('hg incoming' to preview, 'hg pull' to do it), but it's
 important to understand the effects of parallel development. 
 
 For now, let's just say that you always want to use the rebase extension when you pull:
@@ -443,7 +442,7 @@ hg bisect --good 1300
 
 Otherwise, we could just jump to various revisions ourselves until we found one that worked, then just call hg bisect --good with no revision to tell hg that the current revision is ok.
 Either way, once you've told Mercurial the extent of the good/bad range, the working copy will be updated to a revision in between the known good & bad revisions for you to test again, and to
-call "hg bisect --good" or "hg bisect --bad" depending on the test results. Each time you do this, the working copy will update again to the next text revision. If you can script this, great! If not, you'll be manually testing at each step.
+call "hg bisect --good" or "hg bisect --bad" depending on the test results. Each time you do this, the working copy will update again to the next revision for testing, bisecting the range between good and bad. If you can script this, great! If not, you'll be manually testing at each step.
 
 Eventually you will find the case of a bad revision directly after a good revision, and hg will tell you. In this case, let's assume we've just tested revision 1519 and found that it's ok, but we'd previously tested 1520 and it wasn't:
 
