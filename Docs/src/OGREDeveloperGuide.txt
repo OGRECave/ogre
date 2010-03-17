@@ -194,43 +194,35 @@ branches. If these clones need to be public, then a fork should be created on Bi
 Later on if the work in these forks is to be reintegrated into the master repository, the changes can be either 
 submitted as a patch or (preferably) the changes pulled across with the full commit history, if that makes sense. 
 
-Everyday Tasks
-~~~~~~~~~~~~~~
-
 Committing
-^^^^^^^^^^
+~~~~~~~~~~
 
 General Principles
-++++++++++++++++++
+^^^^^^^^^^^^^^^^^^
 
-*Testing:* Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes
-to the master, you should still try to ensure that all your commits are consistent in themselves, that is that evey point in the history
-of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if
-you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, *do* commit
-often, because a rich history is always best, but do at least check that everything compiles and runs before creating a new commit. 
+*Testing*::
+  Mercurial allows you to commit locally, which means you have a faster workflow. However, as a core developer who will be pushing changes to the master, you should still try to ensure that all your commits are consistent in themselves, that is that evey point in the history of the repository builds and runs. It 'is' possible to re-shuffle the commits you've made later using Mercurial Queues, 'but only' if you haven't pushed the commits anywhere else beforehand. Usually it's better to try to keep your commits consistent all the time. So, *do* commit often, because a rich history is always best, but do at least check that everything compiles and runs before creating a new commit. 
 
-*Cohesive commits:* Your commits should be as focussed as possible on a single subject. Try not to commit changes for multiple purposes at once, it
-makes it much more difficult to pick apart those changes later if needed. And most importantly, never 'ever' commit a bugfix and a feature 
-change in one commit, unless changing the feature was the only way to fix the bug (in which case it can only be fixed in the unstable default branch). 
+*Cohesive commits*::
+  Your commits should be as focussed as possible on a single subject. Try not to commit changes for multiple purposes at once, it makes it much more difficult to pick apart those changes later if needed. And most importantly, never 'ever' commit a bugfix and a feature change in one commit, unless changing the feature was the only way to fix the bug (in which case it can only be fixed in the unstable default branch).  
 
-*Unnecessary changes:* Although it can be tempting to "tidy" code, fix indenting, standardise etc, you should generally avoid doing this for its own sake. 
-If you're changing the code anyway, by all means fix any formatting and standardisation issues in the area in question while you're at it. But purely 
-aesthetic changes should never be committed on their own, because all of them can potentially make merging 'real' changes - across branches and
-accepting patches - far more difficult because of conflicts caused simply by trivial formatting changes. 
+*Unnecessary changes*:: 
+  Although it can be tempting to "tidy" code, fix indenting, standardise etc, you should generally avoid doing this for its own sake. If you're changing the code anyway, by all means fix any formatting and standardisation issues in the area in question while you're at it. But purely aesthetic changes should never be committed on their own, because all of them can potentially make merging 'real' changes - across branches and accepting patches - far more difficult because of conflicts caused simply by trivial formatting changes. 
 
 Committing Bugfixes
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 Bugfixes should always be committed to the 'current stable branch' (assuming they affect it) first. So for example at the time of writing
 bugfixes should be committed to the v1-7 branch. These bugfixes will be merged forwards into the default branch periodically. The reasons for 
 committing to the stable branch first and merging forward, as opposed to committing to the default branch and picking commits to transplant back to the 
 stable branch, are many:
+
 * It encourages primary testing and early committing on the stable branch, which is where fixes are most needed most urgently anyway.
 * Merge conflicts always happen in the unstable branch, not the stable branch. This is better again because the stable branch is the most important to keep as clean as possible
 * Merging is automatic. You always want to merge ALL changes from the stable branch into the default branch, there is no human error involved in selecting what changes to merge. If you cherry-pick fixes to port to the stable branch, you have to make sure you don't miss anything, make sure you don't accidentally include an interface change, etc. And if someone has committed a combined fix and an API change in one commit (see below) it's a mess.
 
 Committing New Features and Breaking Changes
-++++++++++++++++++++++++++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Any new feature, or a change which changes either the API or the behaviour within the existing API, must always be committed to the default branch (often referred to as 'unstable'). 
 
@@ -292,26 +284,34 @@ talk about generating and consuming patches in this section.
 Generating Patches
 ^^^^^^^^^^^^^^^^^^
 
-As mentioned above, in Mercurial you generate patches from your local commits. This is quite simple:
+Exporting Changesets
+++++++++++++++++++++
+
+This is the recommended approach to generating patches. As mentioned above, in Mercurial you can generate patches from your local commits. This is quite simple:
 -------------------------------------------------------------
 hg export --git -o %b_patch%nof%N_%h.patch REVS
 -------------------------------------------------------------
 
 Replace REVS with a list of revisions, or a range such as REV1:REV2. It will create one file per changeset named something like ogre_patch1of2_f0c47360a828.diff. You should zip them 
-up and send them to the patch list. 
-
-NOTE: Although it's possible to just pipe the output from hg export to a single file for multiple changesets, and this does work, this is generally not recommended, because a failure to import one
-of the patches will cause the entire file to fail. 
-
-NOTE: If you've configured Mercurial the way we recommended in the <<HgCfgDiff,Mercurial configuration section>>, the --git is unecessary because it's the default,
+up and send them to the patch list. If you've configured Mercurial the way we recommended in the <<HgCfgDiff,Mercurial configuration section>>, the --git is unecessary because it's the default,
 but it's included for completeness. 
 
-NOTE: The PatchBomb extension can be used to email many patches at once, but its reliance on email (and thus mailing lists) makes it not that useful to us, since
-we use a dedicated patch list.
+Other Ways
+++++++++++
 
-NOTE: Mercurial Queues (MQ) allows vastly more complex handling of patches, particularly for those wanting to keep track of non-core alterations and to consolidate
-sets of commits into a smaller list for submission upstream. You can read about them in the http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html[Mercurial Manual].
-We won't talk about MQ here because it isn't needed unless your requirements are fairly complex.
+There are alternative ways to generate patches, but they're not recommended unless you know what you're doing. 
+
+*Piped output*::
+  It's possible to just pipe the output from "hg export" to a single file for multiple changesets, instead of saving each changeset to its own file. However with a single file, a failure to import one of the changesets will cause the entire file to fail, so it's more fragile when importing. Separate patch files are easier to process. 
+  
+*Working copy diff*::
+  You can also generate patches from your working copy if you want, using "hg diff" but these patches lack context so are not a good substitute for exporting actual commits which specify their parents. You might want to use this to post something quickly on a forum as a test, or to exchange work-in-progress information, but not for submitting patches.
+  
+*PatchBomb extension*::
+  The PatchBomb extension can be used to email many patches at once, but its reliance on email (and thus mailing lists) makes it not that useful to us, since we use a dedicated patch list.
+  
+*Mercurial Queues (MQ)*::
+ MQ allows vastly more complex handling of patches, particularly for those wanting to keep track of non-core alterations and to consolidate sets of commits into a smaller list for submission upstream. You can read about them in the http://hgbook.red-bean.com/read/managing-change-with-mercurial-queues.html[Mercurial Manual]. We won't talk about MQ here because it isn't needed unless your requirements are fairly complex.
 
 Applying Patches
 ^^^^^^^^^^^^^^^^
@@ -383,14 +383,66 @@ TIP: Even on Windows, I strongly recommend using KDiff3 (included with TortoiseH
 Transplanting Individual Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+Let's say someone committed a bugfix to the default branch when in fact it should have been committed to the stable branch. How do you handle that? Well, in the target branch, you do this:
+---------------------------------------------------------------
+hg transplant --log REV
+---------------------------------------------------------------
+
+Where REV is the revision you want to transplant. The "--log" option is there to record the transplant information in the new commit. 
+
+TIP: It's also possible to use the "-s REPOSITORY" option to transplant specific changes from another repository, as a specific alternative to pull. 
 
 Backing out a change
 ~~~~~~~~~~~~~~~~~~~~
 
-TODO
+Mistakes happen. When they do, you need to correct them, and there are 2 ways to do this:
+
+Local Rollback
+^^^^^^^^^^^^^^
+
+This is a classic "oops" case, maybe you realised just after you committed that you forgot to add a file or forgot to remove some test code, or similar. Provided you haven't pushed the change to anyone else, you can just undo it:
+---------------------------------------------------------------
+hg rollback
+---------------------------------------------------------------
+
+This removes the last commit and puts the changes from it back in your working directory, ready to be committed again. 
+
+Reverse Commit
+^^^^^^^^^^^^^^
+
+If a change has already left your local repository, or if it's buried a few levels down in the history, then you will want to undo it in a new commit that reverses the changes. You do this using the "backout" command:
+---------------------------------------------------------------
+hg backout -m "Backed out silly mistake in X" REV
+---------------------------------------------------------------
+Notice how this commits the reversal automatically (which is why a message is included). 
 
 Using Bisect to Track Down Breakages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TODO
+Oh no! Something is broken, and you don't know why, or when it broke, and don't know where to start looking. A common approach is to check out the repository at different revisions to figure out when the problem started happening, and to narrow it down by jumping around the range where the problem started happening, halving the range every time depending on whether the problem is there or not. Mercurial provides a command to make this easier: 'hg bisect'.
+
+You start the process, usually at the tip where the problem occurs, by telling Mercurial that it doesn't work (after first resetting any previous bisect state):
+---------------------------------------------------------------
+hg bisect --reset
+hg bisect --bad
+---------------------------------------------------------------
+
+Next, we need to either jump to, or define a revision we know the problem didn't occur, some time in history. For example if we know already that it didn't occur in revision 1300, we could do this:
+---------------------------------------------------------------
+hg bisect --good 1300
+---------------------------------------------------------------
+
+Otherwise, we could just jump to various revisions ourselves until we found one that worked, then just call hg bisect --good with no revision to tell hg that the current revision is ok.
+Either way, once you've told Mercurial the extent of the good/bad range, the working copy will be updated to a revision in between the known good & bad revisions for you to test again, and to
+call "hg bisect --good" or "hg bisect --bad" depending on the test results. Each time you do this, the working copy will update again to the next text revision. If you can script this, great! If not, you'll be manually testing at each step.
+
+Eventually you will find the case of a bad revision directly after a good revision, and hg will tell you. In this case, let's assume we've just tested revision 1519 and found that it's ok, but we'd previously tested 1520 and it wasn't:
+
+---------------------------------------------------------------------
+c:\myproject>hg bisect --good
+The first bad revision is:
+changeset:   1520:898fcb8708fc48
+user:        Fred Bloggs <fred@bloggs.com>
+date:        Wed Jan 11 07:25:04 2010 +0000
+summary:     Some commit message
+---------------------------------------------------------------------
