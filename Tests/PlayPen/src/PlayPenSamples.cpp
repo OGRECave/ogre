@@ -295,6 +295,8 @@ String PlayPen_testManualLODFromFile::getLODMesh()
 	}
 	ser.exportMesh(msh1.get(), prefix + "/testlod.mesh");
 
+	MeshManager::getSingleton().removeAll();
+
 	return "testlod.mesh";
 
 }
