@@ -205,6 +205,99 @@ void PlayPen_testCameraSetDirection::checkBoxToggled(OgreBites::CheckBox* box)
 
 	}
 }
+//---------------------------------------------------------------------
+PlayPen_testManualLOD::PlayPen_testManualLOD()
+{
+	mInfo["Title"] = "PlayPen: Test Manual LOD";
+	mInfo["Description"] = "Testing meshes with manual LODs assigned";
+}
+//---------------------------------------------------------------------
+String PlayPen_testManualLOD::getLODMesh()
+{
+	MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+	msh1->createManualLodLevel(200, "razor.mesh");
+	msh1->createManualLodLevel(500, "sphere.mesh");
+
+	return msh1->getName();
+
+}
+//---------------------------------------------------------------------
+void PlayPen_testManualLOD::setupContent()
+{
+	String meshName = getLODMesh();
+
+	Entity *ent;
+	for (int i = 0; i < 5; ++i)
+	{
+		ent = mSceneMgr->createEntity("robot" + StringConverter::toString(i), meshName);
+		// Add entity to the scene node
+		mSceneMgr->getRootSceneNode()->createChildSceneNode(
+			Vector3(0,0,(i*50)-(5*50/2)))->attachObject(ent);
+	}
+	mAnimState = ent->getAnimationState("Walk");
+	mAnimState->setEnabled(true);
+
+
+
+	// Give it a little ambience with lights
+	Light* l;
+	l = mSceneMgr->createLight("BlueLight");
+	l->setPosition(-200,-80,-100);
+	l->setDiffuseColour(0.5, 0.5, 1.0);
+
+	l = mSceneMgr->createLight("GreenLight");
+	l->setPosition(0,0,-100);
+	l->setDiffuseColour(0.5, 1.0, 0.5);
+
+	// Position the camera
+	mCamera->setPosition(100,50,100);
+	mCamera->lookAt(-50,50,0);
+
+	mSceneMgr->setAmbientLight(ColourValue::White);
+
+}
+//---------------------------------------------------------------------
+bool PlayPen_testManualLOD::frameStarted(const Ogre::FrameEvent& evt)
+{
+	mAnimState->addTime(evt.timeSinceLastFrame);
+
+	return PlayPenBase::frameStarted(evt);
+}
+//---------------------------------------------------------------------
+PlayPen_testManualLODFromFile::PlayPen_testManualLODFromFile()
+{
+	mInfo["Title"] = "PlayPen: Test Manual LOD (file)";
+	mInfo["Description"] = "Testing meshes with manual LODs assigned, loaded from a file";
+}
+//---------------------------------------------------------------------
+String PlayPen_testManualLODFromFile::getLODMesh()
+{
+	MeshPtr msh1 = (MeshPtr)MeshManager::getSingleton().load("robot.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+	msh1->createManualLodLevel(200, "razor.mesh");
+	msh1->createManualLodLevel(500, "sphere.mesh");
+
+	// this time, we save this data to a file and re-load it
+
+	MeshSerializer ser;
+	const ResourceGroupManager::LocationList& ll = 
+		ResourceGroupManager::getSingleton().getResourceLocationList(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	String prefix;
+	for (ResourceGroupManager::LocationList::const_iterator i = ll.begin(); i != ll.end(); ++i)
+	{
+		if (StringUtil::endsWith((*i)->archive->getName(), "media"))
+		{
+			prefix = (*i)->archive->getName();
+		}
+	}
+	ser.exportMesh(msh1.get(), prefix + "/testlod.mesh");
+
+	return "testlod.mesh";
+
+}
 
 
 
