@@ -45,7 +45,7 @@ THE SOFTWARE.
 #include <list>
 #include <algorithm>
 
-#include <OgreOctree.h>
+#include "OgreOctree.h"
 
 
 namespace Ogre
