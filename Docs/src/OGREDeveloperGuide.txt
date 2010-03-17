@@ -20,6 +20,7 @@ copy of the repository and commit to it themselves too, with changes being excha
 For an introduction to Mercurial, please read http://mercurial.selenic.com/wiki/Tutorial[the official Mercurial tutorials] or
 http://hginit.com[Joel Spolsky's tutorials]. However, please note particularly in the case of the latter that the OGRE team's
 recommeded approach to using Mercurial differs slightly, with respect to the following cases:
+
 * How to resolve the case where another user pushed their changes to the master before you
 * How stable version branches are handled
 
