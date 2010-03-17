@@ -195,6 +195,11 @@ branches. If these clones need to be public, then a fork should be created on Bi
 Later on if the work in these forks is to be reintegrated into the master repository, the changes can be either 
 submitted as a patch or (preferably) the changes pulled across with the full commit history, if that makes sense. 
 
+TIP: If you have some long-running experimental changes in your own private repository, do them in a local clone to keep them separate
+from changes you will want to push upstream to the master. This is similar Git's local branches (which are not pushed unless you ask), 
+and in fact there is a non-official Mercurial extension to support this, but I do not recommend it. A clone is simple to maintain and you'll
+want to be testing it anyway so having a separate working copy is useful.
+
 Committing
 ~~~~~~~~~~
 
@@ -238,6 +243,9 @@ Pushing Changesets
 
 This is very easy to do, you can use 'hg outgoing' and 'hg push' (or the GUI equivalent) to send the changesets (commits) you've already made to the master - the default remote will be
 the master if you cloned from it originally, otherwise you can define other aliases in REPO_ROOT/.hg/hgrc.
+
+TIP: By default the target of push and pull is where you cloned the repository from. If you make a *local clone* of your repository, remember that the
+default push/pull location will be the local origin, not the master. Edit .hg/hgrc to change where the default points to (or to add aliases).
 
 However, a common occurrence is that you try to push your commits to the master, but find that you get an error saying:
 ------------------------------------------------------------------
