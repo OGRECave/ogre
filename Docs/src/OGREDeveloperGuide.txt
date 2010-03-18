@@ -270,7 +270,7 @@ Pulling Changesets
 Pulling changesets from the master (usually the default) or other repositories is easy to do ('hg incoming' to preview, 'hg pull' to do it), but it's
 important to understand the effects of parallel development. 
 
-For now, let's just say that you always want to use the rebase extension when you pull:
+For now, let's just say that you always want to use the rebase extension when you pull from the master:
 --------------------------------------
 hg pull --rebase
 --------------------------------------
@@ -278,7 +278,11 @@ hg pull --rebase
 If you forget to use --rebase, it's no big deal because you can rebase later too, but definitely try to remember to use it because it's simpler. 
 In TortoiseHg you can set is as the default option, see <<THGConfig,TortoiseHg config options>> for details.
 
-For more on this, see <<ParallelDev,Parallel Development>>.
+NOTE: There are special occasions where you would not want to use --rebase (or the GUI option equivalent), and this is mainly when pulling changes from very large,
+long-running forks of the project for re-integration (for example, Google Summer of Code or other long-running experimental forks). These are the minority
+case so it's still worth setting rebase as your default behaviour, but just bear in mind that very occasionally you might want to change this. 
+
+For more on rebasing and merging, see <<ParallelDev,Parallel Development>>.
 
 Dealing With Patches
 ~~~~~~~~~~~~~~~~~~~~
@@ -342,20 +346,22 @@ See <<ParallelDev,Parallel Development>> for more information.
 Parallel Development
 ~~~~~~~~~~~~~~~~~~~~~
 
-Because a commit in Mercurial always knows what changeset it was parented from, if you pull changes into your local repository (or import a patch using the --exact option), they are by default applied
-as differences against the base changeset they were originally made against. If you already have changes on the branch in question after this parent changeset, this effectively
-creates a divergence in the history:
- 
+Deviations in development within a branch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In centralised systems like Subversion, the only way to record a commit is at the master repository, so all parallel development must be resolved into one stream (per branch) at commit time. 
+Mercurial lets everyone commit locally, so committed deviations can build up in the distributed repositories, and have to be resolved differently. It's actually possible in Mercurial to have more than one "HEAD" revision on a single branch in one repository, although by default you're not allowed to push that ambiguitiy to anyone else. This may occur because you have pulled changesets into your repository when you have other changes of your own on that branch, or that you've created deviating paths locally (which you can do by manually updating to a previous revision, then committing from that point, creating a split in the branch:
+
 image:images/hgmultipleheads1.png[height=200]
 
-In this case the green revisions are your changes, and the orange ones are those you have just pulled from the master (in the case of hg import --exact, the green revisions would be the contents of the patch). 
+This situation could have been caused by making your own changes (green), and pulling someone elses changes from the master (orange) which were based on the same ancestor. Or, maybe the orange revisions came from a patch applied as "hg import --exact", or pulling changes from a fork.
 
-The http://hginit.com[HG Init] tutorials suggest resolving this by merging the changes with your own, which is indeed the standard no-extension way
-to handle this, but it has one major drawback - every time it happens, in the history you have a permanent record of this divergence in the form of a 
-split and merge of the 2 developers changes. This is extremely distracting when trying to decipher the history. 
+Resolving multiple heads: Rebase
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Instead, by using the Rebase extension, after pulling changes you 'rebase' your own commits so that they are re-applied on top of the 
-head you pulled from the master, essentially flattening the history, like this: 
+The most common case of deviations like this is simple, short-term parallel development within the team (for more long-term deviations, see the next section). The http://hginit.com[HG Init] tutorials suggest resolving this by merging the changes with your own (covered next), which is indeed the standard no-extension way to handle this, but it has one major drawback - every time it happens, in the history you have a permanent record of this divergence in the form of a split and merge of the 2 developers changes. Because this is literally an everyday occurrence of short-term deviation, this is extremely distracting when trying to decipher the history, and therefore not recommended. 
+
+Instead, by using the Rebase extension, after pulling someone elses changes you 'rebase' your own commits so that they are re-applied on top of the head you pulled from the master, essentially flattening the history and looking like there was never any deviation, like this: 
 
 image:images/hgmultipleheads2.png[height=300]
 
@@ -375,10 +381,23 @@ hg rebase -s492385cab361 -da638fcd23823 --continue
 -------------------------------------------------------------
 You could use the Mercurial short revision numbers instead of the "short" hashes there, but the principle is that you're moving the base of the green revisions to the top of the orange ones. You very rarely need to use this explicit form, but that's how you do it if you need to.
 
-Merging Bugfixes
-~~~~~~~~~~~~~~~~
+Resolving multiple heads: Merge
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The case where you will want to use the merge command is when merging bugfixes in the stable branch (currently v1-7) into the default (unstable) branch. This is very simple in Mercurial; if we assume we're in a working copy which is on the head of the default branch:
+The other way of resolving 2 heads on a single branch is to merge one into the other. This preserves the history of the original deviation and then unifies the changes into a single head. As mentioned in the previouis section, you don't want to use this approach for everyday parallel development, because it just creates a spaghetti history. However, there are less common cases where it *is* the best way to record the outcome of parallel development - specifically the cases where the parallel development has deviated for a reasonable time, such as Google Summer of Code and other longer-running external forks that you then want to reintegrate. Rebasing history for a period of several months isn't appropriate because it's highly artificial - rebase is appropriate for smoothing out the misleading splitting and merging for everyday development, but if the development really did diverge for a long time, it's worth preserving that. 
+
+So, assuming you've just pulled a set of changesets from a long-running fork and you now have 2 heads, you simply want to update your working copy to your own HEAD of the branch, and issue a simple command:
+-------------------------------------------------------------
+hg merge
+-------------------------------------------------------------
+Mercurial automatically knows that you want to merge the 2 heads on this branch and will do it for you. You'll need to resolve any conflicts if they occur, then commit the merge, unifying the heads (and being able to push them if you want), like so:
+image:images/hgmultipleheads3.png[height=250]
+
+
+Merging bugfixes across branches
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The most common case where you will want to use the merge command is when merging bugfixes in the stable branch (currently v1-7) into the default (unstable) branch. This is very simple in Mercurial; if we assume we're in a working copy which is on the head of the default branch:
 -------------------------------------------------------------
 hg merge v1-7
 -------------------------------------------------------------
