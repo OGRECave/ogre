@@ -315,37 +315,35 @@ void Sample_ShaderSystem::setupContent()
 	childNode->attachObject(entity);
 
 	// Create texture layer blending demonstration entity.
-	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D9") != String::npos)
-	{
-		entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
-		entity->setMaterialName("RTSS/LayeredBlending");
-		childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		childNode->setPosition(300.0, 200.0, -200.0);
-		childNode->attachObject(entity);
 
-		// Grab the render state of the material.
-		RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending", 0);
+	entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
+	entity->setMaterialName("RTSS/LayeredBlending");
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(300.0, 200.0, -200.0);
+	childNode->attachObject(entity);
 
-		if (renderState != NULL)
-		{			
-			const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
-			SubRenderStateListConstIterator it = subRenderStateList.begin();
-			SubRenderStateListConstIterator itEnd = subRenderStateList.end();
+	// Grab the render state of the material.
+	RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending", 0);
 
-			// Search for the texture layer blend sub state.
-			for (; it != itEnd; ++it)
+	if (renderState != NULL)
+	{			
+		const SubRenderStateList& subRenderStateList = renderState->getTemplateSubRenderStateList();
+		SubRenderStateListConstIterator it = subRenderStateList.begin();
+		SubRenderStateListConstIterator itEnd = subRenderStateList.end();
+
+		// Search for the texture layer blend sub state.
+		for (; it != itEnd; ++it)
+		{
+			SubRenderState* curSubRenderState = *it;
+
+			if (curSubRenderState->getType() == LayeredBlending::Type)
 			{
-				SubRenderState* curSubRenderState = *it;
-
-				if (curSubRenderState->getType() == LayeredBlending::Type)
-				{
-					mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
-					break;
-				}
+				mLayerBlendSubRS = static_cast<LayeredBlending*>(curSubRenderState);
+				break;
 			}
 		}
 	}
-	
+
 
 	// Create per pixel lighting demonstration entity.
 	entity = mSceneMgr->createEntity("PerPixelEntity", "knot.mesh");
