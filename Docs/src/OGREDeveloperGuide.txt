@@ -9,6 +9,8 @@ existing developers.
 
 NOTE: While this document is primarily aimed at core developers and other contributors to OGRE, 
 regular users might find it interesting too, particularly if they aspire to contribute code eventually.
+Currently this guide concentrates on Mercurial to help our transition to it, but can be updated to include more
+later on.
 
 Recommended Mercurial Configuration
 -----------------------------------
