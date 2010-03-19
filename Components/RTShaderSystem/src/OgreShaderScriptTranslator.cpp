@@ -80,15 +80,15 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 		{
 			PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 			AbstractNodeList::const_iterator it = prop->values.begin();
-			PropertyValues popertyValues;
+			PropertyValues propertyValues;
 			for( ;it != prop->values.end(); ++it)
 			{
 				if(true == SGScriptTranslator::getString(*it, &strValue))
 				{
-					popertyValues.push_back(strValue);
+					propertyValues.push_back(strValue);
 				}
 			}
-			properties[prop->name] = popertyValues;
+			properties[prop->name] = propertyValues;
 		}
 	}
 	mParamCollection[textureUnitState] = properties;
