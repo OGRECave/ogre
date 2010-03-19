@@ -411,6 +411,8 @@ NOTE: Any team member can perform the merge (sinbad used to do it all the time u
 
 TIP: Even on Windows, I strongly recommend using KDiff3 (included with TortoiseHg) to resolve conflicts and not WinMerge or TortoiseMerge. The reason is that when using a graphical diff tool, conflicts are handled in Mercurial by keeping separate files rather than embedding the "chevron markers" inside the main file. When Mercurial delegates the merge to the GUI tool, it assumes you resolved the problem when you exit - and the problem with WinMerge is that it doesn't give you any warning if you exit without resolving the problem (often leaving you with a file which has not merged either of the conflicting changes into it, so you lose changes!). KDiff3 however warns you if you try to exit without resolving every conflict. 
 
+TIP: I *strongly recommend* merging on the command line as above, and not using TortoiseHg which can be extremely unintuitive for doing merges. In TortoiseHg you have to left-click to select the revision you want to merge changes into (so in this case, the tip of the default branch), then *right-click* the revision you want to merge changes from (in this case, the tip of the v1-7 branch), then select "Merge With...". It's very manual and very error prone - if you get it backwards you will effectively switch your working copy to v1-7 and merge the default changes into it!! Very bad. The command-line is far simpler and less prone to manual error.
+
 Transplanting Individual Changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
