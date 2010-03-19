@@ -398,7 +398,7 @@ const String& IntegratedPSSM3Factory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler, 
-													  PropertyAbstractNode* prop, Pass* pass)
+													  PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "integrated_pssm4")
 	{		

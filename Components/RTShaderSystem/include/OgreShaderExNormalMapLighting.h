@@ -350,7 +350,7 @@ public:
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass);
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.

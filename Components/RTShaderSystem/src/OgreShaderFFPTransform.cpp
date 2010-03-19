@@ -106,7 +106,7 @@ const String& FFPTransformFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPTransformFactory::createInstance(ScriptCompiler* compiler, 
-												   PropertyAbstractNode* prop, Pass* pass)
+												   PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "transform_stage")
 	{

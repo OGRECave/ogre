@@ -286,7 +286,7 @@ const String& FFPColourFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPColourFactory::createInstance(ScriptCompiler* compiler, 
-													PropertyAbstractNode* prop, Pass* pass)
+													PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "colour_stage")
 	{

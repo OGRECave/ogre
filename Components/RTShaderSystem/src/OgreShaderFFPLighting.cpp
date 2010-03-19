@@ -760,7 +760,7 @@ const String& FFPLightingFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPLightingFactory::createInstance(ScriptCompiler* compiler, 
-												PropertyAbstractNode* prop, Pass* pass)
+												PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "lighting_stage")
 	{

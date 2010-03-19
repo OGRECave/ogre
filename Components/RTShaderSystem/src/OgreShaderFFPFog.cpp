@@ -399,7 +399,7 @@ const String& FFPFogFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	FFPFogFactory::createInstance(ScriptCompiler* compiler, 
-													PropertyAbstractNode* prop, Pass* pass)
+													PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "fog_stage")
 	{
