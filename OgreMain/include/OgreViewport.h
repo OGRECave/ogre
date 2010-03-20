@@ -226,6 +226,15 @@ namespace Ogre {
         */
         const ColourValue& getBackgroundColour(void) const;
 
+		/** Sets the initial depth buffer value of the viewport (before
+            rendering). Default is 1
+        */
+        void setDepthClear( Real depth );
+
+        /** Gets the default depth buffer value to which the viewport is cleared.
+        */
+        Real getDepthClear(void) const;
+
         /** Determines whether to clear the viewport before rendering.
 		@remarks
 			You can use this method to set which buffers are cleared
@@ -393,6 +402,7 @@ namespace Ogre {
         int mZOrder;
         /// Background options
         ColourValue mBackColour;
+		Real mDepthClearValue;
         bool mClearEveryFrame;
 		unsigned int mClearBuffers;
         bool mUpdated;

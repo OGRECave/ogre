@@ -1477,7 +1477,8 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 	{
 		mDestRenderSystem->clearFrameBuffer(
 			mCurrentViewport->getClearBuffers(), 
-			mCurrentViewport->getBackgroundColour());
+			mCurrentViewport->getBackgroundColour(),
+			mCurrentViewport->getDepthClear() );
 	}        
     // Begin the frame
     mDestRenderSystem->_beginFrame();

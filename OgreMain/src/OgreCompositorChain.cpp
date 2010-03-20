@@ -266,6 +266,7 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
 	CompositionTargetPass* passParent = pass->getParent();
 	if (pass->getClearBuffers() != mViewport->getClearBuffers() ||
 		pass->getClearColour() != mViewport->getBackgroundColour() ||
+		pass->getClearDepth() != mViewport->getDepthClear() ||
 		passParent->getVisibilityMask() != mViewport->getVisibilityMask() ||
 		passParent->getMaterialScheme() != mViewport->getMaterialScheme() ||
 		passParent->getShadowsEnabled() != mViewport->getShadowsEnabled())
@@ -273,6 +274,7 @@ void CompositorChain::preViewportUpdate(const RenderTargetViewportEvent& evt)
 		// recompile if viewport settings are different
 		pass->setClearBuffers(mViewport->getClearBuffers());
 		pass->setClearColour(mViewport->getBackgroundColour());
+		pass->setClearDepth(mViewport->getDepthClear());
 		passParent->setVisibilityMask(mViewport->getVisibilityMask());
 		passParent->setMaterialScheme(mViewport->getMaterialScheme());
 		passParent->setShadowsEnabled(mViewport->getShadowsEnabled());
@@ -404,6 +406,7 @@ void CompositorChain::_compile()
 	CompositionPass* pass = mOriginalScene->getTechnique()->getOutputTargetPass()->getPass(0);
 	pass->setClearBuffers(mViewport->getClearBuffers());
 	pass->setClearColour(mViewport->getBackgroundColour());
+	pass->setClearDepth(mViewport->getDepthClear());
     for(Instances::iterator i=mInstances.begin(); i!=mInstances.end(); ++i)
     {
         if((*i)->getEnabled())

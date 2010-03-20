@@ -50,6 +50,7 @@ namespace Ogre {
         // Actual dimensions will update later
         , mZOrder(ZOrder)
         , mBackColour(ColourValue::Black)
+		, mDepthClearValue(1)
         , mClearEveryFrame(true)
 		, mClearBuffers(FBT_COLOUR | FBT_DEPTH)
         , mUpdated(false)
@@ -280,6 +281,16 @@ namespace Ogre {
         return mBackColour;
     }
     //---------------------------------------------------------------------
+	void Viewport::setDepthClear( Real depth )
+    {
+        mDepthClearValue = depth;
+    }
+    //---------------------------------------------------------------------
+    Real Viewport::getDepthClear(void) const
+    {
+        return mDepthClearValue;
+    }
+	//---------------------------------------------------------------------
     void Viewport::setClearEveryFrame(bool clear, unsigned int buffers)
     {
         mClearEveryFrame = clear;
