@@ -94,8 +94,8 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld,
 	vec3 vWorldNormal = (mWorld * vec4(vNormal, 1.0)).xyz;
 	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
 
-	vOut.x = (vViewNormal.x / 2.0) + 0.5;
-	vOut.y = (-vViewNormal.y / 2.0) + 0.5;
+	vOut.x = vViewNormal.x/2.0 + 0.5;
+	vOut.y = -vViewNormal.y/2.0 + 0.5;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,8 +110,8 @@ void FFP_GenerateTexCoord_EnvMap_Sphere(in mat4 mWorld,
 
 	vec2 vSphereCoords;
 
-	vSphereCoords.x = (vViewNormal.x / 2.0) + 0.5;
-	vSphereCoords.y = (-vViewNormal.y / 2.0) + 0.5;
+	vSphereCoords.x = vViewNormal.x/2.0 + 0.5;
+	vSphereCoords.y = -vViewNormal.y/2.0 + 0.5;
 	
 	vOut = (mTexture * vec4(vSphereCoords, 0.0, 0.0)).xy;
 }

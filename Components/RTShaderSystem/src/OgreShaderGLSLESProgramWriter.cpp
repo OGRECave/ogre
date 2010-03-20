@@ -506,7 +506,7 @@ namespace Ogre {
                             break;
                         }				
                         
-                        //  Swizzle masks are only defined for types like vec2, vec3, vec4.
+                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
                         if (opMask == Operand::OPM_ALL)
                         {
                             gpuType = pParam->getType();
@@ -549,11 +549,14 @@ namespace Ogre {
             std::sort(forwardDecl.begin(), forwardDecl.end());
             StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
             
-            // Parse the source shader and write out only the needed function
+            // Parse the source shader and write out only the needed functions
             // Iterate through each library
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
             {
                 const String& curDependency = program->getDependency(i);
+
+                StringMap functionCache;
+                functionCache.clear();
 
                 // GLSL ES does not have the transpose function.  If we are using the
                 // FFP Texturing library there is a good chance that we'll need it.
@@ -622,15 +625,30 @@ namespace Ogre {
                         }
                         else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
                         {
-                            // Try to identify a function definition
-
                             String function;
 
-                            // First, look for a return type
+                            // Break up the line.
                             StringVector tokens = StringUtil::tokenise(line, " (\n\r");
 
+                            // Always copy #defines
+                            if(tokens[0] == "#define")
+                            {
+                                // Add the line in
+                                os << line;
+                                
+                                // Also add a newline because it got stripped out a few lines up
+                                os << "\n";
+                                
+                                // Move on to the next line in the shader
+                                continue;
+                            }
+                            
+                            // Try to identify a function definition
+                            // First, look for a return type
                             if(isBasicType(tokens[0]))
                             {
+                                String functionName;
+                                
                                 // Return type
                                 function += tokens[0];
                                 function += " ";
@@ -638,6 +656,7 @@ namespace Ogre {
                                 // Function name
                                 function += tokens[1];
                                 function += "(";
+                                functionName = tokens[1];
                                 
                                 bool foundEndOfSignature = false;
                                 // Now look for all the parameters, they may span multiple lines
@@ -723,14 +742,42 @@ namespace Ogre {
 
                                     String::size_type brace_pos = line.find('{', 0);
                                     if(brace_pos != String::npos)
+                                    {
                                         braceCount++;
+                                    }
 
+                                    // Look for non-builtin functions
+                                    // Do so by assuming that these functions do not have several variations.
+                                    // Also, because GLSL is C based, functions must be defined before they are used
+                                    // so we can make the assumption that we already have this function cached.
+                                    //
+                                    // If we find a function, look it up in the map and write it out
+                                    StringUtil::trim(line);
+                                    StringVector tokens = StringUtil::split(line, "(");
+                                    for (StringVector::iterator it = tokens.begin(); it != tokens.end(); it++)
+                                    {
+                                        StringVector moreTokens = StringUtil::split(*it, " ");
+                                            
+                                        if(!functionCache[moreTokens.back()].empty())
+                                        {
+                                            String func = functionCache[moreTokens.back()];
+                                            os << functionCache[moreTokens.back()];
+                                            
+                                            // Because we don't want to write it out twice, remove from the cache
+                                            functionCache.erase(moreTokens.back());
+                                        }
+                                    }
+                                    
                                     brace_pos = line.find('}', 0);
                                     if(brace_pos != String::npos)
                                         braceCount--;
 
                                     if(braceCount == 0)
                                         foundEndOfBody = true;
+                                    
+                                    // Save function here to our cache
+                                    functionCache[functionName] = function;
+
                                     line = stream->getLine();
                                 }
 

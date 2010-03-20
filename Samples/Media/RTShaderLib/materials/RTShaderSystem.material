@@ -58,11 +58,11 @@ material RTSS/NormalMapping_SinglePass
 	}
 }
 
-// This is a multi pass nroaml map lighting based material.
+// This is a multi pass normal map lighting based material.
 // It acts as any other multi light material.
 // This material defined to use only one type of light per lighting pass because the RTSS need to
 // know what code to produce for the iterative lighting pass, otherwise it will throw an exception.
-// It support any number of lights drawing but it uses more geometery drawing. 
+// It support any number of lights drawing but it uses more geometry drawing. 
 // Use this method when your scene uses large amount of lights. (3-8).
 material RTSS/NormalMapping_MultiPass
 {
@@ -207,7 +207,7 @@ material RTSS/LayeredBlending
 
 			texture_unit
 			{
-				// RT Shader system section - required by the comming layered blend extension.
+				// RT Shader system section - required by the layered blend extension.
 				rtshader_system
 				{
 					layered_blend blend_luminosity
