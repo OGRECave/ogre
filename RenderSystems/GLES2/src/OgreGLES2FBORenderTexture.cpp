@@ -100,10 +100,12 @@ namespace Ogre {
     static const GLenum depthFormats[] =
     {
         GL_NONE,
-        GL_DEPTH_COMPONENT16,
-        GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
+        GL_DEPTH_COMPONENT16
+#if GL_OES_depth24
+        , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
+#endif
 #if GL_OES_packed_depth_stencil        
-        , GL_DEPTH24_STENCIL8_OES  // Packed depth / stencil
+        , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
 #endif
     };
     static const size_t depthBits[] =
@@ -294,6 +296,7 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
+#if GL_OES_packed_depth_stencil        
                     if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
                     {
                         // General depth/stencil combination
@@ -318,6 +321,7 @@ namespace Ogre {
                         }
                     }
                     else
+#endif
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))
@@ -381,8 +385,10 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
+#if GL_OES_packed_depth_stencil        
 			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
 				desirability += 5000;
+#endif
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
             if(desirability>bestscore)

@@ -29,6 +29,9 @@ THE SOFTWARE.
 #ifndef __GLES2Prerequisites_H__
 #define __GLES2Prerequisites_H__
 
+#include "OgrePrerequisites.h"
+#include "OgreMath.h"
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #	if !defined( __MINGW32__ )
 #		ifndef WIN32_LEAN_AND_MEAN
@@ -43,9 +46,6 @@ THE SOFTWARE.
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
 
-#include "OgrePrerequisites.h"
-#include "OgreMath.h"
-
 #if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
 #   include <OpenGLES/ES2/gl.h>
 #   include <OpenGLES/ES2/glext.h>
@@ -59,7 +59,32 @@ THE SOFTWARE.
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
 #   include <EGL/egl.h>
-#endif
+
+// Function pointers for FBO extension methods
+// Declare them here since we don't have GLEW to do it for us
+
+#	ifndef GL_GLEXT_PROTOTYPES
+extern PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
+extern PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
+extern PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
+extern PFNGLGENRENDERBUFFERSOESPROC glGenRenderbuffersOES;
+extern PFNGLRENDERBUFFERSTORAGEOESPROC glRenderbufferStorageOES;
+extern PFNGLGETRENDERBUFFERPARAMETERIVOESPROC glGetRenderbufferParameterivOES;
+extern PFNGLISFRAMEBUFFEROESPROC glIsFramebufferOES;
+extern PFNGLBINDFRAMEBUFFEROESPROC glBindFramebufferOES;
+extern PFNGLDELETEFRAMEBUFFERSOESPROC glDeleteFramebuffersOES;
+extern PFNGLGENFRAMEBUFFERSOESPROC glGenFramebuffersOES;
+extern PFNGLCHECKFRAMEBUFFERSTATUSOESPROC glCheckFramebufferStatusOES;
+extern PFNGLFRAMEBUFFERRENDERBUFFEROESPROC glFramebufferRenderbufferOES;
+extern PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
+extern PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
+extern PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
+extern PFNGLBLENDEQUATIONOESPROC glBlendEquationOES;
+extern PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
+extern PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
+extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
+extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+#	endif
 
 // If we are going to use the PVRTC_CODEC make sure we
 // setup the needed constants
@@ -72,6 +97,9 @@ THE SOFTWARE.
 #		define GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
 #	endif
 #endif
+
+#endif
+
 
 // Define GL_NONE for convenience
 #define GL_NONE 0

@@ -190,6 +190,7 @@ namespace Ogre {
     {
         if(mUseShadowBuffer)
         {
+            // Get data from the shadow buffer
             void* srcData = mpShadowBuffer->lock(offset, length, HBL_READ_ONLY);
             memcpy(pDest, srcData, length);
             mpShadowBuffer->unlock();

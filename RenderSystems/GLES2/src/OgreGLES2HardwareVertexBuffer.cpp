@@ -170,7 +170,7 @@ namespace Ogre {
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
 					"Buffer data corrupted, please reload", 
-					"GLHardwareVertexBuffer::unlock");
+					"GLES2HardwareVertexBuffer::unlock");
 			}
 #else
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,

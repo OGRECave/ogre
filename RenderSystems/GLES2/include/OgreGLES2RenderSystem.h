@@ -129,6 +129,11 @@ namespace Ogre {
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
 
+            /** OpenGL ES doesn't support setting the PolygonMode like desktop GL
+                So we will cache the value and set it manually
+             */
+            GLenum mPolygonMode;
+
             GLuint getCombinedMinMipFilter(void) const;
 
             GLES2GpuProgram* mCurrentVertexProgram;
@@ -482,6 +487,8 @@ namespace Ogre {
 
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);
+
+            GLenum _getPolygonMode(void) { return mPolygonMode; }
 
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);

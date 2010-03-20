@@ -43,10 +43,37 @@ THE SOFTWARE.
 #   include "OgreEAGL2Window.h"
 #else
 #   include "OgreEGLWindow.h"
+#	ifndef GL_GLEXT_PROTOTYPES
+    // Function pointers for FBO extension
+    PFNGLISRENDERBUFFEROESPROC glIsRenderbufferOES;
+    PFNGLBINDRENDERBUFFEROESPROC glBindRenderbufferOES;
+    PFNGLDELETERENDERBUFFERSOESPROC glDeleteRenderbuffersOES;
+    PFNGLGENRENDERBUFFERSOESPROC glGenRenderbuffersOES;
+    PFNGLRENDERBUFFERSTORAGEOESPROC glRenderbufferStorageOES;
+    PFNGLGETRENDERBUFFERPARAMETERIVOESPROC glGetRenderbufferParameterivOES;
+    PFNGLISFRAMEBUFFEROESPROC glIsFramebufferOES;
+    PFNGLBINDFRAMEBUFFEROESPROC glBindFramebufferOES;
+    PFNGLDELETEFRAMEBUFFERSOESPROC glDeleteFramebuffersOES;
+    PFNGLGENFRAMEBUFFERSOESPROC glGenFramebuffersOES;
+    PFNGLCHECKFRAMEBUFFERSTATUSOESPROC glCheckFramebufferStatusOES;
+    PFNGLFRAMEBUFFERRENDERBUFFEROESPROC glFramebufferRenderbufferOES;
+    PFNGLFRAMEBUFFERTEXTURE2DOESPROC glFramebufferTexture2DOES;
+    PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVOESPROC glGetFramebufferAttachmentParameterivOES;
+    PFNGLGENERATEMIPMAPOESPROC glGenerateMipmapOES;
+	PFNGLBLENDEQUATIONOESPROC glBlendEquationOES;
+	PFNGLBLENDFUNCSEPARATEOESPROC glBlendFuncSeparateOES;
+	PFNGLBLENDEQUATIONSEPARATEOESPROC glBlendEquationSeparateOES;
+    PFNGLMAPBUFFEROESPROC glMapBufferOES;
+    PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+#	endif
+
 #endif
 
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+// Copy this definition from desktop GL.  Used for polygon modes.
+#define GL_FILL    0x1B02
 
 namespace Ogre {
     GLES2RenderSystem::GLES2RenderSystem()
@@ -84,8 +111,9 @@ namespace Ogre {
         mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
-		mCurrentVertexProgram = 0;
-		mCurrentFragmentProgram = 0;
+        mCurrentVertexProgram = 0;
+        mCurrentFragmentProgram = 0;
+        mPolygonMode = GL_FILL;
     }
 
     GLES2RenderSystem::~GLES2RenderSystem()
@@ -204,6 +232,8 @@ namespace Ogre {
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+        rsc->setNumMultiRenderTargets(OGRE_MAX_MULTIPLE_RENDER_TARGETS);
+        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
         // Cube map
         rsc->setCapability(RSC_CUBEMAPPING);
@@ -694,87 +724,19 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
-//        mTextureCoordIndex[stage] = index;
+        // Not supported
     }
 
     void GLES2RenderSystem::_setTextureCoordCalculation(size_t stage,
                                                        TexCoordCalcMethod m,
                                                        const Frustum* frustum)
     {
-        if (stage >= mFixedFunctionTextureUnits)
-        {
-            // Can't do this
-            return;
-        }
-
-        GLfloat M[16];
-        Matrix4 projectionBias;
-
-        // Default to no extra auto texture matrix
-        mUseAutoTextureMatrix = false;
-
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
-
-        switch(m)
-        {
-            case TEXCALC_NONE:
-                break;
-
-            case TEXCALC_ENVIRONMENT_MAP:
-                mUseAutoTextureMatrix = true;
-                memset(mAutoTextureMatrix, 0, sizeof(GLfloat)*16);
-                mAutoTextureMatrix[0] = mAutoTextureMatrix[10] = mAutoTextureMatrix[15] = 1.0f;
-                mAutoTextureMatrix[5] = -1.0f;
-                break;
-
-            case TEXCALC_ENVIRONMENT_MAP_PLANAR:
-                // TODO not implemented
-                break;
-
-            case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
-                // We need an extra texture matrix here
-                // This sets the texture matrix to be the inverse of the view matrix
-                mUseAutoTextureMatrix = true;
-                makeGLMatrix(M, mViewMatrix);
-
-                // Transpose 3x3 in order to invert matrix (rotation)
-                // Note that we need to invert the Z _before_ the rotation
-                // No idea why we have to invert the Z at all, but reflection is wrong without it
-                mAutoTextureMatrix[0] = M[0]; mAutoTextureMatrix[1] = M[4]; mAutoTextureMatrix[2] = -M[8];
-                mAutoTextureMatrix[4] = M[1]; mAutoTextureMatrix[5] = M[5]; mAutoTextureMatrix[6] = -M[9];
-                mAutoTextureMatrix[8] = M[2]; mAutoTextureMatrix[9] = M[6]; mAutoTextureMatrix[10] = -M[10];
-                mAutoTextureMatrix[3] = mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
-                mAutoTextureMatrix[12] = mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
-                mAutoTextureMatrix[15] = 1.0f;
-                break;
-
-            case TEXCALC_ENVIRONMENT_MAP_NORMAL:
-                break;
-
-            case TEXCALC_PROJECTIVE_TEXTURE:
-                mUseAutoTextureMatrix = true;
-
-                // Set scale and translation matrix for projective textures
-                projectionBias = Matrix4::CLIPSPACE2DTOIMAGESPACE;
-
-                projectionBias = projectionBias * frustum->getProjectionMatrix();
-                projectionBias = projectionBias * frustum->getViewMatrix();
-                projectionBias = projectionBias * mWorldMatrix;
-
-                makeGLMatrix(mAutoTextureMatrix, projectionBias);
-                break;
-
-            default:
-                break;
-        }
-
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+        // Not supported
     }
 
     void GLES2RenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)
     {
+        // Not supported
     }
 
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
@@ -1324,7 +1286,19 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setPolygonMode(PolygonMode level)
     {
-        // Not supported
+        switch(level)
+        {
+        case PM_POINTS:
+            mPolygonMode = GL_POINTS;
+            break;
+        case PM_WIREFRAME:
+            mPolygonMode = GL_LINE_STRIP;
+            break;
+        default:
+        case PM_SOLID:
+            mPolygonMode = GL_FILL;
+            break;
+        }
     }
 
     void GLES2RenderSystem::setStencilCheckEnabled(bool enabled)
@@ -1710,7 +1684,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 				GL_CHECK_ERROR;
-                glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
+                glDrawElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexCount, indexType, pBufferData);
                 GL_CHECK_ERROR;
             } while (updatePassIterationRenderState());
         }
@@ -1725,7 +1699,7 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
-                glDrawArrays(primType, 0, op.vertexData->vertexCount);
+                glDrawArrays((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), 0, op.vertexData->vertexCount);
                 GL_CHECK_ERROR;
             } while (updatePassIterationRenderState());
         }
