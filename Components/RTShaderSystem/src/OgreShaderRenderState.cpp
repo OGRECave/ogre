@@ -83,7 +83,33 @@ void RenderState::getLightCount(int lightCount[3]) const
 //-----------------------------------------------------------------------
 void RenderState::addTemplateSubRenderState(SubRenderState* subRenderState)
 {
-	mSubRenderStateList.push_back(subRenderState);	
+	bool addSubRenderState = true;
+
+	// Go over the current sub render state.
+	for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
+	{
+		// Case the same instance already exists -> do not add to list.
+		if (*it == subRenderState)
+		{
+			addSubRenderState = false;
+			break;
+		}
+
+		// Case it is different sub render state instance with the same type, use the new sub render state
+		// instead of the previous sub render state. This scenario is usually caused by material inheritance, so we use the derived material sub render state
+		// and destroy the base sub render state.
+		else if ((*it)->getType() == subRenderState->getType())
+		{
+			removeTemplateSubRenderState(*it);
+			break;
+		}
+	}
+
+	// Add only if this sub render state instance is not on the list.
+	if (addSubRenderState)
+	{
+		mSubRenderStateList.push_back(subRenderState);	
+	}	
 }
 
 //-----------------------------------------------------------------------

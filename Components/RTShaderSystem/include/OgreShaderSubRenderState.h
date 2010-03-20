@@ -254,6 +254,15 @@ public:
 	*/
 	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) { return NULL; }
 
+	/** Create an instance of the SubRenderState based on script properties.	
+	This method is called in the context of script parsing and let this factory
+	the opportunity to create custom SubRenderState instances based on extended script properties.
+	@param compiler The compiler instance.
+	@param prop The abstract property node.
+	@param texState The pass that is the parent context of this node.
+	*/
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) { return NULL; }
+
 	/** Destroy the given instance.	
 	@param subRenderState The instance to destroy.
 	*/
@@ -270,10 +279,20 @@ public:
 	@param ser The material serializer instace.
 	@param subRenderState The sub render state instance to write down.
 	@param srcPass The source pass.
-	@pass dstPass The generated shader based pass.
+	@param dstPass The generated shader based pass.
 	*/
 	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) {}
 
+	/** Write the given sub-render state instance using the material serializer.
+	This method is called in the context of material serialization. It is useful for integrating into
+	bigger context of material exporters from various environment that want to take advantage of the RT Shader System.
+	Sub classes of this interface should override in case they need to write custom properties into the script context.
+	@param ser The material serializer instace.
+	@param subRenderState The sub render state instance to write down.
+	@param srcTextureUnit The source texture unit state.
+	@param dstTextureUnit The generated shader based texture unit state.
+	*/
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit) {}
 protected:
 	/** Create instance implementation method. Each sub class of this interface
 	must implement this method in which it will allocate the specific sub class of 

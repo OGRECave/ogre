@@ -35,6 +35,12 @@ namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------------
+SGScriptTranslator::SGScriptTranslator() :
+	mGeneratedRenderState(NULL)
+{
+}
+
+//-----------------------------------------------------------------------------
 void SGScriptTranslator::translate(ScriptCompiler* compiler, const AbstractNodePtr &node)
 {
 	ObjectAbstractNode* obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
@@ -50,48 +56,88 @@ void SGScriptTranslator::translate(ScriptCompiler* compiler, const AbstractNodeP
 		translateTextureUnit(compiler, node);
 	}
 }
+
+//-----------------------------------------------------------------------------
+SubRenderState* SGScriptTranslator::getGeneratedSubRenderState(const String& typeName)
+{
+	//check if we are in the middle of parsing
+	if (mGeneratedRenderState)
+	{
+		/** Get the list of the template sub render states composing this render state. */
+		const SubRenderStateList& rsList =
+			mGeneratedRenderState->getTemplateSubRenderStateList();
+		
+		SubRenderStateList::const_iterator it = rsList.begin();
+		SubRenderStateList::const_iterator itEnd = rsList.end();
+		for(; it != itEnd; ++it)
+		{
+			if ((*it)->getType() == typeName)
+				return *it;
+		}
+	}
+	return NULL;
+}
 	
-//-----------------------------------------------------------------------------
-SGScriptTranslator::TexturesParamCollection SGScriptTranslator::getParamCollection()
-{
-	return mParamCollection;
-}
-
-//-----------------------------------------------------------------------------
-void SGScriptTranslator::clearParamCollection()
-{
-	mParamCollection.clear();
-}
-
 //-----------------------------------------------------------------------------
 /*
 note: we can know the texture unit index by getting parent then finding it in the list of children
 */
 void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const AbstractNodePtr &node)
 {
-	ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-	TextureUnitState* textureUnitState = any_cast<TextureUnitState*>(obj->parent->context);	
-	String strValue = "";
+	ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());	
+	TextureUnitState* texState = any_cast<TextureUnitState*>(obj->parent->context);
+	Pass* pass = texState->getParent();
+	Technique* technique = pass->getParent();
+	Material* material = technique->getParent();
+	ShaderGenerator* shaderGenerator = ShaderGenerator::getSingletonPtr();
+	String dstTechniqueSchemeName = obj->name;
+	bool techniqueCreated;
+
+	// Make sure the scheme name is valid - use default if none exists.
+	if (dstTechniqueSchemeName.empty())	
+		dstTechniqueSchemeName = ShaderGenerator::DEFAULT_SCHEME_NAME;	
+
+
+	//check if technique already created
+	techniqueCreated = shaderGenerator->hasShaderBasedTechnique(material->getName(), 
+		technique->getSchemeName(), 
+		dstTechniqueSchemeName);
 	
-	Properties properties;
-	for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+	if (techniqueCreated == false)
 	{
-		if((*i)->type == ANT_PROPERTY)
-		{
-			PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
-			AbstractNodeList::const_iterator it = prop->values.begin();
-			PropertyValues propertyValues;
-			for( ;it != prop->values.end(); ++it)
-			{
-				if(true == SGScriptTranslator::getString(*it, &strValue))
-				{
-					propertyValues.push_back(strValue);
-				}
-			}
-			properties[prop->name] = propertyValues;
-		}
+		// Create the shader based technique.
+		techniqueCreated = shaderGenerator->createShaderBasedTechnique(material->getName(), 
+			technique->getSchemeName(), 
+			dstTechniqueSchemeName);
 	}
-	mParamCollection[textureUnitState] = properties;
+
+
+					
+	// Case technique successfully created.
+	if (techniqueCreated)
+	{
+		//Attempt to get the render state which might have been created by the pass parsing
+		mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
+	
+		// Go over all the render state properties.
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				SubRenderState* subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, texState, this);
+				
+				if (subRenderState)
+					addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), pass->getIndex());
+			}
+			else
+			{
+				processNode(compiler, *i);
+			}
+		}
+
+		mGeneratedRenderState = NULL;
+	}	
 }
 
 
@@ -158,13 +204,8 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 				else
 				{
 					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass, this);
-					if (subRenderState != NULL)
-					{
-						shaderGenerator->createScheme(dstTechniqueSchemeName);
-						RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
-
-						renderState->addTemplateSubRenderState(subRenderState);
-					}
+					if (subRenderState)
+						addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), pass->getIndex());
 				}				
 			}
 			else
@@ -172,7 +213,29 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 				processNode(compiler, *i);
 			}
 		}
-	}	
+
+		mGeneratedRenderState = NULL;
+	}
+
+}
+
+//-----------------------------------------------------------------------------
+void SGScriptTranslator::addSubRenderState(SubRenderState* newSubRenderState, 
+		const String& dstTechniqueSchemeName, const String& materialName, unsigned short passIndex)
+{
+	assert(newSubRenderState);
+
+	//check if a different sub render state of the same type already exists
+	ShaderGenerator* shaderGenerator = ShaderGenerator::getSingletonPtr();
+	
+	//create a new scheme if needed
+	shaderGenerator->createScheme(dstTechniqueSchemeName);
+	
+	//update the active render state
+	mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, materialName, passIndex);
+
+	//add the new sub render state
+	mGeneratedRenderState->addTemplateSubRenderState(newSubRenderState);
 }
 
 }

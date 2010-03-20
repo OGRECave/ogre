@@ -410,6 +410,28 @@ SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler,
 	return subRenderState;
 }
 
+
+//-----------------------------------------------------------------------------
+SubRenderState*	ShaderGenerator::createSubRenderState(ScriptCompiler* compiler, 
+													  PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	SubRenderStateFactoryIterator it = mSubRenderStateFactories.begin();
+	SubRenderStateFactoryIterator itEnd = mSubRenderStateFactories.end();
+	SubRenderState* subRenderState = NULL;
+
+	while (it != itEnd)
+	{
+		subRenderState = it->second->createInstance(compiler, prop, texState, translator);
+		if (subRenderState != NULL)		
+			break;				
+		++it;
+	}	
+
+	return subRenderState;
+}
+
 //-----------------------------------------------------------------------------
 void ShaderGenerator::createScheme(const String& schemeName)
 {
@@ -525,6 +547,40 @@ void ShaderGenerator::setFragmentShaderProfiles(const String& fragmentShaderProf
 	mFragmentShaderProfilesList = StringUtil::split(fragmentShaderProfiles);
 }
 
+
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
+												 const String& srcTechniqueSchemeName, 
+												 const String& dstTechniqueSchemeName) const
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	// Make sure material exists;
+	if (false == MaterialManager::getSingleton().resourceExists(materialName))
+		return false;
+
+	
+	SGMaterialConstIterator itMatEntry = mMaterialEntriesMap.find(materialName);
+	
+	// Check if technique already created.
+	if (itMatEntry != mMaterialEntriesMap.end())
+	{
+		const SGTechniqueList& techniqueEntires = itMatEntry->second->getTechniqueList();
+		SGTechniqueConstIterator itTechEntry = techniqueEntires.begin();
+
+		for (; itTechEntry != techniqueEntires.end(); ++itTechEntry)
+		{
+			// Check requested mapping already exists.
+			if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTechniqueSchemeName &&
+				(*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName &&
+				(*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
+			{
+				return true;
+			}			
+		}
+	}
+	return false;
+}
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::createShaderBasedTechnique(const String& materialName, 
 												 const String& srcTechniqueSchemeName, 
@@ -936,15 +992,14 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 	ser->beginSection(3);
 
 	// Grab the custom render state this pass uses.
-	RenderState* customenderState = passEntry->getCustomRenderState();
+	RenderState* customRenderState = passEntry->getCustomRenderState();
 
-	if (customenderState != NULL)
+	if (customRenderState != NULL)
 	{
 		// Write each of the sub-render states that composing the final render state.
-		const SubRenderStateList& subRenderStates = customenderState->getTemplateSubRenderStateList();
+		const SubRenderStateList& subRenderStates = customRenderState->getTemplateSubRenderStateList();
 		SubRenderStateListConstIterator it		= subRenderStates.begin();
 		SubRenderStateListConstIterator itEnd	= subRenderStates.end();
-
 
 		for (; it != itEnd; ++it)
 		{
@@ -954,7 +1009,6 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 			if (itFactory != mSubRenderStateFactories.end())
 			{
 				SubRenderStateFactory* curFactory = itFactory->second;
-
 				curFactory->writeInstance(ser, curSubRenderState, passEntry->getSrcPass(), passEntry->getDstPass());
 			}
 		}
@@ -962,6 +1016,51 @@ void ShaderGenerator::serializePassAttributes(MaterialSerializer* ser, SGPass* p
 	
 	// Write section end.
 	ser->endSection(3);		
+}
+
+
+
+//-----------------------------------------------------------------------------
+void ShaderGenerator::serializeTextureUnitStateAttributes(MaterialSerializer* ser, SGPass* passEntry, const TextureUnitState* srcTextureUnit)
+{
+	
+	// Write section header and begin it.
+	ser->writeAttribute(4, "rtshader_system");
+	ser->beginSection(4);
+
+	// Grab the custom render state this pass uses.
+	RenderState* customRenderState = passEntry->getCustomRenderState();
+			
+	if (customRenderState != NULL)
+	{
+		//retrive the destintion texture unit state
+		TextureUnitState* dstTextureUnit = NULL;
+		unsigned short texIndex = srcTextureUnit->getParent()->getTextureUnitStateIndex(srcTextureUnit);
+		if (texIndex < passEntry->getDstPass()->getNumTextureUnitStates())
+		{
+			dstTextureUnit = passEntry->getDstPass()->getTextureUnitState(texIndex);
+		}
+		
+		// Write each of the sub-render states that composing the final render state.
+		const SubRenderStateList& subRenderStates = customRenderState->getTemplateSubRenderStateList();
+		SubRenderStateListConstIterator it		= subRenderStates.begin();
+		SubRenderStateListConstIterator itEnd	= subRenderStates.end();
+
+		for (; it != itEnd; ++it)
+		{
+			SubRenderState* curSubRenderState = *it;
+			SubRenderStateFactoryIterator itFactory = mSubRenderStateFactories.find(curSubRenderState->getType());
+
+			if (itFactory != mSubRenderStateFactories.end())
+			{
+				SubRenderStateFactory* curFactory = itFactory->second;
+				curFactory->writeInstance(ser, curSubRenderState, srcTextureUnit, dstTextureUnit);
+			}
+		}
+	}
+	
+	// Write section end.
+	ser->endSection(4);		
 }
 
 //-----------------------------------------------------------------------------

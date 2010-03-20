@@ -198,7 +198,7 @@ material RTSS/LayeredBlending
 	{
 		pass
 		{		
-		lighting off	
+			lighting off	
 			texture_unit
 			{
 				scale 0.1 0.1
@@ -213,14 +213,7 @@ material RTSS/LayeredBlending
 					layered_blend blend_luminosity
 				}
 				texture ogrelogo.png
-			}
-			
-			// RT Shader system section.
-			rtshader_system
-			{
-				// Override texturing stage with extended texture layered blend model.
-				texturing_stage layered_blend
-			}
+			}						
 		}
 	}
 }

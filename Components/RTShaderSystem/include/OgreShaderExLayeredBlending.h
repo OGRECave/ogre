@@ -45,6 +45,7 @@ class _OgreRTSSExport LayeredBlending : public FFPTexturing
 public:
 	enum BlendMode
 	{
+		LB_Invalid = -1,
 		LB_FFPBlend,
 		LB_BlendNormal,
 		LB_BlendLighten,			
@@ -91,12 +92,12 @@ public:
 	@param index The texture unit texture. Textures units (index-1) and (index) will be blended.
 	@param mode The blend mode to apply.
 	*/
-	void setBlendMode(int index, BlendMode mode);
+	void setBlendMode(unsigned short index, BlendMode mode);
 
 	/** 
 	Return the blend mode of the given texture unit index.
 	*/
-	BlendMode getBlendMode(int index) const;
+	BlendMode getBlendMode(unsigned short index) const;
 
 	/** 
 	@see SubRenderState::copyFrom.
@@ -148,12 +149,12 @@ public:
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit);
 
 	
 protected:
@@ -167,6 +168,10 @@ protected:
 	@Converts string to Enum
 	*/
 	LayeredBlending::BlendMode stringToBlendMode(const String &strValue);
+	/** 
+	@Converts Enum to string
+	*/
+	String blendModeToString(LayeredBlending::BlendMode blendMode);
 };
 
 }

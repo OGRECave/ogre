@@ -35,6 +35,47 @@ namespace RTShader {
 
 String LayeredBlending::Type = "LayeredBlendRTSSEx";
 
+ struct BlendModeDescription {
+        /* Type of the blend mode */
+        LayeredBlending::BlendMode type;
+        /* name of the blend mode. */
+        const char* name;
+        /* shader function name . */
+        const char* funcName;
+    };
+
+BlendModeDescription _blendModes[(int)LayeredBlending::LB_MaxBlendModes] = {
+ 	{ LayeredBlending::LB_FFPBlend ,"blend_default", ""},
+	{ LayeredBlending::LB_BlendNormal ,"blend_normal", "SGX_blend_normal"},
+	{ LayeredBlending::LB_BlendLighten,"blend_lighten", "SGX_blend_lighten"},
+	{ LayeredBlending::LB_BlendDarken ,"blend_darken", "SGX_blend_darken"},
+	{ LayeredBlending::LB_BlendMultiply ,"blend_multiply", "SGX_blend_multiply"},
+	{ LayeredBlending::LB_BlendAverage ,"blend_average", "SGX_blend_average"},
+	{ LayeredBlending::LB_BlendAdd ,"blend_add", "SGX_blend_add"},
+	{ LayeredBlending::LB_BlendSubtract ,"blend_subtract", "SGX_blend_subtract"},
+	{ LayeredBlending::LB_BlendDifference ,"blend_difference", "SGX_blend_difference"},
+	{ LayeredBlending::LB_BlendNegation ,"blend_negation", "SGX_blend_negation"},
+	{ LayeredBlending::LB_BlendExclusion ,"blend_exclusion", "SGX_blend_exclusion"},
+	{ LayeredBlending::LB_BlendScreen ,"blend_screen", "SGX_blend_screen"},
+	{ LayeredBlending::LB_BlendOverlay ,"blend_overlay", "SGX_blend_overlay"},
+	{ LayeredBlending::LB_BlendHardLight ,"blend_hardLight", "SGX_blend_hardLight"},
+	{ LayeredBlending::LB_BlendSoftLight ,"blend_softLight", "SGX_blend_softLight"},
+	{ LayeredBlending::LB_BlendColorDodge ,"blend_colorDodge", "SGX_blend_colorDodge"},
+	{ LayeredBlending::LB_BlendColorBurn ,"blend_colorBurn", "SGX_blend_colorBurn"},
+	{ LayeredBlending::LB_BlendLinearDodge ,"blend_linearDodge", "SGX_blend_linearDodge"},
+	{ LayeredBlending::LB_BlendLinearBurn ,"blend_linearBurn", "SGX_blend_linearBurn"},
+	{ LayeredBlending::LB_BlendLinearLight ,"blend_linearLight", "SGX_blend_linearLight"},
+	{ LayeredBlending::LB_BlendVividLight ,"blend_vividLight", "SGX_blend_vividLight"},
+	{ LayeredBlending::LB_BlendPinLight ,"blend_pinLight", "SGX_blend_pinLight"},
+	{ LayeredBlending::LB_BlendHardMix ,"blend_hardMix", "SGX_blend_hardMix"},
+	{ LayeredBlending::LB_BlendReflect ,"blend_reflect", "SGX_blend_reflect"},
+	{ LayeredBlending::LB_BlendGlow ,"blend_glow", "SGX_blend_glow"},
+	{ LayeredBlending::LB_BlendPhoenix ,"blend_phoenix", "SGX_blend_phoenix"},
+	{ LayeredBlending::LB_BlendSaturation ,"blend_saturation", "SGX_blend_saturation"},
+	{ LayeredBlending::LB_BlendColor ,"blend_color", "SGX_blend_color"},
+	{ LayeredBlending::LB_BlendLuminosity, "blend_luminosity", "SGX_blend_luminosity"}
+	};
+		
 //-----------------------------------------------------------------------
 LayeredBlending::LayeredBlending()
 {
@@ -80,7 +121,6 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 {
 	FunctionInvocation* curFuncInvocation = NULL;
 
-	String funcName;
 	BlendMode mode = LB_FFPBlend;
 	
 	if (((size_t)samplerIndex < mBlendModes.size()) && (samplerIndex >= 0))
@@ -88,126 +128,53 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 		mode = mBlendModes[samplerIndex];
 	}
 
-	switch(mode)
+	if (LB_FFPBlend == mode)
 	{
-	case LB_FFPBlend:
 		FFPTexturing::addPSBlendInvocations(psMain, arg1, arg2, texel, samplerIndex, blendMode, groupOrder, internalCounter, targetChannels);
-		break;
-	case LB_BlendNormal:
-		funcName = "SGX_blend_normal";
-		break;
-	case LB_BlendLighten:
-		funcName = "SGX_blend_lighten";						
-		break;
-	case LB_BlendDarken:
-		funcName = "SGX_blend_darken";
-		break;
-	case LB_BlendMultiply:
-		funcName = "SGX_blend_multiply";
-		break;
-	case LB_BlendAverage:
-		funcName = "SGX_blend_average";						
-		break;
-	case LB_BlendAdd:
-		funcName = "SGX_blend_add";						
-		break;
-	case LB_BlendSubtract:
-		funcName = "SGX_blend_subtract";						
-		break;
-	case LB_BlendDifference:
-		funcName = "SGX_blend_difference";						
-		break;
-	case LB_BlendNegation:
-		funcName = "SGX_blend_negation";						
-		break;
-	case LB_BlendExclusion:
-		funcName = "SGX_blend_exclusion";						
-		break;
-	case LB_BlendScreen:
-		funcName = "SGX_blend_screen";						
-		break;
-	case LB_BlendOverlay:
-		funcName = "SGX_blend_overlay";						
-		break;
-	case LB_BlendHardLight:
-		funcName = "SGX_blend_hardLight";						
-		break;
-	case LB_BlendSoftLight:
-		funcName = "SGX_blend_softLight";						
-		break;
-	case LB_BlendColorDodge:
-		funcName = "SGX_blend_colorDodge";						
-		break;
-	case LB_BlendColorBurn:
-		funcName = "SGX_blend_colorBurn";						
-		break;	
-	case LB_BlendLinearDodge:
-		funcName = "SGX_blend_linearDodge";						
-		break;
-	case LB_BlendLinearBurn:
-		funcName = "SGX_blend_linearBurn";						
-		break;
-	case LB_BlendLinearLight:
-		funcName = "SGX_blend_linearLight";						
-		break;
-	case LB_BlendVividLight:
-		funcName = "SGX_blend_vividLight";						
-		break;
-	case LB_BlendPinLight:
-		funcName = "SGX_blend_pinLight";						
-		break;
-	case LB_BlendHardMix:
-		funcName = "SGX_blend_hardMix";						
-		break;
-	case LB_BlendReflect:
-		funcName = "SGX_blend_reflect";						
-		break;
-	case LB_BlendGlow:
-		funcName = "SGX_blend_glow";						
-		break;
-	case LB_BlendPhoenix:
-		funcName = "SGX_blend_phoenix";						
-		break;
-	case LB_BlendSaturation:
-		funcName = "SGX_blend_saturation";						
-		break;
-	case LB_BlendColor:
-		funcName = "SGX_blend_color";						
-		break;
-	case LB_BlendLuminosity:
-		funcName = "SGX_blend_luminosity";						
-		break;
 	}
-
-	if(mode != LB_FFPBlend)
+	else 
 	{
-		curFuncInvocation = OGRE_NEW FunctionInvocation(funcName, groupOrder, internalCounter++);
-		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
-		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
-		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);	
+		//find the function name for the blend mode
+		String funcName;
+		for(int i = 0 ; i < (int)LayeredBlending::LB_MaxBlendModes ; ++i)
+		{
+			if (_blendModes[i].type == mode)
+			{
+				funcName = _blendModes[i].funcName;
+				break;
+			}
+		}
+
+		//add the function of the blend mode
+		if (funcName.empty() == false)
+		{
+			curFuncInvocation = OGRE_NEW FunctionInvocation(funcName, groupOrder, internalCounter++);
+			curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
+			curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
+			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
+			psMain->addAtomInstace(curFuncInvocation);	
+		}
 	}
 }
 
 //-----------------------------------------------------------------------
-void LayeredBlending::setBlendMode(int index, BlendMode mode)
+void LayeredBlending::setBlendMode(unsigned short index, BlendMode mode)
 {
-	if(mBlendModes.size() < index + 1)
+	if(mBlendModes.size() < (size_t)index + 1)
 	{
 		mBlendModes.resize(index + 1);
 	}
-	mBlendModes[index]= mode;
+	mBlendModes[index] = mode;
 }
 
 //-----------------------------------------------------------------------
-LayeredBlending::BlendMode LayeredBlending::getBlendMode(int index) const
+LayeredBlending::BlendMode LayeredBlending::getBlendMode(unsigned short index) const
 {
 	if(index < mBlendModes.size())
 	{
 		return mBlendModes[index];
 	}
-	
-	return LB_FFPBlend;
+	return LB_Invalid;
 }
 
 
@@ -220,73 +187,75 @@ const String& LayeredBlendingFactory::getType() const
 
 //-----------------------------------------------------------------------
 SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler, 
-													PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+									PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator)
 {
-	if (prop->name == "texturing_stage")
+	if (prop->name == "layered_blend")
 	{
-		String modelType;
-
-		if(false == SGScriptTranslator::getString(prop->values.front(), &modelType))
+		String blendType;
+		if(false == SGScriptTranslator::getString(prop->values.front(), &blendType))
 		{
 			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 			return NULL;
 		}
 
-		// Case mode type is not layered -> return NULL.
-		if (modelType != "layered_blend")
-			return NULL;
-			
-				
-		SGScriptTranslator::TexturesParamCollection paramCollection = translator->getParamCollection();
-		SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
-		LayeredBlending* LayeredBlendState = static_cast<LayeredBlending*>(subRenderState);
-		
-		String strValue = "blend_default";
-
-		SGScriptTranslator::TexturesParamCollection::const_iterator it = paramCollection.begin();
-		for( ;it != paramCollection.end(); ++it)
+		LayeredBlending::BlendMode blendMode = stringToBlendMode(blendType);
+		if (blendMode == LayeredBlending::LB_Invalid)
 		{
-			int index = 0;
-			TextureUnitState * textureUnitState = it->first;
-
-			Pass* pass = textureUnitState->getParent();
-			Pass::TextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
-			while(texIter.hasMoreElements())
-			{
-				TextureUnitState* pTex = texIter.getNext();
-				if(pTex == textureUnitState)
-				{
-					break;
-				}
-				++index;
-			}
-			
-			SGScriptTranslator::Properties properties = it->second;
-
-			SGScriptTranslator::Properties::const_iterator iter = properties.find("layered_blend");
-			if(iter != properties.end())
-			{
-				SGScriptTranslator::PropertyValues propValues = iter->second;
-				if(propValues.size() > 0)
-				{
-					strValue = propValues[0];
-				}
-			}
-			LayeredBlendState->setBlendMode(index, stringToBlendMode(strValue));
+			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+				"Expected one of the following blend modes: blend_default, blend_normal, " \
+				"blend_lighten, blend_darken, blend_multiply, blend_average, blend_add, " \
+				"blend_subtract, blend_difference, blend_negation, blend_exclusion, " \
+				"blend_screen, blend_overlay, blend_hardLight, blend_softLight, " \
+				"blend_colorDodge, blend_colorBurn, blend_linearDodge, blend_linearBurn, " \
+				"blend_linearLight, blend_vividLight, blend_pinLight, blend_hardMix, " \
+				"blend_reflect, blend_glow, blend_phoenix, blend_saturation, blend_color, blend_luminosity");
+			return NULL;
 		}
-		translator->clearParamCollection();
-		return subRenderState;								
-	}		
 
+		
+		//get the layer blend sub-render state to work on
+		LayeredBlending* layeredBlendState;
+		
+		//check if we already create a blend srs
+		SubRenderState*	subState = translator->getGeneratedSubRenderState(LayeredBlending::Type);
+		if (subState != NULL)
+		{
+			layeredBlendState = static_cast<LayeredBlending*>(subState);
+		}
+		else
+		{
+			SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+			layeredBlendState = static_cast<LayeredBlending*>(subRenderState);
+		}
 
+		//update the layer sub render state
+		unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
+		layeredBlendState->setBlendMode(texIndex, blendMode);
+
+		return layeredBlendState;
+	}
 	return NULL;
+		
 }
 
 //-----------------------------------------------------------------------
 void LayeredBlendingFactory::writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, 
-										Pass* srcPass, Pass* dstPass)
+										const TextureUnitState* srcTextureState, const TextureUnitState* dstTextureState)
 {
-	ser->writeAttribute(4, "layered_blend");	
+	unsigned short texIndex = srcTextureState->getParent()->
+		getTextureUnitStateIndex(srcTextureState);
+	
+	//get blend mode for current texture unit
+	LayeredBlending* layeredBlendingSubRenderState = static_cast<LayeredBlending*>(subRenderState);
+	LayeredBlending::BlendMode blendMode = layeredBlendingSubRenderState->getBlendMode(texIndex);
+
+	//write blend mode
+	if (blendMode != LayeredBlending::LB_Invalid)
+	{
+		ser->writeAttribute(5, "layered_blend");	
+		ser->writeValue(blendModeToString(blendMode));
+	}
+
 }
 
 //-----------------------------------------------------------------------
@@ -298,128 +267,31 @@ SubRenderState*	LayeredBlendingFactory::createInstanceImpl()
 //-----------------------------------------------------------------------
 LayeredBlending::BlendMode LayeredBlendingFactory::stringToBlendMode(const String &strValue)
 {
-	LayeredBlending::BlendMode mode;
+	for(int i = 0 ; i < (int)LayeredBlending::LB_MaxBlendModes ; ++i)
+	{
+		if (_blendModes[i].name == strValue)
+		{
+			return _blendModes[i].type;
+		}
+	}
+	return LayeredBlending::LB_Invalid;
+}
 
-	if (strValue == "blend_default")
+//-----------------------------------------------------------------------
+String LayeredBlendingFactory::blendModeToString(LayeredBlending::BlendMode blendMode)
+{
+	for(int i = 0 ; i < (int)LayeredBlending::LB_MaxBlendModes ; ++i)
 	{
-		mode = LayeredBlending::LB_FFPBlend;
+		if (_blendModes[i].type == blendMode)
+		{
+			return _blendModes[i].name;
+		}
 	}
-	else if (strValue == "blend_normal")
-	{
-		mode = LayeredBlending::LB_BlendNormal;
-	}
-	else if (strValue == "blend_lighten")
-	{
-		mode = LayeredBlending::LB_BlendLighten;
-	}
-	else if (strValue == "blend_darken")
-	{
-		mode = LayeredBlending::LB_BlendDarken;
-	}
-	else if (strValue == "blend_multiply")
-	{
-		mode = LayeredBlending::LB_BlendMultiply;
-	}
-	else if (strValue == "blend_average")
-	{
-		mode = LayeredBlending::LB_BlendAverage;
-	}
-	else if (strValue == "blend_add")
-	{
-		mode = LayeredBlending::LB_BlendAdd;
-	}
-	else if (strValue == "blend_subtract")
-	{
-		mode = LayeredBlending::LB_BlendSubtract;
-	}
-	else if (strValue == "blend_difference")
-	{
-		mode = LayeredBlending::LB_BlendDifference;
-	}				
-	else if (strValue == "blend_negation")
-	{
-		mode = LayeredBlending::LB_BlendNegation;
-	}				
-	else if (strValue == "blend_exclusion")
-	{
-		mode = LayeredBlending::LB_BlendExclusion;
-	}
-	else if (strValue == "blend_screen")
-	{
-		mode = LayeredBlending::LB_BlendScreen;
-	}
-	else if (strValue == "blend_overlay")
-	{
-		mode = LayeredBlending::LB_BlendOverlay;
-	}
-	else if (strValue == "blend_hardLight")
-	{
-		mode = LayeredBlending::LB_BlendHardLight;
-	}
-	else if (strValue == "blend_softLight")
-	{
-		mode = LayeredBlending::LB_BlendSoftLight;
-	}
-	else if (strValue == "blend_colorDodge")
-	{
-		mode = LayeredBlending::LB_BlendColorDodge;
-	}
-	else if (strValue == "blend_colorBurn")
-	{
-		mode = LayeredBlending::LB_BlendColorBurn;
-	}
-	else if (strValue == "blend_linearDodge")
-	{
-		mode = LayeredBlending::LB_BlendLinearDodge;
-	}
-	else if (strValue == "blend_linearBurn")
-	{
-		mode = LayeredBlending::LB_BlendLinearBurn;
-	}
-	else if (strValue == "blend_linearLight")
-	{
-		mode = LayeredBlending::LB_BlendLinearLight;
-	}
-	else if (strValue == "blend_vividLight")
-	{
-		mode = LayeredBlending::LB_BlendVividLight;
-	}
-	else if (strValue == "blend_pinLight")
-	{
-		mode = LayeredBlending::LB_BlendPinLight;
-	}
-	else if (strValue == "blend_hardMix")
-	{
-		mode = LayeredBlending::LB_BlendHardMix;
-	}
-	else if (strValue == "blend_reflect")
-	{
-		mode = LayeredBlending::LB_BlendReflect;
-	}
-	else if (strValue == "blend_glow")
-	{
-		mode = LayeredBlending::LB_BlendGlow;
-	}
-	else if (strValue == "blend_phoenix")
-	{
-		mode = LayeredBlending::LB_BlendPhoenix;
-	}
-	else if (strValue == "blend_saturation")
-	{
-		mode = LayeredBlending::LB_BlendSaturation;
-	}
-	else if (strValue == "blend_color")
-	{
-		mode = LayeredBlending::LB_BlendColor;
-	}
-	else if (strValue == "blend_luminosity")
-	{
-		mode = LayeredBlending::LB_BlendLuminosity;
-	}
-	
-	return mode;
+	return "";
 }
 
 }
 }
 #endif
+
+

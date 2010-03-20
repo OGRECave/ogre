@@ -232,6 +232,15 @@ public:
 
 
 	/** 
+	Checks if a shader based technique has been created for a given technique. 
+	Return true if exist. False if not.
+	@param materialName The source material name.
+	@param srcTechniqueSchemeName The source technique scheme name.
+	@param dstTechniqueSchemeName The destination shader based technique scheme name.
+	*/
+	bool			hasShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
+
+	/** 
 	Create shader based technique from a given technique. 
 	Return true upon success. Failure may occur if the source technique is not FFP pure, or different
 	source technique is mapped to the requested destination scheme.
@@ -713,6 +722,16 @@ protected:
 	@param the translator for the specific SubRenderState
 	*/
 	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	
+	/** Create an instance of the SubRenderState based on script properties using the
+	current sub render state factories.
+	@see SubRenderStateFactory::createInstance	
+	@param compiler The compiler instance.
+	@param prop The abstract property node.
+	@param texState The texture unit state that is the parent context of this node.
+	@param the translator for the specific SubRenderState
+	*/
+	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 
 	/** 
 	Add custom script translator. 
@@ -743,6 +762,13 @@ protected:
 	*/
 	void				serializePassAttributes				(MaterialSerializer* ser, SGPass* passEntry);
 
+	/** This method called by instance of SGMaterialSerializerListener and 
+	serialize a given textureUnitState entry attributes.
+	@param ser The material serializer.
+	@param passEntry The SGPass instance.
+	@param srcTextureUnit The TextureUnitState being serialized.
+	*/
+	void serializeTextureUnitStateAttributes(MaterialSerializer* ser, SGPass* passEntry, const TextureUnitState* srcTextureUnit);
 
 
 protected:	

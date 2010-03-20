@@ -102,6 +102,23 @@ void SGMaterialSerializerListener::passEventRaised(MaterialSerializer* ser,
 }
 
 //-----------------------------------------------------------------------------
+void SGMaterialSerializerListener::textureUnitStateEventRaised(MaterialSerializer* ser, 
+											MaterialSerializer::SerializeEvent event, 
+											bool& skip, const TextureUnitState* textureUnit)
+{
+	// End of pass writing event.
+	if (event == MaterialSerializer::MSE_WRITE_END)
+	{		
+		// Grab the shader generator pass instance.
+		ShaderGenerator::SGPass* passEntry = getShaderGeneratedPass(textureUnit->getParent());
+		
+		// Case this pass use as source pass for shader generated pass.
+		if (passEntry != NULL)							
+			ShaderGenerator::getSingleton().serializeTextureUnitStateAttributes(ser, passEntry, textureUnit);
+	}	
+}
+
+//-----------------------------------------------------------------------------
 void SGMaterialSerializerListener::createSGPassList(Material* mat, SGPassList& passList)
 {
 	for (unsigned short techniqueIndex = 0; techniqueIndex < mat->getNumTechniques(); ++techniqueIndex)
