@@ -329,7 +329,7 @@ void ShaderExReflectionMap::updateGpuProgramsParams(Renderable* rend, Pass* pass
 
 //-----------------------------------------------------------------------
 SubRenderState*	ShaderExReflectionMapFactory::createInstance(ScriptCompiler* compiler, 
-														 PropertyAbstractNode* prop, Pass* pass)
+														 PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "rtss_ext_reflection_map")
 	{
