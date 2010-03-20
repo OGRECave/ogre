@@ -35,6 +35,7 @@ namespace Ogre
 {
 	// forward decls
 	class Grid2DPageStrategy;
+	class Grid3DPageStrategy;
 	class Page;
 	class PageConnection;
 	class PageContent;

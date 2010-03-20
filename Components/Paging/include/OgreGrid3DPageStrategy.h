@@ -26,14 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_Grid2DPageStrategy_H__
-#define __Ogre_Grid2DPageStrategy_H__
+#ifndef __Ogre_Grid3DPageStrategy_H__
+#define __Ogre_Grid3DPageStrategy_H__
 
 #include "OgrePagingPrerequisites.h"
 #include "OgrePageStrategy.h"
-#include "OgreVector2.h"
 #include "OgreVector3.h"
-#include "OgreQuaternion.h"
 
 namespace Ogre
 {
@@ -46,35 +44,25 @@ namespace Ogre
 	/*@{*/
 
 
-	/// The 2D grid mode
-	enum Grid2DMode
-	{
-		/// Grid is in the X/Z plane
-		G2D_X_Z = 0, 
-		/// Grid is in the X/Y plane
-		G2D_X_Y = 1, 
-		/// Grid is in the Y/Z plane
-		G2D_Y_Z = 2
-	};
-	/** Specialisation of PageStrategyData for Grid2DPageStrategy.
+    /** Specialisation of PageStrategyData for Grid3DPageStrategy.
 	@remarks
-		Structurally this data defines with a grid of pages, with the logical 
-		origin in the middle of the entire grid.
+		Structurally this data defines with a 3D grid of pages, with the logical 
+		origin in the center of the entire grid.
 		The grid cells are indexed from 0 as a 'centre' slot, supporting both 
-		positive and negative values. so (0,0) is the centre cell, (1,0) is the
-		cell to the right of the centre, (1,0) is the cell above the centre, (-2,1) 
-		is the cell two to the left of the centre and one up, etc. The maximum
-		extent of each axis is -32768 to +32767, so in other words enough for
-		over 4 billion entries. 
+		positive and negative values. so (0,0,0) is the centre cell, (1,0,0) is the
+		cell to the right of the centre, (0,0,1) is the cell in front of the centre,
+        (0,1,0) the cell above the center, etc.
+        The maximum extent of each axis is -512 to +511, so in other words enough for
+		over 2 billion different entries. 
 	@par
 		To limit the page load requests that are generated to a fixed region, 
 		you can set the min and max cell indexes (inclusive)for each direction;
 		if a page request would address a cell outside this range it is ignored
 		so you don't have the expense of checking for page data that will never
 		exist.
-	@par
+    @par
 		The data format for this in a file is:<br/>
-		<b>Grid2DPageStrategyData (Identifier 'G2DD')</b>\n
+		<b>Grid3DPageStrategyData (Identifier 'G3DD')</b>\n
 		[Version 1]
 		<table>
 		<tr>
@@ -83,23 +71,18 @@ namespace Ogre
 			<td><b>Description</b></td>
 		</tr>
 		<tr>
-			<td>Grid orientation</td>
-			<td>uint8</td>
-			<td>The orientation of the grid; XZ = 0, XY = 1, YZ = 2</td>
-		</tr>
-		<tr>
 			<td>Grid origin</td>
 			<td>Vector3</td>
 			<td>World origin of the grid.</td>
 		</tr>
 		<tr>
 			<td>Grid cell size</td>
-			<td>Real</td>
+			<td>Vector3</td>
 			<td>The size of each cell (page) in the grid</td>
 		</tr>
 		<tr>
-			<td>Grid cell range (minx, maxx, miny, maxy)</td>
-			<td>int16 * 4</td>
+			<td>Grid cell range (minx, maxx, miny, maxy, minz, maxz)</td>
+			<td>int16 * 6</td>
 			<td>The extents of the world in cell indexes</td>
 		</tr>
 		<tr>
@@ -115,53 +98,44 @@ namespace Ogre
 		</tr>
 		</table>
 
-    @sa Grid3DPageStrategyData
+        @sa Grid2DPageStrategyData
+
 	*/
-	class _OgrePagingExport Grid2DPageStrategyData : public PageStrategyData
+	class _OgrePagingExport Grid3DPageStrategyData : public PageStrategyData
 	{
 	protected:
-		/// Orientation of the grid
-		Grid2DMode mMode;
 		/// Origin (world space)
 		Vector3 mWorldOrigin;
 		/// Origin (grid-aligned world space)
-		Vector2 mOrigin;
+		Vector3 mOrigin;
 		/// Grid cell (page) size
-		Real mCellSize;
+		Vector3 mCellSize;
 		/// Load radius
 		Real mLoadRadius;
 		/// Hold radius
 		Real mHoldRadius;
-		Real mLoadRadiusInCells;
-		Real mHoldRadiusInCells;
 		int32 mMinCellX;
 		int32 mMinCellY;
+		int32 mMinCellZ;
 		int32 mMaxCellX;
 		int32 mMaxCellY;
-
-		void updateDerivedMetrics();
+		int32 mMaxCellZ;
 
 	public:
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
 
-		Grid2DPageStrategyData();
-		~Grid2DPageStrategyData();
-
-		/// Set the grid alignment mode
-		virtual void setMode(Grid2DMode mode);
-
-		/// Set the grid alignment mode
-		virtual Grid2DMode getMode() const { return mMode; }
+		Grid3DPageStrategyData();
+		~Grid3DPageStrategyData();
 
 		/// Set the origin of the grid in world space
 		virtual void setOrigin(const Vector3& worldOrigin);
 		/// Get the origin of the grid in world space
 		virtual const Vector3& getOrigin(const Vector3& worldOrigin) { return mWorldOrigin; }
 		/// Set the size of the cells in the grid
-		virtual void setCellSize(Real sz);
+		virtual void setCellSize(const Vector3& sz);
 		/// Get the size of the cells in the grid
-		virtual Real getCellSize() const { return mCellSize; }
+		virtual Vector3 getCellSize() const { return mCellSize; }
 		/// Set the loading radius 
 		virtual void setLoadRadius(Real sz);
 		/// Get the loading radius 
@@ -170,70 +144,68 @@ namespace Ogre
 		virtual void setHoldRadius(Real sz);
 		/// Get the Holding radius 
 		virtual Real getHoldRadius() const { return mHoldRadius; }
-		/// Get the load radius as a multiple of cells
-		virtual Real getLoadRadiusInCells() { return mLoadRadiusInCells; }
-		/// Get the Hold radius as a multiple of cells
-		virtual Real getHoldRadiusInCells(){ return mHoldRadiusInCells; }
 
 		/// Set the index range of all cells (values outside this will be ignored)
-		virtual void setCellRange(int32 minX, int32 minY, int32 maxX, int32 maxY);
+		virtual void setCellRange(int32 minX, int32 minY, int32 minZ, int32 maxX, int32 maxY, int32 maxZ);
 		/// Set the index range of all cells (values outside this will be ignored)
 		virtual void setCellRangeMinX(int32 minX);
 		/// Set the index range of all cells (values outside this will be ignored)
 		virtual void setCellRangeMinY(int32 minY);
 		/// Set the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMinZ(int32 minZ);
+		/// Set the index range of all cells (values outside this will be ignored)
 		virtual void setCellRangeMaxX(int32 maxX);
 		/// Set the index range of all cells (values outside this will be ignored)
 		virtual void setCellRangeMaxY(int32 maxY);
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual void setCellRangeMaxZ(int32 maxZ);
 		/// get the index range of all cells (values outside this will be ignored)
 		virtual int32 getCellRangeMinX() const { return mMinCellX; }
 		/// get the index range of all cells (values outside this will be ignored)
 		virtual int32 getCellRangeMinY() const { return mMinCellY; }
 		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMinZ() const { return mMinCellZ; }
+		/// get the index range of all cells (values outside this will be ignored)
 		virtual int32 getCellRangeMaxX() const { return mMaxCellX; }
 		/// get the index range of all cells (values outside this will be ignored)
 		virtual int32 getCellRangeMaxY() const { return mMaxCellY; }
+		/// get the index range of all cells (values outside this will be ignored)
+		virtual int32 getCellRangeMaxZ() const { return mMaxCellZ; }
 
 		/// Load this data from a stream (returns true if successful)
 		bool load(StreamSerialiser& stream);
 		/// Save this data to a stream
 		void save(StreamSerialiser& stream);
 
-		/// Convert a world point to grid space (not relative to origin)
-		virtual void convertWorldToGridSpace(const Vector3& world, Vector2& grid);
-		/// Convert a grid point to world space - note only 2 axes populated
-		virtual void convertGridToWorldSpace(const Vector2& grid, Vector3& world);
-		/// Get the (grid space) mid point of a cell
-		virtual void getMidPointGridSpace(int32 x, int32 y, Vector2& mid);
+		virtual void getMidPointGridSpace(int32 x, int32 y, int32 z, Vector3& mid);
 		/// Get the (grid space) bottom-left of a cell
-		virtual void getBottomLeftGridSpace(int32 x, int32 y, Vector2& bl);
+		virtual void getBottomLeftGridSpace(int32 x, int32 y, int z, Vector3& bl);
 		/** Get the (grid space) corners of a cell.
 		@remarks
-			Populates pFourPoints in anticlockwise order from the bottom left point.
+			Populates pEightPoints in anticlockwise order from the bottom left point.
 		*/
-		virtual void getCornersGridSpace(int32 x, int32 y, Vector2* pFourPoints);
+		virtual void getCornersGridSpace(int32 x, int32 y, int32 z, Vector3* pEightPoints);
 		
 		/// Convert a grid position into a row and column index
-		void determineGridLocation(const Vector2& gridpos, int32* x, int32* y);
+		void determineGridLocation(const Vector3& gridpos, int32* x, int32* y, int32* z);
 
-		PageID calculatePageID(int32 x, int32 y);
-		void calculateCell(PageID inPageID, int32* x, int32* y);
-
+		PageID calculatePageID(int32 x, int32 y, int32 z);
+		void calculateCell(PageID inPageID, int32* x, int32* y, int32* z);
 	};
 
 
-	/** Page strategy which loads new pages based on a regular 2D grid.
+	/** Page strategy which loads new pages based on a regular 3D grid.
 	@remarks
-		The grid can be up to 65536 x 65536 cells in size. PageIDs are generated
-		like this: (row * 65536) + col. The grid is centred around the grid origin, such 
+		The grid can be up to 1024 x 1024 x 1024 cells in size. PageIDs are generated
+		like this: (slice*1024 + row) * 1024 + col. The grid is centred around the grid origin, such 
 		that the boundaries of the cell around that origin are [-CellSize/2, CellSize/2)
 	*/
-	class _OgrePagingExport Grid2DPageStrategy : public PageStrategy
+	class _OgrePagingExport Grid3DPageStrategy : public PageStrategy
 	{
 	public:
-		Grid2DPageStrategy(PageManager* manager);
+		Grid3DPageStrategy(PageManager* manager);
 
-		~Grid2DPageStrategy();
+		~Grid3DPageStrategy();
 
 		// Overridden members
 		void notifyCamera(Camera* cam, PagedWorldSection* section);
