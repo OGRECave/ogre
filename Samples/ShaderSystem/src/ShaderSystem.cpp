@@ -315,7 +315,6 @@ void Sample_ShaderSystem::setupContent()
 	childNode->attachObject(entity);
 
 	// Create texture layer blending demonstration entity.
-
 	entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
 	entity->setMaterialName("RTSS/LayeredBlending");
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -390,8 +389,15 @@ void Sample_ShaderSystem::setupUI()
 	// Create language selection 
 	mLanguageMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "LangMode", "Language", 220, 120, 10);	
 
-	// Use GLSL in case of OpenGL render system.
-	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
+    // Use GLSL ES in case of OpenGL ES 2 render system.
+	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+	{
+		mLanguageMenu->addItem("glsles");
+		mShaderGenerator->setTargetLanguage("glsles");		
+	}
+    
+    // Use GLSL in case of OpenGL render system.
+    else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL") != String::npos)
 	{
 		mLanguageMenu->addItem("glsl");
 		mShaderGenerator->setTargetLanguage("glsl");		
@@ -451,7 +457,8 @@ void Sample_ShaderSystem::setupUI()
 	// Allow reflection map only on PS3 and above since with all lights on + specular + bump we 
 	// exceed the instruction count limits of PS2.
 	if (GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") ||
-		GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))		
+        GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
+		GpuProgramManager::getSingleton().isSyntaxSupported("fp30"))
 	{
 		mTrayMgr->createCheckBox(TL_BOTTOM, REFLECTIONMAP_BOX, "Reflection Map", 240)->setChecked(mReflectionMapEnable);
 		mReflectionPowerSlider = mTrayMgr->createThickSlider(TL_BOTTOM, REFLECTIONMAP_POWER_SLIDER, "Reflection Power", 240, 80, 0, 1, 100);
@@ -996,7 +1003,8 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 Ogre::StringVector Sample_ShaderSystem::getRequiredPlugins()
 {
 	StringVector names;
-	names.push_back("Cg Program Manager");
+    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        names.push_back("Cg Program Manager");
 	return names;
 }
 
@@ -1015,6 +1023,11 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 		return;
 	}
 
+	// Check if GLSL ES shaders are supported - is so - then we are OK.
+	if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+	{
+		return;
+	}
 
 	if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0"))
@@ -1326,40 +1339,7 @@ void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode
 	}
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchPressed( const OIS::MultiTouchEvent& evt )
-{
-	if (mTrayMgr->injectMouseDown(evt)) 
-		return true;
-	if (evt.state.touchIsType(OIS::MT_Pressed)) 
-		mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene
-	return true;
-}
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchReleased( const OIS::MultiTouchEvent& evt )
-{
-	if (mTrayMgr->injectMouseUp(evt)) 
-		return true;
-	if (evt.state.touchIsType(OIS::MT_Pressed)) 
-		mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
-	return true;
-}
-
-//-----------------------------------------------------------------------
-bool Sample_ShaderSystem::touchMoved( const OIS::MultiTouchEvent& evt )
-{
-	// only rotate the camera if cursor is hidden
-	if (mTrayMgr->isCursorVisible()) 
-		mTrayMgr->injectMouseMove(evt);
-	else 
-		mCameraMan->injectMouseMove(evt);
-	return true;
-}
-
-#else
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )

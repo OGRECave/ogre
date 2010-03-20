@@ -48,13 +48,7 @@ public:
 
 	void updateTargetObjInfo();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-	bool touchPressed(const OIS::MultiTouchEvent& evt);
-
-	bool touchReleased(const OIS::MultiTouchEvent& evt);
-
-	bool touchMoved(const OIS::MultiTouchEvent& evt);
-#else
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 	/** @see Sample::mousePressed. */
 	bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
 
