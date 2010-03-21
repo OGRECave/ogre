@@ -29,7 +29,9 @@ THE SOFTWARE.
 #define __D3D9PREREQUISITES_H__
 
 #include "OgrePrerequisites.h"
-#include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
+#ifdef __MINGW32__
+#  include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
+#endif
 
 #if OGRE_THREAD_SUPPORT
 #define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();

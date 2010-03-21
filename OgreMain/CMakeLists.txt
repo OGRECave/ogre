@@ -451,6 +451,7 @@ if (WIN32)
     include/WIN32/OgreConfigDialogImp.h
     include/WIN32/OgreErrorDialogImp.h
     include/WIN32/OgreTimerImp.h
+    include/WIN32/OgreMinGWSupport.h
   )
   set(PLATFORM_SOURCE_FILES
     src/WIN32/OgreConfigDialog.cpp

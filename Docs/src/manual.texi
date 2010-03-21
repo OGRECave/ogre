@@ -1537,6 +1537,7 @@ Default: mipmap_bias 0
 @subheading colour_op
 
 Determines how the colour of this texture layer is combined with the one below it (or the lighting effect on the geometry if this is the first layer).@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
 
 Format: colour_op <replace|add|modulate|alpha_blend>@*@*
 
@@ -1558,6 +1559,7 @@ Default: colour_op modulate
 @subheading colour_op_ex
 
 This is an extended version of the @ref{colour_op} attribute which allows extremely detailed control over the blending applied between this and earlier layers. Multitexturing hardware can apply more complex blending operations that multipass blending, but you are limited to the number of texture units which are available in hardware.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
 
 Format: colour_op_ex <operation> <source1> <source2> [<manual_factor>] [<manual_colour1>] [<manual_colour2>]@*@*
 
@@ -1639,11 +1641,13 @@ The parameters are the same as in the scene_blend attribute; this is because mul
 @subheading alpha_op_ex
 
 Behaves in exactly the same away as @ref{colour_op_ex} except that it determines how alpha values are combined between texture layers rather than colour values.The only difference is that the 2 manual colours at the end of colour_op_ex are just single floating-point values in alpha_op_ex.
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a fragment program this will have no effect.@*@*
 
 @anchor{env_map}
 @subheading env_map
 
 Turns on/off texture coordinate effect that makes this layer an environment map.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect.@*@*
 
 Format: env_map <off|spherical|planar|cubic_reflection|cubic_normal>@*@*
 
@@ -1665,8 +1669,8 @@ Default: env_map off@*
 @anchor{scroll}
 @subheading scroll
 
-
 Sets a fixed scroll offset for the texture.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: scroll <x> <y>@*@*
 
@@ -1676,6 +1680,7 @@ This method offsets the texture in this layer by a fixed amount. Useful for smal
 @subheading scroll_anim
 
 Sets up an animated scroll for the texture layer. Useful for creating fixed-speed scrolling effects on a texture layer (for varying scroll speeds, see @ref{wave_xform}).@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: scroll_anim <xspeed> <yspeed>@*
 
@@ -1683,15 +1688,19 @@ Format: scroll_anim <xspeed> <yspeed>@*
 @subheading rotate
 
 Rotates a texture to a fixed angle. This attribute changes the rotational orientation of a texture to a fixed angle, useful for fixed adjustments. If you wish to animate the rotation, see @ref{rotate_anim}.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: rotate <angle>@*@*
 
 The parameter is a anti-clockwise angle in degrees.@*@*
 
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex shader this will have no effect unless you use the texture_matrix auto-param.@*@*
+
 @anchor{rotate_anim}
 @subheading rotate_anim
 
 Sets up an animated rotation effect of this layer. Useful for creating fixed-speed rotation animations (for varying speeds, see @ref{wave_xform}).@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: rotate_anim <revs_per_second>@*@*
 
@@ -1701,6 +1710,7 @@ The parameter is a number of anti-clockwise revolutions per second.@*@*
 @subheading scale
 
 Adjusts the scaling factor applied to this texture layer. Useful for adjusting the size of textures without making changes to geometry. This is a fixed scaling factor, if you wish to animate this see @ref{wave_xform}.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: scale <x_scale> <y_scale>@*@*
 
@@ -1710,6 +1720,7 @@ Valid scale values are greater than 0, with a scale factor of 2 making the textu
 @subheading wave_xform
 
 Sets up a transformation animation based on a wave function. Useful for more advanced texture layer transform effects. You can add multiple instances of this attribute to a single texture layer if you wish.@*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: wave_xform <xform_type> <wave_type> <base> <frequency> <phase> <amplitude>@*@*
 
@@ -1757,6 +1768,7 @@ The range of the output of the wave will be {base, base+amplitude}. So the examp
 @subheading transform
 
 This attribute allows you to specify a static 4x4 transformation matrix for the texture unit, thus replacing the individual scroll, rotate and scale attributes mentioned above. @*@*
+@strong{Note:} Only applies to the fixed-function pipeline, if you're using a vertex program this will have no effect unless you use the texture_matrix auto-param.@*@*
 
 Format: transform m00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33@*@*
 

@@ -68,6 +68,26 @@ protected:
 	void track();
 
 };
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testManualLOD : public PlayPenBase
+{
+public:
+	PlayPen_testManualLOD();
+	bool frameStarted(const Ogre::FrameEvent& evt);
+protected:
+	AnimationState* mAnimState;
+	void setupContent();
+	String getLODMesh();
+};
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testManualLODFromFile : public PlayPen_testManualLOD
+{
+public:
+	PlayPen_testManualLODFromFile();
+protected:
+	String getLODMesh();
+};
+
 
 
 

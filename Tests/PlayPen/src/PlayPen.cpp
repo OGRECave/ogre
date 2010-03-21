@@ -37,6 +37,8 @@ PlayPenPlugin::PlayPenPlugin()
 	addSample(new PlayPen_testManualBlend());
 	addSample(new PlayPen_testProjectSphere());
 	addSample(new PlayPen_testCameraSetDirection());
+	addSample(new PlayPen_testManualLOD());
+	addSample(new PlayPen_testManualLODFromFile());
 }
 //---------------------------------------------------------------------
 PlayPenPlugin::~PlayPenPlugin()
