@@ -363,7 +363,7 @@ namespace Ogre {
         SubEntityList::iterator i;
         for (i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
         {
-            (*i)->setMaterialName(name);
+            (*i)->setMaterialName(name, groupName);
         }
 
     }
