@@ -347,8 +347,6 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 			}
 
 			finalState.findVisibleObjects = true;
-			finalState.materialScheme = target->getMaterialScheme();
-			finalState.shadowsEnabled = target->getShadowsEnabled();
 
             break;
 		}
@@ -435,7 +433,8 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
         ts.onlyInitial = target->getOnlyInitial();
         ts.visibilityMask = target->getVisibilityMask();
         ts.lodBias = target->getLodBias();
-		ts.shadowsEnabled = target->getShadowsEnabled();
+        ts.shadowsEnabled = target->getShadowsEnabled();
+        ts.materialScheme = target->getMaterialScheme();
         /// Check for input mode previous
         if(target->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
         {
@@ -458,7 +457,9 @@ void CompositorInstance::_compileOutputOperation(TargetOperation &finalState)
     /// Logical-and together the visibilityMask, and multiply the lodBias
     finalState.visibilityMask &= tpass->getVisibilityMask();
     finalState.lodBias *= tpass->getLodBias();
-    
+    finalState.materialScheme = tpass->getMaterialScheme();
+    finalState.shadowsEnabled = tpass->getShadowsEnabled();
+
     if(tpass->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
     {
         /// Collect target state for previous compositor
