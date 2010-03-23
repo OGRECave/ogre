@@ -300,7 +300,42 @@ String PlayPen_testManualLODFromFile::getLODMesh()
 	return "testlod.mesh";
 
 }
+//---------------------------------------------------------------------
+PlayPen_testFullScreenSwitch::PlayPen_testFullScreenSwitch()
+{
+	mInfo["Title"] = "PlayPen: Test full screen";
+	mInfo["Description"] = "Testing switching full screen modes without re-initialisation";
 
+}
+//---------------------------------------------------------------------
+void PlayPen_testFullScreenSwitch::setupContent()
+{
+	m640x480w = mTrayMgr->createButton(TL_CENTER, "m640x480w", "640 x 480 (windowed)", 300);
+	m640x480fs = mTrayMgr->createButton(TL_CENTER, "m640x480fs", "640 x 480 (fullscreen)", 300);
+	m800x600w = mTrayMgr->createButton(TL_CENTER, "m800x600w", "800 x 600 (windowed)", 300);
+	m800x600fs = mTrayMgr->createButton(TL_CENTER, "m800x600fs", "800 x 600 (fullscreen)", 300);
+	m1024x768w = mTrayMgr->createButton(TL_CENTER, "m1024x768w", "1024 x 768 (windowed)", 300);
+	m1024x768fs = mTrayMgr->createButton(TL_CENTER, "m1024x768fs", "1024 x 768 (fullscreen)", 300);
+
+	mTrayMgr->showCursor();
+
+}
+//---------------------------------------------------------------------
+void PlayPen_testFullScreenSwitch::buttonHit(OgreBites::Button* button)
+{
+	if (button == m640x480w)
+		mWindow->setFullscreen(false, 640, 480);
+	else if (button == m640x480fs)
+		mWindow->setFullscreen(true, 640, 480);
+	else if (button == m800x600w)
+		mWindow->setFullscreen(false, 800, 600);
+	else if (button == m800x600fs)
+		mWindow->setFullscreen(true, 800, 600);
+	else if (button == m1024x768w)
+		mWindow->setFullscreen(false, 1024, 768);
+	else if (button == m1024x768fs)
+		mWindow->setFullscreen(true, 1024, 768);
+}
 
 
 

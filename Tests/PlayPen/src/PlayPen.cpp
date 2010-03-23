@@ -39,6 +39,7 @@ PlayPenPlugin::PlayPenPlugin()
 	addSample(new PlayPen_testCameraSetDirection());
 	addSample(new PlayPen_testManualLOD());
 	addSample(new PlayPen_testManualLODFromFile());
+	addSample(new PlayPen_testFullScreenSwitch());
 }
 //---------------------------------------------------------------------
 PlayPenPlugin::~PlayPenPlugin()

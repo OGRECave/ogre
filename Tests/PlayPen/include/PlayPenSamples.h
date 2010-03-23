@@ -88,6 +88,24 @@ protected:
 	String getLODMesh();
 };
 
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testFullScreenSwitch : public PlayPenBase
+{
+public:
+	PlayPen_testFullScreenSwitch();
+
+	void buttonHit(OgreBites::Button* button);
+protected:
+	void setupContent();
+
+	OgreBites::Button* m640x480w;
+	OgreBites::Button* m800x600w;
+	OgreBites::Button* m1024x768w;
+	OgreBites::Button* m640x480fs;
+	OgreBites::Button* m800x600fs;
+	OgreBites::Button* m1024x768fs;
+
+};
 
 
 
