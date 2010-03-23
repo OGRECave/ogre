@@ -374,7 +374,7 @@ function(ogre_config_tool TOOLNAME)
     ogre_install_target(${TOOLNAME} "" FALSE)
     if (OGRE_INSTALL_PDB)
       # install debug pdb files
-      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${TOOLNAME}.pdb
+      install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${TOOLNAME}_d.pdb
         DESTINATION bin${OGRE_DEBUG_PATH}
         CONFIGURATIONS Debug
         )
