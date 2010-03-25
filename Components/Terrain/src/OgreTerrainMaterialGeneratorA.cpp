@@ -310,10 +310,12 @@ namespace Ogre
 		{
 			bool check2x = mLayerNormalMappingEnabled || mLayerParallaxMappingEnabled;
 			if (hmgr.isLanguageSupported("cg") && 
-				(check2x && (gmgr.isSyntaxSupported("fp40") || gmgr.isSyntaxSupported("ps_2_x"))) ||
-				(gmgr.isSyntaxSupported("ps_2_0")))
+				((check2x && (gmgr.isSyntaxSupported("fp40") || gmgr.isSyntaxSupported("ps_2_x"))) ||
+				(!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
 				mShaderGen = OGRE_NEW ShaderHelperCg();
-			else if (hmgr.isLanguageSupported("hlsl"))
+			else if (hmgr.isLanguageSupported("hlsl") &&
+				((check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
+				(!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
 			else if (hmgr.isLanguageSupported("glsl"))
 				mShaderGen = OGRE_NEW ShaderHelperGLSL();
