@@ -85,7 +85,10 @@ namespace Ogre {
 			, useFreeMethod(freeMethod)
 		{
             OGRE_SET_AUTO_SHARED_MUTEX_NULL
-			OGRE_NEW_AUTO_SHARED_MUTEX
+			if (rep)
+			{
+				OGRE_NEW_AUTO_SHARED_MUTEX
+			}
 		}
 		SharedPtr(const SharedPtr& r)
             : pRep(0), pUseCount(0), useFreeMethod(SPFM_DELETE)
