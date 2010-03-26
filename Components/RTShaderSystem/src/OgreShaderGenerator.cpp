@@ -1550,11 +1550,12 @@ void ShaderGenerator::SGScheme::validate()
 void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 {
 	SceneManager* sceneManager = ShaderGenerator::getSingleton().getActiveSceneManager();
+	RenderState* curRenderState = getRenderState();
 
-	if (sceneManager != NULL)
+	if (sceneManager != NULL && curRenderState->getLightCountAutoUpdate())
 	{
 		const LightList& lightList =  sceneManager->_getLightsAffectingFrustum();
-		RenderState* curRenderState = getRenderState();
+		
 		int sceneLightCount[3] = {0};
 		int currLightCount[3] = {0};
 
@@ -1562,11 +1563,8 @@ void ShaderGenerator::SGScheme::synchronizeWithLightSettings()
 		{
 			sceneLightCount[lightList[i]->getType()]++;
 		}
-
-		if (curRenderState->getLightCountAutoUpdate())
-		{
-			mRenderState->getLightCount(currLightCount);
-		}
+		
+		mRenderState->getLightCount(currLightCount);		
 
 		// Case light state has been changed -> invalidate this scheme.
 		if (currLightCount[0] != sceneLightCount[0] ||

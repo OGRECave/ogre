@@ -92,15 +92,15 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	}
 	else if (cbName == DIRECTIONAL_LIGHT_NAME)
 	{
-		setLightVisible(cbName, box->isChecked());		
+		updateLightState(cbName, box->isChecked());		
 	}
 	else if (cbName == POINT_LIGHT_NAME)
 	{
-		setLightVisible(cbName, box->isChecked());
+		updateLightState(cbName, box->isChecked());
 	}
 	else if (cbName == SPOT_LIGHT_NAME)
 	{
-		setLightVisible(cbName, box->isChecked());
+		updateLightState(cbName, box->isChecked());
 	}
 	else if (cbName == PER_PIXEL_FOG_BOX)
 	{
@@ -361,6 +361,11 @@ void Sample_ShaderSystem::setupContent()
 	createDirectionalLight();
 	createPointLight();
 	createSpotLight();
+
+	RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+	// Take responsibility for updating the light count manually.
+	schemRenderState->setLightCountAutoUpdate(false);
 	
 	setupUI();
 
@@ -820,7 +825,7 @@ void Sample_ShaderSystem::createSpotLight()
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::setLightVisible(const String& lightName, bool visible)
+void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible)
 {
 	if (mSceneMgr->hasLight(lightName))
 	{		
@@ -862,7 +867,36 @@ void Sample_ShaderSystem::setLightVisible(const String& lightName, bool visible)
 		else
 		{
 			mSceneMgr->getLight(lightName)->setVisible(visible);
-		}		
+		}	
+
+		RenderState* schemRenderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		
+		int lightCount[3] = {0};
+
+		// Update point light count.
+		if (mSceneMgr->getLight(POINT_LIGHT_NAME)->isVisible())
+		{
+			lightCount[0] = 1;
+		}
+
+		// Update directional light count.
+		if (mSceneMgr->getLight(DIRECTIONAL_LIGHT_NAME)->isVisible())
+		{
+			lightCount[1] = 1;
+		}
+
+		// Update spot light count.
+		if (mSceneMgr->getLight(SPOT_LIGHT_NAME)->isVisible())
+		{
+			lightCount[2] = 1;
+		}
+
+		// Update the scheme light count.
+		schemRenderState->setLightCount(lightCount);
+		
+
+		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 	}
 }
 

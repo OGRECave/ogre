@@ -92,7 +92,7 @@ protected:
 	void createSpotLight();
 
 	/** Toggle light visibility. */
-	void setLightVisible(const String& lightName, bool visible);
+	void updateLightState(const String& lightName, bool visible);
 
 	/** Update runtime generated shaders of the target entities in this demo. */
 	void updateSystemShaders();
