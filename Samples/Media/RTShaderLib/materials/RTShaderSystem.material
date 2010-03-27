@@ -211,6 +211,7 @@ material RTSS/LayeredBlending
 				rtshader_system
 				{
 					layered_blend blend_luminosity
+					source_modifier src1_inverse_modulate custom 2
 				}
 				texture ogrelogo.png
 			}						

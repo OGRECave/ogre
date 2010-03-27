@@ -791,3 +791,35 @@ void SGX_blend_luminosity(in float basePixel, in float blendPixel, out float oCo
 {
 	oColor = BlendLuminosity1(basePixel, blendPixel);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+/// Source modification functions
+////////////////////////////////////////////////////////////////////////////////////
+
+
+void SGX_src_mod_modulate(in vec4 iColor, in vec4 controlVal, out vec4 oColor)
+{
+	oColor = iColor * controlVal;
+}
+void SGX_src_mod_modulate(in vec3 iColor, in vec3 controlVal, out vec3 oColor)
+{
+	oColor = iColor * controlVal;
+}
+void SGX_src_mod_modulate(in float iColor, in float controlVal, out float oColor)
+{
+	oColor = iColor * controlVal;
+}
+
+void SGX_src_mod_inv_modulate(in vec4 iColor, in vec4 controlVal, out vec4 oColor)
+{
+	oColor = mix(iColor, 1, controlVal);
+}
+void SGX_src_mod_inv_modulate(in vec3 iColor, in vec3 controlVal, out vec3 oColor)
+{
+	oColor = mix(iColor, 1, controlVal);
+}
+void SGX_src_mod_inv_modulate(in float iColor, in float controlVal, out float oColor)
+{
+	oColor = mix(iColor, 1, controlVal);
+}

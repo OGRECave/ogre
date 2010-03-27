@@ -162,6 +162,8 @@ protected:
 	Label*								mLayerBlendLabel;		// The layer blending lable.
 	Slider*								mReflectionPowerSlider;	// The reflection power controller slider.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.
+	Slider*								mModifierValueSlider;   // The value of the modifier for the layered blend controller slider.
+	Entity*								mLayeredBlendingEntity; // Entity used to show layered blending SRS
 	SceneNode*							mPointLightNode;		// Point light scene node.
 	SceneNode*							mDirectionalLightNode;	// Directional light scene node.		
 	RaySceneQuery*						mRayQuery;				// The ray scene query.

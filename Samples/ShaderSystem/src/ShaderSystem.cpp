@@ -19,6 +19,7 @@ const String MAIN_ENTITY_NAME			= "MainEntity";
 const String EXPORT_BUTTON_NAME			= "ExportMaterial";
 const String FLUSH_BUTTON_NAME			= "FlushShaderCache";
 const String LAYERBLEND_BUTTON_NAME		= "ChangeLayerBlendType";
+const String MODIFIER_VALUE_SLIDER  	= "ModifierValueSlider";
 const String SAMPLE_MATERIAL_GROUP		= "RTShaderSystemMaterialsGroup";
 const int MESH_ARRAY_SIZE = 2;
 const String MESH_ARRAY[MESH_ARRAY_SIZE] =
@@ -51,7 +52,8 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 
 //-----------------------------------------------------------------------
-Sample_ShaderSystem::Sample_ShaderSystem()
+Sample_ShaderSystem::Sample_ShaderSystem() :
+	mLayeredBlendingEntity(NULL)
 {
 	mInfo["Title"] = "Shader System";
 	mInfo["Description"] = "Demonstrate the capabilities of the RT Shader System component."
@@ -196,6 +198,15 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
 			}
 		}
 	}	
+
+	if (slider->getName() == MODIFIER_VALUE_SLIDER)
+	{
+		if (mLayeredBlendingEntity != NULL)
+		{
+			Ogre::Real val = mModifierValueSlider->getValue();
+			mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4(val,val,val,0));
+		}
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -315,11 +326,12 @@ void Sample_ShaderSystem::setupContent()
 	childNode->attachObject(entity);
 
 	// Create texture layer blending demonstration entity.
-	entity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
-	entity->setMaterialName("RTSS/LayeredBlending");
+	mLayeredBlendingEntity = mSceneMgr->createEntity("LayeredBlendingMaterialEntity", MAIN_ENTITY_MESH);
+	mLayeredBlendingEntity->setMaterialName("RTSS/LayeredBlending");
+	mLayeredBlendingEntity->getSubEntity(0)->setCustomParameter(2, Vector4::ZERO);
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 200.0, -200.0);
-	childNode->attachObject(entity);
+	childNode->attachObject(mLayeredBlendingEntity);
 
 	// Grab the render state of the material.
 	RTShader::RenderState* renderState = mShaderGenerator->getRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending", 0);
@@ -484,7 +496,8 @@ void Sample_ShaderSystem::setupUI()
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	mLayerBlendLabel = mTrayMgr->createLabel(TL_RIGHT, "Blend Type", "Blend Type", 240);
 	mTrayMgr->createButton(TL_RIGHT, LAYERBLEND_BUTTON_NAME, "Change Blend Type", 220);
-
+	mModifierValueSlider = mTrayMgr->createThickSlider(TL_RIGHT, MODIFIER_VALUE_SLIDER, "Modifier", 240, 80, 0, 1, 100);
+	mModifierValueSlider->setValue(0.0,false);	
 	// Update the caption.
 	updateLayerBlendingCaption(mLayerBlendSubRS->getBlendMode(1));
 
@@ -1242,6 +1255,7 @@ void Sample_ShaderSystem::changeTextureLayerBlendMode()
 		nextBlendMode = (LayeredBlending::BlendMode)(curBlendMode + 1);
 	}
 
+	
 	mLayerBlendSubRS->setBlendMode(1, nextBlendMode);			
 	mShaderGenerator->invalidateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, "RTSS/LayeredBlending");
 

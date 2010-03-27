@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef _OgreShaderExLayeredBlending_
 #define _OgreShaderExLayeredBlending_
 
+#include "OgreShaderPrerequisites.h"
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPTexturing.h"
 #include "OgreShaderProgramSet.h"
 #include "OgreShaderParameter.h"
@@ -78,6 +80,28 @@ public:
 		LB_MaxBlendModes
 	};
 
+	enum SourceModifier
+	{
+		SM_Invalid = -1,
+		SM_None,
+		SM_Source1Modulate,
+		SM_Source2Modulate,
+		SM_Source1InvModulate,
+		SM_Source2InvModulate,
+		SM_MaxSourceModifiers
+	};
+
+	struct TextureBlend
+	{
+		TextureBlend() : blendMode(LB_Invalid), sourceModifier(SM_Invalid), customNum(0) {}
+
+		BlendMode blendMode; //The blend mode to use
+		SourceModifier sourceModifier; //The source modification to use
+		int customNum; // The number of the custom param controlling the source modification
+		ParameterPtr modControlParam; //The parameter controlling the source modification
+	};
+
+
 	/** Class default constructor */
 	LayeredBlending();
 
@@ -99,6 +123,23 @@ public:
 	*/
 	BlendMode getBlendMode(unsigned short index) const;
 
+	
+
+	/** 
+	Set the source modifier parameters for a given texture unit
+	@param modType The source modification type to use
+	@param customNum The custom parameter number used to control the modification
+	*/
+	void setSourceModifier(unsigned short index, SourceModifier modType, int customNum);
+
+	/** 
+	Returns the source modifier parameters for a given texture unit
+	@return True if a valid modifier exist for the given texture unit
+	@param modType The source modification type to use
+	@param customNum The custom parameter number used to control the modification
+	*/
+	bool getSourceModifier(unsigned short index, SourceModifier& , int& customNum) const;
+
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
@@ -110,9 +151,14 @@ public:
 protected:
 	
 	/** 
+	@see SubRenderState::resolveParameters.
+	*/
+	virtual bool resolveParameters(ProgramSet* programSet);
+
+	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool resolveDependencies		(Ogre::RTShader::ProgramSet* programSet);
+	virtual bool resolveDependencies(Ogre::RTShader::ProgramSet* programSet);
 
 
 	virtual void addPSBlendInvocations(Function* psMain, 
@@ -124,10 +170,21 @@ protected:
 									const int groupOrder, 
 									int& internalCounter,
 									int targetChannels);
+	/** 
+	Adds the function invocation to the pixel shader which will modify
+	the blend sources according to the source modification parameters.
+	*/
+	void addPSModifierInvocation(Function* psMain, 
+								int samplerIndex, 
+								ParameterPtr arg1,
+								ParameterPtr arg2,
+								const int groupOrder, 
+								int& internalCounter,
+								int targetChannels);
 
 	// Attributes.
 protected:
-	vector<BlendMode>::type mBlendModes;
+	vector<TextureBlend>::type mTextureBlends;
 
 };
 
@@ -172,9 +229,27 @@ protected:
 	@Converts Enum to string
 	*/
 	String blendModeToString(LayeredBlending::BlendMode blendMode);
+
+	/** 
+	@Converts string to Enum
+	*/
+	LayeredBlending::SourceModifier stringToSourceModifier(const String &strValue);
+	
+	/** 
+	@Converts Enum to string
+	*/
+	String sourceModifierToString(LayeredBlending::SourceModifier modifier);
+
+	/** 
+	Returns the LayeredBlending sub-rener state previously created for this material/pass.
+	if no such sub-render state exists creates a new one
+	@param trscript compiler
+	*/
+	LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
 };
 
 }
 }
 
+#endif
 #endif
