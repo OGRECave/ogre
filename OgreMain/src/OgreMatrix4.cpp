@@ -227,8 +227,8 @@ namespace Ogre
 
         // Because we're inverting, order is translation, rotation, scale
         // So make translation relative to scale & rotation
-        invTranslate *= invScale; // scale
         invTranslate = invRot * invTranslate; // rotate
+        invTranslate *= invScale; // scale
 
         // Next, make a 3x3 rotation matrix
         Matrix3 rot3x3;
