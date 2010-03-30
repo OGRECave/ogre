@@ -1029,16 +1029,7 @@ namespace Ogre {
         pluginDir = cfg.getSetting("PluginFolder"); // Ignored on Mac OS X, uses Resources/ directory
         pluginList = cfg.getMultiSetting("Plugin");
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-		if (pluginDir.empty())
-		{
-			// User didn't specify plugins folder, try current one
-			pluginDir = ".";
-		}
-#endif
-
-        char last_char = pluginDir[pluginDir.length()-1];
-        if (last_char != '/' && last_char != '\\')
+        if (!pluginDir.empty() && *pluginDir.rbegin() != '/' && *pluginDir.rbegin() != '\\')
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
             pluginDir += "\\";
