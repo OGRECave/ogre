@@ -374,6 +374,8 @@ namespace Ogre
 		// Inform all resources that device lost.
 		D3D9RenderSystem::getResourceManager()->notifyOnDeviceLost(mpDevice);
 
+		// Notify all listener before device is rested
+		renderSystem->notifyOnDeviceLost(this);
 
 		// Release all automatic temporary buffers and free unused
 		// temporary buffers, so we doesn't need to recreate them,
