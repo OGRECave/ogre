@@ -123,8 +123,11 @@ means you have to use Mercurial itself to apply the patches.
 git = True
 ------------------------------------------------------------
 
-Windows Text Handling
-^^^^^^^^^^^^^^^^^^^^^
+Windows Specific
+~~~~~~~~~~~~~~~~
+
+Text Handling
+^^^^^^^^^^^^^
 Because Windows handles line endings differently to Linux and OS X, you will need some extra entries in your configuration:
 
 ------------------------------------------------------------
@@ -162,6 +165,40 @@ postpull = rebase
 
 This sets the default action after pulling changesets to rebase your own outstanding changesets on top of it. You can 
 also find it in the Global Options under Synchronize > After Pull Operation.
+
+Mac OS X Specific
+~~~~~~~~~~~~~~~~~
+
+Using FileMerge
+^^^^^^^^^^^^^^^
+
+Apple's included FileMerge tool is an extremely powerful 3-way merge tool that you really want to be
+using for visual diffs and manual merges. It can be launched from the command-line using 'opendiff', but
+unfortunately if you call it directly it doesn't block further execution in the console which causes
+problems for Mercurial. So, the first thing you need to do is create a wrapper script called
+"opendiff-w" in /usr/bin (or somewhere else on your path), with this content:
+
+----------------------------
+#!/bin/sh
+opendiff "$@" | cat
+----------------------------
+
+Make sure you chmod +x this file. Then, make the following changes in your ~/.hgrc file:
+------------------------------------
+[extensions]
+hgext.extdiff =
+
+[extdiff]
+cmd.opendiff = opendiff-w
+
+[merge-tools]
+filemerge.executable = opendiff-w
+filemerge.args = $local $other -ancestor $base -merge $output
+------------------------------------
+
+The first entry makes the 'opendiff' command available so you can call 'hg opendiff' instead of 'hg diff'
+and it will open up FileMerge instead of showing you a unified diff on the command line. The merge-tools
+section makes opendiff the default when merging.
 
 Using Mercurial
 ---------------
@@ -334,13 +371,28 @@ Applying patches is also fairly simple in itself, but there are a couple of nuan
 -------------------------------------------------------------
 hg import PATCH_FILES...
 -------------------------------------------------------------
-It doesn't matter whether the patch file is in GNU style or Git style, it will work either way. But it's important to understand what this does - each patch file (usually) contains
-a single commit, and those commits are applied on top of your current repository, on to your current branch. Unlike a patch for Subversion, which applies to your working copy which 
-you then need to commit, this actually transfers commits directly, including the original author names & emails. 
+It doesn't matter whether the patch file is in GNU style or Git style, it will work either way. But 
+it's important to understand what this does - each patch file (usually) contains a single commit, 
+and those commits are applied on top of your current repository, on to your current branch. Unlike 
+a patch for Subversion, which applies to your working copy which you then need to commit, this 
+actually transfers commits directly, including the original author names & emails. 
 
-Because it tries to apply the commits in the patch to the current base, failures are possible if conflicting changes have occurred. In this case, hg import just aborts. A good way to 
-deal with this is to use the --exact parameter, which then applies the changes to the revision that is listed as the base in the patch file (which should therefore always succeed unless
-the patch is broken). This will create one or more new heads on the branch in question which you should then merge or rebase into your own branch, resolving the conflicts as appropriate. 
+NOTE: Well, at least it tries to preserve the author & commit message, if the patch was generated
+from a commit using hg export. If alternatively the patch was generated from hg diff in a working 
+copy, or the header was chopped off by someone before submission, then actually hg import will 
+bring up your editor and asks you to provide a new commit message (and will commit it under your 
+own name).
+
+TIP: If you would prefer to just import the patch into your working copy rather than as a commit, 
+use "hg import --no-commit PATCH_FILES..."
+
+Because it tries to apply the commits in the patch to the current base, failures are possible if 
+conflicting changes have occurred. In this case, hg import just aborts. A good way to 
+deal with this is to use the --exact parameter, which then applies the changes to the revision that 
+is listed as the base in the patch file (which should therefore always succeed unless
+the patch is broken). This will create one or more new heads on the branch in 
+question which you should then merge or rebase into your own branch, resolving the conflicts 
+as appropriate. 
 See <<ParallelDev,Parallel Development>> for more information.
 
 
@@ -392,7 +444,8 @@ So, assuming you've just pulled a set of changesets from a long-running fork and
 -------------------------------------------------------------
 hg merge
 -------------------------------------------------------------
-Mercurial automatically knows that you want to merge the 2 heads on this branch and will do it for you. You'll need to resolve any conflicts if they occur, then commit the merge, unifying the heads (and being able to push them if you want), like so:
+Mercurial automatically knows that you want to merge the 2 heads on this branch and will do it for you. 
+You'll need to resolve any conflicts if they occur, then commit the merge, unifying the heads (and being able to push them if you want), like so:
 image:images/hgmultipleheads3.png[height=250]
 
 
@@ -438,7 +491,9 @@ This is a classic "oops" case, maybe you realised just after you committed that 
 hg rollback
 ---------------------------------------------------------------
 
-This removes the last commit and puts the changes from it back in your working directory, ready to be committed again. 
+This removes the last commit and puts the changes from it back in your working directory, ready to be committed again. You can 
+actually keep calling this to roll back multiple commits, but bear in mind that it will just merge the changes into your
+working copy, meaning you'll probably create a single commit to replace it.
 
 Reverse Commit
 ^^^^^^^^^^^^^^
