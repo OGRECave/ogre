@@ -52,6 +52,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgreLodStrategy.h"
 #include "OgreLodListener.h"
+#include "OgreMaterialManager.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -68,8 +69,7 @@ namespace Ogre {
           mFrameBonesLastUpdated(NULL),
 		  mSharedSkeletonEntities(NULL),
 		  mDisplaySkeleton(false),
-	      mHardwareAnimation(false),
-		  mHardwarePoseCount(0),
+	      mHardwarePoseCount(0),
 		  mVertexProgramInUse(false),
 		  mSoftwareAnimationRequests(0),
 		  mSoftwareAnimationNormalsRequests(0),
@@ -105,7 +105,6 @@ namespace Ogre {
         mFrameBonesLastUpdated(NULL),
         mSharedSkeletonEntities(NULL),
 		mDisplaySkeleton(false),
-		mHardwareAnimation(false),
 		mVertexProgramInUse(false),
 		mSoftwareAnimationRequests(0),
 		mSoftwareAnimationNormalsRequests(0),
@@ -1483,11 +1482,32 @@ namespace Ogre {
         return (mMesh->getEdgeList(mMeshLodIndex) != NULL);
     }
     //-----------------------------------------------------------------------
+	bool Entity::isHardwareAnimationEnabled(void)
+	{
+		//find whether the entity has hardware animation for the current active sceme
+		unsigned short schemeIndex = MaterialManager::getSingleton()._getActiveSchemeIndex();
+		SchemeHardwareAnimMap::iterator it = mSchemeHardwareAnim.find(schemeIndex);
+		if (it == mSchemeHardwareAnim.end())
+		{
+			//evaluate the animation hardware value
+			it = mSchemeHardwareAnim.insert(
+				SchemeHardwareAnimMap::value_type(schemeIndex,
+					calcVertexProcessing())).first;
+		}
+		return it->second;
+	}
+
+	//-----------------------------------------------------------------------
     void Entity::reevaluateVertexProcessing(void)
     {
+		//clear the cache so that the values will be reevaluated
+		mSchemeHardwareAnim.clear();
+	}
+	//-----------------------------------------------------------------------
+    bool Entity::calcVertexProcessing(void)
+	{
         // init
-        mHardwareAnimation = false;
-        mVertexProgramInUse = false; // assume false because we just assign this
+		bool hasHardwareAnimation = false;
         bool firstPass = true;
 
         SubEntityList::iterator i, iend;
@@ -1512,22 +1532,33 @@ namespace Ogre {
             Pass* p = t->getPass(0);
             if (p->hasVertexProgram())
             {
-                // If one material uses a vertex program, set this flag
-                // Causes some special processing like forcing a separate light cap
-                mVertexProgramInUse = true;
+                if (mVertexProgramInUse == false)
+				{
+					// If one material uses a vertex program, set this flag
+					// Causes some special processing like forcing a separate light cap
+					mVertexProgramInUse = true;
+					
+					// If shadow renderables already created create their light caps
+					ShadowRenderableList::iterator si = mShadowRenderables.begin();
+					ShadowRenderableList::iterator siend = mShadowRenderables.end();
+					for (si = mShadowRenderables.begin(); si != siend; ++si)
+					{
+						static_cast<EntityShadowRenderable*>(*si)->_createSeparateLightCap();
+					}
+				}
 
-                if (hasSkeleton())
+				if (hasSkeleton())
 				{
 					// All materials must support skinning for us to consider using
 					// hardware animation - if one fails we use software
 					if (firstPass)
 					{
-						mHardwareAnimation = p->getVertexProgram()->isSkeletalAnimationIncluded();
+						hasHardwareAnimation = p->getVertexProgram()->isSkeletalAnimationIncluded();
 						firstPass = false;
 					}
 					else
 					{
-						mHardwareAnimation = mHardwareAnimation &&
+						hasHardwareAnimation = hasHardwareAnimation &&
 							p->getVertexProgram()->isSkeletalAnimationIncluded();
 					}
 				}
@@ -1547,12 +1578,12 @@ namespace Ogre {
 					// hardware animation - if one fails we use software
 					if (firstPass)
 					{
-						mHardwareAnimation = p->getVertexProgram()->isMorphAnimationIncluded();
+						hasHardwareAnimation = p->getVertexProgram()->isMorphAnimationIncluded();
 						firstPass = false;
 					}
 					else
 					{
-						mHardwareAnimation = mHardwareAnimation &&
+						hasHardwareAnimation = hasHardwareAnimation &&
 							p->getVertexProgram()->isMorphAnimationIncluded();
 					}
 				}
@@ -1562,7 +1593,7 @@ namespace Ogre {
 					// hardware animation - if one fails we use software
 					if (firstPass)
 					{
-						mHardwareAnimation = p->getVertexProgram()->isPoseAnimationIncluded();
+						hasHardwareAnimation = p->getVertexProgram()->isPoseAnimationIncluded();
 						if (sub->getSubMesh()->useSharedVertices)
 							mHardwarePoseCount = p->getVertexProgram()->getNumberOfPosesIncluded();
 						else
@@ -1571,7 +1602,7 @@ namespace Ogre {
 					}
 					else
 					{
-						mHardwareAnimation = mHardwareAnimation &&
+						hasHardwareAnimation = hasHardwareAnimation &&
 							p->getVertexProgram()->isPoseAnimationIncluded();
 						if (sub->getSubMesh()->useSharedVertices)
 							mHardwarePoseCount = std::max(mHardwarePoseCount,
@@ -1593,6 +1624,8 @@ namespace Ogre {
         {
             mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber() - 1;
         }
+
+		return hasHardwareAnimation;
     }
     //-----------------------------------------------------------------------
     Real Entity::_getMeshLodFactorTransformed() const
@@ -1892,13 +1925,21 @@ namespace Ogre {
                 vertexData->vertexCount * 2;
             if (createSeparateLightCap)
             {
-                // Create child light cap
-                mLightCap = OGRE_NEW EntityShadowRenderable(parent,
-                    indexBuffer, vertexData, false, subent, true);
+				_createSeparateLightCap();
             }
         }
-
     }
+
+	//-----------------------------------------------------------------------
+    void Entity::EntityShadowRenderable::_createSeparateLightCap()
+	{
+		if (mLightCap == NULL)
+		{
+			// Create child light cap
+			mLightCap = OGRE_NEW EntityShadowRenderable(mParent,
+				&mRenderOp.indexData->indexBuffer, mCurrentVertexData, false, mSubEntity, true);
+		}   
+	}
     //-----------------------------------------------------------------------
     Entity::EntityShadowRenderable::~EntityShadowRenderable()
     {
@@ -2082,11 +2123,11 @@ namespace Ogre {
 		return mMesh->sharedVertexData;
 	}
 	//-----------------------------------------------------------------------
-	Entity::VertexDataBindChoice Entity::chooseVertexDataForBinding(bool vertexAnim) const
+	Entity::VertexDataBindChoice Entity::chooseVertexDataForBinding(bool vertexAnim)
 	{
 		if (hasSkeleton())
 		{
-			if (!mHardwareAnimation)
+			if (!isHardwareAnimationEnabled())
 			{
 				// all software skeletal binds same vertex data
 				// may be a 2-stage s/w transform including morph earlier though
@@ -2106,7 +2147,7 @@ namespace Ogre {
 		else if (vertexAnim)
 		{
 			// morph only, no skeletal
-			if (mHardwareAnimation)
+			if (isHardwareAnimationEnabled())
 			{
 				return BIND_HARDWARE_MORPH;
 			}

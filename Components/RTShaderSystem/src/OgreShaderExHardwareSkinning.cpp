@@ -42,6 +42,7 @@ String HardwareSkinning::Type = "SGX_HardwareSkinning";
 HardwareSkinning::HardwareSkinning() :
 	mBoneCount(0),
 	mWeightCount(0),
+	mAllowStateChange(false),
 	mGroupOrder((int)FFP_VS_TRANSFORM - 10)
 {
 }
@@ -81,10 +82,12 @@ ushort HardwareSkinning::getWeightCount()
 //-----------------------------------------------------------------------
 bool HardwareSkinning::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	return (srcPass->hasVertexProgram() == true) &&
-		(srcPass->getVertexProgram()->isSkeletalAnimationIncluded() == true) &&
+	return 
 		(mBoneCount != 0) && (mBoneCount <= 256) &&
-		(mWeightCount != 0) && (mWeightCount <= 4);
+		(mWeightCount != 0) && (mWeightCount <= 4) &&
+		((mAllowStateChange == true) ||
+		((srcPass->hasVertexProgram() == true) &&
+		(srcPass->getVertexProgram()->isSkeletalAnimationIncluded() == true)));
 }
 
 //-----------------------------------------------------------------------
@@ -301,6 +304,7 @@ void HardwareSkinning::copyFrom(const SubRenderState& rhs)
 	const HardwareSkinning& hardSkin = static_cast<const HardwareSkinning&>(rhs);
 	mWeightCount = hardSkin.mWeightCount;
 	mBoneCount = hardSkin.mBoneCount;
+	mAllowStateChange = hardSkin.mAllowStateChange;
 }
 
 //-----------------------------------------------------------------------
@@ -337,9 +341,15 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		}
 		else
 		{
+			//create and update the hardware skinning sub render state
 			SubRenderState*	subRenderState = SubRenderStateFactory::createInstance();
 			HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
 			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount);
+			
+			//hardware skinning was specificaly asked for in the material
+			//so allow for change no matter what
+			hardSkinSrs->setAllowSkinningStateChange(true);
+
 			return subRenderState;
 		}
 

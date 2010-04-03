@@ -101,6 +101,25 @@ public:
 	*/
 	virtual bool preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
+	
+	/**
+	Sets whether skinning will be enabled for materials not containing hardware
+	skinning in their original material.
+	@note 
+	This value is by default false. However the value is automaticly changed
+	to true if the render state was created as a result of material script
+	parsing.
+	*/
+	void setAllowSkinningStateChange(bool value) { mAllowStateChange = value; }
+	
+
+	/**
+	Returns whether skinning will be enabled for materials not containing hardware
+	skinning in their original material.
+	@see setAllowSkinningStateChange
+	*/
+	bool getAllowSkinningStateChange() const {	return mAllowStateChange; }
+	
 	static String Type;
 
 	
@@ -143,6 +162,7 @@ protected:
 	
 	ushort mBoneCount;
 	ushort mWeightCount;
+	bool mAllowStateChange;
 	int mGroupOrder;
 
 	ParameterPtr mParamInPosition;

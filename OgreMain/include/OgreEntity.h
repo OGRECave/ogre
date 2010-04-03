@@ -84,7 +84,9 @@ namespace Ogre {
 		friend class EntityFactory;
 		friend class SubEntity;
 	public:
+		
 		typedef set<Entity*>::type EntitySet;
+		typedef map<unsigned short, bool>::type SchemeHardwareAnimMap;
 
 	protected:
 
@@ -184,8 +186,12 @@ namespace Ogre {
 
 		/// Flag determines whether or not to display skeleton
 		bool mDisplaySkeleton;
-		/// Flag indicating whether hardware animation is supported by this entities materials
-		bool mHardwareAnimation;
+		/** 
+		* Flag indicating whether hardware animation is supported by this entities materials
+		* data is saved per scehme number
+		*/
+		SchemeHardwareAnimMap mSchemeHardwareAnim;
+
 		/// Number of hardware poses supported by materials
 		ushort mHardwarePoseCount;
 		/// Flag indicating whether we have a vertex program in use on any of our subentities
@@ -250,9 +256,17 @@ namespace Ogre {
 		/// internal implementation of detaching all 'child' objects of this entity
 		void detachAllObjectsImpl(void);
 
-		/// Trigger reevaluation of the kind of vertex processing in use
+		/// ensures reevaluation of the vertex processing usage
 		void reevaluateVertexProcessing(void);
 
+		/** calculates the kind of vertex processing in use
+		@remarks
+		This function's return value is calculated according to the current 
+		active scheme. This is due to the fact that RTSS schemes may be diffrent
+		in their handling of hardware animation.
+		*/
+		bool calcVertexProcessing(void);
+	
 		/// Apply vertex animation
 		void applyVertexAnimation(bool hardwareAnimation, bool stencilShadows);
 		/// Initialise the hardware animation elements for given vertex data
@@ -297,6 +311,9 @@ namespace Ogre {
 				HardwareIndexBufferSharedPtr* indexBuffer, const VertexData* vertexData,
 				bool createSeparateLightCap, SubEntity* subent, bool isLightCap = false);
 			~EntityShadowRenderable();
+			
+			/// create the seperate light cap if it doesn't already exists
+			void _createSeparateLightCap();
 			/// Overridden from ShadowRenderable
 			void getWorldTransforms(Matrix4* xform) const;
 			HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
@@ -565,8 +582,12 @@ namespace Ogre {
 		vertex programs must support 'includes_morph_animation true' if using
         morph animation, 'includes_pose_animation true' if using pose animation
         and 'includes_skeletal_animation true' if using skeletal animation.
+
+		Also note the the function returns value according to the current active
+		scheme. This is due to the fact that RTSS schemes may be diffrent in their
+		handling of hardware animation.
 		*/
-		bool isHardwareAnimationEnabled(void) const { return mHardwareAnimation; }
+		bool isHardwareAnimationEnabled(void);
 
 		/** Overridden from MovableObject */
 		void _notifyAttached(Node* parent, bool isTagPoint = false);
@@ -721,7 +742,7 @@ namespace Ogre {
 			BIND_HARDWARE_MORPH
 		};
 		/// Choose which vertex data to bind to the renderer
-		VertexDataBindChoice chooseVertexDataForBinding(bool hasVertexAnim) const;
+		VertexDataBindChoice chooseVertexDataForBinding(bool hasVertexAnim);
 
 		/** Are buffers already marked as vertex animated? */
 		bool _getBuffersMarkedForAnimation(void) const { return mVertexAnimationAppliedThisFrame; }
