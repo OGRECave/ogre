@@ -340,7 +340,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
 	// Resolve input vertex shader tangent.
 	if (mNormalMapSpace == NMS_TANGENT)
 	{
-		mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT, GCT_FLOAT3);
+		mVSInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 		if (mVSInTangent.get() == NULL)
 			return false;
 

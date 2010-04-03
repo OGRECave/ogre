@@ -164,8 +164,6 @@ public:
 		SPC_POSTOLIGHT_TANGENT_SPACE6,
 		SPC_POSTOLIGHT_TANGENT_SPACE7,
 
-
-
 		/// Light direction in object space index 0-7
 		SPC_LIGHTDIRECTION_OBJECT_SPACE0,
 		SPC_LIGHTDIRECTION_OBJECT_SPACE1,
@@ -245,11 +243,29 @@ public:
 		/// Blending indices
 		SPC_BLEND_INDICES,
 		
-		/// Tangent vector
-		SPC_TANGENT,
+		/// Tangent in object space
+		SPC_TANGENT_OBJECT_SPACE,
 
-		/// Binormal vector
-		SPC_BINORMAL,
+		/// Tangent in world space
+		SPC_TANGENT_WORLD_SPACE,
+
+		/// Tangent in view space
+		SPC_TANGENT_VIEW_SPACE,
+
+		/// Tangent in tangent space
+		SPC_TANGENT_TANGENT_SPACE,
+
+		/// Binormal in object space
+		SPC_BINORMAL_OBJECT_SPACE,
+
+		/// Binormal in world space
+		SPC_BINORMAL_WORLD_SPACE,
+
+		/// Binormal in view space
+		SPC_BINORMAL_VIEW_SPACE,
+
+		/// Binormal in tangent space
+		SPC_BINORMAL_TANGENT_SPACE,
 
 		/// Diffuse color
 		SPC_COLOR_DIFFUSE,

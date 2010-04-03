@@ -488,7 +488,7 @@ ParameterPtr ParameterFactory::createInBiNormal(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_BINORMAL, index, 
-		Parameter::SPC_BINORMAL));
+		Parameter::SPC_BINORMAL_OBJECT_SPACE));
 }
 
 //-----------------------------------------------------------------------
@@ -496,7 +496,7 @@ ParameterPtr ParameterFactory::createInTangent(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), 
 		Parameter::SPS_TANGENT, index, 
-		Parameter::SPC_TANGENT));
+		Parameter::SPC_TANGENT_OBJECT_SPACE));
 }
 
 //-----------------------------------------------------------------------
@@ -512,7 +512,7 @@ ParameterPtr ParameterFactory::createOutBiNormal(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_BINORMAL, index, 
-		Parameter::SPC_BINORMAL));
+		Parameter::SPC_BINORMAL_OBJECT_SPACE));
 }
 
 //-----------------------------------------------------------------------
@@ -520,7 +520,7 @@ ParameterPtr ParameterFactory::createOutTangent(int index)
 {
 	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), 
 		Parameter::SPS_TANGENT, index, 
-		Parameter::SPC_TANGENT));
+		Parameter::SPC_TANGENT_OBJECT_SPACE));
 }
 
 //-----------------------------------------------------------------------

@@ -142,16 +142,22 @@ protected:
 	*/
 	virtual bool addFunctionInvocations	(ProgramSet* programSet);
 
+	/** Adds functions to calculate position data in world, object and projective space */
+	void addPositionCalculations(Function* vsMain, int& funcCounter);
+
 	/** Adds the weight of a given position for a given index */
 	void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
 
 	/** Adds the calculations for calculating a normal related element */
 	void addNormalRelatedCalculations(Function* vsMain,
-								ParameterPtr& pNormalParam, 
+								ParameterPtr& pNormalRelatedParam, 
+								ParameterPtr& pNormalWorldRelatedParam, 
 								int& funcCounter);
 
 	/** Adds the weight of a given normal related parameter for a given index */
-	void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalParam, int index, int& funcCounter);
+	void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam, 
+						ParameterPtr& pNormalWorldRelatedParam, 
+						int index, int& funcCounter);
 
 	/** Translates an index number to a mask value */
 	Operand::OpMask indexToMask(int index);
@@ -163,8 +169,9 @@ protected:
 	ushort mBoneCount;
 	ushort mWeightCount;
 	bool mAllowStateChange;
-	int mGroupOrder;
 
+	bool mDoBoneCalculations;
+	
 	ParameterPtr mParamInPosition;
 	ParameterPtr mParamInNormal;
 	ParameterPtr mParamInBiNormal;
@@ -173,11 +180,19 @@ protected:
 	ParameterPtr mParamInWeights;
 	UniformParameterPtr mParamInWorldMatrices;
 	UniformParameterPtr mParamInInvWorldMatrix;
+	UniformParameterPtr mParamInViewProjMatrix;
+	UniformParameterPtr mParamInWorldMatrix;
+	UniformParameterPtr mParamInWorldViewProjMatrix;
 	
 	ParameterPtr mParamTempFloat4;
-	ParameterPtr mParamAggregFloat4;
 	ParameterPtr mParamTempFloat3;
-	ParameterPtr mParamAggregFloat3;
+	ParameterPtr mParamLocalPositionWorld;
+	ParameterPtr mParamLocalNormalWorld;
+	ParameterPtr mParamLocalTangentWorld;
+	ParameterPtr mParamLocalBinormalWorld;
+	ParameterPtr mParamOutPositionProj;
+
+
 };
 
 

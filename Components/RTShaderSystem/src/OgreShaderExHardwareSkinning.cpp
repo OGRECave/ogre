@@ -43,7 +43,7 @@ HardwareSkinning::HardwareSkinning() :
 	mBoneCount(0),
 	mWeightCount(0),
 	mAllowStateChange(false),
-	mGroupOrder((int)FFP_VS_TRANSFORM - 10)
+	mDoBoneCalculations(false)
 {
 }
 
@@ -57,7 +57,7 @@ const String& HardwareSkinning::getType() const
 //-----------------------------------------------------------------------
 int	HardwareSkinning::getExecutionOrder() const
 {
-	return FFP_TRANSFORM - 10;
+	return FFP_TRANSFORM;
 }
 
 //-----------------------------------------------------------------------
@@ -82,12 +82,14 @@ ushort HardwareSkinning::getWeightCount()
 //-----------------------------------------------------------------------
 bool HardwareSkinning::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	return 
+	mDoBoneCalculations =  
 		(mBoneCount != 0) && (mBoneCount <= 256) &&
 		(mWeightCount != 0) && (mWeightCount <= 4) &&
 		((mAllowStateChange == true) ||
 		((srcPass->hasVertexProgram() == true) &&
 		(srcPass->getVertexProgram()->isSkeletalAnimationIncluded() == true)));
+
+	return true;
 }
 
 //-----------------------------------------------------------------------
@@ -99,20 +101,27 @@ bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 
 	vsProgram->setSkeletalAnimationIncluded(true);
 	
-	//input parameters
+	//
+	// get the parameters we need whether we are doing bone calculations or not
+	//
+	// Note: in order to be consistent we will always output position, normal,
+	// tangent and binormal in both object and world space. And output position
+	// in projective space to cover the responsibility of the transform stage
+
+	//input param
 	mParamInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
 	mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);	
-	mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL, GCT_FLOAT3);	
-	mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT, GCT_FLOAT3);	
-	mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-	mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-	mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, 0, mBoneCount);
-	mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
+	mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);	
+	mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);	
 	
-	mParamTempFloat4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal4", GCT_FLOAT4);	
-	mParamAggregFloat4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempAggreg4", GCT_FLOAT4);	
-	mParamTempFloat3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3", GCT_FLOAT3);	
-	mParamAggregFloat3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempAggreg3", GCT_FLOAT3);	
+	//local param
+	mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);	
+	mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);	
+	mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);	
+	mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);	
+	
+	//output param
+	mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);	
 	
 	//check if parameter retrival went well
 	bool isValid = 
@@ -120,14 +129,48 @@ bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 		(mParamInNormal.get() != NULL) &&
 		(mParamInBiNormal.get() != NULL) &&
 		(mParamInTangent.get() != NULL) &&
-		(mParamInIndices.get() != NULL) &&
-		(mParamInWeights.get() != NULL) &&
-		(mParamInWorldMatrices.get() != NULL) &&
-		(mParamInInvWorldMatrix.get() != NULL) &&
-		(mParamTempFloat4.get() != NULL) &&
-		(mParamAggregFloat4.get() != NULL) &&
-		(mParamTempFloat3.get() != NULL) &&
-		(mParamAggregFloat3.get() != NULL);
+		(mParamLocalPositionWorld.get() != NULL) &&
+		(mParamLocalNormalWorld.get() != NULL) &&
+		(mParamLocalTangentWorld.get() != NULL) &&
+		(mParamLocalBinormalWorld.get() != NULL) &&
+		(mParamOutPositionProj.get() != NULL);
+
+	
+	if (mDoBoneCalculations == true)
+	{
+		//input parameters
+		mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);	
+		mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);	
+		mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);	
+		mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+		mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, 0, mBoneCount);
+		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
+		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
+		
+		mParamTempFloat4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal4", GCT_FLOAT4);	
+		mParamTempFloat3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3", GCT_FLOAT3);	
+			
+		//check if parameter retrival went well
+		isValid &= 
+			(mParamInIndices.get() != NULL) &&
+			(mParamInWeights.get() != NULL) &&
+			(mParamInWorldMatrices.get() != NULL) &&
+			(mParamInViewProjMatrix.get() != NULL) &&
+			(mParamInInvWorldMatrix.get() != NULL) &&
+			(mParamTempFloat4.get() != NULL) &&
+			(mParamTempFloat3.get() != NULL);
+	}
+	else
+	{
+		mParamInWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
+		mParamInWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
+	
+		//check if parameter retrival went well
+		isValid &= 
+			(mParamInWorldMatrix.get() != NULL) &&
+			(mParamInWorldViewProjMatrix.get() != NULL);
+	}
 	return isValid;
 }
 
@@ -147,46 +190,95 @@ bool HardwareSkinning::addFunctionInvocations(ProgramSet* programSet)
 	
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	Function* vsMain = vsProgram->getEntryPointFunction();
-	FunctionInvocation* curFuncInvocation = NULL;	
 	int internalCounter = 0;
 
-	//set functions to calculate world position
-	for(int i = 0 ; i < getWeightCount() ; ++i)
-	{
-		addIndexedPositionWeight(vsMain, i, internalCounter);
-	}
-
-	//update back the original position relative to the object
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, mGroupOrder, internalCounter++); 								
-	curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamAggregFloat4, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT);
-	vsMain->addAtomInstace(curFuncInvocation);	
-
-	addNormalRelatedCalculations(vsMain, mParamInNormal, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInBiNormal, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInTangent, internalCounter);
+	//add functions to calculate position data in world, object and projective space
+	addPositionCalculations(vsMain, internalCounter);
+	
+	//add functions to calculate normal and normal related data in world and object space
+	addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
+	addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
+	addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
 	return true;
 }
 
 //-----------------------------------------------------------------------
+void HardwareSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
+{
+	FunctionInvocation* curFuncInvocation = NULL;	
+	
+	if (mDoBoneCalculations == true)
+	{
+		//set functions to calculate world position
+		for(int i = 0 ; i < getWeightCount() ; ++i)
+		{
+			addIndexedPositionWeight(vsMain, i, funcCounter);
+		}
+		
+		//update back the original position relative to the object
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+
+		//update the projective position thereby filling the transform stage role
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInViewProjMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+	}
+	else
+	{
+		//update from object to world space
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+
+		//update from object to projective space
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInWorldViewProjMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+	}
+}
+
+//-----------------------------------------------------------------------
 void HardwareSkinning::addNormalRelatedCalculations(Function* vsMain,
-								ParameterPtr& pNormalParam, 
+								ParameterPtr& pNormalRelatedParam, 
+								ParameterPtr& pNormalWorldRelatedParam, 
 								int& funcCounter)
 {
-	//set functions to calculate world normal
-	for(int i = 0 ; i < getWeightCount() ; ++i)
-	{
-		addIndexedNormalRelatedWeight(vsMain, pNormalParam, i, funcCounter);
-	}
-
-	//update back the original position relative to the object
 	FunctionInvocation* curFuncInvocation;
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, mGroupOrder, funcCounter++); 								
-	curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamAggregFloat3, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(pNormalParam, Operand::OPS_OUT);
-	vsMain->addAtomInstace(curFuncInvocation);	
+	
+	if (mDoBoneCalculations == true)
+	{
+		//set functions to calculate world normal
+		for(int i = 0 ; i < getWeightCount() ; ++i)
+		{
+			addIndexedNormalRelatedWeight(vsMain, pNormalRelatedParam, pNormalWorldRelatedParam, i, funcCounter);
+		}
+
+		//update back the original position relative to the object
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+	}
+	else
+	{
+		//update from object to world space
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);
+		vsMain->addAtomInstace(curFuncInvocation);	
+	}
 
 }
 
@@ -199,7 +291,7 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 	FunctionInvocation* curFuncInvocation;
 
 	//multiply position with world matrix and put into temporary param
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, mGroupOrder, funcCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
 	curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);	
@@ -207,13 +299,13 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 	vsMain->addAtomInstace(curFuncInvocation);	
 
 	//set w value of temporary param to 1
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, mGroupOrder, funcCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0f), Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_W);	
 	vsMain->addAtomInstace(curFuncInvocation);	
 
 	//multiply temporary param with  weight
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, mGroupOrder, funcCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
 	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT);	
@@ -223,18 +315,18 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 	if (index == 0)
 	{
 		//set the local param as the value of the world param
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, mGroupOrder, funcCounter++); 								
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
 		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamAggregFloat4, Operand::OPS_OUT);	
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);	
 	}
 	else
 	{
 		//add the local param as the value of the world param
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, mGroupOrder, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamAggregFloat4, Operand::OPS_IN);	
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);	
+		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);	
 		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamAggregFloat4, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);	
 	}
 }
@@ -243,6 +335,7 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 //-----------------------------------------------------------------------
 void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 								ParameterPtr& pNormalParam, 
+								ParameterPtr& pNormalWorldRelatedParam, 
 								int index, int& funcCounter)
 {
 
@@ -251,7 +344,7 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 	Operand::OpMask indexMask = indexToMask(index);
 	
 	//multiply position with world matrix and put into temporary param
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, mGroupOrder, funcCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN, Operand::OPM_ALL);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
 	curFuncInvocation->pushOperand(pNormalParam, Operand::OPS_IN);	
@@ -259,7 +352,7 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 	vsMain->addAtomInstace(curFuncInvocation);	
 
 	//multiply temporary param with weight
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, mGroupOrder, funcCounter++); 								
+	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
 	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);	
@@ -269,18 +362,18 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 	if (index == 0)
 	{
 		//set the local param as the value of the world normal
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, mGroupOrder, funcCounter++); 								
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
 		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamAggregFloat3, Operand::OPS_OUT);	
+		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);	
 	}
 	else
 	{
 		//add the local param as the value of the world normal
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, mGroupOrder, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamAggregFloat3, Operand::OPS_IN);	
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);	
+		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);	
 		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamAggregFloat3, Operand::OPS_OUT);	
 		vsMain->addAtomInstace(curFuncInvocation);	
 	}
 }
@@ -305,6 +398,7 @@ void HardwareSkinning::copyFrom(const SubRenderState& rhs)
 	mWeightCount = hardSkin.mWeightCount;
 	mBoneCount = hardSkin.mBoneCount;
 	mAllowStateChange = hardSkin.mAllowStateChange;
+	mDoBoneCalculations = hardSkin.mDoBoneCalculations;
 }
 
 //-----------------------------------------------------------------------
