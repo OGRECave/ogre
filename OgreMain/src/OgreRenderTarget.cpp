@@ -40,13 +40,13 @@ THE SOFTWARE.
 namespace Ogre {
 
     RenderTarget::RenderTarget()
-		:mPriority(OGRE_DEFAULT_RT_GROUP),
-		mActive(true),
-		mAutoUpdate(true),
-		mHwGamma(false), 
-		mFSAA(0),
-		mDepthBuffer(0),
-		mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
+		: mPriority(OGRE_DEFAULT_RT_GROUP)
+		, mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
+		, mDepthBuffer(0)
+		, mActive(true)
+		, mAutoUpdate(true)
+		, mHwGamma(false)
+		, mFSAA(0)
     {
         mTimer = Root::getSingleton().getTimer();
         resetStatistics();

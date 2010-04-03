@@ -169,6 +169,7 @@ namespace Ogre {
 		, mLightsPerIteration(1)
 		, mRunOnlyForOneLightType(false)
 		, mOnlyLightType(Light::LT_POINT)
+		, mLightMask(0xFFFFFFFF)
 		, mShadeOptions(SO_GOURAUD)
 		, mPolygonMode(PM_SOLID)
 		, mNormaliseNormals(false)
@@ -196,7 +197,6 @@ namespace Ogre {
 		, mLightScissoring(false)
 		, mLightClipPlanes(false)
 		, mIlluminationStage(IS_UNKNOWN)
-		, mLightMask(0xFFFFFFFF)
     {
 		mPointAttenuationCoeffs[0] = 1.0f;
 		mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
