@@ -69,6 +69,7 @@ namespace Ogre
 			void updateParams(const MaterialPtr& mat, const Terrain* terrain);
 			void updateParamsForCompositeMap(const MaterialPtr& mat, const Terrain* terrain);
 			void requestOptions(Terrain* terrain);
+			bool isVertexCompressionSupported() const;
 
 			/** Whether to support normal mapping per layer in the shader (default true). 
 			*/

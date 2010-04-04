@@ -1394,6 +1394,44 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void Terrain::getPointTransform(Matrix4* outXform) const
+	{
+		*outXform = Matrix4::IDENTITY;
+		switch(mAlign)
+		{
+			case ALIGN_X_Z:
+				//outpos->y = height (z)
+				(*outXform)[1][2] = 1.0f;
+				//outpos->x = x * mScale + mBase;
+				(*outXform)[0][0] = mScale;
+				(*outXform)[0][3] = mBase;
+				//outpos->z = y * -mScale - mBase;
+				(*outXform)[3][1] = -mScale;
+				(*outXform)[3][3] = -mBase;
+				break;
+			case ALIGN_Y_Z:
+				//outpos->x = height;
+				(*outXform)[0][2] = 1.0f;
+				//outpos->z = x * -mScale - mBase;
+				(*outXform)[3][0] = -mScale;
+				(*outXform)[3][3] = -mBase;
+				//outpos->y = y * mScale + mBase;
+				(*outXform)[2][1] = mScale;
+				(*outXform)[2][3] = mBase;
+				break;
+			case ALIGN_X_Y:
+				//outpos->z = height;
+				(*outXform)[2][2] = 1.0f; // strictly already the case, but..
+				//outpos->x = x * mScale + mBase;
+				(*outXform)[0][0] = mScale;
+				(*outXform)[0][3] = mBase;
+				//outpos->y = y * mScale + mBase;
+				(*outXform)[1][1] = mScale;
+				(*outXform)[1][3] = mBase;
+				break;
+		};
+	}
+	//---------------------------------------------------------------------
 	void Terrain::getVector(const Vector3& inVec, Vector3* outVec)
 	{
 		getVectorAlign(inVec.x, inVec.y, inVec.z, mAlign, outVec);
@@ -2905,6 +2943,11 @@ namespace Ogre
 
 		}
 
+	}
+	//---------------------------------------------------------------------
+	bool Terrain::_getUseVertexCompression() const
+	{
+		return mMaterialGenerator->isVertexCompressionSupported();
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)

@@ -553,19 +553,36 @@ namespace Ogre
 			mVertexDataRecord->cpuVertexData = OGRE_NEW VertexData(dcl, bufbind);
 
 			// Vertex declaration
-			// TODO: consider vertex compression
 			size_t offset = 0;
-			// POSITION 
-			// float3(x, y, z)
-			offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT3, VES_POSITION).getSize();
-			// UV0
-			// float2(u, v)
-			// TODO - only include this if needing fixed-function
-			offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
-			// UV1 delta information
-			// float2(delta, deltaLODthreshold)
-			offset = 0;
-			offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
+			
+			if (mTerrain->_getUseVertexCompression())
+			{
+				// 14 bytes per vertex, shaders only
+				// POSITION (encoded x/y as indexes from base)
+				// short2(x, y)
+				offset += dcl->addElement(POSITION_BUFFER, offset, VET_SHORT2, VES_POSITION).getSize();
+				// UV0 - height
+				// float(height)
+				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
+				// UV1 delta information
+				// float2(delta, deltaLODthreshold)
+				offset = 0;
+				offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
+			}
+			else 
+			{
+				// 28 bytes per vertex, compatibility
+				// POSITION 
+				// float3(x, y, z)
+				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT3, VES_POSITION).getSize();
+				// UV0
+				// float2(u, v)
+				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
+				// UV1 delta information
+				// float2(delta, deltaLODthreshold)
+				offset = 0;
+				offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
+			}
 
 			// Calculate number of vertices
 			// Base geometry size * size
@@ -654,6 +671,8 @@ namespace Ogre
 		}
 		Vector3 pos;
 		
+		bool vcompress = mTerrain->_getUseVertexCompression();
+		
 		for (uint16 y = rect.top; y < rect.bottom; y += inc)
 		{
 			const float* pHeight = pBaseHeight;
@@ -671,28 +690,22 @@ namespace Ogre
 					pos -= mLocalCentre;
 
 					pHeight += inc;
-
-					*pPosBuf++ = pos.x;
-					*pPosBuf++ = pos.y;
-					*pPosBuf++ = pos.z;
-
-					// UVs - base UVs vary from 0 to 1, all other values
-					// will be derived using scalings
-					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0f - (y * uvScale);
+					
+					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
+					
 
 				}
 
 				if (pDeltaBuf)
 				{
-					// delta
-					*pDeltaBuf++ = *pDelta;
-					pDelta += inc;
-					// delta LOD threshold
+					// delta, and delta LOD threshold
 					// we want delta to apply to LODs no higher than this value
 					// at runtime this will be combined with a per-renderable parameter
 					// to ensure we only apply morph to the correct LOD
-					*pDeltaBuf++ = (float)mTerrain->getLODLevelWhenVertexEliminated(x, y) - 1.0f;
+					writeDeltaVertex(vcompress, x, y, *pDelta, 
+						(float)mTerrain->getLODLevelWhenVertexEliminated(x, y) - 1.0f, 
+						&pDeltaBuf);
+					pDelta += inc;
 
 				}
 
@@ -757,23 +770,16 @@ namespace Ogre
 					pHeight += inc;
 
 					pos += skirtOffset;
-
-					*pPosBuf++ = pos.x;
-					*pPosBuf++ = pos.y;
-					*pPosBuf++ = pos.z;
-
-					// UVs - same as base
-					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0f - (y * uvScale);
+					
+					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
 
 				}
 
 				if (pDeltaBuf)
 				{
 					// delta (none)
-					*pDeltaBuf++ = 0; 
 					// delta threshold (irrelevant)
-					*pDeltaBuf++ = 99;
+					writeDeltaVertex(vcompress, x, y, 0, 99, &pDeltaBuf);
 				}
 			}
 			pBaseHeight += mTerrain->getSize() * skirtSpacing;
@@ -827,21 +833,15 @@ namespace Ogre
 					// relative to local centre
 					pos -= mLocalCentre;
 					pos += skirtOffset;
+					
+					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
 
-					*pPosBuf++ = pos.x;
-					*pPosBuf++ = pos.y;
-					*pPosBuf++ = pos.z;
-
-					// UVs - same as base
-					*pPosBuf++ = x * uvScale;
-					*pPosBuf++ = 1.0f - (y * uvScale);
 				}
 				if (pDeltaBuf)
 				{
 					// delta (none)
-					*pDeltaBuf++ = 0; 
 					// delta threshold (irrelevant)
-					*pDeltaBuf++ = 99;
+					writeDeltaVertex(vcompress, x, y, 0, 99, &pDeltaBuf);
 				}
 			}
 			if (pRowPosBuf)
@@ -855,6 +855,40 @@ namespace Ogre
 		if (!deltabuf.isNull())
 			deltabuf->unlock();
 		
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::writePosVertex(bool compress, uint16 x, uint16 y, 
+		const Vector3& pos, float uvScale, float** ppPos)
+	{
+		float* pPosBuf = *ppPos;
+		
+		if (compress)
+		{
+			short* pPosShort = static_cast<short*>(static_cast<void*>(pPosBuf));
+			*pPosShort++ = (short)x;
+			*pPosShort++ = (short)y;
+			pPosBuf = static_cast<float*>(static_cast<void*>(pPosShort));
+		}
+		else 
+		{
+			*pPosBuf++ = pos.x;
+			*pPosBuf++ = pos.y;
+			*pPosBuf++ = pos.z;
+			
+			// UVs - base UVs vary from 0 to 1, all other values
+			// will be derived using scalings
+			*pPosBuf++ = x * uvScale;
+			*pPosBuf++ = 1.0f - (y * uvScale);
+		}
+		
+		*ppPos = pPosBuf;
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::writeDeltaVertex(bool compress, uint16 x, uint16 y, 
+		float delta, float deltaThresh, float** ppDelta)
+	{
+		*(*ppDelta)++ = delta;
+		*(*ppDelta)++ = deltaThresh;
 	}
 	//---------------------------------------------------------------------
 	uint16 TerrainQuadTreeNode::calcSkirtVertexIndex(uint16 mainIndex, bool isCol)

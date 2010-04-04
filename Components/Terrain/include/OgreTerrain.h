@@ -839,6 +839,10 @@ namespace Ogre
 		@note This point is relative to Terrain::getPosition
 		*/
 		void getPoint(long x, long y, float height, Vector3* outpos);
+		/** Get a transform which converts Vector4(xindex, yindex, height, 1) into 
+			an object-space position including scalings and alignment.
+		*/
+		void getPointTransform(Matrix4* outXform) const;
 		/** Translate a vector from world space to local terrain space based on the alignment options.
 		@param inVec The vector in basis space, where x/y represents the 
 		terrain plane and z represents the up vector
@@ -1499,6 +1503,9 @@ namespace Ogre
 		*/
 		void _setCompositeMapRequired(bool compositeMap);
 
+		/// Whether we're using vertex compression or not
+		bool _getUseVertexCompression() const; 
+		
 		/// WorkQueue::RequestHandler override
 		bool canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);
 		/// WorkQueue::RequestHandler override

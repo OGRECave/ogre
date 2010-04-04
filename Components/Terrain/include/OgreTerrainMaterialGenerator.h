@@ -176,7 +176,8 @@ namespace Ogre
 			const String& getName() const { return mName; }
 			/// Get the description of this profile
 			const String& getDescription() const { return mDesc; }
-			
+			/// Compressed vertex format supported?
+			virtual bool isVertexCompressionSupported() const = 0;		
 			/// Generate / resuse a material for the terrain
 			virtual MaterialPtr generate(const Terrain* terrain) = 0;
 			/// Generate / resuse a material for the terrain
@@ -262,6 +263,14 @@ namespace Ogre
 		virtual bool canGenerateUsingDeclaration(const TerrainLayerDeclaration& decl)
 		{
 			return decl == mLayerDecl;
+		}
+		
+		/** Return whether this material generator supports using a compressed
+			vertex format. This is only possible when using shaders.
+		*/
+		virtual bool isVertexCompressionSupported() const
+		{
+			return getActiveProfile()->isVertexCompressionSupported();
 		}
 
 		/** Triggers the generator to request the options that it needs.

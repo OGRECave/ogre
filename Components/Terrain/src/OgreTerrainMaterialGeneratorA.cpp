@@ -100,6 +100,12 @@ namespace Ogre
 		terrain->_setCompositeMapRequired(mCompositeMapEnabled);
 	}
 	//---------------------------------------------------------------------
+	bool TerrainMaterialGeneratorA::SM2Profile::isVertexCompressionSupported() const
+	{
+		// TODO - enable this when working
+		return false;
+	}
+	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
 	{
 		if (enabled != mLayerNormalMappingEnabled)
@@ -533,7 +539,15 @@ namespace Ogre
 			}
 		}
 
+		if (prof->isVertexCompressionSupported())
+		{
+			Matrix4 posIndexToObjectSpace;
+			terrain->getPointTransform(&posIndexToObjectSpace);
+			params->setNamedConstant("posIndexToObjectSpace", posIndexToObjectSpace);
+		}
 
+		
+		
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::ShaderHelper::defaultFpParams(
@@ -623,6 +637,12 @@ namespace Ogre
 				terrain->getLayerUVMultiplier(i * 4 + 3) 
 				);
 			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
+		}
+		
+		if (prof->isVertexCompressionSupported())
+		{
+			Real baseUVScale = 1.0f / (terrain->getSize() - 1);
+			params->setNamedConstant("baseUVScale", baseUVScale);
 		}
 
 	}
@@ -755,9 +775,20 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 	{
 		outStream << 
-			"void main_vp(\n"
-			"float4 pos : POSITION,\n"
-			"float2 uv  : TEXCOORD0,\n";
+			"void main_vp(\n";
+		if (prof->isVertexCompressionSupported())
+		{
+			outStream << 
+				"float2 posIndex : POSITION,\n"
+				"float height  : TEXCOORD0,\n";
+		}
+		else
+		{
+			outStream <<
+				"float4 pos : POSITION,\n"
+				"float2 uv  : TEXCOORD0,\n";
+
+		}
 		if (tt != RENDER_COMPOSITE_MAP)
 			outStream << "float2 delta  : TEXCOORD1,\n"; // lodDelta, lodThreshold
 
@@ -766,6 +797,12 @@ namespace Ogre
 			"uniform float4x4 viewProjMatrix,\n"
 			"uniform float2   lodMorph,\n"; // morph amount, morph LOD target
 
+		if (prof->isVertexCompressionSupported())
+		{
+			outStream << 
+				"uniform float4x4   posIndexToObjectSpace,\n"
+				"uniform float    baseUVScale,\n";
+		}
 		// uv multipliers
 		uint maxLayers = prof->getMaxLayers(terrain);
 		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
@@ -824,7 +861,15 @@ namespace Ogre
 
 		outStream <<
 			")\n"
-			"{\n"
+			"{\n";
+		if (prof->isVertexCompressionSupported())
+		{
+			outStream <<
+				"	float4 pos;\n"
+				"	pos = mul(posIndexToObjectSpace, float4(posIndex, height, 1));\n"
+				"   float2 uv = float2(posIndex.x * baseUVScale, 1.0 - (posIndex.y * baseUVScale));\n";
+		}
+		outStream <<
 			"	float4 worldPos = mul(worldMatrix, pos);\n"
 			"	oPosObj = pos;\n";
 
