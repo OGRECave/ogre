@@ -4111,12 +4111,20 @@ namespace Ogre
 	size_t Terrain::getPositionBufVertexSize() const
 	{
 		size_t sz = 0;
-		// float3 position
-		// TODO we can compress this when shaders in use if we use parametric positioning
-		sz += sizeof(float) * 3;
-		// float2 uv
-		// TODO we can omit these where shaders are being used & calculate
-		sz += sizeof(float) * 2;
+		if (_getUseVertexCompression())
+		{
+			// short2 position
+			sz += sizeof(short) * 2;
+			// float1 height
+			sz += sizeof(float);
+		}
+		else
+		{
+			// float3 position
+			sz += sizeof(float) * 3;
+			// float2 uv
+			sz += sizeof(float) * 2;
+		}
 
 		return sz;
 

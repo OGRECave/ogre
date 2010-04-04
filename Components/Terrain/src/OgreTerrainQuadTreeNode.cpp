@@ -557,7 +557,7 @@ namespace Ogre
 			
 			if (mTerrain->_getUseVertexCompression())
 			{
-				// 14 bytes per vertex, shaders only
+				// 16 bytes per vertex, shaders only
 				// POSITION (encoded x/y as indexes from base)
 				// short2(x, y)
 				offset += dcl->addElement(POSITION_BUFFER, offset, VET_SHORT2, VES_POSITION).getSize();
