@@ -538,7 +538,7 @@ namespace Ogre
 			}
 		}
 
-		if (prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP)
+		if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
 		{
 			Matrix4 posIndexToObjectSpace;
 			terrain->getPointTransform(&posIndexToObjectSpace);
@@ -638,7 +638,7 @@ namespace Ogre
 			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
 		}
 		
-		if (prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP)
+		if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
 		{
 			Real baseUVScale = 1.0f / (terrain->getSize() - 1);
 			params->setNamedConstant("baseUVScale", baseUVScale);
@@ -775,7 +775,7 @@ namespace Ogre
 	{
 		outStream << 
 			"void main_vp(\n";
-		bool compression = prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP;
+		bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
 		if (compression)
 		{
 			outStream << 
