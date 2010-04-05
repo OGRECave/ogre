@@ -684,6 +684,7 @@ namespace Ogre
 				if (pPosBuf)
 				{
 					mTerrain->getPoint(x, y, *pHeight, &pos);
+
 					// Update bounds *before* making relative
 					mergeIntoBounds(x, y, pos);
 					// relative to local centre
@@ -868,6 +869,8 @@ namespace Ogre
 			*pPosShort++ = (short)x;
 			*pPosShort++ = (short)y;
 			pPosBuf = static_cast<float*>(static_cast<void*>(pPosShort));
+
+			*pPosBuf++ = pos.z;
 		}
 		else 
 		{
