@@ -899,11 +899,13 @@ namespace Ogre
 			switch (terrain->getAlignment())
 			{
 			case Terrain::ALIGN_X_Y:
+				outStream << "	worldPos.z += delta.x * toMorph * lodMorph.x;\n";
 				break;
 			case Terrain::ALIGN_X_Z:
 				outStream << "	worldPos.y += delta.x * toMorph * lodMorph.x;\n";
 				break;
 			case Terrain::ALIGN_Y_Z:
+				outStream << "	worldPos.x += delta.x * toMorph * lodMorph.x;\n";
 				break;
 			};
 		}
