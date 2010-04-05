@@ -106,6 +106,7 @@ namespace Ogre
 		, mCompositeMapDiffuse(ColourValue::White)
 		, mCompositeMapDistance(4000)
 		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		, mUseVertexCompressionWhenAvailable(true)
 	{
 	}
 	//---------------------------------------------------------------------
@@ -2948,7 +2949,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::_getUseVertexCompression() const
 	{
-		return mMaterialGenerator->isVertexCompressionSupported();
+		return mMaterialGenerator->isVertexCompressionSupported() &&
+			TerrainGlobalOptions::getSingleton().getUseVertexCompressionWhenAvailable();
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)

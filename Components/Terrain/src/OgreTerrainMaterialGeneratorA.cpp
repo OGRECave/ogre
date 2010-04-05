@@ -102,8 +102,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool TerrainMaterialGeneratorA::SM2Profile::isVertexCompressionSupported() const
 	{
-		// TODO - enable this when working
-		return false;
+		return true;
 	}
 	//---------------------------------------------------------------------
 	void TerrainMaterialGeneratorA::SM2Profile::setLayerNormalMappingEnabled(bool enabled)
@@ -539,7 +538,7 @@ namespace Ogre
 			}
 		}
 
-		if (prof->isVertexCompressionSupported())
+		if (prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP)
 		{
 			Matrix4 posIndexToObjectSpace;
 			terrain->getPointTransform(&posIndexToObjectSpace);
@@ -639,7 +638,7 @@ namespace Ogre
 			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
 		}
 		
-		if (prof->isVertexCompressionSupported())
+		if (prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP)
 		{
 			Real baseUVScale = 1.0f / (terrain->getSize() - 1);
 			params->setNamedConstant("baseUVScale", baseUVScale);
@@ -776,7 +775,8 @@ namespace Ogre
 	{
 		outStream << 
 			"void main_vp(\n";
-		if (prof->isVertexCompressionSupported())
+		bool compression = prof->isVertexCompressionSupported() && tt != RENDER_COMPOSITE_MAP;
+		if (compression)
 		{
 			outStream << 
 				"float2 posIndex : POSITION,\n"
@@ -797,7 +797,7 @@ namespace Ogre
 			"uniform float4x4 viewProjMatrix,\n"
 			"uniform float2   lodMorph,\n"; // morph amount, morph LOD target
 
-		if (prof->isVertexCompressionSupported())
+		if (compression)
 		{
 			outStream << 
 				"uniform float4x4   posIndexToObjectSpace,\n"
@@ -862,7 +862,7 @@ namespace Ogre
 		outStream <<
 			")\n"
 			"{\n";
-		if (prof->isVertexCompressionSupported())
+		if (compression)
 		{
 			outStream <<
 				"	float4 pos;\n"

@@ -1406,8 +1406,19 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::getWorldTransforms(Matrix4* xform) const
 	{
-		// the vertex data is relative to the node that owns the vertex data
-		*xform = mNodeWithVertexData->mMovable->_getParentNodeFullTransform();
+		if (mTerrain->_getUseVertexCompression())
+		{
+			// vertex data is generated in terrain space
+			*xform = Matrix4::IDENTITY;
+			xform->setTrans(mTerrain->getPosition());
+			
+		}
+		else 
+		{
+			// the vertex data is relative to the node that owns the vertex data
+			*xform = mNodeWithVertexData->mMovable->_getParentNodeFullTransform();			
+		}
+
 	}
 	//---------------------------------------------------------------------
 	Real TerrainQuadTreeNode::getSquaredViewDepth(const Camera* cam) const

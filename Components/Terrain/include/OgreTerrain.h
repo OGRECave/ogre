@@ -1848,6 +1848,7 @@ namespace Ogre
 		ColourValue mCompositeMapDiffuse;
 		Real mCompositeMapDistance;
 		String mResourceGroup;
+		bool mUseVertexCompressionWhenAvailable;
 
 	public:
 		TerrainGlobalOptions();
@@ -2013,6 +2014,20 @@ namespace Ogre
 		/** Get the default resource group to use to load / save terrains.
 		*/
 		const String& getDefaultResourceGroup() { return mResourceGroup; }
+		
+		/** Get whether to allow vertex compression to be used when the material
+			generator states that it supports it.
+		*/
+		bool getUseVertexCompressionWhenAvailable() const { return mUseVertexCompressionWhenAvailable; }
+
+		/** Set whether to allow vertex compression to be used when the material
+		 generator states that it supports it.
+		 @note You should only call this before creating any terrain instances. 
+		 The default is true, so if a material generator supports compressed vertices, 
+		 and so does the hardware (this basically means shader support), they will be used).
+		 However you can disable this in an emergency if required.
+		 */
+		void setUseVertexCompressionWhenAvailable(bool enable) { mUseVertexCompressionWhenAvailable = enable; }
 
 		/** Override standard Singleton retrieval.
 		@remarks
