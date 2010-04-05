@@ -257,7 +257,8 @@ namespace Ogre
 		/// Buffer binding used for holding delta values
 		static unsigned short DELTA_BUFFER;
 
-
+		/// Returns the internal renderable object for this node
+		Renderable *_getRenderable();
 	protected:
 		Terrain* mTerrain;
 		TerrainQuadTreeNode* mParent;

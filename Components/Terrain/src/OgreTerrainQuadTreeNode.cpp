@@ -1356,6 +1356,11 @@ namespace Ogre
 			Vector4(mLodTransition, mCurrentLod + mBaseLod + 1, 0, 0));
 	}
 	//---------------------------------------------------------------------
+	Renderable *TerrainQuadTreeNode::_getRenderable()
+	{
+		return mRend;
+	}
+	//---------------------------------------------------------------------
 	bool TerrainQuadTreeNode::isRenderedAtCurrentLod() const
 	{
 		return mCurrentLod != -1;
