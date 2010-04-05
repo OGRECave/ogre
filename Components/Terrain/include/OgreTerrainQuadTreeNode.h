@@ -398,7 +398,7 @@ namespace Ogre
 		void destroyGpuIndexData();
 
 		void populateIndexData(uint16 batchSize, IndexData* destData);
-		void writePosVertex(bool compress, uint16 x, uint16 y, const Vector3& pos, float uvScale, float** ppPos);
+		void writePosVertex(bool compress, uint16 x, uint16 y, float height, const Vector3& pos, float uvScale, float** ppPos);
 		void writeDeltaVertex(bool compress, uint16 x, uint16 y, float delta, float deltaThresh, float** ppDelta);
 		
 		uint16 calcSkirtVertexIndex(uint16 mainIndex, bool isCol);

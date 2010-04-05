@@ -689,10 +689,9 @@ namespace Ogre
 					mergeIntoBounds(x, y, pos);
 					// relative to local centre
 					pos -= mLocalCentre;
-
+			
+					writePosVertex(vcompress, x, y, *pHeight, pos, uvScale, &pPosBuf);
 					pHeight += inc;
-					
-					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
 					
 
 				}
@@ -768,11 +767,12 @@ namespace Ogre
 					mTerrain->getPoint(x, y, *pHeight, &pos);
 					// relative to local centre
 					pos -= mLocalCentre;
+					pos += skirtOffset;
+					writePosVertex(vcompress, x, y, *pHeight - mTerrain->getSkirtSize(), pos, uvScale, &pPosBuf);
+
 					pHeight += inc;
 
-					pos += skirtOffset;
 					
-					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
 
 				}
 
@@ -830,12 +830,13 @@ namespace Ogre
 			{
 				if (pPosBuf)
 				{
-					mTerrain->getPoint(x, y, mTerrain->getHeightAtPoint(x, y), &pos);
+					float height = mTerrain->getHeightAtPoint(x, y);
+					mTerrain->getPoint(x, y, height, &pos);
 					// relative to local centre
 					pos -= mLocalCentre;
 					pos += skirtOffset;
 					
-					writePosVertex(vcompress, x, y, pos, uvScale, &pPosBuf);
+					writePosVertex(vcompress, x, y, height - mTerrain->getSkirtSize(), pos, uvScale, &pPosBuf);
 
 				}
 				if (pDeltaBuf)
@@ -858,7 +859,7 @@ namespace Ogre
 		
 	}
 	//---------------------------------------------------------------------
-	void TerrainQuadTreeNode::writePosVertex(bool compress, uint16 x, uint16 y, 
+	void TerrainQuadTreeNode::writePosVertex(bool compress, uint16 x, uint16 y, float height, 
 		const Vector3& pos, float uvScale, float** ppPos)
 	{
 		float* pPosBuf = *ppPos;
@@ -870,7 +871,7 @@ namespace Ogre
 			*pPosShort++ = (short)y;
 			pPosBuf = static_cast<float*>(static_cast<void*>(pPosShort));
 
-			*pPosBuf++ = pos.z;
+			*pPosBuf++ = height;
 		}
 		else 
 		{
