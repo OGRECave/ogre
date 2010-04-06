@@ -56,6 +56,9 @@ namespace Ogre {
 
         /** Writes a RenderSystemCapabilities object to a data stream */
         void writeScript(const RenderSystemCapabilities* caps, String name, String filename);
+		
+		/** Writes a RenderSystemCapabilities object to a string */
+		String writeString(const RenderSystemCapabilities* caps, String name);
 
         /** Parses a RenderSystemCapabilities script file passed as a stream.
             Adds it to RenderSystemCapabilitiesManager::_addRenderSystemCapabilities
