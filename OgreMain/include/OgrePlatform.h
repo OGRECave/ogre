@@ -155,20 +155,29 @@ namespace Ogre {
 
 // Disable unicode support on MingW for GCC 3, poorly supported in stdlibc++
 // STLPORT fixes this though so allow if found
-// MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLKIT_UNICODE__ in _mingw.h
+// MinGW C++ Toolkit supports unicode and sets the define __MINGW32_TOOLBOX_UNICODE__ in _mingw.h
 // GCC 4 is also fine
-#if defined( __MINGW32__ ) && !defined(_STLPORT_VERSION)
+#if defined(__MINGW32__)
+# if OGRE_COMP_VER < 400
+#  if !defined(_STLPORT_VERSION)
 #   include<_mingw.h>
 #   if defined(__MINGW32_TOOLBOX_UNICODE__) || OGRE_COMP_VER > 345
-#	    define OGRE_UNICODE_SUPPORT 1
+#    define OGRE_UNICODE_SUPPORT 1
 #   else
-#       define OGRE_UNICODE_SUPPORT 0
+#    define OGRE_UNICODE_SUPPORT 0
 #   endif
+#  else
+#   define OGRE_UNICODE_SUPPORT 1
+#  endif
+# else
+#  define OGRE_UNICODE_SUPPORT 1
+# endif
 #else
-#	define OGRE_UNICODE_SUPPORT 1
+#  define OGRE_UNICODE_SUPPORT 1
 #endif
 
-#endif
+#endif // OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+
 //----------------------------------------------------------------------------
 // Symbian Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
