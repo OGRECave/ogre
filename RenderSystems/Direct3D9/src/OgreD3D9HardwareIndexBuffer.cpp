@@ -59,7 +59,7 @@ namespace Ogre {
 		mBufferDesc.Pool = eResourcePool;
 				
 		// Allocate the system memory buffer.
-		mSystemMemoryBuffer = new char [getSizeInBytes()];
+		mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
 		memset(mSystemMemoryBuffer, 0, getSizeInBytes());
 
 		// Case we have to create this buffer resource on loading.
@@ -83,11 +83,15 @@ namespace Ogre {
 		while (it != mMapDeviceToBufferResources.end())
 		{
 			SAFE_RELEASE(it->second->mBuffer);
-			SAFE_DELETE(it->second);
+			if (it->second != NULL)
+			{
+				OGRE_FREE (it->second, MEMCATEGORY_RENDERSYS);
+				it->second = NULL;
+			}
 			++it;
 		}	
 		mMapDeviceToBufferResources.clear();   
-		SAFE_DELETE_ARRAY(mSystemMemoryBuffer);
+		OGRE_FREE (mSystemMemoryBuffer, MEMCATEGORY_RESOURCE);
     }
 	//---------------------------------------------------------------------
     void* D3D9HardwareIndexBuffer::lockImpl(size_t offset, 
@@ -191,7 +195,11 @@ namespace Ogre {
 		if (it != mMapDeviceToBufferResources.end())	
 		{									
 			SAFE_RELEASE(it->second->mBuffer);
-			SAFE_DELETE(it->second);
+			if (it->second != NULL)
+			{
+				OGRE_FREE (it->second, MEMCATEGORY_RENDERSYS);
+				it->second = NULL;
+			}
 			mMapDeviceToBufferResources.erase(it);
 		}
 	}
@@ -237,7 +245,7 @@ namespace Ogre {
 		}
 		else
 		{
-			bufferResources = new BufferResources;			
+			bufferResources = OGRE_ALLOC_T(BufferResources, 1, MEMCATEGORY_RENDERSYS);			
 			mMapDeviceToBufferResources[d3d9Device] = bufferResources;
 		}
 

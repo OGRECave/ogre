@@ -58,8 +58,12 @@ D3D9HardwarePixelBuffer::~D3D9HardwarePixelBuffer()
 	while (it != mMapDeviceToBufferResources.end())
 	{
 		SAFE_RELEASE(it->second->surface);
-		SAFE_RELEASE(it->second->volume);
-		SAFE_DELETE(it->second);
+		SAFE_RELEASE(it->second->volume);		
+		if (it->second != NULL)
+		{
+			OGRE_FREE (it->second, MEMCATEGORY_RENDERSYS);
+			it->second = NULL;
+		}
 		DeviceToBufferResourcesIterator deadi = it++;
 		mMapDeviceToBufferResources.erase(deadi);
 	}
@@ -118,10 +122,10 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DSurface9 *sur
 				Box fullBufferBox(0,0,0,mWidth,mHeight,mDepth);
 				PixelBox dstBox(fullBufferBox, mFormat);
 
-				dstBox.data = new char[getSizeInBytes()];
+				dstBox.data = OGRE_MALLOC (getSizeInBytes(), MEMCATEGORY_RESOURCE);
 				blitToMemory(fullBufferBox, dstBox, it->second, it->first);
 				blitFromMemory(dstBox, fullBufferBox, bufferResources);
-				SAFE_DELETE_ARRAY(dstBox.data);
+				OGRE_FREE(dstBox.data, MEMCATEGORY_RESOURCE);
 				break;
 			}
 			++it;			
@@ -174,10 +178,10 @@ void D3D9HardwarePixelBuffer::bind(IDirect3DDevice9 *dev, IDirect3DVolume9 *volu
 				Box fullBufferBox(0,0,0,mWidth,mHeight,mDepth);
 				PixelBox dstBox(fullBufferBox, mFormat);
 
-				dstBox.data = new char[getSizeInBytes()];
+				dstBox.data = OGRE_MALLOC(getSizeInBytes(), MEMCATEGORY_RESOURCE);
 				blitToMemory(fullBufferBox, dstBox, it->second, it->first);
 				blitFromMemory(dstBox, fullBufferBox, bufferResources);
-				SAFE_DELETE(dstBox.data);
+				OGRE_FREE(dstBox.data, MEMCATEGORY_RESOURCE);
 				break;
 			}
 			++it;			
@@ -199,7 +203,7 @@ D3D9HardwarePixelBuffer::BufferResources* D3D9HardwarePixelBuffer::getBufferReso
 //-----------------------------------------------------------------------------  
 D3D9HardwarePixelBuffer::BufferResources* D3D9HardwarePixelBuffer::createBufferResources()
 {
-	BufferResources* newResources = new BufferResources;
+	BufferResources* newResources = OGRE_ALLOC_T(BufferResources, 1, MEMCATEGORY_RENDERSYS);
 
 	memset(newResources, 0, sizeof(BufferResources));
 
@@ -216,8 +220,12 @@ void D3D9HardwarePixelBuffer::destroyBufferResources(IDirect3DDevice9* d3d9Devic
 	if (it != mMapDeviceToBufferResources.end())
 	{
 		SAFE_RELEASE(it->second->surface);
-		SAFE_RELEASE(it->second->volume);	
-		SAFE_DELETE(it->second);
+		SAFE_RELEASE(it->second->volume);			
+		if (it->second != NULL)
+		{
+			OGRE_FREE (it->second, MEMCATEGORY_RENDERSYS);
+			it->second = NULL;
+		}
 		mMapDeviceToBufferResources.erase(it);
 	}
 }
@@ -620,7 +628,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
 	// convert to pixelbuffer's native format if necessary
 	if (D3D9Mappings::_getPF(src.format) == D3DFMT_UNKNOWN)
 	{
-		buf.bind(new MemoryDataStream(
+		buf.bind(OGRE_NEW MemoryDataStream(
 			PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(),
 			mFormat)));
 		converted = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), mFormat, buf->getPtr());
@@ -968,7 +976,7 @@ void D3D9HardwarePixelBuffer::updateRenderTexture(bool writeGamma, uint fsaa, co
 		String name;
 		name = "rtt/" +Ogre::StringConverter::toString((size_t)this) + "/" + srcName;
 
-		mRenderTexture = new D3D9RenderTexture(name, this, writeGamma, fsaa);		
+		mRenderTexture = OGRE_NEW D3D9RenderTexture(name, this, writeGamma, fsaa);		
 		Root::getSingleton().getRenderSystem()->attachRenderTarget(*mRenderTexture);
 	}
 }

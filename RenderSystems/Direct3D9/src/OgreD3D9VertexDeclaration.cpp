@@ -116,7 +116,7 @@ namespace Ogre {
 		// Case we have to create the declaration for this device.
 		if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
 		{
-			D3DVERTEXELEMENT9* d3delems = new D3DVERTEXELEMENT9[mElementList.size() + 1];
+			D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, mElementList.size() + 1, MEMCATEGORY_RENDERSYS);
 
 			VertexElementList::const_iterator i, iend;
 			unsigned int idx;
@@ -162,7 +162,7 @@ namespace Ogre {
 					"Direct3D9VertexDeclaration::getD3DVertexDeclaration");
 			}
 
-			delete [] d3delems;
+			OGRE_FREE(d3delems, MEMCATEGORY_RENDERSYS);
 
 			mMapDeviceToDeclaration[pCurDevice] = lpVertDecl;
 		}

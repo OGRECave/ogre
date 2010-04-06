@@ -53,7 +53,7 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
-        D3D9Texture* ret = new D3D9Texture(this, name, handle, group, isManual, loader); 		
+        D3D9Texture* ret = OGRE_NEW D3D9Texture(this, name, handle, group, isManual, loader); 		
 		return ret;
     }
 

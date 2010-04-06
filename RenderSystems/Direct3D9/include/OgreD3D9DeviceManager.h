@@ -37,7 +37,7 @@ namespace Ogre {
 
 	/** Device manager interface.
 	*/
-	class _OgreD3D9Export D3D9DeviceManager
+	class _OgreD3D9Export D3D9DeviceManager : public ResourceAlloc
 	{	
 
 	// Interface.

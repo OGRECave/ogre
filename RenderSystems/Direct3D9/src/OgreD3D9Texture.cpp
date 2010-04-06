@@ -77,7 +77,7 @@ namespace Ogre
 		{
 			TextureResources* textureResource = it->second;
 			
-			SAFE_DELETE(textureResource);
+			OGRE_DELETE_T(textureResource, TextureResources, MEMCATEGORY_RENDERSYS);
 			++it;
 		}		
 		mMapDeviceToTextureResources.clear();
@@ -294,7 +294,7 @@ namespace Ogre
 	{
 		assert(getTextureType() == TEX_TYPE_CUBE_MAP);
 
-        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T );
         // DDS load?
 		if (getSourceFileType() == "dds")
 		{
@@ -302,7 +302,7 @@ namespace Ogre
 			DataStreamPtr dstream = 
 				ResourceGroupManager::getSingleton().openResource(
 					mName, mGroup, true, this);
-            loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
+            loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         }
         else
         {
@@ -327,7 +327,7 @@ namespace Ogre
 					ResourceGroupManager::getSingleton().openResource(
 						fullName, mGroup, true, this);
 
-                loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
+                loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
 			}
         }
 
@@ -343,8 +343,8 @@ namespace Ogre
 			ResourceGroupManager::getSingleton().openResource(
 				mName, mGroup, true, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
-        loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         return loadedStreams;
     }
 	/****************************************************************************************/
@@ -357,8 +357,8 @@ namespace Ogre
 			ResourceGroupManager::getSingleton().openResource(
 				mName, mGroup, true, this);
 
-        LoadedStreams loadedStreams = LoadedStreams(new vector<MemoryDataStreamPtr>::type());
-        loadedStreams->push_back(MemoryDataStreamPtr(new MemoryDataStream(dstream)));
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
         return loadedStreams;
 	}
 	/****************************************************************************************/
@@ -415,7 +415,7 @@ namespace Ogre
 	{
 		assert(mMapDeviceToTextureResources.find(d3d9Device) == mMapDeviceToTextureResources.end());
 
-		TextureResources* textureResources = new TextureResources;
+		TextureResources* textureResources = OGRE_NEW_T(TextureResources, MEMCATEGORY_RENDERSYS);
 
 		textureResources->pNormTex		= NULL;
 		textureResources->pCubeTex		= NULL;
@@ -1700,7 +1700,7 @@ namespace Ogre
 			{
 				for(size_t mip=0; mip<=mNumMipmaps; ++mip)
 				{
-					buffer = new D3D9HardwarePixelBuffer((HardwareBuffer::Usage)bufusage, this);
+					buffer = OGRE_NEW D3D9HardwarePixelBuffer((HardwareBuffer::Usage)bufusage, this);
 					mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buffer));
 				}
 			}
@@ -1854,8 +1854,8 @@ namespace Ogre
 			// after device reset.
 			freeTextureResources(d3d9Device, textureResource);
 
-			SAFE_DELETE(textureResource);
-
+			OGRE_DELETE_T(textureResource, TextureResources, MEMCATEGORY_RENDERSYS);
+			
 			mMapDeviceToTextureResources.erase(it);
 
 			LogManager::getSingleton().logMessage("Released D3D9 texture: " + mName);	

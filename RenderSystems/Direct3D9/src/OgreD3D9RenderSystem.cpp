@@ -82,7 +82,7 @@ namespace Ogre
 		mDeviceManager = NULL;	
 
 		// Create the resource manager.
-		mResourceManager = new D3D9ResourceManager();
+		mResourceManager = OGRE_NEW D3D9ResourceManager();
 
 		
 		// init lights
@@ -129,13 +129,18 @@ namespace Ogre
 			// Remove from manager safely
 			if (HighLevelGpuProgramManager::getSingletonPtr())
 				HighLevelGpuProgramManager::getSingleton().removeFactory(mHLSLProgramFactory);
-			delete mHLSLProgramFactory;
+			OGRE_DELETE mHLSLProgramFactory;
 			mHLSLProgramFactory = 0;
 		}
 		
 		SAFE_RELEASE( mpD3D );
-		SAFE_DELETE ( mResourceManager );
-
+		
+		if (mResourceManager != NULL)
+		{
+			OGRE_DELETE mResourceManager;
+			mResourceManager = NULL;
+		}
+		
 		LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " destroyed." );
 
 		msD3D9RenderSystem = NULL;
@@ -150,7 +155,7 @@ namespace Ogre
 	D3D9DriverList* D3D9RenderSystem::getDirect3DDrivers()
 	{
 		if( !mDriverList )
-			mDriverList = new D3D9DriverList();
+			mDriverList = OGRE_NEW D3D9DriverList();
 
 		return mDriverList;
 	}
@@ -535,19 +540,19 @@ namespace Ogre
 		mDriverVersion.build = LOWORD(mActiveD3DDriver->getAdapterIdentifier().DriverVersion.LowPart);
 
 		// Create the device manager.
-		mDeviceManager = new D3D9DeviceManager();
+		mDeviceManager = OGRE_NEW D3D9DeviceManager();
 
 		// Create the texture manager for use by others		
-		mTextureManager = new D3D9TextureManager();
+		mTextureManager = OGRE_NEW D3D9TextureManager();
 
 		// Also create hardware buffer manager		
-		mHardwareBufferManager = new D3D9HardwareBufferManager();
+		mHardwareBufferManager = OGRE_NEW D3D9HardwareBufferManager();
 
 		// Create the GPU program manager		
-		mGpuProgramManager = new D3D9GpuProgramManager();
+		mGpuProgramManager = OGRE_NEW D3D9GpuProgramManager();
 
 		// Create & register HLSL factory		
-		mHLSLProgramFactory = new D3D9HLSLProgramFactory();
+		mHLSLProgramFactory = OGRE_NEW D3D9HLSLProgramFactory();
 		
 		if( autoCreateWindow )
 		{
@@ -650,15 +655,38 @@ namespace Ogre
 	{
 		RenderSystem::shutdown();
 		
-		SAFE_DELETE( mDeviceManager );
+		if (mDeviceManager != NULL)
+		{
+			OGRE_DELETE mDeviceManager;
+			mDeviceManager = NULL;
+		}
 
-		SAFE_DELETE( mDriverList );
+		if (mDriverList != NULL)
+		{
+			OGRE_DELETE mDriverList;
+			mDriverList = NULL;
+		}				
 		mActiveD3DDriver = NULL;	
 						
 		LogManager::getSingleton().logMessage("D3D9 : Shutting down cleanly.");
-		SAFE_DELETE( mTextureManager );
-		SAFE_DELETE( mHardwareBufferManager );
-		SAFE_DELETE( mGpuProgramManager );			
+		
+		if (mTextureManager != NULL)
+		{
+			OGRE_DELETE mTextureManager;
+			mTextureManager = NULL;
+		}
+
+		if (mHardwareBufferManager != NULL)
+		{
+			OGRE_DELETE mHardwareBufferManager;
+			mHardwareBufferManager = NULL;
+		}
+
+		if (mGpuProgramManager != NULL)
+		{
+			OGRE_DELETE mGpuProgramManager;
+			mGpuProgramManager = NULL;
+		}			
 	}
 	//---------------------------------------------------------------------
 	RenderWindow* D3D9RenderSystem::_createRenderWindow(const String &name, 
@@ -695,7 +723,7 @@ namespace Ogre
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D9RenderSystem::_createRenderWindow" );
 		}
 				
-		D3D9RenderWindow* renderWindow = new D3D9RenderWindow(mhInstance);
+		D3D9RenderWindow* renderWindow = OGRE_NEW D3D9RenderWindow(mhInstance);
 		
 		renderWindow->create(name, width, height, fullScreen, miscParams);
 
@@ -744,7 +772,7 @@ namespace Ogre
 	{			
 		RenderSystemCapabilities* rsc = mRealCapabilities;
 		if (rsc == NULL)
-			rsc = new RenderSystemCapabilities();
+			rsc = OGRE_NEW RenderSystemCapabilities();
 
 		rsc->setCategoryRelevant(CAPS_CATEGORY_D3D9, true);
 		rsc->setDriverVersion(mDriverVersion);
@@ -1399,7 +1427,7 @@ namespace Ogre
 	MultiRenderTarget * D3D9RenderSystem::createMultiRenderTarget(const String & name)
 	{
 		MultiRenderTarget *retval;
-		retval = new D3D9MultiRenderTarget(name);
+		retval = OGRE_NEW D3D9MultiRenderTarget(name);
 		attachRenderTarget(*retval);
 
 		return retval;
@@ -2741,7 +2769,7 @@ namespace Ogre
 						"D3D9RenderSystem::_createDepthBufferFor" );
 		}
 
-		D3D9DepthBuffer *newDepthBuffer = new D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+		D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 												getActiveD3D9Device(), depthBufferSurface,
 												dsfmt, srfDesc.Width, srfDesc.Height,
 												srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, false );
@@ -2769,7 +2797,7 @@ namespace Ogre
 		if( FAILED(depthSurface->GetDesc(&dsDesc)) )
 			return 0;
 
-		D3D9DepthBuffer *newDepthBuffer = new D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+		D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 												getActiveD3D9Device(), depthSurface,
 												dsDesc.Format, dsDesc.Width, dsDesc.Height,
 												dsDesc.MultiSampleType, dsDesc.MultiSampleQuality, true );
@@ -2797,7 +2825,7 @@ namespace Ogre
 				//Only delete those who match the specified creator
 				if( static_cast<D3D9DepthBuffer*>(*itor)->getDeviceCreator() == creator )
 				{
-					delete *itor;
+					OGRE_DELETE *itor;
 
 					//Erasing a vector invalidates iterators, we need to recalculate
 					//to avoid memory corruption and asserts. The new itor will point
@@ -2965,7 +2993,7 @@ namespace Ogre
 		//Stop rendering
 		_endFrame();
 
-		D3D9RenderContext* context = new D3D9RenderContext;
+		D3D9RenderContext* context = OGRE_ALLOC_T(D3D9RenderContext, 1, MEMCATEGORY_RENDERSYS);
 		context->target = mActiveRenderTarget;
 		
 		
@@ -2978,7 +3006,7 @@ namespace Ogre
 		_beginFrame();
 		D3D9RenderContext* d3dContext = static_cast<D3D9RenderContext*>(context);
 
-		delete context;
+		OGRE_FREE(context, MEMCATEGORY_RENDERSYS);
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
@@ -3594,7 +3622,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	HardwareOcclusionQuery* D3D9RenderSystem::createHardwareOcclusionQuery()
 	{
-		D3D9HardwareOcclusionQuery* ret = new D3D9HardwareOcclusionQuery(); 
+		D3D9HardwareOcclusionQuery* ret = OGRE_NEW D3D9HardwareOcclusionQuery(); 
 		mHwOcclusionQueries.push_back(ret);
 		return ret;
 	}

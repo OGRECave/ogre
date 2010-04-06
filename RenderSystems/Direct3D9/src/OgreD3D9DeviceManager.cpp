@@ -403,7 +403,7 @@ namespace Ogre
 		// No matching device found -> create new one.
 		if (renderDevice == NULL)
 		{
-			renderDevice = new D3D9Device(this, nAdapterOrdinal, direct3D9->GetAdapterMonitor(nAdapterOrdinal), devType, extraFlags);
+			renderDevice = OGRE_NEW D3D9Device(this, nAdapterOrdinal, direct3D9->GetAdapterMonitor(nAdapterOrdinal), devType, extraFlags);
 			mRenderDevices.push_back(renderDevice);
 			if (mActiveDevice == NULL)			
 				setActiveDevice(renderDevice);											
@@ -453,7 +453,7 @@ namespace Ogre
 			{			
 				if (*itDevice == device)
 				{					
-					SAFE_DELETE(device);
+					OGRE_DELETE device;
 					mRenderDevices.erase(itDevice);
 					break;
 				}												

@@ -70,7 +70,7 @@ namespace Ogre {
             }
         }
 #endif
-		D3D9HardwareVertexBuffer* vbuf = new D3D9HardwareVertexBuffer(
+		D3D9HardwareVertexBuffer* vbuf = OGRE_NEW D3D9HardwareVertexBuffer(
 			this, vertexSize, numVerts, usage, false, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
@@ -102,7 +102,7 @@ namespace Ogre {
             }
         }
 #endif
-		D3D9HardwareIndexBuffer* idx = new D3D9HardwareIndexBuffer(
+		D3D9HardwareIndexBuffer* idx = OGRE_NEW D3D9HardwareIndexBuffer(
 			this, itype, numIndexes, usage, false, useShadowBuffer);
 		{
 			OGRE_LOCK_MUTEX(mIndexBuffersMutex)
@@ -122,11 +122,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     VertexDeclaration* D3D9HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {
-        return new D3D9VertexDeclaration();
+        return OGRE_NEW D3D9VertexDeclaration();
     }
     //-----------------------------------------------------------------------
     void D3D9HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
     {
-        delete decl;
+        OGRE_DELETE decl;
     }
 }

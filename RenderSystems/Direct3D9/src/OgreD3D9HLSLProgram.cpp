@@ -64,7 +64,7 @@ namespace Ogre {
 			// Note - must NOT copy the null terminator, otherwise this will terminate
 			// the entire program string!
 			*pByteLen = static_cast<UINT>(source.length());
-			char* pChar = new char[*pByteLen];
+			char* pChar = OGRE_ALLOC_T(char, *pByteLen, MEMCATEGORY_RESOURCE);
 			memcpy(pChar, source.c_str(), *pByteLen);
 			*ppData = pChar;
 
@@ -72,9 +72,8 @@ namespace Ogre {
 		}
 
 		STDMETHOD(Close)(LPCVOID pData)
-		{
-			char* pChar = (char*)pData;
-			delete [] pChar;
+		{			
+			OGRE_FREE(pData, MEMCATEGORY_RESOURCE);
 			return S_OK;
 		}
 	protected:

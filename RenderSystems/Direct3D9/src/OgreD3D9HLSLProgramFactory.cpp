@@ -51,12 +51,12 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        return new D3D9HLSLProgram(creator, name, handle, group, isManual, loader);
+        return OGRE_NEW D3D9HLSLProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
 	void D3D9HLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
-        delete prog;
+        OGRE_DELETE prog;
     }
     //-----------------------------------------------------------------------
 
