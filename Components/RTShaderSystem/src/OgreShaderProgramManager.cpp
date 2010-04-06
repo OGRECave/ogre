@@ -415,8 +415,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		// Case cache directory specified -> create program from file.
 		if (cachePath.empty() == false)
 		{
-			const String  programName = programName + "." + language;
-			const String  programFileName = cachePath + programName;	
+			const String  programFullName = programName + "." + language;
+			const String  programFileName = cachePath + programFullName;	
 			std::ifstream programFile;
 			bool		  writeFile = true;
 
@@ -447,7 +447,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 				outFile.close();
 			}
 
-			pGpuProgram->setSourceFile(programName);
+			pGpuProgram->setSourceFile(programFullName);
 		}
 
 		// No cache directory specified -> create program from system memory.
