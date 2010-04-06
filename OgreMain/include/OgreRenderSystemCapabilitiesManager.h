@@ -72,6 +72,9 @@ namespace Ogre {
 		*/
         RenderSystemCapabilities* loadParsedCapabilities(const String& name);
 
+		/** Access to the internal map of loaded capabilities */
+		const map<String, RenderSystemCapabilities*>::type &getCapabilities() const;
+
         /** Method used by RenderSystemCapabilitiesSerializer::parseScript */
         void _addRenderSystemCapabilities(const String& name, RenderSystemCapabilities* caps);
 

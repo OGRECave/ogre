@@ -62,7 +62,7 @@ namespace Ogre
 
 		file << "\t" << "device_name " << caps->getDeviceName() << endl;
 		const DriverVersion& driverVer = caps->getDriverVersion();
-		file << "\t" << "driver_version " << driverVer.toString();
+		file << "\t" << "driver_version " << driverVer.toString() << endl;
 		file << "\t" << "vendor " << caps->vendorToString(caps->getVendor());
 
 		file << endl;
