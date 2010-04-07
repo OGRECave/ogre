@@ -168,6 +168,24 @@ namespace Ogre {
 		std::advance(i, index);
 		mSubMeshList.erase(i);
 		
+		// Fix up any name/index entries
+		for(SubMeshNameMap::iterator ni = mSubMeshNameMap.begin(); ni != mSubMeshNameMap.end();)
+		{
+			if (ni->second == index)
+			{
+				SubMeshNameMap::iterator eraseIt = ni++;
+				mSubMeshNameMap.erase(eraseIt);
+			}
+			else
+			{
+				// reduce indexes following
+				if (ni->second > index)
+					ni->second = ni->second - 1;
+
+				++ni;
+			}
+		}
+
 		if (isLoaded())
 			_dirtyState();
 		
