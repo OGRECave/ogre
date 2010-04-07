@@ -961,10 +961,12 @@ namespace Ogre {
         {
             // Load the mesh now
 			try {
+				String groupName = mMeshLodUsageList[index].manualGroup.empty() ? 
+					mGroup : mMeshLodUsageList[index].manualGroup;
 				mMeshLodUsageList[index].manualMesh =
 					MeshManager::getSingleton().load(
 						mMeshLodUsageList[index].manualName,
-						mMeshLodUsageList[index].manualGroup);
+						groupName);
 				// get the edge data, if required
 				if (!mMeshLodUsageList[index].edgeData)
 				{
