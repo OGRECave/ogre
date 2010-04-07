@@ -328,6 +328,12 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Sample_*.dylib 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
+	if (OGRE_BUILD_TESTS)
+	  add_custom_command(TARGET SampleBrowser POST_BUILD
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/PlayPen.dylib 
+		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+		)
+	ENDIF()
   endif()
 endif (APPLE)
 
