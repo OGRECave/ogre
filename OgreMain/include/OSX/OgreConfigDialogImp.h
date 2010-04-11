@@ -58,6 +58,7 @@ THE SOFTWARE.
 
 - (void)cancelButtonPressed:(id)sender;
 - (void)okButtonPressed:(id)sender;
+- (void)popUpValueChanged:(id)sender;
 
 // Getters and setters
 - (void)setOptions:(NSDictionary *)dict;
