@@ -160,7 +160,7 @@ material OceanHLSL_GLSL
 
 			texture_unit
 			{
-				texture NoiseVolume.dds 3d
+				texture NoiseVolume.png 2d
 				tex_coord_set 0
 				filtering linear linear none
 				tex_address_mode wrap

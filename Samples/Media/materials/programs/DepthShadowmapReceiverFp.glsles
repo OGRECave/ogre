@@ -14,11 +14,13 @@ uniform sampler2D shadowMap;
 
 varying vec4 shadowUV;
 varying vec4 vColor;
+varying vec4 vUv0;
+varying vec4 vUv1;
 
 void main()
 {
 	// point on shadowmap
-	vec4 local_shadowUV;
+	vec4 local_shadowUV = vUv0;
 #if LINEAR_RANGE
 	local_shadowUV.xy = shadowUV.xy / shadowUV.w;
 #else

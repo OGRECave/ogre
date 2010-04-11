@@ -1,0 +1,15 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+varying vec2 oDepth;
+uniform vec4 pssmSplitPoints;
+
+void main()
+{
+	float finalDepth = oDepth.x / oDepth.y;
+	gl_FragColor = vec4(finalDepth, finalDepth, finalDepth, 1.0);
+}

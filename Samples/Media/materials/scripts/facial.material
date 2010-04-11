@@ -16,6 +16,19 @@ material drbunsen_head
 	}
 }
 
+material drbunsen_eye
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.25 0.25 0.25
+			diffuse 1.0 1.0 1.0
+
+		}
+	}
+}
+
 material drbunsen_teeth
 {
 	technique

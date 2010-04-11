@@ -12,7 +12,7 @@ uniform sampler2D shadowMap;
 uniform sampler2D diffuseMap;
 uniform vec4 vertexLight;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 varying vec4 oShadowUV;
 
 //////////////////////// GRASS SHADOW RECEIVER
@@ -20,7 +20,7 @@ void main()
 {		
     if (oShadowUV.z > 0.0)
     {
-       vec4 diffuse = texture2D(diffuseMap, oUv.xy);
+       vec4 diffuse = texture2D(diffuseMap, oUv0.xy);
        if (diffuse.a > 0.001)
        {
             gl_FragColor = vec4(0.0);

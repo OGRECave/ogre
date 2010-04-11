@@ -17,7 +17,7 @@ uniform sampler2D refractMap;
 varying vec3 noiseCoord;
 varying vec4 projectionCoord;
 varying vec3 eyeDir;
-varying vec3 normal;
+varying vec3 oNormal;
 
 // Fragment program for distorting a texture using a 3D noise texture
 void main()
@@ -31,7 +31,7 @@ void main()
 
 	// Fresnel
 	//normal = normalize(normal + noiseNormal.xz);
-	float fresnel = fresnelBias + fresnelScale * pow(1.0 + dot(eyeDir, normal), fresnelPower);
+	float fresnel = fresnelBias + fresnelScale * pow(1.0 + dot(eyeDir, oNormal), fresnelPower);
 
 	// Reflection / refraction
 	vec4 reflectionColour = texture2D(reflectMap, final);

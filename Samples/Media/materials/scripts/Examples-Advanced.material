@@ -43,10 +43,13 @@ fragment_program Ogre/CelShadingFPGLSLES glsles
 	source Example_CelShadingFp.glsles
 	profiles glsles
 
-	// map diffuse from custom renderable param 2
-	param_named diffuse float4
-	// map specular from custom renderable param 2
-	param_named specular float4
+	default_params
+	{
+		// map diffuse from custom renderable param 2
+		param_named diffuse float4 1 1 1 1
+		// map specular from custom renderable param 3
+		param_named specular float4 1 1 1 1
+	}
 }
 
 vertex_program Ogre/CelShadingVP unified
@@ -76,7 +79,7 @@ material Examples/CelShading
 			{
 				// map diffuse from custom renderable param 2
 				param_named_auto diffuse custom 2
-				// map specular from custom renderable param 2
+				// map specular from custom renderable param 3
 				param_named_auto specular custom 3
 			}
 			texture_unit
@@ -261,11 +264,14 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
+//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+//			{
+//				param_named_auto worldViewProj worldviewproj_matrix
+//				param_named_auto ambient ambient_light_colour
+//			}
+//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+//			{
+//			}
 			
 		}
 		// Now do the lighting pass
@@ -327,11 +333,14 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-				param_named_auto worldViewProj worldviewproj_matrix
-				param_named ambient float4 1 1 1 1
-			}
+//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+//			{
+//				param_named_auto worldViewProj worldviewproj_matrix
+//				param_named ambient float4 1 1 1 1
+//			}
+//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+//			{
+//			}
 			scene_blend dest_colour zero
 			texture_unit decalmap
 			{
@@ -405,7 +414,9 @@ material Examples/BumpMapping/MultiLightTangentParity : Examples/BumpMapping/Mul
 				param_named_auto lightPosition light_position_object_space 0
 				param_named_auto worldViewProj worldviewproj_matrix
 			}
-
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
 			
 		}
 		
@@ -471,7 +482,7 @@ material Examples/GeneralTexProjection
 // Distortion effects
 //----------------------------
 
-vertex_program Examples/FresnelRefractReflectVP cg
+vertex_program Examples/FresnelRefractReflectVPCg cg
 {
 	source Example_Fresnel.cg
 	entry_point main_vp
@@ -490,7 +501,13 @@ vertex_program Examples/FresnelRefractReflectVPGLSLES glsles
 	profiles glsles
 }
 
-fragment_program Examples/FresnelRefractReflectFP cg
+vertex_program Examples/FresnelRefractReflectVP unified
+{
+	delegate Examples/FresnelRefractReflectVPGLSLES
+	delegate Examples/FresnelRefractReflectVPCg
+}
+
+fragment_program Examples/FresnelRefractReflectFPCg cg
 {
 	source Example_Fresnel.cg
 	entry_point main_fp
@@ -510,6 +527,12 @@ fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 	source Example_FresnelFp.glsles
 	entry_point main
 	profiles glsles
+}
+
+fragment_program Examples/FresnelRefractReflectFP unified
+{
+	delegate Examples/FresnelRefractReflectFPGLSLES
+	delegate Examples/FresnelRefractReflectFPCg
 }
 
 material Examples/FresnelReflectionRefraction
@@ -618,53 +641,6 @@ material Examples/FresnelReflectionRefraction
 		}
 	}
 
-	// glsles
-	technique
-	{
-		pass 
-		{
-			vertex_program_ref Examples/FresnelRefractReflectVPGLSLES
-			{
-				param_named_auto worldViewProjMatrix worldviewproj_matrix
-				param_named_auto eyePosition camera_position_object_space
-				param_named_auto timeVal time 0.05
-				param_named scroll float 1  
-				param_named scale float 1 
-				param_named noise float 1 
-				// scroll and noisePos will need updating per frame
-			}
-			fragment_program_ref Examples/FresnelRefractReflectFPGLSLES
-			{
-				param_named fresnelBias float -0.1 
-				param_named fresnelScale float 1.8 
-				param_named fresnelPower float 8  
-				param_named tintColour float4 0 0.05 0.05 1
-				param_named noiseScale float 0.05 
-			}
-			// Noise
-			texture_unit
-			{
-				// Perlin noise volume
-				texture waves2.dds
-				// min / mag filtering, no mip
-				filtering linear linear none
-			}
-			// Reflection
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture reflection
-				tex_address_mode clamp
-			}
-			// Refraction
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture refraction
-				tex_address_mode clamp
-			}
-		}
-	}
 }
 
 // Normal-mapped Athene statue

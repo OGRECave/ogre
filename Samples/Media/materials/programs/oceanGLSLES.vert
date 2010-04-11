@@ -5,7 +5,7 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-// oceanGLSL.vert
+// oceanGLSLES.vert
 // vertex program for Ocean water simulation
 // 05 Aug 2005
 // adapted for Ogre by nfz

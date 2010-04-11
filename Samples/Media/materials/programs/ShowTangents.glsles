@@ -1,0 +1,24 @@
+#version 100
+precision highp int;
+precision highp float;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+attribute vec4 position;
+attribute vec3 tangent;
+attribute vec4 uv0;
+
+varying vec4 oPosition;
+varying vec3 oTangent;
+varying vec4 oUv0;
+
+uniform mat4 worldViewProj;
+
+void main()
+{
+	oPosition = worldViewProj * position;
+	oTangent = tangent;
+	oUv0 = uv0;
+
+//	gl_Position = oPosition;
+}

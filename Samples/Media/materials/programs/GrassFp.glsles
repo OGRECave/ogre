@@ -5,14 +5,16 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
+////////////////////////////// MOVING GRASS
+// Vertex program to wave some grass about
+// Assumes UV texture coords of v==0 indicates the top of the grass
 uniform sampler2D diffuseMap;
 
 varying vec4 oUv0;
 varying vec4 oColour;
 
-/// grass_vp ambient
 void main()
 {	
     vec4 texColor = texture2D(diffuseMap, oUv0.xy);
-    gl_FragColor = vec4(oColour.rgb, texColor.a); 
+    gl_FragColor = vec4(texColor.rgb * oColour.rgb, texColor.a); 
 }

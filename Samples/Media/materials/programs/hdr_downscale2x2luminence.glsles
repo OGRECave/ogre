@@ -9,7 +9,7 @@ uniform vec2 texelSize;
 
 varying vec2 uv;
 
-void main(void)
+void main()
 {
 	
     vec4 accum = vec4(0.0, 0.0, 0.0, 0.0);
@@ -26,5 +26,4 @@ void main(void)
 	// take average of 4 samples
 	lum *= 0.25;
 	gl_FragColor = vec4(lum, lum, lum, 1.0);
-
 }

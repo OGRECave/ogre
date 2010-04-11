@@ -13,9 +13,9 @@ uniform vec4 lightColour;
 uniform vec4 shadowDepthRange;
 
 attribute vec4 vertex;
+attribute vec3 normal;
 attribute vec4 uv0;
 attribute vec4 uv1;
-attribute vec3 normal;
 
 varying vec4 shadowUV;
 varying vec4 vColor;

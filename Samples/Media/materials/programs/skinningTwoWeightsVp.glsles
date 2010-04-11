@@ -10,9 +10,10 @@ precision lowp samplerCube;
 attribute vec4 vertex;
 attribute vec3 normal;
 attribute vec4 uv0;
-varying vec4 colour;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
+
+varying vec4 colour;
 
 // 3x4 matrix, passed as vec4's for compatibility with GL 2.0
 // GL 2.0 supports 3x4 matrices
@@ -21,11 +22,12 @@ uniform vec4 worldMatrix3x4Array[72];
 uniform mat4 viewProjectionMatrix;
 uniform vec4 lightPos[2];
 uniform vec4 lightDiffuseColour[2];
+uniform vec4 ambient;
 
 void main()
 {
-	vec3 blendPos = vec3(0,0,0);
-	vec3 blendNorm = vec3(0,0,0);
+	vec3 blendPos = vec3(0.0, 0.0, 0.0);
+	vec3 blendNorm = vec3(0.0, 0.0, 0.0);
 	
 	for (int bone = 0; bone < 2; ++bone)
 	{
@@ -39,7 +41,7 @@ void main()
 		worldMatrix[0] = worldMatrix3x4Array[idx];
 		worldMatrix[1] = worldMatrix3x4Array[idx + 1];
 		worldMatrix[2] = worldMatrix3x4Array[idx + 2];
-		worldMatrix[3] = vec4(0);
+		worldMatrix[3] = vec4(0.0);
 		// now weight this into final 
 	    float weight = blendWeights[bone];
 		blendPos += (vertex * worldMatrix).xyz * weight;
@@ -50,7 +52,7 @@ void main()
 	}
 
 	// apply view / projection to position
-	gl_Position = viewProjectionMatrix * vec4(blendPos, 1);
+	gl_Position = viewProjectionMatrix * vec4(blendPos, 1.0);
 
 	// simple vertex lighting model
 	vec3 lightDir0 = normalize(

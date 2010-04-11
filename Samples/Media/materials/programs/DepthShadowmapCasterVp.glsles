@@ -11,6 +11,7 @@ uniform vec4 depthRange;
 varying vec2 depth;
 
 attribute vec4 vertex;
+attribute vec4 uv0;
 
 void main()
 {

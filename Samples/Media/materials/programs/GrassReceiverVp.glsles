@@ -18,7 +18,7 @@ attribute vec4 normal;
 attribute vec4 uv0;
 
 varying vec4 oShadowUV;
-varying vec3 oUv;
+varying vec3 oUv0;
 varying vec4 oColour;
 
 //////////////////////// GRASS SHADOW RECEIVER
@@ -28,7 +28,7 @@ void main()
 	vec4 factor = vec4(1.0, 1.0, 1.0, 1.0) - uv0.yyyy;
 	mypos = mypos + offset * factor;
 	gl_Position = worldViewProj * mypos;
-	oUv.xy = uv0.xy;    
+	oUv0.xy = uv0.xy;    
     // Transform position to world space
 	vec4 worldPos = world * mypos;
 	// calculate shadow map coords
@@ -51,7 +51,7 @@ void main()
     // in the same direction or opposite
     float alignedLight = dot(myNormal.xyz, lightVec); // -1..1
     // If aligned is negative, shadowing/lighting is not possible.
-    oUv.z = (alignedLight < 0.0) ? 0.0 : 1.0 ;
+    oUv0.z = (alignedLight < 0.0) ? 0.0 : 1.0 ;
          
     float diffuseFactor = max(alignedLight, 0.0);
 	//oColour = diffuseFactor * lightColour;    

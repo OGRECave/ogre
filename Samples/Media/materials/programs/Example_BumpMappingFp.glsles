@@ -4,6 +4,12 @@ precision highp float;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
+uniform vec4 lightDiffuse;
+uniform sampler2D normalMap;
+
+varying vec4 oUv0;
+varying vec3 oTSLightDir;
+
 // General functions
 
 // Expand a range-compressed vector
@@ -12,19 +18,13 @@ vec3 expand(vec3 v)
 	return (v - 0.5) * 2.0;
 }
 
-uniform vec4 lightDiffuse;
-uniform sampler2D normalMap;
-
-varying vec4 oUv;
-varying vec3 oTSLightDir;
-
 void main()
 {
-	// retrieve normalised light vector, expand from range-compressed
+	// Retrieve normalised light vector, expand from range-compressed
 	vec3 lightVec = normalize(oTSLightDir).xyz;
 
-	// get bump map vector, again expand from range-compressed
-	vec3 bumpVec = expand(texture2D(normalMap, oUv.xy).xyz);
+	// Get bump map vector, again expand from range-compressed
+	vec3 bumpVec = expand(texture2D(normalMap, oUv0.xy).xyz);
 
 	// Calculate dot product
 	gl_FragColor = lightDiffuse * dot(bumpVec, lightVec);

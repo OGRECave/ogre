@@ -5,7 +5,7 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 
 attribute vec4 vertex;
 attribute vec4 uv0;
@@ -24,5 +24,5 @@ void main()
 	mypos = mypos + offset * factor;
 	gl_Position = worldViewProj * mypos;
     // Texture Coord
-	oUv.xy = uv0.xy;
+	oUv0.xy = uv0.xy;
 }

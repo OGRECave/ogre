@@ -15,7 +15,7 @@ attribute vec3 normal;
 attribute vec3 tangent;
 attribute vec4 uv0;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 varying vec3 oTSLightDir;
 varying vec3 oTSHalfAngle;
 
@@ -26,7 +26,7 @@ void main()
 	gl_Position = worldViewProj * vertex;
 
 	// pass the main uvs straight through unchanged
-	oUv = uv0;
+	oUv0 = uv0;
 
 	// calculate tangent space light vector
 	// Get object space light direction

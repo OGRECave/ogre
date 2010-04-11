@@ -19,7 +19,7 @@ attribute vec4 vertex;
 attribute vec4 normal;
 attribute vec4 uv0;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 varying vec4 oColour;
 
 void main()
@@ -30,7 +30,7 @@ void main()
 	mypos = mypos + offset * factor;
 	gl_Position = worldViewProj * mypos;
 
-	oUv = uv0;
+	oUv0 = uv0;
     // Color
 	// get vertex light direction (support directional and point)
 	vec3 light = normalize(objSpaceLight.xyz - (mypos.xyz * objSpaceLight.w).xyz);

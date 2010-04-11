@@ -46,6 +46,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 {
 	source AmbientOneTexture.glsles
+    profiles glsles
 
 	default_params
 	{
@@ -62,6 +63,20 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
 }
 
+// A really basic ambient pass program, support for one texture coordinate set
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFPGLSLES glsles
+{
+	source PassthroughFP.glsles
+    profiles glsles
+}
+
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
+{
+//	delegate Ogre/BasicFragmentPrograms/PassthroughFPCg
+//	delegate Ogre/BasicFragmentPrograms/PassthroughFPGLSL
+	delegate Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
+//	delegate Ogre/BasicFragmentPrograms/PassthroughFPHLSL
+}
 
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningOneWeightShadowCaster cg
@@ -177,8 +192,8 @@ vertex_program Ogre/HardwareSkinningFourWeights cg
 		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
 		param_named_auto ambient ambient_light_colour
    }
-
 }
+
 // Basic hardware morph animation 
 vertex_program Ogre/HardwareMorphAnimation cg
 {

@@ -18,8 +18,8 @@ uniform vec3 eyePosition;   // object space
 uniform vec4 shininess;
 uniform mat4 worldViewProj;
 
-varying float diffuse;
-varying float specular;
+varying float diffuseIn;
+varying float specularIn;
 varying float edge;
 
 void main()
@@ -33,18 +33,18 @@ void main()
 	vec3 E = normalize(eyePosition - vertex.xyz);
 	
 	// Calculate diffuse component
-	diffuse = max(dot(N, L) , 0.0);
+	diffuseIn = max(dot(N, L) , 0.0);
 
 	// Mask off specular if diffuse is 0
-	if (diffuse == 0.0)
+	if (diffuseIn == 0.0)
 	{
-	    specular = 0.0;
+	    specularIn = 0.0;
 	}
 	else
 	{
 		// Calculate specular component
 		vec3 H = normalize(L + E);
-		specular = pow(max(dot(N, H), 0.0), shininess.x);
+		specularIn = pow(max(dot(N, H), 0.0), shininess.x);
 	}
 
 	// Edge detection, dot eye and normal vectors

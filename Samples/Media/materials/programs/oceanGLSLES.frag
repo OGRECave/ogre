@@ -5,7 +5,7 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-// oceanGLSL.frag
+// oceanGLSLES.frag
 // fragment program for Ocean water simulation
 // 05 Aug 2005
 // adapted for Ogre by nfz
@@ -17,7 +17,7 @@ precision lowp samplerCube;
 uniform float fadeBias;
 uniform float fadeExp;
 uniform vec4 waterColor;
-uniform sampler3D Noise;
+uniform sampler2D Noise;
 uniform samplerCube skyBox;
 
 varying vec3 uvw;
@@ -26,7 +26,7 @@ varying vec3 vVec;
 
 void main(void)
 {
-   vec3 noisy = texture3D(Noise, uvw).xyz;
+   vec3 noisy = texture2D(Noise, uvw.xy).xyz;
    
    // convert to signed noise
    vec3 bump = 2.0 * noisy - 1.0;

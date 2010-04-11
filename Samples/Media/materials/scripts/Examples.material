@@ -216,7 +216,7 @@ material Examples/EarlyMorningSkyBox
 
 fragment_program Examples/MorningSkyBoxHDRfpGLSLES glsles
 {
-	source hdr.glsles
+	source hdrFp.glsles
 	profiles glsles
 }
 
@@ -774,7 +774,7 @@ material Examples/Ninja
 
 material Examples/Robot
 {
-	// Hardware skinning techniique
+	// Hardware skinning technique
 	technique
 	{
 		pass
@@ -796,7 +796,6 @@ material Examples/Robot
 				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 				param_named_auto viewProjectionMatrix viewproj_matrix
 				param_named_auto ambient ambient_light_colour
-			
 			}
 
 			texture_unit
@@ -852,7 +851,7 @@ vertex_program Examples/GrassWaverVpCg cg
         
         param_named_auto offset custom 999
     }
-  }
+}
   
 vertex_program Examples/GrassWaverTexVpCg cg
   {
@@ -867,13 +866,13 @@ vertex_program Examples/GrassWaverTexVpCg cg
     }
 }
 vertex_program Examples/GrassWaverAmbientVpCg cg
-          {
+{
 	source Grass.cg
 	entry_point grassAmbient_vp
 	profiles vs_1_1 arbvp1
     
     default_params
-  			{
+  	{
   				param_named_auto worldViewProj worldviewproj_matrix
   				param_named_auto ambient ambient_light_colour
         param_named_auto offset custom 999
@@ -888,7 +887,7 @@ fragment_program Examples/GrassWaverAmbientFpCg cg
     {
     }
 }
-fragment_program Examples/GrassWaverFp cg
+fragment_program Examples/GrassWaverFpCg cg
 {
 	source Grass.cg
 	entry_point grass_fp
@@ -1063,6 +1062,15 @@ fragment_program Examples/GrassWaverReceiverFpGLSLES glsles
     }
 }
 
+fragment_program Examples/GrassWaverFpGLSLES glsles
+{
+	source GrassFp.glsles
+	profiles glsles
+    default_params
+    {
+    }
+}
+
 vertex_program Examples/GrassWaverReceiverVp unified
 {
 	delegate Examples/GrassWaverReceiverVpGLSLES
@@ -1103,6 +1111,12 @@ vertex_program Examples/GrassWaverTexVp unified
 {
 	delegate Examples/GrassWaverTexVpGLSLES
 	delegate Examples/GrassWaverTexVpCg
+}
+
+fragment_program Examples/GrassWaverFp unified
+{
+	delegate Examples/GrassWaverFpGLSLES
+	delegate Examples/GrassWaverFpCg
 }
 
 vertex_program Examples/GrassWaverVp unified
@@ -1440,9 +1454,13 @@ material Examples/GrassBladesAdditiveFloat
 			diffuse 0 0 0 
 			specular 0 0 0 0 
 			// Really basic vertex program
-			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-			{
-  }
+//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+//			{
+//				param_named_auto worldViewProj worldviewproj_matrix
+//  			}
+//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+//			{
+//			}
   
 		}
         pass lighting
@@ -1771,7 +1789,7 @@ material Examples/TudorHouse
 
 material jaiqua
 {
-	// Hardware skinning techniique
+	// Hardware skinning technique
 	technique
 	{
 		pass
@@ -1780,13 +1798,19 @@ material jaiqua
 			{
 			
 			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+
 			// alternate shadow caster program
 			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
 			{
 				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 				param_named_auto viewProjectionMatrix viewproj_matrix
 				param_named_auto ambient ambient_light_colour
-			
+			}
+			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
 			}
 
 			texture_unit
@@ -1836,19 +1860,45 @@ material Examples/Plane/IntegratedShadows
 }
 
 
-fragment_program Examples/ShowUV_p cg
+fragment_program Examples/ShowUV_pCg cg
 {
 	source Example_Basic.cg
 	entry_point showuv_p
 	profiles ps_2_0 arbfp1
 }
-fragment_program Examples/ShowUVdir3D cg
+
+fragment_program Examples/ShowUV_pGLSLES glsles
+{
+	source ShowUV.glsles
+	profiles glsles
+}
+
+fragment_program Examples/ShowUV_p unified
+{
+	delegate Examples/ShowUV_pGLSLES
+	delegate Examples/ShowUV_pCg
+}
+
+fragment_program Examples/ShowUVdir3DCg cg
 {
 	source Example_Basic.cg
 	entry_point showuvdir3d_p
 	profiles ps_2_0 arbfp1
 }
-vertex_program Examples/ShowTangents_v cg
+
+fragment_program Examples/ShowUVdir3D_pGLSLES glsles
+{
+	source ShowUVdir3D.glsles
+	profiles glsles
+}
+
+fragment_program Examples/ShowUVdir3D_p unified
+{
+	delegate Examples/ShowUVdir3D_pGLSLES
+	delegate Examples/ShowUVdir3D_pCg
+}
+
+vertex_program Examples/ShowTangents_vCg cg
 {
 	source Example_Basic.cg
 	entry_point basicPassthroughTangent_v
@@ -1858,7 +1908,24 @@ vertex_program Examples/ShowTangents_v cg
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
 }
-vertex_program Examples/ShowNormals_v cg
+
+vertex_program Examples/ShowTangents_vGLSLES glsles
+{
+	source ShowTangents.glsles
+	profiles glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Examples/ShowTangents_v unified
+{
+	delegate Examples/ShowTangents_vGLSLES
+	delegate Examples/ShowTangents_vCg
+}
+
+vertex_program Examples/ShowNormals_vCg cg
 {
 	source Example_Basic.cg
 	entry_point basicPassthroughNormal_v
@@ -1869,6 +1936,22 @@ vertex_program Examples/ShowNormals_v cg
 	}
 }
 
+vertex_program Examples/ShowNormals_vGLSLES glsles
+{
+	source ShowTangents.glsles
+	profiles glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Examples/ShowNormals_v unified
+{
+	delegate Examples/ShowNormals_vGLSLES
+	delegate Examples/ShowNormals_vCg
+}
+
 material Examples/ShowUV
 {
 	technique
@@ -1877,12 +1960,11 @@ material Examples/ShowUV
 		{
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
+				param_named_auto worldViewProj worldviewproj_matrix
 			}
 			fragment_program_ref Examples/ShowUV_p
 			{
 			}
-
-			
 		}
 	}
 }
@@ -1895,11 +1977,9 @@ material Examples/ShowTangents
 			vertex_program_ref Examples/ShowTangents_v
 			{
 			}
-			fragment_program_ref Examples/ShowUVdir3D
+			fragment_program_ref Examples/ShowUVdir3D_p
 			{
 			}
-
-			
 		}
 	}
 }
@@ -1912,11 +1992,9 @@ material Examples/ShowNormals
 			vertex_program_ref Examples/ShowNormals_v
 			{
 			}
-			fragment_program_ref Examples/ShowUVdir3D
+			fragment_program_ref Examples/ShowUVdir3D_p
 			{
 			}
-
-			
 		}
 	}
 }

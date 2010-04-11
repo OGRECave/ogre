@@ -12,7 +12,7 @@ uniform vec4 texelOffsets;
 attribute vec4 vertex;
 attribute vec4 uv0;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 varying vec2 oDepth;
 
 //////////////////////// GRASS SHADOW CASTER
@@ -30,5 +30,5 @@ void main()
 	oDepth.x = gl_Position.z;
 	oDepth.y = gl_Position.w;
   
-  	oUv = uv0;
+  	oUv0 = uv0;
 }

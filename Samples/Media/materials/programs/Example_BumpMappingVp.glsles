@@ -19,18 +19,18 @@ attribute vec3 normal;
 attribute vec3 tangent;
 attribute vec4 uv0;
 
-varying vec4 oUv;
+varying vec4 oUv0;
 varying vec3 oTSLightDir;
 
 void main()
 {
-	// calculate output position
+	// Calculate output position
 	gl_Position = worldViewProj * vertex;
 
-	// pass the main uvs straight through unchanged
-	oUv = uv0;
+	// Pass the main uvs straight through unchanged
+	oUv0 = uv0;
 
-	// calculate tangent space light vector
+	// Calculate tangent space light vector
 	// Get object space light direction
 	// Non-normalised since we'll do that in the fragment program anyway
 	vec3 lightDir = lightPosition.xyz - (vertex * lightPosition.w).xyz;
@@ -43,7 +43,7 @@ void main()
 #if TANGENTS_HAVE_PARITY
 	vec3 binormal = cross(tangent.xyz, normal) * tangent.www;
 #else
-	// fixed handedness
+	// Fixed handedness
 	vec3 binormal = cross(tangent.xyz, normal);
 #endif
 	

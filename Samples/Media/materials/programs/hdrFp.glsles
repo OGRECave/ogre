@@ -1,50 +1,17 @@
-void morningskybox_fp (
-	float2 uv : TEXCOORD0,
-	out float4 colour : COLOR,
+#version 100
 
-	uniform sampler2D tex : register(s0) )
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform sampler2D tex;
+varying vec4 oUv0;
+
+void main ()
 {
-	colour = tex2D(tex, uv);
+	gl_FragColor = vec4(texture2D(tex, oUv0.xy));
 
-	// blow out the light a bit
-	colour *= 1.7;
+	// Blow out the light a bit
+	gl_FragColor *= 1.7;
 }
-void morningcubemap_fp (
-	float3 uv : TEXCOORD0,
-	out float4 colour : COLOR,
-
-	uniform samplerCUBE tex : register(s0) )
-{
-	colour = texCUBE(tex, uv);
-
-	// blow out the light a bit
-	colour *= 1.7;
-}
-
-
-
-void morningskybox_fp (
-	float2 uv : TEXCOORD0,
-	out float4 colour : COLOR,
-
-	uniform sampler2D tex : register(s0) )
-{
-	colour = tex2D(tex, uv);
-
-	// blow out the light a bit
-	colour *= 1.7;
-}
-void morningcubemap_fp (
-	float3 uv : TEXCOORD0,
-	out float4 colour : COLOR,
-
-	uniform samplerCUBE tex : register(s0) )
-{
-	colour = texCUBE(tex, uv);
-
-	// blow out the light a bit
-	colour *= 1.7;
-}
-
-
-

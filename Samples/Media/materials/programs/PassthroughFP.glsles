@@ -1,0 +1,16 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform vec4 ambient;
+
+/*
+  Basic ambient lighting fragment program for GLSL ES
+*/
+void main()
+{
+	gl_FragColor = ambient;
+}
