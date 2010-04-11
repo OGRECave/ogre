@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include <signal.h>
 #include <setjmp.h>
 
-    #if OGRE_CPU == OGRE_CPU_ARM
+    #if OGRE_CPU == OGRE_CPU_ARM && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         #include <sys/sysctl.h>
         #include <mach/machine.h>
     #endif

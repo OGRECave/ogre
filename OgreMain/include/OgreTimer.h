@@ -40,6 +40,8 @@ THE SOFTWARE.
 # include "OSX/OgreTimerImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 # include "iPhone/OgreTimerImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+# include "Android/OgreTimerImp.h"
 #endif
 
 #endif

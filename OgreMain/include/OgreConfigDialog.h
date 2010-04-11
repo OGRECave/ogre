@@ -48,6 +48,8 @@ THE SOFTWARE.
 # include "iPhone/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
 # include "Symbian/OgreConfigDialogImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+# include "Android/OgreConfigDialogImp.h"
 #endif
 
 #endif
