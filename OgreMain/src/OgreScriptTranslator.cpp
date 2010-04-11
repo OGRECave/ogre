@@ -2336,6 +2336,9 @@ namespace Ogre{
 				case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
 					translateShadowCasterVertexProgramRef(compiler, child);
 					break;
+				case ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF:
+					translateShadowCasterFragmentProgramRef(compiler, child);
+					break;
 				case ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF:
 					translateShadowReceiverVertexProgramRef(compiler, child);
 					break;
@@ -2449,6 +2452,32 @@ namespace Ogre{
 		if(pass->getShadowCasterVertexProgram()->isSupported())
 		{
 			GpuProgramParametersSharedPtr params = pass->getShadowCasterVertexProgramParameters();
+			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+		}
+	}
+	//-------------------------------------------------------------------------
+	void PassTranslator::translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+	{
+		if(node->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
+			return;
+		}
+
+		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
+		compiler->_fireEvent(&evt, 0);
+
+		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+		{
+			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+			return;
+		}
+
+		Pass *pass = any_cast<Pass*>(node->parent->context);
+		pass->setShadowCasterFragmentProgram(evt.mName);
+		if(pass->getShadowCasterFragmentProgram()->isSupported())
+		{
+			GpuProgramParametersSharedPtr params = pass->getShadowCasterFragmentProgramParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
 		}
 	}

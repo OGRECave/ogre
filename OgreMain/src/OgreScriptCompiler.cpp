@@ -999,6 +999,7 @@ namespace Ogre
 		mIds["geometry_program_ref"] = ID_GEOMETRY_PROGRAM_REF;
 		mIds["fragment_program_ref"] = ID_FRAGMENT_PROGRAM_REF;
 		mIds["shadow_caster_vertex_program_ref"] = ID_SHADOW_CASTER_VERTEX_PROGRAM_REF;
+		mIds["shadow_caster_fragment_program_ref"] = ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF;
 		mIds["shadow_receiver_vertex_program_ref"] = ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF;
 		mIds["shadow_receiver_fragment_program_ref"] = ID_SHADOW_RECEIVER_FRAGMENT_PROGRAM_REF;
 

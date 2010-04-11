@@ -202,6 +202,8 @@ namespace Ogre {
 		GpuProgramUsage *mVertexProgramUsage;
         // Vertex program details
         GpuProgramUsage *mShadowCasterVertexProgramUsage;
+        // Fragment program details
+        GpuProgramUsage *mShadowCasterFragmentProgramUsage;
         // Vertex program details
         GpuProgramUsage *mShadowReceiverVertexProgramUsage;
 		// Fragment program details
@@ -271,6 +273,8 @@ namespace Ogre {
         bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster vertex program
         bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
+        /// Returns true if this pass uses a shadow caster fragment program
+        bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow receiver vertex program
         bool hasShadowReceiverVertexProgram(void) const { return mShadowReceiverVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow receiver fragment program
@@ -1234,6 +1238,51 @@ namespace Ogre {
         /** Gets the vertex program used by this pass when rendering shadow casters,
             only available after _load(). */
         const GpuProgramPtr& getShadowCasterVertexProgram(void) const;
+
+        /** Sets the details of the fragment program to use when rendering as a
+        shadow caster.
+        @remarks
+        Texture-based shadows require that the caster is rendered to a texture
+        in a solid colour (the shadow colour in the case of modulative texture
+        shadows). Whilst Ogre can arrange this for the fixed function
+        pipeline, passes which use vertex programs might need the vertex
+        programs still to run in order to preserve any deformation etc
+        that it does. However, lighting calculations must be a lot simpler,
+        with only the ambient colour being used (which the engine will ensure
+        is bound to the shadow colour).
+        @par
+        Therefore, it is up to implementors of vertex programs to provide an
+        alternative vertex program which can be used to render the object
+        to a shadow texture. Do all the same vertex transforms, but set the
+        colour of the vertex to the ambient colour, as bound using the
+        standard auto parameter binding mechanism.
+        @note
+        Some vertex programs will work without doing this, because Ogre ensures
+        that all lights except for ambient are set black. However, the chances
+        are that your vertex program is doing a lot of unnecessary work in this
+        case, since the other lights are having no effect, and it is good practice
+        to supply an alternative.
+        @note
+        This is only applicable to programmable passes.
+        @par
+        The default behaviour is for Ogre to switch to fixed-function
+        rendering if an explicit fragment program alternative is not set.
+        */
+        void setShadowCasterFragmentProgram(const String& name);
+        /** Sets the fragment program parameters for rendering as a shadow caster.
+        @remarks
+        Only applicable to programmable passes, and this particular call is
+        designed for low-level programs; use the named parameter methods
+        for setting high-level program parameters.
+        */
+        void setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params);
+        /** Gets the name of the fragment program used by this pass when rendering shadow casters. */
+        const String& getShadowCasterFragmentProgramName(void) const;
+        /** Gets the fragment program parameters used by this pass when rendering shadow casters. */
+        GpuProgramParametersSharedPtr getShadowCasterFragmentProgramParameters(void) const;
+        /** Gets the fragment program used by this pass when rendering shadow casters,
+            only available after _load(). */
+        const GpuProgramPtr& getShadowCasterFragmentProgram(void) const;
 
         /** Sets the details of the vertex program to use when rendering as a
             shadow receiver.

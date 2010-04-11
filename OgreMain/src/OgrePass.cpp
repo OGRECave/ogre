@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "OgrePass.h"
+#include "OgreRoot.h"
 #include "OgreTechnique.h"
 #include "OgreException.h"
 #include "OgreGpuProgramUsage.h"
@@ -182,6 +183,7 @@ namespace Ogre {
 		, mFogDensity(0.001)
 		, mVertexProgramUsage(0)
 		, mShadowCasterVertexProgramUsage(0)
+        , mShadowCasterFragmentProgramUsage(0)
 		, mShadowReceiverVertexProgramUsage(0)
 		, mFragmentProgramUsage(0)
 		, mShadowReceiverFragmentProgramUsage(0)
@@ -211,7 +213,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
 	Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
         :mParent(parent), mIndex(index), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), 
-		mShadowReceiverVertexProgramUsage(0), mFragmentProgramUsage(0), 
+		mShadowCasterFragmentProgramUsage(0), mShadowReceiverVertexProgramUsage(0), mFragmentProgramUsage(0), 
 		mShadowReceiverFragmentProgramUsage(0), mGeometryProgramUsage(0),
 		mQueuedForDeletion(false), mPassIterationCount(1)
     {
@@ -229,6 +231,7 @@ namespace Ogre {
 		OGRE_DELETE mVertexProgramUsage;
 		OGRE_DELETE mFragmentProgramUsage;
 		OGRE_DELETE mShadowCasterVertexProgramUsage;
+        OGRE_DELETE mShadowCasterFragmentProgramUsage;
 		OGRE_DELETE mShadowReceiverVertexProgramUsage;
 		OGRE_DELETE mShadowReceiverFragmentProgramUsage;		
     }
@@ -320,6 +323,16 @@ namespace Ogre {
         else
         {
             mShadowCasterVertexProgramUsage = NULL;
+        }
+
+		OGRE_DELETE mShadowCasterFragmentProgramUsage;
+        if (oth.mShadowCasterFragmentProgramUsage)
+        {
+            mShadowCasterFragmentProgramUsage = OGRE_NEW GpuProgramUsage(*(oth.mShadowCasterFragmentProgramUsage), this);
+        }
+        else
+        {
+            mShadowCasterFragmentProgramUsage = NULL;
         }
 
 		OGRE_DELETE mShadowReceiverVertexProgramUsage;
@@ -1243,6 +1256,11 @@ namespace Ogre {
             // Load vertex program
             mShadowCasterVertexProgramUsage->_load();
         }
+        if (mShadowCasterFragmentProgramUsage)
+        {
+            // Load fragment program
+            mShadowCasterFragmentProgramUsage->_load();
+        }
         if (mShadowReceiverVertexProgramUsage)
         {
             // Load vertex program
@@ -1640,6 +1658,11 @@ namespace Ogre {
             OGRE_DELETE mShadowCasterVertexProgramUsage;
             mShadowCasterVertexProgramUsage = 0;
         }
+        if (mShadowCasterFragmentProgramUsage)
+        {
+            OGRE_DELETE mShadowCasterFragmentProgramUsage;
+            mShadowCasterFragmentProgramUsage = 0;
+        }
         if (mShadowReceiverVertexProgramUsage)
         {
             OGRE_DELETE mShadowReceiverVertexProgramUsage;
@@ -1737,6 +1760,67 @@ namespace Ogre {
     const GpuProgramPtr& Pass::getShadowCasterVertexProgram(void) const
     {
         return mShadowCasterVertexProgramUsage->getProgram();
+    }
+    //-----------------------------------------------------------------------
+    void Pass::setShadowCasterFragmentProgram(const String& name)
+    {
+        // Turn off fragment program if name blank
+        if (name.empty())
+        {
+            if (mShadowCasterFragmentProgramUsage) OGRE_DELETE mShadowCasterFragmentProgramUsage;
+            mShadowCasterFragmentProgramUsage = NULL;
+        }
+        else
+        {
+            if (!mShadowCasterFragmentProgramUsage)
+            {
+                mShadowCasterFragmentProgramUsage = OGRE_NEW GpuProgramUsage(GPT_FRAGMENT_PROGRAM, this);
+            }
+            mShadowCasterFragmentProgramUsage->setProgramName(name);
+        }
+        // Needs recompilation
+        mParent->_notifyNeedsRecompile();
+    }
+    //-----------------------------------------------------------------------
+    void Pass::setShadowCasterFragmentProgramParameters(GpuProgramParametersSharedPtr params)
+    {
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            if (!mShadowCasterFragmentProgramUsage)
+            {
+                OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
+                    "This pass does not have a shadow caster fragment program assigned!",
+                    "Pass::setShadowCasterFragmentProgramParameters");
+            }
+            mShadowCasterFragmentProgramUsage->setParameters(params);
+        }
+    }
+    //-----------------------------------------------------------------------
+    const String& Pass::getShadowCasterFragmentProgramName(void) const
+    {
+        if (!mShadowCasterFragmentProgramUsage)
+            return StringUtil::BLANK;
+        else
+            return mShadowCasterFragmentProgramUsage->getProgramName();
+    }
+    //-----------------------------------------------------------------------
+    GpuProgramParametersSharedPtr Pass::getShadowCasterFragmentProgramParameters(void) const
+    {
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            if (!mShadowCasterFragmentProgramUsage)
+            {
+                OGRE_EXCEPT (Exception::ERR_INVALIDPARAMS,
+                    "This pass does not have a shadow caster fragment program assigned!",
+                    "Pass::getShadowCasterFragmentProgramParameters");
+            }
+        }
+        return mShadowCasterFragmentProgramUsage->getParameters();
+    }
+    //-----------------------------------------------------------------------
+    const GpuProgramPtr& Pass::getShadowCasterFragmentProgram(void) const
+    {
+        return mShadowCasterFragmentProgramUsage->getProgram();
     }
     //-----------------------------------------------------------------------
     void Pass::setShadowReceiverVertexProgram(const String& name)

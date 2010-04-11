@@ -80,7 +80,8 @@ namespace Ogre {
         Pass* pass;
         TextureUnitState* textureUnit;
         GpuProgramPtr program; // used when referencing a program, not when defining it
-        bool isProgramShadowCaster; // when referencing, are we in context of shadow caster
+        bool isVertexProgramShadowCaster; // when referencing, are we in context of shadow caster
+        bool isFragmentProgramShadowCaster; // when referencing, are we in context of shadow caster
         bool isVertexProgramShadowReceiver; // when referencing, are we in context of shadow caster
 		bool isFragmentProgramShadowReceiver; // when referencing, are we in context of shadow caster
         GpuProgramParametersSharedPtr programParams;
@@ -243,6 +244,7 @@ namespace Ogre {
         void writePass(const Pass* pPass);
         void writeVertexProgramRef(const Pass* pPass);
         void writeShadowCasterVertexProgramRef(const Pass* pPass);
+        void writeShadowCasterFragmentProgramRef(const Pass* pPass);
         void writeShadowReceiverVertexProgramRef(const Pass* pPass);
         void writeShadowReceiverFragmentProgramRef(const Pass* pPass);
         void writeFragmentProgramRef(const Pass* pPass);
