@@ -558,34 +558,6 @@ namespace Ogre {
                 StringMap functionCache;
                 functionCache.clear();
 
-                // GLSL ES does not have the transpose function.  If we are using the
-                // FFP Texturing library there is a good chance that we'll need it.
-                if(curDependency == "FFPLib_Texturing")
-                {
-                    os << "void transpose(in mat4 mView, out mat4 mOut)\n";
-                    os << "{\n";
-                    os << "\tmOut[0][0] = mView[0][0];\n";
-                    os << "\tmOut[1][0] = mView[0][1];\n";
-                    os << "\tmOut[2][0] = mView[0][2];\n";
-                    os << "\tmOut[3][0] = mView[0][3];\n";
-                    os << "\n";
-                    os << "\tmOut[0][1] = mView[1][0];\n";
-                    os << "\tmOut[1][1] = mView[1][1];\n";
-                    os << "\tmOut[2][1] = mView[1][2];\n";
-                    os << "\tmOut[3][1] = mView[1][3];\n";
-                    os << "\n";
-                    os << "\tmOut[0][2] = mView[2][0];\n";
-                    os << "\tmOut[1][2] = mView[2][1];\n";
-                    os << "\tmOut[2][2] = mView[2][2];\n";
-                    os << "\tmOut[3][2] = mView[2][3];\n";
-                    os << "\n";
-                    os << "\tmOut[0][3] = mView[3][0];\n";
-                    os << "\tmOut[1][3] = mView[3][1];\n";
-                    os << "\tmOut[2][3] = mView[3][2];\n";
-                    os << "\tmOut[3][3] = mView[3][3];\n";
-                    os << "}\n\n";
-                }
-
                 DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(curDependency + 
                                                                                          "." +
                                                                                          getTargetLanguage());
