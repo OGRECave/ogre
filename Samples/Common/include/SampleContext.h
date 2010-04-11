@@ -42,6 +42,10 @@
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES
 #    define OGRE_STATIC_GLES
 #  endif
+#  ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
+//#undef OGRE_STATIC_GLES
+#    define OGRE_STATIC_GLES2
+#  endif
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
 #		define OGRE_STATIC_Direct3D9
@@ -499,7 +503,7 @@ namespace OgreBites
             #endif
 			mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"), 
 				mFSLayer->getWritablePath("ogre.log"));
-
+            
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.load();
 #endif
