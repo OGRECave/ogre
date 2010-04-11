@@ -109,7 +109,6 @@ namespace Ogre {
 			// program object not found for key so need to create it
 			if (programFound == mLinkPrograms.end())
 			{
-				//mActiveLinkProgram = OGRE_NEW GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
 				mActiveLinkProgram = new GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
 				mLinkPrograms[activeKey] = mActiveLinkProgram;
 			}

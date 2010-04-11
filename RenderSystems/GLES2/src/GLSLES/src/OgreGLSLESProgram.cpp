@@ -37,6 +37,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    String operationTypeToString(RenderOperation::OperationType val);
+    RenderOperation::OperationType parseOperationType(const String& val);
+
     //-----------------------------------------------------------------------
 	GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
     GLSLESProgram::CmdAttach GLSLESProgram::msCmdAttach;
@@ -177,7 +180,7 @@ namespace Ogre {
             GL_CHECK_ERROR
 		}
 
-		compile();
+		compile(true);
 	}
     
     //---------------------------------------------------------------------------
@@ -195,11 +198,9 @@ namespace Ogre {
             logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
 
 		// Force exception if not compiled
-		if (checkErrors)
-		{
-			if (mCompiled)
-				logObjectInfo("GLSL ES compiled: " + mName, mGLHandle);
-		}
+        if (mCompiled && checkErrors)
+            logObjectInfo("GLSL ES compiled: " + mName, mGLHandle);
+
 		return (mCompiled == 1);
 	}
 
@@ -246,30 +247,30 @@ namespace Ogre {
 			mSource, *mConstantDefs.get(), mName);
 
 		// Also parse any attached sources
-		for (GLSLESProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
-			i != mAttachedGLSLPrograms.end(); ++i)
-		{
-			GLSLESProgram* childShader = *i;
-
-			GLSLESLinkProgramManager::getSingleton().extractConstantDefs(
-				childShader->getSource(), *mConstantDefs.get(), childShader->getName());
-		}
+//		for (GLSLESProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
+//			i != mAttachedGLSLPrograms.end(); ++i)
+//		{
+//			GLSLESProgram* childShader = *i;
+//
+//			GLSLESLinkProgramManager::getSingleton().extractConstantDefs(
+//				childShader->getSource(), *mConstantDefs.get(), childShader->getName());
+//		}
 	}
 
 	//---------------------------------------------------------------------
-	bool GLSLESProgram::getPassSurfaceAndLightStates(void) const
+	inline bool GLSLESProgram::getPassSurfaceAndLightStates(void) const
 	{
 		// Scenemanager should pass on light & material state to the rendersystem
 		return true;
 	}
 	//---------------------------------------------------------------------
-	bool GLSLESProgram::getPassTransformStates(void) const
+	inline bool GLSLESProgram::getPassTransformStates(void) const
 	{
 		// Scenemanager should pass on transform state to the rendersystem
 		return true;
 	}
 	//---------------------------------------------------------------------
-	bool GLSLESProgram::getPassFogStates(void) const
+	inline bool GLSLESProgram::getPassFogStates(void) const
 	{
 		// Scenemanager should pass on fog state to the rendersystem
 		return true;
@@ -304,43 +305,43 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void GLSLESProgram::attachChildShader(const String& name)
 	{
-		// Is the name valid and already loaded?
-		// check with the high level program manager to see if it was loaded
-		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
-		if (!hlProgram.isNull())
-		{
-			if (hlProgram->getSyntaxCode() == "glsles")
-			{
-				// Make sure attached program source gets loaded and compiled
-				// don't need a low level implementation for attached shader objects
-				// loadHighLevelImpl will only load the source and compile once
-				// so don't worry about calling it several times
-				GLSLESProgram* childShader = static_cast<GLSLESProgram*>(hlProgram.getPointer());
-				// Load the source and attach the child shader only if supported
-				if (isSupported())
-				{
-					childShader->loadHighLevelImpl();
-					// Add to the container
-					mAttachedGLSLPrograms.push_back( childShader );
-					mAttachedShaderNames += name + " ";
-				}
-			}
-		}
+//		// Is the name valid and already loaded?
+//		// check with the high level program manager to see if it was loaded
+//		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
+//		if (!hlProgram.isNull())
+//		{
+//			if (hlProgram->getSyntaxCode() == "glsles")
+//			{
+//				// Make sure attached program source gets loaded and compiled
+//				// don't need a low level implementation for attached shader objects
+//				// loadHighLevelImpl will only load the source and compile once
+//				// so don't worry about calling it several times
+//				GLSLESProgram* childShader = static_cast<GLSLESProgram*>(hlProgram.getPointer());
+//				// Load the source and attach the child shader only if supported
+//				if (isSupported())
+//				{
+//					childShader->loadHighLevelImpl();
+//					// Add to the container
+//					mAttachedGLSLPrograms.push_back( childShader );
+//					mAttachedShaderNames += name + " ";
+//				}
+//			}
+//		}
 	}
 
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::attachToProgramObject( const GLuint programObject )
 	{
 		// Attach child objects
-		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
-
- 		while (childprogramcurrent != childprogramend)
-		{
-			GLSLESProgram* childShader = *childprogramcurrent;
-			childShader->attachToProgramObject(programObject);
-			++childprogramcurrent;
-		}
+//		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
+//		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
+//
+// 		while (childprogramcurrent != childprogramend)
+//		{
+//			GLSLESProgram* childShader = *childprogramcurrent;
+//			childShader->attachToProgramObject(programObject);
+//			++childprogramcurrent;
+//		}
 
 		glAttachShader(programObject, mGLHandle);
         GL_CHECK_ERROR
@@ -352,15 +353,15 @@ namespace Ogre {
         GL_CHECK_ERROR
 
 		// Attach child objects
-		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
-
-		while (childprogramcurrent != childprogramend)
-		{
-			GLSLESProgram* childShader = *childprogramcurrent;
-			childShader->detachFromProgramObject( programObject );
-			++childprogramcurrent;
-		}
+//		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
+//		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
+//
+//		while (childprogramcurrent != childprogramend)
+//		{
+//			GLSLESProgram* childShader = *childprogramcurrent;
+//			childShader->detachFromProgramObject( programObject );
+//			++childprogramcurrent;
+//		}
 
 	}
 

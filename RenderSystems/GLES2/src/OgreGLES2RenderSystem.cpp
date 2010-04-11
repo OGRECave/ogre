@@ -38,6 +38,11 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLSLESProgramFactory.h"
+#include "OgreGLSLESGpuProgram.h"
+
+#include "OgreRoot.h"
+#include "OgreGLSLESLinkProgramManager.h"
+//#include "OgreSceneManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   include "OgreEAGL2Window.h"
@@ -57,6 +62,7 @@ THE SOFTWARE.
 #define GL_FILL    0x1B02
 
 namespace Ogre {
+
     GLES2RenderSystem::GLES2RenderSystem()
         : mDepthWrite(true),
           mStencilMask(0xFFFFFFFF),
@@ -82,6 +88,7 @@ namespace Ogre {
         {
             // Dummy value
             mTextureCoordIndex[i] = 99;
+            mTextureTypes[i] = 0;
         }
 
         mTextureCount = 0;
@@ -114,7 +121,7 @@ namespace Ogre {
 
     const String& GLES2RenderSystem::getName(void) const
     {
-        static String strName("OpenGL ES 2.0 Rendering Subsystem");
+        static String strName("OpenGL ES 2.x Rendering Subsystem");
         return strName;
     }
 
@@ -166,6 +173,8 @@ namespace Ogre {
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
 			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
+		else if (strstr(vendorName, "NVIDIA"))
+			rsc->setVendor(GPU_NVIDIA);
         else
             rsc->setVendor(GPU_UNKNOWN);
 
@@ -212,7 +221,6 @@ namespace Ogre {
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
-        rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
         rsc->setNumMultiRenderTargets(OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 
@@ -224,8 +232,7 @@ namespace Ogre {
 
         rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
-        if (mGLSupport->checkExtension("GL_IMG_user_clip_plane"))
-            rsc->setCapability(RSC_USER_CLIP_PLANES);
+        rsc->setCapability(RSC_USER_CLIP_PLANES);
 
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
@@ -240,7 +247,7 @@ namespace Ogre {
         rsc->setCapability(RSC_DOT3);
         
         // Point size
-        GLfloat psRange[2];
+        GLfloat psRange[2] = {0.0, 0.0};
         glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, psRange);
         GL_CHECK_ERROR;
         rsc->setMaxPointSize(psRange[1]);
@@ -267,7 +274,7 @@ namespace Ogre {
         rsc->setVertexProgramConstantBoolCount(0);
         rsc->setVertexProgramConstantIntCount(0);
 
-        GLfloat floatConstantCount;
+        GLfloat floatConstantCount = 0;
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_VECTORS, &floatConstantCount);
         rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
 
@@ -280,8 +287,7 @@ namespace Ogre {
         rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
-        if (mGLSupport->checkExtension("GL_OES_texture_half_float"))
-            rsc->setCapability(RSC_TEXTURE_FLOAT);
+        rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
@@ -310,9 +316,58 @@ namespace Ogre {
         // Use VBO's by default
         mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
 
-        // Create FBO manager
-        LogManager::getSingleton().logMessage("GL ES: Using FBOs for rendering to textures");
-        mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
+        ConfigOptionMap::iterator cfi = getConfigOptions().find("RTT Preferred Mode");
+		// RTT Mode: 0 use whatever available, 1 use PBuffers, 2 force use copying
+		int rttMode = 0;
+		if (cfi != getConfigOptions().end())
+		{
+			if (cfi->second.currentValue == "PBuffer")
+			{
+				rttMode = 1;
+			}
+			else if (cfi->second.currentValue == "Copy")
+			{
+				rttMode = 2;
+			}
+		}
+
+		// Check for framebuffer object extension
+		if(caps->hasCapability(RSC_FBO) && rttMode < 1)
+		{
+            // Create FBO manager
+            LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
+            mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
+            caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+        }
+		else
+		{
+			// Check GLSupport for PBuffer support
+			if(caps->hasCapability(RSC_PBUFFER) && rttMode < 2)
+			{
+				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
+				{
+					// Use PBuffers
+//					mRTTManager = new GLES2PBRTTManager(mGLSupport, primary);
+					LogManager::getSingleton().logMessage("GL ES 2: Using PBuffers for rendering to textures");
+
+					// TODO: Depth buffer sharing in pbuffer is left unsupported
+				}
+			}
+			else
+			{
+				// No pbuffer support either -- fallback to simplest copying from framebuffer
+				mRTTManager = new GLES2CopyingRTTManager();
+				LogManager::getSingleton().logMessage("GL ES 2: Using framebuffer copy for rendering to textures (worst)");
+				LogManager::getSingleton().logMessage("GL ES 2: Warning: RenderTexture size is restricted to size of framebuffer. If you are on Linux, consider using GLX instead of SDL.");
+
+				//Copy method uses the main depth buffer but no other depth buffer
+                caps->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
+				caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
+			}
+
+			// Downgrade number of simultaneous targets
+			caps->setNumMultiRenderTargets(1);
+		}
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
 		if (defaultLog)
@@ -381,6 +436,7 @@ namespace Ogre {
             mShaderGenerator = NULL;
         }
 
+		// Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
         OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;
 
@@ -477,8 +533,8 @@ namespace Ogre {
 
 		if( win->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH )
 		{
-			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
-			//Only Copy does, but Copy means only one depth buffer...
+			// Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
+			// Only Copy does, but Copy means only one depth buffer...
 			GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 															mCurrentContext, 0, 0,
 															win->getWidth(), win->getHeight(),
@@ -515,13 +571,13 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLES2RenderBuffer *stencilBuffer = depthBuffer;
-			if( stencilBuffer != GL_NONE )
+			if( depthFormat != GL_DEPTH24_STENCIL8_OES && stencilBuffer != GL_NONE )
 			{
 				stencilBuffer = OGRE_NEW GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
 			}
 
-			//No "custom-quality" multisample for now in GL
+			// No "custom-quality" multisample for now in GL
 			retVal = OGRE_NEW GLES2DepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
 										fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0, false );
 		}
@@ -612,10 +668,12 @@ namespace Ogre {
 
     void GLES2RenderSystem::setNormaliseNormals(bool normalise)
     {
+        // Not supported
     }
 
     void GLES2RenderSystem::_useLights(const LightList& lights, unsigned short limit)
     {
+        // Not supported
     }
 
     void GLES2RenderSystem::_setWorldMatrix(const Matrix4 &m)
@@ -651,9 +709,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GL_CHECK_ERROR;
-
-        // TODO We need control texture types?????
         GLES2TexturePtr tex = texPtr;
 
         glActiveTexture(GL_TEXTURE0 + stage);
@@ -663,41 +718,29 @@ namespace Ogre {
         {
             if (!tex.isNull())
             {
-                // note used
+                // Note used
                 tex->touch();
+				mTextureTypes[stage] = tex->getGLES2TextureTarget();
+
+                // Store the number of mipmaps
+                mTextureMipmapCount = tex->getNumMipmaps();
             }
+			else
+				// Assume 2D
+				mTextureTypes[stage] = GL_TEXTURE_2D;
 
-//            glEnable(GL_TEXTURE_2D);
-//            GL_CHECK_ERROR;
-
-            // Store the number of mipmaps
-            mTextureMipmapCount = tex->getNumMipmaps();
-            
-            if (!tex.isNull())
-            {
-                glBindTexture(tex->getGLES2TextureTarget(), tex->getGLID());
-                GL_CHECK_ERROR;
-            }
-            else
-            {
-                glBindTexture(GL_TEXTURE_2D, static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID());
-                GL_CHECK_ERROR;
-            }
-        }
-        else
-        {
-            // mTextureCount--;
-//            glEnable(GL_TEXTURE_2D);
-//            glDisable(GL_TEXTURE_2D);
-//            GL_CHECK_ERROR;
-
-//            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-//            GL_CHECK_ERROR;
-
-            // bind zero texture
-            glBindTexture(GL_TEXTURE_2D, 0);
+			if(!tex.isNull())
+				glBindTexture( mTextureTypes[stage], tex->getGLID() );
+			else
+				glBindTexture( mTextureTypes[stage], static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID() );
             GL_CHECK_ERROR;
-        }
+		}
+		else
+		{
+			// Bind zero texture
+			glBindTexture(GL_TEXTURE_2D, 0); 
+            GL_CHECK_ERROR;
+		}
 
         glActiveTexture(GL_TEXTURE0);
         GL_CHECK_ERROR;
@@ -705,7 +748,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
     {
-        // Not supported
+		mTextureCoordIndex[stage] = index;
     }
 
     void GLES2RenderSystem::_setTextureCoordCalculation(size_t stage,
@@ -728,9 +771,7 @@ namespace Ogre {
             case TextureUnitState::TAM_BORDER:
                 return GL_CLAMP_TO_EDGE;
             case TextureUnitState::TAM_MIRROR:
-#if GL_OES_texture_mirrored_repeat
                 return GL_MIRRORED_REPEAT;
-#endif
             case TextureUnitState::TAM_WRAP:
             default:
                 return GL_REPEAT;
@@ -741,9 +782,9 @@ namespace Ogre {
     {
         glActiveTexture(GL_TEXTURE0 + stage);
         GL_CHECK_ERROR;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
+		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         GL_CHECK_ERROR;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
+		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
         GL_CHECK_ERROR;
         glActiveTexture(GL_TEXTURE0);
         GL_CHECK_ERROR;
@@ -756,35 +797,15 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {
-        if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
-        {
-#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
-            glActiveTexture(GL_TEXTURE0 + unit);
-            GL_CHECK_ERROR;
-            glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
-            GL_CHECK_ERROR;
-            glActiveTexture(GL_TEXTURE0);
-            GL_CHECK_ERROR;
-#endif
-        }
+        // Not supported
     }
 
     void GLES2RenderSystem::_setTextureMatrix(size_t stage, const Matrix4& xform)
     {
-        if (stage >= mFixedFunctionTextureUnits)
-        {
-            // Can't do this
-            return;
-        }
-
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
-
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+        // Not supported
     }
 
-    GLint GLES2RenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
+    GLenum GLES2RenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
     {
         switch (ogreBlend)
         {
@@ -810,15 +831,15 @@ namespace Ogre {
                 return GL_ONE_MINUS_SRC_ALPHA;
         };
 
-        // to keep compiler happy
+        // To keep compiler happy
         return GL_ONE;
     }
 
 	void GLES2RenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op)
 	{
         GL_CHECK_ERROR;
-		GLint sourceBlend = getBlendMode(sourceFactor);
-		GLint destBlend = getBlendMode(destFactor);
+		GLenum sourceBlend = getBlendMode(sourceFactor);
+		GLenum destBlend = getBlendMode(destFactor);
 		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
 		{
 			glDisable(GL_BLEND);
@@ -826,28 +847,23 @@ namespace Ogre {
 		}
 		else
 		{
-			// SBF_SOURCE_COLOUR - not allowed for source - http://www.khronos.org/opengles/sdk/1.1/docs/man/
-			if(sourceFactor == SBF_SOURCE_COLOUR)
-				sourceBlend = getBlendMode(SBF_SOURCE_ALPHA);
-
 			glEnable(GL_BLEND);
 			GL_CHECK_ERROR;
 			glBlendFunc(sourceBlend, destBlend);
 			GL_CHECK_ERROR;
 		}
         
-#if GL_OES_blend_subtract
-        GLint func = GL_FUNC_ADD_OES;
+        GLint func = GL_FUNC_ADD;
 		switch(op)
 		{
 		case SBO_ADD:
-			func = GL_FUNC_ADD_OES;
+			func = GL_FUNC_ADD;
 			break;
 		case SBO_SUBTRACT:
-			func = GL_FUNC_SUBTRACT_OES;
+			func = GL_FUNC_SUBTRACT;
 			break;
 		case SBO_REVERSE_SUBTRACT:
-			func = GL_FUNC_REVERSE_SUBTRACT_OES;
+			func = GL_FUNC_REVERSE_SUBTRACT;
 			break;
 		case SBO_MIN:
 #if GL_EXT_blend_minmax
@@ -860,10 +876,9 @@ namespace Ogre {
 #endif
 			break;
 		}
-        if(glBlendEquationOES)
-            glBlendEquationOES(func);
+
+        glBlendEquation(func);
         GL_CHECK_ERROR;
-#endif
 	}
 
 	void GLES2RenderSystem::_setSeparateSceneBlending(
@@ -871,74 +886,75 @@ namespace Ogre {
         SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha,
         SceneBlendOperation op, SceneBlendOperation alphaOp )
 	{
-        // Kinda hacky way to prevent this from compiling if the extensions aren't available
-#if defined(GL_OES_blend_func_separate) && defined(GL_OES_blend_equation_separate) && defined(GL_EXT_blend_minmax)
-        if (mGLSupport->checkExtension("GL_OES_blend_equation_separate") &&
-            mGLSupport->checkExtension("GL_OES_blend_func_separate"))
+        GLenum sourceBlend = getBlendMode(sourceFactor);
+        GLenum destBlend = getBlendMode(destFactor);
+        GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+        GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
+        
+        if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
+           sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
         {
-            GLint sourceBlend = getBlendMode(sourceFactor);
-            GLint destBlend = getBlendMode(destFactor);
-            GLint sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
-            GLint destBlendAlpha = getBlendMode(destFactorAlpha);
-            
-            if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
-               sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
-            {
-                glDisable(GL_BLEND);
-                GL_CHECK_ERROR;
-            }
-            else
-            {
-                glEnable(GL_BLEND);
-                GL_CHECK_ERROR;
-                glBlendFuncSeparateOES(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-                GL_CHECK_ERROR;
-            }
-            
-            GLint func = GL_FUNC_ADD_OES, alphaFunc = GL_FUNC_ADD_OES;
-            
-            switch(op)
-            {
-                case SBO_ADD:
-                    func = GL_FUNC_ADD_OES;
-                    break;
-                case SBO_SUBTRACT:
-                    func = GL_FUNC_SUBTRACT_OES;
-                    break;
-                case SBO_REVERSE_SUBTRACT:
-                    func = GL_FUNC_REVERSE_SUBTRACT_OES;
-                    break;
-                case SBO_MIN:
-                    func = GL_MIN_EXT;
-                    break;
-                case SBO_MAX:
-                    func = GL_MAX_EXT;
-                    break;
-            }
-            
-            switch(alphaOp)
-            {
-                case SBO_ADD:
-                    alphaFunc = GL_FUNC_ADD_OES;
-                    break;
-                case SBO_SUBTRACT:
-                    alphaFunc = GL_FUNC_SUBTRACT_OES;
-                    break;
-                case SBO_REVERSE_SUBTRACT:
-                    alphaFunc = GL_FUNC_REVERSE_SUBTRACT_OES;
-                    break;
-                case SBO_MIN:
-                    alphaFunc = GL_MIN_EXT;
-                    break;
-                case SBO_MAX:
-                    alphaFunc = GL_MAX_EXT;
-                    break;
-            }
-            
-            glBlendEquationSeparateOES(func, alphaFunc);
+            glDisable(GL_BLEND);
             GL_CHECK_ERROR;
         }
+        else
+        {
+            glEnable(GL_BLEND);
+            GL_CHECK_ERROR;
+            glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
+            GL_CHECK_ERROR;
+        }
+        
+        GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
+        
+        switch(op)
+        {
+            case SBO_ADD:
+                func = GL_FUNC_ADD;
+                break;
+            case SBO_SUBTRACT:
+                func = GL_FUNC_SUBTRACT;
+                break;
+            case SBO_REVERSE_SUBTRACT:
+                func = GL_FUNC_REVERSE_SUBTRACT;
+                break;
+            case SBO_MIN:
+#if defined(GL_EXT_blend_minmax)
+                func = GL_MIN_EXT;
 #endif
+                break;
+            case SBO_MAX:
+#if defined(GL_EXT_blend_minmax)
+                func = GL_MAX_EXT;
+#endif
+                break;
+        }
+        
+        switch(alphaOp)
+        {
+            case SBO_ADD:
+                alphaFunc = GL_FUNC_ADD;
+                break;
+            case SBO_SUBTRACT:
+                alphaFunc = GL_FUNC_SUBTRACT;
+                break;
+            case SBO_REVERSE_SUBTRACT:
+                alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
+                break;
+            case SBO_MIN:
+#if defined(GL_EXT_blend_minmax)
+                alphaFunc = GL_MIN_EXT;
+#endif
+                break;
+            case SBO_MAX:
+#if defined(GL_EXT_blend_minmax)
+                alphaFunc = GL_MAX_EXT;
+#endif
+                break;
+        }
+        
+        glBlendEquationSeparate(func, alphaFunc);
+        GL_CHECK_ERROR;
 	}
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
@@ -988,19 +1004,15 @@ namespace Ogre {
                         "Cannot begin frame - no viewport selected.",
                         "GLES2RenderSystem::_beginFrame");
 
-        if(mCurrentCapabilities->hasCapability(RSC_SCISSOR_TEST)) {
-            glEnable(GL_SCISSOR_TEST);
-            GL_CHECK_ERROR;
-        }
+        glEnable(GL_SCISSOR_TEST);
+        GL_CHECK_ERROR;
     }
 
     void GLES2RenderSystem::_endFrame(void)
     {
         // Deactivate the viewport clipping.
-        if(mCurrentCapabilities->hasCapability(RSC_SCISSOR_TEST)) {
-            glDisable(GL_SCISSOR_TEST);
-            GL_CHECK_ERROR;
-        }
+        glDisable(GL_SCISSOR_TEST);
+        GL_CHECK_ERROR;
 
 		// unbind GPU programs at end of frame
 		// this is mostly to avoid holding bound programs that might get deleted
@@ -1382,7 +1394,7 @@ namespace Ogre {
                 }
 
                 // Combine with existing mip filter
-                glTexParameteri(GL_TEXTURE_2D,
+                glTexParameteri(mTextureTypes[unit],
                                 GL_TEXTURE_MIN_FILTER,
                                 getCombinedMinMipFilter());
                 GL_CHECK_ERROR;
@@ -1393,14 +1405,14 @@ namespace Ogre {
                 {
                     case FO_ANISOTROPIC: // GL treats linear and aniso the same
                     case FO_LINEAR:
-                        glTexParameteri(GL_TEXTURE_2D,
+                        glTexParameteri(mTextureTypes[unit],
                                         GL_TEXTURE_MAG_FILTER,
                                         GL_LINEAR);
                         GL_CHECK_ERROR;
                         break;
                     case FO_POINT:
                     case FO_NONE:
-                        glTexParameteri(GL_TEXTURE_2D,
+                        glTexParameteri(mTextureTypes[unit],
                                         GL_TEXTURE_MAG_FILTER,
                                         GL_NEAREST);
                         GL_CHECK_ERROR;
@@ -1418,7 +1430,7 @@ namespace Ogre {
                 }
 
                 // Combine with existing min filter
-                glTexParameteri(GL_TEXTURE_2D,
+                glTexParameteri(mTextureTypes[unit],
                                 GL_TEXTURE_MIN_FILTER,
                                 getCombinedMinMipFilter());
 
@@ -1433,7 +1445,7 @@ namespace Ogre {
     GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
 	{
 		GLfloat curAniso = 0;
-		glGetTexParameterfv(GL_TEXTURE_2D, 
+		glGetTexParameterfv(mTextureTypes[unit], 
                             GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
         GL_CHECK_ERROR;
 		return curAniso ? curAniso : 1;
@@ -1453,7 +1465,7 @@ namespace Ogre {
 			maxAnisotropy = largest_supported_anisotropy ? 
 			static_cast<uint>(largest_supported_anisotropy) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+			glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
 		glActiveTexture(GL_TEXTURE0);
         GL_CHECK_ERROR;
@@ -1502,117 +1514,137 @@ namespace Ogre {
             unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
 
-            GLint attrib = GLES2GpuProgram::getFixedAttributeIndex(sem, elem->getIndex());
+            bool isCustomAttrib = false;
+ 			if (mCurrentVertexProgram)
+ 				isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem->getIndex());
+
             unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
             GLboolean normalised = GL_FALSE;
-            switch(elem->getType())
-            {
-            case VET_COLOUR:
-            case VET_COLOUR_ABGR:
-            case VET_COLOUR_ARGB:
-            case VET_UBYTE4:
-                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                // VertexElement::getTypeCount treats them as 1 (RGBA)
-                // Also need to normalise the fixed-point data
-                typeCount = 4;
-                normalised = GL_TRUE;
-                break;
-            default:
-                break;
-            };
 
-            switch (sem)
+ 			// Custom attribute support
+ 			// tangents, binormals, blendweights etc always via this route
+ 			// builtins may be done this way too
+ 			if (isCustomAttrib)
+ 			{
+ 				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
+                switch(elem->getType())
+                {
+                case VET_COLOUR:
+                case VET_COLOUR_ABGR:
+                case VET_COLOUR_ARGB:
+                case VET_UBYTE4:
+                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                    // VertexElement::getTypeCount treats them as 1 (RGBA)
+                    // Also need to normalise the fixed-point data
+                    typeCount = 4;
+                    normalised = GL_TRUE;
+                    break;
+                default:
+                    break;
+                };
+ 				glVertexAttribPointer(
+ 					attrib,
+ 					typeCount, 
+  					GLES2HardwareBufferManager::getGLType(elem->getType()), 
+ 					normalised, 
+  					static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+  					pBufferData);
+ 				glEnableVertexAttribArray(attrib);
+ 
+ 				attribsBound.push_back(attrib);
+            }
+            else
             {
-                case VES_POSITION:
-                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
-                                          typeCount,
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                          normalised,
-                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                          pBufferData);
-                    GL_CHECK_ERROR;
-                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0));
-                    GL_CHECK_ERROR;
-                    break;
-                case VES_NORMAL:
-                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0),
-                                          typeCount,
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                          normalised,
-                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                          pBufferData);
-                    GL_CHECK_ERROR;
-                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0));
-                    GL_CHECK_ERROR;
-                    break;
-                case VES_DIFFUSE:
-                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0), 
-                                          typeCount,
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                          normalised,
-                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                          pBufferData);
-                    GL_CHECK_ERROR;
-                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0));
-                    GL_CHECK_ERROR;
-                    break;
-                case VES_SPECULAR:
-                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0), 
-                                          typeCount,
-                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                          normalised,
-                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                          pBufferData);
-                    GL_CHECK_ERROR;
-                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0));
-                    GL_CHECK_ERROR;
-                    break;
-                   break;
-                case VES_TEXTURE_COORDINATES:
-                    if (mCurrentVertexProgram)
-                    {
-                        // Programmable pipeline - direct UV assignment
-                        glActiveTexture(GL_TEXTURE0 + elem->getIndex());
-                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()),
+                switch (sem)
+                {
+                    case VES_POSITION:
+                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
                                               typeCount,
                                               GLES2HardwareBufferManager::getGLType(elem->getType()),
                                               normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()));
+                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0));
                         GL_CHECK_ERROR;
-                    }
-                    else
-                    {
-                        // Fixed function matching to units based on tex_coord_set
-                        for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                        break;
+                    case VES_NORMAL:
+                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0),
+                                              typeCount,
+                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                              normalised,
+                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                              pBufferData);
+                        GL_CHECK_ERROR;
+                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0));
+                        GL_CHECK_ERROR;
+                        break;
+                    case VES_DIFFUSE:
+                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0), 
+                                              typeCount,
+                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                              normalised,
+                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                              pBufferData);
+                        GL_CHECK_ERROR;
+                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0));
+                        GL_CHECK_ERROR;
+                        break;
+                    case VES_SPECULAR:
+                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0), 
+                                              typeCount,
+                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                              normalised,
+                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                              pBufferData);
+                        GL_CHECK_ERROR;
+                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0));
+                        GL_CHECK_ERROR;
+                        break;
+                    case VES_TEXTURE_COORDINATES:
+                        if (mCurrentVertexProgram)
                         {
-                            // Only set this texture unit's texcoord pointer if it
-                            // is supposed to be using this element's index
-                            if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
+                            // Programmable pipeline - direct UV assignment
+                            glActiveTexture(GL_TEXTURE0 + elem->getIndex());
+                            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()),
+                                                  typeCount,
+                                                  GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                                  normalised,
+                                                  static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                                  pBufferData);
+                            GL_CHECK_ERROR;
+                            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()));
+                            GL_CHECK_ERROR;
+                        }
+                        else
+                        {
+                            // Fixed function matching to units based on tex_coord_set
+                            for (i = 0; i < mDisabledTexUnitsFrom; i++)
                             {
-                                if (multitexturing)
-                                    glActiveTexture(GL_TEXTURE0 + i);
-                                GL_CHECK_ERROR;
-                                glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i),
-                                                      typeCount,
-                                                      GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                                      normalised,
-                                                      static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                      pBufferData);
-                                GL_CHECK_ERROR;
-                                glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i));
-                                GL_CHECK_ERROR;
+                                // Only set this texture unit's texcoord pointer if it
+                                // is supposed to be using this element's index
+                                if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
+                                {
+                                    if (multitexturing)
+                                        glActiveTexture(GL_TEXTURE0 + i);
+                                    GL_CHECK_ERROR;
+                                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i),
+                                                          typeCount,
+                                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                                          normalised,
+                                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                                          pBufferData);
+                                    GL_CHECK_ERROR;
+                                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i));
+                                    GL_CHECK_ERROR;
+                                }
                             }
                         }
-                    }
-                    break;
-                default:
-                    break;
-            };
-
-            attribsBound.push_back(attrib);
+                        break;
+                    default:
+                        break;
+                };
+            }
         }
 
 		if (multitexturing)
@@ -1753,6 +1785,7 @@ namespace Ogre {
                 GL_CHECK_ERROR;
             }
             glClearColor(colour.r, colour.g, colour.b, colour.a);
+
             GL_CHECK_ERROR;
         }
         if (buffers & FBT_DEPTH)
@@ -1939,7 +1972,7 @@ namespace Ogre {
         mGLSupport->initialiseExtensions();
 
         LogManager::getSingleton().logMessage("**************************************");
-        LogManager::getSingleton().logMessage("*** OpenGL ES 2.0 Renderer Started ***");
+        LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Renderer Started ***");
         LogManager::getSingleton().logMessage("**************************************");
     }
 
@@ -2023,12 +2056,14 @@ namespace Ogre {
 			return GL_ZERO;
 		case SOP_REPLACE:
 			return GL_REPLACE;
-		case SOP_INCREMENT_WRAP:
         case SOP_INCREMENT:
 			return invert ? GL_DECR : GL_INCR;
-		case SOP_DECREMENT_WRAP:
 		case SOP_DECREMENT:
 			return invert ? GL_INCR : GL_DECR;
+		case SOP_INCREMENT_WRAP:
+			return invert ? GL_DECR_WRAP : GL_INCR_WRAP;
+		case SOP_DECREMENT_WRAP:
+			return invert ? GL_INCR_WRAP : GL_DECR_WRAP;
 		case SOP_INVERT:
 			return GL_INVERT;
 		};
@@ -2045,17 +2080,17 @@ namespace Ogre {
 		//
 		// Note:
 		//  1. Even if both previous and current are the same object, we can't
-		//     bypass re-bind completely since the object itself maybe modified.
+		//     bypass re-bind completely since the object itself may be modified.
 		//     But we can bypass unbind based on the assumption that object
 		//     internally GL program type shouldn't be changed after it has
 		//     been created. The behavior of bind to a GL program type twice
 		//     should be same as unbind and rebind that GL program type, even
-		//     for difference objects.
+		//     for different objects.
 		//  2. We also assumed that the program's type (vertex or fragment) should
 		//     not be changed during it's in using. If not, the following switch
 		//     statement will confuse GL state completely, and we can't fix it
 		//     here. To fix this case, we must coding the program implementation
-		//     itself, if type is changing (during load/unload, etc), and it's inuse,
+		//     itself, if type is changing (during load/unload, etc), and it's in use,
 		//     unbind and notify render system to correct for its state.
 		//
 		switch (glprg->getType())
@@ -2078,12 +2113,13 @@ namespace Ogre {
                 }
                 break;
             case GPT_GEOMETRY_PROGRAM:
+            default:
                 break;
 		}
         
 		// Bind the program
 		glprg->bindProgram();
-        
+
 		RenderSystem::bindGpuProgram(prg);
     }
 
@@ -2123,6 +2159,7 @@ namespace Ogre {
                 mCurrentFragmentProgram->bindProgramParameters(params, mask);
                 break;
             case GPT_GEOMETRY_PROGRAM:
+            default:
                 break;
 		}
     }
@@ -2138,6 +2175,7 @@ namespace Ogre {
                 mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
                 break;
             case GPT_GEOMETRY_PROGRAM:
+            default:
                 break;
 		}
     }
@@ -2146,6 +2184,59 @@ namespace Ogre {
 	{
 		return 1;
 	}
+
+    bool GLES2RenderSystem::activateGLTextureUnit(size_t unit)
+	{
+		if (mActiveTextureUnit != unit)
+		{
+			if (unit < getCapabilities()->getNumTextureUnits())
+			{
+				glActiveTexture(GL_TEXTURE0 + unit);
+                GL_CHECK_ERROR;
+				mActiveTextureUnit = unit;
+				return true;
+			}
+			else if (!unit)
+			{
+				// always ok to use the first unit
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+    void GLES2RenderSystem::activateGLBuffer(GLenum target, GLuint buffer)
+    {
+        BindBufferMap::iterator i = mActiveBufferMap.find(target);
+        if (i == mActiveBufferMap.end())
+        {
+            // Haven't cached this state yet.  Insert it into the map
+            mActiveBufferMap.insert(BindBufferMap::value_type(target, buffer));
+
+            // Update GL
+            glBindBuffer(target, buffer);
+            GL_CHECK_ERROR;
+        }
+        else
+        {
+            // Update the cached value if needed
+            if((*i).second != buffer)
+            {
+                (*i).second = buffer;
+
+                // Update GL
+                glBindBuffer(target, buffer);
+                GL_CHECK_ERROR;
+            }
+        }
+    }
 
     /** This class demonstrates basic usage of the RTShader system.
     It subclasses the material manager listener class and when a target scheme callback

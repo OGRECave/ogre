@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLES2GpuProgramManager.h"
+#include "OgreGLES2GpuProgram.h"
 #include "OgreLogManager.h"
 
 namespace Ogre {
@@ -68,14 +69,15 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "You must supply 'syntax' and 'type' parameters",
-                "GLESGpuProgramManager::createImpl");
+                "GLES2GpuProgramManager::createImpl");
         }
 
         ProgramMap::const_iterator iter = mProgramMap.find(paramSyntax->second);
         if(iter == mProgramMap.end())
         {
-            // TODO not implemented
-            return 0;
+            // No factory, this is an unsupported syntax code, probably for another rendersystem
+            // Create a basic one, it doesn't matter what it is since it won't be used
+            return new GLES2GpuProgram(this, name, handle, group, isManual, loader);
         }
 
         GpuProgramType gpt;
@@ -99,21 +101,14 @@ namespace Ogre {
                                                 GpuProgramType gptype,
                                                 const String& syntaxCode)
     {
-        // TODO not implemented
-		class DummyGpuProgram : public GpuProgram
-		{
-		public:
-			DummyGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-				const String& group, bool isManual, ManualResourceLoader* loader)
-				: GpuProgram(creator, name, handle, group, isManual, loader )
-			{};
-			/** @copydoc Resource::unloadImpl */
-			void unloadImpl(void){};
-			/** Overridden from GpuProgram */
-			void loadFromSource(void){};
-
-		};
-		return OGRE_NEW DummyGpuProgram(this, name, handle, group, 
-			isManual, loader);
+        ProgramMap::const_iterator iter = mProgramMap.find(syntaxCode);
+        if(iter == mProgramMap.end())
+        {
+            // No factory, this is an unsupported syntax code, probably for another rendersystem
+            // Create a basic one, it doesn't matter what it is since it won't be used
+            return new GLES2GpuProgram(this, name, handle, group, isManual, loader);
+        }
+        
+        return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);
     }
 }

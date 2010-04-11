@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2FBORenderTexture.h"
+#include "OgreGLES2GpuProgram.h"
 #include "OgreRoot.h"
 
 static int computeLog(GLuint value)
@@ -100,6 +101,7 @@ namespace Ogre {
             download(mBuffer);
         }
         mCurrentLockOptions = options;
+	mLockedBox = lockBox;
         return mBuffer.getSubVolume(lockBox);
     }
 
@@ -108,7 +110,7 @@ namespace Ogre {
         if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
         {
             // From buffer to card, only upload if was locked for writing
-            upload(mCurrentLock, Box(0, 0, 0, mWidth, mHeight, mDepth));
+            upload(mCurrentLock, mLockedBox);
         }
         freeBuffer();
     }
@@ -567,6 +569,57 @@ namespace Ogre {
                 bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice);
             }
 
+            /// Calculate source texture coordinates
+            float u1 = (float)srcBox.left / (float)src->mWidth;
+            float v1 = (float)srcBox.top / (float)src->mHeight;
+            float u2 = (float)srcBox.right / (float)src->mWidth;
+            float v2 = (float)srcBox.bottom / (float)src->mHeight;
+            /// Calculate source slice for this destination slice
+            float w = (float)(slice - dstBox.front) / (float)dstBox.getDepth();
+            /// Get slice # in source
+            w = w * (float)srcBox.getDepth() + srcBox.front;
+            /// Normalise to texture coordinate in 0.0 .. 1.0
+            w = (w+0.5f) / (float)src->mDepth;
+            
+            /// Finally we're ready to rumble	
+            glBindTexture(src->mTarget, src->mTextureID);
+
+            GLfloat squareVertices[] = {
+               -1.0f, -1.0f,
+                1.0f, -1.0f,
+               -1.0f,  1.0f,
+                1.0f,  1.0f,
+            };
+            GLfloat texCoords[] = {
+                u1, v1, w,
+                u2, v1, w,
+                u2, v2, w,
+                u1, v2, w
+            };
+
+            // Draw the textured quad
+            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
+                                  2,
+                                  GL_FLOAT,
+                                  0,
+                                  0,
+                                  squareVertices);
+            GL_CHECK_ERROR;
+            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0));
+            GL_CHECK_ERROR;
+            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0),
+                                  3,
+                                  GL_FLOAT,
+                                  0,
+                                  0,
+                                  texCoords);
+            GL_CHECK_ERROR;
+            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0));
+            GL_CHECK_ERROR;
+
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            GL_CHECK_ERROR;
+
             if(tempTex)
             {
                 // Copy temporary texture
@@ -723,7 +776,7 @@ namespace Ogre {
             glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
             dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
 
-            glTexImage2D(GL_TEXTURE_2D,
+            glTexImage2D(mFaceTarget,
                          mip,
                          glFormat,
                          width, height,

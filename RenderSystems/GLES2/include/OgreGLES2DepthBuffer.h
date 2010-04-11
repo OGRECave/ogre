@@ -66,7 +66,7 @@ namespace Ogre
 
 	protected:
 		uint32						mMultiSampleQuality;
-		GLES2Context					*mCreatorContext;
+		GLES2Context				*mCreatorContext;
 		GLES2RenderBuffer			*mDepthBuffer;
 		GLES2RenderBuffer			*mStencilBuffer;
 		GLES2RenderSystem			*mRenderSystem;

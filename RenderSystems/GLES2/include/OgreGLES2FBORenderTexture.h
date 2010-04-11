@@ -36,7 +36,7 @@ namespace Ogre {
     class GLES2FBOManager;
     class GLES2RenderBuffer;
 
-    /** RenderTexture for GL ES FBO
+    /** RenderTexture for GL ES 2 FBO
     */
     class _OgrePrivate GLES2FBORenderTexture: public GLES2RenderTexture
     {
@@ -56,7 +56,7 @@ namespace Ogre {
         GLES2FrameBufferObject mFB;
     };
     
-    /** Factory for GL Frame Buffer Objects, and related things.
+    /** Factory for GL ES 2 Frame Buffer Objects, and related things.
     */
     class _OgrePrivate GLES2FBOManager: public GLES2RTTManager
     {

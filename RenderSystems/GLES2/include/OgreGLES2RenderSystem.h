@@ -42,6 +42,7 @@ namespace Ogre {
     class GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramFactory;
+    class GLSLESGpuProgram;
     class HardwareBufferManager;
     class RTShader::ShaderGenerator;
 
@@ -62,12 +63,7 @@ namespace Ogre {
     class _OgrePrivate GLES2RenderSystem : public RenderSystem
     {
         private:
-
-            /** Array of up to 8 lights, indexed as per API
-                Note that a null value indicates a free slot
-              */ 
-            #define MAX_LIGHTS 8
-			LightList mLights;
+            typedef HashMap<GLenum, GLuint>  BindBufferMap;
 
             /// View matrix to set world against
             Matrix4 mViewMatrix;
@@ -87,6 +83,9 @@ namespace Ogre {
 
             /// What texture coord set each texture unit is using
             size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];
+
+            /// Holds texture type settings for every stage
+            GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
             /// Number of fixed-function texture units
             unsigned short mFixedFunctionTextureUnits;
@@ -126,6 +125,13 @@ namespace Ogre {
               */
             GLES2RTTManager *mRTTManager;
 
+            /** These variables are used for caching RenderSystem state.
+                They are cached because OpenGL state changes can be quite expensive,
+                which is especially important on mobile or embedded systems.
+             */
+            GLenum mActiveTextureUnit;
+            BindBufferMap mActiveBufferMap;
+
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
 
@@ -140,7 +146,7 @@ namespace Ogre {
             GLES2GpuProgram* mCurrentFragmentProgram;
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
-            GLint getBlendMode(SceneBlendFactor ogreBlend) const;
+            GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
             void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
 
             /// The Shader generator instance.
@@ -148,10 +154,18 @@ namespace Ogre {
             /// Shader generator material manager listener.	
             ShaderGeneratorTechniqueResolverListener *mMaterialMgrListener;
 
+            bool activateGLTextureUnit(size_t unit);
+            void activateGLBuffer(GLenum target, GLuint buffer);
+
         public:
             // Default constructor / destructor
             GLES2RenderSystem();
             virtual ~GLES2RenderSystem();
+        
+            friend class ShaderGeneratorTechniqueResolverListener;
+
+//            GLSLESGpuProgram* getStubFragmentProgram(void);
+//            GLSLESGpuProgram* getStubVertexProgram(void);
 
             // ----------------------------------
             // Overridden RenderSystem functions

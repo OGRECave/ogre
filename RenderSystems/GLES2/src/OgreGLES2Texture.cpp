@@ -92,7 +92,7 @@ namespace Ogre {
         mDepth = GLES2PixelUtil::optionalPO2(mDepth);
 
 		// Adjust format if required
-        mFormat = TextureManager::getSingleton().getNativeFormat(TEX_TYPE_2D, mFormat, mUsage);
+        mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
 
 		// Check requested number of mipmaps
         size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
@@ -114,7 +114,7 @@ namespace Ogre {
 
         // Set some misc default parameters, these can of course be changed later
         glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+                        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         GL_CHECK_ERROR;
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -185,7 +185,7 @@ namespace Ogre {
                     default:
                         break;
                 };
-//                LogManager::getSingleton().logMessage("GLESTexture::create - Mip: " + StringConverter::toString(mip) +
+//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
 //                                                      " Width: " + StringConverter::toString(width) +
 //                                                      " Height: " + StringConverter::toString(height) +
 //                                                      " Internal Format: " + StringConverter::toString(format)
@@ -236,6 +236,11 @@ namespace Ogre {
                     default:
                         break;
                 };
+//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
+//                                                      " Width: " + StringConverter::toString(width) +
+//                                                      " Height: " + StringConverter::toString(height) +
+//                                                      " Internal Format: " + StringConverter::toString(format)
+//                                                      );
 
                 if (width > 1)
                 {

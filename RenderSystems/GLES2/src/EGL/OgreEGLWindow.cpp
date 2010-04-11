@@ -153,7 +153,6 @@ namespace Ogre {
             return;
         }
 
-        glFlush();
         if (eglSwapBuffers(mEglDisplay, mEglSurface) == EGL_FALSE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -194,7 +193,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 				"Invalid box.",
-				"Win32Window::copyContentsToMemory" );
+				"EGLWindow::copyContentsToMemory" );
 		}
 
 		if (buffer == FB_AUTO)
@@ -209,7 +208,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 				"Unsupported format.",
-				"GtkEGLWindow::copyContentsToMemory" );
+				"EGLWindow::copyContentsToMemory" );
 		}
 
 
@@ -254,7 +253,8 @@ namespace Ogre {
     {
         ::EGLSurface surface;
 
-        surface = eglCreateWindowSurface(display, mEglConfig, win, NULL);
+        surface = eglCreateWindowSurface(display, mEglConfig, (EGLNativeWindowType)win, NULL);
+        EGL_CHECK_ERROR
 
         if (surface == EGL_NO_SURFACE)
         {

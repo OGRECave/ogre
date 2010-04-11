@@ -228,7 +228,7 @@ namespace Ogre {
 
 		if(mIsFullScreen && mGLSupport->mAtomFullScreen == None) 
 		{
-			LogManager::getSingleton().logMessage("EGLWindow::switchFullScreen: Your WM has no fullscreen support");
+			LogManager::getSingleton().logMessage("X11EGLWindow::switchFullScreen: Your WM has no fullscreen support");
 
 			// A second best approach for outdated window managers
 			attr.backing_store = NotUseful;
@@ -440,9 +440,9 @@ namespace Ogre {
         bool vsync = false;
         ::EGLContext eglContext = 0;
 		int left = 0;
-		int top  = 0;
+        int top  = 0;
 
-		getLeftAndTopFromNativeWindow(left, top, width, height);
+        getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
 
@@ -455,6 +455,7 @@ namespace Ogre {
                 StringConverter::parseBool(opt->second))
             {
                 eglContext = eglGetCurrentContext();
+                EGL_CHECK_ERROR
                 if (eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -463,7 +464,9 @@ namespace Ogre {
                 }
 
                 eglContext = eglGetCurrentContext();
+                EGL_CHECK_ERROR
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                EGL_CHECK_ERROR
             }
 
             // Note: Some platforms support AA inside ordinary windows
@@ -530,23 +533,31 @@ namespace Ogre {
 
         mIsExternal = (mEglSurface != 0);
 
-
-
         if (!mEglConfig)
         {
             int minAttribs[] = {
+                EGL_RED_SIZE,       5,
+                EGL_GREEN_SIZE,     6,
+                EGL_BLUE_SIZE,      5,
                 EGL_DEPTH_SIZE,     16,
+                EGL_SAMPLES,        0,
+                EGL_ALPHA_SIZE,     EGL_DONT_CARE,
+                EGL_DEPTH_SIZE,     EGL_DONT_CARE,
+                EGL_STENCIL_SIZE,   EGL_DONT_CARE,
                 EGL_SAMPLE_BUFFERS,  0,
-                EGL_SAMPLES,         0,
-                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-                EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
                 EGL_NONE
             };
 
             int maxAttribs[] = {
+                EGL_RED_SIZE,       5,
+                EGL_GREEN_SIZE,     6,
+                EGL_BLUE_SIZE,      5,
+                EGL_DEPTH_SIZE,     16,
+                EGL_ALPHA_SIZE,     8,
+                EGL_DEPTH_SIZE,     8,
+                EGL_STENCIL_SIZE,   8,
+                EGL_SAMPLE_BUFFERS, 1,
                 EGL_SAMPLES, samples,
-                EGL_STENCIL_SIZE, INT_MAX,
-                EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
                 EGL_NONE
             };
 
@@ -565,16 +576,19 @@ namespace Ogre {
             mGLSupport->switchMode (width, height, frequency);
         }
 
-		if (!mIsExternal)
+	if (!mIsExternal)
         {
-			createNativeWindow(left, top, width, height, title);
-		}
+	    createNativeWindow(left, top, width, height, title);
+	}
 
-		mContext = createEGLContext();
+	mContext = createEGLContext();
 
         ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
+        EGL_CHECK_ERROR
         ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
+        EGL_CHECK_ERROR
         ::EGLContext oldContext  = eglGetCurrentContext();
+        EGL_CHECK_ERROR
 
         int glConfigID;
 
@@ -592,6 +606,5 @@ namespace Ogre {
         mClosed = false;
 	}
 
-
-
 }
+

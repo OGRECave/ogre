@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
+GLenum getGLShaderType(GpuProgramType programType);
+
 GLenum getGLShaderType(GpuProgramType programType)
 {
 	switch (programType)

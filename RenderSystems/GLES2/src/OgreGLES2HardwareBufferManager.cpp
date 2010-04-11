@@ -31,9 +31,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareIndexBuffer.h"
 
 namespace Ogre {
-    #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
-    #define SCRATCH_ALIGNMENT 32
-
+    //-----------------------------------------------------------------------
     // Scratch pool management (32 bit structure)
     struct GLES2ScratchBufferAlloc
     {
@@ -42,6 +40,8 @@ namespace Ogre {
         /// Free? (pack with size)
         uint32 free: 1;
     };
+    #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
+    #define SCRATCH_ALIGNMENT 32
 
     GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
     {
@@ -111,7 +111,9 @@ namespace Ogre {
                 return GL_STATIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC:
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
+                return GL_DYNAMIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
+                return GL_STREAM_DRAW;
             default:
                 return GL_DYNAMIC_DRAW;
         };

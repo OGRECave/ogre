@@ -130,7 +130,7 @@ namespace Ogre {
             typedef std::vector<RenderTexture*> SliceTRT;
             SliceTRT mSliceTRT;
 
-            static void buildMipmaps(const PixelBox &data);
+            void buildMipmaps(const PixelBox &data);
     };
 
      /** Renderbuffer surface.  Needs FBO extension.

@@ -49,7 +49,7 @@ THE SOFTWARE.
 namespace Ogre {
 	EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
                            size_t width, size_t height)
-        : GLES2PBuffer(format, width, height)
+        : GLESPBuffer(format, width, height)
     {
 
     }

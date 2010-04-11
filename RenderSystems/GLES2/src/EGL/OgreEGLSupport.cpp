@@ -45,7 +45,8 @@ namespace Ogre {
 
     EGLSupport::EGLSupport()
         : mGLDisplay(0),
-		  mRandr(false)
+          mNativeDisplay(0),
+	  mRandr(false)
     {
     }
 
@@ -172,9 +173,10 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-        EGLint major, minor;
+        EGLint major = 0, minor = 0;
 
-	mGLDisplay = eglGetDisplay(mNativeDisplay);
+        mGLDisplay = eglGetDisplay(mNativeDisplay);
+        EGL_CHECK_ERROR
 
         if(mGLDisplay == EGL_NO_DISPLAY)
         {
@@ -189,7 +191,8 @@ namespace Ogre {
                         "Couldn`t initialize EGLDisplay ",
                         "EGLSupport::getGLDisplay");
         }
-	return mGLDisplay;
+        EGL_CHECK_ERROR
+        return mGLDisplay;
     }
 
 
@@ -210,8 +213,8 @@ namespace Ogre {
 
             *nElements = 0;
             return 0;
-	}
-
+        }
+        EGL_CHECK_ERROR
         configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
         if (eglChooseConfig(mGLDisplay, attribList, configs, *nElements, nElements) == EGL_FALSE)
         {
@@ -221,9 +224,9 @@ namespace Ogre {
 
             *nElements = 0;
             free(configs);
-	    return 0;
+            return 0;
         }
-
+        EGL_CHECK_ERROR
         return configs;
     }
 
@@ -232,7 +235,7 @@ namespace Ogre {
         EGLBoolean status;
 
         status = eglGetConfigAttrib(mGLDisplay, glConfig, attribute, value);
-
+        EGL_CHECK_ERROR
         return status;
     }
 
@@ -252,7 +255,7 @@ namespace Ogre {
                         __FUNCTION__);
             return 0;
         }
-
+        EGL_CHECK_ERROR
         return glConfig;
     }
 
@@ -268,10 +271,11 @@ namespace Ogre {
                         __FUNCTION__);
             return 0;
         }
-
+        EGL_CHECK_ERROR
         eglQuerySurface(mGLDisplay, drawable, EGL_WIDTH, (EGLint *) w);
+        EGL_CHECK_ERROR
         eglQuerySurface(mGLDisplay, drawable, EGL_HEIGHT, (EGLint *) h);
-
+        EGL_CHECK_ERROR
         return glConfig;
     }
 
@@ -437,21 +441,23 @@ namespace Ogre {
     }
 
     ::EGLContext EGLSupport::createNewContext(EGLDisplay eglDisplay,
-											  ::EGLConfig glconfig,
+					      ::EGLConfig glconfig,
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
             EGL_CONTEXT_CLIENT_VERSION, 2,
-            EGL_NONE
+            EGL_NONE, EGL_NONE
         };
 	::EGLContext context = ((::EGLContext) 0);
 	if (eglDisplay == ((EGLDisplay) 0))
 	{
 		context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
+        EGL_CHECK_ERROR
 	}
 	else
 	{
 		context = eglCreateContext(eglDisplay, glconfig, 0, contextAttrs);
+        EGL_CHECK_ERROR
 	}
 
 	if (context == ((::EGLContext) 0))

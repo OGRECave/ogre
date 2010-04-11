@@ -78,6 +78,7 @@ namespace Ogre {
     {
         EGLBoolean ret = eglMakeCurrent(mEglDisplay,
                                         mDrawable, mDrawable, mContext);
+        EGL_CHECK_ERROR
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -89,6 +90,7 @@ namespace Ogre {
     void EGLContext::endCurrent()
     {
 		eglMakeCurrent(mEglDisplay, 0, 0, 0);
+        EGL_CHECK_ERROR
     }
 
 	EGLSurface EGLContext::getDrawable() const

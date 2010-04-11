@@ -89,58 +89,18 @@ namespace Ogre {
 	mNativeDisplay = getNativeDisplay();
         mGLDisplay = getGLDisplay();
 
-		int dummy;
+	int dummy;
 
-        if (XQueryExtension((Display*)mNativeDisplay, "RANDR", &dummy, &dummy, &dummy))
-        {
-            XRRScreenConfiguration *screenConfig;
+	// TODO: Probe video modes
+        mCurrentMode.first.first = 1280;
+        mCurrentMode.first.second = 1024;
+//            mCurrentMode.first.first = DisplayWidth((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
+//            mCurrentMode.first.second = DisplayHeight((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
+        mCurrentMode.second = 0;
+        mOriginalMode = mCurrentMode;
+        mVideoModes.push_back(mCurrentMode);
 
-            mRandr = true;
-            screenConfig = XRRGetScreenInfo((Display*)mNativeDisplay, DefaultRootWindow((Display*)mNativeDisplay));
-
-            if (screenConfig)
-            {
-                XRRScreenSize *screenSizes;
-                int nSizes = 0;
-                Rotation currentRotation;
-                int currentSizeID = XRRConfigCurrentConfiguration(screenConfig, &currentRotation);
-
-                screenSizes = XRRConfigSizes(screenConfig, &nSizes);
-                mCurrentMode.first.first = screenSizes[currentSizeID].width;
-                mCurrentMode.first.second = screenSizes[currentSizeID].height;
-                mCurrentMode.second = XRRConfigCurrentRate(screenConfig);
-                mOriginalMode = mCurrentMode;
-
-                for (int sizeID = 0; sizeID < nSizes; sizeID++)
-                {
-                    short *rates;
-                    int nRates = 0;
-
-                    rates = XRRConfigRates(screenConfig, sizeID, &nRates);
-                    for (int rate = 0; rate < nRates; rate++)
-                    {
-                        VideoMode mode;
-
-                        mode.first.first = screenSizes[sizeID].width;
-                        mode.first.second = screenSizes[sizeID].height;
-                        mode.second = rates[rate];
-
-                        mVideoModes.push_back(mode);
-                    }
-                }
-                XRRFreeScreenConfigInfo(screenConfig);
-            }
-        }
-        else
-        {
-            mCurrentMode.first.first = DisplayWidth((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.first.second = DisplayHeight((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
-            mCurrentMode.second = 0;
-            mOriginalMode = mCurrentMode;
-            mVideoModes.push_back(mCurrentMode);
-        }
-
-		EGLConfig *glConfigs;
+	EGLConfig *glConfigs;
         int config, nConfigs = 0;
 
         glConfigs = chooseGLConfig(NULL, &nConfigs);
@@ -163,19 +123,6 @@ namespace Ogre {
         removeDuplicates(mSampleLevels);
     }
 
-
-	//Removed this because it was easier to call new X11EGLWindow directly
-	//to get the native version
-//	EGLWindow* X11EGLSupport::createEGLWindow( EGLSupport * support )
-//	{
-//		return new X11EGLWindow((X11EGLSupport*)support);
-//	}
-
-	GLES2PBuffer* X11EGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
-	{
-		return new X11EGLPBuffer(this, format, width, height);
-	}
-
     X11EGLSupport::~X11EGLSupport()
     {
         if (mNativeDisplay)
@@ -187,22 +134,19 @@ namespace Ogre {
         {
             eglTerminate(mGLDisplay);
         }
-	}
+    }
 
-
-
-
-	NativeDisplayType X11EGLSupport::getNativeDisplay()
-	{
+    NativeDisplayType X11EGLSupport::getNativeDisplay()
+    {
         if (!mNativeDisplay)
         {
-	    mNativeDisplay = (NativeDisplayType)XOpenDisplay(0);
+	    mNativeDisplay = (NativeDisplayType)XOpenDisplay(NULL);
 
             if (!mNativeDisplay)
             {
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                             "Couldn`t open X display",
-                            "EGLSupport::getXDisplay");
+                            "X11EGLSupport::getXDisplay");
             }
 
             mAtomDeleteWindow = XInternAtom((Display*)mNativeDisplay, "WM_DELETE_WINDOW", True);
@@ -216,13 +160,13 @@ namespace Ogre {
     String X11EGLSupport::getDisplayName(void)
     {
 		return String((const char*)XDisplayName(DisplayString(mNativeDisplay)));
-	}
+    }
 
 
     void X11EGLSupport::switchMode(uint& width, uint& height, short& frequency)
     {
-        if (!mRandr)
-            return;
+//        if (!mRandr)
+//            return;
 
         int size = 0;
         int newSize = -1;
@@ -258,23 +202,13 @@ namespace Ogre {
 
         if (newMode && *newMode != mCurrentMode)
         {
-            XRRScreenConfiguration *screenConfig =
-                XRRGetScreenInfo((Display*)mNativeDisplay, DefaultRootWindow((Display*)mNativeDisplay));
-            if (screenConfig)
-            {
-                Rotation currentRotation;
-
-                XRRConfigCurrentConfiguration (screenConfig, &currentRotation);
-                XRRSetScreenConfigAndRate((Display*)mNativeDisplay, screenConfig, DefaultRootWindow((Display*)mNativeDisplay),
-                                          newSize, currentRotation, newMode->second, CurrentTime);
-                XRRFreeScreenConfigInfo(screenConfig);
-                mCurrentMode = *newMode;
-                LogManager::getSingleton().logMessage("Entered video mode " + StringConverter::toString(mCurrentMode.first.first) + "x" + StringConverter::toString(mCurrentMode.first.second) + " @ " + StringConverter::toString(mCurrentMode.second) + "MHz");
-            }
+            XWindowAttributes winAtt;
+            newMode->first.first = DisplayWidth(mNativeDisplay, 0);
+            newMode->first.second = DisplayHeight(mNativeDisplay, 0);
+            newMode->second = 0; // TODO: Hardcoding refresh rate for LCD's
+            mCurrentMode = *newMode;
         }
-	}
-
-
+    }
 
     XVisualInfo *X11EGLSupport::getVisualFromFBConfig(::EGLConfig glConfig)
     {
@@ -292,6 +226,7 @@ namespace Ogre {
                         __FUNCTION__);
             return 0;
         }
+	EGL_CHECK_ERROR
 
         if (vid == 0)
         {
@@ -321,7 +256,6 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-//        EGLWindow* window = createEGLWindow(this);
 	EGLWindow* window = new X11EGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
@@ -336,10 +270,10 @@ namespace Ogre {
 	{
 		if(!mNativeDisplay)
 			mNativeDisplay = getNativeDisplay();
-		return  EGLSupport::getGLDisplay();
+		return EGLSupport::getGLDisplay();
 	}
 	return mGLDisplay;
     }
 
-
 }
+

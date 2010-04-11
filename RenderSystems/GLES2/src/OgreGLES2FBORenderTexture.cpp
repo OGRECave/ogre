@@ -126,7 +126,7 @@ namespace Ogre {
 	{
 		if(!mRenderBufferMap.empty())
 		{
-			LogManager::getSingleton().logMessage("GL: Warning! GLESFBOManager destructor called, but not all renderbuffers were released.");
+			LogManager::getSingleton().logMessage("GL ES 2: Warning! GLES2FBOManager destructor called, but not all renderbuffers were released.");
 		}
         
         glDeleteFramebuffers(1, &mTempFBO);      
@@ -223,6 +223,8 @@ namespace Ogre {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
         glDeleteRenderbuffers(1, &packedRB);
 
+        // For some reason error 0x8CDB - GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT is thrown here on iPhone OS 3
+        // Odd, because that extension isn't supported.
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
 
@@ -263,7 +265,7 @@ namespace Ogre {
                 GL_CHECK_ERROR;
 				
                 // Set some default parameters
-                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+                glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 GL_CHECK_ERROR;
@@ -296,7 +298,7 @@ namespace Ogre {
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
-#if GL_OES_packed_depth_stencil        
+#if GL_OES_packed_depth_stencil
                     if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
                     {
                         // General depth/stencil combination
@@ -339,12 +341,7 @@ namespace Ogre {
             }
 
             // Delete texture and framebuffer
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-            // The screen buffer is 1 on iPhone
-            glBindFramebuffer(GL_FRAMEBUFFER, 1);
-#else
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
             GL_CHECK_ERROR;
             glDeleteFramebuffers(1, &fb);
             GL_CHECK_ERROR;
@@ -360,7 +357,7 @@ namespace Ogre {
             if(mProps[x].valid)
                 fmtstring += PixelUtil::getFormatName((PixelFormat)x)+" ";
         }
-        LogManager::getSingleton().logMessage("[GL] : Valid FBO targets " + fmtstring);
+        LogManager::getSingleton().logMessage("[GLES2] : Valid FBO targets " + fmtstring);
     }
 
     void GLES2FBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
@@ -404,12 +401,12 @@ namespace Ogre {
     GLES2FBORenderTexture *GLES2FBOManager::createRenderTexture(const String &name, 
 		const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa)
     {
-        GLES2FBORenderTexture *retval = OGRE_NEW GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
+        GLES2FBORenderTexture *retval = new GLES2FBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
 	MultiRenderTarget *GLES2FBOManager::createMultiRenderTarget(const String & name)
 	{
-		return OGRE_NEW GLES2FBOMultiRenderTarget(this, name);
+		return new GLES2FBOMultiRenderTarget(this, name);
 	}
 
     void GLES2FBOManager::bind(RenderTarget *target)
@@ -456,7 +453,7 @@ namespace Ogre {
 				retval.numSamples = fsaa;
             }
         }
-//        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
+        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
         return retval;
     }
     //-----------------------------------------------------------------------
@@ -490,8 +487,8 @@ namespace Ogre {
 				// If refcount reaches zero, delete buffer and remove from map
 				OGRE_DELETE it->second.buffer;
 				mRenderBufferMap.erase(it);
-				//std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-				//        << " of " << key.width << "x" << key.height << std::endl;
+				std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+				        << " of " << key.width << "x" << key.height << std::endl;
 			}
 		}
     }

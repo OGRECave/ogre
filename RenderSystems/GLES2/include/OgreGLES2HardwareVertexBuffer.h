@@ -66,7 +66,7 @@ namespace Ogre {
             /** See HardwareBuffer. */
             void _updateFromShadow(void);
 
-            GLuint getGLBufferId(void) const { return mBufferId; }
+            inline GLuint getGLBufferId(void) const { return mBufferId; }
     };
 }
 

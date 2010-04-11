@@ -28,7 +28,10 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreStringConverter.h"
-
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreHighLevelGpuProgramManager.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESGpuProgram.h"
@@ -91,6 +94,7 @@ namespace Ogre {
             mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
             setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
         }
+        
         if (mFragmentProgram)
         {
             mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
@@ -154,9 +158,9 @@ namespace Ogre {
 			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
             GL_CHECK_ERROR
 
+            logObjectInfo( String("GLSL link result : "), mGLHandle );
 			if(mLinked)
 			{
-				logObjectInfo( String("GLSL link result : "), mGLHandle );
 				buildGLUniformReferences();
 				extractAttributes();
 			}

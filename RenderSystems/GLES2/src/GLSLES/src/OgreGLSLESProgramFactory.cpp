@@ -36,14 +36,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	GLSLESProgramFactory::GLSLESProgramFactory(void)
     {
-		//mLinkProgramManager = OGRE_NEW GLSLESLinkProgramManager();
 		mLinkProgramManager = new GLSLESLinkProgramManager();
     }
     //-----------------------------------------------------------------------
     GLSLESProgramFactory::~GLSLESProgramFactory(void)
     {
 		if (mLinkProgramManager)
-		//	OGRE_DELETE mLinkProgramManager;
 			delete mLinkProgramManager;
     }
     //-----------------------------------------------------------------------

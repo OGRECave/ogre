@@ -52,3 +52,4 @@ namespace Ogre {
         return new X11EGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
     }
 }
+

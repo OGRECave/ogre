@@ -81,7 +81,7 @@ namespace Ogre {
             void deallocateScratch(void* ptr);
     };
 
-	/// GLESHardwareBufferManagerBase as a Singleton
+	/// GLES2HardwareBufferManagerBase as a Singleton
 	class _OgrePrivate GLES2HardwareBufferManager : public HardwareBufferManager
 	{
 	public:
@@ -95,15 +95,13 @@ namespace Ogre {
 			OGRE_DELETE mImpl;
 		}
 
-
-
 		/// Utility function to get the correct GL usage based on HBU's
 		static GLenum getGLUsage(unsigned int usage) 
-		{ return GLES2HardwareBufferManagerBase::getGLUsage(usage); }
+            { return GLES2HardwareBufferManagerBase::getGLUsage(usage); }
 
 		/// Utility function to get the correct GL type based on VET's
 		static GLenum getGLType(unsigned int type)
-		{ return GLES2HardwareBufferManagerBase::getGLType(type); }
+            { return GLES2HardwareBufferManagerBase::getGLType(type); }
 
 		/** Allocator method to allow us to use a pool of memory as a scratch
 		area for hardware buffers. This is because glMapBuffer is incredibly

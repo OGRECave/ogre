@@ -140,9 +140,7 @@ namespace Ogre {
             else
             {
                 // Detach
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x,
-                    GL_RENDERBUFFER, 0);
-                GL_CHECK_ERROR;
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0);
             }
         }
 
@@ -168,24 +166,6 @@ namespace Ogre {
 
         /// Depth buffer is not handled here anymore.
 		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
-
-		/// Do glDrawBuffer calls
-		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		GLsizei n=0;
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-		{
-			// Fill attached colour buffers
-			if(mColour[x].buffer)
-			{
-				bufs[x] = GL_COLOR_ATTACHMENT0 + x;
-				// Keep highest used buffer + 1
-				n = x+1;
-			}
-			else
-			{
-				bufs[x] = GL_NONE;
-			}
-		}
 
         /// Check status
         GLuint status;
@@ -234,41 +214,47 @@ namespace Ogre {
 	void GLES2FrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		GLES2DepthBuffer *glDepthBuffer = static_cast<GLES2DepthBuffer*>(depthBuffer);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
+        GL_CHECK_ERROR;
 
 		if( glDepthBuffer )
 		{
 			GLES2RenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GLES2RenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-			//Truly attach depth buffer
+			// Truly attach depth buffer
 			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
 
-			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
+			// Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
 			if( depthBuf != stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
 			else
 			{
 				glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
 											  GL_RENDERBUFFER, 0);
+                GL_CHECK_ERROR;
 			}
 		}
 		else
 		{
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 										  GL_RENDERBUFFER, 0);
+            GL_CHECK_ERROR;
 			glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
 										  GL_RENDERBUFFER, 0);
+            GL_CHECK_ERROR;
 		}
 	}
 	//-----------------------------------------------------------------------------
 	void GLES2FrameBufferObject::detachDepthBuffer()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, mMultisampleFB ? mMultisampleFB : mFB );
+        GL_CHECK_ERROR;
 		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0 );
+        GL_CHECK_ERROR;
 		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
 									  GL_RENDERBUFFER, 0 );
+        GL_CHECK_ERROR;
 	}
 
     size_t GLES2FrameBufferObject::getWidth()

@@ -46,15 +46,16 @@ THE SOFTWARE.
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
 
+#ifndef GL_GLEXT_PROTOTYPES
+#  define  GL_GLEXT_PROTOTYPES
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
 #   include <OpenGLES/ES2/gl.h>
 #   include <OpenGLES/ES2/glext.h>
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define  GL_GLEXT_PROTOTYPES
-#	endif
 #else
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
@@ -111,7 +112,7 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 0
+#define ENABLE_GL_CHECK 1
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
@@ -131,7 +132,7 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+            fprintf(stderr, "EGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
             assert(false); \
         } \
     }
