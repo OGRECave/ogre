@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 
 #include "OgreGLES2Support.h"
-#include "OgreGLES2Prerequisites.h"
+//#include "OgreGLES2Prerequisites.h"
 //#include "OgreGLESPBuffer.h"
 #include "OgreEGLWindow.h"
 

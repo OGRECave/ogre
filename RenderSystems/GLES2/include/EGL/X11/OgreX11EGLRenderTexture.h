@@ -30,6 +30,7 @@ THE SOFTWARE.
 #ifndef __X11EGLRenderTexture_H__
 #define __X11EGLRenderTexture_H__
 
+#if 0
 #include "OgrePrerequisites.h"
 #include "OgreEGLRenderTexture.h"
 #include "OgreX11EGLSupport.h"
@@ -49,5 +50,7 @@ namespace Ogre
             virtual ~X11EGLPBuffer();
     };
 }
+#endif
 
 #endif
+

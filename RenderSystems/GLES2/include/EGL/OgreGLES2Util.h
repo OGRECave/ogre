@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://ogre.sourgeforge.net/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright © 2000-2003 Steven J. Streeting
+Copyright ï¿½ 2000-2003 Steven J. Streeting
 Also see acknowledgements in Readme.html
 
 This program is free software; you can redistribute it and/or modify it under
@@ -24,13 +24,13 @@ http://www.gnu.org/copyleft/gpl.html.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLESUtil_H__
-#define __GLESUtil_H__
+#ifndef __GLES2Util_H__
+#define __GLES2Util_H__
 
 #include "OgreEGLSupport.h"
 
 namespace Ogre {
-    inline GLESSupport* getGLSupport()
+    inline GLES2Support* getGLSupport()
     {
         return new EGLSupport();
     }

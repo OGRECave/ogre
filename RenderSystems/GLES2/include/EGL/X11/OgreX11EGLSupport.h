@@ -34,13 +34,14 @@ THE SOFTWARE.
 #include "OgreEGLSupport.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
-	#include <X11/Xutil.h>
-	#include <X11/extensions/Xrandr.h>
-	#include <X11/Xutil.h>
-	#include <sys/time.h>
+#ifndef Status
+#define Status int
+#endif 
 	#include <X11/Xlib.h>
-	#include <X11/keysym.h>
+	#include <X11/Xutil.h>
 	#include <X11/extensions/Xrandr.h>
+	#include <sys/time.h>
+	#include <X11/keysym.h>
 #else
 	#define StructureNotifyMask 0
 	#define VisibilityChangeMask 0
@@ -148,8 +149,8 @@ namespace Ogre {
             X11EGLSupport();
             virtual ~X11EGLSupport();
 
-			virtual GLES2PBuffer* createPBuffer(PixelComponentType format,
-				size_t width, size_t height);
+//			virtual GLES2PBuffer* createPBuffer(PixelComponentType format,
+//				size_t width, size_t height);
 
 			virtual void switchMode(uint& width, uint& height, short& frequency);
 			String getDisplayName(void);
@@ -174,3 +175,4 @@ namespace Ogre {
 }
 
 #endif
+
