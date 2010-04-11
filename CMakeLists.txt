@@ -192,6 +192,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
 
   add_definitions(-fno-regmove)
+  add_definitions(-falign-loops=16)
   remove_definitions(-msse)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
 
