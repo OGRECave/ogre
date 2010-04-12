@@ -30,10 +30,7 @@ Description: Base class for all the OGRE examples
 #  define OGRE_STATIC_GL
 #  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    define OGRE_STATIC_Direct3D9
-     // dx10 will only work on vista, so be careful about statically linking
-#    if OGRE_USE_D3D10
-#      define OGRE_STATIC_Direct3D10
-#    endif
+     // dx11 will only work on vista, so be careful about statically linking
 #    if OGRE_USE_D3D11
 #      define OGRE_STATIC_Direct3D11
 #    endif

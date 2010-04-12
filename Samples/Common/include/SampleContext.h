@@ -50,10 +50,7 @@
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
 #		define OGRE_STATIC_Direct3D9
 #    endif
-// dx10 will only work on vista, so be careful about statically linking
-#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D10
-#      define OGRE_STATIC_Direct3D10
-#    endif
+// dx11 will only work on vista, so be careful about statically linking
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
 #      define OGRE_STATIC_Direct3D11
 #    endif
