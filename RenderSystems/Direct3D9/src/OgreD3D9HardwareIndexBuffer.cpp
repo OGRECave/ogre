@@ -58,10 +58,20 @@ namespace Ogre {
 		// Set the desired memory pool.
 		mBufferDesc.Pool = eResourcePool;
 				
-		// Allocate the system memory buffer.
-		mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
-		memset(mSystemMemoryBuffer, 0, getSizeInBytes());
+		// Set source buffer to NULL.
+		mSourceBuffer = NULL;
+		mSourceLockedBytes  = NULL;
 
+		// Allocate the system memory buffer.
+		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+		{			
+			mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
+			memset(mSystemMemoryBuffer, 0, getSizeInBytes());
+		}
+		else
+		{			
+			mSystemMemoryBuffer = NULL;
+		}
 		// Case we have to create this buffer resource on loading.
 		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
 		{
@@ -131,7 +141,19 @@ namespace Ogre {
 			}
 		}
 
-		return mSystemMemoryBuffer + offset;		
+		// Case we use system memory buffer -> just return it
+		if (mSystemMemoryBuffer != NULL)
+		{
+			return mSystemMemoryBuffer + offset;
+		}
+		
+		else
+		{
+			// Lock the source buffer.
+			mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
+
+			return mSourceLockedBytes;		
+		}		
     }
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::unlockImpl(void)
@@ -148,10 +170,26 @@ namespace Ogre {
 			if (bufferResources->mOutOfDate && 
 				bufferResources->mBuffer != NULL &&
 				nextFrameNumber - bufferResources->mLastUsedFrame <= 1)
-				updateBufferResources(mSystemMemoryBuffer, bufferResources);
+			{
+				if (mSystemMemoryBuffer != NULL)
+				{
+					updateBufferResources(mSystemMemoryBuffer + bufferResources->mLockOffset, bufferResources);
+				}
+				else if (mSourceBuffer != bufferResources)
+				{
+					updateBufferResources(mSourceLockedBytes, bufferResources);
+				}				
+			}
 
 			++it;
-		}			
+		}	
+
+		// Unlock the source buffer.
+		if (mSystemMemoryBuffer == NULL)
+		{
+			_unlockBuffer(mSourceBuffer);
+			mSourceLockedBytes = NULL;
+		}		
     }
 	//---------------------------------------------------------------------
     void D3D9HardwareIndexBuffer::readData(size_t offset, size_t length, 
@@ -194,6 +232,12 @@ namespace Ogre {
 
 		if (it != mMapDeviceToBufferResources.end())	
 		{									
+			// Case this is the source buffer.
+			if (it->second == mSourceBuffer)
+			{
+				mSourceBuffer = NULL;
+			}
+
 			SAFE_RELEASE(it->second->mBuffer);
 			if (it->second != NULL)
 			{
@@ -201,7 +245,13 @@ namespace Ogre {
 				it->second = NULL;
 			}
 			mMapDeviceToBufferResources.erase(it);
-		}
+
+			// Case source buffer just destroyed -> switch to another one if exits.
+			if (mSourceBuffer == NULL && mMapDeviceToBufferResources.size() > 0)
+			{				
+				mSourceBuffer = mMapDeviceToBufferResources.begin()->second;				
+			}
+		}	
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::notifyOnDeviceLost(IDirect3DDevice9* d3d9Device)
@@ -282,8 +332,12 @@ namespace Ogre {
 				"Cannot get D3D9 Index buffer desc: " + msg, 
 				"D3D9HardwareIndexBuffer::createBuffer");
 		}		
+		// Update source buffer if need to.
+		if (mSourceBuffer == NULL)
+		{
+			mSourceBuffer = bufferResources;
+		}
 	}
-
 	//---------------------------------------------------------------------
 	IDirect3DIndexBuffer9* D3D9HardwareIndexBuffer::getD3DIndexBuffer(void)
 	{		
@@ -301,8 +355,20 @@ namespace Ogre {
 		}
 
 		if (it->second->mOutOfDate)
-			updateBufferResources(mSystemMemoryBuffer, it->second);
+		{
+			if (mSystemMemoryBuffer != NULL)
+			{
+				updateBufferResources(mSystemMemoryBuffer, it->second);
+			}
 
+			else if (mSourceBuffer != it->second && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
+			{
+				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
+				updateBufferResources(mSourceLockedBytes, it->second);
+				_unlockBuffer(mSourceBuffer);
+				mSourceLockedBytes = NULL;
+			}			
+		}
 		it->second->mLastUsedFrame = Root::getSingleton().getNextFrameNumber();
 
 		return it->second->mBuffer;
@@ -315,25 +381,43 @@ namespace Ogre {
 		assert(bufferResources->mBuffer != NULL);
 		assert(bufferResources->mOutOfDate);
 			
-		void* dstBytes;
+				
+		char* dstBytes = _lockBuffer(bufferResources, bufferResources->mLockOffset, bufferResources->mLockLength);		
+		memcpy(dstBytes, systemMemoryBuffer, bufferResources->mLockLength);		
+		_unlockBuffer(bufferResources);
+				
+		return true;		
+	}
+
+	//---------------------------------------------------------------------
+	char* D3D9HardwareIndexBuffer::_lockBuffer(BufferResources* bufferResources, size_t offset, size_t length)
+	{
 		HRESULT hr;
-	
+		char* pSourceBytes;
+
+
 		// Lock the buffer.
 		hr = bufferResources->mBuffer->Lock(
-			static_cast<UINT>(bufferResources->mLockOffset), 
-			static_cast<UINT>(bufferResources->mLockLength), 
-			&dstBytes,
-			D3D9Mappings::get(bufferResources->mLockOptions, mUsage));
+			static_cast<UINT>(offset), 
+			static_cast<UINT>(length), 
+			(void**)&pSourceBytes,
+			D3D9Mappings::get(mSourceBuffer->mLockOptions, mUsage));
 
 		if (FAILED(hr))
 		{
 			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot lock D3D9 vertex buffer: " + msg, 
-				"D3D9HardwareIndexBuffer::updateBufferResources");
+				"D3D9HardwareVertexBuffer::_lockBuffer");
 		}
 
-		memcpy(dstBytes, systemMemoryBuffer + bufferResources->mLockOffset, bufferResources->mLockLength);
+		return pSourceBytes;
+	}
+
+	//---------------------------------------------------------------------
+	void D3D9HardwareIndexBuffer::_unlockBuffer( BufferResources* bufferResources )
+	{
+		HRESULT hr;
 
 		// Unlock the buffer.
 		hr = bufferResources->mBuffer->Unlock();
@@ -342,14 +426,14 @@ namespace Ogre {
 			String msg = DXGetErrorDescription(hr);
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Cannot unlock D3D9 vertex buffer: " + msg, 
-				"D3D9HardwareIndexBuffer::updateBufferResources");
+				"D3D9HardwareVertexBuffer::_unlockBuffer");
 		}
 
+		// Reset attributes.
 		bufferResources->mOutOfDate = false;
 		bufferResources->mLockOffset = mSizeInBytes;
 		bufferResources->mLockLength = 0;
 		bufferResources->mLockOptions = HBL_NORMAL;
 
-		return true;			
 	}
 }

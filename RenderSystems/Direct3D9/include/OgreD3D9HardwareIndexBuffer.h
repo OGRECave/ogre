@@ -85,17 +85,22 @@ namespace Ogre {
 		// updates buffer resources from system memory buffer.
 		bool updateBufferResources(const char* systemMemoryBuffer, BufferResources* bufferResources);
 
+		/** Internal buffer lock method. */
+		char* _lockBuffer(BufferResources* bufferResources, size_t offset, size_t length);
+
+		/** Internal buffer unlock method. */
+		void _unlockBuffer(BufferResources* bufferResources);
+
 	protected:		
 		typedef map<IDirect3DDevice9*, BufferResources*>::type	DeviceToBufferResourcesMap;
 		typedef DeviceToBufferResourcesMap::iterator			DeviceToBufferResourcesIterator;
 
 		DeviceToBufferResourcesMap	mMapDeviceToBufferResources;	// Map between device to buffer resources.	
 		D3DINDEXBUFFER_DESC			mBufferDesc;					// Buffer description.		
-		char*						mSystemMemoryBuffer;			// Consistent system memory buffer for multiple devices support.
+		BufferResources*			mSourceBuffer;					// Source buffer resources when working with multiple devices.
+		char*						mSourceLockedBytes;				// Source buffer locked bytes.
+		char*						mSystemMemoryBuffer;			// Consistent system memory buffer for multiple devices support in case of write only buffers.
     };
 }
-
-
-
 #endif
 
