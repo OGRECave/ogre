@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreFixedFuncState.h"
 
 namespace Ogre { 
 
@@ -49,8 +48,6 @@ namespace Ogre {
 		D3D11_INPUT_ELEMENT_DESC*  mD3delems;
 
 		ShaderToILayoutMap mShaderToILayoutMap;
-
-		VertexBufferDeclaration mVertexBufferDeclaration;
 
 		/** Gets the D3D11-specific vertex declaration. */
 
@@ -85,8 +82,6 @@ namespace Ogre {
 
 		D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(void);
 		void bindToShader(D3D11HLSLProgram* boundVertexProgram);
-
-		const VertexBufferDeclaration & getVertexBufferDeclaration();
 
 	};
 

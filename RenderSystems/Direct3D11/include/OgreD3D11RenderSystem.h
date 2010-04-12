@@ -32,9 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
-#include "OgreFixedFuncState.h"
-#include "OgreHlslFixedFuncEmuShaderGenerator.h"
-#include "OgreFixedFuncEmuShaderManager.h"
 
 namespace Ogre 
 {
@@ -109,12 +106,6 @@ namespace Ogre
         D3D11HLSLProgramFactory* mHLSLProgramFactory;
 
 		size_t mLastVertexSourceCount;
-
-		FixedFuncState mFixedFuncState;
-		FixedFuncPrograms::FixedFuncProgramsParameters mFixedFuncProgramsParameters;
-		Hlsl4FixedFuncEmuShaderGenerator mHlslFixedFuncEmuShaderGenerator;
-		FixedFuncEmuShaderManager	mFixedFuncEmuShaderManager;
-
 
 		/// Internal method for populating the capabilities structure
 		RenderSystemCapabilities* createRenderSystemCapabilities() const;

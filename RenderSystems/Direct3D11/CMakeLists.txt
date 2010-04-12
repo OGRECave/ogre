@@ -36,10 +36,6 @@ set (HEADER_FILES
   include/OgreD3D11VertexDeclaration.h
   include/OgreD3D11VideoMode.h
   include/OgreD3D11VideoModeList.h
-  include/OgreFixedFuncEmuShaderGenerator.h
-  include/OgreFixedFuncEmuShaderManager.h
-  include/OgreFixedFuncState.h
-  include/OgreHlslFixedFuncEmuShaderGenerator.h
 )
 
 set (SOURCE_FILES
@@ -69,11 +65,6 @@ set (SOURCE_FILES
   src/OgreD3D11VertexDeclaration.cpp
   src/OgreD3D11VideoMode.cpp
   src/OgreD3D11VideoModeList.cpp
-  src/OgreFixedFuncEmuShaderGenerator.cpp
-  src/OgreFixedFuncEmuShaderManager.cpp
-  src/OgreFixedFuncState.cpp
-  src/OgreHlslFixedFuncEmuShaderGenerator.cpp
-
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${DirectX_INCLUDE_DIR})

@@ -182,28 +182,6 @@ namespace Ogre {
 		// Set the input layout
 		mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout );
 	}	
-	//-----------------------------------------------------------------------
-	const VertexBufferDeclaration & D3D11VertexDeclaration::getVertexBufferDeclaration()
-	{
-		if (mVertexBufferDeclaration.getVertexBufferElementList().empty())
-		{
-			VertexBufferElementList newList;
-			unsigned short res = 0;
-			for (unsigned short i = 0 ; i < getElementCount() ; i++)
-			{
-				VertexBufferElement newVertexBufferElement;
-				newVertexBufferElement.setVertexElementIndex(getElement(i)->getIndex());
-				newVertexBufferElement.setVertexElementSemantic(getElement(i)->getSemantic());
-				newVertexBufferElement.setVertexElementType(getElement(i)->getType());
-				newList.push_back(newVertexBufferElement);
-			}
-
-			mVertexBufferDeclaration.setVertexBufferElementList(newList);
-
-		}
-
-		return mVertexBufferDeclaration;
-	}
 }
 
 

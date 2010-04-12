@@ -147,17 +147,11 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-
-		mFixedFuncEmuShaderManager.registerGenerator(&mHlslFixedFuncEmuShaderGenerator);
-
-
 	}
 	//---------------------------------------------------------------------
 	D3D11RenderSystem::~D3D11RenderSystem()
 	{
         shutdown();
-
-		mFixedFuncEmuShaderManager.unregisterGenerator(&mHlslFixedFuncEmuShaderGenerator);
 
         // Deleting the HLSL program factory
         if (mHLSLProgramFactory)
@@ -1511,137 +1505,46 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::setAmbientLight( float r, float g, float b )
 	{
-		mFixedFuncProgramsParameters.setLightAmbient(ColourValue(r, g, b, 0.0f));
 	}
 	//---------------------------------------------------------------------
     void D3D11RenderSystem::_useLights(const LightList& lights, unsigned short limit)
     {
-		size_t currentLightsCount = lights.size();
-		if (currentLightsCount > limit)
-		{
-			currentLightsCount = limit;
-		}
-
-		LightList lightsList;
-		mFixedFuncState.getGeneralFixedFuncState().resetLightTypeCounts();
-		for(size_t i = 0 ; i < currentLightsCount ; i++)
-		{
-			Light * curLight = lights[i];
-			lightsList.push_back(curLight);
-			mFixedFuncState.getGeneralFixedFuncState().addOnetoLightTypeCount(curLight->getType());
-		}
-		mFixedFuncProgramsParameters.setLights(lightsList);
     }
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::setShadingType( ShadeOptions so )
 	{
-	/*	HRESULT hr = __SetRenderState( D3DRS_SHADEMODE, D3D11Mappings::get(so) );
-		if( FAILED( hr ) )
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-			"Failed to set render stat D3DRS_SHADEMODE", "D3D11RenderSystem::setShadingType" );
-	*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::setLightingEnabled( bool enabled )
 	{
-		mFixedFuncProgramsParameters.setLightingEnabled(enabled);
-		mFixedFuncState.getGeneralFixedFuncState().setLightingEnabled(enabled);
-
-	
-	/*	HRESULT hr;
-		if( FAILED( hr = __SetRenderState( D3DRS_LIGHTING, enabled ) ) )
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-			"Failed to set render state D3DRS_LIGHTING", "D3D11RenderSystem::setLightingEnabled" );
-	*/}
-	//---------------------------------------------------------------------
+	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setViewMatrix( const Matrix4 &m )
 	{
-		// save latest view matrix
-		mFixedFuncProgramsParameters.setViewMat(m);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setProjectionMatrix( const Matrix4 &m )
 	{
-		 // save latest projection matrix
-		mFixedFuncProgramsParameters.setProjectionMat(m);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setWorldMatrix( const Matrix4 &m )
 	{
-		// save latest world matrix
-		mFixedFuncProgramsParameters.setWorldMat(m);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse,
 		const ColourValue &specular, const ColourValue &emissive, Real shininess,
         TrackVertexColourType tracking )
 	{
-	/*	
-		D3DMATERIAL9 material;
-		material.Diffuse = D3DXCOLOR( diffuse.r, diffuse.g, diffuse.b, diffuse.a );
-		material.Ambient = D3DXCOLOR( ambient.r, ambient.g, ambient.b, ambient.a );
-		material.Specular = D3DXCOLOR( specular.r, specular.g, specular.b, specular.a );
-		material.Emissive = D3DXCOLOR( emissive.r, emissive.g, emissive.b, emissive.a );
-		material.Power = shininess;
-
-		HRESULT hr = mDevice->SetMaterial( &material );
-		if( FAILED( hr ) )
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting D3D material", "D3D11RenderSystem::_setSurfaceParams" );
-
-
-		if(tracking != TVC_NONE) 
-        {
-            __SetRenderState(D3DRS_COLORVERTEX, TRUE);
-            __SetRenderState(D3DRS_AMBIENTMATERIALSOURCE, (tracking&TVC_AMBIENT)?D3DMCS_COLOR1:D3DMCS_MATERIAL);
-            __SetRenderState(D3DRS_DIFFUSEMATERIALSOURCE, (tracking&TVC_DIFFUSE)?D3DMCS_COLOR1:D3DMCS_MATERIAL);
-            __SetRenderState(D3DRS_SPECULARMATERIALSOURCE, (tracking&TVC_SPECULAR)?D3DMCS_COLOR1:D3DMCS_MATERIAL);
-            __SetRenderState(D3DRS_EMISSIVEMATERIALSOURCE, (tracking&TVC_EMISSIVE)?D3DMCS_COLOR1:D3DMCS_MATERIAL);
-        } 
-        else 
-        {
-            __SetRenderState(D3DRS_COLORVERTEX, FALSE);               
-        }
-    */    
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setPointParameters(Real size, 
 		bool attenuationEnabled, Real constant, Real linear, Real quadratic,
 		Real minSize, Real maxSize)
     {
-	/*	if(attenuationEnabled)
-		{
-			// scaling required
-			__SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
-			__SetFloatRenderState(D3DRS_POINTSCALE_A, constant);
-			__SetFloatRenderState(D3DRS_POINTSCALE_B, linear);
-			__SetFloatRenderState(D3DRS_POINTSCALE_C, quadratic);
-		}
-		else
-		{
-			// no scaling required
-			__SetRenderState(D3DRS_POINTSCALEENABLE, FALSE);
-		}
-		__SetFloatRenderState(D3DRS_POINTSIZE, size);
-		__SetFloatRenderState(D3DRS_POINTSIZE_MIN, minSize);
-		if (maxSize == 0.0f)
-			maxSize = mCapabilities->getMaxPointSize();
-		__SetFloatRenderState(D3DRS_POINTSIZE_MAX, maxSize);
-
-*/
     }
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setPointSpritesEnabled(bool enabled)
 	{
-	/*	if (enabled)
-		{
-			__SetRenderState(D3DRS_POINTSPRITEENABLE, TRUE);
-		}
-		else
-		{
-			__SetRenderState(D3DRS_POINTSPRITEENABLE, FALSE);
-		}
-	*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
@@ -1665,10 +1568,6 @@ namespace Ogre
 		{
 			mTexStageDesc[stage].used = false;
 		}
-
-		mFixedFuncProgramsParameters.setTextureEnabled(stage, enabled);
-
-
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
@@ -1687,14 +1586,6 @@ namespace Ogre
 	void D3D11RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
 	{
 		mTexStageDesc[stage].coordIndex = index;
-	/*	HRESULT hr;
-        // Record settings
-        mTexStageDesc[stage].coordIndex = index;
-
-		hr = __SetTextureStageState( stage, D3DTSS_TEXCOORDINDEX, D3D11Mappings::get(mTexStageDesc[stage].autoTexCoordType, mCaps) | index );
-		if( FAILED( hr ) )
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture coord. set index", "D3D11RenderSystem::_setTextureCoordSet" );
-	*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
@@ -1707,214 +1598,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
 	{
-	/*	if (mCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
-		{
-			// ugh - have to pass float data through DWORD with no conversion
-			HRESULT hr = __SetSamplerState(unit, D3DSAMP_MIPMAPLODBIAS, 
-				*(DWORD*)&bias);
-			if(FAILED(hr))
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture mipmap bias", 
-				"D3D11RenderSystem::_setTextureMipmapBias" );
 
-		}
-	*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
 	{
-		mFixedFuncProgramsParameters.setTextureMatrix(stage, xForm);
-	/*	HRESULT hr;
-		D3DXMATRIX d3dMat; // the matrix we'll maybe apply
-		Matrix4 newMat = xForm; // the matrix we'll apply after conv. to D3D format
-		// Cache texcoord calc method to register
-		TexCoordCalcMethod autoTexCoordType = mTexStageDesc[stage].autoTexCoordType;
-
-		if (autoTexCoordType == TEXCALC_ENVIRONMENT_MAP)
-        {
-            if (mCaps.VertexProcessingCaps & D3DVTXPCAPS_TEXGEN_SPHEREMAP)
-            {
-                // Invert the texture for the spheremap 
-                Matrix4 ogreMatEnvMap = Matrix4::IDENTITY;
-			    // set env_map values
-			    ogreMatEnvMap[1][1] = -1.0f;
-			    // concatenate with the xForm
-			    newMat = newMat.concatenate(ogreMatEnvMap);
-            }
-            else
-            {
-		        // If envmap is applied, but device doesn't support spheremap,
-		        //then we have to use texture transform to make the camera space normal
-		        //reference the envmap properly. This isn't exactly the same as spheremap
-		        //(it looks nasty on flat areas because the camera space normals are the same)
-		        //but it's the best approximation we have in the absence of a proper spheremap 
-			    // concatenate with the xForm
-                newMat = newMat.concatenate(Matrix4::CLIPSPACE2DTOIMAGESPACE);
-            }
-		}
-
-        // If this is a cubic reflection, we need to modify using the view matrix
-        if (autoTexCoordType == TEXCALC_ENVIRONMENT_MAP_REFLECTION)
-        {
-            // Get transposed 3x3
-            // We want to transpose since that will invert an orthonormal matrix ie rotation
-            Matrix4 ogreViewTransposed;
-            ogreViewTransposed[0][0] = mViewMatrix[0][0];
-            ogreViewTransposed[0][1] = mViewMatrix[1][0];
-            ogreViewTransposed[0][2] = mViewMatrix[2][0];
-            ogreViewTransposed[0][3] = 0.0f;
-
-            ogreViewTransposed[1][0] = mViewMatrix[0][1];
-            ogreViewTransposed[1][1] = mViewMatrix[1][1];
-            ogreViewTransposed[1][2] = mViewMatrix[2][1];
-            ogreViewTransposed[1][3] = 0.0f;
-
-            ogreViewTransposed[2][0] = mViewMatrix[0][2];
-            ogreViewTransposed[2][1] = mViewMatrix[1][2];
-            ogreViewTransposed[2][2] = mViewMatrix[2][2];
-            ogreViewTransposed[2][3] = 0.0f;
-
-            ogreViewTransposed[3][0] = 0.0f;
-            ogreViewTransposed[3][1] = 0.0f;
-            ogreViewTransposed[3][2] = 0.0f;
-            ogreViewTransposed[3][3] = 1.0f;
-            
-            newMat = newMat.concatenate(ogreViewTransposed);
-        }
-
-        if (autoTexCoordType == TEXCALC_PROJECTIVE_TEXTURE)
-        {
-            // Derive camera space to projector space transform
-            // To do this, we need to undo the camera view matrix, then 
-            // apply the projector view & projection matrices
-            newMat = mViewMatrix.inverse();
-			if(mTexProjRelative)
-			{
-				Matrix4 viewMatrix;
-				mTexStageDesc[stage].frustum->calcViewMatrixRelative(mTexProjRelativeOrigin, viewMatrix);
-				newMat = viewMatrix * newMat;
-			}
-			else
-			{
-				newMat = mTexStageDesc[stage].frustum->getViewMatrix() * newMat;
-			}
-            newMat = mTexStageDesc[stage].frustum->getProjectionMatrix() * newMat;
-            newMat = Matrix4::CLIPSPACE2DTOIMAGESPACE * newMat;
-            newMat = xForm * newMat;
-        }
-
-		// need this if texture is a cube map, to invert D3D's z coord
-		if (autoTexCoordType != TEXCALC_NONE &&
-            autoTexCoordType != TEXCALC_PROJECTIVE_TEXTURE)
-		{
-            newMat[2][0] = -newMat[2][0];
-            newMat[2][1] = -newMat[2][1];
-            newMat[2][2] = -newMat[2][2];
-            newMat[2][3] = -newMat[2][3];
-		}
-
-        // convert our matrix to D3D format
-		d3dMat = D3D11Mappings::makeD3DXMatrix(newMat);
-
-		// set the matrix if it's not the identity
-		if (!D3DXMatrixIsIdentity(&d3dMat))
-		{
-            /* It's seems D3D automatically add a texture coordinate with value 1,
-            and fill up the remaining texture coordinates with 0 for the input
-            texture coordinates before pass to texture coordinate transformation.
-
-               NOTE: It's difference with D3DDECLTYPE enumerated type expand in
-            DirectX SDK documentation!
-
-               So we should prepare the texcoord transform, make the transformation
-            just like standardized vector expand, thus, fill w with value 1 and
-            others with 0.
-            * /
-            if (autoTexCoordType == TEXCALC_NONE)
-            {
-                /* FIXME: The actually input texture coordinate dimensions should
-                be determine by texture coordinate vertex element. Now, just trust
-                user supplied texture type matchs texture coordinate vertex element.
-                * /
-                if (mTexStageDesc[stage].texType == D3D11Mappings::D3D_TEX_TYPE_NORMAL)
-                {
-                    /* It's 2D input texture coordinate:
-
-                      texcoord in vertex buffer     D3D expanded to     We are adjusted to
-                                                -->                 -->
-                                (u, v)               (u, v, 1, 0)          (u, v, 0, 1)
-                    * /
-                    std::swap(d3dMat._31, d3dMat._41);
-                    std::swap(d3dMat._32, d3dMat._42);
-                    std::swap(d3dMat._33, d3dMat._43);
-                    std::swap(d3dMat._34, d3dMat._44);
-                }
-            }
-            else
-            {
-                // All texgen generate 3D input texture coordinates.
-            }
-
-			// tell D3D the dimension of tex. coord.
-			int texCoordDim = D3DTTFF_COUNT2;
-            if (mTexStageDesc[stage].autoTexCoordType == TEXCALC_PROJECTIVE_TEXTURE)
-            {
-                /* We want texcoords (u, v, w, q) always get divided by q, but D3D
-                projected texcoords is divided by the last element (in the case of
-                2D texcoord, is w). So we tweak the transform matrix, transform the
-                texcoords with w and q swapped: (u, v, q, w), and then D3D will
-                divide u, v by q. The w and q just ignored as it wasn't used by
-                rasterizer.
-                * /
-			    switch (mTexStageDesc[stage].texType)
-			    {
-			    case D3D11Mappings::D3D_TEX_TYPE_NORMAL:
-                    std::swap(d3dMat._13, d3dMat._14);
-                    std::swap(d3dMat._23, d3dMat._24);
-                    std::swap(d3dMat._33, d3dMat._34);
-                    std::swap(d3dMat._43, d3dMat._44);
-
-                    texCoordDim = D3DTTFF_PROJECTED | D3DTTFF_COUNT3;
-                    break;
-
-			    case D3D11Mappings::D3D_TEX_TYPE_CUBE:
-			    case D3D11Mappings::D3D_TEX_TYPE_VOLUME:
-                    // Yes, we support 3D projective texture.
-				    texCoordDim = D3DTTFF_PROJECTED | D3DTTFF_COUNT4;
-                    break;
-                }
-            }
-            else
-            {
-			    switch (mTexStageDesc[stage].texType)
-			    {
-			    case D3D11Mappings::D3D_TEX_TYPE_NORMAL:
-				    texCoordDim = D3DTTFF_COUNT2;
-				    break;
-			    case D3D11Mappings::D3D_TEX_TYPE_CUBE:
-			    case D3D11Mappings::D3D_TEX_TYPE_VOLUME:
-				    texCoordDim = D3DTTFF_COUNT3;
-                    break;
-			    }
-            }
-
-			hr = __SetTextureStageState( stage, D3DTSS_TEXTURETRANSFORMFLAGS, texCoordDim );
-			if (FAILED(hr))
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture coord. dimension", "D3D11RenderSystem::_setTextureMatrix" );
-
-			hr = mDevice->SetTransform( (D3DTRANSFORMSTATETYPE)(D3DTS_TEXTURE0 + stage), &d3dMat );
-			if (FAILED(hr))
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture matrix", "D3D11RenderSystem::_setTextureMatrix" );
-		}
-		else
-		{
-			// disable all of this
-			hr = __SetTextureStageState( stage, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE );
-			if( FAILED( hr ) )
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to disable texture coordinate transform", "D3D11RenderSystem::_setTextureMatrix" );
-
-			// Needless to sets texture transform here, it's never used at all
-		}
-		*/
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
@@ -2056,12 +1744,6 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
 	{
-		mFixedFuncProgramsParameters.setFogMode(mode);
-		mFixedFuncProgramsParameters.setFogColour(colour);
-		mFixedFuncProgramsParameters.setFogDensitiy(densitiy);
-		mFixedFuncProgramsParameters.setFogStart(start);
-		mFixedFuncProgramsParameters.setFogEnd(end);
-		mFixedFuncState.getGeneralFixedFuncState().setFogMode(mode);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setPolygonMode(PolygonMode level)
@@ -2470,15 +2152,12 @@ namespace Ogre
 			ID3D11BlendState * mBlendState;
 			ID3D11RasterizerState * mRasterizer;
 			ID3D11DepthStencilState * mDepthStencilState;
-			TextureLayerStateList mTextureLayerStateList;
 
 			ID3D11SamplerState * mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
 			size_t mSamplerStatesCount;
 
 			ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
 			size_t mTexturesCount;
-
-			FixedFuncPrograms * mFixedFuncPrograms;
 
 			~D3D11RenderOperationState()
 			{
@@ -2573,32 +2252,12 @@ namespace Ogre
 			}
 			opState->mSamplerStatesCount = numberOfSamplers;
 
-
-
-			for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
-			{
-				sD3DTextureStageDesc & curDesc = mTexStageDesc[i];
-				if (curDesc.used)
-				{
-					TextureLayerState textureLayerState;
-					textureLayerState.setTextureType(curDesc.type);
-					textureLayerState.setTexCoordCalcMethod(curDesc.autoTexCoordType);
-					textureLayerState.setLayerBlendModeEx(curDesc.layerBlendMode);
-					textureLayerState.setCoordIndex((uint8)curDesc.coordIndex);
-					opState->mTextureLayerStateList.push_back(textureLayerState);
-
-				}
-			}
-
-
 			if (!unstandardRenderOperation)
 			{
 				op.srcRenderable->setRenderSystemData(opState);
 			}
 
 		}
-
-		mFixedFuncState.setTextureLayerStateList(opState->mTextureLayerStateList);
 
 		if (unstandardRenderOperation || opState->mBlendState != mBoundBlendState)
 		{
@@ -2673,53 +2332,12 @@ namespace Ogre
 
 
 
-		// well, in D3D11 we have to make sure that we have a vertex and fragment shader
-		// bound before we start rendering, so we do that first...
-		bool needToUnmapFS = false;
-		bool needToUnmapVS = false;
 	 	if (!mBoundVertexProgram || !mBoundFragmentProgram) // I know this is bad code - but I want to get things going
 		{
 			
-
-	
-			{
-				const VertexBufferDeclaration &  vertexBufferDeclaration = 
-					(static_cast<D3D11VertexDeclaration *>(op.vertexData->vertexDeclaration))->getVertexBufferDeclaration();
-
-				opState->mFixedFuncPrograms = mFixedFuncEmuShaderManager.getShaderPrograms("hlsl4", 
-					vertexBufferDeclaration,
-					mFixedFuncState
-					);
-			}
-
-
-
-			FixedFuncPrograms * fixedFuncPrograms = opState->mFixedFuncPrograms;
-				
-			
-			fixedFuncPrograms->setFixedFuncProgramsParameters(mFixedFuncProgramsParameters);
-
-			if (!mBoundVertexProgram)
-			{
-				needToUnmapVS = true;
-				// Bind Vertex Program
-				bindGpuProgram(fixedFuncPrograms->getVertexProgramUsage()->getProgram().get());
-				bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-					fixedFuncPrograms->getVertexProgramUsage()->getParameters(), (uint16)GPV_ALL);
-
-			}
-
-			if (!mBoundFragmentProgram)
-			{
-				needToUnmapFS = true;
-				// Bind Fragment Program 
-				bindGpuProgram(fixedFuncPrograms->getFragmentProgramUsage()->getProgram().get());
-				bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
-					fixedFuncPrograms->getFragmentProgramUsage()->getParameters(), (uint16)GPV_ALL);
-			}
-				
-
-		
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Attempted to render to a D3D11 device without both vertex and fragment shaders",
+				"D3D11RenderSystem::_render");
 		}
 
 		mDevice.GetImmediateContext()->GSSetShader( NULL, NULL, 0 );
@@ -2852,15 +2470,6 @@ namespace Ogre
 
 		}
 
-		if (needToUnmapVS)
-		{
-			unbindGpuProgram(GPT_VERTEX_PROGRAM);
-		}
-
-		if (needToUnmapFS)
-		{
-			unbindGpuProgram(GPT_FRAGMENT_PROGRAM);
-		} 	
 
 		if (unstandardRenderOperation)
 		{
