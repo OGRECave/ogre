@@ -1431,8 +1431,10 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void destroyDummyScene()
 		{
+			Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
+			mShaderGenerator->removeSceneManager(dummyScene);
 			mWindow->removeAllViewports();
-			mRoot->destroySceneManager(mRoot->getSceneManager("DummyScene"));
+			mRoot->destroySceneManager(dummyScene);
 		}	
 
 		/*-----------------------------------------------------------------------------
