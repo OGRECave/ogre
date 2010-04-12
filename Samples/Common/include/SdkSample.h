@@ -43,8 +43,7 @@ namespace OgreBites
 	=============================================================================*/
 	class SdkSample : public Sample, public SdkTrayListener
     {
-    public:
-
+	public:
 		SdkSample()
 		{
 			// so we don't have to worry about checking if these keys exist later
@@ -227,23 +226,23 @@ namespace OgreBites
 			// Toggle schemes.			
 			else if (evt.key == OIS::KC_F2)
 			{	
-				Ogre::Viewport* mainVP = mCamera->getViewport();
-				const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
-
-				if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
-				{							
-					mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-					mDetailsPanel->setParamValue(11, "On");
-				}
-				else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+				if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
 				{
-					mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-					mDetailsPanel->setParamValue(11, "Off");
-				}														
+					Ogre::Viewport* mainVP = mCamera->getViewport();
+					const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+
+					if (curMaterialScheme == Ogre::MaterialManager::DEFAULT_SCHEME_NAME)
+					{							
+						mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+						mDetailsPanel->setParamValue(11, "On");
+					}
+					else if (curMaterialScheme == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+					{
+						mainVP->setMaterialScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
+						mDetailsPanel->setParamValue(11, "Off");
+					}														
+				}
 			}			
-
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-
 			// Toggles per pixel per light model.
 			else if (evt.key == OIS::KC_F3)
 			{
@@ -293,7 +292,6 @@ namespace OgreBites
 					mDetailsPanel->setParamValue(12, "Vertex");
 				usePerPixelLighting = !usePerPixelLighting;				
 			}	
-#endif
 
 			// Switch vertex shader outputs compaction policy.
 			else if (evt.key == OIS::KC_F4)   
@@ -319,7 +317,7 @@ namespace OgreBites
 				// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
 				mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			}	
-#endif
+#endif // USE_RTSHADER_SYSTEM
 
 			mCameraMan->injectKeyDown(evt);
 			return true;
@@ -434,19 +432,7 @@ namespace OgreBites
 			setupView();
 
 			mTrayMgr = new SdkTrayManager("SampleControls", window, mouse, this);  // create a tray interface
-			
-#ifdef USE_RTSHADER_SYSTEM
-			// Initialize shader generator.
-			// Must be before resource loading in order to allow parsing extended material attributes.
-			bool success = initializeRTShaderSystem(mSceneMgr);
-			if (!success) 
-			{
-				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
-					"Shader Generator Initialization failed - Core shader libs path not found", 
-					"SdkSample::_setup");
-			}														
-#endif
-			
+						
 			loadResources();
 			mResourcesLoaded = true;
 
@@ -485,6 +471,14 @@ namespace OgreBites
 
 #ifdef USE_RTSHADER_SYSTEM
 			mDetailsPanel->setParamValue(11, "Off");
+
+      Ogre::Viewport* mainVP = mCamera->getViewport();
+      const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+      if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
+      {
+          mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+          mDetailsPanel->setParamValue(11, "On");
+      }
 			mDetailsPanel->setParamValue(12, "Vertex");
 			mDetailsPanel->setParamValue(13, "Low");
 			mDetailsPanel->setParamValue(14, "0");
@@ -517,7 +511,7 @@ namespace OgreBites
 			mCamera = mSceneMgr->createCamera("MainCamera");
 			mViewport = mWindow->addViewport(mCamera);
 #ifdef  USE_RTSHADER_SYSTEM
-            if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != Ogre::String::npos)
+            if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
                 // Make this viewport work with shader generator scheme.
                 mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);

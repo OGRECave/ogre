@@ -266,7 +266,7 @@ namespace OgreBites
 		{
 			while (!mLastRun)
 			{
-        mLastRun = true;  // assume this is our last run
+				mLastRun = true;  // assume this is our last run
 
 				initApp(initialSample);
 

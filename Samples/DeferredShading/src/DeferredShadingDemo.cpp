@@ -23,14 +23,6 @@ This demo source file is in the public domain.
 
 #include "Ogre.h"
 
-
-/*-----------------------------------------------------------------------------
-| Disable rt shader system on this demo
------------------------------------------------------------------------------*/
-#ifdef USE_RTSHADER_SYSTEM
-#undef USE_RTSHADER_SYSTEM
-#endif
-
 #include "SamplePlugin.h"
 #include "SdkSample.h"
 
