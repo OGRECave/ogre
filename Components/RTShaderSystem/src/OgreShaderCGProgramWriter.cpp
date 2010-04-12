@@ -210,6 +210,7 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
 
 		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
 			parameter->getSemantic() != Parameter::SPS_NORMAL &&
+			parameter->getSemantic() != Parameter::SPS_TANGENT &&
 			(!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
 			parameter->getIndex() >= 0)
 		{			
