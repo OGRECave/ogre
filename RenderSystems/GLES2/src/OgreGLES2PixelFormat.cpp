@@ -26,13 +26,13 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreGLES2PixelFormat.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreBitwise.h"
 
-#include "OgreGLES2PixelFormat.h"
-
 namespace Ogre  {
+	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginFormat(PixelFormat mFormat)
     {
         switch (mFormat)
@@ -77,10 +77,13 @@ namespace Ogre  {
             case PF_A4R4G4B4:
             case PF_A2R10G10B10:
 // This case in incorrect, swaps R & B channels
+//#if GL_IMG_read_format || GL_IMG_texture_format_BGRA8888
 //                return GL_BGRA;
+//#endif
 
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
+			case PF_R8G8B8A8:
             case PF_A2B10G10R10:
             case PF_FLOAT16_RGBA:
             case PF_FLOAT32_RGBA:
@@ -93,22 +96,43 @@ namespace Ogre  {
             case PF_R8G8B8:
                 return GL_RGB;
             case PF_B8G8R8:
+    #if GL_EXT_bgra
+                return GL_BGR_EXT;
+    #else
                 return 0;
+    #endif
+
 #else
             case PF_R8G8B8:
-                return 0;
+    #if GL_EXT_bgra
+                return GL_BGR_EXT;
+    #else
             case PF_B8G8R8:
                 return GL_RGB;
+    #endif
 #endif
+
             case PF_DXT1:
+#if GL_EXT_texture_compression_dxt1
+                return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+#endif
             case PF_DXT3:
+#if GL_EXT_texture_compression_s3tc
+                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
             case PF_DXT5:
+#if GL_EXT_texture_compression_s3tc
+                return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+#endif
             case PF_B5G6R5:
+#if GL_EXT_bgra
+                return GL_BGR_EXT;
+#endif
             default:
                 return 0;
         }
     }
-
+	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLOriginDataType(PixelFormat mFormat)
     {
         switch (mFormat)
@@ -128,10 +152,9 @@ namespace Ogre  {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
-                return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
-                return GL_UNSIGNED_INT_8_8_8_8_REV;
+                return 0;
             case PF_B8G8R8A8:
                 return GL_UNSIGNED_BYTE;
             case PF_R8G8B8A8:
@@ -159,19 +182,31 @@ namespace Ogre  {
 
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
+#if GL_EXT_texture_type_2_10_10_10_REV
+                return GL_UNSIGNED_INT_2_10_10_10_REV_EXT;
+#endif
             case PF_FLOAT16_R:
             case PF_FLOAT16_GR:
             case PF_FLOAT16_RGB:
             case PF_FLOAT16_RGBA:
+#if GL_ARB_half_float_pixel
+                return GL_HALF_FLOAT_ARB;
+#endif
             case PF_R3G3B2:
             case PF_A1R5G5B5:
+#if GL_EXT_read_format_bgra
+                return GL_UNSIGNED_SHORT_1_5_5_5_REV_EXT;
+#endif
             case PF_A4R4G4B4:
+#if GL_EXT_read_format_bgra
+                return GL_UNSIGNED_SHORT_4_4_4_4_REV_EXT;
+#endif
                 // TODO not supported
             default:
                 return 0;
         }
     }
-
+	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getGLInternalFormat(PixelFormat fmt, bool hwGamma)
     {
         switch (fmt)
@@ -200,6 +235,10 @@ namespace Ogre  {
             case PF_B8G8R8:
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
+                if (!hwGamma)
+                {
+                    return GL_RGBA;
+                }
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
                 if (!hwGamma)
@@ -226,19 +265,31 @@ namespace Ogre  {
             case PF_SHORT_RGBA:
             case PF_SHORT_RGB:
             case PF_SHORT_GR:
-            case PF_DXT1:
+			case PF_DXT1:
+#if GL_EXT_texture_compression_dxt1
+				if (!hwGamma)
+					return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+#endif
             case PF_DXT3:
+#if GL_EXT_texture_compression_s3tc
+				if (!hwGamma)
+	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
             case PF_DXT5:
+#if GL_EXT_texture_compression_s3tc
+				if (!hwGamma)
+	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
             default:
                 return 0;
         }
     }
-
+	//-----------------------------------------------------------------------------
     GLenum GLES2PixelUtil::getClosestGLInternalFormat(PixelFormat mFormat,
                                                    bool hwGamma)
     {
         GLenum format = getGLInternalFormat(mFormat, hwGamma);
-        if (format == 0)
+        if (format == GL_NONE)
         {
             if (hwGamma)
             {
@@ -255,7 +306,7 @@ namespace Ogre  {
             return format;
         }
     }
-
+	//-----------------------------------------------------------------------------
     PixelFormat GLES2PixelUtil::getClosestOGREFormat(GLenum fmt)
     {
         switch (fmt)
@@ -276,25 +327,32 @@ namespace Ogre  {
                 return PF_A8;
             case GL_LUMINANCE_ALPHA:
                 return PF_BYTE_LA;
-            
             case GL_RGB:
                 return PF_X8R8G8B8;
             case GL_RGBA:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) || (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2)
 				// seems that in windows we need this value to get the right color
                 return PF_X8B8G8R8;
 #endif
                 return PF_A8R8G8B8;
-#ifdef GL_BGRA
-            case GL_BGRA:
+
+#if GL_EXT_texture_compression_dxt1
+            case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+            case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+                return PF_DXT1;
 #endif
-//                return PF_X8B8G8R8;
+#if GL_EXT_texture_compression_s3tc
+            case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+                return PF_DXT3;
+            case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+                return PF_DXT5;
+#endif
             default:
                 //TODO: not supported
                 return PF_A8R8G8B8;
         };
     }
-
+	//-----------------------------------------------------------------------------
     size_t GLES2PixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth,
                                       PixelFormat format)
     {
@@ -325,7 +383,7 @@ namespace Ogre  {
 
         return count;
     }
-
+	//-----------------------------------------------------------------------------
     size_t GLES2PixelUtil::optionalPO2(size_t value)
     {
         const RenderSystemCapabilities *caps =
@@ -340,7 +398,7 @@ namespace Ogre  {
             return Bitwise::firstPO2From((uint32)value);
         }
     }
-
+	//-----------------------------------------------------------------------------
     PixelBox* GLES2PixelUtil::convertToGLformat(const PixelBox &data,
                                              GLenum *outputFormat)
     {
