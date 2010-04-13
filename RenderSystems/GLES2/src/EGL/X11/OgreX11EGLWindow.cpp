@@ -542,7 +542,6 @@ namespace Ogre {
                 EGL_DEPTH_SIZE,     16,
                 EGL_SAMPLES,        0,
                 EGL_ALPHA_SIZE,     EGL_DONT_CARE,
-                EGL_DEPTH_SIZE,     EGL_DONT_CARE,
                 EGL_STENCIL_SIZE,   EGL_DONT_CARE,
                 EGL_SAMPLE_BUFFERS,  0,
                 EGL_NONE
@@ -552,9 +551,8 @@ namespace Ogre {
                 EGL_RED_SIZE,       5,
                 EGL_GREEN_SIZE,     6,
                 EGL_BLUE_SIZE,      5,
-                EGL_DEPTH_SIZE,     16,
+                EGL_DEPTH_SIZE,     24,
                 EGL_ALPHA_SIZE,     8,
-                EGL_DEPTH_SIZE,     8,
                 EGL_STENCIL_SIZE,   8,
                 EGL_SAMPLE_BUFFERS, 1,
                 EGL_SAMPLES, samples,
