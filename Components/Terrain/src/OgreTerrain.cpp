@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreDeflate.h"
 
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -253,7 +254,9 @@ namespace Ogre
 	void Terrain::save(const String& filename)
 	{
 		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, _getDerivedResourceGroup(), true);
-		StreamSerialiser ser(stream);
+		// Compress
+		DataStreamPtr compressStream(OGRE_NEW DeflateStream(filename, stream));
+		StreamSerialiser ser(compressStream);
 		save(ser);
 	}
 	//---------------------------------------------------------------------
@@ -568,8 +571,15 @@ namespace Ogre
 	{
 		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
 			_getDerivedResourceGroup());
-		StreamSerialiser ser(stream);
+		
+		// uncompress
+		// Note DeflateStream automatically falls back on reading the underlying
+		// stream direct if it's not actually compressed so this will still work
+		// with uncompressed streams
+		DataStreamPtr uncompressStream(OGRE_NEW DeflateStream(filename, stream));
+		StreamSerialiser ser(uncompressStream);
 		return prepare(ser);
+
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)

@@ -63,6 +63,7 @@ set (HEADER_FILES
   include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
   include/OgreDefaultHardwareBufferManager.h
+  include/OgreDeflate.h
   include/OgreDepthBuffer.h
   include/OgreDistanceLodStrategy.h
   include/OgreDynLib.h
@@ -288,6 +289,7 @@ set (SOURCE_FILES
   src/OgreDataStream.cpp
   src/OgreDefaultHardwareBufferManager.cpp
   src/OgreDefaultSceneQueries.cpp
+  src/OgreDeflate.cpp
   src/OgreDepthBuffer.cpp
   src/OgreDistanceLodStrategy.cpp
   src/OgreDynLib.cpp
