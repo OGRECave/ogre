@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   include "OgreEAGL2Window.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#	include "OgreAndroidWindow.h"
 #else
 #   include "OgreEGLWindow.h"
 #	ifndef GL_GLEXT_PROTOTYPES

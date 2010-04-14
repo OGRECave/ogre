@@ -56,6 +56,13 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#	ifndef GL_GLEXT_PROTOTYPES
+#		define  GL_GLEXT_PROTOTYPES
+#	endif
+#	include <GLES2/gl2platform.h>
+#	include <GLES2/gl2.h>
+#	include <GLES2/gl2ext.h>
 #else
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
