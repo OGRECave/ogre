@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #ifndef __RenderSystemCapabilities__
-#define __RenderSystemCapabilities__ 1
+#define __RenderSystemCapabilities__
 
 // Precompiler options
 #include "OgrePrerequisites.h"
