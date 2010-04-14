@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -40,8 +39,9 @@ namespace Ogre {
 	protected:
 		AndroidGLSupport* mGLSupport;
 		bool mClosed;
+		int mHandle;
 
-		AndroidGLContext * createGLContext() const;
+		AndroidGLContext * createGLContext(int handle) const;
 		void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
 		void initNativeCreatedWindow(const NameValuePairList *miscParams);
 		void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
@@ -58,9 +58,7 @@ namespace Ogre {
 		/**
 		@remarks
 		* Get custom attribute; the following attributes are valid:
-		* XDISPLAY        The X Display connection behind that context.
-		* XWINDOW        The X NativeWindowType connection behind that context.
-		* ATOM           The X Atom used in client delete events.
+		* HANDLE        The integer id of the android window
 		*/
 		void getCustomAttribute(const String& name, void* pData);
 		

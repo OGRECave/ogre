@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,11 +43,6 @@ namespace Ogre {
     AndroidGLSupport::AndroidGLSupport()
     {
     }
-
-	GLES2PBuffer* AndroidGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
-	{
-		return 0;
-	}
 
     AndroidGLSupport::~AndroidGLSupport()
     {
@@ -115,18 +109,8 @@ namespace Ogre {
     
 	void AndroidGLSupport::addConfig(void)
 	{
-        ConfigOption optRTTMode;
-
-        optRTTMode.name = "RTT Preferred Mode";
-        optRTTMode.immutable = false;
-
-        refreshConfig();
-        optRTTMode.possibleValues.push_back("Copy");
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
-
-        mOptions[optRTTMode.name] = optRTTMode;
-
-        refreshConfig();
+		// Currently no config options supported
+		refreshConfig();
 	}
 	
 	void AndroidGLSupport::refreshConfig(void)

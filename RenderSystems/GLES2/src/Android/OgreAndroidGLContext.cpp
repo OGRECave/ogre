@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,8 +29,8 @@ THE SOFTWARE.
 #include "OgreAndroidGLContext.h"
 
 namespace Ogre {
-    AndroidGLContext::AndroidGLContext(const AndroidGLSupport *glsupport)
-		:mGLSupport(glsupport)
+    AndroidGLContext::AndroidGLContext(const AndroidGLSupport *glsupport, int handle)
+		:mGLSupport(glsupport), mHandle(handle), mDelegate(0)
     {
     }
 
@@ -51,6 +50,21 @@ namespace Ogre {
 
     GLES2Context* AndroidGLContext::clone() const
     {
-        return new AndroidGLContext(mGLSupport);
+        return new AndroidGLContext(mGLSupport, mHandle);
     }
+	
+	void AndroidGLContext::setDelegate(AndroidGLContextDelegate *delegate)
+	{
+		mDelegate = delegate;
+	}
+	
+	AndroidGLContextDelegate *AndroidGLContext::getDelegate()
+	{
+		return mDelegate;
+	}
+	
+	int AndroidGLContext::getHandle() const
+	{
+		return mHandle;
+	}
 }

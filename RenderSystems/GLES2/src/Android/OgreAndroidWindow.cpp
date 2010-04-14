@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
---------------------------------------------------------------------------*/
+-----------------------------------------------------------------------------
+*/
 
 #include "OgreRoot.h"
 #include "OgreException.h"
@@ -45,7 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	AndroidWindow::AndroidWindow(AndroidGLSupport *glsupport)
-		: mGLSupport(glsupport), mClosed(false)
+		: mGLSupport(glsupport), mClosed(false), mHandle(0)
 	{
 	}
 
@@ -56,16 +56,21 @@ namespace Ogre {
 
 	void AndroidWindow::getCustomAttribute( const String& name, void* pData )
 	{
-		
+		if(name == "HANDLE")
+		{
+			*(int*)pData = mHandle;
+		}
 	}
 
-	AndroidGLContext * AndroidWindow::createGLContext() const
+	AndroidGLContext * AndroidWindow::createGLContext(int handle) const
 	{
-		return new AndroidGLContext(mGLSupport);
+		return new AndroidGLContext(mGLSupport, handle);
 	}
 
 	void AndroidWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
 	{
+		// We don't have a native window.... but I think all android windows are origined
+		left = top = 0;
 	}
 
 	void AndroidWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)

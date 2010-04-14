@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,18 +33,32 @@ THE SOFTWARE.
 
 namespace Ogre {
     class AndroidGLSupport;
+	
+	/// Implements the callback mechanisms for external context calls
+	class _OgreExport AndroidGLContextDelegate
+	{
+	public:
+		virtual void setCurrent(int) = 0; // handle of context
+		virtual void endCurrent(int) = 0; // handle of context
+	};
 
     class _OgrePrivate AndroidGLContext : public GLES2Context
     {
 		private:
 			const AndroidGLSupport *mGLSupport;
+			int mHandle; // Handle to external implementation
+			AndroidGLContextDelegate *mDelegate;
         public:
-            AndroidGLContext(const AndroidGLSupport *glsupport);
+            AndroidGLContext(const AndroidGLSupport *glsupport, int handle);
             virtual ~AndroidGLContext();
 
 			virtual void setCurrent();
             virtual void endCurrent();
             GLES2Context* clone() const;
+			
+			void setDelegate(AndroidGLContextDelegate *delegate);
+			AndroidGLContextDelegate *getDelegate();
+			int getHandle() const;
     };
 }
 

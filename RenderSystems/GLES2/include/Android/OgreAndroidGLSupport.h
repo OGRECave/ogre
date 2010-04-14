@@ -1,10 +1,9 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,9 +40,6 @@ namespace Ogre {
             AndroidGLSupport();
             virtual ~AndroidGLSupport();
 
-			GLES2PBuffer* createPBuffer(PixelComponentType format,
-				size_t width, size_t height);
-
 			void switchMode(uint& width, uint& height, short& frequency);
 			String getDisplayName(void);
 
@@ -51,7 +47,6 @@ namespace Ogre {
                                        GLES2RenderSystem *renderSystem,
                                        const String& windowTitle);
 									   
-			//Moved this here from EGLSupport because maybe it should be more native.
 	        RenderWindow* newWindow(const String& name,
             	                    unsigned int width, unsigned int height,
             	                    bool fullScreen,
