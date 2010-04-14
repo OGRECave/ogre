@@ -229,9 +229,11 @@ namespace Ogre
         GPU_IMAGINATION_TECHNOLOGIES = 8,
         GPU_APPLE = 9,  // Apple Software Renderer
         GPU_NOKIA = 10,
+		GPU_MS_SOFTWARE = 11, // Microsoft software device
+		GPU_MS_WARP = 12, // Microsoft WARP (Windows Advanced Rasterization Platform) software device - http://msdn.microsoft.com/en-us/library/dd285359.aspx
 
 		/// placeholder
-		GPU_VENDOR_COUNT = 11
+		GPU_VENDOR_COUNT = 13
 	};
 
 	/** singleton class for storing the capabilities of the graphics card. 

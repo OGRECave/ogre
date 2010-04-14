@@ -52,7 +52,7 @@ namespace Ogre
 		{
 			DT_HARDWARE, // GPU based
 			DT_SOFTWARE, // microsoft original (slow) software driver
-			DT_WARP // microsoft new (faster) software driver
+			DT_WARP // microsoft new (faster) software driver - (Windows Advanced Rasterization Platform) - http://msdn.microsoft.com/en-us/library/dd285359.aspx
 
 		};
 
