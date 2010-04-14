@@ -1344,23 +1344,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 		// Lock scene graph mutex, no more changes until we're ready to render
 		OGRE_LOCK_MUTEX(sceneGraphMutex)
 
-		// Update scene graph for this camera (can happen multiple times per frame)
-		{
-			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
-			_updateSceneGraph(camera);
-
-			// Auto-track nodes
-			AutoTrackingSceneNodes::iterator atsni, atsniend;
-			atsniend = mAutoTrackingSceneNodes.end();
-			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
-			{
-				(*atsni)->_autoTrack();
-			}
-			// Auto-track camera if required
-			camera->_autoTrack();
-		}
-
-
 		if (mIlluminationStage != IRS_RENDER_TO_TEXTURE && mFindVisibleObjects)
 		{
 			// Locate any lights which could be affecting the frustum
@@ -1389,6 +1372,22 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 					mCurrentViewport = vp;
 				}
 			}
+		}
+
+		// Update scene graph for this camera (can happen multiple times per frame)
+		{
+			OgreProfileGroup("_updateSceneGraph", OGREPROF_GENERAL);
+			_updateSceneGraph(camera);
+
+			// Auto-track nodes
+			AutoTrackingSceneNodes::iterator atsni, atsniend;
+			atsniend = mAutoTrackingSceneNodes.end();
+			for (atsni = mAutoTrackingSceneNodes.begin(); atsni != atsniend; ++atsni)
+			{
+				(*atsni)->_autoTrack();
+			}
+			// Auto-track camera if required
+			camera->_autoTrack();
 		}
 
 		// Invert vertex winding?

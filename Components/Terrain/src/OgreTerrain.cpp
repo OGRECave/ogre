@@ -2519,7 +2519,7 @@ namespace Ogre
 
             TerrainLayerBlendMapList::iterator bi = mLayerBlendMapList.begin();
             std::advance(bi, blendIndex);
-            mLayerBlendMapList.insert(bi, 0);
+            mLayerBlendMapList.insert(bi, static_cast<TerrainLayerBlendMap*>(0));
 		}
 		if (textureNames)
 		{
