@@ -169,6 +169,7 @@ namespace Ogre {
 
         rsc->setRenderSystemName(getName());
 
+		
 		// Determine vendor
 		if (strstr(vendorName, "Imagination Technologies"))
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
@@ -256,7 +257,7 @@ namespace Ogre {
         // Point sprites
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
-
+		
         // GLSL ES is always supported in GL ES 2
         rsc->addShaderProfile("glsles");
         LogManager::getSingleton().logMessage("GLSL ES support detected");
@@ -292,6 +293,9 @@ namespace Ogre {
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
+		
+		// No point sprites, so no size
+		rsc->setMaxPointSize(0.f);
         
         return rsc;
     }
@@ -504,7 +508,7 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
-
+			
             StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
             if (!tokens.empty())
             {
@@ -515,6 +519,7 @@ namespace Ogre {
                     mDriverVersion.release = StringConverter::parseInt(tokens[2]);
             }
             mDriverVersion.build = 0;
+			
 			// Initialise GL after the first window has been created
 			// TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
             mRealCapabilities = createRenderSystemCapabilities();
