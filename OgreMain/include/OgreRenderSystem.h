@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreTextureUnitState.h"
 #include "OgreCommon.h"
 
+#include "OgreMaterialManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreRenderSystemCapabilities.h"
 #include "OgreRenderTarget.h"
@@ -1116,6 +1117,18 @@ namespace Ogre
 		/** Returns the driver version.
 		*/
 		virtual const DriverVersion& getDriverVersion(void) const { return mDriverVersion; }
+
+        /** Returns the default material scheme used by the render system.
+            Systems that use the RTSS to emulate a fixed function pipeline 
+            (e.g. OpenGL ES 2, DX11) need to override this function to return
+            the default material scheme of the RTSS ShaderGenerator.
+         
+            This is currently only used to set the default material scheme for
+            viewports.  It is a necessary step on these render systems for
+            render textures to be rendered into properly.
+		*/
+		virtual const String& _getDefaultViewportMaterialScheme(void) const 
+            { return MaterialManager::DEFAULT_SCHEME_NAME; }
 
 		/** Binds a given GpuProgram (but not the parameters). 
 		@remarks Only one GpuProgram of each type can be bound at once, binding another
