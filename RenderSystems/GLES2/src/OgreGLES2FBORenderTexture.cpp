@@ -89,11 +89,24 @@ namespace Ogre {
     static const GLenum stencilFormats[] =
     {
         GL_NONE,                    // No stencil
+#if GL_OES_stencil1
+        GL_STENCIL_INDEX1_OES,
+#endif
+#if GL_OES_stencil4
+        GL_STENCIL_INDEX4_OES,
+#endif
         GL_STENCIL_INDEX8
     };
     static const size_t stencilBits[] =
     {
-        0, 8
+        0,
+#if GL_OES_stencil1
+        1,
+#endif
+#if GL_OES_stencil4
+        4,
+#endif
+        8
     };
     #define STENCILFORMAT_COUNT (sizeof(stencilFormats)/sizeof(GLenum))
 
@@ -104,13 +117,25 @@ namespace Ogre {
 #if GL_OES_depth24
         , GL_DEPTH_COMPONENT24_OES   // Prefer 24 bit depth
 #endif
-#if GL_OES_packed_depth_stencil        
+#if GL_OES_depth32
+        , GL_DEPTH_COMPONENT32_OES
+#endif
+#if GL_OES_packed_depth_stencil
         , GL_DEPTH24_STENCIL8_OES    // Packed depth / stencil
 #endif
     };
     static const size_t depthBits[] =
     {
-        0,16,24,24
+        0,16
+#if GL_OES_depth24
+        ,24
+#endif
+#if GL_OES_depth32
+        ,32
+#endif
+#if GL_OES_packed_depth_stencil
+        ,24
+#endif
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
@@ -253,37 +278,26 @@ namespace Ogre {
 
             // Create and attach framebuffer
             glGenFramebuffers(1, &fb);
-            GL_CHECK_ERROR;
             glBindFramebuffer(GL_FRAMEBUFFER, fb);
-            GL_CHECK_ERROR;
             if (fmt!=GL_NONE)
             {
 				// Create and attach texture
 				glGenTextures(1, &tid);
-                GL_CHECK_ERROR;
 				glBindTexture(target, tid);
-                GL_CHECK_ERROR;
 				
                 // Set some default parameters
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                GL_CHECK_ERROR;
                             
 				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GL_UNSIGNED_BYTE, 0);
-                GL_CHECK_ERROR;
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                 target, tid, 0);
-                GL_CHECK_ERROR;
             }
 
             // Check status
             GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-            GL_CHECK_ERROR;
 
 			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
 			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
@@ -342,13 +356,10 @@ namespace Ogre {
 
             // Delete texture and framebuffer
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            GL_CHECK_ERROR;
             glDeleteFramebuffers(1, &fb);
-            GL_CHECK_ERROR;
 			
             if (fmt!=GL_NONE)
                 glDeleteTextures(1, &tid);
-            GL_CHECK_ERROR;
         }
 
 		String fmtstring;

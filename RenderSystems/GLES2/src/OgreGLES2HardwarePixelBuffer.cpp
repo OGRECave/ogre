@@ -94,14 +94,17 @@ namespace Ogre {
     PixelBox GLES2HardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
     {
         allocateBuffer();
-        if (options != HardwareBuffer::HBL_DISCARD &&
-            (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
+        if (options != HardwareBuffer::HBL_DISCARD
+#ifndef GL_NV_read_buffer
+            && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0
+#endif
+            )
         {
             // Download the old contents of the texture
             download(mBuffer);
         }
         mCurrentLockOptions = options;
-	mLockedBox = lockBox;
+        mLockedBox = lockBox;
         return mBuffer.getSubVolume(lockBox);
     }
 
@@ -149,21 +152,14 @@ namespace Ogre {
         }
         else
         {
+            allocateBuffer();
             scaled = src;
+
             if (src.format == PF_R8G8B8)
             {
                 scaled.format = PF_B8G8R8;
                 PixelUtil::bulkPixelConversion(src, scaled);
             }
-
-            // No scaling or conversion needed
-            // Set extents for upload
-            scaled.left = dstBox.left;
-            scaled.right = dstBox.right;
-            scaled.top = dstBox.top;
-            scaled.bottom = dstBox.bottom;
-            scaled.front = dstBox.front;
-            scaled.back = dstBox.back;
         }
 
         upload(scaled, dstBox);
@@ -411,9 +407,41 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::download(const PixelBox &data)
     {
+#ifndef GL_NV_get_tex_image
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
                     "Downloading texture buffers is not supported by OpenGL ES",
                     "GLES2TextureBuffer::download");
+#else
+        if(data.getWidth() != getWidth() ||
+            data.getHeight() != getHeight() ||
+            data.getDepth() != getDepth())
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "only download of entire buffer is supported by GL",
+                "GLTextureBuffer::download");
+        glBindTexture( mTarget, mTextureID );
+        if(PixelUtil::isCompressed(data.format))
+        {
+            if(data.format != mFormat || !data.isConsecutive())
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                "Compressed images must be consecutive, in the source format",
+                "GLTextureBuffer::download");
+            // Data must be consecutive and at beginning of buffer as PixelStorei not allowed
+            // for compressed formate
+            glGetCompressedTexImageNV(mFaceTarget, mLevel, data.data);
+        } 
+        else
+        {
+            if((data.getWidth()*PixelUtil::getNumElemBytes(data.format)) & 3) {
+                // Standard alignment of 4 is not right
+                glPixelStorei(GL_PACK_ALIGNMENT, 1);
+            }
+            // We can only get the entire texture
+            glGetTexImageNV(mFaceTarget, mLevel, 
+                GLES2PixelUtil::getGLOriginFormat(data.format), GLES2PixelUtil::getGLOriginDataType(data.format),
+                data.data);
+            // Restore defaults
+            glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        }
+#endif
     }
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
@@ -437,7 +465,7 @@ namespace Ogre {
     {
         GLES2TextureBuffer *srct = static_cast<GLES2TextureBuffer *>(src.getPointer());
         // TODO: Check for FBO support first
-        // Destination texture must be 2D
+        // Destination texture must be 2D or Cube
         // Source texture must be 2D
         if((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D))
         {
