@@ -204,9 +204,12 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Extended point parameters: "
 			+ StringConverter::toString(hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true));
-		pLog->logMessage(
-			" * Max Point Size: "
-			+ StringConverter::toString(mMaxPointSize));
+		if(hasCapability(RSC_POINT_SPRITES))
+		{
+			pLog->logMessage(
+				" * Max Point Size: "
+				+ StringConverter::toString(mMaxPointSize));
+		}
 		pLog->logMessage(
 			" * Vertex texture fetch: "
 			+ StringConverter::toString(hasCapability(RSC_VERTEX_TEXTURE_FETCH), true));
