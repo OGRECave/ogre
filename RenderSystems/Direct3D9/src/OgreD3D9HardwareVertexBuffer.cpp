@@ -429,8 +429,8 @@ namespace Ogre {
 
 		// Reset attributes.
 		bufferResources->mOutOfDate = false;
-		bufferResources->mLockOffset = mSizeInBytes;
-		bufferResources->mLockLength = 0;
+		bufferResources->mLockOffset = 0;
+		bufferResources->mLockLength = mSizeInBytes;
 		bufferResources->mLockOptions = HBL_NORMAL;
 
 	}
