@@ -148,7 +148,6 @@ namespace Ogre  {
                 return GL_UNSIGNED_SHORT_5_6_5;
             case PF_L16:
                 return GL_UNSIGNED_SHORT;
-
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
@@ -245,11 +244,13 @@ namespace Ogre  {
                 {
                     return GL_RGBA;
                 }
+            case PF_A4R4G4B4:
+                return GL_RGBA4;
+            case PF_A1R5G5B5:
+				return GL_RGB5_A1;
             case PF_A4L4:
             case PF_L16:
-            case PF_A4R4G4B4:
             case PF_R3G3B2:
-            case PF_A1R5G5B5:
             case PF_R5G6B5:
             case PF_B5G6R5:
             case PF_A2R10G10B10:
@@ -327,6 +328,16 @@ namespace Ogre  {
                 return PF_A8;
             case GL_LUMINANCE_ALPHA:
                 return PF_BYTE_LA;
+            case GL_RGB5_A1:
+                return PF_A1R5G5B5;
+            case GL_RGBA4:
+                return PF_A4R4G4B4;
+#if GL_OES_rgb8_rgba8
+            case GL_RGB8_OES:
+                return PF_X8R8G8B8;
+            case GL_RGBA8_OES:
+                return PF_A8R8G8B8;
+#endif
             case GL_RGB:
                 return PF_X8R8G8B8;
             case GL_RGBA:
