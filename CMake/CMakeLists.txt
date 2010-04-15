@@ -16,7 +16,7 @@
 if(WIN32 OR APPLE)
 	set(OGRE_CMAKE_DIR "CMake")
 else()
-	set(OGRE_CMAKE_DIR "lib/OGRE/cmake")
+	set(OGRE_CMAKE_DIR "${OGRE_LIB_DIRECTORY}/OGRE/cmake")
 endif()
 
 set(INST_FILES
