@@ -45,13 +45,14 @@ THE SOFTWARE.
 
 namespace Ogre {
 	AndroidWindow::AndroidWindow(AndroidGLSupport *glsupport)
-		: mGLSupport(glsupport), mClosed(false), mHandle(0)
+		: mGLSupport(glsupport), mClosed(false), mContext(0), mHandle(0), mDelegate(0)
 	{
 	}
 
 	AndroidWindow::~AndroidWindow()
 	{
-
+		if(mContext)
+			delete mContext;
 	}
 
 	void AndroidWindow::getCustomAttribute( const String& name, void* pData )
@@ -59,6 +60,12 @@ namespace Ogre {
 		if(name == "HANDLE")
 		{
 			*(int*)pData = mHandle;
+			return;
+		}
+		else if(name == "GLCONTEXT")
+		{
+			*static_cast<AndroidGLContext**>(pData) = mContext;
+            return;
 		}
 	}
 
@@ -75,32 +82,56 @@ namespace Ogre {
 
 	void AndroidWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
 	{
+		LogManager::getSingleton().logMessage("\tinitNativeCreatedWindow called");
 		if (miscParams)
 		{
 			NameValuePairList::const_iterator opt;
 			NameValuePairList::const_iterator end = miscParams->end();
 
+			opt = miscParams->find("externalWindowHandle");
+			if(opt != end)
+			{
+				mHandle = Ogre::StringConverter::parseInt(opt->second);
+			}
+			
+			int ctxHandle = -1;
+			opt = miscParams->find("externalGLContext");
+			if(opt != end)
+			{
+				ctxHandle = Ogre::StringConverter::parseInt(opt->second);
+			}
+			
+			if(ctxHandle != -1)
+			{
+				mContext = new AndroidGLContext(mGLSupport, ctxHandle);
+			}
+			else
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"externalGLContext parameter required for Android windows.",
+					"AndroidWindow::initNativeCreatedWindow" );
+			}
 		}
 	}
 
 	void AndroidWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
 	{
-		WindowEventUtilities::_addRenderWindow(this);
+		LogManager::getSingleton().logMessage("\tcreateNativeWindow called");
 	}
 
 	void AndroidWindow::reposition( int left, int top )
 	{
-		
+		LogManager::getSingleton().logMessage("\treposition called");
 	}
 
 	void AndroidWindow::resize(uint width, uint height)
 	{
-		
+		LogManager::getSingleton().logMessage("\tresize called");
 	}
 
 	void AndroidWindow::windowMovedOrResized()
 	{
-		
+		LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
 	}
 	
 	void AndroidWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
@@ -115,7 +146,7 @@ namespace Ogre {
 		
 	void AndroidWindow::destroy(void)
 	{
-	
+		LogManager::getSingleton().logMessage("\tdestroy called");
 	}
 		
 	bool AndroidWindow::isClosed(void) const
@@ -123,11 +154,12 @@ namespace Ogre {
 		return mClosed;
 	}
 
-	//Moved EGLWindow::create to native source because it has native calls in it
     void AndroidWindow::create(const String& name, uint width, uint height,
                            bool fullScreen, const NameValuePairList *miscParams)
     {
-        
+        LogManager::getSingleton().logMessage("\tcreate called");
+		
+		initNativeCreatedWindow(miscParams);
 	}
 
 
