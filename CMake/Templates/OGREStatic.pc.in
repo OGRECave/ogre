@@ -1,6 +1,6 @@
 prefix=@OGRE_PREFIX_PATH@
 exec_prefix=${prefix}
-libdir=${prefix}/lib
+libdir=${prefix}/@OGRE_LIB_DIRECTORY@
 includedir=${prefix}/include
 plugindir=${libdir}/OGRE
 
