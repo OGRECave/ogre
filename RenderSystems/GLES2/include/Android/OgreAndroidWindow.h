@@ -34,10 +34,18 @@ THE SOFTWARE.
 namespace Ogre {
 	class AndroidGLContext;
 	
+	class AndroidWindowDelegate
+	{
+	public:
+		
+	};
+	
     class _OgrePrivate AndroidWindow : public RenderWindow
     {
 	protected:
 		AndroidGLSupport* mGLSupport;
+		AndroidGLContext* mContext;
+		AndroidWindowDelegate *mDelegate;
 		bool mClosed;
 		int mHandle;
 
@@ -59,6 +67,7 @@ namespace Ogre {
 		@remarks
 		* Get custom attribute; the following attributes are valid:
 		* HANDLE        The integer id of the android window
+		* GLCONTEXT      The Ogre GLContext used for rendering.
 		*/
 		void getCustomAttribute(const String& name, void* pData);
 		
