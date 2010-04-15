@@ -40,12 +40,14 @@ namespace Ogre {
 	
 	void AndroidGLContext::setCurrent()
     {
-      
+		if(mDelegate)
+			mDelegate->setCurrent(mHandle);
     }
 
     void AndroidGLContext::endCurrent()
     {
-		
+		if(mDelegate)
+			mDelegate->endCurrent(mHandle);
     }
 
     GLES2Context* AndroidGLContext::clone() const

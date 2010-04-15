@@ -51,7 +51,7 @@ namespace Ogre {
 
     String AndroidGLSupport::getDisplayName(void)
     {
-		return "";
+		return "Android GLES2 Support";
 	}
 
 
@@ -64,6 +64,8 @@ namespace Ogre {
 											GLES2RenderSystem *renderSystem,
 											const String& windowTitle)
 	{
+		LogManager::getSingleton().logMessage("\tGLSupport createWindow called");
+		
 		RenderWindow *window = 0;
 
         if (autoCreateWindow)
@@ -91,6 +93,8 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
+		LogManager::getSingleton().logMessage("\tGLSupport newWindow called");
+		
 		AndroidWindow* window = new AndroidWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
@@ -99,16 +103,18 @@ namespace Ogre {
 	
 	void AndroidGLSupport::start(void)
 	{
-	
+		LogManager::getSingleton().logMessage("\tGLSupport start called");
 	}
     
 	void AndroidGLSupport::stop(void)
 	{
-	
+		LogManager::getSingleton().logMessage("\tGLSupport stop called");
 	}
     
 	void AndroidGLSupport::addConfig(void)
 	{
+		LogManager::getSingleton().logMessage("\tGLSupport addConfig called");
+		
 		// Currently no config options supported
 		refreshConfig();
 	}
