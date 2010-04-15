@@ -108,38 +108,35 @@ namespace Ogre {
         size_t length, LockOptions options)
     {		
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+		
+		DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
 
-		if (options != HBL_READ_ONLY)
+		while (it != mMapDeviceToBufferResources.end())
 		{
-			DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
+			BufferResources* bufferResources = it->second;
 
-			while (it != mMapDeviceToBufferResources.end())
-			{
-				BufferResources* bufferResources = it->second;
-
+			if (options != HBL_READ_ONLY)
 				bufferResources->mOutOfDate = true;
 
-				if(bufferResources->mLockLength > 0)
-				{
-					size_t highPoint = std::max( offset + length, 
-						bufferResources->mLockOffset + bufferResources->mLockLength );
-					bufferResources->mLockOffset = std::min( bufferResources->mLockOffset, offset );
-					bufferResources->mLockLength = highPoint - bufferResources->mLockOffset;
-				}
-				else
-				{
-					if (offset < bufferResources->mLockOffset)
-						bufferResources->mLockOffset = offset;
-					if (length > bufferResources->mLockLength)
-						bufferResources->mLockLength = length;
-				}
-			
-				if (bufferResources->mLockOptions != HBL_DISCARD)
-					bufferResources->mLockOptions = options;
-
-				++it;
+			if(bufferResources->mLockLength > 0)
+			{
+				size_t highPoint = std::max( offset + length, 
+					bufferResources->mLockOffset + bufferResources->mLockLength );
+				bufferResources->mLockOffset = std::min( bufferResources->mLockOffset, offset );
+				bufferResources->mLockLength = highPoint - bufferResources->mLockOffset;
 			}
-		}
+			else
+			{
+				if (offset < bufferResources->mLockOffset)
+					bufferResources->mLockOffset = offset;
+				if (length > bufferResources->mLockLength)
+					bufferResources->mLockLength = length;
+			}
+					
+			bufferResources->mLockOptions = options;
+		
+			++it;
+		}		
 
 		// Case we use system memory buffer -> just return it
 		if (mSystemMemoryBuffer != NULL)
@@ -150,7 +147,7 @@ namespace Ogre {
 		else
 		{
 			// Lock the source buffer.
-			mSourceLockedBytes = _lockBuffer(mSourceBuffer, offset, length);
+			mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
 
 			return mSourceLockedBytes;		
 		}		
