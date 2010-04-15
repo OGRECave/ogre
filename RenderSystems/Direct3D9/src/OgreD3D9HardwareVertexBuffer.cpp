@@ -119,21 +119,24 @@ namespace Ogre {
 			if (options != HBL_READ_ONLY)
 				bufferResources->mOutOfDate = true;
 
-			if(bufferResources->mLockLength > 0)
-			{
-				size_t highPoint = std::max( offset + length, 
-					bufferResources->mLockOffset + bufferResources->mLockLength );
-				bufferResources->mLockOffset = std::min( bufferResources->mLockOffset, offset );
-				bufferResources->mLockLength = highPoint - bufferResources->mLockOffset;
-			}
-			else
+			// Case it is the first buffer lock in this frame.
+			if (bufferResources->mLockLength == 0)
 			{
 				if (offset < bufferResources->mLockOffset)
 					bufferResources->mLockOffset = offset;
 				if (length > bufferResources->mLockLength)
 					bufferResources->mLockLength = length;
 			}
-						
+
+			// Case buffer already locked in this frame.
+			else
+			{
+				size_t highPoint = std::max( offset + length, 
+					bufferResources->mLockOffset + bufferResources->mLockLength );
+				bufferResources->mLockOffset = std::min( bufferResources->mLockOffset, offset );
+				bufferResources->mLockLength = highPoint - bufferResources->mLockOffset;
+			}
+								
 			bufferResources->mLockOptions = options;					
 
 			++it;
@@ -429,8 +432,8 @@ namespace Ogre {
 
 		// Reset attributes.
 		bufferResources->mOutOfDate = false;
-		bufferResources->mLockOffset = 0;
-		bufferResources->mLockLength = mSizeInBytes;
+		bufferResources->mLockOffset = mSizeInBytes;
+		bufferResources->mLockLength = 0;
 		bufferResources->mLockOptions = HBL_NORMAL;
 
 	}
