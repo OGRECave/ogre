@@ -151,7 +151,7 @@ namespace Ogre {
 		else
 		{
 			// Lock the source buffer.
-			mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
+			mSourceLockedBytes = _lockBuffer(mSourceBuffer, offset, length);
 
 			return mSourceLockedBytes;		
 		}		
