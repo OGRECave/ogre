@@ -73,9 +73,7 @@ class _OgreSampleClassExport PlayPen_testManualLOD : public PlayPenBase
 {
 public:
 	PlayPen_testManualLOD();
-	bool frameStarted(const Ogre::FrameEvent& evt);
 protected:
-	AnimationState* mAnimState;
 	void setupContent();
 	String getLODMesh();
 };
@@ -107,6 +105,14 @@ protected:
 
 };
 
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testMorphAnimation : public PlayPenBase
+{
+public:
+	PlayPen_testMorphAnimation();
+protected:
+	void setupContent();
+};
 
 
 

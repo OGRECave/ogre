@@ -236,9 +236,9 @@ void PlayPen_testManualLOD::setupContent()
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(
 			Vector3(0,0,(i*50)-(5*50/2)))->attachObject(ent);
 	}
-	mAnimState = ent->getAnimationState("Walk");
-	mAnimState->setEnabled(true);
-
+	AnimationState* anim = ent->getAnimationState("Walk");
+	anim->setEnabled(true);
+	mAnimStateList.push_back(anim);
 
 
 	// Give it a little ambience with lights
@@ -257,13 +257,6 @@ void PlayPen_testManualLOD::setupContent()
 
 	mSceneMgr->setAmbientLight(ColourValue::White);
 
-}
-//---------------------------------------------------------------------
-bool PlayPen_testManualLOD::frameStarted(const Ogre::FrameEvent& evt)
-{
-	mAnimState->addTime(evt.timeSinceLastFrame);
-
-	return PlayPenBase::frameStarted(evt);
 }
 //---------------------------------------------------------------------
 PlayPen_testManualLODFromFile::PlayPen_testManualLODFromFile()
@@ -336,6 +329,132 @@ void PlayPen_testFullScreenSwitch::buttonHit(OgreBites::Button* button)
 	else if (button == m1024x768fs)
 		mWindow->setFullscreen(true, 1024, 768);
 }
+//---------------------------------------------------------------------
+PlayPen_testMorphAnimation::PlayPen_testMorphAnimation()
+{
+	mInfo["Title"] = "PlayPen: Test morph animation";
+	mInfo["Description"] = "Testing morph animation";
+}
+//---------------------------------------------------------------------
+void PlayPen_testMorphAnimation::setupContent()
+{
+	bool testStencil = true;
 
+	if (testStencil)
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
+
+	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+	Vector3 dir(-1, -1, 0.5);
+	dir.normalise();
+	Light* l = mSceneMgr->createLight("light1");
+	l->setType(Light::LT_DIRECTIONAL);
+	l->setDirection(dir);
+
+	
+	MeshPtr mesh = MeshManager::getSingleton().load("sphere.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	
+	String morphName = "testmorph.mesh";
+	mesh = mesh->clone(morphName);
+
+	SubMesh* sm = mesh->getSubMesh(0);
+	// Re-organise geometry since this mesh has no animation and all 
+	// vertex elements are packed into one buffer
+	VertexDeclaration* newDecl = 
+		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true);
+	sm->vertexData->reorganiseBuffers(newDecl);
+	if (testStencil)
+		sm->vertexData->prepareForShadowVolume(); // need to re-prep since reorganised
+	// get the position buffer (which should now be separate);
+	const VertexElement* posElem = 
+		sm->vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+	HardwareVertexBufferSharedPtr origbuf = 
+		sm->vertexData->vertexBufferBinding->getBuffer(
+			posElem->getSource());
+
+	// Create a new position buffer with updated values
+	HardwareVertexBufferSharedPtr newbuf = 
+		HardwareBufferManager::getSingleton().createVertexBuffer(
+			VertexElement::getTypeSize(VET_FLOAT3),
+			sm->vertexData->vertexCount, 
+			HardwareBuffer::HBU_STATIC, true);
+	float* pSrc = static_cast<float*>(origbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+	float* pDst = static_cast<float*>(newbuf->lock(HardwareBuffer::HBL_DISCARD));
+
+	// Make the sphere turn into a cube
+	// Do this just by clamping each of the directions (we shrink it)
+	float cubeDimension = 0.3f * mesh->getBoundingSphereRadius();
+	for (size_t v = 0; v < sm->vertexData->vertexCount; ++v)
+	{
+		// x/y/x
+		for (int d = 0; d < 3; ++d)
+		{
+			if (*pSrc >= 0)
+			{
+				*pDst++ = std::min(cubeDimension, *pSrc++);
+			}
+			else 
+			{
+				*pDst++ = std::max(-cubeDimension, *pSrc++);			
+			}
+		}
+	}
+
+	origbuf->unlock();
+	newbuf->unlock();
+	
+	// create a morph animation
+	Animation* anim = mesh->createAnimation("testAnim", 10.0f);
+	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_MORPH);
+	// re-use start positions for frame 0
+	VertexMorphKeyFrame* kf = vt->createVertexMorphKeyFrame(0);
+	kf->setVertexBuffer(origbuf);
+
+	// Use translated buffer for mid frame
+	kf = vt->createVertexMorphKeyFrame(4.0f);
+	kf->setVertexBuffer(newbuf);
+
+	// Pause there
+	kf = vt->createVertexMorphKeyFrame(6.0f);
+	kf->setVertexBuffer(newbuf);
+	
+	// re-use start positions for final frame
+	kf = vt->createVertexMorphKeyFrame(10.0f);
+	kf->setVertexBuffer(origbuf);
+	
+
+	Entity* e = mSceneMgr->createEntity("test", morphName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+	AnimationState* animState = e->getAnimationState("testAnim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+
+	e = mSceneMgr->createEntity("test2", morphName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,0,0))->attachObject(e);
+	// test hardware morph
+	e->setMaterialName("Examples/HardwareMorphAnimation");
+	animState = e->getAnimationState("testAnim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+
+	mCamera->setNearClipDistance(0.5);
+	mCamera->setPosition(0,100,-400);
+	mCamera->lookAt(Vector3::ZERO);
+	//mSceneMgr->setShowDebugShadows(true);
+
+	Plane plane;
+	plane.normal = Vector3::UNIT_Y;
+	plane.d = 200;
+	MeshManager::getSingleton().createPlane("Myplane",
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
+	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt->setMaterialName("2 - Default");
+	pPlaneEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+	
+}
 
 

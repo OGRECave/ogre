@@ -28,6 +28,11 @@ public:
 
 	PlayPenBase();
 	void unloadResources();
+	bool frameStarted(const Ogre::FrameEvent& evt);
+	
+protected:
+	typedef list<AnimationState*>::type AnimationStateList;
+	AnimationStateList mAnimStateList;
 
 };
 
