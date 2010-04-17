@@ -56,7 +56,7 @@ namespace Ogre {
     public:
         /** Default constructor - should never get called by a client app.
         */
-        ArchiveManager() {}
+        ArchiveManager();
         /** Default destructor.
         */
         virtual ~ArchiveManager();

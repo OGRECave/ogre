@@ -46,30 +46,30 @@ void UseCustomCapabilitiesTests::setUp()
 
 	// set up silent logging to not polute output
 	if(LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	
 	// write cleanup to log
 	if(LogManager::getSingletonPtr() == 0)
 	{
-		LogManager* logManager = new LogManager();
+		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesSetUp.log", true, false);
 	}
 
 	
 	if(Ogre::HighLevelGpuProgramManager::getSingletonPtr())
-		delete Ogre::HighLevelGpuProgramManager::getSingletonPtr();
+		OGRE_DELETE Ogre::HighLevelGpuProgramManager::getSingletonPtr();
 	if(Ogre::GpuProgramManager::getSingletonPtr())
-		delete Ogre::GpuProgramManager::getSingletonPtr();
+		OGRE_DELETE Ogre::GpuProgramManager::getSingletonPtr();
 	if(Ogre::CompositorManager::getSingletonPtr())
-		delete Ogre::CompositorManager::getSingletonPtr();
+		OGRE_DELETE Ogre::CompositorManager::getSingletonPtr();
 	if(Ogre::MaterialManager::getSingletonPtr())
-		delete Ogre::MaterialManager::getSingletonPtr();
+		OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
 	if(Ogre::ResourceGroupManager::getSingletonPtr())
-		delete Ogre::ResourceGroupManager::getSingletonPtr();
+		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
 	// set up silent logging to not polute output
 	if(LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 }
 
 void UseCustomCapabilitiesTests::tearDown()
@@ -77,7 +77,7 @@ void UseCustomCapabilitiesTests::tearDown()
 	using namespace Ogre;
 	// set up silent logging to not polute output
 	if(LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
 }
 
@@ -186,15 +186,15 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 
 	// set up silent logging to not polute output
 	if(LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	
 	if(LogManager::getSingletonPtr() == 0)
 	{
-		LogManager* logManager = new LogManager();
+		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
 	}
 
-	Root* root = new Root("plugins.cfg");
+	Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -217,7 +217,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		{
 		}
 	}
-    delete root;
+    OGRE_DELETE root;
 }
 
 void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
@@ -241,15 +241,15 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 {
 	// set up silent logging to not polute output
 	if(LogManager::getSingletonPtr())
-		delete Ogre::LogManager::getSingletonPtr();
+		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	
 	if(LogManager::getSingletonPtr() == 0)
 	{
-		LogManager* logManager = new LogManager();
+		LogManager* logManager = OGRE_NEW LogManager();
 		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
 	}
 
-    Root* root = new Root("plugins.cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -273,7 +273,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		}
 	}
 
-    delete root;
+    OGRE_DELETE root;
 }
 
 

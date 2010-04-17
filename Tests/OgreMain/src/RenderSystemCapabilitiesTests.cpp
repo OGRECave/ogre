@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreRenderSystemCapabilitiesManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
+#include "OgreArchiveManager.h"
 
 #include <fstream>
 #include <algorithm>
@@ -44,21 +45,21 @@ void RenderSystemCapabilitiesTests::setUp()
     using namespace Ogre;
 
     // we need to be able to create FileSystem archives to load .rendercaps
-    mFileSystemArchiveFactory = new FileSystemArchiveFactory();
+    mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
 
-    mArchiveManager = new ArchiveManager();
+    mArchiveManager = OGRE_NEW ArchiveManager();
     ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );
 
-    mRenderSystemCapabilitiesManager = new RenderSystemCapabilitiesManager();
+    mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
     // actual parsing happens here. test methods confirm parse results only
     mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../../../Media/CustomCapabilities", "FileSystem", true);
 }
 
 void RenderSystemCapabilitiesTests::tearDown()
 {
-    delete mRenderSystemCapabilitiesManager;
-    delete mArchiveManager;
-    delete mFileSystemArchiveFactory;
+    OGRE_DELETE mRenderSystemCapabilitiesManager;
+    OGRE_DELETE mArchiveManager;
+    OGRE_DELETE mFileSystemArchiveFactory;
 
 }
 

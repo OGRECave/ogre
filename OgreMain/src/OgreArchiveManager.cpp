@@ -48,7 +48,9 @@ namespace Ogre {
         assert( ms_Singleton );  return ( *ms_Singleton );  
     }
     //-----------------------------------------------------------------------
-
+	ArchiveManager::ArchiveManager()
+	{
+	}
     //-----------------------------------------------------------------------
     Archive* ArchiveManager::load( const String& filename, const String& archiveType)
     {
