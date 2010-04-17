@@ -29,7 +29,9 @@ THE SOFTWARE.
 #include "Ogre.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
+#include "OgreArchiveManager.h"
 #include "MeshWithoutIndexDataTests.h"
+
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
@@ -37,36 +39,36 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MeshWithoutIndexDataTests );
 void MeshWithoutIndexDataTests::setUp()
 {
 	LogManager::getSingleton().createLog("MeshWithoutIndexDataTests.log", true);
-	new ResourceGroupManager();
-	new LodStrategyManager();
-    mBufMgr = new DefaultHardwareBufferManager();
-    mMeshMgr = new MeshManager();
-    archiveMgr = new ArchiveManager();
-    archiveMgr->addArchiveFactory(new FileSystemArchiveFactory());
+	OGRE_NEW ResourceGroupManager();
+	OGRE_NEW LodStrategyManager();
+    mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
+    mMeshMgr = OGRE_NEW MeshManager();
+    archiveMgr = OGRE_NEW ArchiveManager();
+    archiveMgr->addArchiveFactory(OGRE_NEW FileSystemArchiveFactory());
 
-	MaterialManager* matMgr = new MaterialManager();
+	MaterialManager* matMgr = OGRE_NEW MaterialManager();
 	matMgr->initialise();
 }
 void MeshWithoutIndexDataTests::tearDown()
 {
-    delete mMeshMgr;
-    delete mBufMgr;
-    delete archiveMgr;
-	delete MaterialManager::getSingletonPtr();
-	delete LodStrategyManager::getSingletonPtr();
-	delete ResourceGroupManager::getSingletonPtr();
+    OGRE_DELETE mMeshMgr;
+    OGRE_DELETE mBufMgr;
+    OGRE_DELETE archiveMgr;
+	OGRE_DELETE MaterialManager::getSingletonPtr();
+	OGRE_DELETE LodStrategyManager::getSingletonPtr();
+	OGRE_DELETE ResourceGroupManager::getSingletonPtr();
 }
 
 void MeshWithoutIndexDataTests::testCreateSimpleLine()
 {
-    ManualObject* line = new ManualObject("line");
+    ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     line->position(0, 50, 0);
     line->position(50, 100, 0);
     line->end();
     String fileName = "line.mesh";
     MeshPtr lineMesh = line->convertToMesh(fileName);
-    delete line;
+    OGRE_DELETE line;
 
     CPPUNIT_ASSERT(lineMesh->getNumSubMeshes() == 1);
     CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
@@ -96,7 +98,7 @@ void MeshWithoutIndexDataTests::testCreateSimpleLine()
 
 void MeshWithoutIndexDataTests::testCreateLineList()
 {
-    ManualObject* lineList = new ManualObject("line");
+    ManualObject* lineList = OGRE_NEW ManualObject("line");
     lineList->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     lineList->position(0, 50, 0);
     lineList->position(50, 100, 0);
@@ -107,7 +109,7 @@ void MeshWithoutIndexDataTests::testCreateLineList()
     lineList->end();
     String fileName = "lineList.mesh";
     MeshPtr lineListMesh = lineList->convertToMesh(fileName);
-    delete lineList;
+    OGRE_DELETE lineList;
 
     CPPUNIT_ASSERT(lineListMesh->getNumSubMeshes() == 1);
     CPPUNIT_ASSERT(lineListMesh->getSubMesh(0)->indexData->indexCount == 0);
@@ -137,7 +139,7 @@ void MeshWithoutIndexDataTests::testCreateLineList()
 
 void MeshWithoutIndexDataTests::testCreateLineStrip()
 {
-    ManualObject* lineStrip = new ManualObject("line");
+    ManualObject* lineStrip = OGRE_NEW ManualObject("line");
     lineStrip->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_STRIP);
     lineStrip->position(50, 100, 0);
     lineStrip->position(0, 50, 0);
@@ -146,7 +148,7 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
     lineStrip->end();
     String fileName = "lineStrip.mesh";
     MeshPtr lineStripMesh = lineStrip->convertToMesh(fileName);
-    delete lineStrip;
+    OGRE_DELETE lineStrip;
 
     CPPUNIT_ASSERT(lineStripMesh->getNumSubMeshes() == 1);
     CPPUNIT_ASSERT(lineStripMesh->getSubMesh(0)->indexData->indexCount == 0);
@@ -176,7 +178,7 @@ void MeshWithoutIndexDataTests::testCreateLineStrip()
 
 void MeshWithoutIndexDataTests::testCreatePointList()
 {
-    ManualObject* pointList = new ManualObject("line");
+    ManualObject* pointList = OGRE_NEW ManualObject("line");
     pointList->begin("BaseWhiteNoLighting", RenderOperation::OT_POINT_LIST);
     pointList->position(50, 100, 0);
     pointList->position(0, 50, 0);
@@ -185,7 +187,7 @@ void MeshWithoutIndexDataTests::testCreatePointList()
     pointList->end();
     String fileName = "pointList.mesh";
     MeshPtr pointListMesh = pointList->convertToMesh(fileName);
-    delete pointList;
+    OGRE_DELETE pointList;
 
     CPPUNIT_ASSERT(pointListMesh->getNumSubMeshes() == 1);
     CPPUNIT_ASSERT(pointListMesh->getSubMesh(0)->indexData->indexCount == 0);
@@ -220,14 +222,14 @@ void MeshWithoutIndexDataTests::testCreateLineWithMaterial()
     Pass* pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(1.0, 0.1, 0.1, 0);
 
-    ManualObject* line = new ManualObject("line");
+    ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin(matName, RenderOperation::OT_LINE_LIST);
     line->position(0, 50, 0);
     line->position(50, 100, 0);
     line->end();
     String fileName = "lineWithMat.mesh";
     MeshPtr lineMesh = line->convertToMesh(fileName);
-    delete line;
+    OGRE_DELETE line;
 
     CPPUNIT_ASSERT(lineMesh->getNumSubMeshes() == 1);
     CPPUNIT_ASSERT(lineMesh->getSubMesh(0)->indexData->indexCount == 0);
@@ -288,7 +290,7 @@ void createMeshWithMaterial(String fileName)
     pass = matPtr->getTechnique(0)->getPass(0);
     pass->setDiffuse(1.0, 1.0, 0.1, 0);
 
-    ManualObject* manObj = new ManualObject("mesh");
+    ManualObject* manObj = OGRE_NEW ManualObject("mesh");
     manObj->begin(matName1, RenderOperation::OT_TRIANGLE_LIST);
     manObj->position(0, 50, 0);
     manObj->position(50, 50, 0);
@@ -318,7 +320,7 @@ void createMeshWithMaterial(String fileName)
     manObj->position(0, 0, 0);
     manObj->end();
     manObj->convertToMesh(fileName);
-    delete manObj;
+    OGRE_DELETE manObj;
 
 }
 
@@ -380,13 +382,13 @@ void MeshWithoutIndexDataTests::testCloneMesh()
 void MeshWithoutIndexDataTests::testEdgeList()
 {
     String fileName = "testEdgeList.mesh";
-    ManualObject* line = new ManualObject("line");
+    ManualObject* line = OGRE_NEW ManualObject("line");
     line->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
     line->position(0, 50, 0);
     line->position(50, 100, 0);
     line->end();
     MeshPtr mesh = line->convertToMesh(fileName);
-    delete line;
+    OGRE_DELETE line;
 
     // whole mesh must not contain index data, for this test
     CPPUNIT_ASSERT(mesh->getNumSubMeshes() == 1);
