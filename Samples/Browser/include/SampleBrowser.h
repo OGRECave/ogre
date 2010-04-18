@@ -43,6 +43,7 @@
 #include "CameraTrack.h"
 #include "CelShading.h"
 #include "CharacterSample.h"
+#include "Compositor.h"
 #include "CubeMapping.h"
 #include "Dot3Bump.h"
 #include "DynTex.h"
@@ -909,7 +910,8 @@ protected:
             mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
-            mPluginNameMap["Sample_Character"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
+            mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
+            mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
             mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
             mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
