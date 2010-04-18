@@ -112,7 +112,7 @@ namespace Ogre {
 			Body is not checked for correctness.
 			*/
 			void buildAndIncludeDirection(const ConvexBody& body, 
-				const AxisAlignedBox& aabMax, const Vector3& dir);
+				Real extrudeDist, const Vector3& dir);
 
 			/** Returns the bounding box representation.
 			*/
@@ -180,10 +180,11 @@ namespace Ogre {
 		@param cam: currently active camera
 		@param light: currently active light
 		@param sceneBB: scene bounding box for clipping operations
+		@param receiverAABB: bounding information for just the receivers
 		@param out_bodyB: final intersection bodyB point list
 		*/
 		void calculateB(const SceneManager& sm, const Camera& cam, const Light& light, 
-			const AxisAlignedBox& sceneBB, PointListBody *out_bodyB) const;
+			const AxisAlignedBox& sceneBB, const AxisAlignedBox& receiverBB, PointListBody *out_bodyB) const;
 
 		/** Calculates the bodyLVS.
 		@remarks

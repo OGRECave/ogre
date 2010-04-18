@@ -195,7 +195,8 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void FocusedShadowCameraSetup::calculateB(const SceneManager& sm, const Camera& cam, 
-		const Light& light, const AxisAlignedBox& sceneBB, PointListBody *out_bodyB) const
+		const Light& light, const AxisAlignedBox& sceneBB, const AxisAlignedBox& receiverBB, 
+		PointListBody *out_bodyB) const
 	{
 		OgreAssert(out_bodyB != NULL, "bodyB vertex list is NULL");
 
@@ -249,8 +250,9 @@ namespace Ogre
 		}
 		else
 		{
-			// clip bodyB with sceneBB
-			mBodyB.clip(sceneBB);
+			// For directional lights, all we care about is projecting the receivers
+			// backwards towards the light, clipped by the camera region
+			mBodyB.clip(receiverBB);
 
 			// Also clip based on shadow far distance if appropriate
 			Real farDist = light.getShadowFarDistance();
@@ -264,9 +266,9 @@ namespace Ogre
 
 			// Extrude the intersection bodyB into the inverted light direction and store 
 			// the info in the point list.
-			// The sceneBB holds the maximum extent of the extrusion.
+			// Maximum extrusion extent is to the shadow far distance
 			out_bodyB->buildAndIncludeDirection(mBodyB, 
-				sceneBB, 
+				farDist ? farDist : cam.getNearClipDistance() * 3000, 
 				-light.getDerivedDirection());
 		}
 	}
@@ -426,7 +428,8 @@ namespace Ogre
 		// build scene bounding box
 		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
 		AxisAlignedBox sceneBB = visInfo.aabb;
-		sceneBB.merge(sm->getVisibleObjectsBoundsInfo(cam).receiverAabb);
+		AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
+		sceneBB.merge(receiverAABB);
 		sceneBB.merge(cam->getDerivedPosition());
 
 		// in case the sceneBB is empty (e.g. nothing visible to the cam) simply
@@ -440,7 +443,7 @@ namespace Ogre
 
 		// calculate the intersection body B
 		mPointListBodyB.reset();
-		calculateB(*sm, *cam, *light, sceneBB, &mPointListBodyB);
+		calculateB(*sm, *cam, *light, sceneBB, receiverAABB, &mPointListBodyB);
 
 		// in case the bodyB is empty (e.g. nothing visible to the light or the cam)
 		// simply return the standard shadow mapping matrix
@@ -562,34 +565,13 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void FocusedShadowCameraSetup::PointListBody::buildAndIncludeDirection(
-		const ConvexBody& body, const AxisAlignedBox& aabMax, const Vector3& dir)
+		const ConvexBody& body, Real extrudeDist, const Vector3& dir)
 	{
 		// reset point list
 		this->reset();
 
 		// intersect the rays formed by the points in the list with the given direction and
 		// insert them into the list
-
-		// min/max aab points for comparison
-		const Vector3& min = aabMax.getMinimum();
-		const Vector3& max = aabMax.getMaximum();
-
-		// assemble the clipping planes
-		Plane pl[6];
-
-		// front
-		pl[0].redefine(Vector3::UNIT_Z, max);
-		// back
-		pl[1].redefine(Vector3::NEGATIVE_UNIT_Z, min);
-		// left
-		pl[2].redefine(Vector3::NEGATIVE_UNIT_X, min);
-		// right
-		pl[3].redefine(Vector3::UNIT_X, max);
-		// bottom
-		pl[4].redefine(Vector3::NEGATIVE_UNIT_Y, min);
-		// top
-		pl[5].redefine(Vector3::UNIT_Y, max);
-
 
 		const size_t polyCount = body.getPolygonCount();
 		for (size_t iPoly = 0; iPoly < polyCount; ++iPoly)
@@ -614,34 +596,8 @@ namespace Ogre
 				// intersection ray
 				Ray ray(pt, dir);
 
-				// intersect with each plane
-				for (size_t iPlane = 0; iPlane < 6; ++iPlane)
-				{
-					std::pair< bool, Real > intersect = ray.intersects(pl[ iPlane ]);
-
-					const Vector3 ptIntersect = ray.getPoint(intersect.second);
-
-					// intersection point must exist (first) and the point distance must be greater than null (second)
-					// in case of distance null the intersection point equals the base point
-					if (intersect.first && intersect.second > 0)
-					{
-						if (ptIntersect.x < max.x + 1e-3f && ptIntersect.x > min.x - 1e-3f && 
-							ptIntersect.y < max.y + 1e-3f && ptIntersect.y > min.y - 1e-3f && 
-							ptIntersect.z < max.z + 1e-3f && ptIntersect.z > min.z - 1e-3f)
-						{
-							// in case the point lies on the boundary, continue and see if there is another plane that intersects
-							if (pt.positionEquals(ptIntersect))
-							{
-								continue;
-							}
-
-							// add intersection point
-							this->addPoint(ptIntersect);
-						}
-
-					} // if: intersection available
-
-				} // for: plane intersection
+				const Vector3 ptIntersect = ray.getPoint(extrudeDist);
+				this->addPoint(ptIntersect);
 
 			} // for: polygon point iteration
 
