@@ -378,7 +378,9 @@ protected:
         //mSceneMgr->setShowDebugShadows(true);
 
 		setupGUI();
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 		setDragLook(true);
+#endif
     }
 
 	virtual void setupView()
