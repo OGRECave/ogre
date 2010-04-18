@@ -252,7 +252,8 @@ namespace Ogre
 		// build scene bounding box
 		const VisibleObjectsBoundsInfo& visInfo = sm->getVisibleObjectsBoundsInfo(texCam);
 		AxisAlignedBox sceneBB = visInfo.aabb;
-		sceneBB.merge(sm->getVisibleObjectsBoundsInfo(cam).receiverAabb);
+		AxisAlignedBox receiverAABB = sm->getVisibleObjectsBoundsInfo(cam).receiverAabb;
+		sceneBB.merge(receiverAABB);
 		sceneBB.merge(cam->getDerivedPosition());
 
 		// in case the sceneBB is empty (e.g. nothing visible to the cam) simply
@@ -266,7 +267,7 @@ namespace Ogre
 
 		// calculate the intersection body B
 		mPointListBodyB.reset();
-		calculateB(*sm, *cam, *light, sceneBB, &mPointListBodyB);
+		calculateB(*sm, *cam, *light, sceneBB, receiverAABB, &mPointListBodyB);
 
 		// in case the bodyB is empty (e.g. nothing visible to the light or the cam)
 		// simply return the standard shadow mapping matrix
