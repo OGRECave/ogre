@@ -43,9 +43,7 @@ namespace Ogre
 	const String sPluginName = "Octree Zone Factory";
 	//---------------------------------------------------------------------
 	OctreeZonePlugin::OctreeZonePlugin()
-		:mOctreeZoneFactory(0),
-		 mTerrainZoneFactory(0),
-		 mTerrainZonePSListenerManager(0)
+		:mOctreeZoneFactory(0)
 	{
 
 	}
@@ -59,8 +57,6 @@ namespace Ogre
 	{
 		// Create objects
 		mOctreeZoneFactory = OGRE_NEW OctreeZoneFactory();
-		mTerrainZoneFactory = OGRE_NEW TerrainZoneFactory();
-		mTerrainZonePSListenerManager = OGRE_NEW TerrainZonePageSourceListenerManager();
 
 	}
 	//---------------------------------------------------------------------
@@ -69,7 +65,6 @@ namespace Ogre
 		// Register
 		PCZoneFactoryManager & pczfm = PCZoneFactoryManager::getSingleton();
 		pczfm.registerPCZoneFactory(mOctreeZoneFactory);
-		pczfm.registerPCZoneFactory(mTerrainZoneFactory);
 	}
 	//---------------------------------------------------------------------
 	void OctreeZonePlugin::shutdown()
@@ -77,16 +72,11 @@ namespace Ogre
 		// Unregister
 		PCZoneFactoryManager & pczfm = PCZoneFactoryManager::getSingleton();
 		pczfm.unregisterPCZoneFactory(mOctreeZoneFactory);
-		pczfm.unregisterPCZoneFactory(mTerrainZoneFactory);
 	}
 	//---------------------------------------------------------------------
 	void OctreeZonePlugin::uninstall()
 	{
 		// destroy 
-		OGRE_DELETE mTerrainZonePSListenerManager;
-		mTerrainZonePSListenerManager = 0;
-		OGRE_DELETE mTerrainZoneFactory;
-		mTerrainZoneFactory = 0;
 		OGRE_DELETE mOctreeZoneFactory;
 		mOctreeZoneFactory = 0;
 	}
