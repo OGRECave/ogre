@@ -31,10 +31,10 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	const String sPluginName = "Octree & Terrain Scene Manager";
+	const String sPluginName = "Octree Scene Manager";
 	//---------------------------------------------------------------------
 	OctreePlugin::OctreePlugin()
-		:mOctreeSMFactory(0), mTerrainSMFactory(0), mTerrainPSListenerManager(0)
+		:mOctreeSMFactory(0)
 	{
 
 	}
@@ -48,8 +48,6 @@ namespace Ogre
 	{
 		// Create objects
 		mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
-		mTerrainSMFactory = OGRE_NEW TerrainSceneManagerFactory();
-		mTerrainPSListenerManager = OGRE_NEW TerrainPageSourceListenerManager();
 
 	}
 	//---------------------------------------------------------------------
@@ -57,23 +55,17 @@ namespace Ogre
 	{
 		// Register
 		Root::getSingleton().addSceneManagerFactory(mOctreeSMFactory);
-		Root::getSingleton().addSceneManagerFactory(mTerrainSMFactory);
 	}
 	//---------------------------------------------------------------------
 	void OctreePlugin::shutdown()
 	{
 		// Unregister
-		Root::getSingleton().removeSceneManagerFactory(mTerrainSMFactory);
 		Root::getSingleton().removeSceneManagerFactory(mOctreeSMFactory);
 	}
 	//---------------------------------------------------------------------
 	void OctreePlugin::uninstall()
 	{
 		// destroy 
-		OGRE_DELETE mTerrainPSListenerManager;
-		mTerrainPSListenerManager = 0;
-		OGRE_DELETE mTerrainSMFactory;
-		mTerrainSMFactory = 0;
 		OGRE_DELETE mOctreeSMFactory;
 		mOctreeSMFactory = 0;
 

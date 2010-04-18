@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePlugin.h"
 #include "OgreOctreeSceneManager.h"
-#include "OgreTerrainSceneManager.h"
 
 namespace Ogre
 {
@@ -58,8 +57,6 @@ namespace Ogre
 		void uninstall();
 	protected:
 		OctreeSceneManagerFactory* mOctreeSMFactory;
-		TerrainSceneManagerFactory* mTerrainSMFactory;
-		TerrainPageSourceListenerManager* mTerrainPSListenerManager;
 
 	};
 }

@@ -37,7 +37,7 @@ THE SOFTWARE.
 #ifndef OCTREESCENEMANAGER_H
 #define OCTREESCENEMANAGER_H
 
-#include "OgreTerrainPrerequisites.h"
+#include "OgreOctreePrerequisites.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderOperation.h"
 #include "OgreSphere.h"

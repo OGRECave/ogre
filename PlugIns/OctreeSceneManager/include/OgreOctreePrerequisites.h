@@ -24,33 +24,36 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
-OgreTerrainZonePrerequisites.h  -  based on OgreTerrainPrerequisites.h from Ogre3d
-
------------------------------------------------------------------------------
-begin                : Thu May 3 2007
-author               : Eric Cha
-email                : ericcATxenopiDOTcom
------------------------------------------------------------------------------
 */
 
-#ifndef __TerrainZonePrerequisites_H__
-#define __TerrainZonePrerequisites_H__
+#ifndef __OctreePrerequisites_H__
+#define __OctreePrerequisites_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreOctreeZonePrerequisites.h"
 
 //-----------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------
 
-namespace Ogre
-{
-    class TerrainZone;
-    class TerrainZonePageSource;
-    class TerrainZoneRenderable;
-    class TerrainZonePage;
-}
+//-----------------------------------------------------------------------
+// Windows Settings
+//-----------------------------------------------------------------------
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 ) && !defined(OGRE_STATIC_LIB)
+#   ifdef OGRE_OCTREEPLUGIN_EXPORTS
+#       define _OgreOctreePluginExport __declspec(dllexport)
+#   else
+#       if defined( __MINGW32__ )
+#           define _OgreOctreePluginExport
+#       else
+#    		define _OgreOctreePluginExport __declspec(dllimport)
+#       endif
+#   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#    define _OgreOctreePluginExport  __attribute__ ((visibility("default")))
+#else
+#   define _OgreOctreePluginExport
+#endif
 
 #endif
 

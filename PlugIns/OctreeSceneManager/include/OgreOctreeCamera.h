@@ -41,7 +41,7 @@ Enhancements 2003 - 2004 (C) The OGRE Team
 #include <OgreCamera.h>
 #include <OgreHardwareBufferManager.h>
 #include <OgreSimpleRenderable.h>
-#include "OgreTerrainPrerequisites.h"
+#include "OgreOctreePrerequisites.h"
 
 /**
 *@author Jon Anderson
