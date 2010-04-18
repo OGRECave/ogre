@@ -1,7 +1,7 @@
 // -------------------------------
 // Cel Shading Section
 // -------------------------------
-vertex_program Ogre/CelShadingVPCg cg
+vertex_program Ogre/CelShadingVP cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
@@ -16,52 +16,12 @@ vertex_program Ogre/CelShadingVPCg cg
 	}
 }
 
-fragment_program Ogre/CelShadingFPCg cg
+fragment_program Ogre/CelShadingFP cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
 	profiles ps_1_1 arbfp1 fp20
 
-}
-
-vertex_program Ogre/CelShadingVPGLSLES glsles
-{
-	source Example_CelShadingVp.glsles
-	profiles glsles
-
-	default_params
-	{
-		param_named_auto lightPosition light_position_object_space 0
-		param_named_auto eyePosition camera_position_object_space
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named shininess float 10
-	}
-}
-
-fragment_program Ogre/CelShadingFPGLSLES glsles
-{
-	source Example_CelShadingFp.glsles
-	profiles glsles
-
-	default_params
-	{
-		// map diffuse from custom renderable param 2
-		param_named diffuse float4 1 1 1 1
-		// map specular from custom renderable param 3
-		param_named specular float4 1 1 1 1
-	}
-}
-
-vertex_program Ogre/CelShadingVP unified
-{
-	delegate Ogre/CelShadingVPGLSLES
-	delegate Ogre/CelShadingVPCg
-}
-
-fragment_program Ogre/CelShadingFP unified
-{
-	delegate Ogre/CelShadingFPGLSLES
-	delegate Ogre/CelShadingFPCg
 }
 
 material Examples/CelShading
@@ -264,14 +224,14 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-//			{
-//				param_named_auto worldViewProj worldviewproj_matrix
-//				param_named_auto ambient ambient_light_colour
-//			}
-//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-//			{
-//			}
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
 			
 		}
 		// Now do the lighting pass
@@ -333,14 +293,14 @@ material Examples/BumpMapping/MultiLight
 			// NB we don't use fixed function here because GL does not like
 			// mixing fixed function and vertex programs, depth fighting can
 			// be an issue
-//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-//			{
-//				param_named_auto worldViewProj worldviewproj_matrix
-//				param_named ambient float4 1 1 1 1
-//			}
-//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-//			{
-//			}
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+				param_named ambient float4 1 1 1 1
+			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
 			scene_blend dest_colour zero
 			texture_unit decalmap
 			{
