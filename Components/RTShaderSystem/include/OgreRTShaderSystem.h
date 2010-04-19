@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreShaderExNormalMapLighting.h"
 #include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderExLayeredBlending.h"
+#include "OgreShaderExHardwareSkinning.h"
 #include "OgreShaderMaterialSerializerListener.h"
 
 /** \addtogroup Core

@@ -146,6 +146,30 @@ namespace RTShader {
 			return val;
 		}
 	};
+	/** ConstParameterInt represents an int constant.
+	*/
+	class ConstParameterInt : public ConstParameter<int>
+	{
+	public:
+		ConstParameterInt(int val, 
+			GpuConstantType type, 
+			const Semantic& semantic,  
+			const Content& content) 
+			: ConstParameter<int>(val, type, semantic, content)
+		{
+		}
+
+		~ConstParameterInt() {}
+
+		/** 
+		@see Parameter::toString.
+		*/
+		virtual String toString () const
+		{
+			return Ogre::StringConverter::toString(mValue);
+		}
+	};
+
 	//-----------------------------------------------------------------------
 
 	struct AutoShaderParameter
@@ -296,13 +320,14 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 Parameter::Parameter(GpuConstantType type, const String& name, 
 			const Semantic& semantic, int index, 
-			const Content& content)
+			const Content& content, size_t size)
 {
 	mName					= name;
 	mType					= type;
 	mSemantic				= semantic;
 	mIndex					= index;
 	mContent				= content;
+	mSize					= size;
 }
 
 //-----------------------------------------------------------------------
@@ -347,7 +372,7 @@ bool UniformParameter::isSampler() const
 UniformParameter::UniformParameter(GpuConstantType type, const String& name, 
 				 const Semantic& semantic, int index, 
 				 const Content& content,
-				 uint16 variability) : Parameter(type, name, semantic, index, content)
+				 uint16 variability, size_t size) : Parameter(type, name, semantic, index, content, size)
 {
 	mIsAutoConstantReal	 = false;	
 	mIsAutoConstantInt	 = false;
@@ -358,7 +383,7 @@ UniformParameter::UniformParameter(GpuConstantType type, const String& name,
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size)
 {
 	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
 
@@ -376,10 +401,11 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 	mVariability		= (uint16)GPV_GLOBAL;
 	mParamsPtr			 = NULL;
 	mPhysicalIndex		 = -1;
+	mSize				 = size;
 }
 
 //-----------------------------------------------------------------------
-UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData)
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
 	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
 
@@ -397,6 +423,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 	mVariability		= (uint16)GPV_GLOBAL;
 	mParamsPtr			 = NULL;
 	mPhysicalIndex		 = -1;
+	mSize				 = size;
 }
 
 //-----------------------------------------------------------------------
@@ -436,6 +463,24 @@ ParameterPtr ParameterFactory::createInNormal(int index)
 	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), 
 		Parameter::SPS_NORMAL, index, 
 		Parameter::SPC_NORMAL_OBJECT_SPACE));
+}
+
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createInWeights(int index)
+{
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iBlendWeights_" + StringConverter::toString(index), 
+		Parameter::SPS_BLEND_WEIGHTS, index, 
+		Parameter::SPC_BLEND_WEIGHTS));
+}
+
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createInIndices(int index)
+{
+	return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iBlendIndices_" + StringConverter::toString(index), 
+		Parameter::SPS_BLEND_INDICES, index, 
+		Parameter::SPC_BLEND_INDICES));
 }
 
 //-----------------------------------------------------------------------
@@ -692,7 +737,7 @@ UniformParameterPtr ParameterFactory::createSampler1D(int index)
 	return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER1D, "gSampler1D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
-		(uint16)GPV_GLOBAL));
+		(uint16)GPV_GLOBAL, 1));
 }
 
 //-----------------------------------------------------------------------
@@ -701,7 +746,7 @@ UniformParameterPtr ParameterFactory::createSampler2D(int index)
 	return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER2D, "gSampler2D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
-		(uint16)GPV_GLOBAL));
+		(uint16)GPV_GLOBAL, 1));
 }
 
 //-----------------------------------------------------------------------
@@ -710,7 +755,7 @@ UniformParameterPtr ParameterFactory::createSampler3D(int index)
 	return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER3D, "gSampler3D_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
-		(uint16)GPV_GLOBAL));
+		(uint16)GPV_GLOBAL, 1));
 }
 
 //-----------------------------------------------------------------------
@@ -719,7 +764,7 @@ UniformParameterPtr ParameterFactory::createSamplerCUBE(int index)
 	return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLERCUBE, "gSamplerCUBE_" + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
-		(uint16)GPV_GLOBAL));
+		(uint16)GPV_GLOBAL, 1));
 }
 //-----------------------------------------------------------------------
 ParameterPtr ParameterFactory::createConstParamVector2(Vector2 val)
@@ -760,13 +805,14 @@ ParameterPtr ParameterFactory::createConstParamFloat(float val)
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createUniform(GpuConstantType type, 
 											 int index, uint16 variability,
-											 const String& suggestedName)
+											 const String& suggestedName,
+											 size_t size)
 {
 	UniformParameterPtr param;
 	
 	param = UniformParameterPtr(OGRE_NEW UniformParameter(type, suggestedName + StringConverter::toString(index), 
 		Parameter::SPS_UNKNOWN, index, 
-		Parameter::SPC_UNKNOWN, variability));
+		Parameter::SPC_UNKNOWN, variability, size));
 		
 	return param;
 }

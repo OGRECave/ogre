@@ -212,7 +212,8 @@ void hardwareSkinningFourWeights_vp(
 	float3 norm = float3(0,0,0);
 	for (i = 0; i < 4; ++i)
 	{
-		norm += mul((float3x3)worldMatrix3x4Array[blendIdx[i]], normal) * 
+		float3x3 d = (float3x3)worldMatrix3x4Array[blendIdx[i]];
+		norm += mul(d, normal) * 
 		blendWgt[i];
 	}
 	norm = normalize(norm);

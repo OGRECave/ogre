@@ -30,11 +30,12 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 //-----------------------------------------------------------------------------
-Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask)
+Operand::Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, ushort indirectionLevel)
 {
 	mParameter = parameter;
 	mSemantic = opSemantic;
 	mMask = opMask;
+	mIndirectionLevel = indirectionLevel;
 }
 //-----------------------------------------------------------------------------
 Operand::Operand(const Operand& other) 
@@ -49,6 +50,7 @@ Operand& Operand::operator= (const Operand & other)
 		mParameter = other.mParameter;
 		mSemantic = other.mSemantic;
 		mMask = other.mMask;
+		mIndirectionLevel = other.mIndirectionLevel;
 	}		
 	return *this;
 }
@@ -192,15 +194,41 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 	os << mFunctionName << "(";
 
 	// Write parameters.
+	ushort curIndLevel = 0;
 	for (OperandVector::const_iterator it = mOperands.begin(); it != mOperands.end(); )
 	{
 		os << (*it).toString();
-
 		++it;
 
+		ushort opIndLevel = 0;
 		if (it != mOperands.end())
 		{
-			os << ", ";
+			opIndLevel = (*it).getIndirectionLevel();
+		}
+
+		if (curIndLevel < opIndLevel)
+		{
+			while (curIndLevel < opIndLevel)
+			{
+				++curIndLevel;
+				os << "[";
+			}
+		}
+		else //if (curIndLevel >= opIndLevel)
+		{
+			while (curIndLevel > opIndLevel)
+			{
+				--curIndLevel;
+				os << "]";
+			}
+			if (opIndLevel != 0)
+			{
+				os << "][";
+			}
+			else if (it != mOperands.end())
+			{
+				os << ", ";
+			}
 		}
 	}
 
@@ -209,9 +237,9 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 }
 
 //-----------------------------------------------------------------------
-void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask)
+void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
 {
-	mOperands.push_back(Operand(parameter, opSemantic, opMask));
+	mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
 }
 
 }

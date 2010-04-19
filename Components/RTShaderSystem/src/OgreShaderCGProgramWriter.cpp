@@ -187,7 +187,11 @@ void CGProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPt
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
 	os << parameter->getName();	
-
+	if (parameter->isArray() == true)
+	{
+		os << "[" << parameter->getSize() << "]";	
+	}
+	
 	if (parameter->isSampler())
 	{
 		os << " : register(s" << parameter->getIndex() << ")";		
@@ -202,7 +206,11 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
 
 	os << "\t";	
 	os << parameter->getName();	
-
+	if (parameter->isArray() == true)
+	{
+		os << "[" << parameter->getSize() << "]";	
+	}
+	
 	if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
 	{
 		os << " : ";
@@ -211,6 +219,8 @@ void CGProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr para
 		if (parameter->getSemantic() != Parameter::SPS_POSITION && 
 			parameter->getSemantic() != Parameter::SPS_NORMAL &&
 			parameter->getSemantic() != Parameter::SPS_TANGENT &&
+			parameter->getSemantic() != Parameter::SPS_BLEND_INDICES &&
+			parameter->getSemantic() != Parameter::SPS_BLEND_WEIGHTS &&
 			(!(parameter->getSemantic() == Parameter::SPS_COLOR && parameter->getIndex() == 0)) &&
 			parameter->getIndex() >= 0)
 		{			
@@ -225,6 +235,10 @@ void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr paramet
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
 	os << parameter->getName();		
+	if (parameter->isArray() == true)
+	{
+		os << "[" << parameter->getSize() << "]";	
+	}
 }
 
 //-----------------------------------------------------------------------

@@ -108,7 +108,8 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 		// Create the shader based technique.
 		techniqueCreated = shaderGenerator->createShaderBasedTechnique(material->getName(), 
 			technique->getSchemeName(), 
-			dstTechniqueSchemeName);
+			dstTechniqueSchemeName,
+			shaderGenerator->getCreateShaderOverProgrammablePass());
 	}
 
 
@@ -160,7 +161,8 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 	// Create the shader based technique.
 	techniqueCreated = shaderGenerator->createShaderBasedTechnique(material->getName(), 
 		technique->getSchemeName(), 
-		dstTechniqueSchemeName);
+		dstTechniqueSchemeName,
+		shaderGenerator->getCreateShaderOverProgrammablePass());
 
 
 	// Case technique successfully created.

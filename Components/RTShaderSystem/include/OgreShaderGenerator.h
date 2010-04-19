@@ -247,8 +247,9 @@ public:
 	@param materialName The source material name.
 	@param srcTechniqueSchemeName The source technique scheme name.
 	@param dstTechniqueSchemeName The destination shader based technique scheme name.
+	@param overProgrammable If true a shader will be created even if the material has shaders
 	*/
-	bool			createShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
+	bool			createShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
 
 	/** 
@@ -344,6 +345,19 @@ public:
 	@see VSOutputCompactPolicy.	
 	*/
 	VSOutputCompactPolicy			getVertexShaderOutputsCompactPolicy		() const { return mVSOutputCompactPolicy; }
+
+
+	/** Sets whether shaders are created for passes with shaders.
+	Note that this only refers to when the system parses the materials itself.
+	Not for when calling the createShaderBasedTechnique() function directly
+	@param value The value to set this attribute pass.	
+	*/
+	void							setCreateShaderOverProgrammablePass		(bool value) { mCreateShaderOverProgrammablePass = value; }
+
+	/** Returns whether shaders are created for passes with shaders.
+	@see setCreateShaderOverProgrammablePass().	
+	*/
+	bool							getCreateShaderOverProgrammablePass		() const { return mCreateShaderOverProgrammablePass; }
 
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
@@ -701,6 +715,9 @@ protected:
 	/** Find source technique to generate shader based technique based on it. */
 	Technique*			findSourceTechnique				(const String& materialName, const String& srcTechniqueSchemeName);
 
+	/** Checks if a given technique has passes with shaders. */
+	bool				isProgrammable					(Technique* tech) const;
+ 
 	/** Called from the sub class of the RenderObjectLister when single object is rendered. */
 	void				notifyRenderSingleObject		(Renderable* rend, const Pass* pass,  const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges);
 
@@ -798,7 +815,7 @@ protected:
 	bool							mActiveViewportValid;			// True if active view port use a valid SGScheme.
 	int								mLightCount[3];					// Light count per light type.
 	VSOutputCompactPolicy			mVSOutputCompactPolicy;			// Vertex shader outputs compact policy.
-	
+	bool							mCreateShaderOverProgrammablePass; // Tells whether shaders are created for passes with shaders
 private:
 	friend class SGPass;
 	friend class FFPRenderStateBuilder;

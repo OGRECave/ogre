@@ -105,7 +105,7 @@ public:
 	@param opSemantic The in/out semantic of the parameter.
 	@param opMask The field mask of the parameter.
 	*/
-	Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL);
+	Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, ushort indirectionLevel = 0);
 
 	/** Copy constructor */
 	Operand(const Operand& rhs);
@@ -130,6 +130,13 @@ public:
 	/** Returns the operand semantic (do we read/write or both with the parameter). */
 	OpSemantic			getSemantic		()	const { return mSemantic; }
 
+	/** Returns the level of indirection. 
+	The greater the indirection level the more the parameter needs to be nested in brackets.
+	For example given 4 parameters x1...x4 with the indirections levels 0,1,1,2 
+	respectivly. The parameters should form the following string: x1[x2][x3[x4]].
+	*/
+	ushort				getIndirectionLevel()	const { return mIndirectionLevel; }
+
 	/** Returns the parameter name and the usage mask like this 'color.xyz' */
 	String				toString		()	const;
 
@@ -143,9 +150,10 @@ public:
 	static GpuConstantType		getGpuConstantType	(int mask);
 
 protected:
-	ParameterPtr	mParameter;
-	OpSemantic		mSemantic;
-	int				mMask;
+	ParameterPtr	mParameter;			//The parameter being carried by the operand
+	OpSemantic		mSemantic;			//Tells if the parameter is of type input,output or both
+	int				mMask;				//Which part of the parameter should be passed (x,y,z,w)
+	ushort			mIndirectionLevel; //The level of indirection. @see getIndirectionLevel
 };
 
 /** A class that represents function invocation code from shader based program function.
@@ -182,8 +190,9 @@ public:
 	@param parameter A function parameter.
 	@param opSemantic The in/out semantic of the parameter.
 	@param opMask The field mask of the parameter.
+	@param indirectionLevel The level of nesting inside brackets
 	*/
-	void					pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL);
+	void					pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, int indirectionLevel = 0);
 
 	/** Return the function name */
 	const String&			getFunctionName	() const {return mFunctionName; }

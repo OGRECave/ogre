@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreShaderExNormalMapLighting.h"
 #include "OgreShaderExIntegratedPSSM3.h"
 #include "OgreShaderExLayeredBlending.h"
+#include "OgreShaderExHardwareSkinning.h"
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
@@ -84,6 +85,7 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[1]				= 0;
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
+	mCreateShaderOverProgrammablePass = false;
 
 
 	mShaderLanguage = "";
@@ -205,6 +207,9 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
+	curFactory = OGRE_NEW HardwareSkinningFactory;	
+	addSubRenderStateFactory(curFactory);
+	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 #endif
 }
 
@@ -584,7 +589,8 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::createShaderBasedTechnique(const String& materialName, 
 												 const String& srcTechniqueSchemeName, 
-												 const String& dstTechniqueSchemeName)
+												 const String& dstTechniqueSchemeName,
+												 bool overProgrammable)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
@@ -623,13 +629,15 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	// No technique created -> check if one can be created from the given source technique scheme.	
 	Technique* srcTechnique = NULL;
-
 	srcTechnique = findSourceTechnique(materialName, srcTechniqueSchemeName);
 
-
 	// No appropriate source technique found.
-	if (srcTechnique == NULL)
+	if ((srcTechnique == NULL) ||
+		((overProgrammable == false) && (isProgrammable(srcTechnique) == true)))
+	{
 		return false;
+	}
+
 
 	// Create shader based technique from the given source technique.	
 	SGMaterial* matEntry = NULL;
@@ -788,21 +796,29 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 
 		 if (curTechnique->getSchemeName() == srcTechniqueSchemeName)
 		 {
-			 for (unsigned short i=0; i < curTechnique->getNumPasses(); ++i)
-			 {
-				 Pass* curPass = curTechnique->getPass(i);
-
-				 if (curPass->isProgrammable() == true)
-				 {
-					 return NULL;
-				 }				
-			 }
 			 return curTechnique;				
 		 }		
 	 }
 
 	 return NULL;
  }
+
+ //-----------------------------------------------------------------------------
+ bool ShaderGenerator::isProgrammable(Technique* tech) const
+ {
+	 if (tech != NULL)
+	 {
+		 for (unsigned short i=0; i < tech->getNumPasses(); ++i)
+		 {
+			 if (tech->getPass(i)->isProgrammable() == true)
+			 {
+				 return true;
+			 }				
+		 }
+	 }
+	 return false;
+ }
+
 
 //-----------------------------------------------------------------------------
  void ShaderGenerator::notifyRenderSingleObject(Renderable* rend, 

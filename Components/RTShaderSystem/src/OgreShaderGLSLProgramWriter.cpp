@@ -148,6 +148,10 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		os << mGpuConstTypeMap[pUniformParam->getType()];
 		os << "\t";	
 		os << pUniformParam->getName();
+		if (pUniformParam->isArray() == true)
+		{
+			os << "[" << pUniformParam->getSize() << "]";	
+		}
 		os << ";" << std::endl;		
 	}
 	os << std::endl;			
@@ -564,6 +568,10 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 				os << mGpuConstTypeMap[pParam->getType()];
 				os << "\t";
 				os << pParam->getName();
+				if (pParam->isArray() == true)
+				{
+					os << "[" << pParam->getSize() << "]";	
+				}
 				os << ";" << std::endl;	
 			}
 		}
@@ -582,6 +590,10 @@ void GLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr param
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
 	os << parameter->getName();		
+	if (parameter->isArray() == true)
+	{
+		os << "[" << parameter->getSize() << "]";	
+	}
 }
 //-----------------------------------------------------------------------
 }

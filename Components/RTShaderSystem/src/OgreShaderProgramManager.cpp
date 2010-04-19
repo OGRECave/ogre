@@ -324,6 +324,9 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 	programSet->setGpuVertexProgram(vsGpuProgram);
 
+	//update flags
+	programSet->getGpuVertexProgram()->setSkeletalAnimationIncluded(
+		programSet->getCpuVertexProgram()->getSkeletalAnimationIncluded());
 
 	// Create the fragment shader program.
 	GpuProgramPtr psGpuProgram;

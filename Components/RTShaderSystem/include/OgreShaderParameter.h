@@ -239,6 +239,12 @@ public:
 		/// Light position in tangent space index 0-7
 		SPC_LIGHTPOSITION_TANGENT_SPACE,
 
+		/// Blending weights
+		SPC_BLEND_WEIGHTS,
+
+		/// Blending indices
+		SPC_BLEND_INDICES,
+		
 		/// Tangent vector
 		SPC_TANGENT,
 
@@ -293,7 +299,7 @@ public:
 	*/
 	Parameter(GpuConstantType type, const String& name, 
 		const Semantic& semantic, int index, 
-		const Content& content);
+		const Content& content, size_t size = 1);
 
 	/** Class destructor */
 	virtual ~Parameter() {};
@@ -318,6 +324,15 @@ public:
 
 	/** Returns the string representation of this parameter. */
 	virtual String			toString							() const { return mName; }
+	
+	/** Returns Whether this parameter is an array. */
+	bool					isArray								() const { return mSize > 1; }
+
+	/** Returns the number of elements in the parameter (for arrays). */
+	size_t					getSize								() const { return mSize; }
+	
+	/** Sets the number of elements in the parameter (for arrays). */
+	void					setSize								(size_t size) { mSize = size; }
 
 // Attributes.
 protected:
@@ -326,6 +341,7 @@ protected:
 	Semantic								mSemantic;				// Semantic of this parameter.
 	int										mIndex;					// Index of this parameter.
 	Content									mContent;				// The content of this parameter.
+	size_t									mSize;					// Number of elements in the parameter (for arrays)
 	
 };
 
@@ -347,23 +363,26 @@ public:
 	@param index The index of this parameter.
 	@param content The content of this parameter.
 	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
+	@param size number of elements in the parameter.	
 	*/
 	UniformParameter(GpuConstantType type, const String& name, 
 		const Semantic& semantic, int index, 
 		const Content& content,
-		uint16 variability);
+		uint16 variability, size_t size);
 
 	/** Class constructor.
 	@param autoType The auto type of this parameter.
 	@param fAutoConstantData The real data for this auto constant parameter.	
+	@param size number of elements in the parameter.	
 	*/
-	UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData);
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size);
 
 	/** Class constructor.
 	@param autoType The auto type of this parameter.
 	@param nAutoConstantData The int data for this auto constant parameter.	
+	@param size number of elements in the parameter.	
 	*/
-	UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData);
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size);
 
 	
 	/** Get auto constant int data of this parameter, in case it is auto constant parameter. */
@@ -393,10 +412,9 @@ public:
 	/** Return the variability of this parameter. */
 	uint16					getVariability						() const { return mVariability; }
 
-
 	/** Bind this parameter to the corresponding GPU parameter. */
 	void					bind								(GpuProgramParametersSharedPtr paramsPtr);
-	
+
 public:
 
 	/** Update the GPU parameter with the given value. */	
@@ -474,7 +492,6 @@ protected:
 	uint16									mVariability;			// How this parameter varies (bitwise combination of GpuProgramVariability).
 	GpuProgramParameters*					mParamsPtr;				// The actual GPU parameters pointer.
 	size_t									mPhysicalIndex;			// The physical index of this parameter in the GPU program.
-
 };
 
 typedef SharedPtr<UniformParameter>				UniformParameterPtr; 
@@ -529,6 +546,8 @@ public:
 	static ParameterPtr	createOutPosition		(int index);
 
 	static ParameterPtr	createInNormal			(int index);
+	static ParameterPtr createInWeights			(int index);
+	static ParameterPtr createInIndices			(int index);
 	static ParameterPtr	createOutNormal			(int index);
 	static ParameterPtr	createInBiNormal		(int index);
 	static ParameterPtr	createOutBiNormal		(int index);
@@ -559,7 +578,7 @@ public:
 	static UniformParameterPtr	createSampler3D			(int index);
 	static UniformParameterPtr	createSamplerCUBE		(int index);	
 
-	static UniformParameterPtr	createUniform			(GpuConstantType type, 	int index, uint16 variability, const String& suggestedName);
+	static UniformParameterPtr	createUniform			(GpuConstantType type, 	int index, uint16 variability, const String& suggestedName, size_t size);
 };
 
 
