@@ -18,30 +18,6 @@ public:
 		mInfo["Category"] = "Animation";
 	}
 
-
-#ifdef USE_RTSHADER_SYSTEM
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-	/*-----------------------------------------------------------------------------
-	| Initialize the RT Shader system and add hardware skinning
-	-----------------------------------------------------------------------------*/
-	virtual bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr)
-	{
-		bool retVal = SdkSample::initializeRTShaderSystem(sceneMgr);
-		if (retVal = true)
-		{
-			Ogre::RTShader::RenderState* schemRenderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			Ogre::RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
-			Ogre::RTShader::HardwareSkinning* hardwareSkinning = static_cast<Ogre::RTShader::HardwareSkinning*>(subRenderState);
-			hardwareSkinning->setHardwareSkinningParam(24,2);
-			schemRenderState->addTemplateSubRenderState(subRenderState);
-
-			mMaterialMgrListener->setCreateOverProgrammable(true);
-		}
-		return retVal;
-	}
-#endif
-#endif
-
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         for (unsigned int i = 0; i < NUM_MODELS; i++)
