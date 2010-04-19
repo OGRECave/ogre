@@ -17,7 +17,7 @@ uniform mat4 worldViewProj;
 uniform mat4 worldMatrix;
 uniform mat4 texViewProj;
 
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec3 normal;
 attribute vec3 tangent;
 attribute vec4 uv0;
@@ -29,7 +29,7 @@ varying vec3 oTSLightDir;
 void main()
 {
 	// calculate output position
-	gl_Position = worldViewProj * vertex;
+	gl_Position = worldViewProj * position;
 
 	// pass the main uvs straight through unchanged
 	oUv0 = uv0;
@@ -37,7 +37,7 @@ void main()
 	// calculate tangent space light vector
 	// Get object space light direction
 	// Non-normalised since we'll do that in the fragment program anyway
-	vec3 lightDir = lightPosition.xyz - (vertex * lightPosition.w).xyz;
+	vec3 lightDir = lightPosition.xyz - (position * lightPosition.w).xyz;
 
 	// Calculate the binormal (NB we assume both normal and tangent are
 	// already normalised)
@@ -52,6 +52,6 @@ void main()
 	oTSLightDir = rotation * lightDir;
 
 	// Projection
-    uvproj = worldMatrix * vertex;
+    uvproj = worldMatrix * position;
 	uvproj = texViewProj * uvproj;
 }

@@ -7,7 +7,7 @@ precision lowp samplerCube;
 
 uniform vec4 lightDiffuse;
 uniform vec4 lightSpecular;
-// uniform vec4 scaleBias;
+uniform vec4 scaleBias;
 uniform float exponent;
 uniform sampler2D normalHeightMap;
 
@@ -35,7 +35,6 @@ vec3 expand(vec3 v)
 */
 void main()
 {
-	vec4 scaleBias = vec4(0.04, -0.02, 1.0, 0.0);
 	float height = texture2D(normalHeightMap, oUv0.xy).a;
 	float displacement = (height * scaleBias.x) + scaleBias.y;
 	vec2 newTexCoord = ((tangentEyeDir * displacement) + oUv0.xyz).xy;

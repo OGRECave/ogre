@@ -10,7 +10,7 @@ uniform vec4 lightPosition; // object space
 uniform vec3 eyePosition;   // object space
 uniform mat4 worldViewProj;
 
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec3 normal;
 attribute vec3 tangent;
 attribute vec4 uv0;
@@ -23,14 +23,14 @@ varying vec3 oTSHalfAngle;
 void main()
 {
 	// calculate output position
-	gl_Position = worldViewProj * vertex;
+	gl_Position = worldViewProj * position;
 
 	// pass the main uvs straight through unchanged
 	oUv0 = uv0;
 
 	// calculate tangent space light vector
 	// Get object space light direction
-	vec3 lightDir = normalize(lightPosition.xyz - (vertex * lightPosition.w).xyz);
+	vec3 lightDir = normalize(lightPosition.xyz - (position * lightPosition.w).xyz);
 
 	// Calculate the binormal (NB we assume both normal and tangent are
 	// already normalised)
@@ -45,7 +45,7 @@ void main()
 	oTSLightDir = rotation * lightDir;
 
 	// Calculate half-angle in tangent space
-	vec3 eyeDir = normalize(eyePosition - vertex.xyz);
+	vec3 eyeDir = normalize(eyePosition - position.xyz);
 	vec3 halfAngle = normalize(eyeDir + lightDir);
 	oTSHalfAngle = rotation * halfAngle;
 }

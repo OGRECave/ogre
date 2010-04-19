@@ -112,6 +112,11 @@ fragment_program Examples/BumpMapFPGLSLES glsles
 {
 	source Example_BumpMappingFp.glsles
 	profiles glsles
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named normalMap int 0
+	}
 }
 
 fragment_program Examples/BumpMapFP unified
@@ -154,6 +159,12 @@ fragment_program Examples/BumpMapFPShadowRcvGLSLES glsles
 {
 	source Example_BumpMappingShadowRcvFp.glsles
 	profiles glsles
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named shadowMap int 0
+		param_named normalMap int 1
+	}
 }
 
 fragment_program Examples/BumpMapFPShadowRcv unified
@@ -196,6 +207,11 @@ fragment_program Examples/BumpMapFPSpecularGLSLES glsles
 {
 	source Example_BumpMappingSpecularFp.glsles
 	profiles glsles
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named normalMap int 0
+	}
 }
 
 fragment_program Examples/BumpMapFPSpecular unified
@@ -487,6 +503,13 @@ fragment_program Examples/FresnelRefractReflectFPGLSLES glsles
 	source Example_FresnelFp.glsles
 	entry_point main
 	profiles glsles
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named noiseMap int 0
+		param_named reflectMap int 1
+		param_named refractMap int 2
+	}
 }
 
 fragment_program Examples/FresnelRefractReflectFP unified

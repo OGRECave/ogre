@@ -20,27 +20,43 @@ fragment_program Examples/OffsetMappingPSAsm asm
    source OffsetMapping_specular.asm 
    // sorry, only for ps_1_4 and above:) 
    syntax ps_1_4 
+	default_params
+	{
+        // Parallax Height scale and bias 
+        param_indexed 2 float4 0.04 -0.02 1 0 
+	}
 } 
 
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingPSGLSLES glsles
 { 
-   source OffsetMapping_specular.glsles
-   profiles glsles
-} 
+    source OffsetMapping_specular.glsles
+    profiles glsles
+	default_params
+	{
+        // Parallax Height scale and bias 
+        param_named scaleBias float4 0.04 -0.02 1 0 
+	}
+}
 
 // Bump map with Parallax offset vertex program, support for this is required 
 vertex_program Examples/OffsetMappingVPGLSLES glsles
 { 
-   source OffsetMappingVp.glsles
-   profiles glsles
+    source OffsetMappingVp.glsles
+    profiles glsles
 } 
 
 // Bump map with parallax fragment program 
 fragment_program Examples/OffsetMappingFPGLSLES glsles
 { 
-   source OffsetMappingFp.glsles
-   profiles glsles
+    source OffsetMappingFp.glsles
+    profiles glsles
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named normalHeightMap int 0
+		param_named diffuseMap int 1
+	}
 } 
 
 vertex_program Examples/OffsetMappingVP unified
@@ -73,13 +89,13 @@ material Examples/OffsetMapping/Specular
 	  pass
 	  {
 	      illumination_stage ambient
-//		  vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-//		  {
-//              param_named_auto worldViewProj worldviewproj_matrix
-//		  }
-//		  fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-//		  {
-//		  }
+		  vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+		  {
+              param_named_auto worldViewProj worldviewproj_matrix
+		  }
+		  fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+		  {
+		  }
 		  
 	  }
       // do the lighting and bump mapping with parallax pass 

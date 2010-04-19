@@ -5,7 +5,7 @@ precision lowp sampler2D;
 precision lowp samplerCube;
 
 attribute vec3 tangent;
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec3 normal;
 
 uniform mat4 world;
@@ -23,12 +23,12 @@ attribute vec4 uv1;
 
 void main()
 {
-	gl_Position = vertex * worldViewProj;
+	gl_Position = position * worldViewProj;
 	
-	vec4 worldPos = world * vertex;
+	vec4 worldPos = world * position;
 
 	// Get object space light direction 
-    vec3 lightDir = normalize(lightPosition.xyz -  (vertex.xyz * lightPosition.w));
+    vec3 lightDir = normalize(lightPosition.xyz -  (position.xyz * lightPosition.w));
 
 	// calculate shadow map coords
 	vUv0 = texViewProj * worldPos;

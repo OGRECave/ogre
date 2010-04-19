@@ -6,7 +6,7 @@ precision lowp sampler2D;
 precision lowp samplerCube;
 
 attribute vec4 uv0;
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec3 normal;
 
 uniform mat4 worldViewProjMatrix;
@@ -24,7 +24,7 @@ varying vec3 oNormal;
 // Vertex program for fresnel reflections / refractions
 void main()
 {
-	gl_Position = worldViewProjMatrix * vertex;
+	gl_Position = worldViewProjMatrix * position;
 	// Projective texture coordinates, adjust for mapping
 	mat4 scalemat = mat4(0.5, 0.0, 0.0, 0.5, 
                          0.0, -0.5, 0.0, 0.5,
@@ -36,6 +36,6 @@ void main()
 	noiseCoord.xy = (uv0.xy + (timeVal * scroll)) * scale;
 	noiseCoord.z = noise * timeVal;
 
-	eyeDir = normalize(vertex.xyz - eyePosition); 
+	eyeDir = normalize(position.xyz - eyePosition); 
 	oNormal = normal.rgb;
 }

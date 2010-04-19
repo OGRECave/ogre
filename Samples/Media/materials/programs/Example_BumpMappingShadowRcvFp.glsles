@@ -12,9 +12,9 @@ vec3 expand(vec3 v)
 	return (v - 0.5) * 2.0;
 }
 
-uniform vec4 lightDiffuse;
 uniform sampler2D shadowMap;
 uniform sampler2D normalMap;
+uniform vec4 lightDiffuse;
 
 varying vec4 uvproj;
 varying vec4 oUv0;
