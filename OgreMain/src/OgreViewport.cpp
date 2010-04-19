@@ -74,6 +74,10 @@ namespace Ogre {
         // Set the default orientation mode
         mOrientationMode = mDefaultOrientationMode;     
 
+        // Set the default material scheme
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        mMaterialSchemeName = rs->_getDefaultViewportMaterialScheme();
+        
         // Calculate actual dimensions
         _updateDimensions();
 

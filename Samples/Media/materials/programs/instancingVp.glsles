@@ -11,11 +11,14 @@ uniform vec4 lightPos;
 uniform vec4 ambient;
 uniform vec4 lightDiffuseColour;
 
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec3 normal;
+attribute vec4 uv0;
+attribute vec4 uv1;
+
 varying vec4 colour;
-varying vec4 uv0;
-varying vec4 uv1;
+varying vec4 oUv0;
+varying vec4 oUv1;
 
 void main()
 {
@@ -28,16 +31,15 @@ void main()
 	for (int row = 0; row < 3; ++row)
 	{
 		vec4 matrixRow = worldMatrix3x4Array[instanceOffset + row];
-		transformedPos[row] = dot(matrixRow, vertex);
+		transformedPos[row] = dot(matrixRow, position);
 #if SHADOW_CASTER
 #else
 		transformedNorm[row] = dot(matrixRow.xyz, normal);
 #endif
-		
 	}
 	
 	// view / projection
-	gl_Position = viewProjectionMatrix * vec4(transformedPos,1);
+	gl_Position = viewProjectionMatrix * vec4(transformedPos, 1.0);
     colour = vec4(0);
 	
 #if SHADOW_CASTER

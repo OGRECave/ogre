@@ -472,13 +472,13 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 			mDetailsPanel->setParamValue(11, "Off");
 
-      Ogre::Viewport* mainVP = mCamera->getViewport();
-      const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
-      if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
-      {
-          mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-          mDetailsPanel->setParamValue(11, "On");
-      }
+            Ogre::Viewport* mainVP = mCamera->getViewport();
+            const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+            if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
+            {
+                mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+                mDetailsPanel->setParamValue(11, "On");
+            }
 			mDetailsPanel->setParamValue(12, "Vertex");
 			mDetailsPanel->setParamValue(13, "Low");
 			mDetailsPanel->setParamValue(14, "0");
@@ -510,13 +510,6 @@ namespace OgreBites
 			// setup default viewport layout and camera
 			mCamera = mSceneMgr->createCamera("MainCamera");
 			mViewport = mWindow->addViewport(mCamera);
-#ifdef  USE_RTSHADER_SYSTEM
-            if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
-            {
-                // Make this viewport work with shader generator scheme.
-                mViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-            }
-#endif
 			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
 			mCamera->setNearClipDistance(5);
 

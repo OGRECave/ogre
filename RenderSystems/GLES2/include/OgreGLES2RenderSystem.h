@@ -102,9 +102,6 @@ namespace Ogre {
             GLfloat mAutoTextureMatrix[16];
 
             bool mUseAutoTextureMatrix;
-            size_t mTextureCount;
-
-            bool mTextureEnabled;
 
             /// GL support class, used for creating windows etc.
             GLES2Support *mGLSupport;
@@ -147,7 +144,6 @@ namespace Ogre {
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
-            void makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m);
 
             /// The Shader generator instance.
             RTShader::ShaderGenerator *mShaderGenerator;
@@ -163,9 +159,6 @@ namespace Ogre {
             virtual ~GLES2RenderSystem();
         
             friend class ShaderGeneratorTechniqueResolverListener;
-
-//            GLSLESGpuProgram* getStubFragmentProgram(void);
-//            GLSLESGpuProgram* getStubVertexProgram(void);
 
             // ----------------------------------
             // Overridden RenderSystem functions
@@ -250,6 +243,11 @@ namespace Ogre {
              */
             void setNormaliseNormals(bool normalise);
     
+            /** See
+              RenderSystem
+             */
+            const String& _getDefaultViewportMaterialScheme(void) const { return Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME; }
+
             // -----------------------------
             // Low-level overridden members
             // -----------------------------

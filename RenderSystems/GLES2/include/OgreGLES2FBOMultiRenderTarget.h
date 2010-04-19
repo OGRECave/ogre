@@ -35,7 +35,7 @@ namespace Ogre {
     
     class GLES2FBOManager;
 
-	/** MultiRenderTarget for GL ES 2.x. Requires the FBO extension.
+	/** MultiRenderTarget for GL ES 2.x.
 	*/
 	class _OgrePrivate GLES2FBOMultiRenderTarget : public MultiRenderTarget
 	{

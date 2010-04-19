@@ -54,7 +54,13 @@ namespace Ogre {
         GLES2ScratchBufferAlloc* ptrAlloc = (GLES2ScratchBufferAlloc*)mScratchBufferPool;
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLES2ScratchBufferAlloc);
         ptrAlloc->free = 1;
-    }
+
+        // non-Win32 machines are having issues glBufferSubData, looks like buffer corruption
+		// disable for now until we figure out where the problem lies			
+#	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+		mMapBufferThreshold = 0;
+#	endif
+}
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
     {
@@ -242,4 +248,14 @@ namespace Ogre {
         // Should never get here unless there's a corruption
         assert(false && "Memory deallocation error");
     }
+	//---------------------------------------------------------------------
+	const size_t GLES2HardwareBufferManagerBase::getGLMapBufferThreshold() const
+	{
+		return mMapBufferThreshold;
+	}
+	//---------------------------------------------------------------------
+	void GLES2HardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
+	{
+		mMapBufferThreshold = value;
+	}
 }

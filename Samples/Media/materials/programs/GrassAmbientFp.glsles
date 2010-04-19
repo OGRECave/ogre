@@ -14,5 +14,10 @@ varying vec4 oColour;
 void main()
 {	
     vec4 texColor = texture2D(diffuseMap, oUv0.xy);
+    // Do manual alpha rejection because it is not built into OpenGL ES 2
+    if (texColor.a < 0.588)
+    {
+        discard;
+    }
     gl_FragColor = vec4(oColour.rgb, texColor.a); 
 }

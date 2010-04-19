@@ -5,8 +5,6 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-attribute vec3 tangent;
-
 uniform vec4 lightPosition; // object space 
 uniform vec4 lightPosition1; // object space 
 uniform vec4 eyePosition;   // object space 
@@ -23,16 +21,16 @@ varying vec3 tangentSpotDir[2];
 varying vec4 shadowUV[2];
 varying vec4 oUv0;
 
-attribute vec4 vertex;
+attribute vec3 tangent;
+attribute vec4 position;
 attribute vec3 normal;
 attribute vec4 uv0;
 
 void main()
 {
-//	gl_Position = vertex;
-	gl_Position = worldViewProj * vertex;
+	gl_Position = worldViewProj * position;
 
-	vec4 worldPos = worldMatrix * vertex;
+	vec4 worldPos = worldMatrix * position;
 
     oUv0 = uv0;
 
@@ -41,10 +39,10 @@ void main()
 
 	// calculate tangent space light vector 
 	// Get object space light direction 
-    vec3 lightDir = normalize(lightPosition.xyz -  (vertex.xyz * lightPosition.w));
-	vec3 lightDir1 = normalize(lightPosition1.xyz -  (vertex.xyz * lightPosition1.w));
+    vec3 lightDir = normalize(lightPosition.xyz -  (position.xyz * lightPosition.w));
+	vec3 lightDir1 = normalize(lightPosition1.xyz -  (position.xyz * lightPosition1.w));
 	
-	vec3 eyeDir = (eyePosition - vertex).xyz; 
+	vec3 eyeDir = (eyePosition - position).xyz; 
 
 	// Calculate the binormal (NB we assume both normal and tangent are 
 	// already normalised) 
@@ -58,7 +56,7 @@ void main()
 	tangentLightDir[1] = normalize(rotation * lightDir1); 
 	// Invert the Y on the eye dir since we'll be using this to alter UVs and
 	// GL has Y inverted
-	tangentEyeDir = normalize(rotation * eyeDir) * vec3(1, -1, 1); 
+	tangentEyeDir = normalize(rotation * eyeDir) * vec3(1.0, -1.0, 1.0); 
 
 	tangentSpotDir[0] = normalize(rotation * -spotDirection.xyz);
 	tangentSpotDir[1] = normalize(rotation * -spotDirection1.xyz);	

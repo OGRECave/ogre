@@ -1454,13 +1454,13 @@ material Examples/GrassBladesAdditiveFloat
 			diffuse 0 0 0 
 			specular 0 0 0 0 
 			// Really basic vertex program
-//			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
-//			{
-//				param_named_auto worldViewProj worldviewproj_matrix
-//  			}
-//			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-//			{
-//			}
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+  			}
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
   
 		}
         pass lighting

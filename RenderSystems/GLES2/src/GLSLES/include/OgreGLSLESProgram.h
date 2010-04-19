@@ -134,10 +134,6 @@ namespace Ogre {
 		String mAttachedShaderNames;
 		/// Preprocessor options
 		String mPreprocessorDefines;
-		/// Container of attached programs
-//		typedef vector< GLSLESProgram* >::type GLSLESProgramContainer;
-//		typedef GLSLESProgramContainer::iterator GLSLESProgramContainerIterator;
-//		GLSLESProgramContainer mAttachedGLSLPrograms;
     };
 }
 

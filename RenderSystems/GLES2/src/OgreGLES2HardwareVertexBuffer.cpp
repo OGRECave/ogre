@@ -82,12 +82,14 @@ namespace Ogre {
 
         void* retPtr = 0;
 
+		GLES2HardwareBufferManager* glBufManager = static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
+
 		// Try to use scratch buffers for smaller buffers
-        if (length < OGRE_GL_MAP_BUFFER_THRESHOLD)
+        if (length < glBufManager->getGLMapBufferThreshold())
         {
 			// if this fails, we fall back on mapping
-            retPtr = static_cast<GLES2HardwareBufferManager*>(
-                HardwareBufferManager::getSingletonPtr())->allocateScratch((uint32)length);
+            retPtr = glBufManager->allocateScratch((uint32)length);
+
             if (retPtr)
             {
                 mLockedToScratch = true;
@@ -110,7 +112,7 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer::lock");
         }
 
-#if defined(GL_GLEXT_PROTOTYPES)
+#if GL_OES_mapbuffer
         if (!retPtr)
 		{
 			// Use glMapBuffer
@@ -163,7 +165,7 @@ namespace Ogre {
         }
         else
         {
-#if defined(GL_GLEXT_PROTOTYPES)
+#if GL_OES_mapbuffer
 			glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
 
 			if(!glUnmapBufferOES(GL_ARRAY_BUFFER))

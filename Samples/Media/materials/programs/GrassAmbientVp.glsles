@@ -9,7 +9,7 @@ uniform mat4 worldViewProj;
 uniform vec4 ambient;
 uniform vec4 offset;
 
-attribute vec4 vertex;
+attribute vec4 position;
 attribute vec4 normal;
 attribute vec4 uv0;
 
@@ -20,7 +20,7 @@ varying vec4 oColour;
 void main()
 {	
      // Position
-	vec4 mypos = vertex;
+	vec4 mypos = position;
 	vec4 factor = vec4(1.0, 1.0, 1.0, 1.0) - uv0.yyyy;
 	mypos = mypos + offset * factor;
   	gl_Position = worldViewProj * mypos;

@@ -23,12 +23,17 @@ void main()
        vec4 diffuse = texture2D(diffuseMap, oUv0.xy);
        if (diffuse.a > 0.001)
        {
+            // Do manual alpha rejection because it is not built into OpenGL ES 2
+            if (diffuse.a < 0.588)
+            {
+                discard;
+            }
             gl_FragColor = vec4(0.0);
        }
        else
        {
             vec4 normShadowUV = oShadowUV / oShadowUV.w;
-            vec4 shadowDepths = texture2D(shadowMap, oShadowUV.xy);        
+            vec4 shadowDepths = texture2D(shadowMap, normShadowUV.xy);        
             
             float gradientFactor = gradientClamp * gradientScaleBias;
             float depthAdjust = gradientFactor + fixedDepthBias * shadowDepths.x;

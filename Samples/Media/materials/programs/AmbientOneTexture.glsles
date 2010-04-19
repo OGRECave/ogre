@@ -8,18 +8,15 @@ precision lowp samplerCube;
 uniform vec4 ambient;
 uniform mat4 worldViewProj;
 
-attribute vec4 vertex;
-attribute vec4 uv0;
+attribute vec4 position;
 
 varying vec4 colour;
-varying vec4 oUv0;
 
 /*
   Basic ambient lighting vertex program for GLSL ES
 */
 void main()
 {
-	gl_Position = vertex * worldViewProj;
-	oUv0 = uv0;
+	gl_Position = position;
 	colour = ambient;
 }

@@ -38,7 +38,6 @@ namespace Ogre {
         private:
             GLuint mBufferId;
             // Scratch buffer handling
-            void* mcopyPtr;
             bool mLockedToScratch;
             size_t mScratchOffset;
             size_t mScratchSize;

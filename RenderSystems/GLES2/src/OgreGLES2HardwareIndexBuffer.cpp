@@ -92,7 +92,7 @@ namespace Ogre {
         }
         else
         {
-#if defined(GL_GLEXT_PROTOTYPES)
+#if GL_OES_mapbuffer
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
 			if(!glUnmapBufferOES(GL_ELEMENT_ARRAY_BUFFER))
@@ -123,11 +123,11 @@ namespace Ogre {
 
         void* retPtr = 0;
         GLenum access = 0;
+		GLES2HardwareBufferManager* glBufManager = static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
-        if(length < OGRE_GL_MAP_BUFFER_THRESHOLD)
+        if(length < glBufManager->getGLMapBufferThreshold())
         {
-            retPtr = static_cast<GLES2HardwareBufferManager*>(
-                    HardwareBufferManager::getSingletonPtr())->allocateScratch((uint32)length);
+            retPtr = glBufManager->allocateScratch((uint32)length);
             if (retPtr)
             {
                 mLockedToScratch = true;
@@ -149,7 +149,7 @@ namespace Ogre {
                         "GLES2HardwareIndexBuffer::lock");
         }
 
-#if defined(GL_GLEXT_PROTOTYPES)
+#if GL_OES_mapbuffer
 		if (!retPtr)
 		{
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );

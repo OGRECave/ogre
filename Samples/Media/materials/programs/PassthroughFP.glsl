@@ -1,10 +1,3 @@
-#version 100
-
-precision highp float;
-precision highp int;
-precision lowp sampler2D;
-precision lowp samplerCube;
-
 varying vec4 colour;
 
 /*

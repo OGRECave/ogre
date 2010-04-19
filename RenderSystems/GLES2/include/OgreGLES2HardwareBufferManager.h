@@ -33,14 +33,8 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
-    // Threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
-    // non-Win32 machines are having issues with this, looks like buffer corruption
-    // disable for now until we figure out where the problem lies
-    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
     #   define OGRE_GL_MAP_BUFFER_THRESHOLD (1024 * 32)
-    #else
-    #   define OGRE_GL_MAP_BUFFER_THRESHOLD 0
-    #endif
 
     /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgrePrivate GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
@@ -48,6 +42,7 @@ namespace Ogre {
         protected:
             char* mScratchBufferPool;
             OGRE_MUTEX(mScratchMutex)
+            size_t mMapBufferThreshold;
 
         public:
             GLES2HardwareBufferManagerBase();
@@ -79,7 +74,12 @@ namespace Ogre {
 
             /// @see allocateScratch
             void deallocateScratch(void* ptr);
-    };
+
+    		/** Threshold after which glMapBuffer is used and not glBufferSubData
+            */
+            const size_t getGLMapBufferThreshold() const;
+            void setGLMapBufferThreshold( const size_t value );
+};
 
 	/// GLES2HardwareBufferManagerBase as a Singleton
 	class _OgrePrivate GLES2HardwareBufferManager : public HardwareBufferManager
@@ -119,6 +119,17 @@ namespace Ogre {
 		void deallocateScratch(void* ptr)
 		{
 			static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->deallocateScratch(ptr);
+		}
+
+        /** Threshold after which glMapBuffer is used and not glBufferSubData
+		*/
+		const size_t getGLMapBufferThreshold() const
+		{
+			return static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->getGLMapBufferThreshold();
+		}
+		void setGLMapBufferThreshold( const size_t value )
+		{
+			static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->setGLMapBufferThreshold(value);
 		}
 
 	};

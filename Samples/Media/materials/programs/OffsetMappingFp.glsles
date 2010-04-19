@@ -41,6 +41,5 @@ void main()
     vec3 specular = pow(clamp(dot(normal, oHalfAngle), 0.0, 1.0), 32.0) * lightSpecular;
 
     vec3 col = diffuse * (clamp(dot(normal, oLightDir), 0.0, 1.0) * lightDiffuse) + specular;
-		
     gl_FragColor = vec4(col, 1.0);
 }
