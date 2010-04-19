@@ -1059,10 +1059,13 @@ namespace Ogre {
 		{
 			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			//Only Copy does, but Copy means only one depth buffer...
-			GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-															mCurrentContext, 0, 0,
-															win->getWidth(), win->getHeight(),
-															win->getFSAA(), 0, true );
+			GLContext *windowContext;
+			win->getCustomAttribute( "GLCONTEXT", &windowContext );
+
+ 			GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+															windowContext, 0, 0,
+ 															win->getWidth(), win->getHeight(),
+ 															win->getFSAA(), 0, true );
 
 			mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
