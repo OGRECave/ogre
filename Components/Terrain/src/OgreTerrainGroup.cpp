@@ -322,7 +322,7 @@ namespace Ogre
 	{
 		for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
 		{
-			delete i->second;
+			OGRE_DELETE i->second;
 		}
 		mTerrainSlots.clear();
 		// Also clear buffer pools, if we're clearing completely may not be representative
