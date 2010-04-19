@@ -70,10 +70,11 @@ namespace Ogre
                 }
 				logMessage += "\n" + String(infoLog);
 
+                LogManager::getSingleton().logMessage(logMessage);
+
 				OGRE_DELETE [] infoLog;
 			}
 		}
-        LogManager::getSingleton().logMessage(logMessage);
 
 		return logMessage;
 	}
