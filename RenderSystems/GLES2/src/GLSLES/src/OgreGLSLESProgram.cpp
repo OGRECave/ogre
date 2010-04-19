@@ -283,14 +283,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void GLSLESProgram::CmdAttach::doSet(void *target, const String& shaderNames)
     {
-		// Get all the shader program names: there could be more than one
-		StringVector vecShaderNames = StringUtil::split(shaderNames, " \t", 0);
-
-		size_t programNameCount = vecShaderNames.size();
-		for ( size_t i = 0; i < programNameCount; ++i )
-		{
-	        static_cast<GLSLESProgram*>(target)->attachChildShader(vecShaderNames[i]);
-		}
     }
 	//-----------------------------------------------------------------------
 	String GLSLESProgram::CmdPreprocessorDefines::doGet(const void *target) const
@@ -305,44 +297,11 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
     void GLSLESProgram::attachChildShader(const String& name)
 	{
-//		// Is the name valid and already loaded?
-//		// check with the high level program manager to see if it was loaded
-//		HighLevelGpuProgramPtr hlProgram = HighLevelGpuProgramManager::getSingleton().getByName(name);
-//		if (!hlProgram.isNull())
-//		{
-//			if (hlProgram->getSyntaxCode() == "glsles")
-//			{
-//				// Make sure attached program source gets loaded and compiled
-//				// don't need a low level implementation for attached shader objects
-//				// loadHighLevelImpl will only load the source and compile once
-//				// so don't worry about calling it several times
-//				GLSLESProgram* childShader = static_cast<GLSLESProgram*>(hlProgram.getPointer());
-//				// Load the source and attach the child shader only if supported
-//				if (isSupported())
-//				{
-//					childShader->loadHighLevelImpl();
-//					// Add to the container
-//					mAttachedGLSLPrograms.push_back( childShader );
-//					mAttachedShaderNames += name + " ";
-//				}
-//			}
-//		}
 	}
 
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::attachToProgramObject( const GLuint programObject )
 	{
-		// Attach child objects
-//		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-//		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
-//
-// 		while (childprogramcurrent != childprogramend)
-//		{
-//			GLSLESProgram* childShader = *childprogramcurrent;
-//			childShader->attachToProgramObject(programObject);
-//			++childprogramcurrent;
-//		}
-
 		glAttachShader(programObject, mGLHandle);
         GL_CHECK_ERROR
 	}
@@ -351,18 +310,6 @@ namespace Ogre {
 	{
 		glDetachShader(programObject, mGLHandle);
         GL_CHECK_ERROR
-
-		// Attach child objects
-//		GLSLESProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
-//		GLSLESProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();
-//
-//		while (childprogramcurrent != childprogramend)
-//		{
-//			GLSLESProgram* childShader = *childprogramcurrent;
-//			childShader->detachFromProgramObject( programObject );
-//			++childprogramcurrent;
-//		}
-
 	}
 
     //-----------------------------------------------------------------------
@@ -378,7 +325,6 @@ namespace Ogre {
 		GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
 		params->setTransposeMatrices(true);
 		return params;
-
 	}
 	//-----------------------------------------------------------------------
 	RenderOperation::OperationType parseOperationType(const String& val)

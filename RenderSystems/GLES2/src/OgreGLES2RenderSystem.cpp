@@ -93,7 +93,6 @@ namespace Ogre {
             mTextureTypes[i] = 0;
         }
 
-        mTextureCount = 0;
         mActiveRenderTarget = 0;
         mCurrentContext = 0;
         mMainContext = 0;
@@ -232,9 +231,8 @@ namespace Ogre {
         // Stencil wrapping
         rsc->setCapability(RSC_STENCIL_WRAP);
 
-        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
-
-        rsc->setCapability(RSC_USER_CLIP_PLANES);
+        // TODO: Need to implement in RTSS
+//        rsc->setCapability(RSC_USER_CLIP_PLANES);
 
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
@@ -244,6 +242,7 @@ namespace Ogre {
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
+        rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
 
         // DOT3 support is standard
         rsc->setCapability(RSC_DOT3);
@@ -255,8 +254,7 @@ namespace Ogre {
         rsc->setMaxPointSize(psRange[1]);
 
         // Point sprites
-        if (mGLSupport->checkExtension("GL_OES_point_sprite"))
-            rsc->setCapability(RSC_POINT_SPRITES);
+        rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
 
         // GLSL ES is always supported in GL ES 2
@@ -289,7 +287,7 @@ namespace Ogre {
         rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
-        rsc->setCapability(RSC_TEXTURE_FLOAT);
+//        rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
@@ -713,8 +711,8 @@ namespace Ogre {
     {
         GLES2TexturePtr tex = texPtr;
 
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(stage))
+			return;
 
         if (enabled)
         {
@@ -744,7 +742,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
 		}
 
-        glActiveTexture(GL_TEXTURE0);
+        activateGLTextureUnit(GL_TEXTURE0);
         GL_CHECK_ERROR;
     }
 
@@ -782,14 +780,13 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
     {
-        glActiveTexture(GL_TEXTURE0 + stage);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(stage))
+			return;
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         GL_CHECK_ERROR;
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
         GL_CHECK_ERROR;
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+        activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
@@ -961,6 +958,24 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
     {
+		bool a2c = false;
+		static bool lasta2c = false;
+
+        if(func != CMPF_ALWAYS_PASS)
+		{
+			a2c = alphaToCoverage;
+        }
+
+		if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
+		{
+			if (a2c)
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+            GL_CHECK_ERROR;
+
+			lasta2c = a2c;
+		}
 	}
 
     void GLES2RenderSystem::_setViewport(Viewport *vp)
@@ -1380,8 +1395,8 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        GL_CHECK_ERROR;
+		if (!activateGLTextureUnit(unit))
+			return;
 
         switch (ftype)
         {
@@ -1440,8 +1455,7 @@ namespace Ogre {
                 break;
         }
 
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
@@ -1458,7 +1472,8 @@ namespace Ogre {
 		if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
 			return;
 
-		glActiveTexture(GL_TEXTURE0 + unit);
+		if (!activateGLTextureUnit(unit))
+			return;
         
 		GLfloat largest_supported_anisotropy = 0;
 		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
@@ -1469,8 +1484,7 @@ namespace Ogre {
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
 			glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 
-		glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
@@ -1534,7 +1548,6 @@ namespace Ogre {
                 case VET_COLOUR:
                 case VET_COLOUR_ABGR:
                 case VET_COLOUR_ARGB:
-                case VET_UBYTE4:
                     // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
                     // VertexElement::getTypeCount treats them as 1 (RGBA)
                     // Also need to normalise the fixed-point data
@@ -2007,20 +2020,6 @@ namespace Ogre {
 
 		// Bind frame buffer object
         mRTTManager->bind(target);
-    }
-
-    void GLES2RenderSystem::makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m)
-    {
-        size_t x = 0;
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            for (size_t j = 0; j < 4; j++)
-            {
-                gl_matrix[x] = m[j][i];
-                x++;
-            }
-        }
     }
 
     GLint GLES2RenderSystem::convertCompareFunction(CompareFunction func) const

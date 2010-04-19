@@ -456,7 +456,7 @@ namespace Ogre {
     {
         glBindTexture(mTarget, mTextureID);
         GL_CHECK_ERROR;
-        glCopyTexSubImage2D(mTarget, mLevel, 0, 0, 0, 0, mWidth, mHeight);
+        glCopyTexSubImage2D(mFaceTarget, mLevel, 0, 0, 0, 0, mWidth, mHeight);
         GL_CHECK_ERROR;
     }
 
