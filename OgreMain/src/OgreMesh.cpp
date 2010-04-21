@@ -553,10 +553,9 @@ namespace Ogre {
     void Mesh::_initAnimationState(AnimationStateSet* animSet)
     {
 		// Animation states for skeletal animation
-		if (hasSkeleton())
+		if (!mSkeleton.isNull())
 		{
 			// Delegate to Skeleton
-			assert(!mSkeleton.isNull() && "Skeleton not present");
 			mSkeleton->_initAnimationState(animSet);
 
 			// Take the opportunity to update the compiled bone assignments
@@ -583,7 +582,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void Mesh::_refreshAnimationState(AnimationStateSet* animSet)
 	{
-		if (hasSkeleton())
+		if (!mSkeleton.isNull())
 		{
 			mSkeleton->_refreshAnimationState(animSet);
 		}
