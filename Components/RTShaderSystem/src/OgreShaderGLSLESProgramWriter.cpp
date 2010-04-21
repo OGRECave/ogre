@@ -325,12 +325,6 @@ namespace Ogre {
                 os << "}" << ENDL;
             }
             os << ENDL;
-			
-			std::stringstream temp(os.str());
-			std::string s;
-			while(std::getline(temp, s)){
-				LogManager::getSingleton().logMessage(s);
-			}
         }
 
         //-----------------------------------------------------------------------
