@@ -151,7 +151,7 @@ void Sample_ShaderSystem::buttonHit( OgreBites::Button* b )
 	{		
 		const String& materialName = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName();
 		
-		exportRTShaderSystemMaterial(mRTShaderLibsPath + "materials/ShaderSystemExport.material", materialName);						
+		exportRTShaderSystemMaterial(mExportMaterialPath + "ShaderSystemExport.material", materialName);						
 	}
 	// Case the shader cache should be flushed.
 	else if (b->getName() == FLUSH_BUTTON_NAME)
@@ -316,7 +316,7 @@ void Sample_ShaderSystem::setupContent()
 	childNode->showBoundingBox(true);
 
 	// Create reflection entity that will show the exported material.
-	const String& mainExportedMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName() + "_RTSS";
+	const String& mainExportedMaterial = mSceneMgr->getEntity(MAIN_ENTITY_NAME)->getSubEntity(0)->getMaterialName() + "_RTSS_Export";
 	MaterialPtr matMainEnt        = MaterialManager::getSingleton().getByName(mainExportedMaterial, SAMPLE_MATERIAL_GROUP);
 
 	entity = mSceneMgr->createEntity("ExportedMaterialEntity", MAIN_ENTITY_MESH);
@@ -1042,7 +1042,7 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 		matSer.addListener(matRTSSListener);
 
 		// Simply export the material.
-		matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS");
+		matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS_Export");
 	}
 }
 
@@ -1099,39 +1099,11 @@ void Sample_ShaderSystem::createPrivateResourceGroup()
 {
 	// Create the resource group of the RT Shader System Sample.
 	ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
-	Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
-	Ogre::StringVector::iterator itGroup = groupVector.begin();
-	Ogre::StringVector::iterator itGroupEnd = groupVector.end();
-	Ogre::String shaderCoreLibsPath;
-	
 
-	for (; itGroup != itGroupEnd; ++itGroup)
-	{
-		Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
-		Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-		Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-		bool coreLibsFound = false;
-
-		// Find the location of the core shader libs
-		for (; it != itEnd; ++it)
-		{
-			if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
-			{
-				shaderCoreLibsPath = (*it)->archive->getName() + "/";	
-				coreLibsFound = true;
-				break;
-			}
-		}
-
-		// Core libs path found in the current group.
-		if (coreLibsFound) 
-			break; 
-	}
-
-	mRTShaderLibsPath = shaderCoreLibsPath;
+	mExportMaterialPath = "C:/";
 
 	rgm.createResourceGroup(SAMPLE_MATERIAL_GROUP, false);
-	rgm.addResourceLocation(shaderCoreLibsPath + "materials", "FileSystem", SAMPLE_MATERIAL_GROUP);		
+	rgm.addResourceLocation(mExportMaterialPath, "FileSystem", SAMPLE_MATERIAL_GROUP);		
 	rgm.initialiseResourceGroup(SAMPLE_MATERIAL_GROUP);
 	rgm.loadResourceGroup(SAMPLE_MATERIAL_GROUP, true);
 }
@@ -1141,8 +1113,12 @@ void Sample_ShaderSystem::unloadResources()
 {
 	destroyPrivateResourceGroup();
 
+	mShaderGenerator->removeAllShaderBasedTechniques("Panels");
+	mShaderGenerator->removeAllShaderBasedTechniques("Panels_RTSS_Export");
+
 	if (mReflectionMapFactory != NULL)
-	{			
+	{		
+		mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
 		OGRE_DELETE mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
