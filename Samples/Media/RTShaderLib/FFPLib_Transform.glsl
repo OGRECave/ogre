@@ -50,7 +50,7 @@ void FFP_Transform(in mat4 m,
 				   in vec4 v, 
 				   out vec3 vOut)
 {
-	vOut = mul(m, v);
+	vOut = mul(m, v).xyz;
 }
 
 //-----------------------------------------------------------------------------
