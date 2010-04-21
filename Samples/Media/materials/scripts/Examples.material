@@ -1789,7 +1789,7 @@ material Examples/TudorHouse
 
 material jaiqua
 {
-	// Hardware skinning technique
+	// Hardware skinning technique - GLES2 passthrough fragment program
 	technique
 	{
 		pass
@@ -1798,7 +1798,7 @@ material jaiqua
 			{
 			
 			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
 			{
 			}
 
@@ -1809,7 +1809,7 @@ material jaiqua
 				param_named_auto viewProjectionMatrix viewproj_matrix
 				param_named_auto ambient ambient_light_colour
 			}
-			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
 			{
 			}
 
@@ -1821,6 +1821,31 @@ material jaiqua
 		}
 	}
 
+	// Hardware skinning technique - no fragment program
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			{
+			
+			}
+
+			// alternate shadow caster program
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
 	// Software blending technique
 	technique
 	{
