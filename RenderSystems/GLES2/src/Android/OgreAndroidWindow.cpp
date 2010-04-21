@@ -160,6 +160,16 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("\tcreate called");
 		
 		initNativeCreatedWindow(miscParams);
+		
+		mName = name;
+        mWidth = width;
+        mHeight = height;
+        mLeft = 0;
+        mTop = 0;
+        mActive = true;
+		//mVisible = true;
+
+        mClosed = false;
 	}
 
 

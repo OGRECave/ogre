@@ -1495,7 +1495,7 @@ namespace Ogre {
     }
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
-    {
+    {		
         GL_CHECK_ERROR;
         // Call super class
         RenderSystem::_render(op);
@@ -2280,7 +2280,7 @@ namespace Ogre {
 
 			// Case technique registration succeeded.
 			if (techniqueCreated)
-			{
+			{				
 				// Force creating the shaders for the generated technique.
 				mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
 				
@@ -2292,7 +2292,7 @@ namespace Ogre {
 					Ogre::Technique* curTech = itTech.getNext();
 
 					if (curTech->getSchemeName() == schemeName)
-					{
+					{					
 						generatedTech = curTech;
 						break;
 					}
