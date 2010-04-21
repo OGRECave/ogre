@@ -33,16 +33,24 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgrePass.h"
 #include "OgreLogManager.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #include "OgreShaderCGProgramWriter.h"
 #include "OgreShaderHLSLProgramWriter.h"
 #include "OgreShaderGLSLProgramWriter.h"
+#endif
 #include "OgreShaderGLSLESProgramWriter.h"
 #include "OgreShaderProgramProcessor.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #include "OgreShaderCGProgramProcessor.h"
 #include "OgreShaderHLSLProgramProcessor.h"
 #include "OgreShaderGLSLProgramProcessor.h"
+#endif
 #include "OgreShaderGLSLESProgramProcessor.h"
 #include "OgreGpuProgramManager.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include "OgreStringSerialiser.h"
+#endif
 
 namespace Ogre {
 
@@ -108,7 +116,6 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 	pass->setVertexProgram(programSet->getGpuVertexProgram()->getName());
 	pass->setFragmentProgram(programSet->getGpuFragmentProgram()->getName());
 
-
 	// Bind uniform parameters to pass parameters.
 	bindUniformParameters(programSet->getCpuVertexProgram(), pass->getVertexProgramParameters());
 	bindUniformParameters(programSet->getCpuFragmentProgram(), pass->getFragmentProgramParameters());
@@ -169,10 +176,12 @@ void ProgramManager::flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap)
 void ProgramManager::createDefaultProgramWriterFactories()
 {
 	// Add standard shader writer factories 
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterCGFactory());
 	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLFactory());
-	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLESFactory());
 	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterHLSLFactory());
+#endif
+	mProgramWriterFactories.push_back(OGRE_NEW ShaderProgramWriterGLSLESFactory());
 	
 	for (unsigned int i=0; i < mProgramWriterFactories.size(); ++i)
 	{
@@ -195,10 +204,12 @@ void ProgramManager::destroyDefaultProgramWriterFactories()
 void ProgramManager::createDefaultProgramProcessors()
 {
 	// Add standard shader processors
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 	mDefaultProgramProcessors.push_back(OGRE_NEW CGProgramProcessor);
 	mDefaultProgramProcessors.push_back(OGRE_NEW GLSLProgramProcessor);
-	mDefaultProgramProcessors.push_back(OGRE_NEW GLSLESProgramProcessor);
 	mDefaultProgramProcessors.push_back(OGRE_NEW HLSLProgramProcessor);
+#endif
+	mDefaultProgramProcessors.push_back(OGRE_NEW GLSLESProgramProcessor);
 
 	for (unsigned int i=0; i < mDefaultProgramProcessors.size(); ++i)
 	{
@@ -276,7 +287,6 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	ProgramWriterIterator itWriter = mProgramWritersMap.find(language);
 	ProgramWriter* programWriter = NULL;
 
-
 	// No writer found -> create new one.
 	if (itWriter == mProgramWritersMap.end())
 	{
@@ -301,14 +311,12 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	programProcessor = itProcessor->second;
 
 	bool success;
-
+	
 	// Call the pre creation of GPU programs method.
 	success = programProcessor->preCreateGpuPrograms(programSet);
 	if (success == false)	
 		return false;	
 	
-
-
 	// Create the vertex shader program.
 	GpuProgramPtr vsGpuProgram;
 	
@@ -327,7 +335,6 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	//update flags
 	programSet->getGpuVertexProgram()->setSkeletalAnimationIncluded(
 		programSet->getCpuVertexProgram()->getSkeletalAnimationIncluded());
-
 	// Create the fragment shader program.
 	GpuProgramPtr psGpuProgram;
 
@@ -343,7 +350,6 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 
 	programSet->setGpuFragmentProgram(psGpuProgram);
 
-	
 	// Call the post creation of GPU programs method.
 	success = programProcessor->postCreateGpuPrograms(programSet);
 	if (success == false)	
@@ -379,14 +385,17 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 {
 
 	
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	Ogre::StringSerialiser sourceCodeStringStream;
+#else
 	std::stringstream sourceCodeStringStream;
+#endif
 	_StringHash stringHash;
 	uint32 programHashCode;
 	String programName;
 
 	// Generate source code.
-	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);	
+	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
 
 	// Generate program hash code.
 	programHashCode = static_cast<uint32>(stringHash(sourceCodeStringStream.str()));

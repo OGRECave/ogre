@@ -59,7 +59,11 @@ public:
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	virtual void            writeSourceCode			(StringSerialiser& os, Program* program);
+#else
 	virtual void            writeSourceCode			(std::ostream& os, Program* program);
+#endif
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
@@ -76,17 +80,41 @@ protected:
 	void				initializeStringMaps		();
 
     /** Write the program dependencies. */
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void                writeProgramDependencies	(StringSerialiser& os, Program* program);
+#else
 	void                writeProgramDependencies	(std::ostream& os, Program* program);
+#endif
 
 	/** Write a local parameter. */
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void				writeLocalParameter			(StringSerialiser& os, ParameterPtr parameter);
+#else
 	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+#endif
 
 	/** Write the input params of the function */
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void				writeInputParameters		(StringSerialiser& os, Function* function, GpuProgramType gpuType);
+#else
 	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
+#endif
 	
 	/** Write the output params of the function */
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void				writeOutParameters			(StringSerialiser& os, Function* function, GpuProgramType gpuType);
+#else
 	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
+#endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	void writeAssignFunction(StringSerialiser& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
+#else
+	void writeAssignFunction(std::stringstream& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
+#endif
+
+	String processOperand(Operand op, GpuProgramType gpuType);
+	
     /** Check if a string matches one of the GLSL ES basic types */
     bool                isBasicType(String &type);
 protected:

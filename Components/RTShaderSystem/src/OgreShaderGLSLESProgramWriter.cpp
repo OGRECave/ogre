@@ -31,6 +31,12 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 #include "OgreRoot.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#	define ENDL "\n"
+#else
+#	define ENDL std::endl
+#endif
+
 namespace Ogre {
     namespace RTShader {
 
@@ -94,10 +100,30 @@ namespace Ogre {
             mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
             mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
         }
+		
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeAssignFunction(StringSerialiser& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType)
+#else
+		void GLSLESProgramWriter::writeAssignFunction(std::stringstream& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType)
+#endif
+		{
+			Operand op1 = *itOperand;
+			itOperand++;
+			if(itOperand != itOperandEnd)
+			{
+				Operand op2 = *itOperand;
+				
+				os << "\t" << processOperand(op2, gpuType) << " = " << processOperand(op1, gpuType) << ";";
+			}
+		}
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeSourceCode(std::ostream& os, Program* program)
-        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeSourceCode(StringSerialiser& os, Program* program)
+#else
+		void GLSLESProgramWriter::writeSourceCode(std::ostream& os, Program* program)
+#endif
+        {			
             GpuProgramType gpuType = program->getType();
             if(gpuType == GPT_GEOMETRY_PROGRAM)
             {
@@ -116,25 +142,25 @@ namespace Ogre {
             UniformParameterConstIterator itUniformParam = parameterList.begin();
             
             // Write the current version (this forces the driver to fulfill the glsl es standard)
-            os << "#version "<< mGLSLVersion << std::endl;
+            os << "#version "<< mGLSLVersion << ENDL;
 
             // Default precision declaration is required in fragment and vertex shaders.
-            os << "precision highp float;" << std::endl;
-            os << "precision highp int;" << std::endl;
-            os << "precision lowp sampler2D;" << std::endl;
-            os << "precision lowp samplerCube;" << std::endl;
+            os << "precision highp float;" << ENDL;
+            os << "precision highp int;" << ENDL;
+            os << "precision lowp sampler2D;" << ENDL;
+            os << "precision lowp samplerCube;" << ENDL;
 
             // Generate source code header.
             writeProgramTitle(os, program);
-            os<< std::endl;
+            os<< ENDL;
 
             // Embed dependencies.
             writeProgramDependencies(os, program);
-            os << std::endl;
+            os << ENDL;
 
             // Generate global variable code.
             writeUniformParametersTitle(os, program);
-            os << std::endl;
+            os << ENDL;
 
             // Write the uniforms 
             for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
@@ -145,9 +171,9 @@ namespace Ogre {
                 os << mGpuConstTypeMap[pUniformParam->getType()];
                 os << "\t";
                 os << pUniformParam->getName();
-                os << ";" << std::endl;
+                os << ";" << ENDL;
             }
-            os << std::endl;			
+            os << ENDL;			
 
             // Write program function(s).
             for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
@@ -164,7 +190,7 @@ namespace Ogre {
                 writeOutParameters(os, curFunction, gpuType);
                             
                 // The function name must always main.
-                os << "void main() {" << std::endl;
+                os << "void main() {" << ENDL;
 
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
@@ -175,9 +201,9 @@ namespace Ogre {
                 {
                     os << "\t";
                     writeLocalParameter(os, *itParam);			
-                    os << ";" << std::endl;						
+                    os << ";" << ENDL;						
                 }
-                os << std::endl;			
+                os << ENDL;			
 
                 // Sort function atoms.
                 curFunction->sortAtomInstances();
@@ -191,148 +217,129 @@ namespace Ogre {
                     FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
                     FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
                     FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-
+					
                     // Local string stream
-                    std::stringstream localOs;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+					StringSerialiser localOs;
+#else
+					std::stringstream localOs;
+#endif
 
-                    // Write function name			
-                    localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
+					for (; itOperand != itOperandEnd; )
+					{
+						Operand op = *itOperand;
+						Operand::OpSemantic opSemantic = op.getSemantic();
+						String paramName = op.getParameter()->getName();
+						Parameter::Content content = op.getParameter()->getContent();
+						
+						// Check if we write to an varying because the are only readable in fragment programs 
+						if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
+						{	
+							// Is the written parameter a varying 
+							bool isVarying = false;
 
-                    for (; itOperand != itOperandEnd; )
-                    {
-                        Operand op = *itOperand;
-                        Operand::OpSemantic opSemantic = op.getSemantic();
-                        String paramName = op.getParameter()->getName();
-                        Parameter::Content content = op.getParameter()->getContent();
+							// Check if we write to an varying because the are only readable in fragment programs 
+							if (gpuType == GPT_FRAGMENT_PROGRAM)
+							{	
+								StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
+								if(itFound != mFragInputParams.end())
+								{						
+									// Declare the copy variable
+									String newVar = "local_" + paramName;
+									String tempVar = paramName;
+									isVarying = true;
 
-                        // Check if we write to an varying because the are only readable in fragment programs 
-                        if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
-                        {	
-                            // Is the written parameter a varying 
-                            bool isVarying = false;
+									// We stored the original values in the mFragInputParams thats why we have to replace the first var with o
+									// because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
+									tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
-                            // Check if we write to an varying because the are only readable in fragment programs 
-                            if (gpuType == GPT_FRAGMENT_PROGRAM)
-                            {	
-                                StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
-                                if(itFound != mFragInputParams.end())
-                                {						
-                                    // Declare the copy variable
-                                    String newVar = "local_" + paramName;
-                                    String tempVar = paramName;
-                                    isVarying = true;
+									// Declare the copy variable and assign the original
+									os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << ENDL;	
 
-                                    // We stored the original values in the mFragInputParams thats why we have to replace the first var with o
-                                    // because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
-                                    tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
+									// From now on we replace it automatic 
+									mInputToGLStatesMap[paramName] = newVar;
 
-                                    // Declare the copy variable and assign the original
-                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+									// Remove the param because now it is replaced automatic with the local variable
+									// (which could be written).
+									mFragInputParams.erase(itFound++);
+								}
+							}
+							
+							// If its not a varying param check if a uniform is written
+							if(!isVarying)
+							{
+								UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
+								if(itFound != parameterList.end())
+								{	
+									// Declare the copy variable
+									String newVar = "local_" + paramName;
 
-                                    // From now on we replace it automatic 
-                                    mInputToGLStatesMap[paramName] = newVar;
+									// now we check if we already declared a uniform redirector var
+									if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
+									{
+										// Declare the copy variable and assign the original
+										os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << ENDL;	
 
-                                    // Remove the param because now it is replaced automatic with the local variable
-                                    // (which could be written).
-                                    mFragInputParams.erase(itFound++);
-                                }
-                            }
-                            
-                            // If its not a varying param check if a uniform is written
-                            if(!isVarying)
-                            {
-                                UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
-                                if(itFound != parameterList.end())
-                                {	
-                                    // Declare the copy variable
-                                    String newVar = "local_" + paramName;
+										// From now on we replace it automatic 
+										mInputToGLStatesMap[paramName] = newVar;
+									}
+								}
+							}
 
-                                    // now we check if we already declared a uniform redirector var
-                                    if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
-                                    {
-                                        // Declare the copy variable and assign the original
-                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
+						}
+						
+						++itOperand;
+					}
+					
+					itOperand = pFuncInvoc->getOperandList().begin();
+                    itOperandEnd = pFuncInvoc->getOperandList().end();
+					
+					if(pFuncInvoc->getFunctionName() == "FFP_Assign")
+					{
+						writeAssignFunction(localOs, itOperand, itOperandEnd, gpuType);
+					}
+					else
+					{
+						// Write function name			
+						localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
 
-                                        // From now on we replace it automatic 
-                                        mInputToGLStatesMap[paramName] = newVar;
-                                    }
-                                }
-                            }
+						for (; itOperand != itOperandEnd; )
+						{	
+							localOs << processOperand(*itOperand, gpuType);
+							
+							++itOperand;
 
-                        }
+							// Prepare for the next operand
+							if (itOperand != itOperandEnd)
+							{
+								localOs << ", ";
+							}
+						}
 
-                        if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
-                        {
-                            int mask = op.getMask(); // our swizzle mask
-
-                            // Here we insert the renamed param name
-                            localOs << mInputToGLStatesMap[paramName];
-
-                            if(mask != Operand::OPM_ALL)
-                            {
-                                localOs << "." << Operand::getMaskAsString(mask);
-                            }	
-                            // Now that every texcoord is a vec4 (passed as vertex attributes) we
-                            // have to swizzle them according the desired type.
-                            else if(gpuType == GPT_VERTEX_PROGRAM &&
-                                    content == Parameter::SPC_TEXTURE_COORDINATE0 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE1 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE2 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE3 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE4 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE5 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE6 ||
-                                    content == Parameter::SPC_TEXTURE_COORDINATE7 )
-                            {
-                                // Now generate the swizzle mask according
-                                // the type.
-                                switch(op.getParameter()->getType())
-                                {
-                                case GCT_FLOAT1:
-                                    localOs << ".x";
-                                    break;
-                                case GCT_FLOAT2:
-                                    localOs << ".xy";
-                                    break;
-                                case GCT_FLOAT3:
-                                    localOs << ".xyz";
-                                    break;
-                                case GCT_FLOAT4:
-                                    localOs << ".xyzw";
-                                    break;
-
-                                default:
-                                    break;
-                                }
-                            }						
-                        }
-                        else
-                        {
-                            localOs << op.toString();
-                        }
-                        
-                        ++itOperand;
-
-                        // Prepare for the next operand
-                        if (itOperand != itOperandEnd)
-                        {
-                            localOs << ", ";
-                        }
-                    }
-
-                    // Write function call closer.
-                    localOs << ");" << std::endl;
-                    localOs << std::endl;
+						// Write function call closer.
+						localOs << ");" << ENDL;
+					}
+                    localOs << ENDL;
                     os << localOs.str();
                 }
-                os << "}" << std::endl;
+                os << "}" << ENDL;
             }
-            os << std::endl;
+            os << ENDL;
+			
+			std::stringstream temp(os.str());
+			std::string s;
+			while(std::getline(temp, s)){
+				LogManager::getSingleton().logMessage(s);
+			}
         }
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
-        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeInputParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType)
+#else
+		void GLSLESProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+#endif
+		{
             const ShaderParameterList& inParams = function->getInputParameters();
 
             ShaderParameterConstIterator itParam = inParams.begin();
@@ -360,7 +367,7 @@ namespace Ogre {
                     os << mGpuConstTypeMap[pParam->getType()];
                     os << "\t";	
                     os << paramName;
-                    os << ";" << std::endl;	
+                    os << ";" << ENDL;	
                 }
                 else if (gpuType == GPT_VERTEX_PROGRAM && 
                          mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -388,7 +395,7 @@ namespace Ogre {
                     }
                     os << "\t";	
                     os << mContentToPerVertexAttributes[paramContent];
-                    os << ";" << std::endl;	
+                    os << ";" << ENDL;	
                 }
                 else
                 {
@@ -396,13 +403,17 @@ namespace Ogre {
                     os << mGpuConstTypeMap[pParam->getType()];
                     os << "\t";	
                     os << paramName;
-                    os << ";" << std::endl;	
+                    os << ";" << ENDL;	
                 }							
             }
         }
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeOutParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType)
+#else
+		void GLSLESProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+#endif
         {
             const ShaderParameterList& outParams = function->getOutputParameters();
 
@@ -426,7 +437,7 @@ namespace Ogre {
                         os << mGpuConstTypeMap[pParam->getType()];
                         os << "\t";
                         os << pParam->getName();
-                        os << ";" << std::endl;	
+                        os << ";" << ENDL;	
                     }
                 }
                 else if(gpuType == GPT_FRAGMENT_PROGRAM &&
@@ -448,11 +459,15 @@ namespace Ogre {
         // 4. When we reach the last closing brace, write the function and its signature to the output stream
         // 5. Go back to step 1 until we have found all the functions
         //
-        void GLSLESProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
-        {
-            os << "//-----------------------------------------------------------------------------" << std::endl;
-            os << "//                         PROGRAM DEPENDENCIES"                                 << std::endl;
-            os << "//-----------------------------------------------------------------------------" << std::endl;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeProgramDependencies(StringSerialiser& os, Program* program)
+#else
+		void GLSLESProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
+#endif
+		{
+            os << "//-----------------------------------------------------------------------------" << ENDL;
+            os << "//                         PROGRAM DEPENDENCIES"                                 << ENDL;
+            os << "//-----------------------------------------------------------------------------" << ENDL;
 
             StringVector forwardDecl; // Holds all generated function declarations 
             const ShaderFunctionList& functionList = program->getFunctions();
@@ -789,12 +804,78 @@ namespace Ogre {
         }
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void GLSLESProgramWriter::writeLocalParameter(StringSerialiser& os, ParameterPtr parameter)
+#else
+		void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
+#endif
         {
             os << mGpuConstTypeMap[parameter->getType()];
             os << "\t";	
             os << parameter->getName();		
         }
+		
+		String GLSLESProgramWriter::processOperand(Operand op, GpuProgramType gpuType)
+		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			StringSerialiser localOs;
+#else
+			std::stringstream localOs;
+#endif
 
+			String paramName = op.getParameter()->getName();
+			Parameter::Content content = op.getParameter()->getContent();
+			if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
+			{
+				int mask = op.getMask(); // our swizzle mask
+
+				// Here we insert the renamed param name
+				localOs << mInputToGLStatesMap[paramName];
+
+				if(mask != Operand::OPM_ALL)
+				{
+					localOs << "." << Operand::getMaskAsString(mask);
+				}	
+				// Now that every texcoord is a vec4 (passed as vertex attributes) we
+				// have to swizzle them according the desired type.
+				else if(gpuType == GPT_VERTEX_PROGRAM &&
+						content == Parameter::SPC_TEXTURE_COORDINATE0 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE1 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE2 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE3 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE4 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE5 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE6 ||
+						content == Parameter::SPC_TEXTURE_COORDINATE7 )
+				{
+					// Now generate the swizzle mask according
+					// the type.
+					switch(op.getParameter()->getType())
+					{
+					case GCT_FLOAT1:
+						localOs << ".x";
+						break;
+					case GCT_FLOAT2:
+						localOs << ".xy";
+						break;
+					case GCT_FLOAT3:
+						localOs << ".xyz";
+						break;
+					case GCT_FLOAT4:
+						localOs << ".xyzw";
+						break;
+
+					default:
+						break;
+					}
+				}						
+			}
+			else
+			{
+				localOs << op.toString();
+			}
+			
+			return localOs.str();
+		}
     }
 }

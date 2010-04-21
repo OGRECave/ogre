@@ -827,7 +827,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 	 const LightList* pLightList, bool suppressRenderStateChanges)
 {
 	if (mActiveViewportValid)
-	{		
+	{
 		const Any& passUserData = pass->getUserObjectBindings().getUserAny(SGPass::UserKey);
 
 		if (passUserData.isEmpty())	
@@ -1518,8 +1518,7 @@ void ShaderGenerator::SGScheme::removeTechniqueEntry(SGTechnique* techEntry)
 
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::validate()
-{
-
+{	
 	// Synchronize with light settings.
 	synchronizeWithLightSettings();
 
@@ -1545,7 +1544,7 @@ void ShaderGenerator::SGScheme::validate()
 	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
-
+		
 		if (curTechEntry->getBuildDestinationTechnique())
 			curTechEntry->acquirePrograms();		
 	}

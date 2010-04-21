@@ -78,7 +78,7 @@ public:
 	/**
 	*@see ScriptTranslator::getInt.
 	*/
-	ScriptTranslator::getInt; 
+	ScriptTranslator::getInt;
 
 	/**
 	*@see ScriptTranslator::getUInt.
