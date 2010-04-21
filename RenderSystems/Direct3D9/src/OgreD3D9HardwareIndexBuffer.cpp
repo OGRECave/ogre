@@ -72,16 +72,14 @@ namespace Ogre {
 		{			
 			mSystemMemoryBuffer = NULL;
 		}
-		// Case we have to create this buffer resource on loading.
-		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
-		{
-			for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
-			{
-				IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
 
-				createBuffer(d3d9Device, mBufferDesc.Pool);
-			}
-		}				
+		// Create buffer resource(s).
+		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
+		{
+			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
+
+			createBuffer(d3d9Device, mBufferDesc.Pool);
+		}					
     }
 	//---------------------------------------------------------------------
     D3D9HardwareIndexBuffer::~D3D9HardwareIndexBuffer()

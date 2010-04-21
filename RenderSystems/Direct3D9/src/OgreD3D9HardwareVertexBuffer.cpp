@@ -73,16 +73,13 @@ namespace Ogre {
 			mSystemMemoryBuffer = NULL;
 		}
 		
-		// Case we have to create this buffer resource on loading.
-		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
+		// Create buffer resource(s).
+		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
 		{
-			for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
-			{
-				IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
+			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
 
-				createBuffer(d3d9Device, mBufferDesc.Pool);
-			}
-		}				
+			createBuffer(d3d9Device, mBufferDesc.Pool);
+		}						
     }
 	//---------------------------------------------------------------------
     D3D9HardwareVertexBuffer::~D3D9HardwareVertexBuffer()
@@ -149,7 +146,7 @@ namespace Ogre {
 		}
 		
 		else
-		{
+		{			
 			// Lock the source buffer.
 			mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
 
