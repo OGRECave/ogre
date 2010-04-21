@@ -61,8 +61,8 @@ namespace Ogre {
 		, mRQSequence(0)
 		, mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
 		, mIsAutoUpdated(true)
-    {
-#if OGRE_COMPILER != OGRE_COMPILER_GCCE
+    {			
+#if OGRE_COMPILER != OGRE_COMPILER_GCCE && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 		LogManager::getSingleton().stream(LML_TRIVIAL)
 			<< "Creating viewport on target '" << target->getName() << "'"
 			<< ", rendering from camera '" << (cam != 0 ? cam->getName() : "NULL") << "'"
@@ -72,8 +72,8 @@ namespace Ogre {
 #endif
 
         // Set the default orientation mode
-        mOrientationMode = mDefaultOrientationMode;     
-
+        mOrientationMode = mDefaultOrientationMode;
+			
         // Set the default material scheme
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
         mMaterialSchemeName = rs->_getDefaultViewportMaterialScheme();

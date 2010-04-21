@@ -341,6 +341,8 @@ namespace Ogre
 
 	bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
 	{
+		LogManager::getSingleton().logMessage("ScriptCompiler::compile called");
+		
 		// Set up the compilation context
 		mGroup = group;
 
@@ -365,13 +367,14 @@ namespace Ogre
 		// Allows early bail-out through the listener
 		if(mListener && !mListener->postConversion(this, ast))
 			return mErrors.empty();
-
+		
 		// Translate the nodes
 		for(AbstractNodeList::iterator i = ast->begin(); i != ast->end(); ++i)
 		{
 			//logAST(0, *i);
 			if((*i)->type == ANT_OBJECT && reinterpret_cast<ObjectAbstractNode*>((*i).get())->abstract)
 				continue;
+			//LogManager::getSingleton().logMessage(reinterpret_cast<ObjectAbstractNode*>((*i).get())->name);
 			ScriptTranslator *translator = ScriptCompilerManager::getSingleton().getTranslator(*i);
 			if(translator)
 				translator->translate(this, *i);

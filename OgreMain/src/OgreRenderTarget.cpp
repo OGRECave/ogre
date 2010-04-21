@@ -221,7 +221,7 @@ namespace Ogre {
 
     Viewport* RenderTarget::addViewport(Camera* cam, int ZOrder, float left, float top ,
         float width , float height)
-    {
+    {		
         // Check no existing viewport with this Z-order
         ViewportList::iterator it = mViewportList.find(ZOrder);
 
