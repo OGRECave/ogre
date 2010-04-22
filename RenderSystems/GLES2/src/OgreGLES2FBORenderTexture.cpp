@@ -248,8 +248,8 @@ namespace Ogre {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
         glDeleteRenderbuffers(1, &packedRB);
 
-        // For some reason error 0x8CDB - GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT is thrown here on iPhone OS 3
-        // Odd, because that extension isn't supported.
+        // Status 0x8CDB - GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT is returned here 
+        // by the iPhone simulator.  Works on device though.
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
 
