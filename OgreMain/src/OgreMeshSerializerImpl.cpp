@@ -1982,8 +1982,6 @@ namespace Ogre {
 		size_t size = STREAM_OVERHEAD_SIZE;
 		// float time
 		size += sizeof(float);
-		// bool isOriginalGeometry  // point at original geometry?
-		size += sizeof(bool);
 		// float x,y,z
 		size += sizeof(float) * 3 * vertexCount;
 
