@@ -341,11 +341,12 @@ namespace Ogre  {
             case GL_RGB:
                 return PF_X8R8G8B8;
             case GL_RGBA:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) || (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2)
-				// seems that in windows we need this value to get the right color
+				// Seems that iPhone treats the RGBA format differently than every other platform
+#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE)
                 return PF_X8B8G8R8;
-#endif
+#else
                 return PF_A8R8G8B8;
+#endif
 
 #if GL_EXT_texture_compression_dxt1
             case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
