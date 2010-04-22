@@ -9,7 +9,7 @@ precision lowp samplerCube;
 
 attribute vec4 vertex;
 attribute vec3 normal;
-//attribute vec4 uv0;
+attribute vec4 uv0;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
 
@@ -23,6 +23,7 @@ uniform mat4 viewProjectionMatrix;
 uniform vec4 lightPos[2];
 uniform vec4 lightDiffuseColour[2];
 uniform vec4 ambient;
+uniform sampler2D skinTex;
 
 void main()
 {
@@ -61,10 +62,12 @@ void main()
 		lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
 
 //	gl_FrontSecondaryColor = vec4(0);
-	colour = vec4(0.5, 0.5, 0.5, 1.0) 
+	vec4 texColour = texture2D(skinTex, uv0.xy);
+	colour = //vec4(0.5, 0.5, 0.5, 1.0) 
+	    texColour
 		+ clamp(dot(lightDir0, blendNorm), 0.0, 1.0) * lightDiffuseColour[0]
 		+ clamp(dot(lightDir1, blendNorm), 0.0, 1.0) * lightDiffuseColour[1];
 
 //	gl_TexCoord[0] = uv0;
-	
+
 }

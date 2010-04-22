@@ -8,7 +8,7 @@ precision lowp samplerCube;
 // Example GLSL program for skinning with two bone weights per vertex
 
 attribute vec4 vertex;
-//attribute vec4 uv0;
+attribute vec4 uv0;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
 varying vec4 colour;
@@ -19,6 +19,7 @@ varying vec4 colour;
 uniform vec4 worldMatrix3x4Array[72];
 uniform mat4 viewProjectionMatrix;
 uniform vec4 ambient;
+uniform sampler2D skinTex;
 
 void main()
 {
@@ -43,6 +44,7 @@ void main()
 	gl_Position = viewProjectionMatrix * vec4(blendPos, 1.0);
 	
 //	gl_FrontSecondaryColor = vec4(0,0,0,0);
-	colour = ambient;
+	vec4 texColour = texture2D(skinTex, uv0.xy);
+	colour = ambient + texColour;
 //	gl_TexCoord[0] = uv0;
 }
