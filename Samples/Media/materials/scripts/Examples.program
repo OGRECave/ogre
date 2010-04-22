@@ -64,51 +64,10 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFPGLSLES glsles
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFP glsles
 {
 	source PassthroughFP.glsles
     profiles glsles
-}
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFPGLSL glsl
-{
-	source PassthroughFP.glsl
-    profiles glsl
-	default_params
-	{
-		param_named_auto ambient ambient_light_colour
-	}
-}
-
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFPCg cg
-{
-	source Examples_Basic.cg
-	entry_point passthrough_fp
-	profiles vs_1_1 arbvp1
-
-	default_params
-	{
-		param_named_auto ambient ambient_light_colour
-	}
-}
-
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFPHLSL hlsl
-{
-	source Examples_Basic.hlsl
-	entry_point passthrough_fp
-	target vs_1_1
-
-	default_params
-	{
-		param_named_auto ambient ambient_light_colour
-	}
-}
-
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
-{
-	delegate Ogre/BasicFragmentPrograms/PassthroughFPCg
-	delegate Ogre/BasicFragmentPrograms/PassthroughFPGLSL
-	delegate Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
-	delegate Ogre/BasicFragmentPrograms/PassthroughFPHLSL
 }
 
 // Same as below, but for use when rendering texture shadows
@@ -156,6 +115,11 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
 {
 	source skinningTwoWeightsShadowCasterVp.glsles
 	includes_skeletal_animation true
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named skinTex int 0
+	}
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
@@ -186,6 +150,11 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
 {
    source skinningTwoWeightsVp.glsles
    includes_skeletal_animation true
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named skinTex int 0
+	}
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeights unified
