@@ -3326,6 +3326,11 @@ namespace Ogre
 			}
 		}
 
+		// delete memory
+		OGRE_FREE(lightmapBox->data, MEMCATEGORY_GENERAL);
+		OGRE_DELETE(lightmapBox);
+
+
 	}
 	//---------------------------------------------------------------------
 	void Terrain::updateCompositeMap()
