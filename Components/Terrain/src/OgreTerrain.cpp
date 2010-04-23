@@ -731,7 +731,8 @@ namespace Ogre
 		deriveUVMultipliers();
 		mMaxBatchSize = importData.maxBatchSize;
 		mMinBatchSize = importData.minBatchSize;
-		mPos = importData.pos;
+		setPosition(importData.pos);
+
 		updateBaseScale();
 		determineLodLevels();
 
