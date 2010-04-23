@@ -742,7 +742,8 @@ namespace Ogre
 		deriveUVMultipliers();
 		mMaxBatchSize = importData.maxBatchSize;
 		mMinBatchSize = importData.minBatchSize;
-		mPos = importData.pos;
+		setPosition(importData.pos);
+
 		updateBaseScale();
 		determineLodLevels();
 
@@ -3380,6 +3381,11 @@ namespace Ogre
 				mLightmap->getBuffer()->blitFromMemory(*lightmapBox, dstBox);
 			}
 		}
+
+		// delete memory
+		OGRE_FREE(lightmapBox->data, MEMCATEGORY_GENERAL);
+		OGRE_DELETE(lightmapBox);
+
 
 	}
 	//---------------------------------------------------------------------
