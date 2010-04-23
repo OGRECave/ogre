@@ -31,6 +31,125 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.7.1 [Cthugha] (25 April 2010) - MAINTENANCE RELEASE</p>
+<ul>
+<li> Terrain: Fix memory leak after updating lightmaps</li>
+<li> Terrain: Ensure that imported position is used when preparing from ImportData</li>
+<li> Fix calcMorphKeyframeSize in serializer - there has never been an 'isOriginalGeometry' flag!</li>
+<li> Safety checks - use !mSkeleton.isNull() instead of hasSkeleton() when accessing the pointer, since hasSkeleton() determines whether the skeleton name is provided, not whether the skeleton has loaded & the pointer is valid</li>
+<li> Terrain: Fix a delete that should have been OGRE_DELETE as pointed out by harkon</li>
+<li> Focussed shadow camera setup dealt with extrusion of directional light volume incorrectly:
+- It clipped the extrusions against the scene AABB, which may exclude casters in sparse scenes where the main camera has stopped seeing them or their shadows for a frame or more
+- It should actually have been extruding the receivers AABB clipped to the camera by the shadow far distance
+- Focus regions would not be affected because extrusion along the light direction does not widen the focus; in fact the use of the whole scene BB instead of just the receivers BB may have led to worse focus</li>
+<li> ArchiveManager's constructor should be in source, not header, to avoid link errors if constructed from outside OgreMain (this fixes tests build on OS X)
+Fix some new/deletes in tests that should have been OGRE_NEW/OGRE_DELETE</li>
+<li> Mark a few more options as 'Advanced' to de-clutter the main CMake page.
+Disabling zip, freeimage, dds etc is definitely an advanced function.</li>
+<li> Patch 2981322 - allow OGRE_LIB_DIRECTORY to be set to install in alternate named directories such as lib64 for 64-bit Linuxes that use that convention.</li>
+<li> Fix for VC10</li>
+<li> Patch 2986452: avoid potential resource group change deadlocks</li>
+<li> Patch 2986446: For ACT_LIGHT_POSITION_OBJECT_SPACE for directional lights, we need to use the inverse of the inverse transpose as with ACT_LIGHT_DIRECTION_OBJECT_SPACE, to deal with non-uniform scalings</li>
+<li> Patch 2986441: MovableObject's queryLights and _notifyCurrentCamera didn't take account of object scaling when dealing with bounding radius</li>
+<li> Patch 2986437: auto-tracking update should be after the re-entrant call to update shadow textures, otherwise old tracking state may be used</li>
+<li> Fixed BillboardChain::getNumChainElements when tail < head</li>
+<li> Fix loading of mesh versions 1.30 and before
+They were picking up LOD loading from latest version instead of fallback in MeshSerializerImpl_v1_4 because of inheritence error</li>
+<li> In Mesh::destroySubMesh, fix up SubMesh name map for the removed item</li>
+<li> If group name on manual LOD level is blank, use parent mesh</li>
+<li> Make PlayPen plugin work on OS X</li>
+<li> Fix bug 308 according to user report - don't include _mingw.h in more recent MinGW packages</li>
+<li> Fix bug 313: doc build target doesn't handle spaces in directry names</li>
+<li> Fix terrain rendering on ATI/GL - no support for fp30/fp40 in latest ATI drivers but arbfp1 works</li>
+<li> Terrain morphing was missing from shader when alignment wasn't x/z</li>
+<li> Deal with CMAKE_OSX_ARCHITECTURES a little better:
+- Selectively remove 64-bit archs (Carbon requirement) instead of manually setting "i386 ppc", so that user can still customise archs for 10.6
+- Set the default arch if none is specified (Cmake 2.8.0)</li>
+<li> Patch 2977286: Fix support for scene blending operations other than SBO_ADD on Dx9 because caps were not being set</li>
+<li> Patch 2979431: Matrix4::makeInverseTransform bug with non-uniform scale</li>
+<li> Patch 2978035: D3D9 should send a "DeviceLost" message to app-side listeners before a device is reset</li>
+<li> Deferred Shading Demo : Fixed 'is camera inside light' test for spotlights.</li>
+<li> Fix problem with picking the right shader generator in TerrainMaterialGeneratorA
+- Would not fall back from Cg when Cg not available (bad nesting)
+- Can only use ps_2_0 when not parallax mapping</li>
+<li> Fix memory leak in SharedPtr when initialised with a null pointer</li>
+<li> Ensure libdl exists before linking to it</li>
+<li> Fix install of tools PDBs in debug mode</li>
+<li> Add test for switching full screen modes without reinitialisation</li>
+<li> (Fixed commit) Applied l3fthn4d's compositor (material_scheme & shadows settings) patch as discussed in http://www.ogre3d.org/forums/viewtopic.php?f=4&t=56031</li>
+<li> Fix bug 305: Entity::setMaterialName(material, group) calls SubEntity::setMaterialName(material) without group.</li>
+<li> Add the rtshader materials directory to resources.cfg</li>
+<li> Correct case-sensitivity issue with samples media path</li>
+<li> Remove nested parenthesis, not supported on CMake 2.6 (only 2.8)</li>
+<li> Explicitly include errno.h.  Otherwise build errors occur if not using boost and threading is turned off.</li>
+<li> Patch 2971821: Fix consistency of inclusions of OctreeSceneManager plugin (important when referenced with relative paths)</li>
+<li> Patch 2971818: deal with missing MinGW header & make inclusion specific to MinGW</li>
+<li> Just make sure meshes are being reloaded in LOD test</li>
+<li> Added tests for manual LOD, seems to work</li>
+<li> Explicitly note in the manual some directives which are irrelevant when using shaders</li>
+<li> Another bad svn:eol-style property</li>
+<li> Fix some bad svn:eol-style properties</li>
+<li> More Xcode template work.  Cleaned up warnings.  Changed iPhone template to use a NSTimer to make it more reliable at high framerates.  Fixed the installer path.</li>
+<li> GLES 1.x patch: fix opengl es 1.1 compilation under windows - ID: 2961527. Thanks Thomas.
+http://sourceforge.net/tracker/?func=detail&atid=302997&aid=2961527&group_id=2997</li>
+<li> GLES 1.x render system: Replaced a printf with a log entry.</li>
+<li> RTSS: Extended the normal map texture unit settings script parsing caps.
+Now it can read the filtering type, max anisotropy and mip map bias.</li>
+<li> Patch 2965714: CMake Infinite Loop Fix for OS X using makefiles instead of XCode</li>
+<li> Patch 2968889: fix ExampleApplication loading config files in debug mode</li>
+<li> Fixed some iPhone remnants of the OGRE_CONFIG_DISABLE to OGRE_CONFIG_ENABLE change</li>
+<li> Implement missing wireframe and points rendering in GL ES.  Also fixed a typo in a comment.</li>
+<li> Doc fix</li>
+<li> Fix copy & paste error that could cause crashes when unloading & reinitialising terrain</li>
+<li> Fix a couple bugs in the Xcode templates.  Added an option to choose separate locations for OS X and iPhone SDK's.  Cleaned up the installer package a little bit.</li>
+<li> Patch 2963406: Deal with negative scale in Entity::getBoundingRadius</li>
+<li> Patch 2963372: Matrix4::makeTransform/makeInverseTransform inefficiencies fixed
+Reduces complexity of this from 39MUL+30ADD to 18MUL+15ADD</li>
+<li> Must set the OGRE_MEDIA_DIR_* to an absolute path for build folder versions</li>
+<li> Patch 2959565: fix XSI exporter build</li>
+<li> Fix bug 264: problem with Camera::setDirection when using non-fixed yaw and a non-identity parent node.</li>
+<li> Fix bug 299: Sequence of light changes can cause crash because of light hash==0</li>
+<li> Make sure linking or copying media works in non-SDK builds for OS X and iPhone</li>
+<li> Mention that the default material generator requires the Cg plugin</li>
+<li> Fix water sample when exiting & reentering it by making sure mesh is removed from MeshManager</li>
+<li> Update Xcode templates for 1.7 final release</li>
+<li> Profiler: endProfile checks group id against mask.</li>
+<li> GpuProgram: Added init in the contractor to mMorphAnimation and mPoseAnimation members.</li>
+<li> Fix bug 297: Incorrect use of Boost_USE_STATIC_LIBS causes boost library search to fail when trying to switch to Boost dynamic libs</li>
+<li> Changes for building SDK for iPhone</li>
+<li> Should delete .exe not .7z when building SDK multiple times</li>
+<li> D3D9 Render System: Device multi thread flag is used now only when OGRE_THREAD_SUPPORT == 1. This will save us a few cycles in the other threading modes..</li>
+<li> FindOIS.cmake fixes:
+- Respect OGRE_DEPENDENCIES_DIR (useful if used outside of OGRE)
+- On Win32 define names of the OIS DLLs so they can be copied from wherever they are found</li>
+<li> FindOGRE.cmake fixes:
+- Use OGRE_DEPENDENCIES_DIR if defined (external dependencies)
+- Find media in the OGRE_SOURCE folder correctly
+- Use a zip file common to 1.6 and 1.7 to detect media (OgreCore.zip doesn't exist anymore in 1.7+)</li>
+<li> Compile fix for people using ExampleFrameListener</li>
+<li> RTSS: Fixed Normal map point and spotlight GPU parameters that weren't update correctly.</li>
+<li> Minor tweaks to the demos installer
+- Nicer defaults
+- License display (forced to be RTF unfortunately)</li>
+<li> Enable WiX installer interface and allow the user to specify the install directory for the demos
+Fix media installing
+Add missing samples.cfg</li>
+<li> Fixed remaining bugs for MinGW SDK and finished mingwsdk.sh</li>
+<li> Fix shortcut errors in WiX setup</li>
+<li> Generate WiX config files and custom task for building a demo installer on MSVC
+Remove space in OGRE_VERSION before suffix, more trouble than it's worth even for display strings
+demomedia.wxi.in was generated using 'heat dir Media -gg -cg OgreMedia -out demomedia.wxi.in -sfrag' on a clean Media export, then replacing SourceDir with Cmake variable</li>
+<li> Fixes and enhancements for MinGW SDK generation.</li>
+<li> Merged v9841 into tag since urgent change</li>
+<li> Merged v9841 into tag since urgent change</li>
+<li> In future, use the Windows-mode 7zip self-extractor not the default console-mode one</li>
+<li> Final changes for the OS X SDK.  Fixes up all the absolute paths in CMake generated files.</li>
+<li> OGRE_VERSION has a whitespace and version suffix appended; this breaks builds if used as the .so version for shared libraries. Use a dedicated OGRE_SOVERSION instead.</li>
+<li> RTSS: Fixed Normal map and PSSM3 GPU parameters that weren't update on object switch scenario.</li>
+
+</ul>
+
+<p class="mainheader">
     v1.7.0 [Cthugha] (28 February 2010) - MAJOR RELEASE</p>
 	    <a href="#changessince1.7.0RC1">[View changes since RC1]</a>
 
