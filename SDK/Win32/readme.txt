@@ -31,7 +31,4 @@ Run buildsdk.bat with one of the following parameters to pick the compiler of yo
  
 You can also add "clean" to the parameters to delete any existing build folder (or do it manually).
  
-Packaging the SDK
------------------
-
-Zip up the contents of %compiler%/sdk. 
+The SDK will be packaged as OgreSDK_%COMPILER%_v%OGREVERSION%.exe which is the file you should upload.
