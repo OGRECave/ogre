@@ -70,6 +70,8 @@ namespace Ogre
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;
         /** See Renderable. */
+		const MaterialPtr& getMaterial(void) const;
+        /** See Renderable. */
         void getRenderOperation(RenderOperation& op);
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
