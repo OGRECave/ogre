@@ -359,10 +359,6 @@ namespace Ogre {
         if (mpFont.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find font " + font,
 				"TextAreaOverlayElement::setFontName" );
-        mpFont->load();
-        mpMaterial = mpFont->getMaterial();
-        mpMaterial->setDepthCheckEnabled(false);
-        mpMaterial->setLightingEnabled(false);
 		
 		mGeomPositionsOutOfDate = true;
 		mGeomUVsOutOfDate = true;
@@ -432,8 +428,23 @@ namespace Ogre {
         return msTypeName;
     }
     //---------------------------------------------------------------------
-    void TextAreaOverlayElement::getRenderOperation(RenderOperation& op)
+    const MaterialPtr& TextAreaOverlayElement::getMaterial(void) const
     {
+		// On-demand load
+		// Moved from setFontName to avoid issues with background parsing of scripts
+		if (mpMaterial.isNull() && !mpFont.isNull())
+		{
+			mpFont->load();
+			// Ugly hack, but we need to override for lazy-load
+			*const_cast<MaterialPtr*>(&mpMaterial) = mpFont->getMaterial();
+			mpMaterial->setDepthCheckEnabled(false);
+			mpMaterial->setLightingEnabled(false);
+		}
+        return mpMaterial;
+    }
+    //---------------------------------------------------------------------
+    void TextAreaOverlayElement::getRenderOperation(RenderOperation& op)
+    { 
         op = mRenderOp;
     }
     //---------------------------------------------------------------------
