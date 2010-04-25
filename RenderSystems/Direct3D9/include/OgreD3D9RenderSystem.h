@@ -199,6 +199,15 @@ namespace Ogre
 		void _cleanupDepthBuffers( IDirect3DDevice9 *creator );
 
 		/**
+		 * This function does NOT override RenderSystem::_cleanupDepthBuffers(bool) functionality.
+		 * Manually created surfaces may be released arbitrarely without being pulled out from the pool
+		 * (specially RenderWindows) this function takes care of that.
+		 * @param:
+		 *		Depthbuffer surrface to compare against. Shouldn't be null
+		 */
+		void _cleanupDepthBuffers( IDirect3DSurface9 *manualSurface );
+
+		/**
          * Set current render target to target, enabling its GL context if needed
          */
 		void _setRenderTarget(RenderTarget *target);

@@ -2851,6 +2851,49 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	void D3D9RenderSystem::_cleanupDepthBuffers( IDirect3DSurface9 *manualSurface )
+	{
+		assert( manualSurface );
+
+		DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+		DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+		while( itMap != enMap )
+		{
+			DepthBufferVec::iterator itor = itMap->second.begin();
+			DepthBufferVec::iterator end  = itMap->second.end();
+
+			while( itor != end )
+			{
+				//Only delete those who match the specified surface
+				if( static_cast<D3D9DepthBuffer*>(*itor)->getDepthBufferSurface() == manualSurface )
+				{
+					OGRE_DELETE *itor;
+
+					//Erasing a vector invalidates iterators, we need to recalculate
+					//to avoid memory corruption and asserts. The new itor will point
+					//to the next iterator
+					const size_t idx = itor - itMap->second.begin();
+					itMap->second.erase( itor );	//Erase
+					itor = itMap->second.begin() + idx;
+					end  = itMap->second.end();
+				}
+				else
+					++itor;
+			}
+
+			//Erase the pool if it's now empty. Note erasing from a map is
+			//valid while iterating through it
+			if( itMap->second.empty() )
+			{
+				DepthBufferMap::iterator deadi = itMap++;
+				mDepthBufferPool.erase( deadi );
+			}
+			else
+				++itMap;
+		}
+	}
+	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setRenderTarget(RenderTarget *target)
 	{
 		mActiveRenderTarget = target;

@@ -787,6 +787,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::releaseRenderWindowResources(RenderWindowResources* renderWindowResources)
 	{
+		if( renderWindowResources->depthBuffer )
+		{
+			D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>
+													(Root::getSingleton().getRenderSystem());
+			renderSystem->_cleanupDepthBuffers( renderWindowResources->depthBuffer );
+		}
+
 		SAFE_RELEASE(renderWindowResources->backBuffer);
 		SAFE_RELEASE(renderWindowResources->depthBuffer);
 		SAFE_RELEASE(renderWindowResources->swapChain);
