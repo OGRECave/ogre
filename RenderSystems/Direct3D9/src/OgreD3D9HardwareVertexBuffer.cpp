@@ -268,10 +268,12 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void D3D9HardwareVertexBuffer::notifyOnDeviceReset(IDirect3DDevice9* d3d9Device)
 	{		
-		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
-
-		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
-			createBuffer(d3d9Device, mBufferDesc.Pool);
+ 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+ 
+ 		if (mBufferDesc.Pool == D3DPOOL_DEFAULT)
+		{
+ 			createBuffer(d3d9Device, mBufferDesc.Pool);
+		}
 	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareVertexBuffer::createBuffer(IDirect3DDevice9* d3d9Device, D3DPOOL ePool)
