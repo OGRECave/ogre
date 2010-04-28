@@ -74,6 +74,7 @@ namespace Ogre {
     {
         switch(mTextureType)
         {
+            case TEX_TYPE_1D:
             case TEX_TYPE_2D:
                 return GL_TEXTURE_2D;
             case TEX_TYPE_CUBE_MAP:
@@ -162,6 +163,7 @@ namespace Ogre {
 
 				switch(mTextureType)
 				{
+					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
                         glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
@@ -180,7 +182,6 @@ namespace Ogre {
                             GL_CHECK_ERROR;
 						}
 						break;
-					case TEX_TYPE_1D:
 					case TEX_TYPE_3D:
                     default:
                         break;
@@ -214,6 +215,7 @@ namespace Ogre {
 				// Normal formats
 				switch(mTextureType)
 				{
+					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
                         glTexImage2D(GL_TEXTURE_2D,
                                      mip,
@@ -231,7 +233,6 @@ namespace Ogre {
 								GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						}
 						break;
-					case TEX_TYPE_1D:
 					case TEX_TYPE_3D:
                     default:
                         break;
@@ -281,7 +282,7 @@ namespace Ogre {
 
         LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 std::vector<Image>());
 
-        if (mTextureType == TEX_TYPE_2D)
+        if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D)
         {
             doImageIO(mName, mGroup, ext, *loadedImages, this);
 

@@ -1,7 +1,7 @@
 // -------------------------------
 // Cel Shading Section
 // -------------------------------
-vertex_program Ogre/CelShadingVP cg
+vertex_program Ogre/CelShadingVPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
@@ -16,12 +16,44 @@ vertex_program Ogre/CelShadingVP cg
 	}
 }
 
-fragment_program Ogre/CelShadingFP cg
+fragment_program Ogre/CelShadingFPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
 	profiles ps_1_1 arbfp1 fp20
 
+}
+
+vertex_program Ogre/CelShadingVPGLSLES glsles
+{
+	source Example_CelShadingVp.glsles
+	profiles glsles
+
+	default_params
+	{
+		param_named_auto lightPosition light_position_object_space 0
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named shininess float 10 
+	}
+}
+
+fragment_program Ogre/CelShadingFPGLSLES glsles
+{
+	source Example_CelShadingFp.glsles
+	profiles glsles
+}
+
+fragment_program Ogre/CelShadingFP unified
+{
+	delegate Ogre/CelShadingFPGLSLES
+	delegate Ogre/CelShadingFPCg
+}
+
+vertex_program Ogre/CelShadingVP unified
+{
+	delegate Ogre/CelShadingVPGLSLES
+	delegate Ogre/CelShadingVPCg
 }
 
 material Examples/CelShading

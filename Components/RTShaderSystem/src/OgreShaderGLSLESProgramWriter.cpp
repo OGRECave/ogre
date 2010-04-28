@@ -66,6 +66,7 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
             mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
             mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
+            mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler2D";
             mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
             mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
             mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
@@ -525,6 +526,9 @@ namespace Ogre {
                                 "GLSLESProgramWriter::writeProgramDependencies" );	
                         }
 
+                        if (gpuType == GCT_SAMPLER1D)
+                            gpuType = GCT_SAMPLER2D;
+                        
                         // Write the operand type.
                         funcDecl += mGpuConstTypeMap[gpuType];
 
