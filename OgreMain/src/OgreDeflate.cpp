@@ -279,6 +279,8 @@ namespace Ogre
 			/* done when last data in file processed */
 		} while (flush != Z_FINISH);
 		assert(ret == Z_STREAM_END);        /* stream will be complete */
+		
+		deflateEnd(mpZStream);
 				
 		remove(mTempFileName.c_str());
 						
