@@ -344,8 +344,8 @@ namespace Ogre  {
 				// Seems that iPhone treats the RGBA format differently than every other platform
 #if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE)
                 return PF_X8B8G8R8;
-#else
-                return PF_A8R8G8B8;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		return PF_A8B8G8R8;
 #endif
 
 #if GL_EXT_texture_compression_dxt1
