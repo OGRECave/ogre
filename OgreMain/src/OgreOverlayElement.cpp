@@ -386,7 +386,7 @@ namespace Ogre {
                 OverlayManager& oMgr = OverlayManager::getSingleton();
                 vpWidth = (Real) (oMgr.getViewportWidth());
                 vpHeight = (Real) (oMgr.getViewportHeight());
-
+				
                 mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
                 mPixelScaleY = 1.0f /  10000.0f;
 

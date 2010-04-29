@@ -660,7 +660,6 @@ namespace Ogre{
 	//-------------------------------------------------------------------------
 	void TechniqueTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
 	{
-		LogManager::getSingleton().logMessage("Translating technique");
 		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 		
 		// Create the technique from the material
@@ -904,10 +903,8 @@ namespace Ogre{
 	//-------------------------------------------------------------------------
 	void PassTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
 	{
-		LogManager::getSingleton().logMessage("Translating pass");
 		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
-		LogManager::getSingleton().logMessage("Getting technique object");
 		Technique *technique = any_cast<Technique*>(obj->parent->context);
 		mPass = technique->createPass();
 		obj->context = Any(mPass);
@@ -922,7 +919,6 @@ namespace Ogre{
 			if((*i)->type == ANT_PROPERTY)
 			{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
-				LogManager::getSingleton().logMessage(prop->name);
 				switch(prop->id)
 				{
 				case ID_AMBIENT:
@@ -1010,7 +1006,6 @@ namespace Ogre{
 						}
 						else
 						{
-							LogManager::getSingleton().logMessage("Reading specular");
 							AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
 								i1 = getNodeAt(prop->values, 1),
 								i2 = getNodeAt(prop->values, 2);
@@ -1019,7 +1014,6 @@ namespace Ogre{
 							{
 								if(prop->values.size() == 4)
 								{
-									LogManager::getSingleton().logMessage("Setting specular");
 									mPass->setSpecular(val);
 
 									AbstractNodeList::const_iterator i3 = getNodeAt(prop->values, 3);
@@ -1029,7 +1023,6 @@ namespace Ogre{
 									else
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 											"specular fourth argument must be a valid number for shininess attribute");
-									LogManager::getSingleton().logMessage("Specular is set");
 								}
 								else if(prop->values.size() > 4)
 								{
@@ -2028,7 +2021,6 @@ namespace Ogre{
 						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0);
 						if((*i0)->type == ANT_ATOM)
 						{
-							LogManager::getSingleton().logMessage("Getting iteration");
 							AtomAbstractNode *atom = (AtomAbstractNode*)(*i0).get();
 							if(atom->id == ID_ONCE)
 							{
@@ -2064,7 +2056,6 @@ namespace Ogre{
 							}
 							else if(StringConverter::isNumber(atom->value))
 							{
-								LogManager::getSingleton().logMessage("Setting iteration count");
 								mPass->setPassIterationCount(Ogre::StringConverter::parseInt(atom->value));
 
 								AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1);
@@ -2103,11 +2094,9 @@ namespace Ogre{
 										AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
 										if(i2 != prop->values.end() && (*i2)->type == ANT_ATOM)
 										{
-											LogManager::getSingleton().logMessage("Getting per_n_lights");
 											atom = (AtomAbstractNode*)(*i2).get();
 											if(StringConverter::isNumber(atom->value))
 											{
-												LogManager::getSingleton().logMessage("Setting count per iteration");
 												mPass->setLightCountPerIteration(
 													static_cast<unsigned short>(StringConverter::parseInt(atom->value)));
 												
@@ -2555,7 +2544,6 @@ namespace Ogre{
 	//-------------------------------------------------------------------------
 	void TextureUnitTranslator::translate(ScriptCompiler *compiler, const Ogre::AbstractNodePtr &node)
 	{
-		LogManager::getSingleton().logMessage("Translating texture unit");
 		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
 
 		Pass *pass = any_cast<Pass*>(obj->parent->context);
@@ -2572,7 +2560,6 @@ namespace Ogre{
 			if((*i)->type == ANT_PROPERTY)
 			{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
-				LogManager::getSingleton().logMessage(prop->name);
 				switch(prop->id)
 				{
 				case ID_TEXTURE_ALIAS:
@@ -2607,12 +2594,10 @@ namespace Ogre{
 					}
 					else
 					{
-						LogManager::getSingleton().logMessage("Getting texture name");
 						AbstractNodeList::const_iterator j = prop->values.begin();
 						String val;
 						if(getString(*j, &val))
 						{
-							LogManager::getSingleton().logMessage("Got texture name");
 							TextureType texType = TEX_TYPE_2D;
 							bool isAlpha = false;
 							bool sRGBRead = false;
@@ -2663,19 +2648,13 @@ namespace Ogre{
 								++j;
 							}
 
-							LogManager::getSingleton().logMessage("Firing event");
 							ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, val);
 							compiler->_fireEvent(&evt, 0);
 
-							LogManager::getSingleton().logMessage("Setting texture");
 							mUnit->setTextureName(evt.mName, texType);
-							LogManager::getSingleton().logMessage("Setting format");
 							mUnit->setDesiredFormat(format);
-							LogManager::getSingleton().logMessage("Setting alpha");
 							mUnit->setIsAlpha(isAlpha);
-							LogManager::getSingleton().logMessage("Setting mipmaps");
 							mUnit->setNumMipmaps(mipmaps);
-							LogManager::getSingleton().logMessage("Setting hardware gamma");
 							mUnit->setHardwareGammaEnabled(sRGBRead);
 						}
 						else
