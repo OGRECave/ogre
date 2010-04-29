@@ -43,7 +43,7 @@ namespace Ogre {
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 		static char buffer[128] = "";
-		int n = snprintf(buffer, 128, "%f", width, precision, val);
+		int n = snprintf(buffer, 128, "%f", val);
 		return String(buffer, n);
 #else
         stringstream stream;
@@ -309,11 +309,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real StringConverter::parseReal(const String& val)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		Real ret = 0;
+		int n = sscanf(val.c_str(), "%f", &ret);
+		
+		if(n == 0){
+			// Nothing read, so try integer format
+			int ret2 = 0;
+			n = sscanf(val.c_str(), "%d", &ret2);
+			if(n == 1)
+				ret = (Real)ret2;
+		}
+#else
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		Real ret = 0;
 		str >> ret;
-
+#endif
         return ret;
     }
     //-----------------------------------------------------------------------
@@ -484,15 +496,16 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool StringConverter::isNumber(const String& val)
 	{
-		/*
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		float test;
+		int n = sscanf(val.c_str(), "%f", &test);
+		return n == 1;
+#else
 		StringStream str(val);
 		float tst;
 		str >> tst;
 		return !str.fail() && str.eof();
-		*/
-		float test;
-		int n = sscanf(val.c_str(), "%f", &test);
-		return n == 1;
+#endif
 	}
 }
 
