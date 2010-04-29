@@ -2292,7 +2292,44 @@ namespace Ogre {
 					Ogre::Technique* curTech = itTech.getNext();
 
 					if (curTech->getSchemeName() == schemeName)
-					{					
+					{
+						/*
+						for(unsigned int i = 0; i < curTech->getNumPasses(); ++i)
+						{
+							Ogre::Pass *pass = curTech->getPass(i);
+							
+							Ogre::GpuProgramPtr vp = pass->getVertexProgram();
+							Ogre::GpuProgramPtr fp = pass->getFragmentProgram();
+							
+							if(!vp.isNull())
+							{
+								std::stringstream stream(vp->getSource());
+								std::string line;
+								while(std::getline(stream, line))
+								{
+									LogManager::getSingleton().logMessage(line);
+								}
+								
+								GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
+								GpuProgramParameters::AutoConstantIterator iter = params->getAutoConstantIterator();
+								while(iter.hasMoreElements())
+								{
+									GpuProgramParameters::AutoConstantEntry e = iter.getNext();
+									const GpuProgramParameters::AutoConstantDefinition *def = GpuProgramParameters::getAutoConstantDefinition(e.paramType);
+									LogManager::getSingleton().logMessage(def->name);
+								}
+							}
+							if(!fp.isNull())
+							{
+								std::stringstream stream(fp->getSource());
+								std::string line;
+								while(std::getline(stream, line))
+								{
+									LogManager::getSingleton().logMessage(line);
+								}
+							}
+						}
+						*/
 						generatedTech = curTech;
 						break;
 					}
