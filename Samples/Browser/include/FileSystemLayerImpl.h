@@ -82,6 +82,14 @@ namespace OgreBites
 		{
 			return mHomePath + filename;
 		}
+		
+		void setConfigPaths(const Ogre::StringVector &paths){
+			mConfigPaths = paths;
+		}
+		
+		void setHomePath(const Ogre::String &path){
+			mHomePath = path;
+		}
 
 	private:
 		Ogre::StringVector mConfigPaths;
