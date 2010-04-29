@@ -83,7 +83,7 @@ namespace OgreBites
 			mResourcesLoaded = false;
 			mContentSetup = false;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			mMouse = 0;
 			mAccelerometer = 0;
 #else
@@ -140,14 +140,14 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, FileSystemLayer* fsLayer)
 #else
 		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
 #endif
 		{
 			mWindow = window;
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 			mKeyboard = keyboard;
 #endif
 			mMouse = mouse;
@@ -222,7 +222,7 @@ namespace OgreBites
 		virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
 		virtual bool keyPressed(const OIS::KeyEvent& evt) { return true; }
 		virtual bool keyReleased(const OIS::KeyEvent& evt) { return true; }
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt) { return true; }
 		virtual bool touchPressed(const OIS::MultiTouchEvent& evt) { return true; }
 		virtual bool touchReleased(const OIS::MultiTouchEvent& evt) { return true; }
@@ -290,7 +290,7 @@ namespace OgreBites
 
 		Ogre::Root* mRoot;                // OGRE root object
 		Ogre::RenderWindow* mWindow;      // context render window
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		OIS::MultiTouch* mMouse;          // context multitouch device
 		OIS::JoyStick* mAccelerometer;    // context accelerometer device
 #else

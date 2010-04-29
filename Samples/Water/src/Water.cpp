@@ -544,7 +544,7 @@ public:
 
 		// rain
 		processCircles(evt.timeSinceLastFrame);
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
 			particleEmitter->setEmissionRate(20.0f);
 		} else {

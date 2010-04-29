@@ -29,6 +29,7 @@
 #define __SampleContext_H__
 
 #include "Ogre.h"
+#include "OgreLogManager.h"
 #include "OgrePlugin.h"
 #include "Sample.h"
 #include "FileSystemLayerImpl.h"
@@ -95,7 +96,7 @@ namespace OgreBites
 	class SampleContext :
 		public Ogre::FrameListener,
 		public Ogre::WindowEventListener,
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 		public OIS::KeyListener,
 		public OIS::MouseListener
 #else
@@ -115,7 +116,7 @@ namespace OgreBites
 			mLastRun = false;
 			mLastSample = 0;
 			mInputMgr = 0;
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			mMouse = 0;
 			mAccelerometer = 0;
 #else
@@ -154,6 +155,7 @@ namespace OgreBites
 
 			if (s)
 			{
+				Ogre::LogManager::getSingleton().logMessage("Starting a sample");
 				// retrieve sample's required plugins and currently installed plugins
 				Ogre::Root::PluginInstanceList ip = mRoot->getInstalledPlugins();
 				Ogre::StringVector rp = s->getRequiredPlugins();
@@ -190,7 +192,8 @@ namespace OgreBites
 				// test system capabilities against sample requirements
 				s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+				Ogre::LogManager::getSingleton().logMessage("setting up");
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 				s->_setup(mWindow, mMouse, mFSLayer);   // start new sample
 #else
 				s->_setup(mWindow, mKeyboard, mMouse, mFSLayer);   // start new sample
@@ -218,6 +221,20 @@ namespace OgreBites
             else if (initialSample) runSample(initialSample);
 
             mRoot->saveConfig();
+
+			Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
+
+			// Clear event times
+			Ogre::Root::getSingleton().clearEventTimes();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			createRoot();
+
+            setup();
+
+            if (!mFirstRun) recoverLastSample();
+            else if (initialSample) runSample(initialSample);
+
+            //mRoot->saveConfig();
 
 			Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
 
@@ -344,7 +361,7 @@ namespace OgreBites
 			// manually call sample callback to ensure correct order
 			if (mCurrentSample && !mSamplePaused) mCurrentSample->windowResized(rw);
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 			const OIS::MouseState& ms = mMouse->getMouseState();
 			ms.width = rw->getWidth();
 			ms.height = rw->getHeight();
@@ -389,7 +406,7 @@ namespace OgreBites
 		}
 
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-    #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+    #if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
         void transformInputState(OIS::MultiTouchState &state)
     #else
         void transformInputState(OIS::MouseState &state)
@@ -428,7 +445,7 @@ namespace OgreBites
         }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
 		{
 			if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchMoved(evt);
@@ -442,7 +459,7 @@ namespace OgreBites
 		}
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
 		{
 			if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchPressed(evt);
@@ -456,7 +473,7 @@ namespace OgreBites
 		}
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
 		{
 			if (mCurrentSample && !mSamplePaused) return mCurrentSample->touchReleased(evt);
@@ -477,16 +494,22 @@ namespace OgreBites
          -----------------------------------------------------------------------------*/
 		virtual void setup()
 		{
+			Ogre::LogManager::getSingleton().logMessage("creating window");
 			createWindow();
+			Ogre::LogManager::getSingleton().logMessage("setting up input");
 			setupInput();
+			Ogre::LogManager::getSingleton().logMessage("locating resources");
 			locateResources();
+			Ogre::LogManager::getSingleton().logMessage("loading resources");
 			loadResources();
             
 			Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
             
 			// adds context as listener to process context-level (above the sample level) events
 			mRoot->addFrameListener(this);
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
+#endif
 		}
         
 		/*-----------------------------------------------------------------------------
@@ -494,13 +517,17 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void createRoot()
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			mRoot = Ogre::Root::getSingletonPtr();
+#else
             Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
             #ifndef OGRE_STATIC_LIB
 				pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
             #endif
 			mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"), 
 				mFSLayer->getWritablePath("ogre.log"));
-            
+#endif
+
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.load();
 #endif
@@ -532,6 +559,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setupInput()
 		{
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			OIS::ParamList pl;
 			size_t winHandle = 0;
 			std::ostringstream winHandleStr;
@@ -546,6 +574,7 @@ namespace OgreBites
 			createInputDevices();      // create the specific input devices
 
 			windowResized(mWindow);    // do an initial adjustment of mouse area
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -555,6 +584,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void createInputDevices()
 		{
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 			mMouse = static_cast<OIS::MultiTouch*>(mInputMgr->createInputObject(OIS::OISMultiTouch, true));
 			mAccelerometer = static_cast<OIS::JoyStick*>(mInputMgr->createInputObject(OIS::OISJoyStick, true));
@@ -565,6 +595,7 @@ namespace OgreBites
 			mKeyboard->setEventCallback(this);
 #endif
 			mMouse->setEventCallback(this);
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -573,6 +604,9 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void locateResources()
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			// TODO: This is handled externally for now
+#else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;
 			cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
@@ -603,6 +637,7 @@ namespace OgreBites
 					Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
 				}
 			}
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -688,6 +723,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void shutdownInput()
 		{
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			if (mInputMgr)
 			{
 #if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
@@ -700,6 +736,7 @@ namespace OgreBites
 				OIS::InputManager::destroyInputSystem(mInputMgr);
 				mInputMgr = 0;
 			}
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -707,12 +744,14 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void captureInputDevices()
 		{
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mKeyboard->capture();
 #else
             mAccelerometer->capture();
 #endif
 			mMouse->capture();
+#endif
 		}
 
 		FileSystemLayer* mFSLayer; 		// File system abstraction layer
@@ -722,7 +761,7 @@ namespace OgreBites
 #ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		OIS::MultiTouch* mMouse;        // multitouch device
 		OIS::JoyStick* mAccelerometer;  // accelerometer device
 #else

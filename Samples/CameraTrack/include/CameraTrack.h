@@ -46,7 +46,7 @@ protected:
         // create a camera node and attach camera to it
         SceneNode* camNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         camNode->attachObject(mCamera);
-
+		
 		// set up a 10 second animation for our camera, using spline interpolation for nice curves
         Animation* anim = mSceneMgr->createAnimation("CameraTrack", 10);
         anim->setInterpolationMode(Animation::IM_SPLINE);
