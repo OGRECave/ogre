@@ -69,9 +69,9 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::exportMesh(const Mesh* pMesh, 
-		const String& filename, Endian endianMode)
+		DataStreamPtr stream, Endian endianMode)
     {
-        LogManager::getSingleton().logMessage("MeshSerializer writing mesh data to " + filename + "...");
+        LogManager::getSingleton().logMessage("MeshSerializer writing mesh data to stream " + stream->getName() + "...");
 
 		// Decide on endian mode
 		determineEndianness(endianMode);
@@ -83,11 +83,11 @@ namespace Ogre {
                 " bounds completely defined. Define them first before exporting.",
                 "MeshSerializerImpl::exportMesh");
         }
-        mpfFile = fopen(filename.c_str(), "wb");
-		if (!mpfFile)
+        mStream = stream;
+		if (!stream->isWriteable())
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Unable to open file " + filename + " for writing",
+				"Unable to use stream " + stream->getName() + " for writing",
 				"MeshSerializerImpl::exportMesh");
 		}
 
@@ -99,7 +99,6 @@ namespace Ogre {
         writeMesh(pMesh);
         LogManager::getSingleton().logMessage("Mesh data exported.");
 
-        fclose(mpfFile);
         LogManager::getSingleton().logMessage("MeshSerializer export successful.");
     }
     //---------------------------------------------------------------------

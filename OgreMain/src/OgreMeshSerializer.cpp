@@ -80,15 +80,27 @@ namespace Ogre {
     void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
 		Endian endianMode)
     {
-        MeshSerializerImplMap::iterator impl = mImplementations.find(msCurrentVersion);
-        if (impl == mImplementations.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot find serializer implementation for "
-                "current version " + msCurrentVersion, "MeshSerializer::exportMesh");
-        }
+		std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
+		f->open(filename.c_str(), std::ios::binary | std::ios::out);
+		DataStreamPtr stream(OGRE_NEW FileStreamDataStream(f));
 
-        impl->second->exportMesh(pMesh, filename, endianMode);
+        exportMesh(pMesh, stream, endianMode);
+
+		stream->close();
     }
+	//---------------------------------------------------------------------
+	void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
+		Endian endianMode)
+	{
+		MeshSerializerImplMap::iterator impl = mImplementations.find(msCurrentVersion);
+		if (impl == mImplementations.end())
+		{
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot find serializer implementation for "
+				"current version " + msCurrentVersion, "MeshSerializer::exportMesh");
+		}
+
+		impl->second->exportMesh(pMesh, stream, endianMode);
+	}
     //---------------------------------------------------------------------
     void MeshSerializer::importMesh(DataStreamPtr& stream, Mesh* pDest)
     {

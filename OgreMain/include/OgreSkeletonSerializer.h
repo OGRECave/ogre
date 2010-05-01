@@ -71,6 +71,16 @@ namespace Ogre {
         void exportSkeleton(const Skeleton* pSkeleton, const String& filename,
 			Endian endianMode = ENDIAN_NATIVE);
 
+        /** Exports a skeleton to the stream specified. 
+        @remarks
+            This method takes an externally created Skeleton object, and exports both it
+            and animations it uses to a .skeleton file.
+        @param pSkeleton Weak reference to the Skeleton to export
+        @param stream The destination stream
+		@param endianMode The endian mode to write in
+        */
+        void exportSkeleton(const Skeleton* pSkeleton, DataStreamPtr stream,
+			Endian endianMode = ENDIAN_NATIVE);
         /** Imports Skeleton and animation data from a .skeleton file DataStream.
         @remarks
             This method imports data from a DataStream opened from a .skeleton file and places it's

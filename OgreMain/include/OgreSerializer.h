@@ -67,7 +67,7 @@ namespace Ogre {
     protected:
 
         uint32 mCurrentstreamLen;
-        FILE* mpfFile;
+        DataStreamPtr mStream;
         String mVersion;
 		bool mFlipEndian; // default to native endian, derive from header
 
