@@ -179,7 +179,7 @@ namespace Ogre {
             @param
                 vTile The number of times the texture should be repeated in the v direction
             @param
-                upVector The 'Up' direction of the plane.
+                upVector The 'Up' direction of the plane texture coordinates.
 			@param
 				vertexBufferUsage The usage flag with which the vertex buffer for this plane will be created
 			@param
