@@ -446,13 +446,13 @@ namespace Ogre{
 			switch(count1)
 			{
 			case 2:
-				*op = (GpuConstantType)(GCT_MATRIX_2X2 + count2 - 1);
+				*op = (GpuConstantType)(GCT_MATRIX_2X2 + count2 - 2);
 				break;
 			case 3:
-				*op = (GpuConstantType)(GCT_MATRIX_3X2 + count2 - 1);
+				*op = (GpuConstantType)(GCT_MATRIX_3X2 + count2 - 2);
 				break;
 			case 4:
-				*op = (GpuConstantType)(GCT_MATRIX_4X2 + count2 - 1);
+				*op = (GpuConstantType)(GCT_MATRIX_4X2 + count2 - 2);
 				break;
 			}
 
