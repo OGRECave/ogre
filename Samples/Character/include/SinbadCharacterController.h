@@ -166,11 +166,13 @@ private:
 		mBodyNode->attachObject(mBodyEnt);
 
 		// create swords and attach to sheath
+		LogManager::getSingleton().logMessage("Creating swords");
 		mSword1 = sceneMgr->createEntity("SinbadSword1", "Sword.mesh");
 		mSword2 = sceneMgr->createEntity("SinbadSword2", "Sword.mesh");
 		mBodyEnt->attachObjectToBone("Sheath.L", mSword1);
 		mBodyEnt->attachObjectToBone("Sheath.R", mSword2);
 
+		LogManager::getSingleton().logMessage("Creating the chains");
 		// create a couple of ribbon trails for the swords, just for fun
 		NameValuePairList params;
 		params["numberOfChains"] = "2";
