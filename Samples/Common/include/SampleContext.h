@@ -116,9 +116,12 @@ namespace OgreBites
 			mLastRun = false;
 			mLastSample = 0;
 			mInputMgr = 0;
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 			mMouse = 0;
 			mAccelerometer = 0;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			mMouse = 0;
+			mKeyboard = 0;
 #else
 			mKeyboard = 0;
 			mMouse = 0;
@@ -263,11 +266,15 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void closeApp()
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			shutdown();
+#else
 			mRoot->saveConfig();
 			shutdown();
 			if (mRoot) OGRE_DELETE mRoot;
 #ifdef OGRE_STATIC_LIB
 			mStaticPluginLoader.unload();
+#endif
 #endif
 
 		}
@@ -494,13 +501,9 @@ namespace OgreBites
          -----------------------------------------------------------------------------*/
 		virtual void setup()
 		{
-			Ogre::LogManager::getSingleton().logMessage("creating window");
 			createWindow();
-			Ogre::LogManager::getSingleton().logMessage("setting up input");
 			setupInput();
-			Ogre::LogManager::getSingleton().logMessage("locating resources");
 			locateResources();
-			Ogre::LogManager::getSingleton().logMessage("loading resources");
 			loadResources();
             
 			Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -761,9 +764,12 @@ namespace OgreBites
 #ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
 #endif
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 		OIS::MultiTouch* mMouse;        // multitouch device
 		OIS::JoyStick* mAccelerometer;  // accelerometer device
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		OIS::MultiTouch* mMouse;        // multitouch device
+		OIS::Keyboard* mKeyboard;       // keyboard device
 #else
 		OIS::Keyboard* mKeyboard;       // keyboard device
 		OIS::Mouse* mMouse;             // mouse device

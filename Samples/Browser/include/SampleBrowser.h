@@ -232,10 +232,11 @@ protected:
 		| init pre-created window for android
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void initAppForAndroid(Ogre::RenderWindow *window, OIS::MultiTouch *mouse)
+		void initAppForAndroid(Ogre::RenderWindow *window, OIS::MultiTouch *mouse, OIS::Keyboard *keyboard)
 		{
 			mWindow = window;
 			mMouse = mouse;
+			mKeyboard = keyboard;
 		}
 #endif
 
@@ -959,14 +960,10 @@ protected:
             
 			Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
             
-			Ogre::LogManager::getSingleton().logMessage("creating tray");
 			mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mMouse, this);
-			Ogre::LogManager::getSingleton().logMessage("showing backdrop");
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
-			Ogre::LogManager::getSingleton().logMessage("hiding");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
             
-			Ogre::LogManager::getSingleton().logMessage("creating dummy scene");
 			createDummyScene();
 
 #ifdef USE_RTSHADER_SYSTEM
@@ -978,7 +975,6 @@ protected:
 
 			loadResources();
 
-			Ogre::LogManager::getSingleton().logMessage("loading samples");
 			Sample* startupSample = loadSamples();
             
 			Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -991,9 +987,7 @@ protected:
 			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SampleThumbnail", "Essential");
 			thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
             
-			Ogre::LogManager::getSingleton().logMessage("setting up widgets");
 			setupWidgets();
-			Ogre::LogManager::getSingleton().logMessage("window resized");
 			windowResized(mWindow);   // adjust menus for resolution
 
 			// if this is our first time running, and there's a startup sample, run it
@@ -1130,7 +1124,7 @@ protected:
 			sampleList.push_back("Sample_BezierPatch");
 			sampleList.push_back("Sample_CameraTrack");
 			sampleList.push_back("Sample_CelShading");
-			sampleList.push_back("Sample_Character");     
+			//sampleList.push_back("Sample_Character");     
 			//sampleList.push_back("Sample_CubeMapping");    
 			//sampleList.push_back("Sample_Dot3Bump");   
 			sampleList.push_back("Sample_DynTex");      
