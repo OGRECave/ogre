@@ -359,17 +359,30 @@ void SceneManager::destroyCamera(const String& name)
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllCameras(void)
 {
+	CameraList::iterator camIt = mCameras.begin();
+	while( camIt != mCameras.end() )
+	{
+		bool dontDelete = false;
+		 // dont destroy shadow texture cameras here. destroyAllCameras is public
+		ShadowTextureCameraList::iterator camShadowTexIt = mShadowTextureCameras.begin( );
+		for( ; camShadowTexIt != mShadowTextureCameras.end(); camShadowTexIt++ )
+		{
+			if( (*camShadowTexIt) == camIt->second )
+			{
+				dontDelete = true;
+				break;
+			}
+		}
 
-    CameraList::iterator i = mCameras.begin();
-    for (; i != mCameras.end(); ++i)
-    {
-        // Notify render system
-        mDestRenderSystem->_notifyCameraRemoved(i->second);
-        OGRE_DELETE i->second;
-    }
-    mCameras.clear();
-	mCamVisibleObjectsMap.clear();
-	mShadowCamLightMapping.clear();
+		if( dontDelete )	// skip this camera
+			camIt++;
+		else 
+		{
+			destroyCamera(camIt->second);
+			camIt = mCameras.begin(); // recreate iterator
+		}
+	}
+
 }
 //-----------------------------------------------------------------------
 Light* SceneManager::createLight(const String& name)
