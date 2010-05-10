@@ -354,11 +354,13 @@ namespace Ogre {
 	const String StringUtil::replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat)
 	{
 		String result = source;
+        String::size_type pos = 0;
 		while(1)
 		{
-			String::size_type pos = result.find(replaceWhat);
+			pos = result.find(replaceWhat,pos);
 			if (pos == String::npos) break;
 			result.replace(pos,replaceWhat.size(),replaceWithWhat);
+            pos += replaceWithWhat.size();
 		}
 		return result;
 	}
