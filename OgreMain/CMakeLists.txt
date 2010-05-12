@@ -660,9 +660,20 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
 endif ()
 
+set (TARGET_LINK_FLAGS "")
+
 # setup OgreMain target
 add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES})
-set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION})
+# In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
+if(WIN32 AND MSVC10 AND CMAKE_CL_64)
+  set_target_properties(OgreMain PROPERTIES 
+                        VERSION ${OGRE_SOVERSION}
+                        LINK_FLAGS "/INCREMENTAL:NO"
+                      )
+else()
+  set_target_properties(OgreMain PROPERTIES VERSION ${OGRE_SOVERSION})
+endif()
+
 if (APPLE)
   if (NOT OGRE_BUILD_PLATFORM_IPHONE)
     set_target_properties(OgreMain PROPERTIES FRAMEWORK TRUE)

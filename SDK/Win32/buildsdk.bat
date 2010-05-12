@@ -68,7 +68,7 @@ rmdir /S/Q CMakeFiles
 
 rem Patch up absolute references to pdbs & debug directories
 rem The former should be fixed in a future version of CMake, but the latter is because we configure these files in manually
-dir /b /s *.vcproj *.vcproj.user > filestopatch.txt
+dir /b /s *.vcproj *.vcproj.user *.vcxproj *.vcxproj.user  > filestopatch.txt
 for /F "delims=" %%f in ('type filestopatch.txt') do (
 cscript //nologo ..\..\removeabsolutepaths.vbs "%%f"
 )
