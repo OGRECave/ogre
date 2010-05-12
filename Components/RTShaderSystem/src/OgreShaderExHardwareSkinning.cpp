@@ -413,7 +413,7 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 {
 	if (prop->name == "hardware_skinning")
 	{
-		bool hasError = true;
+		bool hasError = false;
 		uint32 boneCount = 0;
 		uint32 weightCount = 0;
 		

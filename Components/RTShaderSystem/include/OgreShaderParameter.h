@@ -315,7 +315,7 @@ public:
 	*/
 	Parameter(GpuConstantType type, const String& name, 
 		const Semantic& semantic, int index, 
-		const Content& content, size_t size = 1);
+		const Content& content, size_t size = 0);
 
 	/** Class destructor */
 	virtual ~Parameter() {};
@@ -342,7 +342,7 @@ public:
 	virtual String			toString							() const { return mName; }
 	
 	/** Returns Whether this parameter is an array. */
-	bool					isArray								() const { return mSize > 1; }
+	bool					isArray								() const { return mSize > 0; }
 
 	/** Returns the number of elements in the parameter (for arrays). */
 	size_t					getSize								() const { return mSize; }
