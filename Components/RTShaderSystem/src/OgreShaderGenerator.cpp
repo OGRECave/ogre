@@ -471,7 +471,16 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName)
 
 //-----------------------------------------------------------------------------
 RenderState* ShaderGenerator::getRenderState(const String& schemeName, 
+											 const String& materialName, 
+											 unsigned short passIndex)
+{
+	return getRenderState(schemeName, materialName, 
+		ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, passIndex);
+}
+//-----------------------------------------------------------------------------
+RenderState* ShaderGenerator::getRenderState(const String& schemeName, 
 									 const String& materialName, 
+									 const String& groupName, 
 									 unsigned short passIndex)
 {
 	OGRE_LOCK_AUTO_MUTEX
@@ -485,7 +494,7 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName,
 			"ShaderGenerator::getRenderState");
 	}
 
-	return itFind->second->getRenderState(materialName, passIndex);
+	return itFind->second->getRenderState(materialName, groupName, passIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -552,9 +561,17 @@ void ShaderGenerator::setFragmentShaderProfiles(const String& fragmentShaderProf
 	mFragmentShaderProfilesList = StringUtil::split(fragmentShaderProfiles);
 }
 
-
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
+											  const String& srcTechniqueSchemeName, 
+											  const String& dstTechniqueSchemeName) const
+{
+	return hasShaderBasedTechnique(materialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+		srcTechniqueSchemeName, dstTechniqueSchemeName);
+}
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName, 
+												 const String& groupName, 
 												 const String& srcTechniqueSchemeName, 
 												 const String& dstTechniqueSchemeName) const
 {
@@ -565,7 +582,7 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
 		return false;
 
 	
-	SGMaterialConstIterator itMatEntry = mMaterialEntriesMap.find(materialName);
+	SGMaterialConstIterator itMatEntry = findMaterialEntryIt(materialName, groupName);
 	
 	// Check if technique already created.
 	if (itMatEntry != mMaterialEntriesMap.end())
@@ -592,14 +609,27 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 												 const String& dstTechniqueSchemeName,
 												 bool overProgrammable)
 {
+	return createShaderBasedTechnique(materialName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+		srcTechniqueSchemeName, dstTechniqueSchemeName, overProgrammable);
+}
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::createShaderBasedTechnique(const String& materialName, 
+												 const String& groupName, 
+												 const String& srcTechniqueSchemeName, 
+												 const String& dstTechniqueSchemeName,
+												 bool overProgrammable)
+{
 	OGRE_LOCK_AUTO_MUTEX
 
 	// Make sure material exists;
-	if (false == MaterialManager::getSingleton().resourceExists(materialName))
+	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
+	if (srcMat.isNull() == true)
 		return false;
 
-	
-	SGMaterialIterator itMatEntry = mMaterialEntriesMap.find(materialName);
+	//update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
+	String trueGroupName = srcMat->getGroup();
+		
+	SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, trueGroupName);
 	
 	// Check if technique already created.
 	if (itMatEntry != mMaterialEntriesMap.end())
@@ -629,7 +659,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	// No technique created -> check if one can be created from the given source technique scheme.	
 	Technique* srcTechnique = NULL;
-	srcTechnique = findSourceTechnique(materialName, srcTechniqueSchemeName);
+	srcTechnique = findSourceTechnique(materialName, trueGroupName, srcTechniqueSchemeName);
 
 	// No appropriate source technique found.
 	if ((srcTechnique == NULL) ||
@@ -644,8 +674,9 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	if (itMatEntry == mMaterialEntriesMap.end())
 	{
-		matEntry = OGRE_NEW SGMaterial(materialName);
-		mMaterialEntriesMap[materialName] = matEntry;
+		matEntry = OGRE_NEW SGMaterial(materialName, trueGroupName);
+		mMaterialEntriesMap.insert(SGMaterialMap::value_type(
+			MatGroupPair(materialName, trueGroupName), matEntry));
 	}
 	else
 	{
@@ -686,6 +717,15 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
 												 const String& srcTechniqueSchemeName, 
 												 const String& dstTechniqueSchemeName)
 {
+	return removeShaderBasedTechnique(materialName,ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+		srcTechniqueSchemeName,dstTechniqueSchemeName);
+}
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName, 
+												 const String& groupName, 
+												 const String& srcTechniqueSchemeName, 
+												 const String& dstTechniqueSchemeName)
+{
 	OGRE_LOCK_AUTO_MUTEX
 
 	// Make sure scheme exists.
@@ -700,7 +740,7 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
 
 
 	// Find the material entry.
-	SGMaterialIterator itMatEntry = mMaterialEntriesMap.find(materialName);
+	SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName,groupName);
 
 	// Case material not found.
 	if (itMatEntry == mMaterialEntriesMap.end())
@@ -740,13 +780,13 @@ bool ShaderGenerator::removeShaderBasedTechnique(const String& materialName,
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName)
+bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName, const String& groupName)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
 	// Find the material entry.
-	SGMaterialIterator itMatEntry = mMaterialEntriesMap.find(materialName);
-
+	SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, groupName);
+	
 	// Case material not found.
 	if (itMatEntry == mMaterialEntriesMap.end())
 		return false;
@@ -759,7 +799,7 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName)
 	{	
 		SGTechniqueIterator itTechEntry = matTechniqueEntires.begin();
 
-		removeShaderBasedTechnique(materialName, (*itTechEntry)->getSourceTechnique()->getSchemeName(), 
+		removeShaderBasedTechnique(materialName, itMatEntry->first.second, (*itTechEntry)->getSourceTechnique()->getSchemeName(), 
 			(*itTechEntry)->getDestinationTechniqueSchemeName());		
 	}
 
@@ -778,14 +818,15 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 	{
 		SGMaterialIterator itMatEntry = mMaterialEntriesMap.begin();
 
-		removeAllShaderBasedTechniques(itMatEntry->first);
+		removeAllShaderBasedTechniques(itMatEntry->first.first, itMatEntry->first.second);
 	}
 }
 												 
 //-----------------------------------------------------------------------------
- Technique* ShaderGenerator::findSourceTechnique(const String& materialName, const String& srcTechniqueSchemeName)
+ Technique* ShaderGenerator::findSourceTechnique(const String& materialName, 
+				const String& groupName, const String& srcTechniqueSchemeName)
  {
-	 MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName);
+	 MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	 Material::TechniqueIterator itMatTechniques = mat->getTechniqueIterator();
 	 
 
@@ -885,18 +926,18 @@ bool ShaderGenerator::validateScheme(const String& schemeName)
 }
 
 //-----------------------------------------------------------------------------
-void ShaderGenerator::invalidateMaterial(const String& schemeName, const String& materialName)
+void ShaderGenerator::invalidateMaterial(const String& schemeName, const String& materialName, const String& groupName)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
 	SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
 	
 	if (itScheme != mSchemeEntriesMap.end())			
-		itScheme->second->invalidate(materialName);	
+		itScheme->second->invalidate(materialName, groupName);	
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::validateMaterial(const String& schemeName, const String& materialName)
+bool ShaderGenerator::validateMaterial(const String& schemeName, const String& materialName, const String& groupName)
 {
 	OGRE_LOCK_AUTO_MUTEX
 
@@ -906,7 +947,7 @@ bool ShaderGenerator::validateMaterial(const String& schemeName, const String& m
 	if (itScheme == mSchemeEntriesMap.end())	
 		return false;
 
-	return itScheme->second->validate(materialName);	
+	return itScheme->second->validate(materialName, groupName);	
 }
 
 //-----------------------------------------------------------------------------
@@ -1133,6 +1174,53 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 }
 
 //-----------------------------------------------------------------------------
+ShaderGenerator::SGMaterialIterator ShaderGenerator::findMaterialEntryIt(const String& materialName, const String& groupName)
+{
+	SGMaterialIterator itMatEntry;
+	//check if we have auto detect request
+	if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+	{
+		//find the possible first entry
+		itMatEntry = mMaterialEntriesMap.lower_bound(MatGroupPair(materialName,""));
+		if ((itMatEntry != mMaterialEntriesMap.end()) &&
+			(itMatEntry->first.first != materialName))
+		{
+			//no entry found
+			itMatEntry = mMaterialEntriesMap.end();
+		}
+	}
+	else
+	{
+		//find entry with group name specified
+		itMatEntry = mMaterialEntriesMap.find(MatGroupPair(materialName,groupName));
+	}
+	return itMatEntry;
+}
+
+//-----------------------------------------------------------------------------
+ShaderGenerator::SGMaterialConstIterator ShaderGenerator::findMaterialEntryIt(const String& materialName, const String& groupName) const
+{
+	SGMaterialConstIterator itMatEntry;
+	//check if we have auto detect request
+	if (groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+	{
+		//find the possible first entry
+		itMatEntry = mMaterialEntriesMap.lower_bound(MatGroupPair(materialName,""));
+		if ((itMatEntry != mMaterialEntriesMap.end()) &&
+			(itMatEntry->first.first != materialName))
+		{
+			//no entry found
+			itMatEntry = mMaterialEntriesMap.end();
+		}
+	}
+	else
+	{
+		//find entry with group name specified
+		itMatEntry = mMaterialEntriesMap.find(MatGroupPair(materialName,groupName));
+	}
+	return itMatEntry;
+}
+//-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {
 	mParent				= parent;
@@ -1295,10 +1383,11 @@ void ShaderGenerator::SGTechnique::createSGPasses()
 ShaderGenerator::SGTechnique::~SGTechnique()
 {
 	const String& materialName = mParent->getMaterialName();
-		
+	const String& groupName = mParent->getGroupName();
+
 	if (MaterialManager::getSingleton().resourceExists(materialName))
 	{
-		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName);
+		MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	
 		// Remove the destination technique from parent material.
 		for (unsigned int i=0; i < mat->getNumTechniques(); ++i)
@@ -1470,16 +1559,18 @@ RenderState* ShaderGenerator::SGScheme::getRenderState()
 }
 
 //-----------------------------------------------------------------------------
-RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialName, unsigned short passIndex)
+RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialName, const String& groupName, unsigned short passIndex)
 {
 	SGTechniqueIterator itTech;
 
 	// Find the desired technique.
+	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
 	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
-
-		if (curTechEntry->getSourceTechnique()->getParent()->getName() == materialName)
+		Material* curMat = curTechEntry->getSourceTechnique()->getParent();
+		if ((curMat->getName() == materialName) && 
+			((doAutoDetect == true) || (curMat->getGroup() == groupName)))
 		{
 			return curTechEntry->getRenderState(passIndex);			
 		}
@@ -1606,7 +1697,7 @@ void ShaderGenerator::SGScheme::synchronizeWithFogSettings()
 }
 
 //-----------------------------------------------------------------------------
-bool ShaderGenerator::SGScheme::validate(const String& materialName)
+bool ShaderGenerator::SGScheme::validate(const String& materialName, const String& groupName)
 {
 	// Synchronize with light settings.
 	synchronizeWithLightSettings();
@@ -1618,12 +1709,14 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName)
 	SGTechniqueIterator itTech;
 	
 	// Find the desired technique.
+	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
 	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
-
-		if (curTechEntry->getParent()->getMaterialName() == materialName &&
-			curTechEntry->getBuildDestinationTechnique())
+		const SGMaterial* curMat = curTechEntry->getParent();
+		if ((curMat->getMaterialName() == materialName) && 
+			((doAutoDetect == true) || (curMat->getGroupName() == groupName)) &&
+			(curTechEntry->getBuildDestinationTechnique()))
 		{		
 			// Build render state for each technique.
 			curTechEntry->buildTargetRenderState();
@@ -1641,16 +1734,18 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName)
 	return false;
 }
 //-----------------------------------------------------------------------------
-void ShaderGenerator::SGScheme::invalidate(const String& materialName)
+void ShaderGenerator::SGScheme::invalidate(const String& materialName, const String& groupName)
 {
 	SGTechniqueIterator itTech;
 
 	// Find the desired technique.
+	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
 	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
-
-		if (curTechEntry->getParent()->getMaterialName() == materialName)
+		const SGMaterial* curMaterial = curTechEntry->getParent();
+		if ((curMaterial->getMaterialName() == materialName) &&
+			((doAutoDetect == true) || (curMaterial->getGroupName() == groupName))) 
 		{			
 			// Turn on the build destination technique flag.
 			curTechEntry->setBuildDestinationTechnique(true);

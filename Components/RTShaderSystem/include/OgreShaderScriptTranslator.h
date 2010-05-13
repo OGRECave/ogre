@@ -124,10 +124,12 @@ protected:
 	* @param newSubRenderState The sub-render state to add
 	* @param dstTechniqueSchemeName The technique which the sub render state is associated with
 	* @param materialName The material name which the sub render state is associated with
+	* @param groupName The material group name which the sub render state is associated with
 	* @param passIndex The index of the pass which the sub render state is associated with
 	*/
 	void addSubRenderState(SubRenderState* newSubRenderState, 
-		const String& dstTechniqueSchemeName, const String& materialName, unsigned short passIndex);
+		const String& dstTechniqueSchemeName, const String& materialName, 
+		const String& groupName, unsigned short passIndex);
 
 			
 protected:
