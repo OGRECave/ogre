@@ -331,79 +331,178 @@ namespace Ogre {
 	void XsiMeshExporter::processPolygonMesh(Mesh* pMesh, PolygonMeshEntry* xsiMesh, 
 		bool lookForBoneAssignments, unsigned short progressUpdates)
 	{
-		// Pre-process the mesh
-		if (!preprocessPolygonMesh(xsiMesh))
-		{
-			while(progressUpdates--)
-				ProgressManager::getSingleton().progress();
-
-			return;
-		}
-		
-        // Retrieve all the XSI relevant summary info
-        CPointRefArray pointArray(xsiMesh->mesh.GetPoints());
-        MATH::CVector3Array srcPosArray = pointArray.GetPositionArray();
-        CPolygonNodeRefArray nodeArray(xsiMesh->mesh.GetNodes());
-        MATH::CVector3Array srcNormArray = nodeArray.GetNormalArray();
-        CTriangleRefArray triArray = xsiMesh->mesh.GetTriangles();
+		CRefArray uvs = xsiMesh->geometry.GetUVs();
 
 		StringUtil::StrStreamType msg;
-		msg << "-- " << XSItoOgre(xsiMesh->obj.GetName()) << " --" << std::endl;
-		msg << "Points: " << pointArray.GetCount() << std::endl;
-		msg << "Triangles: " << triArray.GetCount() << std::endl;
-		msg << "Normals: " << srcNormArray.GetCount() << std::endl;
-		msg << "Num UVs: " << mCurrentTextureCoordDimensions.size() << std::endl;
+		msg << "-- " << XSItoOgre(xsiMesh->name) << " --" << std::endl;
+		msg << "Points: " << xsiMesh->geometry.GetVertexCount() << std::endl;
+		msg << "Triangles: " << xsiMesh->geometry.GetTriangleCount() << std::endl;
+		msg << "Normals: " << xsiMesh->geometry.GetNodeCount() << std::endl;
+		msg << "Num UVs: " << uvs.GetCount() << std::endl;
 		String str = msg.str();
 		LogOgreAndXSI(str);
 
-		if (mCurrentTextureCoordDimensions.size() > OGRE_MAX_TEXTURE_COORD_SETS)
+		if (uvs.GetCount() > OGRE_MAX_TEXTURE_COORD_SETS)
 		{
 			// too many texture coordinates!
 			StringUtil::StrStreamType str;
-			str << "PolygonMesh '" << XSItoOgre(xsiMesh->mesh.GetName()) 
+			str << "PolygonMesh '" << XSItoOgre(xsiMesh->name) 
 				<< "' has too many texture coordinate sets (" 
-				<< mCurrentTextureCoordDimensions.size()
+				<< uvs.GetCount()
 				<< "); the limit is " << OGRE_MAX_TEXTURE_COORD_SETS;
 
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, str.str(), 
 				"XsiMeshExporter::processPolygonMesh");
-
 		}
+
+		// Collect texture coordinates data
+		TextureCoordDimensionList textureCoordDimensions;
+		SamplerSetList samplerSets;
+		textureCoordDimensions.reserve(uvs.GetCount());
+		samplerSets.reserve(uvs.GetCount());
+		for (int i = 0; i < uvs.GetCount(); ++ i)
+		{
+			Vector3* samplerUVs = new Vector3[xsiMesh->geometry.GetNodeCount()];
+			samplerSets.push_back(samplerUVs);
+
+			ClusterProperty uvProp = uvs[i];
+			CFloatArray uvValues;
+			uvProp.GetValues(uvValues);
+
+			String textureProjectionName = XSItoOgre(uvProp.GetName());
+			mTextureProjectionMap[textureProjectionName] = i;
+
+			int usedDims = 0;
+			for (int j = 0; j < xsiMesh->geometry.GetNodeCount(); ++j)
+			{
+				if (samplerUVs[j].x = uvValues[j * 3] != 0)
+					usedDims |= 1; //u
+				if (samplerUVs[j].y = 1.0f - uvValues[j * 3 + 1] != 0)
+					usedDims |= 2; //v (invert)
+				if (samplerUVs[j].z = uvValues[j * 3 + 2] != 0)
+					usedDims |= 4; //w
+			}
+
+			if (usedDims & 4) // w
+				textureCoordDimensions.push_back(3);
+			else if (usedDims & 2) // v
+				textureCoordDimensions.push_back(2);
+			else // u
+				textureCoordDimensions.push_back(1);
+		}
+
 		
 		// Save transforms
-		MATH::CTransformation xsiTransform = xsiMesh->obj.GetKinematics().GetGlobal().GetTransform();
+		MATH::CTransformation xsiTransform = xsiMesh->transform;
 		MATH::CTransformation rotTrans;
 		rotTrans.SetRotation(xsiTransform.GetRotation());
+
 		// Bounds calculation
-        Real squaredRadius = 0.0f;
-        Vector3 min, max;
-        bool first = true;
-		CPolygonFaceRefArray polys(xsiMesh->mesh.GetPolygons());
-        UniqueVertex vertex;
+		Real squaredRadius = 0.0f;
+		Vector3 min, max;
+		bool first = true;
+
+		UniqueVertex vertex;
 
 
-		float progPerTri = (float)progressUpdates / triArray.GetCount();
+		float progPerTri = (float)progressUpdates / xsiMesh->geometry.GetTriangleCount();
 		float prog = 0.0f;
-		// Iterate through all the triangles
-        // There will often be less positions than normals and UVs
-        // But TrianglePoint
-        for (long t = 0; t < triArray.GetCount(); ++t)
-        {
-            Triangle tri(triArray[t]);
-			// derive sampler indices for triangle
-			size_t samplerIndices[3];
-			deriveSamplerIndices(tri, polys[tri.GetPolygonIndex()], samplerIndices);
 
-			// Decide which ProtoSubMesh we're to add this to (assume main)
-			// If we find this triangle relates to a polygon which is in 
-			// a cluster which has a different material, we change
-			ProtoSubMesh* currentProto = mMainProtoMesh;
-			PolygonToProtoSubMeshList::iterator polyi = 
-				mPolygonToProtoSubMeshList.find(tri.GetPolygonIndex());
-			if (polyi != mPolygonToProtoSubMeshList.end())
+		CLongArray polygonTriangleIndices;
+		xsiMesh->geometry.GetPolygonTriangleIndices(polygonTriangleIndices);
+
+		CLongArray triangleVertexIndices;
+		xsiMesh->geometry.GetTriangleVertexIndices(triangleVertexIndices);
+
+		CDoubleArray vertexPositions;
+		xsiMesh->geometry.GetVertexPositions(vertexPositions);
+
+		CRefArray vertexColours = xsiMesh->geometry.GetVertexColors();
+		bool hasVertexColours = vertexColours.GetCount() > 0? true : false;
+		CFloatArray vertexColoursValues;
+		if (hasVertexColours)
+		{
+			ClusterProperty c = vertexColours[0];
+			c.GetValues(vertexColoursValues);
+		}
+
+		CFloatArray nodeNormals;
+		xsiMesh->geometry.GetNodeNormals(nodeNormals);
+
+		CLongArray triangleNodeIndices;
+		xsiMesh->geometry.GetTriangleNodeIndices(triangleNodeIndices);
+
+		CLongArray polygonMaterialIndices;
+		xsiMesh->geometry.GetPolygonMaterialIndices(polygonMaterialIndices);
+
+		CRefArray materials = xsiMesh->geometry.GetMaterials();
+
+		ProtoSubMesh** materialToProtoSubMesh = new ProtoSubMesh*[materials.GetCount()];
+		for (LONG i = 0; i < materials.GetCount(); ++ i)
+			materialToProtoSubMesh[i] = 0;
+
+		CRefArray polygonClusters = xsiMesh->geometry.GetClusters(siClusterPolygonType);
+
+		// Test for hidden polygons
+		XSI::CBitArray hiddenPolygons(xsiMesh->geometry.GetPolygonCount());
+		for (LONG c = 0; c < polygonClusters.GetCount(); ++ c)
+		{
+			XSI::Cluster cluster = XSI::Cluster(polygonClusters[c]);
+			XSI::CRef clsvisibility;
+
+			if (cluster.GetProperties().Find(CString("clsvisibility"), clsvisibility) == CStatus::OK)
 			{
-				currentProto = polyi->second;
+				Property p(clsvisibility);
+				if (!p.GetParameterValue(CString("viewvis")))
+				{
+					XSI::CBitArray clusterPolys;
+					cluster.GetGeometryElementFlags(clusterPolys);
+					hiddenPolygons.Or(clusterPolys);
+				}
 			}
+		}
+
+		// Iterate through all the triangles
+		for (long t = 0; t < xsiMesh->geometry.GetTriangleCount(); ++t)
+		{
+			// Skip the triangle if it relates to a hidden polygon
+			if (hiddenPolygons[polygonTriangleIndices[t]])
+				continue;
+
+			LONG polygonIndex = polygonTriangleIndices[t];
+			LONG materialIndex = polygonMaterialIndices[polygonIndex];
+			ProtoSubMesh* currentProto = materialToProtoSubMesh[materialIndex];
+
+			// Do we already have a protosubmesh for the material of this triangle?
+			if (!currentProto)
+			{
+				CString SubMeshName = xsiMesh->name;
+
+				XSI::Material m(materials[materialIndex]);
+				
+				// Use the name of the cluster as the submesh name
+				for (LONG c = 0; c < polygonClusters.GetCount(); ++ c)
+				{
+					XSI::Cluster cluster = XSI::Cluster(polygonClusters[c]);
+					if (cluster.GetMaterial().GetName() == m.GetName())
+					{
+						LONG out_clusterIndex;
+						cluster.FindIndex(polygonIndex, out_clusterIndex);
+						if (out_clusterIndex != -1)
+						{
+							SubMeshName = cluster.GetName();
+							break;
+						}
+					}
+				}
+
+				currentProto = materialToProtoSubMesh[materialIndex] = createOrRetrieveProtoSubMesh(
+					mMaterialPrefix + XSItoOgre(m.GetName()),
+					XSItoOgre(SubMeshName),
+					textureCoordDimensions,
+					hasVertexColours);
+			}
+
 			// has this mesh been used in this proto before? if not set offset
 			size_t positionIndexOffset;
 			if (currentProto->lastMeshEntry == xsiMesh)
@@ -422,39 +521,50 @@ namespace Ogre {
 				currentProto->polygonMeshOffsetMap[xsiMesh] = positionIndexOffset;
 			}
 			
-            CTriangleVertexRefArray points = tri.GetPoints();
             for (long p = 0; p < 3; ++p)
             {
-                TriangleVertex point(points[p]);
-                long posIndex = point.GetIndex(); // unique position index
+				LONG posIndex = triangleVertexIndices[t * 3 + p]; // unique position index
+
+				// Get position
+				MATH::CVector3 xsipos(vertexPositions[posIndex * 3],
+					vertexPositions[posIndex * 3 + 1],
+					vertexPositions[posIndex * 3 + 2]);
+
+				// Apply global SRT
+				xsipos.MulByTransformationInPlace(xsiTransform);
+				vertex.position = XSItoOgre(xsipos);
+
+				// Get normal
+				MATH::CVector3 xsinorm(nodeNormals[triangleNodeIndices[t * 3 + p] * 3],
+					nodeNormals[triangleNodeIndices[t * 3 + p] * 3 + 1],
+					nodeNormals[triangleNodeIndices[t * 3 + p] * 3 + 2]);
+
+				// Apply global rotation
+				xsinorm *= rotTrans;
+				vertex.normal = XSItoOgre(xsinorm);
+
+				for (size_t i = 0; i < textureCoordDimensions.size(); ++i)
+				{
+					// sampler indices can correctly dereference to sampler-order
+					// uv sets we built earlier
+					vertex.uv[i] = (samplerSets[i])[triangleNodeIndices[t * 3 + p]];
+				}
+                
+				if (hasVertexColours)
+				{
+					vertex.colour = XSItoOgre(CVertexColor((unsigned char)(vertexColoursValues[posIndex * 4] * 255),
+						(unsigned char)(vertexColoursValues[posIndex * 4 + 1] * 255),
+						(unsigned char)(vertexColoursValues[posIndex * 4 + 2] * 255),
+						(unsigned char)(vertexColoursValues[posIndex * 4 + 3] * 255)));
+				}
+
 				// adjust index per offset, this makes position indices unique
 				// per polymesh in teh same protosubmesh
 				posIndex += positionIndexOffset;
 
-				// Get position
-				MATH::CVector3 xsipos = point.GetPosition();
-				// Apply global SRT
-				xsipos.MulByTransformationInPlace(xsiTransform);
-                vertex.position = XSItoOgre(xsipos);
-				// Get normal
-				MATH::CVector3 xsinorm = point.GetNormal();
-				// Apply global rotation
-				xsinorm *= rotTrans;
-                vertex.normal = XSItoOgre(xsinorm);
-
-				for (size_t i = 0; i < mCurrentTextureCoordDimensions.size(); ++i)
-				{
-					// sampler indices can correctly dereference to sampler-order
-					// uv sets we built earlier
-					vertex.uv[i] = (mCurrentSamplerSets[i])[samplerIndices[p]];
-				}
-                
-                if (mCurrentHasVertexColours)
-                    vertex.colour = XSItoOgre(point.GetColor());
-
-                size_t index = createOrRetrieveUniqueVertex(
+				size_t index = createOrRetrieveUniqueVertex(
 									currentProto, posIndex, true, vertex);
-                currentProto->indices.push_back(index);
+				currentProto->indices.push_back(index);
 
 				// bounds
 				if (first)
@@ -470,7 +580,7 @@ namespace Ogre {
 					min.makeFloor(vertex.position);
 					max.makeCeil(vertex.position);
 				}
-            }
+			}
 		
 			// Progress
 			prog += progPerTri;
@@ -484,10 +594,10 @@ namespace Ogre {
 
 		// Merge bounds
 		AxisAlignedBox box;
-        box.setExtents(min, max);
-        box.merge(pMesh->getBounds());
-        pMesh->_setBounds(box);
-        pMesh->_setBoundingSphereRadius(
+		box.setExtents(min, max);
+		box.merge(pMesh->getBounds());
+		pMesh->_setBounds(box, false);
+		pMesh->_setBoundingSphereRadius(
 			std::max(
 				pMesh->getBoundingSphereRadius(), 
 				Math::Sqrt(squaredRadius)));
@@ -501,180 +611,15 @@ namespace Ogre {
 		// process any shape keys
 		processShapeKeys(pMesh, xsiMesh);
 
-		// Post-process the mesh
-		postprocessPolygonMesh(xsiMesh);
-
-	}
-	//-----------------------------------------------------------------------
-	bool XsiMeshExporter::preprocessPolygonMesh(PolygonMeshEntry* xsiMesh)
-	{
-        // derive number of UVs
-        int numUVs = 0;
-        CRefArray clusterRefArray;
-        // Filter to 'sample' types
-        xsiMesh->mesh.GetClusters().Filter(
-			siSampledPointCluster,CStringArray(),L"",clusterRefArray);
-
-        Cluster samplePointClusterUV;
-        CRefArray uvClusterPropertiesRefArray;
-		int i;
-        
-        for(i = 0; i < clusterRefArray.GetCount(); ++i)
-        {
-            Cluster cluster(clusterRefArray[i]);		
-            // Now filter all the 'uvspace' children
-            // there is one of these per UV set
-            if(cluster.GetProperties().Filter(
-                siClsUVSpaceTxtType, CStringArray(), L"", 
-                uvClusterPropertiesRefArray) == CStatus::OK)
-            {
-                samplePointClusterUV = cluster;			
-                break;
-            }
-        }
-
-        // Ok, we now have our array of UV sets
-        numUVs = uvClusterPropertiesRefArray.GetCount();
-		size_t numSamplerPoints = xsiMesh->mesh.GetNodes().GetCount();
-		// list of UVs stored in order of sampler points (use 3D coords by default)
-		mCurrentSamplerSets.reserve(numUVs);
-		mCurrentTextureCoordDimensions.reserve(numUVs);
-        for(i = 0; i < numUVs; ++i)
-        {
-			// init sampler points
-			Vector3* samplerUVs = new Vector3[numSamplerPoints];
-			mCurrentSamplerSets.push_back(samplerUVs);
-
-			// Detect the dimensions by figuring out if any are all 0
-			bool hasU, hasV, hasW;
-			hasU = hasV = hasW = false;
-
-			// Pull out all the UV data for this set and reorder it based on 
-			// samples, we'll need this for reference later
-			// get Elements from uvspace Property
-            ClusterProperty uvProp(uvClusterPropertiesRefArray[i]);
-			CClusterPropertyElementArray uvElements = uvProp.GetElements();
-
-			// Add this to an map from uv set name to index
-			String textureProjectionName = XSItoOgre(uvProp.GetName());
-			mTextureProjectionMap[textureProjectionName] = i;
-
-			// Now, each Element here is actually a CDoubleArray of the u,v,w values
-			// However it's not in order of samplers, we need to use the Array
-			// linked to from the Elements collection under the cluster (not the 
-			// cluster property, confusing I know) to figure out what sampler 
-			// index it is, i.e.
-			// samplerUVs[Array[j]] = Element[j]
-			// In all casesmCurrentSamplerSets in XSI element properties are referenced back to 
-			// their original poly index via this array, ie all cluster properties
-			// in the same cluster are dereferenced in the same way. 
-			CLongArray derefArray = samplePointClusterUV.GetElements().GetArray();
-
-			for (int j = 0; j < uvElements.GetCount(); ++j)
-			{
-				CDoubleArray curUVW(uvElements.GetItem(j));
-				size_t samplerIndex = derefArray[j];
-				samplerUVs[samplerIndex].x = curUVW[0];//u
-				samplerUVs[samplerIndex].y = 1.0f - curUVW[1];//v (invert)
-				samplerUVs[samplerIndex].z = curUVW[2];//w
-
-				if (!hasU && !Ogre::Math::RealEqual(curUVW[0], 0))
-					hasU = true;
-				if (!hasV && !Ogre::Math::RealEqual(curUVW[1], 0))
-					hasV = true;
-				if (!hasW && !Ogre::Math::RealEqual(curUVW[2], 0))
-					hasW = true;
-
-			}
-			
-			// save dimensions
-			mCurrentTextureCoordDimensions.push_back(
-				(hasU?1:0) + (hasV?1:0) + (hasW?1:0));
-
-        }
-
-
-        // do we have vertex colours?
-        ClusterProperty vertexColourClusterProperty = xsiMesh->mesh.GetCurrentVertexColor();
-        if (vertexColourClusterProperty.IsValid())
-            mCurrentHasVertexColours = true;
-		else
-			mCurrentHasVertexColours = false;
-
-		
-		/* Create any ProtoSubMeshes which don't exist yet for the 
-		 * materials in question, and define the PolygonCluster map
-		 */
-		// Main material (will never exist if not merging submeshes)
-		String materialName = mMaterialPrefix + 
-			XSItoOgre(xsiMesh->obj.GetMaterial().GetName());
-		registerMaterial(materialName, xsiMesh->obj.GetMaterial());
-		
-		mMainProtoMesh = createOrRetrieveProtoSubMesh(
-			materialName, 
-			XSItoOgre(xsiMesh->obj.GetName()),
-			mCurrentTextureCoordDimensions, 
-			mCurrentHasVertexColours);
-		
-		// For each polygon cluster
-        CRefArray polygonClusters;
-        // Filter to 'poly' types
-        xsiMesh->mesh.GetClusters().Filter(siPolygonCluster, CStringArray(), L"", 
-			polygonClusters);
-		mPolygonToProtoSubMeshList.clear();
-        for(i = 0; i < polygonClusters.GetCount(); ++i)
-        {
-			Cluster cluster(polygonClusters[i]);	
-			// Is the material different for this poly cluster?
-			if (cluster.GetMaterial() != xsiMesh->obj.GetMaterial())
-			{
-				String submatName = mMaterialPrefix + 
-					XSItoOgre(cluster.GetMaterial().GetName());
-				registerMaterial(submatName, cluster.GetMaterial());
-				ProtoSubMesh* ps = createOrRetrieveProtoSubMesh(
-					submatName,
-					XSItoOgre(cluster.GetName()),
-					mCurrentTextureCoordDimensions, 
-					mCurrentHasVertexColours);
-				// Each element is a polygon index 
-				CLongArray elems = cluster.GetElements().GetArray();
-				for (int p = 0; p < elems.GetCount(); ++p)
-				{
-					mPolygonToProtoSubMeshList[elems[p]] = ps;
-				}
-			}
-		}
-
-		return true;
-
-
-	}
-	//-----------------------------------------------------------------------
-	void XsiMeshExporter::postprocessPolygonMesh(PolygonMeshEntry* xsiMesh)
-	{
-		// clear all position index remaps, incase merged
-		for (MaterialProtoSubMeshMap::iterator m = mMaterialProtoSubmeshMap.begin();
-			m != mMaterialProtoSubmeshMap.end(); ++m)
-		{
-
-			for (ProtoSubMeshList::iterator p = m->second->begin();
-				p != m->second->end(); ++p)
-			{
-				ProtoSubMesh* ps = *p;
-				ps->posIndexRemap.clear();
-			}
-		}
-
 		// free temp UV data now
-		for(SamplerSetList::iterator s = mCurrentSamplerSets.begin();
-			s != mCurrentSamplerSets.end(); ++s)
+		for(SamplerSetList::iterator s = samplerSets.begin();
+			s != samplerSets.end(); ++s)
 		{
 			// init sampler points
 			delete [] *s;
 		}
-		mCurrentSamplerSets.clear();
-		mCurrentTextureCoordDimensions.clear();
-		
+		samplerSets.clear();
+		textureCoordDimensions.clear();
 	}
 	//-----------------------------------------------------------------------
 	void XsiMeshExporter::processBoneAssignments(Mesh* pMesh, PolygonMeshEntry* xsiMesh)
@@ -687,7 +632,7 @@ namespace Ogre {
 		// back to the top-level caller to build a skeleton from later
 		CRefArray clusterRefArray;
 		// Filter to 'vertex' types
-		xsiMesh->mesh.GetClusters().Filter(
+		xsiMesh->geometry.GetClusters().Filter(
 			siVertexCluster,CStringArray(),L"",clusterRefArray);
 
 
@@ -814,214 +759,93 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void XsiMeshExporter::processShapeKeys(Mesh* pMesh, PolygonMeshEntry* xsiMesh)
 	{
-		// ShapeKeys are kept underneath clusters
-		// The clusters are point clusters, not poly clusters like those used 
-		// to define materials
-		// Each point cluster identifies the list of points involved, and the shape key
-		// contains the offsets for that key
-		// Like bone assignments, we have to ensure we add keys for duplicated points
+		CRefArray shapeKeys = xsiMesh->geometry.GetShapeKeys();
 
-		// Get points & vertices incase we need to convert from local reference frame
-		CPointRefArray pointsArray = xsiMesh->mesh.GetPoints();
-		CVertexRefArray verticesArray = xsiMesh->mesh.GetVertices();
-
-        CRefArray clusterRefArray;
-        // Filter to 'pnt' types
-        xsiMesh->mesh.GetClusters().Filter(
-			siVertexCluster,CStringArray(),L"",clusterRefArray);
-
-		for(int i = 0; i < clusterRefArray.GetCount(); ++i)
+		for (int i = 0; i < shapeKeys.GetCount(); ++ i)
 		{
-			Cluster cluster(clusterRefArray[i]);
+			ShapeKey shapeKey = shapeKeys[i];
+			LogOgreAndXSI("Found shape key " + XSItoOgre(shapeKey.GetName()));
 
-			// Cluster elements are the vertex indices affected
-			CClusterElementArray vertexIndexArray = cluster.GetElements();
-
-			CRefArray clusterProperties = cluster.GetProperties();
-			for (int p = 0; p < clusterProperties.GetCount(); ++p)
+			// Locate ProtoSubMeshes which use this mesh
+			for (MaterialProtoSubMeshMap::iterator mi = mMaterialProtoSubmeshMap.begin();
+				mi != mMaterialProtoSubmeshMap.end(); ++mi)
 			{
-				ClusterProperty prop(clusterProperties[p]);
-				// Pull out only shape keys
-				if (prop.GetPropertyType() == siClusterPropertyShapeKeyType)
+				for (ProtoSubMeshList::iterator psi = mi->second->begin();
+					psi != mi->second->end(); ++psi)
 				{
-					ShapeKey shapeKey(prop);
-
-					Parameter keyTypeParam = shapeKey.GetParameter(L"KeyType");
-					CValue currMode = keyTypeParam.GetValue();
-					/*
-					StringUtil::StrStreamType str;
-					str << "KeyType = " << (unsigned short)currMode << 
-						" siShapeLocalReferenceMode = " << (unsigned short)siShapeLocalReferenceMode <<
-						" siShapeAbsoluteReferenceMode = " << (unsigned short)siShapeAbsoluteReferenceMode <<
-						" siShapeObjectReferenceMode = " << (unsigned short)siShapeObjectReferenceMode;
-					LogOgreAndXSI(str.str());
-					*/
-
-					// XSI bug? siShapeReferenceMode enum doesn't match runtime values
-					// Local = 1, Absolute = 0, Object = 2 in real life
-					// Logged with Softimage as UDEV00203965 
-					bool isLocalSpace = 
-						((unsigned short)currMode) == 1; //siShapeLocalReferenceMode;
-					bool isGlobalSpace = 
-						((unsigned short)currMode) == 0;//siShapeAbsoluteReferenceMode;
-
-					LogOgreAndXSI("Found shape key " + XSItoOgre(shapeKey.GetName()));
-					// elements of property are the offsets, a double array of values
-					CClusterPropertyElementArray shapeElements = shapeKey.GetElements();
-
-					// Locate ProtoSubMeshes which use this mesh
-					for (MaterialProtoSubMeshMap::iterator mi = mMaterialProtoSubmeshMap.begin();
-						mi != mMaterialProtoSubmeshMap.end(); ++mi)
+					ProtoSubMesh* ps = *psi;
+					ProtoSubMesh::PolygonMeshOffsetMap::iterator poli = 
+						ps->polygonMeshOffsetMap.find(xsiMesh);
+					if (poli != ps->polygonMeshOffsetMap.end())
 					{
-						for (ProtoSubMeshList::iterator psi = mi->second->begin();
-							psi != mi->second->end(); ++psi)
+						// remap from mesh vertex index to proto vertex index
+						size_t indexAdjustment = poli->second;
+
+						// Create a new pose, target is implied by proto, final
+						// index to be determined later including merging
+						Pose pose(0, XSItoOgre(shapeKey.GetName()));
+
+						CBitArray affectedPoints;
+						CFloatArray shapeValues;
+						shapeKey.GetValues(shapeValues, affectedPoints); // automatically converted to object relative reference mode
+
+						// Iterate per vertex affected
+						LONG idxPoint = affectedPoints.GetIterator();
+						while (affectedPoints.GetNextTrueBit(idxPoint) )
 						{
-							ProtoSubMesh* ps = *psi;
-							ProtoSubMesh::PolygonMeshOffsetMap::iterator poli = 
-								ps->polygonMeshOffsetMap.find(xsiMesh);
-							if (poli != ps->polygonMeshOffsetMap.end())
+							// Now get offset
+							Vector3 offset(shapeValues[idxPoint * 3], shapeValues[idxPoint * 3 + 1], shapeValues[idxPoint * 3 + 2]);
+
+							// Skip zero offsets
+							if (offset == Vector3::ZERO)
+								continue;
+
+							// Convert to world space
+							MATH::CVector3 off(offset.x, offset.y, offset.z);
+							off.MulByTransformationInPlace(xsiMesh->transform);
+							offset = XSItoOgre(off);
+
+							// adjust index based on merging
+							size_t adjIndex = idxPoint + indexAdjustment;
+
+							// look up real index
+							// If it doesn't exist, it's probably on a seam
+							// between clusters and we can safely skip it
+							IndexRemap::iterator remi = ps->posIndexRemap.find(adjIndex);
+							if (remi != ps->posIndexRemap.end())
 							{
-								// remap from mesh vertex index to proto vertex index
-								size_t indexAdjustment = poli->second;
+								size_t vertIndex = remi->second;
+								bool moreVerts = true;
 
-								// Create a new pose, target is implied by proto, final
-								// index to be determined later including merging
-								Pose pose(0, XSItoOgre(shapeKey.GetName()));
-
-								// Iterate per vertex affected
-								for (int xi = 0; xi < vertexIndexArray.GetCount(); ++xi)
+								// add UniqueVertex and clones
+								while (moreVerts)
 								{
-									// Index
-									size_t positionIndex = vertexIndexArray.GetItem(xi);
-									// Now get offset
-									CDoubleArray xsiOffset = shapeElements.GetItem(xi);
-									Vector3 offset(xsiOffset[0], xsiOffset[1], xsiOffset[2]);
+									UniqueVertex& vertex = ps->uniqueVertices[vertIndex];
 
-									// Skip zero offsets
-									if (offset == Vector3::ZERO)
-										continue;
+									// Create a vertex pose entry
+									pose.addVertex(vertIndex, offset);
 
-
-									if (isLocalSpace)
+									if (vertex.nextIndex == 0)
 									{
-										// Local reference mode -> object space
-										// Local mode is the most popular since in XSI
-										// it plays nice with skeletal animation, but
-										// it's relative to the _point's_ local space
-
-										// Get local axes
-										// XSI defines local space as:
-										// Y = vertex normal
-										// X = normalised projection of first edge 
-										//     from vertex onto normal plane
-										// Z = cross product of above
-										Point point(pointsArray[positionIndex]);
-										bool normalValid;
-										Vector3 localY = XSItoOgre(point.GetNormal(normalValid));
-										Vertex vertex(verticesArray.GetItem(positionIndex));
-										CEdgeRefArray edgeArray = vertex.GetNeighborEdges();
-										if (normalValid && edgeArray.GetCount() > 0)
-										{
-
-											Edge edge(edgeArray[0]);
-											CVertexRefArray verticesOnEdge = edge.GetNeighborVertices();
-											Vertex otherVertex = 
-												(verticesOnEdge[0] == vertex) ?
-												verticesOnEdge[1] : verticesOnEdge[0];
-											Vector3 edgeVector 
-												= XSItoOgre(otherVertex.GetPosition())
-													- XSItoOgre(vertex.GetPosition());
-											// Project the vector onto the normal plane (d irrelevant)
-											Plane normPlane(localY, 0);
-											Vector3 localX = normPlane.projectVector(edgeVector);
-											localX.normalise();
-
-											Vector3 localZ = localX.crossProduct(localY);
-
-											// multiply out position by local axes to form
-											// final position
-											offset = (localX * offset.x) + 
-												(localY * offset.y) + 
-												(localZ * offset.z);
-
-										}
-
+										moreVerts = false;
 									}
-									
-									if (!isGlobalSpace)
+									else
 									{
-										// shape is in object space, if object is parented
-										// by a null or a static bone, we need to adjust the
-										// shape offset since this inherited transform is
-										// baked into the base OGRE mesh (to preserve
-										// relative positioning of parts)
-										// This deals with rotation and scaling
-
-										// If object is parented
-										// Don't know if anyone really uses this
-										// Convert global to object space
-										MATH::CTransformation xform = 
-											xsiMesh->obj.GetKinematics().GetGlobal().GetTransform();
-										MATH::CVector3 off(offset.x, offset.y, offset.z);
-										off.MulByTransformationInPlace(xform);
-										// now adjust for position since OGRE's poses
-										// are relative to original vertex position
-										off -= xform.GetTranslation();
-
-										offset = XSItoOgre(off);
-
-
-
+										vertIndex = vertex.nextIndex;
 									}
+								} // more duplicate verts
+							} // found remap?
+						} // for each vertex affected
 
+						// Add pose to proto
+						ps->poseList.push_back(pose);
 
-									// adjust index based on merging
-									size_t adjIndex = positionIndex + indexAdjustment;
-									// look up real index
-									// If it doesn't exist, it's probably on a seam
-									// between clusters and we can safely skip it
-									IndexRemap::iterator remi = ps->posIndexRemap.find(adjIndex);
-									if (remi != ps->posIndexRemap.end())
-									{
-
-										size_t vertIndex = remi->second;
-										bool moreVerts = true;
-
-
-										// add UniqueVertex and clones
-										while (moreVerts)
-										{
-											UniqueVertex& vertex = ps->uniqueVertices[vertIndex];
-
-											// Create a vertex pose entry
-											pose.addVertex(vertIndex, offset);
-
-											if (vertex.nextIndex == 0)
-											{
-												moreVerts = false;
-											}
-											else
-											{
-												vertIndex = vertex.nextIndex;
-											}
-										} // more duplicate verts
-									} // found remap?
-								} // for each vertex affected
-
-								// Add pose to proto
-								ps->poseList.push_back(pose);
-
-								// record that we used this shape key
-								ps->shapeKeys.Add(shapeKey);
-
-
-							} // proto found?
-						}// for each proto
-					} // for each material/protolist
-				} // shape key cluster property?
-			} // for each cluster property
-		} // for each cluster
-
+						// record that we used this shape key
+						ps->shapeKeys.Add(shapeKey);
+					} // proto found?
+				} // for each proto
+			}
+		}
 	}
 	//-----------------------------------------------------------------------
 	void XsiMeshExporter::buildShapeClipList(ShapeClipList& listToPopulate)
@@ -1468,10 +1292,19 @@ namespace Ogre {
 				Geometry geom(prim.GetGeometry());
 				if (geom.GetRef().GetClassID() == siPolygonMeshID)
 				{
+					// Find the current level of subdivision
+					LONG subd = 0;
+					XSI::CRef geomapprox;
+					if (x3dObj.GetProperties().Find(CString("geomapprox"), geomapprox) == CStatus::OK)
+					{
+						Property p(geomapprox);
+						subd = p.GetParameterValue(CString("gapproxmosl"));
+					}
+
 					// add it to the list
 					PolygonMesh pmesh(geom);
 					mXsiPolygonMeshList.insert(
-						new PolygonMeshEntry(pmesh, x3dObj));
+						new PolygonMeshEntry(x3dObj.GetName(), x3dObj.GetKinematics().GetGlobal().GetTransform(), pmesh.GetGeometryAccessor(siConstructionModeSecondaryShape, siCatmullClark, subd)));
 
 					LogOgreAndXSI(L"-- Queueing " +  name) ;
 				}

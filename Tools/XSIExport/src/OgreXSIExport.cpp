@@ -68,7 +68,7 @@ THE SOFTWARE.
 
 using namespace XSI;
 
-#define OGRE_XSI_EXPORTER_VERSION L"1.2.0"
+#define OGRE_XSI_EXPORTER_VERSION L"1.7.0"
 
 // define columns of animations list
 #define ANIMATION_LIST_EXPORT_COL 0
@@ -176,17 +176,30 @@ XSI::CStatus OgreMeshExportCommand_Init( const XSI::CRef& context )
 
 	ArgumentArray args = cmd.GetArguments();
 
-    args.Add( L"objectName", L"" );
 	args.Add( L"targetMeshFileName", L"c:/default.mesh" );
+	args.Add( L"mergeSubmeshes", L"true" );
+	args.Add( L"exportChildren", L"true" );
 	args.Add( L"calculateEdgeLists", L"true" );
     args.Add( L"calculateTangents", L"false" );
-    args.Add( L"exportSkeleton", L"true" );
+	args.Add( L"tangentSemantic", L"true" );
+	args.Add( L"tangentsSplitMirrored", L"false" );
+	args.Add( L"tangentsSplitRotated", L"false" );
+	args.Add( L"tangentsUseParity", L"false" );
+	args.Add( L"numLodLevels", L"0" );
+	args.Add( L"lodDistanceIncrement", L"2000" );
+	args.Add( L"lodQuota", L"true" );
+	args.Add( L"lodReduction", L"50" );
+	args.Add( L"exportMaterials", L"true" );
+	args.Add( L"targetMaterialFileName", L"c:/default.material" );
+	args.Add( L"materialPrefix", L"" );
+	args.Add( L"copyTextures", L"true" );
 	args.Add( L"exportVertexAnimation", L"true" );
-    args.Add( L"targetSkeletonFileName", L"c:/default.skeleton" );
-    args.Add( L"fps", L"24" );
-    args.Add( L"animationList", L"" ); 
-	return XSI::CStatus::OK;
+	args.Add( L"exportSkeleton", L"true" );
+	args.Add( L"targetSkeletonFilename", L"c:/default.skeleton" );
+	args.Add( L"fps", L"24" );
+	args.Add( L"animationList", L"" ); 
 
+	return XSI::CStatus::OK;
 }
 
 #ifdef unix
@@ -210,13 +223,216 @@ XSI::CStatus OgreMeshExportCommand_Execute( XSI::CRef& in_context )
 	}
 #endif
 
-	if ( args.GetCount() != 9 ) 
+	if ( args.GetCount() != 22 ) 
 	{
 		// Arguments of the command might not be properly registered
 		return CStatus::InvalidArgument ;
 	}
 
-    // TODO - perform the export!
+	Ogre::LogManager logMgr;
+	logMgr.createLog("OgreXSIExporter.log", true);
+	CString msg(L"OGRE Exporter Version ");
+	msg += OGRE_XSI_EXPORTER_VERSION;
+	LogOgreAndXSI(msg);
+
+	CStatus st(CStatus::OK);
+
+	try
+	{
+		Ogre::XsiMeshExporter meshExporter;
+		Ogre::XsiSkeletonExporter skelExporter;
+
+		Ogre::String meshFileName = XSItoOgre(XSI::CString(args[0]));
+		if (meshFileName.empty())
+		{
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, 
+				"You must supply a mesh file name", 
+				"OGRE Exporter");
+		}
+
+		bool mergeSubmeshes = args[1];
+		bool exportChildren = args[2];
+		bool edgeLists = args[3];
+		bool tangents = args[4];
+		bool tangentSem = args[5];
+		Ogre::VertexElementSemantic tangentSemantic = (tangentSem == true)?
+			Ogre::VES_TANGENT : Ogre::VES_TEXTURE_COORDINATES;
+
+		bool tangentsSplitMirrored = args[6];
+		bool tangentsSplitRotated = args[7];
+		bool tangentsUseParity = args[8];
+		long numlods = (LONG)args[9];
+		Ogre::XsiMeshExporter::LodData* lodData = 0;
+		if (numlods > 0)
+		{
+			float distanceInc = args[10];
+
+			bool quota = args[11];
+
+			float reduction = args[12];
+
+			lodData = new Ogre::XsiMeshExporter::LodData;
+			float currentInc = distanceInc;
+			for (int l = 0; l < numlods; ++l)
+			{
+				lodData->distances.push_back(currentInc);
+				currentInc += distanceInc;
+			}
+			lodData->quota = (quota == true) ?
+				Ogre::ProgressiveMesh::VRQ_PROPORTIONAL : Ogre::ProgressiveMesh::VRQ_CONSTANT;
+			if (lodData->quota == Ogre::ProgressiveMesh::VRQ_PROPORTIONAL)
+				lodData->reductionValue = reduction * 0.01;
+			else
+				lodData->reductionValue = reduction;
+
+		}
+
+		bool exportMaterials = args[13];
+		bool copyTextures = args[16];
+		bool exportVertexAnimation = args[17];
+		bool exportSkeleton = args[18];
+
+		// create singletons
+		Ogre::ResourceGroupManager rgm;
+		Ogre::MeshManager meshMgr;
+		Ogre::SkeletonManager skelMgr;
+		Ogre::MaterialManager matMgr;
+		Ogre::DefaultHardwareBufferManager hardwareBufMgr;
+		Ogre::LodStrategyManager lodStrategyBufMgr;
+
+
+		// determine number of exportsteps
+		size_t numSteps = 3 + OGRE_XSI_NUM_MESH_STEPS;
+		if (numlods > 0)
+			numSteps++;
+		if (edgeLists)
+			numSteps++;
+		if (tangents)
+			numSteps++;
+		if (exportSkeleton)
+			numSteps += 3;
+
+		Ogre::ProgressManager progressMgr(numSteps);
+
+		// Any material prefix? We need that for mesh linking too
+		Ogre::String materialPrefix = XSItoOgre(XSI::CString(args[15]));
+
+		float fps = args[20];
+		if (fps == 0.0f)
+		{
+			OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, 
+				"You must supply a valid value for 'FPS'", 
+				"OGRE Export");
+		}
+
+		Ogre::AnimationList selAnimList;
+		if (exportSkeleton || exportVertexAnimation)
+		{
+
+			GridData gd(args[21]);
+			for (int a = 0; a < gd.GetRowCount(); ++a)
+			{
+				if (gd.GetCell(ANIMATION_LIST_EXPORT_COL, a) == true)
+				{
+					Ogre::AnimationEntry ae;
+					ae.animationName = XSItoOgre(XSI::CString(gd.GetCell(ANIMATION_LIST_NAME_COL, a)));
+					ae.ikSampleInterval = gd.GetCell(ANIMATION_LIST_IKFREQ_COL, a);
+					ae.startFrame = (LONG)gd.GetCell(ANIMATION_LIST_START_COL, a);
+					ae.endFrame = (LONG)gd.GetCell(ANIMATION_LIST_END_COL, a);
+					selAnimList.push_back(ae);
+				}
+			}
+		}
+
+		if (exportSkeleton)
+		{
+			Ogre::String skeletonFileName = XSItoOgre(XSI::CString(args[19]));
+			if (skeletonFileName.empty())
+			{
+				OGRE_EXCEPT(Ogre::Exception::ERR_INVALIDPARAMS, 
+					"You must supply a skeleton file name", 
+					"OGRE Exporter");
+			}
+
+			// fix any omission of '.skeleton'
+			if (!Ogre::StringUtil::endsWith(skeletonFileName, ".skeleton"))
+			{
+				skeletonFileName += ".skeleton";
+			}
+
+			// Truncate the skeleton filename to just the name (no path)
+			Ogre::String skelName = skeletonFileName;
+			int pos = skeletonFileName.find_last_of("\\");
+			if (pos == Ogre::String::npos)
+			{
+				pos = skeletonFileName.find_last_of("/");
+			}
+			if (pos != Ogre::String::npos)
+			{
+				skelName = skelName.substr(pos+1, skelName.size() - pos - 1);
+			}
+
+
+			// Do the mesh
+			Ogre::DeformerMap& deformers = 
+				meshExporter.buildMeshForExport(mergeSubmeshes, 
+				exportChildren, edgeLists, tangents, tangentSemantic, 
+				tangentsSplitMirrored, tangentsSplitRotated, tangentsUseParity,
+				exportVertexAnimation, selAnimList, fps, materialPrefix,
+				lodData, skelName);
+			// do the skeleton
+			const Ogre::AxisAlignedBox& skelAABB = 
+				skelExporter.exportSkeleton(skeletonFileName, deformers, fps, selAnimList);
+
+			// Do final mesh export
+			meshExporter.exportMesh(meshFileName, skelAABB);
+		}
+		else
+		{
+			Ogre::AxisAlignedBox nullbb;
+			// No skeleton
+			meshExporter.buildMeshForExport(mergeSubmeshes, 
+				exportChildren, edgeLists, tangents, tangentSemantic, 
+				tangentsSplitMirrored, tangentsSplitRotated, tangentsUseParity,
+				exportVertexAnimation, selAnimList, fps, materialPrefix, lodData);
+			meshExporter.exportMesh(meshFileName, nullbb);
+		}
+
+
+		delete lodData;
+
+		// Do we want to export materials too?
+		if (exportMaterials)
+		{
+			Ogre::String materialFileName = XSItoOgre(XSI::CString(args[14]));
+			// fix any omission of '.material'
+			if (!Ogre::StringUtil::endsWith(materialFileName, ".material"))
+			{
+				materialFileName += ".material";
+			}
+
+			Ogre::XsiMaterialExporter matExporter;
+			try 
+			{
+				matExporter.exportMaterials(meshExporter.getMaterials(), 
+					meshExporter.getTextureProjectionMap(), 
+					materialFileName, copyTextures);
+			}
+			catch (Ogre::Exception& e)
+			{
+				// ignore, non-fatal and will be in log
+			}
+		}
+	}
+	catch (Ogre::Exception& e)
+	{
+		// Will already have been logged to the Ogre log manager
+		// Tell XSI
+		app.LogMessage(OgretoXSI(e.getDescription()), XSI::siFatalMsg);
+		app.LogMessage(OgretoXSI(e.getFullDescription()), XSI::siInfoMsg);
+	}
+
+	return st;	
 
     return XSI::CStatus::OK;
 }

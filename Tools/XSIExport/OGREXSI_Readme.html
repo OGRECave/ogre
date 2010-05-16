@@ -154,7 +154,7 @@ classes. </p>
 
 
 <p>This distribution contains the files required to export OGRE
-.mesh, .skeleton and .material files from <a href="http://www.softimage.com">SoftImage|XSI</a>. Currently supported XSI versions are 4.x and 5.x<br>
+.mesh, .skeleton and .material files from <a href="http://www.softimage.com">SoftImage|XSI</a>. Currently supported XSI versions are 6.5 up to Softimage 2011<br>
 
 
 
@@ -181,6 +181,10 @@ of XSI (Foundation or better). It will not work with the trial version.<br>
 
 
 <a href="#using">How To Use</a><br>
+
+
+
+<a href="#command">Using the Export Command</a><br>
 
 
 
@@ -218,13 +222,7 @@ source, you need to do the following:<br>
 
 
 
-  <li>copy devil.dll, ilu.dll, ilut.dll and zlib1.dll into
-$(XSI_ROOT)\Application\bin, or make sure they are somewhere on your
-path</li>
-
-
-
-  <li>copy OgreMain.dll (and OgreMain_d.dll if you wish to use the
+  <li>If 'OgreMain.dll' is included, copy it (and OgreMain_d.dll if you wish to use the
 debug version anytime) into $(XSI_ROOT)\Application\bin</li>
 
 
@@ -316,7 +314,11 @@ direct to binary .skeleton format<br>
 
   <li>Exporting of RealTime shaders on materials (OpenGL and DirectX)</li>
 
+  <li>Exporting meshes with subdivsion using the current subD level</li>
 
+  <li>Hidden polygons won't be exported. To hide polygons, create a cluster with clsvisibility property by selecting polygons then click Model -> Property -> Polygon Cluster Visibility)</li>
+
+  <li>Exporting directly from script (no GUI)</li>
 
 </ol>
 
@@ -492,6 +494,63 @@ constraints needs to be 'sampled' to turn it into Forward Kinematics
 
 
 
+<a href="OGREXSI_Readme.html#top">Back To Top</a>
+
+<p class="MainHeader" align="left"><a name="command"></a>Using the Export Command<br>
+</p>
+
+It is now possible to automate the exporting process by using 
+'OgreMeshExportCommand' from a script in Softimage. Below is a list of parameters of that command:
+
+<ol>
+  <li><b>targetMeshFileName</b>: Exported mesh file name (default: "c:/default.mesh")</li>
+
+  <li><b>mergeSubmeshes</b>: Merge objects with same material? If false, a separate named SubMesh will be created for every PolygonMesh preserving your model divisions. If true, the exporter will merge all PolygonMesh objects with the same material, which is more efficient, but does not preserve your modelling divisions. (default: true)</li>
+
+  <li><b>exportChildren</b>: If true, children of all selected objects will be exported.(default: true)</li>
+
+  <li><b>calculateEdgeLists</b>: Calculate Edge Lists (stencil shadows). (default: true)</li>
+
+  <li><b>calculateTangents</b>: Calculate Tangents (normal mapping). (default: false)</li>
+
+  <li><b>tangentSemantic</b>: Tangent Sematic. True for tangent, false for texture coords. (default: true)</li>
+
+  <li><b>tangentsSplitMirrored</b>: Split tangents at UV mirror. (default: false)</li>
+
+  <li><b>tangentsSplitRotated</b>: Split tangents at UV rotation. (default: false)</li>
+
+  <li><b>tangentsUseParity</b>: 4D Tangents. (default: false)</li>
+
+  <li><b>numLodLevels</b>: Levels of Detail. (default: 0)</li>
+
+  <li><b>lodDistanceIncrement</b>: Distance Increment. (default: 2000)</li>
+
+  <li><b>lodQuota</b>: Reduction Style. True for percentage, false for constant. (default: true)</li>
+
+  <li><b>lodReduction</b>: Reduction Value. (default: 50)</li>
+
+  <li><b>exportMaterials</b>: Export Materials. (default: true)</li>
+
+  <li><b>targetMaterialFileName</b>: Material Filename. (default: "c:/default.material")</li>
+
+  <li><b>materialPrefix</b>: Material Prefix. (default: "")</li>
+
+  <li><b>copyTextures</b>: Copy Textures To Folder. (default: true)</li>
+
+  <li><b>exportVertexAnimation</b>: Export Vertex Animation. (default: true)</li>
+
+  <li><b>exportSkeleton</b>: Export Skeleton. (default: true)</li>
+
+  <li><b>targetSkeletonFilename</b>: Skeleton Filename. (default: "c:/default.skeleton")</li>
+
+  <li><b>fps</b>: Frames per second. (default: 24)</li>
+
+  <li><b>animationList</b>: List of animations to be exported. Use GridData to populate the values. (default: null)</li>
+</ol>
+
+<a href="OGREXSI_Readme.html#top">Back To Top</a><br>
+<br>
+
 <p class="MainHeader" align="left"><a name="tips"></a>Tips<br>
 
 
@@ -638,6 +697,14 @@ OGLTexture it's combined with the minification filter)</li>
 </p>
 
 
+
+<p style="font-weight: bold;">1.7.0</p>
+<ul>
+	<li>Fixed a bug causing the bounding box to be larger than it should when selecting multiple meshes for export</li>
+	<li>Added subdivision support</li>
+	<li>Hidden polygon clusters will now not be exported</li>
+	<li>Added a command to export from the script without invoking the export dialog</li>
+</ul>
 
 <p style="font-weight: bold;">1.4.6</p>
 <ul>

@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include <xsi_string.h>
 #include <xsi_application.h>
 #include <xsi_geometry.h>
+#include <xsi_geometryaccessor.h>
 #include <xsi_triangle.h>
 #include <xsi_polygonface.h>
 #include <xsi_facet.h>
@@ -133,11 +134,15 @@ namespace Ogre {
 		class PolygonMeshEntry
 		{
 		public:
-			XSI::PolygonMesh mesh;
-			XSI::X3DObject obj;
+			XSI::CString name;
+			XSI::MATH::CTransformation transform;
+			XSI::CGeometryAccessor geometry;
 
-			PolygonMeshEntry(XSI::PolygonMesh& themesh, XSI::X3DObject& theobj)
-				:mesh(themesh), obj(theobj)
+
+			PolygonMeshEntry(XSI::CString _name, XSI::MATH::CTransformation _transform, XSI::CGeometryAccessor _geometry)
+				: name(_name)
+				, transform(_transform)
+				, geometry(_geometry)
 			{
 			}
 
@@ -148,7 +153,7 @@ namespace Ogre {
 			bool operator()(PolygonMeshEntry* lhs, PolygonMeshEntry* rhs)
 			{
 				// can't name objects the same in XSI, so use that
-				return XSItoOgre(lhs->obj.GetName()) < XSItoOgre(rhs->obj.GetName());
+				return XSItoOgre(lhs->name) < XSItoOgre(rhs->name);
 			}
 		};
 
@@ -256,23 +261,21 @@ namespace Ogre {
 
 		/// List of proto submeshes by material
 		typedef std::map<String, ProtoSubMeshList*> MaterialProtoSubMeshMap;
+
 		/// List of proto submeshes by material
 		MaterialProtoSubMeshMap mMaterialProtoSubmeshMap;
+
 		/// List of deviant proto submeshes by polygon index (clusters)
 		typedef std::map<size_t, ProtoSubMesh*> PolygonToProtoSubMeshList;
+
 		/// List of deviant proto submeshes by polygon index (clusters)
 		PolygonToProtoSubMeshList mPolygonToProtoSubMeshList;
-		/// Primary ProtoSubMesh (the one used by the PolygonMesh by default)
-		ProtoSubMesh* mMainProtoMesh;
-		// Current PolygonMesh texture coord information
+
+		// Holds PolygonMesh texture coord information
 		typedef std::vector<ushort> TextureCoordDimensionList;
-		TextureCoordDimensionList mCurrentTextureCoordDimensions;
-		// Current PolygonMesh sampler-ordered UV information
+
+		// Holds PolygonMesh sampler-ordered UV information
 		typedef std::vector<Vector3*> SamplerSetList;
-		SamplerSetList mCurrentSamplerSets;
-		// Current PolygonMesh has Vertex colours?
-		bool mCurrentHasVertexColours;
-		// Current list of deformers as we discover them (will become bones)
 
 		/// Export the current list of proto submeshes, and clear list
 		void exportProtoSubMeshes(Mesh* pMesh);
@@ -293,10 +296,6 @@ namespace Ogre {
 		ProtoSubMesh* createOrRetrieveProtoSubMesh(const String& materialName,
 			const String& name, TextureCoordDimensionList& texCoordDims,
 			bool hasVertexColours);
-		/// Method called at the start of processing a PolygonMesh
-		bool preprocessPolygonMesh(PolygonMeshEntry* mesh);
-		/// Method called at the end of processing a PolygonMesh
-		void postprocessPolygonMesh(PolygonMeshEntry* mesh);
 
         /** Try to look up an existing vertex with the same information, or
             create a new one.
@@ -338,8 +337,6 @@ namespace Ogre {
 
 		/** Register the use of a given XSI material. */
 		void registerMaterial(const String& name, XSI::Material mat);
-
-
 
     };
 
