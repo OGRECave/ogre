@@ -619,7 +619,11 @@ protected:
 		{
 			if (mTrayMgr->isDialogVisible()) return true;  // ignore keypresses when dialog is showing
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID // TODO: remove this once the BACK event in android is handled
+			if (evt.key == OIS::KC_BACK || evt.key == OIS::KC_COMMA)
+#else
 			if (evt.key == OIS::KC_ESCAPE)
+#endif
 			{
 				if (mTitleLabel->getTrayLocation() != TL_NONE)
 				{
@@ -1126,13 +1130,20 @@ protected:
 			sampleList.push_back("Sample_CelShading");
 			//sampleList.push_back("Sample_Character");     
 			//sampleList.push_back("Sample_CubeMapping");    
-			//sampleList.push_back("Sample_Dot3Bump");   
+			//sampleList.push_back("Sample_Dot3Bump");
 			sampleList.push_back("Sample_DynTex");      
-			//sampleList.push_back("Sample_FacialAnimation");
-			//sampleList.push_back("Sample_Fresnel");
-			sampleList.push_back("Sample_Grass");       
+			sampleList.push_back("Sample_FacialAnimation");
+			sampleList.push_back("Sample_Fresnel");
+			sampleList.push_back("Sample_Grass");
+			sampleList.push_back("Sample_ParticleFX");
+#   ifdef USE_RTSHADER_SYSTEM
+			sampleList.push_back("Sample_ShaderSystem");
+#	endif
 			sampleList.push_back("Sample_Lighting");       
-			sampleList.push_back("Sample_ParticleFX");     		
+			sampleList.push_back("Sample_SkyBox"); 
+			sampleList.push_back("Sample_SkyDome"); 
+			sampleList.push_back("Sample_SkyPlane"); 
+			sampleList.push_back("Sample_Smoke");      		
 #else
 			Ogre::ConfigFile cfg;
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
