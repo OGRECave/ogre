@@ -2755,7 +2755,7 @@ namespace OgreBites
 			if (areFrameStatsVisible())
 			{
 				Ogre::String s("FPS: ");
-				s += Ogre::StringConverter::toString(stats.lastFPS);
+				s += Ogre::StringConverter::toString((int)stats.lastFPS);
 				
 				for (int i = s.length() - 5; i > 5; i -= 3) { s.insert(i, 1, ','); }
 				mFpsLabel->setCaption(s);
@@ -2764,15 +2764,15 @@ namespace OgreBites
 				{
 					Ogre::StringVector values;
 
-					s = Ogre::StringConverter::toString(stats.avgFPS);
+					s = Ogre::StringConverter::toString((int)stats.avgFPS);
 					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
 					values.push_back(s);
 
-					s = Ogre::StringConverter::toString(stats.bestFPS);
+					s = Ogre::StringConverter::toString((int)stats.bestFPS);
 					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
 					values.push_back(s);
 
-					s = Ogre::StringConverter::toString(stats.worstFPS);
+					s = Ogre::StringConverter::toString((int)stats.worstFPS);
 					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
 					values.push_back(s);
 
