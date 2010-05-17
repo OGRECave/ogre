@@ -1615,7 +1615,7 @@ material Examples/Rockwall
 		{
 			texture_unit
 			{
-				texture rockwall.tga
+				texture rockwall.png
 			}
 		}
 	}

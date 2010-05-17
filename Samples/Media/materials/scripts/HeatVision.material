@@ -135,14 +135,14 @@ material Fury/HeatVision/LightToHeat
             // Noise map
             texture_unit
             {
-                texture HeatNoise.tga
+                texture HeatNoise.png
                 tex_coord_set 0
             }
 
             // heat conversion texture
             texture_unit
             {
-                texture HeatLookup.tga
+                texture HeatLookup.png
                 tex_coord_set 0
                 filtering point point none
             }
