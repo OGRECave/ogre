@@ -337,6 +337,13 @@ namespace Ogre {
 		{
 			mSourceBuffer = bufferResources;
 		}
+
+		// This is a new buffer and source buffer exists we must update the content now 
+		// to prevent situation where the source buffer will be destroyed and we won't be able to restore its content.
+		else
+		{			
+			updateBufferContent(bufferResources);			
+		}
 	}
 	//---------------------------------------------------------------------
 	IDirect3DIndexBuffer9* D3D9HardwareIndexBuffer::getD3DIndexBuffer(void)
@@ -354,25 +361,35 @@ namespace Ogre {
 			it = mMapDeviceToBufferResources.find(d3d9Device);						
 		}
 
-		if (it->second->mOutOfDate)
-		{
-			if (mSystemMemoryBuffer != NULL)
-			{
-				updateBufferResources(mSystemMemoryBuffer, it->second);
-			}
-
-			else if (mSourceBuffer != it->second && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
-			{
-				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
-				updateBufferResources(mSourceLockedBytes, it->second);
-				_unlockBuffer(mSourceBuffer);
-				mSourceLockedBytes = NULL;
-			}			
-		}
+		// Make sure that the buffer content is updated.
+		updateBufferContent(it->second);
+		
 		it->second->mLastUsedFrame = Root::getSingleton().getNextFrameNumber();
 
 		return it->second->mBuffer;
 	}
+
+	//---------------------------------------------------------------------
+	void D3D9HardwareIndexBuffer::updateBufferContent(BufferResources* bufferResources)
+	{
+		if (bufferResources->mOutOfDate)
+		{
+			if (mSystemMemoryBuffer != NULL)
+			{
+				updateBufferResources(mSystemMemoryBuffer, bufferResources);
+			}
+
+			else if (mSourceBuffer != bufferResources && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
+			{				
+				mSourceBuffer->mLockOptions = HBL_READ_ONLY;
+				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
+				updateBufferResources(mSourceLockedBytes, bufferResources);
+				_unlockBuffer(mSourceBuffer);
+				mSourceLockedBytes = NULL;
+			}			
+		}
+	}
+
 	//---------------------------------------------------------------------
 	bool D3D9HardwareIndexBuffer::updateBufferResources(const char* systemMemoryBuffer,
 		BufferResources* bufferResources)
