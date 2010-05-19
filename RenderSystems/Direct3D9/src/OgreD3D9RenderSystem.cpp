@@ -192,6 +192,7 @@ namespace Ogre
 		ConfigOption optNVPerfHUD;
 		ConfigOption optSRGB;
 		ConfigOption optResourceCeationPolicy;
+		ConfigOption optMultiDeviceMemHint;
 
 		driverList = this->getDirect3DDrivers();
 
@@ -275,6 +276,13 @@ namespace Ogre
 		optSRGB.currentValue = "No";
 		optSRGB.immutable = false;
 
+		// Multiple device memory usage hint.
+		optMultiDeviceMemHint.name = "Multi device memory hint";
+		optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
+		optMultiDeviceMemHint.possibleValues.push_back("Auto hardware buffers management");
+		optMultiDeviceMemHint.currentValue = "Use minimum system memory";
+		optMultiDeviceMemHint.immutable = false;
+
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
@@ -285,6 +293,7 @@ namespace Ogre
 		mOptions[optNVPerfHUD.name] = optNVPerfHUD;
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
+		mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
 
 		refreshD3DSettings();
 
@@ -416,6 +425,14 @@ namespace Ogre
 			else if (value == "Create on all devices")
 				mResourceManager->setCreationPolicy(RCP_CREATE_ON_ALL_DEVICES);		
 		}
+
+		if (name == "Multi device memory hint")
+		{
+			if (value == "Use minimum system memory")
+				mResourceManager->setAutoHardwareBufferManagement(false);
+			else if (value == "Auto hardware buffers management")
+				mResourceManager->setAutoHardwareBufferManagement(true);
+		}		
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::refreshFSAAOptions()
@@ -607,7 +624,6 @@ namespace Ogre
 			hwGamma = opt->second.currentValue == "Yes";
 
 			
-
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
 			miscParams["FSAA"] = StringConverter::toString(mFSAASamples);

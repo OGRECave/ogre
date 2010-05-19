@@ -63,7 +63,7 @@ namespace Ogre {
 		mSourceLockedBytes  = NULL;
 
 		// Allocate the system memory buffer.
-		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY && D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement())
 		{			
 			mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
 			memset(mSystemMemoryBuffer, 0, getSizeInBytes());
