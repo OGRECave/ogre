@@ -186,6 +186,13 @@ namespace Ogre {
 			}
 		}
 
+		// fix edge list data by simply recreating all edge lists
+		if( mEdgeListsBuilt)
+		{
+			this->freeEdgeList();
+			this->buildEdgeList();
+		}
+
 		if (isLoaded())
 			_dirtyState();
 		
