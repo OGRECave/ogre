@@ -172,6 +172,9 @@ public:
 	*/
 	FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
 
+    /** Copy constructor */
+	FunctionInvocation(const FunctionInvocation& rhs);
+
 	/** 
 	@see FunctionAtom::writeSourceCode
 	*/
@@ -198,6 +201,31 @@ public:
 
 	/** Return the return type */
 	const String&			getReturnType	() const { return mReturnType; }
+
+    /** Determines if the current object is equal to the compared one. */
+    bool operator == ( const FunctionInvocation& rhs ) const;
+
+    /** Determines if the current object is not equal to the compared one. */
+    bool operator != ( const FunctionInvocation& rhs ) const;
+
+    /** Determines if the current object is less than the compared one. */
+    bool operator <  ( const FunctionInvocation& rhs ) const;
+
+    /** Comparator function to be used for sorting.
+        Implemented as a struct to make it easier for the compiler to inline
+    */
+    struct FunctionInvocationLessThan
+    {
+        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+    };
+
+    /** Comparator function to be used for comparisons.
+        Implemented as a struct to make it easier for the compiler to inline
+    */
+    struct FunctionInvocationCompare
+    {
+        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+    };
 
 	/// The type of this class.
 	static String Type;

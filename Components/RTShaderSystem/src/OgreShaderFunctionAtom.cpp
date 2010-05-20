@@ -26,6 +26,7 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderFunctionAtom.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -187,6 +188,19 @@ FunctionInvocation::FunctionInvocation(const String& functionName,
 	mReturnType = returnType;
 }
 
+//-----------------------------------------------------------------------------
+FunctionInvocation::FunctionInvocation(const FunctionInvocation& other)
+{
+    
+	mFunctionName = other.mFunctionName;
+	mGroupExecutionOrder = other.mGroupExecutionOrder;
+	mInternalExecutionOrder = other.mInternalExecutionOrder;
+	mReturnType = other.mReturnType;
+    
+    for ( OperandVector::const_iterator it = other.mOperands.begin(); it != other.mOperands.end(); ++it)
+        mOperands.push_back(Operand(*it));
+}
+
 //-----------------------------------------------------------------------
 void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetLanguage) const
 {
@@ -240,6 +254,115 @@ void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetL
 void FunctionInvocation::pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask, int indirectionLevel)
 {
 	mOperands.push_back(Operand(parameter, opSemantic, opMask, indirectionLevel));
+}
+
+//-----------------------------------------------------------------------
+bool FunctionInvocation::operator == ( const FunctionInvocation& rhs ) const
+{
+    return FunctionInvocationCompare()(*this, rhs);
+}
+
+//-----------------------------------------------------------------------
+bool FunctionInvocation::operator != ( const FunctionInvocation& rhs ) const
+{
+    return !(*this == rhs);
+}
+
+//-----------------------------------------------------------------------
+bool FunctionInvocation::operator < ( const FunctionInvocation& rhs ) const
+{
+    return FunctionInvocationLessThan()(*this, rhs);
+}
+
+bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const
+{
+    // Check the function names first
+    if (lhs.getFunctionName() < rhs.getFunctionName())
+        return true;
+
+    // Next check the return type
+    if (lhs.getReturnType() < rhs.getReturnType())
+        return true;
+
+    // Check the number of operands
+    if (lhs.mOperands.size() < rhs.mOperands.size())
+        return true;
+
+    // Now that we've gotten past the two quick tests, iterate over operands
+    // Check the semantic and type.  The operands must be in the same order as well.
+    OperandVector::const_iterator itLHSOps = lhs.mOperands.begin();
+    OperandVector::const_iterator itRHSOps = rhs.mOperands.begin();
+
+    for ( ; itLHSOps != lhs.mOperands.end(), itRHSOps != rhs.mOperands.end(); ++itLHSOps, ++itRHSOps)
+    {
+        if (itLHSOps->getSemantic() < itRHSOps->getSemantic())
+            return true;
+
+        if (itLHSOps->getParameter()->getType() < itRHSOps->getParameter()->getType())
+            return true;
+    }
+
+    return false;
+}
+
+bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const
+{
+    // Check the function names first
+    if (lhs.getFunctionName() != rhs.getFunctionName())
+        return false;
+
+    // Next check the return type
+    if (lhs.getReturnType() != rhs.getReturnType())
+        return false;
+
+    // Check the number of operands
+    if (lhs.mOperands.size() != rhs.mOperands.size())
+        return false;
+
+    // Now that we've gotten past the two quick tests, iterate over operands
+    // Check the semantic and type.  The operands must be in the same order as well.
+    OperandVector::const_iterator itLHSOps = lhs.mOperands.begin();
+    OperandVector::const_iterator itRHSOps = rhs.mOperands.begin();
+    for ( ; itLHSOps != lhs.mOperands.end(), itRHSOps != rhs.mOperands.end(); ++itLHSOps, ++itRHSOps)
+    {
+        if (itLHSOps->getSemantic() != itRHSOps->getSemantic())
+            return false;
+
+        GpuConstantType leftType    = itLHSOps->getParameter()->getType();
+        GpuConstantType rightType   = itRHSOps->getParameter()->getType();
+        
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            if (leftType == GCT_SAMPLER1D)
+                leftType = GCT_SAMPLER2D;
+
+            if (rightType == GCT_SAMPLER1D)
+                rightType = GCT_SAMPLER2D;
+        }
+
+        // If a swizzle mask is being applied to the parameter, generate the GpuConstantType to
+        // perform the parameter type comparison the way that the compiler will see it.
+        if ((itLHSOps->getFloatCount(itLHSOps->getMask()) > 0) ||
+           (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0))
+        {
+            if (itLHSOps->getFloatCount(itLHSOps->getMask()) > 0)
+            {
+                leftType = (GpuConstantType)((itLHSOps->getParameter()->getType() - itLHSOps->getParameter()->getType()) +
+                                             itLHSOps->getFloatCount(itLHSOps->getMask()));
+            }
+            if (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0)
+            {
+                rightType = (GpuConstantType)((itRHSOps->getParameter()->getType() - itRHSOps->getParameter()->getType()) +
+                                             itRHSOps->getFloatCount(itRHSOps->getMask()));
+            }
+        }
+
+        if (leftType != rightType)
+            return false;
+    }
+
+    // Passed all tests, they are the same
+    return true;
 }
 
 }

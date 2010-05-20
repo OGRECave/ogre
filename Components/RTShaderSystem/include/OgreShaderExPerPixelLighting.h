@@ -45,6 +45,16 @@ namespace RTShader {
 *  @{
 */
 
+#define SGX_LIB_PERPIXELLIGHTING					"SGXLib_PerPixelLighting"
+#define SGX_FUNC_TRANSFORMNORMAL					"SGX_TransformNormal"
+#define SGX_FUNC_TRANSFORMPOSITION					"SGX_TransformPosition"
+#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE			"SGX_Light_Directional_Diffuse"
+#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR	"SGX_Light_Directional_DiffuseSpecular"
+#define SGX_FUNC_LIGHT_POINT_DIFFUSE				"SGX_Light_Point_Diffuse"
+#define SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR		"SGX_Light_Point_DiffuseSpecular"
+#define SGX_FUNC_LIGHT_SPOT_DIFFUSE					"SGX_Light_Spot_Diffuse"
+#define SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR			"SGX_Light_Spot_DiffuseSpecular"	
+
 /** Per pixel Lighting extension sub render state implementation.
 Derives from SubRenderState class.
 */

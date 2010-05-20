@@ -68,12 +68,28 @@ public:
 
 	static String TargetLanguage;
 
+    protected:
+	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
+	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
+	typedef		std::map<Parameter::Content, const char*>	ParamContentToStringMap;
+	typedef		std::map<String, String>					StringMap;
+	typedef		std::map<FunctionInvocation, String>		FunctionMap;
+	typedef		std::vector<FunctionInvocation>             FunctionVector;
+    typedef     FunctionMap::const_iterator                 FunctionMapIterator;
+    typedef     FunctionVector::const_iterator              FunctionVectorIterator;
+    typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
 
 	// Protected methods.
 protected:
 
 	/** Initialize string maps. */
 	void				initializeStringMaps		();
+
+    /** Cache function libraries. */
+	void				cacheFunctionLibraries		();
+
+    /** Create a FunctionInvocation object from a string taken out of a shader library. */
+	FunctionInvocation	*createInvocationFromString	(String input);
 
     /** Write the program dependencies. */
 	void                writeProgramDependencies	(std::ostream& os, Program* program);
@@ -89,20 +105,20 @@ protected:
 
     /** Check if a string matches one of the GLSL ES basic types */
     bool                isBasicType(String &type);
-protected:
-	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
-	typedef		std::map<Parameter::Content, const char*>	ParamContentToStringMap;
-	typedef		std::map<String, String>					StringMap;
-    typedef     ParamContentToStringMap::const_iterator		ParamContentToStringMapIterator;
+    
+    /** Search within a function body for non-builtin functions that a given function invocation depends on. */
+    void                discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector);
 
 	// Attributes.
 protected:
 	GpuConstTypeToStringMap		mGpuConstTypeMap;				// Map between GPU constant type to string value.
 	ParamSemanticToStringMap	mParamSemanticMap;				// Map between parameter semantic to string value.
 
-	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes 
+	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
+	FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
+    StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
+    FunctionVector              mInlinedFunctions;
+	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes
 	int							mGLSLVersion;					// Holds the current glsl es version
 	StringVector				mFragInputParams;				// Holds the fragment input params 
 };

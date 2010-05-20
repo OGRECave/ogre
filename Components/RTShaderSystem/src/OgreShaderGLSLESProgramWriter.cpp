@@ -26,10 +26,14 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderGLSLESProgramWriter.h"
-#include "OgreHighLevelGpuProgramManager.h"
-#include "OgreStringConverter.h"
-#include "OgreShaderGenerator.h"
-#include "OgreRoot.h"
+#include "OgreShaderFFPRenderState.h"
+#include "OgreShaderExIntegratedPSSM3.h"
+#include "OgreShaderExLayeredBlending.h"
+#include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderExPerPixelLighting.h"
+
+#include "OgreShaderFunctionAtom.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
     namespace RTShader {
@@ -50,6 +54,7 @@ namespace Ogre {
         {
             mGLSLVersion = 100;
             initializeStringMaps();
+            cacheFunctionLibraries();
         }
 
         //-----------------------------------------------------------------------
@@ -58,6 +63,315 @@ namespace Ogre {
 
         }
 
+        FunctionInvocation * GLSLESProgramWriter::createInvocationFromString(String input)
+        {
+            String functionName, returnType;
+            FunctionInvocation *invoc = NULL;
+
+            // Get the function name and return type
+            StringVector leftTokens = StringUtil::split(input, "(");
+            StringVector leftTokens2 = StringUtil::split(leftTokens[0], " ");
+            StringUtil::trim(leftTokens2[0]);
+            StringUtil::trim(leftTokens2[1]);
+            returnType      = leftTokens2[0];
+            functionName    = leftTokens2[1];
+
+            invoc = OGRE_NEW FunctionInvocation(functionName, 0, 0, returnType);
+
+            // Split out the parameters
+            StringVector parameters;
+            String::size_type lparen_pos = input.find('(', 0);
+            if(lparen_pos != String::npos)
+            {
+                StringVector tokens = StringUtil::split(input, "(");
+                parameters = StringUtil::split(tokens[1], ",");
+            }
+            else
+            {
+                parameters = StringUtil::split(input, ",");
+            }
+
+            StringVector::const_iterator itParam;
+            int i = 0;
+            for(itParam = parameters.begin(); itParam != parameters.end(); ++itParam, i++)
+            {
+                StringUtil::replaceAll(*itParam, ")", "");
+                StringUtil::replaceAll(*itParam, ",", "");
+                StringVector paramTokens = StringUtil::split(*itParam, " ");
+                // There should be three parts for each token
+                // 1. The operand type(in, out, inout)
+                // 2. The type
+                // 3. The name
+                if(paramTokens.size() == 3)
+                {
+                    Operand::OpSemantic semantic = Operand::OPS_IN;
+                    GpuConstantType gpuType = GCT_UNKNOWN;
+
+                    if(paramTokens[0] == "in")
+                    {
+                        semantic = Operand::OPS_IN;
+                    }
+                    else if(paramTokens[0] == "out")
+                    {
+                        semantic = Operand::OPS_OUT;
+                    }
+                    else if(paramTokens[0] == "inout")
+                    {
+                        semantic = Operand::OPS_INOUT;
+                    }
+
+                    // Find the internal type based on the string that we're given.
+                    GpuConstTypeToStringMapIterator typeMapIterator;
+                    for(typeMapIterator = mGpuConstTypeMap.begin(); typeMapIterator != mGpuConstTypeMap.end(); ++typeMapIterator)
+                    {
+                        if((*typeMapIterator).second == paramTokens[1])
+                        {
+                            gpuType = (*typeMapIterator).first;
+                            break;
+                        }
+                    }
+
+                    // We need a valid type otherwise glsl compilation will not work
+                    if (gpuType == GCT_UNKNOWN)
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "GLSLESProgramWriter::createInvocationFromString" );	
+                    }
+
+                    if(gpuType == GCT_SAMPLER1D)
+                        gpuType = GCT_SAMPLER2D;
+
+                    ParameterPtr p = ParameterPtr(OGRE_NEW Parameter(gpuType, paramTokens[2],
+                                                                     Parameter::SPS_UNKNOWN, i,
+                                                                     Parameter::SPC_UNKNOWN));
+
+                    invoc->pushOperand(p, semantic);
+                }
+            }
+
+            return invoc;
+        }
+        
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::cacheFunctionLibraries()
+        {
+            mFunctionCacheMap.clear();
+
+            StringVectorPtr libNames(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+            libNames->push_back( FFP_LIB_COMMON );
+            libNames->push_back( FFP_LIB_FOG );
+            libNames->push_back( FFP_LIB_LIGHTING );
+            libNames->push_back( FFP_LIB_TEXTURING );
+            libNames->push_back( FFP_LIB_TRANSFORM );
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+            libNames->push_back( SGX_LIB_INTEGRATEDPSSM );
+            libNames->push_back( SGX_LIB_LAYEREDBLENDING );
+            libNames->push_back( SGX_LIB_NORMALMAPLIGHTING );
+            libNames->push_back( SGX_LIB_PERPIXELLIGHTING );
+//            libNames->push_back( "SGX_HardwareSkinning" );
+#endif
+            Ogre::StringVector::const_iterator libraryIterator = libNames->begin();
+
+            // Iterate over all shader libraries
+            while ( libraryIterator != libNames->end() )
+            {
+                DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(*libraryIterator + ".glsles");
+                
+                StringMap functionCache;
+                functionCache.clear();
+
+                String line;
+                while(!stream->eof())
+                {
+                    // Grab a line
+                    line = stream->getLine();
+
+                    // Ignore empty lines and comments
+                    if(line.length() > 0)
+                    {
+                        // Strip whitespace
+                        StringUtil::trim(line);
+
+                        // If we find a multiline comment, run through till we get to the end 
+                        if(line.at(0) == '/' && line.at(1) == '*')
+                        {
+                            bool endFound = false;
+                            
+                            while(!endFound)
+                            {
+                                // Get the next line
+                                line = stream->getLine();
+
+                                // Skip empties
+                                if(line.length() > 0)
+                                {
+                                    // Look for the ending sequence.
+                                    String::size_type comment_pos = line.find("*/", 0);
+                                    if(comment_pos != String::npos)
+                                    {
+                                        endFound = true;
+                                    }
+                                }
+                            }
+                        }
+                        else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
+                        {
+                            // Break up the line.
+                            StringVector tokens = StringUtil::tokenise(line, " (\n\r");
+
+                            // Cache #defines
+                            if(tokens[0] == "#define")
+                            {
+                                // Add the line in
+                                mDefinesMap[line] = *libraryIterator;
+
+                                // Move on to the next line in the shader
+                                continue;
+                            }
+
+                            // Try to identify a function definition
+                            // First, look for a return type
+                            if(isBasicType(tokens[0]))
+                            {
+                                String functionSig;
+                                String functionBody;
+                                FunctionInvocation *functionInvoc = NULL;
+
+                                // Return type
+                                functionSig += tokens[0];
+                                functionSig += " ";
+                                
+                                // Function name
+                                functionSig += tokens[1];
+                                functionSig += "(";
+
+                                bool foundEndOfSignature = false;
+                                // Now look for all the parameters, they may span multiple lines
+                                while(!foundEndOfSignature)
+                                {
+                                    // Trim whitespace from both sides of the line
+                                    StringUtil::trim(line);
+
+                                    // First we want to get everything right of the paren
+                                    StringVector paramTokens;
+                                    String::size_type lparen_pos = line.find('(', 0);
+                                    if(lparen_pos != String::npos)
+                                    {
+                                        StringVector tokens = StringUtil::split(line, "(");
+                                        paramTokens = StringUtil::split(tokens[1], ",");
+                                    }
+                                    else
+                                    {
+                                        paramTokens = StringUtil::split(line, ",");
+                                    }
+
+                                    StringVector::const_iterator itParam;
+                                    for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
+                                    {
+                                        functionSig += *itParam;
+
+                                        String::size_type rparen_pos = itParam->find(')', 0);
+                                        if(rparen_pos == String::npos)
+                                            functionSig += ", ";
+                                    }
+
+                                    String::size_type space_pos = line.find(')', 0);
+                                    if(space_pos != String::npos)
+                                    {
+                                        foundEndOfSignature = true;
+                                    }
+                                    line = stream->getLine();
+                                }
+
+                                functionInvoc = createInvocationFromString(functionSig);
+
+                                // Ok, now if we have found the signature, iterate through the file until we find the end
+                                // of the function.
+                                bool foundEndOfBody = false;
+                                size_t braceCount = 0;
+                                while(!foundEndOfBody)
+                                {
+                                    functionBody += line;
+
+                                    String::size_type brace_pos = line.find('{', 0);
+                                    if(brace_pos != String::npos)
+                                    {
+                                        braceCount++;
+                                    }
+
+                                    brace_pos = line.find('}', 0);
+                                    if(brace_pos != String::npos)
+                                        braceCount--;
+
+                                    if(braceCount == 0)
+                                    {
+                                        foundEndOfBody = true;
+
+                                        // Remove first and last braces
+                                        size_t pos = functionBody.find("{");
+                                        functionBody.erase(pos, 1);
+                                        pos = functionBody.rfind("}");
+                                        functionBody.erase(pos, 1);
+
+                                        mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
+                                    }
+                                    functionBody += "\n";
+                                    line = stream->getLine();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stream->close();
+
+                ++libraryIterator;
+            }
+        }
+
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector)
+        {
+            // Uses recursion to find any functions that the supplied function invocation depends on
+            FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
+            String body = StringUtil::BLANK;
+
+            // Find the function in the cache and retrieve the body
+            for (; itCache != mFunctionCacheMap.end(); ++itCache)
+            {
+                if(!(invoc == (*itCache).first))
+                    continue;
+
+                body = (*itCache).second;
+                break;
+            }
+
+            if(body != StringUtil::BLANK)
+            {
+                // Trim whitespace
+                StringUtil::trim(body);
+                StringVector tokens = StringUtil::split(body, "(");
+
+                for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); it++)
+                {
+                    StringVector moreTokens = StringUtil::split(*it, " ");
+
+                    FunctionMap::const_iterator itFuncCache = mFunctionCacheMap.begin();
+                    for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
+                    {
+                        if(itFuncCache->first.getFunctionName() == moreTokens.back())
+                        {
+                            // Add the function declaration
+                            depVector.push_back(FunctionInvocation((*itFuncCache).first));
+
+                            discoverFunctionDependencies(itFuncCache->first, depVector);
+                        }
+                    }
+                }
+            }
+        }
+        
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::initializeStringMaps()
         {
@@ -108,6 +422,9 @@ namespace Ogre {
 
             // Clear out old input params
             mFragInputParams.clear();
+            
+            // Clear out old inlined functions
+            mInlinedFunctions.clear();
 
             const ShaderFunctionList& functionList = program->getFunctions();
             ShaderFunctionConstIterator itFunction;
@@ -190,7 +507,46 @@ namespace Ogre {
                 {		
                     FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
                     FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
+                    FunctionInvocation::OperandVector::const_iterator itOperandEnd = pFuncInvoc->getOperandList().end();
+                    FunctionInvocation::OperandVector::const_iterator itInlinedOperand;
+
+                    bool inlineable = false;
+                    String inlinedFuncBody = StringUtil::BLANK;
+                    StringVector bodyTokens;
+                    FunctionInvocation pInlinedFuncInvoc = FunctionInvocation("", 0, 0);
+
+                    // Reset the iterator
+                    itOperand = pFuncInvoc->getOperandList().begin();
+                    
+                    FunctionVectorIterator itInline = mInlinedFunctions.begin();
+                    FunctionVectorIterator itInlineEnd = mInlinedFunctions.end();
+                    for (; itInline != itInlineEnd; ++itInline)
+                    {
+                        // See if this is a function that we should inline
+                        if(FunctionInvocation::FunctionInvocationCompare()(*itInline, *pFuncInvoc))
+                        {
+                            inlineable = true;
+
+                            // Now go through the cache and find the function body,
+                            // function invocation and operand pointers
+                            FunctionMapIterator itCache = mFunctionCacheMap.begin();
+                            FunctionMapIterator itCacheEnd = mFunctionCacheMap.end();
+                            for (; itCache != itCacheEnd; ++itCache)
+                            {
+                                if(FunctionInvocation::FunctionInvocationCompare()((*itCache).first, *itInline))
+                                {
+                                    inlinedFuncBody = (*itCache).second;
+                                    pInlinedFuncInvoc = (*itCache).first;
+                                    itInlinedOperand = pInlinedFuncInvoc.getOperandList().begin();
+                                    break;
+                                }
+                            }
+                           
+                            continue;
+                        }
+                    }
+
+                    bodyTokens = StringUtil::split(inlinedFuncBody, "_(),+-*/<>;^=!%?{}[]\n", 0, true);
 
                     // Local string stream
                     std::stringstream localOs;
@@ -205,13 +561,13 @@ namespace Ogre {
                         String paramName = op.getParameter()->getName();
                         Parameter::Content content = op.getParameter()->getContent();
 
-                        // Check if we write to an varying because the are only readable in fragment programs 
+                        // Check if we write to a varying because the are only readable in fragment programs 
                         if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
                         {	
                             // Is the written parameter a varying 
                             bool isVarying = false;
 
-                            // Check if we write to an varying because the are only readable in fragment programs 
+                            // Check if we write to a varying because the are only readable in fragment programs 
                             if (gpuType == GPT_FRAGMENT_PROGRAM)
                             {	
                                 StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
@@ -261,16 +617,17 @@ namespace Ogre {
 
                         }
 
+                        String newParam;
                         if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
                         {
                             int mask = op.getMask(); // our swizzle mask
-
+                            
                             // Here we insert the renamed param name
-                            localOs << mInputToGLStatesMap[paramName];
+                            newParam = mInputToGLStatesMap[paramName];
 
                             if(mask != Operand::OPM_ALL)
                             {
-                                localOs << "." << Operand::getMaskAsString(mask);
+                                newParam += "." + Operand::getMaskAsString(mask);
                             }	
                             // Now that every texcoord is a vec4 (passed as vertex attributes) we
                             // have to swizzle them according the desired type.
@@ -289,16 +646,16 @@ namespace Ogre {
                                 switch(op.getParameter()->getType())
                                 {
                                 case GCT_FLOAT1:
-                                    localOs << ".x";
+                                    newParam += ".x";
                                     break;
                                 case GCT_FLOAT2:
-                                    localOs << ".xy";
+                                    newParam += ".xy";
                                     break;
                                 case GCT_FLOAT3:
-                                    localOs << ".xyz";
+                                    newParam += ".xyz";
                                     break;
                                 case GCT_FLOAT4:
-                                    localOs << ".xyzw";
+                                    newParam += ".xyzw";
                                     break;
 
                                 default:
@@ -308,7 +665,7 @@ namespace Ogre {
                         }
                         else
                         {
-                            localOs << op.toString();
+                            newParam = op.toString();
                         }
                         
                         ++itOperand;
@@ -316,14 +673,60 @@ namespace Ogre {
                         // Prepare for the next operand
                         if (itOperand != itOperandEnd)
                         {
-                            localOs << ", ";
+                            localOs << newParam << ", ";
+                        }
+                        else
+                        {
+                            localOs << newParam;
+                        }
+
+                        if(inlineable)
+                        {
+                            // Replace the variable
+                            String oldParam = (*itInlinedOperand).getParameter()->getName();
+
+                            // Remove ) and ; to make token matching easier
+                            size_t pos = oldParam.find(")");
+                            if(pos != String::npos)
+                                oldParam.erase(pos, 1);
+
+                            pos = oldParam.find(";");
+                            if(pos != String::npos)
+                                oldParam.erase(pos, 1);
+
+                            for (StringVector::iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
+                            {
+                                // Remove whitespace
+                                StringUtil::trim(*it);
+                                StringVector paramTokens = StringUtil::split(*it, ".");
+
+                                if(paramTokens[0] == oldParam)
+                                {
+                                    *it = StringUtil::replaceAll(*it, paramTokens[0], newParam);
+                                }
+                            }
+
+                            ++itInlinedOperand;
                         }
                     }
 
                     // Write function call closer.
-                    localOs << ");" << std::endl;
-                    localOs << std::endl;
-                    os << localOs.str();
+                    if(inlineable)
+                    {
+                        inlinedFuncBody.clear();
+                        // Reconstruct the line with variable replaced
+                        for (StringVector::const_iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
+                            inlinedFuncBody += *it;
+
+                        os << "\t" << inlinedFuncBody << std::endl;
+                    }
+                    else
+                    {
+                        localOs << ");" << std::endl;
+                        localOs << std::endl;
+                        os << localOs.str();
+                    }
+
                 }
                 os << "}" << std::endl;
             }
@@ -454,63 +857,122 @@ namespace Ogre {
             os << "//                         PROGRAM DEPENDENCIES"                                 << std::endl;
             os << "//-----------------------------------------------------------------------------" << std::endl;
 
-            StringVector forwardDecl; // Holds all generated function declarations 
+            FunctionVector forwardDecl; // Holds all function declarations
             const ShaderFunctionList& functionList = program->getFunctions();
             ShaderFunctionConstIterator itFunction;
 
-            // Iterate over all functions in the current program (in our case this is always the main() function)
-            for ( itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
-            {
-                Function* curFunction = *itFunction;
-                const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-                FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-                FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
+            Function* curFunction = *(functionList.begin());
+            FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+            FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
+            FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
+            // Now iterate over all function atoms
+            for ( ; itAtom != itAtomEnd; ++itAtom)
+            {	
+                // Skip non function invocation atoms.
+                if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
+                    continue;
 
-                // Now iterate over all function atoms
-                for ( ; itAtom != itAtomEnd; ++itAtom)
-                {	
-                    // Skip non function invocation atoms.
-                    if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
+                FunctionInvocation pFuncInvoc = *(static_cast<FunctionInvocation *>(*itAtom));
+                forwardDecl.push_back(pFuncInvoc);
+                
+                // Now look into that function for other non-builtin functions and add them to the declaration list
+                // Look for non-builtin functions
+                // Do so by assuming that these functions do not have several variations.
+                // Also, because GLSL is C based, functions must be defined before they are used
+                // so we can make the assumption that we already have this function cached.
+                //
+                // If we find a function, look it up in the map and write it out
+                discoverFunctionDependencies(pFuncInvoc, forwardDecl);
+            }
+
+            // Now remove duplicate declarations, first we have to sort the vector.
+            std::sort(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationLessThan());
+            FunctionVector::const_iterator endIt = forwardDecl.erase(std::unique(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationCompare()), forwardDecl.end());
+
+            for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
+            {
+                const String& curDependency = program->getDependency(i);
+
+                // Write out #defines
+                StringMap::const_iterator itDefines = mDefinesMap.begin();
+                StringMap::const_iterator itDefinesEnd = mDefinesMap.end();
+                for (; itDefines != itDefinesEnd; ++itDefines)
+                {
+                    if((*itDefines).second == curDependency)
+                    {
+                        os << (*itDefines).first;
+                        os << "\n";
+                    }
+                }
+            }
+
+            // Parse the source shader and write out only the needed functions
+            for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
+            {
+                // Only cache basic Fixed Function library functions.  These all start with "FFP"
+                bool inlineable = false;
+                if(StringUtil::startsWith((*it).getFunctionName(), "FFP", false))
+                    inlineable = true;
+                
+                FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
+                FunctionInvocation invoc = FunctionInvocation("", 0, 0);
+                String body = StringUtil::BLANK;
+
+                // Find the function in the cache
+                for (; itCache != mFunctionCacheMap.end(); ++itCache)
+                {
+                    if(!((*it) == (*itCache).first))
                         continue;
 
-                    FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);			
-                    FunctionInvocation::OperandVector::iterator itOperator = pFuncInvoc->getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperatorEnd = pFuncInvoc->getOperandList().end();
+                    invoc = (*itCache).first;
+                    body = (*itCache).second;
+                    break;
+                }
 
-                    // Start with function declaration 
-                    String funcDecl = pFuncInvoc->getReturnType() + " " + pFuncInvoc->getFunctionName() + "(";
+                if(inlineable)
+                {
+                    mInlinedFunctions.push_back(invoc);
+                }
+                else
+                {
+                    // Write out the function from the cached FunctionInvocation;
+                    os << invoc.getReturnType();
+                    os << " ";
+                    os << invoc.getFunctionName();
+                    os << "(";
 
-                    // Now iterate overall operands
-                    for (; itOperator != itOperatorEnd; )
+                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
+                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
+                    for (; itOperand != itOperandEnd;)
                     {
-                        ParameterPtr pParam = (*itOperator).getParameter();				
-                        Operand::OpSemantic opSemantic = (*itOperator).getSemantic();
-                        int opMask = (*itOperator).getMask();
+                        Operand op = *itOperand;
+                        Operand::OpSemantic opSemantic = op.getSemantic();
+                        String paramName = op.getParameter()->getName();
+                        int opMask = (*itOperand).getMask();
                         GpuConstantType gpuType = GCT_UNKNOWN;
 
-                        // Write the semantic in, out, inout
                         switch(opSemantic)
                         {
                         case Operand::OPS_IN:
-                            funcDecl += "in ";
+                            os << "in ";
                             break;
 
                         case Operand::OPS_OUT:
-                            funcDecl += "out ";
+                            os << "out ";
                             break;
 
                         case Operand::OPS_INOUT:
-                            funcDecl += "inout ";
+                            os << "inout ";
                             break;
 
                         default:
                             break;
-                        }				
-                        
+                        }
+
                         // Swizzle masks are only defined for types like vec2, vec3, vec4.
                         if (opMask == Operand::OPM_ALL)
                         {
-                            gpuType = pParam->getType();
+                            gpuType = op.getParameter()->getType();
                         }
                         else
                         {
@@ -526,242 +988,17 @@ namespace Ogre {
                                 "GLSLESProgramWriter::writeProgramDependencies" );	
                         }
 
-                        if (gpuType == GCT_SAMPLER1D)
-                            gpuType = GCT_SAMPLER2D;
-                        
-                        // Write the operand type.
-                        funcDecl += mGpuConstTypeMap[gpuType];
+                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
 
-                        ++itOperator;
+                        ++itOperand;
 
                         // Prepare for the next operand
-                        if (itOperator != itOperatorEnd)
+                        if (itOperand != itOperandEnd)
                         {
-                            funcDecl += ", ";
+                            os << ", ";
                         }
                     }
-                    // Write function call closer.
-                    funcDecl += ");\n";
-
-                    // Push the generated declaration into the vector
-                    // duplicate declarations will be removed later.
-                    forwardDecl.push_back(funcDecl);
-                }
-            }
-
-            // Now remove duplicate declaration, first we have to sort the vector.
-            std::sort(forwardDecl.begin(), forwardDecl.end());
-            StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
-            
-            // Parse the source shader and write out only the needed functions
-            // Iterate through each library
-            for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
-            {
-                const String& curDependency = program->getDependency(i);
-
-                StringMap functionCache;
-                functionCache.clear();
-
-                DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(curDependency + 
-                                                                                         "." +
-                                                                                         getTargetLanguage());
-                String line;
-                while(!stream->eof())
-                {
-                    // Grab a line
-                    line = stream->getLine();
-
-                    // Ignore empty lines and comments
-                    if(line.length() > 0)
-                    {
-                        // Strip whitespace
-                        StringUtil::trim(line);
-
-                        // If we find a multiline comment, run through till we get to the end 
-                        if(line.at(0) == '/' && line.at(1) == '*')
-                        {
-                            bool endFound = false;
-                            
-                            while(!endFound)
-                            {
-                                // Get the next line
-                                line = stream->getLine();
-
-                                // Skip empties
-                                if(line.length() > 0)
-                                {
-                                    // Look for the ending sequence.
-                                    String::size_type comment_pos = line.find("*/", 0);
-                                    if(comment_pos != String::npos)
-                                    {
-                                        endFound = true;
-                                    }
-                                }
-                            }
-                        }
-                        else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
-                        {
-                            String function;
-
-                            // Break up the line.
-                            StringVector tokens = StringUtil::tokenise(line, " (\n\r");
-
-                            // Always copy #defines
-                            if(tokens[0] == "#define")
-                            {
-                                // Add the line in
-                                os << line;
-                                
-                                // Also add a newline because it got stripped out a few lines up
-                                os << "\n";
-                                
-                                // Move on to the next line in the shader
-                                continue;
-                            }
-                            
-                            // Try to identify a function definition
-                            // First, look for a return type
-                            if(isBasicType(tokens[0]))
-                            {
-                                String functionName;
-                                
-                                // Return type
-                                function += tokens[0];
-                                function += " ";
-                                
-                                // Function name
-                                function += tokens[1];
-                                function += "(";
-                                functionName = tokens[1];
-                                
-                                bool foundEndOfSignature = false;
-                                // Now look for all the parameters, they may span multiple lines
-                                while(!foundEndOfSignature)
-                                {
-                                    // First we want to get everything right of the paren
-                                    StringVector paramTokens;
-                                    String::size_type lparen_pos = line.find('(', 0);
-                                    if(lparen_pos != String::npos)
-                                    {
-                                        StringVector tokens = StringUtil::split(line, "(");
-                                        paramTokens = StringUtil::split(tokens[1], ",");
-                                    }
-                                    else
-                                    {
-                                        paramTokens = StringUtil::split(line, ",");
-                                    }
-
-                                    StringVector::iterator itParam;
-                                    for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
-                                    {
-                                        function += *itParam;
-
-                                        String::size_type rparen_pos = itParam->find(')', 0);
-                                        if(rparen_pos == String::npos)
-                                            function += ", ";
-                                    }
-
-                                    String::size_type space_pos = line.find(')', 0);
-                                    if(space_pos != String::npos)
-                                    {
-                                        foundEndOfSignature = true;
-                                        function += "\n";
-                                    }
-                                    line = stream->getLine();
-                                }
-                                
-                                // Check to see if this is a function that we actually need.
-                                // This will require a little alteration of the function signature to remove parameter names
-                                
-                                String funcDecl;
-                                StringVector tokens = StringUtil::split(function, "(");
-                                funcDecl = tokens[0];
-                                funcDecl += "(";
-
-                                StringVector paramTokens = StringUtil::split(tokens[1], ",");
-                                StringVector::iterator itParam;
-                                for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
-                                {
-                                    StringVector paramPieces = StringUtil::split(*itParam, " ");
-                                    // If there are no spaces than this might be an empty line, skip over it
-                                    if(paramPieces.size() < 2)
-                                        continue;
-
-                                    funcDecl += paramPieces[0];
-                                    funcDecl += " ";
-                                    funcDecl += paramPieces[1];
-
-                                    String::size_type rparen_pos = itParam->find(')', 0);
-                                    if(rparen_pos == String::npos)
-                                        funcDecl += ", ";
-                                    else
-                                        funcDecl += ");\n";
-                                }
-
-                                bool functionIsNeeded = false;
-                                for (StringVector::iterator it = forwardDecl.begin(); it != endIt; it++)
-                                {
-                                    if(*it != funcDecl)
-                                        continue;
-
-                                    functionIsNeeded = true;
-                                    break;
-                                }
-                                
-                                // Ok, now if we have found the signature, iterate through the file until we find the end
-                                // of the function.
-                                bool foundEndOfBody = false;
-                                size_t braceCount = 0;
-                                while(!foundEndOfBody)
-                                {
-                                    function += "\t" + line + "\n";
-
-                                    String::size_type brace_pos = line.find('{', 0);
-                                    if(brace_pos != String::npos)
-                                    {
-                                        braceCount++;
-                                    }
-
-                                    // Look for non-builtin functions
-                                    // Do so by assuming that these functions do not have several variations.
-                                    // Also, because GLSL is C based, functions must be defined before they are used
-                                    // so we can make the assumption that we already have this function cached.
-                                    //
-                                    // If we find a function, look it up in the map and write it out
-                                    StringUtil::trim(line);
-                                    StringVector tokens = StringUtil::split(line, "(");
-                                    for (StringVector::iterator it = tokens.begin(); it != tokens.end(); it++)
-                                    {
-                                        StringVector moreTokens = StringUtil::split(*it, " ");
-                                            
-                                        if(!functionCache[moreTokens.back()].empty())
-                                        {
-                                            String func = functionCache[moreTokens.back()];
-                                            os << functionCache[moreTokens.back()];
-                                            
-                                            // Because we don't want to write it out twice, remove from the cache
-                                            functionCache.erase(moreTokens.back());
-                                        }
-                                    }
-                                    
-                                    brace_pos = line.find('}', 0);
-                                    if(brace_pos != String::npos)
-                                        braceCount--;
-
-                                    if(braceCount == 0)
-                                        foundEndOfBody = true;
-                                    
-                                    // Save function here to our cache
-                                    functionCache[functionName] = function;
-
-                                    line = stream->getLine();
-                                }
-
-                                if(functionIsNeeded)
-                                    os << function;
-                            }
-                        }
-                    }
+                    os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }
         }
