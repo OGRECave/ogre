@@ -159,7 +159,7 @@ String Operand::toString() const
 FunctionAtom::FunctionAtom()
 {
 	mGroupExecutionOrder   = -1;
-	mInteralExecutionOrder = -1;
+	mInternalExecutionOrder = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ int FunctionAtom::getGroupExecutionOrder() const
 //-----------------------------------------------------------------------------
 int	FunctionAtom::getInternalExecutionOrder() const
 {
-	return mInteralExecutionOrder;
+	return mInternalExecutionOrder;
 }
 
 
@@ -183,7 +183,7 @@ FunctionInvocation::FunctionInvocation(const String& functionName,
 {
 	mFunctionName = functionName;
 	mGroupExecutionOrder = groupOrder;
-	mInteralExecutionOrder = internalOrder;
+	mInternalExecutionOrder = internalOrder;
 	mReturnType = returnType;
 }
 

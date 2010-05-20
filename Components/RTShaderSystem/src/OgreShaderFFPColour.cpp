@@ -149,7 +149,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_OUT);
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 
 	if (mVSOutputDiffuse.get() != NULL)
@@ -157,7 +157,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
 		curFuncInvocation->pushOperand(vsDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutputDiffuse, Operand::OPS_OUT);
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 	
 	if (mVSInputSpecular.get() != NULL)
@@ -174,7 +174,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_OUT);
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 
 	if (mVSOutputSpecular.get() != NULL)
@@ -182,7 +182,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_COLOUR, internalCounter++);
 		curFuncInvocation->pushOperand(vsSpecular, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutputSpecular, Operand::OPS_OUT);
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 	
 	
@@ -206,7 +206,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_OUT);
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Handle specular colour.
@@ -223,7 +223,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(0.0), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_OUT);
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Assign diffuse colour.
@@ -232,7 +232,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
 		curFuncInvocation->pushOperand(psDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Assign specular colour.
@@ -241,7 +241,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN, internalCounter++);
 		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutputSpecular, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Add specular to out colour.
@@ -252,7 +252,7 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}	
 
 	return true;

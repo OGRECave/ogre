@@ -651,7 +651,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
 					
 					curFuncInvocation->pushOperand(itFind->second, Operand::OPS_IN, curMergeParameter.getSourceParameterMask(p));
 					curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_OUT, i), Operand::OPS_OUT, curMergeParameter.getDestinationParameterMask(p));		
-					func->addAtomInstace(curFuncInvocation);		
+					func->addAtomInstance(curFuncInvocation);		
 				}
 				else if (progType == GPT_FRAGMENT_PROGRAM)
 				{
@@ -659,7 +659,7 @@ void ProgramProcessor::generateLocalSplitParameters(Function* func, GpuProgramTy
 					
 					curFuncInvocation->pushOperand(curMergeParameter.getDestinationParameter(Operand::OPS_IN, i), Operand::OPS_IN, curMergeParameter.getDestinationParameterMask(p));		
 					curFuncInvocation->pushOperand(itFind->second, Operand::OPS_OUT, curMergeParameter.getSourceParameterMask(p));
-					func->addAtomInstace(curFuncInvocation);		
+					func->addAtomInstance(curFuncInvocation);		
 				}
 			}
 		}

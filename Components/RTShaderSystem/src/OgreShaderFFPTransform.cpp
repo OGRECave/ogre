@@ -86,7 +86,7 @@ bool FFPTransform::createCpuSubPrograms(ProgramSet* programSet)
 	transformFunc->pushOperand(positionIn, Operand::OPS_IN);
 	transformFunc->pushOperand(positionOut, Operand::OPS_OUT);
 
-	vsEntry->addAtomInstace(transformFunc);
+	vsEntry->addAtomInstance(transformFunc);
 
 	return true;
 }

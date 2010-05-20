@@ -54,7 +54,7 @@ public:
 		// Vertex program main
 		FFT_VS_MAIN,
 		// Pixel shader main
-		FFT_PS_MAIN,
+		FFT_PS_MAIN
 	};
 
 	/** Get the name of this function */
@@ -142,7 +142,7 @@ public:
 	/** Add a function atom instance to this function. 
 	@param atomInstance The atom instance to add.
 	*/
-	void							addAtomInstace			(FunctionAtom* atomInstance);
+	void							addAtomInstance			(FunctionAtom* atomInstance);
 
 	/** Delete a function atom instance from this function. 
 	@param atomInstance The atom instance to OGRE_DELETE.
