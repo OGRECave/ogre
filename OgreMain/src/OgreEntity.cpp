@@ -1154,9 +1154,10 @@ namespace Ogre {
     {
         Root& root = Root::getSingleton();
         unsigned long currentFrameNumber = root.getNextFrameNumber();
-        if (*mFrameBonesLastUpdated  != currentFrameNumber) {
-
-			if (!mSkipAnimStateUpdates)
+        if ((*mFrameBonesLastUpdated != currentFrameNumber) ||
+			(hasSkeleton() && getSkeleton()->getManualBonesDirty()))
+		{
+			if ((!mSkipAnimStateUpdates) && (*mFrameBonesLastUpdated != currentFrameNumber))
 	            mSkeletonInstance->setAnimationState(*mAnimationState);
             mSkeletonInstance->_getBoneMatrices(mBoneMatrices);
             *mFrameBonesLastUpdated  = currentFrameNumber;
