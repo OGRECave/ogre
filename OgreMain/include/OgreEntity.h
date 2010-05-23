@@ -202,6 +202,8 @@ namespace Ogre {
         int mSoftwareAnimationNormalsRequests;
 		/// Flag indicating whether to skip automatic updating of the Skeleton's AnimationState
 		bool mSkipAnimStateUpdates;
+		/// Flag indicating whether to update the main entity skeleton even when an LOD is displayed
+		bool mAlwaysUpdateMainSkeleton;
 
 
 		/// The LOD number of the mesh to use, calculated by _notifyCurrentCamera
@@ -801,6 +803,23 @@ namespace Ogre {
 		}
 
 
+		/** The skeleton of the main entity will be updated even if the an LOD entity is being displayed.
+		useful if you have entities attached to the main entity. Otherwise position of attached
+		entities will not be updated.
+		*/
+		void setAlwaysUpdateMainSkeleton(bool update) {
+			mAlwaysUpdateMainSkeleton = update;
+		}
+
+		/** The skeleton of the main entity will be updated even if the an LOD entity is being displayed.
+		useful if you have entities attached to the main entity. Otherwise position of attached
+		entities will not be updated.
+		*/
+		bool getAlwaysUpdateMainSkeleton() const {
+			return mAlwaysUpdateMainSkeleton;
+		}
+
+		
 	};
 
 	/** Factory object for creating Entity instances */

@@ -86,6 +86,7 @@ namespace Ogre {
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
 		  mMeshStateCount(0),
+		  mAlwaysUpdateMainSkeleton(false),
           mFullBoundingBox()
     {
     }
@@ -121,6 +122,7 @@ namespace Ogre {
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
 		mMeshStateCount(0),
+		mAlwaysUpdateMainSkeleton(false),
         mFullBoundingBox()
 	{
 		_initialise();
@@ -594,6 +596,12 @@ namespace Ogre {
                 }
             }
         }
+
+		if (getAlwaysUpdateMainSkeleton() && hasSkeleton() && (mMeshLodIndex > 0))
+		{
+			cacheBoneMatrices();
+			getSkeleton()->_updateTransforms();
+		}
 
         // Since we know we're going to be rendered, take this opportunity to
         // update the animation
