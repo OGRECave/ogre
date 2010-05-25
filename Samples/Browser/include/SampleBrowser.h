@@ -1130,7 +1130,7 @@ protected:
 			sampleList.push_back("Sample_CelShading");
 			//sampleList.push_back("Sample_Character");     
 			//sampleList.push_back("Sample_CubeMapping");    
-			//sampleList.push_back("Sample_Dot3Bump");
+			sampleList.push_back("Sample_Dot3Bump");
 			sampleList.push_back("Sample_DynTex");      
 			sampleList.push_back("Sample_FacialAnimation");
 			sampleList.push_back("Sample_Fresnel");
