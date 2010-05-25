@@ -348,6 +348,7 @@ set (SOURCE_FILES
   src/OgreOverlayContainer.cpp
   src/OgreOverlayElement.cpp
   src/OgreOverlayElementCommands.cpp
+  src/OgreOverlayElementFactory.cpp
   src/OgreOverlayManager.cpp
   src/OgrePanelOverlayElement.cpp
   src/OgreParticle.cpp
