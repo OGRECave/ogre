@@ -2795,19 +2795,25 @@ namespace OgreBites
 		{
 			mLoadInc = mGroupInitProportion / scriptCount;
 			mLoadBar->setCaption("Parsing...");
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void scriptParseStarted(const Ogre::String& scriptName, bool& skipThisScript)
 		{
 			mLoadBar->setComment(scriptName);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void scriptParseEnded(const Ogre::String& scriptName, bool skipped)
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void resourceGroupScriptingEnded(const Ogre::String& groupName) {}
@@ -2816,31 +2822,41 @@ namespace OgreBites
 		{
 			mLoadInc = mGroupLoadProportion / resourceCount;
 			mLoadBar->setCaption("Loading...");
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void resourceLoadStarted(const Ogre::ResourcePtr& resource)
 		{
 			mLoadBar->setComment(resource->getName());
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void resourceLoadEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void worldGeometryStageStarted(const Ogre::String& description)
 		{
 			mLoadBar->setComment(description);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void worldGeometryStageEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
 			mWindow->update();
+#endif
 		}
 
 		void resourceGroupLoadEnded(const Ogre::String& groupName) {}

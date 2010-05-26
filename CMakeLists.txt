@@ -136,8 +136,14 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
 endif (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
 
 # determine system endianess
-include(TestBigEndian)
-test_big_endian(OGRE_TEST_BIG_ENDIAN)
+if (MSVC)
+  # This doesn't work on VS 2010
+  # MSVC only builds for intel anyway
+  set(OGRE_TEST_BIG_ENDIAN FALSE)
+else()
+  include(TestBigEndian)
+  test_big_endian(OGRE_TEST_BIG_ENDIAN)
+endif()
 
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")

@@ -39,17 +39,6 @@ THE SOFTWARE.
 namespace Ogre {
 namespace RTShader {
 
-#define SGX_LIB_PERPIXELLIGHTING					"SGXLib_PerPixelLighting"
-#define SGX_FUNC_TRANSFORMNORMAL					"SGX_TransformNormal"
-#define SGX_FUNC_TRANSFORMPOSITION					"SGX_TransformPosition"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSE			"SGX_Light_Directional_Diffuse"
-#define SGX_FUNC_LIGHT_DIRECTIONAL_DIFFUSESPECULAR	"SGX_Light_Directional_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSE				"SGX_Light_Point_Diffuse"
-#define SGX_FUNC_LIGHT_POINT_DIFFUSESPECULAR		"SGX_Light_Point_DiffuseSpecular"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSE					"SGX_Light_Spot_Diffuse"
-#define SGX_FUNC_LIGHT_SPOT_DIFFUSESPECULAR			"SGX_Light_Spot_DiffuseSpecular"
-	
-
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -566,7 +555,7 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder, i
 	curFuncInvocation->pushOperand(mWorldViewITMatrix, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT);	
-	vsMain->addAtomInstace(curFuncInvocation);
+	vsMain->addAtomInstance(curFuncInvocation);
 
 	// Transform view space position if need to.
 	if (mVSOutViewPos.get() != NULL)
@@ -575,7 +564,7 @@ bool PerPixelLighting::addVSInvocation(Function* vsMain, const int groupOrder, i
 		curFuncInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutViewPos, Operand::OPS_OUT);	
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 	
 
@@ -594,7 +583,7 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 	}
 	else
 	{
@@ -604,14 +593,14 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
-			psMain->addAtomInstace(curFuncInvocation);
+			psMain->addAtomInstance(curFuncInvocation);
 		}
 		else
 		{
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);
+			psMain->addAtomInstance(curFuncInvocation);
 		}
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
@@ -620,7 +609,7 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
-			psMain->addAtomInstace(curFuncInvocation);
+			psMain->addAtomInstance(curFuncInvocation);
 		}
 		else
 		{
@@ -628,7 +617,7 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT);	
-			psMain->addAtomInstace(curFuncInvocation);
+			psMain->addAtomInstance(curFuncInvocation);
 		}		
 	}
 
@@ -637,7 +626,7 @@ bool PerPixelLighting::addPSGlobalIlluminationInvocation(Function* psMain, const
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT);	
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 	}
 	
 	return true;
@@ -655,7 +644,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Merge specular colour with vertex colour if need to.
@@ -665,7 +654,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 	}
 
 	switch (curLightParams->mType)
@@ -685,7 +674,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);
+			psMain->addAtomInstance(curFuncInvocation);
 		}
 
 		else
@@ -696,7 +685,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);	
+			psMain->addAtomInstance(curFuncInvocation);	
 		}	
 		break;
 
@@ -715,7 +704,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);		
+			psMain->addAtomInstance(curFuncInvocation);		
 		}
 		else
 		{
@@ -727,7 +716,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);	
+			psMain->addAtomInstance(curFuncInvocation);	
 		}
 
 		break;
@@ -749,7 +738,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);			
+			psMain->addAtomInstance(curFuncInvocation);			
 		}
 		else
 		{
@@ -763,7 +752,7 @@ bool PerPixelLighting::addPSIlluminationInvocation(LightParams* curLightParams, 
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			psMain->addAtomInstace(curFuncInvocation);	
+			psMain->addAtomInstance(curFuncInvocation);	
 		}
 		break;
 	}
@@ -779,19 +768,19 @@ bool PerPixelLighting::addPSFinalAssignmentInvocation( Function* psMain, const i
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
 	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_OUT);	
-	psMain->addAtomInstace(curFuncInvocation);	
+	psMain->addAtomInstance(curFuncInvocation);	
 
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 								
 	curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);	
 	curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);	
-	psMain->addAtomInstace(curFuncInvocation);
+	psMain->addAtomInstance(curFuncInvocation);
 
 	if (mSpecularEnable)
 	{
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_PS_COLOUR_BEGIN + 1, internalCounter++); 
 		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_OUT);			
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 	}
 
 	return true;

@@ -455,7 +455,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(mDerivedSceneColour, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-		vsMain->addAtomInstace(curFuncInvocation);		
+		vsMain->addAtomInstance(curFuncInvocation);		
 	}
 	else
 	{
@@ -465,14 +465,14 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 			curFuncInvocation->pushOperand(mLightAmbientColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);			
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstace(curFuncInvocation);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 		else
 		{
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 			curFuncInvocation->pushOperand(mDerivedAmbientLightColour, Operand::OPS_IN, (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 
 		if (mTrackVertexColourType & TVC_EMISSIVE)
@@ -481,7 +481,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 			curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstace(curFuncInvocation);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 		else
 		{
@@ -489,7 +489,7 @@ bool FFPLighting::addGlobalIlluminationInvocation(Function* vsMain, const int gr
 			curFuncInvocation->pushOperand(mSurfaceEmissiveColour, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);	
-			vsMain->addAtomInstace(curFuncInvocation);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}		
 	}
 
@@ -508,7 +508,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 
 	// Merge specular colour with vertex colour if need to.
@@ -518,7 +518,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 		curFuncInvocation->pushOperand(mVSDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 		curFuncInvocation->pushOperand(curLightParams->mSpecularColour, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
-		vsMain->addAtomInstace(curFuncInvocation);
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 
 	switch (curLightParams->mType)
@@ -540,7 +540,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 
 		else
@@ -552,7 +552,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);	
+			vsMain->addAtomInstance(curFuncInvocation);	
 		}				
 		break;
 
@@ -573,7 +573,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);			
+			vsMain->addAtomInstance(curFuncInvocation);			
 		}
 		else
 		{
@@ -587,7 +587,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);	
+			vsMain->addAtomInstance(curFuncInvocation);	
 		}
 				
 		break;
@@ -611,7 +611,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutSpecular, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);			
+			vsMain->addAtomInstance(curFuncInvocation);			
 		}
 		else
 		{
@@ -627,7 +627,7 @@ bool FFPLighting::addIlluminationInvocation(LightParams* curLightParams, Functio
 			curFuncInvocation->pushOperand(curLightParams->mDiffuseColour, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));					
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_IN, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
 			curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT, (Operand::OPM_X |  Operand::OPM_Y | Operand::OPM_Z));	
-			vsMain->addAtomInstace(curFuncInvocation);	
+			vsMain->addAtomInstance(curFuncInvocation);	
 		}
 		break;
 	}

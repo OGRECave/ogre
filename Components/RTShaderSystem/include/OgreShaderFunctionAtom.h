@@ -70,7 +70,7 @@ public:
 // Attributes.
 protected:
 	int			mGroupExecutionOrder;		// The owner group execution order.	
-	int			mInteralExecutionOrder;		// The execution order within the group.		
+	int			mInternalExecutionOrder;		// The execution order within the group.		
 };
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
@@ -150,10 +150,10 @@ public:
 	static GpuConstantType		getGpuConstantType	(int mask);
 
 protected:
-	ParameterPtr	mParameter;			//The parameter being carried by the operand
-	OpSemantic		mSemantic;			//Tells if the parameter is of type input,output or both
-	int				mMask;				//Which part of the parameter should be passed (x,y,z,w)
-	ushort			mIndirectionLevel; //The level of indirection. @see getIndirectionLevel
+	ParameterPtr	mParameter;			/// The parameter being carried by the operand
+	OpSemantic		mSemantic;			/// Tells if the parameter is of type input,output or both
+	int				mMask;				/// Which part of the parameter should be passed (x,y,z,w)
+	ushort			mIndirectionLevel;  /// The level of indirection. @see getIndirectionLevel
 };
 
 /** A class that represents function invocation code from shader based program function.
@@ -172,16 +172,18 @@ public:
 	*/
 	FunctionInvocation(const String& functionName, int groupOrder, int internalOrder, String returnType = "void");
 
+    /** Copy constructor */
+	FunctionInvocation(const FunctionInvocation& rhs);
+
 	/** 
 	@see FunctionAtom::writeSourceCode
 	*/
 	virtual void			writeSourceCode	(std::ostream& os, const String& targetLanguage) const;
 
-
 	/** 
 	@see FunctionAtom::getFunctionAtomType
 	*/
-	virtual const String&	getFunctionAtomType			() { return Type; }
+	virtual const String&	getFunctionAtomType () { return Type; }
 
 	/** Get a list of parameters this function invocation will use in the function call as arguments. */
 	OperandVector&			getOperandList	() { return mOperands; }
@@ -195,10 +197,35 @@ public:
 	void					pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, int indirectionLevel = 0);
 
 	/** Return the function name */
-	const String&			getFunctionName	() const {return mFunctionName; }
+	const String&			getFunctionName	() const { return mFunctionName; }
 
 	/** Return the return type */
-	const String&			getReturnType	() const {return mReturnType; }
+	const String&			getReturnType	() const { return mReturnType; }
+
+    /** Determines if the current object is equal to the compared one. */
+    bool operator == ( const FunctionInvocation& rhs ) const;
+
+    /** Determines if the current object is not equal to the compared one. */
+    bool operator != ( const FunctionInvocation& rhs ) const;
+
+    /** Determines if the current object is less than the compared one. */
+    bool operator <  ( const FunctionInvocation& rhs ) const;
+
+    /** Comparator function to be used for sorting.
+        Implemented as a struct to make it easier for the compiler to inline
+    */
+    struct FunctionInvocationLessThan
+    {
+        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+    };
+
+    /** Comparator function to be used for comparisons.
+        Implemented as a struct to make it easier for the compiler to inline
+    */
+    struct FunctionInvocationCompare
+    {
+        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+    };
 
 	/// The type of this class.
 	static String Type;
@@ -221,4 +248,3 @@ typedef FunctionAtomInstanceList::const_iterator	FunctionAtomInstanceConstIterat
 }
 
 #endif
-

@@ -244,7 +244,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(mWorldViewProjMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);	
-		vsMain->addAtomInstace(curFuncInvocation);		
+		vsMain->addAtomInstance(curFuncInvocation);		
 
 		internalCounter = 0;
 		switch (mFogMode)
@@ -268,7 +268,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(mFogColour, Operand::OPS_IN);		
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 		
 	}
 
@@ -297,7 +297,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);		
 		curFuncInvocation->pushOperand(mFogParams, Operand::OPS_IN);		
 		curFuncInvocation->pushOperand(mVSOutFogFactor, Operand::OPS_OUT);
-		vsMain->addAtomInstace(curFuncInvocation);		
+		vsMain->addAtomInstance(curFuncInvocation);		
 
 
 		internalCounter = 0;
@@ -307,7 +307,7 @@ bool FFPFog::addFunctionInvocations(ProgramSet* programSet)
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInFogFactor, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT);
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 	}
 
 

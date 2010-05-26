@@ -456,7 +456,7 @@ ParameterPtr Function::getParameterByContent(const ShaderParameterList& paramete
 
 
 //-----------------------------------------------------------------------------
-void Function::addAtomInstace(FunctionAtom* atomInstance)
+void Function::addAtomInstance(FunctionAtom* atomInstance)
 {
 	mAtomInstances.push_back(atomInstance);
 }

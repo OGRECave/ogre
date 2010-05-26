@@ -63,7 +63,7 @@ namespace Ogre {
 		mSourceLockedBytes  = NULL;
 
 		// Allocate the system memory buffer.
-		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY)
+		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY && D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement())
 		{			
 			mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
 			memset(mSystemMemoryBuffer, 0, getSizeInBytes());
@@ -336,6 +336,13 @@ namespace Ogre {
 		{
 			mSourceBuffer = bufferResources;
 		}
+
+		// This is a new buffer and source buffer exists we must update the content now 
+		// to prevent situation where the source buffer will be destroyed and we won't be able to restore its content.
+		else
+		{			
+			updateBufferContent(bufferResources);			
+		}
 	}
 	//---------------------------------------------------------------------
 	IDirect3DVertexBuffer9* D3D9HardwareVertexBuffer::getD3D9VertexBuffer(void)
@@ -353,26 +360,35 @@ namespace Ogre {
 			it = mMapDeviceToBufferResources.find(d3d9Device);			
 		}
 
-		if (it->second->mOutOfDate)
-		{
-			if (mSystemMemoryBuffer != NULL)
-			{
-				updateBufferResources(mSystemMemoryBuffer, it->second);
-			}
-
-			else if (mSourceBuffer != it->second && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
-			{
-				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
-				updateBufferResources(mSourceLockedBytes, it->second);
-				_unlockBuffer(mSourceBuffer);
-				mSourceLockedBytes = NULL;
-			}			
-		}
-
+		// Make sure that the buffer content is updated.
+		updateBufferContent(it->second);
+		
 		it->second->mLastUsedFrame = Root::getSingleton().getNextFrameNumber();
 
 		return it->second->mBuffer;
 	}	
+
+	//---------------------------------------------------------------------
+	void D3D9HardwareVertexBuffer::updateBufferContent(BufferResources* bufferResources)
+	{
+		if (bufferResources->mOutOfDate)
+		{
+			if (mSystemMemoryBuffer != NULL)
+			{
+				updateBufferResources(mSystemMemoryBuffer, bufferResources);
+			}
+
+			else if (mSourceBuffer != bufferResources && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
+			{				
+				mSourceBuffer->mLockOptions = HBL_READ_ONLY;
+				mSourceLockedBytes = _lockBuffer(mSourceBuffer, 0, mSizeInBytes);
+				updateBufferResources(mSourceLockedBytes, bufferResources);
+				_unlockBuffer(mSourceBuffer);
+				mSourceLockedBytes = NULL;
+			}			
+		}
+	}
+
 	//---------------------------------------------------------------------
 	bool D3D9HardwareVertexBuffer::updateBufferResources(const char* systemMemoryBuffer,
 		BufferResources* bufferResources)

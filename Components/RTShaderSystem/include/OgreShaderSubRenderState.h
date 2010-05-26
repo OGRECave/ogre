@@ -276,7 +276,7 @@ public:
 	This method is called in the context of material serialization. It is useful for integrating into
 	bigger context of material exporters from various environment that want to take advantage of the RT Shader System.
 	Sub classes of this interface should override in case they need to write custom properties into the script context.
-	@param ser The material serializer instace.
+	@param ser The material serializer instance.
 	@param subRenderState The sub render state instance to write down.
 	@param srcPass The source pass.
 	@param dstPass The generated shader based pass.
@@ -287,7 +287,7 @@ public:
 	This method is called in the context of material serialization. It is useful for integrating into
 	bigger context of material exporters from various environment that want to take advantage of the RT Shader System.
 	Sub classes of this interface should override in case they need to write custom properties into the script context.
-	@param ser The material serializer instace.
+	@param ser The material serializer instance.
 	@param subRenderState The sub render state instance to write down.
 	@param srcTextureUnit The source texture unit state.
 	@param dstTextureUnit The generated shader based texture unit state.

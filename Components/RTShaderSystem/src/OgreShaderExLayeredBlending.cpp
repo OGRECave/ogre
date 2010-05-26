@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderExLayeredBlending.h"
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderProgram.h"
 
 namespace Ogre {
@@ -207,7 +207,7 @@ void LayeredBlending::addPSBlendInvocations(Function* psMain,
 			curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 			curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-			psMain->addAtomInstace(curFuncInvocation);	
+			psMain->addAtomInstance(curFuncInvocation);	
 		}
 	}
 }
@@ -256,7 +256,7 @@ void LayeredBlending::addPSModifierInvocation(Function* psMain,
 			curFuncInvocation->pushOperand(modifiedParam, Operand::OPS_IN, targetChannels);
 			curFuncInvocation->pushOperand(controlParam, Operand::OPS_IN, targetChannels);
 			curFuncInvocation->pushOperand(modifiedParam, Operand::OPS_OUT, targetChannels);		
-			psMain->addAtomInstace(curFuncInvocation);	
+			psMain->addAtomInstance(curFuncInvocation);	
 		}
 	}
 }

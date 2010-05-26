@@ -159,7 +159,7 @@ protected:
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
 	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
 	RTShader::LayeredBlending*			mLayerBlendSubRS;		// The layer blending sub render state.
-	Label*								mLayerBlendLabel;		// The layer blending lable.
+	Label*								mLayerBlendLabel;		// The layer blending label.
 	Slider*								mReflectionPowerSlider;	// The reflection power controller slider.
 	bool								mReflectionMapEnable;	// The current reflection map effect state.
 	Slider*								mModifierValueSlider;   // The value of the modifier for the layered blend controller slider.

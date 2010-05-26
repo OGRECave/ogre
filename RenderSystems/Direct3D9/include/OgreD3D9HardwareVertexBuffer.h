@@ -80,8 +80,13 @@ namespace Ogre {
 	protected:		
 		/** See HardwareBuffer. */
 		void* lockImpl(size_t offset, size_t length, LockOptions options);		
+		
 		/** See HardwareBuffer. */
 		void unlockImpl(void);			
+		
+		/** Update the given buffer content.*/
+		void updateBufferContent(BufferResources* bufferResources);
+
 		// updates buffer resources from system memory buffer.
 		bool updateBufferResources(const char* systemMemoryBuffer, BufferResources* bufferResources);		
 
@@ -90,6 +95,7 @@ namespace Ogre {
 
 		/** Internal buffer unlock method. */
 		void _unlockBuffer(BufferResources* bufferResources);
+
 
 	protected:
 		typedef map<IDirect3DDevice9*, BufferResources*>::type	DeviceToBufferResourcesMap;

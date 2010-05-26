@@ -99,17 +99,17 @@ int main(int argc, char *argv[])
 
     try {
         sb.initApp();
+
+        mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f)
+                                                  target:self
+                                                selector:@selector(renderOneFrame:)
+                                                userInfo:nil
+                                                 repeats:YES];
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
     }
-        
-    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f)
-                                              target:self
-                                            selector:@selector(renderOneFrame:)
-                                            userInfo:nil
-                                             repeats:YES];
-    
+
     [pool release];
 }
 

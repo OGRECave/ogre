@@ -100,6 +100,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 
 	//check if technique already created
 	techniqueCreated = shaderGenerator->hasShaderBasedTechnique(material->getName(), 
+		material->getGroup(),
 		technique->getSchemeName(), 
 		dstTechniqueSchemeName);
 	
@@ -107,6 +108,7 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 	{
 		// Create the shader based technique.
 		techniqueCreated = shaderGenerator->createShaderBasedTechnique(material->getName(), 
+			material->getGroup(),
 			technique->getSchemeName(), 
 			dstTechniqueSchemeName,
 			shaderGenerator->getCreateShaderOverProgrammablePass());
@@ -118,7 +120,8 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 	if (techniqueCreated)
 	{
 		//Attempt to get the render state which might have been created by the pass parsing
-		mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
+		mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
+					material->getName(), material->getGroup(), pass->getIndex());
 	
 		// Go over all the render state properties.
 		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
@@ -129,7 +132,10 @@ void SGScriptTranslator::translateTextureUnit(ScriptCompiler* compiler, const Ab
 				SubRenderState* subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, texState, this);
 				
 				if (subRenderState)
-					addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), pass->getIndex());
+				{
+					addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), 
+						material->getGroup(), pass->getIndex());
+				}
 			}
 			else
 			{
@@ -160,6 +166,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 
 	// Create the shader based technique.
 	techniqueCreated = shaderGenerator->createShaderBasedTechnique(material->getName(), 
+		material->getGroup(), 
 		technique->getSchemeName(), 
 		dstTechniqueSchemeName,
 		shaderGenerator->getCreateShaderOverProgrammablePass());
@@ -194,7 +201,8 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 						else
 						{
 							shaderGenerator->createScheme(dstTechniqueSchemeName);
-							RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, material->getName(), pass->getIndex());
+							RenderState* renderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, 
+								material->getName(), material->getGroup(), pass->getIndex());
 
 							renderState->setLightCount(lightCount);
 							renderState->setLightCountAutoUpdate(false);
@@ -207,7 +215,9 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 				{
 					subRenderState = ShaderGenerator::getSingleton().createSubRenderState(compiler, prop, pass, this);
 					if (subRenderState)
-						addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), pass->getIndex());
+					{
+						addSubRenderState(subRenderState, dstTechniqueSchemeName, material->getName(), material->getGroup(), pass->getIndex());
+					}
 				}				
 			}
 			else
@@ -223,7 +233,7 @@ void SGScriptTranslator::translatePass(ScriptCompiler* compiler, const AbstractN
 
 //-----------------------------------------------------------------------------
 void SGScriptTranslator::addSubRenderState(SubRenderState* newSubRenderState, 
-		const String& dstTechniqueSchemeName, const String& materialName, unsigned short passIndex)
+		const String& dstTechniqueSchemeName, const String& materialName, const String& groupName, unsigned short passIndex)
 {
 	assert(newSubRenderState);
 
@@ -234,7 +244,7 @@ void SGScriptTranslator::addSubRenderState(SubRenderState* newSubRenderState,
 	shaderGenerator->createScheme(dstTechniqueSchemeName);
 	
 	//update the active render state
-	mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, materialName, passIndex);
+	mGeneratedRenderState = shaderGenerator->getRenderState(dstTechniqueSchemeName, materialName, groupName, passIndex);
 
 	//add the new sub render state
 	mGeneratedRenderState->addTemplateSubRenderState(newSubRenderState);

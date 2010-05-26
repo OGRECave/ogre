@@ -24,6 +24,8 @@ option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE
 macro(install_debug INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/debug/${INPUT})
     install(FILES ${OGRE_DEP_DIR}/bin/debug/${INPUT} DESTINATION bin/debug CONFIGURATIONS Debug)
+  else()
+    message(send_error "${OGRE_DEP_DIR}/bin/debug/${INPUT} did not exist, can't install!")
   endif ()
 endmacro()
 
@@ -32,6 +34,8 @@ macro(install_release INPUT)
     install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
     install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
 	install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
+  else()
+    message(send_error "${OGRE_DEP_DIR}/bin/release/${INPUT} did not exist, can't install!")
   endif ()
 endmacro()
 

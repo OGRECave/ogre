@@ -80,12 +80,7 @@
 
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
-    // For now, always write the shaders to disk on iPhone.  Makes debugging them easier.
-    #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-        #define _RTSS_WRITE_SHADERS_TO_DISK
-    #else
-        //#define _RTSS_WRITE_SHADERS_TO_DISK
-    #endif
+//#define _RTSS_WRITE_SHADERS_TO_DISK
 #endif // USE_RTSHADER_SYSTEM
 
 typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;

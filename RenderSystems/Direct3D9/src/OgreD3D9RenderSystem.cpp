@@ -192,6 +192,7 @@ namespace Ogre
 		ConfigOption optNVPerfHUD;
 		ConfigOption optSRGB;
 		ConfigOption optResourceCeationPolicy;
+		ConfigOption optMultiDeviceMemHint;
 
 		driverList = this->getDirect3DDrivers();
 
@@ -275,6 +276,13 @@ namespace Ogre
 		optSRGB.currentValue = "No";
 		optSRGB.immutable = false;
 
+		// Multiple device memory usage hint.
+		optMultiDeviceMemHint.name = "Multi device memory hint";
+		optMultiDeviceMemHint.possibleValues.push_back("Use minimum system memory");
+		optMultiDeviceMemHint.possibleValues.push_back("Auto hardware buffers management");
+		optMultiDeviceMemHint.currentValue = "Use minimum system memory";
+		optMultiDeviceMemHint.immutable = false;
+
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
@@ -285,6 +293,7 @@ namespace Ogre
 		mOptions[optNVPerfHUD.name] = optNVPerfHUD;
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
+		mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
 
 		refreshD3DSettings();
 
@@ -416,6 +425,14 @@ namespace Ogre
 			else if (value == "Create on all devices")
 				mResourceManager->setCreationPolicy(RCP_CREATE_ON_ALL_DEVICES);		
 		}
+
+		if (name == "Multi device memory hint")
+		{
+			if (value == "Use minimum system memory")
+				mResourceManager->setAutoHardwareBufferManagement(false);
+			else if (value == "Auto hardware buffers management")
+				mResourceManager->setAutoHardwareBufferManagement(true);
+		}		
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::refreshFSAAOptions()
@@ -607,7 +624,6 @@ namespace Ogre
 			hwGamma = opt->second.currentValue == "Yes";
 
 			
-
 			NameValuePairList miscParams;
 			miscParams["colourDepth"] = StringConverter::toString(videoMode->getColourDepth());
 			miscParams["FSAA"] = StringConverter::toString(mFSAASamples);
@@ -2756,7 +2772,8 @@ namespace Ogre
 
 		//Create the depthstencil surface
 		IDirect3DSurface9 *depthBufferSurface = NULL;
-		HRESULT hr = getActiveD3D9Device()->CreateDepthStencilSurface( 
+		IDirect3DDevice9* activeDevice = getActiveD3D9Device();
+		HRESULT hr = activeDevice->CreateDepthStencilSurface( 
 											srfDesc.Width, srfDesc.Height, dsfmt,
 											srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, 
 											TRUE,  // discard true or false?
@@ -2770,7 +2787,7 @@ namespace Ogre
 		}
 
 		D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-												getActiveD3D9Device(), depthBufferSurface,
+												activeDevice, depthBufferSurface,
 												dsfmt, srfDesc.Width, srfDesc.Height,
 												srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, false );
 
@@ -2778,7 +2795,7 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
-	DepthBuffer* D3D9RenderSystem::_addManualDepthBuffer( IDirect3DSurface9 *depthSurface )
+	DepthBuffer* D3D9RenderSystem::_addManualDepthBuffer( IDirect3DDevice9* depthSurfaceDevice, IDirect3DSurface9 *depthSurface )
 	{
 		//If this depth buffer was already added, return that one
 		DepthBufferVec::const_iterator itor = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].begin();
@@ -2798,7 +2815,7 @@ namespace Ogre
 			return 0;
 
 		D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-												getActiveD3D9Device(), depthSurface,
+												depthSurfaceDevice, depthSurface,
 												dsDesc.Format, dsDesc.Width, dsDesc.Height,
 												dsDesc.MultiSampleType, dsDesc.MultiSampleQuality, true );
 
@@ -2928,10 +2945,18 @@ namespace Ogre
 			//Depth is automatically managed and there is no depth buffer attached to this RT
 			//or the Current D3D device doesn't match the one this Depth buffer was created
 			setDepthBufferFor( target );
+			
+			//Retrieve depth buffer again
+			depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
 		}
 
-		//Retrieve depth buffer again
-		depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
+		if ( depthBuffer->getDeviceCreator() != getActiveD3D9Device() )
+		{
+			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+				"Can't use a depth buffer from a diffrent device!",
+				"D3D9RenderSystem::_setRenderTarget" );
+		}
+
 		IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
 
 		// Bind render targets

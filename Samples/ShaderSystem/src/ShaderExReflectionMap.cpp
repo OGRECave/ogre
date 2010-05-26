@@ -239,35 +239,35 @@ bool ShaderExReflectionMap::addFunctionInvocations(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupOrder )
 {
-	FunctionInvocation* funcInvoaction = NULL;
+	FunctionInvocation* funcInvocation = NULL;
 	int internalCounter = 0;
 
 	// Output mask texture coordinates.
-	funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
-	funcInvoaction->pushOperand(mVSInMaskTexcoord, Operand::OPS_IN);
-	funcInvoaction->pushOperand(mVSOutMaskTexcoord, Operand::OPS_OUT);
-	vsMain->addAtomInstace(funcInvoaction);
+	funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+	funcInvocation->pushOperand(mVSInMaskTexcoord, Operand::OPS_IN);
+	funcInvocation->pushOperand(mVSOutMaskTexcoord, Operand::OPS_OUT);
+	vsMain->addAtomInstance(funcInvocation);
 
 	// Output reflection texture coordinates.
 	if (mReflectionMapType == TEX_TYPE_2D)
 	{
-		funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder, internalCounter++); 
-		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);	
-		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
-		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
-		vsMain->addAtomInstace(funcInvoaction);
+		funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_SPHERE,  groupOrder, internalCounter++); 
+		funcInvocation->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+		funcInvocation->pushOperand(mViewMatrix, Operand::OPS_IN);	
+		funcInvocation->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+		funcInvocation->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
+		vsMain->addAtomInstance(funcInvocation);
 	}
 	else
 	{
-		funcInvoaction = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
-		funcInvoaction->pushOperand(mWorldMatrix, Operand::OPS_IN);
-		funcInvoaction->pushOperand(mWorldITMatrix, Operand::OPS_IN);
-		funcInvoaction->pushOperand(mViewMatrix, Operand::OPS_IN);					
-		funcInvoaction->pushOperand(mVSInputNormal, Operand::OPS_IN);	
-		funcInvoaction->pushOperand(mVSInputPos, Operand::OPS_IN);				
-		funcInvoaction->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
-		vsMain->addAtomInstace(funcInvoaction);
+		funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_GENERATE_TEXCOORD_ENV_REFLECT, groupOrder, internalCounter++); 
+		funcInvocation->pushOperand(mWorldMatrix, Operand::OPS_IN);
+		funcInvocation->pushOperand(mWorldITMatrix, Operand::OPS_IN);
+		funcInvocation->pushOperand(mViewMatrix, Operand::OPS_IN);					
+		funcInvocation->pushOperand(mVSInputNormal, Operand::OPS_IN);	
+		funcInvocation->pushOperand(mVSInputPos, Operand::OPS_IN);				
+		funcInvocation->pushOperand(mVSOutReflectionTexcoord, Operand::OPS_OUT);
+		vsMain->addAtomInstance(funcInvocation);
 	}
 	
 
@@ -278,19 +278,19 @@ bool ShaderExReflectionMap::addVSInvocations( Function* vsMain, const int groupO
 //-----------------------------------------------------------------------
 bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupOrder )
 {
-	FunctionInvocation* funcInvoaction = NULL;
+	FunctionInvocation* funcInvocation = NULL;
 	int internalCounter = 0;
 
-	funcInvoaction = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder, internalCounter++);
-	funcInvoaction->pushOperand(mMaskMapSampler, Operand::OPS_IN);
-	funcInvoaction->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
-	funcInvoaction->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
-	funcInvoaction->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);	
-	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
-	funcInvoaction->pushOperand(mReflectionPower, Operand::OPS_IN);
-	funcInvoaction->pushOperand(mPSOutDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_APPLY_REFLECTION_MAP, groupOrder, internalCounter++);
+	funcInvocation->pushOperand(mMaskMapSampler, Operand::OPS_IN);
+	funcInvocation->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
+	funcInvocation->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
+	funcInvocation->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);	
+	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvocation->pushOperand(mReflectionPower, Operand::OPS_IN);
+	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
 	
-	psMain->addAtomInstace(funcInvoaction);
+	psMain->addAtomInstance(funcInvocation);
 
 	return true;
 }

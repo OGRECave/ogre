@@ -421,7 +421,7 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 	}
 
 	if (texCoordCalcFunc != NULL)
-		vsMain->addAtomInstace(texCoordCalcFunc);
+		vsMain->addAtomInstance(texCoordCalcFunc);
 
 	return true;
 }
@@ -447,7 +447,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-	psMain->addAtomInstace(curFuncInvocation);
+	psMain->addAtomInstance(curFuncInvocation);
 
 	// Build colour argument for source1.
 	source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source1", GCT_FLOAT4);
@@ -531,25 +531,25 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 		else
 			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBS_TEXTURE:		
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(texel, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBS_DIFFUSE:		
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);	
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);		
 		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBS_SPECULAR:		
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);	
 		curFuncInvocation->pushOperand(mPSSpecular, Operand::OPS_IN);		
 		curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);		
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 		break;
 
 	case LBS_MANUAL:
@@ -568,7 +568,7 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
 		}
 		
 		curFuncInvocation->pushOperand(arg, Operand::OPS_IN);	
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 		break;
 	}
 }
@@ -592,62 +592,62 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);						
+		psMain->addAtomInstance(curFuncInvocation);						
 		break;
 	case LBX_SOURCE2:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);							
+		psMain->addAtomInstance(curFuncInvocation);							
 		break;
 	case LBX_MODULATE:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);			
+		psMain->addAtomInstance(curFuncInvocation);			
 		break;
 	case LBX_MODULATE_X2:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX2, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);			
+		psMain->addAtomInstance(curFuncInvocation);			
 		break;
 	case LBX_MODULATE_X4:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATEX4, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 		break;
 	case LBX_ADD:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);			
+		psMain->addAtomInstance(curFuncInvocation);			
 		break;
 	case LBX_ADD_SIGNED:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSIGNED, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);				
+		psMain->addAtomInstance(curFuncInvocation);				
 		break;
 	case LBX_ADD_SMOOTH:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADDSMOOTH, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);			
+		psMain->addAtomInstance(curFuncInvocation);			
 		break;
 	case LBX_SUBTRACT:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);	
+		psMain->addAtomInstance(curFuncInvocation);	
 		break;
 	case LBX_BLEND_DIFFUSE_ALPHA:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SUBTRACT, groupOrder, internalCounter++);
@@ -655,7 +655,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBX_BLEND_TEXTURE_ALPHA:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
@@ -663,7 +663,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(texel, Operand::OPS_IN, Operand::OPM_W);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBX_BLEND_CURRENT_ALPHA:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
@@ -675,7 +675,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		else
 			curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN, Operand::OPM_W);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBX_BLEND_MANUAL:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
@@ -683,14 +683,14 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(blendMode.factor), Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);
+		psMain->addAtomInstance(curFuncInvocation);
 		break;
 	case LBX_DOTPRODUCT:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_DOTPRODUCT, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);		
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	case LBX_BLEND_DIFFUSE_COLOUR:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
@@ -698,7 +698,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 		curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, targetChannels);		
-		psMain->addAtomInstace(curFuncInvocation);		
+		psMain->addAtomInstance(curFuncInvocation);		
 		break;
 	}
 }

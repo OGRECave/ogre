@@ -26,16 +26,14 @@ THE SOFTWARE.
 */
 
 #include "OgreShaderGLSLESProgramWriter.h"
-#include "OgreHighLevelGpuProgramManager.h"
-#include "OgreStringConverter.h"
-#include "OgreShaderGenerator.h"
-#include "OgreRoot.h"
+#include "OgreShaderFFPRenderState.h"
+#include "OgreShaderExIntegratedPSSM3.h"
+#include "OgreShaderExLayeredBlending.h"
+#include "OgreShaderExNormalMapLighting.h"
+#include "OgreShaderExPerPixelLighting.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#	define ENDL "\n"
-#else
-#	define ENDL std::endl
-#endif
+#include "OgreShaderFunctionAtom.h"
+#include "OgreResourceGroupManager.h"
 
 namespace Ogre {
     namespace RTShader {
@@ -56,6 +54,7 @@ namespace Ogre {
         {
             mGLSLVersion = 100;
             initializeStringMaps();
+            cacheFunctionLibraries();
         }
 
         //-----------------------------------------------------------------------
@@ -64,516 +63,124 @@ namespace Ogre {
 
         }
 
-        //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::initializeStringMaps()
+        FunctionInvocation * GLSLESProgramWriter::createInvocationFromString(String input)
         {
-            // Basic glsl es types
-            mGpuConstTypeMap[GCT_FLOAT1] = "float";
-            mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
-            mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
-            mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
-            mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler2D";
-            mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
-            mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
-            mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
-            mGpuConstTypeMap[GCT_MATRIX_3X3] = "mat3";
-            mGpuConstTypeMap[GCT_MATRIX_4X4] = "mat4";
-            mGpuConstTypeMap[GCT_INT1] = "int";
-            mGpuConstTypeMap[GCT_INT2] = "int2";
-            mGpuConstTypeMap[GCT_INT3] = "int3";
-            mGpuConstTypeMap[GCT_INT4] = "int4";
+            String functionName, returnType;
+            FunctionInvocation *invoc = NULL;
 
-            // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
-            mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
-            mContentToPerVertexAttributes[Parameter::SPC_NORMAL_OBJECT_SPACE] = "normal";
-            mContentToPerVertexAttributes[Parameter::SPC_TANGENT_OBJECT_SPACE] = "tangent";
-            mContentToPerVertexAttributes[Parameter::SPC_BINORMAL_OBJECT_SPACE] = "binormal";
+            // Get the function name and return type
+            StringVector leftTokens = StringUtil::split(input, "(");
+            StringVector leftTokens2 = StringUtil::split(leftTokens[0], " ");
+            StringUtil::trim(leftTokens2[0]);
+            StringUtil::trim(leftTokens2[1]);
+            returnType      = leftTokens2[0];
+            functionName    = leftTokens2[1];
 
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE0] = "uv0";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE1] = "uv1";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE2] = "uv2";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE3] = "uv3";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE4] = "uv4";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE5] = "uv5";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
-            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";
-            mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
-            mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
-        }
-		
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeAssignFunction(StringSerialiser& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType)
-#else
-		void GLSLESProgramWriter::writeAssignFunction(std::stringstream& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType)
-#endif
-		{
-			Operand op1 = *itOperand;
-			itOperand++;
-			if(itOperand != itOperandEnd)
-			{
-				Operand op2 = *itOperand;
-				
-				os << "\t" << processOperand(op2, gpuType) << " = " << processOperand(op1, gpuType) << ";";
-			}
-		}
+            invoc = OGRE_NEW FunctionInvocation(functionName, 0, 0, returnType);
 
-        //-----------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeSourceCode(StringSerialiser& os, Program* program)
-#else
-		void GLSLESProgramWriter::writeSourceCode(std::ostream& os, Program* program)
-#endif
-        {			
-            GpuProgramType gpuType = program->getType();
-            if(gpuType == GPT_GEOMETRY_PROGRAM)
+            // Split out the parameters
+            StringVector parameters;
+            String::size_type lparen_pos = input.find('(', 0);
+            if(lparen_pos != String::npos)
             {
-                OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, 
-                    "Geometry Programs not supported in GLSL ES writer ", 
-                    "GLSLESProgramWriter::writeSourceCode" );	
+                StringVector tokens = StringUtil::split(input, "(");
+                parameters = StringUtil::split(tokens[1], ",");
+            }
+            else
+            {
+                parameters = StringUtil::split(input, ",");
             }
 
-            // Clear out old input params
-            mFragInputParams.clear();
-
-            const ShaderFunctionList& functionList = program->getFunctions();
-            ShaderFunctionConstIterator itFunction;
-
-            const UniformParameterList& parameterList = program->getParameters();
-            UniformParameterConstIterator itUniformParam = parameterList.begin();
-            
-            // Write the current version (this forces the driver to fulfill the glsl es standard)
-            os << "#version "<< mGLSLVersion << ENDL;
-
-            // Default precision declaration is required in fragment and vertex shaders.
-            os << "precision highp float;" << ENDL;
-            os << "precision highp int;" << ENDL;
-            os << "precision lowp sampler2D;" << ENDL;
-            os << "precision lowp samplerCube;" << ENDL;
-
-            // Generate source code header.
-            writeProgramTitle(os, program);
-            os<< ENDL;
-
-            // Embed dependencies.
-            writeProgramDependencies(os, program);
-            os << ENDL;
-
-            // Generate global variable code.
-            writeUniformParametersTitle(os, program);
-            os << ENDL;
-
-            // Write the uniforms 
-            for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+            StringVector::const_iterator itParam;
+            int i = 0;
+            for(itParam = parameters.begin(); itParam != parameters.end(); ++itParam, i++)
             {
-                ParameterPtr pUniformParam = *itUniformParam;
-
-                os << "uniform\t";
-                os << mGpuConstTypeMap[pUniformParam->getType()];
-                os << "\t";
-                os << pUniformParam->getName();
-                os << ";" << ENDL;
-            }
-            os << ENDL;			
-
-            // Write program function(s).
-            for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
-            {
-                Function* curFunction = *itFunction;
-
-                writeFunctionTitle(os, curFunction);
-                
-                // Clear output mapping this map is used when we use glsl built in types
-                mInputToGLStatesMap.clear();
-
-                // Write inout params and fill mInputToGLStatesMap
-                writeInputParameters(os, curFunction, gpuType);
-                writeOutParameters(os, curFunction, gpuType);
-                            
-                // The function name must always main.
-                os << "void main() {" << ENDL;
-
-                // Write local parameters.
-                const ShaderParameterList& localParams = curFunction->getLocalParameters();
-                ShaderParameterConstIterator itParam = localParams.begin();
-                ShaderParameterConstIterator itParamEnd = localParams.end();
-
-                for (; itParam != itParamEnd; ++itParam)
+                StringUtil::replaceAll(*itParam, ")", "");
+                StringUtil::replaceAll(*itParam, ",", "");
+                StringVector paramTokens = StringUtil::split(*itParam, " ");
+                // There should be three parts for each token
+                // 1. The operand type(in, out, inout)
+                // 2. The type
+                // 3. The name
+                if(paramTokens.size() == 3)
                 {
-                    os << "\t";
-                    writeLocalParameter(os, *itParam);			
-                    os << ";" << ENDL;						
-                }
-                os << ENDL;			
+                    Operand::OpSemantic semantic = Operand::OPS_IN;
+                    GpuConstantType gpuType = GCT_UNKNOWN;
 
-                // Sort function atoms.
-                curFunction->sortAtomInstances();
-                
-                const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-                FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-                FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
-
-                for (; itAtom != itAtomEnd; ++itAtom)
-                {		
-                    FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
-                    FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-					
-                    // Local string stream
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-					StringSerialiser localOs;
-#else
-					std::stringstream localOs;
-#endif
-
-					for (; itOperand != itOperandEnd; )
-					{
-						Operand op = *itOperand;
-						Operand::OpSemantic opSemantic = op.getSemantic();
-						String paramName = op.getParameter()->getName();
-						Parameter::Content content = op.getParameter()->getContent();
-						
-						// Check if we write to an varying because the are only readable in fragment programs 
-						if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
-						{	
-							// Is the written parameter a varying 
-							bool isVarying = false;
-
-							// Check if we write to an varying because the are only readable in fragment programs 
-							if (gpuType == GPT_FRAGMENT_PROGRAM)
-							{	
-								StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
-								if(itFound != mFragInputParams.end())
-								{						
-									// Declare the copy variable
-									String newVar = "local_" + paramName;
-									String tempVar = paramName;
-									isVarying = true;
-
-									// We stored the original values in the mFragInputParams thats why we have to replace the first var with o
-									// because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
-									tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
-
-									// Declare the copy variable and assign the original
-									os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << ENDL;	
-
-									// From now on we replace it automatic 
-									mInputToGLStatesMap[paramName] = newVar;
-
-									// Remove the param because now it is replaced automatic with the local variable
-									// (which could be written).
-									mFragInputParams.erase(itFound++);
-								}
-							}
-							
-							// If its not a varying param check if a uniform is written
-							if(!isVarying)
-							{
-								UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
-								if(itFound != parameterList.end())
-								{	
-									// Declare the copy variable
-									String newVar = "local_" + paramName;
-
-									// now we check if we already declared a uniform redirector var
-									if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
-									{
-										// Declare the copy variable and assign the original
-										os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << ENDL;	
-
-										// From now on we replace it automatic 
-										mInputToGLStatesMap[paramName] = newVar;
-									}
-								}
-							}
-
-						}
-						
-						++itOperand;
-					}
-					
-					itOperand = pFuncInvoc->getOperandList().begin();
-                    itOperandEnd = pFuncInvoc->getOperandList().end();
-					
-					if(pFuncInvoc->getFunctionName() == "FFP_Assign")
-					{
-						writeAssignFunction(localOs, itOperand, itOperandEnd, gpuType);
-					}
-					else
-					{
-						// Write function name			
-						localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
-
-						for (; itOperand != itOperandEnd; )
-						{	
-							localOs << processOperand(*itOperand, gpuType);
-							
-							++itOperand;
-
-							// Prepare for the next operand
-							if (itOperand != itOperandEnd)
-							{
-								localOs << ", ";
-							}
-						}
-
-						// Write function call closer.
-						localOs << ");" << ENDL;
-					}
-                    localOs << ENDL;
-                    os << localOs.str();
-                }
-                os << "}" << ENDL;
-            }
-            os << ENDL;
-        }
-
-        //-----------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeInputParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType)
-#else
-		void GLSLESProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
-#endif
-		{
-            const ShaderParameterList& inParams = function->getInputParameters();
-
-            ShaderParameterConstIterator itParam = inParams.begin();
-            ShaderParameterConstIterator itParamEnd = inParams.end();
-
-            for ( ; itParam != itParamEnd; ++itParam)
-            {		
-                ParameterPtr pParam = *itParam;
-                Parameter::Content paramContent = pParam->getContent();
-                String paramName = pParam->getName();
-
-                if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {					
-                    // push fragment inputs they all could be written (in glsl you can not write
-                    // input params in the fragment program)
-                    mFragInputParams.push_back(paramName);
-
-                    // In the vertex and fragment program the variable names must match.
-                    // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
-                    // Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
-                    paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
-                    mInputToGLStatesMap[pParam->getName()] = paramName;
-
-                    os << "varying\t";
-                    os << mGpuConstTypeMap[pParam->getType()];
-                    os << "\t";	
-                    os << paramName;
-                    os << ";" << ENDL;	
-                }
-                else if (gpuType == GPT_VERTEX_PROGRAM && 
-                         mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
-                {
-                    // Due the fact that glsl does not have register like cg we have to rename the params
-                    // according their content.
-                    mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
-                    os << "attribute\t"; 
-
-                    // All uv texcoords passed by OGRE are vec4
-                    if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
-                        paramContent == Parameter::SPC_TEXTURE_COORDINATE7)
+                    if(paramTokens[0] == "in")
                     {
-                        os << "vec4";
+                        semantic = Operand::OPS_IN;
                     }
-                    else
+                    else if(paramTokens[0] == "out")
                     {
-                        os << mGpuConstTypeMap[pParam->getType()];
+                        semantic = Operand::OPS_OUT;
                     }
-                    os << "\t";	
-                    os << mContentToPerVertexAttributes[paramContent];
-                    os << ";" << ENDL;	
-                }
-                else
-                {
-                    os << "uniform \t ";
-                    os << mGpuConstTypeMap[pParam->getType()];
-                    os << "\t";	
-                    os << paramName;
-                    os << ";" << ENDL;	
-                }							
-            }
-        }
+                    else if(paramTokens[0] == "inout")
+                    {
+                        semantic = Operand::OPS_INOUT;
+                    }
 
+                    // Find the internal type based on the string that we're given.
+                    GpuConstTypeToStringMapIterator typeMapIterator;
+                    for(typeMapIterator = mGpuConstTypeMap.begin(); typeMapIterator != mGpuConstTypeMap.end(); ++typeMapIterator)
+                    {
+                        if((*typeMapIterator).second == paramTokens[1])
+                        {
+                            gpuType = (*typeMapIterator).first;
+                            break;
+                        }
+                    }
+
+                    // We need a valid type otherwise glsl compilation will not work
+                    if (gpuType == GCT_UNKNOWN)
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "GLSLESProgramWriter::createInvocationFromString" );	
+                    }
+
+                    if(gpuType == GCT_SAMPLER1D)
+                        gpuType = GCT_SAMPLER2D;
+
+                    ParameterPtr p = ParameterPtr(OGRE_NEW Parameter(gpuType, paramTokens[2],
+                                                                     Parameter::SPS_UNKNOWN, i,
+                                                                     Parameter::SPC_UNKNOWN));
+
+                    invoc->pushOperand(p, semantic);
+                }
+            }
+
+            return invoc;
+        }
+        
         //-----------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeOutParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType)
-#else
-		void GLSLESProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
-#endif
+        void GLSLESProgramWriter::cacheFunctionLibraries()
         {
-            const ShaderParameterList& outParams = function->getOutputParameters();
+            mFunctionCacheMap.clear();
 
-            ShaderParameterConstIterator itParam = outParams.begin();
-            ShaderParameterConstIterator itParamEnd = outParams.end();
-
-            for ( ; itParam != itParamEnd; ++itParam)
-            {
-                ParameterPtr pParam = *itParam;
-
-                if(gpuType == GPT_VERTEX_PROGRAM)
-                {
-                    // GLSL vertex program has to write always gl_Position
-                    if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
-                    {
-                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
-                    }
-                    else
-                    {
-                        os << "varying\t";
-                        os << mGpuConstTypeMap[pParam->getType()];
-                        os << "\t";
-                        os << pParam->getName();
-                        os << ";" << ENDL;	
-                    }
-                }
-                else if(gpuType == GPT_FRAGMENT_PROGRAM &&
-                        pParam->getSemantic() == Parameter::SPS_COLOR)
-                {					
-                    // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";						
-                }
-            }
-        }
-
-        //-----------------------------------------------------------------------
-        // Here's the gist of how and what we're doing here.
-        // First, identify which fixed function libraries we need.  We already have a list of functions that we need to find.
-        // Then for each library file we perform the following steps:
-        // 1. Go through the source line by line to find function signatures.
-        // 2. Once we have found one, compare it to the list of functions that we are searching for
-        // 3. If a match is found then continue reading through the file until we reach the end of the function.
-        // 4. When we reach the last closing brace, write the function and its signature to the output stream
-        // 5. Go back to step 1 until we have found all the functions
-        //
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeProgramDependencies(StringSerialiser& os, Program* program)
-#else
-		void GLSLESProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
+            StringVectorPtr libNames(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+            libNames->push_back( FFP_LIB_COMMON );
+            libNames->push_back( FFP_LIB_FOG );
+            libNames->push_back( FFP_LIB_LIGHTING );
+            libNames->push_back( FFP_LIB_TEXTURING );
+            libNames->push_back( FFP_LIB_TRANSFORM );
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+            libNames->push_back( SGX_LIB_INTEGRATEDPSSM );
+            libNames->push_back( SGX_LIB_LAYEREDBLENDING );
+            libNames->push_back( SGX_LIB_NORMALMAPLIGHTING );
+            libNames->push_back( SGX_LIB_PERPIXELLIGHTING );
+//            libNames->push_back( "SGX_HardwareSkinning" );
 #endif
-		{
-            os << "//-----------------------------------------------------------------------------" << ENDL;
-            os << "//                         PROGRAM DEPENDENCIES"                                 << ENDL;
-            os << "//-----------------------------------------------------------------------------" << ENDL;
+            Ogre::StringVector::const_iterator libraryIterator = libNames->begin();
 
-            StringVector forwardDecl; // Holds all generated function declarations 
-            const ShaderFunctionList& functionList = program->getFunctions();
-            ShaderFunctionConstIterator itFunction;
-
-            // Iterate over all functions in the current program (in our case this is always the main() function)
-            for ( itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
+            // Iterate over all shader libraries
+            while ( libraryIterator != libNames->end() )
             {
-                Function* curFunction = *itFunction;
-                const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-                FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
-                FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
-
-                // Now iterate over all function atoms
-                for ( ; itAtom != itAtomEnd; ++itAtom)
-                {	
-                    // Skip non function invocation atoms.
-                    if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
-                        continue;
-
-                    FunctionInvocation* pFuncInvoc = static_cast<FunctionInvocation*>(*itAtom);			
-                    FunctionInvocation::OperandVector::iterator itOperator = pFuncInvoc->getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperatorEnd = pFuncInvoc->getOperandList().end();
-
-                    // Start with function declaration 
-                    String funcDecl = pFuncInvoc->getReturnType() + " " + pFuncInvoc->getFunctionName() + "(";
-
-                    // Now iterate overall operands
-                    for (; itOperator != itOperatorEnd; )
-                    {
-                        ParameterPtr pParam = (*itOperator).getParameter();				
-                        Operand::OpSemantic opSemantic = (*itOperator).getSemantic();
-                        int opMask = (*itOperator).getMask();
-                        GpuConstantType gpuType = GCT_UNKNOWN;
-
-                        // Write the semantic in, out, inout
-                        switch(opSemantic)
-                        {
-                        case Operand::OPS_IN:
-                            funcDecl += "in ";
-                            break;
-
-                        case Operand::OPS_OUT:
-                            funcDecl += "out ";
-                            break;
-
-                        case Operand::OPS_INOUT:
-                            funcDecl += "inout ";
-                            break;
-
-                        default:
-                            break;
-                        }				
-                        
-                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
-                        if (opMask == Operand::OPM_ALL)
-                        {
-                            gpuType = pParam->getType();
-                        }
-                        else
-                        {
-                            // Now we have to convert the mask to operator
-                            gpuType = Operand::getGpuConstantType(opMask);
-                        }
-
-                        // We need a valid type otherwise glsl compilation will not work
-                        if (gpuType == GCT_UNKNOWN)
-                        {
-                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                                "Can not convert Operand::OpMask to GpuConstantType", 
-                                "GLSLESProgramWriter::writeProgramDependencies" );	
-                        }
-
-                        if (gpuType == GCT_SAMPLER1D)
-                            gpuType = GCT_SAMPLER2D;
-                        
-                        // Write the operand type.
-                        funcDecl += mGpuConstTypeMap[gpuType];
-
-                        ++itOperator;
-
-                        // Prepare for the next operand
-                        if (itOperator != itOperatorEnd)
-                        {
-                            funcDecl += ", ";
-                        }
-                    }
-                    // Write function call closer.
-                    funcDecl += ");\n";
-
-                    // Push the generated declaration into the vector
-                    // duplicate declarations will be removed later.
-                    forwardDecl.push_back(funcDecl);
-                }
-            }
-
-            // Now remove duplicate declaration, first we have to sort the vector.
-            std::sort(forwardDecl.begin(), forwardDecl.end());
-            StringVector::iterator endIt = std::unique(forwardDecl.begin(), forwardDecl.end()); 
-            
-            // Parse the source shader and write out only the needed functions
-            // Iterate through each library
-            for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
-            {
-                const String& curDependency = program->getDependency(i);
-
+                DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(*libraryIterator + ".glsles");
+                
                 StringMap functionCache;
                 functionCache.clear();
 
-                DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(curDependency + 
-                                                                                         "." +
-                                                                                         getTargetLanguage());
                 String line;
                 while(!stream->eof())
                 {
@@ -610,43 +217,42 @@ namespace Ogre {
                         }
                         else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
                         {
-                            String function;
-
                             // Break up the line.
                             StringVector tokens = StringUtil::tokenise(line, " (\n\r");
 
-                            // Always copy #defines
+                            // Cache #defines
                             if(tokens[0] == "#define")
                             {
                                 // Add the line in
-                                os << line;
-                                
-                                // Also add a newline because it got stripped out a few lines up
-                                os << "\n";
-                                
+                                mDefinesMap[line] = *libraryIterator;
+
                                 // Move on to the next line in the shader
                                 continue;
                             }
-                            
+
                             // Try to identify a function definition
                             // First, look for a return type
                             if(isBasicType(tokens[0]))
                             {
-                                String functionName;
-                                
+                                String functionSig;
+                                String functionBody;
+                                FunctionInvocation *functionInvoc = NULL;
+
                                 // Return type
-                                function += tokens[0];
-                                function += " ";
+                                functionSig += tokens[0];
+                                functionSig += " ";
                                 
                                 // Function name
-                                function += tokens[1];
-                                function += "(";
-                                functionName = tokens[1];
-                                
+                                functionSig += tokens[1];
+                                functionSig += "(";
+
                                 bool foundEndOfSignature = false;
                                 // Now look for all the parameters, they may span multiple lines
                                 while(!foundEndOfSignature)
                                 {
+                                    // Trim whitespace from both sides of the line
+                                    StringUtil::trim(line);
+
                                     // First we want to get everything right of the paren
                                     StringVector paramTokens;
                                     String::size_type lparen_pos = line.find('(', 0);
@@ -660,70 +266,33 @@ namespace Ogre {
                                         paramTokens = StringUtil::split(line, ",");
                                     }
 
-                                    StringVector::iterator itParam;
+                                    StringVector::const_iterator itParam;
                                     for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
                                     {
-                                        function += *itParam;
+                                        functionSig += *itParam;
 
                                         String::size_type rparen_pos = itParam->find(')', 0);
                                         if(rparen_pos == String::npos)
-                                            function += ", ";
+                                            functionSig += ", ";
                                     }
 
                                     String::size_type space_pos = line.find(')', 0);
                                     if(space_pos != String::npos)
                                     {
                                         foundEndOfSignature = true;
-                                        function += "\n";
                                     }
                                     line = stream->getLine();
                                 }
-                                
-                                // Check to see if this is a function that we actually need.
-                                // This will require a little alteration of the function signature to remove parameter names
-                                
-                                String funcDecl;
-                                StringVector tokens = StringUtil::split(function, "(");
-                                funcDecl = tokens[0];
-                                funcDecl += "(";
 
-                                StringVector paramTokens = StringUtil::split(tokens[1], ",");
-                                StringVector::iterator itParam;
-                                for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
-                                {
-                                    StringVector paramPieces = StringUtil::split(*itParam, " ");
-                                    // If there are no spaces than this might be an empty line, skip over it
-                                    if(paramPieces.size() < 2)
-                                        continue;
+                                functionInvoc = createInvocationFromString(functionSig);
 
-                                    funcDecl += paramPieces[0];
-                                    funcDecl += " ";
-                                    funcDecl += paramPieces[1];
-
-                                    String::size_type rparen_pos = itParam->find(')', 0);
-                                    if(rparen_pos == String::npos)
-                                        funcDecl += ", ";
-                                    else
-                                        funcDecl += ");\n";
-                                }
-
-                                bool functionIsNeeded = false;
-                                for (StringVector::iterator it = forwardDecl.begin(); it != endIt; it++)
-                                {
-                                    if(*it != funcDecl)
-                                        continue;
-
-                                    functionIsNeeded = true;
-                                    break;
-                                }
-                                
                                 // Ok, now if we have found the signature, iterate through the file until we find the end
                                 // of the function.
                                 bool foundEndOfBody = false;
                                 size_t braceCount = 0;
                                 while(!foundEndOfBody)
                                 {
-                                    function += "\t" + line + "\n";
+                                    functionBody += line;
 
                                     String::size_type brace_pos = line.find('{', 0);
                                     if(brace_pos != String::npos)
@@ -731,46 +300,705 @@ namespace Ogre {
                                         braceCount++;
                                     }
 
-                                    // Look for non-builtin functions
-                                    // Do so by assuming that these functions do not have several variations.
-                                    // Also, because GLSL is C based, functions must be defined before they are used
-                                    // so we can make the assumption that we already have this function cached.
-                                    //
-                                    // If we find a function, look it up in the map and write it out
-                                    StringUtil::trim(line);
-                                    StringVector tokens = StringUtil::split(line, "(");
-                                    for (StringVector::iterator it = tokens.begin(); it != tokens.end(); it++)
-                                    {
-                                        StringVector moreTokens = StringUtil::split(*it, " ");
-                                            
-                                        if(!functionCache[moreTokens.back()].empty())
-                                        {
-                                            String func = functionCache[moreTokens.back()];
-                                            os << functionCache[moreTokens.back()];
-                                            
-                                            // Because we don't want to write it out twice, remove from the cache
-                                            functionCache.erase(moreTokens.back());
-                                        }
-                                    }
-                                    
                                     brace_pos = line.find('}', 0);
                                     if(brace_pos != String::npos)
                                         braceCount--;
 
                                     if(braceCount == 0)
+                                    {
                                         foundEndOfBody = true;
-                                    
-                                    // Save function here to our cache
-                                    functionCache[functionName] = function;
 
+                                        // Remove first and last braces
+                                        size_t pos = functionBody.find("{");
+                                        functionBody.erase(pos, 1);
+                                        pos = functionBody.rfind("}");
+                                        functionBody.erase(pos, 1);
+
+                                        mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
+                                    }
+                                    functionBody += "\n";
                                     line = stream->getLine();
                                 }
-
-                                if(functionIsNeeded)
-                                    os << function;
                             }
                         }
                     }
+                }
+
+                stream->close();
+
+                ++libraryIterator;
+            }
+        }
+
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector)
+        {
+            // Uses recursion to find any functions that the supplied function invocation depends on
+            FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
+            String body = StringUtil::BLANK;
+
+            // Find the function in the cache and retrieve the body
+            for (; itCache != mFunctionCacheMap.end(); ++itCache)
+            {
+                if(!(invoc == (*itCache).first))
+                    continue;
+
+                body = (*itCache).second;
+                break;
+            }
+
+            if(body != StringUtil::BLANK)
+            {
+                // Trim whitespace
+                StringUtil::trim(body);
+                StringVector tokens = StringUtil::split(body, "(");
+
+                for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); it++)
+                {
+                    StringVector moreTokens = StringUtil::split(*it, " ");
+
+                    FunctionMap::const_iterator itFuncCache = mFunctionCacheMap.begin();
+                    for (; itFuncCache != mFunctionCacheMap.end(); ++itFuncCache)
+                    {
+                        if(itFuncCache->first.getFunctionName() == moreTokens.back())
+                        {
+                            // Add the function declaration
+                            depVector.push_back(FunctionInvocation((*itFuncCache).first));
+
+                            discoverFunctionDependencies(itFuncCache->first, depVector);
+                        }
+                    }
+                }
+            }
+        }
+        
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::initializeStringMaps()
+        {
+            // Basic glsl es types
+            mGpuConstTypeMap[GCT_FLOAT1] = "float";
+            mGpuConstTypeMap[GCT_FLOAT2] = "vec2";
+            mGpuConstTypeMap[GCT_FLOAT3] = "vec3";
+            mGpuConstTypeMap[GCT_FLOAT4] = "vec4";
+            mGpuConstTypeMap[GCT_SAMPLER1D] = "sampler2D";
+            mGpuConstTypeMap[GCT_SAMPLER2D] = "sampler2D";
+            mGpuConstTypeMap[GCT_SAMPLERCUBE] = "samplerCube";
+            mGpuConstTypeMap[GCT_MATRIX_2X2] = "mat2";
+            mGpuConstTypeMap[GCT_MATRIX_3X3] = "mat3";
+            mGpuConstTypeMap[GCT_MATRIX_4X4] = "mat4";
+            mGpuConstTypeMap[GCT_INT1] = "int";
+            mGpuConstTypeMap[GCT_INT2] = "int2";
+            mGpuConstTypeMap[GCT_INT3] = "int3";
+            mGpuConstTypeMap[GCT_INT4] = "int4";
+
+            // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
+            mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
+            mContentToPerVertexAttributes[Parameter::SPC_NORMAL_OBJECT_SPACE] = "normal";
+            mContentToPerVertexAttributes[Parameter::SPC_TANGENT_OBJECT_SPACE] = "tangent";
+            mContentToPerVertexAttributes[Parameter::SPC_BINORMAL_OBJECT_SPACE] = "binormal";
+
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE0] = "uv0";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE1] = "uv1";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE2] = "uv2";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE3] = "uv3";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE4] = "uv4";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE5] = "uv5";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE6] = "uv6";
+            mContentToPerVertexAttributes[Parameter::SPC_TEXTURE_COORDINATE7] = "uv7";
+            mContentToPerVertexAttributes[Parameter::SPC_COLOR_DIFFUSE] = "colour";
+            mContentToPerVertexAttributes[Parameter::SPC_COLOR_SPECULAR] = "secondary_colour";
+        }
+
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::writeSourceCode(std::ostream& os, Program* program)
+        {
+            GpuProgramType gpuType = program->getType();
+            if(gpuType == GPT_GEOMETRY_PROGRAM)
+            {
+                OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, 
+                    "Geometry Programs not supported in GLSL ES writer ", 
+                    "GLSLESProgramWriter::writeSourceCode" );	
+            }
+
+            // Clear out old input params
+            mFragInputParams.clear();
+            
+            // Clear out old inlined functions
+            mInlinedFunctions.clear();
+
+            const ShaderFunctionList& functionList = program->getFunctions();
+            ShaderFunctionConstIterator itFunction;
+
+            const UniformParameterList& parameterList = program->getParameters();
+            UniformParameterConstIterator itUniformParam = parameterList.begin();
+            
+            // Write the current version (this forces the driver to fulfill the glsl es standard)
+            os << "#version "<< mGLSLVersion << std::endl;
+
+            // Default precision declaration is required in fragment and vertex shaders.
+            os << "precision highp float;" << std::endl;
+            os << "precision highp int;" << std::endl;
+            os << "precision lowp sampler2D;" << std::endl;
+            os << "precision lowp samplerCube;" << std::endl;
+
+            // Generate source code header.
+            writeProgramTitle(os, program);
+            os<< std::endl;
+
+            // Embed dependencies.
+            writeProgramDependencies(os, program);
+            os << std::endl;
+
+            // Generate global variable code.
+            writeUniformParametersTitle(os, program);
+            os << std::endl;
+
+            // Write the uniforms 
+            for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
+            {
+                ParameterPtr pUniformParam = *itUniformParam;
+
+                os << "uniform\t";
+                os << mGpuConstTypeMap[pUniformParam->getType()];
+                os << "\t";
+                os << pUniformParam->getName();
+                os << ";" << std::endl;
+            }
+            os << std::endl;			
+
+            // Write program function(s).
+            for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
+            {
+                Function* curFunction = *itFunction;
+
+                writeFunctionTitle(os, curFunction);
+                
+                // Clear output mapping this map is used when we use glsl built in types
+                mInputToGLStatesMap.clear();
+
+                // Write inout params and fill mInputToGLStatesMap
+                writeInputParameters(os, curFunction, gpuType);
+                writeOutParameters(os, curFunction, gpuType);
+                            
+                // The function name must always main.
+                os << "void main() {" << std::endl;
+
+                // Write local parameters.
+                const ShaderParameterList& localParams = curFunction->getLocalParameters();
+                ShaderParameterConstIterator itParam = localParams.begin();
+                ShaderParameterConstIterator itParamEnd = localParams.end();
+
+                for (; itParam != itParamEnd; ++itParam)
+                {
+                    os << "\t";
+                    writeLocalParameter(os, *itParam);			
+                    os << ";" << std::endl;						
+                }
+                os << std::endl;			
+
+                // Sort function atoms.
+                curFunction->sortAtomInstances();
+                
+                const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+                FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
+                FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
+
+                for (; itAtom != itAtomEnd; ++itAtom)
+                {		
+                    FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
+                    FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
+                    FunctionInvocation::OperandVector::const_iterator itOperandEnd = pFuncInvoc->getOperandList().end();
+                    FunctionInvocation::OperandVector::const_iterator itInlinedOperand;
+
+                    bool inlineable = false;
+                    String inlinedFuncBody = StringUtil::BLANK;
+                    StringVector bodyTokens;
+                    FunctionInvocation pInlinedFuncInvoc = FunctionInvocation("", 0, 0);
+
+                    // Reset the iterator
+                    itOperand = pFuncInvoc->getOperandList().begin();
+                    
+                    FunctionVectorIterator itInline = mInlinedFunctions.begin();
+                    FunctionVectorIterator itInlineEnd = mInlinedFunctions.end();
+                    for (; itInline != itInlineEnd; ++itInline)
+                    {
+                        // See if this is a function that we should inline
+                        if(FunctionInvocation::FunctionInvocationCompare()(*itInline, *pFuncInvoc))
+                        {
+                            inlineable = true;
+
+                            // Now go through the cache and find the function body,
+                            // function invocation and operand pointers
+                            FunctionMapIterator itCache = mFunctionCacheMap.begin();
+                            FunctionMapIterator itCacheEnd = mFunctionCacheMap.end();
+                            for (; itCache != itCacheEnd; ++itCache)
+                            {
+                                if(FunctionInvocation::FunctionInvocationCompare()((*itCache).first, *itInline))
+                                {
+                                    inlinedFuncBody = (*itCache).second;
+                                    pInlinedFuncInvoc = (*itCache).first;
+                                    itInlinedOperand = pInlinedFuncInvoc.getOperandList().begin();
+                                    break;
+                                }
+                            }
+                           
+                            continue;
+                        }
+                    }
+
+                    bodyTokens = StringUtil::split(inlinedFuncBody, "_(),+-*/<>;^=!%?{}[]\n", 0, true);
+
+                    // Local string stream
+                    std::stringstream localOs;
+
+                    // Write function name			
+                    localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
+
+                    for (; itOperand != itOperandEnd; )
+                    {
+                        Operand op = *itOperand;
+                        Operand::OpSemantic opSemantic = op.getSemantic();
+                        String paramName = op.getParameter()->getName();
+                        Parameter::Content content = op.getParameter()->getContent();
+
+                        // Check if we write to a varying because the are only readable in fragment programs 
+                        if (opSemantic == Operand::OPS_OUT || opSemantic == Operand::OPS_INOUT)
+                        {	
+                            // Is the written parameter a varying 
+                            bool isVarying = false;
+
+                            // Check if we write to a varying because the are only readable in fragment programs 
+                            if (gpuType == GPT_FRAGMENT_PROGRAM)
+                            {	
+                                StringVector::iterator itFound = std::find(mFragInputParams.begin(), mFragInputParams.end(), paramName);	
+                                if(itFound != mFragInputParams.end())
+                                {						
+                                    // Declare the copy variable
+                                    String newVar = "local_" + paramName;
+                                    String tempVar = paramName;
+                                    isVarying = true;
+
+                                    // We stored the original values in the mFragInputParams thats why we have to replace the first var with o
+                                    // because all vertex output vars are prefixed with o in glsl the name has to match in the fragment program.
+                                    tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
+
+                                    // Declare the copy variable and assign the original
+                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+
+                                    // From now on we replace it automatic 
+                                    mInputToGLStatesMap[paramName] = newVar;
+
+                                    // Remove the param because now it is replaced automatic with the local variable
+                                    // (which could be written).
+                                    mFragInputParams.erase(itFound++);
+                                }
+                            }
+                            
+                            // If its not a varying param check if a uniform is written
+                            if(!isVarying)
+                            {
+                                UniformParameterList::const_iterator itFound = std::find_if( parameterList.begin(), parameterList.end(), std::bind2nd( CompareUniformByName(), paramName ) );
+                                if(itFound != parameterList.end())
+                                {	
+                                    // Declare the copy variable
+                                    String newVar = "local_" + paramName;
+
+                                    // now we check if we already declared a uniform redirector var
+                                    if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
+                                    {
+                                        // Declare the copy variable and assign the original
+                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
+
+                                        // From now on we replace it automatic 
+                                        mInputToGLStatesMap[paramName] = newVar;
+                                    }
+                                }
+                            }
+
+                        }
+
+                        String newParam;
+                        if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
+                        {
+                            int mask = op.getMask(); // our swizzle mask
+                            
+                            // Here we insert the renamed param name
+                            newParam = mInputToGLStatesMap[paramName];
+
+                            if(mask != Operand::OPM_ALL)
+                            {
+                                newParam += "." + Operand::getMaskAsString(mask);
+                            }	
+                            // Now that every texcoord is a vec4 (passed as vertex attributes) we
+                            // have to swizzle them according the desired type.
+                            else if(gpuType == GPT_VERTEX_PROGRAM &&
+                                    content == Parameter::SPC_TEXTURE_COORDINATE0 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE1 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE2 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE3 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE4 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE5 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE6 ||
+                                    content == Parameter::SPC_TEXTURE_COORDINATE7 )
+                            {
+                                // Now generate the swizzle mask according
+                                // the type.
+                                switch(op.getParameter()->getType())
+                                {
+                                case GCT_FLOAT1:
+                                    newParam += ".x";
+                                    break;
+                                case GCT_FLOAT2:
+                                    newParam += ".xy";
+                                    break;
+                                case GCT_FLOAT3:
+                                    newParam += ".xyz";
+                                    break;
+                                case GCT_FLOAT4:
+                                    newParam += ".xyzw";
+                                    break;
+
+                                default:
+                                    break;
+                                }
+                            }						
+                        }
+                        else
+                        {
+                            newParam = op.toString();
+                        }
+                        
+                        ++itOperand;
+
+                        // Prepare for the next operand
+                        if (itOperand != itOperandEnd)
+                        {
+                            localOs << newParam << ", ";
+                        }
+                        else
+                        {
+                            localOs << newParam;
+                        }
+
+                        if(inlineable)
+                        {
+                            // Replace the variable
+                            String oldParam = (*itInlinedOperand).getParameter()->getName();
+
+                            // Remove ) and ; to make token matching easier
+                            size_t pos = oldParam.find(")");
+                            if(pos != String::npos)
+                                oldParam.erase(pos, 1);
+
+                            pos = oldParam.find(";");
+                            if(pos != String::npos)
+                                oldParam.erase(pos, 1);
+
+                            for (StringVector::iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
+                            {
+                                // Remove whitespace
+                                StringUtil::trim(*it);
+                                StringVector paramTokens = StringUtil::split(*it, ".");
+
+                                if(paramTokens[0] == oldParam)
+                                {
+                                    *it = StringUtil::replaceAll(*it, paramTokens[0], newParam);
+                                }
+                            }
+
+                            ++itInlinedOperand;
+                        }
+                    }
+
+                    // Write function call closer.
+                    if(inlineable)
+                    {
+                        inlinedFuncBody.clear();
+                        // Reconstruct the line with variable replaced
+                        for (StringVector::const_iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
+                            inlinedFuncBody += *it;
+
+                        os << "\t" << inlinedFuncBody << std::endl;
+                    }
+                    else
+                    {
+                        localOs << ");" << std::endl;
+                        localOs << std::endl;
+                        os << localOs.str();
+                    }
+
+                }
+                os << "}" << std::endl;
+            }
+            os << std::endl;
+        }
+
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+        {
+            const ShaderParameterList& inParams = function->getInputParameters();
+
+            ShaderParameterConstIterator itParam = inParams.begin();
+            ShaderParameterConstIterator itParamEnd = inParams.end();
+
+            for ( ; itParam != itParamEnd; ++itParam)
+            {		
+                ParameterPtr pParam = *itParam;
+                Parameter::Content paramContent = pParam->getContent();
+                String paramName = pParam->getName();
+
+                if (gpuType == GPT_FRAGMENT_PROGRAM)
+                {					
+                    // push fragment inputs they all could be written (in glsl you can not write
+                    // input params in the fragment program)
+                    mFragInputParams.push_back(paramName);
+
+                    // In the vertex and fragment program the variable names must match.
+                    // Unfortunately now the input params are prefixed with an 'i' and output params with 'o'.
+                    // Thats why we are using a map for name mapping (we rename the params which are used in function atoms).
+                    paramName.replace(paramName.begin(), paramName.begin() + 1, "o");	
+                    mInputToGLStatesMap[pParam->getName()] = paramName;
+
+                    os << "varying\t";
+                    os << mGpuConstTypeMap[pParam->getType()];
+                    os << "\t";	
+                    os << paramName;
+                    os << ";" << std::endl;	
+                }
+                else if (gpuType == GPT_VERTEX_PROGRAM && 
+                         mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
+                {
+                    // Due the fact that glsl does not have register like cg we have to rename the params
+                    // according their content.
+                    mInputToGLStatesMap[paramName] = mContentToPerVertexAttributes[paramContent];
+                    os << "attribute\t"; 
+
+                    // All uv texcoords passed by OGRE are vec4
+                    if (paramContent == Parameter::SPC_TEXTURE_COORDINATE0 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE1 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE2 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE3 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE4 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE5 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE6 ||
+                        paramContent == Parameter::SPC_TEXTURE_COORDINATE7)
+                    {
+                        os << "vec4";
+                    }
+                    else
+                    {
+                        os << mGpuConstTypeMap[pParam->getType()];
+                    }
+                    os << "\t";	
+                    os << mContentToPerVertexAttributes[paramContent];
+                    os << ";" << std::endl;	
+                }
+                else
+                {
+                    os << "uniform \t ";
+                    os << mGpuConstTypeMap[pParam->getType()];
+                    os << "\t";	
+                    os << paramName;
+                    os << ";" << std::endl;	
+                }							
+            }
+        }
+
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+        {
+            const ShaderParameterList& outParams = function->getOutputParameters();
+
+            ShaderParameterConstIterator itParam = outParams.begin();
+            ShaderParameterConstIterator itParamEnd = outParams.end();
+
+            for ( ; itParam != itParamEnd; ++itParam)
+            {
+                ParameterPtr pParam = *itParam;
+
+                if(gpuType == GPT_VERTEX_PROGRAM)
+                {
+                    // GLSL vertex program has to write always gl_Position
+                    if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
+                    {
+                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
+                    }
+                    else
+                    {
+                        os << "varying\t";
+                        os << mGpuConstTypeMap[pParam->getType()];
+                        os << "\t";
+                        os << pParam->getName();
+                        os << ";" << std::endl;	
+                    }
+                }
+                else if(gpuType == GPT_FRAGMENT_PROGRAM &&
+                        pParam->getSemantic() == Parameter::SPS_COLOR)
+                {					
+                    // GLSL ES fragment program has to always write gl_FragColor
+                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";						
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------------
+        // Here's the gist of how and what we're doing here.
+        // First, identify which fixed function libraries we need.  We already have a list of functions that we need to find.
+        // Then for each library file we perform the following steps:
+        // 1. Go through the source line by line to find function signatures.
+        // 2. Once we have found one, compare it to the list of functions that we are searching for
+        // 3. If a match is found then continue reading through the file until we reach the end of the function.
+        // 4. When we reach the last closing brace, write the function and its signature to the output stream
+        // 5. Go back to step 1 until we have found all the functions
+        //
+        void GLSLESProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
+        {
+            os << "//-----------------------------------------------------------------------------" << std::endl;
+            os << "//                         PROGRAM DEPENDENCIES"                                 << std::endl;
+            os << "//-----------------------------------------------------------------------------" << std::endl;
+
+            FunctionVector forwardDecl; // Holds all function declarations
+            const ShaderFunctionList& functionList = program->getFunctions();
+            ShaderFunctionConstIterator itFunction;
+
+            Function* curFunction = *(functionList.begin());
+            FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
+            FunctionAtomInstanceConstIterator itAtom = atomInstances.begin();
+            FunctionAtomInstanceConstIterator itAtomEnd = atomInstances.end();
+            // Now iterate over all function atoms
+            for ( ; itAtom != itAtomEnd; ++itAtom)
+            {	
+                // Skip non function invocation atoms.
+                if ((*itAtom)->getFunctionAtomType() != FunctionInvocation::Type)
+                    continue;
+
+                FunctionInvocation pFuncInvoc = *(static_cast<FunctionInvocation *>(*itAtom));
+                forwardDecl.push_back(pFuncInvoc);
+                
+                // Now look into that function for other non-builtin functions and add them to the declaration list
+                // Look for non-builtin functions
+                // Do so by assuming that these functions do not have several variations.
+                // Also, because GLSL is C based, functions must be defined before they are used
+                // so we can make the assumption that we already have this function cached.
+                //
+                // If we find a function, look it up in the map and write it out
+                discoverFunctionDependencies(pFuncInvoc, forwardDecl);
+            }
+
+            // Now remove duplicate declarations, first we have to sort the vector.
+            std::sort(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationLessThan());
+            FunctionVector::const_iterator endIt = forwardDecl.erase(std::unique(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationCompare()), forwardDecl.end());
+
+            for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
+            {
+                const String& curDependency = program->getDependency(i);
+
+                // Write out #defines
+                StringMap::const_iterator itDefines = mDefinesMap.begin();
+                StringMap::const_iterator itDefinesEnd = mDefinesMap.end();
+                for (; itDefines != itDefinesEnd; ++itDefines)
+                {
+                    if((*itDefines).second == curDependency)
+                    {
+                        os << (*itDefines).first;
+                        os << "\n";
+                    }
+                }
+            }
+
+            // Parse the source shader and write out only the needed functions
+            for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
+            {
+                // Only cache basic Fixed Function library functions.  These all start with "FFP"
+                bool inlineable = false;
+                if(StringUtil::startsWith((*it).getFunctionName(), "FFP", false))
+                    inlineable = true;
+                
+                FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
+                FunctionInvocation invoc = FunctionInvocation("", 0, 0);
+                String body = StringUtil::BLANK;
+
+                // Find the function in the cache
+                for (; itCache != mFunctionCacheMap.end(); ++itCache)
+                {
+                    if(!((*it) == (*itCache).first))
+                        continue;
+
+                    invoc = (*itCache).first;
+                    body = (*itCache).second;
+                    break;
+                }
+
+                if(inlineable)
+                {
+                    mInlinedFunctions.push_back(invoc);
+                }
+                else
+                {
+                    // Write out the function from the cached FunctionInvocation;
+                    os << invoc.getReturnType();
+                    os << " ";
+                    os << invoc.getFunctionName();
+                    os << "(";
+
+                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
+                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
+                    for (; itOperand != itOperandEnd;)
+                    {
+                        Operand op = *itOperand;
+                        Operand::OpSemantic opSemantic = op.getSemantic();
+                        String paramName = op.getParameter()->getName();
+                        int opMask = (*itOperand).getMask();
+                        GpuConstantType gpuType = GCT_UNKNOWN;
+
+                        switch(opSemantic)
+                        {
+                        case Operand::OPS_IN:
+                            os << "in ";
+                            break;
+
+                        case Operand::OPS_OUT:
+                            os << "out ";
+                            break;
+
+                        case Operand::OPS_INOUT:
+                            os << "inout ";
+                            break;
+
+                        default:
+                            break;
+                        }
+
+                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
+                        if (opMask == Operand::OPM_ALL)
+                        {
+                            gpuType = op.getParameter()->getType();
+                        }
+                        else
+                        {
+                            // Now we have to convert the mask to operator
+                            gpuType = Operand::getGpuConstantType(opMask);
+                        }
+
+                        // We need a valid type otherwise glsl compilation will not work
+                        if (gpuType == GCT_UNKNOWN)
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                                "Can not convert Operand::OpMask to GpuConstantType", 
+                                "GLSLESProgramWriter::writeProgramDependencies" );	
+                        }
+
+                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
+
+                        ++itOperand;
+
+                        // Prepare for the next operand
+                        if (itOperand != itOperandEnd)
+                        {
+                            os << ", ";
+                        }
+                    }
+                    os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }
         }
@@ -798,78 +1026,12 @@ namespace Ogre {
         }
 
         //-----------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-		void GLSLESProgramWriter::writeLocalParameter(StringSerialiser& os, ParameterPtr parameter)
-#else
-		void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
-#endif
+        void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
         {
             os << mGpuConstTypeMap[parameter->getType()];
             os << "\t";	
             os << parameter->getName();		
         }
-		
-		String GLSLESProgramWriter::processOperand(Operand op, GpuProgramType gpuType)
-		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser localOs;
-#else
-			std::stringstream localOs;
-#endif
 
-			String paramName = op.getParameter()->getName();
-			Parameter::Content content = op.getParameter()->getContent();
-			if(mInputToGLStatesMap.find(paramName) != mInputToGLStatesMap.end())
-			{
-				int mask = op.getMask(); // our swizzle mask
-
-				// Here we insert the renamed param name
-				localOs << mInputToGLStatesMap[paramName];
-
-				if(mask != Operand::OPM_ALL)
-				{
-					localOs << "." << Operand::getMaskAsString(mask);
-				}	
-				// Now that every texcoord is a vec4 (passed as vertex attributes) we
-				// have to swizzle them according the desired type.
-				else if(gpuType == GPT_VERTEX_PROGRAM &&
-						content == Parameter::SPC_TEXTURE_COORDINATE0 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE1 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE2 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE3 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE4 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE5 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE6 ||
-						content == Parameter::SPC_TEXTURE_COORDINATE7 )
-				{
-					// Now generate the swizzle mask according
-					// the type.
-					switch(op.getParameter()->getType())
-					{
-					case GCT_FLOAT1:
-						localOs << ".x";
-						break;
-					case GCT_FLOAT2:
-						localOs << ".xy";
-						break;
-					case GCT_FLOAT3:
-						localOs << ".xyz";
-						break;
-					case GCT_FLOAT4:
-						localOs << ".xyzw";
-						break;
-
-					default:
-						break;
-					}
-				}						
-			}
-			else
-			{
-				localOs << op.toString();
-			}
-			
-			return localOs.str();
-		}
     }
 }
