@@ -26,13 +26,23 @@ THE SOFTWARE.
 */
 #include "OgreShaderProgramWriter.h"
 
-#define ENDL "\n"
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#	define ENDL "\n"
+#else
+#	define ENDL std::endl
+#endif
 
 namespace Ogre {
 namespace RTShader {
 
 //-----------------------------------------------------------------------
-void ProgramWriter::writeProgramTitle(StringSerialiser& os, Program* program)
+void ProgramWriter::writeProgramTitle(
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	StringSerialiser& os,
+#else
+	std::ostream &os,
+#endif
+	Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << ENDL;
 	os << "// Program Type: ";
@@ -57,14 +67,26 @@ void ProgramWriter::writeProgramTitle(StringSerialiser& os, Program* program)
 }
 
 //-----------------------------------------------------------------------
-void ProgramWriter::writeUniformParametersTitle(StringSerialiser& os, Program* program)
+void ProgramWriter::writeUniformParametersTitle(
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	StringSerialiser& os,
+#else
+	std::ostream &os,
+#endif
+	Program* program)
 {
 	os << "//-----------------------------------------------------------------------------" << ENDL;
 	os << "//                         GLOBAL PARAMETERS" << ENDL;
 	os << "//-----------------------------------------------------------------------------" << ENDL;
 }
 //-----------------------------------------------------------------------
-void ProgramWriter::writeFunctionTitle(StringSerialiser& os, Function* function)
+void ProgramWriter::writeFunctionTitle(
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	StringSerialiser& os,
+#else
+	std::ostream &os,
+#endif 
+	Function* function)
 {
 	os << "//-----------------------------------------------------------------------------" << ENDL;
 	os << "// Function Name: " <<  function->getName() << ENDL;
