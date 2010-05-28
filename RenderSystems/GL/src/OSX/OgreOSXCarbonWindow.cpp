@@ -333,7 +333,10 @@ void OSXCarbonWindow::destroy(void)
             
             // Remove our event handler
             if(mEventHandlerRef)
-                RemoveEventHandler(mEventHandlerRef);        
+                RemoveEventHandler(mEventHandlerRef);
+            
+            // Also tell the OS that we no longer need this window
+            DisposeWindow(mWindow);
         }
     }
 
@@ -357,7 +360,7 @@ bool OSXCarbonWindow::isClosed() const
 //-------------------------------------------------------------------------------------------------//
 void OSXCarbonWindow::reposition(int left, int top)
 {
-	//LogManager::getSingleton().logMessage( "OSXCarbonWindow::reposition()" );
+	LogManager::getSingleton().logMessage( "OSXCarbonWindow::reposition()" );
 	if(mWindow)
 		MoveWindow(mWindow, left, top, true);
 }
@@ -365,7 +368,7 @@ void OSXCarbonWindow::reposition(int left, int top)
 //-------------------------------------------------------------------------------------------------//
 void OSXCarbonWindow::resize(unsigned int width, unsigned int height)
 {
-	//LogManager::getSingleton().logMessage( "OSXCarbonWindow::resize()" );
+	LogManager::getSingleton().logMessage( "OSXCarbonWindow::resize()" );
 	if(!mWindow)
 		return;
 
