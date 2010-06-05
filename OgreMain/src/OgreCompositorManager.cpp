@@ -184,7 +184,7 @@ Renderable *CompositorManager::_getTexturedRectangle2D()
 	if(!mRectangle)
 	{
 		/// 2D rectangle, to use for render_quad passes
-		mRectangle = OGRE_NEW Rectangle2D(true);
+		mRectangle = OGRE_NEW Rectangle2D(true, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
 	}
 	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 	Viewport* vp = rs->_getViewport();
