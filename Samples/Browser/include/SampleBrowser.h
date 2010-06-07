@@ -1120,25 +1120,25 @@ protected:
 			Ogre::String startupSampleTitle = "";
 			Ogre::String sampleDir = "";
 			Ogre::StringVector sampleList;
-			sampleList.push_back("Sample_BezierPatch");
+			//sampleList.push_back("Sample_BezierPatch");
 			sampleList.push_back("Sample_CameraTrack");
 			sampleList.push_back("Sample_CelShading");
 			sampleList.push_back("Sample_Character");     
 			//sampleList.push_back("Sample_CubeMapping");    
-			sampleList.push_back("Sample_Dot3Bump");
-			sampleList.push_back("Sample_DynTex");      
-			sampleList.push_back("Sample_FacialAnimation");
-			sampleList.push_back("Sample_Fresnel");
-			sampleList.push_back("Sample_Grass");
-			sampleList.push_back("Sample_ParticleFX");
+			//sampleList.push_back("Sample_Dot3Bump");
+			//sampleList.push_back("Sample_DynTex");      
+			//sampleList.push_back("Sample_FacialAnimation");
+			//sampleList.push_back("Sample_Fresnel");
+			//sampleList.push_back("Sample_Grass");
+			//sampleList.push_back("Sample_ParticleFX");
 #   ifdef USE_RTSHADER_SYSTEM
-			sampleList.push_back("Sample_ShaderSystem");
+			//sampleList.push_back("Sample_ShaderSystem");
 #	endif
-			sampleList.push_back("Sample_Lighting");       
-			sampleList.push_back("Sample_SkyBox"); 
-			sampleList.push_back("Sample_SkyDome"); 
-			sampleList.push_back("Sample_SkyPlane"); 
-			sampleList.push_back("Sample_Smoke");      		
+			//sampleList.push_back("Sample_Lighting");       
+			//sampleList.push_back("Sample_SkyBox"); 
+			//sampleList.push_back("Sample_SkyDome"); 
+			//sampleList.push_back("Sample_SkyPlane"); 
+			//sampleList.push_back("Sample_Smoke");      		
 #else
 			Ogre::ConfigFile cfg;
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
