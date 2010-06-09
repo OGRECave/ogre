@@ -482,6 +482,15 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
+	bool D3D9Device::isFullScreen() const
+	{		
+		if (mPresentationParamsCount > 0 && mPresentationParams[0].Windowed == FALSE)
+			return true;
+				
+		return false;
+	}
+
+	//---------------------------------------------------------------------
 	const D3DCAPS9& D3D9Device::getD3D9DeviceCaps() const
 	{
 		if (mD3D9DeviceCapsValid == false)

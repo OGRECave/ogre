@@ -59,6 +59,7 @@ namespace Ogre {
 		D3DDEVTYPE				getDeviceType			() const;
 		bool					isMultihead				() const;					
 		bool					isAutoDepthStencil		() const;
+		bool					isFullScreen			() const;
 		
 		const D3DCAPS9&			getD3D9DeviceCaps		() const;
 		D3DFORMAT				getBackBufferFormat		() const;

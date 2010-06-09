@@ -373,7 +373,8 @@ namespace Ogre
 				D3D9Device* currDevice = mRenderDevices[i];
 
 				if (currDevice->getAdapterNumber() == nAdapterOrdinal &&
-					currDevice->getDeviceType() == devType)
+					currDevice->getDeviceType() == devType &&
+					currDevice->isFullScreen() == renderWindow->isFullScreen())
 				{
 					renderDevice = currDevice;
 					break;
