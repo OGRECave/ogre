@@ -248,8 +248,6 @@ namespace Ogre {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, 0);
         glDeleteRenderbuffers(1, &packedRB);
 
-        // Status 0x8CDB - GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT is returned here 
-        // by the iPhone simulator.  Works on device though.
         return status == GL_FRAMEBUFFER_COMPLETE;
     }
 
@@ -464,7 +462,7 @@ namespace Ogre {
 				retval.numSamples = fsaa;
             }
         }
-        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
+//        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
         return retval;
     }
     //-----------------------------------------------------------------------
@@ -498,8 +496,8 @@ namespace Ogre {
 				// If refcount reaches zero, delete buffer and remove from map
 				OGRE_DELETE it->second.buffer;
 				mRenderBufferMap.erase(it);
-				std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-				        << " of " << key.width << "x" << key.height << std::endl;
+				//std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+				//        << " of " << key.width << "x" << key.height << std::endl;
 			}
 		}
     }

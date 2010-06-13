@@ -173,7 +173,12 @@ namespace Ogre {
         GL_CHECK_ERROR;
 
         /// Bind main buffer
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+        // The screen buffer is 1 on iPhone
+        glBindFramebuffer(GL_FRAMEBUFFER, 1);
+#else
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
         GL_CHECK_ERROR;
 
         switch(status)

@@ -249,7 +249,7 @@ CPreprocessor::CPreprocessor (const Token &iToken, int iLine) : MacroList (NULL)
 
 CPreprocessor::~CPreprocessor ()
 {
-    OGRE_DELETE MacroList;
+    delete MacroList;
 }
 
 void CPreprocessor::Error (int iLine, const char *iError, const Token *iToken)
@@ -415,7 +415,7 @@ CPreprocessor::Token CPreprocessor::ExpandMacro (const Token &iToken)
             Token t = GetArguments (nargs, args, cur->ExpandFunc ? false : true);
             if (t.Type == Token::TK_ERROR)
             {
-                OGRE_DELETE [] args;
+                delete [] args;
                 return t;
             }
 
@@ -444,7 +444,7 @@ CPreprocessor::Token CPreprocessor::ExpandMacro (const Token &iToken)
             cur->Expand (nargs, args, MacroList);
         t.AppendNL (Line - old_line);
 
-        OGRE_DELETE [] args;
+        delete [] args;
 
         return t;
     }
@@ -855,8 +855,7 @@ CPreprocessor::Token CPreprocessor::GetArguments (int &oNumArgs, Token *&oArgs,
 
 Done:
     oNumArgs = nargs;
-    //oArgs = OGRE_NEW Token [nargs];
-	oArgs = new Token [nargs];
+    oArgs = new Token [nargs];
     for (int i = 0; i < nargs; i++)
         oArgs [i] = args [i];
     return t;
@@ -874,8 +873,7 @@ bool CPreprocessor::HandleDefine (Token &iBody, int iLine)
         return false;
     }
 
-    //Macro *m = OGRE_NEW Macro (t);
-	Macro *m = new Macro (t);
+    Macro *m = new Macro (t);
     m->Body = iBody;
     t = cpp.GetArguments (m->NumArgs, m->Args, false);
     while (t.Type == Token::TK_WHITESPACE)
@@ -890,7 +888,7 @@ bool CPreprocessor::HandleDefine (Token &iBody, int iLine)
             break;
 
         case Token::TK_ERROR:
-            OGRE_DELETE m;
+            delete m;
             return false;
 
         default:
@@ -1142,8 +1140,7 @@ Done:
 void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
                             const char *iMacroValue, size_t iMacroValueLen)
 {
-    //Macro *m = OGRE_NEW Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-	Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
+    Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
     m->Value = Token (Token::TK_TEXT, iMacroValue, iMacroValueLen);
     m->Next = MacroList;
     MacroList = m;
@@ -1152,8 +1149,7 @@ void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
 void CPreprocessor::Define (const char *iMacroName, size_t iMacroNameLen,
                             long iMacroValue)
 {
-//    Macro *m = OGRE_NEW Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
-	Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
+    Macro *m = new Macro (Token (Token::TK_KEYWORD, iMacroName, iMacroNameLen));
     m->Value.SetValue (iMacroValue);
     m->Next = MacroList;
     MacroList = m;
@@ -1169,7 +1165,7 @@ bool CPreprocessor::Undef (const char *iMacroName, size_t iMacroNameLen)
         {
             Macro *next = (*cur)->Next;
             (*cur)->Next = NULL;
-            OGRE_DELETE (*cur);
+            delete (*cur);
             *cur = next;
             return true;
         }

@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreLogManager.h"
-#include "OgreStringVector.h"
 #include "OgreStringConverter.h"
 
 namespace Ogre {

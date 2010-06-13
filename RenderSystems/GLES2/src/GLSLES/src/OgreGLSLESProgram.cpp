@@ -245,16 +245,6 @@ namespace Ogre {
 		createParameterMappingStructures(true);
 		GLSLESLinkProgramManager::getSingleton().extractConstantDefs(
 			mSource, *mConstantDefs.get(), mName);
-
-		// Also parse any attached sources
-//		for (GLSLESProgramContainer::const_iterator i = mAttachedGLSLPrograms.begin();
-//			i != mAttachedGLSLPrograms.end(); ++i)
-//		{
-//			GLSLESProgram* childShader = *i;
-//
-//			GLSLESLinkProgramManager::getSingleton().extractConstantDefs(
-//				childShader->getSource(), *mConstantDefs.get(), childShader->getName());
-//		}
 	}
 
 	//---------------------------------------------------------------------

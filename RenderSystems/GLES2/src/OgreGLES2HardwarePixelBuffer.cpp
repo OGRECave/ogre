@@ -61,7 +61,7 @@ namespace Ogre {
                                                      HardwareBuffer::Usage usage)
         : HardwarePixelBuffer(mWidth, mHeight, mDepth, mFormat, usage, false, false),
           mBuffer(mWidth, mHeight, mDepth, mFormat),
-          mGLInternalFormat(0)
+          mGLInternalFormat(GL_NONE)
     {
     }
 
@@ -95,10 +95,8 @@ namespace Ogre {
     {
         allocateBuffer();
         if (options != HardwareBuffer::HBL_DISCARD
-#ifndef GL_NV_read_buffer
-            && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0
-#endif
-            )
+//#ifndef GL_NV_read_buffer
+            && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
         {
             // Download the old contents of the texture
             download(mBuffer);
@@ -147,7 +145,6 @@ namespace Ogre {
             // do conversion in temporary buffer
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
-
             PixelUtil::bulkPixelConversion(src, scaled);
         }
         else
@@ -407,11 +404,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void GLES2TextureBuffer::download(const PixelBox &data)
     {
-#ifndef GL_NV_get_tex_image
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                    "Downloading texture buffers is not supported by OpenGL ES",
-                    "GLES2TextureBuffer::download");
-#else
+#if 0 || defined(GL_NV_get_tex_image)
         if(data.getWidth() != getWidth() ||
             data.getHeight() != getHeight() ||
             data.getDepth() != getDepth())
@@ -441,6 +434,10 @@ namespace Ogre {
             // Restore defaults
             glPixelStorei(GL_PACK_ALIGNMENT, 4);
         }
+#else
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+                    "Downloading texture buffers is not supported by OpenGL ES",
+                    "GLES2TextureBuffer::download");
 #endif
     }
     //-----------------------------------------------------------------------------  
@@ -493,15 +490,12 @@ namespace Ogre {
         // Store reference to FBO manager
         GLES2FBOManager *fboMan = static_cast<GLES2FBOManager *>(GLES2RTTManager::getSingletonPtr());
         
-        // Save and clear GL state for rendering
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_disableTextureUnitsFrom(0);
+		glActiveTexture(GL_TEXTURE0);
 
         // Disable alpha, depth and scissor testing, disable blending, 
-        // disable culling, disble lighting, disable fog and reset foreground
-        // colour.
+        // and disable culling
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_SCISSOR_TEST);
         glDisable(GL_BLEND);
@@ -529,7 +523,7 @@ namespace Ogre {
             if(src->mUsage & TU_AUTOMIPMAP)
             {
                 // Automatic mipmaps, we can safely use trilinear filter which
-                // brings greatly imporoved quality for minimisation.
+                // brings greatly improved quality for minimisation.
                 glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 GL_CHECK_ERROR;
                 glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
@@ -611,6 +605,9 @@ namespace Ogre {
             
             /// Finally we're ready to rumble	
             glBindTexture(src->mTarget, src->mTextureID);
+            GL_CHECK_ERROR;
+            glEnable(src->mTarget);
+            GL_CHECK_ERROR;
 
             GLfloat squareVertices[] = {
                -1.0f, -1.0f,
@@ -646,6 +643,9 @@ namespace Ogre {
             GL_CHECK_ERROR;
 
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            GL_CHECK_ERROR;
+
+            glDisable(src->mTarget);
             GL_CHECK_ERROR;
 
             if(tempTex)

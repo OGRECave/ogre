@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include "OgreEGLSupport.h"
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2)
 #ifndef Status
 #define Status int
 #endif 

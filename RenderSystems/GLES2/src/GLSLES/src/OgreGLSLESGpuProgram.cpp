@@ -26,10 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESGpuProgram.h"
-#include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESProgram.h"
+#include "OgreGLSLESLinkProgramManager.h"
 
 namespace Ogre {
 

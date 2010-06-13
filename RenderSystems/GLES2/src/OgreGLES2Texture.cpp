@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
     static inline void doImageIO(const String &name, const String &group,
                                  const String &ext,
-                                 std::vector<Image> &images,
+                                 vector<Image>::type &images,
                                  Resource *r)
     {
         size_t imgIdx = images.size();
@@ -280,7 +280,7 @@ namespace Ogre {
             ext = mName.substr(pos+1);
         }
 
-        LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 std::vector<Image>());
+        LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 vector<Image>::type());
 
         if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D)
         {

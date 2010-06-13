@@ -26,17 +26,13 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreStringVector.h"
-#include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-#include "OgreRoot.h"
-#include "OgreHighLevelGpuProgramManager.h"
-#include "OgreGLES2RenderSystem.h"
-#include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESLinkProgram.h"
+#include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreStringVector.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
 
