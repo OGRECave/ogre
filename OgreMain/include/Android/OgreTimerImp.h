@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __iPhoneTimer_H__
-#define __iPhoneTimer_H__
+#ifndef __AndroidTimer_H__
+#define __AndroidTimer_H__
 
 #include "OgrePrerequisites.h"
 

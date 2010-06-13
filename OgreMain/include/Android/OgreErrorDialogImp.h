@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __iPhoneErrorDialog_H__
-#define __iPhoneErrorDialog_H__
+#ifndef __AndroidErrorDialog_H__
+#define __AndroidErrorDialog_H__
 
 #include "OgrePrerequisites.h"
 
