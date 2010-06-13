@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include "OgreX11EGLContext.h"
 
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX)
+#if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX) && (OGRE_PLATFORM != OGRE_PLATFORM_TEGRA2)
 	void XStringListToTextProperty(char ** prop, int num, XTextProperty * textProp){};
 	Window DefaultRootWindow(Display* nativeDisplayType){return Window();};
 	bool XQueryExtension(Display* nativeDisplayType, char * name, int * dummy0, int * dummy2, int * dummy3){return 0;}
@@ -86,10 +86,13 @@ namespace Ogre {
 
     X11EGLSupport::X11EGLSupport()
     {
-	mNativeDisplay = getNativeDisplay();
+		// A connection that might be shared with the application for GL rendering:
         mGLDisplay = getGLDisplay();
 
-	int dummy;
+ 		// A connection that is NOT shared to enable independent event processing:
+        mNativeDisplay = getNativeDisplay();
+
+        int dummy = 0;
 
 	// TODO: Probe video modes
         mCurrentMode.first.first = 1280;
@@ -100,7 +103,7 @@ namespace Ogre {
         mOriginalMode = mCurrentMode;
         mVideoModes.push_back(mCurrentMode);
 
-	EGLConfig *glConfigs;
+        EGLConfig *glConfigs;
         int config, nConfigs = 0;
 
         glConfigs = chooseGLConfig(NULL, &nConfigs);
@@ -226,7 +229,7 @@ namespace Ogre {
                         __FUNCTION__);
             return 0;
         }
-	EGL_CHECK_ERROR
+        EGL_CHECK_ERROR
 
         if (vid == 0)
         {
@@ -256,7 +259,7 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams)
     {
-	EGLWindow* window = new X11EGLWindow(this);
+        EGLWindow* window = new X11EGLWindow(this);
         window->create(name, width, height, fullScreen, miscParams);
 
         return window;
@@ -266,13 +269,13 @@ namespace Ogre {
 	//then calls EGLSupport::getGLDisplay
     EGLDisplay X11EGLSupport::getGLDisplay()
     {
-	if (!mGLDisplay)
-	{
-		if(!mNativeDisplay)
-			mNativeDisplay = getNativeDisplay();
-		return EGLSupport::getGLDisplay();
-	}
-	return mGLDisplay;
+        if (!mGLDisplay)
+        {
+            if(!mNativeDisplay)
+                mNativeDisplay = getNativeDisplay();
+            return EGLSupport::getGLDisplay();
+        }
+        return mGLDisplay;
     }
 
 }
