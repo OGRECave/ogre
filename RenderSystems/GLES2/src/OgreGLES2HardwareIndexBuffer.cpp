@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2HardwareBufferManager.h"
+#include "OgreGLES2RenderSystem.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
@@ -61,8 +63,9 @@ namespace Ogre {
                 "GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer");
         }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
+
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
                      GLES2HardwareBufferManager::getGLUsage(usage));
         GL_CHECK_ERROR;
@@ -93,7 +96,7 @@ namespace Ogre {
         else
         {
 #if GL_OES_mapbuffer
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 
 			if(!glUnmapBufferOES(GL_ELEMENT_ARRAY_BUFFER))
 			{
@@ -152,7 +155,7 @@ namespace Ogre {
 #if GL_OES_mapbuffer
 		if (!retPtr)
 		{
-			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)
 			{
@@ -207,7 +210,7 @@ namespace Ogre {
                                             const void* pSource,
                                             bool discardWholeBuffer)
     {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
 
         // Update the shadow buffer
@@ -247,7 +250,7 @@ namespace Ogre {
             const void *srcData = mpShadowBuffer->lock(mLockStart, mLockSize,
                                                        HBL_READ_ONLY);
 
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
             GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal

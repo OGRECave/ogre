@@ -28,6 +28,8 @@ THE SOFTWARE.
 
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
+#include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
     GLES2HardwareVertexBuffer::GLES2HardwareVertexBuffer(HardwareBufferManagerBase* mgr, 
@@ -40,7 +42,7 @@ namespace Ogre {
         if (!useShadowBuffer)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Only support with shadowBuffer",
+                        "Only supported with shadowBuffer",
                         "GLES2HardwareVertexBuffer");
         }
 
@@ -54,7 +56,7 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer::GLES2HardwareVertexBuffer");
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
         glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
                      GLES2HardwareBufferManager::getGLUsage(usage));
@@ -116,7 +118,7 @@ namespace Ogre {
         if (!retPtr)
 		{
 			// Use glMapBuffer
-			glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)
 			{
@@ -166,7 +168,7 @@ namespace Ogre {
         else
         {
 #if GL_OES_mapbuffer
-			glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
 			if(!glUnmapBufferOES(GL_ARRAY_BUFFER))
 			{
@@ -205,7 +207,7 @@ namespace Ogre {
                                            const void* pSource,
                                            bool discardWholeBuffer)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
 
         // Update the shadow buffer
@@ -245,7 +247,7 @@ namespace Ogre {
                                                        mLockSize,
                                                        HBL_READ_ONLY);
 
-            glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
+            dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
             GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal

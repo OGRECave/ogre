@@ -46,7 +46,7 @@ namespace Ogre {
     class HardwareBufferManager;
     class RTShader::ShaderGenerator;
 
-    class _OgrePrivate ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
+    class _OgreGLES2Export ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
     {
         public:
             ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator);
@@ -60,7 +60,7 @@ namespace Ogre {
     /**
       Implementation of GL ES 2.x as a rendering system.
      */
-    class _OgrePrivate GLES2RenderSystem : public RenderSystem
+    class _OgreGLES2Export GLES2RenderSystem : public RenderSystem
     {
         private:
             typedef HashMap<GLenum, GLuint>  BindBufferMap;
@@ -151,7 +151,6 @@ namespace Ogre {
             ShaderGeneratorTechniqueResolverListener *mMaterialMgrListener;
 
             bool activateGLTextureUnit(size_t unit);
-            void activateGLBuffer(GLenum target, GLuint buffer);
 
         public:
             // Default constructor / destructor
@@ -504,6 +503,8 @@ namespace Ogre {
 
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
+
+            void _bindGLBuffer(GLenum target, GLuint buffer);
     };
 }
 

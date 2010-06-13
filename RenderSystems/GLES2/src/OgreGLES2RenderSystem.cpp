@@ -28,7 +28,6 @@ THE SOFTWARE.
 #define NOMINMAX
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2TextureManager.h"
-#include "OgreGLES2DefaultHardwareBufferManager.h"
 #include "OgreGLES2DepthBuffer.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2HardwareBufferManager.h"
@@ -38,11 +37,6 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLSLESProgramFactory.h"
-#include "OgreGLSLESGpuProgram.h"
-
-#include "OgreRoot.h"
-#include "OgreGLSLESLinkProgramManager.h"
-//#include "OgreSceneManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   include "OgreEAGL2Window.h"
@@ -51,8 +45,14 @@ THE SOFTWARE.
 #else
 #   include "OgreEGLWindow.h"
 #	ifndef GL_GLEXT_PROTOTYPES
-    PFNGLMAPBUFFEROESPROC glMapBufferOES;
-    PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+    PFNGLMAPBUFFEROESPROC glMapBufferOES = NULL;
+    PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES = NULL;
+    PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB = NULL;
+    PFNGLREADBUFFERNVPROC glReadBufferNV = NULL;
+    PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV = NULL;
+    PFNGLGETTEXIMAGENVPROC glGetTexImageNV = NULL;
+    PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV = NULL;
+    PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV = NULL;
 #	endif
 
 #endif
@@ -193,6 +193,7 @@ namespace Ogre {
         if(stencil)
         {
             rsc->setCapability(RSC_HWSTENCIL);
+			rsc->setCapability(RSC_TWO_SIDED_STENCIL);
             rsc->setStencilBufferBitDepth(stencil);
         }
 
@@ -223,17 +224,13 @@ namespace Ogre {
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
-        rsc->setNumMultiRenderTargets(OGRE_MAX_MULTIPLE_RENDER_TARGETS);
-        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
+        rsc->setNumMultiRenderTargets(1);
 
         // Cube map
         rsc->setCapability(RSC_CUBEMAPPING);
 
         // Stencil wrapping
         rsc->setCapability(RSC_STENCIL_WRAP);
-
-        // TODO: Need to implement in RTSS
-//        rsc->setCapability(RSC_USER_CLIP_PLANES);
 
         // GL always shares vertex and fragment texture units (for now?)
         rsc->setVertexTextureUnitsShared(true);
@@ -271,21 +268,19 @@ namespace Ogre {
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
-        // TODO:
-        rsc->setVertexProgramConstantBoolCount(0);
-        rsc->setVertexProgramConstantIntCount(0);
 
         GLfloat floatConstantCount = 0;
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_VECTORS, &floatConstantCount);
         rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
+        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
+        rsc->setVertexProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Fragment Program Properties
-        rsc->setFragmentProgramConstantBoolCount(0);
-        rsc->setFragmentProgramConstantIntCount(0);
-
         floatConstantCount = 0;
         glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &floatConstantCount);
         rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
+        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
+        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
 //        rsc->setCapability(RSC_TEXTURE_FLOAT);
@@ -460,14 +455,17 @@ namespace Ogre {
 
     void GLES2RenderSystem::setAmbientLight(float r, float g, float b)
     {
+        // Not supported
     }
 
     void GLES2RenderSystem::setShadingType(ShadeOptions so)
     {
+        // Not supported
     }
 
     void GLES2RenderSystem::setLightingEnabled(bool enabled)
     {
+        // Not supported
     }
 
     RenderWindow* GLES2RenderSystem::_createRenderWindow(const String &name, unsigned int width, unsigned int height,
@@ -617,11 +615,11 @@ namespace Ogre {
 				GLES2Context *windowContext;
 				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
 
-				//1 Window <-> 1 Context, should be always true
+				// 1 Window <-> 1 Context, should be always true
 				assert( windowContext );
 
 				bool bFound = false;
-				//Find the depth buffer from this window and remove it.
+				// Find the depth buffer from this window and remove it.
 				DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
 				DepthBufferMap::iterator enMap = mDepthBufferPool.end();
 
@@ -701,56 +699,67 @@ namespace Ogre {
 
     void GLES2RenderSystem::_setProjectionMatrix(const Matrix4 &m)
     {
-        Matrix4 mat = m;
-        if (mActiveRenderTarget->requiresTextureFlipping())
-        {
-            mat[0][1] = -mat[0][1];
-            mat[1][1] = -mat[1][1];
-            mat[2][1] = -mat[2][1];
-            mat[3][1] = -mat[3][1];
-        }
-
+		// Nothing to do but mark clip planes dirty
         if (!mClipPlanes.empty())
             mClipPlanesDirty = true;
     }
 
     void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GLES2TexturePtr tex = texPtr;
+		GLES2TexturePtr tex = texPtr;
+
+		GLenum lastTextureType = mTextureTypes[stage];
 
 		if (!activateGLTextureUnit(stage))
 			return;
 
-        if (enabled)
-        {
-            if (!tex.isNull())
-            {
-                // Note used
-                tex->touch();
+		if (enabled)
+		{
+			if (!tex.isNull())
+			{
+				// Note used
+				tex->touch();
 				mTextureTypes[stage] = tex->getGLES2TextureTarget();
 
                 // Store the number of mipmaps
                 mTextureMipmapCount = tex->getNumMipmaps();
-            }
+			}
 			else
 				// Assume 2D
 				mTextureTypes[stage] = GL_TEXTURE_2D;
+
+			if(lastTextureType != mTextureTypes[stage] && lastTextureType != 0)
+			{
+				if (stage < mFixedFunctionTextureUnits)
+				{
+					glDisable( lastTextureType );
+				}
+			}
+
+			if (stage < mFixedFunctionTextureUnits)
+			{
+				glEnable( mTextureTypes[stage] );
+			}
 
 			if(!tex.isNull())
 				glBindTexture( mTextureTypes[stage], tex->getGLID() );
 			else
 				glBindTexture( mTextureTypes[stage], static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID() );
-            GL_CHECK_ERROR;
 		}
 		else
 		{
+			if (stage < mFixedFunctionTextureUnits)
+			{
+				if (lastTextureType != 0)
+				{
+					glDisable( mTextureTypes[stage] );
+				}
+			}
 			// Bind zero texture
 			glBindTexture(GL_TEXTURE_2D, 0); 
-            GL_CHECK_ERROR;
 		}
 
-        activateGLTextureUnit(0);
-        GL_CHECK_ERROR;
+		activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_setTextureCoordSet(size_t stage, size_t index)
@@ -1341,21 +1350,51 @@ namespace Ogre {
 		bool flip;
 		mStencilMask = mask;
 
-        // NB: We should always treat CCW as front face for consistent with default
-        // culling mode. Therefore, we must take care with two-sided stencil settings.
-        flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
+		if (twoSidedOperation)
+		{
+			if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported",
+                            "GLES2RenderSystem::setStencilBufferParams");
+            
+			// NB: We should always treat CCW as front face for consistent with default
+			// culling mode. Therefore, we must take care with two-sided stencil settings.
+			flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
             (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+            // Back
+            glStencilMaskSeparate(GL_BACK, mask);
+            GL_CHECK_ERROR;
+            glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, mask);
+            GL_CHECK_ERROR;
+            glStencilOpSeparate(GL_BACK, 
+                                convertStencilOp(stencilFailOp, !flip), 
+                                convertStencilOp(depthFailOp, !flip), 
+                                convertStencilOp(passOp, !flip));
 
-        flip = false;
-        glStencilMask(mask);
-        GL_CHECK_ERROR;
-        glStencilFunc(convertCompareFunction(func), refValue, mask);
-        GL_CHECK_ERROR;
-        glStencilOp(
-            convertStencilOp(stencilFailOp, flip),
-            convertStencilOp(depthFailOp, flip), 
-            convertStencilOp(passOp, flip));
-        GL_CHECK_ERROR;
+            GL_CHECK_ERROR;
+            // Front
+            glStencilMaskSeparate(GL_FRONT, mask);
+            GL_CHECK_ERROR;
+            glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, mask);
+            GL_CHECK_ERROR;
+            glStencilOpSeparate(GL_FRONT, 
+                                convertStencilOp(stencilFailOp, flip),
+                                convertStencilOp(depthFailOp, flip), 
+                                convertStencilOp(passOp, flip));
+            GL_CHECK_ERROR;
+		}
+		else
+		{
+			flip = false;
+			glStencilMask(mask);
+            GL_CHECK_ERROR;
+			glStencilFunc(convertCompareFunction(func), refValue, mask);
+            GL_CHECK_ERROR;
+			glStencilOp(
+                        convertStencilOp(stencilFailOp, flip),
+                        convertStencilOp(depthFailOp, flip), 
+                        convertStencilOp(passOp, flip));
+            GL_CHECK_ERROR;
+		}
     }
 
     GLuint GLES2RenderSystem::getCombinedMinMipFilter(void) const
@@ -1369,7 +1408,7 @@ namespace Ogre {
                     case FO_ANISOTROPIC:
                     case FO_LINEAR:
                         // linear min, linear mip
-//                        return GL_LINEAR_MIPMAP_LINEAR;
+                        return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
                         // linear min, point mip
 //                        return GL_LINEAR_MIPMAP_NEAREST;
@@ -1499,15 +1538,13 @@ namespace Ogre {
         GL_CHECK_ERROR;
         // Call super class
         RenderSystem::_render(op);
-
         // Add a render state for per pixel lighting
         Ogre::RTShader::RenderState* renderState =
             mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
         Ogre::RTShader::SubRenderState* perPerPixelLightModel =
             mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
-
         renderState->addTemplateSubRenderState(perPerPixelLightModel);
-        
+
         void* pBufferData = 0;
 		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
@@ -1524,7 +1561,7 @@ namespace Ogre {
 
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elem->getSource());
-            glBindBuffer(GL_ARRAY_BUFFER,
+            _bindGLBuffer(GL_ARRAY_BUFFER,
                 static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get())->getGLBufferId());
             GL_CHECK_ERROR;
             pBufferData = VBO_BUFFER_OFFSET(elem->getOffset());
@@ -1536,7 +1573,7 @@ namespace Ogre {
 
             unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
-
+            
             bool isCustomAttrib = false;
  			if (mCurrentVertexProgram)
  				isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem->getIndex());
@@ -1627,7 +1664,7 @@ namespace Ogre {
                         if (mCurrentVertexProgram)
                         {
                             // Programmable pipeline - direct UV assignment
-                            glActiveTexture(GL_TEXTURE0 + elem->getIndex());
+                            activateGLTextureUnit(GL_TEXTURE0 + elem->getIndex());
                             glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()),
                                                   typeCount,
                                                   GLES2HardwareBufferManager::getGLType(elem->getType()),
@@ -1648,7 +1685,7 @@ namespace Ogre {
                                 if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
                                 {
                                     if (multitexturing)
-                                        glActiveTexture(GL_TEXTURE0 + i);
+                                        activateGLTextureUnit(GL_TEXTURE0 + i);
                                     GL_CHECK_ERROR;
                                     glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i),
                                                           typeCount,
@@ -1670,7 +1707,7 @@ namespace Ogre {
         }
 
 		if (multitexturing)
-            glActiveTexture(GL_TEXTURE0);
+            activateGLTextureUnit(GL_TEXTURE0);
         GL_CHECK_ERROR;
 
         // Find the correct type to render
@@ -1700,7 +1737,7 @@ namespace Ogre {
 
         if (op.useIndexes)
         {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
+            _bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                          static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
             GL_CHECK_ERROR;
@@ -1927,6 +1964,14 @@ namespace Ogre {
 
     void GLES2RenderSystem::_switchContext(GLES2Context *context)
     {
+		// Unbind GPU programs and rebind to new context later, because
+		// scene manager treat render system as ONE 'context' ONLY, and it
+		// cached the GPU programs using state.
+		if (mCurrentVertexProgram)
+			mCurrentVertexProgram->unbindProgram();
+		if (mCurrentFragmentProgram)
+			mCurrentFragmentProgram->unbindProgram();
+        
 		// Disable textures
 		_disableTextureUnitsFrom(0);
 
@@ -1943,6 +1988,12 @@ namespace Ogre {
             mCurrentContext->setInitialized();
         }
 
+        // Rebind GPU programs to new context
+		if (mCurrentVertexProgram)
+			mCurrentVertexProgram->bindProgram();
+		if (mCurrentFragmentProgram)
+			mCurrentFragmentProgram->bindProgram();
+        
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
@@ -1977,6 +2028,7 @@ namespace Ogre {
 
     void GLES2RenderSystem::_oneTimeContextInitialization()
     {
+		glDisable(GL_DITHER);
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)
@@ -2220,7 +2272,7 @@ namespace Ogre {
 		}
 	}
 
-    void GLES2RenderSystem::activateGLBuffer(GLenum target, GLuint buffer)
+    void GLES2RenderSystem::_bindGLBuffer(GLenum target, GLuint buffer)
     {
         BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
@@ -2293,43 +2345,6 @@ namespace Ogre {
 
 					if (curTech->getSchemeName() == schemeName)
 					{
-						/*
-						for(unsigned int i = 0; i < curTech->getNumPasses(); ++i)
-						{
-							Ogre::Pass *pass = curTech->getPass(i);
-							
-							Ogre::GpuProgramPtr vp = pass->getVertexProgram();
-							Ogre::GpuProgramPtr fp = pass->getFragmentProgram();
-							
-							if(!vp.isNull())
-							{
-								std::stringstream stream(vp->getSource());
-								std::string line;
-								while(std::getline(stream, line))
-								{
-									LogManager::getSingleton().logMessage(line);
-								}
-								
-								GpuProgramParametersSharedPtr params = pass->getVertexProgramParameters();
-								GpuProgramParameters::AutoConstantIterator iter = params->getAutoConstantIterator();
-								while(iter.hasMoreElements())
-								{
-									GpuProgramParameters::AutoConstantEntry e = iter.getNext();
-									const GpuProgramParameters::AutoConstantDefinition *def = GpuProgramParameters::getAutoConstantDefinition(e.paramType);
-									LogManager::getSingleton().logMessage(def->name);
-								}
-							}
-							if(!fp.isNull())
-							{
-								std::stringstream stream(fp->getSource());
-								std::string line;
-								while(std::getline(stream, line))
-								{
-									LogManager::getSingleton().logMessage(line);
-								}
-							}
-						}
-						*/
 						generatedTech = curTech;
 						break;
 					}
