@@ -128,18 +128,8 @@ int main(int argc, char *argv[])
 }
         
 - (void)applicationWillTerminate:(UIApplication *)application {
-    Ogre::Root::getSingleton().queueEndRendering();
+    sb.closeApp();
 }
-
-//- (void)applicationWillResignActive:(UIApplication *)application
-//{
-//    // Pause FrameListeners and rendering
-//}
-//
-//- (void)applicationDidBecomeActive:(UIApplication *)application
-//{
-//    // Resume FrameListeners and rendering
-//}
 
 - (void)dealloc {
     [mTimer release];
