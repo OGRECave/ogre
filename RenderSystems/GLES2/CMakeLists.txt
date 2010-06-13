@@ -137,6 +137,11 @@ elseif (UNIX)
   include_directories(src/EGL/X11 include/EGL/X11)
   set(PLATFORM_HEADER_INSTALL "X11")
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+  if(OGRE_BUILD_PLATFORM_TEGRA2)
+    # TODO: Figure out how to get the locations of necessary libraries
+    # For now, you will need to hardcode the absolute paths to the compiler and runtime libs
+    #set(PLATFORM_LIBS /Path/To/Libs)
+  endif()
 endif ()
 
 # Add support for the RT Shader System

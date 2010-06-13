@@ -67,7 +67,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("Loading library " + mName);
 
 		String name = mName;
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
         // dlopen() does not add .so to the filename, like windows does for .dll
         if (name.substr(name.length() - 3, 3) != ".so")
            name += ".so";
@@ -133,7 +133,7 @@ namespace Ogre {
         // Free the buffer.
         LocalFree( lpMsgBuf );
         return ret;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
         return String(dlerror());
 #else
         return String("");

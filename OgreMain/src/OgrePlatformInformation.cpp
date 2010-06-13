@@ -42,7 +42,9 @@ THE SOFTWARE.
 
     #if OGRE_CPU == OGRE_CPU_ARM && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         #include <sys/sysctl.h>
-        #include <mach/machine.h>
+        #if _MACH_
+            #include <mach/machine.h>
+        #endif
     #endif
 #endif
 
@@ -481,34 +483,34 @@ namespace Ogre {
         String cpuID;
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         // Get the size of the CPU subtype struct
-        size_t size;
-        sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
-        
-        // Get the ARM CPU subtype
-        cpu_subtype_t cpusubtype = 0;
-        sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
-
-        switch(cpusubtype)
-        {
-            case CPU_SUBTYPE_ARM_V4T:
-                cpuID = "ARMv4T";
-                break;
-            case CPU_SUBTYPE_ARM_V6:
-                cpuID = "ARMv6";
-                break;
-            case CPU_SUBTYPE_ARM_V5TEJ:
-                cpuID = "ARMv5TEJ";
-                break;
-            case CPU_SUBTYPE_ARM_XSCALE:
-                cpuID = "ARM XScale";
-                break;
-            case CPU_SUBTYPE_ARM_V7:
-                cpuID = "ARMv7";
-                break;
-            default:
-                cpuID = "Unknown ARM";
-                break;
-        }
+//        size_t size;
+//        sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);
+//        
+//        // Get the ARM CPU subtype
+//        cpu_subtype_t cpusubtype = 0;
+//        sysctlbyname("hw.cpusubtype", &cpusubtype, &size, NULL, 0);
+//
+//        switch(cpusubtype)
+//        {
+//            case CPU_SUBTYPE_ARM_V4T:
+//                cpuID = "ARMv4T";
+//                break;
+//            case CPU_SUBTYPE_ARM_V6:
+//                cpuID = "ARMv6";
+//                break;
+//            case CPU_SUBTYPE_ARM_V5TEJ:
+//                cpuID = "ARMv5TEJ";
+//                break;
+//            case CPU_SUBTYPE_ARM_XSCALE:
+//                cpuID = "ARM XScale";
+//                break;
+//            case CPU_SUBTYPE_ARM_V7:
+//                cpuID = "ARMv7";
+//                break;
+//            default:
+//                cpuID = "Unknown ARM";
+//                break;
+//        }
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 //        FILE *cpuinfo;
 //        int proccount = -1;
@@ -528,12 +530,14 @@ namespace Ogre {
 //    done:
 //        fclose(cpuinfo); 
         
+/*
         static char processor[257];
         size_t s = sizeof processor;
         static int mib[] = { CTL_HW, HW_MODEL };
         if (sysctl (mib, 2, processor, &s, 0, 0) >= 0)
             cpuID = processor;
         else
+*/
             cpuID = "Unknown ARM";
 
 #endif

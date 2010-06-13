@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
@@ -25,33 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __CommonConfigDialog_H__
-#define __CommonConfigDialog_H__
+#include "OgreErrorDialog.h"
+#include <iostream>
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+using namespace Ogre;
 
-// Bring in the specific platform's header file: first allow forced override
-#if defined OGRE_GUI_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreConfigDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
-# include "Tegra2/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-# include "iPhone/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-# include "Symbian/OgreConfigDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreConfigDialogImp.h"
-#endif
+//---------------------------------------------------------------------------//
+ErrorDialog::ErrorDialog()
+{
+}
 
-#endif
+//---------------------------------------------------------------------------//
+void ErrorDialog::display(const String& errorMessage, String logName)
+{
+	std::cout << "*** ERROR: " << errorMessage << std::endl;
+}

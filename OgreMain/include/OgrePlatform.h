@@ -39,6 +39,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_SYMBIAN 4
 #define OGRE_PLATFORM_IPHONE 5
 #define OGRE_PLATFORM_ANDROID 6
+#define OGRE_PLATFORM_TEGRA2 7
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -106,6 +107,10 @@ namespace Ogre {
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
 #   endif
+#elif defined(linux) && defined(__arm__)
+// TODO: This is NOT the correct way to detect the Tegra 2 platform but it works for now.
+// It doesn't appear that GCC defines any platform specific macros.
+#   define OGRE_PLATFORM OGRE_PLATFORM_TEGRA2
 #elif defined(__ANDROID__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
 #else
@@ -224,8 +229,8 @@ namespace Ogre {
 #endif
 */
 //----------------------------------------------------------------------------
-// Linux/Apple/Symbian Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+// Linux/Apple/Symbian/Tegra2 Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
