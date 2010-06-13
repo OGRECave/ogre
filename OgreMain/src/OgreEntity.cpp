@@ -74,6 +74,7 @@ namespace Ogre {
 		  mSoftwareAnimationRequests(0),
 		  mSoftwareAnimationNormalsRequests(0),
           mSkipAnimStateUpdates(false),
+		  mAlwaysUpdateMainSkeleton(false),
 		  mMeshLodIndex(0),
 		  mMeshLodFactorTransformed(1.0f),
 		  mMinMeshLodIndex(99),
@@ -86,7 +87,6 @@ namespace Ogre {
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
 		  mMeshStateCount(0),
-		  mAlwaysUpdateMainSkeleton(false),
           mFullBoundingBox()
     {
     }
@@ -110,6 +110,7 @@ namespace Ogre {
 		mSoftwareAnimationRequests(0),
 		mSoftwareAnimationNormalsRequests(0),
         mSkipAnimStateUpdates(false),
+		mAlwaysUpdateMainSkeleton(false),
 		mMeshLodIndex(0),
 		mMeshLodFactorTransformed(1.0f),
 		mMinMeshLodIndex(99),
@@ -122,7 +123,6 @@ namespace Ogre {
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
 		mMeshStateCount(0),
-		mAlwaysUpdateMainSkeleton(false),
         mFullBoundingBox()
 	{
 		_initialise();

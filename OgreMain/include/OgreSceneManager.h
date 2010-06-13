@@ -549,7 +549,7 @@ namespace Ogre {
             ensure that objects are rendered solid black.
             This method will usually return the standard solid black pass for
             all fixed function passes, but will merge in a vertex program
-            and fudge the AutpoParamDataSource to set black lighting for
+            and fudge the AutoParamDataSource to set black lighting for
             passes with vertex programs. 
         */
         virtual const Pass* deriveShadowCasterPass(const Pass* pass);
