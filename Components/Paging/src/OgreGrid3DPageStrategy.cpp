@@ -52,10 +52,10 @@ namespace Ogre
 		, mLoadRadius(2000)
 		, mHoldRadius(3000)
 		, mMinCellX(-512)
-		, mMaxCellX(511)
 		, mMinCellY(-512)
-		, mMaxCellY(511)
 		, mMinCellZ(-512)
+		, mMaxCellX(511)
+		, mMaxCellY(511)
 		, mMaxCellZ(511)
 	{
 	}
