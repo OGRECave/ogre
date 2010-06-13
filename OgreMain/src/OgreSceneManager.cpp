@@ -4877,50 +4877,6 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 				retPass->setVertexProgram(StringUtil::BLANK);
 			}
 		}
-
-        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
-        {
-            if (!pass->getShadowCasterFragmentProgramName().empty())
-            {
-                // Have to merge the shadow caster fragment program in
-                retPass->setFragmentProgram(
-                    pass->getShadowCasterFragmentProgramName(), false);
-                const GpuProgramPtr& prg = retPass->getFragmentProgram();
-                // Load this program if not done already
-                if (!prg->isLoaded())
-                    prg->load();
-                // Copy params
-                retPass->setFragmentProgramParameters(
-                    pass->getShadowCasterFragmentProgramParameters());
-                // Also have to hack the light autoparams, that is done later
-            }
-            else 
-            {
-                if (retPass == mShadowTextureCustomCasterPass)
-                {
-                    // reset fp?
-                    if (mShadowTextureCustomCasterPass->getFragmentProgramName() !=
-                        mShadowTextureCustomCasterFragmentProgram)
-                    {
-                        mShadowTextureCustomCasterPass->setFragmentProgram(
-                            mShadowTextureCustomCasterFragmentProgram, false);
-                        if(mShadowTextureCustomCasterPass->hasFragmentProgram())
-                        {
-                            mShadowTextureCustomCasterPass->setFragmentProgramParameters(
-                                mShadowTextureCustomCasterFPParams);
-
-                        }
-
-                    }
-
-                }
-                else
-                {
-                    // Standard shadow caster pass, reset to no vp
-                    retPass->setFragmentProgram(StringUtil::BLANK);
-                }
-            }
-        }
 		return retPass;
 	}
 	else
