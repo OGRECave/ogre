@@ -942,10 +942,12 @@ namespace Ogre {
             for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
             {
                 // Only cache basic Fixed Function library functions.  These all start with "FFP"
+                // Except for lighting functions which start with "FFP_Light"
                 bool inlineable = false;
-                if(StringUtil::startsWith((*it).getFunctionName(), "FFP", false))
+                if(StringUtil::startsWith((*it).getFunctionName(), "FFP", false) && 
+                   !StringUtil::startsWith((*it).getFunctionName(), "FFP_Light", false))
                     inlineable = true;
-                
+
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
                 FunctionInvocation invoc = FunctionInvocation("", 0, 0);
                 String body = StringUtil::BLANK;
