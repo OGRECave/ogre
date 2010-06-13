@@ -42,6 +42,8 @@ THE SOFTWARE.
 #		endif
 #	endif
 #	define OGRE_NEW_FIX_FOR_WIN32 new 
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
+#	define OGRE_NEW_FIX_FOR_WIN32 new
 #else
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
@@ -74,6 +76,12 @@ THE SOFTWARE.
 #	ifndef GL_GLEXT_PROTOTYPES
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+extern PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB;
+extern PFNGLREADBUFFERNVPROC glReadBufferNV;
+extern PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV;
+extern PFNGLGETTEXIMAGENVPROC glGetTexImageNV;
+extern PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV;
+extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 #	endif
 
 // If we are going to use the PVRTC_CODEC make sure we
@@ -119,7 +127,7 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \

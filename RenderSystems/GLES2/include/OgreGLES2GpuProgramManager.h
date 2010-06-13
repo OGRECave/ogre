@@ -30,9 +30,11 @@ THE SOFTWARE.
 #define __GLES2GpuProgramManager_H__
 
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
-    class _OgrePrivate GLES2GpuProgramManager : public GpuProgramManager
+
+    class _OgreGLES2Export GLES2GpuProgramManager : public GpuProgramManager
     {
         public:
             typedef GpuProgram* (*CreateGpuProgramCallback)(ResourceManager* creator,
@@ -41,14 +43,15 @@ namespace Ogre {
                 GpuProgramType gptype, const String& syntaxCode);
 
         private:
-            typedef std::map<String, CreateGpuProgramCallback> ProgramMap;
+            typedef map<String, CreateGpuProgramCallback>::type ProgramMap;
             ProgramMap mProgramMap;
 
         protected:
+    /// @copydoc ResourceManager::createImpl
             Resource* createImpl(const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader,
                 const NameValuePairList* params);
-
+    /// Specialised create method with specific parameters
             Resource* createImpl(const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader,
                 GpuProgramType gptype, const String& syntaxCode);

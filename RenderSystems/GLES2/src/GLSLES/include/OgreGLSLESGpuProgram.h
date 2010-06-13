@@ -45,7 +45,7 @@ namespace Ogre {
 		interface between the GLSLESLinkProgramManager , GLES2RenderSystem, and the active GLSLESProgram
 		instances.
 	*/
-    class _OgrePrivate GLSLESGpuProgram : public GLES2GpuProgram
+    class _OgreGLES2Export GLSLESGpuProgram : public GLES2GpuProgram
     {
     private:
 		/// GL Handle for the shader object

@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate GLES2Texture : public Texture
+    class _OgreGLES2Export GLES2Texture : public Texture
     {
         public:
             // Constructor
@@ -58,7 +58,7 @@ namespace Ogre {
             {
                 return mTextureID;
             }
-            
+
         protected:
             /// @copydoc Texture::createInternalResourcesImpl
             void createInternalResourcesImpl(void);
@@ -70,29 +70,30 @@ namespace Ogre {
             void loadImpl(void);
             /// @copydoc Resource::freeInternalResourcesImpl
             void freeInternalResourcesImpl(void);
-            
+
             /** Internal method, create GLHardwarePixelBuffers for every face and
              mipmap level. This method must be called after the GL texture object was created,
              the number of mipmaps was set (GL_TEXTURE_MAX_LEVEL) and glTexImageXD was called to
              actually allocate the buffer
              */
             void _createSurfaceList();
-            
+
             /// Used to hold images between calls to prepare and load.
-            typedef SharedPtr<std::vector<Image> > LoadedImages;
-            
+            typedef SharedPtr<vector<Image>::type > LoadedImages;
+
             /** Vector of images that were pulled from disk by
              prepareLoad but have yet to be pushed into texture memory
              by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
              */
             LoadedImages mLoadedImages;
 
+
         private:
             GLuint mTextureID;
             GLES2Support& mGLSupport;
             
             /// Vector of pointers to subsurfaces
-            typedef std::vector<HardwarePixelBufferSharedPtr> SurfaceList;
+            typedef vector<HardwarePixelBufferSharedPtr>::type SurfaceList;
             SurfaceList mSurfaceList;
 
     };
@@ -103,7 +104,7 @@ namespace Ogre {
     except to do so requires a form VC6 does not support i.e.
     ResourceSubclassPtr<T> : public SharedPtr<T>
     */
-    class _OgrePrivate GLES2TexturePtr : public SharedPtr<GLES2Texture>
+    class _OgreGLES2Export GLES2TexturePtr : public SharedPtr<GLES2Texture>
     {
         public:
             GLES2TexturePtr() : SharedPtr<GLES2Texture>() {}

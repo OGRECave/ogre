@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     /** Factory class for GLSL ES programs. */
-    class _OgrePrivate GLSLESProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreGLES2Export GLSLESProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
 		static String sLanguageName;

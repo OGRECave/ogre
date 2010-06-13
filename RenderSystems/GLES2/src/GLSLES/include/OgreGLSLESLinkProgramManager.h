@@ -49,7 +49,7 @@ namespace Ogre {
 
 	*/
 
-	class _OgrePrivate GLSLESLinkProgramManager : public Singleton<GLSLESLinkProgramManager>
+	class _OgreGLES2Export GLSLESLinkProgramManager : public Singleton<GLSLESLinkProgramManager>
 	{
 
 	private:

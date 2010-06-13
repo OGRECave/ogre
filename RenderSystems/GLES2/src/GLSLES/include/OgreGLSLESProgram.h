@@ -53,7 +53,7 @@ namespace Ogre {
 		seperated by white space.
         
     */
-    class _OgrePrivate GLSLESProgram : public HighLevelGpuProgram
+    class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram
     {
     public:
         /// Command object for attaching another GLSL Program 

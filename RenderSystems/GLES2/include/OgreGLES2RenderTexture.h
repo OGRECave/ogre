@@ -36,7 +36,7 @@ namespace Ogre {
 
     /** GL surface descriptor. Points to a 2D surface that can be rendered to.
     */
-    struct _OgrePrivate GLES2SurfaceDesc
+    struct _OgreGLES2Export GLES2SurfaceDesc
     {
         public:
             GLES2HardwarePixelBuffer *buffer;
@@ -48,7 +48,7 @@ namespace Ogre {
 
     /** Base class for GL Render Textures
     */
-    class _OgrePrivate GLES2RenderTexture : public RenderTexture
+    class _OgreGLES2Export GLES2RenderTexture : public RenderTexture
     {
         public:
             GLES2RenderTexture(const String &name, const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -58,7 +58,7 @@ namespace Ogre {
 
     /** Manager/factory for RenderTextures.
     */
-    class _OgrePrivate GLES2RTTManager : public Singleton<GLES2RTTManager>
+    class _OgreGLES2Export GLES2RTTManager : public Singleton<GLES2RTTManager>
     {
         public:
             virtual ~GLES2RTTManager();
@@ -99,7 +99,7 @@ namespace Ogre {
     /** RenderTexture for simple copying from frame buffer
     */
     class GLES2CopyingRTTManager;
-    class _OgrePrivate GLES2CopyingRenderTexture : public GLES2RenderTexture
+    class _OgreGLES2Export GLES2CopyingRenderTexture : public GLES2RenderTexture
     {
         public:
             GLES2CopyingRenderTexture(GLES2CopyingRTTManager *manager,
@@ -113,7 +113,7 @@ namespace Ogre {
     /** Simple, copying manager/factory for RenderTextures. This is only used as the last fallback if
         FBOs aren't supported.
     */
-    class _OgrePrivate GLES2CopyingRTTManager : public GLES2RTTManager
+    class _OgreGLES2Export GLES2CopyingRTTManager : public GLES2RTTManager
     {
         public:
             GLES2CopyingRTTManager();

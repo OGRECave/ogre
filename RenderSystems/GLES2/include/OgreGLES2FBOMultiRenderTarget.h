@@ -37,7 +37,7 @@ namespace Ogre {
 
 	/** MultiRenderTarget for GL ES 2.x.
 	*/
-	class _OgrePrivate GLES2FBOMultiRenderTarget : public MultiRenderTarget
+	class _OgreGLES2Export GLES2FBOMultiRenderTarget : public MultiRenderTarget
 	{
 	public:
 		GLES2FBOMultiRenderTarget(GLES2FBOManager *manager, const String &name);

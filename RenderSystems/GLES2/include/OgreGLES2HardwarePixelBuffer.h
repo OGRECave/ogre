@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate GLES2HardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreGLES2Export GLES2HardwarePixelBuffer: public HardwarePixelBuffer
     {
         protected:
             /// Lock a box
@@ -81,8 +81,8 @@ namespace Ogre {
 
     /** Texture surface.
     */
-    class _OgrePrivate GLES2TextureBuffer: public GLES2HardwarePixelBuffer
-    {
+    class _OgreGLES2Export GLES2TextureBuffer: public GLES2HardwarePixelBuffer
+            {
         public:
             /** Texture constructor */
             GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, GLint width, GLint height, GLint format, 
@@ -117,7 +117,6 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
-        
         protected:
             // In case this is a texture level
             GLenum mTarget;
@@ -127,7 +126,7 @@ namespace Ogre {
             GLint mLevel;
             bool mSoftwareMipmap;
 
-            typedef std::vector<RenderTexture*> SliceTRT;
+            typedef vector<RenderTexture*>::type SliceTRT;
             SliceTRT mSliceTRT;
 
             void buildMipmaps(const PixelBox &data);
@@ -135,7 +134,7 @@ namespace Ogre {
 
      /** Renderbuffer surface.  Needs FBO extension.
      */
-    class _OgrePrivate GLES2RenderBuffer: public GLES2HardwarePixelBuffer
+    class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer
     {
         public:
             GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);

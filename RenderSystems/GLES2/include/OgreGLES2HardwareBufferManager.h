@@ -34,10 +34,10 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
-    #   define OGRE_GL_MAP_BUFFER_THRESHOLD (1024 * 32)
+    #   define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
 
     /** Implementation of HardwareBufferManager for OpenGL ES. */
-    class _OgrePrivate GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
             char* mScratchBufferPool;
@@ -82,7 +82,7 @@ namespace Ogre {
 };
 
 	/// GLES2HardwareBufferManagerBase as a Singleton
-	class _OgrePrivate GLES2HardwareBufferManager : public HardwareBufferManager
+	class _OgreGLES2Export GLES2HardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		GLES2HardwareBufferManager()

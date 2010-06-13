@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgrePrivate GLES2FrameBufferObject
+    class _OgreGLES2Export GLES2FrameBufferObject
     {
     public:
         GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa);
@@ -60,7 +60,7 @@ namespace Ogre {
 		*/
 		void swapBuffers();
 
-        /** This function acts very similar to @see GLESFBORenderTexture::attachDepthBuffer
+        /** This function acts very similar to @see GLES2FBORenderTexture::attachDepthBuffer
 			The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
 			while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
 			be attached for OGL.

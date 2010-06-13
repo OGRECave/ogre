@@ -36,7 +36,7 @@ namespace Ogre {
     /**
     * Class to do pixel format mapping between GL and OGRE
     */
-    class _OgrePrivate GLES2PixelUtil
+    class _OgreGLES2Export GLES2PixelUtil
     {
         public:
             /** Takes the OGRE pixel format and returns the appropriate GL one

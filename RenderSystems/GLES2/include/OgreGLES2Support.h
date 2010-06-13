@@ -130,6 +130,7 @@ namespace Ogre
             */
             virtual bool checkExtension(const String& ext) const;
 
+	/// @copydoc RenderSystem::getDisplayMonitorCount
             virtual unsigned int getDisplayMonitorCount() const
             {
                 return 1;
@@ -155,7 +156,7 @@ namespace Ogre
             ConfigOptionMap mOptions;
 
             // This contains the complete list of supported extensions
-            std::set<String> extensionList;
+            set<String>::type extensionList;
     };
 
 };

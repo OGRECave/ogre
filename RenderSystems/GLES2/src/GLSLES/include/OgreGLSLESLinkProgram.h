@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
+    
+    class GLSLESGpuProgram;
+
 	/// Structure used to keep track of named uniforms in the linked program object
 	struct GLUniformReference
 	{
@@ -51,7 +54,7 @@ namespace Ogre {
 
 	*/
 
-	class _OgrePrivate GLSLESLinkProgram
+	class _OgreGLES2Export GLSLESLinkProgram
 	{
 	private:
 		/// Container of uniform references that are active in the program object

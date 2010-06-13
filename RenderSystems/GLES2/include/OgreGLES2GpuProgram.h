@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Generalised low-level GL program, can be applied to multiple types (eg ARB and NV) */
-    class _OgrePrivate GLES2GpuProgram : public GpuProgram
+    class _OgreGLES2Export GLES2GpuProgram : public GpuProgram
     {
     public:
         GLES2GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,

@@ -36,22 +36,22 @@ THE SOFTWARE.
 
 namespace Ogre {
     /// Specialisation of HardwareVertexBuffer for emulation
-    class _OgrePrivate GLES2DefaultHardwareVertexBuffer : public HardwareVertexBuffer
+    class _OgreGLES2Export GLES2DefaultHardwareVertexBuffer : public HardwareVertexBuffer
     {
         protected:
             unsigned char* mpData;
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::lock
             void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::unlock
             void unlockImpl(void);
 
         public:
             GLES2DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
                                           HardwareBuffer::Usage usage);
             virtual ~GLES2DefaultHardwareVertexBuffer();
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::readData
             void readData(size_t offset, size_t length, void* pDest);
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::writeData
             void writeData(size_t offset, size_t length, const void* pSource,
                            bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */
@@ -63,21 +63,21 @@ namespace Ogre {
     };
 
     /// Specialisation of HardwareIndexBuffer for emulation
-    class _OgrePrivate GLES2DefaultHardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLES2Export GLES2DefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
         protected:
             unsigned char* mpData;
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::lock
             void* lockImpl(size_t offset, size_t length, LockOptions options);
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::unlock
             void unlockImpl(void);
 
         public:
             GLES2DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
             virtual ~GLES2DefaultHardwareIndexBuffer();
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::readData
             void readData(size_t offset, size_t length, void* pDest);
-            /** See HardwareBuffer. */
+        /// @copydoc HardwareBuffer::writeData
             void writeData(size_t offset, size_t length, const void* pSource,
                     bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */
@@ -95,7 +95,7 @@ namespace Ogre {
         rendering system (which is required to create a 'real' hardware
         buffer manager.
     */
-    class _OgrePrivate GLES2DefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreGLES2Export GLES2DefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         public:
             GLES2DefaultHardwareBufferManagerBase();
@@ -113,7 +113,7 @@ namespace Ogre {
     };
 
 	/// GLES2DefaultHardwareBufferManagerBase as a Singleton
-	class _OgrePrivate GLES2DefaultHardwareBufferManager : public HardwareBufferManager
+	class _OgreGLES2Export GLES2DefaultHardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		GLES2DefaultHardwareBufferManager()

@@ -48,7 +48,7 @@ namespace Ogre
 		Note that FBOs don't allow sharing with the main window's depth buffer. Therefore even
 		when FBO is enabled, a dummy DepthBuffer is still used to manage the windows.
 	*/
-	class GLES2DepthBuffer : public DepthBuffer
+	class _OgreGLES2Export GLES2DepthBuffer : public DepthBuffer
 	{
 	public:
 		GLES2DepthBuffer( uint16 poolId, GLES2RenderSystem *renderSystem, GLES2Context *creatorContext,

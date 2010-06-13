@@ -38,7 +38,7 @@ namespace Ogre {
      * This object can also be used to cache renderstate if we decide to do so
      * in the future.
      */
-    class _OgrePrivate GLES2Context
+    class _OgreGLES2Export GLES2Context
     {
         public:
             GLES2Context();
@@ -63,6 +63,11 @@ namespace Ogre {
             @note The caller is responsible for deleting the returned context.
             */
             virtual GLES2Context* clone() const = 0;
+
+		/**
+		* Release the render context.
+		*/
+		virtual void releaseContext() {}
 
         protected:
             bool initialized;

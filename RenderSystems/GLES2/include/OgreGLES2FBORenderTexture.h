@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** RenderTexture for GL ES 2 FBO
     */
-    class _OgrePrivate GLES2FBORenderTexture: public GLES2RenderTexture
+    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture
     {
     public:
         GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -58,7 +58,7 @@ namespace Ogre {
     
     /** Factory for GL ES 2 Frame Buffer Objects, and related things.
     */
-    class _OgrePrivate GLES2FBOManager: public GLES2RTTManager
+    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager
     {
     public:
         GLES2FBOManager();
