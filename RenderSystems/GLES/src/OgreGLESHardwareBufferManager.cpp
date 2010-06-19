@@ -33,9 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 
 namespace Ogre {
-    #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
-    #define SCRATCH_ALIGNMENT 32
-
+    //-----------------------------------------------------------------------
     // Scratch pool management (32 bit structure)
     struct GLESScratchBufferAlloc
     {
@@ -44,6 +42,8 @@ namespace Ogre {
         /// Free? (pack with size)
         uint32 free: 1;
     };
+    #define SCRATCH_POOL_SIZE 1 * 1024 * 1024
+    #define SCRATCH_ALIGNMENT 32
 
     GLESHardwareBufferManagerBase::GLESHardwareBufferManagerBase()
     {
@@ -56,6 +56,12 @@ namespace Ogre {
         GLESScratchBufferAlloc* ptrAlloc = (GLESScratchBufferAlloc*)mScratchBufferPool;
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GLESScratchBufferAlloc);
         ptrAlloc->free = 1;
+
+        // non-Win32 machines are having issues glBufferSubData, looks like buffer corruption
+		// disable for now until we figure out where the problem lies			
+#	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+		mMapBufferThreshold = 0;
+#	endif
     }
 
     GLESHardwareBufferManagerBase::~GLESHardwareBufferManagerBase()
@@ -113,6 +119,7 @@ namespace Ogre {
                 return GL_STATIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC:
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
+                return GL_DYNAMIC_DRAW;
             case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
             default:
                 return GL_DYNAMIC_DRAW;
@@ -242,4 +249,14 @@ namespace Ogre {
         // Should never get here unless there's a corruption
         assert(false && "Memory deallocation error");
     }
+	//---------------------------------------------------------------------
+	const size_t GLESHardwareBufferManagerBase::getGLMapBufferThreshold() const
+	{
+		return mMapBufferThreshold;
+	}
+	//---------------------------------------------------------------------
+	void GLESHardwareBufferManagerBase::setGLMapBufferThreshold( const size_t value )
+	{
+		mMapBufferThreshold = value;
+	}
 }

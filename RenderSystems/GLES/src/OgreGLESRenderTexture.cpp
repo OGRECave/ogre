@@ -28,12 +28,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLESRenderTexture.h"
-#include "OgreGLESPixelFormat.h"
 #include "OgreGLESHardwarePixelBuffer.h"
-
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
     template<> GLESRTTManager* Singleton<GLESRTTManager>::ms_Singleton = 0;

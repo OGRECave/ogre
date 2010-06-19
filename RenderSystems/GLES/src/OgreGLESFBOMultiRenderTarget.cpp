@@ -27,9 +27,6 @@ THE SOFTWARE.
 */
 
 #include "OgreGLESFBOMultiRenderTarget.h"
-#include "OgreGLESPixelFormat.h"
-#include "OgreRoot.h"
-#include "OgreGLESHardwarePixelBuffer.h"
 
 namespace Ogre {
 

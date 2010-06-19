@@ -59,7 +59,7 @@ namespace Ogre {
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Cannot create GL index buffer",
+                "Cannot create GL ES index buffer",
                 "GLESHardwareIndexBuffer::GLESHardwareIndexBuffer");
         }
 
@@ -117,8 +117,6 @@ namespace Ogre {
                                             size_t length,
                                             LockOptions options)
     {
-        GLenum access = 0;
-
         if(mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -127,11 +125,12 @@ namespace Ogre {
         }
 
         void* retPtr = 0;
+        GLenum access = 0;
+		GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
-        if(length < OGRE_GL_MAP_BUFFER_THRESHOLD)
+        if(length < glBufManager->getGLMapBufferThreshold())
         {
-            retPtr = static_cast<GLESHardwareBufferManager*>(
-                    HardwareBufferManager::getSingletonPtr())->allocateScratch((uint32)length);
+            retPtr = glBufManager->allocateScratch((uint32)length);
             if (retPtr)
             {
                 mLockedToScratch = true;
@@ -193,6 +192,7 @@ namespace Ogre {
     {
         if(mUseShadowBuffer)
         {
+            // Get data from the shadow buffer
             void* srcData = mpShadowBuffer->lock(offset, length, HBL_READ_ONLY);
             memcpy(pDest, srcData, length);
             mpShadowBuffer->unlock();

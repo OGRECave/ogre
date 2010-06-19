@@ -103,7 +103,7 @@ static const size_t depthBits[] =
 	{
 		if(!mRenderBufferMap.empty())
 		{
-			LogManager::getSingleton().logMessage("GL: Warning! GLESFBOManager destructor called, but not all renderbuffers were released.");
+			LogManager::getSingleton().logMessage("GL ES: Warning! GLESFBOManager destructor called, but not all renderbuffers were released.");
 		}
         
         glDeleteFramebuffersOES(1, &mTempFBO);      
@@ -230,37 +230,26 @@ static const size_t depthBits[] =
 
             // Create and attach framebuffer
             glGenFramebuffersOES(1, &fb);
-            GL_CHECK_ERROR;
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, fb);
-            GL_CHECK_ERROR;
             if (fmt!=GL_NONE)
             {
 				// Create and attach texture
 				glGenTextures(1, &tid);
-                GL_CHECK_ERROR;
 				glBindTexture(target, tid);
-                GL_CHECK_ERROR;
 				
                 // Set some default parameters
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                GL_CHECK_ERROR;
                 glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                GL_CHECK_ERROR;
                             
 				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GL_UNSIGNED_BYTE, 0);
-                GL_CHECK_ERROR;
 				glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES,
                                 target, tid, 0);
-                GL_CHECK_ERROR;
             }
 
             // Check status
             GLuint status = glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES);
-            GL_CHECK_ERROR;
 
 			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
 			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
@@ -316,19 +305,11 @@ static const size_t depthBits[] =
             }
 
             // Delete texture and framebuffer
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-            // The screen buffer is 1 on iPhone
-            glBindFramebufferOES(GL_FRAMEBUFFER_OES, 1);
-#else
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
-#endif
-            GL_CHECK_ERROR;
             glDeleteFramebuffersOES(1, &fb);
-            GL_CHECK_ERROR;
 			
             if (fmt!=GL_NONE)
                 glDeleteTextures(1, &tid);
-            GL_CHECK_ERROR;
         }
 
 		String fmtstring;
@@ -337,7 +318,7 @@ static const size_t depthBits[] =
             if(mProps[x].valid)
                 fmtstring += PixelUtil::getFormatName((PixelFormat)x)+" ";
         }
-        LogManager::getSingleton().logMessage("[GL] : Valid FBO targets " + fmtstring);
+        LogManager::getSingleton().logMessage("[GLES] : Valid FBO targets " + fmtstring);
     }
 
     void GLESFBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
