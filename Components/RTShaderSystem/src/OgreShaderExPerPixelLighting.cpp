@@ -87,7 +87,6 @@ void PerPixelLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, con
 	if (mLightParamsList.size() == 0)
 		return;
 
-	SceneManager* sceneMgr = ShaderGenerator::getSingleton().getActiveSceneManager();
 	const Matrix4& matView = source->getViewMatrix();
 	Light::LightTypes curLightType = Light::LT_DIRECTIONAL; 
 	unsigned int curSearchLightIndex = 0;

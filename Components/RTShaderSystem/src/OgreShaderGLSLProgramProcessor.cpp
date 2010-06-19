@@ -176,7 +176,6 @@ void GLSLProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgramP
 	for (itParams=progParams.begin(); itParams != progParams.end(); ++itParams)
 	{
 		const UniformParameterPtr pCurParam = *itParams;
-		const GpuConstantDefinition* gpuConstDef = pGpuParams->_findNamedConstantDefinition(pCurParam->getName());
 		
 		if (pCurParam->isSampler())
 		{		
