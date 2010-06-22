@@ -457,6 +457,8 @@ void XMLToBinary(XmlOptions opts)
         xmlMeshSerializer->importMesh(opts.source, colourElementType, newMesh.getPointer());
 
         // Re-jig the buffers?
+		// Make sure animation types are up to date first
+		newMesh->_determineAnimationTypes();
         if (opts.reorganiseBuffers)
         {
             logMgr->logMessage("Reorganising vertex buffers to automatic layout..");
@@ -466,7 +468,7 @@ void XMLToBinary(XmlOptions opts)
                 // Automatic
                 VertexDeclaration* newDcl = 
                     newMesh->sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                        newMesh->hasSkeleton(), newMesh->hasVertexAnimation());
+                        newMesh->hasSkeleton(), newMesh->hasVertexAnimation(), newMesh->getSharedVertexDataAnimationIncludesNormals());
                 if (*newDcl != *(newMesh->sharedVertexData->vertexDeclaration))
                 {
                     // Usages don't matter here since we're onlly exporting
@@ -486,7 +488,7 @@ void XMLToBinary(XmlOptions opts)
                     // Automatic
                     VertexDeclaration* newDcl = 
                         sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                            newMesh->hasSkeleton(), newMesh->hasVertexAnimation());
+                            newMesh->hasSkeleton(), newMesh->hasVertexAnimation(), sm->getVertexAnimationIncludesNormals());
                     if (*newDcl != *(sm->vertexData->vertexDeclaration))
                     {
                         // Usages don't matter here since we're onlly exporting

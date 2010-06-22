@@ -157,6 +157,17 @@ namespace Ogre {
 		*/
 		void bindMissingHardwarePoseBuffers(const VertexData* srcData, 
 			VertexData* destData);
+			
+		/** When performing software pose animation, initialise software copy
+			of vertex data
+		*/
+		void initialisePoseVertexData(const VertexData* srcData, VertexData* destData, 
+			bool animateNormals);
+
+		/** When animating normals for pose animation, finalise normals by filling in
+			with the reference mesh normal where applied normal weights < 1
+		*/
+		void finalisePoseNormals(const VertexData* srcData, VertexData* destData);
 
 		/// Cached bone matrices, including any world transform
         Matrix4 *mBoneWorldMatrices;

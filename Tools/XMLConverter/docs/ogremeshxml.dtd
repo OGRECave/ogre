@@ -128,13 +128,18 @@
 	target	(mesh|submesh) #REQUIRED
 	index   CDATA   "0"
 	name	CDATA	"">
-<!-- poseoffset lists the vertices that change position, and by how much -->
+<!-- poseoffset lists the vertices that change position, and by how much 
+	& also optionally an absolute normal -->
 <!ELEMENT poseoffset EMPTY>
 <!ATTLIST poseoffset
     index	CDATA	#REQUIRED
 	x		CDATA	#REQUIRED
 	y		CDATA	#REQUIRED
-	z		CDATA	#REQUIRED >
+	z		CDATA	#REQUIRED 
+	nx		CDATA	""
+	ny		CDATA	""
+	nz		CDATA	""
+	>
 <!ELEMENT animations (animation+)>
 <!ELEMENT animation (tracks)>
 <!ATTLIST animation
@@ -142,7 +147,7 @@
 	length  CDATA   #REQUIRED >
 <!ELEMENT tracks (track+)>
 <!ELEMENT track (keyframes)>
-<!-- Morph animation is a keyframed set of absolute vertex positions. Cannot
+<!-- Morph animation is a keyframed set of absolute vertex positions/normals. Cannot
      be blended with other morph animations or pose animation.
      Pose animation is a set of keyframes referencing poses and a weight,
 	 with one track per set of vertex data.
@@ -157,7 +162,7 @@
 <!-- keyframes are applicable for all tracks, but for morph tracks
      they contain positions, and for pose tracks they contain pose references -->
 <!ELEMENT keyframes (keyframe*)>
-<!ELEMENT keyframe (position*, poseref*)>
+<!ELEMENT keyframe ((position|(position,normal))*, poseref*)>
 <!ATTLIST keyframe
 	time	CDATA	#REQUIRED >
 <!-- Pose reference, links to pose via numeric index. target of parent track

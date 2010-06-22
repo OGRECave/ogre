@@ -1840,9 +1840,24 @@ namespace Ogre {
 				offset.y = StringConverter::parseReal(poseOffsetNode->Attribute("y"));
 				offset.z = StringConverter::parseReal(poseOffsetNode->Attribute("z"));
 
-				pose->addVertex(index, offset);
+				if (poseOffsetNode->Attribute("nx") && 
+					poseOffsetNode->Attribute("ny") &&
+					poseOffsetNode->Attribute("nz"))
+				{
+					Vector3 normal;
+					normal.x = StringConverter::parseReal(poseOffsetNode->Attribute("nx"));
+					normal.y = StringConverter::parseReal(poseOffsetNode->Attribute("ny"));
+					normal.z = StringConverter::parseReal(poseOffsetNode->Attribute("nz"));
+					pose->addVertex(index, offset, normal);
+					
+				}
+				else 
+				{
+					pose->addVertex(index, offset);
+				}
 
 				poseOffsetNode = poseOffsetNode->NextSiblingElement();
+
 			}
 
 			poseNode = poseNode->NextSiblingElement();
@@ -1970,11 +1985,14 @@ namespace Ogre {
 			Real time = StringConverter::parseReal(val);
 
 			VertexMorphKeyFrame* kf = track->createVertexMorphKeyFrame(time);
+			
+			bool includesNormals = keyNode->FirstChildElement("normal") != 0;
 
+			size_t vertexSize = sizeof(float) * (includesNormals ? 6 : 3);
 			// create a vertex buffer
 			HardwareVertexBufferSharedPtr vbuf = 
 				HardwareBufferManager::getSingleton().createVertexBuffer(
-				VertexElement::getTypeSize(VET_FLOAT3), vertexCount, 
+				vertexSize, vertexCount, 
 				HardwareBuffer::HBU_STATIC, true);
 
 			float* pFloat = static_cast<float*>(
@@ -1982,6 +2000,7 @@ namespace Ogre {
 
 
 			TiXmlElement* posNode = keyNode->FirstChildElement("position");
+			TiXmlElement* normNode = keyNode->FirstChildElement("normal");
 			for (size_t v = 0; v < vertexCount; ++v)
 			{
 				if (!posNode)
@@ -1998,6 +2017,25 @@ namespace Ogre {
 					posNode->Attribute("y"));
 				*pFloat++ = StringConverter::parseReal(
 					posNode->Attribute("z"));
+					
+				if (includesNormals)
+				{
+					if (!normNode)
+					{
+						OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+							"Not enough 'normal' elements under keyframe", 
+							"XMLMeshSerializer::readKeyFrames");
+
+					}
+					
+					*pFloat++ = StringConverter::parseReal(
+						normNode->Attribute("x"));
+					*pFloat++ = StringConverter::parseReal(
+						normNode->Attribute("y"));
+					*pFloat++ = StringConverter::parseReal(
+						normNode->Attribute("z"));
+					normNode = normNode->NextSiblingElement("normal");
+				}
 
 
 				posNode = posNode->NextSiblingElement("position");
@@ -2087,8 +2125,11 @@ namespace Ogre {
 					StringConverter::toString(target - 1));
 			}
 			poseNode->SetAttribute("name", pose->getName());
+			
+			bool includesNormals = !pose->getNormals().empty();
 
 			Pose::ConstVertexOffsetIterator vit = pose->getVertexOffsetIterator();
+			Pose::ConstNormalsIterator nit = pose->getNormalsIterator();
 			while (vit.hasMoreElements())
 			{
 				TiXmlElement* poseOffsetElement = poseNode->InsertEndChild(
@@ -2101,6 +2142,16 @@ namespace Ogre {
 				poseOffsetElement->SetAttribute("x", StringConverter::toString(offset.x));
 				poseOffsetElement->SetAttribute("y", StringConverter::toString(offset.y));
 				poseOffsetElement->SetAttribute("z", StringConverter::toString(offset.z));
+				
+				if (includesNormals)
+				{
+					Vector3 normal = nit.getNext();
+					poseOffsetElement->SetAttribute("nx", StringConverter::toString(normal.x));
+					poseOffsetElement->SetAttribute("ny", StringConverter::toString(normal.y));
+					poseOffsetElement->SetAttribute("nz", StringConverter::toString(normal.z));
+				}
+				
+				
 
 
 			}
@@ -2183,6 +2234,9 @@ namespace Ogre {
 				StringConverter::toString(kf->getTime()));
 
 			HardwareVertexBufferSharedPtr vbuf = kf->getVertexBuffer();
+			
+			bool includesNormals = vbuf->getVertexSize() > (sizeof(float) * 3);
+			
 			float* pFloat = static_cast<float*>(
 				vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 
@@ -2193,6 +2247,15 @@ namespace Ogre {
 				posNode->SetAttribute("x", StringConverter::toString(*pFloat++));
 				posNode->SetAttribute("y", StringConverter::toString(*pFloat++));
 				posNode->SetAttribute("z", StringConverter::toString(*pFloat++));
+				
+				if (includesNormals)
+				{
+					TiXmlElement* normNode = 
+						keyNode->InsertEndChild(TiXmlElement("normal"))->ToElement();
+					normNode->SetAttribute("x", StringConverter::toString(*pFloat++));
+					normNode->SetAttribute("y", StringConverter::toString(*pFloat++));
+					normNode->SetAttribute("z", StringConverter::toString(*pFloat++));
+				}
 			}
 
 		}

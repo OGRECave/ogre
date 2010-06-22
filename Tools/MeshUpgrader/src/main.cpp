@@ -318,7 +318,7 @@ void copyElems(VertexDeclaration* decl, VertexDeclaration::VertexElementList* el
 	elemList->sort(VertexDeclaration::vertexElementLess);
 }
 // Utility function to allow the user to modify the layout of vertex buffers.
-void reorganiseVertexBuffers(const String& desc, Mesh& mesh, VertexData* vertexData)
+void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, VertexData* vertexData)
 {
 	cout << endl << desc << ":- " << endl;
 	// Copy elements into a list
@@ -372,7 +372,8 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, VertexData* vertexD
                 // Automatic
                 VertexDeclaration* newDcl = 
                     vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                        mesh.hasSkeleton(), mesh.hasVertexAnimation());
+                        mesh.hasSkeleton(), mesh.hasVertexAnimation(), 
+						sm ? sm->getVertexAnimationIncludesNormals() : mesh.getSharedVertexDataAnimationIncludesNormals());
                 copyElems(newDcl, &elemList);
                 HardwareBufferManager::getSingleton().destroyVertexDeclaration(newDcl);
                 anyChanges = true;
@@ -475,16 +476,19 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, VertexData* vertexD
 // Utility function to allow the user to modify the layout of vertex buffers.
 void reorganiseVertexBuffers(Mesh& mesh)
 {
+	// Make sure animation types up to date
+	mesh._determineAnimationTypes();
+
 	if (mesh.sharedVertexData)
 	{
 		if (opts.interactive)
-			reorganiseVertexBuffers("Shared Geometry", mesh, mesh.sharedVertexData);
+			reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData);
 		else
 		{
 			// Automatic
 			VertexDeclaration* newDcl = 
 				mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-				mesh.hasSkeleton(), mesh.hasVertexAnimation());
+				mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
 			if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration))
 			{
 				// Usages don't matter here since we're onlly exporting
@@ -508,14 +512,14 @@ void reorganiseVertexBuffers(Mesh& mesh)
 			{
 				StringUtil::StrStreamType str;
 				str << "SubMesh " << idx++; 
-				reorganiseVertexBuffers(str.str(), mesh, sm->vertexData);
+				reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData);
 			}
 			else
 			{
 				// Automatic
 				VertexDeclaration* newDcl = 
 					sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-					mesh.hasSkeleton(), mesh.hasVertexAnimation());
+					mesh.hasSkeleton(), mesh.hasVertexAnimation(), sm->getVertexAnimationIncludesNormals());
 				if (*newDcl != *(sm->vertexData->vertexDeclaration))
 				{
 					// Usages don't matter here since we're onlly exporting

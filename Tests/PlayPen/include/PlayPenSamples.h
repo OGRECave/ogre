@@ -106,10 +106,34 @@ protected:
 };
 
 //---------------------------------------------------------------------
-class _OgreSampleClassExport PlayPen_testMorphAnimation : public PlayPenBase
+class _OgreSampleClassExport PlayPen_testMorphAnimationWithNormals : public PlayPenBase
 {
 public:
-	PlayPen_testMorphAnimation();
+	PlayPen_testMorphAnimationWithNormals();
+protected:
+	void setupContent();
+};
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testMorphAnimationWithoutNormals : public PlayPenBase
+{
+public:
+	PlayPen_testMorphAnimationWithoutNormals();
+protected:
+	void setupContent();
+};
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testPoseAnimationWithNormals : public PlayPenBase
+{
+public:
+	PlayPen_testPoseAnimationWithNormals();
+protected:
+	void setupContent();
+};
+//---------------------------------------------------------------------
+class _OgreSampleClassExport PlayPen_testPoseAnimationWithoutNormals : public PlayPenBase
+{
+public:
+	PlayPen_testPoseAnimationWithoutNormals();
 protected:
 	void setupContent();
 };

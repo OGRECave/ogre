@@ -489,7 +489,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     VertexDeclaration* VertexDeclaration::getAutoOrganisedDeclaration(
-		bool skeletalAnimation, bool vertexAnimation)
+		bool skeletalAnimation, bool vertexAnimation, bool vertexAnimationNormals)
     {
         VertexDeclaration* newDecl = this->clone();
         // Set all sources to the same buffer (for now)
@@ -517,15 +517,16 @@ namespace Ogre {
             switch (elem.getSemantic())
             {
             case VES_POSITION:
-                // For morph animation, we need positions on their own
-                splitWithPrev = vertexAnimation;
-                splitWithNext = vertexAnimation;
+                // Split positions if vertex animated with only positions
+				// group with normals otherwise
+				splitWithPrev = false;
+                splitWithNext = vertexAnimation && !vertexAnimationNormals;
                 break;
             case VES_NORMAL:
-                // Normals can't sharing with blend weights/indices
+                // Normals can't share with blend weights/indices
                 splitWithPrev = (prevSemantic == VES_BLEND_WEIGHTS || prevSemantic == VES_BLEND_INDICES);
                 // All animated meshes have to split after normal
-                splitWithNext = (skeletalAnimation || vertexAnimation);
+                splitWithNext = (skeletalAnimation || (vertexAnimation && vertexAnimationNormals));
                 break;
             case VES_BLEND_WEIGHTS:
                 // Blend weights/indices can be sharing with their own buffer only
@@ -535,11 +536,15 @@ namespace Ogre {
                 // Blend weights/indices can be sharing with their own buffer only
                 splitWithNext = true;
                 break;
+			default:
             case VES_DIFFUSE:
             case VES_SPECULAR:
             case VES_TEXTURE_COORDINATES:
             case VES_BINORMAL:
             case VES_TANGENT:
+				// Make sure position is separate if animated & there were no normals
+				splitWithPrev = prevSemantic == VES_POSITION && 
+					(skeletalAnimation || vertexAnimation);
                 break;
             }
 

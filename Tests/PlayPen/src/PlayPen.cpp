@@ -40,7 +40,10 @@ PlayPenPlugin::PlayPenPlugin()
 	addSample(new PlayPen_testManualLOD());
 	addSample(new PlayPen_testManualLODFromFile());
 	addSample(new PlayPen_testFullScreenSwitch());
-	addSample(new PlayPen_testMorphAnimation());
+	addSample(new PlayPen_testMorphAnimationWithNormals());
+	addSample(new PlayPen_testMorphAnimationWithoutNormals());
+	addSample(new PlayPen_testPoseAnimationWithNormals());
+	addSample(new PlayPen_testPoseAnimationWithoutNormals());
 }
 //---------------------------------------------------------------------
 PlayPenPlugin::~PlayPenPlugin()

@@ -693,7 +693,7 @@ namespace Ogre {
 		bool ret = true;
 		if (mMesh->sharedVertexData && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
 		{
-			ret = ret && mTempVertexAnimInfo.buffersCheckedOut(true, false);
+			ret = ret && mTempVertexAnimInfo.buffersCheckedOut(true, mMesh->getSharedVertexDataAnimationIncludesNormals());
 		}
 		for (SubEntityList::const_iterator i = mSubEntityList.begin();
 			i != mSubEntityList.end(); ++i)
@@ -702,7 +702,8 @@ namespace Ogre {
 			if (!sub->getSubMesh()->useSharedVertices
 				&& sub->getSubMesh()->getVertexAnimationType() != VAT_NONE)
 			{
-				ret = ret && sub->_getVertexAnimTempBufferInfo()->buffersCheckedOut(true, false);
+				ret = ret && sub->_getVertexAnimTempBufferInfo()->buffersCheckedOut(
+					true, sub->getSubMesh()->getVertexAnimationIncludesNormals());
 			}
 		}
 		return ret;
@@ -766,7 +767,8 @@ namespace Ogre {
 					if (mSoftwareVertexAnimVertexData
 						&& mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
 					{
-						mTempVertexAnimInfo.checkoutTempCopies(true, false);
+						bool useNormals = mMesh->getSharedVertexDataAnimationIncludesNormals();
+						mTempVertexAnimInfo.checkoutTempCopies(true, useNormals);
 						// NB we suppress hardware upload while doing blend if we're
 						// hardware animation, because the only reason for doing this
 						// is for shadow, which need only be uploaded then
@@ -782,7 +784,8 @@ namespace Ogre {
 						if (se->isVisible() && se->mSoftwareVertexAnimVertexData
 							&& se->getSubMesh()->getVertexAnimationType() != VAT_NONE)
 						{
-							se->mTempVertexAnimInfo.checkoutTempCopies(true, false);
+							bool useNormals = se->getSubMesh()->getVertexAnimationIncludesNormals();
+							se->mTempVertexAnimInfo.checkoutTempCopies(true, useNormals);
 							se->mTempVertexAnimInfo.bindTempCopies(se->mSoftwareVertexAnimVertexData,
 								hwAnimation);
 						}
@@ -946,6 +949,7 @@ namespace Ogre {
 		{
 			// May be blending multiple poses in software
 			// Suppress hardware upload of buffers
+			// Note, we query position buffer here but it may also include normals
 			if (mSoftwareVertexAnimVertexData &&
 				mMesh->getSharedVertexDataAnimationType() == VAT_POSE)
 			{
@@ -954,6 +958,9 @@ namespace Ogre {
 				HardwareVertexBufferSharedPtr buf = mSoftwareVertexAnimVertexData
 					->vertexBufferBinding->getBuffer(elem->getSource());
 				buf->suppressHardwareUpdate(true);
+				
+				initialisePoseVertexData(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData, 
+					mMesh->getSharedVertexDataAnimationIncludesNormals());
 			}
 			for (SubEntityList::iterator si = mSubEntityList.begin();
 				si != mSubEntityList.end(); ++si)
@@ -968,6 +975,9 @@ namespace Ogre {
 					HardwareVertexBufferSharedPtr buf = data
 						->vertexBufferBinding->getBuffer(elem->getSource());
 					buf->suppressHardwareUpdate(true);
+					// if we're animating normals, we need to start with zeros
+					initialisePoseVertexData(sub->getSubMesh()->vertexData, data, 
+						sub->getSubMesh()->getVertexAnimationIncludesNormals());
 				}
 			}
 		}
@@ -997,6 +1007,10 @@ namespace Ogre {
 			if (mSoftwareVertexAnimVertexData &&
 				msh->getSharedVertexDataAnimationType() == VAT_POSE)
 			{
+				// if we're animating normals, if pose influence < 1 need to use the base mesh
+				if (mMesh->getSharedVertexDataAnimationIncludesNormals())
+					finalisePoseNormals(mMesh->sharedVertexData, mSoftwareVertexAnimVertexData);
+			
 				const VertexElement* elem = mSoftwareVertexAnimVertexData
 					->vertexDeclaration->findElementBySemantic(VES_POSITION);
 				HardwareVertexBufferSharedPtr buf = mSoftwareVertexAnimVertexData
@@ -1011,6 +1025,10 @@ namespace Ogre {
 					sub->getSubMesh()->getVertexAnimationType() == VAT_POSE)
 				{
 					VertexData* data = sub->_getSoftwareVertexAnimVertexData();
+					// if we're animating normals, if pose influence < 1 need to use the base mesh
+					if (sub->getSubMesh()->getVertexAnimationIncludesNormals())
+						finalisePoseNormals(sub->getSubMesh()->vertexData, data);
+					
 					const VertexElement* elem = data->vertexDeclaration
 						->findElementBySemantic(VES_POSITION);
 					HardwareVertexBufferSharedPtr buf = data
@@ -1048,6 +1066,8 @@ namespace Ogre {
 			!mVertexAnimationAppliedThisFrame &&
 			(!hardwareAnimation || mMesh->getSharedVertexDataAnimationType() == VAT_MORPH))
 		{
+			// Note, VES_POSITION is specified here but if normals are included in animation
+			// then these will be re-bound too (buffers must be shared)
 			const VertexElement* srcPosElem =
 				mMesh->sharedVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
 			HardwareVertexBufferSharedPtr srcBuf =
@@ -1059,7 +1079,7 @@ namespace Ogre {
 				mSoftwareVertexAnimVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
 			mSoftwareVertexAnimVertexData->vertexBufferBinding->setBinding(
 				destPosElem->getSource(), srcBuf);
-
+				
 		}
 
 		// rebind any missing hardware pose buffers
@@ -1107,6 +1127,104 @@ namespace Ogre {
 			}
 		}
 
+	}
+	//-----------------------------------------------------------------------
+	void Entity::initialisePoseVertexData(const VertexData* srcData, 
+		VertexData* destData, bool animateNormals)
+	{
+	
+		// First time through for a piece of pose animated vertex data
+		// We need to copy the original position values to the temp accumulator
+		const VertexElement* origelem = 
+			srcData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+		const VertexElement* destelem = 
+			destData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+		HardwareVertexBufferSharedPtr origBuffer = 
+			srcData->vertexBufferBinding->getBuffer(origelem->getSource());
+		HardwareVertexBufferSharedPtr destBuffer = 
+			destData->vertexBufferBinding->getBuffer(destelem->getSource());
+		destBuffer->copyData(*origBuffer.get(), 0, 0, destBuffer->getSizeInBytes(), true);
+	
+		// If normals are included in animation, we want to reset the normals to zero
+		if (animateNormals)
+		{
+			const VertexElement* normElem =
+				destData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+				
+			if (normElem)
+			{
+				HardwareVertexBufferSharedPtr buf = 
+					destData->vertexBufferBinding->getBuffer(normElem->getSource());
+				char* pBase = static_cast<char*>(buf->lock(HardwareBuffer::HBL_NORMAL));
+				pBase += destData->vertexStart * buf->getVertexSize();
+				
+				for (size_t v = 0; v < destData->vertexCount; ++v)
+				{
+					float* pNorm;
+					normElem->baseVertexPointerToElement(pBase, &pNorm);
+					*pNorm++ = 0.0f;
+					*pNorm++ = 0.0f;
+					*pNorm++ = 0.0f;
+					
+					pBase += buf->getVertexSize();
+				}
+				buf->unlock();
+			}
+		}
+	}
+	//-----------------------------------------------------------------------
+	void Entity::finalisePoseNormals(const VertexData* srcData, VertexData* destData)
+	{
+		const VertexElement* destNormElem =
+			destData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+		const VertexElement* srcNormElem =
+			srcData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+			
+		if (destNormElem && srcNormElem)
+		{
+			HardwareVertexBufferSharedPtr srcbuf = 
+				srcData->vertexBufferBinding->getBuffer(srcNormElem->getSource());
+			HardwareVertexBufferSharedPtr dstbuf = 
+				destData->vertexBufferBinding->getBuffer(destNormElem->getSource());
+			char* pSrcBase = static_cast<char*>(srcbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+			char* pDstBase = static_cast<char*>(dstbuf->lock(HardwareBuffer::HBL_NORMAL));
+			pSrcBase += srcData->vertexStart * srcbuf->getVertexSize();
+			pDstBase += destData->vertexStart * dstbuf->getVertexSize();
+			
+			// The goal here is to detect the length of the vertices, and to apply
+			// the base mesh vertex normal at one minus that length; this deals with 
+			// any individual vertices which were either not affected by any pose, or
+			// were not affected to a complete extent
+			// We also normalise every normal to deal with over-weighting
+			for (size_t v = 0; v < destData->vertexCount; ++v)
+			{
+				float* pDstNorm;
+				destNormElem->baseVertexPointerToElement(pDstBase, &pDstNorm);
+				Vector3 norm(pDstNorm);
+				Real len = norm.length();
+				if (len + 1e-4f < 1.0f)
+				{
+					// Poses did not completely fill in this normal
+					// Apply base mesh
+					float baseWeight = 1.0f - (float)len;
+					float* pSrcNorm;
+					srcNormElem->baseVertexPointerToElement(pSrcBase, &pSrcNorm);
+					norm.x += *pSrcNorm++ * baseWeight;
+					norm.y += *pSrcNorm++ * baseWeight;
+					norm.z += *pSrcNorm++ * baseWeight;
+				}
+				norm.normalise();
+				
+				*pDstNorm++ = norm.x;
+				*pDstNorm++ = norm.y;
+				*pDstNorm++ = norm.z;
+				
+				pDstBase += dstbuf->getVertexSize();
+				pSrcBase += dstbuf->getVertexSize();
+			}
+			srcbuf->unlock();
+			dstbuf->unlock();
+		}
 	}
 	//-----------------------------------------------------------------------
 	void Entity::_updateAnimation(void)

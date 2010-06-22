@@ -176,11 +176,14 @@ namespace Ogre {
 		AnimationList mAnimationsList;
 		/// The vertex animation type associated with the shared vertex data
 		mutable VertexAnimationType mSharedVertexDataAnimationType;
+		/// Whether vertex animation includes normals
+		mutable bool mSharedVertexDataAnimationIncludesNormals;
 		/// Do we need to scan animations for animation types?
 		mutable bool mAnimationTypesDirty;
 
 		/// List of available poses for shared and dedicated geometryPoseList
 		PoseList mPoseList;
+		mutable bool mPosesIncludeNormals;
 
 
         /** Loads the mesh from disk.  This call only performs IO, it
@@ -360,7 +363,7 @@ namespace Ogre {
 		/** Returns whether or not this mesh has some kind of vertex animation. 
 		*/
 		bool hasVertexAnimation(void) const;
-
+		
 		/** Gets a pointer to any linked Skeleton. 
         @returns Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
@@ -754,12 +757,14 @@ namespace Ogre {
 			for the duration)
         @param weight Parametric weight to scale the offsets by
 		@param vertexOffsetMap Potentially sparse map of vertex index -> offset
+		@param normalsMap Potentially sparse map of vertex index -> normal
 		@param targetVertexData VertexData destination; assumed to have a separate position
 			buffer already bound, and the number of vertices must agree with the
 			number in start and end
 		*/
 		static void softwareVertexPoseBlend(Real weight, 
 			const map<size_t, Vector3>::type& vertexOffsetMap,
+			const map<size_t, Vector3>::type& normalsMap,
 			VertexData* targetVertexData);
         /** Gets a reference to the optional name assignments of the SubMeshes. */
         const SubMeshNameMap& getSubMeshNameMap(void) const { return mSubMeshNameMap; }
@@ -784,6 +789,9 @@ namespace Ogre {
 		/** Gets the type of vertex animation the shared vertex data of this mesh supports.
 		*/
 		virtual VertexAnimationType getSharedVertexDataAnimationType(void) const;
+
+		/// Returns whether animation on shared vertex data includes normals
+		bool getSharedVertexDataAnimationIncludesNormals() const { return mSharedVertexDataAnimationIncludesNormals; }
 
 		/** Creates a new Animation object for vertex animating this mesh. 
         @param name The name of this animation

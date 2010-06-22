@@ -388,6 +388,7 @@ namespace Ogre {
 			VertexData* hwVertexData;
 			VertexData* origVertexData;
 			bool firstAnim = false;
+			bool normals = false;
 			if (handle == 0)
 			{
 				// shared vertex data
@@ -396,6 +397,7 @@ namespace Ogre {
 				hwVertexData = entity->_getHardwareVertexAnimVertexData();
 				origVertexData = entity->getMesh()->sharedVertexData;
 				entity->_markBuffersUsedForAnimation();
+				normals = entity->getMesh()->getSharedVertexDataAnimationIncludesNormals();
 			}
 			else
 			{
@@ -409,24 +411,11 @@ namespace Ogre {
 				hwVertexData = s->_getHardwareVertexAnimVertexData();
 				origVertexData = s->getSubMesh()->vertexData;
 				s->_markBuffersUsedForAnimation();
+				normals = s->getSubMesh()->getVertexAnimationIncludesNormals();
 			}
 			// Apply to both hardware and software, if requested
 			if (software)
 			{
-				if (firstAnim && track->getAnimationType() == VAT_POSE)
-				{
-					// First time through for a piece of pose animated vertex data
-					// We need to copy the original position values to the temp accumulator
-					const VertexElement* origelem = 
-						origVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
-					const VertexElement* destelem = 
-						swVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
-					HardwareVertexBufferSharedPtr origBuffer = 
-						origVertexData->vertexBufferBinding->getBuffer(origelem->getSource());
-					HardwareVertexBufferSharedPtr destBuffer = 
-						swVertexData->vertexBufferBinding->getBuffer(destelem->getSource());
-					destBuffer->copyData(*origBuffer.get(), 0, 0, destBuffer->getSizeInBytes(), true);
-				}
 				track->setTargetMode(VertexAnimationTrack::TM_SOFTWARE);
 				track->applyToVertexData(swVertexData, timeIndex, weight, 
 					&(entity->getMesh()->getPoseList()));

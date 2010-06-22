@@ -510,7 +510,7 @@ namespace Ogre {
 			// first vertex, autoorganise decl
 			VertexDeclaration* oldDcl = rop->vertexData->vertexDeclaration;
 			rop->vertexData->vertexDeclaration =
-				oldDcl->getAutoOrganisedDeclaration(false, false);
+				oldDcl->getAutoOrganisedDeclaration(false, false, false);
 			HardwareBufferManager::getSingleton().destroyVertexDeclaration(oldDcl);
 		}
 		resizeTempVertexBufferIfNeeded(++rop->vertexData->vertexCount);

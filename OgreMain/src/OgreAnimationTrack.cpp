@@ -679,14 +679,17 @@ namespace Ogre {
 	//--------------------------------------------------------------------------
 	VertexAnimationTrack::VertexAnimationTrack(Animation* parent,
 		unsigned short handle, VertexAnimationType animType)
-		: AnimationTrack(parent, handle), mAnimationType(animType)
+		: AnimationTrack(parent, handle)
+		, mAnimationType(animType)
 	{
 	}
 	//--------------------------------------------------------------------------
 	VertexAnimationTrack::VertexAnimationTrack(Animation* parent, unsigned short handle,
 		VertexAnimationType animType, VertexData* targetData, TargetMode target)
-		: AnimationTrack(parent, handle), mAnimationType(animType),
-		mTargetVertexData(targetData), mTargetMode(target)
+		: AnimationTrack(parent, handle)
+		, mAnimationType(animType)
+		, mTargetVertexData(targetData)
+		, mTargetMode(target)
 	{
 	}
 	//--------------------------------------------------------------------------
@@ -710,6 +713,36 @@ namespace Ogre {
 				"VertexAnimationTrack::createVertexPoseKeyFrame");
 		}
 		return static_cast<VertexPoseKeyFrame*>(createKeyFrame(timePos));
+	}
+	//--------------------------------------------------------------------------
+	bool VertexAnimationTrack::getVertexAnimationIncludesNormals() const
+	{
+		if (mAnimationType == VAT_NONE)
+			return false;
+		
+		if (mAnimationType == VAT_MORPH)
+		{
+			bool normals = false;
+			for (KeyFrameList::const_iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+			{
+				VertexMorphKeyFrame* kf = static_cast<VertexMorphKeyFrame*>(*i);
+				bool thisnorm = kf->getVertexBuffer()->getVertexSize() > 12;
+				if (i == mKeyFrames.begin())
+					normals = thisnorm;
+				else
+					// Only support normals if ALL keyframes include them
+					normals = normals && thisnorm;
+
+			}
+			return normals;
+		}
+		else 
+		{
+			// needs to derive from Mesh::PoseList, can't tell here
+			return false;
+		}
+
+				
 	}
 	//--------------------------------------------------------------------------
 	void VertexAnimationTrack::apply(const TimeIndex& timeIndex, Real weight, Real scale)
@@ -741,7 +774,7 @@ namespace Ogre {
 					"Haven't set up hardware vertex animation elements!");
 
 				// no use for TempBlendedBufferInfo here btw
-				// NB we assume that position buffer is unshared
+				// NB we assume that position buffer is unshared, except for normals
 				// VertexDeclaration::getAutoOrganisedDeclaration should see to that
 				const VertexElement* posElem =
 					data->vertexDeclaration->findElementBySemantic(VES_POSITION);
@@ -859,7 +892,7 @@ namespace Ogre {
 		else
 		{
 			// Software
-			Mesh::softwareVertexPoseBlend(influence, pose->getVertexOffsets(), data);
+			Mesh::softwareVertexPoseBlend(influence, pose->getVertexOffsets(), pose->getNormals(), data);
 		}
 
 	}

@@ -330,15 +330,18 @@ void PlayPen_testFullScreenSwitch::buttonHit(OgreBites::Button* button)
 		mWindow->setFullscreen(true, 1024, 768);
 }
 //---------------------------------------------------------------------
-PlayPen_testMorphAnimation::PlayPen_testMorphAnimation()
+PlayPen_testMorphAnimationWithNormals::PlayPen_testMorphAnimationWithNormals()
 {
-	mInfo["Title"] = "PlayPen: Test morph animation";
-	mInfo["Description"] = "Testing morph animation";
+	mInfo["Title"] = "PlayPen: Morph anim (+normals)";
+	mInfo["Description"] = "Testing morph animation with normals";
 }
 //---------------------------------------------------------------------
-void PlayPen_testMorphAnimation::setupContent()
+void PlayPen_testMorphAnimationWithNormals::setupContent()
 {
-	bool testStencil = true;
+	// Cannot change this to true, not possible to use software morph animation + normals with stencil shadows
+	// because the former requires pos & normals to be in the same buffer, and the
+	// latter requires positions to be on their own.
+	bool testStencil = false;
 
 	if (testStencil)
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
@@ -354,14 +357,14 @@ void PlayPen_testMorphAnimation::setupContent()
 	MeshPtr mesh = MeshManager::getSingleton().load("sphere.mesh", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 	
-	String morphName = "testmorph.mesh";
+	String morphName = "testmorphwithnormals.mesh";
 	mesh = mesh->clone(morphName);
 
 	SubMesh* sm = mesh->getSubMesh(0);
 	// Re-organise geometry since this mesh has no animation and all 
 	// vertex elements are packed into one buffer
 	VertexDeclaration* newDecl = 
-		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true);
+		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, true);
 	sm->vertexData->reorganiseBuffers(newDecl);
 	if (testStencil)
 		sm->vertexData->prepareForShadowVolume(); // need to re-prep since reorganised
@@ -372,10 +375,10 @@ void PlayPen_testMorphAnimation::setupContent()
 		sm->vertexData->vertexBufferBinding->getBuffer(
 			posElem->getSource());
 
-	// Create a new position buffer with updated values
+	// Create a new position & normal buffer with updated values
 	HardwareVertexBufferSharedPtr newbuf = 
 		HardwareBufferManager::getSingleton().createVertexBuffer(
-			VertexElement::getTypeSize(VET_FLOAT3),
+			VertexElement::getTypeSize(VET_FLOAT3) * 2,
 			sm->vertexData->vertexCount, 
 			HardwareBuffer::HBU_STATIC, true);
 	float* pSrc = static_cast<float*>(origbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -384,20 +387,36 @@ void PlayPen_testMorphAnimation::setupContent()
 	// Make the sphere turn into a cube
 	// Do this just by clamping each of the directions (we shrink it)
 	float cubeDimension = 0.3f * mesh->getBoundingSphereRadius();
+	size_t srcSkip = origbuf->getVertexSize() / sizeof(float) - 3;
 	for (size_t v = 0; v < sm->vertexData->vertexCount; ++v)
 	{
-		// x/y/x
+		// x/y/z position
+		Vector3 pos;
 		for (int d = 0; d < 3; ++d)
 		{
 			if (*pSrc >= 0)
 			{
-				*pDst++ = std::min(cubeDimension, *pSrc++);
+				pos.ptr()[d] = std::min(cubeDimension, *pSrc++);
 			}
 			else 
 			{
-				*pDst++ = std::max(-cubeDimension, *pSrc++);			
+				pos.ptr()[d] = std::max(-cubeDimension, *pSrc++);			
 			}
+			*pDst++ = pos.ptr()[d];
 		}
+		
+		// normal
+		// this should point along the major axis
+		// unfortunately since vertices are not duplicated at edges there will be
+		// some inaccuracy here but the most important thing is to add sharp edges
+		Vector3 norm = pos.normalisedCopy();
+		norm = norm.primaryAxis();
+		*pDst++ = norm.x;
+		*pDst++ = norm.y;
+		*pDst++ = norm.z;
+
+		pSrc += srcSkip;
+
 	}
 
 	origbuf->unlock();
@@ -421,7 +440,17 @@ void PlayPen_testMorphAnimation::setupContent()
 	// re-use start positions for final frame
 	kf = vt->createVertexMorphKeyFrame(10.0f);
 	kf->setVertexBuffer(origbuf);
+
+	// Export the mesh
+	DataStreamPtr stream = Root::getSingleton().createFileStream(morphName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
+	MeshSerializer ser;
+	ser.exportMesh(mesh.get(), stream);
+	stream->close();
 	
+	// Unload old mesh to force reload
+	MeshManager::getSingleton().remove(mesh->getHandle());
+	mesh->unload();
+	mesh.setNull();
 
 	Entity* e = mSceneMgr->createEntity("test", morphName);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
@@ -455,6 +484,412 @@ void PlayPen_testMorphAnimation::setupContent()
 	pPlaneEnt->setCastShadows(false);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
 	
+}
+
+//---------------------------------------------------------------------
+PlayPen_testMorphAnimationWithoutNormals::PlayPen_testMorphAnimationWithoutNormals()
+{
+	mInfo["Title"] = "PlayPen: Morph anim (-normals)";
+	mInfo["Description"] = "Testing morph animation without normals";
+}
+//---------------------------------------------------------------------
+void PlayPen_testMorphAnimationWithoutNormals::setupContent()
+{
+	bool testStencil = false;
+
+	if (testStencil)
+		mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
+
+	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+	Vector3 dir(-1, -1, 0.5);
+	dir.normalise();
+	Light* l = mSceneMgr->createLight("light1");
+	l->setType(Light::LT_DIRECTIONAL);
+	l->setDirection(dir);
+
+
+	MeshPtr mesh = MeshManager::getSingleton().load("sphere.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+	String morphName = "testmorphnonormals.mesh";
+	mesh = mesh->clone(morphName);
+
+	SubMesh* sm = mesh->getSubMesh(0);
+	// Re-organise geometry since this mesh has no animation and all 
+	// vertex elements are packed into one buffer
+	VertexDeclaration* newDecl = 
+		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, false);
+	sm->vertexData->reorganiseBuffers(newDecl);
+	if (testStencil)
+		sm->vertexData->prepareForShadowVolume(); // need to re-prep since reorganised
+	// get the position buffer (which should now be separate);
+	const VertexElement* posElem = 
+		sm->vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+	HardwareVertexBufferSharedPtr origbuf = 
+		sm->vertexData->vertexBufferBinding->getBuffer(
+		posElem->getSource());
+
+	// Create a new position & normal buffer with updated values
+	HardwareVertexBufferSharedPtr newbuf = 
+		HardwareBufferManager::getSingleton().createVertexBuffer(
+		VertexElement::getTypeSize(VET_FLOAT3),
+		sm->vertexData->vertexCount, 
+		HardwareBuffer::HBU_STATIC, true);
+	float* pSrc = static_cast<float*>(origbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+	float* pDst = static_cast<float*>(newbuf->lock(HardwareBuffer::HBL_DISCARD));
+
+	// Make the sphere turn into a cube
+	// Do this just by clamping each of the directions (we shrink it)
+	float cubeDimension = 0.3f * mesh->getBoundingSphereRadius();
+	for (size_t v = 0; v < sm->vertexData->vertexCount; ++v)
+	{
+		// x/y/z position
+		Vector3 pos;
+		for (int d = 0; d < 3; ++d)
+		{
+			if (*pSrc >= 0)
+			{
+				pos.ptr()[d] = std::min(cubeDimension, *pSrc++);
+			}
+			else 
+			{
+				pos.ptr()[d] = std::max(-cubeDimension, *pSrc++);			
+			}
+			*pDst++ = pos.ptr()[d];
+		}
+
+	}
+
+	origbuf->unlock();
+	newbuf->unlock();
+
+	// create a morph animation
+	Animation* anim = mesh->createAnimation("testAnim", 10.0f);
+	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_MORPH);
+	// re-use start positions for frame 0
+	VertexMorphKeyFrame* kf = vt->createVertexMorphKeyFrame(0);
+	kf->setVertexBuffer(origbuf);
+
+	// Use translated buffer for mid frame
+	kf = vt->createVertexMorphKeyFrame(4.0f);
+	kf->setVertexBuffer(newbuf);
+
+	// Pause there
+	kf = vt->createVertexMorphKeyFrame(6.0f);
+	kf->setVertexBuffer(newbuf);
+
+	// re-use start positions for final frame
+	kf = vt->createVertexMorphKeyFrame(10.0f);
+	kf->setVertexBuffer(origbuf);
+
+	// Export the mesh
+	DataStreamPtr stream = Root::getSingleton().createFileStream(morphName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
+	MeshSerializer ser;
+	ser.exportMesh(mesh.get(), stream);
+	stream->close();
+
+	// Unload old mesh to force reload
+	MeshManager::getSingleton().remove(mesh->getHandle());
+	mesh->unload();
+	mesh.setNull();
+
+	Entity* e = mSceneMgr->createEntity("test", morphName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+	AnimationState* animState = e->getAnimationState("testAnim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+
+	e = mSceneMgr->createEntity("test2", morphName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,0,0))->attachObject(e);
+	// test hardware morph
+	e->setMaterialName("Examples/HardwareMorphAnimation");
+	animState = e->getAnimationState("testAnim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+
+	mCamera->setNearClipDistance(0.5);
+	mCamera->setPosition(0,100,-400);
+	mCamera->lookAt(Vector3::ZERO);
+	//mSceneMgr->setShowDebugShadows(true);
+
+	Plane plane;
+	plane.normal = Vector3::UNIT_Y;
+	plane.d = 200;
+	MeshManager::getSingleton().createPlane("Myplane",
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
+	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt->setMaterialName("2 - Default");
+	pPlaneEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+}
+//---------------------------------------------------------------------
+PlayPen_testPoseAnimationWithNormals::PlayPen_testPoseAnimationWithNormals()
+{
+	mInfo["Title"] = "PlayPen: Pose anim (+normals)";
+	mInfo["Description"] = "Testing pose animation with normals";
+
+}
+//---------------------------------------------------------------------
+void PlayPen_testPoseAnimationWithNormals::setupContent()
+{
+	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+	Vector3 dir(-1, -1, 0.5);
+	dir.normalise();
+	Light* l = mSceneMgr->createLight("light1");
+	l->setType(Light::LT_DIRECTIONAL);
+	l->setDirection(dir);
+
+	MeshPtr mesh = MeshManager::getSingleton().load("cube.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		
+	String newName = "testposewithnormals.mesh";
+	mesh = mesh->clone(newName);
+
+
+	SubMesh* sm = mesh->getSubMesh(0);
+	// Re-organise geometry since this mesh has no animation and all 
+	// vertex elements are packed into one buffer
+	VertexDeclaration* newDecl = 
+		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, true);
+	sm->vertexData->reorganiseBuffers(newDecl);
+
+	// create 2 poses
+	Pose* pose = mesh->createPose(1, "pose1");
+	// Pose1 moves vertices 0, 1, 2 and 3 upward and pushes normals left
+	Vector3 offset1(0, 50, 0);
+	pose->addVertex(0, offset1, Vector3::NEGATIVE_UNIT_X);
+	pose->addVertex(1, offset1, Vector3::NEGATIVE_UNIT_X);
+	pose->addVertex(2, offset1, Vector3::NEGATIVE_UNIT_X);
+	pose->addVertex(3, offset1, Vector3::NEGATIVE_UNIT_X);
+
+	pose = mesh->createPose(1, "pose2");
+	// Pose2 moves vertices 3, 4, and 5 to the right and pushes normals right
+	// Note 3 gets affected by both
+	Vector3 offset2(100, 0, 0);
+	pose->addVertex(3, offset2, Vector3::UNIT_X);
+	pose->addVertex(4, offset2, Vector3::UNIT_X);
+	pose->addVertex(5, offset2, Vector3::UNIT_X);
+
+
+	Animation* anim = mesh->createAnimation("poseanim", 20.0f);
+	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_POSE);
+	
+	// Frame 0 - no effect 
+	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(0);
+
+	// Frame 1 - bring in pose 1 (index 0)
+	kf = vt->createVertexPoseKeyFrame(3);
+	kf->addPoseReference(0, 1.0f);
+
+	// Frame 2 - remove all 
+	kf = vt->createVertexPoseKeyFrame(6);
+
+	// Frame 3 - bring in pose 2 (index 1)
+	kf = vt->createVertexPoseKeyFrame(9);
+	kf->addPoseReference(1, 1.0f);
+
+	// Frame 4 - remove all
+	kf = vt->createVertexPoseKeyFrame(12);
+
+
+	// Frame 5 - bring in pose 1 at 50%, pose 2 at 100% 
+	kf = vt->createVertexPoseKeyFrame(15);
+	kf->addPoseReference(0, 0.5f);
+	kf->addPoseReference(1, 1.0f);
+
+	// Frame 6 - bring in pose 1 at 100%, pose 2 at 50% 
+	kf = vt->createVertexPoseKeyFrame(18);
+	kf->addPoseReference(0, 1.0f);
+	kf->addPoseReference(1, 0.5f);
+
+	// Frame 7 - reset
+	kf = vt->createVertexPoseKeyFrame(20);
+
+
+	// Export the mesh
+	DataStreamPtr stream = Root::getSingleton().createFileStream(newName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
+	MeshSerializer ser;
+	ser.exportMesh(mesh.get(), stream);
+	stream->close();
+
+	// Unload old mesh to force reload
+	MeshManager::getSingleton().remove(mesh->getHandle());
+	mesh->unload();
+	mesh.setNull();
+
+	Entity*  e;
+	AnimationState* animState;
+	// software pose
+	e = mSceneMgr->createEntity("test2", newName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150,0,0))->attachObject(e);
+	animState = e->getAnimationState("poseanim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+	
+	// test hardware pose
+	e = mSceneMgr->createEntity("test", newName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+	e->setMaterialName("Examples/HardwarePoseAnimation");
+	animState = e->getAnimationState("poseanim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+	
+
+	mCamera->setNearClipDistance(0.5);
+	mSceneMgr->setShowDebugShadows(true);
+
+	Plane plane;
+	plane.normal = Vector3::UNIT_Y;
+	plane.d = 200;
+	MeshManager::getSingleton().createPlane("Myplane",
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
+	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt->setMaterialName("2 - Default");
+	pPlaneEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+	mCamera->setPosition(0,-200,-300);
+	mCamera->lookAt(0,0,0);
+
+}
+
+//---------------------------------------------------------------------
+PlayPen_testPoseAnimationWithoutNormals::PlayPen_testPoseAnimationWithoutNormals()
+{
+	mInfo["Title"] = "PlayPen: Pose anim (-normals)";
+	mInfo["Description"] = "Testing pose animation without normals";
+
+}
+//---------------------------------------------------------------------
+void PlayPen_testPoseAnimationWithoutNormals::setupContent()
+{
+	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+	Vector3 dir(-1, -1, 0.5);
+	dir.normalise();
+	Light* l = mSceneMgr->createLight("light1");
+	l->setType(Light::LT_DIRECTIONAL);
+	l->setDirection(dir);
+
+	MeshPtr mesh = MeshManager::getSingleton().load("cube.mesh", 
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		
+	String newName = "testposenonormals.mesh";
+	mesh = mesh->clone(newName);
+
+
+	SubMesh* sm = mesh->getSubMesh(0);
+	// Re-organise geometry since this mesh has no animation and all 
+	// vertex elements are packed into one buffer
+	VertexDeclaration* newDecl = 
+		sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(false, true, false);
+	sm->vertexData->reorganiseBuffers(newDecl);
+
+	// create 2 poses
+	Pose* pose = mesh->createPose(1, "pose1");
+	// Pose1 moves vertices 0, 1, 2 and 3 upward 
+	Vector3 offset1(0, 50, 0);
+	pose->addVertex(0, offset1);
+	pose->addVertex(1, offset1);
+	pose->addVertex(2, offset1);
+	pose->addVertex(3, offset1);
+
+	pose = mesh->createPose(1, "pose2");
+	// Pose2 moves vertices 3, 4, and 5 to the right
+	// Note 3 gets affected by both
+	Vector3 offset2(100, 0, 0);
+	pose->addVertex(3, offset2);
+	pose->addVertex(4, offset2);
+	pose->addVertex(5, offset2);
+
+
+	Animation* anim = mesh->createAnimation("poseanim", 20.0f);
+	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_POSE);
+	
+	// Frame 0 - no effect 
+	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(0);
+
+	// Frame 1 - bring in pose 1 (index 0)
+	kf = vt->createVertexPoseKeyFrame(3);
+	kf->addPoseReference(0, 1.0f);
+
+	// Frame 2 - remove all 
+	kf = vt->createVertexPoseKeyFrame(6);
+
+	// Frame 3 - bring in pose 2 (index 1)
+	kf = vt->createVertexPoseKeyFrame(9);
+	kf->addPoseReference(1, 1.0f);
+
+	// Frame 4 - remove all
+	kf = vt->createVertexPoseKeyFrame(12);
+
+
+	// Frame 5 - bring in pose 1 at 50%, pose 2 at 100% 
+	kf = vt->createVertexPoseKeyFrame(15);
+	kf->addPoseReference(0, 0.5f);
+	kf->addPoseReference(1, 1.0f);
+
+	// Frame 6 - bring in pose 1 at 100%, pose 2 at 50% 
+	kf = vt->createVertexPoseKeyFrame(18);
+	kf->addPoseReference(0, 1.0f);
+	kf->addPoseReference(1, 0.5f);
+
+	// Frame 7 - reset
+	kf = vt->createVertexPoseKeyFrame(20);
+
+	// Export the mesh
+	DataStreamPtr stream = Root::getSingleton().createFileStream(newName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);
+	MeshSerializer ser;
+	ser.exportMesh(mesh.get(), stream);
+	stream->close();
+
+	// Unload old mesh to force reload
+	MeshManager::getSingleton().remove(mesh->getHandle());
+	mesh->unload();
+	mesh.setNull();
+
+	Entity*  e;
+	AnimationState* animState;
+	// software pose
+	e = mSceneMgr->createEntity("test2", newName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150,0,0))->attachObject(e);
+	animState = e->getAnimationState("poseanim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+	
+	// test hardware pose
+	e = mSceneMgr->createEntity("test", newName);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
+	e->setMaterialName("Examples/HardwarePoseAnimation");
+	animState = e->getAnimationState("poseanim");
+	animState->setEnabled(true);
+	animState->setWeight(1.0f);
+	mAnimStateList.push_back(animState);
+	
+
+	mCamera->setNearClipDistance(0.5);
+
+	Plane plane;
+	plane.normal = Vector3::UNIT_Y;
+	plane.d = 200;
+	MeshManager::getSingleton().createPlane("Myplane",
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
+	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt->setMaterialName("2 - Default");
+	pPlaneEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+	mCamera->setPosition(0,-200,-300);
+	mCamera->lookAt(0,0,0);
+
 }
 
 

@@ -112,7 +112,9 @@ namespace Ogre {
         mEdgeListsBuilt(false),
         mAutoBuildEdgeLists(true), // will be set to false by serializers of 1.30 and above
 		mSharedVertexDataAnimationType(VAT_NONE),
+		mSharedVertexDataAnimationIncludesNormals(false),
 		mAnimationTypesDirty(true),
+		mPosesIncludeNormals(false),
 		sharedVertexData(0)
     {
 
@@ -1810,17 +1812,28 @@ namespace Ogre {
 		const VertexElement* posElem =
 			targetVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
 		assert(posElem);
+		const VertexElement* normElem =
+			targetVertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
+		
+		bool morphNormals = false;
+		if (normElem && normElem->getSource() == posElem->getSource() &&
+			b1->getVertexSize() == 24 && b2->getVertexSize() == 24)
+			morphNormals = true;
+		
 		HardwareVertexBufferSharedPtr destBuf =
 			targetVertexData->vertexBufferBinding->getBuffer(
 				posElem->getSource());
-		assert(posElem->getSize() == destBuf->getVertexSize() &&
-			"Positions must be in a buffer on their own for morphing");
+		assert((posElem->getSize() == destBuf->getVertexSize()
+				|| (morphNormals && posElem->getSize() + normElem->getSize() == destBuf->getVertexSize())) &&
+			"Positions (or positions & normals) must be in a buffer on their own for morphing");
 		float* pdst = static_cast<float*>(
 			destBuf->lock(HardwareBuffer::HBL_DISCARD));
 
         OptimisedUtil::getImplementation()->softwareVertexMorph(
             t, pb1, pb2, pdst,
-            targetVertexData->vertexCount);
+			b1->getVertexSize(), b2->getVertexSize(), destBuf->getVertexSize(),
+            targetVertexData->vertexCount,
+			morphNormals);
 
 		destBuf->unlock();
 		b1->unlock();
@@ -1830,6 +1843,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void Mesh::softwareVertexPoseBlend(Real weight,
 		const map<size_t, Vector3>::type& vertexOffsetMap,
+		const map<size_t, Vector3>::type& normalsMap,
 		VertexData* targetVertexData)
 	{
 		// Do nothing if no weight
@@ -1838,23 +1852,31 @@ namespace Ogre {
 
 		const VertexElement* posElem =
 			targetVertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+		const VertexElement* normElem =
+			targetVertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 		assert(posElem);
+		// Support normals if they're in the same buffer as positions and pose includes them
+		bool normals = normElem && !normalsMap.empty() && posElem->getSource() == normElem->getSource();
 		HardwareVertexBufferSharedPtr destBuf =
 			targetVertexData->vertexBufferBinding->getBuffer(
 			posElem->getSource());
-		assert(posElem->getSize() == destBuf->getVertexSize() &&
-			"Positions must be in a buffer on their own for pose blending");
+
+		size_t elemsPerVertex = destBuf->getVertexSize()/sizeof(float);
+		size_t dstSkip = elemsPerVertex - 3;
+		if (normals)
+			dstSkip -= 3;
+			
 
 		// Have to lock in normal mode since this is incremental
 		float* pBase = static_cast<float*>(
 			destBuf->lock(HardwareBuffer::HBL_NORMAL));
-
+				
 		// Iterate over affected vertices
 		for (map<size_t, Vector3>::type::const_iterator i = vertexOffsetMap.begin();
 			i != vertexOffsetMap.end(); ++i)
 		{
 			// Adjust pointer
-			float *pdst = pBase + i->first*3;
+			float *pdst = pBase + i->first*elemsPerVertex;
 
 			*pdst = *pdst + (i->second.x * weight);
 			++pdst;
@@ -1862,9 +1884,28 @@ namespace Ogre {
 			++pdst;
 			*pdst = *pdst + (i->second.z * weight);
 			++pdst;
-
+			
 		}
+		
+		if (normals)
+		{
+			float* pNormBase;
+			normElem->baseVertexPointerToElement((void*)pBase, &pNormBase);
+			for (map<size_t, Vector3>::type::const_iterator i = normalsMap.begin();
+				i != normalsMap.end(); ++i)
+			{
+				// Adjust pointer
+				float *pdst = pNormBase + i->first*elemsPerVertex;
 
+				*pdst = *pdst + (i->second.x * weight);
+				++pdst;
+				*pdst = *pdst + (i->second.y * weight);
+				++pdst;
+				*pdst = *pdst + (i->second.z * weight);
+				++pdst;				
+				
+			}
+		}
 		destBuf->unlock();
 	}
     //---------------------------------------------------------------------
@@ -1931,10 +1972,22 @@ namespace Ogre {
 
 		// Initialise all types to nothing
 		mSharedVertexDataAnimationType = VAT_NONE;
+		mSharedVertexDataAnimationIncludesNormals = false;
 		for (SubMeshList::const_iterator i = mSubMeshList.begin();
 			i != mSubMeshList.end(); ++i)
 		{
 			(*i)->mVertexAnimationType = VAT_NONE;
+			(*i)->mVertexAnimationIncludesNormals = false;
+		}
+		
+		mPosesIncludeNormals = false;
+		for (PoseList::const_iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
+		{
+			if (i == mPoseList.begin())
+				mPosesIncludeNormals = (*i)->getIncludesNormals();
+			else if (mPosesIncludeNormals != (*i)->getIncludesNormals())
+				// only support normals if consistently included
+				mPosesIncludeNormals = mPosesIncludeNormals && (*i)->getIncludesNormals();
 		}
 
 		// Scan all animations and determine the type of animation tracks
@@ -1962,6 +2015,11 @@ namespace Ogre {
 							"Mesh::_determineAnimationTypes");
 					}
 					mSharedVertexDataAnimationType = track->getAnimationType();
+					if (track->getAnimationType() == VAT_MORPH)
+						mSharedVertexDataAnimationIncludesNormals = track->getVertexAnimationIncludesNormals();
+					else 
+						mSharedVertexDataAnimationIncludesNormals = mPosesIncludeNormals;
+
 				}
 				else
 				{
@@ -1979,6 +2037,10 @@ namespace Ogre {
 							"Mesh::_determineAnimationTypes");
 					}
 					sm->mVertexAnimationType = track->getAnimationType();
+					if (track->getAnimationType() == VAT_MORPH)
+						sm->mVertexAnimationIncludesNormals = track->getVertexAnimationIncludesNormals();
+					else 
+						sm->mVertexAnimationIncludesNormals = mPosesIncludeNormals;
 
 				}
 			}

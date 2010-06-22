@@ -42,7 +42,22 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void Pose::addVertex(size_t index, const Vector3& offset)
 	{
+		if (!mNormalsMap.empty())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Inconsistent calls to addVertex, must include normals always or never",
+				"Pose::addVertex");
 		mVertexOffsetMap[index] = offset;
+		mBuffer.setNull();
+	}
+	//---------------------------------------------------------------------
+	void Pose::addVertex(size_t index, const Vector3& offset, const Vector3& normal)
+	{
+		if (!mVertexOffsetMap.empty() && mNormalsMap.empty())
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+				"Inconsistent calls to addVertex, must include normals always or never",
+				"Pose::addVertex");
+		mVertexOffsetMap[index] = offset;
+		mNormalsMap[index] = normal;
 		mBuffer.setNull();
 	}
 	//---------------------------------------------------------------------
@@ -54,11 +69,17 @@ namespace Ogre {
 			mVertexOffsetMap.erase(i);
 			mBuffer.setNull();
 		}
+		NormalsMap::iterator j = mNormalsMap.find(index);
+		if (j != mNormalsMap.end())
+		{
+			mNormalsMap.erase(j);
+		}
 	}
 	//---------------------------------------------------------------------
-	void Pose::clearVertexOffsets(void)
+	void Pose::clearVertices(void)
 	{
 		mVertexOffsetMap.clear();
+		mNormalsMap.clear();
 		mBuffer.setNull();
 	}
 	//---------------------------------------------------------------------
@@ -74,27 +95,53 @@ namespace Ogre {
 		return VertexOffsetIterator(mVertexOffsetMap.begin(), mVertexOffsetMap.end());
 	}
 	//---------------------------------------------------------------------
+	Pose::ConstNormalsIterator Pose::getNormalsIterator(void) const
+	{
+		return ConstNormalsIterator(mNormalsMap.begin(), mNormalsMap.end());
+	}
+	//---------------------------------------------------------------------
+	Pose::NormalsIterator Pose::getNormalsIterator(void)
+	{
+		return NormalsIterator(mNormalsMap.begin(), mNormalsMap.end());
+	}
+	//---------------------------------------------------------------------
 	const HardwareVertexBufferSharedPtr& Pose::_getHardwareVertexBuffer(size_t numVertices) const
 	{
 		if (mBuffer.isNull())
 		{
 			// Create buffer
+			size_t vertexSize = VertexElement::getTypeSize(VET_FLOAT3);
+			bool normals = getIncludesNormals();
+			if (normals)
+				vertexSize += VertexElement::getTypeSize(VET_FLOAT3);
+				
 			mBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
-				VertexElement::getTypeSize(VET_FLOAT3),
-				numVertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+				vertexSize,	numVertices, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
 			float* pFloat = static_cast<float*>(
 				mBuffer->lock(HardwareBuffer::HBL_DISCARD));
 			// initialise
 			memset(pFloat, 0, mBuffer->getSizeInBytes()); 
 			// Set each vertex
-			for (VertexOffsetMap::const_iterator i = mVertexOffsetMap.begin();
-				i != mVertexOffsetMap.end(); ++i)
+			VertexOffsetMap::const_iterator v = mVertexOffsetMap.begin();
+			NormalsMap::const_iterator n = mNormalsMap.begin();
+			while(v != mVertexOffsetMap.end())
 			{
-				float* pDst = pFloat + (3 * i->first);
-				*pDst++ = i->second.x;
-				*pDst++ = i->second.y;
-				*pDst++ = i->second.z;
+				// Remember, vertex maps are *sparse* so may have missing entries
+				// This is why we skip
+				float* pDst = pFloat + (3 * v->first);
+				*pDst++ = v->second.x;
+				*pDst++ = v->second.y;
+				*pDst++ = v->second.z;
+				++v;
+				if (normals)
+				{
+					*pDst++ = n->second.x;
+					*pDst++ = n->second.y;
+					*pDst++ = n->second.z;
+					++n;
+				}
+				
 			}
 			mBuffer->unlock();
 		}

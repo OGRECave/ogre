@@ -37,7 +37,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    String MeshSerializer::msCurrentVersion = "[MeshSerializer_v1.41]";
+    String MeshSerializer::msCurrentVersion = "[MeshSerializer_v1.8]";
     const unsigned short HEADER_CHUNK_ID = 0x1000;
     //---------------------------------------------------------------------
     MeshSerializer::MeshSerializer()
@@ -59,6 +59,10 @@ namespace Ogre {
         mImplementations.insert(
             MeshSerializerImplMap::value_type("[MeshSerializer_v1.40]", 
             OGRE_NEW MeshSerializerImpl_v1_4() ) );
+
+        mImplementations.insert(
+            MeshSerializerImplMap::value_type("[MeshSerializer_v1.41]", 
+            OGRE_NEW MeshSerializerImpl_v1_41() ) );
 
         mImplementations.insert(
             MeshSerializerImplMap::value_type(msCurrentVersion, 

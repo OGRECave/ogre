@@ -71,6 +71,14 @@ namespace Ogre {
 		typedef MapIterator<VertexOffsetMap> VertexOffsetIterator;
 		/// An iterator over the vertex offsets
 		typedef ConstMapIterator<VertexOffsetMap> ConstVertexOffsetIterator;
+		/// A collection of normals based on the vertex index
+		typedef map<size_t, Vector3>::type NormalsMap;
+		/// An iterator over the vertex offsets
+		typedef MapIterator<NormalsMap> NormalsIterator;
+		/// An iterator over the vertex offsets
+		typedef ConstMapIterator<NormalsMap> ConstNormalsIterator;
+		/// Return whether the pose vertices include normals
+		bool getIncludesNormals() const { return !mNormalsMap.empty(); }
 
 		/** Adds an offset to a vertex for this pose. 
 		@param index The vertex index
@@ -78,11 +86,17 @@ namespace Ogre {
 		*/
 		void addVertex(size_t index, const Vector3& offset);
 
+		/** Adds an offset to a vertex and a new normal for this pose. 
+		@param index The vertex index
+		@param offset The position offset for this pose
+		*/
+		void addVertex(size_t index, const Vector3& offset, const Vector3& normal);
+
 		/** Remove a vertex offset. */
 		void removeVertex(size_t index);
 
-		/** Clear all vertex offsets. */
-		void clearVertexOffsets(void);
+		/** Clear all vertices. */
+		void clearVertices(void);
 
 		/** Gets an iterator over all the vertex offsets. */
 		ConstVertexOffsetIterator getVertexOffsetIterator(void) const;
@@ -90,6 +104,13 @@ namespace Ogre {
 		VertexOffsetIterator getVertexOffsetIterator(void);
 		/** Gets a const reference to the vertex offsets. */
 		const VertexOffsetMap& getVertexOffsets(void) const { return mVertexOffsetMap; }
+
+		/** Gets an iterator over all the vertex offsets. */
+		ConstNormalsIterator getNormalsIterator(void) const;
+		/** Gets an iterator over all the vertex offsets. */
+		NormalsIterator getNormalsIterator(void);
+		/** Gets a const reference to the vertex offsets. */
+		const NormalsMap& getNormals(void) const { return mNormalsMap; }
 
 		/** Get a hardware vertex buffer version of the vertex offsets. */
 		const HardwareVertexBufferSharedPtr& _getHardwareVertexBuffer(size_t numVertices) const;
@@ -105,6 +126,8 @@ namespace Ogre {
 		String mName;
 		/// Primary storage, sparse vertex use
 		VertexOffsetMap mVertexOffsetMap;
+		/// Primary storage, sparse vertex use
+		NormalsMap mNormalsMap;
 		/// Derived hardware buffer, covers all vertices
 		mutable HardwareVertexBufferSharedPtr mBuffer;
 	};

@@ -126,7 +126,7 @@ namespace Ogre {
 		virtual size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
 		virtual size_t calcPoseKeyframeSize(const VertexPoseKeyFrame* kf);
 		virtual size_t calcPoseKeyframePoseRefSize(void);
-		virtual size_t calcPoseVertexSize(void);
+		virtual size_t calcPoseVertexSize(const Pose* pose);
         virtual size_t calcSubMeshTextureAliasesSize(const SubMesh* pSub);
 
 
@@ -176,8 +176,24 @@ namespace Ogre {
 
     };
 
+    /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. */
+    class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl
+    {
+    public:
+        MeshSerializerImpl_v1_41();
+        ~MeshSerializerImpl_v1_41();
+    protected:
+		void writeMorphKeyframe(const VertexMorphKeyFrame* kf, size_t vertexCount);
+		void readMorphKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);
+		void writePose(const Pose* pose);
+		void readPose(DataStreamPtr& stream, Mesh* pMesh);
+		size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
+		size_t calcPoseSize(const Pose* pose);
+		size_t calcPoseVertexSize(void);
+    };
+
     /** Class for providing backwards-compatibility for loading version 1.4 of the .mesh format. */
-    class _OgrePrivate MeshSerializerImpl_v1_4 : public MeshSerializerImpl
+    class _OgrePrivate MeshSerializerImpl_v1_4 : public MeshSerializerImpl_v1_41
     {
     public:
         MeshSerializerImpl_v1_4();

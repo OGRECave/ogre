@@ -238,6 +238,10 @@ namespace Ogre {
 		/** Get the type of any vertex animation used by dedicated geometry.
 		*/
 		VertexAnimationType getVertexAnimationType(void) const;
+		
+		/// Returns whether animation on dedicated vertex data includes normals
+		bool getVertexAnimationIncludesNormals() const { return mVertexAnimationIncludesNormals; }
+
 
         /** Generate the submesh extremes (@see extremityPoints).
         @param count
@@ -268,6 +272,9 @@ namespace Ogre {
 
 		/// Type of vertex animation for dedicated vertex data (populated by Mesh)
 		mutable VertexAnimationType mVertexAnimationType;
+
+		/// Whether normals are included in vertex animation keyframes
+		mutable bool mVertexAnimationIncludesNormals;
 
 		/// Is Build Edges Enabled
 		bool mBuildEdgesEnabled;
