@@ -334,9 +334,10 @@ void hardwarePoseAnimationWithNormals(float3 pos : POSITION,
 	float3 ninterp = anim_t.x*pose1norm + anim_t.y*pose2norm;
 
 	// Now add back any influence of the original normal
-	// This depends on whether any weighting was left over
-	float remainder = 1.0 - saturate(anim_t.x + anim_t.y);
-	ninterp = ninterp + normal * remainder;
+	// This depends on what the cumulative weighting left the normal at, if it's lacking or cancelled out
+	//float remainder = 1.0 - min(anim_t.x + anim_t.y, 1.0);
+	float remainder = 1.0 - min(length(ninterp), 1.0);
+	ninterp = ninterp + (normal * remainder);
 	ninterp = normalize(ninterp);
 
 	oPosition = mul(worldViewProj, posinterp);
