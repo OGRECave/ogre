@@ -63,7 +63,7 @@ THE SOFTWARE.
 
 /** Define number of texture coordinate sets allowed per vertex.
 */
-#define OGRE_MAX_TEXTURE_COORD_SETS 6
+#define OGRE_MAX_TEXTURE_COORD_SETS 8
 
 /** Define max number of texture layers allowed per pass on any card.
 */

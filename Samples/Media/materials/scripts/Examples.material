@@ -1642,7 +1642,7 @@ material Examples/Aureola
 	}
 }
 
-// Test hardware morph animation
+// Test hardware morph animation (no normals)
 material Examples/HardwareMorphAnimation
 {
 	technique
@@ -1657,19 +1657,6 @@ material Examples/HardwareMorphAnimation
 
 			texture_unit
 			{
-				tex_coord_set 0
-				colour_op_ex source1 src_current src_current
-			}
-			// need to define these texture units otherwise GL won't use the uv sets			
-			texture_unit
-			{
-				tex_coord_set 1
-				// also need to set blending to ignore texture which is GL warning texture
-				colour_op_ex source1 src_current src_current
-			}
-			texture_unit
-			{
-				tex_coord_set 2
 				colour_op_ex source1 src_current src_current
 			}
 		
@@ -1677,7 +1664,7 @@ material Examples/HardwareMorphAnimation
 	}
 }
 
-// Test hardware pose animation
+// Test hardware pose animation (no normals)
 material Examples/HardwarePoseAnimation
 {
 	technique
@@ -1694,19 +1681,51 @@ material Examples/HardwarePoseAnimation
 				tex_coord_set 0
 				colour_op_ex source1 src_current src_current
 			}
-			// need to define these texture units otherwise GL won't use the uv sets			
-			texture_unit
+		
+		}
+	}
+}
+
+
+// Test hardware morph animation (with normals)
+material Examples/HardwareMorphAnimationWithNormals
+{
+	technique
+	{
+		pass
+		{
+			
+			vertex_program_ref Ogre/HardwareMorphAnimationWithNormals
 			{
-				tex_coord_set 1
-				// also need to set blending to ignore texture which is GL warning texture
-				colour_op_ex source1 src_current src_current
-			}
-			texture_unit
-			{
-				tex_coord_set 2
-				colour_op_ex source1 src_current src_current
+				// all default
 			}
 
+			texture_unit
+			{
+				colour_op_ex source1 src_current src_current
+			}
+		
+		}
+	}
+}
+
+// Test hardware pose animation (no normals)
+material Examples/HardwarePoseAnimationWithNormals
+{
+	technique
+	{
+		pass
+		{
+			
+			vertex_program_ref Ogre/HardwarePoseAnimationWithNormals
+			{
+				// all default
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				colour_op_ex source1 src_current src_current
+			}
 		
 		}
 	}

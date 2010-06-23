@@ -196,7 +196,7 @@ vertex_program Ogre/HardwareSkinningFourWeights cg
    }
 }
 
-// Basic hardware morph animation 
+// Basic hardware morph animation (no normals)
 vertex_program Ogre/HardwareMorphAnimation cg
 {
 	source Example_Basic.cg
@@ -210,7 +210,7 @@ vertex_program Ogre/HardwareMorphAnimation cg
 		param_named_auto anim_t animation_parametric
 	}
 }
-// Basic hardware pose animation supporting 2 active poses
+// Basic hardware pose animation supporting 2 active poses (no normals)
 vertex_program Ogre/HardwarePoseAnimation cg
 {
 	source Example_Basic.cg
@@ -222,5 +222,38 @@ vertex_program Ogre/HardwarePoseAnimation cg
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
 		param_named_auto anim_t animation_parametric
+	}
+}
+
+// Basic hardware morph animation (with normals)
+vertex_program Ogre/HardwareMorphAnimationWithNormals cg
+{
+	source Example_Basic.cg
+	entry_point hardwareMorphAnimationWithNormals
+	profiles vs_1_1 arbvp1
+
+	includes_morph_animation true
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto anim_t animation_parametric
+		param_named_auto objSpaceLightPos light_position_object_space 0
+		param_named_auto ambient ambient_light_colour
+	}
+}
+// Basic hardware pose animation supporting 2 active poses (with normals)
+vertex_program Ogre/HardwarePoseAnimationWithNormals cg
+{
+	source Example_Basic.cg
+	entry_point hardwarePoseAnimationWithNormals
+	profiles vs_1_1 arbvp1
+
+	includes_pose_animation 2
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto anim_t animation_parametric
+		param_named_auto objSpaceLightPos light_position_object_space 0
+		param_named_auto ambient ambient_light_colour
 	}
 }

@@ -437,6 +437,11 @@ namespace Ogre {
 
 		/** Gets the vertex size defined by this declaration for a given source. */
         virtual size_t getVertexSize(unsigned short source);
+		
+		/** Return the index of the next free texture coordinate set which may be added
+			to this declaration.
+		*/
+		virtual unsigned short getNextFreeTextureCoordinate() const;
 
         /** Clones this declaration. 
 		@param mgr Optional HardwareBufferManager to use for creating the clone

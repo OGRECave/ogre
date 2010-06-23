@@ -105,8 +105,10 @@ namespace Ogre {
 		return NormalsIterator(mNormalsMap.begin(), mNormalsMap.end());
 	}
 	//---------------------------------------------------------------------
-	const HardwareVertexBufferSharedPtr& Pose::_getHardwareVertexBuffer(size_t numVertices) const
+	const HardwareVertexBufferSharedPtr& Pose::_getHardwareVertexBuffer(const VertexData* origData) const
 	{
+		size_t numVertices = origData->vertexCount;
+		
 		if (mBuffer.isNull())
 		{
 			// Create buffer
@@ -120,16 +122,45 @@ namespace Ogre {
 
 			float* pFloat = static_cast<float*>(
 				mBuffer->lock(HardwareBuffer::HBL_DISCARD));
-			// initialise
+			// initialise - these will be the values used where no pose vertex is included
 			memset(pFloat, 0, mBuffer->getSizeInBytes()); 
+			if (normals)
+			{
+				// zeroes are fine for positions (deltas), but for normals we need the original
+				// mesh normals, since delta normals don't work (re-normalisation would
+				// always result in a blended normal even with full pose applied)
+				const VertexElement* origNormElem = 
+					origData->vertexDeclaration->findElementBySemantic(VES_NORMAL, 0);
+				assert(origNormElem);
+				
+				const HardwareVertexBufferSharedPtr& origBuffer = 
+					origData->vertexBufferBinding->getBuffer(origNormElem->getSource());
+				float* pDst = pFloat + 3;
+				void* pSrcBase = origBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
+				float* pSrc;
+				origNormElem->baseVertexPointerToElement(pSrcBase, &pSrc);
+				for (size_t v = 0; v < numVertices; ++v)
+				{
+					memcpy(pDst, pSrc, sizeof(float)*3);
+					
+					pDst += 6;
+					pSrc = (float*)(((char*)pSrc) + origBuffer->getVertexSize());
+				}
+				origBuffer->unlock();
+				
+				
+			}
 			// Set each vertex
 			VertexOffsetMap::const_iterator v = mVertexOffsetMap.begin();
 			NormalsMap::const_iterator n = mNormalsMap.begin();
+			
+			size_t numFloatsPerVertex = normals ? 6: 3;
+			
 			while(v != mVertexOffsetMap.end())
 			{
 				// Remember, vertex maps are *sparse* so may have missing entries
 				// This is why we skip
-				float* pDst = pFloat + (3 * v->first);
+				float* pDst = pFloat + (numFloatsPerVertex * v->first);
 				*pDst++ = v->second.x;
 				*pDst++ = v->second.y;
 				*pDst++ = v->second.z;

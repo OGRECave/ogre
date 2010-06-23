@@ -783,7 +783,7 @@ namespace Ogre {
 					posElem->getSource(), vkf1->getVertexBuffer());
 				// Set keyframe2 data as derived
 				data->vertexBufferBinding->setBinding(
-					data->hwAnimationDataList[0].targetVertexElement->getSource(),
+					data->hwAnimationDataList[0].targetBufferIndex,
 					vkf2->getVertexBuffer());
 				// save T for use later
 				data->hwAnimationDataList[0].parametric = t;
@@ -881,8 +881,8 @@ namespace Ogre {
 			{
 				VertexData::HardwareAnimationData& animData = data->hwAnimationDataList[hwIndex];
 				data->vertexBufferBinding->setBinding(
-					animData.targetVertexElement->getSource(),
-					pose->_getHardwareVertexBuffer(data->vertexCount));
+					animData.targetBufferIndex,
+					pose->_getHardwareVertexBuffer(data));
 				// save final influence in parametric
 				animData.parametric = influence;
 

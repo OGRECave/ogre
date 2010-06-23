@@ -763,7 +763,7 @@ namespace Ogre {
 			{
 				if (softwareAnimation)
 				{
-					// grab & bind temporary buffer for positions
+					// grab & bind temporary buffer for positions (& normals if they are included)
 					if (mSoftwareVertexAnimVertexData
 						&& mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
 					{
@@ -898,12 +898,14 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-	void Entity::initHardwareAnimationElements(VertexData* vdata,
-		ushort numberOfElements)
+	ushort Entity::initHardwareAnimationElements(VertexData* vdata,
+		ushort numberOfElements, bool animateNormals)
 	{
+		ushort elemsSupported = numberOfElements;
 		if (vdata->hwAnimationDataList.size() < numberOfElements)
 		{
-			vdata->allocateHardwareAnimationElements(numberOfElements);
+			elemsSupported = 
+				vdata->allocateHardwareAnimationElements(numberOfElements, animateNormals);
 		}
 		// Initialise parametrics incase we don't use all of them
 		for (size_t i = 0; i < vdata->hwAnimationDataList.size(); ++i)
@@ -912,6 +914,8 @@ namespace Ogre {
 		}
 		// reset used count
 		vdata->hwAnimDataItemsUsed = 0;
+				
+		return elemsSupported;
 
 	}
 	//-----------------------------------------------------------------------
@@ -926,9 +930,22 @@ namespace Ogre {
 			if (mHardwareVertexAnimVertexData
 				&& msh->getSharedVertexDataAnimationType() != VAT_NONE)
 			{
-				initHardwareAnimationElements(mHardwareVertexAnimVertexData,
+				ushort supportedCount =
+				  initHardwareAnimationElements(mHardwareVertexAnimVertexData,
 					(msh->getSharedVertexDataAnimationType() == VAT_POSE)
-					? mHardwarePoseCount : 1);
+					? mHardwarePoseCount : 1, 
+					msh->getSharedVertexDataAnimationIncludesNormals());
+				
+				if (supportedCount < mHardwarePoseCount)
+				{
+					LogManager::getSingleton().stream() <<
+					  "Vertex program assigned to Entity '" << mName << 
+					  "' claimed to support " << mHardwarePoseCount << 
+					  " morph/pose vertex sets, but in fact only " << supportedCount <<
+					  " were able to be supported in the shared mesh data.";
+					mHardwarePoseCount = supportedCount;
+				}
+					
 			}
 			for (SubEntityList::iterator si = mSubEntityList.begin();
 				si != mSubEntityList.end(); ++si)
@@ -937,10 +954,22 @@ namespace Ogre {
 				if (sub->getSubMesh()->getVertexAnimationType() != VAT_NONE &&
 					!sub->getSubMesh()->useSharedVertices)
 				{
-					initHardwareAnimationElements(
+					ushort supportedCount = initHardwareAnimationElements(
 						sub->_getHardwareVertexAnimVertexData(),
 						(sub->getSubMesh()->getVertexAnimationType() == VAT_POSE)
-						? sub->mHardwarePoseCount : 1);
+						? sub->mHardwarePoseCount : 1,
+						sub->getSubMesh()->getVertexAnimationIncludesNormals());
+
+					if (supportedCount < mHardwarePoseCount)
+					{
+						LogManager::getSingleton().stream() <<
+						"Vertex program assigned to SubEntity of '" << mName << 
+						"' claimed to support " << sub->mHardwarePoseCount << 
+						" morph/pose vertex sets, but in fact only " << supportedCount <<
+						" were able to be supported in the mesh data.";
+						sub->mHardwarePoseCount = supportedCount;
+					}
+					
 				}
 			}
 
@@ -1119,11 +1148,11 @@ namespace Ogre {
 		{
 			const VertexData::HardwareAnimationData& animData = *i;
 			if (!destData->vertexBufferBinding->isBufferBound(
-				animData.targetVertexElement->getSource()))
+				animData.targetBufferIndex))
 			{
 				// Bind to a safe default
 				destData->vertexBufferBinding->setBinding(
-					animData.targetVertexElement->getSource(), srcBuf);
+					animData.targetBufferIndex, srcBuf);
 			}
 		}
 

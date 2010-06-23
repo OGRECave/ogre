@@ -283,8 +283,8 @@ namespace Ogre {
 		/// Apply vertex animation
 		void applyVertexAnimation(bool hardwareAnimation, bool stencilShadows);
 		/// Initialise the hardware animation elements for given vertex data
-		void initHardwareAnimationElements(VertexData* vdata,
-			ushort numberOfElements);
+		ushort initHardwareAnimationElements(VertexData* vdata,
+			ushort numberOfElements, bool animateNormals);
 		/// Are software vertex animation temp buffers bound?
 		bool tempVertexAnimBuffersBound(void) const;
         /// Are software skeleton animation temp buffers bound?

@@ -113,7 +113,7 @@ namespace Ogre {
 		const NormalsMap& getNormals(void) const { return mNormalsMap; }
 
 		/** Get a hardware vertex buffer version of the vertex offsets. */
-		const HardwareVertexBufferSharedPtr& _getHardwareVertexBuffer(size_t numVertices) const;
+		const HardwareVertexBufferSharedPtr& _getHardwareVertexBuffer(const VertexData* origData) const;
 
 		/** Clone this pose and create another one configured exactly the same
 			way (only really useful for cloning holders of this class).

@@ -669,34 +669,33 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
-	void VertexData::allocateHardwareAnimationElements(ushort count)
+	ushort VertexData::allocateHardwareAnimationElements(ushort count, bool animateNormals)
 	{
 		// Find first free texture coord set
-		unsigned short texCoord = 0;
-		const VertexDeclaration::VertexElementList& vel = vertexDeclaration->getElements();
-		for (VertexDeclaration::VertexElementList::const_iterator i = vel.begin(); 
-			i != vel.end(); ++i)
-		{
-			const VertexElement& el = *i;
-			if (el.getSemantic() == VES_TEXTURE_COORDINATES)
-			{
-				++texCoord;
-			}
-		}
-		assert(texCoord <= OGRE_MAX_TEXTURE_COORD_SETS);
-
+		unsigned short texCoord = vertexDeclaration->getNextFreeTextureCoordinate();
+		unsigned short freeCount = (ushort)(OGRE_MAX_TEXTURE_COORD_SETS - texCoord);
+		if (animateNormals)
+			// we need 2x the texture coords, round down
+			freeCount /= 2;
+		
+		unsigned short supportedCount = std::min(freeCount, count);
+		
 		// Increase to correct size
-		for (size_t c = hwAnimationDataList.size(); c < count; ++c)
+		for (size_t c = hwAnimationDataList.size(); c < supportedCount; ++c)
 		{
 			// Create a new 3D texture coordinate set
 			HardwareAnimationData data;
-			data.targetVertexElement = &(vertexDeclaration->addElement(
-				vertexBufferBinding->getNextIndex(), 0, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++));
+			data.targetBufferIndex = vertexBufferBinding->getNextIndex();
+			vertexDeclaration->addElement(data.targetBufferIndex, 0, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
+			if (animateNormals)
+					vertexDeclaration->addElement(data.targetBufferIndex, sizeof(float)*3, VET_FLOAT3, VES_TEXTURE_COORDINATES, texCoord++);
 
 			hwAnimationDataList.push_back(data);
 			// Vertex buffer will not be bound yet, we expect this to be done by the
 			// caller when it becomes appropriate (e.g. through a VertexAnimationTrack)
 		}
+		
+		return supportedCount;
 	}
     //-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------

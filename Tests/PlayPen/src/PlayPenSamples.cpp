@@ -462,7 +462,7 @@ void PlayPen_testMorphAnimationWithNormals::setupContent()
 	e = mSceneMgr->createEntity("test2", morphName);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(200,0,0))->attachObject(e);
 	// test hardware morph
-	e->setMaterialName("Examples/HardwareMorphAnimation");
+	e->setMaterialName("Examples/HardwareMorphAnimationWithNormals");
 	animState = e->getAnimationState("testAnim");
 	animState->setEnabled(true);
 	animState->setWeight(1.0f);
@@ -734,7 +734,7 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	// test hardware pose
 	e = mSceneMgr->createEntity("test", newName);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
-	e->setMaterialName("Examples/HardwarePoseAnimation");
+	e->setMaterialName("Examples/HardwarePoseAnimationWithNormals");
 	animState = e->getAnimationState("poseanim");
 	animState->setEnabled(true);
 	animState->setWeight(1.0f);
