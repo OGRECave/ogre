@@ -42,9 +42,9 @@ using namespace Ogre;
 void help(void)
 {
     // Print help message
-    cout << endl << "OgreMeshUpgrader: Upgrades .mesh files to the latest version." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004" << endl << endl;
-    cout << "Usage: OgreMeshUpgrader [-e] sourcefile [destfile] " << endl;
+    cout << endl << "OgreMeshUpgrader: Upgrades or downgrades .mesh file versions." << endl;
+    cout << "Provided for OGRE by Steve Streeting 2004-2010" << endl << endl;
+    cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
 	cout << "-i             = Interactive mode, prompt for options" << endl;
 	cout << "-l lodlevels   = number of LOD levels" << endl;
 	cout << "-d loddist     = distance increment to reduce LOD" << endl;
@@ -64,6 +64,8 @@ void help(void)
 	cout << "-srcgl     = Interpret ambiguous colours as GL style" << endl;
 	cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
 	cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
+	cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
+	cout << "             Options are: 1.8, 1.7, 1.4, 1.0" << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
@@ -92,6 +94,7 @@ struct UpgradeOptions
 	bool usePercent;
 	Serializer::Endian endian;
 	bool recalcBounds;
+	MeshVersion targetVersion;
 
 };
 
@@ -131,6 +134,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 	opts.numLods = 0;
 	opts.usePercent = true;
 	opts.recalcBounds = false;
+	opts.targetVersion = MESH_VERSION_LATEST;
 
 
 	UnaryOptionList::iterator ui = unOpts.find("-e");
@@ -228,6 +232,22 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 		if (bi->second == "4")
 			opts.tangentUseParity = true;
 	}
+	
+	bi = binOpts.find("-V");
+	if (!bi->second.empty())
+	{
+		if (bi->second == "1.8")
+			opts.targetVersion = MESH_VERSION_1_8;
+		else if (bi->second == "1.7")
+			opts.targetVersion = MESH_VERSION_1_7;
+		else if (bi->second == "1.4")
+			opts.targetVersion = MESH_VERSION_1_4;
+		else if (bi->second == "1.0")
+			opts.targetVersion = MESH_VERSION_1_0;
+		else
+			logMgr->stream() << "Unrecognised target mesh version '" << bi->second << "'";			
+	}
+	
 }
 
 String describeSemantic(VertexElementSemantic sem)
@@ -938,6 +958,7 @@ int main(int numargs, char** args)
 		binOptList["-E"] = "";
 		binOptList["-td"] = "";
 		binOptList["-ts"] = "";
+		binOptList["-V"] = "";
 
 		int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
 		parseOpts(unOptList, binOptList);
@@ -1045,7 +1066,7 @@ int main(int numargs, char** args)
 		if (opts.recalcBounds)
 			recalcBounds(&mesh);
 
-		meshSerializer->exportMesh(&mesh, dest, opts.endian);
+		meshSerializer->exportMesh(&mesh, dest, opts.targetVersion, opts.endian);
     
 	}
 	catch (Exception& e)
