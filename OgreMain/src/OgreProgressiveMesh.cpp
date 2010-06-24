@@ -910,11 +910,15 @@ namespace Ogre {
         if (i == neighbor.end())
             return; // Not in neighbor list anyway
 
-        FaceList::iterator f, fend;
-        fend = face.end();
-        for(f = face.begin(); f != fend; ++f) 
+		// Always remove self from list, may temporarily become own neighbour if a face collapses
+        if (n != this)
         {
-            if((*f)->hasCommonVertex(n)) return; // Still a neighbor
+            FaceList::iterator f, fend;
+            fend = face.end();
+            for(f = face.begin(); f != fend; ++f) 
+            {
+                if((*f)->hasCommonVertex(n)) return; // Still a neighbor
+            }
         }
 
 #if OGRE_DEBUG_MODE 
