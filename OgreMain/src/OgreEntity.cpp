@@ -936,7 +936,8 @@ namespace Ogre {
 					? mHardwarePoseCount : 1, 
 					msh->getSharedVertexDataAnimationIncludesNormals());
 				
-				if (supportedCount < mHardwarePoseCount)
+				if (msh->getSharedVertexDataAnimationType() == VAT_POSE && 
+					supportedCount < mHardwarePoseCount)
 				{
 					LogManager::getSingleton().stream() <<
 					  "Vertex program assigned to Entity '" << mName << 
@@ -960,7 +961,8 @@ namespace Ogre {
 						? sub->mHardwarePoseCount : 1,
 						sub->getSubMesh()->getVertexAnimationIncludesNormals());
 
-					if (supportedCount < mHardwarePoseCount)
+					if (sub->getSubMesh()->getVertexAnimationType() == VAT_POSE && 
+						supportedCount < mHardwarePoseCount)
 					{
 						LogManager::getSingleton().stream() <<
 						"Vertex program assigned to SubEntity of '" << mName << 
