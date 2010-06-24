@@ -37,7 +37,7 @@ namespace Ogre {
 #define NORMAL_BINDING 1
 #define TEXCOORD_BINDING 2
 
-    Rectangle2D::Rectangle2D(bool includeTextureCoords) 
+	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
     {
         // use identity projection and view matrices
         mUseIdentityProjection = true;
@@ -61,7 +61,7 @@ namespace Ogre {
             HardwareBufferManager::getSingleton().createVertexBuffer(
             decl->getVertexSize(POSITION_BINDING),
             mRenderOp.vertexData->vertexCount,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            vBufUsage);
 
         // Bind buffer
         bind->setBinding(POSITION_BINDING, vbuf);
@@ -72,7 +72,7 @@ namespace Ogre {
 			HardwareBufferManager::getSingleton().createVertexBuffer(
             decl->getVertexSize(NORMAL_BINDING),
             mRenderOp.vertexData->vertexCount,
-            HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+            vBufUsage);
 
 		bind->setBinding(NORMAL_BINDING, vbuf);
 
@@ -104,7 +104,7 @@ namespace Ogre {
                 HardwareBufferManager::getSingleton().createVertexBuffer(
                 decl->getVertexSize(TEXCOORD_BINDING),
                 mRenderOp.vertexData->vertexCount,
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                vBufUsage);
 
             // Bind buffer
             bind->setBinding(TEXCOORD_BINDING, tvbuf);

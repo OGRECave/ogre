@@ -163,7 +163,6 @@ void DeferredShadingSystem::createResources(void)
 	mInstance[DSM_SHOWDSP] = compMan.addCompositor(mViewport, "DeferredShading/ShowDepthSpecular");
 	mInstance[DSM_SHOWCOLOUR] = compMan.addCompositor(mViewport, "DeferredShading/ShowColour");
 
-	mInstance[DSM_SHOWCOLOUR] = compMan.addCompositor(mViewport, "DeferredShading/ShowColour");
 	mSSAOInstance =  compMan.addCompositor(mViewport, "DeferredShading/SSAO");
 }
 
