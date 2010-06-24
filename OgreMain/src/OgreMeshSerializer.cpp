@@ -117,6 +117,11 @@ namespace Ogre {
 	void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
 									MeshVersion version, Endian endianMode)
 	{
+		if (version == MESH_VERSION_LEGACY)
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+						"You may not supply a legacy version number (pre v1.0) for writing meshes.",
+						"MeshSerializer::exportMesh");
+		
 		MeshSerializerImpl* impl = 0;
 		if (version == MESH_VERSION_LATEST)
 			impl = mVersionData[0]->impl;

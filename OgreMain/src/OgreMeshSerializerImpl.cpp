@@ -2507,6 +2507,27 @@ namespace Ogre {
 		}
 
 	}
+	//---------------------------------------------------------------------
+	void MeshSerializerImpl::readExtremes(DataStreamPtr& stream, Mesh *pMesh)
+	{
+		unsigned short idx;
+		readShorts(stream, &idx, 1);
+		
+		SubMesh *sm = pMesh->getSubMesh (idx);
+		
+		int n_floats = (mCurrentstreamLen - STREAM_OVERHEAD_SIZE -
+						sizeof (unsigned short)) / sizeof (float);
+		
+        assert ((n_floats % 3) == 0);
+		
+        float *vert = OGRE_ALLOC_T(float, n_floats, MEMCATEGORY_GEOMETRY);
+		readFloats(stream, vert, n_floats);
+		
+        for (int i = 0; i < n_floats; i += 3)
+			sm->extremityPoints.push_back(Vector3(vert [i], vert [i + 1], vert [i + 2]));
+		
+        OGRE_FREE(vert, MEMCATEGORY_GEOMETRY);
+	}
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -2697,6 +2718,127 @@ namespace Ogre {
 
 
     }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v1_4::writeLodUsageManual(const MeshLodUsage& usage)
+    {
+        // Header
+        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t manualSize = STREAM_OVERHEAD_SIZE;
+        // float fromDepthSquared;
+        size += sizeof(float);
+        // Manual part size
+		
+        // String manualMeshName;
+        manualSize += usage.manualName.length() + 1;
+		
+        size += manualSize;
+		
+        writeChunkHeader(M_MESH_LOD_USAGE, size);
+		// Main difference to later version here is that we use 'value' (squared depth)
+		// rather than 'userValue' which is just depth
+        writeFloats(&(usage.value), 1);
+		
+        writeChunkHeader(M_MESH_LOD_MANUAL, manualSize);
+        writeString(usage.manualName);
+		
+		
+    }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v1_4::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage,
+													unsigned short lodNum)
+    {
+		// Usage Header
+        size_t size = STREAM_OVERHEAD_SIZE;
+		unsigned short subidx;
+		
+        // float fromDepthSquared;
+        size += sizeof(float);
+		
+        // Calc generated SubMesh sections size
+		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
+		{
+			// header
+			size += STREAM_OVERHEAD_SIZE;
+			// unsigned int numFaces;
+			size += sizeof(unsigned int);
+			SubMesh* sm = pMesh->getSubMesh(subidx);
+            const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
+			
+            // bool indexes32Bit
+			size += sizeof(bool);
+			// unsigned short*/int* faceIndexes;
+            if (!indexData->indexBuffer.isNull() &&
+				indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
+            {
+			    size += static_cast<unsigned long>(
+												   sizeof(unsigned int) * indexData->indexCount);
+            }
+            else
+            {
+			    size += static_cast<unsigned long>(
+												   sizeof(unsigned short) * indexData->indexCount);
+            }
+			
+		}
+		
+        writeChunkHeader(M_MESH_LOD_USAGE, size);
+		// Main difference to later version here is that we use 'value' (squared depth)
+		// rather than 'userValue' which is just depth
+        writeFloats(&(usage.value), 1);
+		
+		// Now write sections
+        // Calc generated SubMesh sections size
+		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
+		{
+			size = STREAM_OVERHEAD_SIZE;
+			// unsigned int numFaces;
+			size += sizeof(unsigned int);
+			SubMesh* sm = pMesh->getSubMesh(subidx);
+            const IndexData* indexData = sm->mLodFaceList[lodNum - 1];
+            // bool indexes32Bit
+			size += sizeof(bool);
+			// Lock index buffer to write
+			HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
+			// bool indexes32bit
+			bool idx32 = (!ibuf.isNull() && ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
+			// unsigned short*/int* faceIndexes;
+            if (idx32)
+            {
+			    size += static_cast<unsigned long>(
+												   sizeof(unsigned int) * indexData->indexCount);
+            }
+            else
+            {
+			    size += static_cast<unsigned long>(
+												   sizeof(unsigned short) * indexData->indexCount);
+            }
+			
+			writeChunkHeader(M_MESH_LOD_GENERATED, size);
+			unsigned int idxCount = static_cast<unsigned int>(indexData->indexCount);
+			writeInts(&idxCount, 1);
+			writeBools(&idx32, 1);
+			
+			if (idxCount > 0)
+			{
+				if (idx32)
+				{
+					unsigned int* pIdx = static_cast<unsigned int*>(
+																	ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeInts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+				else
+				{
+					unsigned short* pIdx = static_cast<unsigned short*>(
+																		ibuf->lock(HardwareBuffer::HBL_READ_ONLY));
+					writeShorts(pIdx, indexData->indexCount);
+					ibuf->unlock();
+				}
+			}
+		}
+		
+		
+    }	
     //---------------------------------------------------------------------
     void MeshSerializerImpl_v1_4::readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh)
     {
@@ -2986,26 +3128,98 @@ namespace Ogre {
             }
         }
     }
-	//---------------------------------------------------------------------
-	void MeshSerializerImpl::readExtremes(DataStreamPtr& stream, Mesh *pMesh)
+    //---------------------------------------------------------------------
+	void MeshSerializerImpl_v1_3::writeEdgeList(const Mesh* pMesh)
 	{
-		unsigned short idx;
-		readShorts(stream, &idx, 1);
-
-		SubMesh *sm = pMesh->getSubMesh (idx);
-
-		int n_floats = (mCurrentstreamLen - STREAM_OVERHEAD_SIZE -
-						sizeof (unsigned short)) / sizeof (float);
-
-        assert ((n_floats % 3) == 0);
-
-        float *vert = OGRE_ALLOC_T(float, n_floats, MEMCATEGORY_GEOMETRY);
-		readFloats(stream, vert, n_floats);
-
-        for (int i = 0; i < n_floats; i += 3)
-			sm->extremityPoints.push_back(Vector3(vert [i], vert [i + 1], vert [i + 2]));
-
-        OGRE_FREE(vert, MEMCATEGORY_GEOMETRY);
+        writeChunkHeader(M_EDGE_LISTS, calcEdgeListSize(pMesh));
+		
+        for (ushort i = 0; i < pMesh->getNumLodLevels(); ++i)
+        {
+            const EdgeData* edgeData = pMesh->getEdgeList(i);
+            bool isManual = pMesh->isLodManual() && (i > 0);
+            writeChunkHeader(M_EDGE_LIST_LOD, calcEdgeListLodSize(edgeData, isManual));
+			
+            // unsigned short lodIndex
+            writeShorts(&i, 1);
+			
+            // bool isManual			// If manual, no edge data here, loaded from manual mesh
+            writeBools(&isManual, 1);
+            if (!isManual)
+            {
+                // unsigned long  numTriangles
+                uint32 count = static_cast<uint32>(edgeData->triangles.size());
+                writeInts(&count, 1);
+                // unsigned long numEdgeGroups
+                count = static_cast<uint32>(edgeData->edgeGroups.size());
+                writeInts(&count, 1);
+                // Triangle* triangleList
+                // Iterate rather than writing en-masse to allow endian conversion
+                EdgeData::TriangleList::const_iterator t = edgeData->triangles.begin();
+                EdgeData::TriangleFaceNormalList::const_iterator fni = edgeData->triangleFaceNormals.begin();
+                for ( ; t != edgeData->triangles.end(); ++t, ++fni)
+                {
+                    const EdgeData::Triangle& tri = *t;
+                    // unsigned long indexSet;
+                    uint32 tmp[3];
+                    tmp[0] = tri.indexSet;
+                    writeInts(tmp, 1);
+                    // unsigned long vertexSet;
+                    tmp[0] = tri.vertexSet;
+                    writeInts(tmp, 1);
+                    // unsigned long vertIndex[3];
+                    tmp[0] = tri.vertIndex[0];
+                    tmp[1] = tri.vertIndex[1];
+                    tmp[2] = tri.vertIndex[2];
+                    writeInts(tmp, 3);
+                    // unsigned long sharedVertIndex[3];
+                    tmp[0] = tri.sharedVertIndex[0];
+                    tmp[1] = tri.sharedVertIndex[1];
+                    tmp[2] = tri.sharedVertIndex[2];
+                    writeInts(tmp, 3);
+                    // float normal[4];
+                    writeFloats(&(fni->x), 4);
+					
+                }
+                // Write the groups
+                for (EdgeData::EdgeGroupList::const_iterator gi = edgeData->edgeGroups.begin();
+					 gi != edgeData->edgeGroups.end(); ++gi)
+                {
+                    const EdgeData::EdgeGroup& edgeGroup = *gi;
+                    writeChunkHeader(M_EDGE_GROUP, calcEdgeGroupSize(edgeGroup));
+                    // unsigned long vertexSet
+                    uint32 vertexSet = static_cast<uint32>(edgeGroup.vertexSet);
+                    writeInts(&vertexSet, 1);
+                    // unsigned long numEdges
+                    count = static_cast<uint32>(edgeGroup.edges.size());
+                    writeInts(&count, 1);
+                    // Edge* edgeList
+                    // Iterate rather than writing en-masse to allow endian conversion
+                    for (EdgeData::EdgeList::const_iterator ei = edgeGroup.edges.begin();
+						 ei != edgeGroup.edges.end(); ++ei)
+                    {
+                        const EdgeData::Edge& edge = *ei;
+                        uint32 tmp[2];
+                        // unsigned long  triIndex[2]
+                        tmp[0] = edge.triIndex[0];
+                        tmp[1] = edge.triIndex[1];
+                        writeInts(tmp, 2);
+                        // unsigned long  vertIndex[2]
+                        tmp[0] = edge.vertIndex[0];
+                        tmp[1] = edge.vertIndex[1];
+                        writeInts(tmp, 2);
+                        // unsigned long  sharedVertIndex[2]
+                        tmp[0] = edge.sharedVertIndex[0];
+                        tmp[1] = edge.sharedVertIndex[1];
+                        writeInts(tmp, 2);
+                        // bool degenerate
+                        writeBools(&(edge.degenerate), 1);
+                    }
+					
+                }
+				
+            }
+			
+        }
 	}
 	//---------------------------------------------------------------------
     //---------------------------------------------------------------------

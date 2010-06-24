@@ -208,6 +208,10 @@ namespace Ogre {
         ~MeshSerializerImpl_v1_4();
     protected:
         virtual void writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy);
+		virtual void writeLodUsageManual(const MeshLodUsage& usage);
+		virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage,
+									unsigned short lodNum);
+
         virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
     };
 
@@ -224,6 +228,8 @@ namespace Ogre {
 
         /// Reorganise triangles of the edge list to group by vertex set
         virtual void reorganiseTriangles(EdgeData* edgeData);
+		
+		virtual void writeEdgeList(const Mesh* pMesh);
     };
 
     /** Class for providing backwards-compatibility for loading version 1.2 of the .mesh format. 
