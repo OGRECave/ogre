@@ -35,49 +35,52 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreSkeleton.h"
 
+
 namespace Ogre {
 
-    String MeshSerializer::msCurrentVersion = "[MeshSerializer_v1.8]";
     const unsigned short HEADER_CHUNK_ID = 0x1000;
     //---------------------------------------------------------------------
     MeshSerializer::MeshSerializer()
 		:mListener(0)
     {
-        // Set up map
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type("[MeshSerializer_v1.10]", 
-            OGRE_NEW MeshSerializerImpl_v1_1() ) );
+		// Init implementations
+		// String identifiers have not always been 100% unified with OGRE version
+		
+		// Note MUST be added in reverse order so latest is first in the list
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_1_8, "[MeshSerializer_v1.8]", 
+			OGRE_NEW MeshSerializerImpl()));
 
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type("[MeshSerializer_v1.20]", 
-            OGRE_NEW MeshSerializerImpl_v1_2() ) );
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_1_7, "[MeshSerializer_v1.41]", 
+			OGRE_NEW MeshSerializerImpl_v1_41()));
 
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type("[MeshSerializer_v1.30]", 
-            OGRE_NEW MeshSerializerImpl_v1_3() ) );
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_1_4, "[MeshSerializer_v1.40]", 
+			OGRE_NEW MeshSerializerImpl_v1_4()));
 
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type("[MeshSerializer_v1.40]", 
-            OGRE_NEW MeshSerializerImpl_v1_4() ) );
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_1_0, "[MeshSerializer_v1.30]", 
+			OGRE_NEW MeshSerializerImpl_v1_3()));
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_LEGACY, "[MeshSerializer_v1.20]", 
+			OGRE_NEW MeshSerializerImpl_v1_2()));
 
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type("[MeshSerializer_v1.41]", 
-            OGRE_NEW MeshSerializerImpl_v1_41() ) );
-
-        mImplementations.insert(
-            MeshSerializerImplMap::value_type(msCurrentVersion, 
-            OGRE_NEW MeshSerializerImpl() ) );
+		mVersionData.push_back(OGRE_NEW MeshVersionData(
+			MESH_VERSION_LEGACY, "[MeshSerializer_v1.10]", 
+			OGRE_NEW MeshSerializerImpl_v1_1()));
+		
     }
     //---------------------------------------------------------------------
     MeshSerializer::~MeshSerializer()
     {
         // delete map
-        for (MeshSerializerImplMap::iterator i = mImplementations.begin();
-            i != mImplementations.end(); ++i)
+        for (MeshVersionDataList::iterator i = mVersionData.begin();
+            i != mVersionData.end(); ++i)
         {
-            OGRE_DELETE i->second;
+            OGRE_DELETE *i;
         }
-        mImplementations.clear();
+        mVersionData.clear();
 
     }
     //---------------------------------------------------------------------
@@ -92,18 +95,50 @@ namespace Ogre {
 
 		stream->close();
     }
+    //---------------------------------------------------------------------
+    void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
+									MeshVersion version, Endian endianMode)
+    {
+		std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
+		f->open(filename.c_str(), std::ios::binary | std::ios::out);
+		DataStreamPtr stream(OGRE_NEW FileStreamDataStream(f));
+		
+        exportMesh(pMesh, stream, version, endianMode);
+		
+		stream->close();
+    }
 	//---------------------------------------------------------------------
 	void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
 		Endian endianMode)
 	{
-		MeshSerializerImplMap::iterator impl = mImplementations.find(msCurrentVersion);
-		if (impl == mImplementations.end())
+		exportMesh(pMesh, stream, MESH_VERSION_LATEST, endianMode);
+	}
+	//---------------------------------------------------------------------
+	void MeshSerializer::exportMesh(const Mesh* pMesh, DataStreamPtr stream,
+									MeshVersion version, Endian endianMode)
+	{
+		MeshSerializerImpl* impl = 0;
+		if (version == MESH_VERSION_LATEST)
+			impl = mVersionData[0]->impl;
+		else 
 		{
-			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot find serializer implementation for "
-				"current version " + msCurrentVersion, "MeshSerializer::exportMesh");
+			for (MeshVersionDataList::iterator i = mVersionData.begin(); 
+				 i != mVersionData.end(); ++i)
+			{
+				if (version == (*i)->version)
+				{
+					impl = (*i)->impl;
+					break;
+				}
+			}
 		}
+		
+		if (!impl)
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot find serializer implementation for "
+					"specified version", "MeshSerializer::exportMesh");
 
-		impl->second->exportMesh(pMesh, stream, endianMode);
+					
+		impl->exportMesh(pMesh, stream, endianMode);
 	}
     //---------------------------------------------------------------------
     void MeshSerializer::importMesh(DataStreamPtr& stream, Mesh* pDest)
@@ -127,17 +162,24 @@ namespace Ogre {
         stream->seek(0);
 
         // Find the implementation to use
-        MeshSerializerImplMap::iterator impl = mImplementations.find(ver);
-        if (impl == mImplementations.end())
-        {
+		MeshSerializerImpl* impl = 0;
+		for (MeshVersionDataList::iterator i = mVersionData.begin(); 
+			 i != mVersionData.end(); ++i)
+		{
+			if ((*i)->versionString == ver)
+			{
+				impl = (*i)->impl;
+				break;
+			}
+		}			
+		if (!impl)
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Cannot find serializer implementation for "
-                "current version " + ver, "MeshSerializer::importMesh");
-        }
-
+						"mesh version " + ver, "MeshSerializer::importMesh");
+		
         // Call implementation
-        impl->second->importMesh(stream, pDest, mListener);
+        impl->importMesh(stream, pDest, mListener);
         // Warn on old version of mesh
-        if (ver != msCurrentVersion)
+        if (ver != mVersionData[0]->versionString)
         {
             LogManager::getSingleton().logMessage("WARNING: " + pDest->getName() + 
                 " is an older format (" + ver + "); you should upgrade it as soon as possible" +

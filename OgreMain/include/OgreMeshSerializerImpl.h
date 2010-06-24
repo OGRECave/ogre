@@ -53,6 +53,10 @@ namespace Ogre {
     In order to maintain compatibility with older versions of the .mesh format, there
     will be alternative subclasses of this class to load older versions, whilst this class
     will remain to load the latest version.
+
+	 @note
+		This mesh format was used from Ogre v1.8.
+
     */
     class _OgrePrivate MeshSerializerImpl : public Serializer
     {
@@ -176,7 +180,9 @@ namespace Ogre {
 
     };
 
-    /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. */
+    /** Class for providing backwards-compatibility for loading version 1.41 of the .mesh format. 
+	 This mesh format was used from Ogre v1.7.
+	 */
     class _OgrePrivate MeshSerializerImpl_v1_41 : public MeshSerializerImpl
     {
     public:
@@ -192,7 +198,9 @@ namespace Ogre {
 		size_t calcPoseVertexSize(void);
     };
 
-    /** Class for providing backwards-compatibility for loading version 1.4 of the .mesh format. */
+    /** Class for providing backwards-compatibility for loading version 1.4 of the .mesh format. 
+	 This mesh format was used from Ogre v1.4.
+	 */
     class _OgrePrivate MeshSerializerImpl_v1_4 : public MeshSerializerImpl_v1_41
     {
     public:
@@ -203,7 +211,9 @@ namespace Ogre {
         virtual void readMeshLodInfo(DataStreamPtr& stream, Mesh* pMesh);
     };
 
-    /** Class for providing backwards-compatibility for loading version 1.3 of the .mesh format. */
+    /** Class for providing backwards-compatibility for loading version 1.3 of the .mesh format. 
+	 This mesh format was used from Ogre v1.0 (and some pre-releases)
+	 */
     class _OgrePrivate MeshSerializerImpl_v1_3 : public MeshSerializerImpl_v1_4
     {
     public:
@@ -216,7 +226,9 @@ namespace Ogre {
         virtual void reorganiseTriangles(EdgeData* edgeData);
     };
 
-    /** Class for providing backwards-compatibility for loading version 1.2 of the .mesh format. */
+    /** Class for providing backwards-compatibility for loading version 1.2 of the .mesh format. 
+	 This is a LEGACY FORMAT that pre-dates version Ogre 1.0
+	 */
     class _OgrePrivate MeshSerializerImpl_v1_2 : public MeshSerializerImpl_v1_3
     {
     public:
@@ -235,7 +247,9 @@ namespace Ogre {
             Mesh* pMesh, VertexData* dest, unsigned short set);
     };
 
-    /** Class for providing backwards-compatibility for loading version 1.1 of the .mesh format. */
+    /** Class for providing backwards-compatibility for loading version 1.1 of the .mesh format. 
+	 This is a LEGACY FORMAT that pre-dates version Ogre 1.0
+	 */
     class _OgrePrivate MeshSerializerImpl_v1_1 : public MeshSerializerImpl_v1_2
     {
     public:
