@@ -1856,6 +1856,34 @@ namespace Ogre
 		mLastVertexSourceCount = binds.size();		
 	}
 
+	//---------------------------------------------------------------------
+	// TODO: Move this class to the right place.
+	class D3D11RenderOperationState : public Renderable::RenderSystemData
+	{
+	public:
+		ID3D11BlendState * mBlendState;
+		ID3D11RasterizerState * mRasterizer;
+		ID3D11DepthStencilState * mDepthStencilState;
+
+		ID3D11SamplerState * mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
+		size_t mSamplerStatesCount;
+
+		ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
+		size_t mTexturesCount;
+
+		~D3D11RenderOperationState()
+		{
+			SAFE_RELEASE( mBlendState );
+			SAFE_RELEASE( mRasterizer );
+			SAFE_RELEASE( mDepthStencilState );
+
+			for (size_t i = 0 ; i < mSamplerStatesCount ; i++)
+			{
+				SAFE_RELEASE( mSamplerStates[i] );
+			}
+		}
+	};
+
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render(const RenderOperation& op)
 	{
@@ -1868,34 +1896,6 @@ namespace Ogre
 		// Call super class
 		RenderSystem::_render(op);
 		
-		// TODO: Move this class to the right place.
-		class D3D11RenderOperationState : public Renderable::RenderSystemData
-		{
-		public:
-			ID3D11BlendState * mBlendState;
-			ID3D11RasterizerState * mRasterizer;
-			ID3D11DepthStencilState * mDepthStencilState;
-
-			ID3D11SamplerState * mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
-			size_t mSamplerStatesCount;
-
-			ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
-			size_t mTexturesCount;
-
-			~D3D11RenderOperationState()
-			{
-				SAFE_RELEASE( mBlendState );
-				SAFE_RELEASE( mRasterizer );
-				SAFE_RELEASE( mDepthStencilState );
-
-				for (size_t i = 0 ; i < mSamplerStatesCount ; i++)
-				{
-					SAFE_RELEASE( mSamplerStates[i] );
-				}
-
-			}
-		};
-
 		D3D11RenderOperationState * opState = NULL;
 
 		if(!opState)
@@ -2012,7 +2012,7 @@ namespace Ogre
 		if (opState->mSamplerStatesCount > 0 ) //  if the NumSamplers is 0, the operation effectively does nothing.
 		{
 			// Assaf: seem I have better performance without this check... TODO - remove?
-		//	if ((mBoundSamplerStatesCount != opState->mSamplerStatesCount) || ( 0 != memcmp(opState->mSamplerStates, mBoundSamplerStates, mBoundSamplerStatesCount) ) )
+		//	// if ((mBoundSamplerStatesCount != opState->mSamplerStatesCount) || ( 0 != memcmp(opState->mSamplerStates, mBoundSamplerStates, mBoundSamplerStatesCount) ) )
 			{
 				//mBoundSamplerStatesCount = opState->mSamplerStatesCount;
 				//memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
@@ -2045,7 +2045,6 @@ namespace Ogre
 				"D3D11RenderSystem::_render");
 		}
 
-		mDevice.GetImmediateContext()->GSSetShader( NULL, NULL, 0 );
 		if (mDevice.isError())
 		{
 			// this will never happen but we want to be consistent with the error checks... 
@@ -2062,6 +2061,7 @@ namespace Ogre
 		// Determine rendering operation
 		D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		DWORD primCount = 0;
+		bool useAdjacency = (mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired());
 		switch( op.operationType )
 		{
 		case RenderOperation::OT_POINT_LIST:
@@ -2070,36 +2070,34 @@ namespace Ogre
 			break;
 
 		case RenderOperation::OT_LINE_LIST:
-			primType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+			primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 			primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
 			break;
 
 		case RenderOperation::OT_LINE_STRIP:
-			primType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 			primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
 			break;
 
 		case RenderOperation::OT_TRIANGLE_LIST:
-			primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 			primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
 			break;
 
 		case RenderOperation::OT_TRIANGLE_STRIP:
-			primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+			primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 			primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
 			break;
 
 		case RenderOperation::OT_TRIANGLE_FAN:
-			primType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED; // todo - no TRIANGLE_FAN in DX 10
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)", "D3D11RenderSystem::_render");
-
+			primType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED; // todo - no TRIANGLE_FAN in DX 11
 			primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
 			break;
 		}
 
 		if (primCount)
 		{
-
 			// Issue the op
 			//HRESULT hr;
 			if( op.useIndexes  )
@@ -2238,9 +2236,9 @@ namespace Ogre
 		case GPT_GEOMETRY_PROGRAM:
 			{
 				mBoundGeometryProgram = static_cast<D3D11HLSLProgram*>(prg);
-				ID3D11GeometryShader* psShaderToSet = mBoundFragmentProgram->getGeometryShader();
+				ID3D11GeometryShader* gsShaderToSet = mBoundGeometryProgram->getGeometryShader();
 
-				mDevice.GetImmediateContext()->GSSetShader(psShaderToSet, NULL, 0);
+				mDevice.GetImmediateContext()->GSSetShader(gsShaderToSet, NULL, 0);
 				if (mDevice.isError())
 				{
 					String errorDescription = mDevice.getErrorDescription();
@@ -2280,8 +2278,11 @@ namespace Ogre
 			{
 				mActiveGeometryGpuProgramParameters.setNull();
 				mBoundGeometryProgram = NULL;
-
-			}
+				mDevice.GetImmediateContext()->GSSetShader( NULL, NULL, 0 );
+ 			}
+			break;
+		default:
+			assert(false && "Undefined Program Type!");
 		};
 		RenderSystem::unbindGpuProgram(gptype);
     }

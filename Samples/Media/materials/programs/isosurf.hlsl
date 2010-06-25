@@ -1,39 +1,30 @@
-// Ogre port of Nvidia's IsoSurf.cg file
-// Modified code follows. See http://developer.download.nvidia.com/SDK/10/opengl/samples.html for original
-//
-// Cg port of Yury Uralsky's metaball FX shader
-//
-// Authors: Simon Green and Yury Urlasky
-// Email: sdkfeedback@nvidia.com
-//
-// Copyright (c) NVIDIA Corporation. All rights reserved.
-////////////////////////////////////////////////////////////////////////////////////////////////////
+cbuffer cBuffer0
+{       
+    float4x4 WorldViewProj;
+    float4x4 origWorldViewIT;
+	float4 Metaballs[2];
+	float IsoValue = 1.0;
+
+}
 
 struct SampleData
 {
-	float4 Pos   : POSITION;
+	float4 Pos   : SV_Position;
 	float3 N     : TEXCOORD0;
 	float2 Field : TEXCOORD1;
-	float4 Color : COLOR0;
 };
 
 struct SurfaceVertex
 {
-	float4 Pos	: POSITION;
+	float4 Pos	: SV_Position;
 	float3 N	: TEXCOORD0;
 };
 
-uniform int Num_Metaballs = 2;
-uniform float4 Metaballs[] = {
-	{ -0.5, 0, 0, 0.2 },
-	{ 0.6, 0, 0, 0.4 },
-};
+static const int Num_Metaballs = 2;
 
 // Size of the sampling grid
-uniform int3 SizeMask = { 63, 63, 63 };
-uniform int3 SizeShift = { 0, 6, 12 };
-
-uniform float IsoValue = 1.0;
+static const int3 SizeMask = { 63, 63, 63 };
+static const int3 SizeShift = { 0, 6, 12 };
 
 // Metaball function
 // Returns metaball function value in .w and its gradient in .xyz
@@ -52,9 +43,7 @@ float4 Metaball(float3 Pos, float3 Center, float RadiusSq)
 }
 
 // Vertex shader
-SampleData mainVS(float4 pos : POSITION,
-						uniform float4x4 WorldViewProj,
-						uniform float4x4 origWorldViewIT)
+SampleData mainVS(float4 pos : POSITION)
 {
 	SampleData o;
 	
@@ -75,11 +64,9 @@ SampleData mainVS(float4 pos : POSITION,
 	// Generate in-out flags
 	o.Field.y = (Field.w < IsoValue) ? 1 : 0;
 
-	o.Color = (Field*0.5+0.5) * (Field.w / 10.0);
+//	o.Color = (Field*0.5+0.5) * (Field.w / 10.0);
 	return o;
 }
-
-
 
 // Estimate where isosurface intersects grid edge with endpoints v0, v1
 void CalcIntersection(float4 Pos0,
@@ -87,8 +74,11 @@ void CalcIntersection(float4 Pos0,
 					  float2 Field0,
 					  float4 Pos1,
 					  float3 N1,
-					  float2 Field1)
+					  float2 Field1,
+					  inout TriangleStream<SurfaceVertex> OutputStream
+					  )
 {
+	SurfaceVertex outputVertex;
 	float t = (IsoValue - Field0.x) / (Field1.x - Field0.x);
 	if ((Field0.x < IsoValue) && (Field1.x > Field0.x))
 	{
@@ -96,7 +86,9 @@ void CalcIntersection(float4 Pos0,
 		{
 			float4 Pos = lerp(Pos0, Pos1, t);
 			float3 N = lerp(N0, N1, t);
-			emitVertex(Pos : POSITION, N : TEXCOORD0);
+			outputVertex.Pos = Pos;
+			outputVertex.N = N;
+			OutputStream.Append(outputVertex);
 		}
 	}
 }
@@ -104,20 +96,18 @@ void CalcIntersection(float4 Pos0,
 // Geometry shader
 // input: line with adjacency (tetrahedron)
 // outputs: zero, one or two triangles depending if isosurface intersects tetrahedron
-LINE_ADJ
-TRIANGLE_OUT
-void mainGS(
-	AttribArray<float4> Pos : POSITION,
-	AttribArray<float3> N : TEXCOORD0,
-	AttribArray<float2> Field : TEXCOORD1
-	)
+
+
+[maxvertexcount(4)]
+void mainGS(lineadj SampleData input[4], inout TriangleStream<SurfaceVertex> OutputStream)
 {
 	// construct index for this tetrahedron
-	unsigned int index = (int(Field[0].y) << 3) |
-				(int(Field[1].y) << 2) |
-				(int(Field[2].y) << 1) |
-				 int(Field[3].y);
-	
+	unsigned int index = (int(input[0].Field.y) << 3) |
+				(int(input[1].Field.y) << 2) |
+				(int(input[2].Field.y) << 1) |
+				 int(input[3].Field.y);
+
+
 	// don't bother if all vertices out or all vertices inside isosurface
 	if (index > 0 && index < 15)
 	{
@@ -131,22 +121,22 @@ void mainGS(
 		int4 e0 = int4((edgeVal >> 14) & 0x3, (edgeVal >> 12) & 0x3, (edgeVal >> 10) & 0x3, (edgeVal >> 8) & 0x3);
 		int4 e1 = int4((edgeVal >> 6) & 0x3, (edgeVal >> 4) & 0x3, (edgeVal >> 2) & 0x3, (edgeVal >> 0) & 0x3);
 		
-		CalcIntersection(Pos[e0.x], N[e0.x], Field[e0.x], Pos[e0.y], N[e0.y], Field[e0.y]);
-		CalcIntersection(Pos[e0.z], N[e0.z], Field[e0.z], Pos[e0.w], N[e0.w], Field[e0.w]);
-		CalcIntersection(Pos[e1.x], N[e1.x], Field[e1.x], Pos[e1.y], N[e1.y], Field[e1.y]);
+		CalcIntersection(input[e0.x].Pos, input[e0.x].N, input[e0.x].Field, input[e0.y].Pos, input[e0.y].N, input[e0.y].Field, OutputStream);
+		CalcIntersection(input[e0.z].Pos, input[e0.z].N, input[e0.z].Field, input[e0.w].Pos, input[e0.w].N, input[e0.w].Field, OutputStream);
+		CalcIntersection(input[e1.x].Pos, input[e1.x].N, input[e1.x].Field, input[e1.y].Pos, input[e1.y].N, input[e1.y].Field, OutputStream);
 
 		// Emit additional triangle, if necessary
 		if (e1.z != -1) {
-			CalcIntersection(Pos[e1.z], N[e1.z], Field[e1.z], Pos[e1.w], N[e1.w], Field[e1.w]);
+			CalcIntersection(input[e1.z].Pos, input[e1.z].N, input[e1.z].Field, input[e1.w].Pos, input[e1.w].N, input[e1.w].Field, OutputStream);
 		}
 	}
 }
 
 // Pixel shader
-float4 mainPS(float3 N : TEXCOORD0) : COLOR
+float4 mainPS(SurfaceVertex surfaceVertex) : SV_TARGET
 {
 	//Sanitize input
-	N = normalize(N);
+	float3 N = normalize(surfaceVertex.N);
 	float3 L = float3(0, 0, 1);
 	//return float4(N*0.5+0.5, 1);
 	float3 materials[2] = { float3(1, 1, 1), float3(0, 0, 0.5)};

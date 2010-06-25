@@ -2978,7 +2978,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		// Find the correct type to render
 		GLint primType;
 		//Use adjacency if there is a geometry program and it requested adjacency info
-		bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryProgram->isAdjacencyInfoRequired());
+		bool useAdjacency = (mGeometryProgramBound && mCurrentGeometryProgram && mCurrentGeometryProgram->isAdjacencyInfoRequired());
 		switch (op.operationType)
 		{
 		case RenderOperation::OT_POINT_LIST:

@@ -374,7 +374,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::buildConstantDefinitions() const
 	{
-
 		createParameterMappingStructures(true);
 
 		if (mShaderReflectionConstantBuffer)
@@ -397,12 +396,8 @@ namespace Ogre {
 					// Recursively descend through the structure levels
 					processParamElement( "", shaderVerDesc.Name, i, varRefType);
 
-
 				}
-
-
 			}
-
 		}
 	}
 	//-----------------------------------------------------------------------
