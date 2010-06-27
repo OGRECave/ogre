@@ -87,6 +87,7 @@ namespace Ogre {
 		  mInitialised(false),
 		  mLastParentXform(Matrix4::ZERO),
 		  mMeshStateCount(0),
+		  mCurrentHWAnimationState(false),
           mFullBoundingBox()
     {
     }
@@ -123,6 +124,7 @@ namespace Ogre {
 		mInitialised(false),
 		mLastParentXform(Matrix4::ZERO),
 		mMeshStateCount(0),
+		mCurrentHWAnimationState(false),
         mFullBoundingBox()
 	{
 		_initialise();
@@ -738,6 +740,7 @@ namespace Ogre {
 
 		Root& root = Root::getSingleton();
 		bool hwAnimation = isHardwareAnimationEnabled();
+		bool isNeedUpdateHardwareAnim = hwAnimation && !mCurrentHWAnimationState;
 		bool forcedSwAnimation = getSoftwareAnimationRequests()>0;
 		bool forcedNormals = getSoftwareAnimationNormalsRequests()>0;
 		bool stencilShadows = false;
@@ -751,6 +754,9 @@ namespace Ogre {
         bool animationDirty =
             (mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
             (hasSkeleton() && getSkeleton()->getManualBonesDirty());
+		
+		//update the current hardware animation state
+		mCurrentHWAnimationState = hwAnimation;
 
 		// We only do these tasks if animation is dirty
 		// Or, if we're using a skeleton and manual bones have been moved
@@ -863,8 +869,9 @@ namespace Ogre {
 
         // Need to update the child object's transforms when animation dirty
         // or parent node transform has altered.
-        if (hasSkeleton() &&
-            (animationDirty || mLastParentXform != _getParentNodeFullTransform()))
+		if (hasSkeleton() && 
+            (isNeedUpdateHardwareAnim || 
+			animationDirty || mLastParentXform != _getParentNodeFullTransform()))
         {
             // Cache last parent transform for next frame use too.
             mLastParentXform = _getParentNodeFullTransform();

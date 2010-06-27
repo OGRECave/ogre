@@ -203,6 +203,9 @@ namespace Ogre {
 		*/
 		SchemeHardwareAnimMap mSchemeHardwareAnim;
 
+		/// Current state of the hardware animation as represented by the entities parameters
+		bool mCurrentHWAnimationState;
+
 		/// Number of hardware poses supported by materials
 		ushort mHardwarePoseCount;
 		/// Flag indicating whether we have a vertex program in use on any of our subentities
