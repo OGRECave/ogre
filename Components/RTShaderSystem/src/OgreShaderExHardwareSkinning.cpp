@@ -43,7 +43,8 @@ HardwareSkinning::HardwareSkinning() :
 	mBoneCount(0),
 	mWeightCount(0),
 	mAllowStateChange(false),
-	mDoBoneCalculations(false)
+	mDoBoneCalculations(false),
+	mCreator(NULL)
 {
 }
 
@@ -88,6 +89,22 @@ bool HardwareSkinning::preAddToRenderState(RenderState* renderState, Pass* srcPa
 		((mAllowStateChange == true) ||
 		((srcPass->hasVertexProgram() == true) &&
 		(srcPass->getVertexProgram()->isSkeletalAnimationIncluded() == true)));
+
+	if ((mDoBoneCalculations) && (mCreator))
+	{
+		//update the receiver and caster materials
+		if (dstPass->getParent()->getShadowCasterMaterial().isNull())
+		{
+			dstPass->getParent()->setShadowCasterMaterial(
+				mCreator->getCustomShadowCasterMaterial(mWeightCount - 1));
+		}
+
+		if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
+		{
+			dstPass->getParent()->setShadowReceiverMaterial(
+				mCreator->getCustomShadowReceiverMaterial(mWeightCount - 1));
+		}
+	}
 
 	return true;
 }
@@ -399,6 +416,7 @@ void HardwareSkinning::copyFrom(const SubRenderState& rhs)
 	mBoneCount = hardSkin.mBoneCount;
 	mAllowStateChange = hardSkin.mAllowStateChange;
 	mDoBoneCalculations = hardSkin.mDoBoneCalculations;
+	mCreator = hardSkin.mCreator;
 }
 
 //-----------------------------------------------------------------------
@@ -466,7 +484,43 @@ void HardwareSkinningFactory::writeInstance(MaterialSerializer* ser, SubRenderSt
 //-----------------------------------------------------------------------
 SubRenderState*	HardwareSkinningFactory::createInstanceImpl()
 {
-	return OGRE_NEW HardwareSkinning;
+	HardwareSkinning* pSkin = OGRE_NEW HardwareSkinning;
+	pSkin->_setCreator(this);
+	return pSkin;
+}
+
+//-----------------------------------------------------------------------
+void HardwareSkinningFactory::setCustomShadowCasterMaterials(const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
+											const MaterialPtr& caster3Weight, const MaterialPtr& caster4Weight)
+{
+	mCustomShadowCasterMaterials[0] = caster1Weight;
+	mCustomShadowCasterMaterials[1] = caster2Weight;
+	mCustomShadowCasterMaterials[2] = caster3Weight;
+	mCustomShadowCasterMaterials[3] = caster4Weight;
+}
+
+//-----------------------------------------------------------------------
+void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
+											  const MaterialPtr& receiver3Weight, const MaterialPtr& receiver4Weight)
+{
+	mCustomShadowReceiverMaterials[0] = receiver1Weight;
+	mCustomShadowReceiverMaterials[1] = receiver2Weight;
+	mCustomShadowReceiverMaterials[2] = receiver3Weight;
+	mCustomShadowReceiverMaterials[3] = receiver4Weight;
+}
+
+//-----------------------------------------------------------------------
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowCasterMaterial(ushort index) const
+{
+	assert(index < HS_MAX_WEIGHT_COUNT);
+	return mCustomShadowCasterMaterials[index];
+}
+
+//-----------------------------------------------------------------------
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(ushort index) const
+{
+	assert(index < HS_MAX_WEIGHT_COUNT);
+	return mCustomShadowReceiverMaterials[index];
 }
 
 

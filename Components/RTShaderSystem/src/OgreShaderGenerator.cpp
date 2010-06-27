@@ -352,6 +352,43 @@ void ShaderGenerator::addSubRenderStateFactory(SubRenderStateFactory* factory)
 }
 
 //-----------------------------------------------------------------------------
+size_t ShaderGenerator::getNumSubRenderStateFactories() const
+{
+	return mSubRenderStateFactories.size();
+}
+
+
+//-----------------------------------------------------------------------------
+SubRenderStateFactory*  ShaderGenerator::getSubRenderStateFactory(size_t index)
+{
+	{
+		OGRE_LOCK_AUTO_MUTEX
+
+		SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.begin();
+		for(; index != 0 && itFind != mSubRenderStateFactories.end(); --index , ++itFind);
+
+		if (itFind != mSubRenderStateFactories.end())
+		{
+			return itFind->second;
+		}
+	}
+
+	OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM,
+		"A factory on index " + StringConverter::toString(index) + " does not exist.",
+		"ShaderGenerator::addSubRenderStateFactory");
+		
+	return NULL;
+}
+//-----------------------------------------------------------------------------
+SubRenderStateFactory* ShaderGenerator::getSubRenderStateFactory(const String& type)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	SubRenderStateFactoryIterator itFind = mSubRenderStateFactories.find(type);
+	return (itFind != mSubRenderStateFactories.end()) ? itFind->second : NULL;
+}
+
+//-----------------------------------------------------------------------------
 void ShaderGenerator::removeSubRenderStateFactory(SubRenderStateFactory* factory)
 {
 	OGRE_LOCK_AUTO_MUTEX
@@ -467,6 +504,45 @@ RenderState* ShaderGenerator::getRenderState(const String& schemeName)
 	}	
 	
 	return itFind->second->getRenderState();
+}
+
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::hasRenderState(const String& schemeName) const
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	SGSchemeConstIterator itFind = mSchemeEntriesMap.find(schemeName);
+	return itFind != mSchemeEntriesMap.end();
+}
+
+//-----------------------------------------------------------------------------
+ShaderGenerator::RenderStateCreateOrRetrieveResult ShaderGenerator::createOrRetrieveRenderState(const String& schemeName)
+{
+	SchemeCreateOrRetrieveResult res = createOrRetrieveScheme(schemeName);
+	return RenderStateCreateOrRetrieveResult(res.first->getRenderState(),res.second);
+}
+
+//-----------------------------------------------------------------------------
+ShaderGenerator::SchemeCreateOrRetrieveResult ShaderGenerator::createOrRetrieveScheme(const String& schemeName)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	bool wasCreated = false;
+	SGSchemeIterator itScheme = mSchemeEntriesMap.find(schemeName);
+	SGScheme* schemeEntry = NULL;
+
+	if (itScheme == mSchemeEntriesMap.end())
+	{
+		schemeEntry = OGRE_NEW SGScheme(schemeName);
+		mSchemeEntriesMap.insert(SGSchemeMap::value_type(schemeName, schemeEntry));
+		wasCreated = true;
+	}
+	else
+	{
+		schemeEntry = itScheme->second;
+	}
+
+	return SchemeCreateOrRetrieveResult(schemeEntry, wasCreated);
 }
 
 //-----------------------------------------------------------------------------
@@ -694,19 +770,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 	mTechniqueEntriesMap[techEntry] = techEntry;
 
 	// Add to scheme.
-	SGSchemeIterator itScheme = mSchemeEntriesMap.find(dstTechniqueSchemeName);
-	SGScheme* schemeEntry = NULL;
-
-	if (itScheme == mSchemeEntriesMap.end())
-	{
-		schemeEntry = OGRE_NEW SGScheme(dstTechniqueSchemeName);
-		mSchemeEntriesMap[dstTechniqueSchemeName] = schemeEntry;
-	}
-	else
-	{
-		schemeEntry = itScheme->second;
-	}
-
+	SGScheme* schemeEntry = createOrRetrieveScheme(dstTechniqueSchemeName).first;
 	schemeEntry->addTechniqueEntry(techEntry);
 		
 	return true;

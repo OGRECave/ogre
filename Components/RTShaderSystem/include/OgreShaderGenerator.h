@@ -194,6 +194,22 @@ public:
 	*/
 	RenderState*	getRenderState				(const String& schemeName);
 
+
+	typedef std::pair<RenderState*, bool> RenderStateCreateOrRetrieveResult;
+	/** 
+	Returns a requested render state. If the render state does not exist this function creates it.
+	@param schemeName The scheme name to retrieve.
+	*/
+	RenderStateCreateOrRetrieveResult createOrRetrieveRenderState(const String& schemeName);
+
+
+	/** 
+	Tells if a given render state exists
+	@param schemeName The scheme name to check.
+	*/
+	bool hasRenderState(const String& schemeName) const;
+	
+
 	/** 
 	Get render state of specific pass.
 	Using this method allows the user to customize the behavior of a specific pass.
@@ -212,6 +228,22 @@ public:
 	@param factory The factory to add.
 	*/
 	void			addSubRenderStateFactory	(SubRenderStateFactory* factory);
+
+	/** 
+	Returns the number of existing factories
+	*/
+	size_t			getNumSubRenderStateFactories() const;
+
+	/** 
+	Returns a sub render state factory by index
+	@note index must be lower than the value returned by getNumSubRenderStateFactories()
+	*/
+	SubRenderStateFactory* getSubRenderStateFactory(size_t index);
+
+	/** 
+	Returns a sub render state factory by name
+	*/
+	SubRenderStateFactory* getSubRenderStateFactory(const String& type);
 
 	/** 
 	Remove sub render state factory. 
@@ -408,7 +440,7 @@ protected:
 
 	typedef map<String, SGScheme*>::type			SGSchemeMap;
 	typedef SGSchemeMap::iterator					SGSchemeIterator;
-	typedef SGMaterialMap::const_iterator			SGSchemeConstIterator;
+	typedef SGSchemeMap::const_iterator				SGSchemeConstIterator;
 
 	typedef map<String, ScriptTranslator*>::type	SGScriptTranslatorMap;
 	typedef SGScriptTranslatorMap::iterator			SGScriptTranslatorIterator;
@@ -823,6 +855,13 @@ protected:
 	SGMaterialIterator findMaterialEntryIt(const String& materialName, const String& groupName);
 	SGMaterialConstIterator findMaterialEntryIt(const String& materialName, const String& groupName) const;
 
+
+	typedef std::pair<SGScheme*, bool> SchemeCreateOrRetrieveResult;
+	/** 
+	Returns a requested scheme. If the scheme does not exist this function creates it.
+	@param schemeName The scheme name to retrieve.
+	*/
+	SchemeCreateOrRetrieveResult createOrRetrieveScheme(const String& schemeName);
 
 protected:	
 	OGRE_AUTO_MUTEX													// Auto mutex.

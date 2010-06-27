@@ -506,7 +506,7 @@ LayeredBlending* LayeredBlendingFactory::createOrRetrieveSubRenderState(SGScript
 {
 	LayeredBlending* layeredBlendState;
 	//check if we already create a blend srs
-	SubRenderState*	subState = translator->getGeneratedSubRenderState(LayeredBlending::Type);
+	SubRenderState*	subState = translator->getGeneratedSubRenderState(getType());
 	if (subState != NULL)
 	{
 		layeredBlendState = static_cast<LayeredBlending*>(subState);

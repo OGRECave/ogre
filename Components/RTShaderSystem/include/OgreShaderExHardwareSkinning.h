@@ -34,9 +34,11 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
 
+#define HS_MAX_WEIGHT_COUNT 4
 namespace Ogre {
 namespace RTShader {
 
+class HardwareSkinningFactory;
 
 /** \addtogroup Core
 *  @{
@@ -120,6 +122,12 @@ public:
 	*/
 	bool getAllowSkinningStateChange() const {	return mAllowStateChange; }
 	
+
+	/**
+	Set the factory which created this sub render state
+	*/
+	void _setCreator(const HardwareSkinningFactory* pCreator) { mCreator = pCreator; }
+
 	static String Type;
 
 	
@@ -192,6 +200,8 @@ protected:
 	ParameterPtr mParamLocalBinormalWorld;
 	ParameterPtr mParamOutPositionProj;
 
+	const HardwareSkinningFactory* mCreator; ///The factory which created this sub render state
+
 
 };
 
@@ -219,7 +229,29 @@ public:
 	*/
 	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
+	/** 
+	Sets the list of custom shadow caster materials
+	*/
+	virtual void setCustomShadowCasterMaterials(const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
+		const MaterialPtr& caster3Weight, const MaterialPtr& caster4Weight);
 	
+	/** 
+	Sets the list of custom shadow receiver materials
+	*/
+	virtual void setCustomShadowReceiverMaterials(const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
+		const MaterialPtr& receiver3Weight, const MaterialPtr& receiver4Weight);
+
+	/** 
+	Returns the name of a custom shadow caster material for a given number of weights
+	*/
+	const MaterialPtr& getCustomShadowCasterMaterial(ushort index) const;
+
+	/** 
+	Returns the name of a custom shadow receiver material for a given number of weights
+	*/
+	const MaterialPtr& getCustomShadowReceiverMaterial(ushort index) const;
+
+
 protected:
 
 	/** 
@@ -227,7 +259,10 @@ protected:
 	*/
 	virtual SubRenderState* createInstanceImpl();
 
-
+	/// A set of custom shadow caster materials
+	MaterialPtr	mCustomShadowCasterMaterials[HS_MAX_WEIGHT_COUNT];
+	/// A set of custom shadow receiver materials
+	MaterialPtr	mCustomShadowReceiverMaterials[HS_MAX_WEIGHT_COUNT];
 };
 
 /** @} */
