@@ -65,28 +65,18 @@ namespace Ogre  {
             case PF_PVRTC_RGBA4:
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif                
-            case PF_R3G3B2:
             case PF_R5G6B5:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT32_RGB:
-            case PF_SHORT_RGB:
+            case PF_B5G6R5:
                 return GL_RGB;
 
+            case PF_A1R5G5B5:
+                return GL_BGRA;
+            case PF_A4R4G4B4:
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
-            case PF_A1R5G5B5:
-            case PF_A4R4G4B4:
-            case PF_A2R10G10B10:
-// This case in incorrect, swaps R & B channels
-//                return GL_BGRA;
-
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
-            case PF_A2B10G10R10:
-            case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_RGBA:
-            case PF_SHORT_RGBA:
                 return GL_RGBA;
 
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
@@ -98,14 +88,22 @@ namespace Ogre  {
                 return 0;
 #else
             case PF_R8G8B8:
-                return 0;
-            case PF_B8G8R8:
                 return GL_RGB;
+            case PF_B8G8R8:
+                return 0;
 #endif
             case PF_DXT1:
             case PF_DXT3:
             case PF_DXT5:
-            case PF_B5G6R5:
+            case PF_R3G3B2:
+            case PF_A2R10G10B10:
+            case PF_A2B10G10R10:
+            case PF_SHORT_RGB:
+            case PF_FLOAT16_RGB:
+            case PF_FLOAT32_RGB:
+            case PF_FLOAT16_RGBA:
+            case PF_FLOAT32_RGBA:
+            case PF_SHORT_RGBA:
             default:
                 return 0;
         }
@@ -117,6 +115,7 @@ namespace Ogre  {
         {
             case PF_A8:
             case PF_L8:
+            case PF_L16:
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_BYTE_LA:
@@ -124,8 +123,10 @@ namespace Ogre  {
             case PF_R5G6B5:
             case PF_B5G6R5:
                 return GL_UNSIGNED_SHORT_5_6_5;
-            case PF_L16:
-                return GL_UNSIGNED_SHORT;
+            case PF_A4R4G4B4:
+				return GL_UNSIGNED_SHORT_4_4_4_4;
+            case PF_A1R5G5B5:
+                return GL_UNSIGNED_SHORT_5_5_5_1;
 
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
             case PF_X8B8G8R8:
@@ -143,31 +144,25 @@ namespace Ogre  {
             case PF_A8B8G8R8:
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
-                return GL_UNSIGNED_BYTE;
             case PF_B8G8R8A8:
             case PF_R8G8B8A8:
-                return 0;
+                return GL_UNSIGNED_BYTE;
 #endif
-
+            case PF_DXT1:
+            case PF_DXT3:
+            case PF_DXT5:
+            case PF_R3G3B2:
+            case PF_A2R10G10B10:
+            case PF_A2B10G10R10:
+            case PF_FLOAT16_RGB:
+            case PF_FLOAT16_RGBA:
             case PF_FLOAT32_R:
             case PF_FLOAT32_GR:
             case PF_FLOAT32_RGB:
             case PF_FLOAT32_RGBA:
-                return GL_FLOAT;
             case PF_SHORT_RGBA:
             case PF_SHORT_RGB:
             case PF_SHORT_GR:
-                return GL_UNSIGNED_SHORT;
-
-            case PF_A2R10G10B10:
-            case PF_A2B10G10R10:
-            case PF_FLOAT16_R:
-            case PF_FLOAT16_GR:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT16_RGBA:
-            case PF_R3G3B2:
-            case PF_A1R5G5B5:
-            case PF_A4R4G4B4:
                 // TODO not supported
             default:
                 return 0;
@@ -179,6 +174,7 @@ namespace Ogre  {
         switch (fmt)
         {
             case PF_L8:
+            case PF_L16:
                 return GL_LUMINANCE;
 
             case PF_A8:
@@ -198,25 +194,25 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
                 
-            case PF_R8G8B8:
-            case PF_B8G8R8:
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
-                if (!hwGamma)
-                {
-                    return GL_RGBA;
-                }
-            case PF_A4L4:
-            case PF_L16:
-            case PF_A4R4G4B4:
-            case PF_R3G3B2:
             case PF_A1R5G5B5:
+            case PF_A4R4G4B4:
+                return GL_RGBA;
             case PF_R5G6B5:
             case PF_B5G6R5:
+            case PF_R8G8B8:
+            case PF_B8G8R8:
+                return GL_RGB;
+            case PF_A4L4:
+            case PF_R3G3B2:
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
+            case PF_DXT1:
+            case PF_DXT3:
+            case PF_DXT5:
             case PF_FLOAT16_R:
             case PF_FLOAT16_RGB:
             case PF_FLOAT16_GR:
@@ -228,9 +224,6 @@ namespace Ogre  {
             case PF_SHORT_RGBA:
             case PF_SHORT_RGB:
             case PF_SHORT_GR:
-            case PF_DXT1:
-            case PF_DXT3:
-            case PF_DXT5:
             default:
                 return 0;
         }
@@ -258,7 +251,7 @@ namespace Ogre  {
         }
     }
 
-    PixelFormat GLESPixelUtil::getClosestOGREFormat(GLenum fmt)
+    PixelFormat GLESPixelUtil::getClosestOGREFormat(GLenum fmt, GLenum dataType)
     {
         switch (fmt)
         {
@@ -280,18 +273,33 @@ namespace Ogre  {
                 return PF_BYTE_LA;
             
             case GL_RGB:
-                return PF_X8R8G8B8;
+                switch(dataType)
+                {
+                    case GL_UNSIGNED_SHORT_5_6_5:
+                        return PF_B5G6R5;
+                    default:
+                        return PF_R8G8B8;
+                };
             case GL_RGBA:
+                switch(dataType)
+                {
+                    case GL_UNSIGNED_SHORT_5_5_5_1:
+                        return PF_A1R5G5B5;
+                    case GL_UNSIGNED_SHORT_4_4_4_4:
+                        return PF_A4R4G4B4;
+                    default:
 #if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
-				// seems that in iPhone we need this value to get the right color
-                return PF_A8R8G8B8;
+                        // seems that in iPhone we need this value to get the right color
+                        return PF_A8R8G8B8;
 #else
-                return PF_X8B8G8R8;
+                        return PF_X8B8G8R8;
 #endif
+                }
 #ifdef GL_BGRA
             case GL_BGRA:
+                return PF_A8B8G8R8;
 #endif
-//                return PF_X8B8G8R8;
+
             default:
                 //TODO: not supported
                 return PF_A8R8G8B8;
@@ -344,36 +352,38 @@ namespace Ogre  {
         }
     }
 
-    PixelBox* GLESPixelUtil::convertToGLformat(const PixelBox &data,
-                                             GLenum *outputFormat)
+    void GLESPixelUtil::convertToGLformat(const PixelBox &src, const PixelBox &dst)
     {
-        GLenum glFormat = GLESPixelUtil::getGLOriginFormat(data.format);
-        if (glFormat != 0)
+        // Always need to convert PF_A4R4G4B4, GL expects the colors to be in the 
+        // reverse order
+        if (dst.format == PF_A4R4G4B4)
         {
-            // format already supported
-            return OGRE_NEW PixelBox(data);
-        }
-
-        PixelBox *converted = 0;
-
-        if (data.format == PF_R8G8B8)
-        {
-            // Convert BGR -> RGB
-            converted->format = PF_B8G8R8;
-            *outputFormat = GL_RGB;
-
-            converted = OGRE_NEW PixelBox(data);
-            uint32 *data = (uint32 *) converted->data;
-            for (uint i = 0; i < converted->getWidth() * converted->getHeight(); i++)
+            // Convert PF_A4R4G4B4 -> PF_B4G4R4A4
+            // Reverse pixel order
+            uint16 *srcptr = static_cast<uint16*>(src.data)
+			+ (src.left + src.top * src.rowPitch + src.front * src.slicePitch);
+            uint16 *dstptr = static_cast<uint16*>(dst.data)
+			+ (dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch);
+            const size_t srcSliceSkip = src.getSliceSkip();
+            const size_t dstSliceSkip = dst.getSliceSkip();
+            const size_t k = src.right - src.left;
+            for(size_t z=src.front; z<src.back; z++) 
             {
-                uint32 *color = data;
-                *color = (*color & 0x000000ff) << 16 |
-                         (*color & 0x0000FF00) |
-                         (*color & 0x00FF0000) >> 16;
-                data += 1;
-            }
+                for(size_t y=src.top; y<src.bottom; y++)
+                {
+                    for(size_t x=0; x<k; x++)
+                    {
+                        dstptr[x] = ((srcptr[x]&0x000F)<<12) |  // B
+                                    ((srcptr[x]&0x00F0)<<4) |   // G
+                                    ((srcptr[x]&0x0F00)>>4) |   // R
+                                    ((srcptr[x]&0xF000)>>12);   // A
+                    }
+                    srcptr += src.rowPitch;
+                    dstptr += dst.rowPitch;
+                }
+                srcptr += srcSliceSkip;
+                dstptr += dstSliceSkip;
+            }    
         }
-
-        return converted;
     }
 }

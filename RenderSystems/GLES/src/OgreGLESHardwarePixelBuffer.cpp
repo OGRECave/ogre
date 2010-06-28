@@ -145,8 +145,13 @@ namespace Ogre {
             // do conversion in temporary buffer
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
-
             PixelUtil::bulkPixelConversion(src, scaled);
+
+            if(mFormat == PF_A4R4G4B4)
+            {
+                // ARGB->BGRA
+                GLESPixelUtil::convertToGLformat(scaled, scaled);
+            }
         }
         else
         {
@@ -230,8 +235,8 @@ namespace Ogre {
 
     // TextureBuffer
     GLESTextureBuffer::GLESTextureBuffer(const String &baseName, GLenum target, GLuint id, 
-                                         GLint width, GLint height, GLint format, GLint face, 
-                                         GLint level, Usage usage, bool crappyCard, 
+                                         GLint width, GLint height, GLint internalFormat, GLenum format,
+                                         GLint face, GLint level, Usage usage, bool crappyCard, 
                                          bool writeGamma, uint fsaa)
     : GLESHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
         mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
@@ -248,8 +253,8 @@ namespace Ogre {
         mHeight = height;
         mDepth = 1;
 
-        mGLInternalFormat = format;
-        mFormat = GLESPixelUtil::getClosestOGREFormat(format);
+        mGLInternalFormat = internalFormat;
+        mFormat = GLESPixelUtil::getClosestOGREFormat(internalFormat, format);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -681,7 +686,7 @@ namespace Ogre {
         GLsizei width = GLESPixelUtil::optionalPO2(src.getWidth());
         GLsizei height = GLESPixelUtil::optionalPO2(src.getHeight());
         GLenum format = GLESPixelUtil::getClosestGLInternalFormat(src.format);
-        
+        GLenum datatype = GLESPixelUtil::getGLOriginDataType(src.format);
         // Generate texture name
         glGenTextures(1, &id);
         GL_CHECK_ERROR;
@@ -695,11 +700,11 @@ namespace Ogre {
         GL_CHECK_ERROR;
 
         // Allocate texture memory
-        glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(target, 0, format, width, height, 0, format, datatype, 0);
         GL_CHECK_ERROR;
 
         // GL texture buffer
-        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format,
+        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture
@@ -789,7 +794,7 @@ namespace Ogre {
     //********* GLESRenderBuffer
     //----------------------------------------------------------------------------- 
     GLESRenderBuffer::GLESRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
-    GLESHardwarePixelBuffer(width, height, 1, GLESPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY)
+    GLESHardwarePixelBuffer(width, height, 1, GLESPixelUtil::getClosestOGREFormat(format, PF_A8R8G8B8),HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
         // Generate renderbuffer

@@ -325,10 +325,6 @@ namespace Ogre {
         // Infinite far plane always supported
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
-        // Check for Float textures
-        if (mGLSupport->checkExtension("GL_OES_texture_half_float"))
-            rsc->setCapability(RSC_TEXTURE_FLOAT);
-
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
