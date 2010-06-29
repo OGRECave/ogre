@@ -44,6 +44,11 @@
 #elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
+
+// To use CADisplayLink for smoother animation on iPhone comment out
+// the following line or define it to 1.  Use with caution, it can
+// sometimes cause input lag.
+#define USE_CADISPLAYLINK 0
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -216,10 +221,12 @@ int main(int argc, char *argv[])
 
     // A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
     // class is used as fallback when it isn't available.
+#if USE_CADISPLAYLINK
     NSString *reqSysVer = @"3.1";
     NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
     if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
         mDisplayLinkSupported = TRUE;
+#endif
     
     [self go];
 }
