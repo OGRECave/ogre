@@ -135,6 +135,7 @@ namespace Ogre {
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLESPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
+        GLenum datatype = GLESPixelUtil::getGLOriginDataType(mFormat);
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
@@ -195,7 +196,7 @@ namespace Ogre {
                              width, height,
                              0,
                              format,
-                             GL_UNSIGNED_BYTE, 0);
+                             datatype, 0);
                 GL_CHECK_ERROR;
 
                 if (width > 1)
@@ -332,6 +333,7 @@ namespace Ogre {
                                                                      mTextureID,
                                                                      width, height,
                                                                      GLESPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma),
+                                                                     GLESPixelUtil::getGLOriginDataType(mFormat),
                                                                      face,
                                                                      mip,
                                                                      static_cast<HardwareBuffer::Usage>(mUsage),

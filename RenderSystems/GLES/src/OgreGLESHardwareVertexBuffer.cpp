@@ -53,7 +53,7 @@ namespace Ogre {
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Cannot create GL vertex buffer",
+                        "Cannot create GL ES vertex buffer",
                         "GLESHardwareVertexBuffer::GLESHardwareVertexBuffer");
         }
 
@@ -85,10 +85,14 @@ namespace Ogre {
 
         void* retPtr = 0;
 
-        if (length < OGRE_GL_MAP_BUFFER_THRESHOLD)
+		GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
+
+		// Try to use scratch buffers for smaller buffers
+        if (length < glBufManager->getGLMapBufferThreshold())
         {
-            retPtr = static_cast<GLESHardwareBufferManager*>(
-                HardwareBufferManager::getSingletonPtr())->allocateScratch((uint32)length);
+			// if this fails, we fall back on mapping
+            retPtr = glBufManager->allocateScratch((uint32)length);
+
             if (retPtr)
             {
                 mLockedToScratch = true;
@@ -99,6 +103,7 @@ namespace Ogre {
 
                 if (options != HBL_DISCARD)
                 {
+					// have to read back the data before returning the pointer
                     readData(offset, length, retPtr);
                 }
             }
@@ -135,7 +140,8 @@ namespace Ogre {
 			}
             
 			// return offsetted
-			retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
+			retPtr = static_cast<void*>(
+				static_cast<unsigned char*>(pBuffer) + offset);
             
 			mLockedToScratch = false;
 		}

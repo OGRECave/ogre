@@ -83,10 +83,10 @@ elseif (UNIX)
   set(OGRE_PREFIX_GUESSES
     /opt/ogre
     /opt/OGRE
-    /usr/lib/ogre
-    /usr/lib/OGRE
-    /usr/local/lib/ogre
-    /usr/local/lib/OGRE
+    /usr/lib${LIB_SUFFIX}/ogre
+    /usr/lib${LIB_SUFFIX}/OGRE
+    /usr/local/lib${LIB_SUFFIX}/ogre
+    /usr/local/lib${LIB_SUFFIX}/OGRE
     $ENV{HOME}/ogre
     $ENV{HOME}/OGRE
   )

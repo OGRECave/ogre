@@ -144,7 +144,6 @@ namespace Ogre {
                 // Detach
                 glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES+x,
                     GL_RENDERBUFFER_OES, 0);
-                GL_CHECK_ERROR;
             }
         }
 

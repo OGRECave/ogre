@@ -72,7 +72,7 @@ namespace Ogre {
                 without losing precision.
                 @remarks It is valid for this function to always return PF_A8R8G8B8.
             */
-            static PixelFormat getClosestOGREFormat(GLenum fmt);
+            static PixelFormat getClosestOGREFormat(GLenum fmt, GLenum dataType);
 
             /** Returns the maximum number of Mipmaps that can be generated until we reach
                 the mininum format possible. This does not count the base level.
@@ -96,10 +96,7 @@ namespace Ogre {
                 RSC_NON_POWER_OF_2_TEXTURES is supported it returns value as-is.
             */
             static size_t optionalPO2(size_t value);
-
-
-            static PixelBox* convertToGLformat(const PixelBox &data, GLenum *outputFormat);
-            static void dumpMemory(const PixelBox &data);
+            static void convertToGLformat(const PixelBox &src, const PixelBox &dst);
     };
 };
 

@@ -216,7 +216,9 @@ namespace Ogre {
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
 			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
-		if (strstr(vendorName, "Nokia"))
+		else if (strstr(vendorName, "NVIDIA"))
+			rsc->setVendor(GPU_NVIDIA);
+		else if (strstr(vendorName, "Nokia"))
 			rsc->setVendor(GPU_NOKIA);
         else
             rsc->setVendor(GPU_UNKNOWN);
@@ -248,7 +250,6 @@ namespace Ogre {
 
         // OpenGL ES - Check for these extensions too
         // For 1.1, http://www.khronos.org/registry/gles/api/1.1/glext.h
-        // For 2.0, http://www.khronos.org/registry/gles/api/2.0/gl2ext.h
 
         if (mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
             mGLSupport->checkExtension("GL_AMD_compressed_3DC_texture") ||
@@ -326,13 +327,6 @@ namespace Ogre {
         // Infinite far plane always supported
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
 
-        // hardware occlusion support
-        rsc->setCapability(RSC_HWOCCLUSION);
-
-        // Check for Float textures
-        if (mGLSupport->checkExtension("GL_OES_texture_half_float"))
-            rsc->setCapability(RSC_TEXTURE_FLOAT);
-
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
@@ -351,7 +345,7 @@ namespace Ogre {
 
         mGpuProgramManager = OGRE_NEW GLESGpuProgramManager();
 
-        // set texture the number of texture units
+        // Set texture the number of texture units
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
 
         if(caps->hasCapability(RSC_VBO))
@@ -735,7 +729,7 @@ namespace Ogre {
         glLoadMatrixf(mat);
         GL_CHECK_ERROR;
 
-        // also mark clip planes dirty
+        // Also mark clip planes dirty
         if (!mClipPlanes.empty())
         {
             mClipPlanesDirty = true;
@@ -948,15 +942,15 @@ namespace Ogre {
         {
             if (!tex.isNull())
             {
-                // note used
+                // Note used
                 tex->touch();
+
+                // Store the number of mipmaps
+                mTextureMipmapCount = tex->getNumMipmaps();
             }
 
             glEnable(GL_TEXTURE_2D);
             GL_CHECK_ERROR;
-
-            // Store the number of mipmaps
-            mTextureMipmapCount = tex->getNumMipmaps();
             
             if (!tex.isNull())
             {
@@ -971,7 +965,6 @@ namespace Ogre {
         }
         else
         {
-            // mTextureCount--;
             glEnable(GL_TEXTURE_2D);
             glDisable(GL_TEXTURE_2D);
             GL_CHECK_ERROR;
@@ -1425,15 +1418,15 @@ namespace Ogre {
                 return GL_ONE_MINUS_SRC_ALPHA;
         };
 
-        // to keep compiler happy
+        // To keep compiler happy
         return GL_ONE;
     }
 
 	void GLESRenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op)
 	{
         GL_CHECK_ERROR;
-		GLint sourceBlend = getBlendMode(sourceFactor);
-		GLint destBlend = getBlendMode(destFactor);
+		GLenum sourceBlend = getBlendMode(sourceFactor);
+		GLenum destBlend = getBlendMode(destFactor);
 		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
 		{
 			glDisable(GL_BLEND);
@@ -1492,10 +1485,10 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_OES_blend_equation_separate") &&
             mGLSupport->checkExtension("GL_OES_blend_func_separate"))
         {
-            GLint sourceBlend = getBlendMode(sourceFactor);
-            GLint destBlend = getBlendMode(destFactor);
-            GLint sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
-            GLint destBlendAlpha = getBlendMode(destFactorAlpha);
+            GLenum sourceBlend = getBlendMode(sourceFactor);
+            GLenum destBlend = getBlendMode(destFactor);
+            GLenum sourceBlendAlpha = getBlendMode(sourceFactorAlpha);
+            GLenum destBlendAlpha = getBlendMode(destFactorAlpha);
             
             if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO && 
                sourceFactorAlpha == SBF_ONE && destFactorAlpha == SBF_ZERO)
@@ -1600,6 +1593,8 @@ namespace Ogre {
             mActiveViewport = vp;
 
             GLsizei x, y, w, h;
+
+			// Calculate the "lower-left" corner of the viewport
             w = vp->getActualWidth();
             h = vp->getActualHeight();
             x = vp->getActualLeft();
@@ -2140,8 +2135,7 @@ namespace Ogre {
         VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
 
         elemEnd = decl.end();
-
-        std::vector<GLuint> attribsBound;
+        vector<GLuint>::type attribsBound;
 
         for (elem = decl.begin(); elem != elemEnd; ++elem)
         {

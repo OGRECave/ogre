@@ -102,6 +102,7 @@ namespace Ogre {
             download(mBuffer);
         }
         mCurrentLockOptions = options;
+        mLockedBox = lockBox;
         return mBuffer.getSubVolume(lockBox);
     }
 
@@ -110,7 +111,7 @@ namespace Ogre {
         if (mCurrentLockOptions != HardwareBuffer::HBL_READ_ONLY)
         {
             // From buffer to card, only upload if was locked for writing
-            upload(mCurrentLock, Box(0, 0, 0, mWidth, mHeight, mDepth));
+            upload(mCurrentLock, mLockedBox);
         }
         freeBuffer();
     }
@@ -144,26 +145,24 @@ namespace Ogre {
             // do conversion in temporary buffer
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
-
             PixelUtil::bulkPixelConversion(src, scaled);
+
+            if(mFormat == PF_A4R4G4B4)
+            {
+                // ARGB->BGRA
+                GLESPixelUtil::convertToGLformat(scaled, scaled);
+            }
         }
         else
         {
+            allocateBuffer();
             scaled = src;
+
             if (src.format == PF_R8G8B8)
             {
                 scaled.format = PF_B8G8R8;
                 PixelUtil::bulkPixelConversion(src, scaled);
             }
-
-            // No scaling or conversion needed
-            // Set extents for upload
-            scaled.left = dstBox.left;
-            scaled.right = dstBox.right;
-            scaled.top = dstBox.top;
-            scaled.bottom = dstBox.bottom;
-            scaled.front = dstBox.front;
-            scaled.back = dstBox.back;
         }
 
         upload(scaled, dstBox);
@@ -236,8 +235,8 @@ namespace Ogre {
 
     // TextureBuffer
     GLESTextureBuffer::GLESTextureBuffer(const String &baseName, GLenum target, GLuint id, 
-                                         GLint width, GLint height, GLint format, GLint face, 
-                                         GLint level, Usage usage, bool crappyCard, 
+                                         GLint width, GLint height, GLint internalFormat, GLenum format,
+                                         GLint face, GLint level, Usage usage, bool crappyCard, 
                                          bool writeGamma, uint fsaa)
     : GLESHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
         mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
@@ -254,8 +253,8 @@ namespace Ogre {
         mHeight = height;
         mDepth = 1;
 
-        mGLInternalFormat = format;
-        mFormat = GLESPixelUtil::getClosestOGREFormat(format);
+        mGLInternalFormat = internalFormat;
+        mFormat = GLESPixelUtil::getClosestOGREFormat(internalFormat, format);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -273,7 +272,7 @@ namespace Ogre {
         mBuffer = PixelBox(mWidth, mHeight, mDepth, mFormat);
         
         if (mWidth==0 || mHeight==0 || mDepth==0)
-            /// We are invalid, do not allocate a buffer
+            // We are invalid, do not allocate a buffer
             return;
 
         // Is this a render target?
@@ -433,9 +432,9 @@ namespace Ogre {
     void GLESTextureBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
         GLESTextureBuffer *srct = static_cast<GLESTextureBuffer *>(src.getPointer());
-        /// TODO: Check for FBO support first
-        /// Destination texture must be 2D
-        /// Source texture must be 2D
+        // TODO: Check for FBO support first
+        // Destination texture must be 2D
+        // Source texture must be 2D
         if((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D))
         {
             blitFromTexture(srct, srcBox, dstBox);
@@ -447,12 +446,12 @@ namespace Ogre {
     }
     
     //-----------------------------------------------------------------------------  
-    /// Very fast texture-to-texture blitter and hardware bi/trilinear scaling implementation using FBO
-    /// Destination texture must be 2D
-    /// Source texture must be 2D
-    /// Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
-    /// if available.
-    /// @author W.J. van der Laan
+    // Very fast texture-to-texture blitter and hardware bi/trilinear scaling implementation using FBO
+    // Destination texture must be 2D
+    // Source texture must be 2D
+    // Supports compressed formats as both source and destination format, it will use the hardware DXT compressor
+    // if available.
+    // @author W.J. van der Laan
     void GLESTextureBuffer::blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
 		if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
@@ -466,18 +465,18 @@ namespace Ogre {
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
 //        mTextureID << ":" << dstBox.left << "," << dstBox.top << "," << dstBox.right << "," << dstBox.bottom << std::endl;
 
-        /// Store reference to FBO manager
+        // Store reference to FBO manager
         GLESFBOManager *fboMan = static_cast<GLESFBOManager *>(GLESRTTManager::getSingletonPtr());
         
-        /// Save and clear GL state for rendering
+        // Save and clear GL state for rendering
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
         rsys->_disableTextureUnitsFrom(0);
 
-        /// Disable alpha, depth and scissor testing, disable blending, 
-        /// disable culling, disble lighting, disable fog and reset foreground
-        /// colour.
+        // Disable alpha, depth and scissor testing, disable blending, 
+        // disable culling, disble lighting, disable fog and reset foreground
+        // colour.
         glDisable(GL_ALPHA_TEST);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_SCISSOR_TEST);
@@ -488,7 +487,7 @@ namespace Ogre {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         GL_CHECK_ERROR;
 
-        /// Save and reset matrices
+        // Save and reset matrices
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -500,16 +499,16 @@ namespace Ogre {
         glLoadIdentity();
         GL_CHECK_ERROR;
         
-        /// Set up source texture
+        // Set up source texture
         glBindTexture(src->mTarget, src->mTextureID);
         GL_CHECK_ERROR;
         
-        /// Set filtering modes depending on the dimensions and source
+        // Set filtering modes depending on the dimensions and source
         if(srcBox.getWidth()==dstBox.getWidth() &&
            srcBox.getHeight()==dstBox.getHeight() &&
            srcBox.getDepth()==dstBox.getDepth())
         {
-            /// Dimensions match -- use nearest filtering (fastest and pixel correct)
+            // Dimensions match -- use nearest filtering (fastest and pixel correct)
             glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
             GL_CHECK_ERROR;
             glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -517,12 +516,12 @@ namespace Ogre {
         }
         else
         {
-            /// Dimensions don't match -- use bi or trilinear filtering depending on the
-            /// source texture.
+            // Dimensions don't match -- use bi or trilinear filtering depending on the
+            // source texture.
             if(src->mUsage & TU_AUTOMIPMAP)
             {
-                /// Automatic mipmaps, we can safely use trilinear filter which
-                /// brings greatly imporoved quality for minimisation.
+                // Automatic mipmaps, we can safely use trilinear filter which
+                // brings greatly imporoved quality for minimisation.
                 glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 GL_CHECK_ERROR;
                 glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);    
@@ -530,39 +529,39 @@ namespace Ogre {
             }
             else
             {
-                /// Manual mipmaps, stay safe with bilinear filtering so that no
-                /// intermipmap leakage occurs.
+                // Manual mipmaps, stay safe with bilinear filtering so that no
+                // intermipmap leakage occurs.
                 glTexParameteri(src->mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
                 GL_CHECK_ERROR;
                 glTexParameteri(src->mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 GL_CHECK_ERROR;
             }
         }
-        /// Clamp to edge (fastest)
+        // Clamp to edge (fastest)
         glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
         glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
         
-        /// Store old binding so it can be restored later
+        // Store old binding so it can be restored later
         GLint oldfb;
         glGetIntegerv(GL_FRAMEBUFFER_BINDING_OES, &oldfb);
         GL_CHECK_ERROR;
 
-        /// Set up temporary FBO
+        // Set up temporary FBO
         glBindFramebufferOES(GL_FRAMEBUFFER_OES, fboMan->getTemporaryFBO());
         GL_CHECK_ERROR;
 
         GLuint tempTex = 0;
         if(!fboMan->checkFormat(mFormat))
         {
-            /// If target format not directly supported, create intermediate texture
+            // If target format not directly supported, create intermediate texture
             GLenum tempFormat = GLESPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
             glGenTextures(1, &tempTex);
             GL_CHECK_ERROR;
             glBindTexture(GL_TEXTURE_2D, tempTex);
             GL_CHECK_ERROR;
-            /// Allocate temporary texture of the size of the destination area
+            // Allocate temporary texture of the size of the destination area
             glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
                          GLESPixelUtil::optionalPO2(dstBox.getWidth()), GLESPixelUtil::optionalPO2(dstBox.getHeight()), 
                          0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -570,18 +569,18 @@ namespace Ogre {
             glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES,
                                       GL_TEXTURE_2D, tempTex, 0);
             GL_CHECK_ERROR;
-            /// Set viewport to size of destination slice
+            // Set viewport to size of destination slice
             glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight());
             GL_CHECK_ERROR;
         }
         else
         {
-            /// We are going to bind directly, so set viewport to size and position of destination slice
+            // We are going to bind directly, so set viewport to size and position of destination slice
             glViewport(dstBox.left, dstBox.top, dstBox.getWidth(), dstBox.getHeight());
             GL_CHECK_ERROR;
         }
         
-        /// Process each destination slice
+        // Process each destination slice
         for(size_t slice=dstBox.front; slice<dstBox.back; ++slice)
         {
             if(!tempTex)
@@ -592,7 +591,7 @@ namespace Ogre {
 
             if(tempTex)
             {
-                /// Copy temporary texture
+                // Copy temporary texture
                 glBindTexture(mTarget, mTextureID);
                 GL_CHECK_ERROR;
                 switch(mTarget)
@@ -606,10 +605,10 @@ namespace Ogre {
                 }
             }
         }
-        /// Finish up 
+        // Finish up 
         if(!tempTex)
         {
-            /// Generate mipmaps
+            // Generate mipmaps
             if(mUsage & TU_AUTOMIPMAP)
             {
                 glBindTexture(mTarget, mTextureID);
@@ -619,18 +618,18 @@ namespace Ogre {
             }
         }
         
-        /// Reset source texture to sane state
+        // Reset source texture to sane state
         glBindTexture(src->mTarget, src->mTextureID);
         GL_CHECK_ERROR;
         
-        /// Detach texture from temporary framebuffer
+        // Detach texture from temporary framebuffer
         glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES,
                                      GL_RENDERBUFFER_OES, 0);
         GL_CHECK_ERROR;
-        /// Restore old framebuffer
+        // Restore old framebuffer
         glBindFramebufferOES(GL_FRAMEBUFFER_OES, oldfb);
         GL_CHECK_ERROR;
-        /// Restore matrix stacks and render state
+        // Restore matrix stacks and render state
         glMatrixMode(GL_TEXTURE);
         glPopMatrix();
         glMatrixMode(GL_PROJECTION);
@@ -642,13 +641,13 @@ namespace Ogre {
         GL_CHECK_ERROR;
     }
     //-----------------------------------------------------------------------------  
-    /// blitFromMemory doing hardware trilinear scaling
+    // blitFromMemory doing hardware trilinear scaling
     void GLESTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox)
     {
-        /// Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
-        /// - FBO is not supported
-        /// - Either source or target is luminance due doesn't looks like supported by hardware
-        /// - the source dimensions match the destination ones, in which case no scaling is needed
+        // Fall back to normal GLHardwarePixelBuffer::blitFromMemory in case 
+        // - FBO is not supported
+        // - Either source or target is luminance due doesn't looks like supported by hardware
+        // - the source dimensions match the destination ones, in which case no scaling is needed
         if(!GL_OES_framebuffer_object ||
            PixelUtil::isLuminance(src_orig.format) ||
            PixelUtil::isLuminance(mFormat) ||
@@ -662,14 +661,14 @@ namespace Ogre {
         if(!mBuffer.contains(dstBox))
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Destination box out of range",
                         "GLESTextureBuffer::blitFromMemory");
-        /// For scoped deletion of conversion buffer
+        // For scoped deletion of conversion buffer
         MemoryDataStreamPtr buf;
         PixelBox src;
         
-        /// First, convert the srcbox to a OpenGL compatible pixel format
+        // First, convert the srcbox to a OpenGL compatible pixel format
         if(GLESPixelUtil::getGLOriginFormat(src_orig.format) == 0)
         {
-            /// Convert to buffer internal format
+            // Convert to buffer internal format
             buf.bind(OGRE_NEW MemoryDataStream(PixelUtil::getMemorySize(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(),
                                                                    mFormat)));
             src = PixelBox(src_orig.getWidth(), src_orig.getHeight(), src_orig.getDepth(), mFormat, buf->getPtr());
@@ -677,45 +676,45 @@ namespace Ogre {
         }
         else
         {
-            /// No conversion needed
+            // No conversion needed
             src = src_orig;
         }
         
-        /// Create temporary texture to store source data
+        // Create temporary texture to store source data
         GLuint id;
         GLenum target = GL_TEXTURE_2D;
         GLsizei width = GLESPixelUtil::optionalPO2(src.getWidth());
         GLsizei height = GLESPixelUtil::optionalPO2(src.getHeight());
         GLenum format = GLESPixelUtil::getClosestGLInternalFormat(src.format);
-        
-        /// Generate texture name
+        GLenum datatype = GLESPixelUtil::getGLOriginDataType(src.format);
+        // Generate texture name
         glGenTextures(1, &id);
         GL_CHECK_ERROR;
         
-        /// Set texture type
+        // Set texture type
         glBindTexture(target, id);
         GL_CHECK_ERROR;
         
-        /// Set automatic mipmap generation; nice for minimisation
+        // Set automatic mipmap generation; nice for minimisation
         glTexParameteri(target, GL_GENERATE_MIPMAP, GL_TRUE );
         GL_CHECK_ERROR;
 
-        /// Allocate texture memory
-        glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        // Allocate texture memory
+        glTexImage2D(target, 0, format, width, height, 0, format, datatype, 0);
         GL_CHECK_ERROR;
 
-        /// GL texture buffer
-        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format,
+        // GL texture buffer
+        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
-        /// Upload data to 0,0,0 in temporary texture
+        // Upload data to 0,0,0 in temporary texture
         Image::Box tempTarget(0, 0, 0, src.getWidth(), src.getHeight(), src.getDepth());
         tex.upload(src, tempTarget);
         
-        /// Blit
+        // Blit
         blitFromTexture(&tex, tempTarget, dstBox);
         
-        /// Delete temp texture
+        // Delete temp texture
         glDeleteTextures(1, &id);
         GL_CHECK_ERROR;
     }
@@ -795,17 +794,17 @@ namespace Ogre {
     //********* GLESRenderBuffer
     //----------------------------------------------------------------------------- 
     GLESRenderBuffer::GLESRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
-    GLESHardwarePixelBuffer(width, height, 1, GLESPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY)
+    GLESHardwarePixelBuffer(width, height, 1, GLESPixelUtil::getClosestOGREFormat(format, PF_A8R8G8B8),HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
-        /// Generate renderbuffer
+        // Generate renderbuffer
         glGenRenderbuffersOES(1, &mRenderbufferID);
         GL_CHECK_ERROR;
-        /// Bind it to FBO
+        // Bind it to FBO
         glBindRenderbufferOES(GL_RENDERBUFFER_OES, mRenderbufferID);
         GL_CHECK_ERROR;
         
-        /// Allocate storage for depth buffer
+        // Allocate storage for depth buffer
         if (numSamples <= 0)
         {
             glRenderbufferStorageOES(GL_RENDERBUFFER_OES, format,
@@ -816,7 +815,7 @@ namespace Ogre {
     //----------------------------------------------------------------------------- 
     GLESRenderBuffer::~GLESRenderBuffer()
     {
-        /// Generate renderbuffer
+        // Generate renderbuffer
         glDeleteRenderbuffersOES(1, &mRenderbufferID);
         GL_CHECK_ERROR;
     }

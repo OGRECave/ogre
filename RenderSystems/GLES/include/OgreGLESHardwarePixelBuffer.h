@@ -86,8 +86,8 @@ namespace Ogre {
     {
         public:
             /** Texture constructor */
-            GLESTextureBuffer(const String &baseName, GLenum target, GLuint id, GLint width, GLint height, GLint format, 
-                            GLint face, GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
+            GLESTextureBuffer(const String &baseName, GLenum target, GLuint id, GLint width, GLint height, GLint internalFormat, 
+                            GLenum format, GLint face, GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
             virtual ~GLESTextureBuffer();
 
             /// @copydoc HardwarePixelBuffer::bindToFramebuffer

@@ -297,6 +297,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					_OGRESDK_ROOT_/lib/release,
+					_OGRESDK_ROOT_/Dependencies,
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -307,6 +308,7 @@
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers,
 					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers/OSX,
+					_OGRESDK_ROOT_/boost_1_42,
 					_OGRESDK_ROOT_/Dependencies/include,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
@@ -329,6 +331,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					_OGRESDK_ROOT_/lib/release,
+					_OGRESDK_ROOT_/Dependencies,
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -336,6 +339,7 @@
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers,
 					_OGRESDK_ROOT_/lib/release/Ogre.framework/Headers/OSX,
+					_OGRESDK_ROOT_/boost_1_42,
 					_OGRESDK_ROOT_/Dependencies/include,
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";

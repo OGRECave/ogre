@@ -64,6 +64,7 @@ namespace Ogre {
 
         optVideoMode.name = "Video Mode";
         optVideoMode.possibleValues.push_back("320 x 480");
+        optVideoMode.possibleValues.push_back("640 x 960");
         optVideoMode.possibleValues.push_back("768 x 1024");
         optVideoMode.currentValue = StringConverter::toString(appFrame.size.width) + " x " + 
                                     StringConverter::toString(appFrame.size.height);
