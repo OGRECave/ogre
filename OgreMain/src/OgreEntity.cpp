@@ -1238,7 +1238,7 @@ namespace Ogre {
 			{
 				float* pDstNorm;
 				destNormElem->baseVertexPointerToElement(pDstBase, &pDstNorm);
-				Vector3 norm(pDstNorm);
+				Vector3 norm(pDstNorm[0], pDstNorm[1], pDstNorm[2]);
 				Real len = norm.length();
 				if (len + 1e-4f < 1.0f)
 				{
@@ -1253,9 +1253,9 @@ namespace Ogre {
 				}
 				norm.normalise();
 				
-				*pDstNorm++ = norm.x;
-				*pDstNorm++ = norm.y;
-				*pDstNorm++ = norm.z;
+				*pDstNorm++ = (float)norm.x;
+				*pDstNorm++ = (float)norm.y;
+				*pDstNorm++ = (float)norm.z;
 				
 				pDstBase += dstbuf->getVertexSize();
 				pSrcBase += dstbuf->getVertexSize();
