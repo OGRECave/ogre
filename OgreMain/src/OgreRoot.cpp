@@ -124,6 +124,8 @@ namespace Ogre {
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
 	  , mNextMovableObjectTypeFlag(1)
+	  , mIsBlendIndicesGpuRedundant(true)
+	  , mIsBlendWeightsGpuRedundant(true)
 	  , mIsInitialised(false)
     {
         // superclass will do singleton checking

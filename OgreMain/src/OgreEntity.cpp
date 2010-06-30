@@ -1607,29 +1607,44 @@ namespace Ogre {
     {
         // Clone without copying data
         VertexData* ret = source->clone(false);
-        const VertexElement* blendIndexElem =
-            source->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
-        const VertexElement* blendWeightElem =
-            source->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS);
-        // Remove blend index
-        if (blendIndexElem)
-        {
-            // Remove buffer reference
-            ret->vertexBufferBinding->unsetBinding(blendIndexElem->getSource());
+		bool removeIndices = Ogre::Root::getSingleton().isBlendIndicesGpuRedundant();
+		bool removeWeights = Ogre::Root::getSingleton().isBlendWeightsGpuRedundant();
+		 
+		unsigned short safeSource = 0xFFFF;
+		const VertexElement* blendIndexElem =
+			source->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
+		if (blendIndexElem)
+		{
+			//save the source in order to prevent the next stage from unbinding it.
+			safeSource = blendIndexElem->getSource();
+			if (removeIndices)
+			{
+				// Remove buffer reference
+				ret->vertexBufferBinding->unsetBinding(blendIndexElem->getSource());
+			}
+		}
+		if (removeWeights)
+		{
+			// Remove blend weights
+			const VertexElement* blendWeightElem =
+				source->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS);
+			if (blendWeightElem &&
+				blendWeightElem->getSource() != safeSource)
+			{
+				// Remove buffer reference
+				ret->vertexBufferBinding->unsetBinding(blendWeightElem->getSource());
+			}
+		}
 
-        }
-        if (blendWeightElem &&
-            blendWeightElem->getSource() != blendIndexElem->getSource())
-        {
-            // Remove buffer reference
-            ret->vertexBufferBinding->unsetBinding(blendWeightElem->getSource());
-        }
         // remove elements from declaration
-        ret->vertexDeclaration->removeElement(VES_BLEND_INDICES);
-        ret->vertexDeclaration->removeElement(VES_BLEND_WEIGHTS);
+        if (removeIndices)
+			ret->vertexDeclaration->removeElement(VES_BLEND_INDICES);
+		if (removeWeights)
+			ret->vertexDeclaration->removeElement(VES_BLEND_WEIGHTS);
 
         // Close gaps in bindings for effective and safely
-        ret->closeGapsInBindings();
+		if (removeWeights || removeIndices)
+			ret->closeGapsInBindings();
 
         return ret;
     }
