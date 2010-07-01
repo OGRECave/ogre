@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
+#include "OgreCoreFeature.h"
+
 
 namespace Ogre {
 	// Internal DDS structure definitions
@@ -919,6 +921,26 @@ namespace Ogre {
 		return StringUtil::BLANK;
 
 	}
+	//---------------------------------------------------------------------
+
+	// register DDS codec
+	class DDSCodecFeature : public CoreFeature
+	{
+	public:
+		void setup()
+		{
+			DDSCodec::startup();
+		}
+
+		void shutdown()
+		{
+			DDSCodec::shutdown();
+		}
+
+		void destroy() {}
+	};
+	// DDSCodec should take priority over any other inbuilt image codec
+	OGRE_REGISTER_CORE_FEATURE(DDSCodecFeature, 10)
 	
 }
 

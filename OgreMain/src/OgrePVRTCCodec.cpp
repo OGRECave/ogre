@@ -237,4 +237,23 @@ namespace Ogre {
 
 		return StringUtil::BLANK;
 	}
+	//---------------------------------------------------------------------
+
+	// register PVRTC Codec
+	class PVRTCCodecFeature : public CoreFeature
+	{
+	public:
+		void setup()
+		{
+			PVRTCCodec::startup();
+		}
+
+		void shutdown()
+		{
+			PVRTCCodec::shutdown();
+		}
+
+		void destroy() {}
+	};
+	OGRE_REGISTER_CORE_FEATURE(PVRTCCodecFeature)
 }

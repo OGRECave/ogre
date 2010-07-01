@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
+#include "OgreCoreFeature.h"
+
 #include <FreeImage.h>
 
 // freeimage 3.9.1~3.11.0 interoperability fix
@@ -616,4 +618,23 @@ namespace Ogre {
 			return StringUtil::BLANK;
 		}
 	}
+	//---------------------------------------------------------------------
+
+	// register FreeImage codec
+	class FreeImageCodecFeature : public CoreFeature
+	{
+	public:
+		void setup()
+		{
+			FreeImageCodec::startup();
+		}
+
+		void shutdown()
+		{
+			FreeImageCodec::shutdown();
+		}
+
+		void destroy() {}
+	};
+	OGRE_REGISTER_CORE_FEATURE(FreeImageCodecFeature, 0)
 }

@@ -60,6 +60,7 @@ set (HEADER_FILES
   include/OgreController.h
   include/OgreControllerManager.h
   include/OgreConvexBody.h
+  include/OgreCoreFeature.h
   include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
   include/OgreDefaultHardwareBufferManager.h
@@ -286,6 +287,7 @@ set (SOURCE_FILES
   src/OgreConfigFile.cpp
   src/OgreControllerManager.cpp
   src/OgreConvexBody.cpp
+  src/OgreCoreFeature.cpp
   src/OgreDataStream.cpp
   src/OgreDefaultHardwareBufferManager.cpp
   src/OgreDefaultSceneQueries.cpp

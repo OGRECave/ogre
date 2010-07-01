@@ -66,20 +66,8 @@ THE SOFTWARE.
 #include "OgrePlatformInformation.h"
 #include "OgreConvexBody.h"
 #include "Threading/OgreDefaultWorkQueue.h"
+#include "OgreCoreFeature.h"
 	
-#if OGRE_NO_FREEIMAGE == 0
-#include "OgreFreeImageCodec.h"
-#endif
-#if OGRE_NO_DEVIL == 0
-#include "OgreILCodecs.h"
-#endif
-#if OGRE_NO_DDS_CODEC == 0
-#include "OgreDDSCodec.h"
-#endif
-#if OGRE_NO_ZIP_ARCHIVE == 0
-#include "OgreZip.h"
-#endif
-
 #include "OgreFontManager.h"
 #include "OgreHardwareBufferManager.h"
 
@@ -95,9 +83,6 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #  include "macUtils.h"
-#endif
-#if OGRE_NO_PVRTC_CODEC == 0
-#  include "OgrePVRTCCodec.h"
 #endif
 
 namespace Ogre {
@@ -225,25 +210,6 @@ namespace Ogre {
 #endif
         mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );
-#if OGRE_NO_ZIP_ARCHIVE == 0
-        mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
-        ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory );
-#endif
-#if OGRE_NO_DDS_CODEC == 0
-		// Register image codecs
-		DDSCodec::startup();
-#endif
-#if OGRE_NO_FREEIMAGE == 0
-		// Register image codecs
-		FreeImageCodec::startup();
-#endif
-#if OGRE_NO_DEVIL == 0
-	    // Register image codecs
-	    ILCodecs::registerCodecs();
-#endif
-#if OGRE_NO_PVRTC_CODEC == 0
-        PVRTCCodec::startup();
-#endif
 
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
@@ -269,6 +235,9 @@ namespace Ogre {
 		mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
 		addMovableObjectFactory(mRibbonTrailFactory);
 
+		// register compiled core features
+		CoreFeatureRegistry::getSingleton().setupFeatures();
+
 		// Load plugins
         if (!pluginFileName.empty())
             loadPlugins(pluginFileName);
@@ -288,6 +257,10 @@ namespace Ogre {
     Root::~Root()
     {
         shutdown();
+
+		// unregister compiled core features
+		CoreFeatureRegistry::getSingleton().shutdownFeatures();
+
         OGRE_DELETE mSceneManagerEnum;
 		OGRE_DELETE mShadowTextureManager;
 		OGRE_DELETE mRenderSystemCapabilitiesManager;
@@ -295,18 +268,7 @@ namespace Ogre {
 		destroyAllRenderQueueInvocationSequences();
         OGRE_DELETE mCompositorManager;
 		OGRE_DELETE mExternalTextureSourceManager;
-#if OGRE_NO_FREEIMAGE == 0
-		FreeImageCodec::shutdown();
-#endif
-#if OGRE_NO_DEVIL == 0
-        ILCodecs::deleteCodecs();
-#endif
-#if OGRE_NO_DDS_CODEC == 0
-		DDSCodec::shutdown();
-#endif
-#if OGRE_NO_PVRTC_CODEC == 0
-		PVRTCCodec::shutdown();
-#endif
+
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;
 #endif
@@ -314,9 +276,6 @@ namespace Ogre {
         OGRE_DELETE mFontManager;
 		OGRE_DELETE mLodStrategyManager;
         OGRE_DELETE mArchiveManager;
-#if OGRE_NO_ZIP_ARCHIVE == 0
-        OGRE_DELETE mZipArchiveFactory;
-#endif
         OGRE_DELETE mFileSystemArchiveFactory;
         OGRE_DELETE mSkeletonManager;
         OGRE_DELETE mMeshManager;
@@ -358,6 +317,9 @@ namespace Ogre {
 
 
         StringInterface::cleanupDictionary ();
+
+		// destroy compiled core features
+		CoreFeatureRegistry::getSingleton().destroyFeatures();
     }
 
     //-----------------------------------------------------------------------

@@ -95,7 +95,6 @@ namespace Ogre
         OverlayElementFactory* mTextAreaFactory;
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;
-        ArchiveFactory *mZipArchiveFactory;
         ArchiveFactory *mFileSystemArchiveFactory;
 		ResourceGroupManager* mResourceGroupManager;
 		ResourceBackgroundQueue* mResourceBackgroundQueue;
