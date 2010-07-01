@@ -46,8 +46,8 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//---------------------------------------------------------------------
-	uint32 StreamSerialiser::HEADER_ID = 0x0001;
-	uint32 StreamSerialiser::REVERSE_HEADER_ID = 0x1000;
+	uint32 StreamSerialiser::HEADER_ID = 0x00000001;
+	uint32 StreamSerialiser::REVERSE_HEADER_ID = 0x10000000;
 	uint32 StreamSerialiser::CHUNK_HEADER_SIZE = 
 		sizeof(uint32) + // id
 		sizeof(uint16) + // version
