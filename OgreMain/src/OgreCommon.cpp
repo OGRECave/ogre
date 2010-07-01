@@ -70,7 +70,13 @@ namespace Ogre
 	http://www.azillionmonkeys.com/qed/hash.html
 	Original by Paul Hsieh 
 	*/
-#define OGRE_GET16BITS(d) (*((const uint16 *) (d)))
+#if OGRE_ENDIAN == OGRE_ENDIAN_LITTLE
+#  define OGRE_GET16BITS(d) (*((const uint16 *) (d)))
+#else
+	// Cast to uint16 in little endian means first byte is least significant
+	// replicate that here
+#  define OGRE_GET16BITS(d) (*((const uint8 *) (d)) + (*((const uint8 *) (d+1))<<8))
+#endif
 	uint32 _OgreExport FastHash (const char * data, int len, uint32 hashSoFar)
 	{
 		uint32 hash;
