@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 
+#include "OgreCoreFeature.h"
+
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define PVR_TEXTURE_FLAG_TYPE_MASK	0xff
 
@@ -255,5 +257,5 @@ namespace Ogre {
 
 		void destroy() {}
 	};
-	OGRE_REGISTER_CORE_FEATURE(PVRTCCodecFeature)
+	OGRE_REGISTER_CORE_FEATURE(PVRTCCodecFeature, 0)
 }
