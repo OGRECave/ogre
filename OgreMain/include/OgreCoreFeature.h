@@ -111,6 +111,13 @@ namespace Ogre {
 		vector<std::pair<int, CoreFeature*> >::type mFeatures;
 	};
 
+	/** Required hack to deal with OGRE_NEW's usage of the __FUNCTION__ macro. */
+	template<class Feature>
+	Feature* createFeature()
+	{
+		return OGRE_NEW Feature;
+	}
+
 	/** Call this macro to register a CoreFeature with the registry.
 	  	@param
 			The feature class to register. Must inherit from CoreFeature.
@@ -120,7 +127,7 @@ namespace Ogre {
 	#define OGRE_REGISTER_CORE_FEATURE(FeatureClass, priority) \
 		namespace { \
 			Ogre::CoreFeatureResult _reg_##__LINE__ = \
-				Ogre::CoreFeatureRegistry::getSingleton().registerFeature(OGRE_NEW FeatureClass, priority); \
+				Ogre::CoreFeatureRegistry::getSingleton().registerFeature(createFeature<FeatureClass>(), priority); \
 		}
 
 	/** @} */
