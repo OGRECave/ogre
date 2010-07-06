@@ -125,7 +125,12 @@ namespace Ogre{
 			return false;
 		
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
+#if OGRE_DOUBLE_PRECISION == 0
 		int n = sscanf(atom->value.c_str(), "%f", result);
+#else
+		int n = sscanf(atom->value.c_str(), "%lf", result);
+#endif
+		
 		if(n == 0 || n == EOF)
 			return false; // Conversion failed
 		
