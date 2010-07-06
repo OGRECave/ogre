@@ -84,7 +84,7 @@ namespace Ogre
 		size_t fsaaSamples = 0;
 		String fsaaHint;
 		int monitorIndex = -1;	//Default by detecting the adapter from left / top position
-
+		bool showWindow = true;
 		if(miscParams)
 		{
 			// Get variable-length params
@@ -161,6 +161,9 @@ namespace Ogre
 			opt = miscParams->find("monitorIndex");
 			if(opt != miscParams->end())
 				monitorIndex = StringConverter::parseInt(opt->second);
+			opt = miscParams->find("show");
+			if(opt != miscParams->end())
+				showWindow = StringConverter::parseBool(opt->second);
 
 		}
 
@@ -170,11 +173,16 @@ namespace Ogre
 
 		if (!externalHandle)
 		{
-			DWORD		dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+			DWORD		dwStyle = WS_CLIPCHILDREN;
 			DWORD		dwStyleEx = 0;
 			HMONITOR    hMonitor = NULL;		
 			MONITORINFO monitorInfo;
 			RECT		rc;
+
+			if (showWindow == true)
+			{
+				dwStyle |= WS_VISIBLE;
+			}
 
 
 			// If we specified which adapter we want to use - find it's monitor.
