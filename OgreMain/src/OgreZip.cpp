@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreStringVector.h"
 #include "OgreRoot.h"
-#include "OgreCoreFeature.h"
-#include "OgreArchiveManager.h"
 
 #include <zzip/zzip.h>
 
@@ -387,29 +385,5 @@ namespace Ogre {
         static String name = "Zip";
         return name;
     }
-    //-----------------------------------------------------------------------
-
-	// register ZipArchiveFactory with Ogre
-	class ZipFeature : public CoreFeature
-	{
-	public:
-		void setup()
-		{
-			mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
-			ArchiveManager::getSingleton().addArchiveFactory(mZipArchiveFactory);
-		}
-
-		void shutdown() {}
-
-		void destroy()
-		{
-			OGRE_DELETE mZipArchiveFactory;
-			mZipArchiveFactory = 0;
-		}
-
-	private:
-		ZipArchiveFactory* mZipArchiveFactory;
-	};
-	OGRE_REGISTER_CORE_FEATURE(ZipFeature, 0)
 
 }
