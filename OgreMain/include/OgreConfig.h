@@ -159,6 +159,35 @@ OGRE_THREAD_PROVIDER = 3
 #define OGRE_THREAD_PROVIDER 0
 #endif
 
+/** Disables use of the FreeImage image library for loading images.
+WARNING: Use only when you want to provide your own image loading code via codecs.
+*/
+#ifndef OGRE_NO_FREEIMAGE
+#define OGRE_NO_FREEIMAGE 0
+#endif
+
+/** Disables use of the DevIL image library for loading images.
+By default DevIL is disabled in Eihort in favour of FreeImage, but you may re-enable
+it if you choose
+*/
+#ifndef OGRE_NO_DEVIL
+#define OGRE_NO_DEVIL 1
+#endif
+
+/** Disables use of the internal image codec for loading DDS files.
+WARNING: Use only when you want to provide your own image loading code via codecs.
+*/
+#ifndef OGRE_NO_DDS_CODEC
+#define OGRE_NO_DDS_CODEC 0
+#endif
+
+/** Disables use of the ZIP archive support.
+WARNING: Disabling this will make the samples unusable.
+*/
+#ifndef OGRE_NO_ZIP_ARCHIVE
+#define OGRE_NO_ZIP_ARCHIVE 0
+#endif
+
 /** Enables the use of the new script compilers when Ogre compiles resource scripts.
 */
 #ifndef OGRE_USE_NEW_COMPILERS
