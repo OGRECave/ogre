@@ -58,7 +58,7 @@ namespace Ogre {
 		virtual String getContextType();
 
 		/** Grab the CGLContext if it exists */
-		CGLContextObj getContext();
+		CGLContextObj getContext() { return mCGLContext; }
 
 	private:
 		CGLContextObj mCGLContext;

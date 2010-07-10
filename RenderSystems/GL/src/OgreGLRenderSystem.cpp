@@ -156,7 +156,8 @@ namespace Ogre {
 		}
 		mRenderTargets.clear();
 
-		delete mGLSupport;
+        if(mGLSupport)
+            delete mGLSupport;
 	}
 
 	const String& GLRenderSystem::getName(void) const

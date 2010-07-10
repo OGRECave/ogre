@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
@@ -30,10 +30,9 @@ THE SOFTWARE.
 #define __OSXCarbonWindow_H__
 
 #include "OgreOSXWindow.h"
+
 #include "OgreOSXCarbonContext.h"
 #include "OgreOSXCGLContext.h"
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/CGLTypes.h>
 
 namespace Ogre 
 {
@@ -66,28 +65,33 @@ namespace Ogre
    	    /** Overridden - see RenderTarget */
 		virtual void windowMovedOrResized();
 
-		bool requiresTextureFlipping() const { return false; }
+		bool requiresTextureFlipping(void) const { return false; }
 		
-		void windowResized();
-		void windowHasResized();
+		void windowResized(void);
+		void windowHasResized(void);
 		
 		void getCustomAttribute( const String& name, void* pData );
 
 	private:
-		void processEvents();
-		
-	private:
+		void createNewWindow(unsigned int width, unsigned int height, String title);
+        void createWindowFromExternal(HIViewRef viewRef);
+        void createAGLContext(size_t fsaa_samples, int depth);
+
 		WindowRef mWindow;
         EventHandlerRef mEventHandlerRef;
 		HIViewRef mView;
 		AGLContext mAGLContext;
+        AGLPixelFormat mAGLPixelFormat;
+        String mWindowTitle;
+		OSXCGLContext* mCGLContext;
+		OSXCarbonContext* mCarbonContext;
 		
-    bool mActive;
-    bool mClosed;
-    bool mCreated;
-    bool mHasResized;
-    bool mIsExternal;
-    bool mVisible;
+        bool mActive;
+        bool mClosed;
+        bool mCreated;
+        bool mHasResized;
+        bool mIsExternal;
+        bool mVisible;
 	};
 }
 

@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
@@ -41,21 +41,22 @@ namespace Ogre {
     private:
 		NSWindow *mWindow;
 		NSView *mView;
-		NSOpenGLContext *glContext;
-		
+		NSOpenGLContext *mGLContext;
+
         bool mActive;
         bool mClosed;
 		bool mHasResized;
-            
-        // Process pending events
-        void processEvents(void);
+        bool mIsExternal;
+        String mWindowTitle;
+        bool mUseNSView;
+
     public:
         OSXCocoaWindow();
         ~OSXCocoaWindow();
 		
 		NSView* ogreView() const { return mView; };
 		NSWindow* ogreWindow() const { return mWindow; };
-		NSOpenGLContext* nsopenGLContext() const { return glContext; };
+		NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
 		void createWithView(OgreView *view);
 
 		void create(const String& name, unsigned int width, unsigned int height,
@@ -76,6 +77,8 @@ namespace Ogre {
         virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
 		void windowMovedOrResized();
+		void createNewWindow(unsigned int width, unsigned int height, String title);
+        void createWindowFromExternal(NSView *viewRef);
 
 		bool requiresTextureFlipping() const { return false; }		
 		void getCustomAttribute( const String& name, void* pData );

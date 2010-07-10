@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
@@ -28,21 +28,21 @@ THE SOFTWARE.
 
 #include "OgreOSXCGLContext.h"
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre
 {
 	
-	OSXCGLContext::OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat): mCGLContext(cglContext), mPixelFormat(pixelFormat)
-	{
-	}
+	OSXCGLContext::OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat) :
+        mCGLContext(cglContext), mPixelFormat(pixelFormat) {}
     
 	OSXCGLContext::~OSXCGLContext()
 	{
-        CGLClearDrawable(mCGLContext); 
-		CGLDestroyContext(mCGLContext);
-        
         if(mPixelFormat != NULL)
+        {
             CGLDestroyPixelFormat(mPixelFormat);
+            mPixelFormat = NULL;
+        }
     }
 
     void OSXCGLContext::setCurrent()
@@ -59,16 +59,12 @@ namespace Ogre
 	{
 		CGLContextObj cglCtxShare;
         CGLCreateContext(mPixelFormat, mCGLContext, &cglCtxShare);
-		return new OSXCGLContext(cglCtxShare, mPixelFormat);
+
+		return OGRE_NEW OSXCGLContext(cglCtxShare, mPixelFormat);
 	}
 	
 	String OSXCGLContext::getContextType()
 	{
 		return "CGL";
-	}
-		
-	CGLContextObj OSXCGLContext::getContext()
-	{
-		return mCGLContext;
 	}
 }
