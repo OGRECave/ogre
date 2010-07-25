@@ -55,37 +55,37 @@ public:
 	/**
 	*@see ScriptTranslator::getBoolean.
 	*/
-	ScriptTranslator::getBoolean;
+	using ScriptTranslator::getBoolean;
 	
 	/**
 	*@see ScriptTranslator::getBoolean.
 	*/
-	ScriptTranslator::getString;
+	using ScriptTranslator::getString;
 	
 	/**
 	*@see ScriptTranslator::getReal.
 	*/
-	ScriptTranslator::getReal;
+	using ScriptTranslator::getReal;
 	
 	/**
 	*@see ScriptTranslator::getFloat.
 	*/
-	ScriptTranslator::getFloat;
+	using ScriptTranslator::getFloat;
 
 	/**
 	*@see ScriptTranslator::getInt.
 	*/
-	ScriptTranslator::getInt; 
+	using ScriptTranslator::getInt; 
 
 	/**
 	*@see ScriptTranslator::getUInt.
 	*/
-	ScriptTranslator::getUInt; 
+	using ScriptTranslator::getUInt; 
 
 	/**
 	*@see ScriptTranslator::getColour.
 	*/
-	ScriptTranslator::getColour;
+	using ScriptTranslator::getColour;
 	
 protected:
 

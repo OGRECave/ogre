@@ -208,13 +208,11 @@ namespace Ogre {
         {
             bool visible = 
                 static_cast<const OverlayElement*>(target)->isVisible();
-            switch(visible)
-            {
-            case true:
+            if(visible)
                 return "true";
-            case false:
+            else
                 return "false";
-            }
+
             // To keep compiler happy
             return "true";
         }
