@@ -36,7 +36,6 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    class EAGLSupport;
 
     class _OgrePrivate EAGLESContext : public GLESContext
     {
@@ -71,6 +70,11 @@ namespace Ogre {
 
             /* OpenGL name for the depth buffer that is attached to viewFramebuffer, if it exists (0 if it does not exist) */
             GLuint mDepthRenderbuffer;
+
+            bool mIsMultiSampleSupported;
+            GLsizei mNumSamples;
+            GLuint mFSAAFramebuffer;
+            GLuint mFSAARenderbuffer;
     };
 }
 

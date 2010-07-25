@@ -38,7 +38,11 @@ namespace Ogre {
         mBackingHeight(0),
         mViewRenderbuffer(0),
         mViewFramebuffer(0),
-        mDepthRenderbuffer(0)
+        mDepthRenderbuffer(0),
+        mIsMultiSampleSupported(false),
+        mNumSamples(0),
+        mFSAAFramebuffer(0),
+        mFSAARenderbuffer(0)
     {
 
         mDrawable = [drawable retain];
@@ -84,7 +88,7 @@ namespace Ogre {
         GL_CHECK_ERROR
         glBindRenderbufferOES(GL_RENDERBUFFER_OES, mViewRenderbuffer);
         GL_CHECK_ERROR
-
+        
         if(![mContext renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:(id<EAGLDrawable>) mDrawable])
         {
             GL_CHECK_ERROR
@@ -94,19 +98,72 @@ namespace Ogre {
             return false;
         }
 
-        glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, mViewRenderbuffer);
-        GL_CHECK_ERROR
-
         glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &mBackingWidth);
         GL_CHECK_ERROR
         glGetRenderbufferParameterivOES(GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &mBackingHeight);
         GL_CHECK_ERROR
+        glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, mViewRenderbuffer);
+        GL_CHECK_ERROR
 
-        glGenRenderbuffersOES(1, &mDepthRenderbuffer);
-        glBindRenderbufferOES(GL_RENDERBUFFER_OES, mDepthRenderbuffer);
-        glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mBackingWidth, mBackingHeight);
-        glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthRenderbuffer);
-        
+#if GL_APPLE_framebuffer_multisample
+        if(mIsMultiSampleSupported && mNumSamples > 0)
+        {
+            // Determine how many MSAS samples to use
+            GLint maxSamplesAllowed;
+            glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamplesAllowed);
+            int samplesToUse = (mNumSamples > maxSamplesAllowed) ? maxSamplesAllowed : mNumSamples;
+            
+            // Create the FSAA framebuffer (offscreen)
+            glGenFramebuffersOES(1, &mFSAAFramebuffer);
+            GL_CHECK_ERROR
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mFSAAFramebuffer);
+            GL_CHECK_ERROR
+            
+            /* Create the offscreen MSAA color buffer.
+             * After rendering, the contents of this will be blitted into mFSAAFramebuffer */
+            glGenRenderbuffersOES(1, &mFSAARenderbuffer);
+            GL_CHECK_ERROR
+            glBindRenderbufferOES(GL_RENDERBUFFER_OES, mFSAARenderbuffer);
+            GL_CHECK_ERROR
+            glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, samplesToUse, GL_RGBA8_OES, mBackingWidth, mBackingHeight);
+            GL_CHECK_ERROR
+            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, mFSAARenderbuffer);
+            GL_CHECK_ERROR
+            
+            // Create the FSAA depth buffer
+            glGenRenderbuffersOES(1, &mDepthRenderbuffer);
+            GL_CHECK_ERROR
+            glBindRenderbufferOES(GL_RENDERBUFFER_OES, mDepthRenderbuffer);
+            GL_CHECK_ERROR
+            glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, samplesToUse, GL_DEPTH_COMPONENT24_OES, mBackingWidth, mBackingHeight);
+            GL_CHECK_ERROR
+            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthRenderbuffer);
+            GL_CHECK_ERROR
+
+            // Validate the FSAA framebuffer
+            if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES)
+            {
+                GL_CHECK_ERROR
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Failed to make complete FSAA framebuffer object",
+                            __FUNCTION__);
+                return false;
+            }
+        }
+        else
+#endif
+        {
+            glGenRenderbuffersOES(1, &mDepthRenderbuffer);
+            GL_CHECK_ERROR
+            glBindRenderbufferOES(GL_RENDERBUFFER_OES, mDepthRenderbuffer);
+            GL_CHECK_ERROR
+            glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mBackingWidth, mBackingHeight);
+            GL_CHECK_ERROR
+            glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthRenderbuffer);
+            GL_CHECK_ERROR
+        }
+
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mViewFramebuffer);
         if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES)
         {
             GL_CHECK_ERROR
@@ -125,6 +182,18 @@ namespace Ogre {
         mViewFramebuffer = 0;
         glDeleteRenderbuffersOES(1, &mViewRenderbuffer);
         mViewRenderbuffer = 0;
+        
+        if(mFSAARenderbuffer)
+        {
+            glDeleteRenderbuffersOES(1, &mFSAARenderbuffer);
+            mFSAARenderbuffer = 0;
+        }
+
+        if(mFSAAFramebuffer)
+        {
+            glDeleteFramebuffersOES(1, &mFSAAFramebuffer);
+            mFSAAFramebuffer = 0;
+        }
         
         if(mDepthRenderbuffer)
         {

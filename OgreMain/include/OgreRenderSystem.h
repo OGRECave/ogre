@@ -383,7 +383,18 @@ namespace Ogre
 			</td>
 			<td>&nbsp;</td>
 		 </tr>
-		<tr>
+         <tr>
+             <td>contentScalingFactor</td>
+             <td>Positive Float greater than 1.0</td>
+             <td>The default content scaling factor of the screen</td>
+             <td>Specifies the CAEAGLLayer content scaling factor.  Only supported on iOS 4 or greater.
+                 This can be useful to limit the resolution of the OpenGL ES backing store.  For example, the iPhone 4's
+                 native resolution is 960 x 640.  Windows are always 320 x 480, if you would like to limit the display
+                 to 720 x 480, specify 1.5 as the scaling factor.
+             </td>
+             <td>&nbsp;</td>
+		 </tr>
+         <tr>
 			<td>FSAA</td>
 			<td>Positive integer (usually 0, 2, 4, 8, 16)</td>
 			<td>0</td>

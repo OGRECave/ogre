@@ -41,9 +41,31 @@ namespace Ogre {
         glGenFramebuffersOES(1, &mFB);
         GL_CHECK_ERROR;
 
-        mNumSamples = 0;
-        mMultisampleFB = 0;
-
+		// Check multisampling
+#if GL_APPLE_framebuffer_multisample
+			// Check samples supported
+			glBindFramebufferOES(GL_FRAMEBUFFER_OES, mFB);
+            GL_CHECK_ERROR;
+			GLint maxSamples;
+			glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples);
+            GL_CHECK_ERROR;
+			glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
+            GL_CHECK_ERROR;
+			mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+#else
+			mNumSamples = 0;
+#endif
+		// will we need a second FBO to do multisampling?
+		if (mNumSamples)
+		{
+			glGenFramebuffersOES(1, &mMultisampleFB);
+            GL_CHECK_ERROR;
+		}
+		else
+		{
+			mMultisampleFB = 0;
+		}
+        
         /// Initialise state
         mDepth.buffer=0;
         mStencil.buffer=0;
@@ -143,6 +165,7 @@ namespace Ogre {
                 // Detach
                 glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES+x,
                     GL_RENDERBUFFER_OES, 0);
+                GL_CHECK_ERROR;
             }
         }
 
@@ -267,7 +290,19 @@ namespace Ogre {
 
 	void GLESFrameBufferObject::swapBuffers()
 	{
-        // Do nothing
+#if GL_APPLE_framebuffer_multisample
+		if (mMultisampleFB)
+		{
+			// blit from multisample buffer to final buffer, triggers resolve
+			glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB);
+            GL_CHECK_ERROR;
+			glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, mFB);
+            GL_CHECK_ERROR;
+            glResolveMultisampleFramebufferAPPLE();
+            GL_CHECK_ERROR;
+//			glBlitFramebufferEXT(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		}
+#endif
 	}
 
     size_t GLESFrameBufferObject::getWidth()
