@@ -147,8 +147,7 @@
                 [ogreiPhoneLocationLabel setStringValue:[NSString stringWithFormat:@"%@%@ @ %@", @"Found Ogre version ", version, ogreDirectory]];
 
                 // Replace the placeholder string in the project files with the SDK root chosen by the user
-                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"];
-                projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"];
+                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"];
                 [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
                                                      withString:ogreDirectory
                                                         options:NSLiteralSearch
