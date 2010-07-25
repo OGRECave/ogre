@@ -1062,7 +1062,7 @@ protected:
 			mWindow->removeAllViewports();
 			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
 			Ogre::Camera* cam = sm->createCamera("DummyCamera");
-			Ogre::Viewport* newViewport = mWindow->addViewport(cam);
+			mWindow->addViewport(cam);
 #ifdef USE_RTSHADER_SYSTEM
 			// Initialize shader generator.
 			// Must be before resource loading in order to allow parsing extended material attributes.

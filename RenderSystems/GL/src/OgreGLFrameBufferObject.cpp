@@ -126,7 +126,7 @@ namespace Ogre {
         size_t width = mColour[0].buffer->getWidth();
         size_t height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
-        PixelFormat ogreFormat = mColour[0].buffer->getFormat();
+        //PixelFormat ogreFormat = mColour[0].buffer->getFormat();
 
 		// Bind simple buffer to add colour attachments
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);

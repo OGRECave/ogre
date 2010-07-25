@@ -124,9 +124,9 @@ namespace Ogre {
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
 	  , mNextMovableObjectTypeFlag(1)
+	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
 	  , mIsBlendWeightsGpuRedundant(true)
-	  , mIsInitialised(false)
     {
         // superclass will do singleton checking
         String msg;

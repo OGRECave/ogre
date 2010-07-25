@@ -1360,6 +1360,8 @@ void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode
 	case LayeredBlending::LB_BlendLuminosity:
 		mLayerBlendLabel->setCaption("Luminosity");
 		break;
+	default:
+		break;
 	}
 }
 

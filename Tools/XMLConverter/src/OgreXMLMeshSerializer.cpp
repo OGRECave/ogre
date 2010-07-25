@@ -431,7 +431,7 @@ namespace Ogre {
                     break;
                 case VES_TEXTURE_COORDINATES:
 					{
-						const char *type;
+						const char *type = "float2";
 						switch (elem.getType()) 
 						{
 						case VET_FLOAT1: 

@@ -576,7 +576,7 @@ void XMLToBinary(XmlOptions opts)
         if (genLod)
         {
             unsigned short numLod;
-            ProgressiveMesh::VertexReductionQuota quota;
+            ProgressiveMesh::VertexReductionQuota quota = ProgressiveMesh::VRQ_PROPORTIONAL;
             Real reduction;
             Mesh::LodValueList valueList;
 

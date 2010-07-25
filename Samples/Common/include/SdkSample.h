@@ -475,7 +475,7 @@ namespace OgreBites
 			mDetailsPanel->setParamValue(11, "Off");
 
             Ogre::Viewport* mainVP = mCamera->getViewport();
-            const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
+            //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
                 mainVP->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
