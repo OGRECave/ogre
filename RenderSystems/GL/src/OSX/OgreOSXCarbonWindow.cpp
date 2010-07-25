@@ -204,7 +204,7 @@ namespace Ogre
             // Set the default attributes for the window
             WindowAttributes windowAttrs = kWindowStandardDocumentAttributes; // default: "resize"
 
-            windowAttrs |= kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute /*| kWindowHideOnFullScreenAttribute*/ | kWindowNoShadowAttribute;
+            windowAttrs |= kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowHideOnFullScreenAttribute | kWindowNoShadowAttribute;
 
             // Create the window
             CreateNewWindow(kDocumentWindowClass, windowAttrs, &windowRect, &mWindow);
