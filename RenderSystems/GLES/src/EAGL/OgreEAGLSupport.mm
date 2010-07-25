@@ -51,6 +51,7 @@ namespace Ogre {
         ConfigOption optOrientation;
         ConfigOption optVideoMode;
         ConfigOption optDisplayFrequency;
+        ConfigOption optContentScalingFactor;
         ConfigOption optFSAA;
         ConfigOption optRTTMode;
 
@@ -60,14 +61,15 @@ namespace Ogre {
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
 
-        CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+        // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
+        // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
+        CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
 
         optVideoMode.name = "Video Mode";
         optVideoMode.possibleValues.push_back("320 x 480");
-        optVideoMode.possibleValues.push_back("640 x 960");
         optVideoMode.possibleValues.push_back("768 x 1024");
-        optVideoMode.currentValue = StringConverter::toString(appFrame.size.width) + " x " + 
-                                    StringConverter::toString(appFrame.size.height);
+        optVideoMode.currentValue = StringConverter::toString(screenSize.width) + " x " + 
+                                    StringConverter::toString(screenSize.height);
         optVideoMode.immutable = false;
 
         optOrientation.name = "Orientation";
@@ -82,27 +84,23 @@ namespace Ogre {
         optDisplayFrequency.currentValue = "0 Hz";
         optDisplayFrequency.immutable = false;
 
+        optContentScalingFactor.name = "Content Scaling Factor";
+        optContentScalingFactor.possibleValues.push_back( "1.0" );
+        optContentScalingFactor.possibleValues.push_back( "1.33" );
+        optContentScalingFactor.possibleValues.push_back( "1.5" );
+        optContentScalingFactor.possibleValues.push_back( "2.0" );
+#if __IPHONE_4_0
+        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
+            optContentScalingFactor.currentValue = StringConverter::toString([UIScreen mainScreen].scale);
+        else
+#endif
+        optContentScalingFactor.currentValue = "1.0";
+        optContentScalingFactor.immutable = false;
+        
         optFSAA.name = "FSAA";
         optFSAA.possibleValues.push_back( "0" );
-        
-        // TODO: DJR - figure out how to get the number of samples
-        switch( 0 )
-        {
-            case 6:
-                optFSAA.possibleValues.push_back( "2" );
-                optFSAA.possibleValues.push_back( "4" );
-                optFSAA.possibleValues.push_back( "6" );
-                break;
-            case 4:
-                optFSAA.possibleValues.push_back( "2" );
-                optFSAA.possibleValues.push_back( "4" );
-                break;
-            case 2:
-                optFSAA.possibleValues.push_back( "2" );
-                break;
-            default: break;
-        }
-        
+        optFSAA.possibleValues.push_back( "2" );
+        optFSAA.possibleValues.push_back( "4" );
         optFSAA.currentValue = "0";
         optFSAA.immutable = false;
 
@@ -115,6 +113,7 @@ namespace Ogre {
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
+        mOptions[optContentScalingFactor.name] = optContentScalingFactor;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optRTTMode.name] = optRTTMode;
         mOptions[optOrientation.name] = optOrientation;
@@ -233,7 +232,7 @@ namespace Ogre {
             NameValuePairList miscParams;
 
             bool fullscreen = false;
-            uint w = 320, h = 480;
+            uint w = 0, h = 0;
 
             if ((opt = mOptions.find("Full Screen")) != end)
             {
@@ -250,6 +249,11 @@ namespace Ogre {
                 miscParams["orientation"] = opt->second.currentValue;
             }
 
+            if ((opt = mOptions.find("Content Scaling Factor")) != end)
+            {
+                miscParams["contentScalingFactor"] = opt->second.currentValue;
+            }
+            
             if ((opt = mOptions.find("Video Mode")) != end)
             {
                 String val = opt->second.currentValue;

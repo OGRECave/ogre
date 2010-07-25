@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
@@ -27,13 +27,13 @@ THE SOFTWARE.
 */
 
 #include "OgreOSXCarbonContext.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
 
-    OSXCarbonContext::OSXCarbonContext(AGLContext aglContext, AGLPixelFormat pixelFormat): mAGLContext(aglContext), mPixelFormat(pixelFormat)
-	{
-	}
+    OSXCarbonContext::OSXCarbonContext(AGLContext aglContext, AGLPixelFormat pixelFormat) :
+        mAGLContext(aglContext), mPixelFormat(pixelFormat) {}
 	
 	OSXCarbonContext::~OSXCarbonContext()
 	{
@@ -43,7 +43,7 @@ namespace Ogre
 
     void OSXCarbonContext::setCurrent()
 	{
-		// apple's docs claim that you may need to force the context to null
+		// Apple's docs claim that you may need to force the context to null
 		// before setting current, especially when using pBuffers.
 		aglSetCurrentContext(NULL);
 		aglSetCurrentContext(mAGLContext);
@@ -57,18 +57,13 @@ namespace Ogre
 	GLContext* OSXCarbonContext::clone() const
 	{
         aglSetCurrentContext(NULL);
-		//aglSetCurrentContext(mAGLContext);
 		AGLContext aglCtxShare = aglCreateContext(mPixelFormat, mAGLContext);
-		return new OSXCarbonContext(aglCtxShare, mPixelFormat);
+		return OGRE_NEW OSXCarbonContext(aglCtxShare, mPixelFormat);
 	}
 	
 	String OSXCarbonContext::getContextType()
 	{
 		return "AGL";
 	}
-	
-	AGLContext OSXCarbonContext::getContext()
-	{
-		return mAGLContext;
-	}	
+
 }

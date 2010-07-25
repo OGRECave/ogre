@@ -245,6 +245,8 @@ void LayeredBlending::addPSModifierInvocation(Function* psMain,
 			funcName = "SGX_src_mod_inv_modulate";
 			modifiedParam = arg2;
 			break;
+		default:
+			break;
 		}
 
 		//add the function of the blend mode

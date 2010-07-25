@@ -43,337 +43,387 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
-//-------------------------------------------------------------------------------------------------//
-OSXWindow::OSXWindow() : mCGLContext(NULL)
-{
-}
-
-//-------------------------------------------------------------------------------------------------//
-OSXWindow::~OSXWindow()
-{
-}
-
-//-------------------------------------------------------------------------------------------------//
-void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
-{
-	if ((dst.left < 0) || (dst.right > mWidth) ||
-		(dst.top < 0) || (dst.bottom > mHeight) ||
-		(dst.front != 0) || (dst.back != 1))
-	{
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-					"Invalid box.",
-					"OSXWindow::copyContentsToMemory" );
-	}
-
-	if (buffer == FB_AUTO)
-	{
-		buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-	}
-
-	GLenum format = Ogre::GLPixelUtil::getGLOriginFormat(dst.format);
-	GLenum type = Ogre::GLPixelUtil::getGLOriginDataType(dst.format);
-
-	if ((format == GL_NONE) || (type == 0))
-	{
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-					"Unsupported format.",
-					"OSXWindow::copyContentsToMemory" );
-	}
-
-	if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
-	{
-		// Standard alignment of 4 is not right
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	}
-	
-	glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-	glReadPixels((GLint)dst.left, (GLint)dst.top,
-				 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-				 format, type, dst.data);
-
-	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-	
-	//vertical flip
-	{
-		size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-		size_t height = dst.getHeight();
-		uchar *tmpData = new uchar[rowSpan * height];
-		uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
-
-		while (tmpRow >= tmpData)
-		{
-			memcpy(tmpRow, srcRow, rowSpan);
-			srcRow += rowSpan;
-			tmpRow -= rowSpan;
-		}
-		memcpy(dst.data, tmpData, rowSpan * height);
-
-		delete [] tmpData;
-	}
-}
-
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-uint32 OSXWindow::bitDepthFromDisplayMode(CGDisplayModeRef mode)
-{
-    uint32 depth = 0;
-    CFStringRef pixEnc = CGDisplayModeCopyPixelEncoding(mode);
-    if(CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
-        depth = 32;
-    else if(CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
-        depth = 16;
-    else if(CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
-        depth = 8;
-    
-    return depth;
-}
-#endif
-
-//-------------------------------------------------------------------------------------------------//
-void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext)
-{
-    // Find the best match to what was requested
-    boolean_t exactMatch = 0;
-    int reqWidth, reqHeight, reqDepth;
-    CGLError err;
-    CGError cgErr;
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-    
-    // Get a copy of the current display mode
-    CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
-
-    // Loop through all display modes to determine the closest match.
-    // CGDisplayBestModeForParameters is deprecated on 10.6 so we will emulate it's behavior
-    // Try to find a mode with the requested depth and equal or greater dimensions first.
-    // If no match is found, try to find a mode with greater depth and same or greater dimensions.
-    // If still no match is found, just use the current mode.
-    CFArrayRef allModes = CGDisplayCopyAllDisplayModes(kCGDirectMainDisplay, NULL);
-    for(int i = 0; i < CFArrayGetCount(allModes); i++)
+    uint32 OSXWindow::bitDepthFromDisplayMode(CGDisplayModeRef mode)
     {
-        CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(allModes, i);
-        String modeString = StringConverter::toString(CGDisplayModeGetWidth(mode)) + String(" x ") +
-            StringConverter::toString(CGDisplayModeGetHeight(mode)) + String(" @ ") +
-            StringConverter::toString(bitDepthFromDisplayMode(mode)) + "bpp.";
+        uint32 depth = 0;
+        CFStringRef pixEnc = CGDisplayModeCopyPixelEncoding(mode);
+        if(CFStringCompare(pixEnc, CFSTR(IO32BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+            depth = 32;
+        else if(CFStringCompare(pixEnc, CFSTR(IO16BitDirectPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+            depth = 16;
+        else if(CFStringCompare(pixEnc, CFSTR(IO8BitIndexedPixels), kCFCompareCaseInsensitive) == kCFCompareEqualTo)
+            depth = 8;
 
-//        LogManager::getSingleton().logMessage(modeString);
-        if(bitDepthFromDisplayMode(mode) != depth)
-            continue;
-
-        if((CGDisplayModeGetWidth(mode) == width) && (CGDisplayModeGetHeight(mode) == height))
+        return depth;
+    }
+#endif
+    //-------------------------------------------------------------------------------------------------//
+    OSXWindow::OSXWindow() : mContext(NULL), mCGLContextObj(NULL), mOriginalDisplayMode(NULL)
+    {
+    }
+    
+    //-------------------------------------------------------------------------------------------------//
+    OSXWindow::~OSXWindow()
+    {
+    }
+    
+    //-------------------------------------------------------------------------------------------------//
+    void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    {
+        if ((dst.left < 0) || (dst.right > mWidth) ||
+            (dst.top < 0) || (dst.bottom > mHeight) ||
+            (dst.front != 0) || (dst.back != 1))
         {
-            displayMode = mode;
-            exactMatch = 1;
-            break;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Invalid box.",
+                        "OSXWindow::copyContentsToMemory" );
+        }
+        
+        if (buffer == FB_AUTO)
+        {
+            buffer = mIsFullScreen? FB_FRONT : FB_BACK;
+        }
+        
+        GLenum format = Ogre::GLPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = Ogre::GLPixelUtil::getGLOriginDataType(dst.format);
+        
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Unsupported format.",
+                        "OSXWindow::copyContentsToMemory" );
+        }
+        
+        if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
+        {
+            // Standard alignment of 4 is not right
+            glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        }
+        
+        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+        glReadPixels((GLint)dst.left, (GLint)dst.top,
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.data);
+        
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        
+        //vertical flip
+        {
+            size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
+            size_t height = dst.getHeight();
+            uchar *tmpData = OGRE_NEW uchar[rowSpan * height];
+            uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
+            
+            while (tmpRow >= tmpData)
+            {
+                memcpy(tmpRow, srcRow, rowSpan);
+                srcRow += rowSpan;
+                tmpRow -= rowSpan;
+            }
+            memcpy(dst.data, tmpData, rowSpan * height);
+            
+            OGRE_DELETE [] tmpData;
         }
     }
-
-    // No depth match was found
-    if(!exactMatch)
+    
+    //-------------------------------------------------------------------------------------------------//
+    void OSXWindow::createCGLFullscreen(unsigned int width, unsigned int height, unsigned int depth, unsigned int fsaa, CGLContextObj sharedContext)
     {
+        // Find the best match to what was requested
+        boolean_t exactMatch = 0;
+        unsigned int reqWidth = 0, reqHeight = 0, reqDepth = 0;
+        CGLError cglErr = kCGLNoError;
+        CGError cgErr = kCGErrorSuccess;
+        
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+        // Get a copy of the current display mode
+        CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
+        
+        // Loop through all display modes to determine the closest match.
+        // CGDisplayBestModeForParameters is deprecated on 10.6 so we will emulate it's behavior
+        // Try to find a mode with the requested depth and equal or greater dimensions first.
+        // If no match is found, try to find a mode with greater depth and same or greater dimensions.
+        // If still no match is found, just use the current mode.
+        CFArrayRef allModes = CGDisplayCopyAllDisplayModes(kCGDirectMainDisplay, NULL);
         for(int i = 0; i < CFArrayGetCount(allModes); i++)
         {
             CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(allModes, i);
-            if(bitDepthFromDisplayMode(mode) >= depth)
+            String modeString = StringConverter::toString(CGDisplayModeGetWidth(mode)) + String(" x ") +
+            StringConverter::toString(CGDisplayModeGetHeight(mode)) + String(" @ ") +
+            StringConverter::toString(bitDepthFromDisplayMode(mode)) + "bpp.";
+            
+            //        LogManager::getSingleton().logMessage(modeString);
+            if(bitDepthFromDisplayMode(mode) != depth)
                 continue;
-
-            if((CGDisplayModeGetWidth(mode) >= width) && (CGDisplayModeGetHeight(mode) >= height))
+            
+            if((CGDisplayModeGetWidth(mode) == width) && (CGDisplayModeGetHeight(mode) == height))
             {
                 displayMode = mode;
                 exactMatch = 1;
                 break;
             }
         }
-    }
-    
-    reqWidth = CGDisplayModeGetWidth(displayMode);
-    reqHeight = CGDisplayModeGetHeight(displayMode);
-    reqDepth = bitDepthFromDisplayMode(displayMode);
+        
+        // No depth match was found
+        if(!exactMatch)
+        {
+            for(int i = 0; i < CFArrayGetCount(allModes); i++)
+            {
+                CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex(allModes, i);
+                if(bitDepthFromDisplayMode(mode) >= depth)
+                    continue;
+                
+                if((CGDisplayModeGetWidth(mode) >= width) && (CGDisplayModeGetHeight(mode) >= height))
+                {
+                    displayMode = mode;
+                    exactMatch = 1;
+                    break;
+                }
+            }
+        }
+        
+        reqWidth = CGDisplayModeGetWidth(displayMode);
+        reqHeight = CGDisplayModeGetHeight(displayMode);
+        reqDepth = bitDepthFromDisplayMode(displayMode);
 #else
-    CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
-    const void *value = NULL;
-
-    value = CFDictionaryGetValue(displayMode, kCGDisplayWidth);
-    CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqWidth);
-    
-    value = CFDictionaryGetValue(displayMode, kCGDisplayHeight);
-    CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqHeight);
-    
-    value = CFDictionaryGetValue(displayMode, kCGDisplayBitsPerPixel);
-    CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqDepth);
+        const void *value = NULL;
+        CFDictionaryRef displayMode = CGDisplayBestModeForParameters(kCGDirectMainDisplay, depth, width, height, &exactMatch);
+        
+        value = CFDictionaryGetValue(displayMode, kCGDisplayWidth);
+        CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqWidth);
+        
+        value = CFDictionaryGetValue(displayMode, kCGDisplayHeight);
+        CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqHeight);
+        
+        value = CFDictionaryGetValue(displayMode, kCGDisplayBitsPerPixel);
+        CFNumberGetValue((CFNumberRef)value, kCFNumberSInt32Type, &reqDepth);
 #endif
 
-    if(!exactMatch)
-    {
-        // TODO: Report the size difference
-        // That mode is not available, using the closest match
-        String request = StringConverter::toString(width) + String(" x ") + StringConverter::toString(height) + String(" @ ") + 
+        if(!exactMatch)
+        {
+            // That mode is not available, using the closest match
+            String request = StringConverter::toString(width) + String(" x ") + StringConverter::toString(height) + String(" @ ") + 
             StringConverter::toString(depth) + "bpp. ";
 
-        String received = StringConverter::toString(reqWidth) + String(" x ") +
+            String received = StringConverter::toString(reqWidth) + String(" x ") +
             StringConverter::toString(reqHeight) + String(" @ ") + 
             StringConverter::toString(reqDepth) + "bpp. "; 
             
-        LogManager::getSingleton().logMessage(String("RenderSystem Warning:  You requested a fullscreen mode of ") + request +
-            String(" This mode is not available and you will receive the closest match.  The best display mode for the parameters requested is: ")
-            + received);
-    }
-    
-    // Do the fancy display fading
-    CGDisplayFadeReservationToken reservationToken;
-    CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
-                                        &reservationToken);
-    CGDisplayFade(reservationToken,
-                  0.5,
-                  kCGDisplayBlendNormal,
-                  kCGDisplayBlendSolidColor,
-                  0.0, 0.0, 0.0,
-                  true);
-    
-    // Grab the main display and save it for later.
-    // You could render to any display, but picking what display
-    // to render to could be interesting.
-    CGDisplayCapture(kCGDirectMainDisplay);
-    
-    // Switch to the correct resolution
+            LogManager::getSingleton().logMessage(String("RenderSystem Warning: You requested a fullscreen mode of ") + request +
+                                                  String(" This mode is not available and you will receive the closest match.  The best display mode for the parameters requested is: ")
+                                                  + received);
+        }
+
+        // Do the fancy display fading
+        CGDisplayFadeReservationToken reservationToken = 0;
+        cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
+                                                &reservationToken);
+        if(reservationToken)
+        {
+            cgErr = CGDisplayFade(reservationToken,
+                                  0.5f,
+                                  kCGDisplayBlendNormal,
+                                  kCGDisplayBlendSolidColor,
+                                  0.0f, 0.0f, 0.0f,
+                                  true);
+            CG_CHECK_ERROR(cgErr)
+            
+            cgErr = CGReleaseDisplayFadeReservation(reservationToken);
+            reservationToken = 0;
+            CG_CHECK_ERROR(cgErr)
+        }
+        
+        // Grab the main display and save it for later.
+        // You could render to any display, but picking what display
+        // to render to could be interesting.
+        cgErr = CGDisplayCapture(kCGDirectMainDisplay);
+        CG_CHECK_ERROR(cgErr)
+        
+        // Switch to the correct resolution
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-    cgErr = CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
-    if(cgErr != 0)
-    {
-        CGReleaseAllDisplays();
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CG Error: " + StringConverter::toString((int)err)), "OSXWindow::createCGLFullscreen");
-    }
+        mOriginalDisplayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
+        cgErr = CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
 #else
-    CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
+        mOriginalDisplayMode = CGDisplayCurrentMode(kCGDirectMainDisplay);
+        cgErr = CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);
 #endif
-    
-    // Get a pixel format that best matches what we are looking for
-    CGLPixelFormatAttribute attribs[] = { 
-        kCGLPFADoubleBuffer,
-        kCGLPFAAlphaSize,     (CGLPixelFormatAttribute)8,
-        kCGLPFADepthSize,     (CGLPixelFormatAttribute)reqDepth,
-        kCGLPFAStencilSize,   (CGLPixelFormatAttribute)8,
-        kCGLPFASampleBuffers, (CGLPixelFormatAttribute)0,
-        kCGLPFASamples,       (CGLPixelFormatAttribute)0,
-        kCGLPFAFullScreen,
-        kCGLPFASingleRenderer,
-        kCGLPFAAccelerated,
-        kCGLPFADisplayMask,   (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay),
-        (CGLPixelFormatAttribute)0
-    };
-    
-    // Set up FSAA if it was requested
-    if(fsaa > 1)
-    {
-            // turn on kCGLPFASampleBuffers
+        CG_CHECK_ERROR(cgErr)
+        
+        // Get a pixel format that best matches what we are looking for
+        CGLPixelFormatAttribute attribs[] = { 
+            kCGLPFADoubleBuffer,
+            kCGLPFAAlphaSize,     (CGLPixelFormatAttribute)8,
+            kCGLPFADepthSize,     (CGLPixelFormatAttribute)reqDepth,
+            kCGLPFAStencilSize,   (CGLPixelFormatAttribute)8,
+            kCGLPFASampleBuffers, (CGLPixelFormatAttribute)0,
+            kCGLPFASamples,       (CGLPixelFormatAttribute)0,
+            kCGLPFAFullScreen,
+            kCGLPFASingleRenderer,
+            kCGLPFAAccelerated,
+            kCGLPFADisplayMask,   (CGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay),
+            (CGLPixelFormatAttribute)0
+        };
+        
+        // Set up FSAA if it was requested
+        if(fsaa > 1)
+        {
+            // Turn on kCGLPFASampleBuffers
             attribs[8] = (CGLPixelFormatAttribute)1;
-            // set the samples for kCGLPFASamples
+            // Set the samples for kCGLPFASamples
             attribs[10] = (CGLPixelFormatAttribute)fsaa;
-    }
-    
-    
-    CGLPixelFormatObj pixelFormatObj;
-#if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4)
-    GLint numPixelFormats = 0;
-    err = CGLChoosePixelFormat(attribs, &pixelFormatObj, &numPixelFormats);
+        }
+        
+        CGLPixelFormatObj pixelFormatObj = NULL;
+#if defined(MAC_OS_X_VERSION_10_4) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+        long numPixelFormats = 0;
+        cglErr = CGLChoosePixelFormat(attribs, &pixelFormatObj, &numPixelFormats);
 #else
-    long numPixelFormats = 0;
-    err = CGLChoosePixelFormat(attribs, &pixelFormatObj, &numPixelFormats);
+        GLint numPixelFormats = 0;
+        cglErr = CGLChoosePixelFormat(attribs, &pixelFormatObj, &numPixelFormats);
 #endif
-    if(err != 0)
-    {
-        CGReleaseAllDisplays();
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
-    }
+        CGL_CHECK_ERROR(cglErr)
+        
+        if(pixelFormatObj && !mCGLContextObj)
+        {
+            // Create the CGL context from our pixel format, share it with the sharedContext passed in
+            cglErr = CGLCreateContext(pixelFormatObj, sharedContext, &mCGLContextObj);
+            CGL_CHECK_ERROR(cglErr)
+        }
 
-    // Create the CGLcontext from our pixel format, share it with the sharedContext passed in
-    err = CGLCreateContext(pixelFormatObj, sharedContext, &mCGLContext);
-    if(err != 0)
-    {
-        CGReleaseAllDisplays();
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
-    }
-
-    // Set the context to full screen
+        if(mCGLContextObj)
+        {
+            // Set the context as current
+            cglErr = CGLSetCurrentContext(mCGLContextObj);
+            CGL_CHECK_ERROR(cglErr)
+            
+            // Set the context to full screen
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-    err = CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
-    if(err != 0)
-    {
-        CGReleaseAllDisplays();
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
-    }
+            cglErr = CGLSetFullScreenOnDisplay(mCGLContextObj, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
 #else
-    CGLSetFullScreen(mCGLContext);
+            cglErr = CGLSetFullScreen(mCGLContextObj);
 #endif
-    
-    // Set the context as current
-    err = CGLSetCurrentContext(mCGLContext);
-    if(err != 0)
-    {
-        CGReleaseAllDisplays();
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, String("CGL Error: " + String(CGLErrorString(err))), "OSXWindow::createCGLFullscreen");
-    }
-    
-    // This synchronizes CGL with the vertical retrace
-    // Apple docs suggest that OpenGL blocks rendering calls when waiting for
-    // a vertical retrace anyhow.
-#if (MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4)
-    GLint swapInterval = 1;
-    CGLSetParameter(mCGLContext, kCGLCPSwapInterval, &swapInterval);
+            CGL_CHECK_ERROR(cglErr)
+            
+            // This synchronizes CGL with the vertical retrace
+            // Apple docs suggest that OpenGL blocks rendering calls when waiting for
+            // a vertical retrace anyhow.
+#if defined(MAC_OS_X_VERSION_10_4) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
+            long swapInterval = 1;
+            cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #else
-    long swapInterval = 1;
-    CGLSetParameter(mCGLContext, kCGLCPSwapInterval, &swapInterval);
+            GLint swapInterval = 1;
+            cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #endif
-    
-    // Give a copy of our context to the rendersystem
-    mContext = new OSXCGLContext(mCGLContext, pixelFormatObj);
+            CG_CHECK_ERROR(cgErr)
+            
+            // Give a copy of our context to the rendersystem
+            if(!mContext)
+                mContext = OGRE_NEW OSXCGLContext(mCGLContextObj, pixelFormatObj);
 
-    // Once we have the context we can destroy the pixel format
-    // In order to share contexts you must keep a pointer to the context object around
-    // Our context class will now manage the life of the pixelFormatObj
-    CGLDestroyPixelFormat(pixelFormatObj); 
-    
-    // Let everyone know we are fullscreen now
-    mIsFullScreen = true;
+            // Once we have the context we can destroy the pixel format
+            // In order to share contexts you must keep a pointer to the context object around
+            // Our context class will now manage the life of the pixelFormatObj
+            cglErr = CGLDestroyPixelFormat(pixelFormatObj); 
+            CGL_CHECK_ERROR(cglErr)
+            
+            // Let everyone know we are fullscreen now
+            mIsFullScreen = true;
+        }
 
-    // Set some other variables.  Just in case we got a different value from CGDisplayBestModeForParameters than we requested
-    mWidth = reqWidth;
-    mHeight = reqHeight;
-    mColourDepth = reqDepth;
+        // Set some other variables.  Just in case we got a different value from CGDisplayBestModeForParameters than we requested
+        mWidth = reqWidth;
+        mHeight = reqHeight;
+        mColourDepth = reqDepth;
 
-    CGDisplayFade(reservationToken,
-              2.0,
-              kCGDisplayBlendSolidColor,
-              kCGDisplayBlendNormal,
-              0.0, 0.0, 0.0,
-              false);
-    CGReleaseDisplayFadeReservation(reservationToken);
-}
+        cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
+                                                &reservationToken);
+        if(cgErr == kCGErrorSuccess)
+        {
+            cgErr = CGDisplayFade(reservationToken,
+                                  2.0f,
+                                  kCGDisplayBlendSolidColor,
+                                  kCGDisplayBlendNormal,
+                                  0.0f, 0.0f, 0.0f,
+                                  false);
+            CG_CHECK_ERROR(cgErr)
 
-//-------------------------------------------------------------------------------------------------//
-void OSXWindow::destroyCGLFullscreen(void)
-{
-	CGReleaseAllDisplays();
-    if(mCGLContext)
-    {
-        CGLDestroyContext(mCGLContext);
-        mCGLContext = 0;
+            cgErr = CGReleaseDisplayFadeReservation(reservationToken);
+            CG_CHECK_ERROR(cgErr)
+        }
     }
-}
+    
+    //-------------------------------------------------------------------------------------------------//
+    void OSXWindow::destroyCGLFullscreen(void)
+    {
+        CGError cgErr = kCGErrorSuccess;
+        // Do the fancy display fading
+        CGDisplayFadeReservationToken reservationToken = 0;
+        cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
+                                                &reservationToken);
+        if(cgErr == kCGErrorSuccess)
+        {
+            cgErr = CGDisplayFade(reservationToken,
+                                  2.0f,
+                                  kCGDisplayBlendSolidColor,
+                                  kCGDisplayBlendNormal,
+                                  0.0f, 0.0f, 0.0f,
+                                  false);
+            CG_CHECK_ERROR(cgErr)
+            
+            cgErr = CGReleaseDisplayFadeReservation(reservationToken);
+            reservationToken = 0;
+            CG_CHECK_ERROR(cgErr)
+        }
+        
+        // Release the main display
+        cgErr = CGDisplayRelease( kCGDirectMainDisplay );
+        CG_CHECK_ERROR(cgErr)
+        
+        cgErr = CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval,
+                                                &reservationToken);
+        if(cgErr == kCGErrorSuccess)
+        {
+            cgErr = CGDisplayFade(reservationToken,
+                                  0.5f,
+                                  kCGDisplayBlendNormal,
+                                  kCGDisplayBlendSolidColor,
+                                  0.0f, 0.0f, 0.0f,
+                                  true);
+            CG_CHECK_ERROR(cgErr)
+            
+            cgErr = CGReleaseDisplayFadeReservation(reservationToken);
+            CG_CHECK_ERROR(cgErr)
+        }
 
-//-------------------------------------------------------------------------------------------------//
-void OSXWindow::swapCGLBuffers(void)
-{
-	CGLFlushDrawable(mCGLContext);
-	CGLContextObj curCtx = CGLGetCurrentContext();
-	if(curCtx != mCGLContext)
-	{
-		CGLSetCurrentContext(mCGLContext);
+        if(mCGLContextObj)
+        {
+            CGLDestroyContext(mCGLContextObj);
+            mCGLContextObj = 0;
+        }
+
+        // Switch back to the original screen resolution
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
-        CGLSetFullScreenOnDisplay(mCGLContext, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+        CGDisplaySetDisplayMode(kCGDirectMainDisplay, mOriginalDisplayMode, NULL);
 #else
-        CGLSetFullScreen(mCGLContext);
+        CGDisplaySwitchToMode(kCGDirectMainDisplay, mOriginalDisplayMode);
 #endif
-	}
-}
-
+    }
+    
+    //-------------------------------------------------------------------------------------------------//
+    void OSXWindow::swapCGLBuffers(void)
+    {
+        CGLFlushDrawable(mCGLContextObj);
+        CGLContextObj curCtx = CGLGetCurrentContext();
+        if(curCtx != mCGLContextObj)
+        {
+            CGLSetCurrentContext(mCGLContextObj);
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+            CGLSetFullScreenOnDisplay(mCGLContextObj, CGDisplayIDToOpenGLDisplayMask(kCGDirectMainDisplay));
+#else
+            CGLSetFullScreen(mCGLContextObj);
+#endif
+        }
+    }
+    
 }
