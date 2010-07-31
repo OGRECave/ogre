@@ -73,6 +73,7 @@ namespace Ogre
 		mIsExternalGLControl = false;
 		mClosed = false;
 		mActive = false;
+		mHidden = false;
 	}
 	
 	//-------------------------------------------------------------------------------------------------//
@@ -110,6 +111,7 @@ namespace Ogre
 		uint samples = 0;
 		short frequency = 0;
 		bool vsync = false;
+		bool hidden = false;
 		unsigned int vsyncInterval = 1;
 		int gamma = 0;
 		::GLXContext glxContext = 0;
@@ -154,6 +156,9 @@ namespace Ogre
 			
 			if((opt = miscParams->find("vsync")) != end) 
 				vsync = StringConverter::parseBool(opt->second);
+
+			if((opt = miscParams->find("hidden")) != end)
+				hidden = StringConverter::parseBool(opt->second);
 
 			if((opt = miscParams->find("vsyncInterval")) != end) 
 				vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
@@ -398,9 +403,13 @@ namespace Ogre
 			
 			XMapWindow(xDisplay, mWindow);
 			
-			if (mIsFullScreen)
+			if (mIsFullScreen && !hidden)
 			{
 				switchFullScreen (true);
+			}
+			else if (hidden)
+			{
+				setHidden(true);
 			}
 			XFlush(xDisplay);
 			
@@ -513,6 +522,29 @@ namespace Ogre
 		mVisible = visible;
 	}
 	
+	//-------------------------------------------------------------------------------------------------//
+	void GLXWindow::setHidden(bool hidden)
+	{
+		mHidden = hidden;
+		// ignore for external windows as these should handle
+		// this externally
+		if (mIsExternal)
+			return;
+
+		if (hidden)
+		{
+			XUnmapWindow(mGLSupport->getXDisplay(), mWindow);
+		}
+		else
+		{
+			XMapWindow(mGLSupport->getXDisplay(), mWindow);
+			if (mIsFullScreen)
+			{
+				switchFullScreen(true);
+			}
+		}
+	}
+
 	//-------------------------------------------------------------------------------------------------//
 	void GLXWindow::reposition(int left, int top)
 	{

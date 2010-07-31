@@ -59,6 +59,12 @@ namespace Ogre
 		
 		/** @copydoc see RenderWindow::setVisible */
 		void setVisible(bool visible);
+
+		/** @copydoc see RenderWindow::isHidden */
+		bool isHidden(void) const { return mHidden; }
+
+		/** @copydoc see RenderWindow::setHidden */
+		void setHidden(bool hidden);
 		
 		/** @copydoc see RenderWindow::reposition */
 		void reposition(int left, int top);
@@ -91,6 +97,7 @@ namespace Ogre
 	private:
 		bool mClosed;
 		bool mVisible;
+		bool mHidden;
 		bool mIsTopLevel;
 		bool mIsExternal;
 		bool mIsExternalGLControl;

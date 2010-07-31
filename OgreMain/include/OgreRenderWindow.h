@@ -130,6 +130,15 @@ namespace Ogre
         virtual void setVisible(bool visible)
         { (void)visible; }
 
+		/** Indicates whether the window was set to hidden (not displayed)
+		*/
+		virtual bool isHidden(void) const { return false; }
+
+		/** Hide (or show) the window.
+		*/
+		virtual void setHidden(bool hidden)
+		{ (void)hidden; }
+
         /** Overridden from RenderTarget, flags invisible windows as inactive
         */
         virtual bool isActive(void) const { return mActive && isVisible(); }
