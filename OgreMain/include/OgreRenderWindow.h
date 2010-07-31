@@ -134,7 +134,13 @@ namespace Ogre
 		*/
 		virtual bool isHidden(void) const { return false; }
 
-		/** Hide (or show) the window.
+		/** Hide (or show) the window. If called with hidden=true, this
+			will make the window completely invisible to the user.
+		@remarks
+			Setting a window to hidden is useful to create a dummy primary
+			RenderWindow hidden from the user so that you can create and
+			recreate your actual RenderWindows without having to recreate
+			all your resources.
 		*/
 		virtual void setHidden(bool hidden)
 		{ (void)hidden; }
