@@ -55,6 +55,8 @@ namespace Ogre
 		bool				isVisible			() const;
 		bool 				isClosed			() const { return mClosed; }
 		bool				isVSync				() const { return mVSync; }
+		bool				isHidden			() const { return mHidden; }
+		void				setHidden			(bool hidden);
 		void 				reposition			(int left, int top);
 		void 				resize				(unsigned int width, unsigned int height);
 		void 				swapBuffers			( bool waitForVSync = true );
@@ -114,6 +116,7 @@ namespace Ogre
 		HWND						mHWnd;					// Win32 Window handle		
 		bool						mIsExternal;			// window not created by Ogre
 		bool						mClosed;				// Is this window destroyed.		
+		bool						mHidden;
 		bool						mSwitchingFullscreen;	// Are we switching from fullscreen to windowed or vice versa		
 		D3DMULTISAMPLE_TYPE			mFSAAType;				// AA type.
 		DWORD						mFSAAQuality;			// AA quality.

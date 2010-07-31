@@ -39,12 +39,14 @@ namespace Ogre {
         Win32Window(Win32GLSupport &glsupport);
         ~Win32Window();
 
-       void create(const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams);
-	   void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
+		void create(const String& name, unsigned int width, unsigned int height,
+			bool fullScreen, const NameValuePairList *miscParams);
+		void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
         void destroy(void);
 		bool isActive(void) const;
         bool isVisible() const;
+		bool isHidden() const { return mHidden; }
+		void setHidden(bool hidden);
         bool isClosed(void) const;
         void reposition(int left, int top);
         void resize(unsigned int width, unsigned int height);
@@ -81,6 +83,7 @@ namespace Ogre {
 		bool	mIsExternalGLContext;
         bool    mSizing;
 		bool	mClosed;
+		bool	mHidden;
         int     mDisplayFrequency;      // fullscreen only, to restore display
         Win32Context *mContext;
     };

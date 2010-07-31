@@ -51,6 +51,8 @@ namespace Ogre
 		void destroy(void);
 		bool isVisible() const;
 		bool isClosed() const { return mClosed; }
+		bool isHidden() const { return mHidden; }
+		void setHidden(bool hidden);
 		void reposition(int left, int top);
 		void resize(unsigned int width, unsigned int height);
 		void swapBuffers( bool waitForVSync = true );
@@ -93,6 +95,7 @@ namespace Ogre
 		bool	mIsExternal;			// window not created by Ogre
 		bool	mSizing;
 		bool	mClosed;
+		bool	mHidden;
 		bool	mIsSwapChain;			// Is this a secondary window?
 		bool	mSwitchingFullscreen;	// Are we switching from fullscreen to windowed or vice versa
 

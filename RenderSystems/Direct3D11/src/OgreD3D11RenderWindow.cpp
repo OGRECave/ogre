@@ -48,6 +48,7 @@ namespace Ogre
 		mActive = false;
 		mSizing = false;
 		mClosed = false;
+		mHidden = false;
 		mSwitchingFullscreen = false;
 		mDisplayFrequency = 0;
 		mRenderTargetView = 0;
@@ -135,6 +136,10 @@ namespace Ogre
 			opt = miscParams->find("vsyncInterval");
 			if(opt != miscParams->end())
 				mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
+			// hidden	[parseBool]
+			opt = miscParams->find("hidden");
+			if(opt != miscParams->end())
+				mHidden = StringConverter::parseBool(opt->second);
 			// displayFrequency
 			opt = miscParams->find("displayFrequency");
 			if(opt != miscParams->end())
@@ -281,6 +286,7 @@ namespace Ogre
 
 		mActive = true;
 		mClosed = false;
+		setHidden(mHidden);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
@@ -664,6 +670,18 @@ namespace Ogre
 	bool D3D11RenderWindow::isVisible() const
 	{
 		return (mHWnd && !IsIconic(mHWnd));
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderWindow::setHidden(bool hidden)
+	{
+		mHidden = hidden;
+		if (!mIsExternal)
+		{
+			if (hidden)
+				ShowWindow(mHWnd, SW_HIDE);
+			else
+				ShowWindow(mHWnd, SW_SHOWNORMAL);
+		}
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindow::reposition(int top, int left)

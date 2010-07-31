@@ -58,6 +58,7 @@ namespace Ogre {
 		mIsExternalGLContext = false;
 		mSizing = false;
 		mClosed = false;
+		mHidden = false;
 		mDisplayFrequency = 0;
 		mActive = false;
 		mDeviceName = NULL;
@@ -97,6 +98,7 @@ namespace Ogre {
 		HWND parent = 0;
 		String title = name;
 		bool vsync = false;
+		bool hidden = false;
 		unsigned int vsyncInterval = 1;
 		String border;
 		bool outerSize = false;
@@ -127,6 +129,9 @@ namespace Ogre {
 
 			if ((opt = miscParams->find("vsync")) != end)
 				vsync = StringConverter::parseBool(opt->second);
+
+			if ((opt = miscParams->find("hidden")) != end)
+				hidden = StringConverter::parseBool(opt->second);
 
 			if ((opt = miscParams->find("vsyncInterval")) != end)
 				vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
@@ -447,6 +452,7 @@ namespace Ogre {
 		mContext = new Win32Context(mHDC, mGlrc);
 
 		mActive = true;
+		setHidden(hidden);
 	}
 
 	void Win32Window::adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
@@ -650,6 +656,18 @@ namespace Ogre {
 	bool Win32Window::isClosed() const
 	{
 		return mClosed;
+	}
+
+	void Win32Window::setHidden(bool hidden)
+	{
+		mHidden = hidden;
+		if (!mIsExternal)
+		{
+			if (hidden)
+				ShowWindow(mHWnd, SW_HIDE);
+			else
+				ShowWindow(mHWnd, SW_SHOWNORMAL);
+		}
 	}
 
 	void Win32Window::reposition(int left, int top)
