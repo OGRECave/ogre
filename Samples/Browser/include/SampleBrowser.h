@@ -520,7 +520,7 @@ namespace OgreBites
 				}
 				else buttonHit((Button*)mTrayMgr->getWidget("Back"));  // if we're in config, just go back
 			}
-			else if (evt.key == OIS::KC_UP || evt.key == OIS::KC_DOWN && mTitleLabel->getTrayLocation() != TL_NONE)
+			else if ((evt.key == OIS::KC_UP || evt.key == OIS::KC_DOWN) && mTitleLabel->getTrayLocation() != TL_NONE)
 			{
 				// if we're in the main screen, use the up and down arrow keys to cycle through samples
 				int newIndex = mSampleMenu->getSelectionIndex() + (evt.key == OIS::KC_UP ? -1 : 1);
