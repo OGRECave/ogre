@@ -48,6 +48,15 @@ THE SOFTWARE.
     return [CAEAGLLayer class];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"EAGLView frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
+            [self frame].origin.x,
+            [self frame].origin.y,
+            [self frame].size.width,
+            [self frame].size.height];
+}
+
 @end
 
 // Constant to limit framerate to 60 FPS
@@ -177,8 +186,24 @@ namespace Ogre {
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         CAEAGLLayer *eaglLayer = nil;
 
-        CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
-        mWindow = [[[UIWindow alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, screenSize.height)] retain];
+        uint w = 0, h = 0;
+        
+        ConfigOptionMap::const_iterator opt;
+        ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
+        
+        if ((opt = mGLSupport->getConfigOptions().find("Video Mode")) != end)
+        {
+            String val = opt->second.currentValue;
+            String::size_type pos = val.find('x');
+
+            if (pos != String::npos)
+            {
+                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
+            }
+        }
+
+        mWindow = [[[UIWindow alloc] initWithFrame:CGRectMake(0, 0, w, h)] retain];
         if(mWindow == nil)
         {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
@@ -186,7 +211,7 @@ namespace Ogre {
                         __FUNCTION__);
         }
 
-        mView = [[EAGLView alloc] initWithFrame:CGRectMake(0, 0, screenSize.width, screenSize.height)];
+        mView = [[EAGLView alloc] initWithFrame:CGRectMake(0, 0, w, h)];
 
         if(mView == nil)
         {
@@ -242,8 +267,8 @@ namespace Ogre {
         {
             StringStream ss;
             
-            ss << "iOS: Window created " << screenSize.width << " x " << screenSize.height
-            << " with backing store size " << screenSize.width * mContentScalingFactor << " x " << screenSize.height * mContentScalingFactor
+            ss << "iOS: Window created " << w << " x " << h
+            << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight
             << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
 
             LogManager::getSingleton().logMessage(ss.str());
@@ -321,10 +346,10 @@ namespace Ogre {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
 		}
-        
+
         initNativeCreatedWindow(miscParams);
 
-		// Set viewport's default orientation mode
+        // Set viewport's default orientation mode
 		if (orientation == "Landscape Left")
 			Viewport::setDefaultOrientationMode(OR_LANDSCAPELEFT);
 		else if (orientation == "Landscape Right")
@@ -343,10 +368,19 @@ namespace Ogre {
         }
 
 		mName = name;
-		mWidth = width * mContentScalingFactor;
-		mHeight = height * mContentScalingFactor;
 		mLeft = left;
 		mTop = top;
+        if (orientation == "Portrait")
+        {
+            mWidth = width * mContentScalingFactor;
+            mHeight = height * mContentScalingFactor;
+        }
+        else
+        {
+            mWidth = height * mContentScalingFactor;
+            mHeight = width * mContentScalingFactor;
+        }
+
 		mActive = true;
 		mVisible = true;
 		mClosed = false;

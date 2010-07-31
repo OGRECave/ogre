@@ -394,7 +394,13 @@ namespace Ogre {
 	{
 		// Common calcs
 		Real left, right, bottom, top;
-		calcProjectionParameters(left, right, bottom, top);
+
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+        if (mOrientationMode != OR_PORTRAIT)
+            calcProjectionParameters(bottom, top, left, right);
+        else
+#endif
+            calcProjectionParameters(left, right, bottom, top);
 
 		if (!mCustomProjMatrix)
 		{

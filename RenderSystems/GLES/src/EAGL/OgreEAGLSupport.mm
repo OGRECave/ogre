@@ -231,8 +231,9 @@ namespace Ogre {
             ConfigOptionMap::iterator end = mOptions.end();
             NameValuePairList miscParams;
 
+            CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
             bool fullscreen = false;
-            uint w = 0, h = 0;
+            uint w = screenSize.width, h = screenSize.height;
 
             if ((opt = mOptions.find("Full Screen")) != end)
             {
