@@ -277,14 +277,14 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 					// Now that every texcoord is a vec4 (passed as vertex attributes) we
 					// have to swizzle them according the desired type.
 					else if(gpuType == GPT_VERTEX_PROGRAM &&
-							content == Parameter::SPC_TEXTURE_COORDINATE0 ||
+							(content == Parameter::SPC_TEXTURE_COORDINATE0 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE1 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE2 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE3 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE4 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE5 ||
 							content == Parameter::SPC_TEXTURE_COORDINATE6 ||
-							content == Parameter::SPC_TEXTURE_COORDINATE7 )
+							content == Parameter::SPC_TEXTURE_COORDINATE7) )
 					{
 						// Now generate the swizzel mask according
 						// the type.
