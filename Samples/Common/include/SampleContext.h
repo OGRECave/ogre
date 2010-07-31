@@ -431,7 +431,7 @@ namespace OgreBites
             case Ogre::OR_DEGREE_0:
                 break;
             case Ogre::OR_DEGREE_90:
-                state.X.abs = h - absY;
+                state.X.abs = w - absY;
                 state.Y.abs = absX;
                 state.X.rel = -relY;
                 state.Y.rel = relX;
@@ -444,7 +444,7 @@ namespace OgreBites
                 break;
             case Ogre::OR_DEGREE_270:
                 state.X.abs = absY;
-                state.Y.abs = w - absX;
+                state.Y.abs = h - absX;
                 state.X.rel = relY;
                 state.Y.rel = -relX;
                 break;

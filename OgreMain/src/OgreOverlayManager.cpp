@@ -284,24 +284,10 @@ namespace Ogre {
         {
             mViewportDimensionsChanged = true;
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            switch (vp->getOrientationMode())
-            {
-            case Ogre::OR_DEGREE_0:
-            case Ogre::OR_DEGREE_180:
-                mLastViewportWidth = vp->getActualWidth();
-                mLastViewportHeight = vp->getActualHeight();
-                break;
-            case Ogre::OR_DEGREE_90:
-            case Ogre::OR_DEGREE_270:
-                mLastViewportWidth = vp->getActualHeight();
-                mLastViewportHeight = vp->getActualWidth();
-                break;
-            }
             mLastViewportOrientationMode = vp->getOrientationMode();
-#else
+#endif
             mLastViewportWidth = vp->getActualWidth();
             mLastViewportHeight = vp->getActualHeight();
-#endif
         }
         else
         {

@@ -742,6 +742,7 @@ namespace Ogre {
         makeGLMatrix(mat, m);
         if (mActiveRenderTarget->requiresTextureFlipping())
         {
+			// Invert transformed y
             mat[1] = -mat[1];
             mat[5] = -mat[5];
             mat[9] = -mat[9];
@@ -1606,6 +1607,23 @@ namespace Ogre {
                 y = target->getHeight() - h - y;
             }
 
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            ConfigOptionMap::const_iterator opt;
+            ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
+            
+            if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
+            {
+                String val = opt->second.currentValue;
+                String::size_type pos = val.find("Landscape");
+                
+                if (pos != String::npos)
+                {
+                    GLsizei temp = h;
+                    h = w;
+                    w = temp;
+                }
+            }
+#endif
             glViewport(x, y, w, h);
             GL_CHECK_ERROR;
 
