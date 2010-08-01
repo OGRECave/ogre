@@ -778,13 +778,14 @@ namespace Ogre
 	{
 		for (size_t c = 0; c < count; ++c)
 		{
-			void *pData = (void *)((long)pBase + (c * size));
+			void *pData = (void *)((intptr_t)pBase + (c * size));
 			char swapByte;
 			for(size_t byteIndex = 0; byteIndex < size/2; byteIndex++)
 			{
-				swapByte = *(char *)((long)pData + byteIndex);
-				*(char *)((long)pData + byteIndex) = *(char *)((long)pData + size - byteIndex - 1);
-				*(char *)((long)pData + size - byteIndex - 1) = swapByte;
+ 				swapByte = *(char *)((intptr_t)pData + byteIndex);
+ 				*(char *)((intptr_t)pData + byteIndex) = 
+ 					*(char *)((intptr_t)pData + size - byteIndex - 1);
+ 				*(char *)((intptr_t)pData + size - byteIndex - 1) = swapByte;
 			}
 		}
 

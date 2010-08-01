@@ -168,8 +168,8 @@ namespace Ogre {
 		{
 			if (i->dmPelsWidth != width || i->dmPelsHeight != height)
 				continue;
-			optColourDepth->possibleValues.push_back(StringConverter::toString(i->dmBitsPerPel));
-			optDisplayFrequency->possibleValues.push_back(StringConverter::toString(i->dmDisplayFrequency));
+			optColourDepth->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmBitsPerPel));
+			optDisplayFrequency->possibleValues.push_back(StringConverter::toString((unsigned int)i->dmDisplayFrequency));
 		}
 		remove_duplicates(optColourDepth->possibleValues);
 		remove_duplicates(optDisplayFrequency->possibleValues);
@@ -374,7 +374,7 @@ namespace Ogre {
 				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);				
 			}
 
-			newParams["monitorHandle"] = StringConverter::toString((int)hMonitor);																
+			newParams["monitorHandle"] = StringConverter::toString((size_t)hMonitor);																
 		}
 
 		window->create(name, width, height, fullScreen, miscParams);
