@@ -77,6 +77,15 @@ message(STATUS "Configuring OGRE ${OGRE_VERSION}")
 # Configure version file for use by scripts
 configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${OGRE_BINARY_DIR}/version.txt" @ONLY)
 
+# determine if we are compiling for a 32bit or 64bit system
+include(CheckTypeSize)
+CHECK_TYPE_SIZE("void*" OGRE_PTR_SIZE BUILTIN_TYPES_ONLY)
+if (OGRE_PTR_SIZE EQUAL 8)
+  set(OGRE_PLATFORM_X64 TRUE)
+else ()
+  set(OGRE_PLATFORM_X64 FALSE)
+endif ()
+
 if (NOT APPLE)
   # Create debug libraries with _d postfix
   set(CMAKE_DEBUG_POSTFIX "_d")
@@ -130,7 +139,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   endif (OGRE_GCC_VISIBILITY)
   
   # Fix x64 issues on Linux
-  if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
+  if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
   endif()  
 endif (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
