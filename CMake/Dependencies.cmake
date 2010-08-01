@@ -199,6 +199,19 @@ if (APPLE)
   endif (OGRE_BUILD_PLATFORM_IPHONE)
 endif(APPLE)
 
+
+# now see if we have a buildable Dependencies package in
+# the source tree. If so, include that, and it will take care of
+# setting everything up, including overriding any of the above
+# findings.
+set(OGREDEPS_RUNTIME_OUTPUT ${OGRE_RUNTIME_OUTPUT})
+if (EXISTS "${OGRE_SOURCE_DIR}/Dependencies/CMakeLists.txt")
+  add_subdirectory(Dependencies)
+elseif (EXISTS "${OGRE_SOURCE_DIR}/ogredeps/CMakeLists.txt")
+  add_subdirectory(ogredeps)
+endif ()
+
+
 # Display results, terminate if anything required is missing
 MACRO_DISPLAY_FEATURE_LOG()
 
