@@ -257,6 +257,7 @@ cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS "Build RTShader Sys
 
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
 cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_IPHONE;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_XSIEXPORTER "Build the Softimage exporter" FALSE "Softimage_FOUND" FALSE)
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)
 
@@ -362,6 +363,11 @@ add_subdirectory(Samples)
 # Setup command-line tools
 if (OGRE_BUILD_TOOLS)
   add_subdirectory(Tools)
+endif ()
+
+# Setup XSIExporter
+if (OGRE_BUILD_XSIEXPORTER)
+  add_subdirectory(Tools/XSIExport)
 endif ()
 
 # Install documentation

@@ -39,6 +39,7 @@ set(STATIC_INST_FILES
   Packages/FindTBB.cmake
   Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
+  Packages/FindSoftimage.cmake
 )
 if (WIN32)
   set(INST_FILES ${INST_FILES}

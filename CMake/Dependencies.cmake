@@ -173,6 +173,10 @@ macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http:/
 find_package(Doxygen)
 macro_log_feature(DOXYGEN_FOUND "Doxygen" "Tool for building API documentation" "http://doxygen.org" FALSE "" "")
 
+# Find Softimage SDK
+find_package(Softimage)
+macro_log_feature(Softimage_FOUND "Softimage" "Softimage SDK needed for building XSIExporter" FALSE "6.0" "")
+
 #######################################################################
 # Tests
 #######################################################################
