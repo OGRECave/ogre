@@ -478,10 +478,10 @@ static void threadcache_free(nedpool *p, threadcache *tc, int mymspace, void *me
 	assert(size>=sizeof(threadcacheblk) && size<=THREADCACHEMAX+CHUNK_OVERHEAD);
 #ifdef DEBUG
 	{	/* Make sure this is a valid memory block */
-	    mchunkptr p  = mem2chunk(mem);
-	    mstate fm = get_mstate_for(p);
+	    mchunkptr cp  = mem2chunk(mem);
+	    mstate fm = get_mstate_for(cp);
 	    if (!ok_magic(fm)) {
-	      USAGE_ERROR_ACTION(fm, p);
+	      USAGE_ERROR_ACTION(fm, cp);
 	      return;
 	    }
 	}

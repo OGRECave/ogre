@@ -95,14 +95,14 @@ struct Col3b {
 };
 /** Type for PF_FLOAT32_RGB */
 struct Col3f {
-	Col3f(float r, float g, float b):
-		r(r), g(g), b(b) { }
+	Col3f(float inR, float inG, float inB):
+		r(inR), g(inG), b(inB) { }
 	float r,g,b;
 };
 /** Type for PF_FLOAT32_RGBA */
 struct Col4f {
-	Col4f(float r, float g, float b, float a):
-		r(r), g(g), b(b), a(a) { }
+	Col4f(float inR, float inG, float inB, float inA):
+		r(inR), g(inG), b(inB), a(inA) { }
 	float r,g,b,a;
 };
 

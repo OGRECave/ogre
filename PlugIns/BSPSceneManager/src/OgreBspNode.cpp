@@ -34,11 +34,10 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    BspNode::BspNode(BspLevel* owner, bool isLeaf)
+    BspNode::BspNode(BspLevel* owner, bool inIsLeaf)
     {
         mOwner = owner;
-        mIsLeaf = isLeaf;
-
+        mIsLeaf = inIsLeaf;
     }
 
     //-----------------------------------------------------------------------

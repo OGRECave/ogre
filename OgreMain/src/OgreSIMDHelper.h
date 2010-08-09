@@ -283,24 +283,24 @@ namespace Ogre {
     r3 where r0 now holds column 0 of the original matrix, r1 now
     holds column 1 of the original matrix, etc.
 */
-#define __MM_TRANSPOSE4x4_PS(r0, r1, r2, r3)                                        \
-    {                                                                               \
-        __m128 t3, t2, t1, t0;                                                      \
-                                                                                    \
-                                                            /* r00 r01 r02 r03 */   \
-                                                            /* r10 r11 r12 r13 */   \
-                                                            /* r20 r21 r22 r23 */   \
-                                                            /* r30 r31 r32 r33 */   \
-                                                                                    \
-        t0 = _mm_unpacklo_ps(r0, r1);                       /* r00 r10 r01 r11 */   \
-        t2 = _mm_unpackhi_ps(r0, r1);                       /* r02 r12 r03 r13 */   \
-        t1 = _mm_unpacklo_ps(r2, r3);                       /* r20 r30 r21 r31 */   \
-        t3 = _mm_unpackhi_ps(r2, r3);                       /* r22 r32 r23 r33 */   \
-                                                                                    \
-        r0 = _mm_movelh_ps(t0, t1);                         /* r00 r10 r20 r30 */   \
-        r1 = _mm_movehl_ps(t1, t0);                         /* r01 r11 r21 r31 */   \
-        r2 = _mm_movelh_ps(t2, t3);                         /* r02 r12 r22 r32 */   \
-        r3 = _mm_movehl_ps(t3, t2);                         /* r03 r13 r23 r33 */   \
+#define __MM_TRANSPOSE4x4_PS(r0, r1, r2, r3)                                            \
+    {                                                                                   \
+        __m128 tmp3, tmp2, tmp1, tmp0;                                                  \
+                                                                                        \
+                                                            /* r00 r01 r02 r03 */       \
+                                                            /* r10 r11 r12 r13 */       \
+                                                            /* r20 r21 r22 r23 */       \
+                                                            /* r30 r31 r32 r33 */       \
+                                                                                        \
+        tmp0 = _mm_unpacklo_ps(r0, r1);                       /* r00 r10 r01 r11 */     \
+        tmp2 = _mm_unpackhi_ps(r0, r1);                       /* r02 r12 r03 r13 */     \
+        tmp1 = _mm_unpacklo_ps(r2, r3);                       /* r20 r30 r21 r31 */     \
+        tmp3 = _mm_unpackhi_ps(r2, r3);                       /* r22 r32 r23 r33 */     \
+                                                                                        \
+        r0 = _mm_movelh_ps(tmp0, tmp1);                         /* r00 r10 r20 r30 */   \
+        r1 = _mm_movehl_ps(tmp1, tmp0);                         /* r01 r11 r21 r31 */   \
+        r2 = _mm_movelh_ps(tmp2, tmp3);                         /* r02 r12 r22 r32 */   \
+        r3 = _mm_movehl_ps(tmp3, tmp2);                         /* r03 r13 r23 r33 */   \
     }
 
 /** Performing the transpose of a continuous stored rows of a 4x3 matrix to
@@ -311,21 +311,21 @@ namespace Ogre {
     v0 now holds column 0 of the original matrix, v1 now holds column 1
     of the original matrix, etc.
 */
-#define __MM_TRANSPOSE4x3_PS(v0, v1, v2)                                            \
-    {                                                                               \
-        __m128 t0, t1, t2;                                                          \
-                                                                                    \
-                                                            /* r00 r01 r02 r10 */   \
-                                                            /* r11 r12 r20 r21 */   \
-                                                            /* r22 r30 r31 r32 */   \
-                                                                                    \
-        t0 = _mm_shuffle_ps(v0, v2, _MM_SHUFFLE(3,0,3,0));  /* r00 r10 r22 r32 */   \
-        t1 = _mm_shuffle_ps(v0, v1, _MM_SHUFFLE(1,0,2,1));  /* r01 r02 r11 r12 */   \
-        t2 = _mm_shuffle_ps(v1, v2, _MM_SHUFFLE(2,1,3,2));  /* r20 r21 r30 r31 */   \
-                                                                                    \
-        v0 = _mm_shuffle_ps(t0, t2, _MM_SHUFFLE(2,0,1,0));  /* r00 r10 r20 r30 */   \
-        v1 = _mm_shuffle_ps(t1, t2, _MM_SHUFFLE(3,1,2,0));  /* r01 r11 r21 r31 */   \
-        v2 = _mm_shuffle_ps(t1, t0, _MM_SHUFFLE(3,2,3,1));  /* r02 r12 r22 r32 */   \
+#define __MM_TRANSPOSE4x3_PS(v0, v1, v2)                                                \
+    {                                                                                   \
+        __m128 tmp0, tmp1, tmp2;                                                        \
+                                                                                        \
+                                                            /* r00 r01 r02 r10 */       \
+                                                            /* r11 r12 r20 r21 */       \
+                                                            /* r22 r30 r31 r32 */       \
+                                                                                        \
+        tmp0 = _mm_shuffle_ps(v0, v2, _MM_SHUFFLE(3,0,3,0));  /* r00 r10 r22 r32 */     \
+        tmp1 = _mm_shuffle_ps(v0, v1, _MM_SHUFFLE(1,0,2,1));  /* r01 r02 r11 r12 */     \
+        tmp2 = _mm_shuffle_ps(v1, v2, _MM_SHUFFLE(2,1,3,2));  /* r20 r21 r30 r31 */     \
+                                                                                        \
+        v0 = _mm_shuffle_ps(tmp0, tmp2, _MM_SHUFFLE(2,0,1,0));  /* r00 r10 r20 r30 */   \
+        v1 = _mm_shuffle_ps(tmp1, tmp2, _MM_SHUFFLE(3,1,2,0));  /* r01 r11 r21 r31 */   \
+        v2 = _mm_shuffle_ps(tmp1, tmp0, _MM_SHUFFLE(3,2,3,1));  /* r02 r12 r22 r32 */   \
     }
 
 /** Performing the transpose of a 3x4 matrix to a continuous stored rows of
@@ -337,19 +337,19 @@ namespace Ogre {
 */
 #define __MM_TRANSPOSE3x4_PS(v0, v1, v2)                                            \
     {                                                                               \
-        __m128 t0, t1, t2;                                                          \
+        __m128 tmp0, tmp1, tmp2;                                                    \
                                                                                     \
                                                             /* r00 r10 r20 r30 */   \
                                                             /* r01 r11 r21 r31 */   \
                                                             /* r02 r12 r22 r32 */   \
                                                                                     \
-        t0 = _mm_shuffle_ps(v0, v2, _MM_SHUFFLE(2,0,3,1));  /* r10 r30 r02 r22 */   \
-        t1 = _mm_shuffle_ps(v1, v2, _MM_SHUFFLE(3,1,3,1));  /* r11 r31 r12 r32 */   \
-        t2 = _mm_shuffle_ps(v0, v1, _MM_SHUFFLE(2,0,2,0));  /* r00 r20 r01 r21 */   \
+        tmp0 = _mm_shuffle_ps(v0, v2, _MM_SHUFFLE(2,0,3,1));  /* r10 r30 r02 r22 */   \
+        tmp1 = _mm_shuffle_ps(v1, v2, _MM_SHUFFLE(3,1,3,1));  /* r11 r31 r12 r32 */   \
+        tmp2 = _mm_shuffle_ps(v0, v1, _MM_SHUFFLE(2,0,2,0));  /* r00 r20 r01 r21 */   \
                                                                                     \
-        v0 = _mm_shuffle_ps(t2, t0, _MM_SHUFFLE(0,2,2,0));  /* r00 r01 r02 r10 */   \
-        v1 = _mm_shuffle_ps(t1, t2, _MM_SHUFFLE(3,1,2,0));  /* r11 r12 r20 r21 */   \
-        v2 = _mm_shuffle_ps(t0, t1, _MM_SHUFFLE(3,1,1,3));  /* r22 r30 r31 r32 */   \
+        v0 = _mm_shuffle_ps(tmp2, tmp0, _MM_SHUFFLE(0,2,2,0));  /* r00 r01 r02 r10 */   \
+        v1 = _mm_shuffle_ps(tmp1, tmp2, _MM_SHUFFLE(3,1,2,0));  /* r11 r12 r20 r21 */   \
+        v2 = _mm_shuffle_ps(tmp0, tmp1, _MM_SHUFFLE(3,1,1,3));  /* r22 r30 r31 r32 */   \
     }
 
 /** Fill vector of single precision floating point with selected value.
