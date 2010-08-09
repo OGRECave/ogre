@@ -64,6 +64,7 @@ namespace Ogre {
             // iOS 4 content scaling
             bool mIsContentScalingSupported;
             float mContentScalingFactor;
+            float mCurrentOSVersion;
 
             /// The iPhone OS doesn't like rendering too quickly and will throw GL errors because the context is still in use
             /// This timer will be reset every 16 ms to simulate VSync at 60 Hz
