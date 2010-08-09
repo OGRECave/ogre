@@ -295,10 +295,10 @@ namespace Ogre {
         return mDepthClearValue;
     }
 	//---------------------------------------------------------------------
-    void Viewport::setClearEveryFrame(bool clear, unsigned int buffers)
+    void Viewport::setClearEveryFrame(bool inClear, unsigned int inBuffers)
     {
-        mClearEveryFrame = clear;
-		mClearBuffers = buffers;
+        mClearEveryFrame = inClear;
+		mClearBuffers = inBuffers;
     }
     //---------------------------------------------------------------------
     bool Viewport::getClearEveryFrame(void) const
@@ -374,9 +374,9 @@ namespace Ogre {
 		}
     }
     //---------------------------------------------------------------------
-	void Viewport::setAutoUpdated(bool isAutoUpdated)
+	void Viewport::setAutoUpdated(bool inAutoUpdated)
 	{
-		mIsAutoUpdated = isAutoUpdated;
+		mIsAutoUpdated = inAutoUpdated;
 	}
 	//---------------------------------------------------------------------
 	bool Viewport::isAutoUpdated() const

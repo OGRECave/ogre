@@ -2072,19 +2072,19 @@ namespace Ogre {
 			TiXmlElement* poseRefNode = keyNode->FirstChildElement("poseref");
 			while (poseRefNode)
 			{
-				const char* val = poseRefNode->Attribute("poseindex");
-				if (!val)
+				const char* attr = poseRefNode->Attribute("poseindex");
+				if (!attr)
 				{
 					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 						"Required attribute 'poseindex' missing on poseref", 
 						"XMLMeshSerializer::readPoseKeyFrames");
 				}
-				unsigned short poseIndex = StringConverter::parseUnsignedInt(val);
+				unsigned short poseIndex = StringConverter::parseUnsignedInt(attr);
 				Real influence = 1.0f;
-				val = poseRefNode->Attribute("influence");
-				if (val)
+				attr = poseRefNode->Attribute("influence");
+				if (attr)
 				{
-					influence = StringConverter::parseReal(val);
+					influence = StringConverter::parseReal(attr);
 				}
 
 				kf->addPoseReference(poseIndex, influence);

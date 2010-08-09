@@ -70,6 +70,7 @@ namespace Ogre {
             mIsExternalGLControl(false),
             mIsContentScalingSupported(false),
             mContentScalingFactor(1.0),
+            mCurrentOSVersion(0.0),
             mGLSupport(glsupport)
     {
         mIsFullScreen = true;
@@ -79,7 +80,8 @@ namespace Ogre {
         mAnimationTimer = OGRE_NEW Ogre::Timer();
         
         // Check for content scaling.  iOS 4 or later
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
+        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+        if(mCurrentOSVersion >= 4.0)
             mIsContentScalingSupported = true;
     }
 
@@ -242,7 +244,7 @@ namespace Ogre {
 
 #if GL_APPLE_framebuffer_multisample
             // MSAA is only supported on devices running iOS 4+
-            if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
+            if(mCurrentOSVersion >= 4.0)
             {
                 mContext->mIsMultiSampleSupported = true;
                 mContext->mNumSamples = mFSAA;
@@ -435,7 +437,7 @@ namespace Ogre {
 
 #if GL_EXT_discard_framebuffer
         // Framebuffer discard is only supported on devices running iOS 4+
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
+        if(mCurrentOSVersion >= 4.0)
         {
             GLenum attachments[] = { GL_COLOR_ATTACHMENT0_OES, GL_DEPTH_ATTACHMENT_OES, GL_STENCIL_ATTACHMENT_OES };
             glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);

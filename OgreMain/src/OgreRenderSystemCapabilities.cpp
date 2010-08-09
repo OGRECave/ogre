@@ -318,4 +318,4 @@ namespace Ogre {
 		}
 	}
 
-};
+}

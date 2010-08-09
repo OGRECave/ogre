@@ -215,8 +215,8 @@ CPreprocessor::Token CPreprocessor::Macro::Expand (
     Expanding = false;
 
     // Remove the extra macros we have defined
-    for (int i = NumArgs - 1; i >= 0; i--)
-        cpp.Undef (Args [i].String, Args [i].Length);
+    for (int j = NumArgs - 1; j >= 0; j--)
+        cpp.Undef (Args [j].String, Args [j].Length);
 
     cpp.MacroList = NULL;
 

@@ -258,7 +258,7 @@ namespace Ogre
 		struct PortalSortDistance
 		{
 			const Vector3& cameraPosition;
-			PortalSortDistance(const Vector3& cameraPosition) : cameraPosition(cameraPosition)
+			PortalSortDistance(const Vector3& inCameraPosition) : cameraPosition(inCameraPosition)
 			{ }
 
 			bool _OgrePCZPluginExport operator()(const PortalBase* p1, const PortalBase* p2) const

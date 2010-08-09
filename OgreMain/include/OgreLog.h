@@ -65,7 +65,7 @@ namespace Ogre {
     class LogListener
     {
 	public:
-        virtual ~LogListener() {};
+        virtual ~LogListener() {}
 
         /**
         @remarks

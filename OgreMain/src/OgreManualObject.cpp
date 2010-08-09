@@ -810,13 +810,13 @@ namespace Ogre {
 		mUseIdentityView = useIdentityView;
 	}
     //-----------------------------------------------------------------------
-	ManualObject::ManualObjectSection* ManualObject::getSection(unsigned int index) const
+	ManualObject::ManualObjectSection* ManualObject::getSection(unsigned int inIndex) const
     {
-        if (index >= mSectionList.size())
+        if (inIndex >= mSectionList.size())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
             "Index out of bounds.",
             "ManualObject::getSection");
-        return mSectionList[index];
+        return mSectionList[inIndex];
     }
     //-----------------------------------------------------------------------
 	unsigned int ManualObject::getNumSections(void) const

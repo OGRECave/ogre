@@ -451,11 +451,11 @@ namespace Ogre
 					vertex->oppositeParityIndex = newVertexIndex;
 				}
 				// copy old values but reset tangent space
-				VertexInfo newVertex = *vertex;
-				newVertex.tangent = Vector3::ZERO;
-				newVertex.binormal = Vector3::ZERO;
-				newVertex.parity = faceParity;
-				mVertexArray.push_back(newVertex);
+				VertexInfo locVertex = *vertex;
+				locVertex.tangent = Vector3::ZERO;
+				locVertex.binormal = Vector3::ZERO;
+				locVertex.parity = faceParity;
+				mVertexArray.push_back(locVertex);
 				result.indexesRemapped.push_back(IndexRemap(indexSet, faceIndex, splitInfo));
 
 				vertex = &(mVertexArray[newVertexIndex]);

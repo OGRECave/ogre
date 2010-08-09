@@ -44,7 +44,7 @@ namespace Ogre {
     template< typename T > class FactoryObj
     {
     public:
-        virtual ~FactoryObj() {};
+        virtual ~FactoryObj() {}
 
         /** Returns the factory type.
             @return

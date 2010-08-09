@@ -319,10 +319,9 @@ namespace Ogre {
 			// Allocate memory
 			convBox.data = OGRE_ALLOC_T(uchar, convBox.getConsecutiveSize(), MEMCATEGORY_GENERAL);
 			// perform conversion and reassign source
-			PixelBox src(pImgData->width, pImgData->height, 1, pImgData->format, input->getPtr());
-			PixelUtil::bulkPixelConversion(src, convBox);
+			PixelBox newSrc(pImgData->width, pImgData->height, 1, pImgData->format, input->getPtr());
+			PixelUtil::bulkPixelConversion(newSrc, convBox);
 			srcData = static_cast<unsigned char*>(convBox.data);
-
 		}
 
 

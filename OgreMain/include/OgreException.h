@@ -195,56 +195,56 @@ namespace Ogre {
 	class _OgreExport UnimplementedException : public Exception 
 	{
 	public:
-		UnimplementedException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "UnimplementedException", file, line) {}
+		UnimplementedException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "UnimplementedException", inFile, inLine) {}
 	};
 	class _OgreExport FileNotFoundException : public Exception
 	{
 	public:
-		FileNotFoundException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "FileNotFoundException", file, line) {}
+		FileNotFoundException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "FileNotFoundException", inFile, inLine) {}
 	};
 	class _OgreExport IOException : public Exception
 	{
 	public:
-		IOException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "IOException", file, line) {}
+		IOException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "IOException", inFile, inLine) {}
 	};
 	class _OgreExport InvalidStateException : public Exception
 	{
 	public:
-		InvalidStateException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "InvalidStateException", file, line) {}
+		InvalidStateException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "InvalidStateException", inFile, inLine) {}
 	};
 	class _OgreExport InvalidParametersException : public Exception
 	{
 	public:
-		InvalidParametersException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "InvalidParametersException", file, line) {}
+		InvalidParametersException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "InvalidParametersException", inFile, inLine) {}
 	};
 	class _OgreExport ItemIdentityException : public Exception
 	{
 	public:
-		ItemIdentityException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "ItemIdentityException", file, line) {}
+		ItemIdentityException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "ItemIdentityException", inFile, inLine) {}
 	};
 	class _OgreExport InternalErrorException : public Exception
 	{
 	public:
-		InternalErrorException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "InternalErrorException", file, line) {}
+		InternalErrorException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "InternalErrorException", inFile, inLine) {}
 	};
 	class _OgreExport RenderingAPIException : public Exception
 	{
 	public:
-		RenderingAPIException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "RenderingAPIException", file, line) {}
+		RenderingAPIException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "RenderingAPIException", inFile, inLine) {}
 	};
 	class _OgreExport RuntimeAssertionException : public Exception
 	{
 	public:
-		RuntimeAssertionException(int number, const String& description, const String& source, const char* file, long line)
-			: Exception(number, description, source, "RuntimeAssertionException", file, line) {}
+		RuntimeAssertionException(int inNumber, const String& inDescription, const String& inSource, const char* inFile, long inLine)
+			: Exception(inNumber, inDescription, inSource, "RuntimeAssertionException", inFile, inLine) {}
 	};
 
 

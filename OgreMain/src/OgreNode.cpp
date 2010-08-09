@@ -287,21 +287,21 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    Node* Node::createChild(const Vector3& translate, const Quaternion& rotate)
+    Node* Node::createChild(const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl();
-        newNode->translate(translate);
-        newNode->rotate(rotate);
+        newNode->translate(inTranslate);
+        newNode->rotate(inRotate);
         this->addChild(newNode);
 
         return newNode;
     }
     //-----------------------------------------------------------------------
-    Node* Node::createChild(const String& name, const Vector3& translate, const Quaternion& rotate)
+    Node* Node::createChild(const String& name, const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl(name);
-        newNode->translate(translate);
-        newNode->rotate(rotate);
+        newNode->translate(inTranslate);
+        newNode->rotate(inRotate);
         this->addChild(newNode);
 
         return newNode;
@@ -631,10 +631,10 @@ namespace Ogre {
 		mChildrenToUpdate.clear();
     }
     //-----------------------------------------------------------------------
-    void Node::setScale(const Vector3& scale)
+    void Node::setScale(const Vector3& inScale)
     {
-		assert(!scale.isNaN() && "Invalid vector supplied as parameter");
-        mScale = scale;
+		assert(!inScale.isNaN() && "Invalid vector supplied as parameter");
+        mScale = inScale;
         needUpdate();
     }
     //-----------------------------------------------------------------------
@@ -670,9 +670,9 @@ namespace Ogre {
         return mInheritScale;
     }
     //-----------------------------------------------------------------------
-    void Node::scale(const Vector3& scale)
+    void Node::scale(const Vector3& inScale)
     {
-        mScale = mScale * scale;
+        mScale = mScale * inScale;
         needUpdate();
 
     }

@@ -161,7 +161,7 @@ int _findnext(long id, struct _finddata_t *data)
             /* Default type to a normal file */
             data->attrib = _A_NORMAL;
 
-        data->size = stat_buf.st_size;
+        data->size = (unsigned long)stat_buf.st_size;
     }
 
     delete [] xfn;

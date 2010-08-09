@@ -673,7 +673,7 @@ namespace Ogre {
 					flipEndian(&(block.colour_0), sizeof(uint16), 1);
 					flipEndian(&(block.colour_1), sizeof(uint16), 1);
 					// skip back since we'll need to read this again
-					stream->skip(0 - sizeof(DXTColourBlock));
+					stream->skip(0 - (long)sizeof(DXTColourBlock));
 					// colour_0 <= colour_1 means transparency in DXT1
 					if (block.colour_0 <= block.colour_1)
 					{

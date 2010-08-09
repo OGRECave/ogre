@@ -75,14 +75,14 @@ namespace Ogre
 		clear();
 	}
 	//---------------------------------------------------------------------
-	void ShadowTextureManager::getShadowTextures(const ShadowTextureConfigList& config, 
+	void ShadowTextureManager::getShadowTextures(const ShadowTextureConfigList& configList, 
 		ShadowTextureList& listToPopulate)
 	{
 		listToPopulate.clear();
 
 		set<Texture*>::type usedTextures;
 
-		for (ShadowTextureConfigList::const_iterator c = config.begin(); c != config.end(); ++c)
+		for (ShadowTextureConfigList::const_iterator c = configList.begin(); c != configList.end(); ++c)
 		{
 			const ShadowTextureConfig& config = *c;
 			bool found = false;

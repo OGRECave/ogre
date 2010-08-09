@@ -97,9 +97,9 @@ namespace Ogre
         return mPosition; 
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitter::setDirection(const Vector3& direction) 
+    void ParticleEmitter::setDirection(const Vector3& inDirection) 
     { 
-        mDirection = direction; 
+        mDirection = inDirection; 
         mDirection.normalise();
         // Generate an up vector (any will do)
         mUp = mDirection.perpendicular();
@@ -154,9 +154,9 @@ namespace Ogre
         mMaxTTL = maxTtl;
     }
     //-----------------------------------------------------------------------
-    void ParticleEmitter::setColour(const ColourValue& colour)
+    void ParticleEmitter::setColour(const ColourValue& inColour)
     {
-        mColourRangeStart = mColourRangeEnd = colour;
+        mColourRangeStart = mColourRangeEnd = inColour;
     }
     //-----------------------------------------------------------------------
     void ParticleEmitter::setColour(const ColourValue& colourStart, const ColourValue& colourEnd)

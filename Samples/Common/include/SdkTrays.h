@@ -840,7 +840,7 @@ namespace OgreBites
 
 		void selectItem(unsigned int index, bool notifyListener = true)
 		{
-			if (index < 0 || index >= mItems.size())
+			if (index >= mItems.size())
 			{
 				Ogre::String desc = "Menu \"" + getName() + "\" contains no item at position " +
 					Ogre::StringConverter::toString(index) + ".";
@@ -1438,7 +1438,7 @@ namespace OgreBites
 
 		void setParamValue(unsigned int index, const Ogre::DisplayString& paramValue)
 		{
-			if (index < 0 || index >= mNames.size())
+			if (index >= mNames.size())
 			{
 				Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter at position " +
 					Ogre::StringConverter::toString(index) + ".";
@@ -1463,7 +1463,7 @@ namespace OgreBites
 
 		Ogre::DisplayString getParamValue(unsigned int index)
 		{
-			if (index < 0 || index >= mNames.size())
+			if (index >= mNames.size())
 			{
 				Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter at position " +
 					Ogre::StringConverter::toString(index) + ".";
@@ -2042,11 +2042,11 @@ namespace OgreBites
 				// add paddings and resize trays
 				mTrays[i]->setWidth(trayWidth + 2 * mWidgetPadding);
 				mTrays[i]->setHeight(trayHeight + mWidgetPadding);
-				
-				for (unsigned int i = 0; i < labelsAndSeps.size(); i++)
+
+				for (unsigned int j = 0; j < labelsAndSeps.size(); j++)
 				{
-					labelsAndSeps[i]->setWidth((int)trayWidth);
-					labelsAndSeps[i]->setLeft(-(int)(trayWidth / 2));
+					labelsAndSeps[j]->setWidth((int)trayWidth);
+					labelsAndSeps[j]->setLeft(-(int)(trayWidth / 2));
 				}
 			}
 
@@ -2512,7 +2512,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		Widget* getWidget(TrayLocation trayLoc, unsigned int place)
 		{
-			if (place >= 0 && place < mWidgets[trayLoc].size()) return mWidgets[trayLoc][place];
+			if (place < mWidgets[trayLoc].size()) return mWidgets[trayLoc][place];
 			return 0;
 		}
 
@@ -2763,26 +2763,33 @@ namespace OgreBites
 				if (mStatsPanel->getOverlayElement()->isVisible())
 				{
 					Ogre::StringVector values;
-
-					s = Ogre::StringConverter::toString((int)stats.avgFPS);
-					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
+					std::ostringstream oss;
+					
+					oss.str("");
+					oss << std::fixed << std::setprecision(1) << stats.avgFPS;
+					Ogre::String str = oss.str();
+					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(s);
 
-					s = Ogre::StringConverter::toString((int)stats.bestFPS);
-					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
+					oss.str("");
+					oss << std::fixed << std::setprecision(1) << stats.bestFPS;
+					str = oss.str();
+					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
 					values.push_back(s);
 
-					s = Ogre::StringConverter::toString((int)stats.worstFPS);
-					for (int i = s.length() - 5; i > 0; i -= 3) { s.insert(i, 1, ','); }
-					values.push_back(s);
+					oss.str("");
+					oss << std::fixed << std::setprecision(1) << stats.worstFPS;
+					str = oss.str();
+					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
+					values.push_back(str);
 
-					s = Ogre::StringConverter::toString(stats.triangleCount);
-					for (int i = s.length() - 3; i > 0; i -= 3) { s.insert(i, 1, ','); }
-					values.push_back(s);
+					str = Ogre::StringConverter::toString(stats.triangleCount);
+					for (int i = str.length() - 3; i > 0; i -= 3) { str.insert(i, 1, ','); }
+					values.push_back(str);
 
-					s = Ogre::StringConverter::toString(stats.batchCount);
-					for (int i = s.length() - 3; i > 0; i -= 3) { s.insert(i, 1, ','); }
-					values.push_back(s);
+					str = Ogre::StringConverter::toString(stats.batchCount);
+					for (int i = str.length() - 3; i > 0; i -= 3) { str.insert(i, 1, ','); }
+					values.push_back(str);
 
 					mStatsPanel->setAllParamValues(values);
 				}

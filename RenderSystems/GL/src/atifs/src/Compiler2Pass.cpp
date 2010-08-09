@@ -170,7 +170,7 @@ bool Compiler2Pass::processRulePath( uint rulepathIDX)
 				if(Passed) {
 					int TokensPassed = 0;
 					// keep calling until failure
-					while ( Passed = ValidateToken(rulepathIDX, ActiveNTTRule)) {
+					while ((Passed = ValidateToken(rulepathIDX, ActiveNTTRule))) {
 						// increment count for previous passed token
 						TokensPassed++;
 					}
@@ -229,7 +229,7 @@ bool Compiler2Pass::ValidateToken(const uint rulepathIDX, const uint activeRuleI
 				// if Token is supposed to be a number then check if its a numerical constant
 				if (TokenID == mValueID) {
 					float constantvalue;
-					if(Passed = isFloatValue(constantvalue, tokenlength)) {
+					if((Passed = isFloatValue(constantvalue, tokenlength))) {
 						mConstants.push_back(constantvalue);
 					}
 					

@@ -539,9 +539,9 @@ namespace Ogre {
 
 		while (nodei.hasMoreElements())
 		{
-			const SceneNode* node = static_cast<const SceneNode*>(nodei.getNext());
+			const SceneNode* subNode = static_cast<const SceneNode*>(nodei.getNext());
 			// Add this subnode and its children...
-			addSceneNode( node );
+			addSceneNode( subNode );
 		}
 	}
 	//--------------------------------------------------------------------------

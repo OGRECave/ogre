@@ -52,7 +52,7 @@ namespace Ogre {
         /** default constructor*/
         RenderSystemCapabilitiesSerializer();
         /** default destructor*/
-        virtual ~RenderSystemCapabilitiesSerializer() {};
+        virtual ~RenderSystemCapabilitiesSerializer() {}
 
         /** Writes a RenderSystemCapabilities object to a data stream */
         void writeScript(const RenderSystemCapabilities* caps, String name, String filename);

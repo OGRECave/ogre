@@ -648,8 +648,8 @@ namespace Ogre{
 		// Apply the texture aliases
 		if(compiler->getListener())
 		{
-			PreApplyTextureAliasesScriptCompilerEvent evt(mMaterial, &mTextureAliases);
-			compiler->_fireEvent(&evt, 0);
+			PreApplyTextureAliasesScriptCompilerEvent locEvt(mMaterial, &mTextureAliases);
+			compiler->_fireEvent(&locEvt, 0);
 		}
 		mMaterial->applyTextureAliases(mTextureAliases);
 		mTextureAliases.clear();
@@ -2799,11 +2799,11 @@ namespace Ogre{
 							if(compiler->getListener())
 							{
 								// Run each name through the listener
-								for(int i = 0; i < 6; ++i)
+								for(int j = 0; j < 6; ++j)
 								{
-									ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, names[i]);
+									ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::TEXTURE, names[j]);
 									compiler->_fireEvent(&evt, 0);
-									names[i] = evt.mName;
+									names[j] = evt.mName;
 								}
 							}
 
@@ -4073,15 +4073,15 @@ namespace Ogre{
 				{
 					String name = prop->name, value;
 					bool first = true;
-					for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+					for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 					{
-						if((*i)->type == ANT_ATOM)
+						if((*it)->type == ANT_ATOM)
 						{
 							if(!first)
 								value += " ";
 							else
 								first = false;
-							value += ((AtomAbstractNode*)(*i).get())->value;
+							value += ((AtomAbstractNode*)(*it).get())->value;
 						}
 					}
 					customParameters.push_back(std::make_pair(name, value));
@@ -4167,15 +4167,15 @@ namespace Ogre{
 				{
 					String name = prop->name, value;
 					bool first = true;
-					for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+					for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 					{
-						if((*i)->type == ANT_ATOM)
+						if((*it)->type == ANT_ATOM)
 						{
 							if(!first)
 								value += " ";
 							else
 								first = false;
-							value += ((AtomAbstractNode*)(*i).get())->value;
+							value += ((AtomAbstractNode*)(*it).get())->value;
 						}
 					}
 					customParameters.push_back(std::make_pair(name, value));
@@ -4273,9 +4273,9 @@ namespace Ogre{
 				{
 					String name = prop->name, value;
 					bool first = true;
-					for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+					for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 					{
-						if((*i)->type == ANT_ATOM)
+						if((*it)->type == ANT_ATOM)
 						{
 							if(!first)
 								value += " ";
@@ -4284,13 +4284,13 @@ namespace Ogre{
 
 							if(prop->name == "attach")
 							{
-								ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, ((AtomAbstractNode*)(*i).get())->value);
+								ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, ((AtomAbstractNode*)(*it).get())->value);
 								compiler->_fireEvent(&evt, 0);
 								value += evt.mName;
 							}
 							else
 							{
-								value += ((AtomAbstractNode*)(*i).get())->value;
+								value += ((AtomAbstractNode*)(*it).get())->value;
 							}
 						}
 					}
@@ -4980,16 +4980,16 @@ namespace Ogre{
 						{
 							String name = ((AtomAbstractNode*)prop->values.front().get())->value;
 							
-							ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::MATERIAL, name);
-							compiler->_fireEvent(&evt, 0);
+							ProcessResourceNameScriptCompilerEvent locEvt(ProcessResourceNameScriptCompilerEvent::MATERIAL, name);
+							compiler->_fireEvent(&locEvt, 0);
 
-							if(!mSystem->setParameter("material", evt.mName))
+							if(!mSystem->setParameter("material", locEvt.mName))
 							{
 								if(mSystem->getRenderer())
 								{
-									if(!mSystem->getRenderer()->setParameter("material", evt.mName))
+									if(!mSystem->getRenderer()->setParameter("material", locEvt.mName))
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-											"material property could not be set with material \"" + evt.mName + "\"");
+											"material property could not be set with material \"" + locEvt.mName + "\"");
 								}
 							}
 						}
@@ -5006,14 +5006,14 @@ namespace Ogre{
 						String name = prop->name, value;
 
 						// Glob the values together
-						for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+						for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 						{
-							if((*i)->type == ANT_ATOM)
+							if((*it)->type == ANT_ATOM)
 							{
 								if(value.empty())
-									value = ((AtomAbstractNode*)(*i).get())->value;
+									value = ((AtomAbstractNode*)(*it).get())->value;
 								else
-									value = value + " " + ((AtomAbstractNode*)(*i).get())->value;
+									value = value + " " + ((AtomAbstractNode*)(*it).get())->value;
 							}
 							else
 							{
@@ -5077,14 +5077,14 @@ namespace Ogre{
 				String value;
 
 				// Glob the values together
-				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+				for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 				{
-					if((*i)->type == ANT_ATOM)
+					if((*it)->type == ANT_ATOM)
 					{
 						if(value.empty())
-							value = ((AtomAbstractNode*)(*i).get())->value;
+							value = ((AtomAbstractNode*)(*it).get())->value;
 						else
-							value = value + " " + ((AtomAbstractNode*)(*i).get())->value;
+							value = value + " " + ((AtomAbstractNode*)(*it).get())->value;
 					}
 					else
 					{
@@ -5142,14 +5142,14 @@ namespace Ogre{
 				String value;
 
 				// Glob the values together
-				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+				for(AbstractNodeList::iterator it = prop->values.begin(); it != prop->values.end(); ++it)
 				{
-					if((*i)->type == ANT_ATOM)
+					if((*it)->type == ANT_ATOM)
 					{
 						if(value.empty())
-							value = ((AtomAbstractNode*)(*i).get())->value;
+							value = ((AtomAbstractNode*)(*it).get())->value;
 						else
-							value = value + " " + ((AtomAbstractNode*)(*i).get())->value;
+							value = value + " " + ((AtomAbstractNode*)(*it).get())->value;
 					}
 					else
 					{
@@ -5253,15 +5253,15 @@ namespace Ogre{
 					{
 						size_t atomIndex = 1;
 
-						AbstractNodeList::const_iterator i = getNodeAt(prop->values, 0);
+						AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
 
-						if((*i)->type != ANT_ATOM)
+						if((*it)->type != ANT_ATOM)
 						{
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 							return;
 						}
 						// Save the first atom, should be name
-						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i).get();
+						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
 						size_t width = 0, height = 0;
 						float widthFactor = 1.0f, heightFactor = 1.0f;
@@ -5275,13 +5275,13 @@ namespace Ogre{
 
 						while (atomIndex < prop->values.size())
 						{
-							i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
-							if((*i)->type != ANT_ATOM)
+							it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+							if((*it)->type != ANT_ATOM)
 							{
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 								return;
 							}
-							AtomAbstractNode *atom = (AtomAbstractNode*)(*i).get();
+							AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
 
 							switch(atom->id)
 							{
@@ -5313,13 +5313,13 @@ namespace Ogre{
 										pFactor = &heightFactor;
 									}
 									// advance to next to get scaling
-									i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
-									if(prop->values.end() == i || (*i)->type != ANT_ATOM)
+									it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+									if(prop->values.end() == it || (*it)->type != ANT_ATOM)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 										return;
 									}
-									atom = (AtomAbstractNode*)(*i).get();
+									atom = (AtomAbstractNode*)(*it).get();
 									if (!StringConverter::isNumber(atom->value))
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -5352,13 +5352,13 @@ namespace Ogre{
 							case ID_DEPTH_POOL:
 								{
 									// advance to next to get the ID
-									i = getNodeAt(prop->values, static_cast<int>(atomIndex++));
-									if(prop->values.end() == i || (*i)->type != ANT_ATOM)
+									it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+									if(prop->values.end() == it || (*it)->type != ANT_ATOM)
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 										return;
 									}
-									atom = (AtomAbstractNode*)(*i).get();
+									atom = (AtomAbstractNode*)(*it).get();
 									if (!StringConverter::isNumber(atom->value))
 									{
 										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -5437,18 +5437,18 @@ namespace Ogre{
 					{
 						String texName, refCompName, refTexName;
 
-						AbstractNodeList::const_iterator i = getNodeAt(prop->values, 0);
-						if(!getString(*i, &texName))
+						AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
+						if(!getString(*it, &texName))
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 							"texture_ref must have 3 string arguments");
 
-						i = getNodeAt(prop->values, 1);
-						if(!getString(*i, &refCompName))
+						it = getNodeAt(prop->values, 1);
+						if(!getString(*it, &refCompName))
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 							"texture_ref must have 3 string arguments");
 
-						i = getNodeAt(prop->values, 2);
-						if(!getString(*i, &refTexName))
+						it = getNodeAt(prop->values, 2);
+						if(!getString(*it, &refTexName))
 							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 							"texture_ref must have 3 string arguments");
 

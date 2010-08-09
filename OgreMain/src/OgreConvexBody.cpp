@@ -444,13 +444,13 @@ namespace Ogre
 		// to form a ccw polygon)
 		while ( !edgeMap.empty() )
 		{
-			Polygon::EdgeMap::iterator it = edgeMap.begin();
+			Polygon::EdgeMap::iterator mapIt = edgeMap.begin();
 
 			// build polygon it.first, it.second, point
 			Polygon *p = allocatePolygon();
 
-			p->insertVertex(it->first);
-			p->insertVertex(it->second);
+			p->insertVertex(mapIt->first);
+			p->insertVertex(mapIt->second);
 
 			p->insertVertex( pt );
 			// attach polygon to body
@@ -458,7 +458,7 @@ namespace Ogre
 
 			// erase the vertices from the list
 			// pointers are now held by the polygon
-			edgeMap.erase( it );
+			edgeMap.erase( mapIt );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -1187,8 +1187,6 @@ namespace Ogre
 	bool ConvexBody::findAndEraseEdgePair(const Vector3& vec, 
 		Polygon::EdgeMap& intersectionEdges, Vector3& vNext ) const
 	{
-		Polygon::EdgeMap::iterator it = intersectionEdges.begin();
-
 		for (Polygon::EdgeMap::iterator it = intersectionEdges.begin(); 
 			it != intersectionEdges.end(); ++it)
 		{

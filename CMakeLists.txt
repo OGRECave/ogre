@@ -77,6 +77,15 @@ message(STATUS "Configuring OGRE ${OGRE_VERSION}")
 # Configure version file for use by scripts
 configure_file("${OGRE_TEMPLATES_DIR}/version.txt.in" "${OGRE_BINARY_DIR}/version.txt" @ONLY)
 
+# determine if we are compiling for a 32bit or 64bit system
+include(CheckTypeSize)
+CHECK_TYPE_SIZE("void*" OGRE_PTR_SIZE BUILTIN_TYPES_ONLY)
+if (OGRE_PTR_SIZE EQUAL 8)
+  set(OGRE_PLATFORM_X64 TRUE)
+else ()
+  set(OGRE_PLATFORM_X64 FALSE)
+endif ()
+
 if (NOT APPLE)
   # Create debug libraries with _d postfix
   set(CMAKE_DEBUG_POSTFIX "_d")
@@ -130,7 +139,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   endif (OGRE_GCC_VISIBILITY)
   
   # Fix x64 issues on Linux
-  if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
+  if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
   endif()  
 endif (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
@@ -186,16 +195,22 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos3.0)
+  set(CMAKE_OSX_SYSROOT iphoneos4.0)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
-  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_UNIVERSAL_IPHONE_OS)")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
-  set(XCODE_ATTRIBUTE_SDKROOT iphoneos3.0)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES 1.x RenderSystem for iPhone" FORCE)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for iPhone" FORCE)
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos4.0)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iPhone" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
+
+  # CMake 2.8.1 added the ability to specify per-target architectures.
+  # As a side effect, it creates corrupt Xcode projects if you try do it for the whole project.
+  if(VERSION STRLESS "2.8.1")
+    set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+  else()
+    set(CMAKE_OSX_ARCHITECTURES "armv6;armv7;")
+  endif()
 
   add_definitions(-fno-regmove)
   add_definitions(-falign-loops=16)

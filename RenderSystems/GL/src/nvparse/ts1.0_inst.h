@@ -94,7 +94,7 @@ public:
 	float args[TSP_MAX_ARGS];
 private:
 	int expand;
-} *InstPtr;
+} Inst, *InstPtr;
 
 #ifdef TEST_BIT_FIELDS
 

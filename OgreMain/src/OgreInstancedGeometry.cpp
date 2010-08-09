@@ -769,7 +769,7 @@ namespace Ogre {
 	void InstancedGeometry::MaterialBucket:: setMaterial(const String & name)
 	{
 		mMaterial=MaterialManager::getSingleton().getByName(name);
-	};
+	}
 	//--------------------------------------------------------------------------
 	void InstancedGeometry::destroy(void)
 	{

@@ -184,22 +184,22 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    MemoryDataStream::MemoryDataStream(void* pMem, size_t size, bool freeOnClose, bool readOnly)
+    MemoryDataStream::MemoryDataStream(void* pMem, size_t inSize, bool freeOnClose, bool readOnly)
 		: DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mData = mPos = static_cast<uchar*>(pMem);
-        mSize = size;
+        mSize = inSize;
         mEnd = mData + mSize;
         mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
-    MemoryDataStream::MemoryDataStream(const String& name, void* pMem, size_t size, 
+    MemoryDataStream::MemoryDataStream(const String& name, void* pMem, size_t inSize, 
         bool freeOnClose, bool readOnly)
         : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
         mData = mPos = static_cast<uchar*>(pMem);
-        mSize = size;
+        mSize = inSize;
         mEnd = mData + mSize;
         mFreeOnClose = freeOnClose;
         assert(mEnd >= mPos);
@@ -257,10 +257,10 @@ namespace Ogre {
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
-    MemoryDataStream::MemoryDataStream(size_t size, bool freeOnClose, bool readOnly)
+    MemoryDataStream::MemoryDataStream(size_t inSize, bool freeOnClose, bool readOnly)
         : DataStream(static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
-        mSize = size;
+        mSize = inSize;
         mFreeOnClose = freeOnClose;
         mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
@@ -268,11 +268,11 @@ namespace Ogre {
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
-    MemoryDataStream::MemoryDataStream(const String& name, size_t size, 
+    MemoryDataStream::MemoryDataStream(const String& name, size_t inSize, 
         bool freeOnClose, bool readOnly)
         : DataStream(name, static_cast<uint16>(readOnly ? READ : (READ | WRITE)))
     {
-        mSize = size;
+        mSize = inSize;
         mFreeOnClose = freeOnClose;
         mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
         mPos = mData;
@@ -418,7 +418,7 @@ namespace Ogre {
     {
         // calculate the size
         mpInStream->seekg(0, std::ios_base::end);
-        mSize = mpInStream->tellg();
+        mSize = (size_t)mpInStream->tellg();
         mpInStream->seekg(0, std::ios_base::beg);
 		determineAccess();
     }
@@ -429,17 +429,17 @@ namespace Ogre {
     {
         // calculate the size
         mpInStream->seekg(0, std::ios_base::end);
-        mSize = mpInStream->tellg();
+        mSize = (size_t)mpInStream->tellg();
         mpInStream->seekg(0, std::ios_base::beg);
 		determineAccess();
     }
     //-----------------------------------------------------------------------
     FileStreamDataStream::FileStreamDataStream(const String& name, 
-        std::ifstream* s, size_t size, bool freeOnClose)
+        std::ifstream* s, size_t inSize, bool freeOnClose)
         : DataStream(name), mpInStream(s), mpFStreamRO(s), mpFStream(0), mFreeOnClose(freeOnClose)
     {
         // Size is passed in
-        mSize = size;
+        mSize = inSize;
 		determineAccess();
     }
 	//---------------------------------------------------------------------
@@ -449,7 +449,7 @@ namespace Ogre {
 		// writeable!
 		// calculate the size
 		mpInStream->seekg(0, std::ios_base::end);
-		mSize = mpInStream->tellg();
+		mSize = (size_t)mpInStream->tellg();
 		mpInStream->seekg(0, std::ios_base::beg);
 		determineAccess();
 
@@ -462,18 +462,18 @@ namespace Ogre {
 		// writeable!
 		// calculate the size
 		mpInStream->seekg(0, std::ios_base::end);
-		mSize = mpInStream->tellg();
+		mSize = (size_t)mpInStream->tellg();
 		mpInStream->seekg(0, std::ios_base::beg);
 		determineAccess();
 	}
 	//-----------------------------------------------------------------------
 	FileStreamDataStream::FileStreamDataStream(const String& name, 
-		std::fstream* s, size_t size, bool freeOnClose)
+		std::fstream* s, size_t inSize, bool freeOnClose)
 		: DataStream(name, false), mpInStream(s), mpFStreamRO(0), mpFStream(s), mFreeOnClose(freeOnClose)
 	{
 		// writeable!
 		// Size is passed in
-		mSize = size;
+		mSize = inSize;
 		determineAccess();
 	}
 	//---------------------------------------------------------------------
@@ -603,7 +603,7 @@ namespace Ogre {
     size_t FileStreamDataStream::tell(void) const
 	{
 		mpInStream->clear(); //Clear fail status in case eof was set
-		return mpInStream->tellg();
+		return (size_t)mpInStream->tellg();
 	}
 	//-----------------------------------------------------------------------
     bool FileStreamDataStream::eof(void) const

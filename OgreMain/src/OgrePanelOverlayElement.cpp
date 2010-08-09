@@ -136,9 +136,9 @@ namespace Ogre {
         return mTileY[layer];
     }
     //---------------------------------------------------------------------
-    void PanelOverlayElement::setTransparent(bool isTransparent)
+    void PanelOverlayElement::setTransparent(bool inTransparent)
     {
-        mTransparent = isTransparent;
+        mTransparent = inTransparent;
     }
     //---------------------------------------------------------------------
     bool PanelOverlayElement::isTransparent(void) const

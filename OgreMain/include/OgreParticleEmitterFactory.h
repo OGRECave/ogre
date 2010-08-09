@@ -57,7 +57,7 @@ namespace Ogre {
     protected:
         vector<ParticleEmitter*>::type mEmitters;
     public:
-        ParticleEmitterFactory() {};
+        ParticleEmitterFactory() {}
         virtual ~ParticleEmitterFactory();
 
         /** Returns the name of the factory, the name which identifies the particle emitter type this factory creates. */

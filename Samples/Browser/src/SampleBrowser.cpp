@@ -42,7 +42,7 @@
 // To use CADisplayLink for smoother animation on iPhone comment out
 // the following line or define it to 1.  Use with caution, it can
 // sometimes cause input lag.
-#define USE_CADISPLAYLINK 0
+#define USE_CADISPLAYLINK 1
 #endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    

@@ -64,11 +64,11 @@ namespace Ogre {
         class _OgrePrivate CodecData : public CodecAlloc
         {
         public:
-            virtual ~CodecData() {};
+            virtual ~CodecData() {}
 
             /** Returns the type of the data.
             */
-            virtual String dataType() const { return "CodecData"; };
+            virtual String dataType() const { return "CodecData"; }
         };
         typedef SharedPtr<CodecData> CodecDataPtr;
 

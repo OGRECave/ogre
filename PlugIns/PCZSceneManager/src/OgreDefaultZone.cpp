@@ -717,10 +717,10 @@ namespace Ogre
 		if (includeVisitors)
 		{
 			// check visitor nodes
-			PCZSceneNodeList::iterator it = mVisitorNodeList.begin();
-			while ( it != mVisitorNodeList.end() )
+			PCZSceneNodeList::iterator iter = mVisitorNodeList.begin();
+			while ( iter != mVisitorNodeList.end() )
 			{
-				PCZSceneNode * pczsn = *it;
+				PCZSceneNode * pczsn = *iter;
 				if ( pczsn != exclude )
 				{
 					// make sure node is not already in the list (might have been added in another
@@ -735,7 +735,7 @@ namespace Ogre
 						}
 					}
 				}
-				++it;
+				++iter;
 			}
 		}
 
@@ -811,8 +811,8 @@ namespace Ogre
 		if (includeVisitors)
 		{
 			// check visitor nodes
-			PCZSceneNodeList::iterator it = mVisitorNodeList.begin();
-			while ( it != mVisitorNodeList.end() )
+			PCZSceneNodeList::iterator iter = mVisitorNodeList.begin();
+			while ( iter != mVisitorNodeList.end() )
 			{
 				PCZSceneNode * pczsn = *it;
 				if ( pczsn != exclude )
@@ -829,7 +829,7 @@ namespace Ogre
 						}
 					}
 				}
-				++it;
+				++iter;
 			}
 		}
 
@@ -906,8 +906,8 @@ namespace Ogre
 		if (includeVisitors)
 		{
 			// check visitor nodes
-			PCZSceneNodeList::iterator it = mVisitorNodeList.begin();
-			while ( it != mVisitorNodeList.end() )
+			PCZSceneNodeList::iterator iter = mVisitorNodeList.begin();
+			while ( iter != mVisitorNodeList.end() )
 			{
 				PCZSceneNode * pczsn = *it;
 				if ( pczsn != exclude )
@@ -924,7 +924,7 @@ namespace Ogre
 						}
 					}
 				}
-				++it;
+				++iter;
 			}
 		}
 
@@ -1002,10 +1002,10 @@ namespace Ogre
 		if (includeVisitors)
 		{
 			// check visitor nodes
-			PCZSceneNodeList::iterator it = mVisitorNodeList.begin();
-			while ( it != mVisitorNodeList.end() )
+			PCZSceneNodeList::iterator iter = mVisitorNodeList.begin();
+			while ( iter != mVisitorNodeList.end() )
 			{
-				PCZSceneNode * pczsn = *it;
+				PCZSceneNode * pczsn = *iter;
 				if ( pczsn != exclude )
 				{
 					// make sure node is not already in the list (might have been added in another
@@ -1020,7 +1020,7 @@ namespace Ogre
 						}
 					}
 				}
-				++it;
+				++iter;
 			}
 		}
 

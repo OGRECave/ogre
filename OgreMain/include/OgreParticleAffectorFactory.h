@@ -56,7 +56,7 @@ namespace Ogre {
     protected:
         vector<ParticleAffector*>::type mAffectors;
     public:
-        ParticleAffectorFactory() {};
+        ParticleAffectorFactory() {}
         virtual ~ParticleAffectorFactory();
         /** Returns the name of the factory, the name which identifies the particle affector type this factory creates. */
         virtual String getName() const = 0;

@@ -432,16 +432,16 @@ namespace Ogre {
         needUpdate();
     }
     //-----------------------------------------------------------------------
-	SceneNode* SceneNode::createChildSceneNode(const Vector3& translate, 
-        const Quaternion& rotate)
+	SceneNode* SceneNode::createChildSceneNode(const Vector3& inTranslate, 
+        const Quaternion& inRotate)
 	{
-		return static_cast<SceneNode*>(this->createChild(translate, rotate));
+		return static_cast<SceneNode*>(this->createChild(inTranslate, inRotate));
 	}
     //-----------------------------------------------------------------------
-    SceneNode* SceneNode::createChildSceneNode(const String& name, const Vector3& translate, 
-		const Quaternion& rotate)
+    SceneNode* SceneNode::createChildSceneNode(const String& name, const Vector3& inTranslate, 
+		const Quaternion& inRotate)
 	{
-		return static_cast<SceneNode*>(this->createChild(name, translate, rotate));
+		return static_cast<SceneNode*>(this->createChild(name, inTranslate, inRotate));
 	}
     //-----------------------------------------------------------------------
     void SceneNode::findLights(LightList& destList, Real radius, uint32 lightMask) const

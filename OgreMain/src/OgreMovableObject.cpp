@@ -384,7 +384,7 @@ namespace Ogre {
     ShadowCaster::ShadowRenderableListIterator MovableObject::getShadowVolumeRenderableIterator(
         ShadowTechnique shadowTechnique, const Light* light, 
         HardwareIndexBufferSharedPtr* indexBuffer, 
-        bool extrudeVertices, Real extrusionDist, unsigned long flags )
+        bool inExtrudeVertices, Real extrusionDist, unsigned long flags )
     {
         static ShadowRenderableList dummyList;
         return ShadowRenderableListIterator(dummyList.begin(), dummyList.end());

@@ -107,8 +107,8 @@ bool CompositorInstance::getEnabled()
 class RSClearOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-	RSClearOperation(uint32 buffers, ColourValue colour, Real depth, unsigned short stencil):
-		buffers(buffers), colour(colour), depth(depth), stencil(stencil)
+	RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil):
+		buffers(inBuffers), colour(inColour), depth(inDepth), stencil(inStencil)
 	{}
 	/// Which buffers to clear (FrameBufferType)
 	uint32 buffers;
@@ -130,12 +130,12 @@ public:
 class RSStencilOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-	RSStencilOperation(bool stencilCheck,CompareFunction func,uint32 refValue,uint32 mask,
-		StencilOperation stencilFailOp,StencilOperation depthFailOp,StencilOperation passOp,
-		bool twoSidedOperation):
-		stencilCheck(stencilCheck),func(func),refValue(refValue),mask(mask),
-		stencilFailOp(stencilFailOp),depthFailOp(depthFailOp),passOp(passOp),
-		twoSidedOperation(twoSidedOperation)
+	RSStencilOperation(bool inStencilCheck, CompareFunction inFunc, uint32 inRefValue, uint32 inMask,
+		StencilOperation inStencilFailOp, StencilOperation inDepthFailOp, StencilOperation inPassOp,
+		bool inTwoSidedOperation):
+		stencilCheck(inStencilCheck), func(inFunc), refValue(inRefValue), mask(inMask),
+		stencilFailOp(inStencilFailOp), depthFailOp(inDepthFailOp), passOp(inPassOp),
+		twoSidedOperation(inTwoSidedOperation)
 	{}
 	bool stencilCheck;
 	CompareFunction func; 
@@ -158,8 +158,8 @@ public:
 class RSQuadOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-	RSQuadOperation(CompositorInstance *instance, uint32 pass_id, MaterialPtr mat):
-	  mat(mat),instance(instance), pass_id(pass_id),
+	RSQuadOperation(CompositorInstance *inInstance, uint32 inPass_id, MaterialPtr inMat):
+	  mat(inMat), instance(inInstance), pass_id(inPass_id),
       mQuadCornerModified(false),
       mQuadLeft(-1),
       mQuadTop(1),
@@ -369,14 +369,14 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
 			}
 			srctech = srcmat->getBestTechnique(0);
 			/// Create local material
-			MaterialPtr mat = createLocalMaterial(srcmat->getName());
+			MaterialPtr localMat = createLocalMaterial(srcmat->getName());
 			/// Copy and adapt passes from source material
 			Technique::PassIterator i = srctech->getPassIterator();
 			while(i.hasMoreElements())
 			{
 				Pass *srcpass = i.getNext();
 				/// Create new target pass
-				targetpass = mat->getTechnique(0)->createPass();
+				targetpass = localMat->getTechnique(0)->createPass();
 				(*targetpass) = (*srcpass);
 				/// Set up inputs
 				for(size_t x=0; x<pass->getNumInputs(); ++x)

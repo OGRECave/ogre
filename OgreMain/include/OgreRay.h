@@ -71,7 +71,7 @@ namespace Ogre {
 		/** Gets the position of a point t units along the ray. */
 		Vector3 operator*(Real t) const { 
 			return getPoint(t);
-		};
+		}
 
 		/** Tests whether this ray intersects the given plane. 
 		@returns A pair structure where the first element indicates whether
