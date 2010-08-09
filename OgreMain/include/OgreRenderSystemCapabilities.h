@@ -164,7 +164,7 @@ namespace Ogre
 		/// Support for point parameters ARB implementation
 		RSC_POINT_EXTENDED_PARAMETERS_ARB = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 7),
 		/// Support for point parameters EXT implementation
-		RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8),
+		RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8)
 
 
 	};

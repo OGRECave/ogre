@@ -257,13 +257,13 @@ namespace Ogre {
 		{
 			// use the writeable stream 
 			stream = OGRE_NEW FileStreamDataStream(filename,
-				rwStream, tagStat.st_size, true);
+				rwStream, (size_t)tagStat.st_size, true);
 		}
 		else
 		{
 			// read-only stream
 			stream = OGRE_NEW FileStreamDataStream(filename,
-				roStream, tagStat.st_size, true);
+				roStream, (size_t)tagStat.st_size, true);
 		}
 		return DataStreamPtr(stream);
     }

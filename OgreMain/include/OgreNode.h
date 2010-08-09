@@ -93,11 +93,11 @@ namespace Ogre {
 			*/
 			virtual void nodeUpdated(const Node*) {}
 			/** Node is being destroyed */
-			virtual void nodeDestroyed(const Node*) {};
+			virtual void nodeDestroyed(const Node*) {}
 			/** Node has been attached to a parent */
-			virtual void nodeAttached(const Node*) {};
+			virtual void nodeAttached(const Node*) {}
 			/** Node has been detached from a parent */
-			virtual void nodeDetached(const Node*) {};
+			virtual void nodeDetached(const Node*) {}
 		};
 
 		/** Inner class for displaying debug renderable for Node. */

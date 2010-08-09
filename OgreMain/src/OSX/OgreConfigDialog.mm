@@ -161,7 +161,7 @@ namespace Ogre {
         return (retVal == NSRunStoppedResponse) ? true : false;
 	}
 
-};
+}
 
 @implementation OgreConfigWindowDelegate
 
@@ -294,6 +294,7 @@ namespace Ogre {
 
 - (void)popUpValueChanged:(id)sender
 {
+#pragma unused(sender)
     // Grab a copy of the selected RenderSystem name in Ogre::String format
     Ogre::String selectedRenderSystemName = Ogre::String([[[mRenderSystemsPopUp selectedItem] title] UTF8String]);
     
@@ -309,6 +310,7 @@ namespace Ogre {
 
 - (BOOL)windowShouldClose:(id)sender
 {
+#pragma unused(sender)
     // Hide the window
     [mConfigWindow orderOut:nil];
     
@@ -319,6 +321,7 @@ namespace Ogre {
 
 - (void)cancelButtonPressed:(id)sender
 {
+#pragma unused(sender)
     // Hide the window
     [mConfigWindow orderOut:nil];
 
@@ -327,6 +330,7 @@ namespace Ogre {
 
 - (void)okButtonPressed:(id)sender
 {
+#pragma unused(sender)
     // Hide the window
     [mConfigWindow orderOut:nil];
 
@@ -340,11 +344,17 @@ namespace Ogre {
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 #endif
 {
+#pragma unused(aTableView)
     return [[[mOptions keyEnumerator] allObjects] objectAtIndex:rowIndex];
 }
 
+#if defined(MAC_OS_X_VERSION_10_5) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+#else
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
+#endif
 {
+#pragma unused(aTableView)
     return [mOptions count];
 }
 
@@ -355,6 +365,7 @@ namespace Ogre {
 - (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
 #endif
 {
+#pragma unused(aTableView)
     // Clear out the options popup menu
     [mOptionsPopUp removeAllItems];
     

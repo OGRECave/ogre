@@ -290,7 +290,7 @@ namespace Ogre {
 				: size ( cachesize ), type ( cachetype ), tail (0), buffersize (0), hit (0), miss (0)
 			{
 				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
-			};
+			}
 
 			~VertexCacheProfiler()
 			{
@@ -298,12 +298,12 @@ namespace Ogre {
 			}
 
 			void profile(const HardwareIndexBufferSharedPtr& indexBuffer);
-			void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; };
-			void flush() { tail = 0; buffersize = 0; };
+			void reset() { hit = 0; miss = 0; tail = 0; buffersize = 0; }
+			void flush() { tail = 0; buffersize = 0; }
 
-			unsigned int getHits() { return hit; };
-			unsigned int getMisses() { return miss; };
-			unsigned int getSize() { return size; };
+			unsigned int getHits() { return hit; }
+			unsigned int getMisses() { return miss; }
+			unsigned int getSize() { return size; }
 		private:
 			unsigned int size;
 			uint32 *cache;

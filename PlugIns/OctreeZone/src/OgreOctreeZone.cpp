@@ -468,11 +468,11 @@ namespace Ogre
 			{
 				PCZSceneNodeList nodeList;
 				mOctree->_findNodes(p->getAAB(), nodeList, NULL, true, false);
-				PCZSceneNodeList::iterator it = nodeList.begin();
-				while ( it != nodeList.end() )
+				PCZSceneNodeList::iterator i = nodeList.begin();
+				while ( i != nodeList.end() )
 				{
-					(*it)->setMoved(true);
-					++it;
+					(*i)->setMoved(true);
+					++i;
 				}
 			}
 		}

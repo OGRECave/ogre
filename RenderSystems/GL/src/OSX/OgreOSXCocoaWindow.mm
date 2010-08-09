@@ -194,7 +194,6 @@ namespace Ogre {
             }
             else
             {
-                NameValuePairList::const_iterator opt(NULL);
                 NameValuePairList::const_iterator param_useNSView_pair(NULL);
                 if(miscParams)
                 {

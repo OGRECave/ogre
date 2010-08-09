@@ -366,7 +366,7 @@ namespace Ogre {
         class Impl
         {
         protected:
-            ~Impl() { };
+            ~Impl() { }
         };
         /** Get rendersystem specific interface for this RenderTarget.
             This is used by the RenderSystem to (un)bind this target, 

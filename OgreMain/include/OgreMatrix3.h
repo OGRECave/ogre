@@ -72,7 +72,7 @@ namespace Ogre
             @note
                 It does <b>NOT</b> initialize the matrix for efficiency.
         */
-		inline Matrix3 () {};
+		inline Matrix3 () {}
         inline explicit Matrix3 (const Real arr[3][3])
 		{
 			memcpy(m,arr,9*sizeof(Real));
@@ -233,11 +233,11 @@ namespace Ogre
 		/** Function for writing to a stream.
 		*/
 		inline _OgreExport friend std::ostream& operator <<
-			( std::ostream& o, const Matrix3& m )
+			( std::ostream& o, const Matrix3& mat )
 		{
-			o << "Matrix3(" << m[0][0] << ", " << m[0][1] << ", " << m[0][2] << ", " 
-                            << m[1][0] << ", " << m[1][1] << ", " << m[1][2] << ", " 
-                            << m[2][0] << ", " << m[2][1] << ", " << m[2][2] << ")";
+			o << "Matrix3(" << mat[0][0] << ", " << mat[0][1] << ", " << mat[0][2] << ", " 
+                            << mat[1][0] << ", " << mat[1][1] << ", " << mat[1][2] << ", " 
+                            << mat[2][0] << ", " << mat[2][1] << ", " << mat[2][2] << ")";
 			return o;
 		}
 

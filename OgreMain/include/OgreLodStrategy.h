@@ -100,7 +100,7 @@ namespace Ogre {
         void assertSorted(const Mesh::LodValueList& values) const;
 
         /** Get the name of this strategy. */
-        const String& getName() const { return mName; };
+        const String& getName() const { return mName; }
 
     protected:
         /** Implementation of isSorted suitable for ascending values. */

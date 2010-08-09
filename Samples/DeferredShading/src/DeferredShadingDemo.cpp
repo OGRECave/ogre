@@ -46,7 +46,10 @@ This demo source file is in the public domain.
 using namespace Ogre;
 using namespace OgreBites;
 
-template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+namespace Ogre
+{
+    template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+}
 
 const ColourValue SAMPLE_COLORS[] = 
     {   ColourValue::Red, ColourValue::Green, ColourValue::Blue, 

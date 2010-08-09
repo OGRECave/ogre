@@ -139,17 +139,17 @@ namespace Ogre {
 				if(ResourceGroupManager::getSingleton().getLoadingListener()->resourceCollision(res.get(), this))
 				{
 					// Try to do the addition again, no seconds attempts to resolve collisions are allowed
-					std::pair<ResourceMap::iterator, bool> result;
+					std::pair<ResourceMap::iterator, bool> insertResult;
 					if(ResourceGroupManager::getSingleton().isResourceGroupInGlobalPool(res->getGroup()))
 					{
-						result = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
+						insertResult = mResources.insert( ResourceMap::value_type( res->getName(), res ) );
 					}
 					else
 					{
 						ResourceWithGroupMap::iterator itGroup = mResourcesWithGroup.find(res->getGroup());
-						result = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
+						insertResult = itGroup->second.insert( ResourceMap::value_type( res->getName(), res ) );
 					}
-					if (!result.second)
+					if (!insertResult.second)
 					{
 						OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() + 
 							" already exists.", "ResourceManager::add");
@@ -431,11 +431,11 @@ namespace Ogre {
 					ResourceWithGroupMap::iterator iterE = mResourcesWithGroup.end();
 					for ( ; iter != iterE ; iter++ )
 					{
-						ResourceMap::iterator it = iter->second.find(name);
+						ResourceMap::iterator resMapIt = iter->second.find(name);
 
-						if( it != iter->second.end())
+						if( resMapIt != iter->second.end())
 						{
-							res = it->second;
+							res = resMapIt->second;
 							break;
 						}
 					}

@@ -106,10 +106,10 @@ namespace Ogre
 		mMoved = true;
 	}
     //-----------------------------------------------------------------------
-	SceneNode* PCZSceneNode::createChildSceneNode(const Vector3& translate, 
-        const Quaternion& rotate)
+	SceneNode* PCZSceneNode::createChildSceneNode(const Vector3& inTranslate, 
+        const Quaternion& inRotate)
 	{
-		PCZSceneNode * childSceneNode = (PCZSceneNode*)(this->createChild(translate, rotate));
+		PCZSceneNode * childSceneNode = (PCZSceneNode*)(this->createChild(inTranslate, inRotate));
 		if (mHomeZone)
 		{
 			childSceneNode->setHomeZone(mHomeZone);
@@ -118,10 +118,10 @@ namespace Ogre
 		return static_cast<SceneNode*>(childSceneNode);
 	}
     //-----------------------------------------------------------------------
-    SceneNode* PCZSceneNode::createChildSceneNode(const String& name, const Vector3& translate, 
-		const Quaternion& rotate)
+    SceneNode* PCZSceneNode::createChildSceneNode(const String& name, const Vector3& inTranslate, 
+		const Quaternion& inRotate)
 	{
-		PCZSceneNode * childSceneNode = (PCZSceneNode*)(this->createChild(name, translate, rotate));
+		PCZSceneNode * childSceneNode = (PCZSceneNode*)(this->createChild(name, inTranslate, inRotate));
 		if (mHomeZone)
 		{
 			childSceneNode->setHomeZone(mHomeZone);

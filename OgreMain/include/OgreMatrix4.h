@@ -524,7 +524,7 @@ namespace Ogre
         /** Function for writing to a stream.
         */
         inline _OgreExport friend std::ostream& operator <<
-            ( std::ostream& o, const Matrix4& m )
+            ( std::ostream& o, const Matrix4& mat )
         {
             o << "Matrix4(";
 			for (size_t i = 0; i < 4; ++i)
@@ -532,7 +532,7 @@ namespace Ogre
                 o << " row" << (unsigned)i << "{";
                 for(size_t j = 0; j < 4; ++j)
                 {
-                    o << m[i][j] << " ";
+                    o << mat[i][j] << " ";
                 }
                 o << "}";
             }

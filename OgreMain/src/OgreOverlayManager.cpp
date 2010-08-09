@@ -191,7 +191,7 @@ namespace Ogre {
 
 	    while(!stream->eof())
 	    {
-			bool isTemplate = false;
+			bool isATemplate = false;
 			skipLine = false;
 		    line = stream->getLine();
 		    // Ignore comments & blanks
@@ -213,7 +213,7 @@ namespace Ogre {
 					// check to see if there is a template
 					if (line.substr(0,8) == "template")
 					{
-						isTemplate = true;
+						isATemplate = true;
 
 					}
 					else
@@ -232,7 +232,7 @@ namespace Ogre {
 						skipLine = true;
 					}
 			    }
-			    if ((pOverlay && !skipLine) || isTemplate)
+			    if ((pOverlay && !skipLine) || isATemplate)
 			    {
 				    // Already in overlay
                     vector<String>::type params = StringUtil::split(line, "\t\n ()");
@@ -242,9 +242,9 @@ namespace Ogre {
 				    {
 					    // Finished overlay
 					    pOverlay = 0;
-						isTemplate = false;
+						isATemplate = false;
 				    }
-				    else if (parseChildren(stream,line, pOverlay, isTemplate, NULL))
+				    else if (parseChildren(stream,line, pOverlay, isATemplate, NULL))
 						
 				    {
 
@@ -252,7 +252,7 @@ namespace Ogre {
 				    else
 				    {
 					    // Attribute
-						if (!isTemplate)
+						if (!isATemplate)
 						{
 							parseAttrib(line, pOverlay);
 						}
@@ -311,13 +311,13 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void OverlayManager::parseNewElement( DataStreamPtr& stream, String& elemType, String& elemName, 
-            bool isContainer, Overlay* pOverlay, bool isTemplate, String templateName, OverlayContainer* container)
+            bool isContainer, Overlay* pOverlay, bool isATemplate, String templateName, OverlayContainer* container)
     {
         String line;
 
 		OverlayElement* newElement = NULL;
 		newElement = 
-				OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, elemType, elemName, isTemplate);
+				OverlayManager::getSingleton().createOverlayElementFromTemplate(templateName, elemType, elemName, isATemplate);
 
 			// do not add a template to an overlay
 
@@ -346,7 +346,7 @@ namespace Ogre {
                 }
                 else
                 {
-                    if (isContainer && parseChildren(stream,line, pOverlay, isTemplate, static_cast<OverlayContainer*>(newElement)))
+                    if (isContainer && parseChildren(stream,line, pOverlay, isATemplate, static_cast<OverlayContainer*>(newElement)))
                     {
 					    // nested children... don't reparse it
                     }
@@ -362,13 +362,13 @@ namespace Ogre {
 
     //---------------------------------------------------------------------
     bool OverlayManager::parseChildren( DataStreamPtr& stream, const String& line,
-            Overlay* pOverlay, bool isTemplate, OverlayContainer* parent)
+            Overlay* pOverlay, bool isATemplate, OverlayContainer* parent)
 	{
 		bool ret = false;
 		uint skipParam =0;
 		vector<String>::type params = StringUtil::split(line, "\t\n ()");
 
-		if (isTemplate)
+		if (isATemplate)
 		{
 			if (params[0] == "template")
 			{
@@ -377,7 +377,7 @@ namespace Ogre {
 		}
 						
 		// top level component cannot be an element, it must be a container unless it is a template
-		if (params[0+skipParam] == "container" || (params[0+skipParam] == "element" && (isTemplate || parent != NULL)) )
+		if (params[0+skipParam] == "container" || (params[0+skipParam] == "element" && (isATemplate || parent != NULL)) )
 		{
 			String templateName;
 			ret = true;
@@ -420,7 +420,7 @@ namespace Ogre {
 			}
        
 			skipToNextOpenBrace(stream);
-			parseNewElement(stream, params[1+skipParam], params[2+skipParam], true, pOverlay, isTemplate, templateName, (OverlayContainer*)parent);
+			parseNewElement(stream, params[1+skipParam], params[2+skipParam], true, pOverlay, isATemplate, templateName, (OverlayContainer*)parent);
 
 		}
 
@@ -513,20 +513,20 @@ namespace Ogre {
         return mLastViewportOrientationMode;
     }
 	//---------------------------------------------------------------------
-	OverlayManager::ElementMap& OverlayManager::getElementMap(bool isTemplate)
+	OverlayManager::ElementMap& OverlayManager::getElementMap(bool isATemplate)
 	{
-		return (isTemplate)?mTemplates:mInstances;
+		return (isATemplate)?mTemplates:mInstances;
 	}
 
 	//---------------------------------------------------------------------
-	OverlayElement* OverlayManager::createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool isTemplate)
+	OverlayElement* OverlayManager::createOverlayElementFromTemplate(const String& templateName, const String& typeName, const String& instanceName, bool isATemplate)
 	{
 
 		OverlayElement* newObj  = NULL;
 
 		if (templateName.empty())
 		{
-			newObj = createOverlayElement(typeName, instanceName, isTemplate);
+			newObj = createOverlayElement(typeName, instanceName, isATemplate);
 		}
 		else
 		{
@@ -543,7 +543,7 @@ namespace Ogre {
 				typeNameToCreate = typeName;
 			}
 
-			newObj = createOverlayElement(typeNameToCreate, instanceName, isTemplate);
+			newObj = createOverlayElement(typeNameToCreate, instanceName, isATemplate);
 
 			((OverlayContainer*)newObj)->copyFromTemplate(templateGui);
 		}
@@ -560,9 +560,9 @@ namespace Ogre {
 	}
 
 	//---------------------------------------------------------------------
-	OverlayElement* OverlayManager::createOverlayElement(const String& typeName, const String& instanceName, bool isTemplate)
+	OverlayElement* OverlayManager::createOverlayElement(const String& typeName, const String& instanceName, bool isATemplate)
 	{
-		return createOverlayElementImpl(typeName, instanceName, getElementMap(isTemplate));
+		return createOverlayElementImpl(typeName, instanceName, getElementMap(isATemplate));
 	}
 
 	//---------------------------------------------------------------------
@@ -601,14 +601,14 @@ namespace Ogre {
 	}
 
 	//---------------------------------------------------------------------
-	OverlayElement* OverlayManager::getOverlayElement(const String& name, bool isTemplate)
+	OverlayElement* OverlayManager::getOverlayElement(const String& name, bool isATemplate)
 	{
-		return getOverlayElementImpl(name, getElementMap(isTemplate));
+		return getOverlayElementImpl(name, getElementMap(isATemplate));
 	}
 	//---------------------------------------------------------------------
-	bool OverlayManager::hasOverlayElement(const String& name, bool isTemplate)
+	bool OverlayManager::hasOverlayElement(const String& name, bool isATemplate)
 	{
-		return hasOverlayElementImpl(name, getElementMap(isTemplate));
+		return hasOverlayElementImpl(name, getElementMap(isATemplate));
 	}
 	//---------------------------------------------------------------------
 	OverlayElement* OverlayManager::getOverlayElementImpl(const String& name, ElementMap& elementMap)
@@ -630,15 +630,15 @@ namespace Ogre {
 		return ii != elementMap.end();
 	}
 	//---------------------------------------------------------------------
-	void OverlayManager::destroyOverlayElement(const String& instanceName, bool isTemplate)
+	void OverlayManager::destroyOverlayElement(const String& instanceName, bool isATemplate)
 	{
-		destroyOverlayElementImpl(instanceName, getElementMap(isTemplate));
+		destroyOverlayElementImpl(instanceName, getElementMap(isATemplate));
 	}
 
 	//---------------------------------------------------------------------
-	void OverlayManager::destroyOverlayElement(OverlayElement* pInstance, bool isTemplate)
+	void OverlayManager::destroyOverlayElement(OverlayElement* pInstance, bool isATemplate)
 	{
-		destroyOverlayElementImpl(pInstance->getName(), getElementMap(isTemplate));
+		destroyOverlayElementImpl(pInstance->getName(), getElementMap(isATemplate));
 	}
 
 	//---------------------------------------------------------------------
@@ -664,9 +664,9 @@ namespace Ogre {
 		elementMap.erase(ii);
 	}
 	//---------------------------------------------------------------------
-	void OverlayManager::destroyAllOverlayElements(bool isTemplate)
+	void OverlayManager::destroyAllOverlayElements(bool isATemplate)
 	{
-		destroyAllOverlayElementsImpl(getElementMap(isTemplate));
+		destroyAllOverlayElementsImpl(getElementMap(isATemplate));
 	}
 	//---------------------------------------------------------------------
 	void OverlayManager::destroyAllOverlayElementsImpl(ElementMap& elementMap)

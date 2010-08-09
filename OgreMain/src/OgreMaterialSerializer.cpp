@@ -3519,13 +3519,13 @@ namespace Ogre
         // were not included in material script
         if (!includeProgDef && !mGpuProgramBuffer.empty() && !programFilename.empty())
         {
-            FILE *fp;
-            fp = fopen(programFilename.c_str(), "w");
-            if (!fp)
+            FILE *locFp;
+            locFp = fopen(programFilename.c_str(), "w");
+            if (!locFp)
                 OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "Cannot create program material file.",
                 "MaterialSerializer::export");
-            fputs(mGpuProgramBuffer.c_str(), fp);
-            fclose(fp);
+            fputs(mGpuProgramBuffer.c_str(), locFp);
+            fclose(locFp);
         }
 
         LogManager::getSingleton().logMessage("MaterialSerializer : done.", LML_CRITICAL);

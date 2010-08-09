@@ -2365,9 +2365,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::checkLayers(bool includeGPUResources)
 	{
-		for (LayerInstanceList::iterator i = mLayers.begin(); i != mLayers.end(); ++i)
+		for (LayerInstanceList::iterator it = mLayers.begin(); it != mLayers.end(); ++it)
 		{
-			LayerInstance& layer = *i;
+			LayerInstance& layer = *it;
 			// If we're missing sampler entries compared to the declaration, initialise them
 			for (size_t i = layer.textureNames.size(); i < mLayerDecl.samplers.size(); ++i)
 			{
@@ -3607,12 +3607,12 @@ namespace Ogre
 
 		if (!mDirtyGeometryRectForNeighbours.isNull())
 		{
-			Rect dirtyRect(mDirtyGeometryRectForNeighbours);
+			Rect dirtyRectForNeighbours(mDirtyGeometryRectForNeighbours);
 			mDirtyGeometryRectForNeighbours.setNull();
 			// calculate light update rectangle
 			const Vector3& lightVec = TerrainGlobalOptions::getSingleton().getLightMapDirection();
 			Rect lightmapRect;
-			widenRectByVector(lightVec, dirtyRect, getMinHeight(), getMaxHeight(), lightmapRect);
+			widenRectByVector(lightVec, dirtyRectForNeighbours, getMinHeight(), getMaxHeight(), lightmapRect);
 
 			for (int i = 0; i < (int)NEIGHBOUR_COUNT; ++i)
 			{
@@ -3624,7 +3624,7 @@ namespace Ogre
 				// Intersect the incoming rectangles with the edge regions related to this neighbour
 				Rect edgeRect;
 				getEdgeRect(ni, 2, &edgeRect);
-				Rect heightEdgeRect = edgeRect.intersect(dirtyRect);
+				Rect heightEdgeRect = edgeRect.intersect(dirtyRectForNeighbours);
 				Rect lightmapEdgeRect = edgeRect.intersect(lightmapRect);
 
 				if (!heightEdgeRect.isNull() || !lightmapRect.isNull())

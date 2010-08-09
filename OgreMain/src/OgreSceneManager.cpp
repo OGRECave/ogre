@@ -3722,9 +3722,9 @@ void SceneManager::_applySceneAnimations(void)
         Animation::NumericTrackIterator numTrackIt = anim->getNumericTrackIterator();
         while(numTrackIt.hasMoreElements())
         {
-            const AnimableValuePtr& anim = numTrackIt.getNext()->getAssociatedAnimable();
-			if (!anim.isNull())
-				anim->resetToBaseValue();
+            const AnimableValuePtr& animPtr = numTrackIt.getNext()->getAssociatedAnimable();
+			if (!animPtr.isNull())
+				animPtr->resetToBaseValue();
         }
     }
 
@@ -4982,10 +4982,10 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 			{
 				// We didn't bind a receiver-specific program, so bind the original
 				retPass->setVertexProgram(pass->getVertexProgramName(), false);
-				const GpuProgramPtr& prg = retPass->getVertexProgram();
+				const GpuProgramPtr& prog = retPass->getVertexProgram();
 				// Load this program if required
-				if (!prg->isLoaded())
-					prg->load();
+				if (!prog->isLoaded())
+					prog->load();
 				// Copy params
 				retPass->setVertexProgramParameters(
 					pass->getVertexProgramParameters());

@@ -265,7 +265,6 @@ namespace Ogre {
         // update elements
         if (mTransformUpdated)
         {
-            OverlayContainerList::iterator i, iend;
             Matrix4 xform;
 
             _getWorldTransforms(&xform);

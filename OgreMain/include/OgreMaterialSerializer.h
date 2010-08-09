@@ -111,7 +111,7 @@ namespace Ogre {
 			MSE_PRE_WRITE,
 			MSE_WRITE_BEGIN,
 			MSE_WRITE_END,
-			MSE_POST_WRITE,
+			MSE_POST_WRITE
 		};
 
 		/** Class that allows listening in on the various stages of material serialization process.
@@ -315,7 +315,7 @@ namespace Ogre {
 		/** default constructor*/
 		MaterialSerializer();
 		/** default destructor*/
-		virtual ~MaterialSerializer() {};
+		virtual ~MaterialSerializer() {}
 
 		/** Queue an in-memory Material to the internal buffer for export.
 		@param pMat Material pointer

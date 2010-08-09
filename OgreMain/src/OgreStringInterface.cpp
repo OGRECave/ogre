@@ -43,7 +43,7 @@ namespace Ogre {
         else
             return emptyList;
 
-    };
+    }
 
     bool StringInterface::setParameter(const String& name, const String& value)
     {

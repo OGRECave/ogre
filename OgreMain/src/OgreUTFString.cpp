@@ -536,10 +536,10 @@ namespace Ogre {
 		mData = copy.mData;
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( size_type length, const code_point& ch )
+	UTFString::UTFString( size_type inLength, const code_point& ch )
 	{
 		_init();
-		assign( length, ch );
+		assign( inLength, ch );
 	}
 	//--------------------------------------------------------------------------
 	UTFString::UTFString( const code_point* str )
@@ -548,16 +548,16 @@ namespace Ogre {
 		assign( str );
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( const code_point* str, size_type length )
+	UTFString::UTFString( const code_point* str, size_type inLength )
 	{
 		_init();
-		assign( str, length );
+		assign( str, inLength );
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( const UTFString& str, size_type index, size_type length )
+	UTFString::UTFString( const UTFString& str, size_type index, size_type inLength )
 	{
 		_init();
-		assign( str, index, length );
+		assign( str, index, inLength );
 	}
 	//--------------------------------------------------------------------------
 #if OGRE_IS_NATIVE_WCHAR_T
@@ -567,10 +567,10 @@ namespace Ogre {
 		assign( w_str );
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( const wchar_t* w_str, size_type length )
+	UTFString::UTFString( const wchar_t* w_str, size_type inLength )
 	{
 		_init();
-		assign( w_str, length );
+		assign( w_str, inLength );
 	}
 #endif
 	//--------------------------------------------------------------------------
@@ -580,16 +580,16 @@ namespace Ogre {
 		assign( wstr );
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( const char* c_str )
+	UTFString::UTFString( const char* str )
 	{
 		_init();
-		assign( c_str );
+		assign( str );
 	}
 	//--------------------------------------------------------------------------
-	UTFString::UTFString( const char* c_str, size_type length )
+	UTFString::UTFString( const char* str, size_type inLength )
 	{
 		_init();
-		assign( c_str, length );
+		assign( str, inLength );
 	}
 	//--------------------------------------------------------------------------
 	UTFString::UTFString( const std::string& str )
@@ -637,9 +637,9 @@ namespace Ogre {
 		return mData.max_size();
 	}
 	//--------------------------------------------------------------------------
-	void UTFString::reserve( size_type size )
+	void UTFString::reserve( size_type inSize )
 	{
-		mData.reserve( size );
+		mData.reserve( inSize );
 	}
 	//--------------------------------------------------------------------------
 	void UTFString::resize( size_type num, const code_point& val /*= 0 */ )
@@ -680,15 +680,17 @@ namespace Ogre {
 	Ogre::UTFString UTFString::substr( size_type index, size_type num /*= npos */ ) const
 	{
 		// this could avoid the extra copy if we used a private specialty constructor
-		dstring data = mData.substr( index, num );
+		dstring tmpData = mData.substr( index, num );
 		UTFString tmp;
-		tmp.mData.swap( data );
+		tmp.mData.swap( tmpData );
 		return tmp;
 	}
 	//--------------------------------------------------------------------------
 	void UTFString::push_back( unicode_char val )
 	{
-		code_point cp[2];
+		code_point cp[2] = {
+            0, 0
+        };
 		size_t c = _utf32_to_utf16( val, cp );
 		if ( c > 0 ) push_back( cp[0] );
 		if ( c > 1 ) push_back( cp[1] );
@@ -876,9 +878,9 @@ namespace Ogre {
 		return i;
 	}
 
-	UTFString& UTFString::assign( iterator start, iterator end )
+	UTFString& UTFString::assign( iterator start, iterator last )
 	{
-		mData.assign( start.mIter, end.mIter );
+		mData.assign( start.mIter, last.mIter );
 		return *this;
 	}
 
@@ -986,16 +988,16 @@ namespace Ogre {
 		return *this;
 	}
 
-	UTFString& UTFString::assign( const char* c_str )
+	UTFString& UTFString::assign( const char* str )
 	{
-		std::string tmp( c_str );
+		std::string tmp( str );
 		return assign( tmp );
 	}
 
-	UTFString& UTFString::assign( const char* c_str, size_type num )
+	UTFString& UTFString::assign( const char* str, size_type num )
 	{
 		std::string tmp;
-		tmp.assign( c_str, num );
+		tmp.assign( str, num );
 		return assign( tmp );
 	}
 
@@ -1029,9 +1031,9 @@ namespace Ogre {
 		return *this;
 	}
 
-	UTFString& UTFString::append( iterator start, iterator end )
+	UTFString& UTFString::append( iterator start, iterator last )
 	{
-		mData.append( start.mIter, end.mIter );
+		mData.append( start.mIter, last.mIter );
 		return *this;
 	}
 
@@ -1047,9 +1049,9 @@ namespace Ogre {
 		return append( num, static_cast<unicode_char>( ch ) );
 	}
 #endif
-	UTFString& UTFString::append( const char* c_str, size_type num )
+	UTFString& UTFString::append( const char* str, size_type num )
 	{
-		UTFString tmp( c_str, num );
+		UTFString tmp( str, num );
 		append( tmp );
 		return *this;
 	}
@@ -1096,9 +1098,9 @@ namespace Ogre {
 		return *this;
 	}
 
-	void UTFString::insert( iterator i, iterator start, iterator end )
+	void UTFString::insert( iterator i, iterator start, iterator last )
 	{
-		mData.insert( i.mIter, start.mIter, end.mIter );
+		mData.insert( i.mIter, start.mIter, last.mIter );
 	}
 
 	UTFString& UTFString::insert( size_type index, const code_point* str, size_type num )
@@ -1116,9 +1118,9 @@ namespace Ogre {
 	}
 #endif
 
-	UTFString& UTFString::insert( size_type index, const char* c_str, size_type num )
+	UTFString& UTFString::insert( size_type index, const char* str, size_type num )
 	{
-		UTFString tmp( c_str, num );
+		UTFString tmp( str, num );
 		insert( index, tmp );
 		return *this;
 	}
@@ -1197,10 +1199,10 @@ namespace Ogre {
 		return ret;
 	}
 
-	Ogre::UTFString::iterator UTFString::erase( iterator start, iterator end )
+	Ogre::UTFString::iterator UTFString::erase( iterator start, iterator last )
 	{
 		iterator ret;
-		ret.mIter = mData.erase( start.mIter, end.mIter );
+		ret.mIter = mData.erase( start.mIter, last.mIter );
 		ret.mString = this;
 		return ret;
 	}
@@ -1232,12 +1234,12 @@ namespace Ogre {
 		return *this;
 	}
 
-	UTFString& UTFString::replace( iterator start, iterator end, const UTFString& str, size_type num /*= npos */ )
+	UTFString& UTFString::replace( iterator start, iterator last, const UTFString& str, size_type num /*= npos */ )
 	{
 		_const_fwd_iterator st(start); //Work around for gcc, allow it to find correct overload
 
 		size_type index1 = begin() - st;
-		size_type num1 = end - st;
+		size_type num1 = last - st;
 		return replace( index1, num1, str, 0, num );
 	}
 
@@ -1247,12 +1249,12 @@ namespace Ogre {
 		return *this;
 	}
 
-	UTFString& UTFString::replace( iterator start, iterator end, size_type num, code_point ch )
+	UTFString& UTFString::replace( iterator start, iterator last, size_type num, code_point ch )
 	{
 		_const_fwd_iterator st(start); //Work around for gcc, allow it to find correct overload
 
 		size_type index1 = begin() - st;
-		size_type num1 = end - st;
+		size_type num1 = last - st;
 		return replace( index1, num1, num, ch );
 	}
 
@@ -1266,33 +1268,33 @@ namespace Ogre {
 		return mData.compare( str );
 	}
 
-	int UTFString::compare( size_type index, size_type length, const UTFString& str ) const
+	int UTFString::compare( size_type index, size_type inLength, const UTFString& str ) const
 	{
-		return mData.compare( index, length, str.mData );
+		return mData.compare( index, inLength, str.mData );
 	}
 
-	int UTFString::compare( size_type index, size_type length, const UTFString& str, size_type index2, size_type length2 ) const
+	int UTFString::compare( size_type index, size_type inLength, const UTFString& str, size_type index2, size_type length2 ) const
 	{
-		return mData.compare( index, length, str.mData, index2, length2 );
+		return mData.compare( index, inLength, str.mData, index2, length2 );
 	}
 
-	int UTFString::compare( size_type index, size_type length, const code_point* str, size_type length2 ) const
+	int UTFString::compare( size_type index, size_type inLength, const code_point* str, size_type length2 ) const
 	{
-		return mData.compare( index, length, str, length2 );
+		return mData.compare( index, inLength, str, length2 );
 	}
 
 #if OGRE_IS_NATIVE_WCHAR_T
-	int UTFString::compare( size_type index, size_type length, const wchar_t* w_str, size_type length2 ) const
+	int UTFString::compare( size_type index, size_type inLength, const wchar_t* w_str, size_type length2 ) const
 	{
 		UTFString tmp( w_str, length2 );
-		return compare( index, length, tmp );
+		return compare( index, inLength, tmp );
 	}
 #endif
 
-	int UTFString::compare( size_type index, size_type length, const char* c_str, size_type length2 ) const
+	int UTFString::compare( size_type index, size_type inLength, const char* str, size_type length2 ) const
 	{
-		UTFString tmp( c_str, length2 );
-		return compare( index, length, tmp );
+		UTFString tmp( str, length2 );
+		return compare( index, inLength, tmp );
 	}
 
 	Ogre::UTFString::size_type UTFString::find( const UTFString& str, size_type index /*= 0 */ ) const
@@ -1300,23 +1302,23 @@ namespace Ogre {
 		return mData.find( str.c_str(), index );
 	}
 
-	Ogre::UTFString::size_type UTFString::find( const code_point* cp_str, size_type index, size_type length ) const
+	Ogre::UTFString::size_type UTFString::find( const code_point* cp_str, size_type index, size_type inLength ) const
 	{
 		UTFString tmp( cp_str );
-		return mData.find( tmp.c_str(), index, length );
+		return mData.find( tmp.c_str(), index, inLength );
 	}
 
-	Ogre::UTFString::size_type UTFString::find( const char* c_str, size_type index, size_type length ) const
+	Ogre::UTFString::size_type UTFString::find( const char* str, size_type index, size_type inLength ) const
 	{
-		UTFString tmp( c_str );
-		return mData.find( tmp.c_str(), index, length );
+		UTFString tmp( str );
+		return mData.find( tmp.c_str(), index, inLength );
 	}
 
 #if OGRE_IS_NATIVE_WCHAR_T
-	Ogre::UTFString::size_type UTFString::find( const wchar_t* w_str, size_type index, size_type length ) const
+	Ogre::UTFString::size_type UTFString::find( const wchar_t* w_str, size_type index, size_type inLength ) const
 	{
 		UTFString tmp( w_str );
-		return mData.find( tmp.c_str(), index, length );
+		return mData.find( tmp.c_str(), index, inLength );
 	}
 #endif
 
@@ -1355,9 +1357,9 @@ namespace Ogre {
 		return mData.rfind( tmp.c_str(), index, num );
 	}
 
-	Ogre::UTFString::size_type UTFString::rfind( const char* c_str, size_type index, size_type num ) const
+	Ogre::UTFString::size_type UTFString::rfind( const char* str, size_type index, size_type num ) const
 	{
-		UTFString tmp( c_str );
+		UTFString tmp( str );
 		return mData.rfind( tmp.c_str(), index, num );
 	}
 

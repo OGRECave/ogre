@@ -187,7 +187,7 @@ namespace Ogre
 		{
 			// try the other direction
 			ray = Ray(Vector3(e_ls.x, 0.0, bodyB_zMax_ls), Vector3::NEGATIVE_UNIT_Y);
-			std::pair< bool, Real > intersect = ray.intersects(plane);
+			intersect = ray.intersects(plane);
 
 			// we got an intersection point
 			if (intersect.first == true)

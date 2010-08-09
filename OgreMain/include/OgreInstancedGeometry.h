@@ -245,7 +245,7 @@ namespace Ogre {
 			/// Dump contents for diagnostics
 			void dump(std::ofstream& of) const;
 			/// retun the BoundingBox information. Usefull when cloning the batch instance.
-			AxisAlignedBox & getAABB(void){return mAABB;};
+			AxisAlignedBox & getAABB(void){return mAABB;}
 			/// @copydoc MovableObject::visitRenderables
 			void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
 

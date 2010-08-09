@@ -47,12 +47,12 @@ namespace Ogre {
     {
     }
     //---------------------------------------------------------------------
-    Bone* Bone::createChild(unsigned short handle, const Vector3& translate, 
-        const Quaternion& rotate)
+    Bone* Bone::createChild(unsigned short handle, const Vector3& inTranslate, 
+        const Quaternion& inRotate)
     {
         Bone* retBone = mCreator->createBone(handle);
-        retBone->translate(translate);
-        retBone->rotate(rotate);
+        retBone->translate(inTranslate);
+        retBone->rotate(inRotate);
         this->addChild(retBone);
         return retBone;
     }
@@ -96,19 +96,19 @@ namespace Ogre {
     {
         // Combine scale with binding pose inverse scale,
         // NB just combine as equivalent axes, no shearing
-        Vector3 scale = _getDerivedScale() * mBindDerivedInverseScale;
+        Vector3 locScale = _getDerivedScale() * mBindDerivedInverseScale;
 
         // Combine orientation with binding pose inverse orientation
-        Quaternion rotate = _getDerivedOrientation() * mBindDerivedInverseOrientation;
+        Quaternion locRotate = _getDerivedOrientation() * mBindDerivedInverseOrientation;
 
         // Combine position with binding pose inverse position,
         // Note that translation is relative to scale & rotation,
         // so first reverse transform original derived position to
         // binding pose bone space, and then transform to current
         // derived bone space.
-        Vector3 translate = _getDerivedPosition() + rotate * (scale * mBindDerivedInversePosition);
+        Vector3 locTranslate = _getDerivedPosition() + locRotate * (locScale * mBindDerivedInversePosition);
 
-        m.makeTransform(translate, scale, rotate);
+        m.makeTransform(locTranslate, locScale, locRotate);
     }
     //---------------------------------------------------------------------
     unsigned short Bone::getHandle(void) const

@@ -38,11 +38,11 @@ THE SOFTWARE.
 
 namespace Ogre {
 //----------------------------------------------------------------------------- 
-GLHardwarePixelBuffer::GLHardwarePixelBuffer(size_t mWidth, size_t mHeight, size_t mDepth,
-                PixelFormat mFormat,
+GLHardwarePixelBuffer::GLHardwarePixelBuffer(size_t inWidth, size_t inHeight, size_t inDepth,
+                PixelFormat inFormat,
                 HardwareBuffer::Usage usage):
-      HardwarePixelBuffer(mWidth, mHeight, mDepth, mFormat, usage, false, false),
-      mBuffer(mWidth, mHeight, mDepth, mFormat),
+      HardwarePixelBuffer(inWidth, inHeight, inDepth, inFormat, usage, false, false),
+      mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(GL_NONE)
 {
 }
@@ -266,10 +266,10 @@ GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint i
         {
             String name;
 			name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
-            GLSurfaceDesc target;
-            target.buffer = this;
-            target.zoffset = zoffset;
-            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, target, writeGamma, fsaa);
+            GLSurfaceDesc surface;
+            surface.buffer = this;
+            surface.zoffset = zoffset;
+            RenderTexture *trt = GLRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
             mSliceTRT.push_back(trt);
             Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
         }

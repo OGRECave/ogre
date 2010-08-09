@@ -58,7 +58,7 @@ namespace Ogre
 	class _OgreExport WindowEventListener
 	{
 	public:
-		virtual ~WindowEventListener() {};
+		virtual ~WindowEventListener() {}
 
 		/**
 		@Remarks

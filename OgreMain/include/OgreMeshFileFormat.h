@@ -231,7 +231,7 @@ namespace Ogre {
                     // float* pNormals (x, y, z order x numVertices)
                 M_GEOMETRY_COLOURS = 0x5200,    //(Optional)
                     // unsigned long* pColours (RGBA 8888 format x numVertices)
-                M_GEOMETRY_TEXCOORDS = 0x5300,    //(Optional, REPEATABLE, each one adds an extra set)
+                M_GEOMETRY_TEXCOORDS = 0x5300    //(Optional, REPEATABLE, each one adds an extra set)
                     // unsigned short dimensions    (1 for 1D, 2 for 2D, 3 for 3D)
                     // float* pTexCoords  (u [v] [w] order, dimensions x numVertices)
 			/*

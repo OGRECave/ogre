@@ -736,14 +736,14 @@ namespace Ogre {
 		// Not found
 		if (searchGroupsIfNotFound)
 		{
-			ResourceGroup* grp = findGroupContainingResourceImpl(resourceName); 
-			if (grp)
+			ResourceGroup* foundGrp = findGroupContainingResourceImpl(resourceName); 
+			if (foundGrp)
 			{
 				if (resourceBeingLoaded)
 				{
-					resourceBeingLoaded->changeGroupOwnership(grp->name);
+					resourceBeingLoaded->changeGroupOwnership(foundGrp->name);
 				}
-				return openResource(resourceName, grp->name, false);
+				return openResource(resourceName, foundGrp->name, false);
 			}
 			else
 			{

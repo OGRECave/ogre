@@ -33,10 +33,10 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     ParticleIterator::ParticleIterator(list<Particle*>::type::iterator start, 
-        list<Particle*>::type::iterator end)
+        list<Particle*>::type::iterator last)
     {
         mStart = mPos = start;
-        mEnd = end;
+        mEnd = last;
     }
     //-----------------------------------------------------------------------
     bool ParticleIterator::end(void)

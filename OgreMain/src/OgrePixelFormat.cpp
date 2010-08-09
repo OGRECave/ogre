@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace {
 #include "OgrePixelConversions.h"
-};
+}
 
 namespace Ogre {
 

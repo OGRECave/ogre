@@ -100,29 +100,29 @@ namespace Ogre
 		return cls;
 	}
 
-	void ObjectAbstractNode::addVariable(const Ogre::String &name)
+	void ObjectAbstractNode::addVariable(const Ogre::String &inName)
 	{
-		mEnv.insert(std::make_pair(name, ""));
+		mEnv.insert(std::make_pair(inName, ""));
 	}
 
-	void ObjectAbstractNode::setVariable(const Ogre::String &name, const Ogre::String &value)
+	void ObjectAbstractNode::setVariable(const Ogre::String &inName, const Ogre::String &value)
 	{
-		mEnv[name] = value;
+		mEnv[name] = inName;
 	}
 
-	std::pair<bool,String> ObjectAbstractNode::getVariable(const String &name) const
+	std::pair<bool,String> ObjectAbstractNode::getVariable(const String &inName) const
 	{
-		map<String,String>::type::const_iterator i = mEnv.find(name);
+		map<String,String>::type::const_iterator i = mEnv.find(inName);
 		if(i != mEnv.end())
 			return std::make_pair(true, i->second);
 
-		ObjectAbstractNode *parent = (ObjectAbstractNode*)this->parent;
-		while(parent)
+		ObjectAbstractNode *parentNode = (ObjectAbstractNode*)this->parent;
+		while(parentNode)
 		{
-			i = parent->mEnv.find(name);
-			if(i != parent->mEnv.end())
+			i = parentNode->mEnv.find(inName);
+			if(i != parentNode->mEnv.end())
 				return std::make_pair(true, i->second);
-			parent = (ObjectAbstractNode*)parent->parent;
+			parentNode = (ObjectAbstractNode*)parentNode->parent;
 		}
 		return std::make_pair(false, "");
 	}
@@ -553,16 +553,16 @@ namespace Ogre
 		// All import nodes are removed
 		// We have cached the code blocks from all the imported scripts
 		// We can process all import requests now
-		for(ImportCacheMap::iterator i = mImports.begin(); i != mImports.end(); ++i)
+		for(ImportCacheMap::iterator it = mImports.begin(); it != mImports.end(); ++it)
 		{
-			ImportRequestMap::iterator j = mImportRequests.lower_bound(i->first),
-				end = mImportRequests.upper_bound(i->first);
+			ImportRequestMap::iterator j = mImportRequests.lower_bound(it->first),
+				end = mImportRequests.upper_bound(it->first);
 			if(j != end)
 			{
 				if(j->second == "*")
 				{
 					// Insert the entire AST into the import table
-					mImportTable.insert(mImportTable.begin(), i->second->begin(), i->second->end());
+					mImportTable.insert(mImportTable.begin(), it->second->begin(), it->second->end());
 					continue; // Skip ahead to the next file
 				}
 				else
@@ -570,7 +570,7 @@ namespace Ogre
 					for(; j != end; ++j)
 					{
 						// Locate this target and insert it into the import table
-						AbstractNodeListPtr newNodes = locateTarget(i->second.get(), j->second);
+						AbstractNodeListPtr newNodes = locateTarget(it->second.get(), j->second);
 						if(!newNodes.isNull() && !newNodes->empty())
 							mImportTable.insert(mImportTable.begin(), newNodes->begin(), newNodes->end());
 					}

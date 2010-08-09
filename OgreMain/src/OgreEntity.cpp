@@ -446,18 +446,18 @@ namespace Ogre {
                 idx = std::min(mMinMaterialLodIndex, idx);
 
                 // Construct event object
-                EntityMaterialLodChangedEvent evt;
-                evt.subEntity = (*i);
-                evt.camera = cam;
-                evt.lodValue = biasedMaterialLodValue;
-                evt.previousLodIndex = (*i)->mMaterialLodIndex;
-                evt.newLodIndex = idx;
+                EntityMaterialLodChangedEvent subEntEvt;
+                subEntEvt.subEntity = (*i);
+                subEntEvt.camera = cam;
+                subEntEvt.lodValue = biasedMaterialLodValue;
+                subEntEvt.previousLodIndex = (*i)->mMaterialLodIndex;
+                subEntEvt.newLodIndex = idx;
 
                 // Notify lod event listeners
-                cam->getSceneManager()->_notifyEntityMaterialLodChanged(evt);
+                cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);
 
                 // Change lod index
-                (*i)->mMaterialLodIndex = evt.newLodIndex;
+                (*i)->mMaterialLodIndex = subEntEvt.newLodIndex;
 
 				// Also invalidate any camera distance cache
 				(*i)->_invalidateCameraCache ();
@@ -608,8 +608,8 @@ namespace Ogre {
             for( ; child_itr != child_itr_end; child_itr++)
             {
                 MovableObject* child = child_itr->second;
-                bool isVisible = child->isVisible();
-                if (isVisible && (displayEntity != this))
+                bool visible = child->isVisible();
+                if (visible && (displayEntity != this))
                 {
                     //Check if the bone exists in the current LOD
 
@@ -619,10 +619,10 @@ namespace Ogre {
                     {
                         //Current LOD entity does not have the bone that the
                         //child is connected to. Do not display.
-                        isVisible = false;
+                        visible = false;
                     }
                 }
-                if (isVisible)
+                if (visible)
                 {
                     child->_updateRenderQueue(queue);
                 }   

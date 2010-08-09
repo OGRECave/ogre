@@ -336,16 +336,16 @@ namespace Ogre {
 
         if (i == mAnimationsList.end())
         {
-			LinkedSkeletonAnimSourceList::const_iterator i;
-			for (i = mLinkedSkeletonAnimSourceList.begin(); 
-				i != mLinkedSkeletonAnimSourceList.end() && !ret; ++i)
+			LinkedSkeletonAnimSourceList::const_iterator it;
+			for (it = mLinkedSkeletonAnimSourceList.begin(); 
+				it != mLinkedSkeletonAnimSourceList.end() && !ret; ++it)
 			{
-				if (!i->pSkeleton.isNull())
+				if (!it->pSkeleton.isNull())
 				{
-					ret = i->pSkeleton->_getAnimationImpl(name);
+					ret = it->pSkeleton->_getAnimationImpl(name);
 					if (ret && linker)
 					{
-						*linker = &(*i);
+						*linker = &(*it);
 					}
 
 				}
