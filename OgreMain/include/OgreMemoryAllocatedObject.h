@@ -57,65 +57,65 @@ namespace Ogre
 	class _OgreExport AllocatedObject
 	{
 	public:
-		_OgreExport explicit AllocatedObject()
+		explicit AllocatedObject()
 		{ }
 
-		_OgreExport ~AllocatedObject()
+		~AllocatedObject()
 		{ }
 
 		/// operator new, with debug line info
-		_OgreExport void* operator new(size_t sz, const char* file, int line, const char* func)
+		void* operator new(size_t sz, const char* file, int line, const char* func)
 		{
 			return Alloc::allocateBytes(sz, file, line, func);
 		}
 
-		_OgreExport void* operator new(size_t sz)
+		void* operator new(size_t sz)
 		{
 			return Alloc::allocateBytes(sz);
 		}
 
 		/// placement operator new
-		_OgreExport void* operator new(size_t sz, void* ptr)
+		void* operator new(size_t sz, void* ptr)
 		{
 			(void) sz;
 			return ptr;
 		}
 
 		/// array operator new, with debug line info
-		_OgreExport void* operator new[] ( size_t sz, const char* file, int line, const char* func )
+		void* operator new[] ( size_t sz, const char* file, int line, const char* func )
 		{
 			return Alloc::allocateBytes(sz, file, line, func);
 		}
 
-		_OgreExport void* operator new[] ( size_t sz )
+		void* operator new[] ( size_t sz )
 		{
 			return Alloc::allocateBytes(sz);
 		}
 
-		_OgreExport void operator delete( void* ptr )
+		void operator delete( void* ptr )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
 		// Corresponding operator for placement delete (second param same as the first)
-		_OgreExport void operator delete( void* ptr, void* )
+		void operator delete( void* ptr, void* )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
 		// only called if there is an exception in corresponding 'new'
-		_OgreExport void operator delete( void* ptr, const char* , int , const char*  )
+		void operator delete( void* ptr, const char* , int , const char*  )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
-		_OgreExport void operator delete[] ( void* ptr )
+		void operator delete[] ( void* ptr )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
 
 
-		_OgreExport void operator delete[] ( void* ptr, const char* , int , const char*  )
+		void operator delete[] ( void* ptr, const char* , int , const char*  )
 		{
 			Alloc::deallocateBytes(ptr);
 		}
