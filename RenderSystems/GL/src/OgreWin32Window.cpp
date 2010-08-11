@@ -62,6 +62,8 @@ namespace Ogre {
 		mDisplayFrequency = 0;
 		mActive = false;
 		mDeviceName = NULL;
+		mWindowedWinStyle = 0;
+		mFullscreenWinStyle = 0;
 	}
 
 	Win32Window::~Win32Window()
@@ -203,8 +205,7 @@ namespace Ogre {
 		}
 
 		if (!mIsExternal)
-		{
-			DWORD		  dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+		{			
 			DWORD		  dwStyleEx = 0;					
 			MONITORINFOEX monitorInfoEx;
 			RECT		  rc;
@@ -231,7 +232,27 @@ namespace Ogre {
 			size_t devNameLen = strlen(monitorInfoEx.szDevice);
 			mDeviceName = new char[devNameLen + 1];
 
-			strcpy(mDeviceName, monitorInfoEx.szDevice);			
+			strcpy(mDeviceName, monitorInfoEx.szDevice);
+
+			// Update window style flags.
+			mFullscreenWinStyle = WS_VISIBLE | WS_CLIPCHILDREN | WS_POPUP;
+			mWindowedWinStyle   = WS_VISIBLE | WS_CLIPCHILDREN;
+			
+			if (parent)
+			{
+				mWindowedWinStyle |= WS_CHILD;
+			}
+			else
+			{
+				if (border == "none")
+					mWindowedWinStyle |= WS_POPUP;
+				else if (border == "fixed")
+					mWindowedWinStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
+					WS_SYSMENU | WS_MINIMIZEBOX;
+				else
+					mWindowedWinStyle |= WS_OVERLAPPEDWINDOW;
+
+			}
 
 
 			// No specified top left -> Center the window in the middle of the monitor
@@ -269,29 +290,13 @@ namespace Ogre {
 			mLeft = left;
 
 			if (mIsFullScreen)
-			{
-				dwStyle |= WS_POPUP;
+			{				
 				dwStyleEx |= WS_EX_TOPMOST;
 				mTop = monitorInfoEx.rcMonitor.top;
 				mLeft = monitorInfoEx.rcMonitor.left;											
 			}
 			else
-			{				
-				if (parent)
-				{
-					dwStyle |= WS_CHILD;
-				}
-				else
-				{
-					if (border == "none")
-						dwStyle |= WS_POPUP;
-					else if (border == "fixed")
-						dwStyle |= WS_OVERLAPPED | WS_BORDER | WS_CAPTION |
-						WS_SYSMENU | WS_MINIMIZEBOX;
-					else
-						dwStyle |= WS_OVERLAPPEDWINDOW;
-				}
-
+			{
 				int screenw = GetSystemMetrics(SM_CXSCREEN);
 				int screenh = GetSystemMetrics(SM_CYSCREEN);
 
@@ -300,7 +305,7 @@ namespace Ogre {
 					// Calculate window dimensions required
 					// to get the requested client area
 					SetRect(&rc, 0, 0, mWidth, mHeight);
-					AdjustWindowRect(&rc, dwStyle, false);
+					AdjustWindowRect(&rc, getWindowStyle(fullScreen), false);
 					mWidth = rc.right - rc.left;
 					mHeight = rc.bottom - rc.top;
 
@@ -352,7 +357,7 @@ namespace Ogre {
 
 			// Pass pointer to self as WM_CREATE parameter
 			mHWnd = CreateWindowEx(dwStyleEx, "OgreGLWindow", title.c_str(),
-				dwStyle, mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
+				getWindowStyle(fullScreen), mLeft, mTop, mWidth, mHeight, parent, 0, hInst, this);
 
 			WindowEventUtilities::_addRenderWindow(this);
 
@@ -461,7 +466,7 @@ namespace Ogre {
 		// NB only call this for non full screen
 		RECT rc;
 		SetRect(&rc, 0, 0, clientWidth, clientHeight);
-		AdjustWindowRect(&rc, WS_VISIBLE | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW, false);
+		AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
 		*winWidth = rc.right - rc.left;
 		*winHeight = rc.bottom - rc.top;
 
@@ -490,12 +495,10 @@ namespace Ogre {
 		if (mIsFullScreen != fullScreen || width != mWidth || height != mHeight)
 		{
 			mIsFullScreen = fullScreen;
-			DWORD dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
-
+			
 			if (mIsFullScreen)
 			{
-				dwStyle |= WS_POPUP;
-
+				
 				DEVMODE displayDeviceMode;
 
 				memset(&displayDeviceMode, 0, sizeof(displayDeviceMode));
@@ -552,7 +555,7 @@ namespace Ogre {
 				mTop = monitorInfo.rcMonitor.top;
 				mLeft = monitorInfo.rcMonitor.left;
 
-				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
+				SetWindowLong(mHWnd, GWL_STYLE, getWindowStyle(mIsFullScreen));
 				SetWindowPos(mHWnd, HWND_TOPMOST, mLeft, mTop, width, height,
 					SWP_NOACTIVATE);
 				mWidth = width;
@@ -561,9 +564,7 @@ namespace Ogre {
 
 			}
 			else
-			{
-				dwStyle |= WS_OVERLAPPEDWINDOW;
-
+			{				
 				// drop out of fullscreen
 				ChangeDisplaySettingsEx(mDeviceName, NULL, NULL, 0, NULL);
 
@@ -571,7 +572,7 @@ namespace Ogre {
 				unsigned int winWidth, winHeight;
 				adjustWindow(width, height, &winWidth, &winHeight);
 
-				// deal with centreing when switching down to smaller resolution
+				// deal with centering when switching down to smaller resolution
 
 				HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
 				MONITORINFO monitorInfo;
@@ -586,7 +587,7 @@ namespace Ogre {
 				int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
 				int top = screenh > winHeight ? ((screenh - winHeight) / 2) : 0;
 
-				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
+				SetWindowLong(mHWnd, GWL_STYLE, getWindowStyle(mIsFullScreen));
 				SetWindowPos(mHWnd, HWND_NOTOPMOST, left, top, winWidth, winHeight,
 					SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 				mWidth = width;
@@ -684,7 +685,7 @@ namespace Ogre {
 		if (mHWnd && !mIsFullScreen)
 		{
 			RECT rc = { 0, 0, width, height };
-			AdjustWindowRect(&rc, GetWindowLong(mHWnd, GWL_STYLE), false);
+			AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
 			width = rc.right - rc.left;
 			height = rc.bottom - rc.top;
 			SetWindowPos(mHWnd, 0, 0, 0, width, height,
@@ -697,26 +698,55 @@ namespace Ogre {
 		if (!mHWnd || IsIconic(mHWnd))
 			return;
 
+		updateWindowRect();		
+	}
+
+
+	void Win32Window::updateWindowRect()
+	{
 		RECT rc;
-		// top and left represent outer window position
-		GetWindowRect(mHWnd, &rc);
+		BOOL result;
+
+		// Update top left parameters
+		result = GetWindowRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
+			return;
+		}
+
 		mTop = rc.top;
 		mLeft = rc.left;
+
 		// width and height represent drawable area only
-		GetClientRect(mHWnd, &rc);
-
-		if (mWidth == rc.right && mHeight == rc.bottom)
+		result = GetClientRect(mHWnd, &rc);
+		if (result == FALSE)
+		{
+			mTop = 0;
+			mLeft = 0;
+			mWidth = 0;
+			mHeight = 0;
 			return;
+		}
+		unsigned int width = rc.right - rc.left;
+		unsigned int height = rc.bottom - rc.top;
 
-		mWidth = rc.right - rc.left;
-		mHeight = rc.bottom - rc.top;
+		// Case window resized.
+		if (width != mWidth || height != mHeight)
+		{
+			mWidth  = rc.right - rc.left;
+			mHeight = rc.bottom - rc.top;
 
-		// Notify viewports of resize
-		ViewportList::iterator it, itend;
-		itend = mViewportList.end();
-		for( it = mViewportList.begin(); it != itend; ++it )
-			(*it).second->_updateDimensions();
+			// Notify viewports of resize
+			ViewportList::iterator it = mViewportList.begin();
+			while( it != mViewportList.end() )
+				(*it++).second->_updateDimensions();			
+		}
 	}
+
 
 	void Win32Window::swapBuffers(bool waitForVSync)
 	{

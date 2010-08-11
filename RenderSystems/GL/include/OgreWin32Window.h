@@ -73,6 +73,14 @@ namespace Ogre {
 			unsigned int* winWidth, unsigned int* winHeight);
 
 	protected:
+		
+		/** Update the window rect. */ 
+		void updateWindowRect();
+
+		/** Return the target window style depending on the fullscreen parameter. */
+		DWORD getWindowStyle(bool fullScreen) const { if (fullScreen) return mFullscreenWinStyle; return mWindowedWinStyle; }
+
+	protected:
 		Win32GLSupport &mGLSupport;
 		HWND	mHWnd;					// Win32 Window handle
 		HDC		mHDC;
@@ -86,6 +94,8 @@ namespace Ogre {
 		bool	mHidden;
         int     mDisplayFrequency;      // fullscreen only, to restore display
         Win32Context *mContext;
+		DWORD	mWindowedWinStyle;		// Windowed mode window style flags.
+		DWORD	mFullscreenWinStyle;	// Fullscreen mode window style flags.
     };
 }
 

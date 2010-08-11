@@ -110,27 +110,31 @@ namespace Ogre
 			unsigned int* winWidth, unsigned int* winHeight);
 
 	protected:
+		/** Update the window rect. */ 
+		void updateWindowRect();
+
+		/** Return the target window style depending on the fullscreen parameter. */
+		DWORD getWindowStyle(bool fullScreen) const { if (fullScreen) return mFullscreenWinStyle; return mWindowedWinStyle; }
+
+	protected:
 		HINSTANCE					mInstance;				// Process instance
 		D3D9Device* 				mDevice;				// D3D9 device wrapper class.
 		bool						mDeviceValid;			// Device was validation succeeded.
 		HWND						mHWnd;					// Win32 Window handle		
 		bool						mIsExternal;			// window not created by Ogre
 		bool						mClosed;				// Is this window destroyed.		
-		bool						mHidden;
+		bool						mHidden;				// True if this is hidden render window. 
 		bool						mSwitchingFullscreen;	// Are we switching from fullscreen to windowed or vice versa		
 		D3DMULTISAMPLE_TYPE			mFSAAType;				// AA type.
 		DWORD						mFSAAQuality;			// AA quality.
 		UINT						mDisplayFrequency;		// Display frequency.
 		bool						mVSync;					// Use vertical sync or not.
-		unsigned int				mVSyncInterval;		
+		unsigned int				mVSyncInterval;			// The vsync interval.
 		bool						mUseNVPerfHUD;			// Use NV Perf HUD.
-
-		// Desired width / height after resizing
-		unsigned int mDesiredWidth;
-		unsigned int mDesiredHeight;
-
-
-		void updateWindowRect();
+		DWORD						mWindowedWinStyle;		// Windowed mode window style flags.
+		DWORD						mFullscreenWinStyle;	// Fullscreen mode window style flags.		 
+		unsigned int				mDesiredWidth;			// Desired width after resizing
+		unsigned int				mDesiredHeight;			// Desired height after resizing
 	};
 }
 #endif
