@@ -338,7 +338,7 @@ bool FFPLighting::resolveParameters(ProgramSet* programSet)
 			if (mLightParamsList[i].mPosition.get() == NULL)
 				return false;
 
-			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_position_view_space");
+			mLightParamsList[i].mDirection = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_LIGHTS, "light_direction_view_space");
 			if (mLightParamsList[i].mDirection.get() == NULL)
 				return false;
 
