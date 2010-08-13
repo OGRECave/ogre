@@ -38,23 +38,24 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
+#if USE_RTSHADER_SYSTEM
+    #include "ShaderSystem.h"
+    #include "BSP.h"
+    #include "CelShading.h"
+    #include "CubeMapping.h"
+    #include "Dot3Bump.h"
+    #include "Fresnel.h"
+    #include "OceanDemo.h"
+    #include "Terrain.h"
+#endif
 #include "BezierPatch.h"
-#include "BSP.h"
 #include "CameraTrack.h"
-#include "CelShading.h"
 #include "CharacterSample.h"
-#include "CubeMapping.h"
-#include "Dot3Bump.h"
 #include "DynTex.h"
 #include "FacialAnimation.h"
-#include "Fresnel.h"
 #include "Grass.h"
 #include "Lighting.h"
-#include "OceanDemo.h"
 #include "ParticleFX.h"
-#if USE_RTSHADER_SYSTEM
-#include "ShaderSystem.h"
-#endif
 #include "Shadows.h"
 #include "SkeletalAnimation.h"
 #include "SkyBox.h"
@@ -62,7 +63,6 @@
 #include "SkyPlane.h"
 #include "Smoke.h"
 #include "SphereMapping.h"
-#include "Terrain.h"
 #include "TextureFX.h"
 #include "Transparency.h"
 #  if SAMPLES_INCLUDE_PLAYPEN
@@ -801,22 +801,13 @@ namespace OgreBites
 		{
 #ifdef OGRE_STATIC_LIB
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
-            mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
-            mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
-            mPluginNameMap["Sample_Character"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
-            mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
-            mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
+            mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
-            mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
-            mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
-#if USE_RTSHADER_SYSTEM
-            mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
-#endif
             mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
             mPluginNameMap["Sample_SkyBox"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyBox();
@@ -824,9 +815,18 @@ namespace OgreBites
             mPluginNameMap["Sample_SkyPlane"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyPlane();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
-            mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
+#if USE_RTSHADER_SYSTEM
+            mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
+            mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
+            mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
+            mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
+            mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
+            mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
+            mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+            mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
+#endif
 #endif
             
 			createWindow();
