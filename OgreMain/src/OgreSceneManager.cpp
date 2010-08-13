@@ -2214,7 +2214,7 @@ void SceneManager::_renderVisibleObjects(void)
 //-----------------------------------------------------------------------
 void SceneManager::renderVisibleObjectsCustomSequence(RenderQueueInvocationSequence* seq)
 {
-	firePostRenderQueues();
+	firePreRenderQueues();
 
 	RenderQueueInvocationIterator invocationIt = seq->iterator();
 	while (invocationIt.hasMoreElements())

@@ -107,7 +107,7 @@ namespace Ogre
 
 	void ObjectAbstractNode::setVariable(const Ogre::String &inName, const Ogre::String &value)
 	{
-		mEnv[name] = inName;
+		mEnv[inName] = value;
 	}
 
 	std::pair<bool,String> ObjectAbstractNode::getVariable(const String &inName) const

@@ -22,6 +22,9 @@ else ()
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
 endif ()
 
+# Get the list of configured samples
+get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
+
 if (SYMBIAN)
   set(SOURCE_FILES ${SOURCE_FILES}
   Symbian/src/OgreSamplesBrowserApp.cpp
@@ -50,62 +53,21 @@ if (SYMBIAN)
     ${CMAKE_CURRENT_SOURCE_DIR}/Symbian/inc
   )
 
-
-
-	
-
 endif (SYMBIAN)
 
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
-  set (SAMPLE_LIBRARIES
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BezierPatch.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BSP.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CameraTrack.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CelShading.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Character.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Compositor.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CubeMapping.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Dot3Bump.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_DynTex.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_FacialAnimation.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Fresnel.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Grass.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Instancing.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Lighting.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Ocean.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_ParticleFX.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_ShaderSystem.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Shadows.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkeletalAnimation.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkyBox.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkyDome.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SkyPlane.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Smoke.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_SphereMapping.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Terrain.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_TextureFX.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Transparency.a
-       ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_VolumeTex.a
-  )
   if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BezierPatch.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_BSP.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CelShading.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Compositor.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_CubeMapping.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Dot3Bump.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_DynTex.a)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Fresnel.a)
+    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_Compositor Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_Fresnel Sample_Instancing Sample_Lighting Sample_Ocean Sample_ShaderSystem Sample_Terrain Sample_VolumeTex Sample_Water)
   endif()
 
   if(NOT OGRE_BUILD_COMPONENT_TERRAIN)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_Terrain.a)
+    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
   endif()
 
   if(NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-    list(REMOVE_ITEM SAMPLE_LIBRARIES ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Sample_ShaderSystem.a)
+    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystem)
   endif()
 
 endif ()
@@ -150,8 +112,7 @@ add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FI
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 
-# Get the list of configured samples
-get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
+# Add samples as dependencies
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
 
 if (OGRE_STATIC)
@@ -188,7 +149,7 @@ if (APPLE)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Samples/Common/misc/Info.plist)
 
-    set (OGRE_SAMPLE_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/SampleBrowser.app)
+    set (OGRE_SAMPLE_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app)
     add_custom_command(TARGET SampleBrowser POST_BUILD
       COMMAND cp ARGS ${OGRE_BINARY_DIR}/bin/*.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/
       COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -exclude .hg -exclude 'CMakeLists.txt' -resolve-src-symlinks ${OGRE_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_SAMPLE_CONTENTS_PATH}/
