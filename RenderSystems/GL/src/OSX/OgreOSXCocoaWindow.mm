@@ -38,7 +38,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mActive(false),
-        mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
+        mClosed(false), mHidden(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
     {
 		mContext = nil;
     }
@@ -85,7 +85,8 @@ namespace Ogre {
 
 		BOOL hasDepthBuffer = YES;
 		int fsaa_samples = 0;
-		NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
+        bool hidden = false;
+        NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
         NameValuePairList::const_iterator opt(NULL);
@@ -103,6 +104,10 @@ namespace Ogre {
 			opt = miscParams->find("top");
 			if(opt != miscParams->end())
 				winy = NSHeight([[NSScreen mainScreen] frame]) - StringConverter::parseUnsignedInt(opt->second) - height;
+
+            opt = miscParams->find("hidden");
+            if (opt != miscParams->end())
+                hidden = StringConverter::parseBool(opt->second);
 
 			opt = miscParams->find("depthBuffer");
 			if(opt != miscParams->end())
@@ -229,6 +234,7 @@ namespace Ogre {
             mContext = OGRE_NEW OSXCocoaContext(mGLContext, openglFormat);
         }
 		// make active
+        setHidden(hidden);
 		mActive = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
@@ -283,6 +289,18 @@ namespace Ogre {
     bool OSXCocoaWindow::isClosed() const
     {
         return false;
+    }
+
+    void OSXCocoaWindow::setHidden(bool hidden)
+    {
+        mHidden = hidden;
+        if (!mIsExternal)
+        {
+            if (hidden)
+                [mWindow orderOut:nil];
+            else
+                [mWindow makeKeyAndOrderFront:nil];
+        }
     }
 
     void OSXCocoaWindow::reposition(int left, int top)

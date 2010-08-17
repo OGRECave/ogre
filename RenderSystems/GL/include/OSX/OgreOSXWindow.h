@@ -52,6 +52,8 @@ namespace Ogre
         virtual bool isActive( void ) const = 0;
         /** Overridden - see RenderWindow */
         virtual bool isClosed( void ) const = 0;
+        virtual bool isHidden() const = 0;
+        virtual void setHidden(bool hidden) = 0;
         /** Overridden - see RenderWindow */
         virtual void reposition( int left, int top ) = 0;
         /** Overridden - see RenderWindow */

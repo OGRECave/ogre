@@ -50,6 +50,8 @@ namespace Ogre
 		virtual bool isActive( void ) const;
         /** Overridden - see RenderWindow */
 		virtual bool isClosed( void ) const;
+        virtual bool isHidden() const { return mHidden; }
+        virtual void setHidden(bool hidden);
         /** Overridden - see RenderWindow */
 		virtual void reposition( int left, int top );
         /** Overridden - see RenderWindow */
@@ -88,6 +90,7 @@ namespace Ogre
 		
         bool mActive;
         bool mClosed;
+        bool mHidden;
         bool mCreated;
         bool mHasResized;
         bool mIsExternal;

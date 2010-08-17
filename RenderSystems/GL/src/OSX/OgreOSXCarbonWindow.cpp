@@ -59,6 +59,7 @@ namespace Ogre
         size_t fsaa_samples = 0;
         int left = 0;
         int top = 0;
+        bool hidden = false;
         int depth = 32;
 
         if( miscParams )
@@ -81,6 +82,10 @@ namespace Ogre
             opt = miscParams->find( "title" );
             if( opt != miscParams->end() )
                 title = opt->second;
+
+            opt = miscParams->find( "hidden" );
+            if( opt != miscParams->end() )
+                hidden = StringConverter::parseBool(opt->second);
 
             opt = miscParams->find( "depthBuffer" );
             if( opt != miscParams->end() )
@@ -130,7 +135,8 @@ namespace Ogre
                 mContext = mCarbonContext;
             }
         }
-        
+
+        setHidden(hidden);
         mName = name;
         mWidth = width;
         mHeight = height;
@@ -355,7 +361,20 @@ namespace Ogre
     {
         return mClosed;
     }
-    
+
+    //-------------------------------------------------------------------------------------------------//
+    void OSXCarbonWindow::setHidden(bool hidden)
+    {
+        mHidden = hidden;
+        if (!mIsExternal)
+        {
+            if (hidden)
+                HideWindow(mWindow);
+            else
+                ShowWindow(mWindow);
+        }
+    }
+
     //-------------------------------------------------------------------------------------------------//
     void OSXCarbonWindow::reposition(int left, int top)
     {
