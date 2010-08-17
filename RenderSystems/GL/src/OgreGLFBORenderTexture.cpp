@@ -65,7 +65,7 @@ namespace Ogre {
 	bool GLFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		bool result;
-		if( result = GLRenderTexture::attachDepthBuffer( depthBuffer ) )
+		if( (result = GLRenderTexture::attachDepthBuffer( depthBuffer )) )
 			mFB.attachDepthBuffer( depthBuffer );
 
 		return result;

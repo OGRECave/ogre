@@ -194,10 +194,10 @@ namespace Ogre {
 
 		// Check for compile errors
 		glGetShaderiv(mGLHandle, GL_COMPILE_STATUS, &mCompiled);
-        if(checkErrors)
+        if(!mCompiled && checkErrors)
             logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
 
-		// Force exception if not compiled
+		// Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
             logObjectInfo("GLSL ES compiled: " + mName, mGLHandle);
 

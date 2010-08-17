@@ -625,7 +625,7 @@ namespace Ogre {
 						GLESContext *glContext = depthBuffer->getGLContext();
 
 						if( glContext == windowContext &&
-							depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer() )
+							(depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
 						{
 							bFound = true;
 
