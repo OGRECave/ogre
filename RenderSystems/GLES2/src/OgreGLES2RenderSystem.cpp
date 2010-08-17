@@ -169,7 +169,6 @@ namespace Ogre {
 
         rsc->setRenderSystemName(getName());
 
-		
 		// Determine vendor
 		if (strstr(vendorName, "Imagination Technologies"))
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
@@ -636,7 +635,7 @@ namespace Ogre {
 						GLES2Context *glContext = depthBuffer->getGLContext();
 
 						if( glContext == windowContext &&
-							depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer() )
+							(depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
 						{
 							bFound = true;
 
@@ -708,8 +707,6 @@ namespace Ogre {
     {
 		GLES2TexturePtr tex = texPtr;
 
-		GLenum lastTextureType = mTextureTypes[stage];
-
 		if (!activateGLTextureUnit(stage))
 			return;
 
@@ -728,35 +725,17 @@ namespace Ogre {
 				// Assume 2D
 				mTextureTypes[stage] = GL_TEXTURE_2D;
 
-			if(lastTextureType != mTextureTypes[stage] && lastTextureType != 0)
-			{
-				if (stage < mFixedFunctionTextureUnits)
-				{
-					glDisable( lastTextureType );
-				}
-			}
-
-			if (stage < mFixedFunctionTextureUnits)
-			{
-				glEnable( mTextureTypes[stage] );
-			}
-
 			if(!tex.isNull())
 				glBindTexture( mTextureTypes[stage], tex->getGLID() );
 			else
 				glBindTexture( mTextureTypes[stage], static_cast<GLES2TextureManager*>(mTextureManager)->getWarningTextureID() );
+            GL_CHECK_ERROR;
 		}
 		else
 		{
-			if (stage < mFixedFunctionTextureUnits)
-			{
-				if (lastTextureType != 0)
-				{
-					glDisable( mTextureTypes[stage] );
-				}
-			}
 			// Bind zero texture
 			glBindTexture(GL_TEXTURE_2D, 0); 
+            GL_CHECK_ERROR;
 		}
 
 		activateGLTextureUnit(0);
@@ -1000,32 +979,49 @@ namespace Ogre {
         if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
-
+            
             target = vp->getTarget();
             _setRenderTarget(target);
             mActiveViewport = vp;
-
+            
             GLsizei x, y, w, h;
-
+            
 			// Calculate the "lower-left" corner of the viewport
             w = vp->getActualWidth();
             h = vp->getActualHeight();
-
             x = vp->getActualLeft();
             y = vp->getActualTop();
-
+            
             if (!target->requiresTextureFlipping())
             {
                 // Convert "upper-left" corner to "lower-left"
                 y = target->getHeight() - h - y;
             }
+            
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+            ConfigOptionMap::const_iterator opt;
+            ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
+            
+            if ((opt = mGLSupport->getConfigOptions().find("Orientation")) != end)
+            {
+                String val = opt->second.currentValue;
+                String::size_type pos = val.find("Landscape");
+                
+                if (pos != String::npos)
+                {
+                    GLsizei temp = h;
+                    h = w;
+                    w = temp;
+                }
+            }
+#endif
             glViewport(x, y, w, h);
             GL_CHECK_ERROR;
-
+            
 			// Configure the viewport clipping
             glScissor(x, y, w, h);
             GL_CHECK_ERROR;
-
+            
             vp->_clearUpdatedFlag();
         }
     }
@@ -1397,7 +1393,7 @@ namespace Ogre {
 		}
     }
 
-    GLuint GLES2RenderSystem::getCombinedMinMipFilter(void) const
+    GLint GLES2RenderSystem::getCombinedMinMipFilter(void) const
     {
         switch(mMinFilter)
         {
@@ -1529,12 +1525,13 @@ namespace Ogre {
 			static_cast<uint>(largest_supported_anisotropy) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
 			glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        GL_CHECK_ERROR;
 
 		activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
-    {		
+    {
         GL_CHECK_ERROR;
         // Call super class
         RenderSystem::_render(op);
@@ -1608,8 +1605,10 @@ namespace Ogre {
  					normalised, 
   					static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
   					pBufferData);
+                GL_CHECK_ERROR;
  				glEnableVertexAttribArray(attrib);
- 
+                GL_CHECK_ERROR;
+
  				attribsBound.push_back(attrib);
             }
             else
@@ -1780,6 +1779,7 @@ namespace Ogre {
 		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArray(*ai);
+            GL_CHECK_ERROR;
   		}
     }
 
@@ -1844,7 +1844,6 @@ namespace Ogre {
                 GL_CHECK_ERROR;
             }
             glClearColor(colour.r, colour.g, colour.b, colour.a);
-
             GL_CHECK_ERROR;
         }
         if (buffers & FBT_DEPTH)

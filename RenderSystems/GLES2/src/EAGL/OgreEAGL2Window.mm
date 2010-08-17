@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
 
+#include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 
@@ -48,6 +49,15 @@ THE SOFTWARE.
     return [CAEAGLLayer class];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"EAGLView frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
+            [self frame].origin.x,
+            [self frame].origin.y,
+            [self frame].size.width,
+            [self frame].size.height];
+}
+
 @end
 
 // Constant to limit framerate to 60 FPS
@@ -59,6 +69,9 @@ namespace Ogre {
             mVisible(false),
             mIsTopLevel(true),
             mIsExternalGLControl(false),
+            mIsContentScalingSupported(false),
+            mContentScalingFactor(1.0),
+            mCurrentOSVersion(0.0),
             mGLSupport(glsupport)
     {
         mIsFullScreen = true;
@@ -66,6 +79,11 @@ namespace Ogre {
         mWindow = nil;
         mContext = NULL;
         mAnimationTimer = OGRE_NEW Ogre::Timer();
+        
+        // Check for content scaling.  iOS 4 or later
+        mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+        if(mCurrentOSVersion >= 4.0)
+            mIsContentScalingSupported = true;
     }
 
     EAGL2Window::~EAGL2Window()
@@ -125,6 +143,11 @@ namespace Ogre {
 		[mWindow setFrame:frame];
         mWidth = width;
         mHeight = height;
+
+        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+        {
+            (*it).second->_updateDimensions();
+        }
 	}
     
 	void EAGL2Window::windowMovedOrResized()
@@ -146,50 +169,114 @@ namespace Ogre {
 #pragma unused(fullscreen)
 	}
     
+    void EAGL2Window::_beginUpdate(void)
+    {
+        // Call the base class method first
+        RenderTarget::_beginUpdate();
+        
+    #if GL_APPLE_framebuffer_multisample
+        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+        {
+            // Bind the FSAA buffer if we're doing multisampling
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
+            GL_CHECK_ERROR
+        }
+    #endif
+    }
+
     void EAGL2Window::initNativeCreatedWindow(const NameValuePairList *miscParams)
     {
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         CAEAGLLayer *eaglLayer = nil;
         
-        mWindow = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] retain];
+        uint w = 0, h = 0;
+        
+        ConfigOptionMap::const_iterator opt;
+        ConfigOptionMap::const_iterator end = mGLSupport->getConfigOptions().end();
+        
+        if ((opt = mGLSupport->getConfigOptions().find("Video Mode")) != end)
+            {
+            String val = opt->second.currentValue;
+            String::size_type pos = val.find('x');
+            
+            if (pos != String::npos)
+                {
+                w = StringConverter::parseUnsignedInt(val.substr(0, pos));
+                h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
+                }
+            }
+        
+        mWindow = [[[UIWindow alloc] initWithFrame:CGRectMake(0, 0, w, h)] retain];
         if(mWindow == nil)
-        {
+            {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Failed to create native window",
                         __FUNCTION__);
-        }
+            }
         
-        mView = [[EAGL2View alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+        mView = [[EAGL2View alloc] initWithFrame:CGRectMake(0, 0, w, h)];
+        
         if(mView == nil)
-        {
+            {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Failed to create view",
                         __FUNCTION__);
-        }
+            }
         
         mView.opaque = YES;
-
+            // Use the default scale factor of the screen
+            // See Apple's documentation on supporting high resolution devices for more info
+    #if __IPHONE_4_0
+        if(mIsContentScalingSupported)
+            mView.contentScaleFactor = mContentScalingFactor;
+    #endif
+        
         eaglLayer = (CAEAGLLayer *)mView.layer;
         
         eaglLayer.opaque = YES;
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                            [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking,
-                                            kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+                                        [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking,
+                                        kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
+        
         CFDictionaryRef dict;   // TODO: Dummy dictionary for now
         if(eaglLayer)
+            {
             mContext = mGLSupport->createNewContext(dict, eaglLayer);
+            
+    #if GL_APPLE_framebuffer_multisample
+                // MSAA is only supported on devices running iOS 4+
+            if(mCurrentOSVersion >= 4.0)
+                {
+                mContext->mIsMultiSampleSupported = true;
+                mContext->mNumSamples = mFSAA;
+                }
+    #endif
+            }
         
         if(mContext == nil)
-        {
+            {
             OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                         "Fail to create OpenGL ES context",
                         __FUNCTION__);
-        }
-
+            }
+        
         [mWindow addSubview:mView];
         [mWindow makeKeyAndVisible];
         mContext->createFramebuffer();
-
+        
+            // If content scaling is supported, the window size will be smaller than the GL pixel buffer
+            // used to render.  Report the buffer size for reference.
+        if(mIsContentScalingSupported)
+            {
+            StringStream ss;
+            
+            ss << "iOS: Window created " << w << " x " << h
+            << " with backing store size " << mContext->mBackingWidth << " x " << mContext->mBackingHeight
+            << " using content scaling factor " << std::fixed << std::setprecision(1) << mContentScalingFactor;
+            
+            LogManager::getSingleton().logMessage(ss.str());
+            }
+        
         [pool release];
     }
     
@@ -198,7 +285,6 @@ namespace Ogre {
     {
         String title = name;
         String orientation = "Landscape Left";
-        uint samples = 0;
         int gamma;
         short frequency = 0;
         bool vsync = false;
@@ -215,12 +301,17 @@ namespace Ogre {
             // Note: Some platforms support AA inside ordinary windows
             if ((opt = miscParams->find("FSAA")) != end)
             {
-                samples = StringConverter::parseUnsignedInt(opt->second);
+                mFSAA = StringConverter::parseUnsignedInt(opt->second);
             }
             
             if ((opt = miscParams->find("displayFrequency")) != end)
             {
                 frequency = (short)StringConverter::parseInt(opt->second);
+            }
+            
+            if ((opt = miscParams->find("contentScalingFactor")) != end)
+            {
+                mContentScalingFactor = StringConverter::parseReal(opt->second);
             }
             
             if ((opt = miscParams->find("vsync")) != end)
@@ -269,8 +360,8 @@ namespace Ogre {
 		else if (orientation == "Portrait")
 			Viewport::setDefaultOrientationMode(OR_PORTRAIT);
 
+        left = top = 0;
         mIsExternal = false;    // Cannot use external displays on iPhone
-
         mHwGamma = false;
         
         if (!mIsTopLevel)
@@ -280,10 +371,19 @@ namespace Ogre {
         }
 
 		mName = name;
-		mWidth = width;
-		mHeight = height;
 		mLeft = left;
 		mTop = top;
+        if (orientation == "Portrait")
+        {
+            mWidth = width * mContentScalingFactor;
+            mHeight = height * mContentScalingFactor;
+        }
+        else
+        {
+            mWidth = height * mContentScalingFactor;
+            mHeight = width * mContentScalingFactor;
+        }
+
 		mActive = true;
 		mVisible = true;
 		mClosed = false;
@@ -322,6 +422,29 @@ namespace Ogre {
         }
 
         mAnimationTimer->reset();
+
+#if GL_APPLE_framebuffer_multisample
+        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+        {
+            glDisable(GL_SCISSOR_TEST);     
+            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
+            GL_CHECK_ERROR
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+            glResolveMultisampleFramebufferAPPLE();
+            GL_CHECK_ERROR
+        }
+#endif
+
+#if GL_EXT_discard_framebuffer
+        // Framebuffer discard is only supported on devices running iOS 4+
+        if(mCurrentOSVersion >= 4.0)
+        {
+            GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
+            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
+            GL_CHECK_ERROR
+        }
+#endif
 
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR

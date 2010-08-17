@@ -60,6 +60,12 @@ namespace Ogre {
             bool mIsTopLevel;
             bool mIsExternal;
             bool mIsExternalGLControl;
+            
+            // iOS 4 content scaling
+            bool mIsContentScalingSupported;
+            float mContentScalingFactor;
+            float mCurrentOSVersion;
+
             /// The iPhone OS doesn't like rendering too quickly and will throw GL errors because the context is still in use
             /// This timer will be reset every 16 ms to simulate VSync at 60 Hz
             Timer *mAnimationTimer; 
@@ -78,6 +84,7 @@ namespace Ogre {
 			void reposition(int left, int top);
 			void resize(unsigned int width, unsigned int height);
 			void windowMovedOrResized();
+            virtual void _beginUpdate();
 
 	public:
             EAGL2Window(EAGL2Support* glsupport);

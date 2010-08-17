@@ -113,6 +113,10 @@ namespace Ogre {
         glBindTexture(getGLES2TextureTarget(), mTextureID);
         GL_CHECK_ERROR;
 
+#if GL_APPLE_texture_max_level
+        glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps );
+#endif
+
         // Set some misc default parameters, these can of course be changed later
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -141,7 +145,7 @@ namespace Ogre {
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
-
+        GLenum datatype = GLES2PixelUtil::getGLOriginDataType(mFormat);
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
@@ -223,14 +227,14 @@ namespace Ogre {
                                      width, height,
                                      0,
                                      format,
-                                     GL_UNSIGNED_BYTE, 0);
+                                     datatype, 0);
                         GL_CHECK_ERROR;
                         break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
 							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
 								width, height, 0, 
-								GL_RGBA, GL_UNSIGNED_BYTE, 0);
+								format, datatype, 0);
 						}
 						break;
 					case TEX_TYPE_3D:
@@ -397,14 +401,15 @@ namespace Ogre {
             for (size_t mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GLES2HardwarePixelBuffer *buf = OGRE_NEW GLES2TextureBuffer(mName,
-                                                                     getGLES2TextureTarget(),
-                                                                     mTextureID,
-                                                                     width, height,
-                                                                     GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma),
-                                                                     face,
-                                                                     mip,
-                                                                     static_cast<HardwareBuffer::Usage>(mUsage),
-                                                                     doSoftware && mip==0, mHwGamma, mFSAA);
+                                                                            getGLES2TextureTarget(),
+                                                                            mTextureID,
+                                                                            width, height,
+                                                                            GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma),
+                                                                            GLES2PixelUtil::getGLOriginDataType(mFormat),
+                                                                            face,
+                                                                            mip,
+                                                                            static_cast<HardwareBuffer::Usage>(mUsage),
+                                                                            doSoftware && mip==0, mHwGamma, mFSAA);
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 

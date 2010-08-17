@@ -44,7 +44,6 @@ namespace Ogre {
     class GLSLESProgramFactory;
     class GLSLESGpuProgram;
     class HardwareBufferManager;
-    class RTShader::ShaderGenerator;
 
     class _OgreGLES2Export ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
     {
@@ -137,7 +136,7 @@ namespace Ogre {
              */
             GLenum mPolygonMode;
 
-            GLuint getCombinedMinMipFilter(void) const;
+            GLint getCombinedMinMipFilter(void) const;
 
             GLES2GpuProgram* mCurrentVertexProgram;
             GLES2GpuProgram* mCurrentFragmentProgram;

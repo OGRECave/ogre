@@ -284,6 +284,9 @@ namespace Ogre {
 				glBindTexture(target, tid);
 				
                 // Set some default parameters
+#if GL_APPLE_texture_max_level
+                glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+#endif
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

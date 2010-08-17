@@ -259,6 +259,7 @@ namespace Ogre {
             }
             else
             {
+                // TODO: GPU stall
                 glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
                 GL_CHECK_ERROR;
             }

@@ -44,6 +44,21 @@ namespace Ogre {
         mNumSamples = 0;
         mMultisampleFB = 0;
 
+        // Check multisampling if supported
+#if GL_APPLE_framebuffer_multisample
+        // Check samples supported
+        glBindFramebuffer(GL_FRAMEBUFFER, mFB);
+        GLint maxSamples;
+        glGetIntegerv(GL_MAX_SAMPLES_APPLE, &maxSamples);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+#endif
+		// Will we need a second FBO to do multisampling?
+		if (mNumSamples)
+		{
+			glGenFramebuffers(1, &mMultisampleFB);
+		}
+        
         /// Initialise state
         mDepth.buffer=0;
         mStencil.buffer=0;
@@ -167,6 +182,23 @@ namespace Ogre {
         /// Depth buffer is not handled here anymore.
 		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
+        GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+		GLsizei n=0;
+		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		{
+			// Fill attached colour buffers
+			if(mColour[x].buffer)
+			{
+				bufs[x] = GL_COLOR_ATTACHMENT0 + x;
+				// Keep highest used buffer + 1
+				n = x+1;
+			}
+			else
+			{
+				bufs[x] = GL_NONE;
+			}
+		}
+        
         /// Check status
         GLuint status;
         status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -208,7 +240,17 @@ namespace Ogre {
 
 	void GLES2FrameBufferObject::swapBuffers()
 	{
-        // Do nothing
+		if (mMultisampleFB)
+		{
+#if GL_APPLE_framebuffer_multisample
+			// Blit from multisample buffer to final buffer, triggers resolve
+//			size_t width = mColour[0].buffer->getWidth();
+//			size_t height = mColour[0].buffer->getHeight();
+			glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mMultisampleFB);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mFB);
+//			glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
+		}
 	}
 
 	void GLES2FrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )

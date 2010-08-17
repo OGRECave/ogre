@@ -146,6 +146,12 @@ namespace Ogre {
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
             PixelUtil::bulkPixelConversion(src, scaled);
+            
+            if(mFormat == PF_A4R4G4B4)
+            {
+                // ARGB->BGRA
+                GLES2PixelUtil::convertToGLformat(scaled, scaled);
+            }
         }
         else
         {
@@ -229,9 +235,9 @@ namespace Ogre {
 
     // TextureBuffer
     GLES2TextureBuffer::GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, 
-                                         GLint width, GLint height, GLint format, GLint face, 
-                                         GLint level, Usage usage, bool crappyCard, 
-                                         bool writeGamma, uint fsaa)
+                                           GLint width, GLint height, GLint internalFormat, GLint format,
+                                           GLint face, GLint level, Usage usage, bool crappyCard, 
+                                           bool writeGamma, uint fsaa)
     : GLES2HardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
         mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
     {
@@ -250,8 +256,8 @@ namespace Ogre {
         mHeight = height;
         mDepth = 1;
 
-        mGLInternalFormat = format;
-        mFormat = GLES2PixelUtil::getClosestOGREFormat(format);
+        mGLInternalFormat = internalFormat;
+        mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat, format);
 
         mRowPitch = mWidth;
         mSlicePitch = mHeight*mWidth;
@@ -563,6 +569,10 @@ namespace Ogre {
             GL_CHECK_ERROR;
             glBindTexture(GL_TEXTURE_2D, tempTex);
             GL_CHECK_ERROR;
+#if GL_APPLE_texture_max_level
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+            GL_CHECK_ERROR;
+#endif
             // Allocate temporary texture of the size of the destination area
             glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
                          GLES2PixelUtil::optionalPO2(dstBox.getWidth()), GLES2PixelUtil::optionalPO2(dstBox.getHeight()), 
@@ -738,7 +748,8 @@ namespace Ogre {
         GLsizei width = GLES2PixelUtil::optionalPO2(src.getWidth());
         GLsizei height = GLES2PixelUtil::optionalPO2(src.getHeight());
         GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(src.format);
-        
+        GLenum datatype = GLES2PixelUtil::getGLOriginDataType(src.format);
+
         // Generate texture name
         glGenTextures(1, &id);
         GL_CHECK_ERROR;
@@ -747,12 +758,17 @@ namespace Ogre {
         glBindTexture(target, id);
         GL_CHECK_ERROR;
 
+#if GL_APPLE_texture_max_level
+        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000 );
+        GL_CHECK_ERROR;
+#endif
+
         // Allocate texture memory
-        glTexImage2D(target, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(target, 0, format, width, height, 0, format, datatype, 0);
         GL_CHECK_ERROR;
 
         // GL texture buffer
-        GLES2TextureBuffer tex(StringUtil::BLANK, target, id, width, height, format,
+        GLES2TextureBuffer tex(StringUtil::BLANK, target, id, width, height, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture
@@ -842,7 +858,7 @@ namespace Ogre {
     //********* GLES2RenderBuffer
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
-    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY)
+    GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, PF_A8R8G8B8),HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
         // Generate renderbuffer
@@ -853,7 +869,15 @@ namespace Ogre {
         GL_CHECK_ERROR;
         
         // Allocate storage for depth buffer
-        if (numSamples <= 0)
+        if (numSamples > 0)
+        {
+#if GL_APPLE_framebuffer_multisample
+            glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 
+                                                numSamples, format, width, height);
+            GL_CHECK_ERROR;
+#endif
+        }
+        else
         {
             glRenderbufferStorage(GL_RENDERBUFFER, format,
                                      width, height);
