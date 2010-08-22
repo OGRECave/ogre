@@ -88,6 +88,13 @@ namespace Ogre
 		return 0;
 	}
 	//-----------------------------------------------------------------------
+	void InstanceBatchShader::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
+	{
+		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+			m_numWorldMatrices = m_instancesPerBatch * baseSubMesh->blendIndexToBoneIndexMap.size();
+		InstanceBatch::buildFrom( baseSubMesh, renderOperation );
+	}
+	//-----------------------------------------------------------------------
 	void InstanceBatchShader::setupVertices( const SubMesh* baseSubMesh )
 	{
 		m_renderOperation.vertexData = OGRE_NEW VertexData();

@@ -173,7 +173,7 @@ namespace Ogre
 				Caller is responsable for freeing buffers passed as input arguments
 				This function replaces the need to call build()
         */
-		virtual void buildFrom( const RenderOperation &renderOperation );
+		virtual void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		const Ogre::MeshPtr& _getMeshReference(void) const { return m_meshReference; }
 
@@ -181,6 +181,10 @@ namespace Ogre
 			(Num InstancedEntities == m_instancesPerBatch)
 		*/
 		bool isBatchFull(void) const { return m_unusedEntities.empty(); }
+
+		/** Returns true if it no instanced entity has been requested or all of them have been removed
+		*/
+		bool isBatchUnused(void) const { return m_unusedEntities.size() == m_instancedEntities.size(); }
 
 		/** Called by InstancedEntity(s) to tell us we need to update the bounds
 			(we touch the SceneNode so the SceneManager aknowledges such change)

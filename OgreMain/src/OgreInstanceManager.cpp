@@ -37,10 +37,12 @@ THE SOFTWARE.
 namespace Ogre
 {
 	InstanceManager::InstanceManager( const String &customName, SceneManager *sceneManager,
-										const String &meshName, const String &groupName ) :
+										const String &meshName, const String &groupName,
+										InstancingTechnique instancingTechnique, size_t instancesPerBatch ) :
 				m_name( customName ),
 				m_sceneManager( sceneManager ),
-				m_instancesPerBatch( 80 )
+				m_instancesPerBatch( instancesPerBatch ),
+				m_instancingTechnique( instancingTechnique )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
 	}
@@ -145,7 +147,7 @@ namespace Ogre
 
 		//TODO: Check different materials have the same m_instancesPerBatch upper limit
 		//otherwise we can't share
-		batch->buildFrom( m_sharedRenderOperation );
+		batch->buildFrom( m_meshReference->getSubMesh(0), m_sharedRenderOperation );
 
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
@@ -154,5 +156,42 @@ namespace Ogre
 		materialInstanceBatch.push_back( batch );
 
 		return batch;
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::cleanupEmptyBatches(void)
+	{
+		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
+		InstanceBatchMap::iterator end  = m_instanceBatches.end();
+
+		while( itor != end )
+		{
+			InstanceBatchVec::iterator it = itor->second.begin();
+			InstanceBatchVec::iterator en = itor->second.end();
+
+			while( it != en )
+			{
+				if( !(*it)->isBatchUnused() )
+				{
+					OGRE_DELETE *it;
+					//Remove it from the list swapping with the last element and popping back
+					size_t idx = it - itor->second.begin();
+					*it = itor->second.back();
+					itor->second.pop_back();
+
+					//Restore invalidated iterators
+					it = itor->second.begin() + idx;
+					en = itor->second.end();
+				}
+				else
+					++it;
+			}
+
+			++itor;
+		}
+
+		//By this point it may happen that all m_instanceBatches' objects are also empty
+		//however if we call m_instanceBatches.clear(), next time we'll create an InstancedObject
+		//we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
+		//(takes more time and will leak the shared render operation)
 	}
 }

@@ -70,6 +70,8 @@ namespace Ogre
 
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh ) const;
 
+		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
+
 		//Renderable overloads
 		void getWorldTransforms( Matrix4* xform ) const;
 		unsigned short getNumWorldTransforms(void) const;

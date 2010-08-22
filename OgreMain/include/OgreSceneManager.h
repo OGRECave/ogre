@@ -3097,11 +3097,14 @@ namespace Ogre {
 		@param meshName The mesh name the instances will be based upon
 		@param groupName The resource name where the mesh lives
 		@param Technique to use, which may be shader based, or hardware based.
+		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
+		may end up being lower if the technique doesn't support having so many.
 		@returns The new InstanceManager instance
 		*/
 		virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
 														const String &groupName,
-														InstanceManager::InstancingTechnique technique );
+														InstanceManager::InstancingTechnique technique,
+														size_t numInstancesPerBatch );
 
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks

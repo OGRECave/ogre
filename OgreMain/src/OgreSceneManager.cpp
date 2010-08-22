@@ -6456,9 +6456,11 @@ void SceneManager::destroyAllInstancedGeometry(void)
 //---------------------------------------------------------------------
 InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,
 													  const String &groupName,
-													  InstanceManager::InstancingTechnique technique )
+													  InstanceManager::InstancingTechnique technique,
+													  size_t numInstancesPerBatch )
 {
-	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName );
+	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName,
+													technique, numInstancesPerBatch );
 	
 	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
 	{

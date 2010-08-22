@@ -50,6 +50,13 @@ namespace Ogre
      */
 	class _OgreExport InstanceManager : public FactoryAlloc
 	{
+	public:
+		enum InstancingTechnique
+		{
+			ShaderBased,			//Any SM 2.0+
+			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
+		};
+	private:
 		typedef vector<InstanceBatch*>::type		InstanceBatchVec;	//vec[batchN] = Batch
 		typedef map<String, InstanceBatchVec>::type	InstanceBatchMap;	//map[materialName] = Vec
 
@@ -60,6 +67,7 @@ namespace Ogre
 		RenderOperation			m_sharedRenderOperation;
 
 		size_t					m_instancesPerBatch;
+		InstancingTechnique		m_instancingTechnique;
 
 		SceneManager			*m_sceneManager;
 
@@ -86,14 +94,9 @@ namespace Ogre
 
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,
-						 const String &meshName, const String &groupName );
+						 const String &meshName, const String &groupName,
+						 InstancingTechnique instancingTechnique, size_t instancesPerBatch );
 		virtual ~InstanceManager();
-
-		enum InstancingTechnique
-		{
-			ShaderBased,			//Any SM 2.0+
-			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
-		};
 
 		const String& getName() const { return m_name; }
 
@@ -107,6 +110,14 @@ namespace Ogre
 			@param renderTarget The render target to test against
         */
 		InstancedEntity* createInstancedEntity( const String &materialName );
+
+		/** This function can be usefull to improve CPU speed after having too many instances
+			created, which where now removed, thus freeing many batches with zero used Instanced Entities
+			However the batches aren't automatically removed from memory until the InstanceManager is
+			destroyed, or this function is called. This function removes those batches which are completely
+			unused (only wasting memory).
+        */
+		void cleanupEmptyBatches(void);
 	};
 }
 
