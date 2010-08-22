@@ -103,10 +103,6 @@ namespace Ogre
 		//when not attached to a scene node
 		Real getSquaredViewDepth( const Camera* cam ) const;
 
-		//Overriden so we can tell the InstanceBatch it needs to update it's bounds
-		void _notifyMoved(void);
-		void _notifyAttached( Node* parent, bool isTagPoint = false );
-
 		//Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
