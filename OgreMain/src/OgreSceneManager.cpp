@@ -6529,7 +6529,7 @@ void SceneManager::updateInstanceManagers(void)
 
 	while( itor != end )
 	{
-		itor->second->updateBatches();
+		itor->second->_updateBatches();
 		++itor;
 	}
 }

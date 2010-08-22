@@ -187,26 +187,39 @@ namespace Ogre
 		thisIndexData->indexStart = 0;
 		thisIndexData->indexCount = baseIndexData->indexCount * m_instancesPerBatch;
 
-		//TODO: Support 32-bit and check numVertices is below max supported by GPU
+		//TODO: Check numVertices is below max supported by GPU
+		HardwareIndexBuffer::IndexType indexType = HardwareIndexBuffer::IT_16BIT;
+		if( m_renderOperation.vertexData->vertexCount > 65535 )
+			indexType = HardwareIndexBuffer::IT_32BIT;
 		thisIndexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
-										HardwareIndexBuffer::IT_16BIT,
-										thisIndexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+													indexType, thisIndexData->indexCount,
+													HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 
-		uint16 *thisBuf = static_cast<uint16*>(thisIndexData->indexBuffer->
-																lock( HardwareBuffer::HBL_DISCARD ));
-		uint16 *initBaseBuf = static_cast<uint16*>(baseIndexData->indexBuffer->
-																lock( HardwareBuffer::HBL_DISCARD ));
+		void *buf			= thisIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
+		void const *baseBuf	= baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
+
+		uint16 *thisBuf16 = static_cast<uint16*>(buf);
+		uint32 *thisBuf32 = static_cast<uint32*>(buf);
 
 		for( size_t i=0; i<m_instancesPerBatch; ++i )
 		{
-			uint16 const *initBuf		= initBaseBuf;
-			const size_t vertexOffset	= i * m_renderOperation.vertexData->vertexCount /
-											m_instancesPerBatch;
+			const size_t vertexOffset = i * m_renderOperation.vertexData->vertexCount / m_instancesPerBatch;
+
+			uint16 const *initBuf16 = static_cast<uint16 const *>(baseBuf);
+			uint32 const *initBuf32 = static_cast<uint32 const *>(baseBuf);
 
 			for( size_t j=0; j<baseIndexData->indexCount; ++j )
 			{
-				*thisBuf++ = *initBuf + vertexOffset;
-				++initBuf;
+				uint32 originalVal;
+				if( baseSubMesh->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT )
+					originalVal = *initBuf16++;
+				else
+					originalVal = *initBuf32++;
+
+				if( indexType == HardwareIndexBuffer::IT_16BIT )
+					*thisBuf16++ = static_cast<uint16>(originalVal) + vertexOffset;
+				else
+					*thisBuf32++ = originalVal + vertexOffset;
 			}
 		}
 

@@ -59,6 +59,14 @@ namespace Ogre
 		@par
 		Each instance has an instance ID unique within the batch, which matches the ID sent to the vertex
 		shader by some techniques (like InstanceBatchShader).
+		@par
+		Differences between Entity and InstancedEntity:
+		* Entities don't show up in screen until they're attached to a SceneNode that is part of the scene
+		graph (i.e. ultimate parent is the root scene node). InstancedEntities don't show up until they're
+		attached to _any_ SceneNode
+		* Setting RenderQueueGroup and other Renderable stuff works at InstanceBatch level, not
+		InstancedEntity. This is obviously a limitation from instancing in general, not this particular
+		implementation
 
         @remarks
 			Design discussion webpage
@@ -117,7 +125,7 @@ namespace Ogre
 		/** @see Entity::getAllAnimationStates */
 		AnimationStateSet* getAllAnimationStates(void) const;
 
-		/** Called by InstanceBatch in <u>his</i> _updateRenderQueue to tell us we need
+		/** Called by InstanceBatch in <i>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.
 			@remarks Assumes it has a skeleton (m_skeletonInstance != 0)
 		*/

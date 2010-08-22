@@ -46,6 +46,9 @@ namespace Ogre
 				m_instancingTechnique( instancingTechnique )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
+
+		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+			m_meshReference->getSubMesh(0)->_compileBoneAssignments();
 	}
 
 	InstanceManager::~InstanceManager()
@@ -200,7 +203,7 @@ namespace Ogre
 		//(takes more time and will leak the shared render operation)
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::updateBatches(void)
+	void InstanceManager::_updateBatches(void)
 	{
 		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
 		InstanceBatchMap::iterator end  = m_instanceBatches.end();

@@ -39,10 +39,19 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** Description goes here
+	/** This is the main starting point for the new instancing system.
+		Each InstanceManager can control one technique and one mesh, but it can manage
+		multiple materials at the same time.
+		@See SceneManager::createInstanceManager, which creates this InstanceManager. Each
+		must have a unique name. It's wasteless to create two InstanceManagers with the same
+		mesh reference, instancing technique and instances per batch count.
+		This class takes care of managing batches automatically, so that more are created when
+		needed, and reuse existing ones as much as posible; thus the user doesn't have to worry
+		of managing all those low level issues.
+		@See InstanceBatch & @see InstanceEntity for more information.
 
         @remarks
-			Design discussion webpage
+			Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
         @author
             Matias N. Goldberg ("dark_sylinc")
         @version
@@ -126,7 +135,7 @@ namespace Ogre
 			position and direction, which makes updating the whole batch almost every frame anyway.
 			The bbox is updated dynamically for better shadow accuracy.
 		*/
-		void updateBatches(void);
+		void _updateBatches(void);
 	};
 }
 
