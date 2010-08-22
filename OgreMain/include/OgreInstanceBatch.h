@@ -94,7 +94,6 @@ namespace Ogre
 		MeshPtr				 m_meshReference;
 		Mesh::IndexMap const *m_indexToBoneMap;
 
-		//Matrix4				m_transforms;
 		//InstancedEntities are all allocated at build time and kept as "unused"
 		//when they're requested, they're removed from there when requested,
 		//and put back again when they're no longer needed

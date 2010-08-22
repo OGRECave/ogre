@@ -158,9 +158,6 @@ namespace Ogre
 	void InstanceBatch::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
 	{
 		m_renderOperation = renderOperation;
-		m_material = m_material->clone( "asd" );
-		m_renderOperation.vertexData	= m_renderOperation.vertexData->clone( false );
-		m_renderOperation.indexData		= m_renderOperation.indexData->clone( false );
 		createAllInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
