@@ -71,6 +71,8 @@ THE SOFTWARE.
 #include "OgreProfiler.h"
 #include "OgreCompositorManager.h"
 #include "OgreCompositorChain.h"
+#include "OgreInstanceBatch.h"
+#include "OgreInstancedEntity.h"
 // This class implements the most basic scene manager
 
 #include <cstdio>
@@ -775,6 +777,7 @@ void SceneManager::destroyAllParticleSystems(void)
 void SceneManager::clearScene(void)
 {
 	destroyAllStaticGeometry();
+	destroyAllInstanceManagers();
 	destroyAllMovableObjects();
 
 	// Clear root node of all children
@@ -6449,6 +6452,71 @@ void SceneManager::destroyAllInstancedGeometry(void)
 		OGRE_DELETE i->second;
 	}
 	mInstancedGeometryList.clear();
+}
+//---------------------------------------------------------------------
+InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,
+													  const String &groupName,
+													  InstanceManager::InstancingTechnique technique )
+{
+	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName );
+	
+	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
+	{
+		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
+			"InstancedManager with name '" + customName + "' already exists!", 
+			"SceneManager::createInstanceManager");
+	}
+
+	mInstanceManagerMap[customName] = retVal;
+	return retVal;
+}
+//---------------------------------------------------------------------
+void SceneManager::destroyInstanceManager( const String &name )
+{
+	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
+	if (i != mInstanceManagerMap.end())
+	{
+		OGRE_DELETE i->second;
+		mInstanceManagerMap.erase(i);
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::destroyInstanceManager( InstanceManager *instanceManager )
+{
+	destroyInstanceManager( instanceManager->getName() );
+}
+//---------------------------------------------------------------------
+void SceneManager::destroyAllInstanceManagers(void)
+{
+	InstanceManagerMap::iterator itor = mInstanceManagerMap.begin();
+	InstanceManagerMap::iterator end  = mInstanceManagerMap.end();
+
+	while( itor != end )
+	{
+		OGRE_DELETE itor->second;
+		++itor;
+	}
+
+	mInstanceManagerMap.clear();
+}
+//---------------------------------------------------------------------
+InstancedEntity* SceneManager::createInstanceEntity( const String &materialName, const String &managerName )
+{
+	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+
+	if (itor != mInstanceManagerMap.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"InstancedManager with name '" + managerName + "' not found", 
+				"SceneManager::createInstanceEntity");
+	}
+
+	return itor->second->createInstancedEntity( materialName );
+}
+//---------------------------------------------------------------------
+void SceneManager::destroyInstanceEntity( InstancedEntity *instancedEntity )
+{
+	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery* 

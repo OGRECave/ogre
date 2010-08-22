@@ -96,7 +96,11 @@ set (HEADER_FILES
   include/OgreHighLevelGpuProgramManager.h
   include/OgreImage.h
   include/OgreImageCodec.h
+  include/OgreInstanceBatch.h
+  include/OgreInstanceBatchShader.h
   include/OgreInstancedGeometry.h
+  include/OgreInstancedEntity.h
+  include/OgreInstanceManager.h
   include/OgreIteratorRange.h
   include/OgreIteratorWrapper.h
   include/OgreIteratorWrappers.h
@@ -316,7 +320,11 @@ set (SOURCE_FILES
   src/OgreHighLevelGpuProgramManager.cpp
   src/OgreImage.cpp
   src/OgreImageResampler.h
+  src/OgreInstanceBatch.cpp
+  src/OgreInstanceBatchShader.cpp
   src/OgreInstancedGeometry.cpp
+  src/OgreInstancedEntity.cpp
+  src/OgreInstanceManager.cpp
   src/OgreKeyFrame.cpp
   src/OgreLight.cpp
   src/OgreLodStrategy.cpp

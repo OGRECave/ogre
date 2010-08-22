@@ -169,6 +169,10 @@ namespace Ogre {
 	class HighLevelGpuProgramManager;
 	class HighLevelGpuProgramFactory;
     class IndexData;
+	class InstanceBatch;
+	class InstanceBatchShader;
+	class InstanceManager;
+	class InstancedEntity;
     class IntersectionSceneQuery;
     class IntersectionSceneQueryListener;
     class Image;

@@ -53,6 +53,7 @@ Torus Knot Software Ltd.
 #include "OgreCamera.h"
 #include "OgreInstancedGeometry.h"
 #include "OgreLodListener.h"
+#include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 namespace Ogre {
 	/** \addtogroup Core
@@ -390,6 +391,9 @@ namespace Ogre {
 		StaticGeometryList mStaticGeometryList;
 		typedef map<String, InstancedGeometry* >::type InstancedGeometryList;
 		InstancedGeometryList mInstancedGeometryList;
+
+		typedef map<String, InstanceManager*>::type InstanceManagerMap;
+		InstanceManagerMap	mInstanceManagerMap;
 
         typedef map<String, SceneNode*>::type SceneNodeList;
 
@@ -3081,6 +3085,54 @@ namespace Ogre {
 		virtual void destroyInstancedGeometry(const String& name);
 		/** Remove & destroy all InstancedGeometry instances. */
 		virtual void destroyAllInstancedGeometry(void);
+
+		/** Creates an InstanceManager interface to create & manipulate instanced entities
+			You need to call this function at least once before start calling createInstancedEntity
+			to build up an instance based on the given mesh.
+		@remarks
+			Instancing is a way of batching up geometry into a much more 
+			efficient form, but with some limitations, and still be able to move & animate it.
+			Please @see InstanceManager class documentation for full information.
+		@param customName Custom name for referencing. Must be unique
+		@param meshName The mesh name the instances will be based upon
+		@param groupName The resource name where the mesh lives
+		@param Technique to use, which may be shader based, or hardware based.
+		@returns The new InstanceManager instance
+		*/
+		virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
+														const String &groupName,
+														InstanceManager::InstancingTechnique technique );
+
+		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
+		@remarks
+			Be sure you don't have any InstancedEntity referenced somewhere which was created with
+			this manager, since it will become a dangling pointer.
+		@param customName Name of the manager to remove
+		*/
+		virtual void destroyInstanceManager( const String &name );
+		virtual void destroyInstanceManager( InstanceManager *instanceManager );
+
+		virtual void destroyAllInstanceManagers(void);
+
+		/** Creates an InstanceEntity based on an existing InstanceManager (@see createInstanceManager)
+		@remarks
+			* Return value may be null if the InstanceManger technique isn't supported
+			* Try to keep the number of entities with different materials <b>to a minimum</b>
+			* For more information @see InstancedManager @see InstancedBatch, @see InstancedEntity
+			* Alternatively you can call InstancedManager::createInstanceEntity using the returned
+			pointer from createInstanceManager
+		@param materialName Material name 
+		@param managerName Name of the instance manager
+		@returns An InstancedEntity ready to be attached to a SceneNode
+		*/
+		virtual InstancedEntity* createInstanceEntity( const String &materialName,
+														const String &managerName );
+
+		/** Removes an InstancedEntity, @see SceneManager::createInstanceEntity &
+			@see InstanceBatch::removeInstancedEntity
+		@param instancedEntity Instance to remove
+		*/
+		virtual void destroyInstanceEntity( InstancedEntity *instancedEntity );
 
 
 		/** Create a movable object of the type specified.
