@@ -31,18 +31,20 @@ THE SOFTWARE.
 #include "OgreRenderOperation.h"
 #include "OgreInstancedEntity.h"
 #include "OgreSceneNode.h"
+#include "OgreCamera.h"
 #include "OgreException.h"
 
 namespace Ogre
 {
 	InstanceBatch::InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material,
-									size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap ) :
+									size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+									const String &batchName ) :
 				m_instancesPerBatch( instancesPerBatch ),
 				m_material( material ),
 				m_meshReference( meshReference ),
 				m_indexToBoneMap( indexToBoneMap ),
 				m_boundingRadius( 0 ),
-				m_boundsDirty( true ),
+				m_currentCamera( 0 ),
 				mCachedCamera( 0 )
 	{
 		assert( m_instancesPerBatch );
@@ -50,7 +52,7 @@ namespace Ogre
 
 		m_fullBoundingBox.setExtents( -Vector3::UNIT_SCALE, Vector3::UNIT_SCALE );
 
-		//TODO: Put a random name to this MovableObject
+		mName = batchName;
 	}
 
 	InstanceBatch::~InstanceBatch()
@@ -83,6 +85,8 @@ namespace Ogre
 	void InstanceBatch::updateBounds()
 	{
 		mVisible = false;
+
+		const AxisAlignedBox oldAABB = m_fullBoundingBox;
 		m_fullBoundingBox.setNull();
 
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
@@ -91,7 +95,10 @@ namespace Ogre
 		while( itor != end )
 		{
 			//Trick to force Ogre not to render us if none of our instances is visible
-			const bool isVisible = (*itor)->isInScene() & (*itor)->getVisible();
+			//Because we do Camera::isVisible(), it is better if the SceneNode from the
+			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
+			//to avoid unnecesary wasteful calculations
+			bool isVisible = (*itor)->findVisible( m_currentCamera );
 			mVisible |= isVisible;
 
 			//Only increase the bounding box for those objects we know are in the scene
@@ -106,9 +113,8 @@ namespace Ogre
 		//Can't just call mParentNode->_updateBounds() since the SceneManager may be iterating
 		//over us and such call would invalidate the iterator. We'll do this in the next frame
 		//Worst case scenario, all instances flickered (disappeared) for a single frame.
-		mParentNode->needUpdate();
-
-		m_boundsDirty = false;
+		if( mVisible && oldAABB != m_fullBoundingBox )
+			mParentNode->needUpdate( true );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::createAllInstancedEntities()
@@ -193,7 +199,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_boundsDirty(void)
 	{
-		m_boundsDirty = true;
 		mParentNode->needUpdate();
 	}
 	//-----------------------------------------------------------------------
@@ -205,6 +210,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_notifyCurrentCamera( Camera* cam )
 	{
+		m_currentCamera = cam;
+
 		//Clear the camera cache
 		mCachedCamera = 0;
 
@@ -247,8 +254,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
 	{
-		if( m_boundsDirty )
-			updateBounds();
+		updateBounds();
 
 		if( m_meshReference->hasSkeleton() )
 		{

@@ -63,6 +63,7 @@ namespace Ogre
 		const String			m_name;					//Not the name of the mesh
 		MeshPtr					m_meshReference;
 		InstanceBatchMap		m_instanceBatches;
+		size_t					m_idCount;
 
 		RenderOperation			m_sharedRenderOperation;
 

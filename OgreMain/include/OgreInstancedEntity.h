@@ -85,6 +85,9 @@ namespace Ogre
 		//Returns number of matrices writen to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform );
 
+		//Returns true if this InstancedObject is visible to the current camera
+		bool findVisible( Camera *camera );
+
 	public:
 		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID );
 		virtual ~InstancedEntity();
@@ -108,10 +111,15 @@ namespace Ogre
 		void _updateRenderQueue( RenderQueue* queue )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
-		/** Returns whether or not this entity is skeletally animated. */
+		/** @see Entity::hasSkeleton */
 		bool hasSkeleton(void) const { return m_skeletonInstance != 0; }
-		/** Get this Entity's personal skeleton instance. */
+		/** @see Entity::getSkeleton */
 		SkeletonInstance* getSkeleton(void) const { return m_skeletonInstance; }
+
+		/** @see Entity::getAnimationState */
+		AnimationState* getAnimationState(const String& name) const;
+		/** @see Entity::getAllAnimationStates */
+		AnimationStateSet* getAllAnimationStates(void) const;
 
 		/** Called by InstanceBatch in <u>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.

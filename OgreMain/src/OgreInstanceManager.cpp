@@ -41,6 +41,7 @@ namespace Ogre
 										InstancingTechnique instancingTechnique, size_t instancesPerBatch ) :
 				m_name( customName ),
 				m_sceneManager( sceneManager ),
+				m_idCount( 0 ),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_instancingTechnique( instancingTechnique )
 	{
@@ -111,8 +112,9 @@ namespace Ogre
 
 		InstanceBatchVec &materialInstanceBatch = m_instanceBatches[materialName];
 
-		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat,
-																	m_instancesPerBatch, &idxMap );
+		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
+																	&idxMap, m_name + "/InstanceBatch_" +
+																	StringConverter::toString(m_idCount++) );
 
 		m_instancesPerBatch = std::min( m_instancesPerBatch,
 										batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0) ) );
@@ -126,6 +128,7 @@ namespace Ogre
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
 		sceneNode->attachObject( batch );
+		//sceneNode->showBoundingBox( true );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -142,8 +145,9 @@ namespace Ogre
 
 		InstanceBatchVec &materialInstanceBatch = m_instanceBatches[materialName];
 
-		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat,
-																	m_instancesPerBatch, &idxMap );
+		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
+																	&idxMap, m_name + "/InstanceBatch_" +
+																	StringConverter::toString(m_idCount++) );
 
 		//TODO: Check different materials have the same m_instancesPerBatch upper limit
 		//otherwise we can't share
@@ -152,6 +156,7 @@ namespace Ogre
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
 		sceneNode->attachObject( batch );
+		//sceneNode->showBoundingBox( true );
 
 		materialInstanceBatch.push_back( batch );
 

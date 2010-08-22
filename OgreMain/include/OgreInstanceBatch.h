@@ -104,7 +104,7 @@ namespace Ogre
 		//This bbox contains all (visible) instanced entities
 		AxisAlignedBox		m_fullBoundingBox;
 		Real				m_boundingRadius;
-		bool				m_boundsDirty;
+		Camera				*m_currentCamera;
 
 		/// Cached distance to last camera for getSquaredViewDepth
 		mutable Real mCachedCameraDist;
@@ -122,8 +122,8 @@ namespace Ogre
 		void updateBounds();
 
 	public:
-		InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material,
-						size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap=0 );
+		InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
+						const Mesh::IndexMap *indexToBoneMap, const String &batchName );
 		virtual ~InstanceBatch();
 
 		MeshPtr& _getMeshRef() { return m_meshReference; }

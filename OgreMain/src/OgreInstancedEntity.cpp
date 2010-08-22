@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSkeletonInstance.h"
 #include "OgreAnimationState.h"
 #include "OgreOptimisedUtil.h"
+#include "OgreSceneNode.h"
 #include "OgreException.h"
 
 namespace Ogre
@@ -39,10 +40,11 @@ namespace Ogre
 				m_batchOwner( batchOwner ),
 				m_instanceID( instanceID ),
 				m_skeletonInstance( 0 ),
+				mAnimationState( 0 ),
 				mLastParentXform( Matrix4::ZERO ),
 				mFrameAnimationLastUpdated( std::numeric_limits<unsigned long>::max() )
 	{
-		//TODO: Put a random name to this MovableObject
+		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(m_instanceID);
 
 		//Is mesh skeletally animated?
 		if( m_batchOwner->_getMeshRef()->hasSkeleton() &&
@@ -112,6 +114,19 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------
+	bool InstancedEntity::findVisible( Camera *camera )
+	{
+		//Object is explicitly visible and attached to a Node
+		bool retVal = isVisible() & (mParentNode != 0);
+
+		//Object's bounding box is viewed by the camera
+		const SceneNode *parentSceneNode = getParentSceneNode();
+		if( parentSceneNode && camera )
+			retVal &= camera->isVisible( parentSceneNode->_getWorldAABB() );
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------
     const AxisAlignedBox& InstancedEntity::getBoundingBox(void) const
     {
 		//TODO: Add attached objects (TagPoints) to the bbox
@@ -153,6 +168,22 @@ namespace Ogre
 		m_batchOwner->_boundsDirty();
 		MovableObject::_notifyAttached( parent, isTagPoint );
 	}
+	//-----------------------------------------------------------------------
+	AnimationState* InstancedEntity::getAnimationState(const String& name) const
+    {
+        if (!mAnimationState)
+        {
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Entity is not animated",
+                "InstancedEntity::getAnimationState");
+        }
+
+		return mAnimationState->getAnimationState(name);
+    }
+    //-----------------------------------------------------------------------
+    AnimationStateSet* InstancedEntity::getAllAnimationStates(void) const
+    {
+        return mAnimationState;
+    }
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_updateAnimation(void)
 	{

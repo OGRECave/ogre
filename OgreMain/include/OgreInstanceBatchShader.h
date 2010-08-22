@@ -64,8 +64,8 @@ namespace Ogre
 									VertexData *baseVertexData );
 
 	public:
-		InstanceBatchShader( MeshPtr &meshReference, const MaterialPtr &material,
-								size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap=0 );
+		InstanceBatchShader( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
+							 const Mesh::IndexMap *indexToBoneMap, const String &batchName );
 		virtual ~InstanceBatchShader();
 
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh ) const;
