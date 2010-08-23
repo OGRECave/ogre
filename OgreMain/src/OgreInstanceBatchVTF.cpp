@@ -102,12 +102,10 @@ namespace Ogre
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration( thisVertexData->vertexDeclaration );
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
 
-		/*if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
-		{
-			//Building hw skinned batches follow a different path
-			setupHardwareSkinned( baseSubMesh, thisVertexData, baseVertexData );
-			return;
-		}*/
+		HWBoneIdxVec hwBoneIdx;
+		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
+		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+			retrieveBoneIdx( baseVertexData, hwBoneIdx );
 
 		for( unsigned short i=0; i<thisVertexData->vertexDeclaration->getMaxSource()+1; ++i )
 		{
@@ -124,7 +122,7 @@ namespace Ogre
 													baseVertexData->vertexBufferBinding->getBuffer(i);
 
 			char* thisBuf = static_cast<char*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
 
 			//Copy and repeat
 			for( size_t j=0; j<m_instancesPerBatch; ++j )
@@ -139,10 +137,11 @@ namespace Ogre
 		}
 
 		createVertexTexture( baseSubMesh );
-		createVertexSemantics( baseSubMesh, thisVertexData, baseVertexData );
-
+		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx );
+/*
 		thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-		thisVertexData->vertexDeclaration->closeGapsInSource();
+		thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+		thisVertexData->vertexDeclaration->closeGapsInSource();*/
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupIndices( const SubMesh* baseSubMesh )
@@ -164,7 +163,7 @@ namespace Ogre
 													HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 
 		void *buf			= thisIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
-		void const *baseBuf	= baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
+		void const *baseBuf	= baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_READ_ONLY );
 
 		uint16 *thisBuf16 = static_cast<uint16*>(buf);
 		uint32 *thisBuf32 = static_cast<uint32*>(buf);
@@ -193,6 +192,33 @@ namespace Ogre
 
 		baseIndexData->indexBuffer->unlock();
 		thisIndexData->indexBuffer->unlock();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatchVTF::retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx )
+	{
+		const VertexElement *ve = baseVertexData->vertexDeclaration->
+															findElementBySemantic( VES_BLEND_INDICES );
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
+															findElementBySemantic( VES_BLEND_WEIGHTS );
+
+		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
+		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
+
+		for( size_t i=0; i<baseVertexData->vertexCount; ++i )
+		{
+			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
+
+			uint8 biggestWeightIdx = 0;
+			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+				biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
+
+			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
+			outBoneIdx[i] = pIndex[biggestWeightIdx];
+
+			baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
+		}
+
+		buff->unlock();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType )
@@ -245,7 +271,7 @@ namespace Ogre
 		if( (m_numWorldMatrices * 3) % c_maxTexWidth )
 			texHeight += 1;
 
-		TextureType texType = texHeight == 1 ? TEX_TYPE_2D : TEX_TYPE_1D;
+		TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
 
 		m_matrixTexture = TextureManager::getSingleton().createManual(
 										mName + "/VTF", m_meshReference->getGroup(), texType,
@@ -256,10 +282,10 @@ namespace Ogre
 		setupMaterialToUseVTF( texType );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchVTF::createVertexSemantics( const SubMesh* baseSubMesh, VertexData *thisVertexData,
-													VertexData *baseVertexData )
+	void InstanceBatchVTF::createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
+													const HWBoneIdxVec &hwBoneIdx )
 	{
-		const size_t numBones = m_instancesPerBatch / m_numWorldMatrices;
+		const size_t numBones = m_numWorldMatrices / m_instancesPerBatch;
 
 		const size_t texWidth  = m_matrixTexture->getWidth();
 		const size_t texHeight = m_matrixTexture->getHeight();
@@ -269,9 +295,6 @@ namespace Ogre
 		RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
 		texelOffsets.x = renderSystem->getHorizontalTexelOffset() / (float)texWidth;
 		texelOffsets.y = renderSystem->getVerticalTexelOffset() / (float)texHeight;
-
-		std::vector<size_t> instanceInTexPerVertex;
-		instanceInTexPerVertex.resize( thisVertexData->vertexCount, 0 );
 
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 32 bytes aligned :-)
@@ -300,7 +323,7 @@ namespace Ogre
 			{
 				for( size_t k=0; k<4; ++k )
 				{
-					size_t instanceIdx = (instanceInTexPerVertex[j] + i * numBones) * 3 + k;
+					size_t instanceIdx = (hwBoneIdx[j] + i * numBones) * 3 + k;
 					thisVec->x = (instanceIdx % texWidth) / (float)texWidth;
 					thisVec->y = (instanceIdx / texWidth) / (float)texHeight;
 					*thisVec = *thisVec - texelOffsets;

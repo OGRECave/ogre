@@ -137,7 +137,7 @@ namespace Ogre
 													baseVertexData->vertexBufferBinding->getBuffer(i);
 
 			char* thisBuf = static_cast<char*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
 
 			//Copy and repeat
 			for( size_t j=0; j<m_instancesPerBatch; ++j )
@@ -196,7 +196,7 @@ namespace Ogre
 													HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 
 		void *buf			= thisIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
-		void const *baseBuf	= baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_DISCARD );
+		void const *baseBuf	= baseIndexData->indexBuffer->lock( HardwareBuffer::HBL_READ_ONLY );
 
 		uint16 *thisBuf16 = static_cast<uint16*>(buf);
 		uint32 *thisBuf32 = static_cast<uint32*>(buf);
@@ -251,7 +251,7 @@ namespace Ogre
 													baseVertexData->vertexBufferBinding->getBuffer(i);
 
 			char* thisBuf = static_cast<char*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
 			char *startBuf = baseBuf;
 
 			//Copy and repeat

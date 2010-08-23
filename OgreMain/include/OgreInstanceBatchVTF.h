@@ -52,7 +52,11 @@ namespace Ogre
 		  * VTF is only fast on modern GPUs (ATI Radeon HD, GeForce 8 series onwards)
 		  * On GeForce 6/7 series VTF is too slow
 		  * Only one bone weight per vertex is supported
+		  * GPUs with low memory bandwidth (i.e. laptops) may perform even worse than no instancing
 
+		Whether this performs great or bad depends on the hardware. It improved 3x performance on
+		a Intel Core 2 Quad Core X9650 GeForce 8600 GTS, but went 0.6x worse in an Intel Core 2 Duo
+		P7350 ATI Mobility Radeon HD 4650
 		Each InstanceBatchVTF has it's own texture, which occupies memory in VRAM.
 		VRAM usage can be computed by doing 12 bytes * numInstances * numBones
 		@par
@@ -67,6 +71,7 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchVTF : public InstanceBatch
 	{
+		typedef vector<uint8>::type HWBoneIdxVec;
 		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					m_numWorldMatrices;	//Num bones * num instances
@@ -76,6 +81,12 @@ namespace Ogre
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
+		/** Retrieves bone data from the original sub mesh and puts it into an appropiate buffer,
+			later to be read when creating the vertex semantics.
+			Assumes outBoneIdx has enough space (base submesh vertex count)
+		*/
+		void retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx );
+
 		/** Setups the material to use a vertex texture */
 		void setupMaterialToUseVTF( TextureType textureType );
 
@@ -83,8 +94,8 @@ namespace Ogre
 		void createVertexTexture( const SubMesh* baseSubMesh );
 
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
-		void createVertexSemantics( const SubMesh* baseSubMesh, VertexData *thisVertexData,
-									VertexData *baseVertexData );
+		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
+									const HWBoneIdxVec &hwBoneIdx );
 
 		/** Keeps filling the VTF with world matrix data */
 		void updateVertexTexture(void);
