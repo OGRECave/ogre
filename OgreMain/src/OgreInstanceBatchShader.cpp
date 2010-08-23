@@ -254,9 +254,6 @@ namespace Ogre
 			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 			char *startBuf = baseBuf;
 
-			const size_t sizeOfBuffer = baseVertexData->vertexCount *
-											baseVertexData->vertexDeclaration->getVertexSize(i);
-
 			//Copy and repeat
 			for( size_t j=0; j<m_instancesPerBatch; ++j )
 			{
