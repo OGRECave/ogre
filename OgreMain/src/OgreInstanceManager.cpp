@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreInstanceManager.h"
 #include "OgreInstanceBatchShader.h"
+#include "OgreInstanceBatchVTF.h"
 #include "OgreMesh.h"
 #include "OgreSubMesh.h"
 #include "OgreMeshManager.h"
@@ -80,7 +81,7 @@ namespace Ogre
 		InstanceBatch *instanceBatch;
 
 		if( m_instanceBatches.empty() )
-			instanceBatch = buildFirstTime( materialName );
+			instanceBatch = buildNewBatch( materialName, true );
 		else
 			instanceBatch = getFreeBatch( materialName );
 
@@ -102,59 +103,63 @@ namespace Ogre
 		}
 
 		//None found, or they're all full
-		return buildNewBatch( materialName );
+		return buildNewBatch( materialName, true );
 	}
 	//-----------------------------------------------------------------------
-	InstanceBatch* InstanceManager::buildFirstTime( const String &materialName )
+	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName, bool firstTime )
 	{
+		//Get the bone to index map for the batches
 		Mesh::IndexMap &idxMap = m_meshReference->getSubMesh(0)->blendIndexToBoneIndexMap;
 		idxMap = idxMap.empty() ? m_meshReference->sharedBlendIndexToBoneIndexMap : idxMap;
 
+		//Get the material
 		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
 																	m_meshReference->getGroup() );
 
+		//Get the array of batches grouped by this material
 		InstanceBatchVec &materialInstanceBatch = m_instanceBatches[materialName];
 
-		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
-																	&idxMap, m_name + "/InstanceBatch_" +
-																	StringConverter::toString(m_idCount++) );
+		InstanceBatch *batch = 0;
 
-		m_instancesPerBatch = std::min( m_instancesPerBatch,
-										batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0) ) );
-		batch->_setInstancesPerBatch( m_instancesPerBatch );
+		switch( m_instancingTechnique )
+		{
+		case ShaderBased:
+			batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
+													&idxMap, m_name + "/InstanceBatch_" +
+													StringConverter::toString(m_idCount++) );
+			break;
+		case TextureVTF:
+			batch = OGRE_NEW InstanceBatchVTF( m_meshReference, mat, m_instancesPerBatch,
+													&idxMap, m_name + "/InstanceBatch_" +
+													StringConverter::toString(m_idCount++) );
+			break;
+		default:
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+					"Unimplemented instancing technique: " +
+					StringConverter::toString(m_instancingTechnique),
+					"InstanceBatch::buildFirstTime() / InstanceBatch::buildNewBatch()");
+		}
 
-		//TODO: Create a "merge" function that merges all submeshes into one big submesh
-		//instead of just sending submesh #0
-		//Get the RenderOperation to be shared with further instances.
-		m_sharedRenderOperation = batch->build( m_meshReference->getSubMesh(0) );
 
-		//Batches need to be part of a scene node so that their renderable can be rendered
-		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
-		sceneNode->attachObject( batch );
-		//sceneNode->showBoundingBox( true );
+		if( !firstTime )
+		{
+			//TODO: Check different materials have the same m_instancesPerBatch upper limit
+			//otherwise we can't share
+			batch->buildFrom( m_meshReference->getSubMesh(0), m_sharedRenderOperation );
+		}
+		else
+		{
+			//Ensure we don't request more than we can
+			m_instancesPerBatch = std::min(batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0) ),
+											m_instancesPerBatch );
+			batch->_setInstancesPerBatch( m_instancesPerBatch );
 
-		materialInstanceBatch.push_back( batch );
+			//TODO: Create a "merge" function that merges all submeshes into one big submesh
+			//instead of just sending submesh #0
 
-		return batch;
-	}
-	//-----------------------------------------------------------------------
-	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName )
-	{
-		Mesh::IndexMap &idxMap = m_meshReference->getSubMesh(0)->blendIndexToBoneIndexMap;
-		idxMap = idxMap.empty() ? m_meshReference->sharedBlendIndexToBoneIndexMap : idxMap;
-
-		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
-																	m_meshReference->getGroup() );
-
-		InstanceBatchVec &materialInstanceBatch = m_instanceBatches[materialName];
-
-		InstanceBatchShader *batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
-																	&idxMap, m_name + "/InstanceBatch_" +
-																	StringConverter::toString(m_idCount++) );
-
-		//TODO: Check different materials have the same m_instancesPerBatch upper limit
-		//otherwise we can't share
-		batch->buildFrom( m_meshReference->getSubMesh(0), m_sharedRenderOperation );
+			//Get the RenderOperation to be shared with further instances.
+			m_sharedRenderOperation = batch->build( m_meshReference->getSubMesh(0) );
+		}
 
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();

@@ -171,6 +171,7 @@ namespace Ogre {
     class IndexData;
 	class InstanceBatch;
 	class InstanceBatchShader;
+	class InstanceBatchVTF;
 	class InstanceManager;
 	class InstancedEntity;
     class IntersectionSceneQuery;

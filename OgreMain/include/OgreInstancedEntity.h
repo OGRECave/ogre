@@ -79,6 +79,7 @@ namespace Ogre
 	{
 		friend InstanceBatch;
 		friend InstanceBatchShader;
+		friend InstanceBatchVTF;
 
 		const uint32		m_instanceID;
 		InstanceBatch		*m_batchOwner;

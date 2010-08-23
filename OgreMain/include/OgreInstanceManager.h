@@ -64,6 +64,8 @@ namespace Ogre
 		{
 			ShaderBased,			//Any SM 2.0+
 			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
+			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+
+									//only fast on ATI HD 2000+ Radeon and GeForce 8+
 		};
 	private:
 		typedef vector<InstanceBatch*>::type		InstanceBatchVec;	//vec[batchN] = Batch
@@ -86,6 +88,9 @@ namespace Ogre
 		*/
 		inline InstanceBatch* getFreeBatch( const String &materialName );
 
+		/** Performs shared routines between buildFirstTime() & buildNewBatch()
+		*/
+
 		/** Called when creating the first batch for the first time. This can take big build time.
 			It takes care of getting the render operation which will be shared by further batches,
 			which decreases their build time, and prevents GPU RAM from skyrocketing.
@@ -96,11 +101,15 @@ namespace Ogre
 		InstanceBatch* buildFirstTime( const String &materialName );
 
 		/** Called when batches are fully exhausted (can't return more instances) so a new batch
-			is created. For the first time use, @see buildFirstTime
+			is created.
+			For the first time use, it can take big build time.
+			It takes care of getting the render operation which will be shared by further batches,
+			which decreases their build time, and prevents GPU RAM from skyrocketing.
 			@param materialName The material name, to know where to put this batch in the map
+			@param firstTime True if this is the first time it is called
 			@returns The created InstancedManager for convenience
         */
-		InstanceBatch* buildNewBatch( const String &materialName );
+		InstanceBatch* buildNewBatch( const String &materialName, bool firstTime );
 
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,

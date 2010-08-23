@@ -214,7 +214,8 @@ namespace Ogre
 		void _notifyCurrentCamera( Camera* cam );
 		const AxisAlignedBox& getBoundingBox(void) const;
 		Real getBoundingRadius(void) const;
-		void _updateRenderQueue(RenderQueue* queue);
+
+		virtual void _updateRenderQueue(RenderQueue* queue);
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
 	};
 }
