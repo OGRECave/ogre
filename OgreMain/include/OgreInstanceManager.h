@@ -119,14 +119,6 @@ namespace Ogre
 			unused (only wasting memory).
         */
 		void cleanupEmptyBatches(void);
-
-		/** Should be called once per frame to update all batches' data like bounds. Unfortunately
-			we can't leave this automatically by Ogre because Ogre updates on request when
-			a SceneNode change position, scale, etc; but these bounds also depend on camera's
-			position and direction, which makes updating the whole batch almost every frame anyway.
-			The bbox is updated dynamically for better shadow accuracy.
-		*/
-		void updateBatches(void);
 	};
 }
 

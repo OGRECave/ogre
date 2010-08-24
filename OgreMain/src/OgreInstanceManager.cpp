@@ -199,24 +199,4 @@ namespace Ogre
 		//we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
 		//(takes more time and will leak the shared render operation)
 	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::updateBatches(void)
-	{
-		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
-		InstanceBatchMap::iterator end  = m_instanceBatches.end();
-
-		while( itor != end )
-		{
-			InstanceBatchVec::iterator it = itor->second.begin();
-			InstanceBatchVec::iterator en = itor->second.end();
-
-			while( it != en )
-			{
-				(*it)->updateBounds();
-				++it;
-			}
-
-			++itor;
-		}
-	}
 }

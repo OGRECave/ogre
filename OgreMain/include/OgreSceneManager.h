@@ -991,9 +991,6 @@ namespace Ogre {
         typedef vector<EntityMaterialLodChangedEvent>::type EntityMaterialLodChangedEventList;
         EntityMaterialLodChangedEventList mEntityMaterialLodChangedEvents;
 
-		/** @See InstaceManager::updateBatches */
-		void updateInstanceManagers(void);
-
     public:
         /** Constructor.
         */
@@ -3139,6 +3136,7 @@ namespace Ogre {
 		@param instancedEntity Instance to remove
 		*/
 		virtual void destroyInstanceEntity( InstancedEntity *instancedEntity );
+
 
 		/** Create a movable object of the type specified.
 		@remarks

@@ -50,7 +50,7 @@ namespace Ogre
 		assert( m_instancesPerBatch );
 		assert( !(meshReference->hasSkeleton() && !indexToBoneMap) );
 
-		m_fullBoundingBox.setExtents( Vector3::ZERO, Vector3::ZERO );
+		m_fullBoundingBox.setExtents( -Vector3::UNIT_SCALE, Vector3::UNIT_SCALE );
 
 		mName = batchName;
 	}
@@ -80,6 +80,41 @@ namespace Ogre
 		}
 
 		return true;
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::updateBounds()
+	{
+		mVisible = false;
+
+		const AxisAlignedBox oldAABB = m_fullBoundingBox;
+		m_fullBoundingBox.setNull();
+
+		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+
+		while( itor != end )
+		{
+			//Trick to force Ogre not to render us if none of our instances is visible
+			//Because we do Camera::isVisible(), it is better if the SceneNode from the
+			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
+			//to avoid unnecesary wasteful calculations
+			bool isVisible = (*itor)->findVisible( m_currentCamera );
+			mVisible |= isVisible;
+
+			//Only increase the bounding box for those objects we know are in the scene
+			if( isVisible )
+				m_fullBoundingBox.merge( (*itor)->getWorldBoundingBox(true) );
+
+			++itor;
+		}
+
+		m_boundingRadius = Math::boundingRadiusFromAABB( m_fullBoundingBox );
+
+		//Can't just call mParentNode->_updateBounds() since the SceneManager may be iterating
+		//over us and such call would invalidate the iterator. We'll do this in the next frame
+		//Worst case scenario, all instances flickered (disappeared) for a single frame.
+		if( mVisible && oldAABB != m_fullBoundingBox )
+			mParentNode->needUpdate( true );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::createAllInstancedEntities()
@@ -162,36 +197,9 @@ namespace Ogre
 		m_unusedEntities.push_back( instancedEntity );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::updateBounds()
+	void InstanceBatch::_boundsDirty(void)
 	{
-		mVisible = false;
-
-		const AxisAlignedBox oldAABB = m_fullBoundingBox;
-		m_fullBoundingBox.setExtents( Vector3::ZERO, Vector3::ZERO );
-
-		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
-
-		while( itor != end )
-		{
-			//Trick to force Ogre not to render us if none of our instances is visible
-			//Because we do Camera::isVisible(), it is better if the SceneNode from the
-			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
-			//to avoid unnecesary wasteful calculations
-			bool isVisible = (*itor)->findVisible( m_currentCamera );
-			mVisible |= isVisible;
-
-			//Only increase the bounding box for those objects we know are in the scene
-			if( isVisible )
-				m_fullBoundingBox.merge( (*itor)->getWorldBoundingBox(true) );
-
-			++itor;
-		}
-
-		m_boundingRadius = Math::boundingRadiusFromAABB( m_fullBoundingBox );
-
-		if( mVisible && getParentSceneNode() && oldAABB != m_fullBoundingBox )
-			getParentSceneNode()->_updateBounds();
+		mParentNode->needUpdate();
 	}
 	//-----------------------------------------------------------------------
 	const String& InstanceBatch::getMovableType(void) const
@@ -246,6 +254,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
 	{
+		updateBounds();
+
 		if( m_meshReference->hasSkeleton() )
 		{
 			InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();

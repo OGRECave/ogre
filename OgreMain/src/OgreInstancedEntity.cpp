@@ -157,6 +157,18 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyMoved(void)
+	{
+		m_batchOwner->_boundsDirty();
+		MovableObject::_notifyMoved();
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
+	{
+		m_batchOwner->_boundsDirty();
+		MovableObject::_notifyAttached( parent, isTagPoint );
+	}
+	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const
     {
         if (!mAnimationState)
