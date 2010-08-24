@@ -293,10 +293,11 @@ namespace Ogre
 		const size_t texHeight = m_matrixTexture->getHeight();
 
 		//Calculate the texel offsets to correct them offline
+		//Akwardly enough, the offset is needed in OpenGL too
 		Vector2 texelOffsets;
-		RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-		texelOffsets.x = renderSystem->getHorizontalTexelOffset() / (float)texWidth;
-		texelOffsets.y = renderSystem->getVerticalTexelOffset() / (float)texHeight;
+		//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
+		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / (float)texWidth;
+		texelOffsets.y = /*renderSystem->getVerticalTexelOffset()*/ -0.5f / (float)texHeight;
 
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 32 bytes aligned :-)
