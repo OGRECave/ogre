@@ -61,9 +61,6 @@ namespace Ogre
 		shader by some techniques (like InstanceBatchShader).
 		@par
 		Differences between Entity and InstancedEntity:
-		* Entities don't show up in screen until they're attached to a SceneNode that is part of the scene
-		graph (i.e. ultimate parent is the root scene node). InstancedEntities don't show up until they're
-		attached to _any_ SceneNode
 		* Setting RenderQueueGroup and other Renderable stuff works at InstanceBatch level, not
 		InstancedEntity. This is obviously a limitation from instancing in general, not this particular
 		implementation
@@ -111,6 +108,10 @@ namespace Ogre
 		//This is used by our batch owner to get the closest entity's depth, returns infinity
 		//when not attached to a scene node
 		Real getSquaredViewDepth( const Camera* cam ) const;
+
+		//Overriden so we can tell the InstanceBatch it needs to update it's bounds
+		void _notifyMoved(void);
+		void _notifyAttached( Node* parent, bool isTagPoint = false );
 
 		//Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue )	{}

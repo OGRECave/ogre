@@ -88,18 +88,6 @@ namespace Ogre
 		*/
 		inline InstanceBatch* getFreeBatch( const String &materialName );
 
-		/** Performs shared routines between buildFirstTime() & buildNewBatch()
-		*/
-
-		/** Called when creating the first batch for the first time. This can take big build time.
-			It takes care of getting the render operation which will be shared by further batches,
-			which decreases their build time, and prevents GPU RAM from skyrocketing.
-			@See InstanceBatch on how buffers are shared.
-			@param materialName The material name, to know where to put this batch in the map
-			@returns The created InstancedManager for convenience
-        */
-		InstanceBatch* buildFirstTime( const String &materialName );
-
 		/** Called when batches are fully exhausted (can't return more instances) so a new batch
 			is created.
 			For the first time use, it can take big build time.
@@ -137,14 +125,6 @@ namespace Ogre
 			unused (only wasting memory).
         */
 		void cleanupEmptyBatches(void);
-
-		/** Should be called once per frame to update all batches' data like bounds. Unfortunately
-			we can't leave this automatically by Ogre because Ogre updates on request when
-			a SceneNode change position, scale, etc; but these bounds also depend on camera's
-			position and direction, which makes updating the whole batch almost every frame anyway.
-			The bbox is updated dynamically for better shadow accuracy.
-		*/
-		void _updateBatches(void);
 	};
 }
 

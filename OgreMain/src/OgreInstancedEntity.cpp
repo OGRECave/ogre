@@ -117,7 +117,7 @@ namespace Ogre
 	bool InstancedEntity::findVisible( Camera *camera )
 	{
 		//Object is explicitly visible and attached to a Node
-		bool retVal = isVisible() & (mParentNode != 0);
+		bool retVal = isVisible() & isInScene();
 
 		//Object's bounding box is viewed by the camera
 		const SceneNode *parentSceneNode = getParentSceneNode();
@@ -155,6 +155,18 @@ namespace Ogre
 			retVal = mParentNode->getSquaredViewDepth( cam );
 
 		return retVal;
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyMoved(void)
+	{
+		m_batchOwner->_boundsDirty();
+		MovableObject::_notifyMoved();
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
+	{
+		m_batchOwner->_boundsDirty();
+		MovableObject::_notifyAttached( parent, isTagPoint );
 	}
 	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const

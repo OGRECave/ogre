@@ -104,6 +104,7 @@ namespace Ogre
 		//This bbox contains all (visible) instanced entities
 		AxisAlignedBox		m_fullBoundingBox;
 		Real				m_boundingRadius;
+		bool				m_boundsDirty;
 		Camera				*m_currentCamera;
 
 		/// Cached distance to last camera for getSquaredViewDepth
@@ -118,6 +119,9 @@ namespace Ogre
 
 		//Returns false on errors that would prevent building this batch from the given submesh
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
+
+		void updateBounds();
+		void updateVisibility();
 
 	public:
 		InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
@@ -183,6 +187,11 @@ namespace Ogre
 		*/
 		bool isBatchUnused(void) const { return m_unusedEntities.size() == m_instancedEntities.size(); }
 
+		/** Called by InstancedEntity(s) to tell us we need to update the bounds
+			(we touch the SceneNode so the SceneManager aknowledges such change)
+        */
+		void _boundsDirty(void);
+
 		/** Returns a pointer to a new InstancedEntity ready to use
 			Note it's actually preallocated, so no memory allocation happens at
 			this point.
@@ -198,9 +207,6 @@ namespace Ogre
 				Removed instanced entities save little CPU time, but _not_ GPU
         */
 		void removeInstancedEntity( InstancedEntity *instancedEntity );
-
-		/** @See InstanceManager::updateBatches */
-		void updateBounds();
 
 		//Renderable overloads
 		const MaterialPtr& getMaterial(void) const		{ return m_material; }
