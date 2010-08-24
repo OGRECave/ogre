@@ -88,8 +88,6 @@ namespace Ogre
 		const AxisAlignedBox oldAABB = m_fullBoundingBox;
 		m_fullBoundingBox.setNull();
 
-		m_fullBoundingBox.merge( Vector3( 0, 1000, 0 ) );
-
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
 

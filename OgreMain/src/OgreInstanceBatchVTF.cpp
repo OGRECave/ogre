@@ -105,7 +105,13 @@ namespace Ogre
 		HWBoneIdxVec hwBoneIdx;
 		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
 		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+		{
 			retrieveBoneIdx( baseVertexData, hwBoneIdx );
+
+			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+			thisVertexData->vertexDeclaration->closeGapsInSource();
+		}
 
 		for( unsigned short i=0; i<thisVertexData->vertexDeclaration->getMaxSource()+1; ++i )
 		{
@@ -138,10 +144,6 @@ namespace Ogre
 
 		createVertexTexture( baseSubMesh );
 		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx );
-/*
-		thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-		thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-		thisVertexData->vertexDeclaration->closeGapsInSource();*/
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupIndices( const SubMesh* baseSubMesh )
