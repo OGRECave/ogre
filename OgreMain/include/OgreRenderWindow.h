@@ -145,6 +145,26 @@ namespace Ogre
 		virtual void setHidden(bool hidden)
 		{ (void)hidden; }
 
+		/** Enable or disable vertical sync for the RenderWindow.
+		*/
+		virtual void setVSyncEnabled(bool vsync)
+		{ (void)vsync; }
+
+		/** Indicates whether vertical sync is actived for the window.
+		*/
+		virtual bool isVSyncEnabled() const { return false; }
+
+		/** Set the vertical sync interval. This indicates the number of vertical retraces to wait for
+		  	before swapping buffers. A value of 1 is the default.
+		*/
+		virtual void setVSyncInterval(unsigned int interval)
+		{ (void)interval; }
+
+		/** Returns the vertical sync interval. 
+		*/
+		virtual unsigned int getVSyncInterval() const { return 1; }
+	    
+
         /** Overridden from RenderTarget, flags invisible windows as inactive
         */
         virtual bool isActive(void) const { return mActive && isVisible(); }

@@ -74,6 +74,8 @@ namespace Ogre
 		mClosed = false;
 		mActive = false;
 		mHidden = false;
+		mVSync = false;
+		mVSyncInterval = 1;
 	}
 	
 	//-------------------------------------------------------------------------------------------------//
@@ -409,21 +411,12 @@ namespace Ogre
 			WindowEventUtilities::_addRenderWindow(this);
 		}
 		
-    mContext = new GLXContext(mGLSupport, fbConfig, glxDrawable, glxContext);
+		mContext = new GLXContext(mGLSupport, fbConfig, glxDrawable, glxContext);
 		
-		::GLXDrawable oldDrawable = glXGetCurrentDrawable();
-		::GLXContext  oldContext  = glXGetCurrentContext();
-		
-		mContext->setCurrent();
-		
-		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
-		{
-			glXSwapIntervalSGI (vsync ? vsyncInterval : 0);
-		}
-		
-		mContext->endCurrent();
-		
-		glXMakeCurrent (mGLSupport->getGLDisplay(), oldDrawable, oldContext);
+		// apply vsync settings. call setVSyncInterval first to avoid 
+		// setting vsync more than once.
+		setVSyncInterval(vsyncInterval);
+		setVSyncEnabled(vsync);
 		
 		int fbConfigID;
 		
@@ -536,6 +529,47 @@ namespace Ogre
 				switchFullScreen(true);
 			}
 		}
+	}
+
+	//-------------------------------------------------------------------------------------------------//
+	void GLXWindow::setVSyncInterval(unsigned int interval)
+	{
+		mVSyncInterval = interval;
+		if (mVSync)
+			setVSyncEnabled(true);
+	}
+
+	//-------------------------------------------------------------------------------------------------//
+	void GLXWindow::setVSyncEnabled(bool vsync)
+	{
+		mVSync = vsync;
+		// we need to make our context current to set vsync
+		// store previous context to restore when finished.
+		::GLXDrawable oldDrawable = glXGetCurrentDrawable();
+		::GLXContext  oldContext  = glXGetCurrentContext();
+		
+		mContext->setCurrent();
+		
+		if (! mIsExternalGLControl && GLXEW_SGI_swap_control)
+		{
+			glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+		}
+		
+		mContext->endCurrent();
+		
+		glXMakeCurrent (mGLSupport->getGLDisplay(), oldDrawable, oldContext);
+	}
+
+	//-------------------------------------------------------------------------------------------------//
+	bool GLXWindow::isVSyncEnabled() const
+	{
+		return mVSync;
+	}
+
+	//-------------------------------------------------------------------------------------------------//
+	unsigned int GLXWindow::getVSyncInterval() const
+	{
+		return mVSyncInterval;
 	}
 
 	//-------------------------------------------------------------------------------------------------//

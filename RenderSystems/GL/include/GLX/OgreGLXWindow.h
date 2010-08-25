@@ -65,6 +65,18 @@ namespace Ogre
 
 		/** @copydoc see RenderWindow::setHidden */
 		void setHidden(bool hidden);
+
+		/** @copydoc see RenderWindow::setVSyncEnabled */
+		void setVSyncEnabled(bool vsync);
+
+		/** @copydoc see RenderWindow::isVSyncEnabled */
+		bool isVSyncEnabled() const;
+
+		/** @copydoc see RenderWindow::setVSyncInterval */
+		void setVSyncInterval(unsigned int interval);
+
+		/** @copydoc see RenderWindow::getVSyncInterval */
+		unsigned int getVSyncInterval() const;
 		
 		/** @copydoc see RenderWindow::reposition */
 		void reposition(int left, int top);
@@ -101,6 +113,8 @@ namespace Ogre
 		bool mIsTopLevel;
 		bool mIsExternal;
 		bool mIsExternalGLControl;
+		bool mVSync;
+		int mVSyncInterval;
 		
 		GLXGLSupport* mGLSupport;
 		::Window	  mWindow;
