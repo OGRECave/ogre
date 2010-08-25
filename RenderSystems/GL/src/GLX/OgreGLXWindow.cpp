@@ -401,16 +401,9 @@ namespace Ogre
 			
 			glxDrawable = mWindow;
 			
-			XMapWindow(xDisplay, mWindow);
-			
-			if (mIsFullScreen && !hidden)
-			{
-				switchFullScreen (true);
-			}
-			else if (hidden)
-			{
-				setHidden(true);
-			}
+			// setHidden takes care of mapping or unmapping the window
+			// and also calls setFullScreen if appropriate.
+			setHidden(hidden);
 			XFlush(xDisplay);
 			
 			WindowEventUtilities::_addRenderWindow(this);
