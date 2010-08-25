@@ -58,7 +58,7 @@ namespace Ogre
 		a Intel Core 2 Quad Core X9650 GeForce 8600 GTS, but went 0.6x worse in an Intel Core 2 Duo
 		P7350 ATI Mobility Radeon HD 4650
 		Each InstanceBatchVTF has it's own texture, which occupies memory in VRAM.
-		VRAM usage can be computed by doing 12 bytes * numInstances * numBones
+		VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
 		@par
 		The material requires at least a texture unit stage named "InstancingVTF"
 
