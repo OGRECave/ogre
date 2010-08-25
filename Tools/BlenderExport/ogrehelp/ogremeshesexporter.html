@@ -467,15 +467,26 @@ Bellow are a list of default properties based on Blender's material.
 	<li>_culling</li>
 	<li>_lighting</li>
 	<li>_fog_override</li>
-	<li>[textureName]._texture</li>
-	<li>[textureName]._tex_address_mode</li>
-	<li>[textureName]._filtering</li>
-	<li>[textureName]._colour_op</li>
+	<li>(textureName)._texture</li>
+	<li>(textureName)._tex_address_mode</li>
+	<li>(textureName)._filtering</li>
+	<li>(textureName)._colour_op</li>
+	<li>(textureName)._sizeX</li>
+	<li>(textureName)._sizeY</li>
+	<li>(textureName)._sizeZ</li>
+	<li>(textureName)._offsetX</li>
+	<li>(textureName)._offsetY</li>
+	<li>(textureName)._offsetZ</li>
 </ul>
 
 <p>
-An important note on the [textureName]. The texture name is the name defined in the Texture panel in the Material Buttons tab.
+An important note on the (textureName). The texture name is the name defined in the Texture panel in the Material Buttons tab.
 It follows the convension of how it is displayed in the Texture panel; I.E. <em>tex.123</em> gives <em>tex</em> while <em>tex.1a2</em> gives <em>tex.1a2</em>
+</p>
+
+<p>
+On certain cases, one would prefer to use texture indexing instead of (textureName) access. That being the case, you can use the _tex[#] handle to access the texture by index.
+I.E. <em>_tex[0]._filtering</em> will access the first texture's filtering mode.
 </p>
 
 <p>

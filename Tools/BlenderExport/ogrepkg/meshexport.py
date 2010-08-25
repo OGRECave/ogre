@@ -848,6 +848,7 @@ class MeshExporter:
 		# mesh
 		self.bObject = bObject
 		self.name = self.bObject.getData(True)
+		self.hasNoUV = True
 		# vertex animations
 		self.vertexAnimationExporter = VertexAnimationExporter(self)
 		# skeleton
@@ -904,6 +905,8 @@ class MeshExporter:
 			bMesh.getFromObject(self.bObject)
 		else:
 			bMesh = self.bObject.getData(mesh=True)
+
+		self.hasNoUV = bMesh.activeUVLayer is None
 		self.submeshManager = SubmeshManager(bMesh, fixUpAxis, self.armatureExporter)
 		for bMFace in bMesh.faces:
 			faceMaterial = materialManager.getMaterial(bMesh, bMFace, colouredAmbient, self.name)
@@ -927,5 +930,5 @@ class MeshExporter:
 		fileObject.write(indent(0)+"</mesh>\n")
 		fileObject.close()
 		if convertXML:
-			OgreXMLConverter.getSingleton().convert(Blender.sys.join(exportDir, file))
+			OgreXMLConverter.getSingleton().convert(Blender.sys.join(exportDir, file), '', self.hasNoUV)
 		return

@@ -44,6 +44,11 @@ td.example {
 	border-width: 1px;
 	border-color: black;
 }
+
+td.example pre {
+	margin: 0;
+}
+
 dt { color: #3D653D; font-weight: bold;}
 
 A.qindex {} 	 
