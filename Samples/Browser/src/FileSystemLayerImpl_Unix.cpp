@@ -65,10 +65,14 @@ namespace OgreBites
 				}
 			} while (!resolved);
 
-			Ogre::String result (resolved);
 			if (resolved)
+			{
+				Ogre::String result (resolved);
 				OGRE_FREE(resolved, Ogre::MEMCATEGORY_GENERAL);
-			return result;
+				return result;
+			}
+			else
+				return "";
 		}
 	}
     //---------------------------------------------------------------------
