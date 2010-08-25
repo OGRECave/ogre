@@ -235,8 +235,8 @@ namespace Ogre {
 			strcpy(mDeviceName, monitorInfoEx.szDevice);
 
 			// Update window style flags.
-			mFullscreenWinStyle = WS_VISIBLE | WS_CLIPCHILDREN | WS_POPUP;
-			mWindowedWinStyle   = WS_VISIBLE | WS_CLIPCHILDREN;
+			mFullscreenWinStyle = (hidden ? 0 : WS_VISIBLE) | WS_CLIPCHILDREN | WS_POPUP;
+			mWindowedWinStyle   = (hidden ? 0 : WS_VISIBLE) | WS_CLIPCHILDREN;
 			
 			if (parent)
 			{

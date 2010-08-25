@@ -188,7 +188,7 @@ namespace Ogre
 
 		if (!externalHandle)
 		{
-			DWORD dwStyle = WS_VISIBLE | WS_CLIPCHILDREN;
+			DWORD dwStyle = (mHidden ? 0 : WS_VISIBLE) | WS_CLIPCHILDREN;
 			RECT rc;
 
 			mWidth = width;

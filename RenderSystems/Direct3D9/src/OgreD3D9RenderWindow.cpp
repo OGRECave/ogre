@@ -87,7 +87,6 @@ namespace Ogre
 		size_t fsaaSamples = 0;
 		String fsaaHint;
 		int monitorIndex = -1;	//Default by detecting the adapter from left / top position
-		bool showWindow = true;
 		if(miscParams)
 		{
 			// Get variable-length params
@@ -170,7 +169,7 @@ namespace Ogre
 				monitorIndex = StringConverter::parseInt(opt->second);
 			opt = miscParams->find("show");
 			if(opt != miscParams->end())
-				showWindow = StringConverter::parseBool(opt->second);
+				mHidden = !StringConverter::parseBool(opt->second);
 
 		}
 
@@ -223,7 +222,7 @@ namespace Ogre
 			mFullscreenWinStyle = WS_CLIPCHILDREN | WS_POPUP;
 			mWindowedWinStyle   = WS_CLIPCHILDREN;
 
-			if (showWindow == true)
+			if (!mHidden)
 			{
 				mFullscreenWinStyle |= WS_VISIBLE;
 				mWindowedWinStyle |= WS_VISIBLE;
