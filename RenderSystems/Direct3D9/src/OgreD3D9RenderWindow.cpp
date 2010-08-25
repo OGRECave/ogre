@@ -693,6 +693,34 @@ namespace Ogre
 		}
 	}
 
+	void D3D9RenderWindow::setVSyncEnabled(bool vsync)
+	{
+		mVSync = vsync;
+		if (!mIsExternal)
+		{
+			// we need to reset the device with new vsync params
+			// invalidate the window to trigger this
+			mDevice->invalidate(this);
+		}
+	}
+
+	bool D3D9RenderWindow::isVSyncEnabled() const
+	{
+		return mVSync;
+	}
+
+	void D3D9RenderWindow::setVSyncInterval(unsigned int interval)
+	{
+		mVSyncInterval = interval;
+		if (mVSync)
+			setVSyncEnabled(true);
+	}
+
+	unsigned int D3D9RenderWindow::getVSyncInterval() const
+	{
+		return mVSyncInterval;
+	}
+
 	void D3D9RenderWindow::reposition(int top, int left)
 	{
 		if (mHWnd && !mIsFullScreen)

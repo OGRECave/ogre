@@ -59,6 +59,8 @@ namespace Ogre {
 		mSizing = false;
 		mClosed = false;
 		mHidden = false;
+		mVSync = false;
+		mVSyncInterval = 1;
 		mDisplayFrequency = 0;
 		mActive = false;
 		mDeviceName = NULL;
@@ -99,9 +101,7 @@ namespace Ogre {
 		int top = -1; // Defaults to screen center
 		HWND parent = 0;
 		String title = name;
-		bool vsync = false;
 		bool hidden = false;
-		unsigned int vsyncInterval = 1;
 		String border;
 		bool outerSize = false;
 		bool hwGamma = false;
@@ -130,13 +130,13 @@ namespace Ogre {
 			}
 
 			if ((opt = miscParams->find("vsync")) != end)
-				vsync = StringConverter::parseBool(opt->second);
+				mVSync = StringConverter::parseBool(opt->second);
 
 			if ((opt = miscParams->find("hidden")) != end)
 				hidden = StringConverter::parseBool(opt->second);
 
 			if ((opt = miscParams->find("vsyncInterval")) != end)
-				vsyncInterval = StringConverter::parseUnsignedInt(opt->second);
+				mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
 
 			if ((opt = miscParams->find("FSAA")) != end)
 				mFSAA = StringConverter::parseUnsignedInt(opt->second);
@@ -439,7 +439,7 @@ namespace Ogre {
 			PFNWGLSWAPINTERVALEXTPROC _wglSwapIntervalEXT = 
 				(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
 			if (_wglSwapIntervalEXT)
-				_wglSwapIntervalEXT(vsync? vsyncInterval : 0);
+				_wglSwapIntervalEXT(mVSync? mVSyncInterval : 0);
 		}
 
         if (old_context && old_context != mGlrc)
@@ -669,6 +669,48 @@ namespace Ogre {
 			else
 				ShowWindow(mHWnd, SW_SHOWNORMAL);
 		}
+	}
+
+	void Win32Window::setVSyncEnabled(bool vsync)
+	{
+		mVSync = vsync;
+		HDC old_hdc = wglGetCurrentDC();
+		HGLRC old_context = wglGetCurrentContext();
+		if (!wglMakeCurrent(mHDC, mGlrc))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglMakeCurrent", "Win32Window::setVSyncEnabled");
+
+		// Do not change vsync if the external window has the OpenGL control
+		if (!mIsExternalGLControl) {
+			// Don't use wglew as if this is the first window, we won't have initialised yet
+			PFNWGLSWAPINTERVALEXTPROC _wglSwapIntervalEXT = 
+				(PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+			if (_wglSwapIntervalEXT)
+				_wglSwapIntervalEXT(mVSync? mVSyncInterval : 0);
+		}
+
+        if (old_context && old_context != mGlrc)
+        {
+            // Restore old context
+		    if (!wglMakeCurrent(old_hdc, old_context))
+			    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglMakeCurrent() failed", "Win32Window::setVSyncEnabled");
+		}
+	}
+
+	void Win32Window::setVSyncInterval(unsigned int interval)
+	{
+		mVSyncInterval = interval;
+		if (mVSync)
+			setVSyncEnabled(true);
+	}
+
+	bool Win32Window::isVSyncEnabled() const
+	{
+		return mVSync;
+	}
+
+	unsigned int Win32Window::getVSyncInterval() const
+	{
+		return mVSyncInterval;
 	}
 
 	void Win32Window::reposition(int left, int top)

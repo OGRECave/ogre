@@ -57,6 +57,10 @@ namespace Ogre
 		bool				isVSync				() const { return mVSync; }
 		bool				isHidden			() const { return mHidden; }
 		void				setHidden			(bool hidden);
+		void				setVSyncEnabled		(bool vsync);
+		bool				isVSyncEnabled		() const;
+		void				setVSyncInterval	(unsigned int interval);
+		unsigned int		getVSyncInterval	() const;
 		void 				reposition			(int left, int top);
 		void 				resize				(unsigned int width, unsigned int height);
 		void 				swapBuffers			( bool waitForVSync = true );
