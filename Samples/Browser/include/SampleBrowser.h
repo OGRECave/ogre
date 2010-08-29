@@ -38,21 +38,26 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#include "BezierPatch.h"
-#include "CameraTrack.h"
+#if USE_RTSHADER_SYSTEM
+#include "ShaderSystem.h"
+#include "BSP.h"
 #include "CelShading.h"
-#include "CharacterSample.h"
 #include "CubeMapping.h"
 #include "Dot3Bump.h"
+#include "Fresnel.h"
+#include "OceanDemo.h"
+#include "Terrain.h"
+#endif
+#include "BezierPatch.h"
+#include "CameraTrack.h"
+#include "CharacterSample.h"
 #include "DynTex.h"
 #include "FacialAnimation.h"
-#include "Fresnel.h"
 #include "Grass.h"
 #include "Lighting.h"
 #include "ParticleFX.h"
-#ifdef USE_RTSHADER_SYSTEM
-#include "ShaderSystem.h"
-#endif
+#include "Shadows.h"
+#include "SkeletalAnimation.h"
 #include "SkyBox.h"
 #include "SkyDome.h"
 #include "SkyPlane.h"
@@ -60,16 +65,6 @@
 #include "SphereMapping.h"
 #include "TextureFX.h"
 #include "Transparency.h"
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#include "BSP.h"
-#include "Compositor.h"
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
-#include "Shadows.h"
-#include "Terrain.h"
-#include "OceanDemo.h"
-#include "SkeletalAnimation.h"
-#endif
-#endif
 #  if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
      PlayPenPlugin* playPenPlugin = 0;
@@ -894,7 +889,7 @@ protected:
 
 			Ogre::OverlayContainer* center = mTrayMgr->getTrayContainer(TL_CENTER);
 			Ogre::OverlayContainer* left = mTrayMgr->getTrayContainer(TL_LEFT);
-			
+
 			if (center->isVisible() && rw->getWidth() < 1280 - center->getWidth())
 			{
 				while (center->isVisible())
@@ -919,6 +914,12 @@ protected:
 		virtual void setup()
 		{
 #ifdef OGRE_STATIC_LIB
+            // Check if the render system supports any shader profiles.
+            // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
+            const RenderSystemCapabilities* caps = mRoot->getRenderSystem()->getCapabilities();
+            RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
+            bool hasProgrammableGPU = (profiles.size() != 0);
+
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
@@ -941,16 +942,20 @@ protected:
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
-#	if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-			mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
-			mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
-#   if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
-            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
+
+            if(hasProgrammableGPU)
+            {
+				mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
+                mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
+                mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
+                mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
+                mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
+				mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
+#if USE_RTSHADER_SYSTEM
+				mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+            }
             mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
-            mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
-            mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
-#	endif
-#   endif
+#endif
 #endif
             
 			createWindow();
@@ -981,7 +986,7 @@ protected:
 			// adds context as listener to process context-level (above the sample level) events
 			mRoot->addFrameListener(this);
 			Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
-
+            
 			// create template material for sample thumbnails
 			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SampleThumbnail", "Essential");
 			thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
@@ -1031,7 +1036,7 @@ protected:
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			// TODO: what to do here...
 #else
-			mWindow = mRoot->initialise(true, "OGRE Sample Browser");			
+			mWindow = mRoot->initialise(true, "OGRE Sample Browser");
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
@@ -1245,7 +1250,7 @@ protected:
 				{
 					Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
 					Ogre::NameValuePairList::iterator k;
-					
+
 					Ogre::LogManager::getSingleton().logMessage(info["Thumbnail"]);
 
 					// give sample default title and category if none found

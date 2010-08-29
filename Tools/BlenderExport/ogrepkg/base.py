@@ -421,7 +421,7 @@ class OgreXMLConverter(Singleton):
 					found = True
 				i += 1
 		return converter
-	def convert(self, filename, arguments=''):
+	def convert(self, filename, arguments='', ignoreTangentOptions=False):
 		"""Converts given file with the OgreXMLConverter.
 		
 		   @param filename The xml filename to pass to the converter.
@@ -449,16 +449,17 @@ class OgreXMLConverter(Singleton):
 					basicArguments += ' -x ' + self.nuextremityPoints
 				if not self.generateEdgeLists:
 					basicArguments += ' -e'
-				if self.generateTangents:
-					basicArguments += ' -t'
-				if self.tangentSemantic == 'uvw':
-					basicArguments += ' -td uvw'
-				if self.tangentUseParity == '4':
-					basicArguments += ' -ts 4'
-				if self.tangentSplitMirrored:
-					basicArguments += ' -tm'
-				if self.tangentSplitRotated:
-					basicArguments += ' -tr'
+				if not ignoreTangentOptions:
+					if self.generateTangents:
+						basicArguments += ' -t'
+					if self.tangentSemantic == 'uvw':
+						basicArguments += ' -td uvw'
+					if self.tangentUseParity == '4':
+						basicArguments += ' -ts 4'
+					if self.tangentSplitMirrored:
+						basicArguments += ' -tm'
+					if self.tangentSplitRotated:
+						basicArguments += ' -tr'
 				if not self.reorganiseBuffers:
 					basicArguments += ' -r'
 				if not self.optimiseAnimations:

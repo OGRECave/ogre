@@ -746,8 +746,9 @@ class CustomMaterial(RenderingMaterial):
 		self.template = self.Template(templateString)
 		return
 	def write(self, f):
-		# skip if we don't have a valid template set.
+		# fallback if we don't have a valid template set.
 		if not(self.template):
+			RenderingMaterial.write(self, f)
 			return
 
 		# do alpha check for scene blend and depth write flag.
@@ -776,41 +777,61 @@ class CustomMaterial(RenderingMaterial):
 			'_lighting' : self._getLighting(), \
 			'_fog_override' : self._getFogOverride()}
 
+		textureIndex = 0
 		for mtex in self.material.getTextures():
 			if mtex:
 				if (mtex.tex.type == Blender.Texture.Types['IMAGE']):
 					textureName = mtex.tex.getName()
 					name, ext = Blender.sys.splitext(textureName)
 					if ext.lstrip('.').isdigit() : textureName = name
+
+					# alternate texture index access
+					textureIndexName = '_tex[%d]' % textureIndex
+					++textureIndex
+
 					if mtex.tex.getImage():
 						textureFilename = self.manager.registerTextureFile(mtex.tex.getImage().getFilename())
 						templateDict[textureName + '._texture'] = textureFilename
+						templateDict[textureIndexName + '._texture'] = textureFilename
 					if mtex.tex.extend & Blender.Texture.ExtendModes['REPEAT']:
 						templateDict[textureName + '._tex_address_mode'] = 'wrap'
+						templateDict[textureIndexName + '._tex_address_mode'] = 'wrap'
 					else:
 						templateDict[textureName + '._tex_address_mode'] = 'clamp'
+						templateDict[textureIndexName + '._tex_address_mode'] = 'clamp'
 					if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['INTERPOL']):
 						if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['MIPMAP']):
 							templateDict[textureName + '._filtering'] = 'trilinear'
+							templateDict[textureIndexName + '._filtering'] = 'trilinear'
 						else:
 							templateDict[textureName + '._filtering'] = 'linear linear none'
+							templateDict[textureIndexName + '._filtering'] = 'linear linear none'
 					else:
 						if (mtex.tex.imageFlags & Blender.Texture.ImageFlags['MIPMAP']):
 							templateDict[textureName + '._filtering'] = 'bilinear'
+							templateDict[textureIndexName + '._filtering'] = 'bilinear'
 						else:
 							templateDict[textureName + '._filtering'] = 'none'
+							templateDict[textureIndexName + '._filtering'] = 'none'
 					if ((mtex.tex.imageFlags & Blender.Texture.ImageFlags['USEALPHA'])
 						and not(mtex.mapto & Blender.Texture.MapTo['ALPHA'])):
 						templateDict[textureName + '._colour_op'] = 'alpha_blend'
+						templateDict[textureIndexName + '._colour_op'] = 'alpha_blend'
 					else:
 						templateDict[textureName + '._colour_op'] = 'modulate'
+						templateDict[textureIndexName + '._colour_op'] = 'modulate'
 					templateDict[textureName + '._sizeX'] = "%.6g" % mtex.size[0]
+					templateDict[textureIndexName + '._sizeX'] = "%.6g" % mtex.size[0]
 					templateDict[textureName + '._sizeY'] = "%.6g" % mtex.size[1]
+					templateDict[textureIndexName + '._sizeY'] = "%.6g" % mtex.size[1]
 					templateDict[textureName + '._sizeZ'] = "%.6g" % mtex.size[2]
+					templateDict[textureIndexName + '._sizeZ'] = "%.6g" % mtex.size[2]
 					templateDict[textureName + '._offsetX'] = "%.6g" % mtex.ofs[0]
+					templateDict[textureIndexName + '._offsetX'] = "%.6g" % mtex.ofs[0]
 					templateDict[textureName + '._offsetY'] = "%.6g" % mtex.ofs[1]
+					templateDict[textureIndexName + '._offsetY'] = "%.6g" % mtex.ofs[1]
 					templateDict[textureName + '._offsetZ'] = "%.6g" % mtex.ofs[2]
-
+					templateDict[textureIndexName + '._offsetZ'] = "%.6g" % mtex.ofs[2]
 		try:
 			propertyGroup = self.material.properties['properties']
 			self._parseProperties(templateDict, propertyGroup)
@@ -1010,28 +1031,37 @@ class MaterialManager:
 					try:
 						template = material.properties['template']
 						if type(template) is not str:
+							Log.getSingleton().logWarning("==========================================================")
 							Log.getSingleton().logWarning("Material \"%s\" not assigned to a valid template!" % material.getName())
+							Log.getSingleton().logWarning("Falling back to Rendering Material mode for this material.")
 						else:
 							if not(templateStringDict.has_key(template)) :
 								Log.getSingleton().logInfo("Loading template \"%s\"" % template)
 								templateFile = Blender.sys.join(self.customMaterialTplPath, template + '.tpl')
 								if not(Blender.sys.exists(templateFile) == 1):
+									Log.getSingleton().logWarning("==========================================================")
 									Log.getSingleton().logWarning("Material \"%s\" assigned to unknown template \"%s\"!" % (material.getName(), template))
 									Log.getSingleton().logWarning("The template file \"%s\" does not exist." % templateFile)
-									templateStringDict[template] = ''
+									Log.getSingleton().logWarning("Falling back to Rendering Material mode for this material.")
+									templateStringDict[template] = None
 								else:
 									t = open(templateFile, 'r')
 									templateImportSet.add(t.readline())
 									templateStringDict[template] = t.read()
 									t.close()
-							material.setupTemplate(templateStringDict[template])
+							if (templateStringDict[template]):
+								material.setupTemplate(templateStringDict[template])
 					except KeyError:
-						Log.getSingleton().logWarning("Material \"%s\" is not assigned to a template! It will not be exported!" % (material.getName()))
+						Log.getSingleton().logWarning("==========================================================")
+						Log.getSingleton().logWarning("Material \"%s\" is not assigned to a template!" % (material.getName()))
+						Log.getSingleton().logWarning("Falling back to Rendering Material mode for this material.")
 			# write import lines.
 			for importString in templateImportSet:
 				f.write(importString)
 
+		Log.getSingleton().logInfo("Begin writing materials:")
 		for material in self.materialsDict.values():
+			Log.getSingleton().logInfo("  %s" % (material.getName()))
 			material.write(f)
 		f.close()
 		if copyTextures and os.path.exists(dir):
