@@ -30,6 +30,9 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreRenderOperation.h"
+#include "OgreRenderable.h"
+#include "OgreMovableObject.h"
+#include "OgreMesh.h"
 
 namespace Ogre
 {
@@ -71,7 +74,7 @@ namespace Ogre
 		Note that, on GPU side, removing an instance from scene doesn't save GPU cycles on what
 		respects vertex shaders, but saves a little fillrate and pixel shaders; unless all instances
 		are removed, which saves GPU.
-		For more information, see @InstancedEntity
+		For more information, @see InstancedEntity
 		For information on how Ogre manages multiple Instance batches, @see InstanceManager
 
         @remarks

@@ -76,7 +76,6 @@ namespace Ogre
 
 		size_t					m_numWorldMatrices;	//Num bones * num instances
 		TexturePtr				m_matrixTexture;	//The VTF
-		Matrix4Vec				m_xform;			//Used for temp buffer in updateVertexTexture
 
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );

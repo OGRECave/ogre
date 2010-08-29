@@ -74,9 +74,9 @@ namespace Ogre
      */
 	class _OgreExport InstancedEntity : public Ogre::MovableObject
 	{
-		friend InstanceBatch;
-		friend InstanceBatchShader;
-		friend InstanceBatchVTF;
+		friend class InstanceBatch;
+		friend class InstanceBatchShader;
+		friend class InstanceBatchVTF;
 
 		const uint32		m_instanceID;
 		InstanceBatch		*m_batchOwner;
@@ -89,7 +89,9 @@ namespace Ogre
 		unsigned long		mFrameAnimationLastUpdated;
 
 		//Returns number of matrices writen to xform, assumes xform has enough space
-		size_t getTransforms( Matrix4 *xform );
+		size_t getTransforms( Matrix4 *xform ) const;
+		//Returns number of 32-bit values writen
+		size_t getTransforms3x4( float *xform ) const;
 
 		//Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera );

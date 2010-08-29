@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __InstanceManager_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreMesh.h"
 
 namespace Ogre
 {

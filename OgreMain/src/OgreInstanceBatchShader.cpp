@@ -61,7 +61,7 @@ namespace Ogre
 			GpuConstantDefinitionIterator itor = vertexParam->getConstantDefinitionIterator();
 			while( itor.hasMoreElements() )
 			{
-				GpuConstantDefinition &constDef = itor.getNext();
+				const GpuConstantDefinition &constDef = itor.getNext();
 				if( constDef.constType == GCT_MATRIX_3X4 && constDef.isFloat() )
 				{
 					const GpuProgramParameters::AutoConstantEntry *entry =

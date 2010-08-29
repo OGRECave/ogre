@@ -52,8 +52,6 @@ namespace Ogre
 	{
 		//We need to clone the material so we can have different textures for each batch.
 		m_material = m_material->clone( mName + "/VTFMaterial" );
-
-		m_xform.resize( m_numWorldMatrices );
 	}
 
 	InstanceBatchVTF::~InstanceBatchVTF()
@@ -263,7 +261,6 @@ namespace Ogre
 
 		const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 		m_numWorldMatrices = m_instancesPerBatch * numBones;
-		m_xform.resize( m_numWorldMatrices );
 
 		//Calculate the width & height required to hold all the matrices. Start by filling the width
 		//first (i.e. 4096x1 4096x2 4096x3, etc)
@@ -340,34 +337,19 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::updateVertexTexture(void)
 	{
-		//getTransform() returns a 4x4 matrix, but we use 4x3 matrices
+		//Now lock the texture and copy the 4x3 matrices!
+		m_matrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
+		const PixelBox &pixelBox = m_matrixTexture->getBuffer()->getCurrentLock();
 
-		//First gather all world matrices in a temp buffer
-		//Rule #1 when doing working with async and locks: Take as little time
-		//as possible during the lock, that why we gather them with a temp buffer
-		Matrix4 *xform = &m_xform[0];
+		float *pDest = static_cast<float*>(pixelBox.data);
+
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
 
 		while( itor != end )
 		{
-			xform += (*itor)->getTransforms( xform );
+			pDest += (*itor)->getTransforms3x4( pDest );
 			++itor;
-		}
-
-		//Now lock the texture and copy the 4x3 matrices!
-		m_matrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
-		const PixelBox &pixelBox = m_matrixTexture->getBuffer()->getCurrentLock();
-
-		Vector4 *pSrc  = reinterpret_cast<Vector4*>(&m_xform[0]);
-		Vector4 *pDest = static_cast<Vector4*>(pixelBox.data);
-
-		for( size_t i=0; i<m_xform.size(); ++i )
-		{
-			*pDest++ = *pSrc++;
-			*pDest++ = *pSrc++;
-			*pDest++ = *pSrc++;
-			++pSrc;
 		}
 
 		m_matrixTexture->getBuffer()->unlock();

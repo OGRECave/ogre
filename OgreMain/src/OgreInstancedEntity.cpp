@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreAnimationState.h"
 #include "OgreOptimisedUtil.h"
 #include "OgreSceneNode.h"
+#include "OgreStringConverter.h"
+#include "OgreCamera.h"
 #include "OgreException.h"
 
 namespace Ogre
@@ -82,7 +84,7 @@ namespace Ogre
 		return sType;
 	}
 	//-----------------------------------------------------------------------
-	size_t InstancedEntity::getTransforms( Matrix4 *xform )
+	size_t InstancedEntity::getTransforms( Matrix4 *xform ) const
 	{
 		size_t retVal = 1;
 
@@ -109,6 +111,54 @@ namespace Ogre
 				retVal = m_skeletonInstance->getNumBones();
 
 			std::fill_n( xform, retVal, Matrix4::ZERO );
+		}
+
+		return retVal;
+	}
+	//-----------------------------------------------------------------------
+	size_t InstancedEntity::getTransforms3x4( float *xform ) const
+	{
+		size_t retVal = 4;
+
+		//When not attached, returns zero matrix to avoid rendering this one, not identity
+		if( mParentNode )
+		{
+			if( !m_skeletonInstance )
+			{
+				const Matrix4 &mat = mParentNode->_getFullTransform();
+				for( int i=0; i<3; ++i )
+				{
+					Real const *row = mat[i];
+					for( int j=0; j<4; ++j )
+						*xform++ = *row++;
+				}
+			}
+			else
+			{
+				const Mesh::IndexMap *indexMap = m_batchOwner->_getIndexToBoneMap();
+				Mesh::IndexMap::const_iterator itor = indexMap->begin();
+				Mesh::IndexMap::const_iterator end  = indexMap->end();
+
+				while( itor != end )
+				{
+					const Matrix4 &mat = mBoneWorldMatrices[*itor++];
+					for( int i=0; i<3; ++i )
+					{
+						Real const *row = mat[i];
+						for( int j=0; j<4; ++j )
+							*xform++ = *row++;
+					}
+				}
+
+				retVal = indexMap->size() * 4 * 3;
+			}
+		}
+		else
+		{
+			if( m_skeletonInstance )
+				retVal = m_skeletonInstance->getNumBones() * 3 * 4;
+
+			std::fill_n( xform, retVal, 0.0f );
 		}
 
 		return retVal;
