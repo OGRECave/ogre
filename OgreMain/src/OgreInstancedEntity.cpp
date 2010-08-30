@@ -41,6 +41,7 @@ namespace Ogre
 	InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID ) :
 				m_batchOwner( batchOwner ),
 				m_instanceID( instanceID ),
+				m_inUse( false ),
 				m_skeletonInstance( 0 ),
 				mAnimationState( 0 ),
 				mLastParentXform( Matrix4::ZERO ),

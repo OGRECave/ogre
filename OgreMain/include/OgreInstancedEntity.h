@@ -78,7 +78,8 @@ namespace Ogre
 		friend class InstanceBatchShader;
 		friend class InstanceBatchVTF;
 
-		const uint32		m_instanceID;
+		uint16				m_instanceID;
+		bool				m_inUse;
 		InstanceBatch		*m_batchOwner;
 
 		AnimationStateSet	*mAnimationState;

@@ -131,14 +131,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::createAllInstancedEntities()
 	{
-		m_instancedEntities.resize( m_instancesPerBatch );
-		m_unusedEntities.resize( m_instancesPerBatch );
+		m_instancedEntities.reserve( m_instancesPerBatch );
+		m_unusedEntities.reserve( m_instancesPerBatch );
 
 		for( size_t i=0; i<m_instancesPerBatch; ++i )
 		{
 			InstancedEntity *instance = OGRE_NEW InstancedEntity( this, i );
-			m_instancedEntities[i]	= instance;
-			m_unusedEntities[i]		= instance;
+			m_instancedEntities.push_back( instance );
+			m_unusedEntities.push_back( instance );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -154,6 +154,17 @@ namespace Ogre
 
 			OGRE_DELETE *itor++;
 		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::deleteUnusedInstancedEntities()
+	{
+		InstancedEntityVec::const_iterator itor = m_unusedEntities.begin();
+		InstancedEntityVec::const_iterator end  = m_unusedEntities.end();
+
+		while( itor != end )
+			OGRE_DELETE *itor++;
+
+		m_unusedEntities.clear();
 	}
 	//-----------------------------------------------------------------------
 	RenderOperation InstanceBatch::build( const SubMesh* baseSubMesh )
@@ -187,6 +198,8 @@ namespace Ogre
 		{
 			retVal = m_unusedEntities.back();
 			m_unusedEntities.pop_back();
+
+			retVal->m_inUse = true;
 		}
 
 		return retVal;
@@ -205,8 +218,65 @@ namespace Ogre
 		if( instancedEntity->getParentSceneNode() )
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
 
+		instancedEntity->m_inUse = false;
+
 		//Put it back into the queue
 		m_unusedEntities.push_back( instancedEntity );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities )
+	{
+		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+
+		while( itor != end )
+		{
+			if( (*itor)->m_inUse )
+				outEntities.push_back( *itor );
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_defragmentBatchNoCull( InstancedEntityVec &usedEntities )
+	{
+		//Remove and clear what we don't need
+		m_instancedEntities.clear();
+		deleteUnusedInstancedEntities();
+
+		const size_t maxInstancesToCopy = std::min( m_instancesPerBatch, usedEntities.size() );
+		InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
+
+		//Copy from the back to front, into m_instancedEntities
+		m_instancedEntities.insert( m_instancedEntities.begin(), first, usedEntities.end() );
+		//Remove them from the array
+		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
+
+		//Reassign instance IDs and tell we're the new parent
+		uint32 instanceId = 0;
+		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+
+		while( itor != end )
+		{
+			(*itor)->m_instanceID = instanceId++;
+			(*itor)->m_batchOwner = this;
+			++itor;
+		}
+
+		//Recreate unused entities, if there's left space in our container
+		assert( (signed)(m_instancesPerBatch) - (signed)(m_instancedEntities.size()) >= 0 );
+		m_instancedEntities.reserve( m_instancesPerBatch );
+		m_unusedEntities.reserve( m_instancesPerBatch );
+		for( size_t i=m_instancedEntities.size(); i<m_instancesPerBatch; ++i )
+		{
+			InstancedEntity *instance = OGRE_NEW InstancedEntity( this, i );
+			m_instancedEntities.push_back( instance );
+			m_unusedEntities.push_back( instance );
+		}
+
+		//We've potentially changed our bounds
+		mParentNode->needUpdate();
+		m_boundsDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_boundsDirty(void)

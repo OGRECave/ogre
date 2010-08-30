@@ -86,9 +86,9 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatch : public Renderable, public MovableObject
 	{
-	protected:
+	public:
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
-
+	protected:
 		RenderOperation		m_renderOperation;
 		size_t				m_instancesPerBatch;
 
@@ -119,6 +119,7 @@ namespace Ogre
 		virtual void setupIndices( const SubMesh* baseSubMesh ) = 0;
 		virtual void createAllInstancedEntities(void);
 		virtual void deleteAllInstancedEntities(void);
+		virtual void deleteUnusedInstancedEntities(void);
 
 		//Returns false on errors that would prevent building this batch from the given submesh
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
@@ -189,6 +190,23 @@ namespace Ogre
 		/** Returns true if it no instanced entity has been requested or all of them have been removed
 		*/
 		bool isBatchUnused(void) const { return m_unusedEntities.size() == m_instancedEntities.size(); }
+
+		/** Fills the input vector with the instances that are currently being used or were requested
+			Used for defragmentation, @see InstanceManager::defragmentBatches
+		*/
+		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities );
+
+		/** @See InstanceManager::defragmentBatches
+			This function takes InstancedEntities and pushes back all entities it can fit here
+			Extra entities in m_unusedEntities are destroyed
+			(so that used + unused = m_instancedEntities.size())
+			@param Array of InstancedEntities to parent with this batch. Those reparented
+			are removed from this input vector
+			@remarks:
+			This function assumes caller holds data to m_instancedEntities! Otherwise
+			you can get memory leaks. Don't call this directly if you don't know what you're doing!
+		*/
+		void _defragmentBatchNoCull( InstancedEntityVec &usedEntities );
 
 		/** Called by InstancedEntity(s) to tell us we need to update the bounds
 			(we touch the SceneNode so the SceneManager aknowledges such change)

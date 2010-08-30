@@ -100,6 +100,12 @@ namespace Ogre
         */
 		InstanceBatch* buildNewBatch( const String &materialName, bool firstTime );
 
+		/** @See defragmentBatches */
+		void defragmentBatchesNoCull( vector<InstancedEntity*>::type &entities,
+										InstanceBatchVec &fragmentedBatches );
+		/** @See defragmentBatches */
+		void defragmentBatchesDoCull( const vector<InstancedEntity*>::type &entities );
+
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,
 						 const String &meshName, const String &groupName,
@@ -126,6 +132,29 @@ namespace Ogre
 			unused (only wasting memory).
         */
 		void cleanupEmptyBatches(void);
+
+		/** After creating many entities (which turns in many batches) and then removing entities that
+			are in the middle of these batches, there might be many batches with many free entities.
+			Worst case scenario, there could be left one batch per entity. Imagine there can be
+			80 entities per batch, there are 80 batches, making a total of 6400 entities. Then
+			6320 of those entities are removed in a very specific way, which leads to having
+			80 batches, 80 entities, and GPU vertex shader still needs to process 6400!
+			This is called fragmentation. This function reparents the InstancedEntities
+			to fewer batches, in this case leaving only one batch with 80 entities
+
+			@remarks
+			This function takes time. Make sure to call this only when you're sure there's
+			too much of fragmentation and you won't be creating more InstancedEntities soon
+			Also in many cases cleanupEmptyBatches() ought to be enough
+			Defragmentation is done per material
+
+			@param optimizeCulling When true, entities close toghether will be reorganized
+			in the same batch for more efficient CPU culling. This takes significantly more
+			time. You want this to be false if you now you're entities are moving very
+			randomly which tends them to get separated and spread all over the scene
+			(which nullifies any CPU culling)
+        */
+		void defragmentBatches( bool optimizeCulling );
 	};
 }
 

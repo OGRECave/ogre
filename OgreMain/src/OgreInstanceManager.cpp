@@ -103,7 +103,7 @@ namespace Ogre
 		}
 
 		//None found, or they're all full
-		return buildNewBatch( materialName, true );
+		return buildNewBatch( materialName, false );
 	}
 	//-----------------------------------------------------------------------
 	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName, bool firstTime )
@@ -206,5 +206,58 @@ namespace Ogre
 		//however if we call m_instanceBatches.clear(), next time we'll create an InstancedObject
 		//we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
 		//(takes more time and will leak the shared render operation)
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::defragmentBatchesNoCull( InstanceBatch::InstancedEntityVec &usedEntities,
+													InstanceBatchVec &fragmentedBatches )
+	{
+		InstanceBatchVec::const_iterator itor = fragmentedBatches.begin();
+		InstanceBatchVec::const_iterator end  = fragmentedBatches.end();
+
+		while( itor != end && !usedEntities.empty() )
+		{
+			(*itor)->_defragmentBatchNoCull( usedEntities );
+			++itor;
+		}
+
+		const size_t remainingBatches = end - itor;
+
+		while( itor != end )
+		{
+			//If we get here, this means we hit remaining batches which will be unused.
+			//Destroy them
+			OGRE_DELETE *itor;
+			++itor;
+		}
+
+		//Remove remaining batches all at once from the vector
+		fragmentedBatches.resize( fragmentedBatches.size() - remainingBatches );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::defragmentBatches( bool optimizeCulling )
+	{
+		//Do this for every materiali
+		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
+		InstanceBatchMap::iterator end  = m_instanceBatches.end();
+
+		while( itor != end )
+		{
+			InstanceBatch::InstancedEntityVec usedEntities;
+			usedEntities.reserve( itor->second.size() * m_instancesPerBatch );
+
+			//Collect all Instanced Entities being used by _all_ batches from this material
+			InstanceBatchVec::iterator it = itor->second.begin();
+			InstanceBatchVec::iterator en = itor->second.end();
+
+			while( it != en )
+			{
+				(*it)->getInstancedEntitiesInUse( usedEntities );
+				++it;
+			}
+
+			defragmentBatchesNoCull( usedEntities, itor->second );
+
+			++itor;
+		}
 	}
 }
