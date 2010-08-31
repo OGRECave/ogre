@@ -38,7 +38,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	NameGenerator InstancedEntity::msNameGenerator("");
+
 	InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID ) :
+				MovableObject(),
 				m_batchOwner( batchOwner ),
 				m_instanceID( instanceID ),
 				m_inUse( false ),
@@ -47,7 +50,10 @@ namespace Ogre
 				mLastParentXform( Matrix4::ZERO ),
 				mFrameAnimationLastUpdated( std::numeric_limits<unsigned long>::max() )
 	{
-		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(m_instanceID);
+		//Use a static name generator to ensure this name stays unique (which may not happen
+		//otherwise due to reparenting when defragmenting)
+		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(m_instanceID) + "/"+
+				msNameGenerator.generate();
 
 		//Is mesh skeletally animated?
 		if( m_batchOwner->_getMeshRef()->hasSkeleton() &&
@@ -236,7 +242,7 @@ namespace Ogre
         return mAnimationState;
     }
 	//-----------------------------------------------------------------------
-	void InstancedEntity::_updateAnimation(void)
+	bool InstancedEntity::_updateAnimation(void)
 	{
 		const bool animationDirty =
             (mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
@@ -256,6 +262,10 @@ namespace Ogre
 												m_skeletonInstance->getNumBones() );
 
 			mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
+
+			return true;
 		}
+
+		return false;
 	}
 }

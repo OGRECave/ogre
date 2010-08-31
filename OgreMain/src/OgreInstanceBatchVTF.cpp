@@ -367,8 +367,11 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::_updateRenderQueue(RenderQueue* queue)
 	{
+		const bool wasDirty = m_boundsDirty;
+
 		InstanceBatch::_updateRenderQueue( queue );
 
-		updateVertexTexture();
+		if( wasDirty || m_dirtyAnimation )
+			updateVertexTexture();
 	}
 }

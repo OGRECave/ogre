@@ -110,6 +110,8 @@ namespace Ogre
 		bool				m_boundsDirty;
 		Camera				*m_currentCamera;
 
+		bool				m_dirtyAnimation; //Set to false at start of each _updateRenderQueue
+
 		/// Cached distance to last camera for getSquaredViewDepth
 		mutable Real mCachedCameraDist;
 		/// The camera for which the cached distance is valid
@@ -126,6 +128,16 @@ namespace Ogre
 
 		void updateBounds();
 		void updateVisibility();
+
+		/** @See _defragmentBatch */
+		void defragmentBatchNoCull( InstancedEntityVec &usedEntities );
+
+		/** @See _defragmentBatch
+			This one takes the entity closest to the minimum corner of the bbox, then starts
+			gathering entities closest to this entity. There might be much better algorithms (i.e.
+			involving space partition), but this one is simple and works well enough
+		*/
+		void defragmentBatchDoCull( InstancedEntityVec &usedEntities );
 
 	public:
 		InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
@@ -200,13 +212,14 @@ namespace Ogre
 			This function takes InstancedEntities and pushes back all entities it can fit here
 			Extra entities in m_unusedEntities are destroyed
 			(so that used + unused = m_instancedEntities.size())
+			@param optimizeCulling true will call the DoCull version, false the NoCull
 			@param Array of InstancedEntities to parent with this batch. Those reparented
 			are removed from this input vector
 			@remarks:
 			This function assumes caller holds data to m_instancedEntities! Otherwise
 			you can get memory leaks. Don't call this directly if you don't know what you're doing!
 		*/
-		void _defragmentBatchNoCull( InstancedEntityVec &usedEntities );
+		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
 
 		/** @See InstanceManager::_defragmentBatchDiscard
 			Destroys unused entities and clears the m_instancedEntity container which avoids leaving

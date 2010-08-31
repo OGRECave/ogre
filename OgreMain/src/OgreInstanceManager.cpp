@@ -208,15 +208,16 @@ namespace Ogre
 		//(takes more time and will leak the shared render operation)
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::defragmentBatchesNoCull( InstanceBatch::InstancedEntityVec &usedEntities,
-													InstanceBatchVec &fragmentedBatches )
+	void InstanceManager::defragmentBatches( bool optimizeCull,
+												InstanceBatch::InstancedEntityVec &usedEntities,
+												InstanceBatchVec &fragmentedBatches )
 	{
 		InstanceBatchVec::const_iterator itor = fragmentedBatches.begin();
 		InstanceBatchVec::const_iterator end  = fragmentedBatches.end();
 
 		while( itor != end && !usedEntities.empty() )
 		{
-			(*itor)->_defragmentBatchNoCull( usedEntities );
+			(*itor)->_defragmentBatch( optimizeCull, usedEntities );
 			++itor;
 		}
 
@@ -257,7 +258,7 @@ namespace Ogre
 				++it;
 			}
 
-			defragmentBatchesNoCull( usedEntities, itor->second );
+			defragmentBatches( optimizeCulling, usedEntities, itor->second );
 
 			++itor;
 		}

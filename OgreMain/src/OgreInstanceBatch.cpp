@@ -39,6 +39,8 @@ namespace Ogre
 	InstanceBatch::InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material,
 									size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 									const String &batchName ) :
+				MovableObject(),
+				Renderable(),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_material( material ),
 				m_meshReference( meshReference ),
@@ -245,12 +247,8 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_defragmentBatchNoCull( InstancedEntityVec &usedEntities )
+	void InstanceBatch::defragmentBatchNoCull( InstancedEntityVec &usedEntities )
 	{
-		//Remove and clear what we don't need
-		m_instancedEntities.clear();
-		deleteUnusedInstancedEntities();
-
 		const size_t maxInstancesToCopy = std::min( m_instancesPerBatch, usedEntities.size() );
 		InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
 
@@ -258,6 +256,84 @@ namespace Ogre
 		m_instancedEntities.insert( m_instancedEntities.begin(), first, usedEntities.end() );
 		//Remove them from the array
 		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities )
+	{
+		const size_t maxInstancesToCopy = std::min( m_instancesPerBatch, usedEntities.size() );
+
+		//Get the the entity closest to the minimum bbox edge and put into "first"
+		InstancedEntityVec::const_iterator itor	= usedEntities.begin();
+		InstancedEntityVec::const_iterator end	= usedEntities.end();
+
+		Vector3 vMinPos, firstPos;
+		InstancedEntity *first = 0;
+
+		if( !usedEntities.empty() )
+		{
+			first		= *usedEntities.begin();
+			firstPos	= first->getParentNode()->_getDerivedPosition();
+			vMinPos		= first->getParentNode()->_getDerivedPosition();
+		}
+
+		while( itor != end )
+		{
+			const Vector3 &vPos		= (*itor)->getParentNode()->_getDerivedPosition();
+
+			vMinPos.x = std::min( vMinPos.x, vPos.x );
+			vMinPos.y = std::min( vMinPos.y, vPos.y );
+			vMinPos.z = std::min( vMinPos.z, vPos.z );
+
+			if( vMinPos.squaredDistance( vPos ) < vMinPos.squaredDistance( firstPos ) )
+			{
+				first		= *itor;
+				firstPos	= vPos;
+			}
+
+			++itor;
+		}
+
+		//Now collect entities closest to 'first'
+		while( !usedEntities.empty() && m_instancedEntities.size() < m_instancesPerBatch )
+		{
+			InstancedEntityVec::iterator closest	= usedEntities.begin();
+			InstancedEntityVec::iterator itor		= usedEntities.begin();
+			InstancedEntityVec::iterator end		= usedEntities.end();
+
+			Vector3 closestPos;
+			closestPos = (*closest)->getParentNode()->_getDerivedPosition();
+
+			while( itor != end )
+			{
+				const Vector3 &vPos	= (*itor)->getParentNode()->_getDerivedPosition();
+
+				if( firstPos.squaredDistance( vPos ) < firstPos.squaredDistance( closestPos ) )
+				{
+					closest		= itor;
+					closestPos	= vPos;
+				}
+
+				++itor;
+			}
+
+			m_instancedEntities.push_back( *closest );
+
+			//Remove 'closest' from usedEntities using swap and pop_back trick
+			*closest = *(usedEntities.end() - 1);
+			usedEntities.pop_back();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities )
+	{
+		//Remove and clear what we don't need
+		m_instancedEntities.clear();
+		deleteUnusedInstancedEntities();
+
+		if( !optimizeCulling )
+			defragmentBatchNoCull( usedEntities );
+		else
+			defragmentBatchDoCull( usedEntities );
 
 		//Reassign instance IDs and tell we're the new parent
 		uint32 instanceId = 0;
@@ -355,6 +431,8 @@ namespace Ogre
 		if( m_boundsDirty )
 			updateBounds();
 
+		m_dirtyAnimation = false;
+
 		//Is at least one object in the scene?
 		updateVisibility();
 
@@ -367,7 +445,7 @@ namespace Ogre
 
 				while( itor != end )	
 				{
-					(*itor)->_updateAnimation();
+					m_dirtyAnimation |= (*itor)->_updateAnimation();
 					++itor;
 				}
 			}

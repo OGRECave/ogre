@@ -100,11 +100,10 @@ namespace Ogre
         */
 		InstanceBatch* buildNewBatch( const String &materialName, bool firstTime );
 
-		/** @See defragmentBatches */
-		void defragmentBatchesNoCull( vector<InstancedEntity*>::type &entities,
-										InstanceBatchVec &fragmentedBatches );
-		/** @See defragmentBatches */
-		void defragmentBatchesDoCull( const vector<InstancedEntity*>::type &entities );
+		/** @See defragmentBatches overload, this takes care of an array of batches
+			for a specific material */
+		void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
+								InstanceBatchVec &fragmentedBatches );
 
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,
@@ -149,7 +148,7 @@ namespace Ogre
 			Defragmentation is done per material
 
 			@param optimizeCulling When true, entities close toghether will be reorganized
-			in the same batch for more efficient CPU culling. This takes significantly more
+			in the same batch for more efficient CPU culling. This can take more CPU
 			time. You want this to be false if you now you're entities are moving very
 			randomly which tends them to get separated and spread all over the scene
 			(which nullifies any CPU culling)

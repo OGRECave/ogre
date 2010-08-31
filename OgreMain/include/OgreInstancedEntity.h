@@ -78,7 +78,7 @@ namespace Ogre
 		friend class InstanceBatchShader;
 		friend class InstanceBatchVTF;
 
-		uint16				m_instanceID;
+		uint16				m_instanceID;			//Note it may change after defragmenting!
 		bool				m_inUse;
 		InstanceBatch		*m_batchOwner;
 
@@ -96,6 +96,9 @@ namespace Ogre
 
 		//Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera );
+
+		/// Incremented count for next name extension
+        static NameGenerator msNameGenerator;
 
 	public:
 		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID );
@@ -133,8 +136,9 @@ namespace Ogre
 		/** Called by InstanceBatch in <i>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.
 			@remarks Assumes it has a skeleton (m_skeletonInstance != 0)
+			@returns true if something was actually updated
 		*/
-		void _updateAnimation(void);
+		bool _updateAnimation(void);
 	};
 }
 
