@@ -3099,12 +3099,13 @@ namespace Ogre {
 		@param Technique to use, which may be shader based, or hardware based.
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
 		may end up being lower if the technique doesn't support having so many.
+		@param flags @See InstanceManagerFlags
 		@returns The new InstanceManager instance
 		*/
 		virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
 														const String &groupName,
 														InstanceManager::InstancingTechnique technique,
-														size_t numInstancesPerBatch );
+														size_t numInstancesPerBatch, uint16 flags=0 );
 
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks

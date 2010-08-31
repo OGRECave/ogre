@@ -39,12 +39,14 @@ namespace Ogre
 {
 	InstanceManager::InstanceManager( const String &customName, SceneManager *sceneManager,
 										const String &meshName, const String &groupName,
-										InstancingTechnique instancingTechnique, size_t instancesPerBatch ) :
+										InstancingTechnique instancingTechnique, uint16 instancingFlags,
+										size_t instancesPerBatch ) :
 				m_name( customName ),
 				m_sceneManager( sceneManager ),
 				m_idCount( 0 ),
 				m_instancesPerBatch( instancesPerBatch ),
-				m_instancingTechnique( instancingTechnique )
+				m_instancingTechnique( instancingTechnique ),
+				m_instancingFlags( instancingFlags )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
 
@@ -74,6 +76,49 @@ namespace Ogre
 			OGRE_DELETE m_sharedRenderOperation.vertexData;
 		if( m_sharedRenderOperation.indexData )
 			OGRE_DELETE m_sharedRenderOperation.indexData;
+	}
+	//----------------------------------------------------------------------
+	void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )
+	{
+		if( !m_instanceBatches.empty() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
+						" building the batch.", "InstanceManager::setInstancesPerBatch");
+		}
+
+		m_instancesPerBatch = instancesPerBatch;
+	}
+	//----------------------------------------------------------------------
+	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize,
+																uint16 flags )
+	{
+		//Get the material
+		MaterialPtr mat = MaterialManager::getSingleton().getByName( materialName,
+																	m_meshReference->getGroup() );
+		InstanceBatch *batch = 0;
+
+		switch( m_instancingTechnique )
+		{
+		case ShaderBased:
+			batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, suggestedSize,
+													0, m_name + "/TempBatch" );
+			break;
+		case TextureVTF:
+			batch = OGRE_NEW InstanceBatchVTF( m_meshReference, mat, suggestedSize,
+													0, m_name + "/TempBatch" );
+			break;
+		default:
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+					"Unimplemented instancing technique: " +
+					StringConverter::toString(m_instancingTechnique),
+					"InstanceBatch::getMaxOrBestNumInstancesPerBatches()");
+		}
+
+		const size_t retVal = batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0), flags );
+
+		OGRE_DELETE batch;
+
+		return retVal;
 	}
 	//----------------------------------------------------------------------
 	InstancedEntity* InstanceManager::createInstancedEntity( const String &materialName )
@@ -137,7 +182,7 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 					"Unimplemented instancing technique: " +
 					StringConverter::toString(m_instancingTechnique),
-					"InstanceBatch::buildFirstTime() / InstanceBatch::buildNewBatch()");
+					"InstanceBatch::buildNewBatch()");
 		}
 
 
@@ -150,8 +195,9 @@ namespace Ogre
 		else
 		{
 			//Ensure we don't request more than we can
-			m_instancesPerBatch = std::min(batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0) ),
-											m_instancesPerBatch );
+			m_instancesPerBatch = std::min(batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0),
+																			m_instancingFlags ),
+																			m_instancesPerBatch );
 			batch->_setInstancesPerBatch( m_instancesPerBatch );
 
 			//TODO: Create a "merge" function that merges all submeshes into one big submesh

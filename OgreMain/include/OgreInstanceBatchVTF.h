@@ -104,8 +104,10 @@ namespace Ogre
 							 const Mesh::IndexMap *indexToBoneMap, const String &batchName );
 		virtual ~InstanceBatchVTF();
 
-		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh ) const;
+		/** @See InstanceBatch::calculateMaxNumInstances */
+		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
+		/** @See InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		//Renderable overloads

@@ -49,7 +49,7 @@ namespace Ogre
 	}
 
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchShader::calculateMaxNumInstances( const SubMesh *baseSubMesh ) const
+	size_t InstanceBatchShader::calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const
 	{
 		const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
@@ -68,7 +68,15 @@ namespace Ogre
 									vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );
 					if( entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 )
 					{
+						//Material is correctly done! Check the num of arrays
 						size_t retVal = constDef.arraySize / numBones;
+
+						if( flags & IM_USE16BIT )
+						{
+							if( baseSubMesh->vertexData->vertexCount * retVal > 0xFFFF )
+								retVal = 0xFFFF / baseSubMesh->vertexData->vertexCount;
+						}
+
 						if( retVal < 3 )
 						{
 							LogManager::getSingleton().logMessage( "InstanceBatchShader: Mesh " +
@@ -78,6 +86,7 @@ namespace Ogre
 										"be minimal, if any. It might be even slower!",
 										LML_NORMAL );
 						}
+
 						return retVal;
 					}
 				}

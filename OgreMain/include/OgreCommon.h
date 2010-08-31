@@ -298,6 +298,21 @@ namespace Ogre {
         FBT_DEPTH   = 0x2,
         FBT_STENCIL = 0x4
     };
+
+	/** Flags for the Instance Manager when calculating ideal number of instances per batch */
+	enum InstanceManagerFlags
+	{
+		/** Forces an ammount of instances per batch low enough so that vertices * numInst < 65535
+			since usually improves performance. In HW instanced techniques, this flag is ignored
+		*/
+		IM_USE16BIT		= 0x0001,
+
+		/** The num. of instances is adjusted so that as few pixels as possible are wasted
+			in the vertex texture */
+		IM_VTFBESTFIT	= 0x0002,
+
+		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT
+	};
     
 	
 	/** A hashed vector.

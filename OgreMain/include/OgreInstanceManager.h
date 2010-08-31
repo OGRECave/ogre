@@ -81,6 +81,7 @@ namespace Ogre
 
 		size_t					m_instancesPerBatch;
 		InstancingTechnique		m_instancingTechnique;
+		uint16					m_instancingFlags;		//@see InstanceManagerFlags
 
 		SceneManager			*m_sceneManager;
 
@@ -108,10 +109,31 @@ namespace Ogre
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,
 						 const String &meshName, const String &groupName,
-						 InstancingTechnique instancingTechnique, size_t instancesPerBatch );
+						 InstancingTechnique instancingTechnique, uint16 instancingFlags,
+						 size_t instancesPerBatch );
 		virtual ~InstanceManager();
 
 		const String& getName() const { return m_name; }
+
+		/** Raises an exception if trying to change it after creating the first InstancedEntity
+			@remarks The actual value may be less if the technique doesn't support having so much
+			@see getMaxOrBestNumInstancesPerBatches for the usefulness of this function
+			@param instancesPerBatch New instances per batch number
+		*/
+		void setInstancesPerBatch( size_t instancesPerBatch );
+
+		/**	Calculates the maximum (or the best ammount, depending on flags) of instances
+			per batch given the suggested size for the technique this manager was created for.
+			@remarks
+			This is done automatically when creating an instanced entity, but this function in conjunction
+			with @see setInstancesPerBatch allows more flexible control over the ammount of instances
+			per batch
+			@param materialName Name of the material to base on
+			@param suggestedSize Suggested ammount of instances per batch
+			@param flags @See InstanceManagerFlags
+			@returns The max/best ammount of instances per batch given the suggested size and flags
+		*/
+		size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
 
 		/** Returns whether the specified RenderTarget is compatible with this DepthBuffer
 			That is, this DepthBuffer can be attached to that RenderTarget

@@ -158,10 +158,11 @@ namespace Ogre
 			Note this is a helper function, as such it takes a submesh base to compute
 			the parameters, instead of using the object's own. This allows
 			querying for a technique without requiering to actually build it.
-			@param The base submesh that will be using to build it.
+			@param baseSubMesh The base submesh that will be using to build it.
+			@param flags @See InstanceManagerFlags
 			@returns The max instances limit
 		*/
-		virtual size_t calculateMaxNumInstances( const SubMesh *baseSubMesh ) const = 0;
+		virtual size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const = 0;
 
 		/** Constructs all the data needed to use this batch, as well as the
 			InstanceEntities. Placed here because in the constructor virtual

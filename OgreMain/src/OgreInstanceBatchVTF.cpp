@@ -63,7 +63,7 @@ namespace Ogre
 	}
 
 	//-----------------------------------------------------------------------
-	size_t InstanceBatchVTF::calculateMaxNumInstances( const SubMesh *baseSubMesh ) const
+	size_t InstanceBatchVTF::calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const
 	{
 		size_t retVal = 0;
 
@@ -76,6 +76,28 @@ namespace Ogre
 			//TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
 			const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 			retVal = c_maxTexWidth * c_maxTexHeight / 3 / numBones;
+
+			if( flags & IM_USE16BIT )
+			{
+				if( baseSubMesh->vertexData->vertexCount * retVal > 0xFFFF )
+					retVal = 0xFFFF / baseSubMesh->vertexData->vertexCount;
+			}
+
+			if( flags & IM_VTFBESTFIT )
+			{
+				const size_t instancesPerBatch = std::min( retVal, m_instancesPerBatch );
+				//Do the same as in createVertexTexture()
+				const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
+				const size_t numWorldMatrices = instancesPerBatch * numBones;
+
+				size_t texWidth  = std::min<size_t>( numWorldMatrices * 3, c_maxTexWidth );
+				size_t texHeight = numWorldMatrices * 3 / c_maxTexWidth;
+			
+				const size_t remainder = (numWorldMatrices * 3) % c_maxTexWidth;
+
+				if( remainder && texHeight > 0 )
+					retVal = static_cast<size_t>(texWidth * texHeight / 3.0f / (float)(numBones));
+			}
 		}
 
 		return retVal;
