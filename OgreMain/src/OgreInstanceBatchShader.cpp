@@ -62,14 +62,24 @@ namespace Ogre
 			while( itor.hasMoreElements() )
 			{
 				const GpuConstantDefinition &constDef = itor.getNext();
-				if( constDef.constType == GCT_MATRIX_3X4 && constDef.isFloat() )
+				if( constDef.constType == GCT_MATRIX_3X4 ||
+					constDef.constType == GCT_MATRIX_4X3 ||		//OGL GLSL bitches without this
+					constDef.constType == GCT_FLOAT4			//OGL GLSL bitches without this
+					&& constDef.isFloat() )
 				{
 					const GpuProgramParameters::AutoConstantEntry *entry =
 									vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );
 					if( entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 )
 					{
-						//Material is correctly done! Check the num of arrays
-						size_t retVal = constDef.arraySize / numBones;
+						//Material is correctly done!
+						size_t arraySize = constDef.arraySize;
+
+						//Deal with GL "hacky" way of doing 4x3 matrices
+						if( constDef.constType == GCT_FLOAT4 )
+							arraySize /= 3;
+
+						//Check the num of arrays
+						size_t retVal = arraySize / numBones;
 
 						if( flags & IM_USE16BIT )
 						{
