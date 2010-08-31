@@ -59,6 +59,14 @@ namespace Ogre
 	InstanceBatch::~InstanceBatch()
 	{
 		deleteAllInstancedEntities();
+
+		//Remove the parent scene node automatically
+		SceneNode *sceneNode = getParentSceneNode();
+		if( sceneNode )
+		{
+			sceneNode->detachAllObjects();
+			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+		}
 	}
 
 	void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
@@ -277,6 +285,13 @@ namespace Ogre
 		//We've potentially changed our bounds
 		mParentNode->needUpdate();
 		m_boundsDirty = true;
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_defragmentBatchDiscard(void)
+	{
+		//Remove and clear what we don't need
+		m_instancedEntities.clear();
+		deleteUnusedInstancedEntities();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_boundsDirty(void)

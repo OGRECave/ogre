@@ -208,6 +208,13 @@ namespace Ogre
 		*/
 		void _defragmentBatchNoCull( InstancedEntityVec &usedEntities );
 
+		/** @See InstanceManager::_defragmentBatchDiscard
+			Destroys unused entities and clears the m_instancedEntity container which avoids leaving
+			dangling pointers from reparented InstancedEntities
+			Usually called before deleting this pointer. Don't call directly!
+		*/
+		void _defragmentBatchDiscard(void);
+
 		/** Called by InstancedEntity(s) to tell us we need to update the bounds
 			(we touch the SceneNode so the SceneManager aknowledges such change)
         */

@@ -226,6 +226,8 @@ namespace Ogre
 		{
 			//If we get here, this means we hit remaining batches which will be unused.
 			//Destroy them
+			//Call this to avoid freeing InstancedEntities that were just reparented
+			(*itor)->_defragmentBatchDiscard();
 			OGRE_DELETE *itor;
 			++itor;
 		}
