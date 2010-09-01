@@ -4877,6 +4877,11 @@ const Pass* SceneManager::deriveShadowCasterPass(const Pass* pass)
 				retPass->setVertexProgram(StringUtil::BLANK);
 			}
 		}
+		
+		// handle the case where there is no fixed pipeline support
+		retPass->getParent()->getParent()->compile();
+		retPass = retPass->getParent()->getParent()->getBestTechnique()->getPass(0);
+
 		return retPass;
 	}
 	else
@@ -5055,6 +5060,10 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
         }
 
 		retPass->_load();
+
+		// handle the case where there is no fixed pipeline support
+		retPass->getParent()->getParent()->compile();
+		retPass = retPass->getParent()->getParent()->getBestTechnique()->getPass(0);
 
 		return retPass;
 	}
