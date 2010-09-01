@@ -7,12 +7,13 @@
 
 // 06 Aug 2005: moved uvw calculation from fragment program into vertex program 
 
-float4 main(float3 uvw: TEXCOORD0, float3 normal: TEXCOORD1, float3 vVec: TEXCOORD2,
+float4 main(  float4 Pos:    POSITION,
+  float3 uvw: TEXCOORD0, float3 normal: TEXCOORD1, float3 vVec: TEXCOORD2,
 	uniform float fadeBias,
 	uniform float fadeExp,
 	uniform float4 waterColor,
-	uniform sampler Noise,
-	uniform sampler skyBox
+	uniform sampler3D Noise,
+	uniform samplerCUBE skyBox
 
 ) : COLOR
 {
