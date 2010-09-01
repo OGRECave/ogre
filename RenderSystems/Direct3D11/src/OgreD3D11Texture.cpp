@@ -621,7 +621,7 @@ namespace Ogre
 	void D3D11Texture::_createSurfaceList(void)
 	{
 		unsigned int bufusage;
-		if ((mUsage & TU_DYNAMIC) && mDynamicTextures)
+		if ((mUsage & TU_DYNAMIC))
 		{
 			bufusage = HardwareBuffer::HBU_DYNAMIC;
 		}

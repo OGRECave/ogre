@@ -107,11 +107,14 @@ namespace Ogre {
 		D3D11_MAP  flags = D3D11_MAP_WRITE_DISCARD ;
 		switch(options)
 		{
+		case HBL_NO_OVERWRITE:
+			flags = D3D11_MAP_WRITE_NO_OVERWRITE;
+			break;
+		case HBL_NORMAL:
+			flags = D3D11_MAP_WRITE_DISCARD;
+			break;
 		case HBL_DISCARD:
-			// D3D only likes D3DLOCK_DISCARD if you created the texture with D3DUSAGE_DYNAMIC
-			// debug runtime flags this up, could cause problems on some drivers
-			if (mUsage & HBU_DYNAMIC)
-				flags = D3D11_MAP_WRITE_DISCARD;
+			flags = D3D11_MAP_WRITE_DISCARD;
 			break;
 		case HBL_READ_ONLY:
 			flags = D3D11_MAP_READ;

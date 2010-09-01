@@ -103,8 +103,9 @@ protected:
 		mTexBuf = tex->getBuffer();  // save off the texture buffer
 
 		// initialise the texture to have full luminance
-		mTexBuf->lock(HardwareBuffer::HBL_DISCARD);
-		memset(mTexBuf->getCurrentLock().data, 0xff, mTexBuf->getSizeInBytes());
+		mConstantTexBuf = new uint8[mTexBuf->getSizeInBytes()];
+		memset(mConstantTexBuf, 0xff, mTexBuf->getSizeInBytes());
+		memcpy(mTexBuf->lock(HardwareBuffer::HBL_NORMAL), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
 		mTexBuf->unlock();
 
 		// create a penguin and attach him to our penguin node
@@ -138,10 +139,8 @@ protected:
 
 	void updateTexture(uint8 freezeAmount)
 	{
-		mTexBuf->lock(HardwareBuffer::HBL_NORMAL);
-
 		// get access to raw texel data
-		uint8* data = (uint8*)mTexBuf->getCurrentLock().data;
+		uint8* data = mConstantTexBuf;
 
 		uint8 temperature;
 		Real sqrDistToBrush;
@@ -171,17 +170,20 @@ protected:
 			}
 		}
 
+		memcpy(mTexBuf->lock(HardwareBuffer::HBL_NORMAL), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
 		mTexBuf->unlock();
 	}
 
 	void cleanupContent()
 	{
+		delete [] mConstantTexBuf;
 		TextureManager::getSingleton().remove("thaw");
 	}
 
 	const unsigned int TEXTURE_SIZE;
 	const unsigned int SQR_BRUSH_RADIUS;
 	HardwarePixelBufferSharedPtr mTexBuf;
+	uint8* mConstantTexBuf;
 	Real mPlaneSize;
 	RaySceneQuery* mCursorQuery;
 	Vector2 mBrushPos;
