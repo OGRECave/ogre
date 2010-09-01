@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreCompositionTargetPass.h"
 #include "OgreCompositionPass.h"
 #include "OgreMaterialManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -41,6 +42,10 @@ CompositionTargetPass::CompositionTargetPass(CompositionTechnique *parent):
 	mMaterialScheme(MaterialManager::DEFAULT_SCHEME_NAME), 
 	mShadowsEnabled(true)
 {
+	if (Root::getSingleton().getRenderSystem())
+	{
+		mMaterialScheme = Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme();
+	}
 }
 //-----------------------------------------------------------------------
 CompositionTargetPass::~CompositionTargetPass()

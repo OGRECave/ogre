@@ -1,4 +1,4 @@
-sampler RT : register(s0);
+sampler2D RT : register(s0);
 
 float4 Tiling_ps(float4 inPos : POSITION,
 				float2 iTexCoord : TEXCOORD0,

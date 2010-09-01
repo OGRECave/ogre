@@ -349,8 +349,12 @@ void Sample_Compositor::itemSelected(OgreBites::SelectMenu* menu)
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupScene(void)
 {
-	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-	mSceneMgr->setShadowFarDistance(1000);
+	//  d3d11 don't support this type of shadow for now - and shadow is not critical for this sample
+	if (Ogre::Root::getSingleton().getRenderSystem()->getName() != "Direct3D11 Rendering Subsystem") 
+	{
+		mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+		mSceneMgr->setShadowFarDistance(1000);
+	}
     
 	Ogre::MovableObject::setDefaultVisibilityFlags(0x00000001);
 

@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/ASCIIFP cg
 {
 	source ASCIIFP.cg
 	entry_point ASCII_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 	
 	default_params
 	{

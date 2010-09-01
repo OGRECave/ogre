@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/B&W_FP cg
 {
 	source GrayScale.cg
 	entry_point GrayScale_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 material Ogre/Compositor/BlackAndWhite
@@ -25,7 +25,7 @@ material Ogre/Compositor/BlackAndWhite
 			texture_unit
 			{
 				texture RT
-                tex_coord_set 0
+        tex_coord_set 0
 				tex_address_mode clamp
 				filtering linear linear linear
 			}

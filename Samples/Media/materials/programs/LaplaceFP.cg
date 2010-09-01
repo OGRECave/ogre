@@ -1,4 +1,4 @@
-sampler Image : register(s0);
+sampler2D Image : register(s0);
 
 // The Laplace filter approximates the second order derivate,
 // that is, the rate of change of slope in the image. It can be
@@ -13,7 +13,8 @@ sampler Image : register(s0);
 
 
 
-float4 Laplace_ps (float2 texCoord: TEXCOORD0,
+float4 Laplace_ps ( float4 pos : POSITION,
+      float2 texCoord: TEXCOORD0,
 			uniform float scale,
 			uniform float pixelSize) : COLOR
 {

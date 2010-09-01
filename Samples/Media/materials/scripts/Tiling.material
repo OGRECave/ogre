@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/TilingFP cg
 {
 	source TilingFP.cg
 	entry_point Tiling_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 material Ogre/Compositor/Tiling

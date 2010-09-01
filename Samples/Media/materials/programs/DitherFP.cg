@@ -1,7 +1,7 @@
-sampler RT : register(s0);
-sampler pattern : register(s1);
+sampler2D RT : register(s0);
+sampler2D pattern : register(s1);
 
-half4 Dither_ps(	float2 TexCoord : TEXCOORD0) : COLOR
+half4 Dither_ps(float4 pos : POSITION, float2 TexCoord : TEXCOORD0) : COLOR
 {	
 	half c = dot(tex2D(RT, TexCoord),half4(0.30,0.11,0.59,0.00));
 	half n = tex2D(pattern, TexCoord).a*2 - 1.0;

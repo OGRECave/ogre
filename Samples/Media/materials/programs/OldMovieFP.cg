@@ -1,11 +1,11 @@
-sampler RT : register(s0);
-sampler SplotchesTx : register(s1);
-sampler Texture2 : register(s2);
-sampler SepiaTx : register(s3);
+sampler2D RT : register(s0);
+sampler2D SplotchesTx : register(s1);
+sampler1D Texture2 : register(s2);
+sampler1D SepiaTx : register(s3);
 
-float2 calcSpriteAddr(float2 texCoord, float DirtFrequency, float period)
+float2 calcSpriteAddr(float2 texCoord, float DirtFrequency1, float period)
 {
-   return texCoord + tex1D(Texture2, period  * DirtFrequency);
+   return texCoord + tex1D(Texture2, period  * DirtFrequency1).xy;
 }
 
 float4 getSplotches(float2 spriteAddr)
@@ -18,7 +18,8 @@ float4 getSplotches(float2 spriteAddr)
    return tex2D(SplotchesTx, spriteAddr);
 }
 
-float4 OldMovie_ps (float2 texCoord  : TEXCOORD0,
+float4 OldMovie_ps (float4 pos : POSITION, 
+        float2 texCoord  : TEXCOORD0,
 				uniform float time_cycle_period,
 				uniform float flicker,
 				uniform float DirtFrequency,
@@ -41,7 +42,7 @@ float4 OldMovie_ps (float2 texCoord  : TEXCOORD0,
    // randomly shift luminance
    lumi -= spriteAddr.x * lumiShift;
    // tone map luminance
-   base.rgb = tex1D(SepiaTx, lumi );
+   base.rgb = tex1D(SepiaTx, lumi ).rgb;
 
    // calc flicker speed
    float darken = frac(flicker * time_cycle_period);

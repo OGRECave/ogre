@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/HalftoneFP cg
 {
 	source HalftoneFP.cg
 	entry_point Halftone_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 	
 	default_params
 	{

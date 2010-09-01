@@ -36,6 +36,9 @@ namespace Ogre {
 	class D3D11Texture : public Texture
 	{
 	protected:
+        // needed to store data between prepareImpl and loadImpl
+        typedef SharedPtr<vector<MemoryDataStreamPtr>::type > LoadedStreams;
+
 		/// D3DDevice pointer
 		D3D11Device	&	mDevice;	
 
@@ -74,7 +77,7 @@ namespace Ogre {
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
 		/// internal method, load a normal texture
-		void _loadTex();
+		void _loadTex(LoadedStreams & loadedStreams);
 
 		/// internal method, create a blank normal 1D Dtexture
 		void _create1DTex();
@@ -103,8 +106,24 @@ namespace Ogre {
 		/// mipmap level. This method must be called after the D3D texture object was created
 		void _createSurfaceList(void);
 
+
+        /// @copydoc Resource::prepareImpl
+        void prepareImpl(void);
+        /// @copydoc Resource::unprepareImpl
+        void unprepareImpl(void);
 		/// overriden from Resource
 		void loadImpl();
+		/// overriden from Resource
+		void postLoadImpl();
+
+        /** Vector of pointers to streams that were pulled from disk by
+            prepareImpl  but have yet to be pushed into texture memory
+            by loadImpl.  Should be cleared on load and on unprepare.
+        */
+        LoadedStreams mLoadedStreams;
+		LoadedStreams _prepareNormTex();
+		LoadedStreams _prepareVolumeTex();
+		LoadedStreams _prepareCubeTex();
 	public:
 		/// constructor 
 		D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,

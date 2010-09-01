@@ -1,6 +1,6 @@
-sampler RT: register(s0);
+sampler2D RT: register(s0);
 
-float4 sharpenEdges_fp(float2 iTexCoord: TEXCOORD0, uniform float2 vTexelSize) : COLOR
+float4 sharpenEdges_fp( float4 pos : POSITION, float2 iTexCoord: TEXCOORD0, uniform float2 vTexelSize) : COLOR
 {
 
 	float2 usedTexelED[8] = {

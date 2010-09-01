@@ -107,7 +107,24 @@ namespace Ogre
 			return;
 		}
 
-		this->_loadTex();
+		// Make sure streams prepared.
+		if (mLoadedStreams.isNull())
+		{
+			prepareImpl();
+		}
+
+		// Set reading positions of loaded streams to the beginning.
+		for (uint i = 0; i < mLoadedStreams->size(); ++i)
+		{
+			MemoryDataStreamPtr curDataStream = (*mLoadedStreams)[i];
+
+			curDataStream->seek(0);
+		}
+
+		// only copy is on the stack so well-behaved if exception thrown
+		LoadedStreams loadedStreams = mLoadedStreams;
+
+		this->_loadTex(loadedStreams);
 
 	}
 	//---------------------------------------------------------------------
@@ -119,7 +136,7 @@ namespace Ogre
 		SAFE_RELEASE(mp3DTex);
 	}
 	//---------------------------------------------------------------------
-	void D3D11Texture::_loadTex()
+	void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
 	{
 		size_t pos = mName.find_last_of(".");
 		String ext = mName.substr(pos+1);
@@ -128,15 +145,16 @@ namespace Ogre
 		{
 			// Load from 6 separate files
 			// Use OGRE its own codecs
-		//	String baseName;
-		//	size_t pos = mName.find_last_of(".");
+			//	String baseName;
+			//	size_t pos = mName.find_last_of(".");
 			
-		//	if ( pos != String::npos )
+			//	if ( pos != String::npos )
 		//		ext = mName.substr(pos+1);
 			vector<Image>::type images(6);
 			ConstImagePtrList imagePtrs;
 			static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
 
+            assert(loadedStreams->size()==6);
 			for(size_t i = 0; i < 6; i++)
 			{
 				String fullName = baseName + suffixes[i];
@@ -145,11 +163,9 @@ namespace Ogre
 
 				// find & load resource data intro stream to allow resource
 				// group changes if required
-				DataStreamPtr dstream = 
-					ResourceGroupManager::getSingleton().openResource(
-					fullName, mGroup, true, this);
+				DataStreamPtr stream((*loadedStreams)[i]);
 
-				images[i].load(dstream, ext);
+				images[i].load(stream, ext);
 
 				size_t imageMips = images[i].getNumMipmaps();
 
@@ -166,25 +182,10 @@ namespace Ogre
 		}
 		else
 		{
-			Image img;
-			DataStreamPtr dstream ;
-			// find & load resource data intro stream to allow resource
-			// group changes if required
-			if(ResourceGroupManager::getSingleton().resourceExists(mGroup,mName))
-			{
-				dstream = 
-					ResourceGroupManager::getSingleton().openResource(
-					mName, mGroup, true, this);
-			}
-			else
-			{
-				LogManager::getSingleton().logMessage("D3D11 : File "+mName+ " doesn't Exist ,Loading Missing.png instead ");
-				mName="Missing.png";
-				dstream =
-					ResourceGroupManager::getSingleton().openResource(
-					mName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true, this);
-			}
+            assert(loadedStreams->size()==1);
 
+			Image img;
+			DataStreamPtr dstream((*loadedStreams)[0]);
 		
 			if(ext=="dds")
 			{
@@ -751,6 +752,123 @@ namespace Ogre
 	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture::getShaderResourceViewDesc() const
 	{
 		return mSRVDesc;
+	}
+	//---------------------------------------------------------------------
+	void D3D11Texture::prepareImpl( void )
+	{
+		if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
+		{
+			return;
+		}
+
+		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		
+        LoadedStreams loadedStreams;
+
+		// prepare load based on tex.type
+		switch (getTextureType())
+		{
+		case TEX_TYPE_1D:
+		case TEX_TYPE_2D:
+			loadedStreams = _prepareNormTex();
+			break;
+		case TEX_TYPE_3D:
+			loadedStreams = _prepareVolumeTex();
+			break;
+		case TEX_TYPE_CUBE_MAP:
+			loadedStreams = _prepareCubeTex();
+			break;
+		default:
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Unknown texture type", "D3D11Texture::prepareImpl" );
+		}
+
+		mLoadedStreams = loadedStreams;		
+	}
+	//---------------------------------------------------------------------
+	D3D11Texture::LoadedStreams D3D11Texture::_prepareCubeTex()
+	{
+		assert(getTextureType() == TEX_TYPE_CUBE_MAP);
+
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T );
+        // DDS load?
+		if (getSourceFileType() == "dds")
+		{
+            // find & load resource data
+			DataStreamPtr dstream = 
+				ResourceGroupManager::getSingleton().openResource(
+					mName, mGroup, true, this);
+            loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
+        }
+        else
+        {
+			// Load from 6 separate files
+			// Use OGRE its own codecs
+			String baseName, ext;
+			size_t pos = mName.find_last_of(".");
+			baseName = mName.substr(0, pos);
+			if ( pos != String::npos )
+				ext = mName.substr(pos+1);
+			static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
+
+			for(size_t i = 0; i < 6; i++)
+			{
+				String fullName = baseName + suffixes[i];
+				if (!ext.empty())
+					fullName = fullName + "." + ext;
+
+            	// find & load resource data intro stream to allow resource
+				// group changes if required
+				DataStreamPtr dstream = 
+					ResourceGroupManager::getSingleton().openResource(
+						fullName, mGroup, true, this);
+
+                loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
+			}
+        }
+
+        return loadedStreams;
+	}
+	//---------------------------------------------------------------------
+	D3D11Texture::LoadedStreams D3D11Texture::_prepareVolumeTex()
+	{
+		assert(getTextureType() == TEX_TYPE_3D);
+
+		// find & load resource data
+		DataStreamPtr dstream = 
+			ResourceGroupManager::getSingleton().openResource(
+				mName, mGroup, true, this);
+
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
+        return loadedStreams;
+    }
+	//---------------------------------------------------------------------
+	D3D11Texture::LoadedStreams D3D11Texture::_prepareNormTex()
+	{
+		assert(getTextureType() == TEX_TYPE_1D || getTextureType() == TEX_TYPE_2D);
+
+		// find & load resource data
+		DataStreamPtr dstream = 
+			ResourceGroupManager::getSingleton().openResource(
+				mName, mGroup, true, this);
+
+        LoadedStreams loadedStreams = LoadedStreams(OGRE_NEW_T (vector<MemoryDataStreamPtr>::type, MEMCATEGORY_GENERAL), SPFM_DELETE_T);
+        loadedStreams->push_back(MemoryDataStreamPtr(OGRE_NEW MemoryDataStream(dstream)));
+        return loadedStreams;
+	}
+	//---------------------------------------------------------------------
+	void D3D11Texture::unprepareImpl( void )
+	{
+		if (mUsage & TU_RENDERTARGET || isManuallyLoaded())
+		{
+			return;
+		}   
+	}
+	//---------------------------------------------------------------------
+	void D3D11Texture::postLoadImpl()
+	{
+		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		mLoadedStreams.setNull();	
 	}
 	//---------------------------------------------------------------------
 	// D3D11RenderTexture

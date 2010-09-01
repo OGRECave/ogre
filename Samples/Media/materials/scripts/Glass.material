@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/GlassFP cg
 {
 	source GlassFP.cg
 	entry_point main_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 material Ogre/Compositor/GlassPass

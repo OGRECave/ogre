@@ -1,7 +1,8 @@
-sampler RT : register(s0);
-sampler pattern : register(s1);
+sampler2D RT : register(s0);
+sampler3D pattern : register(s1);
 
-float4 ASCII_ps(	float2 TexCoord : TEXCOORD0,
+float4 ASCII_ps( float4 pos : POSITION,
+      float2 TexCoord : TEXCOORD0,
 			uniform float2 numTiles,
 			uniform float2 iNumTiles,
 			uniform float2 iNumTiles2,

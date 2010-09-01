@@ -1264,7 +1264,7 @@ namespace Ogre
 			++itor;
 		}
 
-		//Create a new container fot it
+		//Create a new container for it
 		D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, depthSurface,
 																	width, height, fsaa, fsaaQuality, true );
 
@@ -2037,11 +2037,12 @@ namespace Ogre
 			}
 		}
 
-	 	if (!mBoundVertexProgram || !mBoundFragmentProgram) // I know this is bad code - but I want to get things going
+
+	 	if (!mBoundVertexProgram || !mBoundFragmentProgram) 
 		{
 			
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to render to a D3D11 device without both vertex and fragment shaders",
+				"Attempted to render to a D3D11 device without both vertex and fragment shaders there is no fixed pipeline in d3d11 - use the RTSS or write custom shaders.",
 				"D3D11RenderSystem::_render");
 		}
 

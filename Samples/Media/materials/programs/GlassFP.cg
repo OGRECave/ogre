@@ -1,7 +1,7 @@
-sampler RT : register(s0);
-sampler NormalMap : register(s1);
+sampler2D RT : register(s0);
+sampler2D NormalMap : register(s1);
 
-float4 main_ps(float2 iTexCoord : TEXCOORD0) : COLOR
+float4 main_ps(float4 pos : POSITION, float2 iTexCoord : TEXCOORD0) : COLOR
 {
 	float4 normal = 2 * (tex2D(NormalMap, iTexCoord * 2.5) - 0.5);
 

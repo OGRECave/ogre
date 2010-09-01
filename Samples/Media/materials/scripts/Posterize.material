@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/PosterizeFP cg
 {
 	source PosterizeFP.cg
 	entry_point Posterize_ps
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 material Ogre/Compositor/Posterize
