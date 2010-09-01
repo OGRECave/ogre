@@ -67,83 +67,14 @@ namespace Ogre
 		// set the instance being passed 
 		mhInstance = hInstance;
 
-		// set pointers to NULL
-		mpDXGIFactory = NULL;
-		HRESULT hr;
-		hr = CreateDXGIFactory1( __uuidof(IDXGIFactory1), (void**)&mpDXGIFactory );
-		if( FAILED(hr) )
-		{
-			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-				"Failed to create Direct3D11 DXGIFactory1", 
-				"D3D11RenderSystem::D3D11RenderSystem" );
-		}
+		mRenderSystemWasInited = false;
+		initRenderSystem();
 
-		mDriverList = NULL;
-		mActiveD3DDriver = NULL;
-        mTextureManager = NULL;
-        mHardwareBufferManager = NULL;
-		mGpuProgramManager = NULL;
-		mPrimaryWindow = NULL;
-		mBasicStatesInitialised = false;
-		mUseNVPerfHUD = false;
-        mHLSLProgramFactory = NULL;
-
-		mBoundVertexProgram = NULL;
-		mBoundFragmentProgram = NULL;
-		mBoundGeometryProgram = NULL;
-
-		ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
-
-		ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
-		mRasterizerDesc.FrontCounterClockwise = true;
-		mRasterizerDesc.DepthClipEnable = false;
-		mRasterizerDesc.MultisampleEnable = true;
-
-
-		ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
-
-		ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
-		ZeroMemory( &mScissorRect, sizeof(mScissorRect));
-
-		FilterMinification = FO_NONE;
-		FilterMagnification = FO_NONE;
-		FilterMips = FO_NONE;
-
-		mPolygonMode = PM_SOLID;
-
-		ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
-
-		UINT deviceFlags = 0;
-		if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
-		{
-			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-		}
-		if (!OGRE_THREAD_SUPPORT)
-		{
-			deviceFlags |= D3D11_CREATE_DEVICE_SINGLETHREADED;
-		}
-
-		ID3D11Device * device;
-		if(FAILED(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0)))
-		{
-			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-				"Failed to create Direct3D11 object", 
-				"D3D11RenderSystem::D3D11RenderSystem" );
-		}
-		mDevice = D3D11Device(device) ;
 		// set config options defaults
 		initConfigOptions();
 
 
-		// set stages desc. to defaults
-		for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
-		{
-			mTexStageDesc[n].autoTexCoordType = TEXCALC_NONE;
-			mTexStageDesc[n].coordIndex = 0;
-			mTexStageDesc[n].pTex = 0;
-		}
 
-		mLastVertexSourceCount = 0;
 	}
 	//---------------------------------------------------------------------
 	D3D11RenderSystem::~D3D11RenderSystem()
@@ -370,6 +301,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::setConfigOption( const String &name, const String &value )
 	{
+		initRenderSystem();
 
 		LogManager::getSingleton().stream()
 			<< "D3D11 : RenderSystem Option: " << name << " = " << value;
@@ -836,6 +768,7 @@ namespace Ogre
 	{
 		RenderSystem::shutdown();
 
+		mRenderSystemWasInited = false;
 
 		mPrimaryWindow = NULL; // primary window deleted by base class.
 		freeDevice();
@@ -2721,5 +2654,88 @@ namespace Ogre
 		static String res = RenderSystem::_getDefaultViewportMaterialScheme( );
 #endif
 		return res;
+	}
+
+	void D3D11RenderSystem::initRenderSystem()
+	{
+		if (mRenderSystemWasInited)
+		{
+			return;
+		}
+		// set pointers to NULL
+		mpDXGIFactory = NULL;
+		HRESULT hr;
+		hr = CreateDXGIFactory1( __uuidof(IDXGIFactory1), (void**)&mpDXGIFactory );
+		if( FAILED(hr) )
+		{
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Failed to create Direct3D11 DXGIFactory1", 
+				"D3D11RenderSystem::D3D11RenderSystem" );
+		}
+
+		mDriverList = NULL;
+		mActiveD3DDriver = NULL;
+		mTextureManager = NULL;
+		mHardwareBufferManager = NULL;
+		mGpuProgramManager = NULL;
+		mPrimaryWindow = NULL;
+		mBasicStatesInitialised = false;
+		mUseNVPerfHUD = false;
+		mHLSLProgramFactory = NULL;
+
+		mBoundVertexProgram = NULL;
+		mBoundFragmentProgram = NULL;
+		mBoundGeometryProgram = NULL;
+
+		ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
+
+		ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
+		mRasterizerDesc.FrontCounterClockwise = true;
+		mRasterizerDesc.DepthClipEnable = false;
+		mRasterizerDesc.MultisampleEnable = true;
+
+
+		ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
+
+		ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
+		ZeroMemory( &mScissorRect, sizeof(mScissorRect));
+
+		FilterMinification = FO_NONE;
+		FilterMagnification = FO_NONE;
+		FilterMips = FO_NONE;
+
+		mPolygonMode = PM_SOLID;
+
+		ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
+
+		UINT deviceFlags = 0;
+		if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+		{
+			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		}
+		if (!OGRE_THREAD_SUPPORT)
+		{
+			deviceFlags |= D3D11_CREATE_DEVICE_SINGLETHREADED;
+		}
+
+		ID3D11Device * device;
+		if(FAILED(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0)))
+		{
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Failed to create Direct3D11 object", 
+				"D3D11RenderSystem::D3D11RenderSystem" );
+		}
+		mDevice = D3D11Device(device) ;
+
+
+		// set stages desc. to defaults
+		for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
+		{
+			mTexStageDesc[n].autoTexCoordType = TEXCALC_NONE;
+			mTexStageDesc[n].coordIndex = 0;
+			mTexStageDesc[n].pTex = 0;
+		}
+
+		mLastVertexSourceCount = 0;
 	}
 }

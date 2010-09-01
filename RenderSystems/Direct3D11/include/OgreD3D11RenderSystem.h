@@ -188,7 +188,8 @@ namespace Ogre
 		SecondaryWindowList mSecondaryWindows;
 
 		bool mBasicStatesInitialised;
-
+		
+		bool mRenderSystemWasInited;
 
 		IDXGIFactory1*	mpDXGIFactory;
 	protected:
@@ -196,8 +197,12 @@ namespace Ogre
 	public:
 		// constructor
 		D3D11RenderSystem( HINSTANCE hInstance );
+
 		// destructor
 		~D3D11RenderSystem();
+
+
+		void initRenderSystem();
 
 		virtual void initConfigOptions(void);
 
