@@ -277,16 +277,35 @@ bool FunctionInvocation::operator < ( const FunctionInvocation& rhs ) const
 bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const
 {
     // Check the function names first
+    // Adding an exception to std::string sorting.  I feel that functions beginning with an underscore should be placed before
+    // functions beginning with an alphanumeric character.  By default strings are sorted based on the ASCII value of each character.
+    // Underscores have an ASCII value in between capital and lowercase characters.  This is why the exception is needed.
     if (lhs.getFunctionName() < rhs.getFunctionName())
-        return true;
+    {
+        if(rhs.getFunctionName().at(0) == '_')
+            return false;
+        else
+            return true;
+    }
+    if (lhs.getFunctionName() > rhs.getFunctionName())
+    {
+        if(lhs.getFunctionName().at(0) == '_')
+            return true;
+        else
+            return false;
+    }
 
     // Next check the return type
     if (lhs.getReturnType() < rhs.getReturnType())
         return true;
+    if (lhs.getReturnType() > rhs.getReturnType())
+        return false;
 
     // Check the number of operands
     if (lhs.mOperands.size() < rhs.mOperands.size())
         return true;
+    if (lhs.mOperands.size() > rhs.mOperands.size())
+        return false;
 
     // Now that we've gotten past the two quick tests, iterate over operands
     // Check the semantic and type.  The operands must be in the same order as well.
@@ -297,9 +316,13 @@ bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocat
     {
         if (itLHSOps->getSemantic() < itRHSOps->getSemantic())
             return true;
+        if (itLHSOps->getSemantic() > itRHSOps->getSemantic())
+            return false;
 
         if (itLHSOps->getParameter()->getType() < itRHSOps->getParameter()->getType())
             return true;
+        if (itLHSOps->getParameter()->getType() > itRHSOps->getParameter()->getType())
+            return false;
     }
 
     return false;

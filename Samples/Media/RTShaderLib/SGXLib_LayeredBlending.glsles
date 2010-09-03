@@ -31,7 +31,7 @@ vec4 Desaturate(in vec3 color, in float Desaturation)
 ** Hue, saturation, luminance
 */
 
-vec3 RGBToHSL(in vec3 color)
+vec3 _RGBToHSL(in vec3 color)
 {
 	vec3 hsl; // init to 0 to avoid warnings ? (and reverse if + remove first part)
 	
@@ -73,7 +73,7 @@ vec3 RGBToHSL(in vec3 color)
 	return hsl;
 }
 
-float HueToRGB(in float f1, in float f2, in float hue)
+float _HueToRGB(in float f1, in float f2, in float hue)
 {
 	if (hue < 0.0)
 		hue += 1.0;
@@ -162,8 +162,8 @@ float BlendHue1(in float base, in float blend)
 
 vec3 BlendHue3(in vec3 base, in vec3 blend)
 {
-	vec3 baseHSL = RGBToHSL(base);
-	vec3 rgb, inHSL = vec3(RGBToHSL(blend).r, baseHSL.g, baseHSL.b);
+	vec3 baseHSL = _RGBToHSL(base);
+	vec3 rgb, inHSL = vec3(_RGBToHSL(blend).r, baseHSL.g, baseHSL.b);
 	
 	// The HSLToRGB function has been inlined to here
 	if (inHSL.y == 0.0)
@@ -179,9 +179,9 @@ vec3 BlendHue3(in vec3 base, in vec3 blend)
 			
 		float f1 = 2.0 * inHSL.z - f2;
 		
-		rgb.r = HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
-		rgb.g = HueToRGB(f1, f2, inHSL.x);
-		rgb.b = HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
+		rgb.r = _HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
+		rgb.g = _HueToRGB(f1, f2, inHSL.x);
+		rgb.b = _HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
 	}
 	
 	return rgb;
@@ -201,9 +201,9 @@ float BlendSaturation1(in float base, in float blend)
 
 vec3 BlendSaturation3(in vec3 base, in vec3 blend)
 {
-	vec3 baseHSL = RGBToHSL(base);
+	vec3 baseHSL = _RGBToHSL(base);
 	
-	vec3 rgb, inHSL = vec3(baseHSL.r, RGBToHSL(blend).g, baseHSL.b);
+	vec3 rgb, inHSL = vec3(baseHSL.r, _RGBToHSL(blend).g, baseHSL.b);
 	
 	// The HSLToRGB function has been inlined to here
 	if (inHSL.y == 0.0)
@@ -219,9 +219,9 @@ vec3 BlendSaturation3(in vec3 base, in vec3 blend)
 			
 		float f1 = 2.0 * inHSL.z - f2;
 		
-		rgb.r = HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
-		rgb.g = HueToRGB(f1, f2, inHSL.x);
-		rgb.b = HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
+		rgb.r = _HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
+		rgb.g = _HueToRGB(f1, f2, inHSL.x);
+		rgb.b = _HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
 	}
 	
 	return rgb;
@@ -241,9 +241,9 @@ float BlendColor1(in float base, in float blend)
 
 vec3 BlendColor3(in vec3 base, in vec3 blend)
 {
-	vec3 blendHSL = RGBToHSL(blend);
+	vec3 blendHSL = _RGBToHSL(blend);
 	
-	vec3 rgb, inHSL = vec3(blendHSL.r, blendHSL.g, RGBToHSL(base).b);
+	vec3 rgb, inHSL = vec3(blendHSL.r, blendHSL.g, _RGBToHSL(base).b);
 	
 	// The HSLToRGB function has been inlined to here
 	if (inHSL.y == 0.0)
@@ -259,9 +259,9 @@ vec3 BlendColor3(in vec3 base, in vec3 blend)
 			
 		float f1 = 2.0 * inHSL.z - f2;
 		
-		rgb.r = HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
-		rgb.g = HueToRGB(f1, f2, inHSL.x);
-		rgb.b = HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
+		rgb.r = _HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
+		rgb.g = _HueToRGB(f1, f2, inHSL.x);
+		rgb.b = _HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
 	}
 	
 	return rgb;
@@ -282,8 +282,8 @@ float BlendLuminosity1(in float base, in float blend)
 
 vec3 BlendLuminosity3(in vec3 base, in vec3 blend)
 {
-	vec3 baseHSL = RGBToHSL(base);
-	vec3 rgb, inHSL = vec3(baseHSL.r, baseHSL.g, RGBToHSL(blend).b);
+	vec3 baseHSL = _RGBToHSL(base);
+	vec3 rgb, inHSL = vec3(baseHSL.r, baseHSL.g, _RGBToHSL(blend).b);
 	
 	// The HSLToRGB function has been inlined to here
 	if (inHSL.y == 0.0)
@@ -299,9 +299,9 @@ vec3 BlendLuminosity3(in vec3 base, in vec3 blend)
 			
 		float f1 = 2.0 * inHSL.z - f2;
 		
-		rgb.r = HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
-		rgb.g = HueToRGB(f1, f2, inHSL.x);
-		rgb.b = HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
+		rgb.r = _HueToRGB(f1, f2, inHSL.x + (1.0/3.0));
+		rgb.g = _HueToRGB(f1, f2, inHSL.x);
+		rgb.b = _HueToRGB(f1, f2, inHSL.x - (1.0/3.0));
 	}
 	
 	return rgb;
