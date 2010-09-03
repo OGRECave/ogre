@@ -46,6 +46,7 @@ namespace Ogre {
         bool mActive;
         bool mClosed;
         bool mHidden;
+        bool mVSync;
 		bool mHasResized;
         bool mIsExternal;
         String mWindowTitle;
@@ -68,8 +69,14 @@ namespace Ogre {
         bool isActive(void) const;
         /** Overridden - see RenderWindow */
         bool isClosed(void) const;
-        virtual bool isHidden() const { return mHidden; }
-        virtual void setHidden(bool hidden);
+        /** @copydoc see RenderWindow::isHidden */
+        bool isHidden(void) const { return mHidden; }
+        /** @copydoc see RenderWindow::setHidden */
+        void setHidden(bool hidden);
+        /** @copydoc see RenderWindow::setVSyncEnabled */
+        void setVSyncEnabled(bool vsync);
+        /** @copydoc see RenderWindow::isVSyncEnabled */
+        bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
         void reposition(int left, int top);
         /** Overridden - see RenderWindow */

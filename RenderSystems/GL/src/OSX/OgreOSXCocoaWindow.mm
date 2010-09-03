@@ -303,6 +303,33 @@ namespace Ogre {
         }
     }
 
+	void OSXCocoaWindow::setVSyncEnabled(bool vsync)
+	{
+        mVSync = vsync;
+        mContext->setCurrent();
+        
+        GLint vsyncInterval = mVSync ? 1 : 0;
+        [mGLContext setValues:&vsyncInterval forParameter:NSOpenGLCPSwapInterval];
+
+        mContext->endCurrent();
+        
+        if(!mIsFullScreen)
+        {
+            if(mGLContext != [NSOpenGLContext currentContext])
+                [mGLContext makeCurrentContext];
+        }
+        else
+        {
+            if([mGLContext CGLContextObj] != CGLGetCurrentContext())
+                CGLSetCurrentContext((CGLContextObj)[mGLContext CGLContextObj]);
+        }
+	}
+    
+	bool OSXCocoaWindow::isVSyncEnabled() const
+	{
+        return mVSync;
+	}
+
     void OSXCocoaWindow::reposition(int left, int top)
     {
 		if(!mWindow) return;

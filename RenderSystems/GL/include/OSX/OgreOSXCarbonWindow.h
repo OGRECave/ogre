@@ -50,8 +50,14 @@ namespace Ogre
 		virtual bool isActive( void ) const;
         /** Overridden - see RenderWindow */
 		virtual bool isClosed( void ) const;
-        virtual bool isHidden() const { return mHidden; }
-        virtual void setHidden(bool hidden);
+        /** @copydoc see RenderWindow::isHidden */
+        bool isHidden(void) const { return mHidden; }
+        /** @copydoc see RenderWindow::setHidden */
+        void setHidden(bool hidden);
+        /** @copydoc see RenderWindow::setVSyncEnabled */
+        void setVSyncEnabled(bool vsync);
+        /** @copydoc see RenderWindow::isVSyncEnabled */
+        bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
 		virtual void reposition( int left, int top );
         /** Overridden - see RenderWindow */
@@ -87,7 +93,7 @@ namespace Ogre
         String mWindowTitle;
 		OSXCGLContext* mCGLContext;
 		OSXCarbonContext* mCarbonContext;
-		
+        bool mVSync;
         bool mActive;
         bool mClosed;
         bool mHidden;

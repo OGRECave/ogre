@@ -60,6 +60,8 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optBitDepth;
     ConfigOption optFSAA;
 	ConfigOption optRTTMode;
+	ConfigOption optHiddenWindow;
+	ConfigOption optVsync;
 
 	// FS setting possiblities
 	optFullScreen.name = "Full Screen";
@@ -68,11 +70,32 @@ void OSXGLSupport::addConfig( void )
 	optFullScreen.currentValue = "No";
 	optFullScreen.immutable = false;
 
+    // Hidden window setting possiblities
+	optHiddenWindow.name = "hidden";
+	optHiddenWindow.possibleValues.push_back( "Yes" );
+	optHiddenWindow.possibleValues.push_back( "No" );
+	optHiddenWindow.currentValue = "No";
+	optHiddenWindow.immutable = false;
+
+    // FS setting possiblities
+	optVsync.name = "vsync";
+	optVsync.possibleValues.push_back( "Yes" );
+	optVsync.possibleValues.push_back( "No" );
+	optVsync.currentValue = "No";
+	optVsync.immutable = false;
+
 	optBitDepth.name = "Colour Depth";
 	optBitDepth.possibleValues.push_back( "32" );
 	optBitDepth.possibleValues.push_back( "16" );
 	optBitDepth.currentValue = "32";
 	optBitDepth.immutable = false;
+
+    optRTTMode.name = "RTT Preferred Mode";
+	optRTTMode.possibleValues.push_back( "FBO" );
+	optRTTMode.possibleValues.push_back( "PBuffer" );
+	optRTTMode.possibleValues.push_back( "Copy" );
+	optRTTMode.currentValue = "FBO";
+	optRTTMode.immutable = false;
 
     mOptions[ optFullScreen.name ] = optFullScreen;
 	mOptions[ optBitDepth.name ] = optBitDepth;
@@ -224,17 +247,12 @@ void OSXGLSupport::addConfig( void )
     // Release memory
     CFRelease(goodModes);
 
-    optRTTMode.name = "RTT Preferred Mode";
-	optRTTMode.possibleValues.push_back( "FBO" );
-	optRTTMode.possibleValues.push_back( "PBuffer" );
-	optRTTMode.possibleValues.push_back( "Copy" );
-	optRTTMode.currentValue = "FBO";
-	optRTTMode.immutable = false;
-
 	mOptions[optFullScreen.name] = optFullScreen;
 	mOptions[optVideoMode.name] = optVideoMode;
     mOptions[optFSAA.name] = optFSAA;
 	mOptions[optRTTMode.name] = optRTTMode;
+	mOptions[optHiddenWindow.name] = optHiddenWindow;
+	mOptions[optVsync.name] = optVsync;
 }
 
 String OSXGLSupport::validateConfig( void )
@@ -269,6 +287,22 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
         {
 			winOptions[ "FSAA" ] = opt->second.currentValue;
         }
+
+        opt = mOptions.find( "hidden" );
+        if( opt != mOptions.end() )
+        {
+            winOptions[ "hidden" ] = opt->second.currentValue;
+        }
+
+        opt = mOptions.find( "vsync" );
+        if( opt != mOptions.end() )
+        {
+            winOptions[ "vsync" ] = opt->second.currentValue;
+        }
+
+        opt = mOptions.find( "sRGB Gamma Conversion" );
+        if( opt != mOptions.end() )
+            winOptions["gamma"] = opt->second.currentValue;
 
 		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
 	}
