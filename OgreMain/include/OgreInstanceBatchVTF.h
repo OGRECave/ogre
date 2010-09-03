@@ -43,22 +43,24 @@ namespace Ogre
 	/** Instancing implementation using vertex texture through Vertex Texture Fetch (VTF)
 		This implementation has the following advantages:
 		  * Supports huge ammount of instances per batch
-		  * Supports skinning of huge ammounts of instances per batch
+		  * Supports skinning even with huge ammounts of instances per batch
 		  * Doesn't need shader constants registers.
 		  * Best suited for skinned entities
 
 		But beware the disadvantages:
-		  * VTF isn't (controversely) supported on old ATI X1800 hardware
-		  * VTF is only fast on modern GPUs (ATI Radeon HD, GeForce 8 series onwards)
+		  * VTF is only fast on modern GPUs (ATI Radeon HD 2000+, GeForce 8+ series onwards)
 		  * On GeForce 6/7 series VTF is too slow
+		  * VTF isn't (controversely) supported on old ATI X1800 hardware
 		  * Only one bone weight per vertex is supported
-		  * GPUs with low memory bandwidth (i.e. laptops) may perform even worse than no instancing
+		  * GPUs with low memory bandwidth (i.e. laptops and integrated GPUs)
+		  may perform even worse than no instancing
 
-		Whether this performs great or bad depends on the hardware. It improved 3x performance on
-		a Intel Core 2 Quad Core X9650 GeForce 8600 GTS, but went 0.6x worse in an Intel Core 2 Duo
-		P7350 ATI Mobility Radeon HD 4650
+		Whether this performs great or bad depends on the hardware. It improved up to 4x performance on
+		a Intel Core 2 Quad Core X9650 GeForce 8600 GTS, and in an Intel Core 2 Duo P7350 ATI
+		Mobility Radeon HD 4650, but went 0.75x slower on an AthlonX2 5000+ integrated nForce 6150 SE
 		Each InstanceBatchVTF has it's own texture, which occupies memory in VRAM.
-		VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
+		Approx VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
+		Use flag IM_VTFBESTFIT to avoid wasting VRAM (but may reduce ammount of instances per batch).
 		@par
 		The material requires at least a texture unit stage named "InstancingVTF"
 
@@ -100,8 +102,9 @@ namespace Ogre
 		void updateVertexTexture(void);
 
 	public:
-		InstanceBatchVTF( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
-							 const Mesh::IndexMap *indexToBoneMap, const String &batchName );
+		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+							const String &batchName );
 		virtual ~InstanceBatchVTF();
 
 		/** @See InstanceBatch::calculateMaxNumInstances */

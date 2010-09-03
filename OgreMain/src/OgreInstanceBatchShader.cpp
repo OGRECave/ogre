@@ -36,10 +36,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatchShader::InstanceBatchShader( MeshPtr &meshReference, const MaterialPtr &material,
-										size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-										const String &batchName ) :
-				InstanceBatch( meshReference, material, instancesPerBatch, indexToBoneMap, batchName ),
+	InstanceBatchShader::InstanceBatchShader( InstanceManager *creator, MeshPtr &meshReference,
+										const MaterialPtr &material, size_t instancesPerBatch,
+										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+				InstanceBatch( creator, meshReference, material, instancesPerBatch,
+								indexToBoneMap, batchName ),
 				m_numWorldMatrices( instancesPerBatch )
 	{
 	}

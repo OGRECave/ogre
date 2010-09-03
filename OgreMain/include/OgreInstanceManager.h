@@ -43,7 +43,7 @@ namespace Ogre
 	/** This is the main starting point for the new instancing system.
 		Each InstanceManager can control one technique and one mesh, but it can manage
 		multiple materials at the same time.
-		@See SceneManager::createInstanceManager, which creates this InstanceManager. Each
+		@See SceneManager::createInstanceManager, which creates this InstanceManager. Each one
 		must have a unique name. It's wasteless to create two InstanceManagers with the same
 		mesh reference, instancing technique and instances per batch count.
 		This class takes care of managing batches automatically, so that more are created when
@@ -63,10 +63,9 @@ namespace Ogre
 	public:
 		enum InstancingTechnique
 		{
-			ShaderBased,			//Any SM 2.0+
+			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
 			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
-			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+
-									//only fast on ATI HD 2000+ Radeon and GeForce 8+
+			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
 		};
 	private:
 		typedef vector<InstanceBatch*>::type		InstanceBatchVec;	//vec[batchN] = Batch
@@ -76,6 +75,8 @@ namespace Ogre
 		MeshPtr					m_meshReference;
 		InstanceBatchMap		m_instanceBatches;
 		size_t					m_idCount;
+
+		InstanceBatchVec		m_dirtyBatches;
 
 		RenderOperation			m_sharedRenderOperation;
 
@@ -176,6 +177,14 @@ namespace Ogre
 			(which nullifies any CPU culling)
         */
 		void defragmentBatches( bool optimizeCulling );
+
+		/** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
+			@param dirtyBatch The batch which is dirty, usually same as caller.
+		*/
+		void _addDirtyBatch( InstanceBatch *dirtyBatch );
+
+		/** Called by SceneManager when we told it we have at least one dirty batch */
+		void _updateDirtyBatches(void);
 	};
 }
 

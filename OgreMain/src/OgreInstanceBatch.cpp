@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreInstanceManager.h"
 #include "OgreInstanceBatch.h"
 #include "OgreSubMesh.h"
 #include "OgreRenderOperation.h"
@@ -36,22 +37,25 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	InstanceBatch::InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material,
-									size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-									const String &batchName ) :
+	InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
+									const MaterialPtr &material, size_t instancesPerBatch,
+									const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				MovableObject(),
 				Renderable(),
 				m_instancesPerBatch( instancesPerBatch ),
+				m_creator( creator ),
 				m_material( material ),
 				m_meshReference( meshReference ),
 				m_indexToBoneMap( indexToBoneMap ),
 				m_boundingRadius( 0 ),
-				m_boundsDirty( true ),
+				m_boundsDirty( false ),
 				m_currentCamera( 0 ),
 				mCachedCamera( 0 )
 	{
 		assert( m_instancesPerBatch );
-		assert( !(meshReference->hasSkeleton() && !indexToBoneMap) );
+
+		if( indexToBoneMap )
+			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 
 		m_fullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
@@ -93,9 +97,8 @@ namespace Ogre
 		return true;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::updateBounds()
+	void InstanceBatch::_updateBounds(void)
 	{
-		const AxisAlignedBox oldAABB = m_fullBoundingBox;
 		m_fullBoundingBox.setNull();
 
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
@@ -112,16 +115,13 @@ namespace Ogre
 
 		m_boundingRadius = Math::boundingRadiusFromAABB( m_fullBoundingBox );
 
-		//Can't just call mParentNode->_updateBounds() since the SceneManager may be iterating
-		//over us and such call would invalidate the iterator. We'll do this in the next frame
-		//Worst case scenario, all instances flickered (disappeared) for a single frame.
-		if( oldAABB != m_fullBoundingBox )
-			mParentNode->needUpdate( true );
+		//Tell the SceneManager our bounds have changed
+		getParentSceneNode()->_updateBounds();
 
 		m_boundsDirty = false;
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::updateVisibility()
+	void InstanceBatch::updateVisibility(void)
 	{
 		mVisible = false;
 
@@ -359,8 +359,7 @@ namespace Ogre
 		}
 
 		//We've potentially changed our bounds
-		mParentNode->needUpdate();
-		m_boundsDirty = true;
+		_boundsDirty();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_defragmentBatchDiscard(void)
@@ -372,7 +371,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_boundsDirty(void)
 	{
-		mParentNode->needUpdate();
+		if( !m_boundsDirty )
+			m_creator->_addDirtyBatch( this );
 		m_boundsDirty = true;
 	}
 	//-----------------------------------------------------------------------
@@ -428,8 +428,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
 	{
-		if( m_boundsDirty )
-			updateBounds();
+		/*if( m_boundsDirty )
+			_updateBounds();*/
 
 		m_dirtyAnimation = false;
 

@@ -769,6 +769,12 @@ namespace Ogre {
         virtual void ensureShadowTexturesCreated();
         /// Internal method for destroying shadow textures (texture-based shadows)
         virtual void destroyShadowTextures(void);
+
+		typedef vector<InstanceManager*>::type		InstanceManagerVec;
+		InstanceManagerVec mDirtyInstanceManagers;
+
+		/** Updates all instance managaers with dirty instance batches. @See _addDirtyInstanceManager */
+		void updateDirtyInstanceManagers(void);
         
 	public:
 		/// Method for preparing shadow textures ready for use in a regular render
@@ -3138,6 +3144,11 @@ namespace Ogre {
 		*/
 		virtual void destroyInstanceEntity( InstancedEntity *instancedEntity );
 
+		/** Called by an InstanceManager when it has at least one InstanceBatch that needs their bounds
+			to be updated for proper culling
+			@param dirtyManager The manager with dirty batches to update
+		*/
+		void _addDirtyInstanceManager( InstanceManager *dirtyManager );
 
 		/** Create a movable object of the type specified.
 		@remarks

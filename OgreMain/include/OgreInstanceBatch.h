@@ -45,7 +45,7 @@ namespace Ogre
 
 	/** InstanceBatch forms part of the new Instancing system
 		This is an abstract class that must be derived to implement different instancing techniques
-		(@see InstanceBatchShader)
+		(@see InstanceManager::InstancingTechnique)
 		OGRE wasn't truly thought for instancing. OGRE assumes that either:
 			a. One MovableObject -> No Renderable
 			b. One MovableObject -> One Renderable
@@ -92,6 +92,8 @@ namespace Ogre
 		RenderOperation		m_renderOperation;
 		size_t				m_instancesPerBatch;
 
+		InstanceManager		*m_creator;
+
 		MaterialPtr			m_material;
 
 		MeshPtr				 m_meshReference;
@@ -126,8 +128,7 @@ namespace Ogre
 		//Returns false on errors that would prevent building this batch from the given submesh
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
-		void updateBounds();
-		void updateVisibility();
+		void updateVisibility(void);
 
 		/** @See _defragmentBatch */
 		void defragmentBatchNoCull( InstancedEntityVec &usedEntities );
@@ -140,8 +141,9 @@ namespace Ogre
 		void defragmentBatchDoCull( InstancedEntityVec &usedEntities );
 
 	public:
-		InstanceBatch( MeshPtr &meshReference, const MaterialPtr &material, size_t instancesPerBatch,
-						const Mesh::IndexMap *indexToBoneMap, const String &batchName );
+		InstanceBatch( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+						size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+						const String &batchName );
 		virtual ~InstanceBatch();
 
 		MeshPtr& _getMeshRef() { return m_meshReference; }
@@ -151,6 +153,9 @@ namespace Ogre
 		void _setInstancesPerBatch( size_t instancesPerBatch );
 
 		const Mesh::IndexMap* _getIndexToBoneMap() const { return m_indexToBoneMap; }
+
+		/** @See InstanceManager::updateDirtyBatches */
+		void _updateBounds(void);
 
 		/** Some techniques have a limit on how many instances can be done.
 			Sometimes even depends on the material being used.

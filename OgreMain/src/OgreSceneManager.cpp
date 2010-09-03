@@ -1353,6 +1353,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
     {
         // Update animations
         _applySceneAnimations();
+		updateDirtyInstanceManagers();
         mLastFrameNumber = thisFrameNumber;
     }
 
@@ -6519,6 +6520,25 @@ InstancedEntity* SceneManager::createInstanceEntity( const String &materialName,
 void SceneManager::destroyInstanceEntity( InstancedEntity *instancedEntity )
 {
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
+}
+//---------------------------------------------------------------------
+void SceneManager::_addDirtyInstanceManager( InstanceManager *dirtyManager )
+{
+	mDirtyInstanceManagers.push_back( dirtyManager );
+}
+//---------------------------------------------------------------------
+void SceneManager::updateDirtyInstanceManagers(void)
+{
+	InstanceManagerVec::const_iterator itor = mDirtyInstanceManagers.begin();
+	InstanceManagerVec::const_iterator end  = mDirtyInstanceManagers.end();
+
+	while( itor != end )
+	{
+		(*itor)->_updateDirtyBatches();
+		++itor;
+	}
+
+	mDirtyInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery* 

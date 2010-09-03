@@ -44,10 +44,11 @@ namespace Ogre
 	static const uint16 c_maxTexWidth	= 4096;
 	static const uint16 c_maxTexHeight	= 4096;
 
-	InstanceBatchVTF::InstanceBatchVTF( MeshPtr &meshReference, const MaterialPtr &material,
-										size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-										const String &batchName ) :
-				InstanceBatch( meshReference, material, instancesPerBatch, indexToBoneMap, batchName ),
+	InstanceBatchVTF::InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference,
+										const MaterialPtr &material, size_t instancesPerBatch,
+										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+				InstanceBatch( creator, meshReference, material, instancesPerBatch,
+								indexToBoneMap, batchName ),
 				m_numWorldMatrices( instancesPerBatch )
 	{
 		//We need to clone the material so we can have different textures for each batch.

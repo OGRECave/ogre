@@ -100,11 +100,11 @@ namespace Ogre
 		switch( m_instancingTechnique )
 		{
 		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, suggestedSize,
+			batch = OGRE_NEW InstanceBatchShader( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( m_meshReference, mat, suggestedSize,
+			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
 		default:
@@ -169,12 +169,12 @@ namespace Ogre
 		switch( m_instancingTechnique )
 		{
 		case ShaderBased:
-			batch = OGRE_NEW InstanceBatchShader( m_meshReference, mat, m_instancesPerBatch,
+			batch = OGRE_NEW InstanceBatchShader( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( m_meshReference, mat, m_instancesPerBatch,
+			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
@@ -308,5 +308,27 @@ namespace Ogre
 
 			++itor;
 		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_addDirtyBatch( InstanceBatch *dirtyBatch )
+	{
+		if( m_dirtyBatches.empty() )
+			m_sceneManager->_addDirtyInstanceManager( this );
+
+		m_dirtyBatches.push_back( dirtyBatch );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::_updateDirtyBatches(void)
+	{
+		InstanceBatchVec::const_iterator itor = m_dirtyBatches.begin();
+		InstanceBatchVec::const_iterator end  = m_dirtyBatches.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateBounds();
+			++itor;
+		}
+
+		m_dirtyBatches.clear();
 	}
 }
