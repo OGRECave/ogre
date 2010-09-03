@@ -58,17 +58,35 @@ endif (SYMBIAN)
 if (OGRE_BUILD_PLATFORM_IPHONE)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
+<<<<<<< local
   if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_Compositor Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_Fresnel Sample_Instancing Sample_Lighting Sample_ShaderSystem Sample_Terrain Sample_VolumeTex Sample_Water)
   endif()
+=======
+	if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
+	  list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_Fresnel Sample_Instancing Sample_Lighting Sample_Terrain Sample_VolumeTex Sample_Water)
+	endif()
+>>>>>>> other
 
+<<<<<<< local
   if(NOT OGRE_BUILD_COMPONENT_TERRAIN)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
   endif()
+=======
+	if(NOT OGRE_BUILD_COMPONENT_TERRAIN)
+	  list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
+	endif()
+>>>>>>> other
 
+<<<<<<< local
   if(NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystem)
   endif()
+=======
+	if(NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+	  list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystem)
+	endif()
+>>>>>>> other
 
 endif ()
 
@@ -112,7 +130,10 @@ add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FI
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 
+<<<<<<< local
 # Add samples as dependencies
+=======
+>>>>>>> other
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
 
 if (OGRE_STATIC)
