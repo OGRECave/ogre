@@ -351,7 +351,7 @@ namespace Ogre
 		if (mNumRequestedMipmaps == MIP_UNLIMITED)
 		{
 			numMips = 0;
-			mNumMipmaps = 0; // TODO - get this value from the created texture
+			mNumMipmaps = 0; // Will get this value from the created texture
 		}
 		else
 		{
@@ -423,6 +423,13 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 				"Error creating texture\nError Description:" + errorDescription, 
 				"D3D11Texture::_create2DTex" );
+		}
+
+		if(mNumMipmaps == 0)
+		{
+			D3D11_TEXTURE2D_DESC texDesc;
+			mp2DTex->GetDesc(&texDesc);
+			mNumMipmaps = texDesc.MipLevels; 		
 		}
 
 		// set the base texture we'll use in the render system

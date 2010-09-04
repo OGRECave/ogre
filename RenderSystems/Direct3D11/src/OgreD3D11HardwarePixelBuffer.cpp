@@ -149,7 +149,12 @@ namespace Ogre {
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
 				{
-					mDevice.GetImmediateContext()->Map(mParentTexture->GetTex2D(), static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+					mDevice.GetImmediateContext()->Map(
+							mParentTexture->GetTex2D(), 
+							D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()), 
+							flags, 
+							0, 
+							&pMappedResource);
 					rval.data = pMappedResource.pData;
 					if (mDevice.isError())
 					{
@@ -200,7 +205,8 @@ namespace Ogre {
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
 				{
-					mDevice.GetImmediateContext()->Unmap(mParentTexture->GetTex2D(), mSubresourceIndex);
+					mDevice.GetImmediateContext()->Unmap(mParentTexture->GetTex2D(), 
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()));
 				}
 				break;
 			case TEX_TYPE_3D:
@@ -238,7 +244,7 @@ namespace Ogre {
 				{
 					mDevice.GetImmediateContext()->UpdateSubresource(
 						mParentTexture->GetTex2D(), 
-						static_cast<UINT>(mSubresourceIndex),
+						D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()),
 						&dstBoxDx11, 
 						mDataForStaticUsageLock, 0, 0);
 
@@ -335,7 +341,7 @@ namespace Ogre {
 			{
 				mDevice.GetImmediateContext()->CopySubresourceRegion(
 					mParentTexture->GetTex2D(), 
-					static_cast<UINT>(mSubresourceIndex),
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()),
 					static_cast<UINT>(dstBox.left),
 					static_cast<UINT>(dstBox.top),
 					mFace,
@@ -444,15 +450,18 @@ namespace Ogre {
 			}
 			break;
 		case TEX_TYPE_CUBE_MAP:
+			{
+				int a = 1;
+			}
 		case TEX_TYPE_2D:
 			{
 				mDevice.GetImmediateContext()->UpdateSubresource( 
 					mParentTexture->GetTex2D(), 
-					static_cast<UINT>(mSubresourceIndex),
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()),
 					&dstBoxDx11,
 					converted.data,
 					d3dRowPitch,
-					mFace );
+					0 );
 				if (mDevice.isError())
 				{
 					String errorDescription = mDevice.getErrorDescription();
