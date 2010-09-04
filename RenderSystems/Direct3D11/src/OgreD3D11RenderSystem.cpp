@@ -1136,14 +1136,20 @@ namespace Ogre
 		descDepth.Width					= renderTarget->getWidth();
 		descDepth.Height				= renderTarget->getHeight();
 		descDepth.MipLevels				= 1;
-		descDepth.ArraySize				= 1;
-		descDepth.Format				= DXGI_FORMAT_R32_TYPELESS;
+		descDepth.ArraySize				= BBDesc.ArraySize;
+		descDepth.Format				= DXGI_FORMAT_D32_FLOAT;
 		descDepth.SampleDesc.Count		= BBDesc.SampleDesc.Count;
 		descDepth.SampleDesc.Quality	= BBDesc.SampleDesc.Quality;
 		descDepth.Usage					= D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags				= D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags		= 0;
 		descDepth.MiscFlags				= 0;
+
+		if (descDepth.ArraySize == 6)
+		{
+			descDepth.MiscFlags		|= D3D11_RESOURCE_MISC_TEXTURECUBE;
+		}
+
 
 		HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
 		if( FAILED(hr) || mDevice.isError())

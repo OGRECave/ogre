@@ -900,17 +900,23 @@ namespace Ogre
 			break;
 		case D3D11_SRV_DIMENSION_TEXTURE1D:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
-				break;
+			break;
 		case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
-				break;
+			break;
 		case D3D11_SRV_DIMENSION_TEXTURECUBE:
+			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
+			RTVDesc.Texture2DArray.ArraySize = 1;
+			RTVDesc.Texture2DArray.MipSlice = 0;
+			break;
 		case D3D11_SRV_DIMENSION_TEXTURE2D:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-				break;
+			RTVDesc.Texture2D.MipSlice = static_cast<uint>(buffer->getSubresourceIndex());
+			break;
 		case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-				break;
+			break;
 		case D3D11_SRV_DIMENSION_TEXTURE2DMS:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
 			break;
@@ -923,7 +929,6 @@ namespace Ogre
 		default:
 			assert(false);
 		}
-		RTVDesc.Texture2D.MipSlice = static_cast<uint>(buffer->getSubresourceIndex());
 		HRESULT hr = mDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &mRenderTargetView );
 
 		if (FAILED(hr) || mDevice.isError())

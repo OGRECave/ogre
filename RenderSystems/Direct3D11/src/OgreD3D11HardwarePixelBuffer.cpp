@@ -655,4 +655,9 @@ namespace Ogre {
 	{
 		return mSubresourceIndex;
 	}
+	//-----------------------------------------------------------------------------    
+	size_t D3D11HardwarePixelBuffer::getFace() const
+	{
+		return mFace;
+	}
 };

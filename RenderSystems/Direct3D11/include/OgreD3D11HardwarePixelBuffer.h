@@ -95,6 +95,7 @@ namespace Ogre {
 
 		D3D11Texture * getParentTexture() const;
 		size_t getSubresourceIndex() const;
+		size_t getFace() const;
 	};
 };
 #endif
