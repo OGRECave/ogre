@@ -916,7 +916,6 @@ namespace Ogre
 
 		rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
-		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
 
 		// Adapter details

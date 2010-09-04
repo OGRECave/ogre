@@ -149,7 +149,7 @@ namespace Ogre
 		/// (undefined behavior?), OGL w/ copy supports it
 		RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 9),
 		/// Supports attaching a depth buffer to an RTT that has width & height less or equal than RTT's.
-		/// Otherwise must be of _exact_ same resolution. D3D 9&10, OGL 3.0 (not 2.0)
+		/// Otherwise must be of _exact_ same resolution. D3D 9, OGL 3.0 (not 2.0, not D3D10)
 		RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
 
 		// ***** DirectX specific caps *****
