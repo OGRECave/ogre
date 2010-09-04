@@ -141,7 +141,7 @@ namespace Ogre
 		size_t pos = mName.find_last_of(".");
 		String ext = mName.substr(pos+1);
 		String baseName = mName.substr(0, pos);
-		if(this->getTextureType() == TEX_TYPE_CUBE_MAP)
+		if((getSourceFileType() != "dds") && (this->getTextureType() == TEX_TYPE_CUBE_MAP))
 		{
 			// Load from 6 separate files
 			// Use OGRE its own codecs
