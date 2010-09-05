@@ -1,0 +1,19 @@
+
+//---------------------------------------------
+//Pixel Shader Input
+//---------------------------------------------
+struct PS_INPUT
+{
+	float2 uv0		:	TEXCOORD0;
+	float3 Normal	:	TEXCOORD1;
+	float3 vPos		:	TEXCOORD2;
+};
+
+//---------------------------------------------
+//Vertex Shader Output
+//---------------------------------------------
+struct VS_OUTPUT
+{
+	float4 Position	:	POSITION;
+	PS_INPUT	ps;
+};

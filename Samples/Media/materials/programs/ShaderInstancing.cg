@@ -1,0 +1,49 @@
+
+//---------------------------------------------
+//Vertex Shader Input
+//---------------------------------------------
+struct VS_INPUT
+{
+	float4 Position	:	POSITION;
+	float3 Normal	:	NORMAL;
+	float3 Tangent	:	TANGENT;
+	float2 uv0		:	TEXCOORD0;
+
+	float4 BlendIdx	:	BLENDINDICES;
+	float4 BlendWgt	:	BLENDWEIGHT;
+};
+
+#include "InstancingVertexInterpolators.cg"
+
+//---------------------------------------------
+//Main Vertex Shader
+//---------------------------------------------
+VS_OUTPUT main_vs( in VS_INPUT input,
+				   uniform float4x4 viewProjMatrix,
+				   uniform float3x4 worldMatrix3x4Array[80] )
+{
+	VS_OUTPUT output;
+
+	float4 worldPos	 = 0;
+	float3 worldNorm = 0;
+
+	int idx = int(input.BlendIdx[0]);
+	worldPos  = float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f );
+	worldNorm = mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal );
+
+	/*int i;
+	for( i=0; i<4; i++ )
+	{
+		int idx = int(input.BlendIdx[0]);
+		worldPos += float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f ) * input.BlendWgt[i];
+		worldNorm += mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal ) * input.BlendWgt[i];
+	}*/
+
+	//Transform the position
+	output.Position		= mul( viewProjMatrix, worldPos );
+	output.ps.uv0		= input.uv0;
+	output.ps.Normal	= mul( (float3x3)(viewProjMatrix), normalize(worldNorm) );
+	output.ps.vPos		= worldPos;
+
+	return output;
+}

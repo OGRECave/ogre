@@ -6503,7 +6503,7 @@ void SceneManager::destroyAllInstanceManagers(void)
 	mInstanceManagerMap.clear();
 }
 //---------------------------------------------------------------------
-InstancedEntity* SceneManager::createInstanceEntity( const String &materialName, const String &managerName )
+InstancedEntity* SceneManager::createInstancedEntity( const String &materialName, const String &managerName )
 {
 	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
 
@@ -6517,7 +6517,7 @@ InstancedEntity* SceneManager::createInstanceEntity( const String &materialName,
 	return itor->second->createInstancedEntity( materialName );
 }
 //---------------------------------------------------------------------
-void SceneManager::destroyInstanceEntity( InstancedEntity *instancedEntity )
+void SceneManager::destroyInstancedEntity( InstancedEntity *instancedEntity )
 {
 	instancedEntity->_getOwner()->removeInstancedEntity( instancedEntity );
 }

@@ -1,0 +1,28 @@
+fragment_program Ogre/Instancing_glsl_ps glsl
+{
+	source Instancing.frag
+}
+
+fragment_program Ogre/Instancing_cg_ps cg
+{
+	source Instancing_ps.cg
+	entry_point main_ps
+	profiles ps_3_0 ps_2_0 fp40
+}
+
+fragment_program Ogre/Instancing_ps unified
+{
+	delegate Ogre/Instancing_cg_ps
+	delegate Ogre/Instancing_glsl_ps
+	
+	default_params
+	{
+		param_named_auto	lightPosition		light_position			0
+		param_named_auto	cameraPosition		camera_position			0
+		param_named_auto	lightAmbient		ambient_light_colour
+		param_named_auto	lightDiffuse		light_diffuse_colour	0
+		param_named_auto	lightSpecular		light_specular_colour	0
+		param_named_auto	lightAttenuation	light_attenuation		0
+		param_named_auto	lightGloss			surface_shininess
+	}
+}

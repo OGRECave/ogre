@@ -1,0 +1,62 @@
+//--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+vertex_program ShaderInstancing_glsl_vs glsl
+{
+	source ShaderInstancing.vert
+}
+
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
+vertex_program ShaderInstancing_cg_vs cg
+{
+	source ShaderInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vs_2_0 vp40
+}
+
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program ShaderInstancing_vs unified
+{
+	delegate ShaderInstancing_cg_vs
+	delegate ShaderInstancing_glsl_vs
+
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
+	}
+}
+
+abstract material Examples/InstancingShaderBased
+{
+	technique
+	{
+		pass
+		{
+			specular	1 1 1 1 12.5
+			vertex_program_ref ShaderInstancing_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+		}
+	}
+}
+
+material Examples/Instancing/ShaderBased/Robot : Examples/InstancingShaderBased
+{
+	set_texture_alias	DiffuseMap	r2skin.jpg
+}

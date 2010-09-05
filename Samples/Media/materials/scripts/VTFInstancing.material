@@ -1,0 +1,75 @@
+//--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+vertex_program VTFInstancing_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named			matrixTexture				int 0
+	}
+}
+
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
+vertex_program VTFInstancing_cg_vs cg
+{
+	source VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named_auto viewProjMatrix				viewproj_matrix
+	}
+}
+
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program VTFInstancing_vs unified
+{
+	delegate VTFInstancing_cg_vs
+	delegate VTFInstancing_glsl_vs
+}
+
+abstract material Examples/InstancingVTF
+{
+	technique
+	{
+		pass
+		{
+			specular	1 1 1 1 12.5
+			vertex_program_ref VTFInstancing_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
+material Examples/Instancing/VTF/Robot : Examples/InstancingVTF
+{
+	set_texture_alias	DiffuseMap	r2skin.jpg
+}

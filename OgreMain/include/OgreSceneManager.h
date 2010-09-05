@@ -3124,7 +3124,7 @@ namespace Ogre {
 
 		virtual void destroyAllInstanceManagers(void);
 
-		/** Creates an InstanceEntity based on an existing InstanceManager (@see createInstanceManager)
+		/** Creates an InstancedEntity based on an existing InstanceManager (@see createInstanceManager)
 		@remarks
 			* Return value may be null if the InstanceManger technique isn't supported
 			* Try to keep the number of entities with different materials <b>to a minimum</b>
@@ -3135,14 +3135,14 @@ namespace Ogre {
 		@param managerName Name of the instance manager
 		@returns An InstancedEntity ready to be attached to a SceneNode
 		*/
-		virtual InstancedEntity* createInstanceEntity( const String &materialName,
+		virtual InstancedEntity* createInstancedEntity( const String &materialName,
 														const String &managerName );
 
-		/** Removes an InstancedEntity, @see SceneManager::createInstanceEntity &
+		/** Removes an InstancedEntity, @see SceneManager::createInstancedEntity &
 			@see InstanceBatch::removeInstancedEntity
 		@param instancedEntity Instance to remove
 		*/
-		virtual void destroyInstanceEntity( InstancedEntity *instancedEntity );
+		virtual void destroyInstancedEntity( InstancedEntity *instancedEntity );
 
 		/** Called by an InstanceManager when it has at least one InstanceBatch that needs their bounds
 			to be updated for proper culling
