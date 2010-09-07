@@ -117,7 +117,7 @@ protected:
 		// create a light
 		Light* light = mSceneMgr->createLight();
 		light->setDiffuseColour(lightColour);
-		light->setPosition( 200.0f, 25.0f, 200.0f );
+		light->setPosition( 0.0f, 25.0f, 0.0f );
 		light->setSpecularColour( 0.6, 0.82, 1.0 );
 		light->setAttenuation( 3500, 0.085, 0.00008, 0.00006);
 	}
@@ -131,6 +131,7 @@ protected:
 		{
 			//Instancing
 
+			//Create the manager if we haven't already (i.e. first time)
 			//Because we use IM_USEALL as flags, the actual num of instances per batch might be much lower
 			//If you're not bandwidth limited, you may want to lift IM_VTFBESTFIT flag away
 			if( !mInstanceManagers[mInstancingTechnique] )
@@ -151,11 +152,20 @@ protected:
 			mCurrentManager = mInstanceManagers[mInstancingTechnique];
 
 			createInstancedEntities();
+
+			//Show GUI features available only to instancing
+			mDefragmentBatches->show();
+			mDefragmentOptimumCull->show();
 		}
 		else
 		{
 			//Non-instancing
 			createEntities();
+
+			//Hide GUI features available only to instancing
+			mCurrentManager = 0;
+			mDefragmentBatches->hide();
+			mDefragmentOptimumCull->hide();
 		}
 
 		createSceneNodes();
@@ -165,7 +175,9 @@ protected:
 	{
 		for( int i=0; i<NUM_INST_ROW * NUM_INST_COLUMN; ++i )
 		{
-			//Create the instanced entity
+			//Create the non-instanced entity. Use the same shader as shader-based because:
+			//a. To prove we can (runs without modification! :-) )
+			//b. Make a fair comparision
 			Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
 			ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES-1] );
 			mEntities.push_back( ent );
@@ -197,6 +209,8 @@ protected:
 
 	void createSceneNodes()
 	{
+		//Here the SceneNodes are created. Since InstancedEntities derive from MovableObject,
+		//they behave like regular Entities on this.
 		SceneNode *rootNode = mSceneMgr->getRootSceneNode();
 
 		for( int i=0; i<NUM_INST_ROW; ++i )
@@ -208,8 +222,8 @@ protected:
 				sceneNode->attachObject( mEntities[idx] );
 				sceneNode->setScale( Vector3( 0.1f ) );
 				sceneNode->yaw( Radian( (i+1) * (j+1) * (i+1) * (j+1) ) ); //Random orientation
-				sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * i, 0,
-										mEntities[idx]->getBoundingRadius() * j );
+				sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
+										mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
 
 				mSceneNodes.push_back( sceneNode );
 			}
@@ -291,6 +305,9 @@ protected:
 
 	void defragmentBatches()
 	{
+		//Defragment batches is used after many InstancedEntities were removed (and you won't
+		//be requesting more). However, then the optimize cull option is on, it can cause
+		//quite a perf. boost on large batches (i.e. VTF) even if not a single instance was ever removed.
 		if( mCurrentManager )
 			mCurrentManager->defragmentBatches( mDefragmentOptimumCull->isChecked() );
 	}
@@ -337,6 +354,7 @@ protected:
 	{
 		if( button == mDefragmentBatches ) defragmentBatches();
 	}
+
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*
 	union FusionEntity

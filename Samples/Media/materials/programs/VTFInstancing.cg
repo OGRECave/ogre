@@ -36,7 +36,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );
 	output.ps.uv0		= input.uv0;
-	output.ps.Normal	= mul( (float3x3)(viewProjMatrix), normalize(worldNorm) );
+	output.ps.Normal	= normalize(worldNorm);
 	output.ps.vPos		= worldPos;
 
 	return output;
