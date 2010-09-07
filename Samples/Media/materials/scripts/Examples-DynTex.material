@@ -31,7 +31,7 @@ material Examples/VTDarkStuff
 			diffuse 0.0 0.0 0.0
 			ambient 0.1 0.1 0.15
 			cull_hardware none
-			lighting on
+			lighting off
 		}
 		
 	}

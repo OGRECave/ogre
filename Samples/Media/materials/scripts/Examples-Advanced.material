@@ -108,7 +108,7 @@ vertex_program Examples/BumpMapVPCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
 }
 
 vertex_program Examples/BumpMapVPGLSLES glsles
@@ -137,7 +137,7 @@ fragment_program Examples/BumpMapFPCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point main_fp
-	profiles ps_2_0 arbfp1 fp20
+	profiles ps_4_0 ps_2_0 arbfp1 fp20
 }
 
 fragment_program Examples/BumpMapFPGLSLES glsles
@@ -210,7 +210,7 @@ vertex_program Examples/BumpMapVPSpecularCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point specular_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
 }
 
 // Bump map with specular vertex program, support for this is required
@@ -231,7 +231,7 @@ fragment_program Examples/BumpMapFPSpecularCg cg
 {
 	source Example_BumpMapping.cg
 	entry_point specular_fp
-	profiles ps_2_0 arbfp1 fp20
+	profiles ps_4_0 ps_2_0 arbfp1 fp20
 }
 
 // Bump map fragment program, support for this is optional

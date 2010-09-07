@@ -16,7 +16,7 @@ float3 expand(float3 v)
 void main_vp(float4 position	: POSITION,
 			 float3 normal		: NORMAL,
 			 float2 uv			: TEXCOORD0,
-			 float4 tangent     : TANGENT0,
+			 float4 tangent     : TANGENT,
 			 // outputs
 			 out float4 oPosition    : POSITION,
 			 out float2 oUv			 : TEXCOORD0,
@@ -66,7 +66,7 @@ void main_vp(float4 position	: POSITION,
 void main_shadowreceiver_vp(float4 position	: POSITION,
 			 float3 normal		: NORMAL,
 			 float2 uv			: TEXCOORD0,
-			 float3 tangent     : TANGENT0,
+			 float3 tangent     : TANGENT,
 			 
 			 // outputs
 			 out float4 oPosition    : POSITION,
@@ -110,7 +110,8 @@ void main_shadowreceiver_vp(float4 position	: POSITION,
 }
 
 
-void main_fp( float2 uv			: TEXCOORD0,
+void main_fp( float4 position	: POSITION, 
+        float2 uv			: TEXCOORD0,
 			  float3 TSlightDir : TEXCOORD1,
 
 			  out float4 colour	: COLOR,
@@ -129,7 +130,7 @@ void main_fp( float2 uv			: TEXCOORD0,
 	
 }
 
-void main_shadowreceiver_fp(
+void main_shadowreceiver_fp( float4 position	: POSITION,
 			  float4 uvproj		: TEXCOORD0,
 			  float2 uv			: TEXCOORD1,
 			  float3 TSlightDir : TEXCOORD2,
@@ -160,7 +161,7 @@ void main_shadowreceiver_fp(
 void specular_vp(float4 position	: POSITION,
 			 	 float3 normal		: NORMAL,
 			 	 float2 uv			: TEXCOORD0,
-			 	 float3 tangent     : TANGENT0,
+			 	 float3 tangent     : TANGENT,
 			 	 // outputs
 			 	 out float4 oPosition    : POSITION,
 			 	 out float2 oUv			 : TEXCOORD0,
@@ -202,7 +203,8 @@ void specular_vp(float4 position	: POSITION,
 }
 
 /* Fragment program which supports specular component */
-void specular_fp( float2 uv			: TEXCOORD0,
+void specular_fp( float4 position	: POSITION, 
+        float2 uv			: TEXCOORD0,
 			  float3 TSlightDir : TEXCOORD1,
 			  float3 TShalfAngle: TEXCOORD2,
 

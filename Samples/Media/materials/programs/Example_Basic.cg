@@ -374,13 +374,13 @@ void basicPassthroughNormal_v(float4 position : POSITION,
 	oNormal = normal;
 }
 // Basic fragment program to display UV
-float4 showuv_p (float2 uv : TEXCOORD0) : COLOR
+float4 showuv_p (float4 position : POSITION, float2 uv : TEXCOORD0) : COLOR
 {
 	// wrap values using frac
 	return float4(frac(uv.x), frac(uv.y), 0, 1);
 }
 // Basic fragment program to display 3d uv
-float4 showuvdir3d_p (float3 uv : TEXCOORD0) : COLOR
+float4 showuvdir3d_p (float4 position : POSITION, float3 uv : TEXCOORD0) : COLOR
 {
 	float3 n = normalize(uv);
 	return float4(n.x, n.y, n.z, 1);

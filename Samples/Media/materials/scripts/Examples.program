@@ -9,7 +9,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 {
 	source Example_Basic.cg
 	entry_point ambientOneTexture_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -63,8 +63,24 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
 }
 
+
 // A really basic ambient pass program, support for one texture coordinate set
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFP glsles
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
+{
+	delegate Ogre/BasicVertexPrograms/PassthroughFpCG
+	delegate Ogre/BasicVertexPrograms/PassthroughFpGLSLES
+}
+
+// A really basic ambient pass program, support for one texture coordinate set
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCG cg
+{
+	entry_point main
+	source PassthroughFP.cg
+	profiles ps_4_0
+}
+
+// A really basic ambient pass program, support for one texture coordinate set
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles
 {
 	source PassthroughFP.glsles
     profiles glsles
@@ -91,7 +107,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 {
 	source Example_Basic.cg
 	entry_point hardwareSkinningTwoWeightsCaster_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 }
 
@@ -174,6 +190,15 @@ vertex_program Ogre/HardwareSkinningTwoWeights unified
 		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
 		param_named_auto ambient ambient_light_colour
    }
+}
+
+// Basic hardware skinning using four indexed weights per vertex
+vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
+{
+   source Example_Basic.cg
+   entry_point hardwareSkinningTwoWeights_vp
+   profiles vs_4_0 vs_1_1 arbvp1
+   includes_skeletal_animation true
 }
 
 // Basic hardware skinning using four indexed weights per vertex

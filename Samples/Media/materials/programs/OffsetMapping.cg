@@ -21,7 +21,7 @@ struct app2vertOffsetMapping
     float4 position	: POSITION;
     float3 normal	: NORMAL;
     float2 uv		: TEXCOORD0;
-    float3 tangent      : TANGENT0;
+    float3 tangent      : TANGENT;
 };
 
 struct vert2fragOffsetMapping

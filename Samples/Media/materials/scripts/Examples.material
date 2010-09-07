@@ -1818,7 +1818,7 @@ material jaiqua
 			{
 			
 			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
 			}
 
@@ -1829,7 +1829,7 @@ material jaiqua
 				param_named_auto viewProjectionMatrix viewproj_matrix
 				param_named_auto ambient ambient_light_colour
 			}
-			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFPGLSLES
+			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
 			}
 
@@ -1909,7 +1909,7 @@ fragment_program Examples/ShowUV_pCg cg
 {
 	source Example_Basic.cg
 	entry_point showuv_p
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 fragment_program Examples/ShowUV_pGLSLES glsles
@@ -1928,7 +1928,7 @@ fragment_program Examples/ShowUVdir3DCg cg
 {
 	source Example_Basic.cg
 	entry_point showuvdir3d_p
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 }
 
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
