@@ -38,7 +38,8 @@ void main_vp(float4 position	: POSITION,
 	edge = max(dot(N, E), 0);
 }
 
-void main_fp(float diffuseIn 	: TEXCOORD0,
+void main_fp( float4 position	: POSITION,
+       float diffuseIn 	: TEXCOORD0,
 			 float specularIn	: TEXCOORD1,
 			 float edge		: TEXCOORD2,
 			 

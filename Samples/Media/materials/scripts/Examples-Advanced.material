@@ -5,7 +5,7 @@ vertex_program Ogre/CelShadingVPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
 
 	default_params
 	{
@@ -20,7 +20,7 @@ fragment_program Ogre/CelShadingFPCg cg
 {
 	source Example_CelShading.cg
 	entry_point main_fp
-	profiles ps_1_1 arbfp1 fp20
+	profiles ps_4_0 ps_1_1 arbfp1 fp20
 
 }
 
