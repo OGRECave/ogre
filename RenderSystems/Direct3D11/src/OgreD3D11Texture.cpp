@@ -912,7 +912,6 @@ namespace Ogre
 			break;
 		case D3D11_SRV_DIMENSION_TEXTURE2D:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			RTVDesc.Texture2D.MipSlice = static_cast<uint>(buffer->getSubresourceIndex());
 			break;
 		case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
 			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
