@@ -36,7 +36,8 @@ void main_vp(
 
 // Fragment program for distorting a texture using a 3D noise texture
 void main_fp(
-		float3 noiseCoord			: TEXCOORD0,
+		float4 pos			: POSITION,
+    float3 noiseCoord			: TEXCOORD0,
 		float4 projectionCoord		: TEXCOORD1,
 		float3 eyeDir				: TEXCOORD2,
 		float3 normal				: TEXCOORD3,
