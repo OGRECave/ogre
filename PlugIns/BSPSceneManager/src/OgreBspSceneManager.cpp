@@ -261,7 +261,7 @@ namespace Ogre {
             if (mRenderOp.indexData->indexCount == 0)
                 continue;
 
-            Technique::PassIterator pit = thisMaterial->getTechnique(0)->getPassIterator();
+            Technique::PassIterator pit = thisMaterial->getBestTechnique()->getPassIterator();
 
             while (pit.hasMoreElements())
             {
