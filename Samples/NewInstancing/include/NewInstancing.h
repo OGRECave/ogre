@@ -10,8 +10,8 @@ using namespace OgreBites;
 static const char *c_instancingTechniques[] =
 {
 	"Shader Based",
-	"VTF",
-	"NoInstancing"
+	"Vertex Texture Fetch (VTF)",
+	"No Instancing"
 };
 
 static const char *c_materialsTechniques[] =
@@ -45,6 +45,12 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt)
     {
+		if( mAnimateInstances->isChecked() )
+			animateUnits( evt.timeSinceLastEvent );
+
+		if( mMoveInstances->isChecked() )
+			moveUnits( evt.timeSinceLastEvent );
+
 		return SdkSample::frameRenderingQueued(evt);        // don't forget the parent class updates!
     }
 
@@ -54,11 +60,11 @@ public:
 		if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible())
 			mSceneMgr->showBoundingBoxes( !mSceneMgr->getShowBoundingBoxes() );
 
-		if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
+		/*if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
 		{
 			clearScene();
 			switchInstancingTechnique();
-		}
+		}*/
 
 		return SdkSample::keyPressed(evt);
 	}
@@ -87,8 +93,14 @@ protected:
 		// set initial camera position and speed
 		mCamera->setPosition( 0, 50, 100 );
 
+		setupGUI();
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+		setDragLook(true);
+#endif
+
 		//Initialize the techniques and current mesh
-		mInstancingTechnique	= -1;
+		mInstancingTechnique	= 0;
 		mCurrentMesh			= 0;
 		mCurrentManager			= 0;
 		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
@@ -98,20 +110,22 @@ protected:
 
 	void setupLighting()
 	{
-		mSceneMgr->setAmbientLight(ColourValue::Black);  // turn off ambient light
+		mSceneMgr->setAmbientLight( ColourValue( 0.25f, 0.25f, 0.25f ) );
 
-		ColourValue lightColour(1, 1, 0.3);
+		ColourValue lightColour( 1, 0.5, 0.3 );
 
 		// create a light
 		Light* light = mSceneMgr->createLight();
 		light->setDiffuseColour(lightColour);
-		light->setSpecularColour(1, 1, 0.3);
-		light->setAttenuation(1500, 1, 0.0005, 0);
+		light->setPosition( 200.0f, 25.0f, 200.0f );
+		light->setSpecularColour( 0.6, 0.82, 1.0 );
+		light->setAttenuation( 3500, 0.085, 0.00008, 0.00006);
 	}
 
 	void switchInstancingTechnique()
 	{
-		mInstancingTechnique = (mInstancingTechnique+1) % NUM_TECHNIQUES;
+		//mInstancingTechnique = (mInstancingTechnique+1) % NUM_TECHNIQUES;
+		mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
 
 		if( mInstancingTechnique < NUM_TECHNIQUES-1 )
 		{
@@ -193,6 +207,7 @@ protected:
 				SceneNode *sceneNode = rootNode->createChildSceneNode();
 				sceneNode->attachObject( mEntities[idx] );
 				sceneNode->setScale( Vector3( 0.1f ) );
+				sceneNode->yaw( Radian( (i+1) * (j+1) * (i+1) * (j+1) ) ); //Random orientation
 				sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * i, 0,
 										mEntities[idx]->getBoundingRadius() * j );
 
@@ -244,6 +259,84 @@ protected:
 		clearScene();
 		destroyManagers();
 	}
+
+	void animateUnits( float timeSinceLast )
+	{
+		//Iterates through all AnimationSets and updates the animation being played. Demonstrates the
+		//animation is unique and independent to each instance
+		std::vector<AnimationState*>::const_iterator itor = mAnimations.begin();
+		std::vector<AnimationState*>::const_iterator end  = mAnimations.end();
+
+		while( itor != end )
+		{
+			(*itor)->addTime( timeSinceLast );
+			++itor;
+		}
+	}
+
+	void moveUnits( float timeSinceLast )
+	{
+		const Real fMovSpeed = mEntities[0]->getBoundingRadius() * 0.25f;
+
+		//Randomly move the units along their normal, bouncing around invisible walls
+		std::vector<SceneNode*>::const_iterator itor = mSceneNodes.begin();
+		std::vector<SceneNode*>::const_iterator end  = mSceneNodes.end();
+
+		while( itor != end )
+		{
+			(*itor)->translate( Vector3::UNIT_X * timeSinceLast * fMovSpeed, Node::TS_LOCAL );
+			++itor;
+		}
+	}
+
+	void defragmentBatches()
+	{
+		if( mCurrentManager )
+			mCurrentManager->defragmentBatches( mDefragmentOptimumCull->isChecked() );
+	}
+
+	void setupGUI()
+	{
+		mTechniqueMenu = mTrayMgr->createLongSelectMenu(
+			TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 300, 200, 5);
+		for( int i=0; i<NUM_TECHNIQUES; ++i )
+			mTechniqueMenu->addItem( c_instancingTechniques[i] );
+
+		//Check box to move the units
+		mMoveInstances = mTrayMgr->createCheckBox(TL_TOPRIGHT, "MoveInstances", "Move Instances", 175);
+		mMoveInstances->setChecked(false);
+
+		//Check box to animate the units
+		mAnimateInstances = mTrayMgr->createCheckBox(TL_TOPRIGHT, "AnimateInstances",
+														"Animate Instances", 175);
+		mAnimateInstances->setChecked(false);
+
+		//Controls to control batch defragmentation on the fly
+		mDefragmentBatches =  mTrayMgr->createButton(TL_TOPRIGHT, "DefragmentBatches",
+															"Defragment Batches", 175);
+		mDefragmentOptimumCull = mTrayMgr->createCheckBox(TL_TOPRIGHT, "DefragmentOptimumCull",
+															"Optimum Cull", 175);
+		mDefragmentOptimumCull->setChecked(true);
+
+		mTrayMgr->showCursor();
+	}
+
+	void itemSelected(SelectMenu* menu)
+	{
+		if (menu == mTechniqueMenu)
+		{
+			clearScene();
+			switchInstancingTechnique();
+		}
+		/*else if (menu == mLightingMenu) handleShadowTypeChanged();
+		else if (menu == mProjectionMenu) handleProjectionChanged();
+		else if (menu == mMaterialMenu) handleMaterialChanged();*/
+	}
+
+	void buttonHit( Button* button )
+	{
+		if( button == mDefragmentBatches ) defragmentBatches();
+	}
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*
 	union FusionEntity
@@ -261,6 +354,12 @@ protected:
 	std::vector<AnimationState*>	mAnimations;
 	InstanceManager					*mInstanceManagers[NUM_TECHNIQUES-1];
 	InstanceManager					*mCurrentManager;
+
+	SelectMenu						*mTechniqueMenu;
+	CheckBox						*mMoveInstances;
+	CheckBox						*mAnimateInstances;
+	Button							*mDefragmentBatches;
+	CheckBox						*mDefragmentOptimumCull;
 };
 
 #endif
