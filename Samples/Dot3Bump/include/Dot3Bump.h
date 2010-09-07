@@ -41,9 +41,10 @@ public:
 
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
+			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
 		{
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support shader model 2, "
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
 				"so you cannot run this sample. Sorry!", "Dot3BumpSample::testCapabilities");
 		}
 	}
