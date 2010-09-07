@@ -32,7 +32,7 @@ class _OgreSampleClassExport Sample_NewInstancing : public SdkSample
 {
 public:
 
-	Sample_NewInstancing() : NUM_INST_ROW(100), NUM_INST_COLUMN(100)
+	Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50)
 	{
 		mInfo["Title"] = "New Instancing";
 		mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
@@ -53,6 +53,13 @@ public:
 		// toggle bounding boxes with B key unless the help dialog is visible
 		if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible())
 			mSceneMgr->showBoundingBoxes( !mSceneMgr->getShowBoundingBoxes() );
+
+		if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
+		{
+			clearScene();
+			switchInstancingTechnique();
+		}
+
 		return SdkSample::keyPressed(evt);
 	}
 
@@ -146,6 +153,7 @@ protected:
 		{
 			//Create the instanced entity
 			Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
+			ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES-1] );
 			mEntities.push_back( ent );
 
 			//Get the animation
@@ -193,7 +201,7 @@ protected:
 		}
 	}
 
-	void cleanupContent()
+	void clearScene()
 	{
 		std::vector<MovableObject*>::const_iterator itor = mEntities.begin();
 		std::vector<MovableObject*>::const_iterator end  = mEntities.end();
@@ -202,17 +210,25 @@ protected:
 		//created by this manager (beware of not leaving reference to those pointers)
 		while( itor != end )
 		{
+			SceneNode *sceneNode = (*itor)->getParentSceneNode();
+			sceneNode->detachAllObjects();
+			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+
 			if( mInstancingTechnique == NUM_TECHNIQUES-1 )
 				mSceneMgr->destroyEntity( (*itor)->getName() );
 			else
 				mSceneMgr->destroyInstancedEntity( static_cast<InstancedEntity*>(*itor) );
 
-			SceneNode *sceneNode = (*itor)->getParentSceneNode();
-			sceneNode->detachAllObjects();
-			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
 			++itor;
 		}
 
+		mEntities.clear();
+		mSceneNodes.clear();
+		mAnimations.clear();
+	}
+
+	void destroyManagers()
+	{
 		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
 		{
 			if( mInstanceManagers[i] )
@@ -221,10 +237,12 @@ protected:
 				mInstanceManagers[i] = 0;
 			}
 		}
+	}
 
-		mEntities.clear();
-		mSceneNodes.clear();
-		mAnimations.clear();
+	void cleanupContent()
+	{
+		clearScene();
+		destroyManagers();
 	}
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*

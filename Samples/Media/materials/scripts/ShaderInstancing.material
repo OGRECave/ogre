@@ -14,6 +14,8 @@ vertex_program ShaderInstancing_cg_vs cg
 	source ShaderInstancing.cg
 	entry_point main_vs
 	profiles vs_3_0 vs_2_0 vp40
+	
+	includes_skeletal_animation true
 }
 
 //--------------------------------------------------------------
