@@ -855,7 +855,13 @@ namespace Ogre {
 			ShaderVarWithPosInBuf * iter = &mShaderVars[0];
 			for (size_t i = 0 ; i < mConstantBufferDesc.Variables ; i++, iter++)
 			{
-				String & varName = iter->name;
+				String  varName = iter->name;
+
+				// hack for cg parameter with strange prefix
+				if (varName.size() > 0 && varName[0] == '_')
+				{
+					varName.erase(0,1);
+				}
 
 				const GpuConstantDefinition& def = params->getConstantDefinition(varName);
 				// Since we are mapping with write discard, contents of the buffer are undefined.
