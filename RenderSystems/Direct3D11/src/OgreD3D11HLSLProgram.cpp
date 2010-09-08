@@ -324,7 +324,36 @@ namespace Ogre {
 						ShaderVarWithPosInBuf newVar;
 						newVar.var = shaderVerDesc;
 						newVar.wasInit = false;
-
+						newVar.name = shaderVerDesc.Name;
+						
+						// A hack for cg to get the "original name" of the var in the "auto comments"
+						// that cg adds to the hlsl 4 output. This is to solve the issue that
+						// in some cases cg changes the name of the var to a new name.
+						{
+							String varForSearch = String(" :  : ") + newVar.name;
+							size_t startPosOfVarOrgNameInSource = 0;
+							size_t endPosOfVarOrgNameInSource = mSource.find(varForSearch + " ");
+							if(endPosOfVarOrgNameInSource == -1)
+							{
+								endPosOfVarOrgNameInSource = mSource.find(varForSearch + "[");
+							}
+							if(endPosOfVarOrgNameInSource != -1)
+							{
+								// find space before var;
+								for (size_t i = endPosOfVarOrgNameInSource - 1 ; i > 0 ; i-- )
+								{
+									if (mSource[i] == ' ')
+									{
+										startPosOfVarOrgNameInSource = i + 1;
+										break;
+									}
+								}
+								if (startPosOfVarOrgNameInSource > 0)
+								{
+									newVar.name = mSource.substr(startPosOfVarOrgNameInSource, endPosOfVarOrgNameInSource - startPosOfVarOrgNameInSource);
+								}
+							}
+						}
 
 						mShaderVars.push_back(newVar);
 					}
@@ -826,12 +855,8 @@ namespace Ogre {
 			ShaderVarWithPosInBuf * iter = &mShaderVars[0];
 			for (size_t i = 0 ; i < mConstantBufferDesc.Variables ; i++, iter++)
 			{
-				String varName = iter->var.Name;
-				// hack for cg parameter
-				if (varName.size() > 0 && varName[0] == '_')
-				{
-					varName.erase(0,1);
-				}
+				String & varName = iter->name;
+
 				const GpuConstantDefinition& def = params->getConstantDefinition(varName);
 				// Since we are mapping with write discard, contents of the buffer are undefined.
 				// We must set every variable, even if it has not changed.

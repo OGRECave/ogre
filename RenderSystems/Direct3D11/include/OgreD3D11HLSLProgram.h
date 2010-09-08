@@ -123,6 +123,7 @@ namespace Ogre {
 			bool isFloat;
 			size_t physicalIndex;
 			void * src;
+			String name;
 
 			D3D11_SHADER_VARIABLE_DESC var;
 		};
