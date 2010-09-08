@@ -9,7 +9,7 @@ void grass_vp(float4 position : POSITION,
 			  out float4 oColour    : COLOR,
 
 			  uniform float4x4 worldViewProj,
-			  uniform float4 camObjPos,
+			  //uniform float4 camObjPos,
 			  uniform float4 ambient,
 			  uniform float4 objSpaceLight,
 			  uniform float4 lightColour,
@@ -32,7 +32,8 @@ void grass_vp(float4 position : POSITION,
     
 }
 
-void grass_fp( float2 uv	         : TEXCOORD0,
+void grass_fp( float4 position : POSITION,
+               float2 uv	         : TEXCOORD0,
                float4 colour         : COLOR,  
                
                out float4 oColour    : COLOR,
@@ -42,11 +43,13 @@ void grass_fp( float2 uv	         : TEXCOORD0,
 {	
     float4 texColor = tex2D(diffuseMap, uv.xy);
     oColour = float4(texColor.rgb * colour.rgb, texColor.a); 
+    if(oColour.a < 0.58)
+      discard; 
 }
 
 
 void grassTex_vp(
-              float4 position : POSITION,
+        float4 position : POSITION,
 			  float4 normal   : NORMAL,
 			  float2 uv		  : TEXCOORD0,
               
@@ -111,7 +114,9 @@ void grassAmbient_vp(
 }
 
 
-void grassAmbient_fp( float2 uv	         : TEXCOORD0,
+void grassAmbient_fp( 
+               float4 position : POSITION,
+               float2 uv	         : TEXCOORD0,
                float4 colour         : COLOR,  
                
                out float4 oColour    : COLOR,
@@ -152,7 +157,9 @@ void grasscaster_vp(float4 position : POSITION,
 }
 
 
-void grasscaster_fp(float2 uv	        : TEXCOORD0,
+void grasscaster_fp(
+                    float4 position : POSITION,
+                    float2 uv	        : TEXCOORD0,
                     float2 depth		: TEXCOORD1,
                          
                     out float4 result : COLOR,
@@ -177,7 +184,7 @@ void grasscaster_fp(float2 uv	        : TEXCOORD0,
 
 //////////////////////// GRASS SHADOW RECEIVER
 void grassreceiver_vp(
-                      float4 position : POSITION,
+                float4 position : POSITION,
         			  float4 normal   : NORMAL,
         			  float2 uv		  : TEXCOORD0,
               
@@ -233,7 +240,8 @@ void grassreceiver_vp(
   	
   	
 void grassreceiver_fp( 
-                         float4 shadowUV    : TEXCOORD0
+                         float4 position : POSITION
+                       , float4 shadowUV    : TEXCOORD0
                        , float3 uv	        : TEXCOORD1
                        , float4 vertexLight : COLOR     
                       

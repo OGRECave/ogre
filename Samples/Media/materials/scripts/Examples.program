@@ -9,7 +9,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 {
 	source Example_Basic.cg
 	entry_point ambientOneTexture_vp
-	profiles vs_4_0 vs_1_1 arbvp1
+	profiles vs_1_1 arbvp1
 
 	default_params
 	{
@@ -18,12 +18,27 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 	}
 	
 }
+
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
+{
+	source Example_Basic.cg
+	entry_point ambientOneTexture_vp
+	profiles vs_4_0
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+	
+}
+
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
 	source Example_Basic.hlsl
 	entry_point ambientOneTexture_vp
-	target vs_1_1
+	target vs_4_0 vs_1_1
 
 	default_params
 	{
@@ -58,6 +73,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
@@ -67,17 +83,26 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
-	delegate Ogre/BasicVertexPrograms/PassthroughFpCG
+	delegate Ogre/BasicVertexPrograms/PassthroughFpCgSm4
 	delegate Ogre/BasicVertexPrograms/PassthroughFpGLSLES
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
-fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCG cg
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 {
 	entry_point main
 	source PassthroughFP.cg
 	profiles ps_4_0
 }
+
+// A really basic ambient pass program, support for one texture coordinate set
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTexture cg
+{
+	entry_point mainForAmbientOneTexture
+	source PassthroughFP.cg
+	profiles ps_4_0
+}
+
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles

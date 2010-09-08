@@ -838,13 +838,13 @@ vertex_program Examples/GrassWaverVpCg cg
 {
 	source Grass.cg
 	entry_point grass_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
     
     default_params
     {    
         param_named_auto worldViewProj worldviewproj_matrix
         
-        param_named_auto camObjPos camera_position_object_space
+       // param_named_auto camObjPos camera_position_object_space
         
         param_named_auto ambient ambient_light_colour
         param_named_auto objSpaceLight light_position_object_space 0
@@ -858,7 +858,7 @@ vertex_program Examples/GrassWaverTexVpCg cg
   {
 	source Grass.cg
 	entry_point grassTex_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
     
     default_params
       {
@@ -870,7 +870,7 @@ vertex_program Examples/GrassWaverAmbientVpCg cg
 {
 	source Grass.cg
 	entry_point grassAmbient_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
     
     default_params
   	{
@@ -883,7 +883,7 @@ fragment_program Examples/GrassWaverAmbientFpCg cg
 {
 	source Grass.cg
 	entry_point grassAmbient_fp
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
     default_params
     {
     }
@@ -892,7 +892,7 @@ fragment_program Examples/GrassWaverFpCg cg
 {
 	source Grass.cg
 	entry_point grass_fp
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
     default_params
     {
     }
@@ -902,7 +902,7 @@ vertex_program Examples/GrassWaverCasterVpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
     
     default_params
     {    
@@ -915,7 +915,7 @@ fragment_program Examples/GrassWaverCasterFpCg cg
 {
 	source Grass.cg
 	entry_point grasscaster_fp
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
     default_params
     {
     }
@@ -925,21 +925,21 @@ vertex_program Examples/GrassWaverReceiverVpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_vp
-	profiles vs_1_1 arbvp1
+	profiles vs_4_0 vs_1_1 arbvp1
     
     default_params
     {
         param_named_auto world world_matrix
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto texViewProj texture_viewproj_matrix
+		    param_named_auto worldViewProj worldviewproj_matrix
+		    param_named_auto texViewProj texture_viewproj_matrix
         
         param_named_auto camObjPos camera_position_object_space
         
-  				param_named_auto objSpaceLight light_position_object_space 0
-  				param_named_auto lightColour light_diffuse_colour 0
-        
-  				param_named_auto offset custom 999
-  			}
+  			param_named_auto objSpaceLight light_position_object_space 0
+  			param_named_auto lightColour light_diffuse_colour 0
+       
+  			param_named_auto offset custom 999
+  	}
 }
 
 
@@ -947,7 +947,7 @@ fragment_program Examples/GrassWaverReceiverFpCg cg
 {
 	source Grass.cg
 	entry_point grassreceiver_fp
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
    
 	default_params
     {

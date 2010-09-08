@@ -35,6 +35,7 @@ public:
         }
 
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_1_4") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
