@@ -110,6 +110,7 @@ namespace Ogre
 		AxisAlignedBox		m_fullBoundingBox;
 		Real				m_boundingRadius;
 		bool				m_boundsDirty;
+		bool				m_boundsUpdated; //Set to false by derived classes that need it
 		Camera				*m_currentCamera;
 
 		bool				m_dirtyAnimation; //Set to false at start of each _updateRenderQueue

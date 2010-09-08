@@ -49,6 +49,7 @@ namespace Ogre
 				m_indexToBoneMap( indexToBoneMap ),
 				m_boundingRadius( 0 ),
 				m_boundsDirty( false ),
+				m_boundsUpdated( false ),
 				m_currentCamera( 0 ),
 				mCachedCamera( 0 )
 	{
@@ -118,7 +119,8 @@ namespace Ogre
 		//Tell the SceneManager our bounds have changed
 		getParentSceneNode()->_updateBounds();
 
-		m_boundsDirty = false;
+		m_boundsDirty	= false;
+		m_boundsUpdated	= true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::updateVisibility(void)
@@ -359,7 +361,8 @@ namespace Ogre
 		}
 
 		//We've potentially changed our bounds
-		_boundsDirty();
+		if( !isBatchUnused() )
+			_boundsDirty();
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_defragmentBatchDiscard(void)

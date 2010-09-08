@@ -56,15 +56,13 @@ public:
 
 	bool keyPressed(const OIS::KeyEvent& evt)
 	{
-		// toggle bounding boxes with B key unless the help dialog is visible
-		if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible())
-			mSceneMgr->showBoundingBoxes( !mSceneMgr->getShowBoundingBoxes() );
+		//Toggle bounding boxes with B key unless the help dialog is visible
+		if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible() && mCurrentManager)
+			mCurrentManager->showBoundingBoxes( !mCurrentManager->getShowBoundingBoxes() );
 
-		/*if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
-		{
-			clearScene();
-			switchInstancingTechnique();
-		}*/
+		//Switch to next instancing technique with space bar
+		if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
+			mTechniqueMenu->selectItem( (mTechniqueMenu->getSelectionIndex() + 1) % NUM_TECHNIQUES );
 
 		return SdkSample::keyPressed(evt);
 	}
@@ -84,7 +82,7 @@ protected:
 		
 		// create a ground entity from our mesh and attach it to the origin
 		Entity* ground = mSceneMgr->createEntity("Ground", "ground");
-		ground->setMaterialName("Examples/NewInstancingFloor");
+		ground->setMaterialName("Examples/GrassFloor");
 		ground->setCastShadows(false);
 		mSceneMgr->getRootSceneNode()->attachObject(ground);
 
@@ -251,6 +249,11 @@ protected:
 			++itor;
 		}
 
+		//Free some memory, but don't destroy the manager so when we switch this technique
+		//back again it doesn't take too long
+		if( mCurrentManager )
+			mCurrentManager->cleanupEmptyBatches();
+
 		mEntities.clear();
 		mSceneNodes.clear();
 		mAnimations.clear();
@@ -290,7 +293,7 @@ protected:
 
 	void moveUnits( float timeSinceLast )
 	{
-		const Real fMovSpeed = mEntities[0]->getBoundingRadius() * 0.25f;
+		const Real fMovSpeed = mEntities[0]->getBoundingRadius() * 0.30f;
 
 		//Randomly move the units along their normal, bouncing around invisible walls
 		std::vector<SceneNode*>::const_iterator itor = mSceneNodes.begin();
@@ -298,9 +301,56 @@ protected:
 
 		while( itor != end )
 		{
+			//Calculate bounces
+			Vector3 entityPos = (*itor)->getPosition();
+			Vector3 planeNormal = Vector3::ZERO;
+			if( (*itor)->getPosition().x < -500.0f )
+			{
+				planeNormal = Vector3::UNIT_X;
+				entityPos.x = -499.0f;
+			}
+			else if( (*itor)->getPosition().x > 500.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_X;
+				entityPos.x = 499.0f;
+			}
+			else if( (*itor)->getPosition().z < -500.0f )
+			{
+				planeNormal = Vector3::UNIT_Z;
+				entityPos.z = -499.0f;
+			}
+			else if( (*itor)->getPosition().z > 500.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_Z;
+				entityPos.z = 499.0f;
+			}
+
+			if( planeNormal != Vector3::ZERO )
+			{
+				const Vector3 vDir( (*itor)->getOrientation().xAxis().normalisedCopy() );
+				(*itor)->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
+				(*itor)->setPosition( entityPos );
+			}
+
+			//Move along the direction we're looking to
 			(*itor)->translate( Vector3::UNIT_X * timeSinceLast * fMovSpeed, Node::TS_LOCAL );
 			++itor;
 		}
+	}
+
+	//Helper function to look towards normDir, where this vector is normalized, with fixed Yaw
+	Quaternion lookAt( const Vector3 &normDir )
+	{
+		Quaternion retVal;
+		Vector3 xVec = Vector3::UNIT_Y.crossProduct( normDir );
+        xVec.normalise();
+
+        Vector3 yVec = normDir.crossProduct( xVec );
+        yVec.normalise();
+
+        retVal.FromAxes( xVec, yVec, normDir );
+
+		return retVal;
 	}
 
 	void defragmentBatches()
@@ -329,9 +379,9 @@ protected:
 		mAnimateInstances->setChecked(false);
 
 		//Controls to control batch defragmentation on the fly
-		mDefragmentBatches =  mTrayMgr->createButton(TL_TOPRIGHT, "DefragmentBatches",
+		mDefragmentBatches =  mTrayMgr->createButton(TL_TOP, "DefragmentBatches",
 															"Defragment Batches", 175);
-		mDefragmentOptimumCull = mTrayMgr->createCheckBox(TL_TOPRIGHT, "DefragmentOptimumCull",
+		mDefragmentOptimumCull = mTrayMgr->createCheckBox(TL_TOP, "DefragmentOptimumCull",
 															"Optimum Cull", 175);
 		mDefragmentOptimumCull->setChecked(true);
 

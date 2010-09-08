@@ -46,7 +46,8 @@ namespace Ogre
 				m_idCount( 0 ),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_instancingTechnique( instancingTechnique ),
-				m_instancingFlags( instancingFlags )
+				m_instancingFlags( instancingFlags ),
+				m_showBoundingBoxes( false )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
 
@@ -210,7 +211,7 @@ namespace Ogre
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
 		sceneNode->attachObject( batch );
-		//sceneNode->showBoundingBox( true );
+		sceneNode->showBoundingBox( m_showBoundingBoxes );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -219,6 +220,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::cleanupEmptyBatches(void)
 	{
+		//Do this now to avoid any dangling pointer inside m_dirtyBatches
+		_updateDirtyBatches();
+
 		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
 		InstanceBatchMap::iterator end  = m_instanceBatches.end();
 
@@ -229,7 +233,7 @@ namespace Ogre
 
 			while( it != en )
 			{
-				if( !(*it)->isBatchUnused() )
+				if( (*it)->isBatchUnused() )
 				{
 					OGRE_DELETE *it;
 					//Remove it from the list swapping with the last element and popping back
@@ -285,7 +289,10 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::defragmentBatches( bool optimizeCulling )
 	{
-		//Do this for every materiali
+		//Do this now to avoid any dangling pointer inside m_dirtyBatches
+		_updateDirtyBatches();
+
+		//Do this for every material
 		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
 		InstanceBatchMap::iterator end  = m_instanceBatches.end();
 
@@ -305,6 +312,28 @@ namespace Ogre
 			}
 
 			defragmentBatches( optimizeCulling, usedEntities, itor->second );
+
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::showBoundingBoxes( bool bShow )
+	{
+		m_showBoundingBoxes = bShow;
+
+		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
+		InstanceBatchMap::iterator end  = m_instanceBatches.end();
+
+		while( itor != end )
+		{
+			InstanceBatchVec::iterator it = itor->second.begin();
+			InstanceBatchVec::iterator en = itor->second.end();
+
+			while( it != en )
+			{
+				(*it)->getParentSceneNode()->showBoundingBox( bShow );
+				++it;
+			}
 
 			++itor;
 		}

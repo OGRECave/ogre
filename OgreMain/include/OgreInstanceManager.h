@@ -84,6 +84,7 @@ namespace Ogre
 		InstancingTechnique		m_instancingTechnique;
 		uint16					m_instancingFlags;		//@see InstanceManagerFlags
 
+		bool					m_showBoundingBoxes;
 		SceneManager			*m_sceneManager;
 
 		/** Finds a batch with at least one free instanced entity we can use.
@@ -177,6 +178,13 @@ namespace Ogre
 			(which nullifies any CPU culling)
         */
 		void defragmentBatches( bool optimizeCulling );
+
+		/** Toggles display of batches' bounding boxes on and off (not the individual instances).
+			Useful for debugging or profiling
+		*/
+		void showBoundingBoxes( bool bShow );
+
+		bool getShowBoundingBoxes() const { return m_showBoundingBoxes; }
 
 		/** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
 			@param dirtyBatch The batch which is dirty, usually same as caller.
