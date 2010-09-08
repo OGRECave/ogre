@@ -35,7 +35,9 @@ namespace Ogre {
 	D3D11HardwareVertexBuffer::D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
 		size_t numVertices, HardwareBuffer::Usage usage, D3D11Device & device, 
 		bool useSystemMemory, bool useShadowBuffer)
-		: HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer)
+		: HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, useSystemMemory, useShadowBuffer),
+		  mBufferImpl(0)
+		  
 	{
 		// everything is done via internal generalisation
 		mBufferImpl = new D3D11HardwareBuffer(D3D11HardwareBuffer::VERTEX_BUFFER, 
@@ -45,7 +47,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	D3D11HardwareVertexBuffer::~D3D11HardwareVertexBuffer()
 	{
-		delete mBufferImpl;
+		SAFE_DELETE(mBufferImpl);
 	}
 	//---------------------------------------------------------------------
 	void* D3D11HardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
@@ -72,9 +74,19 @@ namespace Ogre {
 	void D3D11HardwareVertexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
-		D3D11HardwareVertexBuffer& d3dBuf = static_cast<D3D11HardwareVertexBuffer&>(srcBuffer);
+		// check if the other buffer is also a D3D11HardwareVertexBuffer
+		if (srcBuffer.isSystemMemory())
+		{
+			// src is not not a D3D11HardwareVertexBuffer - use default copy
+			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+		else
+		{
+			// src is a D3D11HardwareVertexBuffer use d3d11 optimized copy
+			D3D11HardwareVertexBuffer& d3dBuf = static_cast<D3D11HardwareVertexBuffer&>(srcBuffer);
 
-		mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+			mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+		}
 	}
 	//---------------------------------------------------------------------
 	bool D3D11HardwareVertexBuffer::isLocked(void) const
