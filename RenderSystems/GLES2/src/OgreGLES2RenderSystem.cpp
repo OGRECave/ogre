@@ -359,7 +359,7 @@ namespace Ogre {
 				LogManager::getSingleton().logMessage("GL ES 2: Warning: RenderTexture size is restricted to size of framebuffer. If you are on Linux, consider using GLX instead of SDL.");
 
 				//Copy method uses the main depth buffer but no other depth buffer
-                caps->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
+                caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 				caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 			}
 

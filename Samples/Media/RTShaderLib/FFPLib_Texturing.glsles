@@ -214,10 +214,7 @@ void FFP_GenerateTexCoord_Projection(in mat4 mWorld,
 						   in vec4 vPos,						  				  
 						   out vec3 vOut)
 {
-	vec4 vWorldPos    = mWorld * vPos;
-	vec4 vTexturePos  = mTexViewProjImage * vWorldPos;
-
-	vOut = vTexturePos.xyw;
+	vOut = (mTexViewProjImage * (mWorld * vPos)).xyw;
 }
 
 //-----------------------------------------------------------------------------
