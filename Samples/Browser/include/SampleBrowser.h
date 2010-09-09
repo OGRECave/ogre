@@ -38,15 +38,18 @@
 #endif
 
 #ifdef OGRE_STATIC_LIB
-#if USE_RTSHADER_SYSTEM
+#ifdef USE_RTSHADER_SYSTEM
 #include "ShaderSystem.h"
 #include "BSP.h"
 #include "CelShading.h"
+#include "Compositor.h"
 #include "CubeMapping.h"
+#include "DeferredShadingDemo.h"
 #include "Dot3Bump.h"
 #include "Fresnel.h"
 #include "OceanDemo.h"
 #include "Terrain.h"
+#include "Water.h"
 #endif
 #include "BezierPatch.h"
 #include "CameraTrack.h"
@@ -913,6 +916,10 @@ protected:
          -----------------------------------------------------------------------------*/
 		virtual void setup()
 		{
+			createWindow();
+			setupInput();
+			locateResources();
+
 #ifdef OGRE_STATIC_LIB
             // Check if the render system supports any shader profiles.
             // Don't load samples that require shaders if we don't have any shader support, GL ES 1.x for example.
@@ -925,6 +932,7 @@ protected:
             mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
             mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
             mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
+            mPluginNameMap["Sample_DeferredShading"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_DeferredShading();
             mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
@@ -932,6 +940,8 @@ protected:
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
+            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
+            mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
 #   ifdef USE_RTSHADER_SYSTEM
             mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
 #   endif // USE_RTSHADER_SYSTEM
@@ -947,21 +957,19 @@ protected:
             {
 				mPluginNameMap["Sample_BSP"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_BSP();
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
+                mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
                 mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
                 mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
 				mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
-#if USE_RTSHADER_SYSTEM
+				mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
+#ifdef USE_RTSHADER_SYSTEM
 				mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+#endif
             }
             mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
 #endif
-#endif
-            
-			createWindow();
-			setupInput();
-			locateResources();
-            
+
 			Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
             
 			mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mMouse, this);
