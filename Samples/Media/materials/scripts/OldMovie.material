@@ -1,8 +1,19 @@
-fragment_program Ogre/Compositor/OldMovieFP cg
+fragment_program Ogre/Compositor/OldMovie_Cg_FP cg
 {
 	source OldMovieFP.cg
 	entry_point OldMovie_ps
 	profiles ps_4_0 ps_2_0 arbfp1
+}
+
+fragment_program Ogre/Compositor/OldMovie_GLSLES_FP glsles
+{
+	source OldMovieFP.glsles
+}
+
+fragment_program Ogre/Compositor/OldMovieFP unified
+{
+	delegate Ogre/Compositor/OldMovie_Cg_FP
+	delegate Ogre/Compositor/OldMovie_GLSLES_FP
 }
 
 material Ogre/Compositor/OldMovie

@@ -1,15 +1,25 @@
-fragment_program Ogre/Compositor/PosterizeFP cg
+fragment_program Ogre/Compositor/Posterize_Cg_FP cg
 {
 	source PosterizeFP.cg
 	entry_point Posterize_ps
 	profiles ps_4_0 ps_2_0 arbfp1
 }
 
+fragment_program Ogre/Compositor/Posterize_GLSLES_FP glsles
+{
+	source PosterizeFP.glsles
+}
+
+fragment_program Ogre/Compositor/PosterizeFP unified
+{
+	delegate Ogre/Compositor/Posterize_Cg_FP
+	delegate Ogre/Compositor/Posterize_GLSLES_FP
+}
+
 material Ogre/Compositor/Posterize
 {
     technique
     {
-
 		pass
 		{
 			cull_hardware none

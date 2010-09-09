@@ -5,14 +5,15 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-varying vec2 uv;
+uniform mat4 worldViewProj;
 attribute vec4 vertex;
+varying vec2 uv;
 
-void main()                    
+void main()
 {
-	gl_Position = vertex;
-    
+    gl_Position = worldViewProj * vertex;
+  	
 	vec2 inPos = sign(vertex.xy);
 	
-	uv = (vec2(inPos.x, -inPos.y) + 1.0)/2.0;
+	uv = (vec2(inPos.x, -inPos.y) + 1.0) / 2.0;
 }

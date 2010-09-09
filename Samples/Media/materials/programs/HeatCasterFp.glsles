@@ -5,11 +5,9 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-uniform sampler2D RT;
-varying vec2 uv0;
-varying vec2 uv1;
+varying vec2 NDotV;
 
 void main()
 {
-	gl_FragColor = 1.0 - texture2D(RT, uv0);
+   gl_FragColor = vec4(NDotV.x);
 }

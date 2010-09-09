@@ -61,7 +61,6 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 {
 	source AmbientOneTexture.glsles
-    profiles glsles
 
 	default_params
 	{
@@ -108,7 +107,6 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTextu
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles
 {
 	source PassthroughFP.glsles
-    profiles glsles
 }
 
 // Same as below, but for use when rendering texture shadows

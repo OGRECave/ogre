@@ -3,18 +3,40 @@
 //		HEAT CASTERS PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/HeatCaster_vp cg
+vertex_program Fury/HeatVision/HeatCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_vp
    profiles vs_1_1 arbvp1
 }
 
-fragment_program Fury/HeatVision/HeatCaster_fp cg
+fragment_program Fury/HeatVision/HeatCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_fp
    profiles ps_2_0 arbfp1
+}
+
+vertex_program Fury/HeatVision/HeatCaster_GLSLES_vp glsles
+{
+   source HeatCasterVp.glsles
+}
+
+fragment_program Fury/HeatVision/HeatCaster_GLSLES_fp glsles
+{
+   source HeatCasterFp.glsles
+}
+
+vertex_program Fury/HeatVision/HeatCaster_vp unified
+{
+    delegate Fury/HeatVision/HeatCaster_Cg_vp
+    delegate Fury/HeatVision/HeatCaster_GLSLES_vp
+}
+
+fragment_program Fury/HeatVision/HeatCaster_fp unified
+{
+    delegate Fury/HeatVision/HeatCaster_Cg_fp
+    delegate Fury/HeatVision/HeatCaster_GLSLES_fp
 }
 
 material Fury/HeatVision/HeatCaster
@@ -41,18 +63,40 @@ material Fury/HeatVision/HeatCaster
 //		HEAT CASTERS PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/ColdCaster_vp cg
+vertex_program Fury/HeatVision/ColdCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_vp
    profiles vs_1_1 arbvp1
 }
 
-fragment_program Fury/HeatVision/ColdCaster_fp cg
+fragment_program Fury/HeatVision/ColdCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_fp
    profiles ps_2_0 arbfp1
+}
+
+vertex_program Fury/HeatVision/ColdCaster_GLSLES_vp glsles
+{
+   source ColdCasterVp.glsles
+}
+
+fragment_program Fury/HeatVision/ColdCaster_GLSLES_fp glsles
+{
+   source ColdCasterFp.glsles
+}
+
+vertex_program Fury/HeatVision/ColdCaster_vp unified
+{
+    delegate Fury/HeatVision/ColdCaster_Cg_vp
+    delegate Fury/HeatVision/ColdCaster_GLSLES_vp
+}
+
+fragment_program Fury/HeatVision/ColdCaster_fp unified
+{
+    delegate Fury/HeatVision/ColdCaster_Cg_fp
+    delegate Fury/HeatVision/ColdCaster_GLSLES_fp
 }
 
 material Fury/HeatVision/ColdCaster
@@ -79,7 +123,7 @@ material Fury/HeatVision/ColdCaster
 //  LIGHT TO HEAT CONVERSION PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/LightToHeat_vp cg
+vertex_program Fury/HeatVision/LightToHeat_Cg_vp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_vp
@@ -91,11 +135,38 @@ vertex_program Fury/HeatVision/LightToHeat_vp cg
     }
 }
 
-fragment_program Fury/HeatVision/LightToHeat_fp cg
+fragment_program Fury/HeatVision/LightToHeat_Cg_fp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_fp
    profiles ps_2_0 arbfp1
+}
+
+vertex_program Fury/HeatVision/LightToHeat_GLSLES_vp glsles
+{
+    source LightToHeatVp.glsles
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/LightToHeat_GLSLES_fp glsles
+{
+   source LightToHeatFp.glsles
+}
+
+vertex_program Fury/HeatVision/LightToHeat_vp unified
+{
+    delegate Fury/HeatVision/LightToHeat_Cg_vp
+    delegate Fury/HeatVision/LightToHeat_GLSLES_vp
+}
+
+fragment_program Fury/HeatVision/LightToHeat_fp unified
+{
+    delegate Fury/HeatVision/LightToHeat_Cg_fp
+    delegate Fury/HeatVision/LightToHeat_GLSLES_fp
 }
 
 material Fury/HeatVision/LightToHeat
@@ -157,7 +228,7 @@ material Fury/HeatVision/LightToHeat
 //			 BLUR PASS
 ///////////////////////////////////
 
-vertex_program Fury/HeatVision/Blur_vp cg
+vertex_program Fury/HeatVision/Blur_Cg_vp cg
 {
    source HeatVision.cg
    entry_point Blur_vp
@@ -169,11 +240,38 @@ vertex_program Fury/HeatVision/Blur_vp cg
     }
 }
 
-fragment_program Fury/HeatVision/Blur_fp cg
+fragment_program Fury/HeatVision/Blur_Cg_fp cg
 {
    source HeatVision.cg
    entry_point Blur_fp
    profiles ps_2_0 arbfp1
+}
+
+vertex_program Fury/HeatVision/Blur_GLSLES_vp glsles
+{
+    source HeatBlurVp.glsles
+
+    default_params
+    {
+        param_named_auto flipping render_target_flipping
+    }
+}
+
+fragment_program Fury/HeatVision/Blur_GLSLES_fp glsles
+{
+   source HeatBlurFp.glsles
+}
+
+vertex_program Fury/HeatVision/Blur_vp unified
+{
+    delegate Fury/HeatVision/Blur_Cg_vp
+    delegate Fury/HeatVision/Blur_GLSLES_vp
+}
+
+fragment_program Fury/HeatVision/Blur_fp unified
+{
+    delegate Fury/HeatVision/Blur_Cg_fp
+    delegate Fury/HeatVision/Blur_GLSLES_fp
 }
 
 material Fury/HeatVision/Blur

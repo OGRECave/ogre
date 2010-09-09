@@ -43,7 +43,7 @@ float4 blend
    float4 blur  = tex2D(Blur1, texCoord);
 
    // alpha channel of sharp RT has depth info
-   return lerp(sharp, blur, saturate(range * abs(focus - sharp.a)));
+   return mix(sharp, blur, saturate(range * abs(focus - sharp.a)));
 }
 // Simple blur filter
 
@@ -90,5 +90,5 @@ float4 blend
    float4 blur  = tex2D(Blur1, texCoord);
 
    // alpha channel of sharp RT has depth info
-   return lerp(sharp, blur, saturate(range * abs(focus - sharp.a)));
+   return mix(sharp, blur, saturate(range * abs(focus - sharp.a)));
 }

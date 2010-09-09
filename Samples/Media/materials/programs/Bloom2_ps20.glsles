@@ -17,14 +17,12 @@ uniform sampler2D Blur1;
 
 uniform float OriginalImageWeight;
 uniform float BlurWeight;
-varying vec4 uv0;
+varying vec2 texCoord;
 
 void main()
 {
     vec4 sharp;
     vec4 blur;
-    
-    vec2 texCoord = vec2( uv0 );
 
     sharp = texture2D( RT, texCoord);
     blur = texture2D( Blur1, texCoord);

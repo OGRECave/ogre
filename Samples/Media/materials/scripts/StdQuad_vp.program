@@ -10,7 +10,7 @@ vertex_program Ogre/Compositor/StdQuad_Cg_vp cg
 	}
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex2_vp cg
+vertex_program Ogre/Compositor/StdQuad_Tex2_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex2_vp
@@ -22,7 +22,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2_vp cg
 	}
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex2a_vp cg
+vertex_program Ogre/Compositor/StdQuad_Tex2a_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex2a_vp
@@ -34,7 +34,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex2a_vp cg
 	}
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex3_vp cg
+vertex_program Ogre/Compositor/StdQuad_Tex3_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex3_vp
@@ -46,7 +46,7 @@ vertex_program Ogre/Compositor/StdQuad_Tex3_vp cg
 	}
 }
 
-vertex_program Ogre/Compositor/StdQuad_Tex4_vp cg
+vertex_program Ogre/Compositor/StdQuad_Tex4_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_Tex4_vp
@@ -66,12 +66,77 @@ vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl
 vertex_program Ogre/Compositor/StdQuad_GLSLES_vp glsles
 {
 	source StdQuad_vp.glsles
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
 }
 
+vertex_program Ogre/Compositor/StdQuad_Tex2_GLSLES_vp glsles
+{
+	source StdQuad_Tex2_vp.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
 
+vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSLES_vp glsles
+{
+	source StdQuad_Tex2a_vp.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex3_GLSLES_vp glsles
+{
+	source StdQuad_Tex3_vp.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex4_GLSLES_vp glsles
+{
+	source StdQuad_Tex4_vp.glsles
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+// Unified definitions
 vertex_program Ogre/Compositor/StdQuad_vp unified
 {
 	delegate Ogre/Compositor/StdQuad_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Cg_vp
 }
+
+vertex_program Ogre/Compositor/StdQuad_Tex2_vp unified
+{
+	delegate Ogre/Compositor/StdQuad_Tex2_Cg_vp
+	delegate Ogre/Compositor/StdQuad_Tex2_GLSLES_vp
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex2a_vp unified
+{
+	delegate Ogre/Compositor/StdQuad_Tex2a_Cg_vp
+	delegate Ogre/Compositor/StdQuad_Tex2a_GLSLES_vp
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex3_vp unified
+{
+    delegate Ogre/Compositor/StdQuad_Tex3_Cg_vp
+	delegate Ogre/Compositor/StdQuad_Tex3_GLSLES_vp
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex4_vp unified
+{
+	delegate Ogre/Compositor/StdQuad_Tex4_Cg_vp
+	delegate Ogre/Compositor/StdQuad_Tex4_GLSLES_vp
+}
+

@@ -6,11 +6,11 @@ precision lowp sampler2D;
 precision lowp samplerCube;
 
 uniform sampler2D tex;
-varying vec4 oUv0;
+varying vec4 ambientUV;
 
 void main ()
 {
-	gl_FragColor = vec4(texture2D(tex, oUv0.xy));
+	gl_FragColor = vec4(texture2D(tex, ambientUV.xy));
 
 	// Blow out the light a bit
 	gl_FragColor *= 1.7;

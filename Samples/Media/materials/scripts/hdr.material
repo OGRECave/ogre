@@ -146,8 +146,6 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpassGLSL_fp glsl
 fragment_program Ogre/Compositor/HDR/downscale3x3brightpassGLSLES_fp glsles
 {
 	source hdr_downscale3x3brightpass.glsles
-	// re-use common functions
-	attach Ogre/Compositor/HDR/utils_fp
 	default_params
 	{
 		param_named inRTT int 0
@@ -282,8 +280,6 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingGLSL_fp glsl
 fragment_program Ogre/Compositor/HDR/finaltonemappingGLSLES_fp glsles
 {
 	source hdr_finalToneMapping.glsles
-	// re-use common functions
-	attach Ogre/Compositor/HDR/utils_fp
 	default_params
 	{
 		param_named inRTT int 0
@@ -334,5 +330,3 @@ material Ogre/Compositor/HDR/ToneMapping
 		}
 	}
 }
-
-

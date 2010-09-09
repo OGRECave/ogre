@@ -1,8 +1,19 @@
-fragment_program Ogre/Compositor/B&W_FP cg
+fragment_program Ogre/Compositor/B&W_Cg_FP cg
 {
 	source GrayScale.cg
 	entry_point GrayScale_ps
 	profiles ps_4_0 ps_2_0 arbfp1
+}
+
+fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
+{
+	source GrayScale.glsles
+}
+
+fragment_program Ogre/Compositor/B&W_FP unified
+{
+	delegate Ogre/Compositor/B&W_Cg_FP
+	delegate Ogre/Compositor/B&W_GLSLES_FP
 }
 
 material Ogre/Compositor/BlackAndWhite
@@ -14,7 +25,7 @@ material Ogre/Compositor/BlackAndWhite
 		{
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_Cg_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 
@@ -25,7 +36,7 @@ material Ogre/Compositor/BlackAndWhite
 			texture_unit
 			{
 				texture RT
-        tex_coord_set 0
+				tex_coord_set 0
 				tex_address_mode clamp
 				filtering linear linear linear
 			}

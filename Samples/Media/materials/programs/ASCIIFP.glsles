@@ -24,7 +24,7 @@ float4 ASCII_ps(	float2 TexCoord : TEXCOORD0,
 	local.z = dot(c , lum)*charBias;
 	
 	//fix to brighten the dark pixels with small characters
-	//c *= lerp(2.0,1.0, local.z);
+	//c *= mix(2.0,1.0, local.z);
 	
 	c *= tex3D(pattern,local);
 	return c;

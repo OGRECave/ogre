@@ -1,8 +1,19 @@
-fragment_program Ogre/Compositor/LaplaceFP cg
+fragment_program Ogre/Compositor/Laplace_Cg_FP cg
 {
 	source LaplaceFP.cg
 	entry_point Laplace_ps
 	profiles ps_4_0 ps_2_0 arbfp1
+}
+
+fragment_program Ogre/Compositor/Laplace_GLSLES_FP glsles
+{
+	source LaplaceFP.glsles
+}
+
+fragment_program Ogre/Compositor/LaplaceFP unified
+{
+	delegate Ogre/Compositor/Laplace_Cg_FP
+	delegate Ogre/Compositor/Laplace_GLSLES_FP
 }
 
 material Ogre/Compositor/Laplace
@@ -25,7 +36,6 @@ material Ogre/Compositor/Laplace
 				param_named pixelSize float 0.0031
 				param_named scale float 1.0
 			}
-
 
 			texture_unit RT
 			{

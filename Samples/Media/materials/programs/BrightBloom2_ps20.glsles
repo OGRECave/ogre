@@ -23,10 +23,8 @@ void main()
     vec4 tex;
     vec4 bright4;
     float bright;
-    
-    vec2 texCoord = vec2( uv );
 
-    tex = texture2D( RT, texCoord);
+    tex = texture2D(RT, uv);
     tex -= 1.00000;
     bright4 = -6.00000 * tex * tex + 2.00000;
     bright = dot( bright4, vec4( 0.333333, 0.333333, 0.333333, 0.000000) );

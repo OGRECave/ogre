@@ -24,5 +24,4 @@ void main(void)
     }
     
     gl_FragColor = accum;
-	
 }

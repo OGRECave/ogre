@@ -1,15 +1,19 @@
-float4 Combine_fp
-(
-    in float2 texCoord: TEXCOORD0,
-    
-    uniform sampler RT : register(s0),
-    uniform sampler Sum : register(s1),
+#version 100
+precision mediump int;
+precision mediump float;
+precision lowp sampler2D;
+precision lowp samplerCube;
 
-    uniform float blur
-) : COLOR
+uniform sampler2D RT;
+uniform sampler2D Sum;
+uniform float blur;
+
+varying vec2 uv;
+
+void main()
 {
-   float4 render = tex2D(RT, texCoord);
-   float4 sum = tex2D(Sum, texCoord);
+   vec4 render = texture2D(RT, uv);
+   vec4 sum = texture2D(Sum, uv);
 
-   return lerp(render, sum, blur);
+   gl_FragColor = mix(render, sum, blur);
 }

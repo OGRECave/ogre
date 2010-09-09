@@ -64,22 +64,27 @@ fragment_program Blur_ps_glsles glsles
 	}
 }
 
-vertex_program Blur0_vs_glsles glsles
+//------------------------
+//Unified Definitions
+//------------------------
+vertex_program Blur0_vs_gl_unified unified
 {
-	source Blur0_vs.glsles
+	delegate Blur0_vs_glsl
+	delegate Blur0_vs_glsles
 }
-vertex_program Blur1_vs_glsles glsles
+
+vertex_program Blur1_vs_gl_unified unified
 {
-	source Blur1_vs.glsles
+	delegate Blur1_vs_glsl
+	delegate Blur1_vs_glsles
 }
-fragment_program Blur_ps_glsles glsles
+
+fragment_program Blur_ps_gl_unified unified
 {
-	source Blur_ps.glsles
-	default_params
-	{
-		param_named tex0 int 0
-	}
+	delegate Blur_ps_glsl
+	delegate Blur_ps_glsles
 }
+
 
 //Effect: Bloom
 material Ogre/Compositor/Blur0
@@ -117,10 +122,10 @@ material Ogre/Compositor/Blur0
 			cull_software none
 			depth_check off
 
-			fragment_program_ref Blur_ps_glsl
+			fragment_program_ref Blur_ps_gl_unified
 			{
 			}
-			vertex_program_ref Blur0_vs_glsl
+			vertex_program_ref Blur0_vs_gl_unified
 			{
 			}
 			texture_unit RT
@@ -169,10 +174,10 @@ material Ogre/Compositor/Blur1
 			cull_software none
 			depth_func always_pass
 
-			fragment_program_ref Blur_ps_glsl
+			fragment_program_ref Blur_ps_gl_unified
 			{
 			}
-			vertex_program_ref Blur1_vs_glsl
+			vertex_program_ref Blur1_vs_gl_unified
 			{
 			}
 			texture_unit

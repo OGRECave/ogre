@@ -1,0 +1,25 @@
+#version 100
+
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+uniform mat4 worldViewProj;
+attribute vec4 vertex;
+varying vec2 uv0;
+varying vec2 uv1;
+varying vec4 pos;
+
+void main()
+{
+	// Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+    gl_Position = worldViewProj * vertex;
+
+    // The input positions adjusted by texel offsets, so clean up inaccuracies
+	vec2 inPos = sign(vertex.xy);
+
+    // Convert to image-space
+    uv0 = (vec2(inPos.x, -inPos.y) + 1.0) * 0.5;
+    uv1 = inPos.xy;
+}

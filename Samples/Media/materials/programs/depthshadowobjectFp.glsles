@@ -174,7 +174,7 @@ float4 main_fp(
 #  if FOG
     // if fog is active, interpolate between the unfogged color and the fog color
     // based on vertex shader fog value
-    vColor.rgb = lerp(vColor.rgb, fogColour, In.diffuseUV.z).rgb;
+    vColor.rgb = mix(vColor.rgb, fogColour, In.diffuseUV.z).rgb;
 #  endif
 
     return vColor;
@@ -359,7 +359,7 @@ float4 main_fp(
 #  if FOG
     // if fog is active, interpolate between the unfogged color and the fog color
     // based on vertex shader fog value
-    vColor.rgb = lerp(vColor.rgb, fogColour, In.diffuseUV.z).rgb;
+    vColor.rgb = mix(vColor.rgb, fogColour, In.diffuseUV.z).rgb;
 #  endif
 
     return vColor;

@@ -47,35 +47,6 @@ fragment_program Bloom2_ps20_glsl glsl
 //------------------------
 //OpenGL GLSL ES Definitions
 //------------------------
-vertex_program Blur_vs_glsl glsles
-{
-	source Blur_vs.glsles
-}
-fragment_program BlurV_ps20_glsl glsles
-{
-	source BlurV_ps20.glsles
-}
-fragment_program BlurH_ps20_glsl glsles
-{
-	source BlurH_ps20.glsles
-}
-fragment_program BrightBloom2_ps20_glsl glsles
-{
-	source BrightBloom2_ps20.glsles
-}
-fragment_program Bloom2_ps20_glsl glsles
-{
-	source Bloom2_ps20.glsles
-	default_params
-	{
-		param_named RT int 0
-		param_named Blur1 int 1
-	}
-}
-
-//------------------------
-//OpenGL GLSL ES Definitions
-//------------------------
 vertex_program Blur_vs_glsles glsles
 {
 	source Blur_vs.glsles
@@ -285,30 +256,30 @@ material Ogre/Compositor/BloomBlend2
     {
         pass
         {
-		cull_hardware none
-		cull_software none
-		depth_check off
+			cull_hardware none
+			cull_software none
+			depth_check off
 
-		fragment_program_ref Bloom2_ps
-		{
-			param_named OriginalImageWeight float 1.0
-			param_named BlurWeight float 0.65
-		}
-		//vertex_program_ref Blur_vs
-		//	{
-		//	}
-            texture_unit
-            {
-			tex_coord_set 0
-			tex_address_mode clamp
-			filtering none
-            }
-		texture_unit
-		{
-			tex_coord_set 0
-			tex_address_mode clamp
-			filtering trilinear
-		}
+			fragment_program_ref Bloom2_ps
+			{
+				param_named OriginalImageWeight float 1.0
+				param_named BlurWeight float 0.65
+			}
+			vertex_program_ref Blur_vs
+			{
+			}
+	        texture_unit
+	        {
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering none
+	        }
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
         }
     }
 }
@@ -328,6 +299,11 @@ material Ogre/Compositor/BrightPass2
 			fragment_program_ref BrightBloom2_ps
 			{
 			}
+
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			{
+			}
+			
 			texture_unit
 			{
 				tex_address_mode clamp

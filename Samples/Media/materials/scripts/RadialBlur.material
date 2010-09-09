@@ -1,11 +1,21 @@
 //Cg Pixel Shader ps_2_0
-fragment_program Radial_Blur_ps_cg cg
+fragment_program Radial_Blur_Cg_ps cg
 {
 	source Radial_Blur_FP.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
 
+fragment_program Radial_Blur_GLSLES_ps glsles
+{
+	source Radial_Blur_FP.glsles
+}
+
+fragment_program Radial_Blur_ps unified
+{
+	delegate Radial_Blur_Cg_ps
+	delegate Radial_Blur_GLSLES_ps
+}
 
 //Effect: Radial Blur
 material Ogre/Compositor/Radial_Blur
@@ -19,11 +29,15 @@ material Ogre/Compositor/Radial_Blur
 			cull_software none
 			depth_check off
 
-			fragment_program_ref Radial_Blur_ps_cg
+			fragment_program_ref Radial_Blur_ps
 			{
 	            param_named sampleDist float 1.0
 	            param_named sampleStrength float 2.2
 			}
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			{
+			}
+			
 			texture_unit
 			{
                 tex_coord_set 0

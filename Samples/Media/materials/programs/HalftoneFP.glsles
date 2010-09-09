@@ -1,7 +1,15 @@
-sampler RT : register(s0);
-sampler pattern : register(s1);
+#version 100
 
-float4 Halftone_ps(	float2 TexCoord : TEXCOORD0,
+precision highp float;
+precision highp int;
+precision lowp sampler2D;
+precision lowp samplerCube;
+
+sampler2D RT : register(s0);
+sampler3D pattern : register(s1);
+
+float4 Halftone_ps(	float4 pos : POSITION,
+      float2 TexCoord : TEXCOORD0,
 			uniform float2 numTiles,
 			uniform float2 iNumTiles,
 			uniform float2 iNumTiles2,
