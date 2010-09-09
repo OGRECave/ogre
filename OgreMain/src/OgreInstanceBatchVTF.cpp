@@ -51,8 +51,7 @@ namespace Ogre
 								indexToBoneMap, batchName ),
 				m_numWorldMatrices( instancesPerBatch )
 	{
-		//We need to clone the material so we can have different textures for each batch.
-		m_material = m_material->clone( mName + "/VTFMaterial" );
+		cloneMaterial( m_material );
 	}
 
 	InstanceBatchVTF::~InstanceBatchVTF()
@@ -217,6 +216,43 @@ namespace Ogre
 		thisIndexData->indexBuffer->unlock();
 	}
 	//-----------------------------------------------------------------------
+	void InstanceBatchVTF::cloneMaterial( const MaterialPtr &material )
+	{
+		//Used to track down shadow casters, so the same material caster doesn't get cloned twice
+		typedef map<String, MaterialPtr>::type MatMap;
+		MatMap clonedMaterials;
+
+		//We need to clone the material so we can have different textures for each batch.
+		m_material = material->clone( mName + "/VTFMaterial" );
+
+		//Now do the same with the techniques which have a material shadow caster
+		Material::TechniqueIterator techItor = material->getTechniqueIterator();
+		while( techItor.hasMoreElements() )
+		{
+			Technique *technique = techItor.getNext();
+
+			if( !technique->getShadowCasterMaterial().isNull() )
+			{
+				const MaterialPtr &casterMat	= technique->getShadowCasterMaterial();
+				const String &casterName		= casterMat->getName();
+
+				//Was this material already cloned?
+				MatMap::const_iterator itor = clonedMaterials.find(casterName);
+
+				if( itor == clonedMaterials.end() )
+				{
+					//No? Clone it and track it
+					MaterialPtr &cloned = casterMat->clone( mName + "/VTFMaterialCaster" +
+													StringConverter::toString(clonedMaterials.size()) );
+					technique->setShadowCasterMaterial( cloned );
+					clonedMaterials[casterName] = cloned;
+				}
+				else
+					technique->setShadowCasterMaterial( itor->second ); //Reuse the previously cloned mat
+			}
+		}
+	}
+	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx )
 	{
 		const VertexElement *ve = baseVertexData->vertexDeclaration->
@@ -244,9 +280,9 @@ namespace Ogre
 		buff->unlock();
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType )
+	void InstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material )
 	{
-		Material::TechniqueIterator techItor = m_material->getTechniqueIterator();
+		Material::TechniqueIterator techItor = material->getTechniqueIterator();
 		while( techItor.hasMoreElements() )
 		{
 			Technique *technique = techItor.getNext();
@@ -271,6 +307,9 @@ namespace Ogre
 					}
 				}
 			}
+
+			if( !technique->getShadowCasterMaterial().isNull() )
+				setupMaterialToUseVTF( textureType, technique->getShadowCasterMaterial() );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -301,7 +340,7 @@ namespace Ogre
 										0, PF_FLOAT32_RGBA, TU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 
 		//Set our cloned material to use this custom texture!
-		setupMaterialToUseVTF( texType );
+		setupMaterialToUseVTF( texType, m_material );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,

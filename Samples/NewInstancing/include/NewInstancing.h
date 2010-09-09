@@ -70,6 +70,17 @@ public:
 protected:
 	void setupContent()
 	{
+		mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED );
+		mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_FLOAT32_R );
+		mSceneMgr->setShadowTextureSelfShadow( true );
+		mSceneMgr->setShadowCasterRenderBackFaces( true );
+
+		//LiSPSMShadowCameraSetup *shadowCameraSetup = new LiSPSMShadowCameraSetup();
+		FocusedShadowCameraSetup *shadowCameraSetup = new FocusedShadowCameraSetup();
+		//PlaneOptimalShadowCameraSetup *shadowCameraSetup = new PlaneOptimalShadowCameraSetup();
+		
+		mSceneMgr->setShadowCameraSetup( ShadowCameraSetupPtr(shadowCameraSetup) );
+
 		mEntities.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
 		mSceneNodes.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
 		mAnimations.reserve( NUM_INST_ROW * NUM_INST_COLUMN );
@@ -112,12 +123,25 @@ protected:
 
 		ColourValue lightColour( 1, 0.5, 0.3 );
 
-		// create a light
+		//Create main (point) light
 		Light* light = mSceneMgr->createLight();
 		light->setDiffuseColour(lightColour);
 		light->setPosition( 0.0f, 25.0f, 0.0f );
 		light->setSpecularColour( 0.6, 0.82, 1.0 );
-		light->setAttenuation( 3500, 0.085, 0.00008, 0.00006);
+		light->setAttenuation( 3500, 0.085, 0.00008, 0.00006 );
+		light->setCastShadows( false );
+
+		//Create a dummy spot light for shadows
+		light = mSceneMgr->createLight();
+		light->setType( Light::LT_SPOTLIGHT );
+		light->setDiffuseColour( ColourValue( 0.15f, 0.35f, 0.44f ) );
+		light->setPosition( 250.0f, 200.0f, 250.0f );
+		light->setDirection( (Vector3::UNIT_SCALE * -1.0f).normalisedCopy() );
+		light->setSpecularColour( 0.2, 0.12, 0.11 );
+		light->setAttenuation( 3500, 0.005, 0.00002, 0.00001 );
+		light->setSpotlightRange( Degree(80), Degree(90) );
+		light->setCastShadows( true );
+		light->setLightMask( 0x00000000 );
 	}
 
 	void switchInstancingTechnique()
@@ -183,7 +207,7 @@ protected:
 			//Get the animation
 			AnimationState *anim = ent->getAnimationState( "Walk" );
 			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f  ); //Random start offset
+			anim->addTime( i * i * i * 0.001f ); //Random start offset
 			mAnimations.push_back( anim );
 		}
 	}
@@ -378,6 +402,11 @@ protected:
 														"Animate Instances", 175);
 		mAnimateInstances->setChecked(false);
 
+		//Checkbox to toggle shadows
+		mEnableShadows = mTrayMgr->createCheckBox(TL_TOPRIGHT, "EnableShadows",
+														"Enable Shadows", 175);
+		mEnableShadows->setChecked(true);
+
 		//Controls to control batch defragmentation on the fly
 		mDefragmentBatches =  mTrayMgr->createButton(TL_TOP, "DefragmentBatches",
 															"Defragment Batches", 175);
@@ -405,6 +434,12 @@ protected:
 		if( button == mDefragmentBatches ) defragmentBatches();
 	}
 
+	void checkBoxToggled(CheckBox* box)
+	{
+		if( box == mEnableShadows ) mSceneMgr->setShadowTechnique( mEnableShadows->isChecked() ?
+									SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
+	}
+
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*
 	union FusionEntity
@@ -426,6 +461,7 @@ protected:
 	SelectMenu						*mTechniqueMenu;
 	CheckBox						*mMoveInstances;
 	CheckBox						*mAnimateInstances;
+	CheckBox						*mEnableShadows;
 	Button							*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
 };

@@ -20,7 +20,15 @@ struct VS_INPUT
 //---------------------------------------------
 VS_OUTPUT main_vs( in VS_INPUT input,
 				   uniform float4x4 viewProjMatrix,
-				   uniform float3x4 worldMatrix3x4Array[80] )
+				   uniform float3x4 worldMatrix3x4Array[80]
+
+#if defined( DEPTH_SHADOWCASTER ) || defined( DEPTH_SHADOWRECEIVER )
+				,  uniform float4 depthRange
+#endif
+#ifdef DEPTH_SHADOWRECEIVER
+				,  uniform float4x4 texViewProjMatrix
+#endif
+				   )
 {
 	VS_OUTPUT output;
 
@@ -41,9 +49,24 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );
+	
+#ifdef DEPTH_SHADOWCASTER
+	output.ps.unused	= float3( 0 );
+	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
+#else
 	output.ps.uv0		= input.uv0;
+	
+	//Pass Normal and position for Blinn Phong lighting
 	output.ps.Normal	= normalize(worldNorm);
-	output.ps.vPos		= worldPos;
+	output.ps.vPos		= worldPos.xyz;
+
+	#ifdef DEPTH_SHADOWRECEIVER
+		// Calculate the position of vertex in light space to do shadows
+		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );
+		// make linear
+		output.ps.lightSpacePos.z = (output.ps.lightSpacePos.z - depthRange.x) * depthRange.w;
+	#endif
+#endif
 
 	return output;
 }

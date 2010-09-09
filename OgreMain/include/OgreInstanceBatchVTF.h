@@ -82,6 +82,11 @@ namespace Ogre
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
+		/** Clones the base material so it can have it's own vertex texture, and also
+			clones it's shadow caster materials, if it has any
+		*/
+		void cloneMaterial( const MaterialPtr &material );
+
 		/** Retrieves bone data from the original sub mesh and puts it into an appropiate buffer,
 			later to be read when creating the vertex semantics.
 			Assumes outBoneIdx has enough space (base submesh vertex count)
@@ -89,7 +94,7 @@ namespace Ogre
 		void retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx );
 
 		/** Setups the material to use a vertex texture */
-		void setupMaterialToUseVTF( TextureType textureType );
+		void setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material );
 
 		/** Creates the vertex texture */
 		void createVertexTexture( const SubMesh* baseSubMesh );

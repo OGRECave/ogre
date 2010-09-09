@@ -4,27 +4,31 @@
 vertex_program ShaderInstancing_glsl_vs glsl
 {
 	source ShaderInstancing.vert
+
+	includes_skeletal_animation true
 }
 
 //--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
-vertex_program ShaderInstancing_cg_vs cg
+vertex_program Ogre/Instancing/ShaderBased_cg_vs cg
+{
+	source ShaderInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vs_2_0 vp40
+
+	compile_arguments -DDEPTH_SHADOWRECEIVER
+
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/Instancing/shadow_caster_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
 	profiles vs_3_0 vs_2_0 vp40
 	
-	includes_skeletal_animation true
-}
-
-//--------------------------------------------------------------
-// Unified CG/GLSL Programs
-//--------------------------------------------------------------
-vertex_program ShaderInstancing_vs unified
-{
-	delegate ShaderInstancing_cg_vs
-	delegate ShaderInstancing_glsl_vs
+	compile_arguments -DDEPTH_SHADOWCASTER
 
 	includes_skeletal_animation true
 
@@ -32,17 +36,54 @@ vertex_program ShaderInstancing_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
+		param_named_auto	depthRange					scene_depth_range
 	}
 }
 
-abstract material Examples/InstancingShaderBased
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/ShaderBased_vs unified
+{
+	delegate Ogre/Instancing/ShaderBased_cg_vs
+	delegate ShaderInstancing_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
+		
+		param_named_auto	depthRange					shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+material Examples/Instancing/ShaderBased/shadow_caster
 {
 	technique
 	{
 		pass
 		{
+			vertex_program_ref Ogre/Instancing/shadow_caster_cg_vs
+			{
+			}
+			fragment_program_ref Ogre/Instancing/shadow_caster_ps
+			{
+			}
+		}
+	}
+}
+
+abstract material Examples/Instancing/ShaderBased
+{
+	technique
+	{
+		shadow_caster_material Examples/Instancing/ShaderBased/shadow_caster
+
+		pass
+		{
 			specular	1 1 1 1 12.5
-			vertex_program_ref ShaderInstancing_vs
+			vertex_program_ref Ogre/Instancing/ShaderBased_vs
 			{
 			}
 
@@ -54,11 +95,18 @@ abstract material Examples/InstancingShaderBased
 			{
 				texture_alias		DiffuseMap
 			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
 		}
 	}
 }
 
-material Examples/Instancing/ShaderBased/Robot : Examples/InstancingShaderBased
+material Examples/Instancing/ShaderBased/Robot : Examples/Instancing/ShaderBased
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
 }

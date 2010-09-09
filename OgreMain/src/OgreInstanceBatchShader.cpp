@@ -70,7 +70,7 @@ namespace Ogre
 				{
 					const GpuProgramParameters::AutoConstantEntry *entry =
 									vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );
-					if( entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 )
+					if( entry && entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 )
 					{
 						//Material is correctly done!
 						size_t arraySize = constDef.arraySize;
