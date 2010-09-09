@@ -46,7 +46,6 @@ varying vec2 bumpCoord1;
 varying vec2 bumpCoord2;
 varying vec3 eyeVector;
 
-
 void main(void)
 {
 	// sum normal maps
@@ -74,6 +73,6 @@ void main(void)
 
     vec4 waterColor = mix(shallowColor, deepColor, facing) * waterAmount;
 
-    reflection = mix(waterColor,  reflection * reflectionColor, fresnel) * reflectionAmount;
+    reflection = mix(waterColor, reflection * reflectionColor, fresnel) * reflectionAmount;
     gl_FragColor = waterColor + reflection;
 }

@@ -43,7 +43,6 @@ varying vec2 bumpCoord2;
 varying vec3 eyeVector;
 
 attribute vec4 vertex;
-attribute vec3 normal;
 attribute vec4 uv0;
 
 // wave functions
@@ -61,9 +60,8 @@ void main(void)
 
 	Wave wave[NWAVES];
 
-	wave[0] = Wave( waveFreq, waveAmp, 0.5, vec2(-1, 0) );
+	wave[0] = Wave( waveFreq, waveAmp, 0.5, vec2(-1.0, 0.0) );
 	wave[1] = Wave( 3.0 * waveFreq, 0.33 * waveAmp, 1.7, vec2(-0.7, 0.7) );
-
 
     vec4 P = vertex;
 
@@ -85,9 +83,9 @@ void main(void)
 
 	// compute the 3x3 tranform from tangent space to object space
 	// compute tangent basis
-    vec3 T = normalize(vec3(1.0, ddy, 0.0)) * BumpScale;
-    vec3 B = normalize(vec3(0.0, ddx, 1.0)) * BumpScale;
-    vec3 N = normalize(vec3(ddx, 1.0, ddy));
+    vec3 T = normalize(vec3(1.0, ddy, 0.0)) * BumpScale; // Tangent
+    vec3 B = normalize(vec3(0.0, ddx, 1.0)) * BumpScale; // Binormal
+    vec3 N = normalize(vec3(ddx, 1.0, ddy));             // Normal
 
 	rotMatrix = mat3(T, B, N);
 
