@@ -32,11 +32,23 @@ The wiki article explaining this demo can be found here :
 #ifndef H_DeferredShadingSystem
 #define H_DeferredShadingSystem
 
+#include "Ogre.h"
+#include "SdkSample.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include "windows.h"
+#endif
+
 #include "OgreCompositorInstance.h"
 #include "OgreSceneManager.h"
 #include "OgreSceneNode.h"
 #include "OgreMaterial.h"
 #include "OgreRenderTargetListener.h"
+#include "GeomUtils.h"
+
+using namespace Ogre;
+using namespace OgreBites;
 
 /** System to manage Deferred Shading for a camera/render target.
  *  @note With the changes to the compositor framework, this class just
@@ -100,6 +112,11 @@ protected:
 	void createResources();
 	
 	void logCurrentMode(void);
+};
+
+const ColourValue SAMPLE_COLORS[] = 
+{   ColourValue::Red, ColourValue::Green, ColourValue::Blue, 
+    ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1)
 };
 
 #endif
