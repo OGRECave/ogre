@@ -95,6 +95,13 @@ namespace Ogre {
         {
             mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
         }
+        
+        if (!mVertexProgram && !mFragmentProgram)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Attempted to create a shader program without both a vertex and fragment program.",
+                        "GLSLESLinkProgram::GLSLESLinkProgram");
+        }
 	}
 
 	//-----------------------------------------------------------------------
