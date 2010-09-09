@@ -2598,7 +2598,7 @@ namespace Ogre
         if (context.program.isNull())
         {
             // Unknown program
-            logParseError("Invalid shadow_caster_vertex_program_ref entry - vertex program "
+            logParseError("Invalid shadow_caster_fragment_program_ref entry - fragment program "
                 + params + " has not been defined.", context);
             return true;
         }

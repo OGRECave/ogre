@@ -5,7 +5,9 @@ precision highp int;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-// Example GLSL program for skinning with two bone weights per vertex
+/*
+  Two-weight-per-vertex hardware skinning, shadow caster pass
+*/
 
 attribute vec4 vertex;
 attribute vec4 uv0;
@@ -13,8 +15,7 @@ attribute vec4 blendIndices;
 attribute vec4 blendWeights;
 varying vec4 colour;
 
-// 3x4 matrix, passed as vec4's for compatibility with GL 2.0
-// GL 2.0 supports 3x4 matrices
+// 3x4 matrix, passed as vec4's for compatibility with GL ES 2.0
 // Support 24 bones ie 24*3, but use 72 since our parser can pick that out for sizing
 uniform vec4 worldMatrix3x4Array[72];
 uniform mat4 viewProjectionMatrix;
@@ -42,9 +43,7 @@ void main()
 
 	// Apply view / projection to position
 	gl_Position = viewProjectionMatrix * vec4(blendPos, 1.0);
-	
-//	gl_FrontSecondaryColor = vec4(0,0,0,0);
+
 	vec4 texColour = texture2D(skinTex, uv0.xy);
 	colour = ambient + texColour;
-//	gl_TexCoord[0] = uv0;
 }
