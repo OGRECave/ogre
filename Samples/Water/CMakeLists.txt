@@ -10,6 +10,7 @@
 # Configure Water demo build
 
 set(HEADER_FILES 
+  include/Water.h
   include/WaterMesh.h
 )
 
