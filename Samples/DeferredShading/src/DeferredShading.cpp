@@ -37,6 +37,13 @@ same license as the rest of the engine.
 #include "GBufferSchemeHandler.h"
 #include "NullSchemeHandler.h"
 
+#include "SharedData.h"
+
+namespace Ogre
+{
+    template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+}
+
 using namespace Ogre;
 
 const Ogre::uint8 DeferredShadingSystem::PRE_GBUFFER_RENDER_QUEUE = Ogre::RENDER_QUEUE_1;

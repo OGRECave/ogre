@@ -13,6 +13,7 @@ set(HEADER_FILES
   include/AmbientLight.h
   include/DeferredLightCP.h
   include/DeferredShading.h
+  include/DeferredShadingDemo.h
   include/DLight.h
   include/GBufferMaterialGenerator.h
   include/GBufferSchemeHandler.h
