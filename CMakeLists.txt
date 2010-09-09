@@ -208,8 +208,6 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   # As a side effect, it creates corrupt Xcode projects if you try do it for the whole project.
   if(VERSION STRLESS "2.8.1")
     set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-  else()
-    set(CMAKE_OSX_ARCHITECTURES "armv6;armv7;")
   endif()
 
   add_definitions(-fno-regmove)
