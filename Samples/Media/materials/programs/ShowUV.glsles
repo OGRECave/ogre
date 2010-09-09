@@ -4,12 +4,11 @@ precision highp float;
 precision lowp sampler2D;
 precision lowp samplerCube;
 
-varying vec4 oUv0;
-varying vec4 colour;
+varying vec4 ambientUV;
 
 // Basic fragment program to display UV
 void main()
 {
-	// wrap values using frac
-	gl_FragColor = vec4(fract(oUv0.x), fract(oUv0.y), 0.0, 1.0);
+	// wrap values using fract
+	gl_FragColor = vec4(fract(ambientUV.x), fract(ambientUV.y), 0.0, 1.0);
 }

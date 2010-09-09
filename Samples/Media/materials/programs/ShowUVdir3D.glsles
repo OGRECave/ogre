@@ -5,7 +5,6 @@ precision lowp sampler2D;
 precision lowp samplerCube;
 
 varying vec4 oUv0;
-varying vec4 colour;
 
 // Basic fragment program to display 3d uv
 void main()
