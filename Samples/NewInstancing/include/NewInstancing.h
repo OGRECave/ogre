@@ -36,11 +36,15 @@ public:
 	{
 		mInfo["Title"] = "New Instancing";
 		mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
-			"instances of the same mesh with much less performance impact";
+			" instances of the same mesh with much less performance impact";
 		mInfo["Thumbnail"] = "thumb_grass.png";
 		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Press Space to switch Instancing Techniques.\n"
-						"Press B to toggle bounding boxes";
+						"Press B to toggle bounding boxes.\n\n"
+						"Changes in the slider take effect after switching instancing technique\n"
+						"Different batch sizes give different results depending on CPU culling"
+						" and instance numbers on the scene.\n\n"
+						"If performance is too slow, try defragmenting batches once in a while";
 	}
 
     bool frameRenderingQueued(const FrameEvent& evt)
@@ -119,7 +123,7 @@ protected:
 
 	void setupLighting()
 	{
-		mSceneMgr->setAmbientLight( ColourValue( 0.25f, 0.25f, 0.25f ) );
+		mSceneMgr->setAmbientLight( ColourValue( 0.40f, 0.40f, 0.40f ) );
 
 		ColourValue lightColour( 1, 0.5, 0.3 );
 
@@ -414,6 +418,11 @@ protected:
 															"Optimum Cull", 175);
 		mDefragmentOptimumCull->setChecked(true);
 
+		//Slider to control max number of instances
+		mInstancesSlider = mTrayMgr->createThickSlider( TL_TOPLEFT, "InstancesSlider", "Instances (NxN)",
+														300, 50, 4, 100, 97 );
+		mInstancesSlider->setValue( NUM_INST_ROW );
+
 		mTrayMgr->showCursor();
 	}
 
@@ -424,9 +433,6 @@ protected:
 			clearScene();
 			switchInstancingTechnique();
 		}
-		/*else if (menu == mLightingMenu) handleShadowTypeChanged();
-		else if (menu == mProjectionMenu) handleProjectionChanged();
-		else if (menu == mMaterialMenu) handleMaterialChanged();*/
 	}
 
 	void buttonHit( Button* button )
@@ -440,6 +446,12 @@ protected:
 									SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
 	}
 
+	void sliderMoved(Slider* slider)
+	{
+		if( slider == mInstancesSlider ) NUM_INST_ROW = static_cast<int>(mInstancesSlider->getValue());
+										 NUM_INST_COLUMN = static_cast<int>(mInstancesSlider->getValue());
+	}
+
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*
 	union FusionEntity
@@ -448,8 +460,8 @@ protected:
 		InstancedEntity	instancedEntity;
 	};
 	*/
-	const int NUM_INST_ROW;
-	const int NUM_INST_COLUMN;
+	int NUM_INST_ROW;
+	int NUM_INST_COLUMN;
 	int								mInstancingTechnique;
 	int								mCurrentMesh;
 	std::vector<MovableObject*>		mEntities;
@@ -464,6 +476,7 @@ protected:
 	CheckBox						*mEnableShadows;
 	Button							*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
+	Slider							*mInstancesSlider;
 };
 
 #endif
