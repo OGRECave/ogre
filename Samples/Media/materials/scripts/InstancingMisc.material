@@ -7,15 +7,34 @@
 //consistency (i.e. the ground)
 
 //--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/Misc_glsl_vs glsl
+{
+	source InstancingMisc.vert
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
+}
+
+//--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
-vertex_program Ogre/Instancing/Misc_vs cg
+vertex_program Ogre/Instancing/Misc_cg_vs cg
 {
 	source InstancingMisc.cg
 	entry_point main_vs
-	profiles vs_2_0 arbvp1
+	profiles vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
+}
+
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/Misc_vs unified
+{
+	delegate Ogre/Instancing/Misc_cg_vs
+	delegate Ogre/Instancing/Misc_glsl_vs
 
 	default_params
 	{

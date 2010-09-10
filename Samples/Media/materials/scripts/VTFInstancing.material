@@ -30,7 +30,7 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_glsl_vs glsl
 
 	default_params
 	{
-		param_named			matrixTexture				int 2
+		param_named			matrixTexture				int 0
 	}
 }
 

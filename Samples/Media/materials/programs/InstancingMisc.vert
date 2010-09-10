@@ -7,14 +7,14 @@
 //Vertex input
 attribute vec4 vertex;
 attribute vec3 normal;
-attribute vec4 uv0;
-attribute vec4 uv1;
-attribute vec4 uv2;
 attribute vec3 tangent;
+attribute vec4 uv0;
+attribute vec4 blendIndices;
+attribute vec4 blendWeights;
 
 //Parameters
 uniform mat4 viewProjMatrix;
-uniform sampler2D matrixTexture;
+uniform mat4 worldMatrix;
 
 #if (DEPTH_SHADOWCASTER || DEPTH_SHADOWRECEIVER)
 uniform vec4 depthRange;
@@ -35,18 +35,11 @@ uniform mat4 texViewProjMatrix;
 		varying vec4 oLightSpacePos;
 	#endif
 #endif
-
 //---------------------------------------------
 //Main Vertex Shader
 //---------------------------------------------
 void main(void)
 {
-	mat4 worldMatrix;
-	worldMatrix[0] = texture2D( matrixTexture, uv1.xy );
-	worldMatrix[1] = texture2D( matrixTexture, uv1.zw );
-	worldMatrix[2] = texture2D( matrixTexture, uv2.xy );
-	worldMatrix[3] = vec4( 0, 0, 0, 1 );
-
 	vec4 worldPos		= vertex * worldMatrix;
 	vec3 worldNorm		= normal * mat3(worldMatrix);
 

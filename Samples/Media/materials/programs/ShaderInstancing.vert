@@ -2,6 +2,7 @@
 //These materials/shaders are part of the NEW InstanceManager implementation
 //Writen by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
+#version 120
 
 //Vertex input
 attribute vec4 vertex;
@@ -25,11 +26,15 @@ uniform mat4 texViewProjMatrix;
 #endif
 
 //Output
-varying vec2 _uv0;
-varying vec3 oNormal;
-varying vec3 oVPos;
-#if DEPTH_SHADOWRECEIVER
-	varying vec4 oLightSpacePos;
+#if DEPTH_SHADOWCASTER
+	varying vec2 depth;
+#else
+	varying vec2 _uv0;
+	varying vec3 oNormal;
+	varying vec3 oVPos;
+	#if DEPTH_SHADOWRECEIVER
+		varying vec4 oLightSpacePos;
+	#endif
 #endif
 
 //---------------------------------------------
@@ -49,10 +54,10 @@ void main(void)
 
 	//Transform the position
 	gl_Position			= viewProjMatrix * worldPos;
-	
+
 #if DEPTH_SHADOWCASTER
-	gl_TexCoord[0].xyz	= 0;
-	gl_TexCoord[1].x	= (gl_Position.z - depthRange.x) * depthRange.w;
+	depth.x				= (gl_Position.z - depthRange.x) * depthRange.w;
+	depth.y				= depthRange.w;
 #else
 	_uv0		= uv0.xy;
 	oNormal		= worldNorm;
