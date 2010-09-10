@@ -1,13 +1,38 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+//--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+fragment_program Ogre/Shadow/Utils glsl
+{
+	source shadows.glsl
+}
+
 fragment_program Ogre/Instancing_glsl_ps glsl
 {
 	source Instancing.frag
+	attach Ogre/Shadow/Utils
+	
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
+	
+	default_params
+	{
+		param_named			diffuseMap				int 0
+		param_named			shadowMap				int 1
+	}
 }
 
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
 fragment_program Ogre/Instancing_cg_ps cg
 {
 	source Instancing_ps.cg
 	entry_point main_ps
-	profiles ps_3_0 ps_2_0 fp40
+	profiles ps_3_0 ps_2_0 arbfp1
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 }
@@ -24,6 +49,9 @@ fragment_program Ogre/Instancing/shadow_caster_cg_ps cg
 	}
 }
 
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
 fragment_program Ogre/Instancing_ps unified
 {
 	delegate Ogre/Instancing_cg_ps

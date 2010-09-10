@@ -1,0 +1,62 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+//This shader is not instancing related, but is used in the Instancing tests for lighting
+//consistency (i.e. the ground)
+
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/Misc_vs cg
+{
+	source InstancingMisc.cg
+	entry_point main_vs
+	profiles vs_2_0 arbvp1
+
+	compile_arguments -DDEPTH_SHADOWRECEIVER
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	worldMatrix					world_matrix
+		param_named_auto	depthRange					shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+abstract material Examples/Instancing/Misc
+{
+	technique
+	{
+		pass
+		{
+			specular	1 1 1 1 50
+			vertex_program_ref Ogre/Instancing/Misc_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+		}
+	}
+}
+
+material Examples/Instancing/Misc/Grass : Examples/Instancing/Misc
+{
+	set_texture_alias	DiffuseMap	grass_1024.jpg
+}

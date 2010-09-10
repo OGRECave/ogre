@@ -93,7 +93,7 @@ protected:
 		
 		// create a ground entity from our mesh and attach it to the origin
 		Entity* ground = mSceneMgr->createEntity("Ground", "ground");
-		ground->setMaterialName("Examples/GrassFloor");
+		ground->setMaterialName("Examples/Instancing/Misc/Grass");
 		ground->setCastShadows(false);
 		mSceneMgr->getRootSceneNode()->attachObject(ground);
 

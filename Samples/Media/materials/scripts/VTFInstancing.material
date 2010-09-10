@@ -1,15 +1,36 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
 //--------------------------------------------------------------
 // GLSL Programs
 //--------------------------------------------------------------
-vertex_program VTFInstancing_glsl_vs glsl
+vertex_program Ogre/Instancing/VTF_glsl_vs glsl
 {
 	source VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
 
 	uses_vertex_texture_fetch true
 
 	default_params
 	{
-		param_named			matrixTexture				int 1
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWCASTER=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
 	}
 }
 
@@ -36,14 +57,7 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_cg_vs cg
 	compile_arguments -DDEPTH_SHADOWCASTER
 
 	uses_vertex_texture_fetch true
-	
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto	depthRange					scene_depth_range
-	}
 }
-
 
 //--------------------------------------------------------------
 // Unified CG/GLSL Programs
@@ -51,7 +65,7 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_cg_vs cg
 vertex_program Ogre/Instancing/VTF_vs unified
 {
 	delegate Ogre/Instancing/VTF_cg_vs
-	delegate VTFInstancing_glsl_vs
+	delegate Ogre/Instancing/VTF_glsl_vs
 
 	default_params
 	{
@@ -62,13 +76,25 @@ vertex_program Ogre/Instancing/VTF_vs unified
 	}
 }
 
+vertex_program Ogre/Instancing/VTF/shadow_caster_vs unified
+{
+	delegate Ogre/Instancing/VTF/shadow_caster_cg_vs
+	delegate Ogre/Instancing/VTF/shadow_caster_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	depthRange					scene_depth_range
+	}
+}
+
 material Examples/Instancing/VTF/shadow_caster
 {
 	technique
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_cg_vs
+			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_vs
 			{
 			}
 			fragment_program_ref Ogre/Instancing/shadow_caster_ps

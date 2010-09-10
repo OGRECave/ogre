@@ -3,6 +3,9 @@
 //Writen by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
 
+//This shader is not instancing related, but is used in the Instancing tests for lighting
+//consistency (i.e. the ground)
+
 //---------------------------------------------
 //Vertex Shader Input
 //---------------------------------------------
@@ -10,11 +13,7 @@ struct VS_INPUT
 {
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
-	float3 Tangent	:	TANGENT;
 	float2 uv0		:	TEXCOORD0;
-
-	float4 m01		:	TEXCOORD1;
-	float4 m23		:	TEXCOORD2;
 };
 
 #include "InstancingVertexInterpolators.cg"
@@ -24,12 +23,7 @@ struct VS_INPUT
 //---------------------------------------------
 VS_OUTPUT main_vs( in VS_INPUT input,
 				   uniform float4x4 viewProjMatrix,
-				   
-#ifdef DEPTH_SHADOWCASTER
-				   uniform sampler2D matrixTexture : register(s0)
-#else
-				   uniform sampler2D matrixTexture : register(s2)
-#endif
+				   uniform float4x4 worldMatrix
 
 #if defined( DEPTH_SHADOWCASTER ) || defined( DEPTH_SHADOWRECEIVER )
 				,  uniform float4 depthRange
@@ -37,31 +31,26 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 #ifdef DEPTH_SHADOWRECEIVER
 				,  uniform float4x4 texViewProjMatrix
 #endif
-				)
+				   )
 {
 	VS_OUTPUT output;
-
-	float3x4 worldMatrix;
-	worldMatrix[0] = tex2D( matrixTexture, input.m01.xy );
-	worldMatrix[1] = tex2D( matrixTexture, input.m01.zw );
-	worldMatrix[2] = tex2D( matrixTexture, input.m23.xy );
-
-	float4 worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
-	float3 worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
+	
+	float4 worldPos  = mul( worldMatrix, input.Position );
+	float3 worldNorm = mul( (float3x3)(worldMatrix), input.Normal );
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );
-
+	
 #ifdef DEPTH_SHADOWCASTER
 	output.ps.unused	= float3( 0 );
 	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
 #else
 	output.ps.uv0		= input.uv0;
-
-	//Pass Normal and position for Blinn Phong lighting
-	output.ps.Normal	= normalize(worldNorm);
-	output.ps.vPos		= worldPos.xyz;
 	
+	//Pass Normal and position for Blinn Phong lighting
+	output.ps.Normal	= worldNorm;
+	output.ps.vPos		= worldPos.xyz;
+
 	#ifdef DEPTH_SHADOWRECEIVER
 		// Calculate the position of vertex in light space to do shadows
 		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );

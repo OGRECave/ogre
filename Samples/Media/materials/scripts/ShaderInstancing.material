@@ -1,9 +1,25 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+
 //--------------------------------------------------------------
 // GLSL Programs
 //--------------------------------------------------------------
-vertex_program ShaderInstancing_glsl_vs glsl
+vertex_program Ogre/Instancing/ShaderBased_glsl_vs glsl
 {
 	source ShaderInstancing.vert
+	
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
+
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/Instancing/shadow_caster_glsl_vs glsl
+{
+	source ShaderInstancing.vert
+	preprocessor_defines DEPTH_SHADOWCASTER=1
 
 	includes_skeletal_animation true
 }
@@ -31,13 +47,6 @@ vertex_program Ogre/Instancing/shadow_caster_cg_vs cg
 	compile_arguments -DDEPTH_SHADOWCASTER
 
 	includes_skeletal_animation true
-
-	default_params
-	{
-		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
-		param_named_auto	depthRange					scene_depth_range
-	}
 }
 
 //--------------------------------------------------------------
@@ -46,7 +55,7 @@ vertex_program Ogre/Instancing/shadow_caster_cg_vs cg
 vertex_program Ogre/Instancing/ShaderBased_vs unified
 {
 	delegate Ogre/Instancing/ShaderBased_cg_vs
-	delegate ShaderInstancing_glsl_vs
+	delegate Ogre/Instancing/ShaderBased_glsl_vs
 
 	default_params
 	{
@@ -58,13 +67,26 @@ vertex_program Ogre/Instancing/ShaderBased_vs unified
 	}
 }
 
+vertex_program Ogre/Instancing/shadow_caster_vs unified
+{
+	delegate Ogre/Instancing/shadow_caster_cg_vs
+	delegate Ogre/Instancing/shadow_caster_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	worldMatrix3x4Array			world_matrix_array_3x4
+		param_named_auto	depthRange					scene_depth_range
+	}
+}
+
 material Examples/Instancing/ShaderBased/shadow_caster
 {
 	technique
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/shadow_caster_cg_vs
+			vertex_program_ref Ogre/Instancing/shadow_caster_vs
 			{
 			}
 			fragment_program_ref Ogre/Instancing/shadow_caster_ps
