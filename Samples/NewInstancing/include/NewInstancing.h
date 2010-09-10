@@ -479,6 +479,7 @@ protected:
         }
 
         if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
+			!GpuProgramManager::getSingleton().isSyntaxSupported("fp40") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") )
         {

@@ -254,7 +254,7 @@ namespace Ogre
 				if( itor == clonedMaterials.end() )
 				{
 					//No? Clone it and track it
-					MaterialPtr &cloned = casterMat->clone( mName + "/VTFMaterialCaster" +
+					MaterialPtr cloned = casterMat->clone( mName + "/VTFMaterialCaster" +
 													StringConverter::toString(clonedMaterials.size()) );
 					technique->setShadowCasterMaterial( cloned );
 					clonedMaterials[casterName] = cloned;
@@ -321,7 +321,10 @@ namespace Ogre
 			}
 
 			if( !technique->getShadowCasterMaterial().isNull() )
-				setupMaterialToUseVTF( textureType, technique->getShadowCasterMaterial() );
+			{
+				MaterialPtr matCaster = technique->getShadowCasterMaterial();
+				setupMaterialToUseVTF( textureType, matCaster );
+			}
 		}
 	}
 	//-----------------------------------------------------------------------
