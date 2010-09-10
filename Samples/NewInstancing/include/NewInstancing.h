@@ -37,7 +37,7 @@ public:
 		mInfo["Title"] = "New Instancing";
 		mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
 			" instances of the same mesh with much less performance impact";
-		mInfo["Thumbnail"] = "thumb_grass.png";
+		mInfo["Thumbnail"] = "thumb_newinstancing.png";
 		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Press Space to switch Instancing Techniques.\n"
 						"Press B to toggle bounding boxes.\n\n"
@@ -74,6 +74,15 @@ public:
 protected:
 	void setupContent()
 	{
+		//Initialize the techniques and current mesh variables
+		mInstancingTechnique	= 0;
+		mCurrentMesh			= 0;
+		mCurrentManager			= 0;
+		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
+			mInstanceManagers[i] = 0;
+
+		checkHardwareSupport();
+
 		mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED );
 		mSceneMgr->setShadowTextureConfig( 0, 2048, 2048, PF_FLOAT32_R );
 		mSceneMgr->setShadowTextureSelfShadow( true );
@@ -112,12 +121,6 @@ protected:
 		setDragLook(true);
 #endif
 
-		//Initialize the techniques and current mesh
-		mInstancingTechnique	= 0;
-		mCurrentMesh			= 0;
-		mCurrentManager			= 0;
-		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
-			mInstanceManagers[i] = 0;
 		switchInstancingTechnique();
 	}
 
@@ -152,6 +155,15 @@ protected:
 	{
 		//mInstancingTechnique = (mInstancingTechnique+1) % NUM_TECHNIQUES;
 		mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
+
+		if( !mSupportedTechniques[mInstancingTechnique] )
+		{
+			//Hide GUI features available only to instancing
+			mCurrentManager = 0;
+			mDefragmentBatches->hide();
+			mDefragmentOptimumCull->hide();
+			return;
+		}
 
 		if( mInstancingTechnique < NUM_TECHNIQUES-1 )
 		{
@@ -395,7 +407,12 @@ protected:
 		mTechniqueMenu = mTrayMgr->createLongSelectMenu(
 			TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 300, 200, 5);
 		for( int i=0; i<NUM_TECHNIQUES; ++i )
-			mTechniqueMenu->addItem( c_instancingTechniques[i] );
+		{
+			String text = c_instancingTechniques[i];
+			if( !mSupportedTechniques[i] )
+				text = "Unsupported: " + text;
+			mTechniqueMenu->addItem( text );
+		}
 
 		//Check box to move the units
 		mMoveInstances = mTrayMgr->createCheckBox(TL_TOPRIGHT, "MoveInstances", "Move Instances", 175);
@@ -452,6 +469,50 @@ protected:
 										 NUM_INST_COLUMN = static_cast<int>(mInstancesSlider->getValue());
 	}
 
+	void testCapabilities(const RenderSystemCapabilities* caps)
+	{
+		if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
+        {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and "
+				"fragment programs, so you cannot run this sample. Sorry!",
+				"NewInstancing::testCapabilities");
+        }
+
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
+			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") )
+        {
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample needs at least Shader Model 2.0+ or "
+				"GLSL to work. Your GPU is too old. Sorry!", "NewInstancing::testCapabilities");
+        }
+	}
+
+	//The difference between testCapabilities() is that features checked here aren't fatal errors.
+	//which means the sample can run (with limited functionality) on those computers
+	void checkHardwareSupport()
+	{
+		//Check Technique support
+		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
+		{
+			InstanceManager::InstancingTechnique technique;
+			switch( i )
+			{
+			case 0: technique = InstanceManager::ShaderBased; break;
+			case 1: technique = InstanceManager::TextureVTF; break;
+			}
+
+			const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
+									ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+									c_materialsTechniques[i], technique, NUM_INST_ROW * NUM_INST_COLUMN,
+									IM_USEALL );
+			
+			mSupportedTechniques[i] = numInstances > 0;
+		}
+
+		//Non instancing is always supported
+		mSupportedTechniques[NUM_TECHNIQUES-1] = true;
+	}
+
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
 	/*
 	union FusionEntity
@@ -469,6 +530,7 @@ protected:
 	std::vector<AnimationState*>	mAnimations;
 	InstanceManager					*mInstanceManagers[NUM_TECHNIQUES-1];
 	InstanceManager					*mCurrentManager;
+	bool							mSupportedTechniques[NUM_TECHNIQUES];
 
 	SelectMenu						*mTechniqueMenu;
 	CheckBox						*mMoveInstances;

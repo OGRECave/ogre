@@ -56,8 +56,20 @@ namespace Ogre
 
 	InstanceBatchVTF::~InstanceBatchVTF()
 	{
+		//Remove cloned caster materials (if any)
+		Material::TechniqueIterator techItor = m_material->getTechniqueIterator();
+		while( techItor.hasMoreElements() )
+		{
+			Technique *technique = techItor.getNext();
+
+			if( !technique->getShadowCasterMaterial().isNull() )
+				MaterialManager::getSingleton().remove( technique->getShadowCasterMaterial()->getName() );
+		}
+
+		//Remove cloned material
 		MaterialManager::getSingleton().remove( m_material->getName() );
 
+		//Remove the VTF texture
 		if( !m_matrixTexture.isNull() )
 			TextureManager::getSingleton().remove( m_matrixTexture->getName() );
 	}

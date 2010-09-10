@@ -6503,6 +6503,17 @@ void SceneManager::destroyAllInstanceManagers(void)
 	mInstanceManagerMap.clear();
 }
 //---------------------------------------------------------------------
+size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,
+											  const String &materialName,
+											  InstanceManager::InstancingTechnique technique,
+											  size_t numInstancesPerBatch, uint16 flags )
+{
+	InstanceManager tmpMgr( "TmpInstanceManager", this, meshName, groupName,
+							technique, flags, numInstancesPerBatch );
+	
+	return tmpMgr.getMaxOrBestNumInstancesPerBatch( materialName, numInstancesPerBatch, flags );
+}
+//---------------------------------------------------------------------
 InstancedEntity* SceneManager::createInstancedEntity( const String &materialName, const String &managerName )
 {
 	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);

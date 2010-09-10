@@ -3104,7 +3104,7 @@ namespace Ogre {
 		@param groupName The resource name where the mesh lives
 		@param Technique to use, which may be shader based, or hardware based.
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
-		may end up being lower if the technique doesn't support having so many.
+		may end up being lower if the technique doesn't support having so many. It can't be zero
 		@param flags @See InstanceManagerFlags
 		@returns The new InstanceManager instance
 		*/
@@ -3123,6 +3123,23 @@ namespace Ogre {
 		virtual void destroyInstanceManager( InstanceManager *instanceManager );
 
 		virtual void destroyAllInstanceManagers(void);
+
+		/** @See InstanceManager::getMaxOrBestNumInstancesPerBatch
+		@remarks
+			If you've already created an InstanceManager, you can call it's
+			getMaxOrBestNumInstancesPerBatch() function directly.
+			Another (not recomended) way to know if the technique is unsupported is by creating
+			an InstanceManager and use createInstancedEntity, which will return null pointer.
+			The input parameter "numInstancesPerBatch" is a suggested value when using IM_VTFBESTFIT
+			flag (in that case it should be non-zero)
+		@returns
+			The ideal (or maximum, depending on flags) number of instances per batch for
+			the given technique. Zero if technique is unsupported or errors were spotted
+		*/
+		virtual size_t getNumInstancesPerBatch( const String &meshName, const String &groupName,
+												const String &materialName,
+												InstanceManager::InstancingTechnique technique,
+												size_t numInstancesPerBatch, uint16 flags=0 );
 
 		/** Creates an InstancedEntity based on an existing InstanceManager (@see createInstanceManager)
 		@remarks
