@@ -27,6 +27,7 @@ vertex_program HLSL4/OceanVS hlsl
 	source oceanHLSL_Cg.vert
 	entry_point main
 	target vs_4_0
+  enable_backwards_compatibility true
 
 
 	default_params
@@ -43,6 +44,7 @@ fragment_program HLSL4/OceanFS hlsl
 	source oceanHLSL_Cg.frag
 	entry_point main
 	target ps_4_0
+  enable_backwards_compatibility true
 }
 
 vertex_program GLSL/OceanVS glsl
@@ -183,7 +185,6 @@ vertex_program Cg/OceanVS cg
 	source oceanHLSL_Cg.vert
 	entry_point main
 	profiles vs_4_0 vs_1_1 arbvp1
-
 
 	default_params
 	{
@@ -340,7 +341,7 @@ vertex_program HLSL4/Ocean2VS hlsl
 	source Ocean2HLSL_Cg.vert
 	entry_point main
 	target vs_4_0
-
+  enable_backwards_compatibility true
 
 	default_params
 	{
@@ -354,7 +355,7 @@ fragment_program HLSL4/Ocean2FS hlsl
 	source Ocean2HLSL_Cg.frag
 	entry_point main
 	target ps_4_0
-
+  enable_backwards_compatibility true
 }
 
 vertex_program GLSL/Ocean2VS glsl

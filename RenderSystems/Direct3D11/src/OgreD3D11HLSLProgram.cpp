@@ -38,6 +38,7 @@ namespace Ogre {
 	D3D11HLSLProgram::CmdTarget D3D11HLSLProgram::msCmdTarget;
 	D3D11HLSLProgram::CmdPreprocessorDefines D3D11HLSLProgram::msCmdPreprocessorDefines;
 	D3D11HLSLProgram::CmdColumnMajorMatrices D3D11HLSLProgram::msCmdColumnMajorMatrices;
+	D3D11HLSLProgram::CmdEnableBackwardsCompatibility D3D11HLSLProgram::msCmdEnableBackwardsCompatibility;
 	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::createConstantBuffer(const UINT ByteWidth)
@@ -209,7 +210,8 @@ namespace Ogre {
         else
             compileFlags |= D3D10_SHADER_PACK_MATRIX_ROW_MAJOR;
 
-		compileFlags|=D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
+		if (mEnableBackwardsCompatibility)
+			compileFlags |= D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 
 		HRESULT hr = D3DX11CompileFromMemory(
 			mSource.c_str(),	// [in] Pointer to the shader in memory. 
@@ -625,7 +627,7 @@ namespace Ogre {
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
 		, mpMicroCode(NULL), mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
 		mpIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mpVertexShader(NULL)//, mpConstTable(NULL)
-		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true), mInputVertexDeclaration(device)
+		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mInputVertexDeclaration(device)
 	{
 		if ("Hatch_ps_hlsl" == name)
 		{
@@ -651,6 +653,9 @@ namespace Ogre {
 			dict->addParameter(ParameterDef("column_major_matrices", 
 				"Whether matrix packing in column-major order.",
 				PT_BOOL),&msCmdColumnMajorMatrices);
+			dict->addParameter(ParameterDef("enable_backwards_compatibility", 
+				"enable backwards compatibility.",
+				PT_BOOL),&msCmdEnableBackwardsCompatibility);
 		}
 
 	}
@@ -748,6 +753,15 @@ namespace Ogre {
 	void D3D11HLSLProgram::CmdColumnMajorMatrices::doSet(void *target, const String& val)
 	{
 		static_cast<D3D11HLSLProgram*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
+	}
+	//-----------------------------------------------------------------------
+	String D3D11HLSLProgram::CmdEnableBackwardsCompatibility::doGet(const void *target) const
+	{
+		return StringConverter::toString(static_cast<const D3D11HLSLProgram*>(target)->getEnableBackwardsCompatibility());
+	}
+	void D3D11HLSLProgram::CmdEnableBackwardsCompatibility::doSet(void *target, const String& val)
+	{
+		static_cast<D3D11HLSLProgram*>(target)->setEnableBackwardsCompatibility(StringConverter::parseBool(val));
 	}
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::CreateVertexShader()
