@@ -145,6 +145,7 @@ namespace Ogre
 
 			/// Internal
 			bool _isSM3Available() const { return mSM3Available; }
+			bool _isSM4Available() const { return mSM4Available; }
 		
 		protected:
 
@@ -255,6 +256,7 @@ namespace Ogre
 			bool mDepthShadows;
 			bool mLowLodShadows;
 			bool mSM3Available;
+			bool mSM4Available;
 
 			bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
 

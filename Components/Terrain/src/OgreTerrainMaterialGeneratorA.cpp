@@ -246,7 +246,7 @@ namespace Ogre
 		// Automatically disable normal & parallax mapping if card cannot handle it
 		// We do this rather than having a specific technique for it since it's simpler
 		GpuProgramManager& gmgr = GpuProgramManager::getSingleton();
-		if (!gmgr.isSyntaxSupported("ps_3_0") && !gmgr.isSyntaxSupported("ps_2_x")
+		if (!gmgr.isSyntaxSupported("ps_4_0") && !gmgr.isSyntaxSupported("ps_3_0") && !gmgr.isSyntaxSupported("ps_2_x")
 			&& !gmgr.isSyntaxSupported("fp40") && !gmgr.isSyntaxSupported("arbfp1"))
 		{
 			setLayerNormalMappingEnabled(false);
@@ -317,7 +317,8 @@ namespace Ogre
 			if (hmgr.isLanguageSupported("cg"))
 				mShaderGen = OGRE_NEW ShaderHelperCg();
 			else if (hmgr.isLanguageSupported("hlsl") &&
-				((check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
+				((check2x && gmgr.isSyntaxSupported("ps_4_0")) ||
+				(check2x && gmgr.isSyntaxSupported("ps_2_x")) ||
 				(!check2x && gmgr.isSyntaxSupported("ps_2_0"))))
 				mShaderGen = OGRE_NEW ShaderHelperHLSL();
 			else if (hmgr.isLanguageSupported("glsl"))
@@ -331,6 +332,7 @@ namespace Ogre
 
 			// check SM3 features
 			mSM3Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0");
+			mSM4Available = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
 
 		}
 		HighLevelGpuProgramPtr vprog = mShaderGen->generateVertexProgram(this, terrain, tt);
@@ -633,7 +635,7 @@ namespace Ogre
 				terrain->getLayerUVMultiplier(i * 4 + 2), 
 				terrain->getLayerUVMultiplier(i * 4 + 3) 
 				);
-			params->setNamedConstant("uvMul" + StringConverter::toString(i), uvMul);
+			params->setNamedConstant("uvMul_" + StringConverter::toString(i), uvMul);
 		}
 		
 		if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
@@ -733,7 +735,7 @@ namespace Ogre
 			ret->unload();
 		}
 
-		ret->setParameter("profiles", "vs_3_0 vs_2_0 arbvp1");
+		ret->setParameter("profiles", "vs_4_0 vs_3_0 vs_2_0 arbvp1");
 		ret->setParameter("entry_point", "main_vp");
 
 		return ret;
@@ -759,9 +761,9 @@ namespace Ogre
 		}
 		
 		if(prof->isLayerNormalMappingEnabled() || prof->isLayerParallaxMappingEnabled())
-			ret->setParameter("profiles", "ps_3_0 ps_2_x fp40 arbfp1");
+			ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_x fp40 arbfp1");
 		else
-			ret->setParameter("profiles", "ps_3_0 ps_2_0 fp30 arbfp1");
+			ret->setParameter("profiles", "ps_4_0 ps_3_0 ps_2_0 fp30 arbfp1");
 		ret->setParameter("entry_point", "main_fp");
 
 		return ret;
@@ -808,7 +810,7 @@ namespace Ogre
 		if (numLayers % 4)
 			++numUVMultipliers;
 		for (uint i = 0; i < numUVMultipliers; ++i)
-			outStream << "uniform float4 uvMul" << i << ", \n";
+			outStream << "uniform float4 uvMul_" << i << ", \n";
 
 		outStream <<
 			"out float4 oPos : POSITION,\n"
@@ -918,9 +920,9 @@ namespace Ogre
 				uint uvMulIdx = layer / 4;
 
 				outStream <<
-					"	oUV" << i << ".xy = " << " uv.xy * uvMul" << uvMulIdx << "." << getChannel(layer) << ";\n";
+					"	oUV" << i << ".xy = " << " uv.xy * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
 				outStream <<
-					"	oUV" << i << ".zw = " << " uv.xy * uvMul" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
+					"	oUV" << i << ".zw = " << " uv.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
 				
 			}
 
@@ -947,6 +949,7 @@ namespace Ogre
 
 		outStream << 
 			"float4 main_fp(\n"
+			"float4 vertexPos : POSITION,\n"
 			"float4 position : TEXCOORD0,\n";
 
 		uint texCoordSet = 1;
@@ -1602,7 +1605,9 @@ namespace Ogre
 			ret->unload();
 		}
 
-		if (prof->_isSM3Available())
+		if (prof->_isSM4Available())
+			ret->setParameter("target", "vs_4_0");
+		else if (prof->_isSM3Available())
 			ret->setParameter("target", "vs_3_0");
 		else
 			ret->setParameter("target", "vs_2_0");
@@ -1631,7 +1636,9 @@ namespace Ogre
 			ret->unload();
 		}
 
-		if (prof->_isSM3Available())
+		if (prof->_isSM4Available())
+			ret->setParameter("target", "ps_4_0");
+		else if (prof->_isSM3Available())
 			ret->setParameter("target", "ps_3_0");
 		else
 			ret->setParameter("target", "ps_2_x");
