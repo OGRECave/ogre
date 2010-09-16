@@ -887,8 +887,9 @@ namespace Ogre {
                 }
                 else
                 {
-                    // Ran out of assignments for this vertex, use weight 0 to indicate empty
-                    *pWeight++ = 0.0f;
+                    // Ran out of assignments for this vertex, use weight 0 to indicate empty.
+					// If no bones are defined (an error in itself) set bone 0 as the assigned bone. 
+                    *pWeight++ = (bone == 0) ? 1.0f : 0.0f;
                     *pIndex++ = 0;
                 }
             }
