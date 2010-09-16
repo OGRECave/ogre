@@ -1206,13 +1206,20 @@ namespace Ogre
 				it = mMapRenderWindowToResoruces.begin();
 				while (it != mMapRenderWindowToResoruces.end())			
 				{
+					//This "if" handles the common case of a single device
 					if (it->first->getWindowHandle() == mCreationParams.hFocusWindow)
 					{
 						deviceFocusWindow = it->first;
 						it->second->presentParametersIndex = nextPresParamIndex;
 						++nextPresParamIndex;
 						break;
-					}					
+					}
+					//This "if" handles multiple devices when a shared window is used
+					if ((it->second->presentParametersIndex == 0) && (it->second->acquired == true))
+					{
+						deviceFocusWindow = it->first;
+						++nextPresParamIndex;
+					}
 					++it;
 				}
 			}
