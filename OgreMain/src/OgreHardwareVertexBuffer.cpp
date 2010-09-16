@@ -53,7 +53,7 @@ namespace Ogre {
         if (mUseShadowBuffer)
         {
             mpShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mVertexSize, 
-                    mNumVertices, HardwareBuffer::HBU_DYNAMIC);
+                    mNumVertices, HardwareBuffer::HBU_DYNAMIC, mMgr);
         }
 
     }

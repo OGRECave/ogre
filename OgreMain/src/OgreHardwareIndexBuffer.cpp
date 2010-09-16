@@ -58,7 +58,7 @@ namespace Ogre {
         if (mUseShadowBuffer)
         {
             mpShadowBuffer = OGRE_NEW DefaultHardwareIndexBuffer(mIndexType, 
-                mNumIndexes, HardwareBuffer::HBU_DYNAMIC);
+                mNumIndexes, HardwareBuffer::HBU_DYNAMIC, mMgr);
         }
 
 
