@@ -389,7 +389,11 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 
 	mName				= parameterDef->name;
 	if (fAutoConstantData != 0.0)
+	{
 		mName += StringConverter::toString(fAutoConstantData);
+		//replace possible illegal point character in name
+		std::replace(mName.begin(), mName.end(), '.', '_'); 
+	}
 	mType				= parameterDef->type;
 	mSemantic			= SPS_UNKNOWN;
 	mIndex				= -1;
