@@ -706,7 +706,7 @@ namespace Ogre {
         virtual const Vector3& getInitialScale(void) const;
 
         /** Helper function, get the squared view depth.  */
-        Real getSquaredViewDepth(const Camera* cam) const;
+        virtual Real getSquaredViewDepth(const Camera* cam) const;
 
         /** To be called in the event of transform changes to this node that require it's recalculation.
         @remarks
