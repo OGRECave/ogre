@@ -506,7 +506,22 @@ namespace Ogre
 				numMips = 1;
 			}
 
-            // Determine D3D pool to use
+			// Check dynamic textures
+			if (mUsage & TU_DYNAMIC)
+			{
+				D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
+				if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_TEXTURE, d3dPF))
+				{
+					usage |= D3DUSAGE_DYNAMIC;
+					mDynamicTextures = true;
+				}
+				else
+				{
+					mDynamicTextures = false;
+				}
+			}
+
+			// Determine D3D pool to use
             D3DPOOL pool;
             if (useDefaultPool())
             {
@@ -625,7 +640,22 @@ namespace Ogre
 				numMips = 1;
 			}
 
-            // Determine D3D pool to use
+			// Check dynamic textures
+			if (mUsage & TU_DYNAMIC)
+			{
+				D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
+				if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_TEXTURE, d3dPF))
+				{
+					usage |= D3DUSAGE_DYNAMIC;
+					mDynamicTextures = true;
+				}
+				else
+				{
+					mDynamicTextures = false;
+				}
+			}
+			
+			// Determine D3D pool to use
             D3DPOOL pool;
             if (useDefaultPool())
             {
@@ -767,6 +797,21 @@ namespace Ogre
 				// no mip map support for this kind of textures :(
 				mNumMipmaps = 0;
 				numMips = 1;
+			}
+
+			// Check dynamic textures
+			if (mUsage & TU_DYNAMIC)
+			{
+				D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
+				if (_canUseDynamicTextures(d3d9Device, usage, D3DRTYPE_VOLUMETEXTURE, d3dPF))
+				{
+					usage |= D3DUSAGE_DYNAMIC;
+					mDynamicTextures = true;
+				}
+				else
+				{
+					mDynamicTextures = false;
+				}
 			}
 
             // Determine D3D pool to use
