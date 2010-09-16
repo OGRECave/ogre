@@ -53,7 +53,7 @@ namespace Ogre {
 		void unlockImpl(void);
     public:
 		DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
-            HardwareBuffer::Usage usage);
+            HardwareBuffer::Usage usage, HardwareBufferManagerBase* mgr = NULL);
         ~DefaultHardwareVertexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
@@ -78,7 +78,7 @@ namespace Ogre {
         /** See HardwareBuffer. */
 		void unlockImpl(void);
     public:
-		DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
+		DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage, HardwareBufferManagerBase* mgr = NULL);
         ~DefaultHardwareIndexBuffer();
         /** See HardwareBuffer. */
         void readData(size_t offset, size_t length, void* pDest);
