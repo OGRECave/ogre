@@ -109,17 +109,6 @@ namespace Ogre {
 				"D3D11RenderToVertexBuffer::getRenderOperation");
 		}
 
-		if (mResetRequested || mResetsEveryUpdate)
-		{
-			//Use source data to render to first buffer
-			mSourceRenderable->getRenderOperation(renderOp);
-			targetBufferIndex = 0;
-		}
-		else
-		{
-			//Use current front buffer to render to back buffer
-			this->getRenderOperation(renderOp);
-		}
 		D3D11RenderSystem* targetRenderSystem = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
 
 		D3D11HLSLProgram* originalVertexProgram = targetRenderSystem->_getBoundVertexProgram();
@@ -153,7 +142,7 @@ namespace Ogre {
 
 		mVertexData->vertexCount = -1; // -1 means we will use DrawAuto later when rendering...
 
-		//Switch the vertex binding if neccesary
+		//Switch the vertex binding if necessary
 		if (targetBufferIndex != mFrontBufferIndex)
 		{
 			mVertexData->vertexBufferBinding->unsetAllBindings();
@@ -164,7 +153,7 @@ namespace Ogre {
 		// get back to the original value
 		targetRenderSystem->_setDepthBufferCheckEnabled(depthBufferCheckValue);
 
-		// go back to the orginal shaders
+		// go back to the original shaders
 		targetRenderSystem->bindGpuProgram(originalVertexProgram);
 		targetRenderSystem->bindGpuProgram(originalGeometryProgram);
 
