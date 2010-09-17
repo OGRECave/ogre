@@ -7,12 +7,16 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# - Try to find OpenGLES
+# - Try to find OpenGLES and EGL
 # Once done this will define
 #  
 #  OPENGLES2_FOUND        - system has OpenGLES
 #  OPENGLES2_INCLUDE_DIR  - the GL include directory
 #  OPENGLES2_LIBRARIES    - Link these to use OpenGLES
+#
+#  EGL_FOUND        - system has EGL
+#  EGL_INCLUDE_DIR  - the EGL include directory
+#  EGL_LIBRARIES    - Link these to use EGL
 
 IF (WIN32)
   IF (CYGWIN)
@@ -48,9 +52,22 @@ ELSE (WIN32)
       /usr/include
     )
 
-
     FIND_LIBRARY(OPENGLES2_gl_LIBRARY
       NAMES GLESv2
+      PATHS /opt/graphics/OpenGL/lib
+            /usr/openwin/lib
+            /usr/shlib /usr/X11R6/lib
+            /usr/lib
+    )
+
+    FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
+      /usr/openwin/share/include
+      /opt/graphics/OpenGL/include /usr/X11R6/include
+      /usr/include
+    )
+
+    FIND_LIBRARY(EGL_egl_LIBRARY
+      NAMES EGL
       PATHS /opt/graphics/OpenGL/lib
             /usr/openwin/lib
             /usr/shlib /usr/X11R6/lib
@@ -77,15 +94,17 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 SET( OPENGLES2_FOUND "YES" )
-IF(OPENGLES2_gl_LIBRARY)
+IF(OPENGLES2_gl_LIBRARY AND EGL_egl_LIBRARY)
 
     SET( OPENGLES2_LIBRARIES ${OPENGLES2_gl_LIBRARY} ${OPENGLES2_LIBRARIES})
-
+    SET( EGL_LIBRARIES ${EGL_egl_LIBRARY} ${EGL_LIBRARIES})
     SET( OPENGLES2_FOUND "YES" )
 
-ENDIF(OPENGLES2_gl_LIBRARY)
+ENDIF(OPENGLES2_gl_LIBRARY AND EGL_egl_LIBRARY)
 
 MARK_AS_ADVANCED(
   OPENGLES2_INCLUDE_DIR
   OPENGLES2_gl_LIBRARY
+  EGL_INCLUDE_DIR
+  EGL_egl_LIBRARY
 )

@@ -136,11 +136,11 @@ elseif (UNIX)
   )
   include_directories(src/EGL/X11 include/EGL/X11)
   set(PLATFORM_HEADER_INSTALL "X11")
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
   if(OGRE_BUILD_PLATFORM_TEGRA2)
-    # TODO: Figure out how to get the locations of necessary libraries
-    # For now, you will need to hardcode the absolute paths to the compiler and runtime libs
-    #set(PLATFORM_LIBS /Path/To/Libs)
+    link_directories(${OPENGLES2_LIBRARY_PATH})
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES}) 
+  else()
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
   endif()
 endif ()
 
@@ -153,11 +153,11 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include
   ${CMAKE_SOURCE_DIR}/Components/RTShaderSystem/include
-  ${OPENGLES2_INCLUDE_DIR}
+  ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
 add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSLES_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
-target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES2_LIBRARIES} ${PLATFORM_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_GLES2 PROPERTIES

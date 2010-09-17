@@ -51,6 +51,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_SOURCE_DIR}/CMake/Utils" 
   "${OGRE_SOURCE_DIR}/CMake/Packages"
 )
+
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
@@ -213,6 +214,9 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   add_definitions(-fno-regmove)
   add_definitions(-falign-loops=16)
   remove_definitions(-msse)
+elseif (UNIX AND OGRE_BUILD_PLATFORM_TEGRA2)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for NVIDIA Tegra 2" FORCE)
+  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/Tegra2")
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
 
   # Set 10.4 as the base SDK by default
@@ -251,10 +255,11 @@ cmake_dependent_option(OGRE_STATIC "Static build" FALSE "NOT SYMBIAN" TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D10 "Build Direct3D10 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D10_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D11_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE;NOT OGRE_BUILD_PLATFORM_TEGRA2;NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_IPHONE "Build Ogre for iPhone OS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_TEGRA2 "Build Ogre for NVIDIA Tegra 2 with Linux" FALSE "OGRE_BUILD_PLATFORM_TEGRA2;OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
