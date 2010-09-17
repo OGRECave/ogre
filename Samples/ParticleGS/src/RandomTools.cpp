@@ -9,7 +9,7 @@ TexturePtr RandomTools::generateRandomVelocityTexture()
 {
 	TexturePtr texPtr = TextureManager::getSingleton().createManual("RandomVelocityTexture", 
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		TEX_TYPE_1D, 1024, 1, 1, 1, PF_FLOAT32_RGBA, TU_DYNAMIC);
+		TEX_TYPE_1D, 1024, 1, 1, 1, PF_FLOAT32_RGBA, TU_STATIC_WRITE_ONLY);
 
 	HardwarePixelBufferSharedPtr pixelBuf = texPtr->getBuffer();
 

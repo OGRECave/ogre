@@ -81,7 +81,7 @@ protected:
 		
 		//Apply the random texture
 		TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-		r2vbObject->getRenderToBufferMaterial()->getTechnique(0)->getPass(0)->
+		r2vbObject->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
 			getTextureUnitState("RandomTexture")->setTextureName(
 			randomTexture->getName(), randomTexture->getTextureType());
 
@@ -164,7 +164,7 @@ protected:
 		//Set shader parameters
 		GpuProgramParametersSharedPtr geomParams = particleSystem->
 			getRenderToVertexBuffer()->getRenderToBufferMaterial()->
-			getTechnique(0)->getPass(0)->getGeometryProgramParameters();
+			getBestTechnique()->getPass(0)->getGeometryProgramParameters();
 		geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
 		demoTime += evt.timeSinceLastFrame;
 		geomParams->setNamedConstant("globalTime", demoTime);
