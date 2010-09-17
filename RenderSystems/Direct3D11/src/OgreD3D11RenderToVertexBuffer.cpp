@@ -127,7 +127,7 @@ namespace Ogre {
 		{
 			String errorDescription = mDevice.getErrorDescription();
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set vertex buffer to NULL\nError Description:" + errorDescription,
+				"D3D11 device cannot set Stream-Output Stage to NULL\nError Description:" + errorDescription,
 				"D3D11RenderToVertexBuffer::getRenderOperation");
 		}
 	
@@ -164,7 +164,7 @@ namespace Ogre {
 		{
 			String errorDescription = mDevice.getErrorDescription();
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set vertex buffer to NULL\nError Description:" + errorDescription,
+				"D3D11 device cannot set vertex buffer output to NULL\nError Description:" + errorDescription,
 				"D3D11RenderToVertexBuffer::getRenderOperation");
 		}
 
