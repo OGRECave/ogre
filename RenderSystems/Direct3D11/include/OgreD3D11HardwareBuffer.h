@@ -63,7 +63,7 @@ namespace Ogre {
 
 	public:
 		D3D11HardwareBuffer(BufferType btype, size_t sizeBytes, HardwareBuffer::Usage usage, 
-			D3D11Device & device, bool useSystemMem, bool useShadowBuffer);
+			D3D11Device & device, bool useSystemMem, bool useShadowBuffer, bool streamOut);
 		~D3D11HardwareBuffer();
 		/** See HardwareBuffer. */
 		void readData(size_t offset, size_t length, void* pDest);

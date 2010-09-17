@@ -305,6 +305,13 @@ namespace Ogre {
 
 				}
 
+				if (mShaderDesc.ConstantBuffers > 1)
+				{
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"Multi constant buffers are not supported for now.",
+						"D3D11HLSLProgram::loadFromSource");
+				}
+
 				if (mShaderDesc.ConstantBuffers == 1)
 				{
 					mShaderReflectionConstantBuffer = mpIShaderReflection->GetConstantBufferByIndex(0);

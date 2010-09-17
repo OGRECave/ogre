@@ -35,7 +35,7 @@ namespace Ogre {
 	D3D11HardwareBuffer::D3D11HardwareBuffer(
 		BufferType btype, size_t sizeBytes,
 		HardwareBuffer::Usage usage, D3D11Device & device, 
-		bool useSystemMemory, bool useShadowBuffer)
+		bool useSystemMemory, bool useShadowBuffer, bool streamOut)
 		: HardwareBuffer(usage, useSystemMemory,  false /* TODO: useShadowBuffer*/),
 		mlpD3DBuffer(0),
 		mpTempStagingBuffer(0),
@@ -61,9 +61,13 @@ namespace Ogre {
 			mDesc.BindFlags = btype == VERTEX_BUFFER ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
 
 		}
+		if (streamOut)
+		{
+			mDesc.BindFlags |= D3D10_BIND_STREAM_OUTPUT;
+		}
 
 		mDesc.MiscFlags = 0;
-		if (!useSystemMemory && (usage | HardwareBuffer::HBU_DYNAMIC))
+		if (!useSystemMemory && (usage & HardwareBuffer::HBU_DYNAMIC))
 		{
 			// We want to be able to map this buffer
 			mDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
@@ -200,7 +204,7 @@ namespace Ogre {
 			{
 				// create another buffer instance but use system memory
 				mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
-					mSizeInBytes, mUsage, mDevice, true, false);
+					mSizeInBytes, mUsage, mDevice, true, false, false);
 			}
 
 			// schedule a copy to the staging

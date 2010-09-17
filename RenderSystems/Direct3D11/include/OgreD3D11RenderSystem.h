@@ -142,7 +142,6 @@ namespace Ogre
 		D3D11HLSLProgram* mBoundFragmentProgram;
 		D3D11HLSLProgram* mBoundGeometryProgram;
 
-
 		ID3D11BlendState * mBoundBlendState;
 		ID3D11RasterizerState * mBoundRasterizer;
 		ID3D11DepthStencilState * mBoundDepthStencilState;
@@ -255,6 +254,9 @@ namespace Ogre
 		virtual String getErrorDescription(long errorNumber) const;
 
 		// Low-level overridden members, mainly for internal use
+		D3D11HLSLProgram* _getBoundVertexProgram() const;
+		D3D11HLSLProgram* _getBoundFragmentProgram() const;
+		D3D11HLSLProgram* _getBoundGeometryProgram() const;
         void _useLights(const LightList& lights, unsigned short limit);
 		void _setWorldMatrix( const Matrix4 &m );
 		void _setViewMatrix( const Matrix4 &m );
@@ -284,6 +286,7 @@ namespace Ogre
 		void _setCullingMode( CullingMode mode );
 		void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
 		void _setDepthBufferCheckEnabled( bool enabled = true );
+		bool _getDepthBufferCheckEnabled( void );
 		void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
 		void _setDepthBufferWriteEnabled(bool enabled = true);
 		void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );

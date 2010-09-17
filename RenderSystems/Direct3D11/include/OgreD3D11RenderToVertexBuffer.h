@@ -45,7 +45,7 @@ namespace Ogre {
 		public RenderToVertexBuffer
 	{
 	public:
-		D3D11RenderToVertexBuffer(void);
+		D3D11RenderToVertexBuffer(D3D11Device & device, D3D11HardwareBufferManagerBase * bufManager);
 		virtual ~D3D11RenderToVertexBuffer(void);
 
 		/**
@@ -57,7 +57,13 @@ namespace Ogre {
 		Update the contents of this vertex buffer by rendering
 		*/
 		virtual void update(SceneManager* sceneMgr);
+		void reallocateBuffer(size_t index);
 	private:
+		D3D11Device & mDevice;
+
+		HardwareVertexBufferSharedPtr mVertexBuffers[2];
+		size_t mFrontBufferIndex;
+		D3D11HardwareBufferManagerBase * mBufManager;
 	};
 }
 #endif

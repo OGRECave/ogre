@@ -1975,7 +1975,9 @@ namespace Ogre
 		}
 
 
-	 	if (!mBoundVertexProgram || !mBoundFragmentProgram) 
+	 	if (!mBoundVertexProgram ||
+			 (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST) 
+		   ) 
 		{
 			
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
@@ -2092,11 +2094,18 @@ namespace Ogre
 							"D3D11 device cannot set primitive topology\nError Description:" + errorDescription,
 							"D3D11RenderSystem::_render");
 					}		
-
-					mDevice.GetImmediateContext()->Draw(
-						static_cast<UINT>(op.vertexData->vertexCount), 
-						static_cast<INT>(op.vertexData->vertexStart)
-						); 
+					
+					if (op.vertexData->vertexCount == -1) // -1 is a sign to use DrawAuto
+					{
+						mDevice.GetImmediateContext()->DrawAuto(); 
+					}
+					else
+					{
+						mDevice.GetImmediateContext()->Draw(
+							static_cast<UINT>(op.vertexData->vertexCount), 
+							static_cast<INT>(op.vertexData->vertexStart)
+							); 
+					}
 					if (mDevice.isError())
 					{
 						String errorDescription = mDevice.getErrorDescription();
@@ -2741,5 +2750,25 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
+	}
+	//---------------------------------------------------------------------
+	bool D3D11RenderSystem::_getDepthBufferCheckEnabled( void )
+	{
+		return (bool)mDepthStencilDesc.DepthEnable;
+	}
+	//---------------------------------------------------------------------
+	D3D11HLSLProgram* D3D11RenderSystem::_getBoundVertexProgram() const
+	{
+		return mBoundVertexProgram;
+	}
+	//---------------------------------------------------------------------
+	D3D11HLSLProgram* D3D11RenderSystem::_getBoundFragmentProgram() const
+	{
+		return mBoundFragmentProgram;
+	}
+	//---------------------------------------------------------------------
+	D3D11HLSLProgram* D3D11RenderSystem::_getBoundGeometryProgram() const
+	{
+		return mBoundGeometryProgram;
 	}
 }
