@@ -1397,10 +1397,6 @@ namespace Ogre
 	{
 		static D3D11TexturePtr dt;
 		dt = tex;
-		if (dt.isNull())
-		{
-			enabled = false;
-		}
 		if (enabled)
 		{
 			// note used
@@ -1418,7 +1414,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
 	{
-		_setTexture(stage,true, tex);
+		if (tex.isNull())
+			_setTexture(stage, false, tex);
+        else
+			_setTexture(stage, true, tex);	
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_disableTextureUnit(size_t texUnit)
