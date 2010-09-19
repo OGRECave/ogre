@@ -47,9 +47,7 @@ namespace Ogre {
         mRenderSystem = OGRE_NEW GLES2RenderSystem();
 
         Root::getSingleton().addRenderSystem(mRenderSystem);
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
         Root::getSingleton().setRenderSystem(mRenderSystem);
-#endif
     }
 
     void GLES2Plugin::initialise()
