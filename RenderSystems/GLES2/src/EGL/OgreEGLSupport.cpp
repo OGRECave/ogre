@@ -75,6 +75,9 @@ namespace Ogre {
         optFSAA.immutable = false;
 
         optRTTMode.name = "RTT Preferred Mode";
+        optRTTMode.possibleValues.push_back("FBO");
+        optRTTMode.possibleValues.push_back("Copy");
+        optRTTMode.currentValue = "FBO";
         optRTTMode.immutable = false;
 
         optFullScreen.possibleValues.push_back("No");
@@ -108,7 +111,6 @@ namespace Ogre {
             optFSAA.currentValue = optFSAA.possibleValues[0];
         }
 
-        optRTTMode.possibleValues.push_back("Copy");
         optRTTMode.currentValue = optRTTMode.possibleValues[0];
 
         mOptions[optFullScreen.name] = optFullScreen;
