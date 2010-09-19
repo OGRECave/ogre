@@ -86,21 +86,21 @@ namespace Ogre {
 
     X11EGLSupport::X11EGLSupport()
     {
-		// A connection that might be shared with the application for GL rendering:
+        // A connection that might be shared with the application for GL rendering:
         mGLDisplay = getGLDisplay();
 
- 		// A connection that is NOT shared to enable independent event processing:
+        // A connection that is NOT shared to enable independent event processing:
         mNativeDisplay = getNativeDisplay();
 
         int dummy = 0;
 
 	// TODO: Probe video modes
-        mCurrentMode.first.first = 1280;
-        mCurrentMode.first.second = 1024;
-//            mCurrentMode.first.first = DisplayWidth((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
-//            mCurrentMode.first.second = DisplayHeight((Display*)mNativeDisplay, DefaultScreen(mNativeDisplay));
+        mCurrentMode.first.first = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
+        mCurrentMode.first.second = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
         mCurrentMode.second = 0;
+
         mOriginalMode = mCurrentMode;
+
         mVideoModes.push_back(mCurrentMode);
 
         EGLConfig *glConfigs;
