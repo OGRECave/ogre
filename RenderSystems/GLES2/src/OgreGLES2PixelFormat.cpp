@@ -65,6 +65,8 @@ namespace Ogre  {
 #endif                
             case PF_R5G6B5:
             case PF_B5G6R5:
+            case PF_R8G8B8:
+            case PF_B8G8R8:
                 return GL_RGB;
 
             case PF_A1R5G5B5:
@@ -77,19 +79,6 @@ namespace Ogre  {
             case PF_A8B8G8R8:
                 return GL_RGBA;
 
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            // Formats are in native endian, so R8G8B8 on little endian is
-            // BGR, on big endian it is RGB.
-            case PF_R8G8B8:
-                return GL_RGB;
-            case PF_B8G8R8:
-                return 0;
-#else
-            case PF_R8G8B8:
-                return GL_RGB;
-            case PF_B8G8R8:
-                return 0;
-#endif
             case PF_DXT1:
 #if GL_EXT_texture_compression_dxt1
                 return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
