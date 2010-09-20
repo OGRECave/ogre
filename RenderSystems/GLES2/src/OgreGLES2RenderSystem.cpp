@@ -206,16 +206,16 @@ namespace Ogre {
         // For 2.0, http://www.khronos.org/registry/gles/api/2.0/gl2ext.h
 
         if (mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_3DC_texture") ||
-            mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
-            mGLSupport->checkExtension("GL_OES_compressed_ETC1_RGB8_texture") ||
-            mGLSupport->checkExtension("GL_OES_compressed_paletted_texture"))
+            mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") ||
+            mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))
         {
-            // TODO: Add support for compression types other than pvrtc
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
             if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
+            if(mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") && 
+               mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))
+                rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
         }
 
         if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
