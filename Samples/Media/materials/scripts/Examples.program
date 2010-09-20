@@ -82,8 +82,8 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
-	delegate Ogre/BasicVertexPrograms/PassthroughFpCgSm4
-	delegate Ogre/BasicVertexPrograms/PassthroughFpGLSLES
+	delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
+	delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
