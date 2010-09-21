@@ -555,8 +555,8 @@ elseif (UNIX)
       src/Tegra2/OgreTimer.cpp
       src/OgreSearchOps.cpp
     )
-#    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread dl)
-    set(PLATFORM_LIBS pthread dl)
+
+    set(PLATFORM_LIBS ${X11_LIBRARIES} pthread dl)
     set(PLATFORM_HEADER_INSTALL "Tegra2")
   else ()
     include_directories(include/GLX ${X11_INCLUDE_DIR})
