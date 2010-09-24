@@ -2126,12 +2126,9 @@ namespace Ogre {
 							switch (elem.getSemantic())
 							{
 								case VES_POSITION:
-									tmp.x = *pSrcReal++;
-									tmp.y = *pSrcReal++;
-									tmp.z = *pSrcReal++;
-									*pDstReal++ = tmp.x;
-									*pDstReal++ = tmp.y;
-									*pDstReal++ = tmp.z;
+									tmp.x = pSrcReal[0];
+									tmp.y = pSrcReal[1];
+									tmp.z = pSrcReal[2];
 									if(tmp.x<Xmin)
 										Xmin = tmp.x;
 									if(tmp.y<Ymin)
