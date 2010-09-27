@@ -157,23 +157,12 @@ protected:
 			if (coreLibsFound) 
 				break; 
 		}
-		
-		// Create the resource group of the RT Shader System.
-		rgm.createResourceGroup("RTShaderSystemMaterialsGroup");
-		rgm.addResourceLocation(shaderCoreLibsPath + "materials", "FileSystem", "RTShaderSystemMaterialsGroup");		
-		rgm.initialiseResourceGroup("RTShaderSystemMaterialsGroup");
-		rgm.loadResourceGroup("RTShaderSystemMaterialsGroup", true);
+			
 #endif
 	}
 
 	void unloadResources()
 	{
-#ifdef USE_RTSHADER_SYSTEM
-		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
-		
-		// Destroy the resource group of the RT Shader System			
-		rgm.destroyResourceGroup("RTShaderSystemMaterialsGroup");
-#endif
 
 	}
 
