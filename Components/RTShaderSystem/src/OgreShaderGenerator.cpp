@@ -697,13 +697,20 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 {
 	OGRE_LOCK_AUTO_MUTEX
 
-	// Make sure material exists;
+	// Make sure material exists.
 	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	if (srcMat.isNull() == true)
 		return false;
 
-	//update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
-	String trueGroupName = srcMat->getGroup();
+	// Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
+	const String& trueGroupName = srcMat->getGroup();
+
+	// Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
+	if (trueGroupName != groupName && 
+		groupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
+	{
+		return false;
+	}
 		
 	SGMaterialIterator itMatEntry = findMaterialEntryIt(materialName, trueGroupName);
 	
