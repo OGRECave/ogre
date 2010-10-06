@@ -550,7 +550,7 @@ protected:
 	CheckBox						*mMoveInstances;
 	CheckBox						*mAnimateInstances;
 	CheckBox						*mEnableShadows;
-	OgreBites::Button							*mDefragmentBatches;
+	OgreBites::Button				*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
 	Slider							*mInstancesSlider;
 };
