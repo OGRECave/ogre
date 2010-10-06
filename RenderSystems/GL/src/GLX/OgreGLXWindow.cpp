@@ -256,14 +256,8 @@ namespace Ogre
 		if (! fbConfig && glxContext)
 		{
 			fbConfig = mGLSupport->getFBConfigFromContext (glxContext);
-			
-			if (! fbConfig)
-			{
-				// This should never happen.
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unexpected failure to determine a GLXFBConfig","GLXWindow::create");
-			}
 		}
-		
+			
 		mIsExternal = (glxDrawable != 0);
 		
 		XSetErrorHandler(oldXErrorHandler);
@@ -296,6 +290,12 @@ namespace Ogre
 
 			mHwGamma = (gamma != 0);
 		}
+		
+    if (! fbConfig)
+    {
+      // This should never happen.
+      OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unexpected failure to determine a GLXFBConfig","GLXWindow::create");
+    }
 		
 		mIsTopLevel = (! mIsExternal && parentWindow == DefaultRootWindow(xDisplay));
 		
