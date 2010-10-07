@@ -319,6 +319,9 @@ namespace Ogre
         addKeywordType("fragment_program_constant_float_count", SET_INT_METHOD);
         addKeywordType("fragment_program_constant_int_count", SET_INT_METHOD);
         addKeywordType("fragment_program_constant_bool_count", SET_INT_METHOD);
+        addKeywordType("geometry_program_constant_float_count", SET_INT_METHOD);
+        addKeywordType("geometry_program_constant_int_count", SET_INT_METHOD);
+        addKeywordType("geometry_program_constant_bool_count", SET_INT_METHOD);
         addKeywordType("num_vertex_texture_units", SET_INT_METHOD);
 
         // initialize int setters
@@ -386,12 +389,12 @@ namespace Ogre
         addKeywordType("texture_compression_dxt", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_vtc", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_pvrtc", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("glew1_5_novbo", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("gl1_5_novbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo_arb", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo_ati", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("pbuffer", SET_CAPABILITY_ENUM_BOOL);
-        addKeywordType("glew1_5_nohwocclusion", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("gl1_5_nohwocclusion", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("perstageconstant", SET_CAPABILITY_ENUM_BOOL);
 
 		addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
