@@ -37,7 +37,7 @@ namespace Ogre {
 
     /** GL surface descriptor. Points to a 2D surface that can be rendered to.
     */
-    struct _OgrePrivate GLESSurfaceDesc
+    struct _OgreGLESExport GLESSurfaceDesc
     {
         public:
             GLESHardwarePixelBuffer *buffer;
@@ -49,7 +49,7 @@ namespace Ogre {
 
     /** Base class for GL Render Textures
     */
-    class _OgrePrivate GLESRenderTexture : public RenderTexture
+    class _OgreGLESExport GLESRenderTexture : public RenderTexture
     {
         public:
             GLESRenderTexture(const String &name, const GLESSurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -59,7 +59,7 @@ namespace Ogre {
 
     /** Manager/factory for RenderTextures.
     */
-    class _OgrePrivate GLESRTTManager : public Singleton<GLESRTTManager>
+    class _OgreGLESExport GLESRTTManager : public Singleton<GLESRTTManager>
     {
         public:
             virtual ~GLESRTTManager();
@@ -94,7 +94,7 @@ namespace Ogre {
     /** RenderTexture for simple copying from frame buffer
     */
     class GLESCopyingRTTManager;
-    class _OgrePrivate GLESCopyingRenderTexture : public GLESRenderTexture
+    class _OgreGLESExport GLESCopyingRenderTexture : public GLESRenderTexture
     {
         public:
             GLESCopyingRenderTexture(GLESCopyingRTTManager *manager,
@@ -108,7 +108,7 @@ namespace Ogre {
     /** Simple, copying manager/factory for RenderTextures. This is only used as the last fallback if
         both PBuffers and FBOs aren't supported.
     */
-    class _OgrePrivate GLESCopyingRTTManager : public GLESRTTManager
+    class _OgreGLESExport GLESCopyingRTTManager : public GLESRTTManager
     {
         public:
             GLESCopyingRTTManager();

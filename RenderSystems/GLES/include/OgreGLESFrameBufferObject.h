@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgrePrivate GLESFrameBufferObject
+    class _OgreGLESExport GLESFrameBufferObject
     {
     public:
         GLESFrameBufferObject(GLESFBOManager *manager, uint fsaa);

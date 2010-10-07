@@ -38,7 +38,7 @@ namespace Ogre {
         convience, but the component format is configurable.
     */
     class GLESContext;
-    class _OgrePrivate GLESPBuffer
+    class _OgreGLESExport GLESPBuffer
     {
         public:
             GLESPBuffer(PixelComponentType format, size_t width, size_t height);

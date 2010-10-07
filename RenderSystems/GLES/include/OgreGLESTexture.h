@@ -38,7 +38,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate GLESTexture : public Texture
+    class _OgreGLESExport GLESTexture : public Texture
     {
         public:
             // Constructor
@@ -104,7 +104,7 @@ namespace Ogre {
     except to do so requires a form VC6 does not support i.e.
     ResourceSubclassPtr<T> : public SharedPtr<T>
     */
-    class _OgrePrivate GLESTexturePtr : public SharedPtr<GLESTexture>
+    class _OgreGLESExport GLESTexturePtr : public SharedPtr<GLESTexture>
     {
         public:
             GLESTexturePtr() : SharedPtr<GLESTexture>() {}

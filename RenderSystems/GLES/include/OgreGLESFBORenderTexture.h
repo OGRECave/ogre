@@ -38,7 +38,7 @@ namespace Ogre {
 
     /** RenderTexture for GL ES FBO
     */
-    class _OgrePrivate GLESFBORenderTexture: public GLESRenderTexture
+    class _OgreGLESExport GLESFBORenderTexture: public GLESRenderTexture
     {
     public:
         GLESFBORenderTexture(GLESFBOManager *manager, const String &name, const GLESSurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -53,7 +53,7 @@ namespace Ogre {
     
     /** Factory for GL Frame Buffer Objects, and related things.
     */
-    class _OgrePrivate GLESFBOManager: public GLESRTTManager
+    class _OgreGLESExport GLESFBOManager: public GLESRTTManager
     {
     public:
         GLESFBOManager();
