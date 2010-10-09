@@ -814,7 +814,7 @@ namespace Ogre
 			PCZSceneNodeList::iterator iter = mVisitorNodeList.begin();
 			while ( iter != mVisitorNodeList.end() )
 			{
-				PCZSceneNode * pczsn = *it;
+				PCZSceneNode * pczsn = *iter;
 				if ( pczsn != exclude )
 				{
 					// make sure node is not already in the list (might have been added in another
