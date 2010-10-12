@@ -38,7 +38,7 @@ namespace Ogre {
     #   define OGRE_GL_MAP_BUFFER_THRESHOLD (1024 * 32)
 
     /** Implementation of HardwareBufferManager for OpenGL ES. */
-    class _OgrePrivate GLESHardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreGLESExport GLESHardwareBufferManagerBase : public HardwareBufferManagerBase
     {
         protected:
             char* mScratchBufferPool;
@@ -80,10 +80,10 @@ namespace Ogre {
             */
             const size_t getGLMapBufferThreshold() const;
             void setGLMapBufferThreshold( const size_t value );
-};
+    };
 
 	/// GLESHardwareBufferManagerBase as a Singleton
-	class _OgrePrivate GLESHardwareBufferManager : public HardwareBufferManager
+	class _OgreGLESExport GLESHardwareBufferManager : public HardwareBufferManager
 	{
 	public:
 		GLESHardwareBufferManager()

@@ -39,7 +39,7 @@ namespace Ogre {
     class GLESPBRTTManager;
     class GLESPBuffer;
     class GLESContext;
-    class _OgrePrivate GLESPBRenderTexture: public GLESRenderTexture
+    class _OgreGLESExport GLESPBRenderTexture: public GLESRenderTexture
     {
         public:
             GLESPBRenderTexture(GLESPBRTTManager *manager, const String &name, const GLESSurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -53,7 +53,7 @@ namespace Ogre {
 
     /** Manager for rendertextures and PBuffers (offscreen rendering contexts)
     */
-    class _OgrePrivate GLESPBRTTManager: public GLESRTTManager
+    class _OgreGLESExport GLESPBRTTManager: public GLESRTTManager
     {
         public:
             GLESPBRTTManager(GLESSupport *support, RenderTarget *mainwindow);

@@ -112,7 +112,7 @@ namespace Ogre
 
 		mLastVertexSourceCount = 0;
 
-		mCurrentLights = 0;
+		mCurrentLights.clear();
 
 		// Enumerate events
 		mEventNames.push_back("DeviceLost");
@@ -1585,6 +1585,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_useLights(const LightList& lights, unsigned short limit)
 	{
+		IDirect3DDevice9* activeDevice = getActiveD3D9Device();
 		LightList::const_iterator i, iend;
 		iend = lights.end();
 		unsigned short num = 0;
@@ -1593,11 +1594,11 @@ namespace Ogre
 			setD3D9Light(num, *i);
 		}
 		// Disable extra lights
-		for (; num < mCurrentLights; ++num)
+		for (; num < mCurrentLights[activeDevice]; ++num)
 		{
 			setD3D9Light(num, NULL);
 		}
-		mCurrentLights = std::min(limit, static_cast<unsigned short>(lights.size()));
+		mCurrentLights[activeDevice] = std::min(limit, static_cast<unsigned short>(lights.size()));
 
 	}
 	//---------------------------------------------------------------------

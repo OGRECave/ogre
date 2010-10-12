@@ -37,7 +37,7 @@ namespace Ogre {
 
 	/** MultiRenderTarget for GL ES. Requires the FBO extension.
 	*/
-	class _OgrePrivate GLESFBOMultiRenderTarget : public MultiRenderTarget
+	class _OgreGLESExport GLESFBOMultiRenderTarget : public MultiRenderTarget
 	{
 	public:
 		GLESFBOMultiRenderTarget(GLESFBOManager *manager, const String &name);

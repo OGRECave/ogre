@@ -139,7 +139,7 @@ namespace Ogre
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
 		bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
 		
-        unsigned short mCurrentLights;
+        HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
         Matrix4 mViewMatrix;
 

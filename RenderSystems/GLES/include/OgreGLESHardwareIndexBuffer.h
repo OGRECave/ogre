@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate GLESHardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLESExport GLESHardwareIndexBuffer : public HardwareIndexBuffer
     {
         private:
             GLuint mBufferId;

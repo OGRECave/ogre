@@ -44,7 +44,7 @@ namespace Ogre {
     /**
       Implementation of GL as a rendering system.
      */
-    class _OgrePrivate GLESRenderSystem : public RenderSystem
+    class _OgreGLESExport GLESRenderSystem : public RenderSystem
     {
         private:
             typedef HashMap<GLenum, GLint>              TexEnviMap;

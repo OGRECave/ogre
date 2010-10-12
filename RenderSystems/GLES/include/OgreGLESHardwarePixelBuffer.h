@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
-    class _OgrePrivate GLESHardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreGLESExport GLESHardwarePixelBuffer: public HardwarePixelBuffer
     {
         protected:
             /// Lock a box
@@ -82,7 +82,7 @@ namespace Ogre {
 
     /** Texture surface.
     */
-    class _OgrePrivate GLESTextureBuffer: public GLESHardwarePixelBuffer
+    class _OgreGLESExport GLESTextureBuffer: public GLESHardwarePixelBuffer
     {
         public:
             /** Texture constructor */
@@ -136,7 +136,7 @@ namespace Ogre {
 
      /** Renderbuffer surface.  Needs FBO extension.
      */
-    class _OgrePrivate GLESRenderBuffer: public GLESHardwarePixelBuffer
+    class _OgreGLESExport GLESRenderBuffer: public GLESHardwarePixelBuffer
     {
         public:
             GLESRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
