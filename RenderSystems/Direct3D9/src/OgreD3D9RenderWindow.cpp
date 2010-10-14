@@ -394,9 +394,11 @@ namespace Ogre
 				dwStyle |= WS_OVERLAPPEDWINDOW;
 				// Calculate window dimensions required
 				// to get the requested client area
+				unsigned int winWidth, winHeight;
+				adjustWindow(mWidth, mHeight, &winWidth, &winHeight);
 
 				SetWindowLong(mHWnd, GWL_STYLE, dwStyle);
-				SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, mWidth, mHeight,
+				SetWindowPos(mHWnd, HWND_NOTOPMOST, 0, 0, winWidth, winHeight,
 					SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOACTIVATE);
 				// Note that we also set the position in the restoreLostDevice method
 				// via _finishSwitchingFullScreen
