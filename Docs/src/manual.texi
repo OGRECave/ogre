@@ -9,25 +9,17 @@
 @author Steve Streeting
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} Torus Knot Software Ltd@*@*
+Copyright @copyright{} The OGRE Team@*@*
 
-Permission is granted to make and distribute verbatim
-copies of this manual provided the copyright notice and
-this permission notice are preserved on all copies.@*@*
+This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unported License. To view a copy of this licence, visit @url{http://creativecommons.org/licenses/by-sa/3.0/} or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.@*@*
 
-Permission is granted to copy and distribute modified
-versions of this manual under the conditions for verbatim
-copying, provided that the entire resulting derived work is
-distributed under the terms of a permission notice
-identical to this one.@*@*
 @end titlepage
 
 @node Top
 @top OGRE Manual
 Copyright @copyright{} The OGRE Team@*@*
 
-
-This work is licenced under the Creative Commons Attribution-ShareAlike 2.5 License. To view a copy of this licence, visit @url{http://creativecommons.org/licenses/by-sa/2.5/} or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.@*@*
+This work is licenced under the Creative Commons Attribution-ShareAlike 3.0 Unported License. To view a copy of this licence, visit @url{http://creativecommons.org/licenses/by-sa/3.0/} or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.@*@*
 
 @ifinfo
 @menu
