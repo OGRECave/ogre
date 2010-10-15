@@ -70,6 +70,11 @@ function(ogre_create_vcproj_userfile TARGETNAME)
 	  ${CMAKE_CURRENT_BINARY_DIR}/${TARGETNAME}.vcproj.user
 	  @ONLY
 	)
+    configure_file(
+	  ${OGRE_TEMPLATES_DIR}/VisualStudioUserFile.vcxproj.user.in
+	  ${CMAKE_CURRENT_BINARY_DIR}/${TARGETNAME}.vcxproj.user
+	  @ONLY
+	)
   endif ()
 endfunction(ogre_create_vcproj_userfile)
 
