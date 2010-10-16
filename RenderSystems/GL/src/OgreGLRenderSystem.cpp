@@ -569,15 +569,13 @@ namespace Ogre {
 			}
 			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
 		}
-		else
+
+		// Check GLSupport for PBuffer support
+		if(mGLSupport->supportsPBuffers())
 		{
-			// Check GLSupport for PBuffer support
-			if(mGLSupport->supportsPBuffers())
-			{
-				// Use PBuffers
-				rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
-				rsc->setCapability(RSC_PBUFFER);
-			}
+			// Use PBuffers
+			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
+			rsc->setCapability(RSC_PBUFFER);
 		}
 
 		// Point size
