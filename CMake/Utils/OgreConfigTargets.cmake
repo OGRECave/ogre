@@ -164,7 +164,9 @@ function(ogre_config_lib LIBNAME EXPORT)
     if (CMAKE_COMPILER_IS_GNUCXX)
       # add GCC visibility flags to shared library build
       set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-	endif (CMAKE_COMPILER_IS_GNUCXX)
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
+    endif (CMAKE_COMPILER_IS_GNUCXX)
 	if (MINGW)
 	  # remove lib prefix from DLL outputs
 	  set_target_properties(${LIBNAME} PROPERTIES PREFIX "")
@@ -217,6 +219,8 @@ function(ogre_config_plugin PLUGINNAME)
     if (CMAKE_COMPILER_IS_GNUCXX)
       # add GCC visibility flags to shared library build
       set_target_properties(${PLUGINNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
+      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
       # disable "lib" prefix on Unix
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
 	endif (CMAKE_COMPILER_IS_GNUCXX)	
@@ -281,6 +285,8 @@ function(ogre_config_sample_common SAMPLENAME)
   if (CMAKE_COMPILER_IS_GNUCXX)
     # add GCC visibility flags to shared library build
     set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+    set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
+    set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
     # disable "lib" prefix on Unix
     set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
   endif (CMAKE_COMPILER_IS_GNUCXX)	
