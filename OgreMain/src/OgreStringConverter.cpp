@@ -27,13 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreStringConverter.h"
-#include "OgreVector2.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
-#include "OgreMatrix3.h"
-#include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
-#include "OgreColourValue.h"
 
 namespace Ogre {
 
@@ -253,70 +246,76 @@ namespace Ogre {
         return stream.str();
     }
     //-----------------------------------------------------------------------
-    Real StringConverter::parseReal(const String& val)
+    Real StringConverter::parseReal(const String& val, Real defaultValue)
     {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
-		Real ret = 0;
+		Real ret = defaultValue;
 		str >> ret;
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    int StringConverter::parseInt(const String& val)
+    int StringConverter::parseInt(const String& val, int defaultValue)
     {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
-		int ret = 0;
+		int ret = defaultValue;
 		str >> ret;
 
         return ret;
     }
     //-----------------------------------------------------------------------
-    unsigned int StringConverter::parseUnsignedInt(const String& val)
+    unsigned int StringConverter::parseUnsignedInt(const String& val, unsigned int defaultValue)
     {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
-		unsigned int ret = 0;
+		unsigned int ret = defaultValue;
 		str >> ret;
 
 		return ret;
     }
     //-----------------------------------------------------------------------
-    long StringConverter::parseLong(const String& val)
+    long StringConverter::parseLong(const String& val, long defaultValue)
     {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
-		long ret = 0;
+		long ret = defaultValue;
 		str >> ret;
 
 		return ret;
     }
     //-----------------------------------------------------------------------
-    unsigned long StringConverter::parseUnsignedLong(const String& val)
+    unsigned long StringConverter::parseUnsignedLong(const String& val, unsigned long defaultValue)
     {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
-		unsigned long ret = 0;
+		unsigned long ret = defaultValue;
 		str >> ret;
 
 		return ret;
     }
     //-----------------------------------------------------------------------
-    bool StringConverter::parseBool(const String& val)
+    bool StringConverter::parseBool(const String& val, bool defaultValue)
     {
-		return (StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
-			|| StringUtil::startsWith(val, "1"));
+		if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")
+			|| StringUtil::startsWith(val, "1")))
+			return true;
+		else if ((StringUtil::startsWith(val, "false") || StringUtil::startsWith(val, "no")
+			|| StringUtil::startsWith(val, "0")))
+			return false;
+		else
+			return defaultValue;
     }
     //-----------------------------------------------------------------------
-    Vector2 StringConverter::parseVector2(const String& val)
+    Vector2 StringConverter::parseVector2(const String& val, const Vector2& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 2)
         {
-            return Vector2::ZERO;
+            return defaultValue;
         }
         else
         {
@@ -324,14 +323,14 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-    Vector3 StringConverter::parseVector3(const String& val)
+    Vector3 StringConverter::parseVector3(const String& val, const Vector3& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 3)
         {
-            return Vector3::ZERO;
+            return defaultValue;
         }
         else
         {
@@ -339,14 +338,14 @@ namespace Ogre {
         }
     }
 	//-----------------------------------------------------------------------
-    Vector4 StringConverter::parseVector4(const String& val)
+    Vector4 StringConverter::parseVector4(const String& val, const Vector4& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
-            return Vector4::ZERO;
+            return defaultValue;
         }
         else
         {
@@ -354,14 +353,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Matrix3 StringConverter::parseMatrix3(const String& val)
+    Matrix3 StringConverter::parseMatrix3(const String& val, const Matrix3& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 9)
         {
-            return Matrix3::IDENTITY;
+            return defaultValue;
         }
         else
         {
@@ -371,14 +370,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Matrix4 StringConverter::parseMatrix4(const String& val)
+    Matrix4 StringConverter::parseMatrix4(const String& val, const Matrix4& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 16)
         {
-            return Matrix4::IDENTITY;
+            return defaultValue;
         }
         else
         {
@@ -389,14 +388,14 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    Quaternion StringConverter::parseQuaternion(const String& val)
+    Quaternion StringConverter::parseQuaternion(const String& val, const Quaternion& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
 
         if (vec.size() != 4)
         {
-            return Quaternion::IDENTITY;
+            return defaultValue;
         }
         else
         {
@@ -404,7 +403,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    ColourValue StringConverter::parseColourValue(const String& val)
+    ColourValue StringConverter::parseColourValue(const String& val, const ColourValue& defaultValue)
     {
         // Split on space
         vector<String>::type vec = StringUtil::split(val);
@@ -419,7 +418,7 @@ namespace Ogre {
         }
         else
         {
-            return ColourValue::Black;
+            return defaultValue;
         }
     }
     //-----------------------------------------------------------------------
