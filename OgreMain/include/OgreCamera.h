@@ -107,8 +107,6 @@ namespace Ogre {
 
 		};
     protected:
-        /// Camera name
-        String mName;
         /// Scene manager responsible for the scene
         SceneManager *mSceneMgr;
 
@@ -216,11 +214,6 @@ namespace Ogre {
         /** Returns a pointer to the SceneManager this camera is rendering through.
         */
         SceneManager* getSceneManager(void) const;
-
-        /** Gets the camera's name.
-        */
-        virtual const String& getName(void) const;
-
 
         /** Sets the level of rendering detail required from this camera.
             @remarks
