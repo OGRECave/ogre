@@ -105,7 +105,7 @@ namespace Ogre
 		bool _validateDevice();
 
 		void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
-			unsigned int* winWidth, unsigned int* winHeight);
+			DWORD style, unsigned int* winWidth, unsigned int* winHeight);
 
 	protected:
 		HINSTANCE					mInstance;				// Process instance
@@ -121,7 +121,7 @@ namespace Ogre
 		bool						mVSync;					// Use vertical sync or not.
 		unsigned int				mVSyncInterval;		
 		bool						mUseNVPerfHUD;			// Use NV Perf HUD.
-
+		DWORD						mStyle;					// Window style currently used for this window.
 		// Desired width / height after resizing
 		unsigned int mDesiredWidth;
 		unsigned int mDesiredHeight;
