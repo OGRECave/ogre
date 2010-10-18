@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __StringConverter_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreStringVector.h"
 #include "OgreColourValue.h"
 #include "OgreMath.h"
 #include "OgreMatrix3.h"

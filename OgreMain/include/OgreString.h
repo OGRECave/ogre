@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define _String_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreStringVector.h"
 
 // If we're using the GCC 3.1 C++ Std lib
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 310 && !defined(STLPORT)
@@ -94,7 +93,7 @@ namespace Ogre {
                 maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
                 parameters is > 0, the splitting process will stop after this many splits, left to right.
         */
-		static StringVector split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0);
+		static vector<String>::type split( const String& str, const String& delims = "\t\n ", unsigned int maxSplits = 0);
 
 		/** Returns a StringVector that contains all the substrings delimited
             by the characters in the passed <code>delims</code> argument, 
@@ -108,7 +107,7 @@ namespace Ogre {
                 maxSplits The maximum number of splits to perform (0 for unlimited splits). If this
                 parameters is > 0, the splitting process will stop after this many splits, left to right.
         */
-		static StringVector tokenise( const String& str, const String& delims = "\t\n ", const String& doubleDelims = "\"", unsigned int maxSplits = 0);
+		static vector<String>::type tokenise( const String& str, const String& delims = "\t\n ", const String& doubleDelims = "\"", unsigned int maxSplits = 0);
 
 		/** Lower-cases all the characters in the string.
         */
