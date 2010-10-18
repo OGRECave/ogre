@@ -459,6 +459,8 @@ namespace Ogre {
 			GLint maxOutputVertices;
 			glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&maxOutputVertices);
 			rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+
+			rsc->setCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
 		}
 		
 		//Check if render to vertex buffer (transform feedback in OpenGL)
@@ -2831,6 +2833,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
         elemEnd = decl.end();
 		vector<GLuint>::type attribsBound;
+		vector<GLuint>::type instanceAttribsBound;
 
 		for (elem = decl.begin(); elem != elemEnd; ++elem)
 		{
@@ -2839,10 +2842,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 			HardwareVertexBufferSharedPtr vertexBuffer = 
 				op.vertexData->vertexBufferBinding->getBuffer(elem->getSource());
+
+			const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get()); 
 			if(mCurrentCapabilities->hasCapability(RSC_VBO))
 			{
 				glBindBufferARB(GL_ARRAY_BUFFER_ARB, 
-					static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get())->getGLBufferId());
+					hwGlBuffer->getGLBufferId());
 				pBufferData = VBO_BUFFER_OFFSET(elem->getOffset());
 			}
 			else
@@ -2894,6 +2899,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  				glEnableVertexAttribArrayARB(attrib);
  
  				attribsBound.push_back(attrib);
+
+				if (hwGlBuffer->getIsInstanceData())
+				{
+					glVertexAttribDivisor(attrib, 1);
+					instanceAttribsBound.push_back(attrib);
+				}
  			}
  			else
  			{
@@ -3032,7 +3043,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
 						mDerivedDepthBiasSlopeScale);
 				}
-				glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
+				if(op.numberOfInstances == 1)
+				{
+					glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
+				}
+				else
+				{
+					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, op.numberOfInstances);
+				}
 			} while (updatePassIterationRenderState());
 
 		}
@@ -3047,7 +3065,15 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
 						mDerivedDepthBiasSlopeScale);
 				}
-				glDrawArrays(primType, 0, op.vertexData->vertexCount);
+
+				if(op.numberOfInstances == 1)
+				{
+					glDrawArrays(primType, 0, op.vertexData->vertexCount);
+				}
+				else
+				{
+					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, op.numberOfInstances);
+				}
 			} while (updatePassIterationRenderState());
 		}
 
@@ -3078,6 +3104,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  			glDisableVertexAttribArrayARB(*ai); 
  
   		}
+		
+		// unbind any instance attributes
+		for (vector<GLuint>::type::iterator ai = instanceAttribsBound.begin(); ai != instanceAttribsBound.end(); ++ai)
+		{
+			glVertexAttribDivisor(*ai, 0); 
+
+		}
 		
 		glColor4f(1,1,1,1);
 		if (GLEW_EXT_secondary_color)

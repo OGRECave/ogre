@@ -827,6 +827,7 @@ namespace Ogre
 		rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
 		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
+		rsc->setCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
 
 		for (uint i=0; i < mDeviceManager->getDeviceCount(); ++i)
 		{
@@ -3095,6 +3096,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
 	{
+		setVertexBufferBinding(binding, 1);
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances)
+	{
 		HRESULT hr;
 
 		// TODO: attempt to detect duplicates
@@ -3113,6 +3119,16 @@ namespace Ogre
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source", 
 						"D3D9RenderSystem::setVertexBufferBinding");
 				}
+
+				if(numberOfInstances > 1)
+				{
+					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), 1 );
+					if (FAILED(hr))
+					{
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source Freq", 
+							"D3D9RenderSystem::setVertexBufferBinding");
+					}
+				}
 			}
 
 			D3D9HardwareVertexBuffer* d3d9buf = 
@@ -3129,6 +3145,32 @@ namespace Ogre
 					"D3D9RenderSystem::setVertexBufferBinding");
 			}
 
+			if(numberOfInstances == 1)
+			{
+				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), 1 );
+				if (FAILED(hr))
+				{
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset D3D9 stream source Freq", 
+						"D3D9RenderSystem::setVertexBufferBinding");
+				}
+			}
+			else
+			{
+				if ( d3d9buf->getIsInstanceData() )
+				{
+					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | 1ul );
+				}
+				else
+				{
+					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INDEXEDDATA | numberOfInstances );
+				}
+				if (FAILED(hr))
+				{
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
+						"D3D9RenderSystem::setVertexBufferBinding");
+				}
+			}
+
 
 		}
 
@@ -3141,6 +3183,16 @@ namespace Ogre
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source", 
 					"D3D9RenderSystem::setVertexBufferBinding");
+			}
+
+			if(numberOfInstances > 1)
+			{
+				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(unused), 1 );
+				if (FAILED(hr))
+				{
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source Freq", 
+						"D3D9RenderSystem::setVertexBufferBinding");
+				}
 			}
 
 		}
@@ -3162,7 +3214,7 @@ namespace Ogre
 		// setVertexBufferBinding from RenderSystem since the sequence is
 		// a bit too D3D9-specific?
 		setVertexDeclaration(op.vertexData->vertexDeclaration);
-		setVertexBufferBinding(op.vertexData->vertexBufferBinding);
+		setVertexBufferBinding(op.vertexData->vertexBufferBinding, op.numberOfInstances);
 
 		// Determine rendering operation
 		D3DPRIMITIVETYPE primType = D3DPT_TRIANGLELIST;

@@ -48,22 +48,29 @@ namespace Ogre {
     {
 	    protected:
 
-			HardwareBufferManagerBase* mMgr;
+		    HardwareBufferManagerBase* mMgr;
 		    size_t mNumVertices;
-            size_t mVertexSize;
+		    size_t mVertexSize;
+		    bool mIsInstanceData;
+
+		    /// Checks if vertex instance data is supported by the render system
+		    virtual bool checkIfVertexInstanceDataIsSupported();
 
 	    public:
 		    /// Should be called by HardwareBufferManager
 		    HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
-                HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
-            ~HardwareVertexBuffer();
-			/// Return the manager of this buffer, if any
-			HardwareBufferManagerBase* getManager() const { return mMgr; }
-            /// Gets the size in bytes of a single vertex in this buffer
-            size_t getVertexSize(void) const { return mVertexSize; }
-            /// Get the number of vertices in this buffer
-            size_t getNumVertices(void) const { return mNumVertices; }
-
+		        HardwareBuffer::Usage usage, bool useSystemMemory, bool useShadowBuffer);
+		    ~HardwareVertexBuffer();
+		    /// Return the manager of this buffer, if any
+		    HardwareBufferManagerBase* getManager() const { return mMgr; }
+		    /// Gets the size in bytes of a single vertex in this buffer
+		    size_t getVertexSize(void) const { return mVertexSize; }
+		    /// Get the number of vertices in this buffer
+		    size_t getNumVertices(void) const { return mNumVertices; }
+		    // Get if this vertex buffer is an "instance data" buffer (per instance)
+		    bool getIsInstanceData() const { return mIsInstanceData; }
+		    // Set if this vertex buffer is an "instance data" buffer (per instance)
+		    void setIsInstanceData(const bool val);
 
 
 		    // NB subclasses should override lock, unlock, readData, writeData

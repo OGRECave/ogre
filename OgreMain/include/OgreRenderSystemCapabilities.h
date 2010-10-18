@@ -126,6 +126,8 @@ namespace Ogre
 		RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
 		/// Supports rendering to vertex buffers
 		RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
+		/// Supports using vertex buffers for instance data
+		RSC_VERTEX_BUFFER_AS_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
 
 		/// Supports compressed textures
 		RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),

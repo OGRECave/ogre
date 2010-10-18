@@ -76,11 +76,13 @@ namespace Ogre {
 		/// Debug pointer back to renderable which created this
 		const Renderable* srcRenderable;
 
-
+		// The number of instances for the render operation - this option is supported 
+		// in only a part of the render systems.
+		size_t numberOfInstances;
 
         RenderOperation() :
             vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
-                indexData(0), srcRenderable(0) {}
+                indexData(0), srcRenderable(0), numberOfInstances(1) {}
 
 
 	};

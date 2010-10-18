@@ -44,7 +44,8 @@ namespace Ogre {
         : HardwareBuffer(usage, useSystemMemory, useShadowBuffer), 
 		  mMgr(mgr),
           mNumVertices(numVertices),
-          mVertexSize(vertexSize)
+          mVertexSize(vertexSize),
+          mIsInstanceData(false)
     {
         // Calculate the size of the vertices
         mSizeInBytes = mVertexSize * numVertices;
@@ -67,6 +68,29 @@ namespace Ogre {
         if (mpShadowBuffer)
         {
             OGRE_DELETE mpShadowBuffer;
+        }
+    }
+    //-----------------------------------------------------------------------------
+    bool HardwareVertexBuffer::checkIfVertexInstanceDataIsSupported()
+    {
+    	// Use the current render system
+    	RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+    	// Check if the supported  
+    	return rs->getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
+    }
+    //-----------------------------------------------------------------------------
+    void HardwareVertexBuffer::setIsInstanceData( const bool val )
+    {
+        if (val && !checkIfVertexInstanceDataIsSupported())
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "vertex instance data is not supported by the render system.", 
+                "HardwareVertexBuffer::checkIfInstanceDataSupported");
+        }
+        else
+        {
+        	mIsInstanceData = val;  
         }
     }
     //-----------------------------------------------------------------------------
