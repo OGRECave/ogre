@@ -126,8 +126,6 @@ namespace Ogre
 		RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
 		/// Supports rendering to vertex buffers
 		RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
-		/// Supports using vertex buffers for instance data
-		RSC_VERTEX_BUFFER_AS_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
 
 		/// Supports compressed textures
 		RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -153,6 +151,8 @@ namespace Ogre
 		/// Supports attaching a depth buffer to an RTT that has width & height less or equal than RTT's.
 		/// Otherwise must be of _exact_ same resolution. D3D 9, OGL 3.0 (not 2.0, not D3D10)
 		RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
+		/// Supports using vertex buffers for instance data
+		RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

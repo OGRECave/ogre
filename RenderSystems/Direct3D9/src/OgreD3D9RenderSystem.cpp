@@ -827,7 +827,7 @@ namespace Ogre
 		rsc->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
 		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
-		rsc->setCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
+		rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 
 		for (uint i=0; i < mDeviceManager->getDeviceCount(); ++i)
 		{
@@ -3185,14 +3185,11 @@ namespace Ogre
 					"D3D9RenderSystem::setVertexBufferBinding");
 			}
 
-			if(numberOfInstances > 1)
+			hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(unused), 1 );
+			if (FAILED(hr))
 			{
-				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(unused), 1 );
-				if (FAILED(hr))
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source Freq", 
-						"D3D9RenderSystem::setVertexBufferBinding");
-				}
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset unused D3D9 stream source Freq", 
+					"D3D9RenderSystem::setVertexBufferBinding");
 			}
 
 		}

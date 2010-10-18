@@ -606,6 +606,8 @@ namespace Ogre {
         else
             val = op.vertexData->vertexCount;
 
+		 val *= op.numberOfInstances;
+
         // account for a pass having multiple iterations
         if (mCurrentPassIterationCount > 1)
             val *= mCurrentPassIterationCount;
@@ -614,11 +616,11 @@ namespace Ogre {
         switch(op.operationType)
         {
 		case RenderOperation::OT_TRIANGLE_LIST:
-            mFaceCount += val / 3;
+            mFaceCount += (val / 3);
             break;
         case RenderOperation::OT_TRIANGLE_STRIP:
         case RenderOperation::OT_TRIANGLE_FAN:
-            mFaceCount += val - 2;
+            mFaceCount += (val - 2);
             break;
 	    case RenderOperation::OT_POINT_LIST:
 	    case RenderOperation::OT_LINE_LIST:
@@ -626,7 +628,7 @@ namespace Ogre {
 	        break;
 	    }
 
-        mVertexCount += op.vertexData->vertexCount;
+        mVertexCount += op.vertexData->vertexCount * op.numberOfInstances;
         mBatchCount += mCurrentPassIterationCount;
 
 		// sort out clip planes

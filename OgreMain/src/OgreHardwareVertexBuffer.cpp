@@ -77,7 +77,7 @@ namespace Ogre {
     	RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
     	// Check if the supported  
-    	return rs->getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
+    	return rs->getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
     }
     //-----------------------------------------------------------------------------
     void HardwareVertexBuffer::setIsInstanceData( const bool val )

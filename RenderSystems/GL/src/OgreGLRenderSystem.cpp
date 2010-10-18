@@ -459,10 +459,13 @@ namespace Ogre {
 			GLint maxOutputVertices;
 			glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&maxOutputVertices);
 			rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
-
-			rsc->setCapability(RSC_VERTEX_BUFFER_AS_INSTANCE_DATA);
 		}
 		
+		if (GLEW_VERSION_3_3)
+		{
+			rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+		}
+
 		//Check if render to vertex buffer (transform feedback in OpenGL)
 		if (GLEW_VERSION_2_0 && 
 			GLEW_NV_transform_feedback)
@@ -2864,8 +2867,18 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  
  			bool isCustomAttrib = false;
  			if (mCurrentVertexProgram)
+			{
  				isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem->getIndex());
+
+				if (hwGlBuffer->getIsInstanceData())
+				{
+					GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
+					glVertexAttribDivisor(attrib, 1);
+					instanceAttribsBound.push_back(attrib);
+				}
+			}
  
+
  			// Custom attribute support
  			// tangents, binormals, blendweights etc always via this route
  			// builtins may be done this way too
@@ -2899,12 +2912,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
  				glEnableVertexAttribArrayARB(attrib);
  
  				attribsBound.push_back(attrib);
-
-				if (hwGlBuffer->getIsInstanceData())
-				{
-					glVertexAttribDivisor(attrib, 1);
-					instanceAttribsBound.push_back(attrib);
-				}
  			}
  			else
  			{
