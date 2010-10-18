@@ -60,6 +60,7 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optBitDepth;
     ConfigOption optFSAA;
 	ConfigOption optRTTMode;
+    ConfigOption optMacAPI;
 
 	// FS setting possiblities
 	optFullScreen.name = "Full Screen";
@@ -231,7 +232,14 @@ void OSXGLSupport::addConfig( void )
 	optRTTMode.currentValue = "FBO";
 	optRTTMode.immutable = false;
 
-	mOptions[optFullScreen.name] = optFullScreen;
+    optMacAPI.name = "macAPI";
+    optMacAPI.possibleValues.push_back( "cocoa" );
+    optMacAPI.possibleValues.push_back( "carbon" );
+    optMacAPI.currentValue = "carbon";
+    optMacAPI.immutable = false;
+
+    mOptions[optMacAPI.name] = optMacAPI;
+    mOptions[optFullScreen.name] = optFullScreen;
 	mOptions[optVideoMode.name] = optVideoMode;
     mOptions[optFSAA.name] = optFSAA;
 	mOptions[optRTTMode.name] = optRTTMode;
@@ -288,12 +296,13 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-		NameValuePairList::const_iterator opt(NULL);
-		
+		ConfigOptionMap::const_iterator opt(NULL);
+
 		// First we must determine if this is a Carbon or a Cocoa window
 		// that we wish to create
-		opt = miscParams->find("macAPI");
-		if(opt != miscParams->end() && opt->second == "cocoa")
+		opt = mOptions.find("macAPI");
+        String m = opt->second.currentValue;
+		if(opt != mOptions.end() && opt->second.currentValue == "cocoa")
 		{
 			// Our user wants a Cocoa compatible system
 			mAPI = "cocoa";
