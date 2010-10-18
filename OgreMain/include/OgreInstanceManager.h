@@ -64,8 +64,9 @@ namespace Ogre
 		enum InstancingTechnique
 		{
 			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
-			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
 			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
+			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
+			InstancingTechniquesCount,
 		};
 	private:
 		typedef vector<InstanceBatch*>::type		InstanceBatchVec;	//vec[batchN] = Batch

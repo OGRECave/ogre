@@ -76,7 +76,7 @@ namespace Ogre
 	{
 		friend class InstanceBatch;
 		friend class InstanceBatchShader;
-		friend class InstanceBatchVTF;
+		friend class BaseInstanceBatchVTF;
 
 		uint16				m_instanceID;			//Note it may change after defragmenting!
 		bool				m_inUse;

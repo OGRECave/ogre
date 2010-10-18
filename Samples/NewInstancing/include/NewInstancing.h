@@ -11,6 +11,7 @@ static const char *c_instancingTechniques[] =
 {
 	"Shader Based",
 	"Vertex Texture Fetch (VTF)",
+	"Hardware Instancing",
 	"No Instancing"
 };
 
@@ -18,7 +19,7 @@ static const char *c_materialsTechniques[] =
 {
 	"Examples/Instancing/ShaderBased/Robot",
 	"Examples/Instancing/VTF/Robot",
-	"Examples/Instancing/ShaderBased/Robot"
+	"Examples/Instancing/Hardware/Robot",
 };
 
 static const char *c_meshNames[] =
@@ -26,7 +27,7 @@ static const char *c_meshNames[] =
 	"robot.mesh"
 };
 
-#define NUM_TECHNIQUES 3
+#define NUM_TECHNIQUES ((int)InstanceManager::InstancingTechniquesCount)
 
 class _OgreSampleClassExport Sample_NewInstancing : public SdkSample
 {
@@ -78,7 +79,7 @@ protected:
 		mInstancingTechnique	= 0;
 		mCurrentMesh			= 0;
 		mCurrentManager			= 0;
-		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
+		for( int i=0; i<NUM_TECHNIQUES; ++i )
 			mInstanceManagers[i] = 0;
 
 		checkHardwareSupport();
@@ -165,7 +166,7 @@ protected:
 			return;
 		}
 
-		if( mInstancingTechnique < NUM_TECHNIQUES-1 )
+		if( mInstancingTechnique < NUM_TECHNIQUES )
 		{
 			//Instancing
 
@@ -179,6 +180,7 @@ protected:
 				{
 				case 0: technique = InstanceManager::ShaderBased; break;
 				case 1: technique = InstanceManager::TextureVTF; break;
+				case 2: technique = InstanceManager::HardwareInstancing; break;
 				}
 
 				mInstanceManagers[mInstancingTechnique] = mSceneMgr->createInstanceManager(
@@ -217,7 +219,7 @@ protected:
 			//a. To prove we can (runs without modification! :-) )
 			//b. Make a fair comparision
 			Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
-			ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES-1] );
+			ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES] );
 			mEntities.push_back( ent );
 
 			//Get the animation
@@ -281,7 +283,7 @@ protected:
 			sceneNode->detachAllObjects();
 			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
 
-			if( mInstancingTechnique == NUM_TECHNIQUES-1 )
+			if( mInstancingTechnique == NUM_TECHNIQUES )
 				mSceneMgr->destroyEntity( (*itor)->getName() );
 			else
 				mSceneMgr->destroyInstancedEntity( static_cast<InstancedEntity*>(*itor) );
@@ -301,7 +303,7 @@ protected:
 
 	void destroyManagers()
 	{
-		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
+		for( int i=0; i<NUM_TECHNIQUES; ++i )
 		{
 			if( mInstanceManagers[i] )
 			{
@@ -493,13 +495,14 @@ protected:
 	void checkHardwareSupport()
 	{
 		//Check Technique support
-		for( int i=0; i<NUM_TECHNIQUES-1; ++i )
+		for( int i=0; i<NUM_TECHNIQUES; ++i )
 		{
 			InstanceManager::InstancingTechnique technique;
 			switch( i )
 			{
 			case 0: technique = InstanceManager::ShaderBased; break;
 			case 1: technique = InstanceManager::TextureVTF; break;
+			case 2: technique = InstanceManager::HardwareInstancing; break;
 			}
 
 			const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
@@ -508,10 +511,16 @@ protected:
 									IM_USEALL );
 			
 			mSupportedTechniques[i] = numInstances > 0;
+
+			if ( (technique == InstanceManager::HardwareInstancing) && (mSupportedTechniques[i]) )
+			{
+				RenderSystem* rs = Root::getSingleton().getRenderSystem();
+				mSupportedTechniques[i] = rs->getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+			}
 		}
 
 		//Non instancing is always supported
-		mSupportedTechniques[NUM_TECHNIQUES-1] = true;
+		mSupportedTechniques[NUM_TECHNIQUES] = true;
 	}
 
 	//You can also use a union type to switch between Entity and InstancedEntity almost flawlessly:
@@ -529,7 +538,7 @@ protected:
 	std::vector<MovableObject*>		mEntities;
 	std::vector<SceneNode*>			mSceneNodes;
 	std::vector<AnimationState*>	mAnimations;
-	InstanceManager					*mInstanceManagers[NUM_TECHNIQUES-1];
+	InstanceManager					*mInstanceManagers[NUM_TECHNIQUES];
 	InstanceManager					*mCurrentManager;
 	bool							mSupportedTechniques[NUM_TECHNIQUES];
 

@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __InstanceBatchVTF_H__
-#define __InstanceBatchVTF_H__
+#ifndef __BaseInstanceBatchVTF_H__
+#define __BaseInstanceBatchVTF_H__
 
 #include "OgreInstanceBatch.h"
 #include "OgreTexture.h"
@@ -58,7 +58,7 @@ namespace Ogre
 		Whether this performs great or bad depends on the hardware. It improved up to 4x performance on
 		a Intel Core 2 Quad Core X9650 GeForce 8600 GTS, and in an Intel Core 2 Duo P7350 ATI
 		Mobility Radeon HD 4650, but went 0.75x slower on an AthlonX2 5000+ integrated nForce 6150 SE
-		Each InstanceBatchVTF has it's own texture, which occupies memory in VRAM.
+		Each BaseInstanceBatchVTF has it's own texture, which occupies memory in VRAM.
 		Approx VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
 		Use flag IM_VTFBESTFIT to avoid wasting VRAM (but may reduce ammount of instances per batch).
 		@par
@@ -71,16 +71,14 @@ namespace Ogre
         @version
             1.0
      */
-	class _OgreExport InstanceBatchVTF : public InstanceBatch
+	class _OgreExport BaseInstanceBatchVTF : public InstanceBatch
 	{
+	protected:
 		typedef vector<uint8>::type HWBoneIdxVec;
 		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					m_numWorldMatrices;	//Num bones * num instances
 		TexturePtr				m_matrixTexture;	//The VTF
-
-		void setupVertices( const SubMesh* baseSubMesh );
-		void setupIndices( const SubMesh* baseSubMesh );
 
 		/** Clones the base material so it can have it's own vertex texture, and also
 			clones it's shadow caster materials, if it has any
@@ -100,20 +98,17 @@ namespace Ogre
 		void createVertexTexture( const SubMesh* baseSubMesh );
 
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
-		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
-									const HWBoneIdxVec &hwBoneIdx );
+		virtual void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
+									const HWBoneIdxVec &hwBoneIdx ) = 0;
 
 		/** Keeps filling the VTF with world matrix data */
 		void updateVertexTexture(void);
 
 	public:
-		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+		BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName );
-		virtual ~InstanceBatchVTF();
-
-		/** @See InstanceBatch::calculateMaxNumInstances */
-		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+		virtual ~BaseInstanceBatchVTF();
 
 		/** @See InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
@@ -125,6 +120,43 @@ namespace Ogre
 		/** Overloaded to be able to updated the vertex texture */
 		void _updateRenderQueue(RenderQueue* queue);
 	};
+
+	class _OgreExport ClonedGeometryInstanceBatchVTF : public BaseInstanceBatchVTF
+	{
+		void setupVertices( const SubMesh* baseSubMesh );
+		void setupIndices( const SubMesh* baseSubMesh );
+
+		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
+		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
+			const HWBoneIdxVec &hwBoneIdx );
+	public:
+		ClonedGeometryInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+							const String &batchName );
+		virtual ~ClonedGeometryInstanceBatchVTF();
+
+		/** @See InstanceBatch::calculateMaxNumInstances */
+		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+
+	};
+
+	class _OgreExport HardwareInstanceBatchVFT : public BaseInstanceBatchVTF
+	{
+		void setupVertices( const SubMesh* baseSubMesh );
+		void setupIndices( const SubMesh* baseSubMesh );
+
+		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
+		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
+			const HWBoneIdxVec &hwBoneIdx );
+	public:
+		HardwareInstanceBatchVFT( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
+							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
+							const String &batchName );
+		virtual ~HardwareInstanceBatchVFT();
+		/** @See InstanceBatch::calculateMaxNumInstances */
+		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
+	};
+
 }
 
 #endif

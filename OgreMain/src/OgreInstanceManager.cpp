@@ -105,7 +105,11 @@ namespace Ogre
 													0, m_name + "/TempBatch" );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
+			batch = OGRE_NEW ClonedGeometryInstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
+													0, m_name + "/TempBatch" );
+			break;
+		case HardwareInstancing:
+			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
 		default:
@@ -175,7 +179,12 @@ namespace Ogre
 													StringConverter::toString(m_idCount++) );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, m_instancesPerBatch,
+			batch = OGRE_NEW ClonedGeometryInstanceBatchVTF( this, m_meshReference, mat, m_instancesPerBatch,
+													&idxMap, m_name + "/InstanceBatch_" +
+													StringConverter::toString(m_idCount++) );
+			break;
+		case HardwareInstancing:
+			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
