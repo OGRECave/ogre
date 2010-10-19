@@ -52,7 +52,7 @@ namespace Ogre {
 		    size_t mNumVertices;
 		    size_t mVertexSize;
 		    bool mIsInstanceData;
-
+			size_t mInstanceDataStepRate;			
 		    /// Checks if vertex instance data is supported by the render system
 		    virtual bool checkIfVertexInstanceDataIsSupported();
 
@@ -67,10 +67,14 @@ namespace Ogre {
 		    size_t getVertexSize(void) const { return mVertexSize; }
 		    /// Get the number of vertices in this buffer
 		    size_t getNumVertices(void) const { return mNumVertices; }
-		    // Get if this vertex buffer is an "instance data" buffer (per instance)
+		    /// Get if this vertex buffer is an "instance data" buffer (per instance)
 		    bool getIsInstanceData() const { return mIsInstanceData; }
-		    // Set if this vertex buffer is an "instance data" buffer (per instance)
+		    /// Set if this vertex buffer is an "instance data" buffer (per instance)
 		    void setIsInstanceData(const bool val);
+			/// Get the number of instances to draw using the same per-instance data before advancing in the buffer by one element.
+			size_t getInstanceDataStepRate() const;
+			/// Set the number of instances to draw using the same per-instance data before advancing in the buffer by one element.
+			void setInstanceDataStepRate(const size_t val);
 
 
 		    // NB subclasses should override lock, unlock, readData, writeData

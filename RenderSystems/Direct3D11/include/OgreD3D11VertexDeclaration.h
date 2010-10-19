@@ -51,7 +51,7 @@ namespace Ogre {
 
 		/** Gets the D3D11-specific vertex declaration. */
 
-		ID3D11InputLayout	*  getILayoutByShader(D3D11HLSLProgram* boundVertexProgram);
+		ID3D11InputLayout	*  getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 	public:
 		D3D11VertexDeclaration(D3D11Device &  device);
 		~D3D11VertexDeclaration();
@@ -80,8 +80,8 @@ namespace Ogre {
 			VertexElementSemantic semantic, unsigned short index = 0);
 
 
-		D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(void);
-		void bindToShader(D3D11HLSLProgram* boundVertexProgram);
+		D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(VertexBufferBinding* binding);
+		void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
 	};
 

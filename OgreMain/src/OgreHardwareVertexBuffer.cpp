@@ -45,7 +45,8 @@ namespace Ogre {
 		  mMgr(mgr),
           mNumVertices(numVertices),
           mVertexSize(vertexSize),
-          mIsInstanceData(false)
+          mIsInstanceData(false),
+		  mInstanceDataStepRate(1)
     {
         // Calculate the size of the vertices
         mSizeInBytes = mVertexSize * numVertices;
@@ -93,7 +94,28 @@ namespace Ogre {
         	mIsInstanceData = val;  
         }
     }
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
+	size_t HardwareVertexBuffer::getInstanceDataStepRate() const
+	{
+		return mInstanceDataStepRate;
+	}
+	//-----------------------------------------------------------------------------
+	void HardwareVertexBuffer::setInstanceDataStepRate( const size_t val )
+	{
+        if (val > 0)
+        {
+			mInstanceDataStepRate = val;
+        }
+		else
+		{
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Instance data step rate must be bigger then 0.", 
+                "HardwareVertexBuffer::setInstanceDataStepRate");
+		}
+	}
+	//-----------------------------------------------------------------------------
+	// VertexElement
+	//-----------------------------------------------------------------------------
     VertexElement::VertexElement(unsigned short source, size_t offset, 
         VertexElementType theType, VertexElementSemantic semantic, unsigned short index)
         : mSource(source), mOffset(offset), mType(theType), 

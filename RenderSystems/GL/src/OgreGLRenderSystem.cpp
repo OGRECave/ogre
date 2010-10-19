@@ -2873,7 +2873,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				if (hwGlBuffer->getIsInstanceData())
 				{
 					GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
-					glVertexAttribDivisor(attrib, 1);
+					glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate() );
 					instanceAttribsBound.push_back(attrib);
 				}
 			}

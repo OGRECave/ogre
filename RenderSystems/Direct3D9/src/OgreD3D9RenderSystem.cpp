@@ -3158,7 +3158,7 @@ namespace Ogre
 			{
 				if ( d3d9buf->getIsInstanceData() )
 				{
-					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | 1ul );
+					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
 				}
 				else
 				{

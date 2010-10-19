@@ -51,6 +51,7 @@ THE SOFTWARE.
 
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
+#include "OgreException.h"
 
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
@@ -1750,12 +1751,17 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
 	{
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+					"Cannot directly call setVertexDeclaration in the d3d11 render system - cast then use 'setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)' .", 
+					"D3D11RenderSystem::setVertexDeclaration" );
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)
+	{
       	D3D11VertexDeclaration* d3ddecl = 
 			static_cast<D3D11VertexDeclaration*>(decl);
 
-		d3ddecl->bindToShader(mBoundVertexProgram);
-       
-
+		d3ddecl->bindToShader(mBoundVertexProgram, binding);
 	}
     //---------------------------------------------------------------------
 	void D3D11RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
@@ -1994,7 +2000,7 @@ namespace Ogre
 				"D3D11RenderSystem::_render");
 		}
 
-		setVertexDeclaration(op.vertexData->vertexDeclaration);
+		setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
 		setVertexBufferBinding(op.vertexData->vertexBufferBinding);
 
 
@@ -2064,20 +2070,39 @@ namespace Ogre
 							"D3D11 device cannot set primitive topology\nError Description:" + errorDescription,
 							"D3D11RenderSystem::_render");
 					}
-
-					mDevice.GetImmediateContext()->DrawIndexed(    
-						static_cast<UINT>(op.indexData->indexCount), 
-						static_cast<UINT>(op.indexData->indexStart), 
-						static_cast<INT>(op.vertexData->vertexStart)
-						);
-					if (mDevice.isError())
+					
+					if (op.numberOfInstances == 1)
 					{
-						String errorDescription = mDevice.getErrorDescription();
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot draw indexed\nError Description:" + errorDescription,
-							"D3D11RenderSystem::_render");
+						mDevice.GetImmediateContext()->DrawIndexed(    
+							static_cast<UINT>(op.indexData->indexCount), 
+							static_cast<UINT>(op.indexData->indexStart), 
+							static_cast<INT>(op.vertexData->vertexStart)
+							);
+						if (mDevice.isError())
+						{
+							String errorDescription = mDevice.getErrorDescription();
+							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+								"D3D11 device cannot draw indexed\nError Description:" + errorDescription,
+								"D3D11RenderSystem::_render");
+						}
 					}
-
+					else
+					{
+						mDevice.GetImmediateContext()->DrawIndexedInstanced(    
+							static_cast<UINT>(op.indexData->indexCount), 
+							static_cast<UINT>(op.numberOfInstances), 
+							static_cast<UINT>(op.indexData->indexStart), 
+							static_cast<INT>(op.vertexData->vertexStart),
+							0
+							);
+						if (mDevice.isError())
+						{
+							String errorDescription = mDevice.getErrorDescription();
+							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+								"D3D11 device cannot draw indexed\nError Description:" + errorDescription,
+								"D3D11RenderSystem::_render");
+						}
+					}
 				} while (updatePassIterationRenderState());
 			}
 			else
@@ -2754,7 +2779,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D11RenderSystem::_getDepthBufferCheckEnabled( void )
 	{
-		return (bool)mDepthStencilDesc.DepthEnable;
+		return mDepthStencilDesc.DepthEnable == TRUE;
 	}
 	//---------------------------------------------------------------------
 	D3D11HLSLProgram* D3D11RenderSystem::_getBoundVertexProgram() const

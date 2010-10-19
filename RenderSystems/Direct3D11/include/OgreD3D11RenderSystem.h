@@ -306,6 +306,7 @@ namespace Ogre
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
 		void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 		void setVertexDeclaration(VertexDeclaration* decl);
+		void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
 		void setVertexBufferBinding(VertexBufferBinding* binding);
         void _render(const RenderOperation& op);
         /** See
