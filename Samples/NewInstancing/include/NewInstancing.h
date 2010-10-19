@@ -20,6 +20,7 @@ static const char *c_materialsTechniques[] =
 	"Examples/Instancing/ShaderBased/Robot",
 	"Examples/Instancing/VTF/Robot",
 	"Examples/Instancing/Hardware/Robot",
+	"Examples/Instancing/ShaderBased/Robot"
 };
 
 static const char *c_meshNames[] =
@@ -67,7 +68,7 @@ public:
 
 		//Switch to next instancing technique with space bar
 		if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())
-			mTechniqueMenu->selectItem( (mTechniqueMenu->getSelectionIndex() + 1) % NUM_TECHNIQUES );
+			mTechniqueMenu->selectItem( (mTechniqueMenu->getSelectionIndex() + 1) % (NUM_TECHNIQUES+1) );
 
 		return SdkSample::keyPressed(evt);
 	}
@@ -154,7 +155,7 @@ protected:
 
 	void switchInstancingTechnique()
 	{
-		//mInstancingTechnique = (mInstancingTechnique+1) % NUM_TECHNIQUES;
+		//mInstancingTechnique = (mInstancingTechnique+1) % (NUM_TECHNIQUES+1);
 		mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
 
 		if( !mSupportedTechniques[mInstancingTechnique] )
@@ -335,7 +336,10 @@ protected:
 
 	void moveUnits( float timeSinceLast )
 	{
-		const Real fMovSpeed = mEntities[0]->getBoundingRadius() * 0.30f;
+		Real fMovSpeed = 1.0f;
+		
+		if( !mEntities.empty() )
+			fMovSpeed = mEntities[0]->getBoundingRadius() * 0.30f;
 
 		//Randomly move the units along their normal, bouncing around invisible walls
 		std::vector<SceneNode*>::const_iterator itor = mSceneNodes.begin();
@@ -408,7 +412,7 @@ protected:
 	{
 		mTechniqueMenu = mTrayMgr->createLongSelectMenu(
 			TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 300, 200, 5);
-		for( int i=0; i<NUM_TECHNIQUES; ++i )
+		for( int i=0; i<NUM_TECHNIQUES+1; ++i )
 		{
 			String text = c_instancingTechniques[i];
 			if( !mSupportedTechniques[i] )
@@ -540,7 +544,7 @@ protected:
 	std::vector<AnimationState*>	mAnimations;
 	InstanceManager					*mInstanceManagers[NUM_TECHNIQUES];
 	InstanceManager					*mCurrentManager;
-	bool							mSupportedTechniques[NUM_TECHNIQUES];
+	bool							mSupportedTechniques[NUM_TECHNIQUES+1];
 
 	SelectMenu						*mTechniqueMenu;
 	CheckBox						*mMoveInstances;
