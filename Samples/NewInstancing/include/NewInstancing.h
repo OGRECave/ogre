@@ -458,7 +458,7 @@ protected:
 		}
 	}
 
-	void buttonHit( Button* button )
+	void buttonHit( OgreBites::Button* button )
 	{
 		if( button == mDefragmentBatches ) defragmentBatches();
 	}
@@ -550,7 +550,7 @@ protected:
 	CheckBox						*mMoveInstances;
 	CheckBox						*mAnimateInstances;
 	CheckBox						*mEnableShadows;
-	Button							*mDefragmentBatches;
+	OgreBites::Button							*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
 	Slider							*mInstancesSlider;
 };
