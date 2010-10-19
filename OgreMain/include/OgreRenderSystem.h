@@ -1138,8 +1138,7 @@ namespace Ogre
             viewports.  It is a necessary step on these render systems for
             render textures to be rendered into properly.
 		*/
-		virtual const String& _getDefaultViewportMaterialScheme(void) const 
-            { return MaterialManager::DEFAULT_SCHEME_NAME; }
+		virtual const String& _getDefaultViewportMaterialScheme(void) const;
 
 		/** Binds a given GpuProgram (but not the parameters). 
 		@remarks Only one GpuProgram of each type can be bound at once, binding another

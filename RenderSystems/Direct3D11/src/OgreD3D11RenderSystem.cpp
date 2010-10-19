@@ -2695,17 +2695,6 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	const String& D3D11RenderSystem::_getDefaultViewportMaterialScheme( void ) const
-	{
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS	
-		// I am returning the exeact value for now - I don't want to add dependency for the RTSS just for one string  
-		static String res = "ShaderGeneratorDefaultScheme"; // == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME;
-#else
-		static String res = RenderSystem::_getDefaultViewportMaterialScheme( );
-#endif
-		return res;
-	}
-
 	void D3D11RenderSystem::initRenderSystem()
 	{
 		if (mRenderSystemWasInited)

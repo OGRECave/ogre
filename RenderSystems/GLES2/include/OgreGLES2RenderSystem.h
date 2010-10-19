@@ -240,11 +240,6 @@ namespace Ogre {
               RenderSystem
              */
             void setNormaliseNormals(bool normalise);
-    
-            /** See
-              RenderSystem
-             */
-            const String& _getDefaultViewportMaterialScheme(void) const { return Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME; }
 
             // -----------------------------
             // Low-level overridden members
