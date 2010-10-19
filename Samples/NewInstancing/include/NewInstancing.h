@@ -19,7 +19,7 @@ static const char *c_materialsTechniques[] =
 {
 	"Examples/Instancing/ShaderBased/Robot",
 	"Examples/Instancing/VTF/Robot",
-	"Examples/Instancing/Hardware/Robot",
+	"Examples/Instancing/VTF/Robot",
 	"Examples/Instancing/ShaderBased/Robot"
 };
 
