@@ -2126,10 +2126,22 @@ namespace Ogre
 					}
 					else
 					{
-						mDevice.GetImmediateContext()->Draw(
-							static_cast<UINT>(op.vertexData->vertexCount), 
-							static_cast<INT>(op.vertexData->vertexStart)
-							); 
+						if (op.numberOfInstances == 1)
+						{
+							mDevice.GetImmediateContext()->Draw(
+								static_cast<UINT>(op.vertexData->vertexCount), 
+								static_cast<INT>(op.vertexData->vertexStart)
+								); 
+						}
+						else
+						{
+							mDevice.GetImmediateContext()->DrawInstanced(
+								static_cast<UINT>(op.numberOfInstances), 
+								static_cast<UINT>(op.vertexData->vertexCount), 
+								static_cast<INT>(op.vertexData->vertexStart),
+								0
+								); 
+						}
 					}
 					if (mDevice.isError())
 					{
