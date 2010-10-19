@@ -42,7 +42,7 @@ namespace RTShader {
 */
 
 /** Transform sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/ee422511.aspx
+@see http://msdn.microsoft.com/en-us/library/bb206269.aspx
 Derives from SubRenderState class.
 */
 class _OgreRTSSExport FFPTransform : public SubRenderState

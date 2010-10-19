@@ -46,9 +46,9 @@ namespace RTShader {
 
 /** Texturing sub render state implementation of the Fixed Function Pipeline.
 Implements texture coordinate processing:
-@see http://msdn.microsoft.com/en-us/library/ee422494.aspx
+@see http://msdn.microsoft.com/en-us/library/bb206247.aspx
 Implements texture blending operation:
-@see http://msdn.microsoft.com/en-us/library/ee422488.aspx
+@see http://msdn.microsoft.com/en-us/library/bb206241.aspx
 Derives from SubRenderState class.
 */
 class _OgreRTSSExport FFPTexturing : public SubRenderState

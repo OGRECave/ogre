@@ -17,7 +17,7 @@ Filename:    ParticleGS.cpp
 Description: Demonstrates the use of the geometry shader and render to vertex
 	buffer to create a particle system that is entirely calculated on the GPU.
 	Partial implementation of ParticlesGS example from Microsoft's DirectX 10
-	SDK : http://msdn.microsoft.com/en-us/library/bb205329(VS.85).aspx
+	SDK : http://msdn.microsoft.com/en-us/library/ee416421.aspx
 -----------------------------------------------------------------------------
 */
 

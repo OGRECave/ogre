@@ -47,7 +47,7 @@ namespace RTShader {
 */
 
 /** Lighting sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/ee422035.aspx
+@see http://msdn.microsoft.com/en-us/library/bb147178.aspx
 Derives from SubRenderState class.
 */
 class _OgreRTSSExport FFPLighting : public SubRenderState

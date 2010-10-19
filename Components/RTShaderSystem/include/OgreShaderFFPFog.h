@@ -44,7 +44,7 @@ namespace RTShader {
 */
 
 /** Fog sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/ee418582.aspx
+@see http://msdn.microsoft.com/en-us/library/bb173398.aspx
 Derives from SubRenderState class.
 */
 class _OgreRTSSExport FFPFog : public SubRenderState
@@ -96,7 +96,7 @@ public:
 	@param fogStart Start distance of fog, used for linear mode only.
 	@param fogEnd End distance of fog, used for linear mode only.
 	@param fogDensity Fog density used in exponential modes only.
-	@see http://msdn.microsoft.com/en-us/library/ee418606.aspx
+	@see http://msdn.microsoft.com/en-us/library/bb173401.aspx
 	*/
 	void			setFogProperties				(FogMode fogMode, 
 		const ColourValue& fogColour, 
