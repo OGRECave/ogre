@@ -98,6 +98,10 @@ namespace Ogre
 																	m_meshReference->getGroup() );
 		InstanceBatch *batch = 0;
 
+		//Base material couldn't be found
+		if( mat.isNull() )
+			return 0;
+
 		switch( m_instancingTechnique )
 		{
 		case ShaderBased:
