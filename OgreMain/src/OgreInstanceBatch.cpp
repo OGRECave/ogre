@@ -40,8 +40,8 @@ namespace Ogre
 	InstanceBatch::InstanceBatch( InstanceManager *creator, MeshPtr &meshReference,
 									const MaterialPtr &material, size_t instancesPerBatch,
 									const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
-				MovableObject(),
 				Renderable(),
+				MovableObject(),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_creator( creator ),
 				m_material( material ),
@@ -262,7 +262,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities )
 	{
-		const size_t maxInstancesToCopy = std::min( m_instancesPerBatch, usedEntities.size() );
+		//const size_t maxInstancesToCopy = std::min( m_instancesPerBatch, usedEntities.size() );
 
 		//Get the the entity closest to the minimum bbox edge and put into "first"
 		InstancedEntityVec::const_iterator itor	= usedEntities.begin();

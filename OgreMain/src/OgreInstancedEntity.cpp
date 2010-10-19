@@ -42,11 +42,11 @@ namespace Ogre
 
 	InstancedEntity::InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID ) :
 				MovableObject(),
-				m_batchOwner( batchOwner ),
 				m_instanceID( instanceID ),
+				m_batchOwner( batchOwner ),
 				m_inUse( false ),
-				m_skeletonInstance( 0 ),
 				mAnimationState( 0 ),
+				m_skeletonInstance( 0 ),
 				mLastParentXform( Matrix4::ZERO ),
 				mFrameAnimationLastUpdated( std::numeric_limits<unsigned long>::max() )
 	{

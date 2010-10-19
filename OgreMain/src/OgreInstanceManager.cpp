@@ -42,8 +42,8 @@ namespace Ogre
 										InstancingTechnique instancingTechnique, uint16 instancingFlags,
 										size_t instancesPerBatch ) :
 				m_name( customName ),
-				m_sceneManager( sceneManager ),
 				m_idCount( 0 ),
+				m_sceneManager( sceneManager ),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_instancingTechnique( instancingTechnique ),
 				m_instancingFlags( instancingFlags ),
