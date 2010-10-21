@@ -641,6 +641,14 @@ namespace Ogre
 		
 		fbConfigs = chooseFBConfig(minAttribs, &nConfigs);
 		
+		// this is a fix for cases where chooseFBConfig is not supported.
+		// On the 10/2010 chooseFBConfig was not supported on VirtualBox
+		// http://www.virtualbox.org/ticket/7195
+		if (!nConfigs) 		
+		{ 		    
+			fbConfigs = glXGetFBConfigs(mGLDisplay, DefaultScreen(mGLDisplay), &nConfigs); 		
+		}
+		
 		if (! nConfigs) 
 			return 0;
 		
