@@ -77,6 +77,10 @@ namespace Ogre {
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mEnableFixedPipeline = false;
+#endif
+
         mGLSupport = getGLSupport();
 
         mWorldMatrix = Matrix4::IDENTITY;

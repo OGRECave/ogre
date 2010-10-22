@@ -65,6 +65,10 @@ namespace Ogre
 	{
 		LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mEnableFixedPipeline = false;
+#endif
+
 		// set the instance being passed 
 		mhInstance = hInstance;
 

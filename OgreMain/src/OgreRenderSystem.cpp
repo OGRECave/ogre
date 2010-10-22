@@ -64,8 +64,14 @@ namespace Ogre {
         , mInvertVertexWinding(false)
         , mDisabledTexUnitsFrom(0)
         , mCurrentPassIterationCount(0)
+		, mCurrentPassIterationNum(0)
 		, mDerivedDepthBias(false)
-        , mVertexProgramBound(false)
+		, mDerivedDepthBiasBase(0.0f)
+		, mDerivedDepthBiasMultiplier(0.0f)
+        , mDerivedDepthBiasSlopeScale(0.0f)
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		, mEnableFixedPipeline(true)
+#endif
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
 		, mClipPlanesDirty(true)
@@ -482,7 +488,19 @@ namespace Ogre {
     {
         return mVSync;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+    bool RenderSystem::getFixedPipelineEnabled(void) const
+    {
+        return mEnableFixedPipeline;
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::setFixedPipelineEnabled(bool enabled)
+    {
+        mEnableFixedPipeline = enabled;
+    }
+#endif
+    //-----------------------------------------------------------------------
 	void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
 	{
 		uint16 poolId = renderTarget->getDepthBufferPool();

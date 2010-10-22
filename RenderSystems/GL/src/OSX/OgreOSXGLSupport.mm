@@ -58,10 +58,13 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optFullScreen;
 	ConfigOption optVideoMode;
 	ConfigOption optBitDepth;
-    ConfigOption optFSAA;
+	ConfigOption optFSAA;
 	ConfigOption optRTTMode;
 	ConfigOption optHiddenWindow;
 	ConfigOption optVsync;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+	ConfigOption optEnableFixedPipeline;
+#endif
 
 	// FS setting possiblities
 	optFullScreen.name = "Full Screen";
@@ -97,8 +100,20 @@ void OSXGLSupport::addConfig( void )
 	optRTTMode.currentValue = "FBO";
 	optRTTMode.immutable = false;
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
+		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
+		optEnableFixedPipeline.possibleValues.push_back( "No" );
+		optEnableFixedPipeline.currentValue = "Yes";
+		optEnableFixedPipeline.immutable = false;
+#endif
+
     mOptions[ optFullScreen.name ] = optFullScreen;
 	mOptions[ optBitDepth.name ] = optBitDepth;
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
+#endif
 
 	CGLRendererInfoObj rend;
 
@@ -303,6 +318,14 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
         opt = mOptions.find( "sRGB Gamma Conversion" );
         if( opt != mOptions.end() )
             winOptions["gamma"] = opt->second.currentValue;
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+			opt = mOptions.find("Fixed Pipeline Enabled");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
+			bool enableFixedPipeline = (opt->second.currentValue == "Yes");
+			renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
+#endif
 
 		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
 	}

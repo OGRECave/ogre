@@ -545,6 +545,16 @@ namespace Ogre
 		*/
 		bool getWaitForVerticalBlank(void) const;
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		/** Sets if fixed pipeline rendering is enabled on the system.
+		*/
+		void setFixedPipelineEnabled(bool enabled);
+
+		/** Returns true if fixed pipeline rendering is enabled on the system.
+		*/
+		bool getFixedPipelineEnabled(void) const;
+#endif
+
 		/** Retrieves an existing DepthBuffer or creates a new one suited for the given RenderTarget
 			and sets it.
 			@remarks
@@ -1441,6 +1451,11 @@ namespace Ogre
 		float mDerivedDepthBiasBase;
 		float mDerivedDepthBiasMultiplier;
 		float mDerivedDepthBiasSlopeScale;
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		/// is fixed pipeline enabled
+		bool mEnableFixedPipeline;
+#endif
 
 		/** updates pass iteration rendering state including bound gpu program parameter
 		pass iteration auto constant entry

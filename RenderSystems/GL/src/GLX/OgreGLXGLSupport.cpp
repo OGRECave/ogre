@@ -160,6 +160,9 @@ namespace Ogre
 		ConfigOption optFSAA;
 		ConfigOption optRTTMode;
 		ConfigOption optSRGB;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		ConfigOption optEnableFixedPipeline;
+#endif
 		
 		optFullScreen.name = "Full Screen";
 		optFullScreen.immutable = false;
@@ -181,6 +184,14 @@ namespace Ogre
 		
 		optSRGB.name = "sRGB Gamma Conversion";
 		optSRGB.immutable = false;
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
+		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
+		optEnableFixedPipeline.possibleValues.push_back( "No" );
+		optEnableFixedPipeline.currentValue = "Yes";
+		optEnableFixedPipeline.immutable = false;
+#endif
 
 		optFullScreen.possibleValues.push_back("No");
 		optFullScreen.possibleValues.push_back("Yes");
@@ -251,6 +262,9 @@ namespace Ogre
 		mOptions[optRTTMode.name] = optRTTMode;
 		mOptions[optFSAA.name] = optFSAA;
 		mOptions[optSRGB.name] = optSRGB;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
+#endif
 		
 		refreshConfig();
 	}
@@ -365,6 +379,14 @@ namespace Ogre
 			if((opt = mOptions.find("sRGB Gamma Conversion")) != end)
 				miscParams["gamma"] = opt->second.currentValue;
 			
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+			opt = mOptions.find("Fixed Pipeline Enabled");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
+			bool enableFixedPipeline = (opt->second.currentValue == "Yes");
+			renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
+#endif
+
 			window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
 		} 
 		

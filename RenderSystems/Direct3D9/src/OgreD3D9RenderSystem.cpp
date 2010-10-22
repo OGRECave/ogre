@@ -80,6 +80,7 @@ namespace Ogre
 		mUseNVPerfHUD = false;
 		mHLSLProgramFactory = NULL;		
 		mDeviceManager = NULL;	
+		mPerStageConstantSupport = false;
 
 		// Create the resource manager.
 		mResourceManager = OGRE_NEW D3D9ResourceManager();
@@ -111,7 +112,7 @@ namespace Ogre
 		}
 
 		mLastVertexSourceCount = 0;
-
+		
 		mCurrentLights.clear();
 
 		// Enumerate events
@@ -193,6 +194,9 @@ namespace Ogre
 		ConfigOption optSRGB;
 		ConfigOption optResourceCeationPolicy;
 		ConfigOption optMultiDeviceMemHint;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		ConfigOption optEnableFixedPipeline;
+#endif
 
 		driverList = this->getDirect3DDrivers();
 
@@ -283,6 +287,14 @@ namespace Ogre
 		optMultiDeviceMemHint.currentValue = "Use minimum system memory";
 		optMultiDeviceMemHint.immutable = false;
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
+		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
+		optEnableFixedPipeline.possibleValues.push_back( "No" );
+		optEnableFixedPipeline.currentValue = "Yes";
+		optEnableFixedPipeline.immutable = false;
+#endif
+
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
@@ -294,6 +306,9 @@ namespace Ogre
 		mOptions[optSRGB.name] = optSRGB;
 		mOptions[optResourceCeationPolicy.name] = optResourceCeationPolicy;
 		mOptions[optMultiDeviceMemHint.name] = optMultiDeviceMemHint;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
+#endif
 
 		refreshD3DSettings();
 
@@ -433,6 +448,19 @@ namespace Ogre
 			else if (value == "Auto hardware buffers management")
 				mResourceManager->setAutoHardwareBufferManagement(true);
 		}		
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		if (name == "Fixed Pipeline Enabled")
+		{
+			if (value == "Yes")
+			{
+				mEnableFixedPipeline = true;
+			}
+			else
+				mEnableFixedPipeline = false;
+		}
+#endif
+
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::refreshFSAAOptions()
@@ -795,8 +823,13 @@ namespace Ogre
 		rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
 		rsc->setRenderSystemName(getName());
 
-		// Supports fixed-function
-		rsc->setCapability(RSC_FIXED_FUNCTION);
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		if(mEnableFixedPipeline)
+#endif
+		{
+			// Supports fixed-function
+			rsc->setCapability(RSC_FIXED_FUNCTION);
+		}	
 			
 				
 		// Init caps to maximum.		
@@ -3206,6 +3239,27 @@ namespace Ogre
 
 		// Call super class
 		RenderSystem::_render(op);
+
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		IDirect3DVertexShader9* pVertexShader = NULL;
+		getActiveD3D9Device()->GetVertexShader(&pVertexShader);
+		IDirect3DPixelShader9* pPixelShader = NULL;
+		getActiveD3D9Device()->GetPixelShader(&pPixelShader);
+
+	 	if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
+			 && 
+			 (
+				( !pVertexShader ) ||
+				(!pPixelShader && op.operationType != RenderOperation::OT_POINT_LIST) 		  
+			  )
+		   ) 
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Attempted to render using the fixed pipeline when it is diabled.",
+				"D3D11RenderSystem::_render");
+		}
+#endif
 
 		// To think about: possibly remove setVertexDeclaration and 
 		// setVertexBufferBinding from RenderSystem since the sequence is

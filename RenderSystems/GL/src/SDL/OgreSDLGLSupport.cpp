@@ -32,6 +32,9 @@ void SDLGLSupport::addConfig(void)
     ConfigOption optVideoMode;
     ConfigOption optFSAA;
 	ConfigOption optRTTMode;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+	ConfigOption optEnableFixedPipeline;
+#endif
 
     // FS setting possiblities
     optFullScreen.name = "Full Screen";
@@ -71,11 +74,21 @@ void SDLGLSupport::addConfig(void)
 	optRTTMode.currentValue = "FBO";
 	optRTTMode.immutable = false;
 
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
+		optEnableFixedPipeline.possibleValues.push_back( "Yes" );
+		optEnableFixedPipeline.possibleValues.push_back( "No" );
+		optEnableFixedPipeline.currentValue = "Yes";
+		optEnableFixedPipeline.immutable = false;
+#endif
 
     mOptions[optFullScreen.name] = optFullScreen;
     mOptions[optVideoMode.name] = optVideoMode;
     mOptions[optFSAA.name] = optFSAA;
 	mOptions[optRTTMode.name] = optRTTMode;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
+#endif
 
 }
 
@@ -110,6 +123,14 @@ RenderWindow* SDLGLSupport::createWindow(bool autoCreateWindow, GLRenderSystem* 
         {
 			winOptions["FSAA"] = opt->second.currentValue;
         }
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+			opt = mOptions.find("Fixed Pipeline Enabled");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
+			bool enableFixedPipeline = (opt->second.currentValue == "Yes");
+			renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
+#endif
 
         unsigned int w = StringConverter::parseUnsignedInt(val.substr(0, pos));
         unsigned int h = StringConverter::parseUnsignedInt(val.substr(pos + 1));

@@ -229,8 +229,13 @@ namespace Ogre {
 		else
 			rsc->setVendor(GPU_UNKNOWN);
 
-		// Supports fixed-function
-		rsc->setCapability(RSC_FIXED_FUNCTION);
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		if(mEnableFixedPipeline)
+#endif
+		{
+			// Supports fixed-function
+			rsc->setCapability(RSC_FIXED_FUNCTION);
+		}	
 
         // Check for hardware mipmapping support.
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
@@ -2826,6 +2831,21 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		// Call super class
 		RenderSystem::_render(op);
+
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+	 	if ( ! mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
+			 && 
+			 (
+				( mCurrentVertexProgram == NULL ) ||
+				( mCurrentFragmentProgram == NULL && op.operationType != RenderOperation::OT_POINT_LIST) 		  
+			  )
+		   ) 
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Attempted to render using the fixed pipeline when it is diabled.",
+				"D3D11RenderSystem::_render");
+		}
+#endif
 
 		void* pBufferData = 0;
 		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
