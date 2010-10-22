@@ -916,7 +916,7 @@ protected:
          -----------------------------------------------------------------------------*/
 		virtual void setup()
 		{
-			createWindow();
+			mWindow = createWindow();
 			setupInput();
 			locateResources();
 
@@ -1032,19 +1032,19 @@ protected:
 		/*-----------------------------------------------------------------------------
 		| Overrides the default window title.
 		-----------------------------------------------------------------------------*/
-		virtual void createWindow()
+		virtual Ogre::RenderWindow* createWindow()
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-			mWindow = mRoot->initialise(mNativeWindow == NULL, "OGRE Sample Browser");
+			Ogre::RenderWindow* res = mRoot->initialise(mNativeWindow == NULL, "OGRE Sample Browser");
 			NameValuePairList miscParams;
 			miscParams["NativeWindow"] = StringConverter::toString((unsigned long)mNativeWindow);
 			miscParams["NativeControl"] = StringConverter::toString((unsigned long)mNativeControl);
-			mWindow = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Size().iWidth, mNativeWindow->Size().iHeight, false, &miscParams);
+			res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Size().iWidth, mNativeWindow->Size().iHeight, false, &miscParams);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			// TODO: what to do here...
 #else
-			mWindow = mRoot->initialise(true, "OGRE Sample Browser");
+			Ogre::RenderWindow* res = mRoot->initialise(true, "OGRE Sample Browser");
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
@@ -1053,6 +1053,8 @@ protected:
             
             [[[UIApplication sharedApplication] keyWindow] addSubview:mGestureView];
 #endif
+			
+			return res;
         }
 
 		/*-----------------------------------------------------------------------------

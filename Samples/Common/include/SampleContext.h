@@ -503,7 +503,7 @@ namespace OgreBites
          -----------------------------------------------------------------------------*/
 		virtual void setup()
 		{
-			createWindow();
+			mWindow = createWindow();
 			setupInput();
 			locateResources();
 			loadResources();
@@ -554,9 +554,9 @@ namespace OgreBites
 		| window here, but you can also create an external window if you wish.
 		| Just don't forget to initialise the root.
 		-----------------------------------------------------------------------------*/
-		virtual void createWindow()
+		virtual Ogre::RenderWindow* createWindow()
 		{
-			mWindow = mRoot->initialise(true);
+			return mRoot->initialise(true);
 		}
 
 		/*-----------------------------------------------------------------------------
