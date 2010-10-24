@@ -234,7 +234,14 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
 	{
-		return mMicrocodeCache.find(name) != mMicrocodeCache.end();
+		if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() )
+		{
+			return mMicrocodeCache.find(name) != mMicrocodeCache.end();
+		}
+		else
+		{
+			return false;
+		}
 	}
 	//---------------------------------------------------------------------
 	const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const

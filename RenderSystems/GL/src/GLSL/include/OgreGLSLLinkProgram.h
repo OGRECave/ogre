@@ -93,9 +93,9 @@ namespace Ogre {
 
 		static CustomAttribute msCustomAttributes[];
 
-
-		
-
+		void link();
+		void getMicrocodeFromCache();
+		String getCombinedName();		
 	public:
 		/// constructor should only be used by GLSLLinkProgramManager
 		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
@@ -105,6 +105,7 @@ namespace Ogre {
 
 		*/
 		void activate(void);
+
 		/** updates program object uniforms using data from GpuProgramParamters.
 		normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
 		*/

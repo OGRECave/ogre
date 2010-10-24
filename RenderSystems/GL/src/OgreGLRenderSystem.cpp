@@ -466,10 +466,11 @@ namespace Ogre {
 			rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 		}
 		
-		if (GLEW_VERSION_3_0)
+		if (mGLSupport->checkExtension("GL_ARB_get_program_binary"))
 		{
 			// states 3.0 here: http://developer.download.nvidia.com/opengl/specs/GL_ARB_get_program_binary.txt
 			// but not here: http://www.opengl.org/sdk/docs/man4/xhtml/glGetProgramBinary.xml
+			// and here states 4.1: http://www.geeks3d.com/20100727/opengl-4-1-allows-the-use-of-binary-shaders/
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 

@@ -91,42 +91,6 @@ namespace Ogre {
 			checkForGLSLError( "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
 		}
 
-		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
-		{
-			getMicrocodeFromCache();
-		}
-		else
-		{
-			compile();
-		}
-	}    
-    //-----------------------------------------------------------------------
-    void GLSLProgram::getMicrocodeFromCache(void)
-    {
-		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
-		
-		glProgramBinary(mGLHandle, 
-						*((GLenum *)(&cacheMicrocode[0])), 
-						&cacheMicrocode[sizeof(GLenum)],
-						cacheMicrocode.size() - sizeof(GLenum)
-						);
-
-		GLint   success = 0;
-        glGetProgramiv(mGLHandle, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            //
-            // Something must have changed since the program binaries
-            // were cached away.  Fallback to source shader loading path,
-            // and then retrieve and cache new program binaries once again.
-            //
-			compile();
-        }
-	}
-    //---------------------------------------------------------------------------
-	bool GLSLProgram::compile(const bool checkErrors)
-	{
 		// Preprocess the GLSL shader in order to get a clean source
 		CPreprocessor cpp;
 
@@ -203,6 +167,12 @@ namespace Ogre {
 			checkForGLSLError( "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
 		}
 
+		compile();
+	}
+    
+    //---------------------------------------------------------------------------
+	bool GLSLProgram::compile(const bool checkErrors)
+	{
         if (checkErrors)
         {
             logObjectInfo("GLSL compiling: " + mName, mGLHandle);
@@ -221,31 +191,6 @@ namespace Ogre {
 				logObjectInfo("GLSL compiled : " + mName, mGLHandle);
 			}
 		}
-		else
-		{
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-			{
-				// add to the microcode to the cache
-				GpuProgramManager::Microcode newMicrocode;
-
-				// get buffer size
-				GLint binaryLength = 0;
-				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-
-				// turns out we need this param when loading
-				// it will be the first bytes of the array in the microcode
-				GLenum binaryFormat = 0; 
-
-				// get the buffer
-				newMicrocode.resize(binaryLength + sizeof(GLenum));
-				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, &newMicrocode[sizeof(GLenum)]);
-				memcpy(&newMicrocode[0], &binaryFormat, sizeof(GLenum));
-
-				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
-			}
-		}
-
-
 		return (mCompiled == 1);
 
 	}

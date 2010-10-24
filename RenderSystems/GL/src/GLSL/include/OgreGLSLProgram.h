@@ -172,8 +172,6 @@ namespace Ogre {
         void buildConstantDefinitions() const;
 		/// compile source into shader object
 		bool compile( const bool checkErrors = true);
-		/// get microcode from cache and update the shader object
-		void getMicrocodeFromCache(void);
 
 	private:
 		/// GL handle for shader object
