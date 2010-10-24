@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreD3D9Mappings.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreD3D9RenderSystem.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -161,19 +162,39 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadFromSource(void)
     {
-		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
-
-		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
-		{
-			IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
-
-			loadFromSource(d3d9Device);
-		}
+		loadFromSource(NULL);
     }
-
 	//-----------------------------------------------------------------------------
-	void D3D9GpuProgram::loadFromSource(IDirect3DDevice9* d3d9Device)
-	{
+   void D3D9GpuProgram::loadFromSource( IDirect3DDevice9* d3d9Device )
+    {
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		{
+			getMicrocodeFromCache( d3d9Device );
+		}
+		else
+		{
+			compileMicrocode( d3d9Device );
+		}
+	}
+    //-----------------------------------------------------------------------
+    void D3D9GpuProgram::getMicrocodeFromCache( IDirect3DDevice9* d3d9Device )
+    {
+		GpuProgramManager::Microcode cacheMicrocode = 
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+		
+		LPD3DXBUFFER microcode;
+		HRESULT hr=D3DXCreateBuffer(cacheMicrocode.size(), &microcode); 
+
+		if(microcode)
+		{
+			memcpy(microcode->GetBufferPointer(), &cacheMicrocode[0], cacheMicrocode.size());
+		}
+		
+		loadFromMicrocode(d3d9Device, microcode);
+	}
+    //-----------------------------------------------------------------------
+    void D3D9GpuProgram::compileMicrocode( IDirect3DDevice9* d3d9Device )
+    {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
 
@@ -201,8 +222,20 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
 				"D3D9GpuProgram::loadFromSource");
 		}
-	
+		else
+		{
+			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+			{
+				// add to the microcode to the cache
+				GpuProgramManager::Microcode newMicrocode;
+				newMicrocode.resize(microcode->GetBufferSize());
+				memcpy(&newMicrocode[0], microcode->GetBufferPointer(), microcode->GetBufferSize());
+				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+			}
+		}
+
 		loadFromMicrocode(d3d9Device, microcode);		
+		
 
 		SAFE_RELEASE(microcode);
 		SAFE_RELEASE(errors);
@@ -236,6 +269,16 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
     void D3D9GpuVertexProgram::loadFromMicrocode(IDirect3DDevice9* d3d9Device, ID3DXBuffer* microcode)
     {		 
+		if (d3d9Device == NULL)
+		{
+			for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
+			{
+				IDirect3DDevice9* curD3d9Device = D3D9RenderSystem::getResourceCreationDevice(i);
+
+				loadFromMicrocode(curD3d9Device, microcode);		
+			}
+		}		
+
 		DeviceToVertexShaderIterator it = mMapDeviceToVertexShader.find(d3d9Device);
 
 		if (it != mMapDeviceToVertexShader.end())

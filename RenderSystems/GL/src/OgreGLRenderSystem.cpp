@@ -466,8 +466,16 @@ namespace Ogre {
 			rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 		}
 		
+		if (GLEW_VERSION_3_0)
+		{
+			// states 3.0 here: http://developer.download.nvidia.com/opengl/specs/GL_ARB_get_program_binary.txt
+			// but not here: http://www.opengl.org/sdk/docs/man4/xhtml/glGetProgramBinary.xml
+			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+		}
+
 		if (GLEW_VERSION_3_3)
 		{
+			// states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml
 			rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
 		}
 

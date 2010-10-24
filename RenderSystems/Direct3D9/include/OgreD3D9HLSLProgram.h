@@ -149,6 +149,10 @@ namespace Ogre {
 	protected:
 		OptimisationLevel mOptimisationLevel;
 
+        /** Gets the microcode from the microcode cache. */
+		void getMicrocodeFromCache(void);
+        /** Compiles the microcode from the program source. */
+		void compileMicrocode(void);
     public:
         D3D9HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
@@ -184,7 +188,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
-    };
+	};
 }
 
 #endif

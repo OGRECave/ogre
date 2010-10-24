@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 #include "OgreRoot.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 	//-----------------------------------------------------------------------
@@ -61,8 +62,35 @@ namespace Ogre {
 		}
 
 	}
-	//-----------------------------------------------------------------------
-	void D3D11HLSLProgram::loadFromSource(void)
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::loadFromSource(void)
+    {
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		{
+			getMicrocodeFromCache();
+		}
+		else
+		{
+			compileMicrocode();
+		}
+	}
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::getMicrocodeFromCache(void)
+    {
+		GpuProgramManager::Microcode cacheMicrocode = 
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+		
+		HRESULT hr=D3D10CreateBlob(cacheMicrocode.size(), &mpMicroCode); 
+
+		if(mpMicroCode)
+		{
+			memcpy(mpMicroCode->GetBufferPointer(), &cacheMicrocode[0], cacheMicrocode.size());
+		}
+		
+		analizeMicrocode();
+	}
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::compileMicrocode(void)
 	{
 		class HLSLIncludeHandler : public ID3D10Include
 		{
@@ -272,10 +300,26 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
 				"D3D11HLSLProgram::loadFromSource");
 		}
+		else
+		{
+			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+			{
+				// add to the microcode to the cache
+				GpuProgramManager::Microcode newMicrocode;
+				newMicrocode.resize(mpMicroCode->GetBufferSize());
+				memcpy(&newMicrocode[0], mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
+				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+			}
+		}
 
+		analizeMicrocode();
+	}
+	//-----------------------------------------------------------------------
+	void D3D11HLSLProgram::analizeMicrocode()
+	{
 		SIZE_T BytecodeLength = mpMicroCode->GetBufferSize();
 
-		hr = D3DReflect( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
+		HRESULT hr = D3DReflect( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
 			IID_ID3D11ShaderReflection, // can't do __uuidof(ID3D11ShaderReflection) here...
 			(void**) &mpIShaderReflection );
 
@@ -334,7 +378,7 @@ namespace Ogre {
 						newVar.var = shaderVerDesc;
 						newVar.wasInit = false;
 						newVar.name = shaderVerDesc.Name;
-						
+
 						// A hack for cg to get the "original name" of the var in the "auto comments"
 						// that cg adds to the hlsl 4 output. This is to solve the issue that
 						// in some cases cg changes the name of the var to a new name.

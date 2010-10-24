@@ -50,10 +50,14 @@ namespace Ogre {
 		typedef set<String>::type SyntaxCodes;
 		typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
 
+		typedef vector<uint8>::type Microcode;
+		typedef map<String, Microcode>::type MicrocodeMap;
 
 	protected:
 
 		SharedParametersMap mSharedParametersMap;
+		MicrocodeMap mMicrocodeCache;
+		bool mSaveMicrocodesToCache;
 
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 
@@ -173,6 +177,38 @@ namespace Ogre {
 		/** Get (const) access to the available shared parameter sets. 
 		*/
 		virtual const SharedParametersMap& getAvailableSharedParameters() const;
+
+        /** Get if the microcode of a shader should be saved to a cache
+        */
+		const bool getSaveMicrocodesToCache() const;
+        /** Set if the microcode of a shader should be saved to a cache
+        */
+		void setSaveMicrocodesToCache( const bool val );
+
+		const bool canGetCompiledShaderBuffer() const;
+        /** Check if a microcode is available for a program in the microcode cache.
+        @param name The name of the program.
+        */
+		virtual bool isMicrocodeAvailableInCache( const String & name ) const;
+        /** Returns a microcode for a program from the microcode cache.
+        @param name The name of the program.
+        */
+		virtual const Microcode & getMicrocodeFromCache( const String & name ) const;
+        /** Adds a microcode for a program to the microcode cache.
+        @param name The name of the program.
+        */
+		virtual void addMicrocodeToCache( const String & name, const Microcode & microcode );
+
+        /** Saves the microcode cache to disk.
+        @param stream The destination stream
+        */
+		virtual void saveMicrocodeCache( DataStreamPtr stream ) const;
+        /** Loads the microcode cache from disk.
+        @param stream The source stream
+        */
+		virtual void loadMicrocodeCache( DataStreamPtr stream );
+		
+
 
         /** Override standard Singleton retrieval.
         @remarks

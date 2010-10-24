@@ -991,6 +991,7 @@ namespace Ogre
 		rsc->setCapability(RSC_PERSTAGECONSTANT);
 
 		rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+		rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 
 		return rsc;
 

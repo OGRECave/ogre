@@ -861,6 +861,7 @@ namespace Ogre
 		rsc->setCapability(RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE);
 		rsc->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 		rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+		rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 
 		for (uint i=0; i < mDeviceManager->getDeviceCount(); ++i)
 		{

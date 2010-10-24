@@ -153,6 +153,8 @@ namespace Ogre
 		RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 10),
 		/// Supports using vertex buffers for instance data
 		RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
+		/// Supports using vertex buffers for instance data
+		RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

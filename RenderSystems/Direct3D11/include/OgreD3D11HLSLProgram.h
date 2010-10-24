@@ -143,6 +143,9 @@ namespace Ogre {
 		ShaderVars mShaderVars;
 
 		void createConstantBuffer(const UINT ByteWidth);
+		void analizeMicrocode();
+		void getMicrocodeFromCache(void);
+		void compileMicrocode(void);
 	public:
 		D3D11HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
 			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
@@ -192,7 +195,6 @@ namespace Ogre {
 		void loadFromSource(void);
 
 		D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
-
 	};
 }
 

@@ -86,6 +86,32 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::loadFromSource(void)
     {
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		{
+			getMicrocodeFromCache();
+		}
+		else
+		{
+			compileMicrocode();
+		}
+	}
+    //-----------------------------------------------------------------------
+    void D3D9HLSLProgram::getMicrocodeFromCache(void)
+    {
+		GpuProgramManager::Microcode cacheMicrocode = 
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+		
+		HRESULT hr=D3DXCreateBuffer(cacheMicrocode.size(), &mpMicroCode); 
+
+		if(mpMicroCode)
+		{
+			memcpy(mpMicroCode->GetBufferPointer(), &cacheMicrocode[0], cacheMicrocode.size());
+		}
+		
+	}
+    //-----------------------------------------------------------------------
+    void D3D9HLSLProgram::compileMicrocode(void)
+    {
         // Populate preprocessor defines
         String stringBuffer;
 
@@ -226,8 +252,17 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
                 "D3D9HLSLProgram::loadFromSource");
         }
-
-
+		else
+		{
+			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+			{
+				// add to the microcode to the cache
+				GpuProgramManager::Microcode newMicrocode;
+				newMicrocode.resize(mpMicroCode->GetBufferSize());
+				memcpy(&newMicrocode[0], mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
+				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+			}
+		}
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::createLowLevelImpl(void)

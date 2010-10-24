@@ -50,6 +50,7 @@ namespace Ogre {
 		mLoadOrder = 50.0f;
 		// Resource type
 		mResourceType = "GpuProgram";
+		mSaveMicrocodesToCache = false;
 
 		// subclasses should register with resource group manager
 	}
@@ -199,6 +200,133 @@ namespace Ogre {
 	GpuProgramManager::getAvailableSharedParameters() const
 	{
 		return mSharedParametersMap;
+	}
+	//---------------------------------------------------------------------
+	const bool GpuProgramManager::getSaveMicrocodesToCache() const
+	{
+		return mSaveMicrocodesToCache;
+	}
+	//---------------------------------------------------------------------
+	const bool GpuProgramManager::canGetCompiledShaderBuffer() const
+	{
+		// Use the current render system
+		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+		// Check if the supported  
+		return rs->getCapabilities()->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
+	{
+		if(val && !canGetCompiledShaderBuffer())
+		{
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Can't save microcodes to cache with this render system.", 
+                "GpuProgramManager::setSaveMicrocodesToCache");
+        }
+		else
+		{
+			mSaveMicrocodesToCache = val;
+		}
+
+		
+	}
+	//---------------------------------------------------------------------
+	bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
+	{
+		return mMicrocodeCache.find(name) != mMicrocodeCache.end();
+	}
+	//---------------------------------------------------------------------
+	const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const
+	{
+		return mMicrocodeCache.find(name)->second;
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramManager::addMicrocodeToCache( const String & name, const GpuProgramManager::Microcode & microcode )
+	{
+		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(name);
+		if ( foundIter == mMicrocodeCache.end() )
+		{
+			Microcode empty;
+			mMicrocodeCache.insert(make_pair(name, empty));
+			foundIter = mMicrocodeCache.find(name);
+		}
+
+		Microcode & cacheMicrocode = foundIter->second;
+		cacheMicrocode.resize(microcode.size());
+		memcpy(&cacheMicrocode[0], &microcode[0], microcode.size());
+		
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
+	{
+		if (!stream->isWriteable())
+		{
+			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
+				"Unable to write to stream " + stream->getName(),
+				"GpuProgramManager::saveMicrocodeCache");
+		}
+		
+		// write the size of the array
+		size_t sizeOfArray = mMicrocodeCache.size();
+		stream->write(&sizeOfArray, sizeof(size_t));
+		
+		// loop the array and save it
+		MicrocodeMap::const_iterator iter = mMicrocodeCache.begin();
+		MicrocodeMap::const_iterator iterE = mMicrocodeCache.end();
+		for ( ; iter != iterE ; iter++ )
+		{
+			// saves the name of the shader
+			{
+				const String & nameOfShader = iter->first;
+				size_t stringLength = nameOfShader.size();
+				stream->write(&stringLength, sizeof(size_t));				
+				stream->write(&nameOfShader[0], stringLength);
+			}
+			// saves the microcode
+			{
+				const Microcode & microcodeOfShader = iter->second;
+				size_t microcodeLength = microcodeOfShader.size();
+				stream->write(&microcodeLength, sizeof(size_t));				
+				stream->write(&microcodeOfShader[0], microcodeLength);
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramManager::loadMicrocodeCache( DataStreamPtr stream )
+	{
+		mMicrocodeCache.clear();
+
+		// write the size of the array
+		size_t sizeOfArray = 0;
+		stream->read(&sizeOfArray, sizeof(size_t));
+		
+		// loop the array and load it
+
+		for ( size_t i = 0 ; i < sizeOfArray ; i++ )
+		{
+			String nameOfShader;
+
+			// loads the name of the shader
+			{
+				size_t stringLength  = 0;
+				stream->read(&stringLength, sizeof(size_t));
+				nameOfShader.resize(stringLength);				
+				stream->read(&nameOfShader[0], stringLength);
+				Microcode empty;
+				mMicrocodeCache.insert(make_pair(nameOfShader, empty));
+
+			}
+			// loads the microcode
+			{
+				size_t microcodeLength = 0;
+				stream->read(&microcodeLength, sizeof(size_t));		
+
+				Microcode & microcodeOfShader = mMicrocodeCache.find(nameOfShader)->second;
+				microcodeOfShader.resize(microcodeLength);		
+				stream->read(&microcodeOfShader[0], microcodeLength);
+			}
+		}
 	}
 	//---------------------------------------------------------------------
 

@@ -104,6 +104,8 @@ namespace Ogre {
 		bool mColumnMajorMatrices;
 		ID3DXBuffer* mpExternalMicrocode;
 
+		void getMicrocodeFromCache( IDirect3DDevice9* d3d9Device );
+		void compileMicrocode( IDirect3DDevice9* d3d9Device );
     };
 
     /** Direct3D implementation of low-level vertex programs. */
