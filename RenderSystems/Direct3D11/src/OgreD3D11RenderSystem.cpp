@@ -990,6 +990,8 @@ namespace Ogre
 		// actually irrelevant, but set
 		rsc->setCapability(RSC_PERSTAGECONSTANT);
 
+		rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+
 		return rsc;
 
     }
