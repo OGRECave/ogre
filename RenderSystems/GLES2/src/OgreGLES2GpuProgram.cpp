@@ -68,6 +68,11 @@ GLuint GLES2GpuProgram::getAttributeIndex(VertexElementSemantic semantic, uint i
 	return getFixedAttributeIndex(semantic, index);
 }
 
+GLuint GLES2GpuProgram::getFixedAttributeIndexCount()
+{
+	return 16;
+}
+
 GLuint GLES2GpuProgram::getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
 {
 	// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically

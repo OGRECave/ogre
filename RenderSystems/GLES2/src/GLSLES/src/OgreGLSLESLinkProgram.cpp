@@ -79,6 +79,13 @@ namespace Ogre {
 		, mUniformRefsBuilt(false)
         , mLinked(false)
 	{
+		// init CustomAttributesIndexs
+		mCustomAttributesIndexs.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
+		for(int i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
+		{
+			mCustomAttributesIndexs[i] = -1;
+		}
+
         glGetError(); // Clean up the error. Otherwise will flood log.
         mGLHandle = glCreateProgram();
         GL_CHECK_ERROR
@@ -126,6 +133,7 @@ namespace Ogre {
 				// Because we can't ask GL whether an attribute is used in the shader
 				// until it is linked (chicken and egg!) we have to parse the source
 				
+				size_t indexCount = 0;
 				size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
 				const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
 				for (size_t i = 0; i < numAttribs; ++i)
@@ -149,8 +157,12 @@ namespace Ogre {
 							String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
 							StringVector vec = StringUtil::split(expr);
                             if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
-								glBindAttribLocation(mGLHandle, a.attrib, a.name.c_str());
-                            GL_CHECK_ERROR;
+							{
+								mCustomAttributesIndexs[a.attrib] = indexCount;
+								glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
+								indexCount++;
+								GL_CHECK_ERROR;
+							}
 						}
 					}
 				}
@@ -197,12 +209,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLuint GLSLESLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
 	{
-		return GLES2GpuProgram::getFixedAttributeIndex(semantic, index);
+		return mCustomAttributesIndexs[GLES2GpuProgram::getFixedAttributeIndex(semantic, index)];
 	}
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
 	{
-		return mValidAttributes.find(getAttributeIndex(semantic, index)) != mValidAttributes.end();
+		return mCustomAttributesIndexs[GLES2GpuProgram::getFixedAttributeIndex(semantic, index)] != -1;
 	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::buildGLUniformReferences(void)

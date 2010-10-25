@@ -120,6 +120,7 @@ namespace Ogre  {
             case PF_A8B8G8R8:
                 return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_X8R8G8B8:
+            case PF_A8B8G8R8:
             case PF_A8R8G8B8:
                 return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_B8G8R8A8:
@@ -183,6 +184,7 @@ namespace Ogre  {
                 
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
+			case PF_A8B8G8R8:
             case PF_A8R8G8B8:
             case PF_B8G8R8A8:
             case PF_A1R5G5B5:
@@ -287,12 +289,10 @@ namespace Ogre  {
                 case GL_UNSIGNED_SHORT_4_4_4_4:
                     return PF_A4R4G4B4;
                 default:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2)
-                    return PF_X8B8G8R8;
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-                    return PF_A8B8G8R8;
-#else
+#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
                     return PF_A8R8G8B8;
+#else
+                    return PF_A8B8G8R8;
 #endif
             }
 #ifdef GL_BGRA

@@ -93,6 +93,8 @@ namespace Ogre {
 		};
 
 		static CustomAttribute msCustomAttributes[];
+		vector<GLuint>::type mCustomAttributesIndexs;
+
 
 	public:
 		/// Constructor should only be used by GLSLESLinkProgramManager

@@ -1617,65 +1617,66 @@ namespace Ogre {
             }
             else
             {
+				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
                 switch (sem)
                 {
                     case VES_POSITION:
-                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
+                        glVertexAttribPointer(attrib,
                                               typeCount,
                                               GLES2HardwareBufferManager::getGLType(elem->getType()),
                                               normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0));
+                        glEnableVertexAttribArray(attrib);
                         GL_CHECK_ERROR;
                         break;
                     case VES_NORMAL:
-                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0),
+                        glVertexAttribPointer(attrib,
                                               typeCount,
                                               GLES2HardwareBufferManager::getGLType(elem->getType()),
                                               normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0));
+                        glEnableVertexAttribArray(attrib);
                         GL_CHECK_ERROR;
                         break;
                     case VES_DIFFUSE:
-                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0), 
+                        glVertexAttribPointer(attrib, 
                                               typeCount,
                                               GLES2HardwareBufferManager::getGLType(elem->getType()),
                                               normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0));
+                        glEnableVertexAttribArray(attrib);
                         GL_CHECK_ERROR;
                         break;
                     case VES_SPECULAR:
-                        glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0), 
+                        glVertexAttribPointer(attrib, 
                                               typeCount,
                                               GLES2HardwareBufferManager::getGLType(elem->getType()),
                                               normalised,
                                               static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                               pBufferData);
                         GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0));
+                        glEnableVertexAttribArray(attrib);
                         GL_CHECK_ERROR;
                         break;
                     case VES_TEXTURE_COORDINATES:
                         if (mCurrentVertexProgram)
                         {
                             // Programmable pipeline - direct UV assignment
-                            activateGLTextureUnit(GL_TEXTURE0 + elem->getIndex());
-                            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()),
+                            activateGLTextureUnit(elem->getIndex());
+                            glVertexAttribPointer(attrib,
                                                   typeCount,
                                                   GLES2HardwareBufferManager::getGLType(elem->getType()),
                                                   normalised,
                                                   static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                   pBufferData);
                             GL_CHECK_ERROR;
-                            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, elem->getIndex()));
+                            glEnableVertexAttribArray(attrib);
                             GL_CHECK_ERROR;
                         }
                         else
@@ -1688,16 +1689,16 @@ namespace Ogre {
                                 if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
                                 {
                                     if (multitexturing)
-                                        activateGLTextureUnit(GL_TEXTURE0 + i);
+                                        activateGLTextureUnit(i);
                                     GL_CHECK_ERROR;
-                                    glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i),
+                                    glVertexAttribPointer(attrib,
                                                           typeCount,
                                                           GLES2HardwareBufferManager::getGLType(elem->getType()),
                                                           normalised,
                                                           static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                           pBufferData);
                                     GL_CHECK_ERROR;
-                                    glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, i));
+                                    glEnableVertexAttribArray(attrib);
                                     GL_CHECK_ERROR;
                                 }
                             }

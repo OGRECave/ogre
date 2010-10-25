@@ -71,6 +71,9 @@ namespace Ogre {
 		/** Get the fixed attribute bindings normally used by GL for a semantic. */
 		static GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 
+		/** Get the number of fixed attribute bindings normally used by GL for a semantic. */
+		static GLuint getFixedAttributeIndexCount();
+
     protected:
 		/** Overridden from GpuProgram, do nothing */
 		void loadFromSource(void) {}
