@@ -1225,7 +1225,13 @@ void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 //-----------------------------------------------------------------------------
 void ShaderGenerator::setShaderCachePath( const String& cachePath )
 {
-	if (mShaderCachePath != cachePath)
+	String stdCachePath = cachePath;
+
+	// Standardise the cache path in case of none empty string.
+	if (stdCachePath.empty() == false)
+		stdCachePath = StringUtil::standardisePath(stdCachePath);
+
+	if (mShaderCachePath != stdCachePath)
 	{
 		// Remove previous cache path. 
 		if (mShaderCachePath.empty() == false)
@@ -1233,7 +1239,7 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 			ResourceGroupManager::getSingleton().removeResourceLocation(mShaderCachePath, GENERATED_SHADERS_GROUP_NAME);
 		}
 
-		mShaderCachePath = cachePath;
+		mShaderCachePath = stdCachePath;
 
 		// Case this is a valid file path -> add as resource location in order to make sure that
 		// generated shaders could be loaded by the file system archive.
