@@ -80,7 +80,7 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
 	while(it != mShadowTextureParamsList.end())
 	{						
 		it->mWorldViewProjMatrix->setGpuParameter(source->getTextureWorldViewProjMatrix(shadowIndex));				
-		it->mInvTextureSize->setGpuParameter(source->getInverseTextureSize(shadowIndex));
+		it->mInvTextureSize->setGpuParameter(source->getInverseTextureSize(it->mTextureSamplerIndex));
 		
 		++it;
 		++shadowIndex;
