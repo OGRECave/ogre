@@ -58,6 +58,8 @@ namespace Ogre {
 		SharedParametersMap mSharedParametersMap;
 		MicrocodeMap mMicrocodeCache;
 		bool mSaveMicrocodesToCache;
+			
+		static String addRenderSystemToName( const String &  name );
 
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 

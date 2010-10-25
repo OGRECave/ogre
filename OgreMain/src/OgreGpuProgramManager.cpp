@@ -221,24 +221,33 @@ namespace Ogre {
 		mSaveMicrocodesToCache = val;		
 	}
 	//---------------------------------------------------------------------
+	String GpuProgramManager::addRenderSystemToName( const String & name )
+	{
+		// Use the current render system
+		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+		return rs->getName() + "_" + name;
+	}
+	//---------------------------------------------------------------------
 	bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
 	{
-		return mMicrocodeCache.find(name) != mMicrocodeCache.end();
+		return mMicrocodeCache.find(addRenderSystemToName(name)) != mMicrocodeCache.end();
 	}
 	//---------------------------------------------------------------------
 	const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const
 	{
-		return mMicrocodeCache.find(name)->second;
+		return mMicrocodeCache.find(addRenderSystemToName(name))->second;
 	}
 	//---------------------------------------------------------------------
 	void GpuProgramManager::addMicrocodeToCache( const String & name, const GpuProgramManager::Microcode & microcode )
-	{
-		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(name);
+	{	
+		String nameWithRenderSystem = addRenderSystemToName(name);
+		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
 		if ( foundIter == mMicrocodeCache.end() )
 		{
 			Microcode empty;
-			mMicrocodeCache.insert(make_pair(name, empty));
-			foundIter = mMicrocodeCache.find(name);
+			mMicrocodeCache.insert(make_pair(nameWithRenderSystem, empty));
+			foundIter = mMicrocodeCache.find(nameWithRenderSystem);
 		}
 
 		Microcode & cacheMicrocode = foundIter->second;
