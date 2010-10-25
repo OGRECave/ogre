@@ -80,11 +80,11 @@ namespace Ogre {
 		GpuProgramManager::Microcode cacheMicrocode = 
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 		
-		HRESULT hr=D3D10CreateBlob(cacheMicrocode.size(), &mpMicroCode); 
+		HRESULT hr=D3D10CreateBlob(cacheMicrocode->size(), &mpMicroCode); 
 
 		if(mpMicroCode)
 		{
-			memcpy(mpMicroCode->GetBufferPointer(), &cacheMicrocode[0], cacheMicrocode.size());
+			cacheMicrocode->read(mpMicroCode->GetBufferPointer(), cacheMicrocode->size());
 		}
 		
 		analizeMicrocode();
@@ -305,9 +305,8 @@ namespace Ogre {
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 				// add to the microcode to the cache
-				GpuProgramManager::Microcode newMicrocode;
-				newMicrocode.resize(mpMicroCode->GetBufferSize());
-				memcpy(&newMicrocode[0], mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
+				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(mName, mpMicroCode->GetBufferSize()));
+				newMicrocode->write(mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
 				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
 			}
 		}
