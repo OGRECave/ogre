@@ -155,7 +155,8 @@ namespace Ogre {
 		void getMicrocodeFromCache(void);
         /** Compiles the microcode from the program source. */
 		void compileMicrocode(void);
-    public:
+		void addMicrocodeToCache();
+	public:
         D3D9HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
         ~D3D9HLSLProgram();

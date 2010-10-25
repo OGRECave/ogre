@@ -115,7 +115,7 @@ namespace Ogre {
 
 		void getMicrocodeFromCache(void);
 		void compileMicrocode(void);
-
+		void addMicrocodeToCache();
     public:
         CgProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader, 

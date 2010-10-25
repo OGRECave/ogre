@@ -313,55 +313,60 @@ namespace Ogre {
 
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
-				// add to the microcode to the cache
-				GpuProgramManager::Microcode newMicrocode;
-				
-				size_t sizeOfBuffer = sizeof(size_t) + mpMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
-				newMicrocode.resize(sizeOfBuffer);
-				
-				uint8 * outBuf = &newMicrocode[0];
-
-				// save size of microcode
-				size_t microcodeSize = mpMicroCode->GetBufferSize();
-				memcpy(outBuf, &microcodeSize, sizeof(size_t));
-				outBuf += sizeof(size_t);
-
-				// save microcode
-				memcpy(outBuf, mpMicroCode->GetBufferPointer(), microcodeSize);
-				outBuf += microcodeSize;
-
-				// save size of param map
-				size_t parametersMapSize = mParametersMap.size();
-				memcpy(outBuf, &parametersMapSize, sizeof(size_t));
-				outBuf += sizeof(size_t);
-				
-				// save params
-				GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
-				GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
-				for (; iter != iterE ; iter++)
-				{
-					const String & paramName = iter->first;
-					const GpuConstantDefinition & def = iter->second;
-					
-					// save string size
-					size_t stringSize = paramName.size();
-					memcpy(outBuf, &stringSize, sizeof(size_t));
-					outBuf += sizeof(size_t);
-
-					// save string
-					memcpy(outBuf, &paramName[0], stringSize);
-					outBuf += stringSize;
-				
-					// save def
-					memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
-					outBuf += sizeof(GpuConstantDefinition);
-				}
-
-
-				GpuProgramManager::getSingleton().addMicrocodeToCache(String("D3D9_HLSL_") + mName, newMicrocode);
+				addMicrocodeToCache();
 			}
 		}
     }
+    //-----------------------------------------------------------------------
+	void D3D9HLSLProgram::addMicrocodeToCache()
+	{
+		// add to the microcode to the cache
+		GpuProgramManager::Microcode newMicrocode;
+
+		size_t sizeOfBuffer = sizeof(size_t) + mpMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
+		newMicrocode.resize(sizeOfBuffer);
+
+		uint8 * outBuf = &newMicrocode[0];
+
+		// save size of microcode
+		size_t microcodeSize = mpMicroCode->GetBufferSize();
+		memcpy(outBuf, &microcodeSize, sizeof(size_t));
+		outBuf += sizeof(size_t);
+
+		// save microcode
+		memcpy(outBuf, mpMicroCode->GetBufferPointer(), microcodeSize);
+		outBuf += microcodeSize;
+
+		// save size of param map
+		size_t parametersMapSize = mParametersMap.size();
+		memcpy(outBuf, &parametersMapSize, sizeof(size_t));
+		outBuf += sizeof(size_t);
+
+		// save params
+		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+		for (; iter != iterE ; iter++)
+		{
+			const String & paramName = iter->first;
+			const GpuConstantDefinition & def = iter->second;
+
+			// save string size
+			size_t stringSize = paramName.size();
+			memcpy(outBuf, &stringSize, sizeof(size_t));
+			outBuf += sizeof(size_t);
+
+			// save string
+			memcpy(outBuf, &paramName[0], stringSize);
+			outBuf += stringSize;
+
+			// save def
+			memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
+			outBuf += sizeof(GpuConstantDefinition);
+		}
+
+
+		GpuProgramManager::getSingleton().addMicrocodeToCache(String("D3D9_HLSL_") + mName, newMicrocode);
+	}
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::createLowLevelImpl(void)
     {
@@ -726,7 +731,6 @@ namespace Ogre {
 
         return language;
     }
-
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String D3D9HLSLProgram::CmdEntryPoint::doGet(const void *target) const

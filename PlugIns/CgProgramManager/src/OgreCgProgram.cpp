@@ -225,52 +225,57 @@ namespace Ogre {
 
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
-				// add to the microcode to the cache
-				GpuProgramManager::Microcode newMicrocode;
-				newMicrocode.resize(sizeof(size_t) + mProgramString.size() + sizeof(size_t) + mParametersMapSizeAsBuffer);
-				uint8 * outBuf = &newMicrocode[0];
-				// save size of string
-				size_t programStringSize = mProgramString.size();
-				memcpy(outBuf, &programStringSize, sizeof(size_t));
-				outBuf += sizeof(size_t);
-
-				// save microcode
-				memcpy(outBuf, &mProgramString[0],programStringSize);
-				outBuf += programStringSize;
-
-				// save size of param map
-				size_t parametersMapSize = mParametersMap.size();
-				memcpy(outBuf, &parametersMapSize, sizeof(size_t));
-				outBuf += sizeof(size_t);
-				
-				// save params
-				GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
-				GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
-				for (; iter != iterE ; iter++)
-				{
-					const String & paramName = iter->first;
-					const GpuConstantDefinition & def = iter->second;
-					
-					// save string size
-					size_t stringSize = paramName.size();
-					memcpy(outBuf, &stringSize, sizeof(size_t));
-					outBuf += sizeof(size_t);
-
-					// save string
-					memcpy(outBuf, &paramName[0], stringSize);
-					outBuf += stringSize;
-				
-					// save def
-					memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
-					outBuf += sizeof(GpuConstantDefinition);
-				}
-
-				GpuProgramManager::getSingleton().addMicrocodeToCache(String("CG_") + mName, newMicrocode);
+				addMicrocodeToCache();
 			}
 		}
 
 
     }
+    //-----------------------------------------------------------------------
+	void CgProgram::addMicrocodeToCache()
+	{
+		// add to the microcode to the cache
+		GpuProgramManager::Microcode newMicrocode;
+		newMicrocode.resize(sizeof(size_t) + mProgramString.size() + sizeof(size_t) + mParametersMapSizeAsBuffer);
+		uint8 * outBuf = &newMicrocode[0];
+		// save size of string
+		size_t programStringSize = mProgramString.size();
+		memcpy(outBuf, &programStringSize, sizeof(size_t));
+		outBuf += sizeof(size_t);
+
+		// save microcode
+		memcpy(outBuf, &mProgramString[0],programStringSize);
+		outBuf += programStringSize;
+
+		// save size of param map
+		size_t parametersMapSize = mParametersMap.size();
+		memcpy(outBuf, &parametersMapSize, sizeof(size_t));
+		outBuf += sizeof(size_t);
+
+		// save params
+		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+		for (; iter != iterE ; iter++)
+		{
+			const String & paramName = iter->first;
+			const GpuConstantDefinition & def = iter->second;
+
+			// save string size
+			size_t stringSize = paramName.size();
+			memcpy(outBuf, &stringSize, sizeof(size_t));
+			outBuf += sizeof(size_t);
+
+			// save string
+			memcpy(outBuf, &paramName[0], stringSize);
+			outBuf += stringSize;
+
+			// save def
+			memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
+			outBuf += sizeof(GpuConstantDefinition);
+		}
+
+		GpuProgramManager::getSingleton().addMicrocodeToCache(String("CG_") + mName, newMicrocode);
+	}
     //-----------------------------------------------------------------------
     void CgProgram::createLowLevelImpl(void)
     {
@@ -779,8 +784,7 @@ namespace Ogre {
 
         return language;
     }
-
-
+    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String CgProgram::CmdEntryPoint::doGet(const void *target) const
