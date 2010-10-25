@@ -78,8 +78,7 @@ namespace Ogre {
         mActive = true;
         mWindow = nil;
         mContext = NULL;
-        mAnimationTimer = OGRE_NEW Ogre::Timer();
-        
+
         // Check for content scaling.  iOS 4 or later
         mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
         if(mCurrentOSVersion >= 4.0)
@@ -107,8 +106,6 @@ namespace Ogre {
 
         mClosed = true;
         mActive = false;
-        
-        OGRE_DELETE mAnimationTimer;
 
         if (!mIsExternal)
         {
@@ -415,13 +412,6 @@ namespace Ogre {
         {
             return;
         }
-        
-        if (mAnimationTimer->getMilliseconds() < kSwapInterval)
-        {
-            return;
-        }
-
-        mAnimationTimer->reset();
 
 #if GL_APPLE_framebuffer_multisample
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
