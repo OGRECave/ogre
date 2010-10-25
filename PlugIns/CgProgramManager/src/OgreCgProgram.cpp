@@ -119,8 +119,72 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void CgProgram::loadFromSource(void)
     {
+	    selectProfile();
+
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		{
+			getMicrocodeFromCache();
+		}
+		else
+		{
+			compileMicrocode();
+		}
+	}
+    //-----------------------------------------------------------------------
+    void CgProgram::getMicrocodeFromCache(void)
+    {
+		GpuProgramManager::Microcode cacheMicrocode = 
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+		
+		uint8 * inBuf = &cacheMicrocode[0];
+
+		// get size of string
+		size_t programStringSize = 0;
+		memcpy(&programStringSize, inBuf, sizeof(size_t));
+		inBuf += sizeof(size_t);
+
+		// get microcode
+		mProgramString.resize(programStringSize);
+		memcpy(&mProgramString[0], inBuf,  programStringSize);
+		inBuf += programStringSize;
+
+		// get size of param map
+		size_t parametersMapSize = 0;
+		memcpy(&parametersMapSize, inBuf, sizeof(size_t));
+		inBuf += sizeof(size_t);
+				
+		// get params
+		for(size_t i = 0 ; i < parametersMapSize ; i++)
+		{
+			String paramName;
+			size_t stringSize = 0;
+			GpuConstantDefinition def;
+			
+			// get string size
+			memcpy(&stringSize, inBuf, sizeof(size_t));
+			inBuf += sizeof(size_t);
+
+			// get string
+			paramName.resize(stringSize);
+			memcpy(&paramName[0], inBuf, stringSize);
+			inBuf += stringSize;
+		
+			// get def
+			memcpy( &def, inBuf, sizeof(GpuConstantDefinition));
+			inBuf += sizeof(GpuConstantDefinition);
+
+			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+		}
+
+	}
+    //-----------------------------------------------------------------------
+    void CgProgram::compileMicrocode(void)
+    {
         // Create Cg Program
-        selectProfile();
+  
+        /// Program handle
+        CGprogram cgProgram;
+
 		if (mSelectedCgProfile == CG_PROFILE_UNKNOWN)
 		{
 			LogManager::getSingleton().logMessage(
@@ -131,7 +195,7 @@ namespace Ogre {
         buildArgs();
 		// deal with includes
 		String sourceToUse = resolveCgIncludes(mSource, this, mFilename);
-        mCgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
+        cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
             mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
 
         // Test
@@ -140,6 +204,71 @@ namespace Ogre {
         // Check for errors
         checkForCgError("CgProgram::loadFromSource", 
             "Unable to compile Cg program " + mName + ": ", mCgContext);
+
+        CGerror error = cgGetError();
+        if (error == CG_NO_ERROR)
+        {
+			// get program string (result of cg compile)
+			mProgramString = cgGetProgramString(cgProgram, CG_COMPILED_PROGRAM);
+			
+			// get params
+			mParametersMap.clear();
+			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
+			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
+
+			// Unload Cg Program - we don't need it anymore
+			cgDestroyProgram(cgProgram);
+			checkForCgError("CgProgram::unloadImpl", 
+				"Error while unloading Cg program " + mName + ": ", 
+				mCgContext);
+			cgProgram = 0;
+
+			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+			{
+				// add to the microcode to the cache
+				GpuProgramManager::Microcode newMicrocode;
+				newMicrocode.resize(sizeof(size_t) + mProgramString.size() + sizeof(size_t) + mParametersMapSizeAsBuffer);
+				uint8 * outBuf = &newMicrocode[0];
+				// save size of string
+				size_t programStringSize = mProgramString.size();
+				memcpy(outBuf, &programStringSize, sizeof(size_t));
+				outBuf += sizeof(size_t);
+
+				// save microcode
+				memcpy(outBuf, &mProgramString[0],programStringSize);
+				outBuf += programStringSize;
+
+				// save size of param map
+				size_t parametersMapSize = mParametersMap.size();
+				memcpy(outBuf, &parametersMapSize, sizeof(size_t));
+				outBuf += sizeof(size_t);
+				
+				// save params
+				GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+				GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+				for (; iter != iterE ; iter++)
+				{
+					const String & paramName = iter->first;
+					const GpuConstantDefinition & def = iter->second;
+					
+					// save string size
+					size_t stringSize = paramName.size();
+					memcpy(outBuf, &stringSize, sizeof(size_t));
+					outBuf += sizeof(size_t);
+
+					// save string
+					memcpy(outBuf, &paramName[0], stringSize);
+					outBuf += stringSize;
+				
+					// save def
+					memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
+					outBuf += sizeof(GpuConstantDefinition);
+				}
+
+				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+			}
+		}
+
 
     }
     //-----------------------------------------------------------------------
@@ -161,9 +290,7 @@ namespace Ogre {
 				HighLevelGpuProgramPtr vp = 
 					HighLevelGpuProgramManager::getSingleton().createProgram(
 					mName, mGroup, "hlsl", mType);
-				String hlslSourceFromCg = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
-				
-				vp->setSource(hlslSourceFromCg);
+				vp->setSource(mProgramString);
 				vp->setParameter("target", mSelectedProfile);
 				vp->setParameter("entry_point", "main");
 
@@ -173,20 +300,17 @@ namespace Ogre {
 			}
 			else
 			{
-
-				String shaderAssemblerCode = cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM);
-
                 if (mType == GPT_FRAGMENT_PROGRAM) {
                     //HACK : http://developer.nvidia.com/forums/index.php?showtopic=1063&pid=2378&mode=threaded&start=#entry2378
                     //Still happens in CG 2.2. Remove hack when fixed.
-                    shaderAssemblerCode = StringUtil::replaceAll(shaderAssemblerCode, "oDepth.z", "oDepth");
+                    mProgramString = StringUtil::replaceAll(mProgramString, "oDepth.z", "oDepth");
                 }
 				// Create a low-level program, give it the same name as us
 				mAssemblerProgram = 
 					GpuProgramManager::getSingleton().createProgramFromString(
 					mName, 
 					mGroup,
-					shaderAssemblerCode,
+					mProgramString,
 					mType, 
 					mSelectedProfile);
 			}
@@ -197,16 +321,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void CgProgram::unloadHighLevelImpl(void)
     {
-        // Unload Cg Program
-        // Lowlevel program will get unloaded elsewhere
-        if (mCgProgram)
-        {
-            cgDestroyProgram(mCgProgram);
-            checkForCgError("CgProgram::unloadImpl", 
-                "Error while unloading Cg program " + mName + ": ", 
-                mCgContext);
-            mCgProgram = 0;
-        }
     }
     //-----------------------------------------------------------------------
     void CgProgram::buildConstantDefinitions() const
@@ -214,14 +328,45 @@ namespace Ogre {
         // Derive parameter names from Cg
 		createParameterMappingStructures(true);
 
-		if (!mCgProgram)
+		if ( mProgramString.empty() )
 			return;
+				
+		mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
+		mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 
-		recurseParams(cgGetFirstParameter(mCgProgram, CG_PROGRAM));
-        recurseParams(cgGetFirstParameter(mCgProgram, CG_GLOBAL));
+		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+		for (; iter != iterE ; iter++)
+		{
+			const String & paramName = iter->first;
+			GpuConstantDefinition def = iter->second;
+
+			mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(iter->first, iter->second));
+
+			// Record logical / physical mapping
+			if (def.isFloat())
+			{
+				OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+				mFloatLogicalToPhysical->map.insert(
+					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+			}
+			else
+			{
+				OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+				mIntLogicalToPhysical->map.insert(
+					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+			}
+
+			// Deal with array indexing
+			mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
+		}
 	}
 	//---------------------------------------------------------------------
-	void CgProgram::recurseParams(CGparameter parameter, size_t contextArraySize) const
+	void CgProgram::recurseParams(CGparameter parameter, size_t contextArraySize)
 	{
 		while (parameter != 0)
         {
@@ -316,37 +461,35 @@ namespace Ogre {
 						}
 					}
 
-
 					def.logicalIndex = logicalIndex;
-					mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+					if( mParametersMap.find(paramName) == mParametersMap.end())
+					{
+						mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+						mParametersMapSizeAsBuffer += sizeof(size_t);
+						mParametersMapSizeAsBuffer += paramName.size();
+						mParametersMapSizeAsBuffer += sizeof(GpuConstantDefinition);
+					}
 
 					// Record logical / physical mapping
 					if (def.isFloat())
 					{
 						OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
 						mFloatLogicalToPhysical->map.insert(
-							GpuLogicalIndexUseMap::value_type(logicalIndex, 
+							GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
 								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 						mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-						mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
 					}
 					else
 					{
 						OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
 						mIntLogicalToPhysical->map.insert(
-							GpuLogicalIndexUseMap::value_type(logicalIndex, 
+							GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
 								GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 						mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-						mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 					}
 
-					// Deal with array indexing
-					mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
-
 					break;
-		
-				}
-					
+				}					
             }
             // Get next
             parameter = cgGetNextParameter(parameter);
@@ -448,8 +591,8 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, CGcontext context)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader), 
-        mCgContext(context), mCgProgram(0), 
-        mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0)
+        mCgContext(context), 
+        mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0)
     {
         if (createParamDictionary("CgProgram"))
         {

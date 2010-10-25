@@ -218,30 +218,12 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
 	{
-		if(val && !canGetCompiledShaderBuffer())
-		{
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                "Can't save microcodes to cache with this render system.", 
-                "GpuProgramManager::setSaveMicrocodesToCache");
-        }
-		else
-		{
-			mSaveMicrocodesToCache = val;
-		}
-
-		
+		mSaveMicrocodesToCache = val;		
 	}
 	//---------------------------------------------------------------------
 	bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
 	{
-		if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() )
-		{
-			return mMicrocodeCache.find(name) != mMicrocodeCache.end();
-		}
-		else
-		{
-			return false;
-		}
+		return mMicrocodeCache.find(name) != mMicrocodeCache.end();
 	}
 	//---------------------------------------------------------------------
 	const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const

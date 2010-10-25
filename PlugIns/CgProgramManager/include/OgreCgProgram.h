@@ -89,19 +89,23 @@ namespace Ogre {
         void buildConstantDefinitions() const;
 
 		/// Recurse down structures getting data on parameters
-		void recurseParams(CGparameter param, size_t contextArraySize = 1) const;
+		void recurseParams(CGparameter param, size_t contextArraySize = 1);
 		/// Turn a Cg type into a GpuConstantType and number of elements
 		void mapTypeAndElementSize(CGtype cgType, bool isRegisterCombiner, GpuConstantDefinition& def) const;
 
         StringVector mProfiles;
         String mEntryPoint;
         String mSelectedProfile;
+		String mProgramString;
         CGprofile mSelectedCgProfile;
         String mCompileArgs;
         // Unfortunately Cg uses char** for arguments - bleh
         // This is a null-terminated list of char* (each null terminated)
         char** mCgArguments;
-
+		
+		GpuConstantDefinitionMap mParametersMap;
+		size_t mParametersMapSizeAsBuffer;
+		
         /// Internal method which works out which profile to use for this program
         void selectProfile(void);
         /// Internal method which merges manual and automatic compile arguments
@@ -109,6 +113,8 @@ namespace Ogre {
         /// Releases memory for the horrible Cg char**
         void freeCgArgs(void);
 
+		void getMicrocodeFromCache(void);
+		void compileMicrocode(void);
 
     public:
         CgProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -135,7 +141,6 @@ namespace Ogre {
 
 		/// scan the file for #include and replace with source from the OGRE resources
 		static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
-
     };
 }
 

@@ -153,7 +153,8 @@ namespace Ogre {
 	{
 		if (!mLinked)
 		{			
-			if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
+			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
+				 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
 			{
 				getMicrocodeFromCache();
 			}
