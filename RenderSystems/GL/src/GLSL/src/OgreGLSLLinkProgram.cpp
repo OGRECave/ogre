@@ -171,10 +171,13 @@ namespace Ogre {
 		GpuProgramManager::Microcode cacheMicrocode = 
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 		
+		GLenum binaryFormat = *((GLenum *)(cacheMicrocode->getPtr()));
+		void * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
+		size_t sizeOfBuffer = cacheMicrocode->size() - sizeof(GLenum);
 		glProgramBinary(mGLHandle, 
-						*((GLenum *)(&cacheMicrocode[0])), 
-						&cacheMicrocode[sizeof(GLenum)],
-						cacheMicrocode.size() - sizeof(GLenum)
+						binaryFormat, 
+						programBuffer,
+						sizeOfBuffer
 						);
 
 		GLint   success = 0;
@@ -513,7 +516,8 @@ namespace Ogre {
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 				// add to the microcode to the cache
-				GpuProgramManager::Microcode newMicrocode;
+				String name;
+				name = getCombinedName();
 
 				// get buffer size
 				GLint binaryLength = 0;
@@ -524,12 +528,11 @@ namespace Ogre {
 				GLenum binaryFormat = 0; 
 
 				// get the buffer
-				newMicrocode.resize(binaryLength + sizeof(GLenum));
-				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, &newMicrocode[sizeof(GLenum)]);
-				memcpy(&newMicrocode[0], &binaryFormat, sizeof(GLenum));
+				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum)));
+				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, newMicrocode->getPtr() + sizeof(GLenum));
+				memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
 
-				String name;
-				name = getCombinedName();
+
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
 		}

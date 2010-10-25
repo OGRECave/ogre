@@ -50,7 +50,7 @@ namespace Ogre {
 		typedef set<String>::type SyntaxCodes;
 		typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
 
-		typedef vector<uint8>::type Microcode;
+		typedef MemoryDataStreamPtr Microcode;
 		typedef map<String, Microcode>::type MicrocodeMap;
 
 	protected:

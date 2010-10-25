@@ -245,15 +245,13 @@ namespace Ogre {
 		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
 		if ( foundIter == mMicrocodeCache.end() )
 		{
-			Microcode empty;
-			mMicrocodeCache.insert(make_pair(nameWithRenderSystem, empty));
-			foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+			mMicrocodeCache.insert(make_pair(nameWithRenderSystem, microcode));
 		}
+		else
+		{
+			foundIter->second = microcode;
 
-		Microcode & cacheMicrocode = foundIter->second;
-		cacheMicrocode.resize(microcode.size());
-		memcpy(&cacheMicrocode[0], &microcode[0], microcode.size());
-		
+		}		
 	}
 	//---------------------------------------------------------------------
 	void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
@@ -284,9 +282,9 @@ namespace Ogre {
 			// saves the microcode
 			{
 				const Microcode & microcodeOfShader = iter->second;
-				size_t microcodeLength = microcodeOfShader.size();
+				size_t microcodeLength = microcodeOfShader->size();
 				stream->write(&microcodeLength, sizeof(size_t));				
-				stream->write(&microcodeOfShader[0], microcodeLength);
+				stream->write(microcodeOfShader->getPtr(), microcodeLength);
 			}
 		}
 	}
@@ -304,26 +302,21 @@ namespace Ogre {
 		for ( size_t i = 0 ; i < sizeOfArray ; i++ )
 		{
 			String nameOfShader;
-
 			// loads the name of the shader
-			{
-				size_t stringLength  = 0;
-				stream->read(&stringLength, sizeof(size_t));
-				nameOfShader.resize(stringLength);				
-				stream->read(&nameOfShader[0], stringLength);
-				Microcode empty;
-				mMicrocodeCache.insert(make_pair(nameOfShader, empty));
+			size_t stringLength  = 0;
+			stream->read(&stringLength, sizeof(size_t));
+			nameOfShader.resize(stringLength);				
+			stream->read(&nameOfShader[0], stringLength);
 
-			}
 			// loads the microcode
-			{
-				size_t microcodeLength = 0;
-				stream->read(&microcodeLength, sizeof(size_t));		
+			size_t microcodeLength = 0;
+			stream->read(&microcodeLength, sizeof(size_t));		
 
-				Microcode & microcodeOfShader = mMicrocodeCache.find(nameOfShader)->second;
-				microcodeOfShader.resize(microcodeLength);		
-				stream->read(&microcodeOfShader[0], microcodeLength);
-			}
+			Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(nameOfShader, microcodeLength)); 		
+			microcodeOfShader->seek(0);
+			stream->read(microcodeOfShader->getPtr(), microcodeLength);
+
+			mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
 		}
 	}
 	//---------------------------------------------------------------------
