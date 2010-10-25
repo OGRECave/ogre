@@ -86,7 +86,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::loadFromSource(void)
     {
-		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("D3D9_HLSL_") + mName) )
 		{
 			getMicrocodeFromCache();
 		}
@@ -99,15 +99,47 @@ namespace Ogre {
     void D3D9HLSLProgram::getMicrocodeFromCache(void)
     {
 		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(String("D3D9_HLSL_") + mName);
 		
-		HRESULT hr=D3DXCreateBuffer(cacheMicrocode.size(), &mpMicroCode); 
+		uint8 * inBuf = &cacheMicrocode[0];
 
-		if(mpMicroCode)
-		{
-			memcpy(mpMicroCode->GetBufferPointer(), &cacheMicrocode[0], cacheMicrocode.size());
-		}
+		// get size the microcode
+		size_t microcodeSize = 0;
+		memcpy(&microcodeSize, inBuf, sizeof(size_t));
+		inBuf += sizeof(size_t);
+
+		// get microcode
+		HRESULT hr=D3DXCreateBuffer(microcodeSize, &mpMicroCode); 
+		memcpy(mpMicroCode->GetBufferPointer(), inBuf, microcodeSize);
+		inBuf += microcodeSize;
 		
+		// get size of param map
+		size_t parametersMapSize = 0;
+		memcpy(&parametersMapSize, inBuf, sizeof(size_t));
+		inBuf += sizeof(size_t);
+				
+		// get params
+		for(size_t i = 0 ; i < parametersMapSize ; i++)
+		{
+			String paramName;
+			size_t stringSize = 0;
+			GpuConstantDefinition def;
+			
+			// get string size
+			memcpy(&stringSize, inBuf, sizeof(size_t));
+			inBuf += sizeof(size_t);
+
+			// get string
+			paramName.resize(stringSize);
+			memcpy(&paramName[0], inBuf, stringSize);
+			inBuf += stringSize;
+		
+			// get def
+			memcpy( &def, inBuf, sizeof(GpuConstantDefinition));
+			inBuf += sizeof(GpuConstantDefinition);
+
+			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+		}
 	}
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::compileMicrocode(void)
@@ -226,6 +258,8 @@ namespace Ogre {
 		// include handler
 		HLSLIncludeHandler includeHandler(this);
 
+        LPD3DXCONSTANTTABLE pConstTable;
+
         // Compile & assemble into microcode
         HRESULT hr = D3DXCompileShader(
             mSource.c_str(),
@@ -237,7 +271,7 @@ namespace Ogre {
             compileFlags,
             &mpMicroCode,
             &errors,
-            &mpConstTable);
+            &pConstTable);
 
         if (FAILED(hr))
         {
@@ -254,13 +288,77 @@ namespace Ogre {
         }
 		else
 		{
+
+			// Get contents of the constant table
+			D3DXCONSTANTTABLE_DESC desc;
+			HRESULT hr = pConstTable->GetDesc(&desc);
+
+			createParameterMappingStructures(true);
+
+			if (FAILED(hr))
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Cannot retrieve constant descriptions from HLSL program.", 
+					"D3D9HLSLProgram::buildParameterNameMap");
+			}
+			// Iterate over the constants
+			for (unsigned int i = 0; i < desc.Constants; ++i)
+			{
+				// Recursively descend through the structure levels
+				processParamElement(pConstTable, NULL, "", i);
+			}
+
+
+			SAFE_RELEASE(pConstTable);
+
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 				// add to the microcode to the cache
 				GpuProgramManager::Microcode newMicrocode;
-				newMicrocode.resize(mpMicroCode->GetBufferSize());
-				memcpy(&newMicrocode[0], mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
-				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+				
+				size_t sizeOfBuffer = sizeof(size_t) + mpMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
+				newMicrocode.resize(sizeOfBuffer);
+				
+				uint8 * outBuf = &newMicrocode[0];
+
+				// save size of microcode
+				size_t microcodeSize = mpMicroCode->GetBufferSize();
+				memcpy(outBuf, &microcodeSize, sizeof(size_t));
+				outBuf += sizeof(size_t);
+
+				// save microcode
+				memcpy(outBuf, mpMicroCode->GetBufferPointer(), microcodeSize);
+				outBuf += microcodeSize;
+
+				// save size of param map
+				size_t parametersMapSize = mParametersMap.size();
+				memcpy(outBuf, &parametersMapSize, sizeof(size_t));
+				outBuf += sizeof(size_t);
+				
+				// save params
+				GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+				GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+				for (; iter != iterE ; iter++)
+				{
+					const String & paramName = iter->first;
+					const GpuConstantDefinition & def = iter->second;
+					
+					// save string size
+					size_t stringSize = paramName.size();
+					memcpy(outBuf, &stringSize, sizeof(size_t));
+					outBuf += sizeof(size_t);
+
+					// save string
+					memcpy(outBuf, &paramName[0], stringSize);
+					outBuf += stringSize;
+				
+					// save def
+					memcpy(outBuf, &def, sizeof(GpuConstantDefinition));
+					outBuf += sizeof(GpuConstantDefinition);
+				}
+
+
+				GpuProgramManager::getSingleton().addMicrocodeToCache(String("D3D9_HLSL_") + mName, newMicrocode);
 			}
 		}
     }
@@ -285,47 +383,58 @@ namespace Ogre {
     void D3D9HLSLProgram::unloadHighLevelImpl(void)
     {
         SAFE_RELEASE(mpMicroCode);
-        SAFE_RELEASE(mpConstTable);
 
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::buildConstantDefinitions() const
     {
-        // Derive parameter names from const table
-        assert(mpConstTable && "Program not loaded!");
-        // Get contents of the constant table
-        D3DXCONSTANTTABLE_DESC desc;
-        HRESULT hr = mpConstTable->GetDesc(&desc);
+		mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
+		mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 
-		createParameterMappingStructures(true);
+		GpuConstantDefinitionMap::const_iterator iter = mParametersMap.begin();
+		GpuConstantDefinitionMap::const_iterator iterE = mParametersMap.end();
+		for (; iter != iterE ; iter++)
+		{
+			const String & paramName = iter->first;
+			GpuConstantDefinition def = iter->second;
 
-        if (FAILED(hr))
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-                "Cannot retrieve constant descriptions from HLSL program.", 
-                "D3D9HLSLProgram::buildParameterNameMap");
-        }
-        // Iterate over the constants
-        for (unsigned int i = 0; i < desc.Constants; ++i)
-        {
-            // Recursively descend through the structure levels
-            processParamElement(NULL, "", i);
-        }
+			mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(iter->first, iter->second));
 
+			// Record logical / physical mapping
+			if (def.isFloat())
+			{
+				OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex)
+				mFloatLogicalToPhysical->map.insert(
+					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+			}
+			else
+			{
+				OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex)
+				mIntLogicalToPhysical->map.insert(
+					GpuLogicalIndexUseMap::value_type(def.logicalIndex, 
+						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+				mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+			}
+
+			// Deal with array indexing
+			mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
+		}
         
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::processParamElement(D3DXHANDLE parent, String prefix, 
-        unsigned int index) const
+    void D3D9HLSLProgram::processParamElement(LPD3DXCONSTANTTABLE pConstTable, D3DXHANDLE parent, String prefix, 
+        unsigned int index)
     {
-        D3DXHANDLE hConstant = mpConstTable->GetConstant(parent, index);
+        D3DXHANDLE hConstant = pConstTable->GetConstant(parent, index);
 
         // Since D3D HLSL doesn't deal with naming of array and struct parameters
         // automatically, we have to do it by hand
 
         D3DXCONSTANT_DESC desc;
         unsigned int numParams = 1;
-        HRESULT hr = mpConstTable->GetConstantDesc(hConstant, &desc, &numParams);
+        HRESULT hr = pConstTable->GetConstantDesc(hConstant, &desc, &numParams);
         if (FAILED(hr))
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
@@ -352,7 +461,7 @@ namespace Ogre {
             // Cascade into struct
             for (unsigned int i = 0; i < desc.StructMembers; ++i)
             {
-                processParamElement(hConstant, prefix, i);
+                processParamElement(pConstTable, hConstant, prefix, i);
             }
         }
         else
@@ -375,7 +484,6 @@ namespace Ogre {
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 					mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-					mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
 				}
 				else
 				{
@@ -385,13 +493,16 @@ namespace Ogre {
 						GpuLogicalIndexUseMap::value_type(paramIndex, 
 						GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
 					mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-					mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
 				}
 
-                mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(name, def));
-
-				// Now deal with arrays
-				mConstantDefs->generateConstantDefinitionArrayEntries(name, def);
+				if( mParametersMap.find(paramName) == mParametersMap.end())
+				{
+					mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+					mParametersMapSizeAsBuffer += sizeof(size_t);
+					mParametersMapSizeAsBuffer += paramName.size();
+					mParametersMapSizeAsBuffer += sizeof(GpuConstantDefinition);
+				}
+                
             }
         }
             
@@ -536,8 +647,9 @@ namespace Ogre {
         , mEntryPoint()
         , mPreprocessorDefines()
         , mColumnMajorMatrices(true)
-        , mpMicroCode(NULL), mpConstTable(NULL)
+        , mpMicroCode(NULL)
 		, mOptimisationLevel(OPT_DEFAULT)
+		, mParametersMapSizeAsBuffer(0)
     {
         if (createParamDictionary("D3D9HLSLProgram"))
         {

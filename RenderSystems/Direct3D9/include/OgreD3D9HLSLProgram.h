@@ -116,7 +116,7 @@ namespace Ogre {
         void buildConstantDefinitions() const;
 
         // Recursive utility method for buildParamNameMap
-        void processParamElement(D3DXHANDLE parent, String prefix, unsigned int index) const;
+        void processParamElement(LPD3DXCONSTANTTABLE pConstTable, D3DXHANDLE parent, String prefix, unsigned int index);
 		void populateDef(D3DXCONSTANT_DESC& d3dDesc, GpuConstantDefinition& def) const;
 
         String mTarget;
@@ -125,7 +125,9 @@ namespace Ogre {
         bool mColumnMajorMatrices;
 
         LPD3DXBUFFER mpMicroCode;
-        LPD3DXCONSTANTTABLE mpConstTable;
+
+		GpuConstantDefinitionMap mParametersMap;
+		size_t mParametersMapSizeAsBuffer;
 
 	public:
 		LPD3DXBUFFER getMicroCode();

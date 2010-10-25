@@ -121,7 +121,7 @@ namespace Ogre {
     {
 	    selectProfile();
 
-		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("CG_") + mName) )
 		{
 			getMicrocodeFromCache();
 		}
@@ -134,7 +134,7 @@ namespace Ogre {
     void CgProgram::getMicrocodeFromCache(void)
     {
 		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(String("CG_") + mName);
 		
 		uint8 * inBuf = &cacheMicrocode[0];
 
@@ -265,7 +265,7 @@ namespace Ogre {
 					outBuf += sizeof(GpuConstantDefinition);
 				}
 
-				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+				GpuProgramManager::getSingleton().addMicrocodeToCache(String("CG_") + mName, newMicrocode);
 			}
 		}
 
