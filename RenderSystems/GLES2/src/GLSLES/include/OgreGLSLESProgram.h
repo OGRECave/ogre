@@ -124,7 +124,12 @@ namespace Ogre {
         void buildConstantDefinitions() const;
 		/// compile source into shader object
 		bool compile( const bool checkErrors = false);
-
+		/** check the compile result for an error with default precision - and recompile if needed.
+			some glsl compilers return an error default precision is set to types other then
+			int or float, this function test a failed compile result for the error,
+			delete the needed lines from the source if needed then try to re-compile.
+		*/
+		void checkAndFixInvalidDefaultPrecisionError( String &message );
 	private:
 		/// GL handle for shader object
 		GLuint mGLHandle;

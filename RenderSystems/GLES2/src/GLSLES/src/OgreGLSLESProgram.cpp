@@ -195,7 +195,12 @@ namespace Ogre {
 		// Check for compile errors
 		glGetShaderiv(mGLHandle, GL_COMPILE_STATUS, &mCompiled);
         if(!mCompiled && checkErrors)
-            logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
+		{
+            String message = logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
+			checkAndFixInvalidDefaultPrecisionError(message);
+
+			
+		}
 
 		// Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
@@ -315,6 +320,60 @@ namespace Ogre {
 		GpuProgramParametersSharedPtr params = HighLevelGpuProgram::createParameters();
 		params->setTransposeMatrices(true);
 		return params;
+	}
+	//-----------------------------------------------------------------------
+	void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
+	{
+		String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
+		vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
+		if( message.find(precisionQualifierErrorString) != -1 )
+		{
+			LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
+
+			// remove relevant lines from source
+			vector< String >::type errors = StringUtil::split(message, "\n");
+
+			// going from the end so when we delete a line the numbers of the lines before will not change
+			for(size_t i = errors.size() - 1 ; i != -1 ; i--)
+			{
+				String & curError = errors[i];
+				size_t foundPos = curError.find(precisionQualifierErrorString);
+				if(foundPos != -1)
+				{
+					String lineNumber = curError.substr(0, foundPos);
+					size_t posOfStartOfNumber = lineNumber.find_last_of(':');
+					if (posOfStartOfNumber != -1)
+					{
+						lineNumber = lineNumber.substr(posOfStartOfNumber +	1, lineNumber.size() - (posOfStartOfNumber + 1));
+						if (StringConverter::isNumber(lineNumber))
+						{
+							int iLineNumber = StringConverter::parseInt(lineNumber);
+							linesOfSource.erase(linesOfSource.begin() + iLineNumber - 1);
+						}
+					}
+				}
+			}	
+			// rebuild source
+			std::stringstream newSource;	
+			for(size_t i = 0; i < linesOfSource.size()  ; i++)
+			{
+				newSource << linesOfSource[i] << "\n";
+			}
+			mSource = newSource.str();
+
+			const char *source = mSource.c_str();
+			glShaderSource(mGLHandle, 1, &source, NULL);
+			// Check for load errors
+			GL_CHECK_ERROR
+				if (compile())
+				{
+					LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
+				}
+				else
+				{
+					LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
+				}
+		}
 	}
 	//-----------------------------------------------------------------------
 	RenderOperation::OperationType parseOperationType(const String& val)
