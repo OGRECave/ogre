@@ -47,12 +47,9 @@ namespace Ogre {
         // Unregister with group manager
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
-// on windows the emulation has a bug that makes this line crash
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
         // Delete warning texture
         glDeleteTextures(1, &mWarningTextureID);
         GL_CHECK_ERROR;
-#endif
     }
 
     Resource* GLES2TextureManager::createImpl(const String& name, ResourceHandle handle, 

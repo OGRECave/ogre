@@ -74,9 +74,10 @@ namespace Ogre {
             String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
             virtual String getDisplayName (void);
-	    EGLDisplay getGLDisplay(void);
+			EGLDisplay getGLDisplay(void);
 			void setGLDisplay(EGLDisplay val);
 			EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
+			EGLConfig* getConfigs(EGLint *nElements);
             EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
             void* getProcAddress(const Ogre::String& name);
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;

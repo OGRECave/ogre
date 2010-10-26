@@ -450,8 +450,11 @@ namespace Ogre {
             // Default precision declaration is required in fragment and vertex shaders.
             os << "precision highp float;" << ENDL;
             os << "precision highp int;" << ENDL;
+// not supported on the AMD emulation on win32 - and doesn't really matter to the PowerVR and ARM. 
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
             os << "precision lowp sampler2D;" << ENDL;
             os << "precision lowp samplerCube;" << ENDL;
+#endif
 
             // Generate source code header.
             writeProgramTitle(os, program);

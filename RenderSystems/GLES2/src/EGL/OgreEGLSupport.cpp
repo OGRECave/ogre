@@ -232,6 +232,35 @@ namespace Ogre {
         return configs;
     }
 
+    EGLConfig* EGLSupport::getConfigs(GLint *nElements)
+    {
+        EGLConfig *configs;
+
+        if (eglGetConfigs(mGLDisplay, NULL, 0, nElements) == EGL_FALSE)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Failed to choose config",
+                        __FUNCTION__);
+
+            *nElements = 0;
+            return 0;
+        }
+        EGL_CHECK_ERROR
+        configs = (EGLConfig*) malloc(*nElements * sizeof(EGLConfig));
+        if (eglGetConfigs(mGLDisplay, configs, *nElements, nElements) == EGL_FALSE)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Failed to choose config",
+                        __FUNCTION__);
+
+            *nElements = 0;
+            free(configs);
+            return 0;
+        }
+        EGL_CHECK_ERROR
+        return configs;
+    }
+
     EGLBoolean EGLSupport::getGLConfigAttrib(EGLConfig glConfig, GLint attribute, GLint *value)
     {
         EGLBoolean status;
@@ -350,6 +379,11 @@ namespace Ogre {
         int config, nConfigs = 0;
 
         glConfigs = chooseGLConfig(minAttribs, &nConfigs);
+
+        if (!nConfigs)
+        {
+			glConfigs = getConfigs(&nConfigs);
+		}
 
         if (!nConfigs)
         {
@@ -479,6 +513,8 @@ namespace Ogre {
 
     void EGLSupport::stop()
     {
+		eglTerminate(mGLDisplay);
+		EGL_CHECK_ERROR
     }
 
     void EGLSupport::setGLDisplay( EGLDisplay val )

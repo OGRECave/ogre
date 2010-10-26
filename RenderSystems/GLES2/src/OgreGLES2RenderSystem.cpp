@@ -391,7 +391,6 @@ namespace Ogre {
 
     void GLES2RenderSystem::shutdown(void)
     {
-        RenderSystem::shutdown();
 
         // Deleting the GLSL program factory
 		if (mGLSLESProgramFactory)
@@ -415,6 +414,8 @@ namespace Ogre {
 
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
+
+        RenderSystem::shutdown();
 
         mGLSupport->stop();
 
@@ -544,7 +545,12 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLES2RenderBuffer *stencilBuffer = depthBuffer;
-			if( depthFormat != GL_DEPTH24_STENCIL8_OES && stencilBuffer != GL_NONE )
+			if( 
+// not supported on AMD emulation for now...
+#ifdef GL_DEPTH24_STENCIL8_OES
+				depthFormat != GL_DEPTH24_STENCIL8_OES && 
+#endif
+				stencilBuffer != GL_NONE )
 			{
 				stencilBuffer = OGRE_NEW GLES2RenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );

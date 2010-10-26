@@ -273,6 +273,15 @@ namespace Ogre {
 
 		mNativeDisplay = GetDC(mWindow);
 		mEglDisplay = eglGetDisplay(mNativeDisplay);
+		
+		// fallback for some emulations 
+		if (mEglDisplay == EGL_NO_DISPLAY)
+		{
+			mEglDisplay = eglGetDisplay( EGL_DEFAULT_DISPLAY );
+		}
+		
+		eglInitialize(mEglDisplay, NULL, NULL);
+
 		mGLSupport->setGLDisplay(mEglDisplay);
 		mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
