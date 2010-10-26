@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLES2GpuProgram.h"
-#include "OgreRTShaderSystem.h"
 
 namespace Ogre {
     class GLES2Context;
@@ -45,17 +44,6 @@ namespace Ogre {
     class GLSLESGpuProgram;
     class HardwareBufferManager;
 
-    class _OgreGLES2Export ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
-    {
-        public:
-            ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator);
-            virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, const String& schemeName,
-                                                Material* originalMaterial, unsigned short lodIndex,
-                                                const Renderable* rend);
-        protected:	
-            RTShader::ShaderGenerator*	mShaderGenerator;			// The shader generator instance.
-    };
-    
     /**
       Implementation of GL ES 2.x as a rendering system.
      */
@@ -143,11 +131,6 @@ namespace Ogre {
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
-
-            /// The Shader generator instance.
-            RTShader::ShaderGenerator *mShaderGenerator;
-            /// Shader generator material manager listener.	
-            ShaderGeneratorTechniqueResolverListener *mMaterialMgrListener;
 
             bool activateGLTextureUnit(size_t unit);
 

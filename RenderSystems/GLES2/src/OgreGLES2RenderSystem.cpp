@@ -379,23 +379,6 @@ namespace Ogre {
 
         mTextureManager = OGRE_NEW GLES2TextureManager(*mGLSupport);
 
-        if (RTShader::ShaderGenerator::initialize())
-        {
-            // Grab the shader generator pointer.
-            mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
-
-            // Set shader cache path.
-            mShaderGenerator->setShaderCachePath(mGLSupport->getShaderCachePath());
-            mShaderGenerator->setTargetLanguage("glsles");		
-
-            mMaterialMgrListener = OGRE_NEW_FIX_FOR_WIN32 ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
-            MaterialManager::getSingleton().addListener(mMaterialMgrListener);
-
-            // Add the shader libs and cached resource location.
-            ResourceGroupManager::getSingleton().addResourceLocation(mGLSupport->getShaderLibraryPath(), "FileSystem");
-            ResourceGroupManager::getSingleton().addResourceLocation(mGLSupport->getShaderCachePath(), "FileSystem");
-        }
-
         GL_CHECK_ERROR;
         mGLInitialised = true;
     }
@@ -420,24 +403,6 @@ namespace Ogre {
 			mGLSLESProgramFactory = 0;
 		}
 
-        // Restore default scheme.
-        MaterialManager::getSingleton().setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
-
-        // Unregister the material manager listener.
-        if (mMaterialMgrListener != NULL)
-        {			
-            MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-            OGRE_DELETE mMaterialMgrListener;
-            mMaterialMgrListener = NULL;
-        }
-
-        // Finalize CRTShader system.
-        if (mShaderGenerator != NULL)
-        {
-            RTShader::ShaderGenerator::finalize();
-            mShaderGenerator = NULL;
-        }
-
 		// Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
         OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;
@@ -448,10 +413,10 @@ namespace Ogre {
         OGRE_DELETE mRTTManager;
         mRTTManager = 0;
 
-        mGLSupport->stop();
-
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
+
+        mGLSupport->stop();
 
         mGLInitialised = 0;
     }
@@ -1539,12 +1504,6 @@ namespace Ogre {
         GL_CHECK_ERROR;
         // Call super class
         RenderSystem::_render(op);
-        // Add a render state for per pixel lighting
-        Ogre::RTShader::RenderState* renderState =
-            mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        Ogre::RTShader::SubRenderState* perPerPixelLightModel =
-            mShaderGenerator->createSubRenderState("SGX_PerPixelLighting");
-        renderState->addTemplateSubRenderState(perPerPixelLightModel);
 
         void* pBufferData = 0;
 		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
@@ -2301,62 +2260,5 @@ namespace Ogre {
             }
         }
     }
-
-    /** This class demonstrates basic usage of the RTShader system.
-    It subclasses the material manager listener class and when a target scheme callback
-    is invoked with the shader generator scheme it tries to create an equivalent shader
-    based technique based on the default technique of the given material.
-    */
-	ShaderGeneratorTechniqueResolverListener::ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
-	{
-		mShaderGenerator = pShaderGenerator;			
-	}
-
-	/** This is the hook point where shader based technique will be created.
-	It will be called whenever the material manager won't find appropriate technique
-	that satisfy the target scheme name. If the scheme name is out target RT Shader System
-	scheme name we will try to create shader generated technique for it. 
-	*/
-	Technique* ShaderGeneratorTechniqueResolverListener::handleSchemeNotFound(unsigned short schemeIndex, 
-		const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-		const Renderable* rend)
-	{
-		Ogre::Technique* generatedTech = NULL;
-
-		// Case this is the default shader generator scheme.
-		if (schemeName == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-		{
-			bool techniqueCreated;
-
-			// Create shader generated technique for this material.
-			techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                                                                            originalMaterial->getName(), 
-                                                                            Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
-                                                                            schemeName);
-
-			// Case technique registration succeeded.
-			if (techniqueCreated)
-			{				
-				// Force creating the shaders for the generated technique.
-				mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
-				
-				// Grab the generated technique.
-				Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-				while (itTech.hasMoreElements())
-				{
-					Ogre::Technique* curTech = itTech.getNext();
-
-					if (curTech->getSchemeName() == schemeName)
-					{
-						generatedTech = curTech;
-						break;
-					}
-				}				
-			}
-		}
-
-		return generatedTech;
-	}
 
 }
