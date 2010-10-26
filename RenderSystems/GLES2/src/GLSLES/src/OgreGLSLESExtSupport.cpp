@@ -51,7 +51,7 @@ namespace Ogre
                 GL_CHECK_ERROR
             }
 
-			if (infologLength > 0)
+			if (infologLength > 1)
 			{
 				GLint charsWritten  = 0;
 
@@ -74,11 +74,20 @@ namespace Ogre
 					logMessage += "\n" + String(infoLog);
 				}
 
-                LogManager::getSingleton().logMessage(logMessage);
-
 				OGRE_DELETE [] infoLog;
+
+				if (logMessage.size() > 0)
+				{
+					// remove ends of line in the end - so there will be no empty lines in the log.
+					while( logMessage[logMessage.size() - 1] == '\n' )
+					{
+						logMessage.erase(logMessage.size() - 1, 1);
+					}
+					LogManager::getSingleton().logMessage(logMessage);
+				}
 			}
 		}
+
 
 		return logMessage;
 	}
