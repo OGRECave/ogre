@@ -57,6 +57,7 @@ namespace Ogre
 
 				//GLchar * infoLog = OGRE_NEW GLchar[infologLength];
 				char * infoLog = new char [infologLength];
+				infoLog[0] = 0;
 
                 if(glIsShader(obj))
                 {
@@ -68,7 +69,10 @@ namespace Ogre
                     glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
                     GL_CHECK_ERROR
                 }
-				logMessage += "\n" + String(infoLog);
+				if (strlen(infoLog) > 0)
+				{
+					logMessage += "\n" + String(infoLog);
+				}
 
                 LogManager::getSingleton().logMessage(logMessage);
 
