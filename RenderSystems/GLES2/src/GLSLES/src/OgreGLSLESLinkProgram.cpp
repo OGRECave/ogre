@@ -283,7 +283,7 @@ namespace Ogre {
 			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
 		GL_CHECK_ERROR
 
-			logObjectInfo( String("GLSL link result : "), mGLHandle );
+			logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLHandle );
 		if(mLinked)
 		{
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
