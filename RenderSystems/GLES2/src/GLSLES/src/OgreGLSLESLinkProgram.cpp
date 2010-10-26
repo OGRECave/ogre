@@ -186,8 +186,7 @@ namespace Ogre {
 		cacheMicrocode->read(&binaryLength, sizeof(GLint));
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
-// not supported on any win32 emulation for now...
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+#if GL_OES_get_program_binary
 		// load binary
 		glProgramBinaryOES( mGLHandle, 
 							binaryFormat, 
@@ -300,11 +299,9 @@ namespace Ogre {
 
 				// get buffer size
 				GLint binaryLength = 0;
-// not supported on any win32 emulation for now...
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+#if GL_OES_get_program_binary
 				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
 #endif
-				
 
 				// turns out we need this param when loading
 				GLenum binaryFormat = 0; 
@@ -316,8 +313,7 @@ namespace Ogre {
 				// write size of binary
 				newMicrocode->write(&binaryLength, sizeof(GLint));
 
-// not supported on any win32 emulation for now...
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+#if GL_OES_get_program_binary
 				// get binary
 				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
 #endif
