@@ -79,6 +79,7 @@ namespace Ogre {
 		, mFragmentProgram(fragmentProgram)
 		, mUniformRefsBuilt(false)
         , mLinked(false)
+		, mTriedToLinkAndFailed(false)
 	{
 		// init CustomAttributesIndexs
 		mCustomAttributesIndexs.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
@@ -140,7 +141,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::activate(void)
 	{
-		if (!mLinked)
+		if (!mLinked && !mTriedToLinkAndFailed)
 		{
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -282,8 +283,10 @@ namespace Ogre {
 		GL_CHECK_ERROR
 			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
 		GL_CHECK_ERROR
+	
+		mTriedToLinkAndFailed = !mLinked;
 
-			logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLHandle );
+		logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLHandle );
 		if(mLinked)
 		{
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
