@@ -1255,7 +1255,10 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 					"Could create output files in the given shader cache path '" + mShaderCachePath,
 					"ShaderGenerator::setShaderCachePath");	
 			}
+
+			// Close and remove the test file.
 			outFile.close();
+			remove(outTestFileName.c_str());
 
 			ResourceGroupManager::getSingleton().addResourceLocation(mShaderCachePath, "FileSystem", GENERATED_SHADERS_GROUP_NAME);					
 		}
