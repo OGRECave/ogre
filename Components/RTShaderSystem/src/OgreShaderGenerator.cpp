@@ -1244,8 +1244,20 @@ void ShaderGenerator::setShaderCachePath( const String& cachePath )
 		// Case this is a valid file path -> add as resource location in order to make sure that
 		// generated shaders could be loaded by the file system archive.
 		if (mShaderCachePath.empty() == false)
-		{			
-			ResourceGroupManager::getSingleton().addResourceLocation(cachePath, "FileSystem", GENERATED_SHADERS_GROUP_NAME);		
+		{	
+			// Make sure this is a valid writable path.
+			String outTestFileName(mShaderCachePath + "ShaderGenerator.tst");
+			std::ofstream outFile(outTestFileName.c_str());
+			
+			if (!outFile)
+			{
+				OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
+					"Could create output files in the given shader cache path '" + mShaderCachePath,
+					"ShaderGenerator::setShaderCachePath");	
+			}
+			outFile.close();
+
+			ResourceGroupManager::getSingleton().addResourceLocation(mShaderCachePath, "FileSystem", GENERATED_SHADERS_GROUP_NAME);					
 		}
 	}
 }
