@@ -94,7 +94,10 @@ namespace Ogre {
 
 		static CustomAttribute msCustomAttributes[];
 		vector<GLuint>::type mCustomAttributesIndexs;
+		vector<String>::type mCustomAttributesNames;
 
+		Ogre::String getCombinedName();
+		void getMicrocodeFromCache(void);
 
 	public:
 		/// Constructor should only be used by GLSLESLinkProgramManager
@@ -104,6 +107,8 @@ namespace Ogre {
 		/** Makes a program object active by making sure it is linked and then putting it in use.
 		*/
 		void activate(void);
+
+		void link();
 		/** Updates program object uniforms using data from GpuProgramParameters.
 		normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
 		*/
@@ -134,7 +139,6 @@ namespace Ogre {
 		GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
 		/// Is a non-standard attribute bound in the linked code?
 		bool isAttributeValid(VertexElementSemantic semantic, uint index);
-
 	};
 
 }

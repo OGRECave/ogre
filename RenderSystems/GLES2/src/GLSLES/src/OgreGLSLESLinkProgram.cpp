@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -81,7 +82,9 @@ namespace Ogre {
 	{
 		// init CustomAttributesIndexs
 		mCustomAttributesIndexs.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
-		for(int i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
+		mCustomAttributesNames.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
+
+		for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
 		{
 			mCustomAttributesIndexs[i] = -1;
 		}
@@ -119,65 +122,34 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------
+	Ogre::String GLSLESLinkProgram::getCombinedName()
+	{
+		String name;
+		if (mVertexProgram)
+		{
+			name += "Vertex Program:" ;
+			name += mVertexProgram->getName();
+		}
+		if (mFragmentProgram)
+		{
+			name += " Fragment Program:" ;
+			name += mFragmentProgram->getName();
+		}
+		return name;
+	}
+	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::activate(void)
 	{
 		if (!mLinked)
 		{
-			if (mVertexProgram)
+			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
+				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
 			{
-				// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-				// and end up aliasing existing built-ins. So avoid! 
-				// Bind all used attribs - not all possible ones otherwise we'll get 
-				// lots of warnings in the log, and also may end up aliasing names used
-				// as varyings by accident
-				// Because we can't ask GL whether an attribute is used in the shader
-				// until it is linked (chicken and egg!) we have to parse the source
-				
-				size_t indexCount = 0;
-				size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-				const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
-				for (size_t i = 0; i < numAttribs; ++i)
-				{
-					const CustomAttribute& a = msCustomAttributes[i];
-					
-					// We're looking for either: 
-					//   attribute vec<n> <semantic_name>
-					//   in vec<n> <semantic_name>
-					// The latter is recommended in GLSL 1.3 onwards 
-					// be slightly flexible about formatting
-					String::size_type pos = vpSource.find(a.name);
-					if (pos != String::npos)
-					{
-						String::size_type startpos = vpSource.find("attribute", pos < 20 ? 0 : pos-20);
-						if (startpos == String::npos)
-							startpos = vpSource.find("in", pos-20);
-						if (startpos != String::npos && startpos < pos)
-						{
-							// final check 
-							String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
-							StringVector vec = StringUtil::split(expr);
-                            if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
-							{
-								mCustomAttributesIndexs[a.attrib] = indexCount;
-								glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
-								indexCount++;
-								GL_CHECK_ERROR;
-							}
-						}
-					}
-				}
+				getMicrocodeFromCache();
 			}
-
-			glLinkProgram( mGLHandle );
-            GL_CHECK_ERROR
-			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
-            GL_CHECK_ERROR
-
-            logObjectInfo( String("GLSL link result : "), mGLHandle );
-			if(mLinked)
+			else
 			{
-				buildGLUniformReferences();
-				extractAttributes();
+				link();
 			}
 		}
 
@@ -188,7 +160,187 @@ namespace Ogre {
             GL_CHECK_ERROR
 		}
 	}
+	//-----------------------------------------------------------------------
+	void GLSLESLinkProgram::getMicrocodeFromCache(void)
+	{
+		GpuProgramManager::Microcode cacheMicrocode = 
+			GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 
+		// add to the microcode to the cache
+		String name;
+		name = getCombinedName();
+
+		// buffer size
+		GLint binaryLength = 0;
+
+		// turns out we need this param when loading
+		GLenum binaryFormat = 0; 
+
+		cacheMicrocode->seek(0);
+
+		// get size of binary
+		cacheMicrocode->read(&binaryLength, sizeof(GLint));
+		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+
+// not supported on any win32 emulation for now...
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+		// load binary
+		glProgramBinaryOES( mGLHandle, 
+							binaryFormat, 
+							cacheMicrocode->getPtr(),
+							binaryLength
+			);
+#endif
+		GLint   success = 0;
+		glGetProgramiv(mGLHandle, GL_LINK_STATUS, &success);
+		if (!success)
+		{
+			//
+			// Something must have changed since the program binaries
+			// were cached away.  Fallback to source shader loading path,
+			// and then retrieve and cache new program binaries once again.
+			//
+			link();
+		}
+		else
+		{
+			// jump binary
+			cacheMicrocode->seek(sizeof(GLint) + sizeof(GLenum) + binaryLength);
+
+			// load custom attributes
+			for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
+			{
+				String & name = mCustomAttributesNames[i];
+				// read name length
+				size_t lengthOfName = 0;
+				cacheMicrocode->read(&lengthOfName, sizeof(size_t));
+				name.resize(lengthOfName);
+
+				// read name
+				cacheMicrocode->read(&name[0], lengthOfName);
+
+				// read index
+				GLuint & index = mCustomAttributesIndexs[i];
+				cacheMicrocode->read(&index, sizeof(GLuint));
+			}
+
+		}
+
+	}
+
+	//-----------------------------------------------------------------------
+	void GLSLESLinkProgram::link()
+	{
+
+		// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
+		// and end up aliasing existing built-ins. So avoid! 
+		// Bind all used attribs - not all possible ones otherwise we'll get 
+		// lots of warnings in the log, and also may end up aliasing names used
+		// as varyings by accident
+		// Because we can't ask GL whether an attribute is used in the shader
+		// until it is linked (chicken and egg!) we have to parse the source
+
+		size_t indexCount = 0;
+		size_t sizeOfCustomAttributesAsBuffer = 0;
+		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+		const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
+		for (size_t i = 0; i < numAttribs; ++i)
+		{
+			const CustomAttribute& a = msCustomAttributes[i];
+
+			// We're looking for either: 
+			//   attribute vec<n> <semantic_name>
+			//   in vec<n> <semantic_name>
+			// The latter is recommended in GLSL 1.3 onwards 
+			// be slightly flexible about formatting
+			String::size_type pos = vpSource.find(a.name);
+			if (pos != String::npos)
+			{
+				String::size_type startpos = vpSource.find("attribute", pos < 20 ? 0 : pos-20);
+				if (startpos == String::npos)
+					startpos = vpSource.find("in", pos-20);
+				if (startpos != String::npos && startpos < pos)
+				{
+					// final check 
+					String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
+					StringVector vec = StringUtil::split(expr);
+					if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
+					{
+						mCustomAttributesIndexs[a.attrib] = indexCount;
+						mCustomAttributesNames[a.attrib] = a.name;
+						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + a.name.length();
+
+						glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
+						indexCount++;
+						GL_CHECK_ERROR;
+					}
+				}
+			}
+		}
+
+		glLinkProgram( mGLHandle );
+		GL_CHECK_ERROR
+			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
+		GL_CHECK_ERROR
+
+			logObjectInfo( String("GLSL link result : "), mGLHandle );
+		if(mLinked)
+		{
+			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+			{
+				// add to the microcode to the cache
+				String name;
+				name = getCombinedName();
+
+				// get buffer size
+				GLint binaryLength = 0;
+// not supported on any win32 emulation for now...
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
+#endif
+				
+
+				// turns out we need this param when loading
+				GLenum binaryFormat = 0; 
+
+				// get the buffer
+				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum) + sizeOfCustomAttributesAsBuffer));
+				newMicrocode->seek(0);
+
+				// write size of binary
+				newMicrocode->write(&binaryLength, sizeof(GLint));
+
+// not supported on any win32 emulation for now...
+#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
+				// get binary
+				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
+#endif
+				newMicrocode->seek(sizeof(GLint) + sizeof(GLenum) +binaryLength);
+
+				// save custom attributes
+				for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
+				{
+					const String & name = mCustomAttributesNames[i];
+					// write name length
+					size_t lengthOfName = name.size();
+					newMicrocode->write(&lengthOfName, sizeof(size_t));
+
+					// write name
+					newMicrocode->write(&name[0], lengthOfName);
+
+					// write index
+					GLuint index = mCustomAttributesIndexs[i];
+					newMicrocode->write(&index, sizeof(GLuint));
+				}
+
+
+				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+			}
+
+			buildGLUniformReferences();
+			extractAttributes();
+		}
+	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::extractAttributes(void)
 	{
@@ -332,8 +484,6 @@ namespace Ogre {
   
   		} // End for
 	}
-
-
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)
 	{
@@ -359,4 +509,5 @@ namespace Ogre {
 		}
 
     }
+
 } // namespace Ogre

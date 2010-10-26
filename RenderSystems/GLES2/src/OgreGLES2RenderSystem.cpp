@@ -295,6 +295,12 @@ namespace Ogre {
 		// No point sprites, so no size
 		rsc->setMaxPointSize(0.f);
         
+		if (mGLSupport->checkExtension("GL_OES_get_program_binary"))
+		{
+			// http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
+			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+		}
+
         return rsc;
     }
 
