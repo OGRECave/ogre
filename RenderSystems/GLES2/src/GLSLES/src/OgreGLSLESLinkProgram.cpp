@@ -152,6 +152,9 @@ namespace Ogre {
 			{
 				link();
 			}
+
+			buildGLUniformReferences();
+			extractAttributes();
 		}
 
 		if (mLinked)
@@ -339,9 +342,6 @@ namespace Ogre {
 
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
-
-			buildGLUniformReferences();
-			extractAttributes();
 		}
 	}
 	//-----------------------------------------------------------------------
