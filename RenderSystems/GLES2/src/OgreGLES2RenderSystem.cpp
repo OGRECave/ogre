@@ -1738,7 +1738,6 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 				GL_CHECK_ERROR;
-				assert(pBufferData == NULL);
                 glDrawElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexCount, indexType, pBufferData);
                 GL_CHECK_ERROR;
             } while (updatePassIterationRenderState());
