@@ -70,6 +70,8 @@ namespace Ogre {
 		GLhandleARB mGLHandle;
 		/// flag indicating that the program object has been successfully linked
 		GLint		mLinked;
+		/// Flag indicating that the program object has tried to link and failed
+		bool		mTriedToLinkAndFailed;
 		/// flag indicating skeletal animation is being performed
 		bool mSkeletalAnimation;
 

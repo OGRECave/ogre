@@ -114,7 +114,7 @@ namespace Ogre {
 		, mFragmentProgram(fragmentProgram)
 		, mUniformRefsBuilt(false)
         , mLinked(false)
-
+		, mTriedToLinkAndFailed(false)
 	{
 			//checkForGLSLError( "GLSLLinkProgram::GLSLLinkProgram", "Error prior to Creating GLSL Program Object", 0);
 		    glGetError(); //Clean up the error. Otherwise will flood log.
@@ -151,7 +151,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLLinkProgram::activate(void)
 	{
-		if (!mLinked)
+		if (!mLinked && !mTriedToLinkAndFailed)
 		{			
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -496,6 +496,8 @@ namespace Ogre {
 		// force logging and raise exception if not linked
 		checkForGLSLError( "GLSLLinkProgram::Activate",
 			"Error linking GLSL Program Object : ", mGLHandle, !mLinked, !mLinked );
+		
+		mTriedToLinkAndFailed = !mLinked;
 		if(mLinked)
 		{
 			logObjectInfo( String("GLSL link result : "), mGLHandle );
