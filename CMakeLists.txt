@@ -18,6 +18,12 @@ cmake_minimum_required(VERSION 2.6.2)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+# CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
+# to specify both armv6 and armv7.
+if(OGRE_BUILD_PLATFORM_IPHONE AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
+	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
+endif()
+
 # Use relative paths
 # This is mostly to reduce path size for command-line limits on windows
 if(WIN32)
@@ -197,22 +203,15 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos4.0)
+  set(CMAKE_OSX_SYSROOT iphoneos)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
-  set(XCODE_ATTRIBUTE_SDKROOT iphoneos4.0)
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iPhone" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
-
-  # CMake 2.8.1 added the ability to specify per-target architectures.
-  # As a side effect, it creates corrupt Xcode projects if you try do it for the whole project.
-  if(VERSION STRLESS "2.8.1")
-    set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-  else()
-#    set(CMAKE_OSX_ARCHITECTURES "armv6;armv7;")
-  endif()
+  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
 
   add_definitions(-fno-regmove)
   remove_definitions(-msse)
