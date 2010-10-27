@@ -19,6 +19,9 @@ same license as the rest of the engine.
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreException.h"
+#include "OgreMaterial.h"
+#include "OgreTechnique.h"
+#include "OgreMaterialManager.h"
 
 /********************************************************************************
             MaterialControls Methods
@@ -83,6 +86,14 @@ void loadMaterialControlsFile(MaterialControlsContainer& controlsContainer, cons
             if (!secName.empty() && settings)
             {
                 materialName = cf.getSetting("material", secName);
+				
+				Ogre::MaterialPtr curMat = Ogre::MaterialManager::getSingleton().getByName(materialName);
+				curMat->load();
+				Ogre::Technique * curTec = curMat->getBestTechnique();
+				if (!curTec || !curTec->isSupported())
+				{
+					continue;
+				}
 
                 MaterialControls newMaaterialControls(secName, materialName);
                 controlsContainer.push_back(newMaaterialControls);
