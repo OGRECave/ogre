@@ -92,6 +92,8 @@ namespace Ogre {
 		/// Overridden from GpuProgram
 		GpuProgramParametersSharedPtr createParameters(void);
 
+		/// compile source into shader object
+		bool compile( const bool checkErrors = false);
 
 		/// Command object for setting macro defines
 		class CmdPreprocessorDefines : public ParamCommand
@@ -122,8 +124,6 @@ namespace Ogre {
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
-		/// compile source into shader object
-		bool compile( const bool checkErrors = false);
 		/** check the compile result for an error with default precision - and recompile if needed.
 			some glsl compilers return an error default precision is set to types other then
 			int or float, this function test a failed compile result for the error,

@@ -85,6 +85,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void GLSLESProgram::loadFromSource(void)
 	{
+		// we want to compile only if we need to link - else it is a waste of CPU
+	}
+    
+    //---------------------------------------------------------------------------
+	bool GLSLESProgram::compile(const bool checkErrors)
+	{
+		if (mCompiled == 1)
+		{
+			return true;
+		}
 		// Only create a shader object if glsl es is supported
 		if (isSupported())
 		{
@@ -180,12 +190,6 @@ namespace Ogre {
             GL_CHECK_ERROR
 		}
 
-		compile(true);
-	}
-    
-    //---------------------------------------------------------------------------
-	bool GLSLESProgram::compile(const bool checkErrors)
-	{
         if (checkErrors)
             logObjectInfo("GLSL ES compiling: " + mName, mGLHandle);
 

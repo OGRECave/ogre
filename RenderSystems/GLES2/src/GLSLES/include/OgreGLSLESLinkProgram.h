@@ -96,10 +96,12 @@ namespace Ogre {
 
 		static CustomAttribute msCustomAttributes[];
 		vector<GLuint>::type mCustomAttributesIndexs;
-		vector<String>::type mCustomAttributesNames;
 
 		Ogre::String getCombinedName();
+		/// Get the the binary data of a program from the microcode cache
 		void getMicrocodeFromCache(void);
+		/// Compiles and links the the vertex and fragment programs
+		void compileAndLink();
 
 	public:
 		/// Constructor should only be used by GLSLESLinkProgramManager
@@ -110,17 +112,6 @@ namespace Ogre {
 		*/
 		void activate(void);
 
-		void link();
-
-		/**	Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-			and end up aliasing existing built-ins. So avoid! 
-			Bind all used attribs - not all possible ones otherwise we'll get 
-			lots of warnings in the log, and also may end up aliasing names used
-			as varyings by accident
-			Because we can't ask GL whether an attribute is used in the shader
-			until it is linked (chicken and egg!) we have to parse the source
-		*/
-		size_t bindAttribLocation(  );
 		/** Updates program object uniforms using data from GpuProgramParameters.
 		normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
 		*/

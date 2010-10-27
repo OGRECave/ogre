@@ -83,29 +83,11 @@ namespace Ogre {
 	{
 		// init CustomAttributesIndexs
 		mCustomAttributesIndexs.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
-		mCustomAttributesNames.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
 
 		for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
 		{
 			mCustomAttributesIndexs[i] = -1;
 		}
-
-        glGetError(); // Clean up the error. Otherwise will flood log.
-        mGLHandle = glCreateProgram();
-        GL_CHECK_ERROR
-
-        // Tell shaders to attach themselves to the LinkProgram
-        // let the shaders do the attaching since they may have several children to attach
-        if (mVertexProgram)
-        {
-            mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
-            setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
-        }
-        
-        if (mFragmentProgram)
-        {
-            mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
-        }
         
         if (!mVertexProgram && !mFragmentProgram)
         {
@@ -150,7 +132,7 @@ namespace Ogre {
 			}
 			else
 			{
-				link();
+				compileAndLink();
 			}
 
 			buildGLUniformReferences();
@@ -175,7 +157,7 @@ namespace Ogre {
 		name = getCombinedName();
 
 		// buffer size
-		GLint binaryLength = 0;
+		GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
 
 		// turns out we need this param when loading
 		GLenum binaryFormat = 0; 
@@ -183,7 +165,6 @@ namespace Ogre {
 		cacheMicrocode->seek(0);
 
 		// get size of binary
-		cacheMicrocode->read(&binaryLength, sizeof(GLint));
 		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
 
 #if GL_OES_get_program_binary
@@ -203,40 +184,37 @@ namespace Ogre {
 			// were cached away.  Fallback to source shader loading path,
 			// and then retrieve and cache new program binaries once again.
 			//
-			link();
-		}
-		else
-		{
-			// jump binary
-			cacheMicrocode->seek(sizeof(GLint) + sizeof(GLenum) + binaryLength);
-
-			// load custom attributes
-			for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
-			{
-				String & name = mCustomAttributesNames[i];
-				// read name length
-				size_t lengthOfName = 0;
-				cacheMicrocode->read(&lengthOfName, sizeof(size_t));
-				name.resize(lengthOfName);
-
-				// read name
-				cacheMicrocode->read(&name[0], lengthOfName);
-
-				// read index
-				GLuint & index = mCustomAttributesIndexs[i];
-				cacheMicrocode->read(&index, sizeof(GLuint));
-			}
-
+			compileAndLink();
 		}
 
 	}
 
 	//-----------------------------------------------------------------------
-	void GLSLESLinkProgram::link()
+	void GLSLESLinkProgram::compileAndLink()
 	{
 
-		size_t sizeOfCustomAttributesAsBuffer = bindAttribLocation();
+        glGetError(); // Clean up the error. Otherwise will flood log.
+        mGLHandle = glCreateProgram();
+        GL_CHECK_ERROR
+	
+		// compile and attach Vertex Program
+		if (!mVertexProgram->getGLSLProgram()->compile(true))
+		{
+			// todo error
+			return;
+		}
+        mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+        setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+        
+		// compile and attach Fragment Program
+		if (!mFragmentProgram->getGLSLProgram()->compile(true))
+		{
+			// todo error
+			return;
+		}		
+        mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
 
+		// the link
 		glLinkProgram( mGLHandle );
 		GL_CHECK_ERROR
 			glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
@@ -263,34 +241,13 @@ namespace Ogre {
 				GLenum binaryFormat = 0; 
 
 				// get the buffer
-				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum) + sizeOfCustomAttributesAsBuffer));
+				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum)));
 				newMicrocode->seek(0);
-
-				// write size of binary
-				newMicrocode->write(&binaryLength, sizeof(GLint));
 
 #if GL_OES_get_program_binary
 				// get binary
 				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
 #endif
-				newMicrocode->seek(sizeof(GLint) + sizeof(GLenum) +binaryLength);
-
-				// save custom attributes
-				for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
-				{
-					const String & name = mCustomAttributesNames[i];
-					// write name length
-					size_t lengthOfName = name.size();
-					newMicrocode->write(&lengthOfName, sizeof(size_t));
-
-					// write name
-					newMicrocode->write(&name[0], lengthOfName);
-
-					// write index
-					GLuint index = mCustomAttributesIndexs[i];
-					newMicrocode->write(&index, sizeof(GLuint));
-				}
-
 
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
@@ -471,87 +428,4 @@ namespace Ogre {
 			}
 		}
     }
-	//-----------------------------------------------------------------------
-	size_t GLSLESLinkProgram::bindAttribLocation()
-	{
-
-		size_t sizeOfCustomAttributesAsBuffer = 0;
-		size_t indexCount = 0;
-		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-		const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
-
-		map<String, const CustomAttribute *>::type customAttributesMap;
-		for (size_t i = 0; i < numAttribs; ++i)
-		{
-			const CustomAttribute& a = msCustomAttributes[i];
-			customAttributesMap[a.name] = &a;
-		}
-
-		// seems that the word "position" is also used to define the position
-		customAttributesMap["position"] = &msCustomAttributes[0];
-
-		// We're looking for either: 
-		//   attribute vec<n> <semantic_name>
-		// The latter is recommended in GLSL 1.3 onwards 
-		// be slightly flexible about formatting
-
-		// get the source lines
-		StringVector sourceLines = StringUtil::split(vpSource, "\n");
-
-		StringVector sourceWords;		
-		// delete one line remarks
-		for (size_t i = 0; i < sourceLines.size(); ++i)
-		{
-			String & curLine = sourceLines[i];
-			String::size_type pos = vpSource.find("//");
-			if (pos != String::npos)
-			{
-				curLine.erase(pos, curLine.size() - pos);
-			}
-			StringVector lineWords = StringUtil::split(curLine, " \r\t\n;");
-			for (size_t j = 0; j < lineWords.size(); ++j)
-			{
-				sourceWords.push_back(lineWords[j]);
-			}
-		}
-
-		bool insideMultilineRemark = false;
-		for (size_t i = 0; i < sourceWords.size(); ++i)
-		{
-			String & curWord = sourceWords[i];
-			// one char are too short for us here
-			if (curWord.size() < 2)
-				continue;
-			if(curWord.substr(0, 2) == "*/")
-				insideMultilineRemark = false;
-
-			if(curWord.substr(0, 2) == "/*")
-				insideMultilineRemark = true;
-
-			if (insideMultilineRemark)
-				continue;
-
-			if (curWord == "attribute")
-			{
-				if( i + 2 < sourceWords.size())
-				{
-					String & attName = sourceWords[i+2];
-					String lowercaseAttName = attName;
-					StringUtil::toLowerCase(lowercaseAttName);
-					if (customAttributesMap.find(lowercaseAttName) != customAttributesMap.end())
-					{
-						const CustomAttribute& a = *customAttributesMap.find(attName)->second;
-						mCustomAttributesIndexs[a.attrib] = indexCount;
-						mCustomAttributesNames[a.attrib] = attName;
-						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + attName.length();
-
-						glBindAttribLocation(mGLHandle, indexCount, attName.c_str());
-						indexCount++;
-						GL_CHECK_ERROR;
-					}
-				}
-			}
-		}
-		return sizeOfCustomAttributesAsBuffer;
-	}
 } // namespace Ogre
