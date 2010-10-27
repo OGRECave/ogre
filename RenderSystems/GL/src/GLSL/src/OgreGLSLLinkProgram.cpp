@@ -500,7 +500,7 @@ namespace Ogre {
 		mTriedToLinkAndFailed = !mLinked;
 		if(mLinked)
 		{
-			logObjectInfo( String("GLSL link result : "), mGLHandle );
+			logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLHandle );
 			buildGLUniformReferences();
 			extractAttributes();
 		}
