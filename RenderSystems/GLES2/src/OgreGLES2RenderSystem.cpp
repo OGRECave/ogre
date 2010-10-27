@@ -1553,140 +1553,37 @@ namespace Ogre {
             unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
             
-            bool isCustomAttrib = false;
- 			if (mCurrentVertexProgram)
- 				isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem->getIndex());
-
             unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
             GLboolean normalised = GL_FALSE;
 
- 			// Custom attribute support
- 			// tangents, binormals, blendweights etc always via this route
- 			// builtins may be done this way too
- 			if (isCustomAttrib)
- 			{
- 				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
-                switch(elem->getType())
-                {
-                case VET_COLOUR:
-                case VET_COLOUR_ABGR:
-                case VET_COLOUR_ARGB:
-                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                    // VertexElement::getTypeCount treats them as 1 (RGBA)
-                    // Also need to normalise the fixed-point data
-                    typeCount = 4;
-                    normalised = GL_TRUE;
-                    break;
-                default:
-                    break;
-                };
- 				glVertexAttribPointer(
- 					attrib,
- 					typeCount, 
-  					GLES2HardwareBufferManager::getGLType(elem->getType()), 
- 					normalised, 
-  					static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
-  					pBufferData);
-                GL_CHECK_ERROR;
- 				glEnableVertexAttribArray(attrib);
-                GL_CHECK_ERROR;
-
- 				attribsBound.push_back(attrib);
-            }
-            else
+			GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
+            switch(elem->getType())
             {
-				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
-                switch (sem)
-                {
-                    case VES_POSITION:
-                        glVertexAttribPointer(attrib,
-                                              typeCount,
-                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                              normalised,
-                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                              pBufferData);
-                        GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(attrib);
-                        GL_CHECK_ERROR;
-                        break;
-                    case VES_NORMAL:
-                        glVertexAttribPointer(attrib,
-                                              typeCount,
-                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                              normalised,
-                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                              pBufferData);
-                        GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(attrib);
-                        GL_CHECK_ERROR;
-                        break;
-                    case VES_DIFFUSE:
-                        glVertexAttribPointer(attrib, 
-                                              typeCount,
-                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                              normalised,
-                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                              pBufferData);
-                        GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(attrib);
-                        GL_CHECK_ERROR;
-                        break;
-                    case VES_SPECULAR:
-                        glVertexAttribPointer(attrib, 
-                                              typeCount,
-                                              GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                              normalised,
-                                              static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                              pBufferData);
-                        GL_CHECK_ERROR;
-                        glEnableVertexAttribArray(attrib);
-                        GL_CHECK_ERROR;
-                        break;
-                    case VES_TEXTURE_COORDINATES:
-                        if (mCurrentVertexProgram)
-                        {
-                            // Programmable pipeline - direct UV assignment
-                            activateGLTextureUnit(elem->getIndex());
-                            glVertexAttribPointer(attrib,
-                                                  typeCount,
-                                                  GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                                  normalised,
-                                                  static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                  pBufferData);
-                            GL_CHECK_ERROR;
-                            glEnableVertexAttribArray(attrib);
-                            GL_CHECK_ERROR;
-                        }
-                        else
-                        {
-                            // Fixed function matching to units based on tex_coord_set
-                            for (i = 0; i < mDisabledTexUnitsFrom; i++)
-                            {
-                                // Only set this texture unit's texcoord pointer if it
-                                // is supposed to be using this element's index
-                                if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
-                                {
-                                    if (multitexturing)
-                                        activateGLTextureUnit(i);
-                                    GL_CHECK_ERROR;
-                                    glVertexAttribPointer(attrib,
-                                                          typeCount,
-                                                          GLES2HardwareBufferManager::getGLType(elem->getType()),
-                                                          normalised,
-                                                          static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                                          pBufferData);
-                                    GL_CHECK_ERROR;
-                                    glEnableVertexAttribArray(attrib);
-                                    GL_CHECK_ERROR;
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                };
-            }
-        }
+            case VET_COLOUR:
+            case VET_COLOUR_ABGR:
+            case VET_COLOUR_ARGB:
+                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                // VertexElement::getTypeCount treats them as 1 (RGBA)
+                // Also need to normalise the fixed-point data
+                typeCount = 4;
+                normalised = GL_TRUE;
+                break;
+            default:
+                break;
+            };
+
+            glVertexAttribPointer(attrib,
+                                  typeCount,
+                                  GLES2HardwareBufferManager::getGLType(elem->getType()),
+                                  normalised,
+                                  static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                  pBufferData);
+            GL_CHECK_ERROR;
+            glEnableVertexAttribArray(attrib);
+            GL_CHECK_ERROR;
+ 			
+			attribsBound.push_back(attrib);
+        }	
 
 		if (multitexturing)
             activateGLTextureUnit(GL_TEXTURE0);
