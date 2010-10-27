@@ -489,6 +489,7 @@ namespace Ogre {
     // @author W.J. van der Laan
     void GLES2TextureBuffer::blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
+		return; // todo - add a shader attach...
 //        std::cerr << "GLES2TextureBuffer::blitFromTexture " <<
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
 //        mTextureID << ":" << dstBox.left << "," << dstBox.top << "," << dstBox.right << "," << dstBox.bottom << std::endl;
