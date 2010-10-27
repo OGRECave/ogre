@@ -482,6 +482,9 @@ namespace Ogre {
 			customAttributesMap[a.name] = &a;
 		}
 
+		// seems that the word "position" is also used to define the position
+		customAttributesMap["position"] = &msCustomAttributes[0];
+
 		// We're looking for either: 
 		//   attribute vec<n> <semantic_name>
 		// The latter is recommended in GLSL 1.3 onwards 
@@ -528,14 +531,16 @@ namespace Ogre {
 				if( i + 2 < sourceWords.size())
 				{
 					String & attName = sourceWords[i+2];
-					if (customAttributesMap.find(attName) != customAttributesMap.end())
+					String lowercaseAttName = attName;
+					StringUtil::toLowerCase(lowercaseAttName);
+					if (customAttributesMap.find(lowercaseAttName) != customAttributesMap.end())
 					{
 						const CustomAttribute& a = *customAttributesMap.find(attName)->second;
 						mCustomAttributesIndexs[a.attrib] = indexCount;
-						mCustomAttributesNames[a.attrib] = a.name;
-						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + a.name.length();
+						mCustomAttributesNames[a.attrib] = attName;
+						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + attName.length();
 
-						glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
+						glBindAttribLocation(mGLHandle, indexCount, attName.c_str());
 						indexCount++;
 						GL_CHECK_ERROR;
 					}
