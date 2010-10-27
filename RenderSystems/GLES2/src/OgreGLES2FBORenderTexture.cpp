@@ -425,7 +425,9 @@ namespace Ogre {
     {
         /// Check if the render target is in the rendertarget->FBO map
         GLES2FrameBufferObject *fbo = 0;
+#if GL_OES_packed_depth_stencil
         target->getCustomAttribute("FBO", &fbo);
+#endif
         if(fbo)
             fbo->bind();
         else

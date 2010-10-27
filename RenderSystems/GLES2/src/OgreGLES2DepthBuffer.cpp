@@ -100,7 +100,9 @@ namespace Ogre
 
 		//Now check this is the appropriate format
 		GLES2FrameBufferObject *fbo = 0;
+#if GL_OES_packed_depth_stencil
         renderTarget->getCustomAttribute("FBO", &fbo);
+#endif
 
 		if( !fbo )
 		{

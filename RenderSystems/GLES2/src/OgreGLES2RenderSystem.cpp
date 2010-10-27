@@ -323,6 +323,7 @@ namespace Ogre {
 
         // Use VBO's by default
         mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
+#if GL_OES_packed_depth_stencil
 
         ConfigOptionMap::iterator cfi = getConfigOptions().find("RTT Preferred Mode");
 		// RTT Mode: 0 use whatever available, 1 use PBuffers, 2 force use copying
@@ -362,6 +363,10 @@ namespace Ogre {
 				}
 			}
 			else
+#else
+		{
+
+#endif
 			{
 				// No pbuffer support either -- fallback to simplest copying from framebuffer
 				mRTTManager = new GLES2CopyingRTTManager();
@@ -537,7 +542,9 @@ namespace Ogre {
 		// else creates dummy (empty) containers
 		// retVal = mRTTManager->_createDepthBufferFor( renderTarget );
 		GLES2FrameBufferObject *fbo = 0;
+#if GL_OES_packed_depth_stencil
         renderTarget->getCustomAttribute("FBO", &fbo);
+#endif
 
 		if( fbo )
 		{
@@ -1731,6 +1738,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 				GL_CHECK_ERROR;
+				assert(pBufferData == NULL);
                 glDrawElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexCount, indexType, pBufferData);
                 GL_CHECK_ERROR;
             } while (updatePassIterationRenderState());

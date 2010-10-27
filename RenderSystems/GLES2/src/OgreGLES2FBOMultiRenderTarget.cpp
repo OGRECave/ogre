@@ -41,13 +41,14 @@ namespace Ogre {
 
 	void GLES2FBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
 	{
+#if GL_OES_packed_depth_stencil
 		/// Check if the render target is in the rendertarget->FBO map
         GLES2FrameBufferObject *fbobj = 0;
         target->getCustomAttribute("FBO", &fbobj);
 		assert(fbobj);
 		fbo.bindSurface(attachment, fbobj->getSurface(0));
         GL_CHECK_ERROR;
-
+#endif
 		// Initialise?
 
 		// Set width and height
@@ -67,10 +68,12 @@ namespace Ogre {
 
 	void GLES2FBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
 	{
+#if GL_OES_packed_depth_stencil
 		if(name=="FBO")
         {
             *static_cast<GLES2FrameBufferObject **>(pData) = &fbo;
         }
+#endif
 	}
 	//-----------------------------------------------------------------------------
 	bool GLES2FBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
