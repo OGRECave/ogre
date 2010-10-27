@@ -235,51 +235,7 @@ namespace Ogre {
 	void GLSLESLinkProgram::link()
 	{
 
-		// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-		// and end up aliasing existing built-ins. So avoid! 
-		// Bind all used attribs - not all possible ones otherwise we'll get 
-		// lots of warnings in the log, and also may end up aliasing names used
-		// as varyings by accident
-		// Because we can't ask GL whether an attribute is used in the shader
-		// until it is linked (chicken and egg!) we have to parse the source
-
-		size_t indexCount = 0;
-		size_t sizeOfCustomAttributesAsBuffer = 0;
-		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
-		const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
-		for (size_t i = 0; i < numAttribs; ++i)
-		{
-			const CustomAttribute& a = msCustomAttributes[i];
-
-			// We're looking for either: 
-			//   attribute vec<n> <semantic_name>
-			//   in vec<n> <semantic_name>
-			// The latter is recommended in GLSL 1.3 onwards 
-			// be slightly flexible about formatting
-			String::size_type pos = vpSource.find(a.name);
-			if (pos != String::npos)
-			{
-				String::size_type startpos = vpSource.find("attribute", pos < 20 ? 0 : pos-20);
-				if (startpos == String::npos)
-					startpos = vpSource.find("in", pos-20);
-				if (startpos != String::npos && startpos < pos)
-				{
-					// final check 
-					String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
-					StringVector vec = StringUtil::split(expr);
-					if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
-					{
-						mCustomAttributesIndexs[a.attrib] = indexCount;
-						mCustomAttributesNames[a.attrib] = a.name;
-						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + a.name.length();
-
-						glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
-						indexCount++;
-						GL_CHECK_ERROR;
-					}
-				}
-			}
-		}
+		size_t sizeOfCustomAttributesAsBuffer = bindAttribLocation();
 
 		glLinkProgram( mGLHandle );
 		GL_CHECK_ERROR
@@ -353,7 +309,11 @@ namespace Ogre {
 
 			if (attrib != -1)
 			{
-				mValidAttributes.insert(a.attrib);
+				GLuint  val = mCustomAttributesIndexs[a.attrib];
+				if (val != -1)
+				{
+					mValidAttributes.insert(val);
+				}
 			}
 		}
 	}
@@ -365,7 +325,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
 	{
-		return mCustomAttributesIndexs[GLES2GpuProgram::getFixedAttributeIndex(semantic, index)] != -1;
+		return mValidAttributes.find(getAttributeIndex(semantic, index)) != mValidAttributes.end();
 	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::buildGLUniformReferences(void)
@@ -506,7 +466,82 @@ namespace Ogre {
 				}
 			}
 		}
-
     }
+	//-----------------------------------------------------------------------
+	size_t GLSLESLinkProgram::bindAttribLocation()
+	{
+		size_t sizeOfCustomAttributesAsBuffer = 0;
+		size_t indexCount = 0;
+		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+		const String& vpSource = mVertexProgram->getGLSLProgram()->getSource();
 
+		map<String, const CustomAttribute *>::type customAttributesMap;
+		for (size_t i = 0; i < numAttribs; ++i)
+		{
+			const CustomAttribute& a = msCustomAttributes[i];
+			customAttributesMap[a.name] = &a;
+		}
+
+		// We're looking for either: 
+		//   attribute vec<n> <semantic_name>
+		// The latter is recommended in GLSL 1.3 onwards 
+		// be slightly flexible about formatting
+
+		// get the source lines
+		StringVector sourceLines = StringUtil::split(vpSource, "\n");
+
+		StringVector sourceWords;		
+		// delete one line remarks
+		for (size_t i = 0; i < sourceLines.size(); ++i)
+		{
+			String & curLine = sourceLines[i];
+			String::size_type pos = vpSource.find("//");
+			if (pos != String::npos)
+			{
+				curLine.erase(pos, curLine.size() - pos);
+			}
+			StringVector lineWords = StringUtil::split(curLine, " \r\t\n;");
+			for (size_t j = 0; j < lineWords.size(); ++j)
+			{
+				sourceWords.push_back(lineWords[j]);
+			}
+		}
+
+		bool insideMultilineRemark = false;
+		for (size_t i = 0; i < sourceWords.size(); ++i)
+		{
+			String & curWord = sourceWords[i];
+			// one char are too short for us here
+			if (curWord.size() < 2)
+				continue;
+			if(curWord.substr(0, 2) == "*/")
+				insideMultilineRemark = false;
+
+			if(curWord.substr(0, 2) == "/*")
+				insideMultilineRemark = true;
+
+			if (insideMultilineRemark)
+				continue;
+
+			if (curWord == "attribute")
+			{
+				if( i + 2 < sourceWords.size())
+				{
+					String & attName = sourceWords[i+2];
+					if (customAttributesMap.find(attName) != customAttributesMap.end())
+					{
+						const CustomAttribute& a = *customAttributesMap.find(attName)->second;
+						mCustomAttributesIndexs[a.attrib] = indexCount;
+						mCustomAttributesNames[a.attrib] = a.name;
+						sizeOfCustomAttributesAsBuffer += sizeof(int) +  sizeof(size_t) + a.name.length();
+
+						glBindAttribLocation(mGLHandle, indexCount, a.name.c_str());
+						indexCount++;
+						GL_CHECK_ERROR;
+					}
+				}
+			}
+		}
+		return sizeOfCustomAttributesAsBuffer;
+	}
 } // namespace Ogre
