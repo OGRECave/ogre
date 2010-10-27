@@ -326,7 +326,7 @@ namespace Ogre {
 	{
 		String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
 		vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
-		if( message.find(precisionQualifierErrorString) != -1 )
+		if( message.find(precisionQualifierErrorString) != String::npos )
 		{
 			LogManager::getSingleton().logMessage("Fixing invalid type Type for default precision qualifier by deleting bad lines the re-compiling");
 
@@ -338,11 +338,11 @@ namespace Ogre {
 			{
 				String & curError = errors[i];
 				size_t foundPos = curError.find(precisionQualifierErrorString);
-				if(foundPos != -1)
+				if(foundPos != String::npos)
 				{
 					String lineNumber = curError.substr(0, foundPos);
 					size_t posOfStartOfNumber = lineNumber.find_last_of(':');
-					if (posOfStartOfNumber != -1)
+					if (posOfStartOfNumber != String::npos)
 					{
 						lineNumber = lineNumber.substr(posOfStartOfNumber +	1, lineNumber.size() - (posOfStartOfNumber + 1));
 						if (StringConverter::isNumber(lineNumber))
