@@ -307,13 +307,17 @@ namespace Ogre {
 			GLint attrib = glGetAttribLocation(mGLHandle, a.name.c_str());
             GL_CHECK_ERROR;
 
+			// seems that the word "position" is also used to define the position 
+			if(i == 0 && attrib == -1)
+			{
+				attrib = glGetAttribLocation(mGLHandle, "position");
+				GL_CHECK_ERROR;
+			}
+			
 			if (attrib != -1)
 			{
-				GLuint  val = mCustomAttributesIndexs[a.attrib];
-				if (val != -1)
-				{
-					mValidAttributes.insert(val);
-				}
+				mCustomAttributesIndexs[a.attrib] = attrib;
+				mValidAttributes.insert(attrib);
 			}
 		}
 	}
@@ -470,6 +474,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	size_t GLSLESLinkProgram::bindAttribLocation()
 	{
+
 		size_t sizeOfCustomAttributesAsBuffer = 0;
 		size_t indexCount = 0;
 		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
