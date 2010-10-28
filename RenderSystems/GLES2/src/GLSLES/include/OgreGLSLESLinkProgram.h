@@ -63,7 +63,6 @@ namespace Ogre {
 		GLSLESGpuProgram* mVertexProgram;
 		/// Linked fragment program
 		GLSLESGpuProgram* mFragmentProgram;
-
 		/// Flag to indicate that uniform references have already been built
 		bool		mUniformRefsBuilt;
 		/// GL handle for the program object
@@ -134,6 +133,9 @@ namespace Ogre {
 		GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
 		/// Is a non-standard attribute bound in the linked code?
 		bool isAttributeValid(VertexElementSemantic semantic, uint index);
+
+		GLSLESGpuProgram* getVertexProgram() const { return mVertexProgram; }
+		GLSLESGpuProgram* getFragmentProgram() const { return mFragmentProgram; }
 	};
 
 }
