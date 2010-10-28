@@ -985,7 +985,20 @@ protected:
             }
 #endif // USE_RTSHADER_SYSTEM
 
+
+#ifdef	ENABLE_SHADERS_CACHE
+            FILE * inFile = fopen("cache.bin", "rb");
+            if (inFile)
+            {
+            	Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+            	Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream("cache.bin", inFile, Ogre::DataStream::READ));
+            	Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
+            }
+#endif
+
+
 			loadResources();
+
 
 			Sample* startupSample = loadSamples();
             
@@ -1461,6 +1474,16 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void shutdown()
 		{
+
+#ifdef	ENABLE_SHADERS_CACHE
+            FILE * outFile = fopen("cache.bin", "wb");
+            if (outFile)
+            {
+            	Ogre::DataStreamPtr ostream(new Ogre::FileHandleDataStream("cache.bin", outFile, Ogre::DataStream::WRITE));
+            	Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
+            }
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
             [mGestureView release];
 #endif
