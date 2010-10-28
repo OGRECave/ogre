@@ -89,6 +89,10 @@ namespace Ogre {
 	{
 		if (!mLinked && !mTriedToLinkAndFailed)
 		{
+			glGetError(); // Clean up the error. Otherwise will flood log.
+			mGLHandle = glCreateProgram();
+			GL_CHECK_ERROR
+
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
 			{
@@ -155,11 +159,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::compileAndLink()
 	{
-
-        glGetError(); // Clean up the error. Otherwise will flood log.
-        mGLHandle = glCreateProgram();
-        GL_CHECK_ERROR
-	
 		// compile and attach Vertex Program
 		if (!mVertexProgram->getGLSLProgram()->compile(true))
 		{
