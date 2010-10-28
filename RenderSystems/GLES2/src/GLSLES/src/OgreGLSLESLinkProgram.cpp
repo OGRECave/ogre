@@ -34,29 +34,9 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreStringConverter.h"
 
 namespace Ogre {
-
-	//  a  builtin				custom attrib name
-	// ----------------------------------------------
-	//	0  gl_Vertex			vertex
-	//  1  n/a					blendWeights		
-	//	2  gl_Normal			normal
-	//	3  gl_Color				colour
-	//	4  gl_SecondaryColor	secondary_colour
-	//	5  gl_FogCoord			fog_coord
-	//  7  n/a					blendIndices
-	//  8 tangent
-	//  9 binormal
-	//	10  gl_MultiTexCoord0	uv0
-	//	11  gl_MultiTexCoord1	uv1
-	//	12 gl_MultiTexCoord2	uv2
-	//	13 gl_MultiTexCoord3	uv3
-	//	14 gl_MultiTexCoord4	uv4
-	//	15 gl_MultiTexCoord5	uv5
-	//	16 gl_MultiTexCoord6	uv6
-	//	17 gl_MultiTexCoord7	uv7
-#define NUMBER_OF_CUSTOM_ATTS 18
 
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram::GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
@@ -67,11 +47,10 @@ namespace Ogre {
 		, mTriedToLinkAndFailed(false)
 	{
 		// init CustomAttributesIndexs
-		mCustomAttributesIndexs.resize(NUMBER_OF_CUSTOM_ATTS);
-
-		for(size_t i = 0 ; i < NUMBER_OF_CUSTOM_ATTS; i++)
+		for(size_t i = 0 ; i < VES_COUNT; i++)
+			for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
 		{
-			mCustomAttributesIndexs[i] = -1;
+			mCustomAttributesIndexs[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
 		}
         
         if (!mVertexProgram && !mFragmentProgram)
@@ -121,7 +100,6 @@ namespace Ogre {
 			}
 
 			buildGLUniformReferences();
-			extractAttributes();
 		}
 
 		if (mLinked)
@@ -239,92 +217,28 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void GLSLESLinkProgram::extractAttributes(void)
+	const char * getAttributeSemanticString(VertexElementSemantic semantic)
 	{
-		size_t numAttribs = NUMBER_OF_CUSTOM_ATTS;
-	String customAttributesNames[] = {
-		String("vertex"),
-		String("blendWeights"),
-		String("normal"),
-		String("colour"),
-		String("secondary_colour"),
-		String("blendIndices"),
-		String("tangent"),
-		String("binormal"),
-		String("uv0"),
-		String("uv1"),
-		String("uv2"),
-		String("uv3"),
-		String("uv4"),
-		String("uv5"),
-		String("uv6"),
-		String("uv7"),
-	};
-
-		for (size_t i = 0; i < numAttribs; ++i)
-		{
-			const String& attName = customAttributesNames[i];
-			GLint attrib = glGetAttribLocation(mGLHandle, attName.c_str());
-            GL_CHECK_ERROR;
-
-			// seems that the word "position" is also used to define the position 
-			if(i == 0 && attrib == -1)
-			{
-				attrib = glGetAttribLocation(mGLHandle, "position");
-				GL_CHECK_ERROR;
-			}
-			
-			if (attrib != -1)
-			{
-				mCustomAttributesIndexs[i] = attrib;
-			}
-		}
-	}
-	//-----------------------------------------------------------------------
-	GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
-	{
-		// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
-		// and end up aliasing existing built-ins. So avoid! Fixed builtins are: 
-
-		//  a  builtin				custom attrib name
-		// ----------------------------------------------
-		//	0  gl_Vertex			vertex
-		//  1  n/a					blendWeights		
-		//	2  gl_Normal			normal
-		//	3  gl_Color				colour
-		//	4  gl_SecondaryColor	secondary_colour
-		//	5  gl_FogCoord			fog_coord
-		//  7  n/a					blendIndices
-		//  8 tangent
-		//  9 binormal
-		//	10  gl_MultiTexCoord0	uv0
-		//	11  gl_MultiTexCoord1	uv1
-		//	12 gl_MultiTexCoord2	uv2
-		//	13 gl_MultiTexCoord3	uv3
-		//	14 gl_MultiTexCoord4	uv4
-		//	15 gl_MultiTexCoord5	uv5
-		//	16 gl_MultiTexCoord6	uv6
-		//	17 gl_MultiTexCoord7	uv7
 		switch(semantic)
 		{
 			case VES_POSITION:
-				return 0;
+				return "vertex";
 			case VES_BLEND_WEIGHTS:
-				return 1;
+				return "blendWeights";
 			case VES_NORMAL:
-				return 2;
+				return "normal";
 			case VES_DIFFUSE:
-				return 3;
+				return "colour";
 			case VES_SPECULAR:
-				return 4;
+				return "secondary_colour";
 			case VES_BLEND_INDICES:
-				return 5;
+				return "blendIndices";
 			case VES_TANGENT:
-				return 6;
+				return "tangent";
 			case VES_BINORMAL:
-				return 7;
+				return "binormal";
 			case VES_TEXTURE_COORDINATES:
-				return 8 + index;
+				return "uv";
 			default:
 				assert(false && "Missing attribute!");
 				return 0;
@@ -334,8 +248,30 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLuint GLSLESLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
 	{
+		GLuint res = mCustomAttributesIndexs[semantic-1][index];
+		if (res != NULL_CUSTOM_ATTRIBUTES_INDEX)
+		{
+			const char * attString = getAttributeSemanticString(semantic);
+			GLint attrib = glGetAttribLocation(mGLHandle, attString);
 
-		return mCustomAttributesIndexs[getFixedAttributeIndex(semantic, index)];
+			// sadly position is a special case 
+			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
+			{
+				attrib = glGetAttribLocation(mGLHandle, "position");
+			}
+
+			// for uv and other case the index is a part of the name
+			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
+			{
+				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
+				attrib = glGetAttribLocation(mGLHandle, attStringWithSemantic.c_str());
+			}
+
+			// update mCustomAttributesIndexs with the index we found (or didn't found) 
+			mCustomAttributesIndexs[semantic-1][index] = attrib;
+			res = attrib;
+		}
+		return res;
 	}
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)

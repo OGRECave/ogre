@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreGLES2Prerequisites.h"
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
-
 namespace Ogre {
     
     class GLSLESGpuProgram;
@@ -82,8 +81,13 @@ namespace Ogre {
 		void extractAttributes(void);
 
 		typedef set<GLuint>::type AttributeSet;
-
-		vector<GLuint>::type mCustomAttributesIndexs;
+ 
+		// an array to hold the attributes indexes
+		uint8 mCustomAttributesIndexs[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
+// a value to define the case we didn't look for the attributes since the contractor
+#define NULL_CUSTOM_ATTRIBUTES_INDEX -2
+// a value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
+#define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
 
 		Ogre::String getCombinedName();
 		/// Get the the binary data of a program from the microcode cache
