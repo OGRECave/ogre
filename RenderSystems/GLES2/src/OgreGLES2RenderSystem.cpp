@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLSLESProgramFactory.h"
+#include "OgreGLSLESLinkProgram.h"
+#include "OgreGLSLESLinkProgramManager.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #   include "OgreEAGL2Window.h"
@@ -1556,7 +1558,14 @@ namespace Ogre {
             unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
             GLboolean normalised = GL_FALSE;
 
-			GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
+			GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+			if ( ! linkProgram->isAttributeValid(sem, elem->getIndex()) )
+			{
+				continue;
+			}
+
+			GLint attrib = linkProgram->getAttributeIndex(sem, elem->getIndex());
+
             switch(elem->getType())
             {
             case VET_COLOUR:

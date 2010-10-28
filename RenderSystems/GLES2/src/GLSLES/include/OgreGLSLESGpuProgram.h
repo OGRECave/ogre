@@ -74,14 +74,7 @@ namespace Ogre {
 		const GLuint getProgramID(void) const { return mProgramID; }
 
 		/// Get the GLSLESProgram for the shader object
-		GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }
-
-		/// @copydoc GLES2GpuProgram::getAttributeIndex
-		GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
-		
-		/// @copydoc GLES2GpuProgram::isAttributeValid
-		bool isAttributeValid(VertexElementSemantic semantic, uint index);
-		
+		GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }		
 
     protected:
         /// Overridden from GpuProgram

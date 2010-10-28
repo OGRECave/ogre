@@ -82,19 +82,7 @@ namespace Ogre {
 		void extractAttributes(void);
 
 		typedef set<GLuint>::type AttributeSet;
-		// Custom attribute bindings
-		AttributeSet mValidAttributes;
 
-		/// Name / attribute list
-		struct CustomAttribute
-		{
-			String name;
-			GLuint attrib;
-			CustomAttribute(const String& _name, GLuint _attrib)
-				:name(_name), attrib(_attrib) {}
-		};
-
-		static CustomAttribute msCustomAttributes[];
 		vector<GLuint>::type mCustomAttributesIndexs;
 
 		Ogre::String getCombinedName();

@@ -46,32 +46,17 @@ namespace Ogre {
 	//	4  gl_SecondaryColor	secondary_colour
 	//	5  gl_FogCoord			fog_coord
 	//  7  n/a					blendIndices
-	//	8  gl_MultiTexCoord0	uv0
-	//	9  gl_MultiTexCoord1	uv1
-	//	10 gl_MultiTexCoord2	uv2
-	//	11 gl_MultiTexCoord3	uv3
-	//	12 gl_MultiTexCoord4	uv4
-	//	13 gl_MultiTexCoord5	uv5
-	//	14 gl_MultiTexCoord6	uv6, tangent
-	//	15 gl_MultiTexCoord7	uv7, binormal
-	GLSLESLinkProgram::CustomAttribute GLSLESLinkProgram::msCustomAttributes[] = {
-		CustomAttribute("vertex", GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0)),
-		CustomAttribute("blendWeights", GLES2GpuProgram::getFixedAttributeIndex(VES_BLEND_WEIGHTS, 0)),
-		CustomAttribute("normal", GLES2GpuProgram::getFixedAttributeIndex(VES_NORMAL, 0)),
-		CustomAttribute("colour", GLES2GpuProgram::getFixedAttributeIndex(VES_DIFFUSE, 0)),
-		CustomAttribute("secondary_colour", GLES2GpuProgram::getFixedAttributeIndex(VES_SPECULAR, 0)),
-		CustomAttribute("blendIndices", GLES2GpuProgram::getFixedAttributeIndex(VES_BLEND_INDICES, 0)),
-		CustomAttribute("uv0", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0)),
-		CustomAttribute("uv1", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 1)),
-		CustomAttribute("uv2", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 2)),
-		CustomAttribute("uv3", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 3)),
-		CustomAttribute("uv4", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 4)),
-		CustomAttribute("uv5", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 5)),
-		CustomAttribute("uv6", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 6)),
-		CustomAttribute("uv7", GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 7)),
-		CustomAttribute("tangent", GLES2GpuProgram::getFixedAttributeIndex(VES_TANGENT, 0)),
-		CustomAttribute("binormal", GLES2GpuProgram::getFixedAttributeIndex(VES_BINORMAL, 0)),
-	};
+	//  8 tangent
+	//  9 binormal
+	//	10  gl_MultiTexCoord0	uv0
+	//	11  gl_MultiTexCoord1	uv1
+	//	12 gl_MultiTexCoord2	uv2
+	//	13 gl_MultiTexCoord3	uv3
+	//	14 gl_MultiTexCoord4	uv4
+	//	15 gl_MultiTexCoord5	uv5
+	//	16 gl_MultiTexCoord6	uv6
+	//	17 gl_MultiTexCoord7	uv7
+#define NUMBER_OF_CUSTOM_ATTS 18
 
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram::GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
@@ -82,9 +67,9 @@ namespace Ogre {
 		, mTriedToLinkAndFailed(false)
 	{
 		// init CustomAttributesIndexs
-		mCustomAttributesIndexs.resize(GLES2GpuProgram::getFixedAttributeIndexCount());
+		mCustomAttributesIndexs.resize(NUMBER_OF_CUSTOM_ATTS);
 
-		for(size_t i = 0 ; i < GLES2GpuProgram::getFixedAttributeIndexCount(); i++)
+		for(size_t i = 0 ; i < NUMBER_OF_CUSTOM_ATTS; i++)
 		{
 			mCustomAttributesIndexs[i] = -1;
 		}
@@ -256,12 +241,30 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::extractAttributes(void)
 	{
-		size_t numAttribs = sizeof(msCustomAttributes)/sizeof(CustomAttribute);
+		size_t numAttribs = NUMBER_OF_CUSTOM_ATTS;
+	String customAttributesNames[] = {
+		String("vertex"),
+		String("blendWeights"),
+		String("normal"),
+		String("colour"),
+		String("secondary_colour"),
+		String("blendIndices"),
+		String("tangent"),
+		String("binormal"),
+		String("uv0"),
+		String("uv1"),
+		String("uv2"),
+		String("uv3"),
+		String("uv4"),
+		String("uv5"),
+		String("uv6"),
+		String("uv7"),
+	};
 
 		for (size_t i = 0; i < numAttribs; ++i)
 		{
-			const CustomAttribute& a = msCustomAttributes[i];
-			GLint attrib = glGetAttribLocation(mGLHandle, a.name.c_str());
+			const String& attName = customAttributesNames[i];
+			GLint attrib = glGetAttribLocation(mGLHandle, attName.c_str());
             GL_CHECK_ERROR;
 
 			// seems that the word "position" is also used to define the position 
@@ -273,20 +276,71 @@ namespace Ogre {
 			
 			if (attrib != -1)
 			{
-				mCustomAttributesIndexs[a.attrib] = attrib;
-				mValidAttributes.insert(attrib);
+				mCustomAttributesIndexs[i] = attrib;
 			}
 		}
 	}
 	//-----------------------------------------------------------------------
+	GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index)
+	{
+		// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
+		// and end up aliasing existing built-ins. So avoid! Fixed builtins are: 
+
+		//  a  builtin				custom attrib name
+		// ----------------------------------------------
+		//	0  gl_Vertex			vertex
+		//  1  n/a					blendWeights		
+		//	2  gl_Normal			normal
+		//	3  gl_Color				colour
+		//	4  gl_SecondaryColor	secondary_colour
+		//	5  gl_FogCoord			fog_coord
+		//  7  n/a					blendIndices
+		//  8 tangent
+		//  9 binormal
+		//	10  gl_MultiTexCoord0	uv0
+		//	11  gl_MultiTexCoord1	uv1
+		//	12 gl_MultiTexCoord2	uv2
+		//	13 gl_MultiTexCoord3	uv3
+		//	14 gl_MultiTexCoord4	uv4
+		//	15 gl_MultiTexCoord5	uv5
+		//	16 gl_MultiTexCoord6	uv6
+		//	17 gl_MultiTexCoord7	uv7
+		switch(semantic)
+		{
+			case VES_POSITION:
+				return 0;
+			case VES_BLEND_WEIGHTS:
+				return 1;
+			case VES_NORMAL:
+				return 2;
+			case VES_DIFFUSE:
+				return 3;
+			case VES_SPECULAR:
+				return 4;
+			case VES_BLEND_INDICES:
+				return 5;
+			case VES_TANGENT:
+				return 6;
+			case VES_BINORMAL:
+				return 7;
+			case VES_TEXTURE_COORDINATES:
+				return 8 + index;
+			default:
+				assert(false && "Missing attribute!");
+				return 0;
+		};
+
+	}
+	//-----------------------------------------------------------------------
 	GLuint GLSLESLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
 	{
-		return mCustomAttributesIndexs[GLES2GpuProgram::getFixedAttributeIndex(semantic, index)];
+
+		return mCustomAttributesIndexs[getFixedAttributeIndex(semantic, index)];
 	}
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
 	{
-		return mValidAttributes.find(getAttributeIndex(semantic, index)) != mValidAttributes.end();
+		return getAttributeIndex(semantic, index) != -1;
 	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::buildGLUniformReferences(void)

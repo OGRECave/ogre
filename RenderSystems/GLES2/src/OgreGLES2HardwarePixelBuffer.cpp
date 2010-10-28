@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2GpuProgram.h"
 #include "OgreRoot.h"
+#include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLSLESLinkProgram.h"
 
 static int computeLog(GLuint value)
 {
@@ -633,24 +635,26 @@ namespace Ogre {
                 u1, v2, w
             };
 
+			GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+
             // Draw the textured quad
-            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0),
+            glVertexAttribPointer(linkProgram->getAttributeIndex(VES_POSITION, 0),
                                   2,
                                   GL_FLOAT,
                                   0,
                                   0,
                                   squareVertices);
             GL_CHECK_ERROR;
-            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_POSITION, 0));
+            glEnableVertexAttribArray(linkProgram->getAttributeIndex(VES_POSITION, 0));
             GL_CHECK_ERROR;
-            glVertexAttribPointer(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0),
+            glVertexAttribPointer(linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0),
                                   3,
                                   GL_FLOAT,
                                   0,
                                   0,
                                   texCoords);
             GL_CHECK_ERROR;
-            glEnableVertexAttribArray(GLES2GpuProgram::getFixedAttributeIndex(VES_TEXTURE_COORDINATES, 0));
+            glEnableVertexAttribArray(linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0));
             GL_CHECK_ERROR;
 
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

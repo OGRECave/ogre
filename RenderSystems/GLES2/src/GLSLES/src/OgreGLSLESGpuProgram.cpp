@@ -138,37 +138,4 @@ namespace Ogre {
 		linkProgram->updatePassIterationUniforms( params );
 		
 	}
-	//-----------------------------------------------------------------------------
-	GLuint GLSLESGpuProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-	{
-		// get link program - only call this in the context of bound program
-		GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-
-		if (linkProgram->isAttributeValid(semantic, index))
-		{
-			return linkProgram->getAttributeIndex(semantic, index);
-		}
-		else
-		{
-			// fall back to default implementation, allow default bindings
-			return GLES2GpuProgram::getAttributeIndex(semantic, index);
-		}
-		
-	}
-	//-----------------------------------------------------------------------------
-	bool GLSLESGpuProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
-	{
-		// get link program - only call this in the context of bound program
-		GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-
-		if (linkProgram->isAttributeValid(semantic, index))
-		{
-			return true;
-		}
-		else
-		{
-			// fall back to default implementation, allow default bindings
-			return GLES2GpuProgram::isAttributeValid(semantic, index);
-		}
-	}
 }
