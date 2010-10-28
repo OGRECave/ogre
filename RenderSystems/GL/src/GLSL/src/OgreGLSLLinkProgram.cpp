@@ -116,29 +116,6 @@ namespace Ogre {
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
 	{
-			//checkForGLSLError( "GLSLLinkProgram::GLSLLinkProgram", "Error prior to Creating GLSL Program Object", 0);
-		    glGetError(); //Clean up the error. Otherwise will flood log.
-		    mGLHandle = glCreateProgramObjectARB();
-			checkForGLSLError( "GLSLLinkProgram::GLSLLinkProgram", "Error Creating GLSL Program Object", 0 );
-
-
-			// tell shaders to attach themselves to the LinkProgram
-			// let the shaders do the attaching since they may have several children to attach
-			if (mVertexProgram)
-			{
-				mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
-				setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
-			}
-			if (mGeometryProgram)
-			{
-				mGeometryProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
-				//Don't set adjacency flag. We handle it internally and expose "false"
-			}
-			if (mFragmentProgram)
-			{
-				mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
-			}
-
 	}
 
 	//-----------------------------------------------------------------------
@@ -153,6 +130,10 @@ namespace Ogre {
 	{
 		if (!mLinked && !mTriedToLinkAndFailed)
 		{			
+			glGetError(); //Clean up the error. Otherwise will flood log.
+			mGLHandle = glCreateProgramObjectARB();
+			checkForGLSLError( "GLSLLinkProgram::compileAndLink", "Error Creating GLSL Program Object", 0 );
+
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
 			{
@@ -160,9 +141,11 @@ namespace Ogre {
 			}
 			else
 			{
-				link();
+				compileAndLink();
 
 			}
+			buildGLUniformReferences();
+			extractAttributes();
 		}
 	}
     //-----------------------------------------------------------------------
@@ -172,7 +155,7 @@ namespace Ogre {
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
 		
 		GLenum binaryFormat = *((GLenum *)(cacheMicrocode->getPtr()));
-		void * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
+		uint8 * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
 		size_t sizeOfBuffer = cacheMicrocode->size() - sizeof(GLenum);
 		glProgramBinary(mGLHandle, 
 						binaryFormat, 
@@ -189,7 +172,7 @@ namespace Ogre {
             // were cached away.  Fallback to source shader loading path,
             // and then retrieve and cache new program binaries once again.
             //
-			link();
+			compileAndLink();
         }
 	}
 	//-----------------------------------------------------------------------
@@ -424,11 +407,21 @@ namespace Ogre {
 		return name;
 	}
 	//-----------------------------------------------------------------------
-	void GLSLLinkProgram::link()
+	void GLSLLinkProgram::compileAndLink()
 	{
 		if (mVertexProgram)
 		{
+			// compile and attach Vertex Program
+			if (!mVertexProgram->getGLSLProgram()->compile(true))
+			{
+				// todo error
+				return;
+			}
+			mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+			setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
+
 			// Some drivers (e.g. OS X on nvidia) incorrectly determine the attribute binding automatically
+
 			// and end up aliasing existing built-ins. So avoid! 
 			// Bind all used attribs - not all possible ones otherwise we'll get 
 			// lots of warnings in the log, and also may end up aliasing names used
@@ -468,6 +461,17 @@ namespace Ogre {
 
 		if (mGeometryProgram)
 		{
+			// compile and attach Geometry Program
+			if (!mGeometryProgram->getGLSLProgram()->compile(true))
+			{
+				// todo error
+				return;
+			}
+
+			mGeometryProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+
+			//Don't set adjacency flag. We handle it internally and expose "false"
+
 			RenderOperation::OperationType inputOperationType = mGeometryProgram->getGLSLProgram()->getInputOperationType();
 			glProgramParameteriEXT(mGLHandle,GL_GEOMETRY_INPUT_TYPE_EXT,
 				getGLGeometryInputPrimitiveType(inputOperationType, mGeometryProgram->isAdjacencyInfoRequired()));
@@ -491,6 +495,20 @@ namespace Ogre {
 				mGeometryProgram->getGLSLProgram()->getMaxOutputVertices());
 		}
 
+		if (mFragmentProgram)
+		{
+			// compile and attach Fragment Program
+			if (!mFragmentProgram->getGLSLProgram()->compile(true))
+			{
+				// todo error
+				return;
+			}		
+			mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+		}
+
+		
+		// now the link
+
 		glLinkProgramARB( mGLHandle );
 		glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
 		// force logging and raise exception if not linked
@@ -501,8 +519,6 @@ namespace Ogre {
 		if(mLinked)
 		{
 			logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLHandle );
-			buildGLUniformReferences();
-			extractAttributes();
 		}
 
 		if (mLinked)
@@ -529,11 +545,14 @@ namespace Ogre {
 				// it will be the first bytes of the array in the microcode
 				GLenum binaryFormat = 0; 
 
-				// get the buffer
+				// alloc memory
 				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum)));
-				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, newMicrocode->getPtr() + sizeof(GLenum));
-				memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
 
+				// get the buffer
+				uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);
+				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, programBuffer);
+
+				memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
 
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}

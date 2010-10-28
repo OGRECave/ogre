@@ -95,9 +95,11 @@ namespace Ogre {
 
 		static CustomAttribute msCustomAttributes[];
 
-		void link();
-		void getMicrocodeFromCache();
 		String getCombinedName();		
+		/// Compiles and links the the vertex and fragment programs
+		void compileAndLink();
+		/// Get the the binary data of a program from the microcode cache
+		void getMicrocodeFromCache();
 	public:
 		/// constructor should only be used by GLSLLinkProgramManager
 		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
