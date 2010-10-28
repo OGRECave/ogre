@@ -1978,7 +1978,7 @@ vertex_program Examples/ShowNormals_vCg cg
 
 vertex_program Examples/ShowNormals_vGLSLES glsles
 {
-	source ShowTangents.glsles
+	source ShowNormals.glsles
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
