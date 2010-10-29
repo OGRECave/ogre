@@ -154,6 +154,7 @@
 			};
 			buildConfigurationList = B44174EA08BA33C40065BEDE /* Build configuration list for PBXProject "Select Ogre Install Location" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,

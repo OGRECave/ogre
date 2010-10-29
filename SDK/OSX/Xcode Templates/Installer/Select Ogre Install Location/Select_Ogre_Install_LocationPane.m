@@ -96,7 +96,7 @@
     [openPanel setCanChooseFiles:NO];
     [openPanel setCanChooseDirectories:YES];
     [openPanel setAllowsMultipleSelection:NO];
-    [openPanel setMessage:@"Select where the iPhone OGRE SDK is installed."];
+    [openPanel setMessage:@"Select where the iOS OGRE SDK is installed."];
     isChoosingiPhoneSDK = YES;
 
     [openPanel beginSheetForDirectory:nil
@@ -147,11 +147,24 @@
                 [ogreiPhoneLocationLabel setStringValue:[NSString stringWithFormat:@"%@%@ @ %@", @"Found Ogre version ", version, ogreDirectory]];
 
                 // Replace the placeholder string in the project files with the SDK root chosen by the user
-                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"];
-                [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
-                                                     withString:ogreDirectory
-                                                        options:NSLiteralSearch
-                                                          range:NSMakeRange(0, [projectFileContents length])];
+                NSError *err = nil;
+                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj"
+                                                                                        encoding:NSUTF8StringEncoding
+                                                                                           error:&err];
+                if(([projectFileContents length] == 0) || (err != nil))
+                {
+                    NSLog(@"Error opening iOS template project file: %@", [err localizedDescription]);
+                }
+                
+                unsigned int numReplaced = [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
+                                                                                withString:ogreDirectory
+                                                                                   options:NSLiteralSearch
+                                                                                     range:NSMakeRange(0, [projectFileContents length])];
+                if(numReplaced == 0)
+                {
+                    NSLog(@"Error replacing _OGRESDK_ROOT_ in iOS Template");
+                }
+
                 [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/iPhone OS/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
             }
             else
@@ -183,11 +196,25 @@
                 [ogreOSXLocationLabel setStringValue:[NSString stringWithFormat:@"%@%@ @ %@", @"Found Ogre version ", version, ogreDirectory]];
 
                 // Replace the placeholder string in the project files with the SDK root chosen by the user
-                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"];
-                [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
-                                                     withString:ogreDirectory
-                                                        options:NSLiteralSearch
-                                                          range:NSMakeRange(0, [projectFileContents length])];
+                NSError *err = nil;
+                NSMutableString *projectFileContents = [NSMutableString stringWithContentsOfFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj"
+                                                                                        encoding:NSUTF8StringEncoding
+                                                                                           error:&err];
+
+                if(([projectFileContents length] == 0) || (err != nil))
+                {
+                    NSLog(@"Error opening OS X template project file: %@", [err localizedDescription]);
+                }
+
+                unsigned int numReplaced = [projectFileContents replaceOccurrencesOfString:@"_OGRESDK_ROOT_"
+                                                                                withString:ogreDirectory
+                                                                                   options:NSLiteralSearch
+                                                                                     range:NSMakeRange(0, [projectFileContents length])];
+                if(numReplaced == 0)
+                {
+                    NSLog(@"Error replacing _OGRESDK_ROOT_ in OS X Template");
+                }
+
                 [projectFileContents writeToFile:@"/Library/Application Support/Developer/Shared/Xcode/Project Templates/Ogre/Mac OS X/___PROJECTNAME___.xcodeproj/project.pbxproj" atomically:YES];
             }
             else
