@@ -1493,7 +1493,7 @@ protected:
 				mTrayMgr = 0;
 			}
 
-			if (!mCurrentSample) destroyDummyScene();
+			if (!mCurrentSample && mRoot->getRenderSystem() != NULL) destroyDummyScene();
 
 			mCategoryMenu = 0;
 			mSampleMenu = 0;

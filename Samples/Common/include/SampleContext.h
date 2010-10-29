@@ -292,8 +292,11 @@ namespace OgreBites
 				mLastRun = true;  // assume this is our last run
 
 				initApp(initialSample);
-
-				mRoot->startRendering();    // start the render loop
+        
+                if (mRoot->getRenderSystem() != NULL)
+                {
+				    mRoot->startRendering();    // start the render loop
+                }
 
 				closeApp();
 
