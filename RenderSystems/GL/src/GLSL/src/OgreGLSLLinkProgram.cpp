@@ -545,15 +545,18 @@ namespace Ogre {
 				// it will be the first bytes of the array in the microcode
 				GLenum binaryFormat = 0; 
 
-				// alloc memory
-				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum)));
+                // create microcode
+                GpuProgramManager::Microcode newMicrocode = 
+                    GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
 
-				// get the buffer
+        		// get binary
 				uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);
 				glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, programBuffer);
 
+                // save binary format
 				memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
 
+        		// add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
 		}

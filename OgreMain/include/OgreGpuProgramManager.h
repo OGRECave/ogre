@@ -196,6 +196,12 @@ namespace Ogre {
         @param name The name of the program.
         */
 		virtual const Microcode & getMicrocodeFromCache( const String & name ) const;
+
+        /** Creates a microcode to be later added to the cache.
+		@param size The size of the microcode in bytes
+        */
+		virtual Microcode createMicrocode( const size_t size ) const;
+
         /** Adds a microcode for a program to the microcode cache.
         @param name The name of the program.
         */

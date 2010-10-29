@@ -318,8 +318,10 @@ namespace Ogre {
 		String name = String("D3D9_HLSL_") + mName;
 
 		size_t sizeOfBuffer = sizeof(size_t) + mpMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
-		GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name, sizeOfBuffer));
-		newMicrocode->seek(0);
+		
+        // create microcode
+        GpuProgramManager::Microcode newMicrocode = 
+            GpuProgramManager::getSingleton().createMicrocode(sizeOfBuffer);
 
 		// save size of microcode
 		size_t microcodeSize = mpMicroCode->GetBufferSize();
@@ -353,6 +355,7 @@ namespace Ogre {
 		}
 
 
+		// add to the microcode to the cache
 		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 	}
     //-----------------------------------------------------------------------

@@ -239,6 +239,11 @@ namespace Ogre {
 		return mMicrocodeCache.find(addRenderSystemToName(name))->second;
 	}
 	//---------------------------------------------------------------------
+    GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const size_t size ) const
+	{	
+		return Microcode(OGRE_NEW MemoryDataStream(size));	
+	}
+	//---------------------------------------------------------------------
 	void GpuProgramManager::addMicrocodeToCache( const String & name, const GpuProgramManager::Microcode & microcode )
 	{	
 		String nameWithRenderSystem = addRenderSystemToName(name);

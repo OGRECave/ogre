@@ -229,23 +229,23 @@ namespace Ogre {
 	void CgProgram::addMicrocodeToCache()
 	{
 		String name = String("CG_") + mName;
-		// add to the microcode to the cache
-		GpuProgramManager::Microcode newMicrocode(
-						OGRE_NEW MemoryDataStream( name, 
-												   sizeof(size_t) + 
-												   mProgramString.size() + 
-												   sizeof(size_t) + 
-												   mParametersMapSizeAsBuffer)
-												 );
+		size_t programStringSize = mProgramString.size();
+        size_t sizeOfMicrocode = sizeof(size_t) +   // size of mProgramString
+							     programStringSize + // microcode - mProgramString
+							     sizeof(size_t) + // size of param map
+							     mParametersMapSizeAsBuffer;
+
+		// create microcode
+		GpuProgramManager::Microcode newMicrocode = 
+            GpuProgramManager::getSingleton().createMicrocode(sizeOfMicrocode);
 
 		newMicrocode->seek(0);
 
 		// save size of string
-		size_t programStringSize = mProgramString.size();
 		newMicrocode->write(&programStringSize, sizeof(size_t));
 
 		// save microcode
-		newMicrocode->write(&mProgramString[0],programStringSize);
+		newMicrocode->write(&mProgramString[0], programStringSize);
 
 		// save size of param map
 		size_t parametersMapSize = mParametersMap.size();
@@ -270,6 +270,7 @@ namespace Ogre {
 			newMicrocode->write(&def, sizeof(GpuConstantDefinition));
 		}
 
+		// add to the microcode to the cache
 		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 	}
     //-----------------------------------------------------------------------

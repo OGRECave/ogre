@@ -202,15 +202,16 @@ namespace Ogre {
 				// turns out we need this param when loading
 				GLenum binaryFormat = 0; 
 
-				// get the buffer
-				GpuProgramManager::Microcode newMicrocode(OGRE_NEW MemoryDataStream(name,  binaryLength + sizeof(GLenum)));
-				newMicrocode->seek(0);
+                // create microcode
+                GpuProgramManager::Microcode newMicrocode = 
+                    GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
 
 #if GL_OES_get_program_binary
 				// get binary
 				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
 #endif
 
+        		// add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
 		}
