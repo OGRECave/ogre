@@ -31,8 +31,15 @@ THE SOFTWARE.
 namespace Ogre {
 
 	GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
+																 HardwareBuffer::Usage usage)
+	: HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+	{
+        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+	}
+	//-----------------------------------------------------------------------
+	GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
 		HardwareBuffer::Usage usage)
-        : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
@@ -149,7 +156,7 @@ namespace Ogre {
 		size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		return HardwareVertexBufferSharedPtr(
-			new GLDefaultHardwareVertexBuffer(vertexSize, numVerts, usage));
+			new GLDefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage));
 	}
     //-----------------------------------------------------------------------
 	HardwareIndexBufferSharedPtr 

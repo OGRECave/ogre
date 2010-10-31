@@ -52,7 +52,8 @@ namespace Ogre {
         /** See HardwareBuffer. */
 		void unlockImpl(void);
     public:
-		DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
+		DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, HardwareBuffer::Usage usage);
+		DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
             HardwareBuffer::Usage usage);
         ~DefaultHardwareVertexBuffer();
         /** See HardwareBuffer. */

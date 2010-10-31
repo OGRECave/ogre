@@ -46,13 +46,14 @@ namespace Ogre {
           mNumVertices(numVertices),
           mVertexSize(vertexSize)
     {
+		assert(mMgr != 0);
         // Calculate the size of the vertices
         mSizeInBytes = mVertexSize * numVertices;
 
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mpShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mVertexSize, 
+            mpShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mMgr, mVertexSize, 
                     mNumVertices, HardwareBuffer::HBU_DYNAMIC);
         }
 
