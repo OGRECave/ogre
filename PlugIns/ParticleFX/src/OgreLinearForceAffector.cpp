@@ -59,7 +59,7 @@ namespace Ogre {
                 "The vector representing the force to apply.",
                 PT_VECTOR3),&msForceVectorCmd);
             dict->addParameter(ParameterDef("force_application", 
-                "How to apply the force vector to partices.",
+                "How to apply the force vector to particles.",
                 PT_STRING),&msForceAppCmd);
 
         }

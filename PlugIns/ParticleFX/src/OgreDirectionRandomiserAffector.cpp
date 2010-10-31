@@ -62,7 +62,7 @@ namespace Ogre {
                 "The percentage of particles which is affected.",
                 PT_REAL), &msScopeCmd);
             dict->addParameter(ParameterDef("keep_velocity",
-                "Detemines whether the velocity of the particles is changed.",
+                "Determines whether the velocity of the particles is changed.",
                 PT_BOOL), &msKeepVelocityCmd);
         }
     }

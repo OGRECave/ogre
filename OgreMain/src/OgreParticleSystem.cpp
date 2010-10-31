@@ -744,7 +744,7 @@ namespace Ogre {
             ParamDictionary* dict = getParamDictionary();
 
             dict->addParameter(ParameterDef("quota", 
-                "The maximum number of particle allowed at once in this system.",
+                "The maximum number of particles allowed at once in this system.",
                 PT_UNSIGNED_INT),
                 &msQuotaCmd);
 
