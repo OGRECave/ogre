@@ -799,7 +799,7 @@ void PerPixelLighting::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool PerPixelLighting::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool PerPixelLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	if (srcPass->getLightingEnabled() == false)
 		return false;

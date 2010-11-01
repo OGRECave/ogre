@@ -328,7 +328,7 @@ void FFPFog::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool FFPFog::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool FFPFog::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {	
 	FogMode fogMode;
 	ColourValue newFogColour;

@@ -19,6 +19,18 @@ enum ShaderSystemLightingModel
 	SSLM_NormalMapLightingObjectSpace,		
 };
 
+// a hack class to get infinite frustum - needed by instanced viewports demo
+// a better solution will be to check the frustums of all the viewports in a similer class
+class _OgreSampleClassExport InfiniteFrustum : public Frustum
+{
+public:
+	virtual bool isVisible(const AxisAlignedBox& bound, FrustumPlane* culledBy = 0) const {return true;};
+	virtual bool isVisible(const Sphere& bound, FrustumPlane* culledBy = 0) const {return true;};
+	virtual bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const {return true;};
+
+};
+
+
 // Listener class for frame updates
 class _OgreSampleClassExport Sample_ShaderSystem : public SdkSample
 {
@@ -82,6 +94,9 @@ protected:
 	/** Set fog per pixel enable state. */
 	void setPerPixelFogEnable(bool enable);
 
+	/** Set instanced viewports enable state. */
+	void setInstancedViewportsEnable( bool enable );
+
 	/** Create directional light. */
 	void createDirectionalLight();
 
@@ -90,6 +105,10 @@ protected:
 
 	/** Create spot light. */
 	void createSpotLight();
+
+
+	/** Toggle instanced viewports */
+	void updateInstancedViewports(bool visible);
 
 	/** Toggle light visibility. */
 	void updateLightState(const String& lightName, bool visible);
@@ -124,6 +143,9 @@ protected:
 	/** @see Sample::unloadResources. */
 	void unloadResources();
 
+	void createInstancedViewports();
+	void distroyInstancedViewports();
+
 	/** Destroy private resource group. */
 	void destroyPrivateResourceGroup();
 
@@ -138,7 +160,6 @@ protected:
 
 	/** Update layer blend caption. */
 	void updateLayerBlendingCaption( RTShader::LayeredBlending::BlendMode nextBlendMode );
-
 // Types.
 protected:
 	typedef vector<Entity*>::type	EntityList;
@@ -157,7 +178,12 @@ protected:
 	bool								mPerPixelFogEnable;		// When true the RTSS will do per pixel fog calculations.
 	bool								mSpecularEnable;		// The current specular state.	
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
-	RTShader::SubRenderStateFactory*	mInstancedViewportsFactory;
+	RTShader::SubRenderState*			mInstancedViewportsSubRenderState;// todo - doc
+	bool								mInstancedViewportsEnable;		// todo - doc
+	SceneNode *							mKnot1Node;						// todo - doc
+	SceneNode *							mKnot2Node;						// todo - doc
+	InfiniteFrustum 					mInfiniteFrustum;				// todo - doc
+	BillboardSet*						mBbsFlare;						// todo - doc
 
 	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
 	RTShader::LayeredBlending*			mLayerBlendSubRS;		// The layer blending sub render state.
@@ -177,6 +203,7 @@ protected:
 	CheckBox*							mPointLightCheckBox;	// The point light check box.
 	CheckBox*							mSpotLightCheckBox;		// The spot light check box.
 	String								mExportMaterialPath;	// The path of the export material.
+	CheckBox*							mInstancedViewportsCheckBox; // The instanced viewports check box.
 					
 };
 

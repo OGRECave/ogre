@@ -116,7 +116,7 @@ void IntegratedPSSM3::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool IntegratedPSSM3::preAddToRenderState(RenderState* renderState, 
+bool IntegratedPSSM3::preAddToRenderState(const RenderState* renderState, 
 										 Pass* srcPass, Pass* dstPass)
 {
 	if (srcPass->getLightingEnabled() == false ||

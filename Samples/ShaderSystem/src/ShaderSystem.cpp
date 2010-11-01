@@ -10,6 +10,7 @@ using namespace OgreBites;
 //-----------------------------------------------------------------------
 const String DIRECTIONAL_LIGHT_NAME		= "DirectionalLight";
 const String POINT_LIGHT_NAME			= "PointLight";
+const String INSTANCED_VIEWPORTS_NAME	= "InstancedViewports";
 const String SPOT_LIGHT_NAME			= "SpotLight";
 const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
@@ -77,6 +78,12 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
 					;
 	mPointLightNode = NULL;
 	mReflectionMapFactory = NULL;
+	mInstancedViewportsEnable = false;
+	mInstancedViewportsSubRenderState = NULL;
+	mKnot1Node = NULL;
+	mKnot2Node = NULL;
+	mBbsFlare = NULL;
+
 }
 
 
@@ -100,6 +107,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	else if (cbName == POINT_LIGHT_NAME)
 	{
 		updateLightState(cbName, box->isChecked());
+	}
+	else if (cbName == INSTANCED_VIEWPORTS_NAME)
+	{
+		updateInstancedViewports(box->isChecked());
 	}
 	else if (cbName == SPOT_LIGHT_NAME)
 	{
@@ -363,6 +374,7 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
+	mKnot1Node = childNode;
 
 	// Create normal map lighting demonstration entity.
 	entity = mSceneMgr->createEntity("NormalMapEntity", "knot.mesh");
@@ -370,6 +382,7 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
+	mKnot2Node = childNode;
 	
 	createDirectionalLight();
 	createPointLight();
@@ -434,9 +447,12 @@ void Sample_ShaderSystem::setupUI()
 	mPointLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, POINT_LIGHT_NAME, "Point Light", 220);
 	mSpotLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light", 220);
 
+	mInstancedViewportsCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, INSTANCED_VIEWPORTS_NAME, "Instanced Viewports", 220);
+	
 	mDirLightCheckBox->setChecked(true);
 	mPointLightCheckBox->setChecked(true);
 	mSpotLightCheckBox->setChecked(false);
+	mInstancedViewportsCheckBox->setChecked(false);
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
@@ -772,15 +788,14 @@ void Sample_ShaderSystem::createDirectionalLight()
 
 	// create pivot node
 	mDirectionalLightNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	BillboardSet* bbs;
 
 	// Create billboard set.
-	bbs = mSceneMgr->createBillboardSet();
-	bbs->setMaterialName("Examples/Flare3");
-	bbs->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
-	bbs->setCastShadows(false);
+	mBbsFlare = mSceneMgr->createBillboardSet();
+	mBbsFlare->setMaterialName("Examples/Flare3");
+	mBbsFlare->createBillboard(-dir * 500.0)->setColour(light->getDiffuseColour());
+	mBbsFlare->setCastShadows(false);
 	
-	mDirectionalLightNode->attachObject(bbs);
+	mDirectionalLightNode->attachObject(mBbsFlare);
 	mDirectionalLightNode->attachObject(light);
 }
 
@@ -837,6 +852,53 @@ void Sample_ShaderSystem::createSpotLight()
 	light->setAttenuation(1000.0, 1.0, 0.0005, 0.0);
 }
 
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
+{
+	if (mInstancedViewportsEnable != ebabled)
+	{
+		mInstancedViewportsEnable = ebabled;
+
+		// hide this - the skybox has an issue
+		mSceneMgr->setSkyBox(!mInstancedViewportsEnable, "Examples/SceneCubeMap2");
+		
+		// hide this - the knot 1 has an issue
+		if(mKnot1Node)
+		{
+			mKnot1Node->setVisible(!mInstancedViewportsEnable);
+		}
+
+		// hide this - the knot 2 has an issue
+		if(mKnot2Node)
+		{
+			mKnot2Node->setVisible(!mInstancedViewportsEnable);
+		}
+
+		if (mInstancedViewportsEnable)
+		{
+			mCamera->setCullingFrustum(&mInfiniteFrustum);
+
+			// having problems with bb...
+			mDirectionalLightNode->detachObject(mBbsFlare);
+		}
+		else
+		{
+			mCamera->setCullingFrustum(NULL);
+			mDirectionalLightNode->attachObject(mBbsFlare);
+		}
+
+
+
+		distroyInstancedViewports();
+		if(mInstancedViewportsEnable)
+		{
+			createInstancedViewports();
+		}
+		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+	}
+}
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateLightState(const String& lightName, bool visible)
 {
@@ -946,6 +1008,7 @@ void Sample_ShaderSystem::applyShadowType(int menuIndex)
 		mTrayMgr->moveWidgetToTray(mDirLightCheckBox, TL_TOPLEFT, 1);
 		mTrayMgr->moveWidgetToTray(mPointLightCheckBox, TL_TOPLEFT, 2);
 		mTrayMgr->moveWidgetToTray(mSpotLightCheckBox, TL_TOPLEFT, 3);
+		
 		mDirLightCheckBox->show();
 		mPointLightCheckBox->show();
 		mSpotLightCheckBox->show();
@@ -1091,9 +1154,6 @@ void Sample_ShaderSystem::loadResources()
 	mReflectionMapFactory = OGRE_NEW ShaderExReflectionMapFactory;
 	mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
 
-	mInstancedViewportsFactory = OGRE_NEW ShaderExInstancedViewportsFactory;
-	mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory);
-	
 	createPrivateResourceGroup();
 }
 
@@ -1120,18 +1180,13 @@ void Sample_ShaderSystem::unloadResources()
 	mShaderGenerator->removeAllShaderBasedTechniques("Panels_RTSS_Export");
 
 	if (mReflectionMapFactory != NULL)
-	{		
+	{	
 		mShaderGenerator->removeSubRenderStateFactory(mReflectionMapFactory);
 		OGRE_DELETE mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
 
-	if (mInstancedViewportsFactory != NULL)
-	{		
-		mShaderGenerator->removeSubRenderStateFactory(mInstancedViewportsFactory);
-		OGRE_DELETE mInstancedViewportsFactory;
-		mInstancedViewportsFactory = NULL;
-	}
+	distroyInstancedViewports();
 }
 
 //-----------------------------------------------------------------------
@@ -1414,5 +1469,92 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 	return true;
 }
 
+void Sample_ShaderSystem::distroyInstancedViewports()
+{
+	if (mInstancedViewportsSubRenderState)
+	{
+		Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		renderState->removeTemplateSubRenderState(mInstancedViewportsSubRenderState);
+		mInstancedViewportsSubRenderState = NULL;
+	}
 
+	if (mRoot->getRenderSystem()->getGlobalInstanceVertexBufferVertexDeclaration() != NULL)
+	{
+		Ogre::HardwareBufferManager::getSingleton().destroyVertexDeclaration(
+			mRoot->getRenderSystem()->getGlobalInstanceVertexBufferVertexDeclaration());
+		mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(NULL);
+	}
+	mRoot->getRenderSystem()->setGlobalNumberOfInstances(1);
+	mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(Ogre::HardwareVertexBufferSharedPtr() );
+}
+
+void Sample_ShaderSystem::createInstancedViewports()
+{
+	Ogre::Vector2 monitorCount(4.0, 4.0);
+	mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::ShaderExInstancedViewports::Type);
+	Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
+		= static_cast<Ogre::RTShader::ShaderExInstancedViewports*>(mInstancedViewportsSubRenderState);
+	shaderExInstancedViewports->setMonitorsCount(monitorCount);
+	Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+	renderState->addTemplateSubRenderState(mInstancedViewportsSubRenderState);
+
+	Ogre::VertexDeclaration* vertexDeclaration = Ogre::HardwareBufferManager::getSingleton().createVertexDeclaration();
+	size_t offset = 0;
+	offset = vertexDeclaration->getVertexSize(0);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES, 3);
+	offset = vertexDeclaration->getVertexSize(0);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 4);
+	offset = vertexDeclaration->getVertexSize(0);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 5);
+	offset = vertexDeclaration->getVertexSize(0);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 6);
+	offset = vertexDeclaration->getVertexSize(0);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 7);
+
+	Ogre::HardwareVertexBufferSharedPtr vbuf = 
+		Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+		vertexDeclaration->getVertexSize(0), monitorCount.x * monitorCount.y, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	vbuf->setInstanceDataStepRate(1);
+	vbuf->setIsInstanceData(true);
+
+	float * buf = (float *)vbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD);
+	for (float x = 0 ; x < monitorCount.x ; x++)
+		for (float y = 0 ; y < monitorCount.y ; y++)
+		{
+			*buf = x; buf++;
+			*buf = y; buf++; 
+
+			Ogre::Quaternion q;
+			Ogre::Radian angle = Ogre::Degree(90 / ( monitorCount.x *  monitorCount.y) * (x + y * monitorCount.x) );
+			q.FromAngleAxis(angle,Ogre::Vector3::UNIT_Y);
+			q.normalise();
+			Ogre::Matrix3 rotMat;
+			q.ToRotationMatrix(rotMat);
+
+			*buf = rotMat.GetColumn(0).x; buf++;
+			*buf = rotMat.GetColumn(0).y; buf++;
+			*buf = rotMat.GetColumn(0).z; buf++;
+			*buf = x * -20; buf++;
+
+			*buf = rotMat.GetColumn(1).x; buf++;
+			*buf = rotMat.GetColumn(1).y; buf++;
+			*buf = rotMat.GetColumn(1).z; buf++;
+			*buf = 0; buf++;
+
+			*buf = rotMat.GetColumn(2).x; buf++;
+			*buf = rotMat.GetColumn(2).y; buf++;
+			*buf = rotMat.GetColumn(2).z; buf++;
+			*buf =  y * 20; buf++;
+
+			*buf = 0; buf++;
+			*buf = 0; buf++;
+			*buf = 0; buf++;
+			*buf = 1; buf++;
+		}
+		vbuf->unlock();
+
+		mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(vbuf);
+		mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
+		mRoot->getRenderSystem()->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
+}
 #endif

@@ -50,7 +50,7 @@ String ShaderExInstancedViewports::Type							= "SGX_InstancedViewports";
 //-----------------------------------------------------------------------
 ShaderExInstancedViewports::ShaderExInstancedViewports()
 {
-	mMonitorsCount				= Vector2(2.0, 2.0);			
+	mMonitorsCount				= Vector2(1.0, 1.0);			
 	mMonitorsCountChanged		= true;
 }
 
@@ -79,11 +79,10 @@ void ShaderExInstancedViewports::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool ShaderExInstancedViewports::preAddToRenderState( RenderState* renderState, Pass* srcPass, Pass* dstPass )
+bool ShaderExInstancedViewports::preAddToRenderState( const RenderState* renderState, Pass* srcPass, Pass* dstPass )
 {
-	return true;
+	return srcPass->getParent()->getParent()->getName().find("SdkTrays") == Ogre::String::npos;
 }
-
 //-----------------------------------------------------------------------
 bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 {
@@ -293,7 +292,7 @@ void ShaderExInstancedViewports::updateGpuProgramsParams(Renderable* rend, Pass*
 		mMonitorsCountChanged = false;
 	}	
 }
-
+//-----------------------------------------------------------------------
 void ShaderExInstancedViewports::setMonitorsCount( const Vector2 monitorsCount )
 {
     mMonitorsCount = monitorsCount;
@@ -307,7 +306,6 @@ SubRenderState*	ShaderExInstancedViewportsFactory::createInstance(ScriptCompiler
 	ShaderExInstancedViewports* InstancedViewportsSubRenderState = static_cast<ShaderExInstancedViewports*>(subRenderState);
 	return subRenderState;								
 }
-
 //-----------------------------------------------------------------------
 void ShaderExInstancedViewportsFactory::writeInstance(MaterialSerializer* ser, 
 											 SubRenderState* subRenderState, 

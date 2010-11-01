@@ -793,7 +793,7 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool FFPTexturing::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	setTextureUnitCount(srcPass->getNumTextureUnitStates());
 

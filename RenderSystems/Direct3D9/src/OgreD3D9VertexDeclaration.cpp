@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    D3D9VertexDeclaration::D3D9VertexDeclaration()         
+	D3D9VertexDeclaration::D3D9VertexDeclaration() : mUsedGlobalDeclaration(0)       
     {
 
     }
@@ -109,6 +109,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(VertexDeclaration * globalDeclaration)
     {
+		if (mUsedGlobalDeclaration != globalDeclaration)
+		{
+			releaseDeclaration();
+			mUsedGlobalDeclaration = globalDeclaration;
+		}
 		IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
 		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
 		IDirect3DVertexDeclaration9* lpVertDecl = NULL;

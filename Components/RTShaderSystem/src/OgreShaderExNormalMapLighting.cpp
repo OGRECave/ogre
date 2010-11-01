@@ -1170,7 +1170,7 @@ void NormalMapLighting::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool NormalMapLighting::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool NormalMapLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	if (srcPass->getLightingEnabled() == false)
 		return false;

@@ -71,10 +71,10 @@ public:
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	/** 
-	@see SubRenderState::preAddToRenderState.
+	@see SubRenderState::updateGpuProgramsParams.
 	*/
 	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList);
 
@@ -84,6 +84,8 @@ public:
 	
 	/** Return the monitors count. */
 	Vector2					getMonitorsCount		() const { return mMonitorsCount; }
+
+	static String Type;
 
 // Protected methods.
 protected:
@@ -139,7 +141,6 @@ protected:
     Vector2                 mMonitorsCount;
     bool                    mMonitorsCountChanged;
 
-	static String Type;
 };
 
 
@@ -165,7 +166,6 @@ public:
 	@see SubRenderStateFactory::writeInstance.
 	*/
 	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
-
 
 protected:
 

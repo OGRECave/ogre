@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreShaderFFPRenderState.h"
 
-
 namespace Ogre {
 
 //-----------------------------------------------------------------------

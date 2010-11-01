@@ -83,6 +83,7 @@ namespace Ogre {
 		typedef DeviceToDeclarationMap::iterator							DeviceToDeclarationIterator;
 
 		DeviceToDeclarationMap		mMapDeviceToDeclaration;
+		VertexDeclaration *			mUsedGlobalDeclaration;
     };
 
 }

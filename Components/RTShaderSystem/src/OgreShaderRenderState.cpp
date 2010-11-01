@@ -275,7 +275,14 @@ void TargetRenderState::link(const RenderState& rhs, Pass* srcPass, Pass* dstPas
 
 				newSubRenderState = ShaderGenerator::getSingleton().createSubRenderState(srcSubRenderState->getType());
 				*newSubRenderState = *srcSubRenderState;
-				customSubRenderStates.push_back(newSubRenderState);			
+				if (newSubRenderState->preAddToRenderState(&rhs,  srcPass, dstPass))
+				{
+					customSubRenderStates.push_back(newSubRenderState);			
+				}
+				else
+				{		
+					ShaderGenerator::getSingleton().destroySubRenderState(newSubRenderState);				
+				}
 			}						
 		}						
 	}	

@@ -81,7 +81,7 @@ ushort HardwareSkinning::getWeightCount()
 }
 
 //-----------------------------------------------------------------------
-bool HardwareSkinning::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	mDoBoneCalculations =  
 		(mBoneCount != 0) && (mBoneCount <= 256) &&

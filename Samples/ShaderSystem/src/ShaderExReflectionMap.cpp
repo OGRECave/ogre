@@ -82,7 +82,7 @@ void ShaderExReflectionMap::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool ShaderExReflectionMap::preAddToRenderState( RenderState* renderState, Pass* srcPass, Pass* dstPass )
+bool ShaderExReflectionMap::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass )
 {
 	TextureUnitState* textureUnit;
 	

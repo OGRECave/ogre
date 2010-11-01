@@ -648,7 +648,7 @@ void FFPLighting::copyFrom(const SubRenderState& rhs)
 }
 
 //-----------------------------------------------------------------------
-bool FFPLighting::preAddToRenderState(RenderState* renderState, Pass* srcPass, Pass* dstPass)
+bool FFPLighting::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	if (srcPass->getLightingEnabled() == false)
 		return false;

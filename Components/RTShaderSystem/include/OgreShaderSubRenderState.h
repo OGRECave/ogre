@@ -117,7 +117,7 @@ public:
 	@param srcPass The source pass.
 	@param dstPass The destination pass.
 	*/
-	virtual bool			preAddToRenderState		(RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
+	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
 
 	/** Return the accessor object to this sub render state.
 	@see SubRenderStateAccessor.
