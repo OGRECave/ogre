@@ -1125,6 +1125,13 @@ void Sample_ShaderSystem::unloadResources()
 		OGRE_DELETE mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
+
+	if (mInstancedViewportsFactory != NULL)
+	{		
+		mShaderGenerator->removeSubRenderStateFactory(mInstancedViewportsFactory);
+		OGRE_DELETE mInstancedViewportsFactory;
+		mInstancedViewportsFactory = NULL;
+	}
 }
 
 //-----------------------------------------------------------------------
