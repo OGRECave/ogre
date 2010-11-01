@@ -196,7 +196,7 @@ namespace Ogre {
         //LogManager::getSingleton().logMessage(cgGetProgramString(mCgProgram, CG_COMPILED_PROGRAM));
 
         // Check for errors
-        checkForCgError("CgProgram::loadFromSource", 
+        checkForCgError("CgProgram::compileMicrocode", 
             "Unable to compile Cg program " + mName + ": ", mCgContext);
 
         CGerror error = cgGetError();
