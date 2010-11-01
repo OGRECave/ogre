@@ -48,6 +48,8 @@ namespace Ogre {
         public:
             GLES2DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
                                           HardwareBuffer::Usage usage);
+            GLES2DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+                                          HardwareBuffer::Usage usage);
             virtual ~GLES2DefaultHardwareVertexBuffer();
         /// @copydoc HardwareBuffer::readData
             void readData(size_t offset, size_t length, void* pDest);
