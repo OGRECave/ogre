@@ -545,6 +545,25 @@ namespace Ogre
 		*/
 		bool getWaitForVerticalBlank(void) const;
 
+		/** Returns the global instance vertex buffer.
+		*/
+        HardwareVertexBufferSharedPtr getGlobalInstanceVertexBuffer() const;
+		/** Sets the global instance vertex buffer.
+		*/
+        void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr val);
+		/** gets vertex declaration for the global vertex buffer for the global instancing
+		*/
+        VertexDeclaration* getGlobalInstanceVertexBufferVertexDeclaration() const;
+		/** sets vertex declaration for the global vertex buffer for the global instancing
+		*/
+        void setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val);
+		/** gets the global number of instances.
+		*/
+        size_t getGlobalNumberOfInstances() const;
+		/** sets the global number of instances.
+		*/
+        void setGlobalNumberOfInstances(const size_t val);
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/** Sets if fixed pipeline rendering is enabled on the system.
 		*/
@@ -1451,6 +1470,13 @@ namespace Ogre
 		float mDerivedDepthBiasBase;
 		float mDerivedDepthBiasMultiplier;
 		float mDerivedDepthBiasSlopeScale;
+
+        /// a global vertex buffer for global instancing
+        HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
+        /// a vertex declaration for the global vertex buffer for the global instancing
+        VertexDeclaration* mGlobalInstanceVertexBufferVertexDeclaration;
+        /// the number of global instances (this number will be multiply by the render op instance number) 
+        size_t mGlobalNumberOfInstances;
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		/// is fixed pipeline enabled

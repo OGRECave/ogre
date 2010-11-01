@@ -80,6 +80,8 @@ namespace Ogre {
 		, mUseCustomCapabilities(false)
 		, mTexProjRelative(false)
 		, mTexProjRelativeOrigin(Vector3::ZERO)
+        , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
+        , mGlobalNumberOfInstances(1)
     {
     }
 
@@ -858,5 +860,42 @@ namespace Ogre {
 			return MaterialManager::DEFAULT_SCHEME_NAME;
 		}
 	}
+	//---------------------------------------------------------------------
+    Ogre::HardwareVertexBufferSharedPtr RenderSystem::getGlobalInstanceVertexBuffer() const
+    {
+        return mGlobalInstanceVertexBuffer;
+    }
+	//---------------------------------------------------------------------
+    void RenderSystem::setGlobalInstanceVertexBuffer( const HardwareVertexBufferSharedPtr val )
+    {
+        if ( !val.isNull() && !val->getIsInstanceData() )
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                        "A none instance data vertex buffer was set to be the global instance vertex buffer.",
+                        "RenderSystem::setGlobalInstanceVertexBuffer");
+        }
+        mGlobalInstanceVertexBuffer = val;
+    }
+	//---------------------------------------------------------------------
+    size_t RenderSystem::getGlobalNumberOfInstances() const
+    {
+        return mGlobalNumberOfInstances;
+    }
+	//---------------------------------------------------------------------
+    void RenderSystem::setGlobalNumberOfInstances( const size_t val )
+    {
+        mGlobalNumberOfInstances = val;
+    }
+
+    VertexDeclaration* RenderSystem::getGlobalInstanceVertexBufferVertexDeclaration() const
+    {
+        return mGlobalInstanceVertexBufferVertexDeclaration;
+    }
+    //---------------------------------------------------------------------
+    void RenderSystem::setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val )
+    {
+        mGlobalInstanceVertexBufferVertexDeclaration = val;
+    }
+    //---------------------------------------------------------------------
 }
 

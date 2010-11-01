@@ -107,7 +107,7 @@ namespace Ogre {
 	}
 
     //-----------------------------------------------------------------------
-    IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(void)
+    IDirect3DVertexDeclaration9* D3D9VertexDeclaration::getD3DVertexDeclaration(VertexDeclaration * globalDeclaration)
     {
 		IDirect3DDevice9* pCurDevice   = D3D9RenderSystem::getActiveD3D9Device();
 		DeviceToDeclarationIterator it = mMapDeviceToDeclaration.find(pCurDevice);
@@ -116,33 +116,41 @@ namespace Ogre {
 		// Case we have to create the declaration for this device.
 		if (it == mMapDeviceToDeclaration.end() || it->second == NULL)
 		{
-			D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, mElementList.size() + 1, MEMCATEGORY_RENDERSYS);
+            size_t d3delemsSize = mElementList.size() + 1;
+            if(globalDeclaration != NULL)
+            {
+                d3delemsSize += globalDeclaration->getElementCount(); 
+            }
+			D3DVERTEXELEMENT9* d3delems = OGRE_ALLOC_T(D3DVERTEXELEMENT9, d3delemsSize, MEMCATEGORY_RENDERSYS);
 
 			VertexElementList::const_iterator i, iend;
 			unsigned int idx;
+            size_t maxSource = 0;
 			iend = mElementList.end();
 			for (idx = 0, i = mElementList.begin(); i != iend; ++i, ++idx)
 			{
-				d3delems[idx].Method = D3DDECLMETHOD_DEFAULT;
-				d3delems[idx].Offset = static_cast<WORD>(i->getOffset());
-				d3delems[idx].Stream = i->getSource();
-				d3delems[idx].Type = D3D9Mappings::get(i->getType());
-				d3delems[idx].Usage = D3D9Mappings::get(i->getSemantic());
-				// NB force index if colours since D3D uses the same usage for 
-				// diffuse & specular
-				if (i->getSemantic() == VES_SPECULAR)
-				{
-					d3delems[idx].UsageIndex = 1;
-				}
-				else if (i->getSemantic() == VES_DIFFUSE)
-				{
-					d3delems[idx].UsageIndex = 0;
-				}
-				else
-				{
-					d3delems[idx].UsageIndex = static_cast<BYTE>(i->getIndex());
-				}
+                const VertexElement & element = *i;
+                D3DVERTEXELEMENT9 & dxElement = d3delems[idx];
+                convertElement(element, dxElement);
+                if(element.getSource() > maxSource)
+                {
+                    maxSource = element.getSource();
+                }
 			}
+
+            if(globalDeclaration != NULL)
+            {
+                iend = globalDeclaration->getElements().end();
+			    for (i = globalDeclaration->getElements().begin(); i != iend; ++i, ++idx)
+			    {
+                    const VertexElement & element = *i;
+                    D3DVERTEXELEMENT9 & dxElement = d3delems[idx];
+                    convertElement(element, dxElement);
+                    dxElement.Stream = maxSource + 1;
+			    }                
+            }
+
+
 			// Add terminator
 			d3delems[idx].Stream = 0xff;
 			d3delems[idx].Offset = 0;
@@ -189,7 +197,29 @@ namespace Ogre {
 		}	
 		mMapDeviceToDeclaration.clear();
 	}
-
+    //-----------------------------------------------------------------------
+    void D3D9VertexDeclaration::convertElement( const VertexElement & element, D3DVERTEXELEMENT9 & dxElement )
+    {
+        dxElement.Method = D3DDECLMETHOD_DEFAULT;
+        dxElement.Offset = static_cast<WORD>(element.getOffset());
+        dxElement.Stream = element.getSource();
+        dxElement.Type = D3D9Mappings::get(element.getType());
+        dxElement.Usage = D3D9Mappings::get(element.getSemantic());
+        // NB force index if colours since D3D uses the same usage for 
+        // diffuse & specular
+        if (element.getSemantic() == VES_SPECULAR)
+        {
+            dxElement.UsageIndex = 1;
+        }
+        else if (element.getSemantic() == VES_DIFFUSE)
+        {
+            dxElement.UsageIndex = 0;
+        }
+        else
+        {
+            dxElement.UsageIndex = static_cast<BYTE>(element.getIndex());
+        }
+    }
 	//-----------------------------------------------------------------------
 
 

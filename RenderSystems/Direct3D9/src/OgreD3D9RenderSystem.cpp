@@ -3120,7 +3120,7 @@ namespace Ogre
 		D3D9VertexDeclaration* d3ddecl = 
 			static_cast<D3D9VertexDeclaration*>(decl);
 
-		if (FAILED(hr = getActiveD3D9Device()->SetVertexDeclaration(d3ddecl->getD3DVertexDeclaration())))
+		if (FAILED(hr = getActiveD3D9Device()->SetVertexDeclaration(d3ddecl->getD3DVertexDeclaration(getGlobalInstanceVertexBufferVertexDeclaration()))))
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 vertex declaration", 
 				"D3D9RenderSystem::setVertexDeclaration");
@@ -3137,6 +3137,8 @@ namespace Ogre
 	{
 		HRESULT hr;
 
+        numberOfInstances *= getGlobalNumberOfInstances();
+        
 		// TODO: attempt to detect duplicates
 		const VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
 		VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
@@ -3167,47 +3169,64 @@ namespace Ogre
 
 			D3D9HardwareVertexBuffer* d3d9buf = 
 				static_cast<D3D9HardwareVertexBuffer*>(i->second.get());
+
 			hr = getActiveD3D9Device()->SetStreamSource(
-				static_cast<UINT>(source),
-				d3d9buf->getD3D9VertexBuffer(),
-				0, // no stream offset, this is handled in _render instead
-				static_cast<UINT>(d3d9buf->getVertexSize()) // stride
-				);
+				    static_cast<UINT>(source),
+				    d3d9buf->getD3D9VertexBuffer(),
+				    0, // no stream offset, this is handled in _render instead
+				    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
+				    );
+
 			if (FAILED(hr))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source for buffer binding", 
 					"D3D9RenderSystem::setVertexBufferBinding");
 			}
 
-			if(numberOfInstances == 1)
+            // SetStreamSourceFreq 
+			if ( d3d9buf->getIsInstanceData() )
 			{
-				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), 1 );
-				if (FAILED(hr))
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to reset D3D9 stream source Freq", 
-						"D3D9RenderSystem::setVertexBufferBinding");
-				}
+				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
 			}
 			else
 			{
-				if ( d3d9buf->getIsInstanceData() )
-				{
-					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
-				}
-				else
-				{
-					hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INDEXEDDATA | numberOfInstances );
-				}
-				if (FAILED(hr))
-				{
-					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
-						"D3D9RenderSystem::setVertexBufferBinding");
-				}
+				hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INDEXEDDATA | numberOfInstances );
+			}
+			if (FAILED(hr))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
+					"D3D9RenderSystem::setVertexBufferBinding");
+			}
+		}
+        
+        // bind global instance buffer if exist
+        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        if( !globalInstanceVertexBuffer.isNull() )
+        {
+			D3D9HardwareVertexBuffer * d3d9buf = 
+				static_cast<D3D9HardwareVertexBuffer*>(globalInstanceVertexBuffer.get());
+
+			hr = getActiveD3D9Device()->SetStreamSource(
+				    static_cast<UINT>(source),
+				    d3d9buf->getD3D9VertexBuffer(),
+				    0, // no stream offset, this is handled in _render instead
+				    static_cast<UINT>(d3d9buf->getVertexSize()) // stride
+				    );
+
+			if (FAILED(hr))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source for buffer binding", 
+					"D3D9RenderSystem::setVertexBufferBinding");
 			}
 
-
-		}
-
+		    hr = getActiveD3D9Device()->SetStreamSourceFreq( static_cast<UINT>(source), D3DSTREAMSOURCE_INSTANCEDATA | d3d9buf->getInstanceDataStepRate() );
+			if (FAILED(hr))
+			{
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
+					"D3D9RenderSystem::setVertexBufferBinding");
+			}
+        }
+        
 		// Unbind any unused sources
 		for (size_t unused = source; unused < mLastVertexSourceCount; ++unused)
 		{
