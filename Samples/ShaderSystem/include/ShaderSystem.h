@@ -157,6 +157,8 @@ protected:
 	bool								mPerPixelFogEnable;		// When true the RTSS will do per pixel fog calculations.
 	bool								mSpecularEnable;		// The current specular state.	
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
+	RTShader::SubRenderStateFactory*	mInstancedViewportsFactory;
+
 	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
 	RTShader::LayeredBlending*			mLayerBlendSubRS;		// The layer blending sub render state.
 	Label*								mLayerBlendLabel;		// The layer blending label.

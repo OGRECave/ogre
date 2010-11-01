@@ -2,6 +2,7 @@
 #include "OgreShaderSubRenderState.h"
 #include "ShaderSystem.h"
 #include "ShaderExReflectionMap.h"
+#include "OgreShaderExInstancedViewports.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -726,6 +727,10 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			}
 
 #endif
+            {
+			    RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(mReflectionMapFactory->getType());
+				renderState->addTemplateSubRenderState(subRenderState);
+            }
 
 			if (mReflectionMapEnable)
 			{				
@@ -1090,6 +1095,9 @@ void Sample_ShaderSystem::loadResources()
 	// Create and add the custom reflection map shader extension factory to the shader generator.	
 	mReflectionMapFactory = OGRE_NEW ShaderExReflectionMapFactory;
 	mShaderGenerator->addSubRenderStateFactory(mReflectionMapFactory);
+
+	mInstancedViewportsFactory = OGRE_NEW ShaderExInstancedViewportsFactory;
+	mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory);
 	
 	createPrivateResourceGroup();
 }
