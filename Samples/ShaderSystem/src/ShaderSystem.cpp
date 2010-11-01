@@ -727,11 +727,6 @@ void Sample_ShaderSystem::generateShaders(Entity* entity)
 			}
 
 #endif
-            {
-			    RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(mReflectionMapFactory->getType());
-				renderState->addTemplateSubRenderState(subRenderState);
-            }
-
 			if (mReflectionMapEnable)
 			{				
 				RTShader::SubRenderState* subRenderState = mShaderGenerator->createSubRenderState(ShaderExReflectionMap::Type);
