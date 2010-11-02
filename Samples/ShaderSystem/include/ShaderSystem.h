@@ -144,7 +144,7 @@ protected:
 	void unloadResources();
 
 	void createInstancedViewports();
-	void distroyInstancedViewports();
+	void destroyInstancedViewports();
 
 	/** Destroy private resource group. */
 	void destroyPrivateResourceGroup();

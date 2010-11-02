@@ -889,7 +889,7 @@ void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
 
 
 
-		distroyInstancedViewports();
+		destroyInstancedViewports();
 		if(mInstancedViewportsEnable)
 		{
 			createInstancedViewports();
@@ -1186,7 +1186,7 @@ void Sample_ShaderSystem::unloadResources()
 		mReflectionMapFactory = NULL;
 	}
 
-	distroyInstancedViewports();
+	destroyInstancedViewports();
 }
 
 //-----------------------------------------------------------------------
@@ -1468,8 +1468,9 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 
 	return true;
 }
+#endif
 
-void Sample_ShaderSystem::distroyInstancedViewports()
+void Sample_ShaderSystem::destroyInstancedViewports()
 {
 	if (mInstancedViewportsSubRenderState)
 	{
@@ -1557,4 +1558,3 @@ void Sample_ShaderSystem::createInstancedViewports()
 		mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
 		mRoot->getRenderSystem()->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
 }
-#endif
