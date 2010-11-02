@@ -23,6 +23,7 @@ set(INST_FILES
   Packages/FindOIS.cmake
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
+  Utils/MacroLogFeature.cmake
   Utils/PreprocessorUtils.cmake
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
