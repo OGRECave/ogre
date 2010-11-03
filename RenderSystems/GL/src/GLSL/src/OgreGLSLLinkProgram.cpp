@@ -132,7 +132,7 @@ namespace Ogre {
 		{			
 			glGetError(); //Clean up the error. Otherwise will flood log.
 			mGLHandle = glCreateProgramObjectARB();
-			checkForGLSLError( "GLSLLinkProgram::compileAndLink", "Error Creating GLSL Program Object", 0 );
+			checkForGLSLError( "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
 
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -147,6 +147,16 @@ namespace Ogre {
 			buildGLUniformReferences();
 			extractAttributes();
 		}
+		if (mLinked)
+		{
+			checkForGLSLError( "GLSLLinkProgram::Activate",
+				"Error prior to using GLSL Program Object : ", mGLHandle, false, false);
+
+			glUseProgramObjectARB( mGLHandle );
+
+			checkForGLSLError( "GLSLLinkProgram::Activate",
+				"Error using GLSL Program Object : ", mGLHandle, false, false);
+        }
 	}
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::getMicrocodeFromCache(void)
@@ -511,11 +521,12 @@ namespace Ogre {
 
 		glLinkProgramARB( mGLHandle );
 		glGetObjectParameterivARB( mGLHandle, GL_OBJECT_LINK_STATUS_ARB, &mLinked );
+		mTriedToLinkAndFailed = !mLinked;
+
 		// force logging and raise exception if not linked
-		checkForGLSLError( "GLSLLinkProgram::Activate",
+		checkForGLSLError( "GLSLLinkProgram::compileAndLink",
 			"Error linking GLSL Program Object : ", mGLHandle, !mLinked, !mLinked );
 		
-		mTriedToLinkAndFailed = !mLinked;
 		if(mLinked)
 		{
 			logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLHandle );
@@ -523,14 +534,6 @@ namespace Ogre {
 
 		if (mLinked)
 		{
-			checkForGLSLError( "GLSLLinkProgram::Activate",
-				"Error prior to using GLSL Program Object : ", mGLHandle, false, false);
-
-			glUseProgramObjectARB( mGLHandle );
-
-			checkForGLSLError( "GLSLLinkProgram::Activate",
-				"Error using GLSL Program Object : ", mGLHandle, false, false);
-
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 				// add to the microcode to the cache
