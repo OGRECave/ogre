@@ -190,30 +190,6 @@ namespace Ogre {
 		// deal with includes
 		String sourceToUse = resolveCgIncludes(mSource, this, mFilename);
 
-        {
-            CGprofile selectedCgProfileGlsl;
-            switch(getType())
-            {
-                case GPT_VERTEX_PROGRAM: 
-                    selectedCgProfileGlsl = CG_PROFILE_GLSLV;
-                    break;
-                case GPT_FRAGMENT_PROGRAM: 
-                    selectedCgProfileGlsl = CG_PROFILE_GLSLF;
-                    break;
-                case GPT_GEOMETRY_PROGRAM: 
-                    selectedCgProfileGlsl = CG_PROFILE_GLSLG;
-                    break;
-            }
-
-           CGprogram cgProgramGlsl;
-            cgProgramGlsl = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
-                selectedCgProfileGlsl, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
-
-    		mProgramString = cgGetProgramString(cgProgramGlsl, CG_COMPILED_PROGRAM);
-    		mProgramString = cgGetProgramString(cgProgramGlsl, CG_COMPILED_PROGRAM);
-            cgDestroyProgram(cgProgramGlsl);
-        }
-
         cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
             mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
 
