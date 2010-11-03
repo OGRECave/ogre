@@ -46,7 +46,6 @@ namespace Ogre {
           mNumVertices(numVertices),
           mVertexSize(vertexSize)
     {
-		assert(mMgr != 0);
         // Calculate the size of the vertices
         mSizeInBytes = mVertexSize * numVertices;
 
