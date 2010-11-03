@@ -70,7 +70,7 @@ namespace Ogre {
         mPixelBottomBorderSize(0),
         mpBorderMaterial(0),
         mBorderRenderable(0)
-    {
+    {   
         if (createParamDictionary("BorderPanelOverlayElement"))
         {
             addBaseParameters();
@@ -132,6 +132,7 @@ namespace Ogre {
 			mRenderOp2.indexData = OGRE_NEW IndexData();
 			mRenderOp2.indexData->indexCount = 8 * 6;
 			mRenderOp2.indexData->indexStart = 0;
+            mRenderOp2.useGlobalInstancingVertexBufferIsAvailable = false;
 
 			/* Each cell is
 				0-----2
