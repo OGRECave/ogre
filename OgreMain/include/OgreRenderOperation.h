@@ -76,13 +76,18 @@ namespace Ogre {
 		/// Debug pointer back to renderable which created this
 		const Renderable* srcRenderable;
 
-		// The number of instances for the render operation - this option is supported 
-		// in only a part of the render systems.
+		/// The number of instances for the render operation - this option is supported 
+		/// in only a part of the render systems.
 		size_t numberOfInstances;
+
+        /// a flag to indicate that it is possible for this operation to use a global
+        /// vertex instance buffer if available. 
+        bool useGlobalInstancingVertexBufferIsAvailable;
 
         RenderOperation() :
             vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
-                indexData(0), srcRenderable(0), numberOfInstances(1) {}
+                indexData(0), srcRenderable(0), numberOfInstances(1),
+                useGlobalInstancingVertexBufferIsAvailable(true) {}
 
 
 	};

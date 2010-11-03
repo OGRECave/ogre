@@ -72,7 +72,7 @@ namespace Ogre {
 		virtual void notifyOnDeviceDestroy(IDirect3DDevice9* d3d9Device);
 
         /** Gets the D3D9-specific vertex declaration. */
-        IDirect3DVertexDeclaration9* getD3DVertexDeclaration(VertexDeclaration * globalDeclaration);
+        IDirect3DVertexDeclaration9* getD3DVertexDeclaration(VertexDeclaration * globalDeclaration, bool useGlobalInstancingVertexBufferIsAvailable);
 
 	protected:
 		void	releaseDeclaration();
@@ -83,7 +83,8 @@ namespace Ogre {
 		typedef DeviceToDeclarationMap::iterator							DeviceToDeclarationIterator;
 
 		DeviceToDeclarationMap		mMapDeviceToDeclaration;
-		VertexDeclaration *			mUsedGlobalDeclaration;
+		VertexDeclaration *			mLastUsedGlobalDeclaration;
+		bool			            mUsedGlobalDeclaration;
     };
 
 }

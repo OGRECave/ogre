@@ -2856,170 +2856,50 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 #endif
 
-		void* pBufferData = 0;
-		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
-
+		size_t numberOfInstances = op.numberOfInstances * getGlobalNumberOfInstances();
 
         const VertexDeclaration::VertexElementList& decl = 
             op.vertexData->vertexDeclaration->getElements();
-        VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
+        VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
 		vector<GLuint>::type attribsBound;
 		vector<GLuint>::type instanceAttribsBound;
+        size_t maxSource = 0;
 
-		for (elem = decl.begin(); elem != elemEnd; ++elem)
+		for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
 		{
-			if (!op.vertexData->vertexBufferBinding->isBufferBound(elem->getSource()))
+            const VertexElement & elem = *elemIter;
+            size_t source = elem.getSource();
+            if ( maxSource < source )
+            {
+             maxSource = source;   
+            }
+
+			if (!op.vertexData->vertexBufferBinding->isBufferBound(source))
 				continue; // skip unbound elements
 
 			HardwareVertexBufferSharedPtr vertexBuffer = 
-				op.vertexData->vertexBufferBinding->getBuffer(elem->getSource());
+				op.vertexData->vertexBufferBinding->getBuffer(source);
 
-			const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get()); 
-			if(mCurrentCapabilities->hasCapability(RSC_VBO))
-			{
-				glBindBufferARB(GL_ARRAY_BUFFER_ARB, 
-					hwGlBuffer->getGLBufferId());
-				pBufferData = VBO_BUFFER_OFFSET(elem->getOffset());
-			}
-			else
-			{
-				pBufferData = static_cast<const GLDefaultHardwareVertexBuffer*>(vertexBuffer.get())->getDataPtr(elem->getOffset());
-			}
-			if (op.vertexData->vertexStart)
-			{
-				pBufferData = static_cast<char*>(pBufferData) + op.vertexData->vertexStart * vertexBuffer->getVertexSize();
-			}
-
-			unsigned int i = 0;
-			VertexElementSemantic sem = elem->getSemantic();
- 
- 			bool isCustomAttrib = false;
- 			if (mCurrentVertexProgram)
-			{
- 				isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem->getIndex());
-
-				if (hwGlBuffer->getIsInstanceData())
-				{
-					GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
-					glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate() );
-					instanceAttribsBound.push_back(attrib);
-				}
-			}
- 
-
- 			// Custom attribute support
- 			// tangents, binormals, blendweights etc always via this route
- 			// builtins may be done this way too
- 			if (isCustomAttrib)
- 			{
- 				GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem->getIndex());
-				unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
-				GLboolean normalised = GL_FALSE;
-				switch(elem->getType())
-				{
-				case VET_COLOUR:
-				case VET_COLOUR_ABGR:
-				case VET_COLOUR_ARGB:
-					// Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-					// VertexElement::getTypeCount treats them as 1 (RGBA)
-					// Also need to normalise the fixed-point data
-					typeCount = 4;
-					normalised = GL_TRUE;
-					break;
-				default:
-					break;
-				};
-
- 				glVertexAttribPointerARB(
- 					attrib,
- 					typeCount, 
-  					GLHardwareBufferManager::getGLType(elem->getType()), 
- 					normalised, 
-  					static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
-  					pBufferData);
- 				glEnableVertexAttribArrayARB(attrib);
- 
- 				attribsBound.push_back(attrib);
- 			}
- 			else
- 			{
- 				// fixed-function & builtin attribute support
- 				switch(sem)
-  				{
- 				case VES_POSITION:
- 					glVertexPointer(VertexElement::getTypeCount(
- 						elem->getType()), 
-  						GLHardwareBufferManager::getGLType(elem->getType()), 
-  						static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
-  						pBufferData);
- 					glEnableClientState( GL_VERTEX_ARRAY );
- 					break;
- 				case VES_NORMAL:
- 					glNormalPointer(
- 						GLHardwareBufferManager::getGLType(elem->getType()), 
-  						static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
-  						pBufferData);
- 					glEnableClientState( GL_NORMAL_ARRAY );
- 					break;
- 				case VES_DIFFUSE:
- 					glColorPointer(4, 
-  						GLHardwareBufferManager::getGLType(elem->getType()), 
-  						static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
-  						pBufferData);
- 					glEnableClientState( GL_COLOR_ARRAY );
- 					break;
- 				case VES_SPECULAR:
- 					if (GLEW_EXT_secondary_color)
- 					{
- 						glSecondaryColorPointerEXT(4, 
- 							GLHardwareBufferManager::getGLType(elem->getType()), 
- 							static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
- 							pBufferData);
- 						glEnableClientState( GL_SECONDARY_COLOR_ARRAY );
- 					}
- 					break;
- 				case VES_TEXTURE_COORDINATES:
-  
- 					if (mCurrentVertexProgram)
- 					{
- 						// Programmable pipeline - direct UV assignment
- 						glClientActiveTextureARB(GL_TEXTURE0 + elem->getIndex());
- 						glTexCoordPointer(
- 							VertexElement::getTypeCount(elem->getType()), 
- 							GLHardwareBufferManager::getGLType(elem->getType()),
- 							static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
- 							pBufferData);
- 						glEnableClientState( GL_TEXTURE_COORD_ARRAY );
- 					}
- 					else
- 					{
- 						// fixed function matching to units based on tex_coord_set
- 						for (i = 0; i < mDisabledTexUnitsFrom; i++)
- 						{
- 							// Only set this texture unit's texcoord pointer if it
- 							// is supposed to be using this element's index
- 							if (mTextureCoordIndex[i] == elem->getIndex() && i < mFixedFunctionTextureUnits)
- 							{
-								if (multitexturing)
- 								glClientActiveTextureARB(GL_TEXTURE0 + i);
- 								glTexCoordPointer(
- 									VertexElement::getTypeCount(elem->getType()), 
- 									GLHardwareBufferManager::getGLType(elem->getType()),
- 									static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
- 									pBufferData);
- 								glEnableClientState( GL_TEXTURE_COORD_ARRAY );
- 							}
- 						}
- 					}
- 					break;
- 				default:
- 					break;
- 				};
- 			} // isCustomAttrib
-  
+            bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, 
+                                   attribsBound, instanceAttribsBound);
         }
 
+        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+        if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
+        {
+            elemEnd = globalVertexDeclaration->getElements().end();
+		    for (elemIter = globalVertexDeclaration->getElements().begin(); elemIter != elemEnd; ++elemIter)
+		    {
+                const VertexElement & elem = *elemIter;
+                bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, 
+                                       attribsBound, instanceAttribsBound);
+            
+            }
+        }
+
+		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 		if (multitexturing)
 		glClientActiveTextureARB(GL_TEXTURE0);
 
@@ -3052,6 +2932,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 		if (op.useIndexes)
 		{
+            void* pBufferData = 0;
+
 			if(mCurrentCapabilities->hasCapability(RSC_VBO))
 			{
 				glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
@@ -3079,13 +2961,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
 						mDerivedDepthBiasSlopeScale);
 				}
-				if(op.numberOfInstances == 1)
+				if(numberOfInstances == 1)
 				{
 					glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
 				}
 				else
 				{
-					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, op.numberOfInstances);
+					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
 				}
 			} while (updatePassIterationRenderState());
 
@@ -3102,13 +2984,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasSlopeScale);
 				}
 
-				if(op.numberOfInstances == 1)
+				if(numberOfInstances == 1)
 				{
 					glDrawArrays(primType, 0, op.vertexData->vertexCount);
 				}
 				else
 				{
-					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, op.numberOfInstances);
+					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, numberOfInstances);
 				}
 			} while (updatePassIterationRenderState());
 		}
@@ -3781,5 +3663,157 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		return mGLSupport->getDisplayMonitorCount();
 	}
 
+	//---------------------------------------------------------------------
+    void GLRenderSystem::bindVertexElementToGpu( const VertexElement &elem, 
+            HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,
+            vector<GLuint>::type &attribsBound, 
+            vector<GLuint>::type &instanceAttribsBound )
+    {
+        void* pBufferData = 0;
+        const GLHardwareVertexBuffer* hwGlBuffer = static_cast<const GLHardwareVertexBuffer*>(vertexBuffer.get()); 
+
+        if(mCurrentCapabilities->hasCapability(RSC_VBO))
+        {
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, 
+                hwGlBuffer->getGLBufferId());
+            pBufferData = VBO_BUFFER_OFFSET(elem.getOffset());
+        }
+        else
+        {
+            pBufferData = static_cast<const GLDefaultHardwareVertexBuffer*>(vertexBuffer.get())->getDataPtr(elem.getOffset());
+        }
+        if (vertexStart)
+        {
+            pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();
+        }
+
+        unsigned int i = 0;
+        VertexElementSemantic sem = elem.getSemantic();
+        bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
+
+        bool isCustomAttrib = false;
+        if (mCurrentVertexProgram)
+        {
+            isCustomAttrib = mCurrentVertexProgram->isAttributeValid(sem, elem.getIndex());
+
+            if (hwGlBuffer->getIsInstanceData())
+            {
+                GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
+                glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate() );
+                instanceAttribsBound.push_back(attrib);
+            }
+        }
+
+
+        // Custom attribute support
+        // tangents, binormals, blendweights etc always via this route
+        // builtins may be done this way too
+        if (isCustomAttrib)
+        {
+            GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
+            unsigned short typeCount = VertexElement::getTypeCount(elem.getType());
+            GLboolean normalised = GL_FALSE;
+            switch(elem.getType())
+            {
+            case VET_COLOUR:
+            case VET_COLOUR_ABGR:
+            case VET_COLOUR_ARGB:
+                // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                // VertexElement::getTypeCount treats them as 1 (RGBA)
+                // Also need to normalise the fixed-point data
+                typeCount = 4;
+                normalised = GL_TRUE;
+                break;
+            default:
+                break;
+            };
+
+            glVertexAttribPointerARB(
+                attrib,
+                typeCount, 
+                GLHardwareBufferManager::getGLType(elem.getType()), 
+                normalised, 
+                static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                pBufferData);
+            glEnableVertexAttribArrayARB(attrib);
+
+            attribsBound.push_back(attrib);
+        }
+        else
+        {
+            // fixed-function & builtin attribute support
+            switch(sem)
+            {
+            case VES_POSITION:
+                glVertexPointer(VertexElement::getTypeCount(
+                    elem.getType()), 
+                    GLHardwareBufferManager::getGLType(elem.getType()), 
+                    static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                    pBufferData);
+                glEnableClientState( GL_VERTEX_ARRAY );
+                break;
+            case VES_NORMAL:
+                glNormalPointer(
+                    GLHardwareBufferManager::getGLType(elem.getType()), 
+                    static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                    pBufferData);
+                glEnableClientState( GL_NORMAL_ARRAY );
+                break;
+            case VES_DIFFUSE:
+                glColorPointer(4, 
+                    GLHardwareBufferManager::getGLType(elem.getType()), 
+                    static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                    pBufferData);
+                glEnableClientState( GL_COLOR_ARRAY );
+                break;
+            case VES_SPECULAR:
+                if (GLEW_EXT_secondary_color)
+                {
+                    glSecondaryColorPointerEXT(4, 
+                        GLHardwareBufferManager::getGLType(elem.getType()), 
+                        static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                        pBufferData);
+                    glEnableClientState( GL_SECONDARY_COLOR_ARRAY );
+                }
+                break;
+            case VES_TEXTURE_COORDINATES:
+
+                if (mCurrentVertexProgram)
+                {
+                    // Programmable pipeline - direct UV assignment
+                    glClientActiveTextureARB(GL_TEXTURE0 + elem.getIndex());
+                    glTexCoordPointer(
+                        VertexElement::getTypeCount(elem.getType()), 
+                        GLHardwareBufferManager::getGLType(elem.getType()),
+                        static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                        pBufferData);
+                    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+                }
+                else
+                {
+                    // fixed function matching to units based on tex_coord_set
+                    for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                    {
+                        // Only set this texture unit's texcoord pointer if it
+                        // is supposed to be using this element's index
+                        if (mTextureCoordIndex[i] == elem.getIndex() && i < mFixedFunctionTextureUnits)
+                        {
+                            if (multitexturing)
+                                glClientActiveTextureARB(GL_TEXTURE0 + i);
+                            glTexCoordPointer(
+                                VertexElement::getTypeCount(elem.getType()), 
+                                GLHardwareBufferManager::getGLType(elem.getType()),
+                                static_cast<GLsizei>(vertexBuffer->getVertexSize()), 
+                                pBufferData);
+                            glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+            };
+        } // isCustomAttrib
+    }
 
 }

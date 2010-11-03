@@ -3112,15 +3112,19 @@ namespace Ogre
 
 		OGRE_FREE(context, MEMCATEGORY_RENDERSYS);
 	}
-	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setVertexDeclaration(VertexDeclaration* decl)
+	{
+        setVertexDeclaration(decl, true);
+    }
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::setVertexDeclaration(VertexDeclaration* decl, bool useGlobalInstancingVertexBufferIsAvailable)
 	{
 		HRESULT hr;
 
 		D3D9VertexDeclaration* d3ddecl = 
 			static_cast<D3D9VertexDeclaration*>(decl);
 
-		if (FAILED(hr = getActiveD3D9Device()->SetVertexDeclaration(d3ddecl->getD3DVertexDeclaration(getGlobalInstanceVertexBufferVertexDeclaration()))))
+		if (FAILED(hr = getActiveD3D9Device()->SetVertexDeclaration(d3ddecl->getD3DVertexDeclaration(getGlobalInstanceVertexBufferVertexDeclaration(), useGlobalInstancingVertexBufferIsAvailable))))
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 vertex declaration", 
 				"D3D9RenderSystem::setVertexDeclaration");
@@ -3130,14 +3134,18 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding)
 	{
-		setVertexBufferBinding(binding, 1);
+		setVertexBufferBinding(binding, 1, true);
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances)
+	void D3D9RenderSystem::setVertexBufferBinding(
+        VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable)
 	{
 		HRESULT hr;
 
-        numberOfInstances *= getGlobalNumberOfInstances();
+        if (useGlobalInstancingVertexBufferIsAvailable)
+        {
+            numberOfInstances *= getGlobalNumberOfInstances();
+        }
         
 		// TODO: attempt to detect duplicates
 		const VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
@@ -3199,6 +3207,8 @@ namespace Ogre
 			}
 		}
         
+        if (useGlobalInstancingVertexBufferIsAvailable)
+        {
         // bind global instance buffer if exist
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         if( !globalInstanceVertexBuffer.isNull() )
@@ -3225,6 +3235,8 @@ namespace Ogre
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D9 stream source Freq", 
 					"D3D9RenderSystem::setVertexBufferBinding");
 			}
+        }
+
         }
         
 		// Unbind any unused sources
@@ -3284,8 +3296,8 @@ namespace Ogre
 		// To think about: possibly remove setVertexDeclaration and 
 		// setVertexBufferBinding from RenderSystem since the sequence is
 		// a bit too D3D9-specific?
-		setVertexDeclaration(op.vertexData->vertexDeclaration);
-		setVertexBufferBinding(op.vertexData->vertexBufferBinding, op.numberOfInstances);
+		setVertexDeclaration(op.vertexData->vertexDeclaration, op.useGlobalInstancingVertexBufferIsAvailable);
+		setVertexBufferBinding(op.vertexData->vertexBufferBinding, op.numberOfInstances, op.useGlobalInstancingVertexBufferIsAvailable);
 
 		// Determine rendering operation
 		D3DPRIMITIVETYPE primType = D3DPT_TRIANGLELIST;

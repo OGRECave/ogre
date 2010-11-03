@@ -140,6 +140,9 @@ namespace Ogre {
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 		bool activateGLTextureUnit(size_t unit);
+        void bindVertexElementToGpu( const VertexElement &elem, HardwareVertexBufferSharedPtr vertexBuffer,
+                const size_t vertexStart, 
+                vector<GLuint>::type &attribsBound, vector<GLuint>::type &instanceAttribsBound );
     public:
         // Default constructor / destructor
         GLRenderSystem();
@@ -440,6 +443,7 @@ namespace Ogre {
           RenderSystem
          */
         void _render(const RenderOperation& op);
+
         /** See
           RenderSystem
          */
