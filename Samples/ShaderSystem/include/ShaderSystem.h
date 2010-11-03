@@ -27,6 +27,26 @@ public:
 	virtual bool isVisible(const AxisAlignedBox& bound, FrustumPlane* culledBy = 0) const {return true;};
 	virtual bool isVisible(const Sphere& bound, FrustumPlane* culledBy = 0) const {return true;};
 	virtual bool isVisible(const Vector3& vert, FrustumPlane* culledBy = 0) const {return true;};
+	bool projectSphere(const Sphere& sphere, 
+		Real* left, Real* top, Real* right, Real* bottom) const {*left = *bottom = -1.0f; *right = *top = 1.0f; return true;};
+	Real getNearClipDistance(void) const {return -9999999999999.0f;};
+	Real getFarClipDistance(void) const {return 9999999999999.0f;};
+	const Plane& getFrustumPlane( unsigned short plane ) const
+    {
+        mFrustumPlanes[FRUSTUM_PLANE_LEFT].normal = Vector3::NEGATIVE_UNIT_X;
+		mFrustumPlanes[FRUSTUM_PLANE_LEFT].d = 9999999999999999999.0f;
+        mFrustumPlanes[FRUSTUM_PLANE_RIGHT].normal = Vector3::UNIT_X;
+		mFrustumPlanes[FRUSTUM_PLANE_RIGHT].d = 9999999999999999999.0f;
+        mFrustumPlanes[FRUSTUM_PLANE_TOP].normal = Vector3::NEGATIVE_UNIT_Y;
+		mFrustumPlanes[FRUSTUM_PLANE_TOP].d = 9999999999999999999.0f;
+        mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].normal = Vector3::UNIT_Y;
+		mFrustumPlanes[FRUSTUM_PLANE_BOTTOM].d = 9999999999999999999.0f;
+        mFrustumPlanes[FRUSTUM_PLANE_NEAR].normal = Vector3::NEGATIVE_UNIT_Z;
+		mFrustumPlanes[FRUSTUM_PLANE_NEAR].d = 9999999999999999999.0f;
+        mFrustumPlanes[FRUSTUM_PLANE_FAR].normal = Vector3::UNIT_Z;
+		mFrustumPlanes[FRUSTUM_PLANE_FAR].d = 9999999999999999999.0f;
+        return mFrustumPlanes[plane];
+    }
 
 };
 
@@ -106,9 +126,12 @@ protected:
 	/** Create spot light. */
 	void createSpotLight();
 
+	/** Toggle adding of lots of models */
+	void updateAddLotsOfModels(bool addThem);
+    void addModelToScene(const String &  modelName);
 
 	/** Toggle instanced viewports */
-	void updateInstancedViewports(bool visible);
+	void updateInstancedViewports(bool ebabled);
 
 	/** Toggle light visibility. */
 	void updateLightState(const String& lightName, bool visible);
@@ -184,6 +207,10 @@ protected:
 	SceneNode *							mKnot2Node;						// todo - doc
 	InfiniteFrustum 					mInfiniteFrustum;				// todo - doc
 	BillboardSet*						mBbsFlare;						// todo - doc
+	bool								mAddedLotsOfModels;		        // todo - doc
+    vector<Entity *>::type              mLotsOfModelsEntities;          // todo - doc       
+    vector<SceneNode *>::type           mLotsOfModelsNodes;             // todo - doc  
+    int                                 mNumberOfModelsAdded;           // todo - doc       
 
 	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
 	RTShader::LayeredBlending*			mLayerBlendSubRS;		// The layer blending sub render state.
@@ -204,7 +231,7 @@ protected:
 	CheckBox*							mSpotLightCheckBox;		// The spot light check box.
 	String								mExportMaterialPath;	// The path of the export material.
 	CheckBox*							mInstancedViewportsCheckBox; // The instanced viewports check box.
-					
+	CheckBox*							mAddLotsOfModels; // The "add lots of models" check box.				
 };
 
 #endif

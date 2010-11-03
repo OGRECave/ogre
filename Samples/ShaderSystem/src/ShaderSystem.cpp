@@ -11,6 +11,7 @@ using namespace OgreBites;
 const String DIRECTIONAL_LIGHT_NAME		= "DirectionalLight";
 const String POINT_LIGHT_NAME			= "PointLight";
 const String INSTANCED_VIEWPORTS_NAME	= "InstancedViewports";
+const String ADD_LOTS_OF_MODELS_NAME	= "AddLotsOfModels";
 const String SPOT_LIGHT_NAME			= "SpotLight";
 const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
@@ -83,7 +84,8 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
 	mKnot1Node = NULL;
 	mKnot2Node = NULL;
 	mBbsFlare = NULL;
-
+    mAddedLotsOfModels = false;
+    mNumberOfModelsAdded = 0;
 }
 
 
@@ -111,6 +113,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	else if (cbName == INSTANCED_VIEWPORTS_NAME)
 	{
 		updateInstancedViewports(box->isChecked());
+	}
+	else if (cbName == ADD_LOTS_OF_MODELS_NAME)
+	{
+		updateAddLotsOfModels(box->isChecked());
 	}
 	else if (cbName == SPOT_LIGHT_NAME)
 	{
@@ -448,11 +454,13 @@ void Sample_ShaderSystem::setupUI()
 	mSpotLightCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, SPOT_LIGHT_NAME, "Spot Light", 220);
 
 	mInstancedViewportsCheckBox = mTrayMgr->createCheckBox(TL_TOPLEFT, INSTANCED_VIEWPORTS_NAME, "Instanced Viewports", 220);
+	mAddLotsOfModels = mTrayMgr->createCheckBox(TL_TOPLEFT, ADD_LOTS_OF_MODELS_NAME, "Add lots of models", 220);
 	
 	mDirLightCheckBox->setChecked(true);
 	mPointLightCheckBox->setChecked(true);
 	mSpotLightCheckBox->setChecked(false);
 	mInstancedViewportsCheckBox->setChecked(false);
+	mAddLotsOfModels->setChecked(false);
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
@@ -852,6 +860,54 @@ void Sample_ShaderSystem::createSpotLight()
 	light->setAttenuation(1000.0, 1.0, 0.0005, 0.0);
 }
 
+void Sample_ShaderSystem::addModelToScene(const String &  modelName)
+{
+    mNumberOfModelsAdded++;
+    for(int i = 0 ; i < 8 ; i++)
+    {
+        float scaleFactor = 30;
+	    Entity* entity;
+	    SceneNode* childNode;
+        entity = mSceneMgr->createEntity(modelName);
+	    mLotsOfModelsEntities.push_back(entity);
+	    childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	    mLotsOfModelsNodes.push_back(childNode);
+	    childNode->setPosition(mNumberOfModelsAdded * scaleFactor, 15,  i * scaleFactor);
+	    childNode->attachObject(entity);
+        MeshPtr modelMesh = MeshManager::getSingleton().getByName(modelName);
+        Vector3 modelSize = modelMesh->getBounds().getSize();
+        childNode->scale(1 / modelSize.x * scaleFactor, 
+                         1 / modelSize.y * scaleFactor, 
+                         1 / modelSize.z * scaleFactor
+                         );
+    }
+}
+
+void Sample_ShaderSystem::updateAddLotsOfModels(bool addThem)
+{
+	if (mAddedLotsOfModels != addThem)
+	{
+        mAddedLotsOfModels = addThem;
+        
+        if(mNumberOfModelsAdded == 0)
+        {
+            addModelToScene("Barrel.mesh");
+            addModelToScene("facial.mesh");
+            addModelToScene("fish.mesh");
+            addModelToScene("ninja.mesh");
+            addModelToScene("penguin.mesh");
+            addModelToScene("razor.mesh");
+            addModelToScene("RZR-002.mesh");
+            addModelToScene("tudorhouse.mesh");
+            addModelToScene("WoodPallet.mesh");
+        }
+        for (int i = 0 ; i < mLotsOfModelsNodes.size() ; i++)
+        {
+            mLotsOfModelsNodes[i]->setVisible(mAddedLotsOfModels);
+        }
+        
+    }
+}
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
 {
@@ -1491,7 +1547,7 @@ void Sample_ShaderSystem::destroyInstancedViewports()
 
 void Sample_ShaderSystem::createInstancedViewports()
 {
-	Ogre::Vector2 monitorCount(4.0, 4.0);
+	Ogre::Vector2 monitorCount(2.0, 2.0);
 	mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::ShaderExInstancedViewports::Type);
 	Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
 		= static_cast<Ogre::RTShader::ShaderExInstancedViewports*>(mInstancedViewportsSubRenderState);
@@ -1502,7 +1558,7 @@ void Sample_ShaderSystem::createInstancedViewports()
 	Ogre::VertexDeclaration* vertexDeclaration = Ogre::HardwareBufferManager::getSingleton().createVertexDeclaration();
 	size_t offset = 0;
 	offset = vertexDeclaration->getVertexSize(0);
-	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES, 3);
+	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 3);
 	offset = vertexDeclaration->getVertexSize(0);
 	vertexDeclaration->addElement(0, offset, Ogre::VET_FLOAT4, Ogre::VES_TEXTURE_COORDINATES, 4);
 	offset = vertexDeclaration->getVertexSize(0);
@@ -1524,6 +1580,8 @@ void Sample_ShaderSystem::createInstancedViewports()
 		{
 			*buf = x; buf++;
 			*buf = y; buf++; 
+			*buf = 0; buf++;
+			*buf = 0; buf++; 
 
 			Ogre::Quaternion q;
 			Ogre::Radian angle = Ogre::Degree(90 / ( monitorCount.x *  monitorCount.y) * (x + y * monitorCount.x) );

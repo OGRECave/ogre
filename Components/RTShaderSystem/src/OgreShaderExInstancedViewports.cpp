@@ -139,16 +139,16 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 	if (mProjectionMatrix.get() == NULL)
 		return false;	
 
-#define SPC_MONITOR_INDEX ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 2))
+#define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE3
 	// Resolve vertex shader  monitor index
-	mVSInMonitorIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 3, SPC_MONITOR_INDEX, GCT_FLOAT2);
+	mVSInMonitorIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 3, SPC_MONITOR_INDEX, GCT_FLOAT4);
 	if (mVSInMonitorIndex.get() == NULL)
 		return false;
 
-#define SPC_MATRIX_R0 ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 3))
-#define SPC_MATRIX_R1 ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 4))
-#define SPC_MATRIX_R2 ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 5))
-#define SPC_MATRIX_R3 ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 6))
+#define SPC_MATRIX_R0 Parameter::SPC_TEXTURE_COORDINATE4
+#define SPC_MATRIX_R1 Parameter::SPC_TEXTURE_COORDINATE5
+#define SPC_MATRIX_R2 Parameter::SPC_TEXTURE_COORDINATE6
+#define SPC_MATRIX_R3 Parameter::SPC_TEXTURE_COORDINATE7
 
 	// Resolve vertex shader viewport offset matrix
 	mVSInViewportOffsetMatrixR0 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 4, SPC_MATRIX_R0, GCT_FLOAT4);
@@ -169,7 +169,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
     // Resolve vertex shader output monitor index.	
 	mVSOutMonitorIndex = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			SPC_MONITOR_INDEX,
-			GCT_FLOAT2);
+			GCT_FLOAT4);
 	if (mVSOutMonitorIndex.get() == NULL)
 		return false;
 
@@ -177,7 +177,7 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 	mPSInMonitorIndex = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		mVSOutMonitorIndex->getIndex(), 
 		mVSOutMonitorIndex->getContent(),
-		GCT_FLOAT2);
+		GCT_FLOAT4);
 	if (mPSInMonitorIndex.get() == NULL)
 		return false;
 

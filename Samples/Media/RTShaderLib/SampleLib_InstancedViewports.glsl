@@ -30,28 +30,29 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 void SGX_InstancedViewportsTransform(
-                in float4 i_position,
-                in float4x4	i_worldViewMatrix,
-                in float4x4	i_projectionMatrix,
-						    in  float4 i_viewportOffsetMatrixR0,   
-						    in  float4 i_viewportOffsetMatrixR1,   
-						    in  float4 i_viewportOffsetMatrixR2,   
-						    in  float4 i_viewportOffsetMatrixR3,   
-						    in  float2 i_monitorsCount,   
-						    in float4 i_monitorIndex, 
-						    out float4 o_position)
+                in vec4 i_position,
+                in mat4	i_worldViewMatrix,
+                in mat4	i_projectionMatrix,
+						    in  vec4 i_viewportOffsetMatrixR0,   
+						    in  vec4 i_viewportOffsetMatrixR1,   
+						    in  vec4 i_viewportOffsetMatrixR2,   
+						    in  vec4 i_viewportOffsetMatrixR3,   
+						    in  vec2 i_monitorsCount,   
+						    in vec4 i_monitorIndex, 
+						    out vec4 o_position)
  {
-   o_position = mul(i_worldViewMatrix, i_position);
-   float4x4 viewportOffset = float4x4(i_viewportOffsetMatrixR0, 
-                                      i_viewportOffsetMatrixR1, 
-                                      i_viewportOffsetMatrixR2, 
-                                      i_viewportOffsetMatrixR3
-                                     );
-   o_position = mul(viewportOffset, o_position);
-   o_position = mul(i_projectionMatrix, o_position);
-   float2 monitorIndexNorm =i_monitorIndex.xy  - ((i_monitorsCount  - 1.0)/ 2.0) ;
-   o_position.xy = 
-   (o_position.xy + (o_position.w * monitorIndexNorm)*2.0)  / i_monitorsCount ;
+   o_position = i_worldViewMatrix * i_position;
+   mat4 viewportOffset = mat4(i_viewportOffsetMatrixR0, 
+                              i_viewportOffsetMatrixR1, 
+                              i_viewportOffsetMatrixR2, 
+                              i_viewportOffsetMatrixR3
+                             );
+   o_position = viewportOffset * o_position;
+   o_position = i_projectionMatrix * o_position;
+
+    vec2 monitorIndexNorm = i_monitorIndex.xy - (i_monitorsCount - 1.0)/2.0;
+    o_position.xy = 
+    (o_position.xy + (o_position.w * monitorIndexNorm)*2.0) / i_monitorsCount;
  };
 
 //-----------------------------------------------------------------------------
@@ -59,15 +60,16 @@ void SGX_InstancedViewportsTransform(
 //-----------------------------------------------------------------------------
 
 void SGX_InstancedViewportsDiscardOutOfBounds(
-						    in  float2 i_monitorsCount,   
-						    in float4 i_monitorIndex, 
-						    in float4 i_positionProjectiveSpace)
-{
-   float2 boxedXY = i_positionProjectiveSpace.xy / (i_positionProjectiveSpace.w * 2);
+						    in  vec2 i_monitorsCount,   
+						    in vec4 i_monitorIndex, 
+						    in vec4 i_positionProjectiveSpace)
+{ 
+   vec2 boxedXY = i_positionProjectiveSpace.xy / (i_positionProjectiveSpace.w * 2.0);
    boxedXY = (boxedXY + 0.5) * i_monitorsCount;
-    float2 middleMonitor = ((i_monitorIndex.xy + 0.5));
+   
+   vec2 middleMonitor = ((i_monitorIndex.xy + 0.5));
     
-    boxedXY = abs(boxedXY - middleMonitor);
+   boxedXY = abs(boxedXY - middleMonitor);
    float maxM = max(boxedXY.x,boxedXY.y);
    if (maxM >= 0.5)
    {
