@@ -43,6 +43,7 @@ set(STATIC_INST_FILES
 if (WIN32)
   set(INST_FILES ${INST_FILES}
     Templates/VisualStudioUserFile.vcproj.user.in
+    Templates/VisualStudioUserFile.vcxproj.user.in
   )
 endif ()
 
