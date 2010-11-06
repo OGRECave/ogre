@@ -179,6 +179,16 @@ if (OGRE_RTShaderSystem_FOUND)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
 endif()
 
+if (OGRE_Terrain_FOUND)
+    ogre_add_component_include_dir(Terrain)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
+endif ()
+
+if (OGRE_Paging_FOUND)
+    ogre_add_component_include_dir(Paging)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Paging_LIBRARIES})
+endif ()
+
 if (UNIX AND NOT APPLE)
   # on Linux, shipped samples will still be compiled with CMake, so we need
   # the .cfg files in the build directory.
