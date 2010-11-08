@@ -227,41 +227,30 @@ bool ShaderExInstancedViewports::addVSInvocations( Function* vsMain, const int g
 	FunctionInvocation* funcInvocation = NULL;
 	int internalCounter = 0;
 	
-    {
-        FunctionInvocation* funcInvocation = NULL;
-        int internalCounter = 0;
+    funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_TRANSFORM, groupOrder, internalCounter++);
+    funcInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
+    funcInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
+    funcInvocation->pushOperand(mProjectionMatrix, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInViewportOffsetMatrixR0, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInViewportOffsetMatrixR1, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInViewportOffsetMatrixR2, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInViewportOffsetMatrixR3, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInMonitorsCount, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_OUT);
+    vsMain->addAtomInstance(funcInvocation);
 
-        funcInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_INSTANCED_VIEWPORTS_TRANSFORM, groupOrder, internalCounter++);
-        funcInvocation->pushOperand(mVSInPosition, Operand::OPS_IN);
-        funcInvocation->pushOperand(mWorldViewMatrix, Operand::OPS_IN);
-        funcInvocation->pushOperand(mProjectionMatrix, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInViewportOffsetMatrixR0, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInViewportOffsetMatrixR1, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInViewportOffsetMatrixR2, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInViewportOffsetMatrixR3, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInMonitorsCount, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_OUT);
+	// Output position in projective space.
+    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+    funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSOutPositionProjectiveSpace, Operand::OPS_OUT);
+    vsMain->addAtomInstance(funcInvocation);
 
-        vsMain->addAtomInstance(funcInvocation);
-    }
-
-    {
-        // Output position in projective space.
-        funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
-        funcInvocation->pushOperand(mVSOriginalOutPositionProjectiveSpace, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSOutPositionProjectiveSpace, Operand::OPS_OUT);
-        vsMain->addAtomInstance(funcInvocation);
-    }
-
-    {
-        // Output monitor index.
-        funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
-        funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
-        funcInvocation->pushOperand(mVSOutMonitorIndex, Operand::OPS_OUT);
-        vsMain->addAtomInstance(funcInvocation);
-    }
-
+	// Output monitor index.
+    funcInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN,  groupOrder, internalCounter++); 
+    funcInvocation->pushOperand(mVSInMonitorIndex, Operand::OPS_IN);
+    funcInvocation->pushOperand(mVSOutMonitorIndex, Operand::OPS_OUT);
+    vsMain->addAtomInstance(funcInvocation);
 
 	return true;
 }
