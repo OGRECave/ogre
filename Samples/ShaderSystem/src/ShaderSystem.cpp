@@ -82,8 +82,6 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
 	mInstancedViewportsEnable = false;
 	mInstancedViewportsSubRenderState = NULL;
 	mInstancedViewportsFactory = NULL;
-	mKnot1Node = NULL;
-	mKnot2Node = NULL;
 	mBbsFlare = NULL;
     mAddedLotsOfModels = false;
     mNumberOfModelsAdded = 0;
@@ -384,7 +382,6 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
-	mKnot1Node = childNode;
 
 	// Create normal map lighting demonstration entity.
 	entity = mSceneMgr->createEntity("NormalMapEntity", "knot.mesh");
@@ -392,7 +389,6 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
-	mKnot2Node = childNode;
 	
 	createDirectionalLight();
 	createPointLight();
@@ -922,18 +918,6 @@ void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
 		// hide this - the skybox has an issue
 		mSceneMgr->setSkyBox(!mInstancedViewportsEnable, "Examples/SceneCubeMap2");
 		
-		// hide this - the knot 1 has an issue
-		if(mKnot1Node)
-		{
-			mKnot1Node->setVisible(!mInstancedViewportsEnable);
-		}
-
-		// hide this - the knot 2 has an issue
-		if(mKnot2Node)
-		{
-			mKnot2Node->setVisible(!mInstancedViewportsEnable);
-		}
-
 		if (mInstancedViewportsEnable)
 		{
 			mCamera->setCullingFrustum(&mInfiniteFrustum);

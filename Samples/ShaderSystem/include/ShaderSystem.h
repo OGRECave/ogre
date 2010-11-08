@@ -206,8 +206,6 @@ protected:
 	RTShader::SubRenderStateFactory*	mReflectionMapFactory;	// The custom reflection map shader extension factory.
 	RTShader::SubRenderState*			mInstancedViewportsSubRenderState;// todo - doc
 	bool								mInstancedViewportsEnable;		// todo - doc
-	SceneNode *							mKnot1Node;						// todo - doc
-	SceneNode *							mKnot2Node;						// todo - doc
 	InfiniteFrustum 					mInfiniteFrustum;				// todo - doc
 	BillboardSet*						mBbsFlare;						// todo - doc
 	bool								mAddedLotsOfModels;		        // todo - doc
