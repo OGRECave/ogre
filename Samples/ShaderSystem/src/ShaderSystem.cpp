@@ -915,9 +915,6 @@ void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
 	{
 		mInstancedViewportsEnable = ebabled;
 
-		// hide this - the skybox has an issue
-		mSceneMgr->setSkyBox(!mInstancedViewportsEnable, "Examples/SceneCubeMap2");
-		
 		if (mInstancedViewportsEnable)
 		{
 			mCamera->setCullingFrustum(&mInfiniteFrustum);
