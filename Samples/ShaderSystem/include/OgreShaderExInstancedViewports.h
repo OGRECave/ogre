@@ -44,7 +44,7 @@ namespace RTShader {
 
 /**todo
 */
-class _OgreRTSSExport ShaderExInstancedViewports : public SubRenderState
+class ShaderExInstancedViewports : public SubRenderState
 {
     friend class ShaderExInstancedViewportsFactory;
 
@@ -148,7 +148,7 @@ protected:
 A factory that enables creation of ShaderExInstancedViewports instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport ShaderExInstancedViewportsFactory : public SubRenderStateFactory
+class ShaderExInstancedViewportsFactory : public SubRenderStateFactory
 {
 public:
 

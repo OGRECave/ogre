@@ -81,14 +81,18 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
 	mReflectionMapFactory = NULL;
 	mInstancedViewportsEnable = false;
 	mInstancedViewportsSubRenderState = NULL;
+	mInstancedViewportsFactory = NULL;
 	mKnot1Node = NULL;
 	mKnot2Node = NULL;
 	mBbsFlare = NULL;
     mAddedLotsOfModels = false;
     mNumberOfModelsAdded = 0;
 }
-
-
+//-----------------------------------------------------------------------
+Sample_ShaderSystem::~Sample_ShaderSystem()
+{
+	destroyInstancedViewports();
+}
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 {
@@ -945,13 +949,14 @@ void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
 
 
 
-		destroyInstancedViewports();
 		if(mInstancedViewportsEnable)
 		{
 			createInstancedViewports();
 		}
-		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
-		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		else
+		{
+			destroyInstancedViewports();
+		}
 
 	}
 }
@@ -1241,8 +1246,6 @@ void Sample_ShaderSystem::unloadResources()
 		OGRE_DELETE mReflectionMapFactory;
 		mReflectionMapFactory = NULL;
 	}
-
-	destroyInstancedViewports();
 }
 
 //-----------------------------------------------------------------------
@@ -1525,6 +1528,7 @@ bool Sample_ShaderSystem::mouseMoved( const OIS::MouseEvent& evt )
 	return true;
 }
 #endif
+//-----------------------------------------------------------------------
 
 void Sample_ShaderSystem::destroyInstancedViewports()
 {
@@ -1543,10 +1547,34 @@ void Sample_ShaderSystem::destroyInstancedViewports()
 	}
 	mRoot->getRenderSystem()->setGlobalNumberOfInstances(1);
 	mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(Ogre::HardwareVertexBufferSharedPtr() );
+
+	mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+	mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+	destroyInstancedViewportsFactory();
+
 }
+//-----------------------------------------------------------------------
+void Sample_ShaderSystem::destroyInstancedViewportsFactory()
+{
+	if (mInstancedViewportsFactory != NULL)
+	{
+		mInstancedViewportsFactory->destroyAllInstances();
+		mShaderGenerator->removeSubRenderStateFactory(mInstancedViewportsFactory);
+		delete mInstancedViewportsFactory;
+		mInstancedViewportsFactory = NULL;
+	}
+}
+//-----------------------------------------------------------------------
 
 void Sample_ShaderSystem::createInstancedViewports()
 {
+	if (mInstancedViewportsFactory == NULL)
+	{
+		mInstancedViewportsFactory = OGRE_NEW ShaderExInstancedViewportsFactory;	
+		mShaderGenerator->addSubRenderStateFactory(mInstancedViewportsFactory);
+	}
+
 	Ogre::Vector2 monitorCount(2.0, 2.0);
 	mInstancedViewportsSubRenderState = mShaderGenerator->createSubRenderState(Ogre::RTShader::ShaderExInstancedViewports::Type);
 	Ogre::RTShader::ShaderExInstancedViewports* shaderExInstancedViewports 
@@ -1615,4 +1643,10 @@ void Sample_ShaderSystem::createInstancedViewports()
 		mRoot->getRenderSystem()->setGlobalInstanceVertexBuffer(vbuf);
 		mRoot->getRenderSystem()->setGlobalInstanceVertexBufferVertexDeclaration(vertexDeclaration);
 		mRoot->getRenderSystem()->setGlobalNumberOfInstances(monitorCount.x * monitorCount.y);
+
+		// Invalidate the scheme in order to re-generate all shaders based technique related to this scheme.
+		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+		mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
 }
+

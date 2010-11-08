@@ -41,7 +41,6 @@ THE SOFTWARE.
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreShaderExInstancedViewports.h"
 
 namespace Ogre {
 
@@ -211,11 +210,6 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	curFactory = OGRE_NEW HardwareSkinningFactory;	
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
-
-	curFactory = OGRE_NEW ShaderExInstancedViewportsFactory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
-
 
 #endif
 }

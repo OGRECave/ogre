@@ -56,6 +56,8 @@ class _OgreSampleClassExport Sample_ShaderSystem : public SdkSample
 {
 public:
 	Sample_ShaderSystem();
+	~Sample_ShaderSystem();
+		
 
 	/** @see Sample::checkBoxToggled. */
 	void checkBoxToggled(CheckBox* box);
@@ -168,6 +170,7 @@ protected:
 
 	void createInstancedViewports();
 	void destroyInstancedViewports();
+	void destroyInstancedViewportsFactory();
 
 	/** Destroy private resource group. */
 	void destroyPrivateResourceGroup();
@@ -210,7 +213,8 @@ protected:
 	bool								mAddedLotsOfModels;		        // todo - doc
     vector<Entity *>::type              mLotsOfModelsEntities;          // todo - doc       
     vector<SceneNode *>::type           mLotsOfModelsNodes;             // todo - doc  
-    int                                 mNumberOfModelsAdded;           // todo - doc       
+    int                                 mNumberOfModelsAdded;           // todo - doc   
+    RTShader::SubRenderStateFactory *   mInstancedViewportsFactory;     // todo - doc
 
 	RTShader::SubRenderState*			mReflectionMapSubRS;	// The reflection map sub render state.
 	RTShader::LayeredBlending*			mLayerBlendSubRS;		// The layer blending sub render state.

@@ -3,12 +3,14 @@
 set(HEADER_FILES 
 	include/ShaderSystem.h
 	include/ShaderExReflectionMap.h
+	include/OgreShaderExInstancedViewports.h
 	)
 
 set(SOURCE_FILES 
 	src/ShaderSystem.cpp
 	src/ShaderExReflectionMap.cpp
-	)
+	src/OgreShaderExInstancedViewports.cpp
+  	)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_component_include_dir(RTShaderSystem)
