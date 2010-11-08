@@ -502,7 +502,7 @@ protected:
 
 				bool all = selectedCategory == "All";
 				Ogre::StringVector sampleTitles;
-				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SampleThumbnail");
+				Ogre::MaterialPtr templateMat = Ogre::MaterialManager::getSingleton().getByName("SdkTrays/SampleThumbnail");
 
 				// populate the sample menu and carousel with filtered samples
 				for (SampleSet::iterator i = mLoadedSamples.begin(); i != mLoadedSamples.end(); i++)
@@ -511,7 +511,7 @@ protected:
 
 					if (all || info["Category"] == selectedCategory)
 					{
-						Ogre::String name = "SampleThumb" + Ogre::StringConverter::toString(sampleTitles.size() + 1);
+						Ogre::String name = "SdkTrays/SampleThumb" + Ogre::StringConverter::toString(sampleTitles.size() + 1);
 
 						// clone a new material for sample thumbnail
 						Ogre::MaterialPtr newMat = templateMat->clone(name);
@@ -1009,7 +1009,7 @@ protected:
 			Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
             
 			// create template material for sample thumbnails
-			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SampleThumbnail", "Essential");
+			Ogre::MaterialPtr thumbMat = Ogre::MaterialManager::getSingleton().create("SdkTrays/SampleThumbnail", "Essential");
 			thumbMat->getTechnique(0)->getPass(0)->createTextureUnitState();
             
 			setupWidgets();
