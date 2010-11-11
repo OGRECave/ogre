@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreMovableObject.h"
 #include "OgreCamera.h"
+#include "OgreSceneManagerEnumerator.h"
 
 
 namespace Ogre {
@@ -127,12 +128,24 @@ namespace Ogre {
     void RenderQueue::clear(bool destroyPassMaps)
     {
         // Clear the queues
-        RenderQueueGroupMap::iterator i, iend;
-        i = mGroups.begin();
-        iend = mGroups.end();
-        for (; i != iend; ++i)
+        SceneManagerEnumerator::SceneManagerIterator scnIt =
+            SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+
+        // Note: We clear dirty passes from all RenderQueues in all 
+        // SceneManagers, because the following recalculation of pass hashes
+        // also considers all RenderQueues and could become inconsistent, otherwise.
+        while (scnIt.hasMoreElements())
         {
-            i->second->clear(destroyPassMaps);
+            SceneManager* sceneMgr = scnIt.getNext();
+            RenderQueue* queue = sceneMgr->getRenderQueue();
+
+            RenderQueueGroupMap::iterator i, iend;
+            i = queue->mGroups.begin();
+            iend = queue->mGroups.end();
+            for (; i != iend; ++i)
+            {
+                i->second->clear(destroyPassMaps);
+            }
         }
 
         // Now trigger the pending pass updates
