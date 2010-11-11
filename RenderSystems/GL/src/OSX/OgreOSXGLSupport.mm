@@ -60,6 +60,7 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optBitDepth;
 	ConfigOption optFSAA;
 	ConfigOption optRTTMode;
+    ConfigOption optMacAPI;
 	ConfigOption optHiddenWindow;
 	ConfigOption optVsync;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
@@ -262,6 +263,20 @@ void OSXGLSupport::addConfig( void )
     // Release memory
     CFRelease(goodModes);
 
+    optRTTMode.name = "RTT Preferred Mode";
+	optRTTMode.possibleValues.push_back( "FBO" );
+	optRTTMode.possibleValues.push_back( "PBuffer" );
+	optRTTMode.possibleValues.push_back( "Copy" );
+	optRTTMode.currentValue = "FBO";
+	optRTTMode.immutable = false;
+
+    optMacAPI.name = "macAPI";
+    optMacAPI.possibleValues.push_back( "cocoa" );
+    optMacAPI.possibleValues.push_back( "carbon" );
+    optMacAPI.currentValue = "carbon";
+    optMacAPI.immutable = false;
+
+    mOptions[optMacAPI.name] = optMacAPI;
 	mOptions[optFullScreen.name] = optFullScreen;
 	mOptions[optVideoMode.name] = optVideoMode;
     mOptions[optFSAA.name] = optFSAA;
@@ -345,11 +360,12 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-		NameValuePairList::const_iterator opt(NULL);
+		ConfigOptionMap::const_iterator opt(NULL);
 		
 		// First we must determine if this is a Carbon or a Cocoa window
 		// that we wish to create
-		opt = miscParams->find("macAPI");
+		opt = mOptions.find("macAPI");
+        string m = opt->second.currentValue;
 		if(opt != miscParams->end() && opt->second == "cocoa")
 		{
 			// Our user wants a Cocoa compatible system

@@ -31,7 +31,15 @@ THE SOFTWARE.
 namespace Ogre {
 
 	DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
-		HardwareBuffer::Usage usage, HardwareBufferManagerBase* mgr)
+															 HardwareBuffer::Usage usage)
+	: HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+	{
+        // Allocate aligned memory for better SIMD processing friendly.
+        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+	}
+	//-----------------------------------------------------------------------
+	DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+		HardwareBuffer::Usage usage)
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         // Allocate aligned memory for better SIMD processing friendly.
@@ -83,8 +91,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 
 	DefaultHardwareIndexBuffer::DefaultHardwareIndexBuffer(IndexType idxType, 
-		size_t numIndexes, HardwareBuffer::Usage usage, HardwareBufferManagerBase* mgr) 
-		: HardwareIndexBuffer(mgr, idxType, numIndexes, usage, true, false) // always software, never shadowed
+		size_t numIndexes, HardwareBuffer::Usage usage) 
+		: HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
 	{
 		mpData = OGRE_ALLOC_T(unsigned char, mSizeInBytes, MEMCATEGORY_GEOMETRY);
 	}
@@ -147,7 +155,7 @@ namespace Ogre {
         DefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize, 
 		size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
-        DefaultHardwareVertexBuffer* vb = OGRE_NEW DefaultHardwareVertexBuffer(vertexSize, numVerts, usage, this);
+        DefaultHardwareVertexBuffer* vb = OGRE_NEW DefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage);
         return HardwareVertexBufferSharedPtr(vb);
 	}
     //-----------------------------------------------------------------------
@@ -155,7 +163,7 @@ namespace Ogre {
         DefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
 		size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
-        DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage, this);
+        DefaultHardwareIndexBuffer* ib = OGRE_NEW DefaultHardwareIndexBuffer(itype, numIndexes, usage);
 		return HardwareIndexBufferSharedPtr(ib);
 	}
 	//-----------------------------------------------------------------------

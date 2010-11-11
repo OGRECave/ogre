@@ -47,7 +47,8 @@ namespace Ogre {
         void unlockImpl(void);
 
     public:
-		GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
+		GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, HardwareBuffer::Usage usage);
+		GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
             HardwareBuffer::Usage usage);
         ~GLDefaultHardwareVertexBuffer();
         /// @copydoc HardwareBuffer::readData

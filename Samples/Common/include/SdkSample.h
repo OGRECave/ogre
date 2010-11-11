@@ -420,6 +420,8 @@ namespace OgreBites
 		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
 #endif
 		{
+			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
+			mRoot = Ogre::Root::getSingletonPtr();
 			mWindow = window;
 #if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 			mKeyboard = keyboard;

@@ -37,6 +37,15 @@ namespace Ogre {
         mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
     }
 
+    GLESDefaultHardwareVertexBuffer::GLESDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr,
+                                                                     size_t vertexSize,
+                                                                     size_t numVertices,
+                                                                     HardwareBuffer::Usage usage)
+    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false)
+    {
+        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+    }
+    
     GLESDefaultHardwareVertexBuffer::~GLESDefaultHardwareVertexBuffer()
     {
         OGRE_FREE_SIMD(mpData, MEMCATEGORY_GEOMETRY);
@@ -158,7 +167,7 @@ namespace Ogre {
         size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
     {
         return HardwareVertexBufferSharedPtr(
-            OGRE_NEW GLESDefaultHardwareVertexBuffer(vertexSize, numVerts, usage));
+            OGRE_NEW GLESDefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage));
     }
 
     HardwareIndexBufferSharedPtr

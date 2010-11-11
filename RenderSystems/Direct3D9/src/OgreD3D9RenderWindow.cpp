@@ -87,6 +87,7 @@ namespace Ogre
 		size_t fsaaSamples = 0;
 		String fsaaHint;
 		int monitorIndex = -1;	//Default by detecting the adapter from left / top position
+
 		if(miscParams)
 		{
 			// Get variable-length params
@@ -172,6 +173,7 @@ namespace Ogre
 				mHidden = !StringConverter::parseBool(opt->second);
 
 		}
+		mIsFullScreen = fullScreen;
 
 		// Destroy current window if any
 		if( mHWnd )
@@ -246,8 +248,6 @@ namespace Ogre
 			unsigned int winWidth, winHeight;
 			winWidth = width;
 			winHeight = height;
-			if (!fullScreen)
-				adjustWindow(width, height, &winWidth, &winHeight);
 
 
 			// No specified top left -> Center the window in the middle of the monitor
@@ -289,6 +289,8 @@ namespace Ogre
 			}
 			else
 			{				
+                adjustWindow(width, height, &winWidth, &winHeight);
+
 				if (!outerSize)
 				{
 					// Calculate window dimensions required
@@ -348,7 +350,6 @@ namespace Ogre
 		mName = name;
 		mDepthBufferPoolId = depthBuffer ? DepthBuffer::POOL_DEFAULT : DepthBuffer::POOL_NO_DEPTH;
 		mDepthBuffer = 0;
-		mIsFullScreen = fullScreen;
 		mColourDepth = colourDepth;
 
 		LogManager::getSingleton().stream()

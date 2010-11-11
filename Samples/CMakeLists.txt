@@ -33,10 +33,6 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_OctreeZone)
   endif ()
   
-  if (OGRE_BUILD_COMPONENT_PAGING)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgrePaging)
-  endif ()
-  
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)

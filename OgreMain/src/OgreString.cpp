@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreString.h"
-
 #include "OgreStringVector.h"
 
 namespace Ogre {
@@ -68,9 +67,9 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    vector<String>::type StringUtil::split( const String& str, const String& delims, unsigned int maxSplits, bool preserveDelims)
+    StringVector StringUtil::split( const String& str, const String& delims, unsigned int maxSplits, bool preserveDelims)
     {
-        vector<String>::type ret;
+        StringVector ret;
         // Pre-allocate some space for performance
         ret.reserve(maxSplits ? maxSplits+1 : 10);    // 10 is guessed capacity for most case
 
@@ -128,9 +127,9 @@ namespace Ogre {
         return ret;
     }
 	//-----------------------------------------------------------------------
-	vector< String >::type StringUtil::tokenise( const String& str, const String& singleDelims, const String& doubleDelims, unsigned int maxSplits)
+	StringVector StringUtil::tokenise( const String& str, const String& singleDelims, const String& doubleDelims, unsigned int maxSplits)
 	{
-        vector<String>::type ret;
+        StringVector ret;
         // Pre-allocate some space for performance
         ret.reserve(maxSplits ? maxSplits+1 : 10);    // 10 is guessed capacity for most case
 

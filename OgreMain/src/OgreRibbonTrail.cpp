@@ -477,7 +477,15 @@ namespace Ogre
         // set up this segment
         seg.head = seg.tail = SEGMENT_EMPTY;
         // Create new element, v coord is always 0.0f
-        Element e(node->_getDerivedPosition(),
+		// need to convert to take parent node's position into account
+		Vector3 position = node->_getDerivedPosition();
+		if (mParentNode)
+		{
+			position = mParentNode->_getDerivedOrientation().Inverse() 
+				* (position - mParentNode->_getDerivedPosition()) 
+				/ mParentNode->_getDerivedScale();
+		}
+        Element e(position,
             mInitialWidth[index], 0.0f, mInitialColour[index]);
         // Add the start position
         addChainElement(index, e);

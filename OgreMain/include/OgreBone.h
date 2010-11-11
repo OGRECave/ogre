@@ -95,6 +95,10 @@ namespace Ogre
             that you should also make sure that there are no AnimationTrack objects
             referencing this bone, or if there are, you should disable them using
             pAnimation->destroyTrack(pBone->getHandle());
+		@par
+			You can also use AnimationState::setBlendMask to mask out animation from 
+		    chosen tracks if you want to prevent application of a scripted animation 
+		    to a bone without altering the Animation definition.
         */
         void setManuallyControlled(bool manuallyControlled);
 

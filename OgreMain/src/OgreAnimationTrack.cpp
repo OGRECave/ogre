@@ -506,9 +506,12 @@ namespace Ogre {
 		Vector3 scale = kf.getScale();
 		// Not sure how to modify scale for cumulative anims... leave it alone
 		//scale = ((Vector3::UNIT_SCALE - kf.getScale()) * weight) + Vector3::UNIT_SCALE;
-		if (scl != 1.0f && scale != Vector3::UNIT_SCALE)
+		if (scale != Vector3::UNIT_SCALE)
 		{
-			scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * scl;
+            if (scl != 1.0f)
+                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * scl;
+            else if (weight != 1.0f)
+                scale = Vector3::UNIT_SCALE + (scale - Vector3::UNIT_SCALE) * weight;
 		}
 		node->scale(scale);
 

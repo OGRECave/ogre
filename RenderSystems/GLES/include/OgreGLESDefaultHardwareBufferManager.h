@@ -48,7 +48,9 @@ namespace Ogre {
 
         public:
             GLESDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices,
-                                          HardwareBuffer::Usage usage);
+                                            HardwareBuffer::Usage usage);
+            GLESDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+                                            HardwareBuffer::Usage usage);
             virtual ~GLESDefaultHardwareVertexBuffer();
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);

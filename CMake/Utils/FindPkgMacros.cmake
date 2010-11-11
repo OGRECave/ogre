@@ -136,11 +136,16 @@ MACRO(findpkg_framework fwk)
       /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk/System/Library/Frameworks/
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Release
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug
-      ${OGRE_PREFIX_PATH}/lib/Release
-      ${OGRE_PREFIX_PATH}/lib/Debug
-      ${OGRE_PREFIX_BUILD}/lib/Release
-      ${OGRE_PREFIX_BUILD}/lib/Debug
     )
+    # These could be arrays of paths, add each individually to the search paths
+    foreach(i ${OGRE_PREFIX_PATH})
+      set(${fwk}_FRAMEWORK_PATH ${${fwk}_FRAMEWORK_PATH} ${i}/lib/Release ${i}/lib/Debug)
+    endforeach(i)
+
+    foreach(i ${OGRE_PREFIX_BUILD})
+      set(${fwk}_FRAMEWORK_PATH ${${fwk}_FRAMEWORK_PATH} ${i}/lib/Release ${i}/lib/Debug)
+    endforeach(i)
+
     FOREACH(dir ${${fwk}_FRAMEWORK_PATH})
       SET(fwkpath ${dir}/${fwk}.framework)
       IF(EXISTS ${fwkpath})

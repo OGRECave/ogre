@@ -47,7 +47,7 @@ namespace Ogre {
     String Frustum::msMovableType = "Frustum";
     const Real Frustum::INFINITE_FAR_PLANE_ADJUST = 0.00001;
     //-----------------------------------------------------------------------
-    Frustum::Frustum() : 
+    Frustum::Frustum(const String& name) : 
         mProjType(PT_PERSPECTIVE), 
         mFOVy(Radian(Math::PI/4.0f)), 
         mFarDist(100000.0f), 
@@ -78,6 +78,7 @@ namespace Ogre {
         // Alter superclass members
         mVisible = false;
         mParentNode = 0;
+        mName = name;
 
         mLastLinkedReflectionPlane.normal = Vector3::ZERO;
         mLastLinkedObliqueProjPlane.normal = Vector3::ZERO;

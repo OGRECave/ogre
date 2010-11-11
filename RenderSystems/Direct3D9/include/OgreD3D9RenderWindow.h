@@ -139,6 +139,8 @@ namespace Ogre
 		DWORD						mFullscreenWinStyle;	// Fullscreen mode window style flags.		 
 		unsigned int				mDesiredWidth;			// Desired width after resizing
 		unsigned int				mDesiredHeight;			// Desired height after resizing
+
+        void updateWindowRect();
 	};
 }
 #endif

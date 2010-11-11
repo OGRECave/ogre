@@ -31,6 +31,125 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.7.2 [Cthugha] (03 November 2010) - MAINTENANCE RELEASE</p>
+<ul>
+<li>Fix bug 240: TextAreaOverlayElement incorrectly loads Font in background thread (OGRE_THREAD_SUPPORT == 2)</li>
+<li>Report errors if installable DLLs missing (e.g. cg.dll)<br>
+Make sure OGRE_INSTALL_DEPENDENCIES always true</li>
+<li>Fix Cmake error with VS 2010</li>
+<li>Fixed a compile bug - in visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"</li>
+<li>SDK build - added vcxproj ext to the batch file - for VC10 support</li>
+<li>Fix a breakage from rev 2133 on systems other than 64-bit VS 2010
+- Cannot pass a blank string to LINK_FLAGS</li>
+<li>Fix an infinite loop that could occur with StringUtil::replaceAll if replaceWhat is a substring of replaceWith. Solved by advancing the string position after each replacement.</li>
+<li>Make sure the correct resource path is inserted into config files when building the OS X SDK.</li>
+<li>Correct the iPhone SDK disc image to use the correct background image file.</li>
+<li>Patch 2979571 by moagames : textures referenced with texture_ref can now be also used as render targets. http://www.ogre3d.org/forums/viewtopic.php?f=4&t=56671</li>
+<li>Dispose of Carbon window handles when the window object is destroyed. Fixes a problem with old windows remaining visible after the resolution has been changed.</li>
+<li>Removed redundant compositor creation call from deferred shading demo.</li>
+<li>Allow overriding Rectangle2D's vertex buffer usage, and using this in the compositor's quads. As discussed in http://www.ogre3d.org/forums/viewtopic.php?f=4&t=57656</li>
+<li>fixed parsing of matrix types from shared parameter definition</li>
+<li>ProgressiveMesh::PMVertex can list itself as a neighbor after collapsing vertices. This leads to a crash in ProgressiveMesh::PMTriangle::notifyRemoved.
+Changed ProgressiveMesh::PMVertex::removeIfNonNeighbor to always remove itself from the neighbor set.</li>
+<li>fixed destroySubMesh corrupting the mesh if it contains an edge list</li>
+<li>Add OgreOverlayElementFactory.cpp for methods which can't be inlined.</li>
+<li>Install ressources according to OGRE_LIB_DIRECTORY .</li>
+<li>Support LIB_SUFFIX. Which is the de-facto standard for cmake to support lib64|32 systems.</li>
+<li>Removing a few unused variables to lower the number of compiler warnings.</li>
+<li>GLES: Fixed a crash on texture creation.  Added buffer mapping support(port from GL Rendersystem).</li>
+<li>Adding a few missing header search paths to the Xcode templates.</li>
+<li>Adding iPhone 4's native resolution.</li>
+<li>Xcode Templates: Use devices' native resolution. Shutdown properly. Add CADisplayLink support.</li>
+<li>iPhone: Adding CADisplayLink support to SampleBrowser. Shutdown the app properly on iPhone and disable the loading bar to speed up loading on iOS 4</li>
+<li>GL ES: 16 bit texture support.</li>
+<li>OS X: When targeting 10.6 only - Fixed an issue with old framebuffer contents being displayed when using non-native resolution full screen contexts. Also fixed a crash when switching resolutions.  Added some error checking to the full screen context creation.</li>
+<li>Disabling DisplayLink on iPhone by default, as it can cause input lag sometimes.</li>
+<li>Fix a cross-endian bug in StreamSerialiser::calculateChecksum<br>
+Files written on one endian system would fail checksums on another (even though the data can be converted on the fly) because the checksums were calculated on the raw memory of the header data
+Now always calculate checksums in little-endian</li>
+<li>Endian fix for FastHash - casting to uint16 is non-portable<br>
+NOTE: this will break checksums if you're on a big-endian machine using files generated before this change.</li>
+<li>Fix StreamSerialiser::REVERSE_HEADER_ID which was only reverse for uint16, not the declared uint32</li>
+<li>OS X: Reworked windowing to fix setFullscreen and provide more robust GL context management</li>
+<li>Adding additional directories to search for the Ogre framework when using a prebuilt SDK with your own projects under OS X</li>
+<li>OS X & iOS: Simplify some post build commands by using wildcards. Updating pbxcp commands to exclude .hg directories.</li>
+<li>Refreshed iOS SampleBrowser icons and launch images</li>
+<li>Adding new iOS higher resolution icons and launch images</li>
+<li>Uncomment the use of the HideOnFullScreen attribute for Carbon windows</li>
+<li>Adding the using keyword to resolve a set of warnings.  Also removed a switch for a simple if-else.</li>
+<li>Very minor cleanup from a bad copy/paste in Xcode template installer code</li>
+<li>iOS: Several additions to properly support newer iOS devices including: High resolution screen support, FSAA and Framebuffer discard.  A config key has been added to allow you to manually configure the content scaling factor.  For example, if you only want 720x480 on an iPhone 4, specify contentScalingFactor=1.5.</li>
+<li>iOS: Fixed the camera frustum and viewport dimensions if the device is in landscape. With this fix, the FOV and aspect ratio will be correct in all device orientations</li>
+<li>Patch 3034005: GLSL writers make wrong assumptions about the precedence of the || && operators (v1-7 applicable part)</li>
+<li>Patch 3034009: navigation bug in sample browser</li>
+<li>Build fixes for MinGW-w64</li>
+<li>(CMake) Properly determine if we are on a 64bit platform</li>
+<li>Allow embedding of Dependencies source build into the Ogre source tree</li>
+<li>Due to a change made in CMake 2.8.1, Xcode based projects for iPhone would be corrupted.  This fixes the problem.  Also, up the default SDK version to 4.0 since Apple is no longer shipping a 3.0 SDK but still supports targeting it.</li>
+<li>LLVM compile fix</li>
+<li>Patch 3040518: Fix link warnings when compiling Ogre with -fvisibility-hidden</li>
+<li>Updated sed script to work with the CMake 2.8.1+ fix for iOS</li>
+<li>iOS: Cache the system version so we don't query it every time we call swapBuffers</li>
+<li>Patch 3034010: Reduce a large number of compiler warnings, particularly shadowed local variables</li>
+<li>Backing out use of _OgreExport on AllocatedObject members, causes major build problems on VS</li>
+<li>SceneManager::renderVisibleObjectsCustomSequence was calling firePostRenderQueues at the start instead of firePreRenderQueues (thanks Lacero)</li>
+<li>Fix a script compile error introduced with the warning reduction patch</li>
+<li>Fixing iOS project generation. Running fix_linker_paths.sh may no longer be necessary, especially if using CMake 2.8.1 or later.</li>
+<li>Use RenderSystem capabilities to only load samples that require shaders if we support a shading language when linking statically.</li>
+<li>Bugfix : Scriptcompiler would crash when a specular attribute contained one number.
+As reported in http://www.ogre3d.org/forums/viewtopic.php?f=1&t=59742</li>
+<li>Fix a bug in Unix FileSystemLayerImpl if resolving a symlink fails</li>
+<li>Fixed animation track exporting to avoid XMLConverter to crash.</li>
+<li>Avoid sending tangent related params to XMLConverter when mesh does not have UV data.</li>
+<li>Materials will now fallback to Rendering Material mode when custom material template is invalid</li>
+<li>Added _tex[#] handlers to material template system allowing the use of indexed base texture binding.</li>
+<li>Improved material warnings for better readability.</li>
+<li>Updated help document on feature additions.</li>
+<li>D3D9RenderSystem: Fixed crash when HLSL compilation failed and trying to log errors but D3DXCompileShader returned a NULL pointer</li>
+<li>Fixed nasty memory corruption in OgreInstancedGeometry, when building the GeometryBucket.
+Discussed in http://www.ogre3d.org/forums/viewtopic.php?f=4&t=60432</li>
+<li>[3061946] Fix invalid fbConfig check in GL rendersystem</li>
+<li>Fix errors generated from RenderSystemCapabilitiesTests due to missing or misnamed capability keywords.</li>
+<li>GLES: Use  _OgreGLESExport instead of _OgrePrivate to control symbol visibility for rendersystem classes.</li>
+<li>pkg-config can be used to properly build a PCZSceneManager application</li>
+<li>Installing OIS dependency didn't work on RelWithDebInfo with MingW</li>
+<li>[3059963] Fix a slight copy&paste error in PCZSM</li>
+<li>Change required CMake version to >=2.6.2</li>
+<li>[3078774] Convert home path to OEM codepage in FileSystemLayerImpl_Win32</li>
+<li>[3074121] Fix handling of lights for multiple displays in D3D9 rendersystem.</li>
+<li>[3032954] Properly adjust window size in D3D9 RenderSystem to get the desired client size when switching from fullscreen to windowed.</li>
+<li>[3067141] Generate user files with debug paths for Visual Studio 2010</li>
+<li>Change Manual & API license to Creative Commons ShareAlike v3.0.
+Apparently Debian will only accept the 3.0 license and not 2.x</li>
+<li>[3002754] Add OGRE_UNICODE_SUPPORT guard to OgreUTFString.cpp</li>
+<li>[3072166] Fixed a crash on exit when SdkSample is initialised before Ogre::Root</li>
+<li>[3053689] Terrain sample: Add Numpad +/- as alternative key bindings</li>
+<li>Add threading library's include directory to Ogre include directories in FindOGRE.cmake</li>
+<li>Correctly check for PBuffer support even if FBO is supported in GL rendersystem</li>
+<li>[3043021] Use CMake to make sure that GCC visibility settings are passed along to Xcode.</li>
+<li>[3054042] Fix for two frustums attached to one scene node.  Cameras and Frustums should use the name member that they inherit from MoveableObject instead of their own.</li>
+<li>[3003231] Specify default values in StringConverter::parse*</li>
+<li>D3D9: RenderWindow::adjustWindow needs to take the current window style into consideration, otherwise the produced values can be off.</li>
+<li>D3D9: Fixed a bug where RenderWindow and Viewport sizes would not be in sync during a windowResized event.</li>
+<li>OS X: Fix use of macAPI in config files to specify Carbon or Cocoa windowing APIs</li>
+<li>A fix so ogre can run on Ubuntu that runs in "VirtualBox".<br>
+At the date of this commit - chooseFBConfig was not supported on VirtualBox - http://www.virtualbox.org/ticket/7195<br>
+Now glXGetFBConfigs is uses as an alternative if chooseFBConfig fails.
+</li>
+<li>iOS: Build script and CMake updates for iOS 4.  Fixes several project creation bugs and includes a warning about CMake 2.8.2 which cannot create usable universal Xcode iOS projects.</li>
+<li>Add some error checking to the Xcode template installer to help alleviate installation problems</li>
+<li>Update documentation on Bone::setManuallyControlled to mention the option of using AnimationState::setBlendMask to prevent scripted animations applying to the bone.</li>
+<li>Patch 3097617: initialise mManager correctly in default hardware buffers. 
+Modified slightly to maintain previous interfaces & not break build</li>
+<li>Apply patch 3097617 to the GL ES rendersystem too.</li>
+<li>[3057434] Fix RibbonTrail reset when attached to a SceneNode not positioned at the origin</li>
+<li>iOS: Guard a media dir variable update since we want to preserve the relative paths on iOS</li>
+<li>Remove a couple patterns from the Boost header exclude list.  Some headers in these directories are needed indirectly.</li>
+<li>Add missing CMake file to list of scripts to install</li>
+</ul>
+</p>
+
+<p class="mainheader">
     v1.7.1 [Cthugha] (25 April 2010) - MAINTENANCE RELEASE</p>
 <ul>
 <li> Terrain: Fix memory leak after updating lightmaps</li>

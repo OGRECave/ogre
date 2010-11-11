@@ -30,9 +30,15 @@ THE SOFTWARE.
 #define __StringConverter_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreMath.h"
-#include "OgreString.h"
 #include "OgreStringVector.h"
+#include "OgreColourValue.h"
+#include "OgreMath.h"
+#include "OgreMatrix3.h"
+#include "OgreMatrix4.h"
+#include "OgreQuaternion.h"
+#include "OgreVector2.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 
 namespace Ogre {
 
@@ -166,83 +172,82 @@ namespace Ogre {
         @returns
             0.0 if the value could not be parsed, otherwise the Real version of the String.
         */
-        static Real parseReal(const String& val);
+        static Real parseReal(const String& val, Real defaultValue = 0);
         /** Converts a String to a Angle. 
         @returns
             0.0 if the value could not be parsed, otherwise the Angle version of the String.
         */
-        static inline Radian parseAngle(const String& val) {
-			return Angle(parseReal(val));
+        static inline Radian parseAngle(const String& val, Radian defaultValue = Radian(0)) {
+			return Angle(parseReal(val, defaultValue.valueRadians()));
 		}
         /** Converts a String to a whole number. 
         @returns
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static int parseInt(const String& val);
+        static int parseInt(const String& val, int defaultValue = 0);
         /** Converts a String to a whole number. 
         @returns
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned int parseUnsignedInt(const String& val);
+        static unsigned int parseUnsignedInt(const String& val, unsigned int defaultValue = 0);
         /** Converts a String to a whole number. 
         @returns
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static long parseLong(const String& val);
+        static long parseLong(const String& val, long defaultValue = 0);
         /** Converts a String to a whole number. 
         @returns
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
-        static unsigned long parseUnsignedLong(const String& val);
+        static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0);
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string
 			matches "true", "yes" or "1", false otherwise.
         */
-        static bool parseBool(const String& val);
+        static bool parseBool(const String& val, bool defaultValue = 0);
 		/** Parses a Vector2 out of a String.
         @remarks
             Format is "x y" ie. 2 Real components, space delimited. Failure to parse returns
             Vector2::ZERO.
         */
-        static Vector2 parseVector2(const String& val);
+		static Vector2 parseVector2(const String& val, const Vector2& defaultValue = Vector2::ZERO);
 		/** Parses a Vector3 out of a String.
         @remarks
             Format is "x y z" ie. 3 Real components, space delimited. Failure to parse returns
             Vector3::ZERO.
         */
-        static Vector3 parseVector3(const String& val);
+        static Vector3 parseVector3(const String& val, const Vector3& defaultValue = Vector3::ZERO);
         /** Parses a Vector4 out of a String.
         @remarks
             Format is "x y z w" ie. 4 Real components, space delimited. Failure to parse returns
             Vector4::ZERO.
         */
-        static Vector4 parseVector4(const String& val);
+        static Vector4 parseVector4(const String& val, const Vector4& defaultValue = Vector4::ZERO);
         /** Parses a Matrix3 out of a String.
         @remarks
             Format is "00 01 02 10 11 12 20 21 22" where '01' means row 0 column 1 etc.
             Failure to parse returns Matrix3::IDENTITY.
         */
-        static Matrix3 parseMatrix3(const String& val);
+        static Matrix3 parseMatrix3(const String& val, const Matrix3& defaultValue = Matrix3::IDENTITY);
         /** Parses a Matrix4 out of a String.
         @remarks
             Format is "00 01 02 03 10 11 12 13 20 21 22 23 30 31 32 33" where 
             '01' means row 0 column 1 etc. Failure to parse returns Matrix4::IDENTITY.
         */
-        static Matrix4 parseMatrix4(const String& val);
+        static Matrix4 parseMatrix4(const String& val, const Matrix4& defaultValue = Matrix4::IDENTITY);
         /** Parses a Quaternion out of a String. 
         @remarks
             Format is "w x y z" (i.e. 4x Real values, space delimited). 
             Failure to parse returns Quaternion::IDENTITY.
-
         */
-        static Quaternion parseQuaternion(const String& val);
+        static Quaternion parseQuaternion(const String& val, const Quaternion& defaultValue = Quaternion::IDENTITY);
         /** Parses a ColourValue out of a String. 
         @remarks
             Format is "r g b a" (i.e. 4x Real values, space delimited), or "r g b" which implies
             an alpha value of 1.0 (opaque). Failure to parse returns ColourValue::Black.
         */
-        static ColourValue parseColourValue(const String& val);
+        static ColourValue parseColourValue(const String& val, const ColourValue& defaultValue = ColourValue::Black);
 
         /** Pareses a StringVector from a string.
         @remarks

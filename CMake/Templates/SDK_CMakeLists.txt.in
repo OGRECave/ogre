@@ -15,6 +15,12 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+# CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
+# to specify both armv6 and armv7.
+if(OGRE_BUILD_PLATFORM_IPHONE AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
+	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
+endif()
+
 # Just debug / release since that's all that's included in SDK
 set (CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
@@ -80,18 +86,15 @@ if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
   CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos4.0)
+  set(CMAKE_OSX_SYSROOT iphoneos)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
-  set(XCODE_ATTRIBUTE_SDKROOT iphoneos4.0)
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iPhone" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
-  # CMake 2.8.1 added the ability to specify per-target architectures.
-  # As a side effect, it creates corrupt Xcode projects if you try do it for the whole project.
-  if(VERSION STRLESS "2.8.1")
-    set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)")
-  else()
-    set(CMAKE_OSX_ARCHITECTURES "armv6;armv7;")
-  endif()
+  set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
+  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
 
   remove_definitions(-msse)
   add_definitions(-fno-regmove)
@@ -175,6 +178,16 @@ if (OGRE_RTShaderSystem_FOUND)
 		# Link to RT Shader System if enabled.
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})
 endif()
+
+if (OGRE_Terrain_FOUND)
+    ogre_add_component_include_dir(Terrain)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Terrain_LIBRARIES})
+endif ()
+
+if (OGRE_Paging_FOUND)
+    ogre_add_component_include_dir(Paging)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Paging_LIBRARIES})
+endif ()
 
 if (UNIX AND NOT APPLE)
   # on Linux, shipped samples will still be compiled with CMake, so we need

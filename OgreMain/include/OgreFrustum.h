@@ -193,7 +193,9 @@ namespace Ogre
 
     public:
 
-        Frustum();
+		/// Named constructor
+		Frustum(const String& name = StringUtil::BLANK);
+
         virtual ~Frustum();
         /** Sets the Y-dimension Field Of View (FOV) of the frustum.
             @remarks

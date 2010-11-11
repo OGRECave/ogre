@@ -85,7 +85,8 @@ public:
 		Vector3 tsPos;
 		terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-		if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_MINUS))
+		if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD) ||
+				mKeyboard->isKeyDown(OIS::KC_MINUS) || mKeyboard->isKeyDown(OIS::KC_SUBTRACT))
 		{
 			switch(mMode)
 			{
@@ -114,7 +115,7 @@ public:
 
 							float addedHeight = weight * 250.0 * timeElapsed;
 							float newheight;
-							if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
+							if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD))
 								newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
 							else
 								newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -153,7 +154,7 @@ public:
 							float paint = weight * timeElapsed;
 							size_t imgY = imgSize - y;
 							float val;
-							if (mKeyboard->isKeyDown(OIS::KC_EQUALS))
+							if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD))
 								val = layer->getBlendValue(x, imgY) + paint;
 							else
 								val = layer->getBlendValue(x, imgY) - paint;

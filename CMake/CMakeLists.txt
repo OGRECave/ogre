@@ -23,6 +23,7 @@ set(INST_FILES
   Packages/FindOIS.cmake
   Packages/FindOGRE.cmake
   Utils/FindPkgMacros.cmake
+  Utils/MacroLogFeature.cmake
   Utils/PreprocessorUtils.cmake
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
@@ -44,6 +45,7 @@ set(STATIC_INST_FILES
 if (WIN32)
   set(INST_FILES ${INST_FILES}
     Templates/VisualStudioUserFile.vcproj.user.in
+    Templates/VisualStudioUserFile.vcxproj.user.in
   )
 endif ()
 

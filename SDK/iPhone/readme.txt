@@ -1,12 +1,12 @@
-Instructions for building the iPhone SDK
+Instructions for building the iOS SDK
 ---------------------------------------
 
 System Path
 -----------
 You need the following available on your system path:
 - CMake 2.8+
-- Xcode 3.1
-- iPhone SDK 3.0 or later
+- Xcode 3.2
+- iPhone SDK 4.1 or later
 - Doxygen
 - Graphviz 'dot' command
 

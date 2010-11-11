@@ -18,6 +18,12 @@ cmake_minimum_required(VERSION 2.6.2)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+# CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
+# to specify both armv6 and armv7.
+if(OGRE_BUILD_PLATFORM_IPHONE AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
+	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
+endif()
+
 # Use relative paths
 # This is mostly to reduce path size for command-line limits on windows
 if(WIN32)
@@ -129,6 +135,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
     message(STATUS "Detected g++ ${OGRE_GCC_VERSION}")
     message(STATUS "Enabling GCC visibility flags")
     set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY -fvisibility=hidden")
+    set(XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES")
   
     # check if we can safely add -fvisibility-inlines-hidden
     string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
@@ -136,6 +143,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
       message(STATUS "Skipping -fvisibility-inlines-hidden due to possible bug in g++ < 4.2")
     else ()
       set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
+      set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "YES")
     endif ()
   endif (OGRE_GCC_VISIBILITY)
   
@@ -196,10 +204,10 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
-  set(CMAKE_OSX_SYSROOT iphoneos4.0)
+  set(CMAKE_OSX_SYSROOT iphoneos)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
-  set(XCODE_ATTRIBUTE_SDKROOT iphoneos4.0)
+  set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
@@ -212,6 +220,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
     set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
   endif()
 
+  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
   add_definitions(-fno-regmove)
   add_definitions(-falign-loops=16)
   remove_definitions(-msse)
@@ -234,7 +243,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
     string(REPLACE "ppc64" "" CMAKE_OSX_ARCHITECTURES ${CMAKE_OSX_ARCHITECTURES})
   endif()
 
-  # Make sure that the OpenGL render system is selected for non-iOS Apple builds
+  # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)

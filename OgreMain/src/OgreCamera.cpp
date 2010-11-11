@@ -48,7 +48,7 @@ namespace Ogre {
     String Camera::msMovableType = "Camera";
     //-----------------------------------------------------------------------
     Camera::Camera( const String& name, SceneManager* sm)
-        : mName( name ),
+        : Frustum(name),
 		mSceneMgr(sm),
 		mOrientation(Quaternion::IDENTITY),
 		mPosition(Vector3::ZERO),
@@ -101,11 +101,6 @@ namespace Ogre {
     SceneManager* Camera::getSceneManager(void) const
     {
         return mSceneMgr;
-    }
-    //-----------------------------------------------------------------------
-    const String& Camera::getName(void) const
-    {
-        return mName;
     }
 
 

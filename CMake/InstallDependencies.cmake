@@ -141,14 +141,12 @@ if (OGRE_INSTALL_DEPENDENCIES)
 	  # headers (try to exclude things we don't need)
 	  install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost_${Boost_LIB_VERSION}"
 		PATTERN "accumulators" EXCLUDE
-		PATTERN "algorithm" EXCLUDE
 		PATTERN "archive" EXCLUDE
 		PATTERN "asio" EXCLUDE
 		PATTERN "assign" EXCLUDE
 		PATTERN "bimap" EXCLUDE
 		PATTERN "circular_buffer" EXCLUDE
 		PATTERN "compatibility" EXCLUDE
-		PATTERN "concept" EXCLUDE
 		PATTERN "concept_check" EXCLUDE
 		PATTERN "dynamic_bitset" EXCLUDE
 		PATTERN "filesystem" EXCLUDE

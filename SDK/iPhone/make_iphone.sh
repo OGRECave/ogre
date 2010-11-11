@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Build and package the SDK for iPhone
+# Build and package the SDK for iOS
 # Assumes that you are in the SDK/iPhone directory
 
-OGRE_VERSION="v1.7.0"
 LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
 SDKBUILDDIR=`pwd`
+
+set IPHONEOS_DEPLOYMENT_TARGET 4.0
 
 # Clean up files from previous builds
 echo Cleaning previous builds...
@@ -13,24 +14,23 @@ if [ "$1" = "clean" ];then
 	rm -rf $SDKBUILDDIR/build
 fi
 rm -rf $SDKBUILDDIR/sdk_contents 
-rm OgreSDK_iPhone_$OGRE_VERSION.dmg
 
 # Configure with CMake
 mkdir -p $SDKBUILDDIR/build
 pushd $SDKBUILDDIR/build
 cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
 
+# Fix the linking paths
+#sed -f ../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
+#mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
+
 # Read version number
 OGRE_VERSION=`cat version.txt`
-
-# Fix the linking paths
-sed -f ../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
-mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 
 echo Building API docs...
 
 # Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos3.0
+xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0
 
 pushd api/html
 
@@ -53,23 +53,26 @@ echo API generation done.
 # Install targets will fail because they can't find libraries.  So we've added a post build phase to copy them to the
 # location that the target expects them then copy them to the correct location
 
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos3.0
+echo Building for devices...
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0
 mkdir -p sdk/lib/Release-iphoneos
-mv sdk/lib/*.a sdk/lib/Release-iphoneos
+mv -v lib/Release/*.a sdk/lib/Release-iphoneos
 
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator3.0
+echo Building for simulator...
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=4.0
 mkdir -p sdk/lib/Release-iphonesimulator
-mv sdk/lib/*.a sdk/lib/Release-iphonesimulator
+mv -v lib/Release/*.a sdk/lib/Release-iphonesimulator
 
 # Frameworks
 echo Copying frameworks...
 
 # Stuff we've built
 # Cram them together so we have a 'fat' library for device and simulator
-for LIBNAME in $SDKBUILDDIR/build/lib/Release-iphoneos/lib*
+for LIBNAME in $SDKBUILDDIR/build/sdk/lib/Release-iphoneos/lib*
 do
+	echo lipo $LIBNAME
 	BASELIBNAME=`basename $LIBNAME`
-	$LIPO $SDKBUILDDIR/build/lib/Release-iphoneos/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/lib/Release-iphonesimulator/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
+	$LIPO $SDKBUILDDIR/build/sdk/lib/Release-iphoneos/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/sdk/lib/Release-iphonesimulator/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
 done
 
 rm -rf $SDKBUILDDIR/build/sdk/lib/Release-*
@@ -80,8 +83,8 @@ echo Generating Samples Project...
 
 pushd sdk
 cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -G Xcode .
-sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
-mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
+#sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
+#mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 rm CMakeCache.txt
 
 # Fix absolute paths
@@ -137,8 +140,8 @@ popd
 
 echo End Copying SDK
 
-# Remove SVN files to avoid increasing the size of the SDK with duplicates
-find sdk_contents -iname .svn -exec rm -rf \{\} \;
+# Remove DS_Store files to avoid increasing the size of the SDK with duplicates
+find sdk_contents -iname .DS_Store -exec rm -rf \{\} \;
 
 # Also remove build directories.
 find sdk_contents -iname *.build -exec rm -rf \{\} \;
@@ -149,7 +152,7 @@ echo Building DMG...
 # and has already had 'bless -folder blah -openfolder blah' run on it
 # to make it auto-open on mounting.
 
-SDK_NAME=OgreSDK_iPhone_v$OGRE_VERSION
+SDK_NAME=OgreSDK_iOS_v$OGRE_VERSION
 rm $SDK_NAME.dmg
 
 bunzip2 -k -f template.dmg.bz2
