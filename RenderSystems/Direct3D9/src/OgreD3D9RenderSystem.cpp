@@ -1320,7 +1320,7 @@ namespace Ogre
 		if (caps->getRenderSystemName() != getName())
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"Trying to initialize GLRenderSystem from RenderSystemCapabilities that do not support Direct3D9",
+				"Trying to initialize D3D9RenderSystem from RenderSystemCapabilities that do not support Direct3D9",
 				"D3D9RenderSystem::initialiseFromRenderSystemCapabilities");
 		}
 		if (caps->isShaderProfileSupported("hlsl"))
