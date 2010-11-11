@@ -83,6 +83,7 @@ namespace Ogre {
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
     {
+        mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
 
     //-----------------------------------------------------------------------

@@ -215,6 +215,15 @@ namespace Ogre
 
 		/** Query the real capabilities of the GPU and driver in the RenderSystem*/
 		virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
+ 
+		/** Get a pointer to the current capabilities being used by the RenderSystem.
+		@remarks
+		The capabilities may be modified using this pointer, this will only have an effect
+		before the RenderSystem has been initialised. It's intended use is to allow a
+		listener of the RenderSystemCapabilitiesCreated event to customise the capabilities
+		on the fly before the RenderSystem is initialised.
+		*/
+		RenderSystemCapabilities* getMutableCapabilities(){ return mCurrentCapabilities; }
 
 		/** Force the render system to use the special capabilities. Can only be called
 		*    before the render system has been fully initializer (before createWindow is called) 
