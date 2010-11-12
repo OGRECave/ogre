@@ -314,16 +314,24 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	if(mAPI == "cocoa")
 	{
 		LogManager::getSingleton().logMessage("Creating a Cocoa Compatible Render System");
-		OSXCocoaWindow* window = OGRE_NEW OSXCocoaWindow();
+		OSXCocoaWindow *window = OGRE_NEW OSXCocoaWindow();
 		window->create(name, width, height, fullScreen, miscParams);
+
 		return window;
 	}
-	
-	// Otherwise default to Carbon
-	LogManager::getSingleton().logMessage("Creating a Carbon Compatible Render System");
-	OSXCarbonWindow* window = OGRE_NEW OSXCarbonWindow();
-	window->create(name, width, height, fullScreen, miscParams);
-	return window;
+#ifndef __LP64__
+    else
+    {
+        // Otherwise default to Carbon
+        LogManager::getSingleton().logMessage("Creating a Carbon Compatible Render System");
+        OSXCarbonWindow *window = OGRE_NEW OSXCarbonWindow();
+        window->create(name, width, height, fullScreen, miscParams);
+
+		return window;
+    }
+#endif
+
+   return NULL;
 }
 
 void OSXGLSupport::start()

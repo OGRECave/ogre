@@ -34,14 +34,17 @@ THE SOFTWARE.
 
 #include <Cocoa/Cocoa.h>
 #include "OgreOSXCocoaView.h"
+#include "OgreOSXCGLContext.h"
 
 namespace Ogre {
     class OSXCocoaWindow : public OSXWindow
     {
     private:
-		NSWindow *mWindow;
-		NSView *mView;
-		NSOpenGLContext *mGLContext;
+        NSWindow *mWindow;
+        NSView *mView;
+        NSOpenGLContext *mGLContext;
+        NSOpenGLPixelFormat *mGLPixelFormat;
+        OSXCGLContext* mCGLContext;
 
         bool mActive;
         bool mClosed;

@@ -37,6 +37,7 @@
 #endif 
 
 #include "SampleBrowser.h"
+#include <Cocoa/Cocoa.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -89,6 +90,127 @@ int main()
 int mainWithTrap()
 
 #else
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#   ifdef __OBJC__
+
+// All this does is suppress some messages in the run log.  NSApplication does not
+// implement buttonPressed and apps without a NIB have no target for the action.
+@implementation NSApplication (_suppressUnimplementedActionWarning)
+- (void) buttonPressed:(id)sender
+{
+    /* Do nothing */
+}
+@end
+
+
+@interface AppDelegate : NSObject <NSApplicationDelegate>
+{
+    NSTimer *mTimer;
+    OgreBites::SampleBrowser sb;
+
+    NSDate *mDate;
+    NSTimeInterval mLastFrameTime;
+}
+
+- (void)go;
+- (void)renderOneFrame:(id)sender;
+
+@property (retain) NSTimer *mTimer;
+@property (nonatomic) NSTimeInterval mLastFrameTime;
+
+@end
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+static id mAppDelegate;
+#endif
+
+@implementation AppDelegate
+
+@synthesize mTimer;
+@dynamic mLastFrameTime;
+
+- (NSTimeInterval)mLastFrameTime
+{
+    return mLastFrameTime;
+}
+
+- (void)setLastFrameTime:(NSTimeInterval)frameInterval
+{
+    // Frame interval defines how many display frames must pass between each time the
+    // display link fires. The display link will only fire 30 times a second when the
+    // frame internal is two on a display that refreshes 60 times a second. The default
+    // frame interval setting of one will fire 60 times a second when the display refreshes
+    // at 60 times a second. A frame interval setting of less than one results in undefined
+    // behavior.
+    if (frameInterval >= 1)
+    {
+        mLastFrameTime = frameInterval;
+    }
+}
+
+- (void)go {
+    
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    mLastFrameTime = 1;
+    mTimer = nil;
+
+    try {
+        sb.go();
+        
+        Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
+        
+        // Clear event times
+		Ogre::Root::getSingleton().clearEventTimes();
+    } catch( Ogre::Exception& e ) {
+        std::cerr << "An exception has occurred: " <<
+        e.getFullDescription().c_str() << std::endl;
+    }
+    
+    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
+                                              target:self
+                                            selector:@selector(renderOneFrame:)
+                                            userInfo:nil
+                                             repeats:YES];
+    [pool release];
+}
+    
+- (void)applicationDidFinishLaunching:(NSNotification *)application {
+    mLastFrameTime = 1;
+    mTimer = nil;
+
+    [self go];
+}
+        
+- (void)renderOneFrame:(id)sender
+{
+    if(Ogre::Root::getSingletonPtr() && Ogre::Root::getSingleton().isInitialised())
+    {
+        Ogre::Root::getSingleton().renderOneFrame((Ogre::Real)[mTimer timeInterval]);
+    }
+    else
+    {
+        [mTimer invalidate];
+        mTimer = nil;
+        [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
+    }
+}
+
+- (void)dealloc {
+    if(mTimer)
+    {
+        [mTimer invalidate];
+        mTimer = nil;
+    }
+
+    [super dealloc];
+}
+
+@end
+#   endif
+        
+#endif
+        
 int main(int argc, char *argv[])
 #endif
 {
@@ -96,6 +218,16 @@ int main(int argc, char *argv[])
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
 	[pool release];
+	return retVal;
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    
+    mAppDelegate = [[AppDelegate alloc] init];
+    [[NSApplication sharedApplication] setDelegate:mAppDelegate];
+	int retVal = NSApplicationMain(argc, (const char **) argv);
+
+	[pool release];
+
 	return retVal;
 #else
 
@@ -150,6 +282,15 @@ int main(int argc, char *argv[])
 
 @synthesize mTimer;
 @dynamic mLastFrameTime;
+
+- (id)init
+{
+    if((self = [super init]))
+    {
+        [[NSApplication sharedApplication] setDelegate:self];
+    }
+    return self;
+}
 
 - (NSTimeInterval)mLastFrameTime
 {

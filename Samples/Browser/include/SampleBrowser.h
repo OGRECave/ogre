@@ -33,6 +33,8 @@
 #include "SamplePlugin.h"
 #include "SdkTrays.h"
 
+#include "OgreTimer.h"
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #include "macUtils.h"
 #endif
@@ -116,6 +118,7 @@ namespace OgreBites
 			mDescBox = 0;
 			mRendererMenu = 0;
 			mCarouselPlace = 0.0f;
+            mTimer = NULL;
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 			mGestureView = 0;
 #endif
@@ -206,6 +209,16 @@ namespace OgreBites
 					if (i == mSampleMenu->getSelectionIndex()) frame->setBorderMaterialName("SdkTrays/Frame/Over");
 					else frame->setBorderMaterialName("SdkTrays/Frame");
 				}
+                
+                if(mTimer)
+                {
+                    if(mTimer->getMilliseconds() > 5000)
+                    {
+                        mWindow->setFullscreen(false, mWindow->getWidth(), mWindow->getHeight());
+                        delete mTimer;
+                        mTimer = NULL;
+                    }
+                }
 			}
 
 			mTrayMgr->frameRenderingQueued(evt);
@@ -360,7 +373,16 @@ namespace OgreBites
 				// reset with new settings if necessary
 				if (reset) reconfigure(mRendererMenu->getSelectedItem(), newOptions);
 			}
-			else mRoot->queueEndRendering();   // exit browser
+			else
+            {
+                mRoot->queueEndRendering();   // exit browser
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+				mRoot->saveConfig();
+				shutdown();
+				if (mRoot) OGRE_DELETE mRoot;
+#endif
+            }
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -1318,6 +1340,7 @@ namespace OgreBites
 		Ogre::Real mCarouselPlace;                     // current state of carousel
 		int mLastViewTitle;                            // last sample title viewed
 		int mLastViewCategory;                         // last sample category viewed
+        Ogre::Timer *mTimer;
 		int mLastSampleIndex;                          // index of last sample running
 #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
     public:

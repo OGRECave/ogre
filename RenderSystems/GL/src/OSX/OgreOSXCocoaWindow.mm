@@ -41,6 +41,7 @@ namespace Ogre {
         mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
     {
 		mContext = nil;
+        mCGLContext = NULL;
     }
 
     OSXCocoaWindow::~OSXCocoaWindow()
@@ -50,6 +51,18 @@ namespace Ogre {
 
         destroy();
 
+        if(mGLPixelFormat)
+        {
+            [mGLPixelFormat release];
+            mGLPixelFormat = nil;
+        }
+
+        if(mCGLContext)
+        {
+            OGRE_DELETE mCGLContext;
+            mCGLContext = NULL;
+        }
+        
         if(mWindow)
         {
             [mWindow release];
@@ -102,7 +115,7 @@ namespace Ogre {
 				
 			opt = miscParams->find("top");
 			if(opt != miscParams->end())
-				winy = NSHeight([[NSScreen mainScreen] frame]) - StringConverter::parseUnsignedInt(opt->second) - height;
+				winy = (int)NSHeight([[NSScreen mainScreen] frame]) - StringConverter::parseUnsignedInt(opt->second) - height;
 
 			opt = miscParams->find("depthBuffer");
 			if(opt != miscParams->end())
@@ -148,7 +161,6 @@ namespace Ogre {
         }
         else
         {
-            NSOpenGLPixelFormat* openglFormat = nil;
             NSOpenGLPixelFormatAttribute attribs[30];
             int i = 0;
             
@@ -181,12 +193,12 @@ namespace Ogre {
             
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 0;
 
-            openglFormat = [[[NSOpenGLPixelFormat alloc] initWithAttributes: attribs] autorelease];
+            mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs];
 
 			GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
 			OSXCocoaContext *mainContext = (OSXCocoaContext*)rs->_getMainContext();
 			NSOpenGLContext *shareContext = mainContext == 0? nil : mainContext->getContext();
-            mGLContext = [[NSOpenGLContext alloc] initWithFormat:openglFormat shareContext:shareContext];
+            mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
 
             if(!miscParams || opt == miscParams->end())
             {
@@ -218,15 +230,15 @@ namespace Ogre {
                     mView = view;
                 
                     NSRect b = [mView bounds];
-                    mWidth = b.size.width;
-                    mHeight = b.size.height;
+                    mWidth = (int)b.size.width;
+                    mHeight = (int)b.size.height;
                 }
 
                 createWindowFromExternal(mView);
             }
 
             // Create register the context with the rendersystem and associate it with this window
-            mContext = OGRE_NEW OSXCocoaContext(mGLContext, openglFormat);
+            mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
         }
 		// make active
 		mActive = true;
@@ -267,7 +279,7 @@ namespace Ogre {
 
             if(mWindow)
             {
-                [mWindow close];
+                [mWindow performClose:nil];
             }
 		}
 		
@@ -402,44 +414,46 @@ namespace Ogre {
 
             if(mIsFullScreen) {
                 GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
-                OSXContext *mainContext = (OSXContext *)rs->_getMainContext();
 
                 CGLContextObj share = NULL;
-                if(mainContext == 0)
+                share = (CGLContextObj)[mGLContext CGLContextObj];
+
+                // Create the CGL context object if it doesn't already exist, sharing the AGL context.
+                if(!mCGLContext)
                 {
-                    share = NULL;
-                }
-                else if(mainContext->getContextType() == "NSOpenGL")
-                {
-                    OSXCocoaContext* cocoaContext = static_cast<OSXCocoaContext*>(mainContext);
-                    NSOpenGLContext* nsShare = cocoaContext->getContext();
-                    share = (CGLContextObj)[nsShare CGLContextObj];
-                }
-                else if(mainContext->getContextType() == "CGL")
-                {
-                    OSXCGLContext* cglShare = static_cast<OSXCGLContext*>(mainContext);
-                    share = cglShare->getContext();
+                    mCGLContext = OGRE_NEW OSXCGLContext(mCGLContextObj, (CGLPixelFormatObj) [mGLPixelFormat CGLPixelFormatObj]);
                 }
                 
                 // create the context
                 createCGLFullscreen(width, height, getColourDepth(), getFSAA(), share);
+                rs->_switchContext(mContext);
+
+                // Hide the Cocoa window
+                [mWindow orderOut:nil];
 
                 WindowEventUtilities::_removeRenderWindow(this);
             }
             else
             {
                 // Create a window if we haven't already, existence check is done within the functions
-                if(mIsExternal)
-                    createWindowFromExternal(mView);
-                else
-                    createNewWindow(width, height, mWindowTitle);
+                if(!mWindow)
+                {
+                    if(mIsExternal)
+                        createWindowFromExternal(mView);
+                    else
+                        createNewWindow(width, height, mWindowTitle);
+                }
 
                 // Destroy the current CGL context, we will create a new one when/if we go back to full screen
                 destroyCGLFullscreen();
 
                 // Set the drawable, and current context
                 // If you do this last, there is a moment before the rendering window pops-up
+                [mGLContext makeCurrentContext];
                 [mGLContext setView:mView];
+
+                GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+                rs->_switchContext(mContext);
 
                 // Show window
                 if(mWindow)

@@ -331,10 +331,10 @@ namespace Ogre {
 		GLUniformReferenceList& list)
 	{
 		// scan through the active uniforms and add them to the reference list
-		GLint uniformCount;
+		GLint uniformCount = 0;
 
 		#define BUFFERSIZE 200
-		char   uniformName[BUFFERSIZE];
+		char   uniformName[BUFFERSIZE] = "";
 		//GLint location;
 		GLUniformReference newGLUniformReference;
 
@@ -346,7 +346,7 @@ namespace Ogre {
 		// only do this for user defined uniforms, ignore built in gl state uniforms
 		for (int index = 0; index < uniformCount; index++)
 		{
-			GLint arraySize;
+			GLint arraySize = 0;
 			GLenum glType;
 			glGetActiveUniformARB(programObject, index, BUFFERSIZE, NULL, 
 				&arraySize, &glType, uniformName);
