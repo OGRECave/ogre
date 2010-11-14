@@ -37,11 +37,12 @@
 #endif 
 
 #include "SampleBrowser.h"
-#include <Cocoa/Cocoa.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include <Cocoa/Cocoa.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
@@ -282,15 +283,6 @@ int main(int argc, char *argv[])
 
 @synthesize mTimer;
 @dynamic mLastFrameTime;
-
-- (id)init
-{
-    if((self = [super init]))
-    {
-        [[NSApplication sharedApplication] setDelegate:self];
-    }
-    return self;
-}
 
 - (NSTimeInterval)mLastFrameTime
 {
