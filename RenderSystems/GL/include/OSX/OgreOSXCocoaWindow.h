@@ -35,6 +35,9 @@ THE SOFTWARE.
 #include <Cocoa/Cocoa.h>
 #include "OgreOSXCocoaView.h"
 #include "OgreOSXCGLContext.h"
+#include "OgreOSXCocoaWindowDelegate.h"
+
+@class OSXCocoaWindowDelegate;
 
 namespace Ogre {
     class OSXCocoaWindow : public OSXWindow
@@ -45,6 +48,7 @@ namespace Ogre {
         NSOpenGLContext *mGLContext;
         NSOpenGLPixelFormat *mGLPixelFormat;
         OSXCGLContext* mCGLContext;
+        OSXCocoaWindowDelegate *mWindowDelegate;
 
         bool mActive;
         bool mClosed;
@@ -79,7 +83,9 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
-		void windowMovedOrResized();
+		void windowMovedOrResized(void);
+		void windowResized(void);
+		void windowHasResized(void);
 		void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);
 

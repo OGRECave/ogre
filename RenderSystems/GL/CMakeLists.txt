@@ -163,6 +163,7 @@ elseif (APPLE)
     include/OSX/OgreOSXCocoaContext.h
 	include/OSX/OgreOSXCocoaView.h
     include/OSX/OgreOSXCocoaWindow.h
+    include/OSX/OgreOSXCocoaWindowDelegate.h
     include/OSX/OgreOSXContext.h
     include/OSX/OgreOSXGLSupport.h
     include/OSX/OgreOSXRenderTexture.h
@@ -178,6 +179,7 @@ elseif (APPLE)
     src/OSX/OgreOSXCarbonWindow.cpp
 	src/OSX/OgreOSXCocoaView.mm
     src/OSX/OgreOSXCocoaWindow.mm
+    src/OSX/OgreOSXCocoaWindowDelegate.mm
     src/OSX/OgreOSXGLSupport.mm
     src/OSX/OgreOSXWindow.cpp
   )

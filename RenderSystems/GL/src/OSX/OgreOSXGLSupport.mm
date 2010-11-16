@@ -277,7 +277,12 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
         {
 			winOptions[ "FSAA" ] = opt->second.currentValue;
         }
-
+        opt = mOptions.find( "macAPI" );
+        if( opt != mOptions.end() )
+        {
+			winOptions[ "macAPI" ] = opt->second.currentValue;
+        }
+        
 		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
 	}
 	else
@@ -296,18 +301,17 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-		ConfigOptionMap::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt(NULL);
 
-		// First we must determine if this is a Carbon or a Cocoa window
-		// that we wish to create
-		opt = mOptions.find("macAPI");
-        String m = opt->second.currentValue;
-		if(opt != mOptions.end() && opt->second.currentValue == "cocoa")
-		{
-			// Our user wants a Cocoa compatible system
-			mAPI = "cocoa";
-			mContextType = "NSOpenGL";
-		}
+        // First we must determine if this is a Carbon or a Cocoa window
+        // that we wish to create
+        opt = miscParams->find("macAPI");
+        if(opt != miscParams->end() && opt->second == "cocoa")
+        {
+            // Our user wants a Cocoa compatible system
+            mAPI = "cocoa";
+            mContextType = "NSOpenGL";
+        }
 	}
 	
 	// Create the window, if Cocoa return a Cocoa window
