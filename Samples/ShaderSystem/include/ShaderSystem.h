@@ -61,6 +61,7 @@ public:
 	Sample_ShaderSystem();
 	~Sample_ShaderSystem();
 		
+	virtual void _shutdown();
 
 	/** @see Sample::checkBoxToggled. */
 	void checkBoxToggled(CheckBox* box);

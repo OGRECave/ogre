@@ -89,9 +89,17 @@ Sample_ShaderSystem::Sample_ShaderSystem() :
 //-----------------------------------------------------------------------
 Sample_ShaderSystem::~Sample_ShaderSystem()
 {
-	destroyInstancedViewports();
 }
 //-----------------------------------------------------------------------
+
+void Sample_ShaderSystem::_shutdown()
+{
+	destroyInstancedViewports();
+	SdkSample::_shutdown();
+}
+
+//-----------------------------------------------------------------------
+
 void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 {
 	const String& cbName = box->getName();
