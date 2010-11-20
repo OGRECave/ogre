@@ -421,7 +421,12 @@ namespace Ogre {
     void OSXCocoaWindow::swapBuffers(bool waitForVSync)
     {
 		if(!mIsFullScreen)
+        {
+            if([mGLContext view] != mView)
+                [mGLContext setView:mView];
+
 			[mGLContext flushBuffer];
+        }
 		else
 			swapCGLBuffers();
     }
@@ -475,24 +480,20 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("Creating external window");
 
+        NSRect viewBounds = [mView bounds];
+
         mWindow = [viewRef window];
 
         [mWindow center];
-        
         mView = viewRef;
-        [mWindow setContentView:mView];
+
         [mWindow makeFirstResponder:mView];
-        [mWindow setDelegate:mWindowDelegate];
-
-        [mGLContext setView:mView];
-
-        NSRect viewFrame = [mView frame];
 
         GLint bufferRect[4];
-        bufferRect[0] = viewFrame.origin.x;      // 0 = left edge 
-        bufferRect[1] = viewFrame.origin.y;      // 0 = bottom edge 
-        bufferRect[2] = viewFrame.size.width;    // width of buffer rect 
-        bufferRect[3] = viewFrame.size.height;   // height of buffer rect 
+        bufferRect[0] = viewBounds.origin.x;      // 0 = left edge 
+        bufferRect[1] = viewBounds.origin.y;      // 0 = bottom edge 
+        bufferRect[2] = viewBounds.size.width;    // width of buffer rect 
+        bufferRect[3] = viewBounds.size.height;   // height of buffer rect 
         CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
         CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
         

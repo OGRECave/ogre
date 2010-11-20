@@ -37,6 +37,49 @@ using namespace Ogre;
 
 @synthesize ogreWindow;
 
+- (id)init
+{
+    if (self = [super init])
+    {
+        // Register ourselves for several window event notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowDidResize:)
+                                                     name:@"NSWindowDidResizeNotification" object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowWillMove:)
+                                                     name:@"NSWindowWillMoveNotification" object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowWillClose:)
+                                                     name:@"NSWindowWillCloseNotification" object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowDidBecomeKey:)
+                                                     name:@"NSWindowDidBecomeKeyNotification" object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowDidResignKey:)
+                                                     name:@"NSWindowDidResignKeyNotification" object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowDidMiniaturize:)
+                                                     name:@"NSWindowDidMiniaturizeNotification" object:nil];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(windowDidDeminiaturize:)
+                                                     name:@"NSWindowDidDeminiaturizeNotification" object:nil];
+    }
+    return self;
+}
+
+- (void)dealloc {
+    // Stop observing notifications
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [super dealloc];
+}
+
 - (void)windowDidResize:(NSNotification *)notification
 {
     // Update the Ogre window
