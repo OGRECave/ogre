@@ -148,6 +148,7 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
+			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->Map(
 							mParentTexture->GetTex2D(), 
@@ -204,6 +205,7 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
+			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->Unmap(mParentTexture->GetTex2D(), 
 					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()));
@@ -241,6 +243,7 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
+			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->UpdateSubresource(
 						mParentTexture->GetTex2D(), 
@@ -338,6 +341,7 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
+		case TEX_TYPE_2D_ARRAY:
 			{
 				mDevice.GetImmediateContext()->CopySubresourceRegion(
 					mParentTexture->GetTex2D(), 
@@ -450,10 +454,8 @@ namespace Ogre {
 			}
 			break;
 		case TEX_TYPE_CUBE_MAP:
-			{
-				int a = 1;
-			}
 		case TEX_TYPE_2D:
+		case TEX_TYPE_2D_ARRAY:
 			{
 				mDevice.GetImmediateContext()->UpdateSubresource( 
 					mParentTexture->GetTex2D(), 

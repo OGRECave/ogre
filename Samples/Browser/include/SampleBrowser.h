@@ -67,6 +67,7 @@
 #include "Smoke.h"
 #include "SphereMapping.h"
 #include "TextureFX.h"
+#include "TextureArray.h"
 #include "Transparency.h"
 #  if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
@@ -951,6 +952,7 @@ protected:
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
+            mPluginNameMap["Sample_TextureArray"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
 
             if(hasProgrammableGPU)

@@ -92,6 +92,8 @@ namespace Ogre {
                 return GL_TEXTURE_3D;
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
+            case TEX_TYPE_2D_ARRAY:
+                return GL_TEXTURE_2D_ARRAY;
             default:
                 return 0;
         };
@@ -103,6 +105,11 @@ namespace Ogre {
 		if (!GLEW_VERSION_1_2 && mTextureType == TEX_TYPE_3D)
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 				"3D Textures not supported before OpenGL 1.2", 
+				"GLTexture::createInternalResourcesImpl");
+
+		if (!GLEW_VERSION_2_0 && mTextureType == TEX_TYPE_2D_ARRAY)
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+				"2D texture arrays not supported before OpenGL 2.0", 
 				"GLTexture::createInternalResourcesImpl");
 
 		// Convert to nearest power-of-two size if required
@@ -194,8 +201,9 @@ namespace Ogre {
 							width, height, 0, 
 							size, tmpdata);
 						break;
+					case TEX_TYPE_2D_ARRAY: // todo - check this...
 					case TEX_TYPE_3D:
-						glCompressedTexImage3DARB(GL_TEXTURE_3D, mip, format,
+						glCompressedTexImage3DARB(3, mip, format,
 							width, height, depth, 0, 
 							size, tmpdata);
 						break;
@@ -233,7 +241,8 @@ namespace Ogre {
 							GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						break;
 					case TEX_TYPE_3D:
-						glTexImage3D(GL_TEXTURE_3D, mip, format,
+					case TEX_TYPE_2D_ARRAY:
+						glTexImage3D(getGLTextureTarget(), mip, format,
 							width, height, depth, 0, 
 							GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						break;
@@ -291,7 +300,7 @@ namespace Ogre {
         LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
 
         if(mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D || 
-            mTextureType == TEX_TYPE_3D)
+             mTextureType == TEX_TYPE_2D_ARRAY || mTextureType == TEX_TYPE_3D)
         {
 
             do_image_io(mName, mGroup, ext, *loadedImages, this);
@@ -301,7 +310,7 @@ namespace Ogre {
             if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))
                 mTextureType = TEX_TYPE_CUBE_MAP;
             // If this is a volumetric texture set the texture type flag accordingly.
-            if((*loadedImages)[0].getDepth() > 1)
+            if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
 
         }

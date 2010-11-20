@@ -245,6 +245,7 @@ namespace Ogre
 			break;
 		case TEX_TYPE_2D:
 		case TEX_TYPE_CUBE_MAP:
+		case TEX_TYPE_2D_ARRAY:
 			this->_create2DTex();
 			break;
 		case TEX_TYPE_3D:
@@ -362,7 +363,7 @@ namespace Ogre
 		desc.Width			= static_cast<UINT>(mSrcWidth);
 		desc.Height			= static_cast<UINT>(mSrcHeight);
 		desc.MipLevels		= numMips;
-		desc.ArraySize		= 1;
+		desc.ArraySize		= mDepth == 0 ? 1 : mDepth;
 		desc.Format			= d3dPF;
 		DXGI_SAMPLE_DESC sampleDesc;
 		sampleDesc.Count = 1;
@@ -597,6 +598,12 @@ namespace Ogre
 			else
 				LogManager::getSingleton().logMessage("D3D11 : Loading 2D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
 			break;
+		case TEX_TYPE_2D_ARRAY:
+			if (mUsage & TU_RENDERTARGET)
+				LogManager::getSingleton().logMessage("D3D11 : Creating 2D array RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+			else
+				LogManager::getSingleton().logMessage("D3D11 : Loading 2D Texture array, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+			break;
 		case TEX_TYPE_3D:
 			if (mUsage & TU_RENDERTARGET)
 				LogManager::getSingleton().logMessage("D3D11 : Creating 3D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
@@ -777,6 +784,7 @@ namespace Ogre
 		{
 		case TEX_TYPE_1D:
 		case TEX_TYPE_2D:
+		case TEX_TYPE_2D_ARRAY:
 			loadedStreams = _prepareNormTex();
 			break;
 		case TEX_TYPE_3D:
@@ -852,7 +860,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11Texture::LoadedStreams D3D11Texture::_prepareNormTex()
 	{
-		assert(getTextureType() == TEX_TYPE_1D || getTextureType() == TEX_TYPE_2D);
+		assert(getTextureType() == TEX_TYPE_1D || getTextureType() == TEX_TYPE_2D || getTextureType() == TEX_TYPE_2D_ARRAY);
 
 		// find & load resource data
 		DataStreamPtr dstream = 
