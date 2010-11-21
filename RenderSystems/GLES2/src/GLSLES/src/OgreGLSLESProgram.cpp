@@ -50,8 +50,8 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
-		, mCompiled(0)
 		, mGLHandle(0)
+        , mCompiled(0)
     {
 		// Add parameter command "attach" to the material serializer dictionary
         if (createParamDictionary("GLSLESProgram"))

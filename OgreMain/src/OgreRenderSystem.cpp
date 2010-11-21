@@ -69,6 +69,8 @@ namespace Ogre {
 		, mDerivedDepthBiasBase(0.0f)
 		, mDerivedDepthBiasMultiplier(0.0f)
         , mDerivedDepthBiasSlopeScale(0.0f)
+        , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
+        , mGlobalNumberOfInstances(1)
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		, mEnableFixedPipeline(true)
 #endif
@@ -80,8 +82,6 @@ namespace Ogre {
 		, mUseCustomCapabilities(false)
 		, mTexProjRelative(false)
 		, mTexProjRelativeOrigin(Vector3::ZERO)
-        , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
-        , mGlobalNumberOfInstances(1)
     {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }

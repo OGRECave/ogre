@@ -43,11 +43,11 @@ namespace Ogre
 										size_t instancesPerBatch ) :
 				m_name( customName ),
 				m_idCount( 0 ),
-				m_sceneManager( sceneManager ),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_instancingTechnique( instancingTechnique ),
 				m_instancingFlags( instancingFlags ),
-				m_showBoundingBoxes( false )
+				m_showBoundingBoxes( false ),
+                m_sceneManager( sceneManager )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
 
