@@ -954,6 +954,7 @@ namespace Ogre {
         updateVertexData();
         op.operationType = RenderOperation::OT_LINE_LIST;
         op.useIndexes = false;
+        op.useGlobalInstancingVertexBufferIsAvailable = false;
         op.vertexData = &mVertexData;
     }
     //-----------------------------------------------------------------------

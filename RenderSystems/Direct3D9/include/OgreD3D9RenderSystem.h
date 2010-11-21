@@ -287,7 +287,7 @@ namespace Ogre
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, bool useGlobalInstancingVertexBufferIsAvailable);
 		void setVertexBufferBinding(VertexBufferBinding* binding);
-		void setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable);
+		void setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable, bool indexesUsed);
         void _render(const RenderOperation& op);
         /** See
           RenderSystem

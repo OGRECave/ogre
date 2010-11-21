@@ -1842,6 +1842,19 @@ namespace Ogre
 		if (op.vertexData->vertexCount == 0)
 			return;
 
+        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+
+        bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
+                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
+                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+
+		size_t numberOfInstances = op.numberOfInstances;
+
+        if (op.useGlobalInstancingVertexBufferIsAvailable)
+        {
+            numberOfInstances *= getGlobalNumberOfInstances();
+        }
 
 		// Call super class
 		RenderSystem::_render(op);
@@ -2078,29 +2091,29 @@ namespace Ogre
 							"D3D11RenderSystem::_render");
 					}
 					
-					if (op.numberOfInstances == 1)
+					if (hasInstanceData)
 					{
-						mDevice.GetImmediateContext()->DrawIndexed(    
+						mDevice.GetImmediateContext()->DrawIndexedInstanced(    
 							static_cast<UINT>(op.indexData->indexCount), 
+							static_cast<UINT>(numberOfInstances), 
 							static_cast<UINT>(op.indexData->indexStart), 
-							static_cast<INT>(op.vertexData->vertexStart)
+							static_cast<INT>(op.vertexData->vertexStart),
+							0
 							);
 						if (mDevice.isError())
 						{
 							String errorDescription = mDevice.getErrorDescription();
 							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-								"D3D11 device cannot draw indexed\nError Description:" + errorDescription,
+								"D3D11 device cannot draw indexed instanced\nError Description:" + errorDescription,
 								"D3D11RenderSystem::_render");
 						}
 					}
 					else
 					{
-						mDevice.GetImmediateContext()->DrawIndexedInstanced(    
+						mDevice.GetImmediateContext()->DrawIndexed(    
 							static_cast<UINT>(op.indexData->indexCount), 
-							static_cast<UINT>(op.numberOfInstances), 
 							static_cast<UINT>(op.indexData->indexStart), 
-							static_cast<INT>(op.vertexData->vertexStart),
-							0
+							static_cast<INT>(op.vertexData->vertexStart)
 							);
 						if (mDevice.isError())
 						{
@@ -2133,20 +2146,20 @@ namespace Ogre
 					}
 					else
 					{
-						if (op.numberOfInstances == 1)
+						if (hasInstanceData)
 						{
-							mDevice.GetImmediateContext()->Draw(
+							mDevice.GetImmediateContext()->DrawInstanced(
+								static_cast<UINT>(numberOfInstances), 
 								static_cast<UINT>(op.vertexData->vertexCount), 
-								static_cast<INT>(op.vertexData->vertexStart)
+								static_cast<INT>(op.vertexData->vertexStart),
+								0
 								); 
 						}
 						else
 						{
-							mDevice.GetImmediateContext()->DrawInstanced(
-								static_cast<UINT>(op.numberOfInstances), 
+							mDevice.GetImmediateContext()->Draw(
 								static_cast<UINT>(op.vertexData->vertexCount), 
-								static_cast<INT>(op.vertexData->vertexStart),
-								0
+								static_cast<INT>(op.vertexData->vertexStart)
 								); 
 						}
 					}

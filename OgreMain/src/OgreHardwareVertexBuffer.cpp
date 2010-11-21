@@ -740,6 +740,20 @@ namespace Ogre {
         mHighIndex = targetIndex;
     }
     //-----------------------------------------------------------------------------
+    bool VertexBufferBinding::getHasInstanceData() const
+    {
+		VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
+		iend = mBindingMap.end();
+		for (i = mBindingMap.begin(); i != iend; ++i)
+		{
+			if ( i->second->getIsInstanceData() )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    //-----------------------------------------------------------------------------
     HardwareVertexBufferSharedPtr::HardwareVertexBufferSharedPtr(HardwareVertexBuffer* buf)
         : SharedPtr<HardwareVertexBuffer>(buf)
     {

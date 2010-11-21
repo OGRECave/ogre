@@ -55,6 +55,7 @@ namespace Ogre {
 	{
 		op.operationType = mOperationType;
 		op.useIndexes = false;
+        op.useGlobalInstancingVertexBufferIsAvailable = false;
 		op.vertexData = mVertexData;
 	}
 	void D3D11RenderToVertexBuffer::update(SceneManager* sceneMgr)

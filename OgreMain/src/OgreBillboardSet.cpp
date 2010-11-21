@@ -653,6 +653,7 @@ namespace Ogre {
 		{
 			op.operationType = RenderOperation::OT_POINT_LIST;
     	    op.useIndexes = false;
+            op.useGlobalInstancingVertexBufferIsAvailable = false;
 			op.indexData = 0;
 			op.vertexData->vertexCount = mNumVisibleBillboards;
 		}

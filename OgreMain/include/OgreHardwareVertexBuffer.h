@@ -566,6 +566,9 @@ namespace Ogre {
         */
         virtual void closeGaps(BindingIndexMap& bindingIndexMap);
 
+        /// returns true if has an element that is instance data
+        virtual bool getHasInstanceData() const;
+
 
 	};
 	/** @} */

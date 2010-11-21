@@ -2856,7 +2856,18 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		}
 #endif
 
-		size_t numberOfInstances = op.numberOfInstances * getGlobalNumberOfInstances();
+        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
+        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
+        bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
+                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
+                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+
+		size_t numberOfInstances = op.numberOfInstances;
+
+        if (op.useGlobalInstancingVertexBufferIsAvailable)
+        {
+            numberOfInstances *= getGlobalNumberOfInstances();
+        }
 
         const VertexDeclaration::VertexElementList& decl = 
             op.vertexData->vertexDeclaration->getElements();
@@ -2885,8 +2896,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
                                    attribsBound, instanceAttribsBound);
         }
 
-        HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
-        VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
         if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
         {
             elemEnd = globalVertexDeclaration->getElements().end();
@@ -2961,13 +2970,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasMultiplier * mCurrentPassIterationNum, 
 						mDerivedDepthBiasSlopeScale);
 				}
-				if(numberOfInstances == 1)
+				if(hasInstanceData)
 				{
-					glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
+					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
 				}
 				else
 				{
-					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
+					glDrawElements(primType, op.indexData->indexCount, indexType, pBufferData);
 				}
 			} while (updatePassIterationRenderState());
 
@@ -2984,13 +2993,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 						mDerivedDepthBiasSlopeScale);
 				}
 
-				if(numberOfInstances == 1)
+				if(hasInstanceData)
 				{
-					glDrawArrays(primType, 0, op.vertexData->vertexCount);
+					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, numberOfInstances);
 				}
 				else
 				{
-					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, numberOfInstances);
+					glDrawArrays(primType, 0, op.vertexData->vertexCount);
 				}
 			} while (updatePassIterationRenderState());
 		}
