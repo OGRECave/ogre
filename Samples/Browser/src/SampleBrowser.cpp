@@ -135,12 +135,6 @@ int main(int argc, char *argv[])
 
     try {
         sb.initApp();
-
-        mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f)
-                                                  target:self
-                                                selector:@selector(renderOneFrame:)
-                                                userInfo:nil
-                                                 repeats:YES];
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -155,7 +149,7 @@ int main(int argc, char *argv[])
         mLastFrameTime = -[mDate timeIntervalSinceNow];
         
         mDisplayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
-        [mDisplayLink setFrameInterval:mLastFrameTime];
+        [mDisplayLink setFrameInterval:(1.0f/60.0f)];
         [mDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     }
     else
@@ -174,7 +168,7 @@ int main(int argc, char *argv[])
     // Hide the status bar
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
 
-    mDisplayLinkSupported = FALSE;
+    mDisplayLinkSupported = NO;
     mLastFrameTime = 1;
     mDisplayLink = nil;
     mTimer = nil;
@@ -185,7 +179,7 @@ int main(int argc, char *argv[])
     NSString *reqSysVer = @"3.1";
     NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
     if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
-        mDisplayLinkSupported = TRUE;
+        mDisplayLinkSupported = YES;
 #endif
     
     [self go];
