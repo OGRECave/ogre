@@ -77,7 +77,6 @@ namespace Ogre {
 		{
 			OGRE_DELETE currentProgram->second;
 		}
-
 	}
 
 	//-----------------------------------------------------------------------
@@ -133,9 +132,6 @@ namespace Ogre {
 			mActiveFragmentGpuProgram = fragmentGpuProgram;
 			// ActiveLinkProgram is no longer valid
 			mActiveLinkProgram = NULL;
-			// Change back to fixed pipeline
-			glUseProgram(0);
-            GL_CHECK_ERROR;
 		}
 	}
 
@@ -147,9 +143,6 @@ namespace Ogre {
 			mActiveVertexGpuProgram = vertexGpuProgram;
 			// ActiveLinkProgram is no longer valid
 			mActiveLinkProgram = NULL;
-			// Change back to fixed pipeline
-			glUseProgram(0);
-            GL_CHECK_ERROR;
 		}
 	}
 	//---------------------------------------------------------------------
