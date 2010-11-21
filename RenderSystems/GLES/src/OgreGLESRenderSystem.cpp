@@ -517,6 +517,8 @@ namespace Ogre {
             if (!mUseCustomCapabilities)
                 mCurrentCapabilities = mRealCapabilities;
 
+            fireEvent("RenderSystemCapabilitiesCreated");
+
             initialiseFromRenderSystemCapabilities(mCurrentCapabilities, (RenderTarget *) win);
 
 			// Initialise the main context

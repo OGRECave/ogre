@@ -508,6 +508,8 @@ namespace Ogre {
             if (!mUseCustomCapabilities)
                 mCurrentCapabilities = mRealCapabilities;
 
+            fireEvent("RenderSystemCapabilitiesCreated");
+
             initialiseFromRenderSystemCapabilities(mCurrentCapabilities, (RenderTarget *) win);
 
 			// Initialise the main context
@@ -1552,7 +1554,6 @@ namespace Ogre {
                 pBufferData = static_cast<char*>(pBufferData) + op.vertexData->vertexStart * vertexBuffer->getVertexSize();
             }
 
-            unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
             
             unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
