@@ -3,7 +3,7 @@
 #include "ShaderSystem.h"
 #include "ShaderExReflectionMap.h"
 #include "OgreShaderExInstancedViewports.h"
-
+#include "OgreShaderExTextureAtlasSampler.h"
 using namespace Ogre;
 using namespace OgreBites;
 
@@ -397,7 +397,20 @@ void Sample_ShaderSystem::setupContent()
 	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
-	
+
+
+	RTShader::RenderState* pMainRenderState = 
+		RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+	pMainRenderState->addTemplateSubRenderState(
+		Ogre::RTShader::ShaderGenerator::getSingleton().createSubRenderState(
+		Ogre::RTShader::TextureAtlasSampler::Type));
+
+	// Create texture atlas object and node
+	ManualObject* atlasObject = createTextureAtlasObject();
+	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	childNode->setPosition(-600.0, 0, -850.0);
+	childNode->attachObject(atlasObject);
+
 	createDirectionalLight();
 	createPointLight();
 	createSpotLight();
@@ -1637,5 +1650,129 @@ void Sample_ShaderSystem::createInstancedViewports()
 		mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 		mShaderGenerator->validateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
+}
+
+void Sample_ShaderSystem::createMaterialForTexture( const String & texName, bool isTextureAtlasTexture )
+{
+	MaterialManager * matMgr = MaterialManager::getSingletonPtr();
+	if ( matMgr->resourceExists(texName) == false )
+	{
+		MaterialPtr newMat = matMgr->create(texName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		newMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+		TextureUnitState* pState = newMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName);
+		if(isTextureAtlasTexture) 
+		{
+			// to solve wrap edge bleed
+			pState->setTextureFiltering(TFO_TRILINEAR);
+		}
+	}
+
+}
+
+ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
+{
+	TextureAtlasSamplerFactory * textureAtlasSamplerFactory = 
+		static_cast<TextureAtlasSamplerFactory *>(mShaderGenerator->getSubRenderStateFactory(TextureAtlasSampler::Type));
+	TextureAtlasTable textureAtlasTable;
+
+	DataStreamPtr taiFile = Ogre::ResourceGroupManager::getSingleton().openResource("TextureAtlasSampleWrap.tai");
+
+	textureAtlasSamplerFactory->addTexutreAtlasDefinition(taiFile, &textureAtlasTable);
+
+	//Generate the geometry that will seed the particle system
+	ManualObject* textureAtlasObject = mSceneMgr->createManualObject("TextureAtlasObject");
+
+	int sliceSize = 30.0;
+	int wrapSize = 5.0;
+
+	String curMatName;
+
+	// create original texture geometry
+	for( size_t i = 0 ; i < textureAtlasTable.size() ; i++ )
+	{
+		bool changeMat = (curMatName != textureAtlasTable[i].atlasTextureName);
+
+		if (changeMat)
+		{
+			if (curMatName.empty() == false) // we don't want to end before we begin
+			{
+				textureAtlasObject->end();
+			}
+
+			curMatName = textureAtlasTable[i].originalTextureName;
+			createMaterialForTexture(curMatName, false);
+			textureAtlasObject->begin(curMatName, RenderOperation::OT_TRIANGLE_LIST);
+		}
+
+		// triangle 0
+		textureAtlasObject->position(i * sliceSize, 0, 0); //Position
+		textureAtlasObject->textureCoord(0,0); //UV
+
+		textureAtlasObject->position(i * sliceSize, 0, sliceSize); //Position
+		textureAtlasObject->textureCoord(0,wrapSize); //UV
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0 , sliceSize); //Position
+		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
+
+		// triangle 1
+		textureAtlasObject->position(i * sliceSize, 0, 0); //Position
+		textureAtlasObject->textureCoord(0,0); //UV
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0, sliceSize); //Position
+		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0, 0); //Position
+		textureAtlasObject->textureCoord(wrapSize, 0); //UV
+
+	}
+
+	// create texture atlas geometry
+	for( size_t i = 0 ; i < textureAtlasTable.size() ; i++ )
+	{
+		bool changeMat = (curMatName != textureAtlasTable[i].atlasTextureName);
+
+		if (changeMat)
+		{
+			if (curMatName.empty() == false) // we don't want to end before we begin
+			{
+				textureAtlasObject->end();
+			}
+
+			curMatName = textureAtlasTable[i].atlasTextureName;
+			createMaterialForTexture(curMatName, true);
+			textureAtlasObject->begin(curMatName, RenderOperation::OT_TRIANGLE_LIST);
+		}
+
+		// triangle 0
+		textureAtlasObject->position(i * sliceSize, 0, sliceSize); //Position
+		textureAtlasObject->textureCoord(0,0); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+		textureAtlasObject->position(i * sliceSize, 0, sliceSize * 2); //Position
+		textureAtlasObject->textureCoord(0,wrapSize); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0 , sliceSize * 2); //Position
+		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+		// triangle 1
+		textureAtlasObject->position(i * sliceSize, 0, sliceSize); //Position
+		textureAtlasObject->textureCoord(0,0); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0, sliceSize * 2); //Position
+		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+		textureAtlasObject->position((i + 1) * sliceSize, 0, sliceSize); //Position
+		textureAtlasObject->textureCoord(wrapSize, 0); //UV
+		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+
+	}
+
+	textureAtlasObject->end();
+
+	return textureAtlasObject;
 }
 

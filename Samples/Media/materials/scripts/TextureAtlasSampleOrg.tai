@@ -1,0 +1,36 @@
+# TextureAtlasSampleOrg.tai
+# AtlasCreationTool.exe -width 2048 -height 2048 -o TextureAtlasSampleOrg
+#
+# <filename>		<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
+#
+# Texture <filename> can be found in texture atlas <atlas filename>, i.e., 
+# TextureAtlasSampleOrg<idx>.png of <atlas type> type with texture coordinates boundary given by:
+#   A = ( <woffset>, <hoffset> )
+#   B = ( <woffset> + <width>, <hoffset> + <height> )
+#
+# where coordinates (0,0) and (1,1) of the original texture map correspond
+# to coordinates A and B, respectively, in the texture atlas.
+# If the atlas is a volume texture then <depth offset> is the w-coordinate
+# to use the access the appropriate slice in the volume atlas.
+
+ogrelogo-small.jpg		TextureAtlasSampleOrg0.png, 0, 2D, 0.000000, 0.000000, 0.000000, 0.500000, 0.500000
+img2.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.500000, 0.000000, 0.000000, 0.250000, 0.500000
+radial.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.750000, 0.000000, 0.000000, 0.250000, 0.500000
+1d_SPIRAL.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.000000, 0.500000, 0.000000, 0.125000, 0.250000
+img1.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.125000, 0.500000, 0.000000, 0.125000, 0.250000
+Dirt.jpg		TextureAtlasSampleOrg0.png, 0, 2D, 0.250000, 0.500000, 0.000000, 0.125000, 0.250000
+flare.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.375000, 0.500000, 0.000000, 0.125000, 0.250000
+rockwall.tga		TextureAtlasSampleOrg0.png, 0, 2D, 0.500000, 0.500000, 0.000000, 0.125000, 0.250000
+steelhead.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.625000, 0.500000, 0.000000, 0.125000, 0.250000
+RustyBarrel.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.750000, 0.500000, 0.000000, 0.125000, 0.250000
+NMBalls.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.875000, 0.500000, 0.000000, 0.125000, 0.250000
+terr_dirt-grass.jpg		TextureAtlasSampleOrg0.png, 0, 2D, 0.000000, 0.750000, 0.000000, 0.125000, 0.250000
+SmallLeaf_BP.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.125000, 0.750000, 0.000000, 0.062500, 0.250000
+1d_debug.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.187500, 0.750000, 0.000000, 0.062500, 0.125000
+checker.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.250000, 0.750000, 0.000000, 0.062500, 0.125000
+spotlight_image.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.312500, 0.750000, 0.000000, 0.062500, 0.125000
+nm_bk.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.375000, 0.750000, 0.000000, 0.062500, 0.125000
+dirt01.jpg		TextureAtlasSampleOrg0.png, 0, 2D, 0.437500, 0.750000, 0.000000, 0.062500, 0.125000
+tusk.jpg		TextureAtlasSampleOrg0.png, 0, 2D, 0.500000, 0.750000, 0.000000, 0.062500, 0.125000
+LowRes.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.562500, 0.750000, 0.000000, 0.015625, 0.031250
+scr-up-p.png		TextureAtlasSampleOrg0.png, 0, 2D, 0.578125, 0.750000, 0.000000, 0.007813, 0.015625
