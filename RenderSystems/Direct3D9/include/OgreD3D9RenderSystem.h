@@ -345,6 +345,9 @@ namespace Ogre
 		unsigned int getDisplayMonitorCount() const;
 		
 	protected:	
+		///returns the sampler id for a given unit texture number
+		DWORD getSamplerId(size_t unit);
+
 		/// Notify when a device has been lost.
 		void notifyOnDeviceLost(D3D9Device* device);
 
