@@ -477,6 +477,10 @@ namespace Ogre {
                 os << mGpuConstTypeMap[pUniformParam->getType()];
                 os << "\t";
                 os << pUniformParam->getName();
+				if (pUniformParam->isArray() == true)
+				{
+					os << "[" << pUniformParam->getSize() << "]";	
+				}
                 os << ";" << ENDL;
             }
             os << ENDL;			
@@ -569,6 +573,7 @@ namespace Ogre {
                     // Write function name			
                     localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
 
+					int curIndLevel = 0;
                     for (; itOperand != itOperandEnd; )
                     {
                         Operand op = *itOperand;
@@ -686,15 +691,49 @@ namespace Ogre {
                         ++itOperand;
 
                         // Prepare for the next operand
-                        if (itOperand != itOperandEnd)
-                        {
-                            localOs << newParam << ", ";
-                        }
-                        else
-                        {
-                            localOs << newParam;
-                        }
+                        localOs << newParam;
 
+						// Prepare for the next operand
+						ushort opIndLevel = 0;
+						if (itOperand != itOperandEnd)
+						{
+							opIndLevel = itOperand->getIndirectionLevel();
+						}
+
+						if (curIndLevel != 0)
+						{
+							localOs << ")";
+						}
+
+						if (curIndLevel < opIndLevel)
+						{
+							while (curIndLevel < opIndLevel)
+							{
+								++curIndLevel;
+								localOs << "[";
+							}
+						}
+						else //if (curIndLevel >= opIndLevel)
+						{
+							while (curIndLevel > opIndLevel)
+							{
+								--curIndLevel;
+								localOs << "]";
+							}
+							if (opIndLevel != 0)
+							{
+								localOs << "][";
+							}
+							else if (itOperand != itOperandEnd)
+							{
+								localOs << ", ";
+							}
+						}
+						if (curIndLevel != 0)
+						{
+							localOs << "int(";
+						}
+                       
                         if(inlineable)
                         {
                             // Replace the variable
@@ -858,7 +897,11 @@ namespace Ogre {
                         os << mGpuConstTypeMap[pParam->getType()];
                         os << "\t";
                         os << pParam->getName();
-                        os << ";" << ENDL;	
+						if (pParam->isArray() == true)
+						{
+							os << "[" << pParam->getSize() << "]";	
+						}
+						os << ";" << ENDL;	
                     }
                 }
                 else if(gpuType == GPT_FRAGMENT_PROGRAM &&
@@ -1074,7 +1117,11 @@ namespace Ogre {
             os << mGpuConstTypeMap[parameter->getType()];
             os << "\t";	
             os << parameter->getName();		
-        }
+			if (parameter->isArray() == true)
+			{
+				os << "[" << parameter->getSize() << "]";	
+			}
+		}
 
     }
 }

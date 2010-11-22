@@ -206,6 +206,8 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			// Write function name			
 			localOs << "\t" << pFuncInvoc->getFunctionName() << "(";
 
+			ushort curIndLevel = 0;
+
 			for (; itOperand != itOperandEnd; )
 			{
 				Operand op = *itOperand;
@@ -320,9 +322,44 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 				++itOperand;
 
 				// Prepare for the next operand
+				ushort opIndLevel = 0;
 				if (itOperand != itOperandEnd)
 				{
-					localOs << ", ";
+					opIndLevel = itOperand->getIndirectionLevel();
+				}
+
+				if (curIndLevel != 0)
+				{
+					localOs << ")";
+				}
+
+				if (curIndLevel < opIndLevel)
+				{
+					while (curIndLevel < opIndLevel)
+					{
+						++curIndLevel;
+						localOs << "[";
+					}
+				}
+				else //if (curIndLevel >= opIndLevel)
+				{
+					while (curIndLevel > opIndLevel)
+					{
+						--curIndLevel;
+						localOs << "]";
+					}
+					if (opIndLevel != 0)
+					{
+						localOs << "][";
+					}
+					else if (itOperand != itOperandEnd)
+					{
+						localOs << ", ";
+					}
+				}
+				if (curIndLevel != 0)
+				{
+					localOs << "int(";
 				}
 			}
 
@@ -419,6 +456,11 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
 				funcDecl += mGpuConstTypeMap[gpuType];
 
 				++itOperator;
+				//move over all operators with indirection
+				while ((itOperator != itOperatorEnd) && (itOperator->getIndirectionLevel() != 0)) 
+				{
+					++itOperator;
+				}
 
 				// Prepare for the next operand
 				if (itOperator != itOperatorEnd)
