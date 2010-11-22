@@ -76,17 +76,15 @@ namespace Ogre {
 
 		/// Build uniform references from active named uniforms
 		void buildGLUniformReferences(void);
-		/// Extract attributes
-		void extractAttributes(void);
 
 		typedef set<GLuint>::type AttributeSet;
  
-		// an array to hold the attributes indexes
-		uint8 mCustomAttributesIndexs[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
-// a value to define the case we didn't look for the attributes since the contractor
-#define NULL_CUSTOM_ATTRIBUTES_INDEX -2
-// a value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
-#define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
+		/// An array to hold the attributes indexes
+		GLint mCustomAttributesIndexes[VES_COUNT][OGRE_MAX_TEXTURE_COORD_SETS];
+        /// A value to define the case we didn't look for the attributes since the contractor
+        #define NULL_CUSTOM_ATTRIBUTES_INDEX -2
+        /// A value to define the attribute has not been found (this is also the result when glGetAttribLocation fails)
+        #define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
 
 		Ogre::String getCombinedName();
 		/// Get the the binary data of a program from the microcode cache

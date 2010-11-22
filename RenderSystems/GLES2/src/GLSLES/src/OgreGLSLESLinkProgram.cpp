@@ -50,7 +50,7 @@ namespace Ogre {
 		for(size_t i = 0 ; i < VES_COUNT; i++)
 			for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
 		{
-			mCustomAttributesIndexs[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
+			mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
 		}
         
         if (!mVertexProgram && !mFragmentProgram)
@@ -123,11 +123,8 @@ namespace Ogre {
 		String name;
 		name = getCombinedName();
 
-		// buffer size
-		GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
-
 		// turns out we need this param when loading
-		GLenum binaryFormat = 0; 
+		GLenum binaryFormat = 0;
 
 		cacheMicrocode->seek(0);
 
@@ -199,9 +196,6 @@ namespace Ogre {
 				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
 #endif
 
-				// turns out we need this param when loading
-				GLenum binaryFormat = 0; 
-
                 // create microcode
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
@@ -248,8 +242,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLuint GLSLESLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
 	{
-		GLuint res = mCustomAttributesIndexs[semantic-1][index];
-		if (res != NULL_CUSTOM_ATTRIBUTES_INDEX)
+		GLint res = mCustomAttributesIndexes[semantic-1][index];
+		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
 		{
 			const char * attString = getAttributeSemanticString(semantic);
 			GLint attrib = glGetAttribLocation(mGLHandle, attString);
@@ -267,16 +261,16 @@ namespace Ogre {
 				attrib = glGetAttribLocation(mGLHandle, attStringWithSemantic.c_str());
 			}
 
-			// update mCustomAttributesIndexs with the index we found (or didn't found) 
-			mCustomAttributesIndexs[semantic-1][index] = attrib;
+			// update mCustomAttributesIndexes with the index we found (or didn't find) 
+			mCustomAttributesIndexes[semantic-1][index] = attrib;
 			res = attrib;
 		}
-		return res;
+		return (GLuint)res;
 	}
 	//-----------------------------------------------------------------------
 	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
 	{
-		return getAttributeIndex(semantic, index) != -1;
+		return (GLint)(getAttributeIndex(semantic, index)) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
 	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::buildGLUniformReferences(void)
