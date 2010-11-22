@@ -169,6 +169,12 @@ protected:
 	*/
 	bool					addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
 
+	/** 
+	Adds the fragment shader code which samples the texel color in the texture
+	*/
+	virtual void					addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
+		const ParameterPtr& texel, int groupOrder, int& internalCounter);
+
 	virtual void					addPSArgumentInvocations(Function* psMain, 
 													 ParameterPtr arg,
 													 ParameterPtr texel,

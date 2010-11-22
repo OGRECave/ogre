@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
+#include "OgreShaderExTextureAtlasSampler.h"
 
 namespace Ogre {
 
@@ -211,6 +212,9 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
+	curFactory = new TextureAtlasSamplerFactory;
+	addSubRenderStateFactory(curFactory);
+	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 #endif
 }
 
