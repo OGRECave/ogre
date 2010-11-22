@@ -190,7 +190,10 @@ protected:
 
 	/** Update layer blend caption. */
 	void updateLayerBlendingCaption( RTShader::LayeredBlending::BlendMode nextBlendMode );
-// Types.
+
+	ManualObject* createTextureAtlasObject();
+	void createMaterialForTexture( const String & texName, bool isTextureAtlasTexture );
+	// Types.
 protected:
 	typedef vector<Entity*>::type	EntityList;
 	typedef EntityList::iterator	EntityListIterator;

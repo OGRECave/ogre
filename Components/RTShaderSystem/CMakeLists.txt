@@ -48,6 +48,7 @@ set (HEADER_FILES
   include/OgreShaderHLSLProgramWriter.h
   include/OgreShaderExLayeredBlending.h
   include/OgreShaderExHardwareSkinning.h
+  include/OgreShaderExTextureAtlasSampler.h
 )
 
 set (SOURCE_FILES
@@ -84,6 +85,7 @@ set (SOURCE_FILES
   src/OgreShaderHLSLProgramWriter.cpp
   src/OgreShaderExLayeredBlending.cpp
   src/OgreShaderExHardwareSkinning.cpp
+  src/OgreShaderExTextureAtlasSampler.cpp
 )
 
 

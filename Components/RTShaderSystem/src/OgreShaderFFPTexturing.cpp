@@ -43,6 +43,8 @@ namespace RTShader {
 String FFPTexturing::Type = "FFP_Texturing";
 #define _INT_VALUE(f) (*(int*)(&(f)))
 
+const String c_ParamTexel("texel_");
+
 //-----------------------------------------------------------------------
 FFPTexturing::FFPTexturing()
 {	
@@ -436,18 +438,8 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	
 			
 	// Add texture sampling code.
-	ParameterPtr texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "texel", GCT_FLOAT4);
-	FunctionInvocation* curFuncInvocation = NULL;
-	
-	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
-	else	
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
-
-	curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-	psMain->addAtomInstance(curFuncInvocation);
+	ParameterPtr texel = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, c_ParamTexel + StringConverter::toString(textureUnitParams->mTextureSamplerIndex), GCT_FLOAT4);
+	addPSSampleTexelInvocation(textureUnitParams, psMain, texel, FFP_PS_SAMPLING, internalCounter);
 
 	// Build colour argument for source1.
 	source1 = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "source1", GCT_FLOAT4);
@@ -507,6 +499,24 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 
 	return true;
 }
+
+//-----------------------------------------------------------------------
+void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
+											  const ParameterPtr& texel, int groupOrder, int& internalCounter)
+{
+	FunctionInvocation* curFuncInvocation = NULL;
+
+	if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
+	else	
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, groupOrder, internalCounter++);
+
+	curFuncInvocation->pushOperand(textureUnitParams->mTextureSampler, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(textureUnitParams->mPSInputTexCoord, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+	psMain->addAtomInstance(curFuncInvocation);
+}
+
 
 //-----------------------------------------------------------------------
 void FFPTexturing::addPSArgumentInvocations(Function* psMain, 
