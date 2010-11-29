@@ -181,9 +181,9 @@ void Sample_ShaderSystem::sliderMoved(Slider* slider)
 
 			for (; it != itEnd; ++it)
 			{
-				ShaderExReflectionMap* reflectionMapSubRS = static_cast<ShaderExReflectionMap*>(*it);
+				ShaderExReflectionMap* reflectionMapSubRSInstance = static_cast<ShaderExReflectionMap*>(*it);
 				
-				reflectionMapSubRS->setReflectionPower(reflectionPower);
+				reflectionMapSubRSInstance->setReflectionPower(reflectionPower);
 			}
 		}
 	}	

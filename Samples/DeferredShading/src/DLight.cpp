@@ -111,8 +111,8 @@ void DLight::rebuildGeometry(float radius)
 	case Light::LT_SPOTLIGHT:
 		Real height = mParentLight->getAttenuationRange();
 		Radian coneRadiusAngle = mParentLight->getSpotlightOuterAngle() / 2;
-        Real radius = Math::Tan(coneRadiusAngle) * height;
-		createCone(radius, height, 20);
+        Real rad = Math::Tan(coneRadiusAngle) * height;
+		createCone(rad, height, 20);
 		ENABLE_BIT(mPermutation,LightMaterialGenerator::MI_SPOTLIGHT);
 		break;
 	}	

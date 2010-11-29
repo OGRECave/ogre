@@ -111,7 +111,7 @@ private:
 	float *texBufData;
 	void _prepareMesh()
 	{
-		int i,lvl ;
+		int i,level ;
 
 		mesh = MeshManager::getSingleton().createManual(name,
             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME) ;
@@ -144,17 +144,17 @@ private:
 
 			// static buffers for 16 sets of texture coordinates
 			texcoordsVertexBuffers = new HardwareVertexBufferSharedPtr[16];
-			for(lvl=0;lvl<16;lvl++) {
-				texcoordsVertexBuffers[lvl] =
+			for(level=0;level<16;level++) {
+				texcoordsVertexBuffers[level] =
 					HardwareBufferManager::getSingleton().createVertexBuffer(
 						2*sizeof(float), // size of one vertex data
 						numVertices, // number of vertices
 						HardwareBuffer::HBU_STATIC_WRITE_ONLY, // usage
 						false); // no shadow buffer
-				float *texcoordsBufData = (float*) texcoordsVertexBuffers[lvl]->
+				float *texcoordsBufData = (float*) texcoordsVertexBuffers[level]->
 					lock(HardwareBuffer::HBL_DISCARD);
-				float x0 = (Real)(lvl % 4) * 0.25 ;
-				float y0 = (Real)(lvl / 4) * 0.25 ;
+				float x0 = (Real)(level % 4) * 0.25 ;
+				float y0 = (Real)(level / 4) * 0.25 ;
 				y0 = 0.75-y0 ; // upside down
 				for(i=0;i<4;i++) {
 					texcoordsBufData[i*2 + 0]=
@@ -162,7 +162,7 @@ private:
 					texcoordsBufData[i*2 + 1]=
 						y0 + 0.25 * (Real)(i/2) ;
 				}
-				texcoordsVertexBuffers[lvl]->unlock();
+				texcoordsVertexBuffers[level]->unlock();
 			}
 
 			// Index buffer for 2 faces
@@ -210,13 +210,13 @@ public:
 	{
 		subMesh->vertexData->vertexBufferBinding->setBinding(1, texcoordsVertexBuffers[lvl]);
 	}
-	WaterCircle(const String& name, Real x, Real y)
+	WaterCircle(const String& inName, Real x, Real y)
 	{
-		this->name = name ;
+		this->name = inName ;
 		_prepareMesh();
-		node = static_cast<SceneNode*> (sceneMgr->getRootSceneNode()->createChild(name));
+		node = static_cast<SceneNode*> (sceneMgr->getRootSceneNode()->createChild(inName));
 		node->translate(x*(PLANE_SIZE/COMPLEXITY), 10, y*(PLANE_SIZE/COMPLEXITY));
-		entity = sceneMgr->createEntity(name, name);
+		entity = sceneMgr->createEntity(inName, inName);
 		entity->setMaterialName(CIRCLES_MATERIAL);
 		node->attachObject(entity);
 		tm = 0 ;

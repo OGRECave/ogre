@@ -132,9 +132,9 @@ protected:
 			Root::getSingleton().addMovableObjectFactory(new ProceduralManualObjectFactory);
 			firstTime = false;
 		}
-		ProceduralManualObject* particleSystem = createProceduralParticleSystem();
+		ProceduralManualObject* ps = createProceduralParticleSystem();
 
-		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(particleSystem);
+		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ps);
 		//mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(particleSystem->getManualObject());
 		mCamera->setPosition(0,35,-100);
 		mCamera->lookAt(0,35,0);

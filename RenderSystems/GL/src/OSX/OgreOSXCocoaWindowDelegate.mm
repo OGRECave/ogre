@@ -39,7 +39,7 @@ using namespace Ogre;
 
 - (id)init
 {
-    if (self = [super init])
+    if ((self = [super init]))
     {
         // Register ourselves for several window event notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
