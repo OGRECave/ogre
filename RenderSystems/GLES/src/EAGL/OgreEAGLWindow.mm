@@ -35,12 +35,27 @@ THE SOFTWARE.
 
 @implementation EAGLView
 
+@synthesize mCurrentDeviceOrientation;
+
 - (id)initWithFrame:(CGRect)frame
 {
 	if((self = [super initWithFrame:frame]))
 	{
+        // Read values from the applications info property list relating to orientation.
+        mSupportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+        mCurrentDeviceOrientation = UIDeviceOrientationUnknown;
 	}
 	return self;
+}
+
+- (void)dealloc {
+    [super dealloc];
+
+    if(mSupportedOrientations)
+    {
+        [mSupportedOrientations release];
+        mSupportedOrientations = nil;
+    }
 }
 
 + (Class)layerClass
@@ -57,16 +72,68 @@ THE SOFTWARE.
             [self frame].size.height];
 }
 
-@end
+- (void)orientationChanged:(NSNotification *)notification
+{
+    // Change the viewport orientation based upon the current device orientation.
+    // Note: This only operates on the main viewport, usually the main view.
 
-// Constant to limit framerate to 60 FPS
-#define kSwapInterval 1.0f / 60.0f
+    // Bool to track if the orientation is different than it was previously
+    bool orientChanged = false;
+
+    if(mCurrentDeviceOrientation == UIDeviceOrientationUnknown)
+        orientChanged = true;
+
+    UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+    Ogre::Viewport *viewPort = Ogre::Root::getSingleton().getAutoCreatedWindow()->getViewport(0);
+
+    if ((deviceOrientation == UIDeviceOrientationLandscapeLeft) && 
+        ([mSupportedOrientations indexOfObject:@"UIInterfaceOrientationLandscapeLeft"] != NSNotFound))
+    {
+        if(UIDeviceOrientationIsPortrait(mCurrentDeviceOrientation))
+            orientChanged = true;
+
+        viewPort->setOrientationMode(Ogre::OR_LANDSCAPELEFT);
+    }
+    else if ((deviceOrientation == UIDeviceOrientationLandscapeRight) && 
+        ([mSupportedOrientations indexOfObject:@"UIInterfaceOrientationLandscapeRight"] != NSNotFound))
+    {
+        if(UIDeviceOrientationIsPortrait(mCurrentDeviceOrientation))
+            orientChanged = true;
+
+        viewPort->setOrientationMode(Ogre::OR_LANDSCAPERIGHT);
+    }
+    else if (UIDeviceOrientationIsPortrait(deviceOrientation) && 
+        (([mSupportedOrientations indexOfObject:@"UIInterfaceOrientationPortrait"] != NSNotFound) ||
+         ([mSupportedOrientations indexOfObject:@"UIInterfaceOrientationPortraitUpsideDown"] != NSNotFound)))
+    {
+        if(UIDeviceOrientationIsLandscape(mCurrentDeviceOrientation))
+            orientChanged = true;
+
+        viewPort->setOrientationMode(Ogre::OR_PORTRAIT);
+    }
+
+    if(orientChanged)
+    {
+        // Get the window size and resize it
+        unsigned int w = 0, h = 0;
+        w = Ogre::Root::getSingleton().getAutoCreatedWindow()->getWidth();
+        h = Ogre::Root::getSingleton().getAutoCreatedWindow()->getHeight();
+
+        Ogre::Root::getSingleton().getAutoCreatedWindow()->resize(h, w);
+        
+        // After rotation the aspect ratio of the viewport has changed, update that as well.
+        viewPort->getCamera()->setAspectRatio((Ogre::Real) h / (Ogre::Real) w);
+
+        mCurrentDeviceOrientation = deviceOrientation;
+    }
+}
+
+@end
 
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
         :   mClosed(false),
             mVisible(false),
-            mIsTopLevel(true),
             mIsExternalGLControl(false),
             mIsContentScalingSupported(false),
             mContentScalingFactor(1.0),
@@ -82,6 +149,8 @@ namespace Ogre {
         mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
         if(mCurrentOSVersion >= 4.0)
             mIsContentScalingSupported = true;
+        
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     }
 
     EAGLWindow::~EAGLWindow()
@@ -94,6 +163,9 @@ namespace Ogre {
         }
 
         mContext = NULL;
+
+        [[NSNotificationCenter defaultCenter] removeObserver:mView];
+        [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     }
 
     void EAGLWindow::destroy(void)
@@ -117,26 +189,21 @@ namespace Ogre {
         }
         
         [mWindow release];
+        mWindow = nil;
     }
 
     void EAGLWindow::setFullscreen(bool fullscreen, uint width, uint height)
     {
-#pragma unused(fullscreen, width, height)
     }
 
     void EAGLWindow::reposition(int left, int top)
 	{
-#pragma unused(left, top)
 	}
     
 	void EAGLWindow::resize(unsigned int width, unsigned int height)
 	{
         if(!mWindow) return;
 
-		CGRect frame = [mWindow frame];
-		frame.size.width = width;
-		frame.size.height = height;
-		[mWindow setFrame:frame];
         mWidth = width;
         mHeight = height;
 
@@ -162,7 +229,6 @@ namespace Ogre {
 
 	void EAGLWindow::switchFullScreen( bool fullscreen )
 	{
-#pragma unused(fullscreen)
 	}
 
     void EAGLWindow::_beginUpdate(void)
@@ -218,6 +284,10 @@ namespace Ogre {
                         "Failed to create view",
                         __FUNCTION__);
         }
+
+        // Add our orientation change observer
+        [[NSNotificationCenter defaultCenter] addObserver:mView selector:@selector(orientationChanged:)
+                                                     name:UIDeviceOrientationDidChangeNotification object:nil];
 
         mView.opaque = YES;
         // Use the default scale factor of the screen
@@ -356,15 +426,8 @@ namespace Ogre {
 		else if (orientation == "Portrait")
 			Viewport::setDefaultOrientationMode(OR_PORTRAIT);
 
-        left = top = 0;
-        mIsExternal = false;    // Cannot use external displays on iPhone
+        mIsExternal = false;
         mHwGamma = false;
-        
-        if (!mIsTopLevel)
-        {
-            mIsFullScreen = false;
-            left = top = 0;
-        }
 
 		mName = name;
 		mLeft = left;

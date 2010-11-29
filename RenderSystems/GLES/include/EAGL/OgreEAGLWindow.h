@@ -41,7 +41,13 @@ THE SOFTWARE.
 #import <UIKit/UIKit.h>
 
 @interface EAGLView : UIView {
+    NSArray *mSupportedOrientations;
+    UIDeviceOrientation mCurrentDeviceOrientation;
 }
+
+@property (assign) UIDeviceOrientation mCurrentDeviceOrientation;
+
+- (void)orientationChanged:(NSNotification *)notification;
 
 @end
 
@@ -57,7 +63,6 @@ namespace Ogre {
         protected:
             bool mClosed;
             bool mVisible;
-            bool mIsTopLevel;
             bool mIsExternal;
             bool mIsExternalGLControl;
             
