@@ -29,6 +29,9 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreEdgeListBuilder.h"
 #include "OgreOptimisedUtil.h"
+#include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre {
 	const LightList& ShadowRenderable::getLights(void) const 
@@ -155,19 +158,40 @@ namespace Ogre {
 						if (*lfi)
 							preCountIndexes += increment;
 					}
-					break;
 				}
 			}
 		}
 		// End pre-count
-
+		
+		//Check if index buffer is to small 
+		if (preCountIndexes > indexBuffer->getNumIndexes())
+		{
+			LogManager::getSingleton().logMessage(LML_CRITICAL, 
+				String("Warning: shadow index buffer size to small. Auto increasing buffer size to") + 
+				StringConverter::toString(sizeof(unsigned short) * preCountIndexes));
+			
+			SceneManager* pManager = Root::getSingleton()._getCurrentSceneManager();
+			if (pManager)
+			{
+				pManager->setShadowIndexBufferSize(preCountIndexes);
+			}
+			
+			//Check that the index buffer size has actually increased
+			if (preCountIndexes > indexBuffer->getNumIndexes())
+			{
+				//increasing index buffer size has failed
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"Lock request out of bounds.",
+					"ShadowCaster::generateShadowVolume");
+			}
+		}
 
 		// Lock index buffer for writing, just enough length as we need
 		unsigned short* pIdx = static_cast<unsigned short*>(
 			indexBuffer->lock(0, sizeof(unsigned short) * preCountIndexes, 
 			HardwareBuffer::HBL_DISCARD));
 		size_t numIndices = 0;
-
+		
 		// Iterate over the groups and form renderables for each based on their
 		// lightFacing
 		si = shadowRenderables.begin();
@@ -343,6 +367,7 @@ namespace Ogre {
 		indexBuffer->unlock();
 
 		// In debug mode, check we didn't overrun the index buffer
+		assert(numIndices == preCountIndexes);
 		assert(numIndices <= indexBuffer->getNumIndexes() &&
 			"Index buffer overrun while generating shadow volume!! "
 			"You must increase the size of the shadow index buffer.");
