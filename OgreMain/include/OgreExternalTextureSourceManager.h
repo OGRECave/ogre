@@ -71,7 +71,7 @@ namespace Ogre
 		void destroyAdvancedTexture( const String& sTextureName,
 			const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
-		/** Returns the plugin which reistered itself with a specific name 
+		/** Returns the plugin which registered itself with a specific name 
 		(eg. "video"), or null if specified plugin not found */
 		ExternalTextureSource* getExternalTextureSource( const String& sTexturePlugInType );
 
