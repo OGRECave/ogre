@@ -34,23 +34,7 @@ THE SOFTWARE.
 #include "OgreEAGLESContext.h"
 
 #ifdef __OBJC__
-
-// Forward declarations
-@class CAEAGLLayer;
-
-#import <UIKit/UIKit.h>
-
-@interface EAGLView : UIView {
-    NSArray *mSupportedOrientations;
-    UIDeviceOrientation mCurrentDeviceOrientation;
-}
-
-@property (assign) UIDeviceOrientation mCurrentDeviceOrientation;
-
-- (void)orientationChanged:(NSNotification *)notification;
-
-@end
-
+#import "OgreEAGLView.h"
 #endif
 
 namespace Ogre {
@@ -109,8 +93,7 @@ namespace Ogre {
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The NativeWindowType target for rendering.
                * GLCONTEXT      The Ogre GLESContext used for rendering.
-               * DISPLAY        EAGLDisplay connection behind that context.
-               * DISPLAYNAME    The name for the connected display.
+               * VIEW           EAGLView that the context is drawn in.
                */
             virtual void getCustomAttribute(const String& name, void* pData);
 

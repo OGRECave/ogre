@@ -86,12 +86,14 @@ elseif (APPLE)
     include/EAGL/OgreEAGLESContext.h
     include/EAGL/OgreEAGLSupport.h
     include/EAGL/OgreEAGLRenderTexture.h
+    include/EAGL/OgreEAGLView.h
     include/EAGL/OgreEAGLWindow.h
     include/EAGL/OgreGLESUtil.h
   )
   set(PLATFORM_SOURCES
     src/EAGL/OgreEAGLSupport.mm
     src/EAGL/OgreEAGLRenderTexture.mm
+    src/EAGL/OgreEAGLView.mm
     src/EAGL/OgreEAGLWindow.mm
     src/EAGL/OgreEAGLESContext.mm
   )
