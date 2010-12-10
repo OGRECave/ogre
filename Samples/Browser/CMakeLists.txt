@@ -85,6 +85,20 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
 )
 
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+
+  set(HEADER_FILES ${HEADER_FILES}
+    include/SampleBrowser_OSX.h
+  )
+endif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+
+if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+
+  set(HEADER_FILES ${HEADER_FILES}
+    include/SampleBrowser_iOS.h
+  )
+endif (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+
 if (OGRE_STATIC)
   # Find all samples headers, and copy them to a single include folder
   # We do this instead of including every sample in the include_directories directive, 
