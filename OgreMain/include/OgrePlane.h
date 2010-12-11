@@ -147,7 +147,7 @@ namespace Ogre {
         /// Comparison operator
         bool operator==(const Plane& rhs) const
         {
-            return (rhs.d == d || rhs.normal == normal);
+            return (rhs.d == d && rhs.normal == normal);
         }
         bool operator!=(const Plane& rhs) const
         {
