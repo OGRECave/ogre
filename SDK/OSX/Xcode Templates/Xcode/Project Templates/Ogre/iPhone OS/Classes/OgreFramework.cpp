@@ -87,7 +87,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pViewport->setBackgroundColour(ColourValue(0.8, 0.7, 0.6, 1.0));
     
 	m_pCamera->setAspectRatio(Real(m_pViewport->getActualWidth()) / Real(m_pViewport->getActualHeight()));
-	m_pViewport->setOrientationMode(OR_LANDSCAPELEFT, true);
+
 	m_pViewport->setCamera(m_pCamera);
     
 	unsigned long hWnd = 0;

@@ -40,8 +40,8 @@
 		8D1107310486CEB800E47090 /* ___PROJECTNAMEASIDENTIFIER___-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "___PROJECTNAMEASIDENTIFIER___-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		9C3648C0106DE694006B0F4F /* main.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = main.cpp; path = Classes/main.cpp; sourceTree = SOURCE_ROOT; };
 		9C3648C6106DE706006B0F4F /* ogre.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ogre.cfg; path = Resources/ogre.cfg; sourceTree = "<group>"; };
-		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/lib/release/libboost_date_time.a; sourceTree = "<absolute>"; };
-		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libboost_thread.a; sourceTree = "<absolute>"; };
+		9C364920106DEAFC006B0F4F /* libboost_date_time.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_date_time.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/libboost_date_time.a; sourceTree = "<absolute>"; };
+		9C364921106DEAFC006B0F4F /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/libboost_thread.a; sourceTree = "<absolute>"; };
 		9C364922106DEAFC006B0F4F /* libFreeImage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeImage.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeImage.a; sourceTree = "<absolute>"; };
 		9C364923106DEAFC006B0F4F /* libFreeType.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFreeType.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libFreeType.a; sourceTree = "<absolute>"; };
 		9C364924106DEAFC006B0F4F /* libOIS.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOIS.a; path = _OGRESDK_ROOT_/iPhoneDependencies/lib/release/libOIS.a; sourceTree = "<absolute>"; };
@@ -254,12 +254,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				GCC_THUMB_SUPPORT = NO;
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/iPhoneDependencies/include,
 					_OGRESDK_ROOT_/include/OGRE,
@@ -274,9 +273,10 @@
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/iPhoneDependencies/lib,
+					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 					_OGRESDK_ROOT_/lib,
 					_OGRESDK_ROOT_/lib/release,
-					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};
@@ -290,7 +290,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "___PROJECTNAMEASIDENTIFIER____Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				"GCC_THUMB_SUPPORT[arch=armv6]" = "";
+				GCC_THUMB_SUPPORT = NO;
 				HEADER_SEARCH_PATHS = (
 					_OGRESDK_ROOT_/iPhoneDependencies/include,
 					_OGRESDK_ROOT_/include/OGRE,
@@ -305,9 +305,10 @@
 				);
 				INFOPLIST_FILE = "___PROJECTNAMEASIDENTIFIER___-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
+					_OGRESDK_ROOT_/iPhoneDependencies/lib,
+					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 					_OGRESDK_ROOT_/lib,
 					_OGRESDK_ROOT_/lib/release,
-					_OGRESDK_ROOT_/iPhoneDependencies/lib/release,
 				);
 				PRODUCT_NAME = "___PROJECTNAME___";
 			};
@@ -318,10 +319,8 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_THUMB_SUPPORT = NO;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -333,9 +332,6 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
