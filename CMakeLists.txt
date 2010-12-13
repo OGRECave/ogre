@@ -246,7 +246,7 @@ cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D10 "Build Direct3D10 RenderSys
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D11_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLATFORM_IPHONE "Build Ogre for iPhone OS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_IPHONE "Build Ogre for iPhone OS" FALSE "APPLE;OPENGLES_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PCZ "Build PCZ SceneManager plugin" TRUE)
