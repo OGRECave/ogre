@@ -39,7 +39,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Option named " + name +  " does not exist.",
-                        "GLESSupport::setConfigOption");
+                        "GLES2Support::setConfigOption");
         }
         else
         {
