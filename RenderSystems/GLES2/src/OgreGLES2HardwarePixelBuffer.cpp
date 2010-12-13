@@ -253,9 +253,15 @@ namespace Ogre {
         if(mTarget == GL_TEXTURE_CUBE_MAP)
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
-        // TODO verify who get this
-        mWidth = width;
-        mHeight = height;
+        // Calculate the width and height of the texture at this mip level
+        mWidth = mLevel == 0 ? width : width / pow(2, level);
+        mHeight = mLevel == 0 ? height : height / pow(2, level);
+        if(mWidth < 1)
+            mWidth = 1;
+        if(mHeight < 1)
+            mHeight = 1;
+
+        // Only 2D is supported so depth is always 1
         mDepth = 1;
 
         mGLInternalFormat = internalFormat;
@@ -268,8 +274,8 @@ namespace Ogre {
         // Log a message
 //        std::stringstream str;
 //        str << "GLES2HardwarePixelBuffer constructed for texture " << mTextureID 
-//            << " face " << face << " level " << level << ":"
-//            << " width=" << width << " height="<< height << " depth=" << depth
+//            << " face " << mFace << " level " << mLevel << ": "
+//            << "width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
 //            << " format=" << PixelUtil::getFormatName(mFormat);
 //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
