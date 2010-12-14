@@ -64,7 +64,7 @@ namespace Ogre {
 	bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		bool result;
-		if( result = GLES2RenderTexture::attachDepthBuffer( depthBuffer ) )
+		if( (result = GLES2RenderTexture::attachDepthBuffer( depthBuffer )) )
 			mFB.attachDepthBuffer( depthBuffer );
 
 		return result;
@@ -425,9 +425,7 @@ namespace Ogre {
     {
         /// Check if the render target is in the rendertarget->FBO map
         GLES2FrameBufferObject *fbo = 0;
-#if GL_OES_packed_depth_stencil
         target->getCustomAttribute("FBO", &fbo);
-#endif
         if(fbo)
             fbo->bind();
         else

@@ -68,18 +68,16 @@ namespace Ogre {
 
 	void GLES2FBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
 	{
-#if GL_OES_packed_depth_stencil
 		if(name=="FBO")
         {
             *static_cast<GLES2FrameBufferObject **>(pData) = &fbo;
         }
-#endif
 	}
 	//-----------------------------------------------------------------------------
 	bool GLES2FBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		bool result;
-		if( result = MultiRenderTarget::attachDepthBuffer( depthBuffer ) )
+		if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
 			fbo.attachDepthBuffer( depthBuffer );
 
 		return result;
