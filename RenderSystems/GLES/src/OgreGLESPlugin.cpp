@@ -48,7 +48,7 @@ namespace Ogre {
         mRenderSystem = OGRE_NEW GLESRenderSystem();
 
         Root::getSingleton().addRenderSystem(mRenderSystem);
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         Root::getSingleton().setRenderSystem(mRenderSystem);
 #endif
     }

@@ -168,7 +168,7 @@ CMake.
 --------------------------------------------
 
 To build Ogre for the iPhone, you need to check the option
-OGRE_BUILD_PLATFORM_IPHONE in cmake-gui before you generate the Xcode
+OGRE_BUILD_PLATFORM_APPLE_IOS in cmake-gui before you generate the Xcode
 project. Unfortunately, you will now have to do a few manual steps to
 make the generated build system work properly.
 

@@ -1491,7 +1491,7 @@ void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode
 	}
 }
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_IPHONE) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
 
 //-----------------------------------------------------------------------
 bool Sample_ShaderSystem::mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )

@@ -118,7 +118,7 @@ protected:
 
 		mCamera->setPosition(0, 0, 500);
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 		setDragLook(true);
 #endif
 	}

@@ -93,7 +93,7 @@ THE SOFTWARE.
 
 #include "OgreWindowEventUtilities.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #  include "macUtils.h"
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
@@ -366,7 +366,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::saveConfig(void)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Check the Documents directory within the application sandbox
         Ogre::String outBaseName, extension, configFileName;
         Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
@@ -413,7 +413,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::restoreConfig(void)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Read the config from Documents first(user config) if it exists on iPhone.
         // If it doesn't exist or is invalid then use mConfigFileName
 

@@ -101,13 +101,15 @@ namespace Ogre {
     #   endif
     #endif
 
+    #define OGRE_DEFINE_STATIC_LOCAL(type, name, arguments) \
+        static type& name = *new type arguments
+
     /** In order to avoid finger-aches :)
     */
     typedef unsigned char uchar;
     typedef unsigned short ushort;
     typedef unsigned int uint;
 	typedef unsigned long ulong;
-
 
 	// Useful threading defines
 #include "Threading/OgreThreadDefines.h"

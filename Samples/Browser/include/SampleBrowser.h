@@ -33,7 +33,7 @@
 #include "SamplePlugin.h"
 #include "SdkTrays.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
 
@@ -86,7 +86,7 @@ typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;
 
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   ifdef __OBJC__
 #       import <UIKit/UIKit.h>
 #   endif
@@ -202,7 +202,7 @@ protected:
 			mNativeControl = 0;
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 			mGestureView = 0;
 #endif
 #ifdef USE_RTSHADER_SYSTEM
@@ -687,7 +687,7 @@ protected:
 			return true;
 		}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 		void motionBegan( void )
         {
         }
@@ -726,13 +726,13 @@ protected:
 		| Extends mousePressed to inject mouse press into tray manager, and to check
 		| for thumbnail clicks, just because we can.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
 #else
 		virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 #endif
 		{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
             OIS::MultiTouchState state = evt.state;
             transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
@@ -744,7 +744,7 @@ protected:
             OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			if (mTrayMgr->injectMouseDown(orientedEvt)) return true;
 #else
 			if (mTrayMgr->injectMouseDown(orientedEvt, id)) return true;
@@ -766,7 +766,7 @@ protected:
             
 			try
 			{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 				return SampleContext::touchPressed(orientedEvt);
 #else
 				return SampleContext::mousePressed(orientedEvt, id);
@@ -784,13 +784,13 @@ protected:
 		/*-----------------------------------------------------------------------------
 		| Extends mouseReleased to inject mouse release into tray manager.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
 #else
 		virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 #endif
 		{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
             OIS::MultiTouchState state = evt.state;
             transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
@@ -802,7 +802,7 @@ protected:
             OIS::MouseEvent orientedEvt((OIS::Object*)evt.device, state);
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			if (mTrayMgr->injectMouseUp(orientedEvt)) return true;
 #else
 			if (mTrayMgr->injectMouseUp(orientedEvt, id)) return true;
@@ -810,7 +810,7 @@ protected:
 
 			try
 			{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 				return SampleContext::touchReleased(orientedEvt);
 #else
 				return SampleContext::mouseReleased(orientedEvt, id);
@@ -829,13 +829,13 @@ protected:
 		| Extends mouseMoved to inject mouse position into tray manager, and checks
 		| for mouse wheel movements to slide the carousel, because we can.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 		virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
 #else
 		virtual bool mouseMoved(const OIS::MouseEvent& evt)
 #endif
 		{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
             OIS::MultiTouchState state = evt.state;
             transformInputState(state);
             OIS::MultiTouchEvent orientedEvt((OIS::Object*)evt.device, state);
@@ -858,7 +858,7 @@ protected:
             
 			try
 			{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 				return SampleContext::touchMoved(orientedEvt);
 #else
 				return SampleContext::mouseMoved(orientedEvt);
@@ -873,7 +873,7 @@ protected:
 			return true;
 		}
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
         /*-----------------------------------------------------------------------------
          | Extends touchCancelled to inject an event that a touch was cancelled.
          -----------------------------------------------------------------------------*/
@@ -1062,7 +1062,7 @@ protected:
 			Ogre::RenderWindow* res = mRoot->initialise(true, "OGRE Sample Browser");
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];
             mGestureView.mBrowser = this;
             
@@ -1177,7 +1177,7 @@ protected:
 			Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");
 			Ogre::String startupSampleTitle = cfg.getSetting("StartupSample");
 
-			#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+			#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 			if (sampleDir.empty()) sampleDir = ".";   // user didn't specify plugins folder, try current one
 			#endif
 
@@ -1360,7 +1360,7 @@ protected:
 
 			// create sample viewing controls
 			mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			mDescBox = mTrayMgr->createTextBox(TL_LEFT, "SampleInfo", "Sample Info", 120, 100);
 			mCategoryMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "CategoryMenu", "Select Category", 120, 10); 
 			mSampleMenu = mTrayMgr->createThickSelectMenu(TL_LEFT, "SampleMenu", "Select Sample", 120, 10);
@@ -1381,7 +1381,7 @@ protected:
 
 			// create configuration screen label and renderer menu
 			mTrayMgr->createLabel(TL_NONE, "ConfigLabel", "Configuration");
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 			mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 216, 115, 10);
 #else
 			mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 450, 240, 10);
@@ -1486,7 +1486,7 @@ protected:
             }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             [mGestureView release];
 #endif
 			if (mTrayMgr)
@@ -1617,7 +1617,7 @@ protected:
 								
 #ifdef _RTSS_WRITE_SHADERS_TO_DISK
 				// Set shader cache path.
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 shaderCachePath = Ogre::macCachePath();
 #endif
 				mShaderGenerator->setShaderCachePath(shaderCachePath);		
@@ -1679,7 +1679,7 @@ protected:
 		RWindow * mNativeWindow;
 		CCoeControl * mNativeControl;
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     public:
         SampleBrowserGestureView *mGestureView;
 #endif
@@ -1691,7 +1691,7 @@ protected:
 	};
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 
 @implementation SampleBrowserGestureView
 

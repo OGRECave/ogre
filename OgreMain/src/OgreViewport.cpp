@@ -234,7 +234,7 @@ namespace Ogre {
         }
 
 	// Update the render system config
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         RenderSystem* rs = Root::getSingleton().getRenderSystem();
         if(mOrientationMode == OR_LANDSCAPELEFT)
             rs->setConfigOption("Orientation", "Landscape Left");

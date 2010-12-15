@@ -20,7 +20,7 @@ cmake_policy(SET CMP0003 NEW)
 
 # CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
 # to specify both armv6 and armv7.
-if(OGRE_BUILD_PLATFORM_IPHONE AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
+if(OGRE_BUILD_PLATFORM_APPLE_IOS AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
 	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
 endif()
 
@@ -37,12 +37,12 @@ endif()
 # configuration phase of CMake projects will fall into an infinite loop
 # if compiler assignments are modified after issuing a project(...) command.
 #
-if (OGRE_BUILD_PLATFORM_IPHONE)
+if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   # Force gcc <= 4.2 on iPhone
   include(CMakeForceCompiler)
   CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
   CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
-elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
   include(CMakeForceCompiler)
   CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
@@ -167,7 +167,7 @@ endif()
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
     # Set static early for proper dependency detection
@@ -200,7 +200,7 @@ if (WIN32 OR APPLE)
 endif(WIN32 OR APPLE)
 
 # Set up iPhone overrides.
-if (OGRE_BUILD_PLATFORM_IPHONE)
+if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
 
   # Set build variables
@@ -227,7 +227,7 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
 elseif (UNIX AND OGRE_BUILD_PLATFORM_TEGRA2)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for NVIDIA Tegra 2" FORCE)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/Tegra2")
-elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.4 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
@@ -265,10 +265,10 @@ cmake_dependent_option(OGRE_STATIC "Static build" FALSE "NOT SYMBIAN" TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D10 "Build Direct3D10 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D10_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D11_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE;NOT OGRE_BUILD_PLATFORM_TEGRA2;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_TEGRA2;NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLATFORM_IPHONE "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_TEGRA2 "Build Ogre for NVIDIA Tegra 2 with Linux" FALSE "OGRE_BUILD_PLATFORM_TEGRA2;OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
@@ -278,13 +278,13 @@ cmake_dependent_option(OGRE_BUILD_PLUGIN_PCZ "Build PCZ SceneManager plugin" TRU
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE "NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE "NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" TRUE "Boost_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_IPHONE;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT SYMBIAN" FALSE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS "Build RTShader System FFP core shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_EXT_SHADERS "Build RTShader System extensions shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
 
 option(OGRE_BUILD_SAMPLES "Build Ogre demos" TRUE)
-cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_IPHONE;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_TOOLS "Build the command-line tools" TRUE "NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_XSIEXPORTER "Build the Softimage exporter" FALSE "Softimage_FOUND" FALSE)
 option(OGRE_BUILD_TESTS "Build the unit tests & PlayPen" FALSE)
 option(OGRE_CONFIG_DOUBLE "Use doubles instead of floats in Ogre" FALSE)

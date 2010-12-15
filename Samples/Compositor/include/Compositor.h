@@ -125,7 +125,7 @@ void Sample_Compositor::setupContent(void)
 
 	setupControls();
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 	setDragLook(true);
 #endif
 }

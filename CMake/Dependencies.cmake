@@ -16,7 +16,7 @@
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
-if(OGRE_BUILD_PLATFORM_IPHONE)
+if(OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
     ${ENV_OGRE_DEPENDENCIES_DIR}
@@ -128,10 +128,10 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
-endif (NOT OGRE_BUILD_PLATFORM_IPHONE)
+endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
 # Find Boost
 # Prefer static linking in all cases
@@ -142,7 +142,7 @@ else ()
 	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 endif ()
 if (APPLE)
-	if(OGRE_BUILD_PLATFORM_IPHONE)
+	if(OGRE_BUILD_PLATFORM_APPLE_IOS)
 		set(Boost_COMPILER "-xgcc42")
 	else()
 	    # Boost tries to detect the gcc compiler version by calling the command-line
@@ -209,7 +209,7 @@ macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "h
 # Apple-specific
 #######################################################################
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     find_package(iPhoneSDK)
     macro_log_feature(iPhoneSDK_FOUND "iPhone SDK" "iPhone SDK" "http://developer.apple.com/iphone" FALSE "" "")
   else()
@@ -221,7 +221,7 @@ if (APPLE)
 
     find_package(IOKit)
     macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
-  endif (OGRE_BUILD_PLATFORM_IPHONE)
+  endif (OGRE_BUILD_PLATFORM_APPLE_IOS)
 endif(APPLE)
 
 

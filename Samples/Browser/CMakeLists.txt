@@ -12,7 +12,7 @@
 set(SOURCE_FILES src/SampleBrowser.cpp)
 if (WIN32)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
-elseif (OGRE_BUILD_PLATFORM_IPHONE)
+elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iPhone.mm)
 elseif (APPLE)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
@@ -55,7 +55,7 @@ if (SYMBIAN)
 
 endif (SYMBIAN)
 
-if (OGRE_BUILD_PLATFORM_IPHONE)
+if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
   if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
@@ -145,7 +145,7 @@ if (APPLE)
 	# On OS X, create .app bundle
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE TRUE)
 
-  if (OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Samples/Common/misc/Info.plist)
 

@@ -39,7 +39,7 @@
   add_subdirectory(VolumeTex)
   add_subdirectory(Water)
 
-if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   add_subdirectory(DeferredShading)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)

@@ -481,7 +481,7 @@ namespace Ogre {
     static String _detectCpuIdentifier(void)
     {
         String cpuID;
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Get the size of the CPU subtype struct
 //        size_t size;
 //        sysctlbyname("hw.cpusubtype", NULL, &size, NULL, 0);

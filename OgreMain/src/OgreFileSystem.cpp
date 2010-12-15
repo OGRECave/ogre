@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include <sys/stat.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || \
-    OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || \
+    OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
 	OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
@@ -96,7 +96,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     void FileSystemArchive::findFiles(const String& pattern, bool recursive, 
-        bool dirs, StringVector* simpleList, FileInfoList* detailList) const
+        bool dirs, StringVector* simpleList, FileInfoList* detailList)
     {
         long lHandle, res;
         struct _finddata_t tagData;
@@ -349,7 +349,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     FileInfoListPtr FileSystemArchive::findFileInfo(const String& pattern, 
-        bool recursive, bool dirs) const
+        bool recursive, bool dirs)
     {
 		// Note that we have to tell the SharedPtr to use OGRE_DELETE_T not OGRE_DELETE by passing category
 		FileInfoListPtr ret(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);

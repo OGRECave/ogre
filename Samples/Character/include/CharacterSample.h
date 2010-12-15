@@ -45,7 +45,7 @@ public:
 		return SdkSample::keyReleased(evt);
 	}
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 	bool touchPressed(const OIS::MultiTouchEvent& evt)
 	{
 		// relay input events to character controller

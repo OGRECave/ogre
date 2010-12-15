@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "OgreGLESPBRenderTexture.h"
 #include "OgreGLESFBORenderTexture.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGLWindow.h"
 #else
 #   include "OgreEGLWindow.h"

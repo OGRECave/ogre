@@ -52,7 +52,7 @@ THE SOFTWARE.
 #  define  GL_GLEXT_PROTOTYPES
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
 #   include <OpenGLES/ES2/gl.h>
 #   include <OpenGLES/ES2/glext.h>
 #   ifdef __OBJC__

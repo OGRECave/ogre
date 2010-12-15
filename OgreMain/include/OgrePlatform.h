@@ -37,7 +37,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_LINUX 2
 #define OGRE_PLATFORM_APPLE 3
 #define OGRE_PLATFORM_SYMBIAN 4
-#define OGRE_PLATFORM_IPHONE 5
+#define OGRE_PLATFORM_APPLE_IOS 5
 #define OGRE_PLATFORM_ANDROID 6
 #define OGRE_PLATFORM_TEGRA2 7
 
@@ -103,7 +103,7 @@ namespace Ogre {
     // Device                                                     Simulator
     // Both requiring OS version 3.0 or greater
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 30000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 30000
-#       define OGRE_PLATFORM OGRE_PLATFORM_IPHONE
+#       define OGRE_PLATFORM OGRE_PLATFORM_APPLE_IOS
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
 #   endif
@@ -230,7 +230,7 @@ namespace Ogre {
 */
 //----------------------------------------------------------------------------
 // Linux/Apple/Symbian/Tegra2 Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -256,7 +256,7 @@ namespace Ogre {
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     #define OGRE_PLATFORM_LIB "OgrePlatform.bundle"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #define OGRE_PLATFORM_LIB "OgrePlatform.a"
 #else //OGRE_PLATFORM_LINUX
     #define OGRE_PLATFORM_LIB "libOgrePlatform.so"

@@ -52,7 +52,7 @@ namespace Ogre {
 #   define OGRE_CPU OGRE_CPU_PPC
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #	define OGRE_CPU OGRE_CPU_X86
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE && (defined(__i386__) || defined(__x86_64__))
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #	define OGRE_CPU OGRE_CPU_X86
 #elif defined(__arm__)
 #	define OGRE_CPU OGRE_CPU_ARM

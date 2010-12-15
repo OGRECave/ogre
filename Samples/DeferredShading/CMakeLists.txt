@@ -46,7 +46,7 @@ add_library(Sample_DeferredShading ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FIL
 target_link_libraries(Sample_DeferredShading ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_DeferredShading)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_DeferredShading
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

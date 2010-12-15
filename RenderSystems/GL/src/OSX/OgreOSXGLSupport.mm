@@ -360,13 +360,12 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-		ConfigOptionMap::const_iterator opt(NULL);
-		
-		// First we must determine if this is a Carbon or a Cocoa window
-		// that we wish to create
-		opt = mOptions.find("macAPI");
-        string m = opt->second.currentValue;
-		if(opt != miscParams->end() && opt->second == "cocoa")
+        NameValuePairList::const_iterator opt(NULL);
+        
+        // First we must determine if this is a Carbon or a Cocoa window
+        // that we wish to create
+        opt = miscParams->find("macAPI");
+        if(opt != miscParams->end() && opt->second == "cocoa")
 		{
 			// Our user wants a Cocoa compatible system
 			mAPI = "cocoa";

@@ -10,7 +10,7 @@
 # Configure Tools build
 
 # Tools can't be run on the iPhone so don't build them
-if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   add_subdirectory(XMLConverter)
   add_subdirectory(MeshUpgrader)
-endif (NOT OGRE_BUILD_PLATFORM_IPHONE)
+endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

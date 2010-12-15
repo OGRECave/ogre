@@ -502,7 +502,7 @@ if (WIN32)
   endif ()
 
 elseif (APPLE)
-  if (OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     include_directories("include/iPhone")
     set(PLATFORM_HEADER_FILES
       include/iPhone/OgreConfigDialogImp.h
@@ -704,7 +704,7 @@ else()
 endif()
 
 if (APPLE)
-  if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+  if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES FRAMEWORK TRUE)
     # Set the INSTALL_PATH so that Frameworks can be local
     set_target_properties(OgreMain

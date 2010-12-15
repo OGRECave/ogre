@@ -4,7 +4,7 @@
 #include "SdkSample.h"
 #include "FileSystemLayer.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
 
@@ -41,7 +41,7 @@ protected:
 		mArchive = cf.getSetting("Archive");
 		mMap = cf.getSetting("Map");
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // OS X does not set the working directory relative to the app,
         // In order to make things portable on OS X we need to provide
         // the loading with it's own bundle path location

@@ -18,7 +18,7 @@ rm -rf $SDKBUILDDIR/sdk_contents
 # Configure with CMake
 mkdir -p $SDKBUILDDIR/build
 pushd $SDKBUILDDIR/build
-cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
+cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -G Xcode ../../..
 
 # Fix the linking paths
 #sed -f ../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
@@ -82,7 +82,7 @@ echo Frameworks copied.
 echo Generating Samples Project...
 
 pushd sdk
-cmake -DOGRE_BUILD_PLATFORM_IPHONE:BOOL=TRUE -G Xcode .
+cmake -DOGRE_BUILD_PLATFORM_APPLE_IOS:BOOL=TRUE -G Xcode .
 #sed -f ../../edit_linker_paths.sed OGRE.xcodeproj/project.pbxproj > tmp.pbxproj
 #mv tmp.pbxproj OGRE.xcodeproj/project.pbxproj
 rm CMakeCache.txt

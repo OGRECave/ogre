@@ -399,7 +399,7 @@ namespace Ogre {
             fbo->bind();
         else
             // Old style context (window/pbuffer) or copying render texture
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             // The screen buffer is 1 on iPhone
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, 1);
 #else

@@ -42,7 +42,7 @@ if (UNIX)
   )
 endif ()
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # Set the INSTALL_PATH so that Plugins can be installed in the application package
     set_target_properties(Plugin_OctreeZone
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

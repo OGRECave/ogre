@@ -288,7 +288,7 @@ namespace Ogre  {
                     case GL_UNSIGNED_SHORT_4_4_4_4:
                         return PF_A4R4G4B4;
                     default:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
                         // seems that in iPhone we need this value to get the right color
                         return PF_A8R8G8B8;
 #else

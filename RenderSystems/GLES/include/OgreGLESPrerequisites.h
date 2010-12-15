@@ -51,7 +51,7 @@ THE SOFTWARE.
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_IPHONE)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
 #   include <OpenGLES/ES1/gl.h>
 #   include <OpenGLES/ES1/glext.h>
 #   ifdef __OBJC__

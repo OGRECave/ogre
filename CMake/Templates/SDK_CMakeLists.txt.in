@@ -17,7 +17,7 @@ cmake_policy(SET CMP0003 NEW)
 
 # CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
 # to specify both armv6 and armv7.
-if(OGRE_BUILD_PLATFORM_IPHONE AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
+if(OGRE_BUILD_PLATFORM_APPLE_IOS AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))
 	message(FATAL_ERROR "CMake 2.8.2 cannot create compatible Xcode projects for iOS, please download the latest version or an older release from http://www.cmake.org/files/")
 endif()
 
@@ -79,7 +79,7 @@ set (BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost_@Boost_LIB_VERSION@")
 if (CMAKE_COMPILER_IS_GNUCXX)
   add_definitions(-msse)
 endif ()
-if (APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
+if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
   # Force gcc <= 4.2 on iPhone
   include(CMakeForceCompiler)
   CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
@@ -107,7 +107,7 @@ endif ()
 find_package(OGRE REQUIRED)
 find_package(OIS REQUIRED)
 
-if (NOT OGRE_BUILD_PLATFORM_IPHONE)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 	if (WIN32 OR APPLE)
 		set(Boost_USE_STATIC_LIBS TRUE)
 	else ()
@@ -153,7 +153,7 @@ else()
 	include_directories(${Boost_INCLUDE_DIR})
 	add_definitions(-DBOOST_ALL_NO_LIB)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${Boost_LIBRARIES})
-endif(NOT OGRE_BUILD_PLATFORM_IPHONE)
+endif(NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
 include_directories(
   ${OGRE_INCLUDE_DIRS}
@@ -163,7 +163,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
 )
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_IPHONE)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/iPhone")
   else ()
     # SDK's only include libraries built for i386
