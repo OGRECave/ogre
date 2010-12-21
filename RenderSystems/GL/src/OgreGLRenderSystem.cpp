@@ -2851,8 +2851,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		   ) 
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to render using the fixed pipeline when it is diabled.",
-				"D3D11RenderSystem::_render");
+				"Attempted to render using the fixed pipeline when it is disabled.",
+				"GLRenderSystem::_render");
 		}
 #endif
 
