@@ -46,13 +46,13 @@ struct _OgreRTSSExport TextureAtlasRecord
 {
 	TextureAtlasRecord(const String & texOriginalName, const String & texAtlasName, 
 					   const float texPosU, const float texPosV, const float texWidth, const float texHeight,
-					   const size_t texIndexInAtlas) :
-				originalTextureName(texOriginalName)
-				, atlasTextureName(texAtlasName)
-				, posU(texPosU)
+                       const size_t texIndexInAtlas) :
+				  posU(texPosU)
 				, posV(texPosV)
 				, width(texWidth)
 				, height(texHeight)
+                , originalTextureName(texOriginalName)
+                , atlasTextureName(texAtlasName)
 				, indexInAtlas(texIndexInAtlas)
 	{ }
 

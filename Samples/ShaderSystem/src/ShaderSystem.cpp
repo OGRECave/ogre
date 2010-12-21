@@ -922,7 +922,7 @@ void Sample_ShaderSystem::updateAddLotsOfModels(bool addThem)
             addModelToScene("tudorhouse.mesh");
             addModelToScene("WoodPallet.mesh");
         }
-        for (int i = 0 ; i < mLotsOfModelsNodes.size() ; i++)
+        for (size_t i = 0 ; i < mLotsOfModelsNodes.size() ; i++)
         {
             mLotsOfModelsNodes[i]->setVisible(mAddedLotsOfModels);
         }

@@ -265,7 +265,6 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
 
 	const TextureAtlasSamplerFactory& factory = TextureAtlasSamplerFactory::getSingleton();
 
-	bool hasError = false;
 	unsigned short texCount = srcPass->getNumTextureUnitStates();
 	for(unsigned short i = 0 ; i < texCount ; ++i)
 	{

@@ -128,7 +128,6 @@ protected:
 	void loadResources()
 	{		
 #ifdef USE_RTSHADER_SYSTEM
-		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
 		Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
 		Ogre::StringVector::iterator itGroup = groupVector.begin();
 		Ogre::StringVector::iterator itGroupEnd = groupVector.end();
