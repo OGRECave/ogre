@@ -290,7 +290,7 @@ namespace Ogre {
 	void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
 	{
 		setRenderQueueGroup(queueID);
-		mRenderQueuePriority = queueID;
+		mRenderQueuePriority = priority;
 		mRenderQueuePrioritySet = true;
 
 	}
