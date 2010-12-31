@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2DepthBuffer.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -120,6 +121,8 @@ namespace Ogre {
 		// FBO afterwards to perform the multisample resolve. In that case, the 
 		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
+        ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
+
         /// Store basic stats
         size_t width = mColour[0].buffer->getWidth();
         size_t height = mColour[0].buffer->getHeight();
@@ -130,7 +133,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
 
         /// Bind all attachment points to frame buffer
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        for(size_t x=0; x<maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
@@ -156,6 +159,7 @@ namespace Ogre {
             {
                 // Detach
                 glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+x, GL_RENDERBUFFER, 0);
+                GL_CHECK_ERROR;
             }
         }
 
@@ -178,6 +182,7 @@ namespace Ogre {
 
 			// depth & stencil will be dealt with below
 		}
+        GL_CHECK_ERROR;
 
         /// Depth buffer is not handled here anymore.
 		/// See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
