@@ -36,6 +36,7 @@ THE SOFTWARE.
 // Forward declaration for zziplib to avoid header file dependency.
 typedef struct zzip_dir		ZZIP_DIR;
 typedef struct zzip_file	ZZIP_FILE;
+typedef union _zzip_plugin_io zzip_plugin_io_handlers;
 
 namespace Ogre {
 
@@ -60,10 +61,12 @@ namespace Ogre {
         void checkZzipError(int zzipError, const String& operation) const;
         /// File list (since zziplib seems to only allow scanning of dir tree once)
         FileInfoList mFileList;
+        /// A pointer to file io alternative implementation 
+        zzip_plugin_io_handlers* mPluginIo;
 
 		OGRE_AUTO_MUTEX
     public:
-        ZipArchive(const String& name, const String& archType );
+        ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
         ~ZipArchive();
         /// @copydoc Archive::isCaseSensitive
         bool isCaseSensitive(void) const { return false; }
@@ -117,6 +120,41 @@ namespace Ogre {
         }
         /// @copydoc FactoryObj::destroyInstance
         void destroyInstance( Archive* arch) { OGRE_DELETE arch; }
+    };
+
+    /** Specialisation of ZipArchiveFactory for embedded Zip files. */
+    class _OgreExport EmbeddedZipArchiveFactory : public ZipArchiveFactory
+    {
+    protected:
+        /// A static pointer to file io alternative implementation for the embedded files
+        static zzip_plugin_io_handlers* mPluginIo; 
+    public:
+        EmbeddedZipArchiveFactory();
+        virtual ~EmbeddedZipArchiveFactory();
+        /// @copydoc FactoryObj::getType
+        const String& getType(void) const;
+        /// @copydoc FactoryObj::createInstance
+        Archive *createInstance( const String& name ) 
+        {
+            ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, "EmbeddedZip", mPluginIo);
+            return resZipArchive;
+        }
+        
+        /** a function type to decrypt embedded zip file
+        @param pos pos in file
+        @param buf current buffer to decrypt
+        @param len - length of buffer
+        @returns success
+        */  
+        typedef bool (*DecryptEmbeddedZipFileFunc)(size_t pos, void* buf, size_t len);
+
+        /// Add an embedded file to the embedded file list
+        static void addEmbbeddedFile(const String& name, const uint8 * fileData, 
+                        size_t fileSize, DecryptEmbeddedZipFileFunc decryptFunc);
+
+        /// Remove an embedded file to the embedded file list
+        static void removeEmbbeddedFile(const String& name);
+
     };
 
     /** Specialisation of DataStream to handle streaming data from zip archives. */

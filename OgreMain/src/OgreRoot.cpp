@@ -228,6 +228,8 @@ namespace Ogre {
 #if OGRE_NO_ZIP_ARCHIVE == 0
         mZipArchiveFactory = OGRE_NEW ZipArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mZipArchiveFactory );
+        mEmbeddedZipArchiveFactory = OGRE_NEW EmbeddedZipArchiveFactory();
+        ArchiveManager::getSingleton().addArchiveFactory( mEmbeddedZipArchiveFactory );
 #endif
 #if OGRE_NO_DDS_CODEC == 0
 		// Register image codecs
@@ -316,6 +318,7 @@ namespace Ogre {
         OGRE_DELETE mArchiveManager;
 #if OGRE_NO_ZIP_ARCHIVE == 0
         OGRE_DELETE mZipArchiveFactory;
+        OGRE_DELETE mEmbeddedZipArchiveFactory;
 #endif
         OGRE_DELETE mFileSystemArchiveFactory;
         OGRE_DELETE mSkeletonManager;
