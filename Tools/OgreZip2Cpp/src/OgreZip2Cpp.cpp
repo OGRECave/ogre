@@ -116,7 +116,7 @@ int main(int numargs, char** args)
     outFileDataPos+= sprintf(outFileDataPos, "struct %s{\n", structName.c_str());
     
     // add a data member for the file name
-	outFileDataPos+= sprintf(outFileDataPos, "\tchar * fileName;\n");
+	outFileDataPos+= sprintf(outFileDataPos, "\tconst char * fileName;\n");
 
     //  the struct contractor
 	outFileDataPos+= sprintf(outFileDataPos, "\t%s() : fileName(\"%s\")\n", structName.c_str(), zipFileName.c_str());
