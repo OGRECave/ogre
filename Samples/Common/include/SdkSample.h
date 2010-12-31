@@ -435,8 +435,6 @@ namespace OgreBites
 
 			mTrayMgr = new SdkTrayManager("SampleControls", window, mouse, this);  // create a tray interface
 
-			Ogre::LogManager::getSingleton().logMessage("Loading resources");
-			
 			loadResources();
 			mResourcesLoaded = true;
 
@@ -494,7 +492,6 @@ namespace OgreBites
 			mDetailsPanel->setParamValue(15, "0");															
 #endif
 
-			Ogre::LogManager::getSingleton().logMessage("Setting up content");
 			setupContent();
 			mContentSetup = true;
 

@@ -2258,7 +2258,6 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		void showLogo(TrayLocation trayLoc, int place = -1)
 		{
-			Ogre::LogManager::getSingleton().logMessage("show logo");
 			if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
 			moveWidgetToTray(mLogo, trayLoc, place);
 		}

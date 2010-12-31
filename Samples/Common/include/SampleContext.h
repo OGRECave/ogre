@@ -160,7 +160,6 @@ namespace OgreBites
 
 			if (s)
 			{
-				Ogre::LogManager::getSingleton().logMessage("Starting a sample");
 				// retrieve sample's required plugins and currently installed plugins
 				Ogre::Root::PluginInstanceList ip = mRoot->getInstalledPlugins();
 				Ogre::StringVector rp = s->getRequiredPlugins();
@@ -197,7 +196,6 @@ namespace OgreBites
 				// test system capabilities against sample requirements
 				s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
 
-				Ogre::LogManager::getSingleton().logMessage("setting up");
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
 				s->_setup(mWindow, mMouse, mFSLayer);   // start new sample
 #else

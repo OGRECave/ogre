@@ -341,8 +341,6 @@ namespace Ogre
 
 	bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
 	{
-		LogManager::getSingleton().logMessage("ScriptCompiler::compile called");
-		
 		// Set up the compilation context
 		mGroup = group;
 

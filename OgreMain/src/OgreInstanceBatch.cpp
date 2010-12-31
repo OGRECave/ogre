@@ -266,7 +266,7 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor	= usedEntities.begin();
 		InstancedEntityVec::const_iterator end	= usedEntities.end();
 
-		Vector3 vMinPos, firstPos;
+		Vector3 vMinPos = Vector3::ZERO, firstPos = Vector3::ZERO;
 		InstancedEntity *first = 0;
 
 		if( !usedEntities.empty() )

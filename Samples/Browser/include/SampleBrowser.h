@@ -1019,7 +1019,6 @@ protected:
 
 			// if this is our first time running, and there's a startup sample, run it
 			if (startupSample && mFirstRun){
-				Ogre::LogManager::getSingleton().logMessage("running sample");
 				runSample(startupSample);
 			}
 		}
@@ -1233,13 +1232,11 @@ protected:
 					if(StringUtil::endsWith(sampleName, "_d"))
 						sampleName = sampleName.substr(0, sampleName.length()-2);
 
-					Ogre::LogManager::getSingleton().logMessage("Loading sample " + sampleName);
                     OgreBites::SdkSample *pluginInstance = (OgreBites::SdkSample *) mPluginNameMap[sampleName];
                     if(pluginInstance)
                     {
                         OgreBites::SamplePlugin* sp = OGRE_NEW SamplePlugin(pluginInstance->getInfo()["Title"] + " Sample");
 
-						Ogre::LogManager::getSingleton().logMessage("Installing sample " + sampleName);
                         sp->addSample(pluginInstance);
                         mRoot->installPlugin(sp);
                     }
@@ -1276,8 +1273,6 @@ protected:
 					Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
 					Ogre::NameValuePairList::iterator k;
 
-					Ogre::LogManager::getSingleton().logMessage(info["Thumbnail"]);
-
 					// give sample default title and category if none found
 					k= info.find("Title");
 					if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
@@ -1286,8 +1281,6 @@ protected:
 					k = info.find("Thumbnail");
 					if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
 
-					Ogre::LogManager::getSingleton().logMessage(info["Thumbnail"]);
-					
 					mLoadedSamples.insert(*j);                    // add sample only after ensuring title for sorting
 					mSampleCategories.insert(info["Category"]);   // add sample category
 
