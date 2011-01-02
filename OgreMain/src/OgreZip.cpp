@@ -111,6 +111,10 @@ namespace Ogre {
                     // the compressed size of a folder, and if he does, its useless anyway
                     info.compressedSize = size_t (-1);
                 }
+                else
+                {
+                    info.filename = info.basename;
+                }
 
                 mFileList.push_back(info);
 
@@ -135,16 +139,28 @@ namespace Ogre {
     {
 		// zziplib is not threadsafe
 		OGRE_LOCK_AUTO_MUTEX
+        String lookUpFileName = filename;
 
         // Format not used here (always binary)
         ZZIP_FILE* zzipFile = 
-            zzip_file_open(mZzipDir, filename.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS);
+            zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS);
+        if (!zzipFile) // Try if we find the file
+        {
+            const Ogre::FileInfoListPtr fileNfo = findFileInfo(lookUpFileName, true);
+            if (fileNfo->size() == 1) // If there are more files with the same do not open anyone
+            {
+                Ogre::FileInfo info = fileNfo->at(0);
+                lookUpFileName = info.path + info.basename;
+                zzipFile = zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS); // When an error happens here we will catch it below
+            }
+        }
+
         if (!zzipFile)
 		{
             int zerr = zzip_error(mZzipDir);
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
             LogManager::getSingleton().logMessage(
-                mName + " - Unable to open file " + filename + ", error was '" + zzDesc + "'");
+                mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'");
                 
 			// return null pointer
 			return DataStreamPtr();
@@ -152,10 +168,10 @@ namespace Ogre {
 
 		// Get uncompressed size too
 		ZZIP_STAT zstat;
-		zzip_dir_stat(mZzipDir, filename.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
+		zzip_dir_stat(mZzipDir, lookUpFileName.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
 
         // Construct & return stream
-        return DataStreamPtr(OGRE_NEW ZipDataStream(filename, zzipFile, static_cast<size_t>(zstat.st_size)));
+        return DataStreamPtr(OGRE_NEW ZipDataStream(lookUpFileName, zzipFile, static_cast<size_t>(zstat.st_size)));
 
     }
 	//---------------------------------------------------------------------
@@ -221,7 +237,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
 	FileInfoListPtr ZipArchive::findFileInfo(const String& pattern, 
-        bool recursive, bool dirs)
+        bool recursive, bool dirs) const
     {
 		OGRE_LOCK_AUTO_MUTEX
         FileInfoListPtr ret = FileInfoListPtr(OGRE_NEW_T(FileInfoList, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
@@ -229,7 +245,7 @@ namespace Ogre {
         bool full_match = (pattern.find ('/') != String::npos) ||
                           (pattern.find ('\\') != String::npos);
 
-        FileInfoList::iterator i, iend;
+        FileInfoList::const_iterator i, iend;
         iend = mFileList.end();
         for (i = mFileList.begin(); i != iend; ++i)
             if ((dirs == (i->compressedSize == size_t (-1))) &&

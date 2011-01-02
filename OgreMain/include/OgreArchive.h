@@ -52,7 +52,7 @@ namespace Ogre {
     struct FileInfo {
 		/// The archive in which the file has been found (for info when performing
 		/// multi-Archive searches, note you should still open through ResourceGroupManager)
-		Archive* archive;
+		const Archive* archive;
         /// The file's fully qualified name
         String filename;
         /// Path name; separated by '/' and ending with '/'
@@ -226,7 +226,7 @@ namespace Ogre {
             the criteria.
         */
         virtual FileInfoListPtr findFileInfo(const String& pattern, 
-            bool recursive = true, bool dirs = false) = 0;
+            bool recursive = true, bool dirs = false) const = 0;
 
         /// Return the type code of this Archive
         const String& getType(void) const { return mType; }

@@ -97,7 +97,7 @@ namespace Ogre {
 
         /// @copydoc Archive::findFileInfo
         FileInfoListPtr findFileInfo(const String& pattern, bool recursive = true,
-            bool dirs = false);
+            bool dirs = false) const;
 
         /// @copydoc Archive::exists
         bool exists(const String& filename);
