@@ -37,6 +37,9 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLSLESProgramFactory.h"
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#include "OgreGLSLESCgProgramFactory.h"
+#endif
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
 
@@ -263,7 +266,13 @@ namespace Ogre {
         // GLSL ES is always supported in GL ES 2
         rsc->addShaderProfile("glsles");
         LogManager::getSingleton().logMessage("GLSL ES support detected");
-        
+
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+        rsc->addShaderProfile("cg");
+        rsc->addShaderProfile("ps_2_0");
+        rsc->addShaderProfile("vs_2_0");
+#endif
+
         // UBYTE4 always supported
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
 
@@ -319,6 +328,11 @@ namespace Ogre {
 
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESProgramFactory);
+
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+        mGLSLESCgProgramFactory = OGRE_NEW GLSLESCgProgramFactory();
+        HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESCgProgramFactory);
+#endif
 
         // Set texture the number of texture units
         mFixedFunctionTextureUnits = caps->getNumTextureUnits();
@@ -415,6 +429,17 @@ namespace Ogre {
 			mGLSLESProgramFactory = 0;
 		}
 
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+        // Deleting the GLSL program factory
+        if (mGLSLESCgProgramFactory)
+        {
+            // Remove from manager safely
+            if (HighLevelGpuProgramManager::getSingletonPtr())
+                HighLevelGpuProgramManager::getSingleton().removeFactory(mGLSLESCgProgramFactory);
+            OGRE_DELETE mGLSLESCgProgramFactory;
+            mGLSLESCgProgramFactory = 0;
+        }
+#endif
 		// Deleting the GPU program manager and hardware buffer manager.  Has to be done before the mGLSupport->stop().
         OGRE_DELETE mGpuProgramManager;
         mGpuProgramManager = 0;

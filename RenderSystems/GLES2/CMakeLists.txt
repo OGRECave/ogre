@@ -71,6 +71,17 @@ set(GLSLES_FILES
   src/GLSLES/src/OgreGLSLESProgram.cpp
   src/GLSLES/src/OgreGLSLESProgramFactory.cpp
 )
+
+if (OGRE_CG_SUPPORT_FOR_GLES2)
+set(GLSLES_FILES 
+  src/GLSLES/src/OgreGLSLESCgProgram.cpp
+  src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
+  ${GLSLES_FILES}
+)
+endif (OGRE_CG_SUPPORT_FOR_GLES2)
+	
+	
+
 # Add system specific settings
 if (WIN32)
   set(PLATFORM_HEADERS 

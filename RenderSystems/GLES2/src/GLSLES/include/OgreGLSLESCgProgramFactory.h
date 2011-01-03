@@ -27,8 +27,8 @@ THE SOFTWARE.
 */
 
 
-#ifndef __GLSLESProgramFactory_H__
-#define __GLSLESProgramFactory_H__
+#ifndef __GLSLESCgProgramFactory_H__
+#define __GLSLESCgProgramFactory_H__
 
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreGLSLESExtSupport.h"
@@ -36,25 +36,18 @@ THE SOFTWARE.
 namespace Ogre
 {
     /** Factory class for GLSL ES programs. */
-    class _OgreGLES2Export GLSLESProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreGLES2Export GLSLESCgProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
 		static String sLanguageName;
     public:
-        GLSLESProgramFactory(void);
-        ~GLSLESProgramFactory(void);
-		/// Get the name of the language this factory creates programs for
+        GLSLESCgProgramFactory();
+        virtual ~GLSLESCgProgramFactory();
+
 		const String& getLanguage(void) const;
-		/// Create an instance of GLSLESProgram
-        HighLevelGpuProgram* create(ResourceManager* creator, 
-            const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
-		void destroy(HighLevelGpuProgram* prog);
-
-	private:
-		static GLSLESLinkProgramManager* mLinkProgramManager;
-
+        HighLevelGpuProgram* create(ResourceManager* creator, const String& name, ResourceHandle handle, const String& group, bool isManual, ManualResourceLoader* loader);
+        void destroy(HighLevelGpuProgram* prog);
     };
 }
 
-#endif // __GLSLESProgramFactory_H__
+#endif // __GLSLESCgProgramFactory_H__

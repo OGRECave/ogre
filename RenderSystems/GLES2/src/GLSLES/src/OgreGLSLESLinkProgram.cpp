@@ -162,6 +162,7 @@ namespace Ogre {
 		if (!mVertexProgram->getGLSLProgram()->compile(true))
 		{
 			// todo error
+            mTriedToLinkAndFailed = true;
 			return;
 		}
         mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
@@ -171,6 +172,7 @@ namespace Ogre {
 		if (!mFragmentProgram->getGLSLProgram()->compile(true))
 		{
 			// todo error
+            mTriedToLinkAndFailed = true;
 			return;
 		}		
         mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);

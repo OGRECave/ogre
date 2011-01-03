@@ -41,6 +41,9 @@ namespace Ogre {
     class GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramFactory;
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+    class GLSLESCgProgramFactory;
+#endif
     class GLSLESGpuProgram;
     class HardwareBufferManager;
 
@@ -100,6 +103,9 @@ namespace Ogre {
             GLES2Context *mCurrentContext;
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
+#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+            GLSLESCgProgramFactory* mGLSLESCgProgramFactory;
+#endif
             HardwareBufferManager* mHardwareBufferManager;
 
             /** Manager object for creating render textures.

@@ -26,48 +26,40 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLSLESProgramFactory.h"
-#include "OgreGLSLESLinkProgramManager.h"
-#include "OgreGLSLESProgram.h"
+#include "OgreGLSLESCgProgramFactory.h"
+#include "ogreglslescgprogram.h"
+#include "hlsl2glsl.h" // use the code from here: http://code.google.com/p/hlsl2glslfork/
 
 namespace Ogre {
-    GLSLESLinkProgramManager* GLSLESProgramFactory::mLinkProgramManager = NULL;
     //-----------------------------------------------------------------------
-    String GLSLESProgramFactory::sLanguageName = "glsles";
+    String GLSLESCgProgramFactory::sLanguageName = "cg";
     //-----------------------------------------------------------------------
-	GLSLESProgramFactory::GLSLESProgramFactory(void)
+    GLSLESCgProgramFactory::GLSLESCgProgramFactory()
     {
-        if (mLinkProgramManager == NULL)
-        {
-		    mLinkProgramManager = new GLSLESLinkProgramManager();
-        }
+            Hlsl2Glsl_Initialize();
     }
     //-----------------------------------------------------------------------
-    GLSLESProgramFactory::~GLSLESProgramFactory(void)
+    GLSLESCgProgramFactory::~GLSLESCgProgramFactory()
     {
-		if (mLinkProgramManager)
-        {
-			delete mLinkProgramManager;
-            mLinkProgramManager = NULL;
-        }
+            Hlsl2Glsl_Finalize();
     }
     //-----------------------------------------------------------------------
-    const String& GLSLESProgramFactory::getLanguage(void) const
+    const String& GLSLESCgProgramFactory::getLanguage(void) const
     {
         return sLanguageName;
     }
     //-----------------------------------------------------------------------
-    HighLevelGpuProgram* GLSLESProgramFactory::create(ResourceManager* creator, 
+    HighLevelGpuProgram* GLSLESCgProgramFactory::create(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        return OGRE_NEW GLSLESProgram(creator, name, handle, group, isManual, loader);
+        return OGRE_NEW GLSLESCgProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-	void GLSLESProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLESCgProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
         OGRE_DELETE prog;
     }
-    //-----------------------------------------------------------------------
+
 
 }
