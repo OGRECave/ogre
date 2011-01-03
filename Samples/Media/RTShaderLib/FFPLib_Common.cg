@@ -32,6 +32,7 @@ THE SOFTWARE.
 // Language: CG
 // Notes: Common functions needed by all FFP implementation classes.
 //-----------------------------------------------------------------------------
+#ifndef OPENGL_ES_2
 void FFP_Assign(in unsigned int iColor_0, out float4 oColor_0)
 {
 	oColor_0.w = ((iColor_0 >> 24) & 0xFF) / 255.0f;
@@ -40,6 +41,7 @@ void FFP_Assign(in unsigned int iColor_0, out float4 oColor_0)
 	oColor_0.z = (iColor_0 & 0xFF) / 255.0f;
 
 }
+#endif
 //-----------------------------------------------------------------------------
 void FFP_Assign(in float vIn, out float vOut)
 {
