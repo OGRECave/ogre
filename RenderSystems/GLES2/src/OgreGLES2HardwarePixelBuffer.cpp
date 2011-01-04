@@ -254,8 +254,8 @@ namespace Ogre {
             mFaceTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + face;
 
         // Calculate the width and height of the texture at this mip level
-        mWidth = mLevel == 0 ? width : width / pow(2, level);
-        mHeight = mLevel == 0 ? height : height / pow(2, level);
+        mWidth = mLevel == 0 ? width : width / static_cast<size_t>(pow(2.0f, level));
+        mHeight = mLevel == 0 ? height : height / static_cast<size_t>(pow(2.0f, level));
         if(mWidth < 1)
             mWidth = 1;
         if(mHeight < 1)
