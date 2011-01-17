@@ -177,6 +177,12 @@ namespace Ogre {
         {
             NSOpenGLPixelFormatAttribute attribs[30];
             int i = 0;
+			
+			// Specify the display ID to associate the GL context with (main display for now)
+			// Useful if there is ambiguity
+			attribs[i++] = NSOpenGLPFAScreenMask;
+			attribs[i++] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(CGMainDisplayID());
+
             
             // Specifying "NoRecovery" gives us a context that cannot fall back to the software renderer.
             // This makes the View-based context a compatible with the fullscreen context, enabling us to use
