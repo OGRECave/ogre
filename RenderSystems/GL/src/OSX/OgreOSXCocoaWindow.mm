@@ -439,16 +439,27 @@ namespace Ogre {
 			*static_cast<OSXContext**>(pData) = mContext;
 			return;
 		} 
-		if( name == "WINDOW" ) 
+		else if( name == "WINDOW" ) 
 		{
 			*(void**)pData = mWindow;
 			return;
 		} 
-		if( name == "VIEW" ) 
+		else if( name == "VIEW" ) 
 		{
 			*(void**)(pData) = mView;
 			return;
-		} 
+		}
+		else if( name == "NSOPENGLCONTEXT" ) 
+		{
+			*(void**)(pData) = mGLContext;
+			return;
+		}
+		else if( name == "NSOPENGLPIXELFORMAT" ) 
+		{
+			*(void**)(pData) = mGLPixelFormat;
+			return;
+		}
+		
 	}
 
     void OSXCocoaWindow::createNewWindow(unsigned int width, unsigned int height, String title)
