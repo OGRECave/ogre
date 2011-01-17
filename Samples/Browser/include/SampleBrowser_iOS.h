@@ -163,6 +163,22 @@
 {
     Ogre::Root::getSingleton().queueEndRendering();
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
+    if (mDisplayLinkSupported)
+    {
+        [mDate release];
+        mDate = nil;
+        
+        [mDisplayLink invalidate];
+        mDisplayLink = nil;
+    }
+    else
+    {
+        [mTimer invalidate];
+        mTimer = nil;
+    }
+    
+    sb.shutdown();
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -205,24 +221,6 @@
     {
         Root::getSingleton().renderOneFrame((Real)[mTimer timeInterval]);
     }
-}
-
-- (void)dealloc {
-    if (mDisplayLinkSupported)
-    {
-        [mDate release];
-        mDate = nil;
-
-        [mDisplayLink invalidate];
-        mDisplayLink = nil;
-    }
-    else
-    {
-        [mTimer invalidate];
-        mTimer = nil;
-    }
-
-    [super dealloc];
 }
 
 @end

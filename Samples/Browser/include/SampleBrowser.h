@@ -1245,15 +1245,12 @@ namespace OgreBites
 
 			SampleContext::reconfigure(renderer, options);
 		}
-
+    public:
 		/*-----------------------------------------------------------------------------
 		| Extends shutdown to destroy dummy scene and tray interface.
 		-----------------------------------------------------------------------------*/
 		virtual void shutdown()
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-            [mGestureView release];
-#endif
 			if (mTrayMgr)
 			{
 				delete mTrayMgr;
@@ -1275,8 +1272,16 @@ namespace OgreBites
 			SampleContext::shutdown();
 
 			unloadSamples();
+#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+            [mGestureView release];
+            if(mRoot)
+            {
+                OGRE_DELETE mRoot;
+                mRoot = 0;
+            }
+#endif
 		}
-
+    protected:
 		/*-----------------------------------------------------------------------------
 		| Destroys dummy scene.
 		-----------------------------------------------------------------------------*/
