@@ -514,10 +514,6 @@ namespace Ogre {
         CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
         CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
         
-        // Show window
-        if(mWindow)
-            [mWindow makeKeyAndOrderFront:nil];
-
         mIsExternal = true;
     }
 
