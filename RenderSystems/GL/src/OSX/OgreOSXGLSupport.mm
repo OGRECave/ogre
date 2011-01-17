@@ -234,8 +234,12 @@ void OSXGLSupport::addConfig( void )
 
     optMacAPI.name = "macAPI";
     optMacAPI.possibleValues.push_back( "cocoa" );
-    optMacAPI.possibleValues.push_back( "carbon" );
+#ifndef __LP64__
+	optMacAPI.possibleValues.push_back( "carbon" );
     optMacAPI.currentValue = "carbon";
+#else
+	optMacAPI.currentValue = "cocoa";
+#endif
     optMacAPI.immutable = false;
 
     mOptions[optMacAPI.name] = optMacAPI;
