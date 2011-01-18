@@ -640,10 +640,8 @@ namespace Ogre {
         // Wrap time
         Real totalAnimationLength = mLength;
 
-        while (timePos > totalAnimationLength && totalAnimationLength > 0.0f)
-        {
-            timePos -= totalAnimationLength;
-        }
+        if( timePos > totalAnimationLength && totalAnimationLength > 0.0f )
+			timePos = fmod( timePos, totalAnimationLength );
 
         // Search for global index
         KeyFrameTimeList::iterator it =
