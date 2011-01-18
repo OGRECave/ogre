@@ -501,10 +501,7 @@ namespace Ogre {
 
         mWindow = [viewRef window];
 
-        [mWindow center];
         mView = viewRef;
-
-        [mWindow makeFirstResponder:mView];
 
         GLint bufferRect[4];
         bufferRect[0] = viewBounds.origin.x;      // 0 = left edge 
