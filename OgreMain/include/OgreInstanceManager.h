@@ -65,7 +65,8 @@ namespace Ogre
 		{
 			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
 			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
-			HardwareInstancing,		//Needs SM 3.0+ and HW instancing support
+			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support
+			//HWInstancingVTF,		//Needs SM 3.0+ and HW instancing support, and VTF
 			InstancingTechniquesCount,
 		};
 	private:
@@ -171,6 +172,8 @@ namespace Ogre
 			too much of fragmentation and you won't be creating more InstancedEntities soon
 			Also in many cases cleanupEmptyBatches() ought to be enough
 			Defragmentation is done per material
+			Static batches won't be defragmented. If you want to degragment them, set them
+			to dynamic again, and switch back to static after calling this function.
 
 			@param optimizeCulling When true, entities close toghether will be reorganized
 			in the same batch for more efficient CPU culling. This can take more CPU
@@ -186,6 +189,9 @@ namespace Ogre
 		void showBoundingBoxes( bool bShow );
 
 		bool getShowBoundingBoxes() const { return m_showBoundingBoxes; }
+
+		/**	@copydoc InstanceBatch::setStaticAndUpdate */
+		void setBatchesAsStaticAndUpdate( bool bStatic );
 
 		/** Called by an InstanceBatch when it requests their bounds to be updated for proper culling
 			@param dirtyBatch The batch which is dirty, usually same as caller.

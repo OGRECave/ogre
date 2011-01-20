@@ -97,6 +97,7 @@ set (HEADER_FILES
   include/OgreImage.h
   include/OgreImageCodec.h
   include/OgreInstanceBatch.h
+  include/OgreInstanceBatchHW.h
   include/OgreInstanceBatchShader.h
   include/OgreInstanceBatchVTF.h
   include/OgreInstancedGeometry.h
@@ -322,6 +323,7 @@ set (SOURCE_FILES
   src/OgreImage.cpp
   src/OgreImageResampler.h
   src/OgreInstanceBatch.cpp
+  src/OgreInstanceBatchHW.cpp
   src/OgreInstanceBatchShader.cpp
   src/OgreInstanceBatchVTF.cpp
   src/OgreInstancedGeometry.cpp

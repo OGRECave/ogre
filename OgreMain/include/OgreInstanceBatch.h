@@ -115,6 +115,9 @@ namespace Ogre
 
 		bool				m_dirtyAnimation; //Set to false at start of each _updateRenderQueue
 
+		//False if a technique doesn't support skeletal animation
+		bool				m_technSupportsSkeletal;
+
 		/// Cached distance to last camera for getSquaredViewDepth
 		mutable Real mCachedCameraDist;
 		/// The camera for which the cached distance is valid
@@ -154,6 +157,14 @@ namespace Ogre
 		void _setInstancesPerBatch( size_t instancesPerBatch );
 
 		const Mesh::IndexMap* _getIndexToBoneMap() const { return m_indexToBoneMap; }
+
+		/** Returns true if this technique supports skeletal animation
+		@remarks
+			A virtual function could have been used, but using a simple variable overriden
+			by the derived class is faster than virtual call overhead. And both are clean
+			ways of implementing it.
+		*/
+		bool _supportsSkeletalAnimation() const { return m_technSupportsSkeletal; }
 
 		/** @See InstanceManager::updateDirtyBatches */
 		void _updateBounds(void);
@@ -239,6 +250,22 @@ namespace Ogre
 			(we touch the SceneNode so the SceneManager aknowledges such change)
         */
 		void _boundsDirty(void);
+
+		/** Tells this batch to stop updating animations, positions, rotations, and display
+			all it's actuve instances. Currently only InstanceBatchHW supports it.
+			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
+			memory advantages (less VRAM, less bandwidth) and not LOD support. Very usefull for
+			billboards of trees, repeating vegetation, etc.
+			@remarks
+				Call this function again (with bStatic=true) if you've made a change to an
+				InstancedEntity and wish this change to take effect.
+				@See InstanceBatchHW::setStaticAndUpdate
+		*/
+		virtual void setStaticAndUpdate( bool bStatic )		{}
+
+		/** Returns true if this batch was set as static. @See setStaticAndUpdate
+		*/
+		virtual bool isStatic() const						{ return false; }
 
 		/** Returns a pointer to a new InstancedEntity ready to use
 			Note it's actually preallocated, so no memory allocation happens at

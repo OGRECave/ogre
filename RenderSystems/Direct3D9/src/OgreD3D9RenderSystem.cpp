@@ -1109,7 +1109,13 @@ namespace Ogre
 				rsc->setNumVertexTextureUnits(4);
 				rsc->setVertexTextureUnitsShared(false);
 			}
-		}		
+		}	
+		else
+		{
+			//True HW Instancing is supported since Shader model 3.0 ATI has a nasty
+			//hack for enabling it in their SM 2.0 cards, but we don't (and won't) support it
+			rsc->unsetCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA );
+		}
 
 		// Check alpha to coverage support
 		// this varies per vendor! But at least SM3 is required

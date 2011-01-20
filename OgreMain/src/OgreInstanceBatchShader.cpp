@@ -102,9 +102,14 @@ namespace Ogre
 					}
 				}
 			}
+
+			//Reaching here means material is supported, but malformed
+			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+			"Material '" + m_material->getName() + "' is malformed for this instancing technique",
+			"InstanceBatchShader::calculateMaxNumInstances");
 		}
 
-		//Material is malformed or the technique is just unsupported.
+		//Reaching here the material is just unsupported.
 
 		return 0;
 	}

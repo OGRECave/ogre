@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreInstanceManager.h"
+#include "OgreInstanceBatchHW.h"
 #include "OgreInstanceBatchShader.h"
 #include "OgreInstanceBatchVTF.h"
 #include "OgreMesh.h"
@@ -112,10 +113,14 @@ namespace Ogre
 			batch = OGRE_NEW ClonedGeometryInstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
-		case HardwareInstancing:
-			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, suggestedSize,
+		case HWInstancingBasic:
+			batch = OGRE_NEW InstanceBatchHW( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
+		/*case HWInstancingVTF:
+			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, suggestedSize,
+													0, m_name + "/TempBatch" );
+			break;*/
 		default:
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 					"Unimplemented instancing technique: " +
@@ -187,11 +192,16 @@ namespace Ogre
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
-		case HardwareInstancing:
-			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, m_instancesPerBatch,
+		case HWInstancingBasic:
+			batch = OGRE_NEW InstanceBatchHW( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
+		/*case HWInstancingVTF:
+			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, m_instancesPerBatch,
+													&idxMap, m_name + "/InstanceBatch_" +
+													StringConverter::toString(m_idCount++) );
+			break;*/
 		default:
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 					"Unimplemented instancing technique: " +
@@ -275,28 +285,40 @@ namespace Ogre
 												InstanceBatch::InstancedEntityVec &usedEntities,
 												InstanceBatchVec &fragmentedBatches )
 	{
-		InstanceBatchVec::const_iterator itor = fragmentedBatches.begin();
-		InstanceBatchVec::const_iterator end  = fragmentedBatches.end();
+		InstanceBatchVec::iterator itor = fragmentedBatches.begin();
+		InstanceBatchVec::iterator end  = fragmentedBatches.end();
 
 		while( itor != end && !usedEntities.empty() )
 		{
-			(*itor)->_defragmentBatch( optimizeCull, usedEntities );
+			if( !(*itor)->isStatic() )
+				(*itor)->_defragmentBatch( optimizeCull, usedEntities );
 			++itor;
 		}
 
-		const size_t remainingBatches = end - itor;
+		InstanceBatchVec::iterator lastImportantBatch = itor;
 
 		while( itor != end )
 		{
-			//If we get here, this means we hit remaining batches which will be unused.
-			//Destroy them
-			//Call this to avoid freeing InstancedEntities that were just reparented
-			(*itor)->_defragmentBatchDiscard();
-			OGRE_DELETE *itor;
+			if( !(*itor)->isStatic() )
+			{
+				//If we get here, this means we hit remaining batches which will be unused.
+				//Destroy them
+				//Call this to avoid freeing InstancedEntities that were just reparented
+				(*itor)->_defragmentBatchDiscard();
+				OGRE_DELETE *itor;
+			}
+			else
+			{
+				//This isn't a meaningless batch, move it forward so it doesn't get wipe
+				//when we resize the container (faster than removing element by element)
+				*lastImportantBatch++ = *itor;
+			}
+
 			++itor;
 		}
 
 		//Remove remaining batches all at once from the vector
+		const size_t remainingBatches = end - lastImportantBatch;
 		fragmentedBatches.resize( fragmentedBatches.size() - remainingBatches );
 	}
 	//-----------------------------------------------------------------------
@@ -320,7 +342,10 @@ namespace Ogre
 
 			while( it != en )
 			{
-				(*it)->getInstancedEntitiesInUse( usedEntities );
+				//Don't collect instances from static batches, we assume they're correctly set
+				//Plus, we don't want to put InstancedEntities from non-static into static batches
+				if( !(*it)->isStatic() )
+					(*it)->getInstancedEntitiesInUse( usedEntities );
 				++it;
 			}
 
@@ -345,6 +370,26 @@ namespace Ogre
 			while( it != en )
 			{
 				(*it)->getParentSceneNode()->showBoundingBox( bShow );
+				++it;
+			}
+
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::setBatchesAsStaticAndUpdate( bool bStatic )
+	{
+		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
+		InstanceBatchMap::iterator end  = m_instanceBatches.end();
+
+		while( itor != end )
+		{
+			InstanceBatchVec::iterator it = itor->second.begin();
+			InstanceBatchVec::iterator en = itor->second.end();
+
+			while( it != en )
+			{
+				(*it)->setStaticAndUpdate( bStatic );
 				++it;
 			}
 

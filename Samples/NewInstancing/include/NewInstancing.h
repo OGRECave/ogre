@@ -11,7 +11,7 @@ static const char *c_instancingTechniques[] =
 {
 	"Shader Based",
 	"Vertex Texture Fetch (VTF)",
-	"Hardware Instancing",
+	"Hardware Instancing Basic",
 	"No Instancing"
 };
 
@@ -19,7 +19,7 @@ static const char *c_materialsTechniques[] =
 {
 	"Examples/Instancing/ShaderBased/Robot",
 	"Examples/Instancing/VTF/Robot",
-	"Examples/Instancing/VTF/Robot",
+	"Examples/Instancing/HWBasic/Robot",
 	"Examples/Instancing/ShaderBased/Robot"
 };
 
@@ -181,7 +181,7 @@ protected:
 				{
 				case 0: technique = InstanceManager::ShaderBased; break;
 				case 1: technique = InstanceManager::TextureVTF; break;
-				case 2: technique = InstanceManager::HardwareInstancing; break;
+				case 2: technique = InstanceManager::HWInstancingBasic; break;
 				}
 
 				mInstanceManagers[mInstancingTechnique] = mSceneMgr->createInstanceManager(
@@ -240,11 +240,15 @@ protected:
 												c_materialsTechniques[mInstancingTechnique] );
 			mEntities.push_back( ent );
 
-			//Get the animation
-			AnimationState *anim = ent->getAnimationState( "Walk" );
-			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f  ); //Random start offset
-			mAnimations.push_back( anim );
+			//HWInstancingBasic is the only technique without animation support
+			if( mInstancingTechnique != InstanceManager::HWInstancingBasic )
+			{
+				//Get the animation
+				AnimationState *anim = ent->getAnimationState( "Walk" );
+				anim->setEnabled( true );
+				anim->addTime( i * i * i * 0.001f  ); //Random start offset
+				mAnimations.push_back( anim );
+			}
 		}
 	}
 
@@ -506,7 +510,7 @@ protected:
 			{
 			case 0: technique = InstanceManager::ShaderBased; break;
 			case 1: technique = InstanceManager::TextureVTF; break;
-			case 2: technique = InstanceManager::HardwareInstancing; break;
+			case 2: technique = InstanceManager::HWInstancingBasic; break;
 			}
 
 			const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
@@ -515,12 +519,6 @@ protected:
 									IM_USEALL );
 			
 			mSupportedTechniques[i] = numInstances > 0;
-
-			if ( (technique == InstanceManager::HardwareInstancing) && (mSupportedTechniques[i]) )
-			{
-				RenderSystem* rs = Root::getSingleton().getRenderSystem();
-				mSupportedTechniques[i] = rs->getCapabilities()->hasCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
-			}
 		}
 
 		//Non instancing is always supported

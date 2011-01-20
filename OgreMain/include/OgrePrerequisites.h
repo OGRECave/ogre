@@ -172,6 +172,7 @@ namespace Ogre {
 	class HighLevelGpuProgramFactory;
     class IndexData;
 	class InstanceBatch;
+	class InstanceBatchHW;
 	class InstanceBatchShader;
 	class InstanceBatchVTF;
 	class InstanceManager;

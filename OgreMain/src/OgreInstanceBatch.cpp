@@ -51,6 +51,7 @@ namespace Ogre
 				m_boundsDirty( false ),
 				m_boundsUpdated( false ),
 				m_currentCamera( 0 ),
+				m_technSupportsSkeletal( true ),
 				mCachedCamera( 0 )
 	{
 		assert( m_instancesPerBatch );

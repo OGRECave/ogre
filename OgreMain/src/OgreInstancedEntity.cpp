@@ -57,7 +57,8 @@ namespace Ogre
 
 		//Is mesh skeletally animated?
 		if( m_batchOwner->_getMeshRef()->hasSkeleton() &&
-			!m_batchOwner->_getMeshRef()->getSkeleton().isNull() )
+			!m_batchOwner->_getMeshRef()->getSkeleton().isNull() &&
+			m_batchOwner->_supportsSkeletalAnimation() )
 		{
 			m_skeletonInstance = OGRE_NEW SkeletonInstance( m_batchOwner->_getMeshRef()->getSkeleton() );
 			m_skeletonInstance->load();
@@ -125,7 +126,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	size_t InstancedEntity::getTransforms3x4( float *xform ) const
 	{
-		size_t retVal = 4;
+		size_t retVal;
 
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
 		if( mParentNode )
@@ -139,6 +140,8 @@ namespace Ogre
 					for( int j=0; j<4; ++j )
 						*xform++ = *row++;
 				}
+
+				retVal = 12;
 			}
 			else
 			{

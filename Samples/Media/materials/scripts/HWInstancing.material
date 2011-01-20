@@ -1,0 +1,124 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+//--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HWBasic_glsl_vs glsl
+{
+	source HWBasicInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1
+}
+
+vertex_program Ogre/Instancing/HWBasic/shadow_caster_glsl_vs glsl
+{
+	source HWBasicInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWCASTER=1
+}
+
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HWBasic_cg_vs cg
+{
+	source HWBasicInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWRECEIVER
+}
+
+vertex_program Ogre/Instancing/HWBasic/shadow_caster_cg_vs cg
+{
+	source HWBasicInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWCASTER
+}
+
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HWBasic_vs unified
+{
+	delegate Ogre/Instancing/HWBasic_cg_vs
+	delegate Ogre/Instancing/HWBasic_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+
+		param_named_auto	depthRange					shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+vertex_program Ogre/Instancing/HWBasic/shadow_caster_vs unified
+{
+	delegate Ogre/Instancing/HWBasic/shadow_caster_cg_vs
+	delegate Ogre/Instancing/HWBasic/shadow_caster_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	depthRange					scene_depth_range
+	}
+}
+
+material Examples/Instancing/HWBasic/shadow_caster
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Instancing/HWBasic/shadow_caster_vs
+			{
+			}
+			fragment_program_ref Ogre/Instancing/shadow_caster_ps
+			{
+			}
+		}
+	}
+}
+
+abstract material Examples/Instancing/HWBasic
+{
+	technique
+	{
+		shadow_caster_material Examples/Instancing/HWBasic/shadow_caster
+
+		pass
+		{
+			specular	1 1 1 1 12.5
+			vertex_program_ref Ogre/Instancing/HWBasic_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+		}
+	}
+}
+
+material Examples/Instancing/HWBasic/Robot : Examples/Instancing/HWBasic
+{
+	set_texture_alias	DiffuseMap	r2skin.jpg
+}
