@@ -3302,22 +3302,17 @@ namespace Ogre
 
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
-		IDirect3DVertexShader9* pVertexShader = NULL;
-		getActiveD3D9Device()->GetVertexShader(&pVertexShader);
-		IDirect3DPixelShader9* pPixelShader = NULL;
-		getActiveD3D9Device()->GetPixelShader(&pPixelShader);
-
-	 	if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
+		if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
-				( !pVertexShader ) ||
-				(!pPixelShader && op.operationType != RenderOperation::OT_POINT_LIST) 		  
+				( !mVertexProgramBound ) ||
+				(!mFragmentProgramBound && op.operationType != RenderOperation::OT_POINT_LIST) 		  
 			  )
 		   ) 
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Attempted to render using the fixed pipeline when it is diabled.",
-				"D3D11RenderSystem::_render");
+				"D3D9RenderSystem::_render");
 		}
 #endif
 
