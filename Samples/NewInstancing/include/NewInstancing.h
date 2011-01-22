@@ -197,17 +197,6 @@ protected:
 
 			createInstancedEntities();
 
-			if( mInstancingTechnique == InstanceManager::HWInstancingBasic ||
-				mInstancingTechnique == InstanceManager::HWInstancingVTF )
-			{
-				//Show "static" button, and restore config
-				if( mSetStatic->isChecked() )
-					mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
-				mSetStatic->show();
-			}
-			else
-				mSetStatic->hide();
-
 			//Show GUI features available only to instancing
 			mDefragmentBatches->show();
 			mDefragmentOptimumCull->show();
@@ -219,12 +208,22 @@ protected:
 
 			//Hide GUI features available only to instancing
 			mCurrentManager = 0;
-			mSetStatic->hide();
 			mDefragmentBatches->hide();
 			mDefragmentOptimumCull->hide();
 		}
 
 		createSceneNodes();
+
+		//Show/hide "static" button, and restore config. Do this _after_ createSceneNodes()
+		if( mInstancingTechnique == InstanceManager::HWInstancingBasic ||
+			mInstancingTechnique == InstanceManager::HWInstancingVTF )
+		{
+			if( mSetStatic->isChecked() )
+				mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
+			mSetStatic->show();
+		}
+		else
+			mSetStatic->hide();
 	}
 
 	void createEntities()
