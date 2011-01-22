@@ -192,6 +192,19 @@ namespace Ogre
 		vertexBuffer->unlock();
 	}
 	//-----------------------------------------------------------------------
+	bool InstanceBatchHW_VTF::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
+	{
+		//Max number of texture coordinates is _usually_ 8, we need at least 2 available
+		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() > 8-1 )
+		{
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Given mesh must have at "
+														"least 2 free TEXCOORDs",
+						"InstanceBatchHW_VTF::checkSubMeshCompatibility");
+		}
+
+		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
+	}
+	//-----------------------------------------------------------------------
 	size_t InstanceBatchHW_VTF::calculateMaxNumInstances( 
 					const SubMesh *baseSubMesh, uint16 flags ) const
 	{
@@ -200,8 +213,9 @@ namespace Ogre
 		RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
 		const RenderSystemCapabilities *capabilities = renderSystem->getCapabilities();
 
-		//VTF must be supported
-		if( capabilities->hasCapability( RSC_VERTEX_TEXTURE_FETCH ) )
+		//VTF & HW Instancing must be supported
+		if( capabilities->hasCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA ) &&
+			capabilities->hasCapability( RSC_VERTEX_TEXTURE_FETCH ) )
 		{
 			//TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
 			const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );

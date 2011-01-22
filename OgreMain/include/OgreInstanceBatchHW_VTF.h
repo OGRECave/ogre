@@ -68,6 +68,8 @@ namespace Ogre
 		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
 			const HWBoneIdxVec &hwBoneIdx );
 
+		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
+
 		/** Keeps filling the VTF with world matrix data. Overloaded to avoid culled objects
 			and update visible instances' animation
 		*/

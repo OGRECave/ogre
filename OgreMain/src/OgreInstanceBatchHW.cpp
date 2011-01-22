@@ -65,9 +65,7 @@ namespace Ogre
 		RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
 		const RenderSystemCapabilities *capabilities = renderSystem->getCapabilities();
 
-		//Max number of texture coordinates is usually 8, we need at least 3 available
-		if( capabilities->hasCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA ) &&
-			baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() < 8-3 )
+		if( capabilities->hasCapability( RSC_VERTEX_BUFFER_INSTANCE_DATA ) )
 		{
 			//This value is arbitrary (theorical max is 2^30 for D3D9) but is big enough and safe
 			retVal = 65535;
@@ -162,6 +160,19 @@ namespace Ogre
 		thisVertexData->vertexDeclaration->removeElement(VES_BLEND_INDICES);
 		thisVertexData->vertexDeclaration->removeElement(VES_BLEND_WEIGHTS);
 		thisVertexData->closeGapsInBindings();
+	}
+	//-----------------------------------------------------------------------
+	bool InstanceBatchHW::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
+	{
+		//Max number of texture coordinates is _usually_ 8, we need at least 3 available
+		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() > 8-2 )
+		{
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Given mesh must have at "
+														"least 3 free TEXCOORDs",
+						"InstanceBatchHW::checkSubMeshCompatibility");
+		}
+
+		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
 	}
 	//-----------------------------------------------------------------------
 	size_t InstanceBatchHW::updateVertexBuffer( Camera *currentCamera )
