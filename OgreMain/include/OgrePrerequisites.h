@@ -173,6 +173,7 @@ namespace Ogre {
     class IndexData;
 	class InstanceBatch;
 	class InstanceBatchHW;
+	class InstanceBatchHW_VTF;
 	class InstanceBatchShader;
 	class InstanceBatchVTF;
 	class InstanceManager;

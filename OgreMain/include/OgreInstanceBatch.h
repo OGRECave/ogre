@@ -249,16 +249,19 @@ namespace Ogre
 		/** Called by InstancedEntity(s) to tell us we need to update the bounds
 			(we touch the SceneNode so the SceneManager aknowledges such change)
         */
-		void _boundsDirty(void);
+		virtual void _boundsDirty(void);
 
 		/** Tells this batch to stop updating animations, positions, rotations, and display
-			all it's actuve instances. Currently only InstanceBatchHW supports it.
+			all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
 			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
 			memory advantages (less VRAM, less bandwidth) and not LOD support. Very usefull for
 			billboards of trees, repeating vegetation, etc.
 			@remarks
+				This function moves a lot of processing time from the CPU to the GPU. If the GPU
+				is already a bottleneck, you may see a decrease in performance instead!
 				Call this function again (with bStatic=true) if you've made a change to an
 				InstancedEntity and wish this change to take effect.
+				Be sure to call this after you've set all your instances
 				@See InstanceBatchHW::setStaticAndUpdate
 		*/
 		virtual void setStaticAndUpdate( bool bStatic )		{}

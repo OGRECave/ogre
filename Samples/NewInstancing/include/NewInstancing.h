@@ -12,6 +12,7 @@ static const char *c_instancingTechniques[] =
 	"Shader Based",
 	"Vertex Texture Fetch (VTF)",
 	"Hardware Instancing Basic",
+	"Hardware Instancing + VTF",
 	"No Instancing"
 };
 
@@ -20,6 +21,7 @@ static const char *c_materialsTechniques[] =
 	"Examples/Instancing/ShaderBased/Robot",
 	"Examples/Instancing/VTF/Robot",
 	"Examples/Instancing/HWBasic/Robot",
+	"Examples/Instancing/VTF/HW/Robot",
 	"Examples/Instancing/ShaderBased/Robot"
 };
 
@@ -182,6 +184,7 @@ protected:
 				case 0: technique = InstanceManager::ShaderBased; break;
 				case 1: technique = InstanceManager::TextureVTF; break;
 				case 2: technique = InstanceManager::HWInstancingBasic; break;
+				case 3: technique = InstanceManager::HWInstancingVTF; break;
 				}
 
 				mInstanceManagers[mInstancingTechnique] = mSceneMgr->createInstanceManager(
@@ -194,6 +197,17 @@ protected:
 
 			createInstancedEntities();
 
+			if( mInstancingTechnique == InstanceManager::HWInstancingBasic ||
+				mInstancingTechnique == InstanceManager::HWInstancingVTF )
+			{
+				//Show "static" button, and restore config
+				if( mSetStatic->isChecked() )
+					mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
+				mSetStatic->show();
+			}
+			else
+				mSetStatic->hide();
+
 			//Show GUI features available only to instancing
 			mDefragmentBatches->show();
 			mDefragmentOptimumCull->show();
@@ -205,6 +219,7 @@ protected:
 
 			//Hide GUI features available only to instancing
 			mCurrentManager = 0;
+			mSetStatic->hide();
 			mDefragmentBatches->hide();
 			mDefragmentOptimumCull->hide();
 		}
@@ -438,6 +453,10 @@ protected:
 														"Enable Shadows", 175);
 		mEnableShadows->setChecked(true);
 
+		//Check box to make instances static (where supported)
+		mSetStatic = mTrayMgr->createCheckBox(TL_TOPRIGHT, "SetStatic", "Set Static", 175);
+		mSetStatic->setChecked(false);
+
 		//Controls to control batch defragmentation on the fly
 		mDefragmentBatches =  mTrayMgr->createButton(TL_TOP, "DefragmentBatches",
 															"Defragment Batches", 175);
@@ -471,6 +490,8 @@ protected:
 	{
 		if( box == mEnableShadows ) mSceneMgr->setShadowTechnique( mEnableShadows->isChecked() ?
 									SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
+		else if( box == mSetStatic && mCurrentManager )
+			mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
 	}
 
 	void sliderMoved(Slider* slider)
@@ -511,6 +532,7 @@ protected:
 			case 0: technique = InstanceManager::ShaderBased; break;
 			case 1: technique = InstanceManager::TextureVTF; break;
 			case 2: technique = InstanceManager::HWInstancingBasic; break;
+			case 3: technique = InstanceManager::HWInstancingVTF; break;
 			}
 
 			const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
@@ -548,6 +570,7 @@ protected:
 	CheckBox						*mMoveInstances;
 	CheckBox						*mAnimateInstances;
 	CheckBox						*mEnableShadows;
+	CheckBox						*mSetStatic;
 	OgreBites::Button				*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
 	Slider							*mInstancesSlider;

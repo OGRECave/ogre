@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreInstanceManager.h"
 #include "OgreInstanceBatchHW.h"
+#include "OgreInstanceBatchHW_VTF.h"
 #include "OgreInstanceBatchShader.h"
 #include "OgreInstanceBatchVTF.h"
 #include "OgreMesh.h"
@@ -110,17 +111,17 @@ namespace Ogre
 													0, m_name + "/TempBatch" );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW ClonedGeometryInstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
+			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
 		case HWInstancingBasic:
 			batch = OGRE_NEW InstanceBatchHW( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
 			break;
-		/*case HWInstancingVTF:
-			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, suggestedSize,
+		case HWInstancingVTF:
+			batch = OGRE_NEW InstanceBatchHW_VTF( this, m_meshReference, mat, suggestedSize,
 													0, m_name + "/TempBatch" );
-			break;*/
+			break;
 		default:
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 					"Unimplemented instancing technique: " +
@@ -188,7 +189,7 @@ namespace Ogre
 													StringConverter::toString(m_idCount++) );
 			break;
 		case TextureVTF:
-			batch = OGRE_NEW ClonedGeometryInstanceBatchVTF( this, m_meshReference, mat, m_instancesPerBatch,
+			batch = OGRE_NEW InstanceBatchVTF( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
@@ -197,11 +198,11 @@ namespace Ogre
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
 			break;
-		/*case HWInstancingVTF:
-			batch = OGRE_NEW HardwareInstanceBatchVFT( this, m_meshReference, mat, m_instancesPerBatch,
+		case HWInstancingVTF:
+			batch = OGRE_NEW InstanceBatchHW_VTF( this, m_meshReference, mat, m_instancesPerBatch,
 													&idxMap, m_name + "/InstanceBatch_" +
 													StringConverter::toString(m_idCount++) );
-			break;*/
+			break;
 		default:
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
 					"Unimplemented instancing technique: " +

@@ -65,8 +65,8 @@ namespace Ogre
 		{
 			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
 			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
-			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support
-			//HWInstancingVTF,		//Needs SM 3.0+ and HW instancing support, and VTF
+			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support @See InstanceBatchHW
+			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @See InstanceBatchHW_VTF
 			InstancingTechniquesCount,
 		};
 	private:

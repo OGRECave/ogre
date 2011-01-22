@@ -167,6 +167,8 @@ namespace Ogre
 		{
 			if( m_skeletonInstance )
 				retVal = m_skeletonInstance->getNumBones() * 3 * 4;
+			else
+				retVal = 12;
 
 			std::fill_n( xform, retVal, 0.0f );
 		}

@@ -1,0 +1,74 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Writen by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+//---------------------------------------------
+//Vertex Shader Input
+//---------------------------------------------
+struct VS_INPUT
+{
+	float4 Position	:	POSITION;
+	float3 Normal	:	NORMAL;
+	float3 Tangent	:	TANGENT;
+	float2 uv0		:	TEXCOORD0;
+
+	float4 m03		:	TEXCOORD1; //m03.w is always 0
+	float2 mOffset	:	TEXCOORD2;
+};
+
+#include "InstancingVertexInterpolators.cg"
+
+//---------------------------------------------
+//Main Vertex Shader
+//---------------------------------------------
+VS_OUTPUT main_vs( in VS_INPUT input,
+				   uniform float4x4 viewProjMatrix,
+				   
+#ifdef DEPTH_SHADOWCASTER
+				   uniform sampler2D matrixTexture : register(s0)
+#else
+				   uniform sampler2D matrixTexture : register(s2)
+#endif
+
+#if defined( DEPTH_SHADOWCASTER ) || defined( DEPTH_SHADOWRECEIVER )
+				,  uniform float4 depthRange
+#endif
+#ifdef DEPTH_SHADOWRECEIVER
+				,  uniform float4x4 texViewProjMatrix
+#endif
+				)
+{
+	VS_OUTPUT output;
+
+	float3x4 worldMatrix;
+	worldMatrix[0] = tex2D( matrixTexture, input.m03.xw + input.mOffset );
+	worldMatrix[1] = tex2D( matrixTexture, input.m03.yw + input.mOffset );
+	worldMatrix[2] = tex2D( matrixTexture, input.m03.zw + input.mOffset );
+
+	float4 worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
+	float3 worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
+
+	//Transform the position
+	output.Position		= mul( viewProjMatrix, worldPos );
+
+#ifdef DEPTH_SHADOWCASTER
+	output.ps.unused	= float3( 0 );
+	output.ps.depth		= (output.Position.z - depthRange.x + SHADOW_BIAS) * depthRange.w;
+#else
+	output.ps.uv0		= input.uv0;
+
+	//Pass Normal and position for Blinn Phong lighting
+	output.ps.Normal	= normalize(worldNorm);
+	output.ps.vPos		= worldPos.xyz;
+	
+	#ifdef DEPTH_SHADOWRECEIVER
+		// Calculate the position of vertex in light space to do shadows
+		output.ps.lightSpacePos = mul( texViewProjMatrix, worldPos );
+		// make linear
+		output.ps.lightSpacePos.z = (output.ps.lightSpacePos.z - depthRange.x) * depthRange.w;
+	#endif
+#endif
+
+	return output;
+}
