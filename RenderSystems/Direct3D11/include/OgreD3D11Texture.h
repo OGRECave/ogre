@@ -91,6 +91,8 @@ namespace Ogre {
 
 		/// @copydoc Texture::createInternalResourcesImpl
 		void createInternalResourcesImpl(void);
+		/// @copydoc Texture::freeInternalResources
+		void freeInternalResources(void);
 		/// free internal resources
 		void freeInternalResourcesImpl(void);
 		/// internal method, set Texture class source image protected attributes

@@ -35,7 +35,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	unsigned int D3D11Driver::driverCount = 0;
 	//---------------------------------------------------------------------
-	D3D11Driver::D3D11Driver(D3D11Device & device) : mDevice(device)
+	D3D11Driver::D3D11Driver() 
 	{
 		tempNo = ++driverCount;
 		ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
@@ -44,7 +44,7 @@ namespace Ogre
 		mpDXGIAdapter=NULL;
 	}
 	//---------------------------------------------------------------------
-	D3D11Driver::D3D11Driver( const D3D11Driver &ob ) : mDevice(ob.mDevice)
+	D3D11Driver::D3D11Driver( const D3D11Driver &ob ) 
 	{
 		tempNo = ++driverCount;
 		mAdapterNumber = ob.mAdapterNumber;
@@ -55,7 +55,7 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
-	D3D11Driver::D3D11Driver( D3D11Device & device, unsigned int adapterNumber, IDXGIAdapter1* pDXGIAdapter) : mDevice(device)
+	D3D11Driver::D3D11Driver( unsigned int adapterNumber, IDXGIAdapter1* pDXGIAdapter)
 	{
 		tempNo = ++driverCount;
 		mAdapterNumber = adapterNumber;
@@ -105,11 +105,6 @@ namespace Ogre
 			mpVideoModeList = new D3D11VideoModeList( this );
 
 		return mpVideoModeList;
-	}
-	//---------------------------------------------------------------------
-	void D3D11Driver::setDevice( D3D11Device & device )
-	{
-		mDevice = device;
 	}
 	//---------------------------------------------------------------------
 	unsigned int D3D11Driver::getAdapterNumber() const

@@ -61,7 +61,7 @@ namespace Ogre
 {
 
 	//---------------------------------------------------------------------
-	D3D11RenderSystem::D3D11RenderSystem( HINSTANCE hInstance ) 
+    D3D11RenderSystem::D3D11RenderSystem( HINSTANCE hInstance ) : mDevice(NULL)
 	{
 		LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
@@ -648,8 +648,6 @@ namespace Ogre
 
 
 			mDevice = D3D11Device(device) ;
-
-			mActiveD3DDriver->setDevice(mDevice);
 		}
 
 
@@ -1646,7 +1644,7 @@ namespace Ogre
 	void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
 	{
 		mActiveRenderTarget = target;
-		ID3D11RenderTargetView * pRTView;
+		ID3D11RenderTargetView * pRTView = NULL;
 		target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
 
 		//Retrieve depth buffer
@@ -1821,13 +1819,27 @@ namespace Ogre
 		ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
 		size_t mTexturesCount;
 
+        D3D11RenderOperationState() :
+              mBlendState(NULL)
+            , mRasterizer(NULL)
+            , mDepthStencilState(NULL)
+            , mSamplerStatesCount(0)
+            , mTexturesCount(0)
+        {
+            for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+            {
+                mSamplerStates[i] = 0;
+            }
+        }
+
+
 		~D3D11RenderOperationState()
 		{
 			SAFE_RELEASE( mBlendState );
 			SAFE_RELEASE( mRasterizer );
 			SAFE_RELEASE( mDepthStencilState );
 
-			for (size_t i = 0 ; i < mSamplerStatesCount ; i++)
+			for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
 			{
 				SAFE_RELEASE( mSamplerStates[i] );
 			}
@@ -1859,11 +1871,12 @@ namespace Ogre
 		// Call super class
 		RenderSystem::_render(op);
 		
-		D3D11RenderOperationState * opState = NULL;
+        D3D11RenderOperationState stackOpState;
+		D3D11RenderOperationState * opState = &stackOpState;
 
-		if(!opState)
+		//if(!opState)
 		{
-			opState =  new D3D11RenderOperationState;
+			//opState = new D3D11RenderOperationState;
 
 			HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState) ;
 			if (FAILED(hr))
@@ -2184,7 +2197,7 @@ namespace Ogre
 			mDevice.GetImmediateContext()->RSSetState(0);
 			mDevice.GetImmediateContext()->OMSetDepthStencilState(0, 0); 
 //			mDevice->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(0), 0);
-			delete opState;
+			//delete opState;
 		}
 
 
@@ -2721,6 +2734,8 @@ namespace Ogre
 		{
 			return;
 		}
+
+        mRenderSystemWasInited = true;
 		// set pointers to NULL
 		mpDXGIFactory = NULL;
 		HRESULT hr;

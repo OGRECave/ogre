@@ -61,8 +61,7 @@ namespace Ogre
 		SAFE_RELEASE( mRenderTargetView );
 		SAFE_RELEASE( mDepthStencilView );
 
-		mpBackBuffer->Release();
-		mpBackBuffer = NULL;
+		SAFE_RELEASE(mpBackBuffer);
 
 		destroy();
 	}
@@ -457,14 +456,17 @@ namespace Ogre
 			// Create swap chain			
 			hr = mpDXGIFactory->CreateSwapChain( 
 				pDXGIDevice,&md3dpp,&mpSwapChain);
-
+        
 			if (FAILED(hr))
 			{
 				// Try a second time, may fail the first time due to back buffer count,
 				// which will be corrected by the runtime
 				hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice,&md3dpp,&mpSwapChain);
 			}
-			if (FAILED(hr))
+
+            SAFE_RELEASE(pDXGIDevice);
+
+            if (FAILED(hr))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 					"Unable to create an additional swap chain",
@@ -541,7 +543,9 @@ namespace Ogre
 				descDSV.ViewDimension = mFSAA ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
 				descDSV.Texture2D.MipSlice = 0;
 				hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
-				SAFE_RELEASE( pDepthStencil );
+    
+                SAFE_RELEASE(pDepthStencil);
+                
 				if( FAILED(hr) )
 				{
 					String errorDescription = mDevice.getErrorDescription();
@@ -909,8 +913,7 @@ namespace Ogre
 		mDevice.GetImmediateContext()->Unmap(pTempTexture2D, 0);
 
 		// Release the temp buffer
-		pTempTexture2D->Release();
-		pTempTexture2D = NULL;
+		SAFE_RELEASE(pTempTexture2D);
 	}
 	//-----------------------------------------------------------------------------
 	void D3D11RenderWindow::update(bool swap)

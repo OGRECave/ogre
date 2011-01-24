@@ -41,7 +41,6 @@ namespace Ogre
 	private:
 		// D3D only allows one device per adapter, so it can safely be stored
 		// here as well.
-		D3D11Device & mDevice;
 		unsigned int mAdapterNumber;
 		DXGI_ADAPTER_DESC1 mAdapterIdentifier;
 		DXGI_MODE_DESC mDesktopDisplayMode;
@@ -53,9 +52,9 @@ namespace Ogre
 
 	public:
 		// Constructors
-		D3D11Driver(D3D11Device & device);		// Default
+		D3D11Driver();		// Default
 		D3D11Driver( const D3D11Driver &ob );	// Copy
-		D3D11Driver(D3D11Device & device,  unsigned int adapterNumber,  IDXGIAdapter1* pDXGIAdapter );
+		D3D11Driver( unsigned int adapterNumber,  IDXGIAdapter1* pDXGIAdapter );
 		~D3D11Driver();
 
 		// Information accessors
@@ -63,7 +62,6 @@ namespace Ogre
 		String DriverDescription() const;
 
 		// change the device
-		void setDevice(D3D11Device & device);
 		unsigned int getAdapterNumber() const;
 		const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
 		const DXGI_MODE_DESC& getDesktopMode() const;

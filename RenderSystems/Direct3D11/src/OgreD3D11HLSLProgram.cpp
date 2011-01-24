@@ -451,6 +451,11 @@ namespace Ogre {
 	void D3D11HLSLProgram::unloadHighLevelImpl(void)
 	{
 		SAFE_RELEASE(mpMicroCode);
+        SAFE_RELEASE(mpVertexShader);
+        SAFE_RELEASE(mpPixelShader);
+        SAFE_RELEASE(mpGeometryShader);
+        SAFE_RELEASE(mpIShaderReflection);
+        SAFE_RELEASE(mConstantBuffer);
 
 
 		//        SAFE_RELEASE(mpConstTable);

@@ -38,11 +38,15 @@ namespace Ogre
 	private:
 		ID3D11Device * mD3D11Device;
 		ID3D11DeviceContext * mImmediateContext;
+        ID3D11InfoQueue * mInfoQueue; 
 
-	public:
 		D3D11Device();
+    public:
+
 
 		D3D11Device(ID3D11Device * device);
+
+		~D3D11Device();
 
 		inline ID3D11DeviceContext * GetImmediateContext()
 		{
@@ -59,18 +63,7 @@ namespace Ogre
 			return mD3D11Device;
 		}
 
-		inline const void clearStoredErrorMessages(  ) const
-		{
-			if (mD3D11Device && D3D_NO_EXCEPTION != mExceptionsErrorLevel)
-			{
-				ID3D11InfoQueue * pInfoQueue = NULL; 
-				HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
-				if (SUCCEEDED(hr))
-				{
-					pInfoQueue->ClearStoredMessages();
-				}
-			}
-		}
+		const void clearStoredErrorMessages(  ) const;
 
 		ID3D11Device * operator=(ID3D11Device * device);
 		const bool isNull();
@@ -86,75 +79,7 @@ namespace Ogre
 			return _getErrorsFromQueue();
 		}
 
-		const bool _getErrorsFromQueue() const
-		{
-			ID3D11InfoQueue * pInfoQueue = NULL; 
-			HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
-			if (SUCCEEDED(hr))
-			{
-				UINT64 numStoredMessages = pInfoQueue->GetNumStoredMessages();
-
-				if (D3D_INFO == mExceptionsErrorLevel && numStoredMessages > 0)
-				{
-					// if D3D_INFO we don't need to loop if the numStoredMessages > 0
-					return true;
-				}
-				for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
-				{
-					// Get the size of the message
-					SIZE_T messageLength = 0;
-					hr = pInfoQueue->GetMessage(i, NULL, &messageLength);
-					// Allocate space and get the message
-					D3D11_MESSAGE * pMessage = (D3D11_MESSAGE*)malloc(messageLength);
-					hr = pInfoQueue->GetMessage(i, pMessage, &messageLength);
-
-					bool res = false;
-					switch(pMessage->Severity)
-					{
-					case D3D11_MESSAGE_SEVERITY_CORRUPTION:
-						if (D3D_CORRUPTION == mExceptionsErrorLevel)
-						{
-							res = true;
-						}
-						break;
-					case D3D11_MESSAGE_SEVERITY_ERROR:
-						switch(mExceptionsErrorLevel)
-						{
-						case D3D_INFO:
-						case D3D_WARNING:
-						case D3D_ERROR:
-							res = true;
-						}
-						break;
-					case D3D11_MESSAGE_SEVERITY_WARNING:
-						switch(mExceptionsErrorLevel)
-						{
-						case D3D_INFO:
-						case D3D_WARNING:
-							res = true;
-						}
-						break;
-					}
-
-					free(pMessage);
-					if (res)
-					{
-						// we don't need to loop anymore...
-						return true;
-					}
-
-				}
-
-				clearStoredErrorMessages();
-
-				return false;
-
-			}
-			else
-			{
-				return false;
-			}
-		}
+		const bool _getErrorsFromQueue() const;
 		void release();
 		ID3D11Device * get();
 

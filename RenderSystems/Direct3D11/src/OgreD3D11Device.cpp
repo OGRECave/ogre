@@ -32,52 +32,58 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11Device::eExceptionsErrorLevel D3D11Device::mExceptionsErrorLevel = D3D11Device::D3D_NO_EXCEPTION;
 	//---------------------------------------------------------------------
-	D3D11Device::D3D11Device( ID3D11Device * D3D11device ) : mD3D11Device(D3D11device)
+	D3D11Device::D3D11Device( ID3D11Device * D3D11device ) : mD3D11Device(D3D11device), mInfoQueue(NULL)
 	{
-		D3D11device->GetImmediateContext(&mImmediateContext);
+        if (D3D11device)
+        {
+		    D3D11device->GetImmediateContext(&mImmediateContext);
 
-		ID3D11InfoQueue * pInfoQueue = NULL; 
-		HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
+            HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&mInfoQueue);
 
-		if (SUCCEEDED(hr))
-		{
-			pInfoQueue->ClearStoredMessages();
-			pInfoQueue->ClearRetrievalFilter();
-			pInfoQueue->ClearStorageFilter();
+		    if (SUCCEEDED(hr))
+		    {
+			    mInfoQueue->ClearStoredMessages();
+			    mInfoQueue->ClearRetrievalFilter();
+			    mInfoQueue->ClearStorageFilter();
 
-			D3D11_INFO_QUEUE_FILTER filter;
-			ZeroMemory(&filter, sizeof(D3D11_INFO_QUEUE_FILTER));
-			std::vector<D3D11_MESSAGE_SEVERITY> severityList;
+			    D3D11_INFO_QUEUE_FILTER filter;
+			    ZeroMemory(&filter, sizeof(D3D11_INFO_QUEUE_FILTER));
+			    std::vector<D3D11_MESSAGE_SEVERITY> severityList;
 
-			switch(mExceptionsErrorLevel)
-			{
-			case D3D_NO_EXCEPTION:
-				severityList.push_back(D3D11_MESSAGE_SEVERITY_CORRUPTION);
-			case D3D_CORRUPTION:
-				severityList.push_back(D3D11_MESSAGE_SEVERITY_ERROR);
-			case D3D_ERROR:
-				severityList.push_back(D3D11_MESSAGE_SEVERITY_WARNING);
-			case D3D_WARNING:
-			case D3D_INFO:
-				severityList.push_back(D3D11_MESSAGE_SEVERITY_INFO);
-			default: 
-				break;
-			}
+			    switch(mExceptionsErrorLevel)
+			    {
+			    case D3D_NO_EXCEPTION:
+				    severityList.push_back(D3D11_MESSAGE_SEVERITY_CORRUPTION);
+			    case D3D_CORRUPTION:
+				    severityList.push_back(D3D11_MESSAGE_SEVERITY_ERROR);
+			    case D3D_ERROR:
+				    severityList.push_back(D3D11_MESSAGE_SEVERITY_WARNING);
+			    case D3D_WARNING:
+			    case D3D_INFO:
+				    severityList.push_back(D3D11_MESSAGE_SEVERITY_INFO);
+			    default: 
+				    break;
+			    }
 
 
-			if (severityList.size() > 0)
-			{
-				filter.DenyList.NumSeverities = severityList.size();
-				filter.DenyList.pSeverityList = &severityList[0];
-			}
+			    if (severityList.size() > 0)
+			    {
+				    filter.DenyList.NumSeverities = severityList.size();
+				    filter.DenyList.pSeverityList = &severityList[0];
+			    }
 
-			pInfoQueue->AddStorageFilterEntries(&filter);
-			pInfoQueue->AddRetrievalFilterEntries(&filter);
-		}
+			    mInfoQueue->AddStorageFilterEntries(&filter);
+			    mInfoQueue->AddRetrievalFilterEntries(&filter);
+		    }
+        }
 
 	}
 	//---------------------------------------------------------------------
 	D3D11Device::D3D11Device() : mD3D11Device(0), mImmediateContext(0)
+	{
+	}
+	//---------------------------------------------------------------------
+	D3D11Device::~D3D11Device()
 	{
 	}
 	//---------------------------------------------------------------------
@@ -121,20 +127,17 @@ namespace Ogre
 			assert(false); // unknown HRESULT
 		}
 
-		ID3D11InfoQueue * pInfoQueue = NULL; 
-		HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&pInfoQueue);
-
-		if (SUCCEEDED(hr))
+		if (mInfoQueue != NULL)
 		{
-			UINT64 numStoredMessages = pInfoQueue->GetNumStoredMessages();
+			UINT64 numStoredMessages = mInfoQueue->GetNumStoredMessages();
 			for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
 			{
 				// Get the size of the message
 				SIZE_T messageLength = 0;
-				hr = pInfoQueue->GetMessage(i, NULL, &messageLength);
+				mInfoQueue->GetMessage(i, NULL, &messageLength);
 				// Allocate space and get the message
 				D3D11_MESSAGE * pMessage = (D3D11_MESSAGE*)malloc(messageLength);
-				hr = pInfoQueue->GetMessage(i, pMessage, &messageLength);
+				mInfoQueue->GetMessage(i, pMessage, &messageLength);
 				res = res + pMessage->pDescription + "\n";
 				free(pMessage);
 			}
@@ -145,8 +148,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Device::release()
 	{
-		SAFE_RELEASE(mImmediateContext);
+        SAFE_RELEASE(mInfoQueue);
 		SAFE_RELEASE(mD3D11Device);
+        SAFE_RELEASE(mImmediateContext);
 	}
 	//---------------------------------------------------------------------
 	ID3D11Device * D3D11Device::get()
@@ -163,5 +167,85 @@ namespace Ogre
 	{
 		return mExceptionsErrorLevel;
 	}
+    //---------------------------------------------------------------------
+    const bool D3D11Device::_getErrorsFromQueue() const
+    {
+        if (mInfoQueue != NULL)
+        {
+            UINT64 numStoredMessages = mInfoQueue->GetNumStoredMessages();
+
+            if (D3D_INFO == mExceptionsErrorLevel && numStoredMessages > 0)
+            {
+                // if D3D_INFO we don't need to loop if the numStoredMessages > 0
+                return true;
+            }
+            for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
+            {
+                // Get the size of the message
+                SIZE_T messageLength = 0;
+                mInfoQueue->GetMessage(i, NULL, &messageLength);
+                // Allocate space and get the message
+                D3D11_MESSAGE * pMessage = (D3D11_MESSAGE*)malloc(messageLength);
+                mInfoQueue->GetMessage(i, pMessage, &messageLength);
+
+                bool res = false;
+                switch(pMessage->Severity)
+                {
+                case D3D11_MESSAGE_SEVERITY_CORRUPTION:
+                    if (D3D_CORRUPTION == mExceptionsErrorLevel)
+                    {
+                        res = true;
+                    }
+                    break;
+                case D3D11_MESSAGE_SEVERITY_ERROR:
+                    switch(mExceptionsErrorLevel)
+                    {
+                    case D3D_INFO:
+                    case D3D_WARNING:
+                    case D3D_ERROR:
+                        res = true;
+                    }
+                    break;
+                case D3D11_MESSAGE_SEVERITY_WARNING:
+                    switch(mExceptionsErrorLevel)
+                    {
+                    case D3D_INFO:
+                    case D3D_WARNING:
+                        res = true;
+                    }
+                    break;
+                }
+
+                free(pMessage);
+                if (res)
+                {
+                    // we don't need to loop anymore...
+                    return true;
+                }
+
+            }
+
+            clearStoredErrorMessages();
+
+            return false;
+
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    const void D3D11Device::clearStoredErrorMessages() const
+    {
+        if (mD3D11Device && D3D_NO_EXCEPTION != mExceptionsErrorLevel)
+        {
+            if (mInfoQueue != NULL)
+            {
+                mInfoQueue->ClearStoredMessages();
+            }
+        }
+    }
+
 	//---------------------------------------------------------------------
 }

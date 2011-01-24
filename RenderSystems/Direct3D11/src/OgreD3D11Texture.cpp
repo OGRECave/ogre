@@ -128,9 +128,15 @@ namespace Ogre
 
 	}
 	//---------------------------------------------------------------------
+	void D3D11Texture::freeInternalResources(void)
+	{
+		freeInternalResourcesImpl();
+	}
+	//---------------------------------------------------------------------
 	void D3D11Texture::freeInternalResourcesImpl()
 	{
 		SAFE_RELEASE(mpTex);
+        SAFE_RELEASE(mpShaderResourceView);
 		SAFE_RELEASE(mp1DTex);
 		SAFE_RELEASE(mp2DTex);
 		SAFE_RELEASE(mp3DTex);
@@ -407,8 +413,6 @@ namespace Ogre
 			mNumRequestedMipmaps -= 2;
 			desc.MipLevels -= 2;
 		}
-
-
 
 
 		// create the texture
