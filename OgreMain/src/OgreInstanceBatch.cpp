@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreInstancedEntity.h"
 #include "OgreSceneNode.h"
 #include "OgreCamera.h"
+#include "OgreLodStrategy.h"
 #include "OgreException.h"
 
 namespace Ogre
@@ -51,6 +52,7 @@ namespace Ogre
 				m_boundsDirty( false ),
 				m_boundsUpdated( false ),
 				m_currentCamera( 0 ),
+				m_materialLodIndex( 0 ),
 				m_technSupportsSkeletal( true ),
 				mCachedCamera( 0 )
 	{
@@ -391,6 +393,30 @@ namespace Ogre
 		//Clear the camera cache
 		mCachedCamera = 0;
 
+		//Now calculate Material LOD
+        const LodStrategy *materialStrategy = m_material->getLodStrategy();
+        
+        //Calculate lod value for given strategy
+        Real lodValue =  materialStrategy->getValue( this, cam );
+
+        //Get the index at this depth
+        unsigned short idx = m_material->getLodIndex( lodValue );
+
+		//TODO: Replace subEntity for MovableObject
+        // Construct event object
+        /*EntityMaterialLodChangedEvent subEntEvt;
+        subEntEvt.subEntity = this;
+        subEntEvt.camera = cam;
+        subEntEvt.lodValue = lodValue;
+        subEntEvt.previousLodIndex = m_materialLodIndex;
+        subEntEvt.newLodIndex = idx;
+
+        //Notify lod event listeners
+        cam->getSceneManager()->_notifyEntityMaterialLodChanged(subEntEvt);*/
+
+        //Change lod index
+        m_materialLodIndex = idx;
+
 		MovableObject::_notifyCurrentCamera( cam );
 	}
 	//-----------------------------------------------------------------------
@@ -426,6 +452,11 @@ namespace Ogre
 	const LightList& InstanceBatch::getLights( void ) const
 	{
 		return queryLights();
+	}
+	//-----------------------------------------------------------------------
+	Technique* InstanceBatch::getTechnique( void ) const
+	{
+		return m_material->getBestTechnique( m_materialLodIndex, this );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )

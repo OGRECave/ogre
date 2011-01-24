@@ -113,6 +113,8 @@ namespace Ogre
 		bool				m_boundsUpdated; //Set to false by derived classes that need it
 		Camera				*m_currentCamera;
 
+		unsigned short		m_materialLodIndex;
+
 		bool				m_dirtyAnimation; //Set to false at start of each _updateRenderQueue
 
 		//False if a technique doesn't support skeletal animation
@@ -292,6 +294,7 @@ namespace Ogre
 
 		Real getSquaredViewDepth( const Camera* cam ) const;
         const LightList& getLights( void ) const;
+		Technique* getTechnique(void) const;
 
 		//MovableObject overloads
 		const String& getMovableType(void) const;
