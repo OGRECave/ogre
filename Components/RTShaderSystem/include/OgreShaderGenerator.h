@@ -545,7 +545,6 @@ protected:
 
 		/** Destroy the passes entries. */
 		void				destroySGPasses			();
-
 		
 	protected:
 		SGMaterial*				mParent;					// Parent material.		
@@ -555,7 +554,7 @@ protected:
 		RenderStateList			mCustomRenderStates;		// The custom render states of all passes.
 		bool					mBuildDstTechnique;			// Flag that tells if destination technique should be build.		
 		String					mDstTechniqueSchemeName;	// Scheme name of destination technique.
-	};
+    };
 
 	
 	/** Shader generator material wrapper class. */
@@ -863,6 +862,8 @@ protected:
 	*/
 	SchemeCreateOrRetrieveResult createOrRetrieveScheme(const String& schemeName);
 
+    /** Used to check if finalizing */
+    bool getIsFinalizing() const;
 protected:	
 	OGRE_AUTO_MUTEX													// Auto mutex.
 	SceneManager*					mActiveSceneMgr;				// The active scene manager.
@@ -891,6 +892,7 @@ protected:
 	int								mLightCount[3];					// Light count per light type.
 	VSOutputCompactPolicy			mVSOutputCompactPolicy;			// Vertex shader outputs compact policy.
 	bool							mCreateShaderOverProgrammablePass; // Tells whether shaders are created for passes with shaders
+    bool                            mIsFinalizing;                  // a flag to indicate finalizing
 private:
 	friend class SGPass;
 	friend class FFPRenderStateBuilder;

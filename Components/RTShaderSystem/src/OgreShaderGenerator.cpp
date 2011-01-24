@@ -87,6 +87,7 @@ ShaderGenerator::ShaderGenerator()
 	mLightCount[2]				= 0;
 	mVSOutputCompactPolicy		= VSOCP_LOW;
 	mCreateShaderOverProgrammablePass = false;
+    mIsFinalizing = false;
 
 
 	mShaderLanguage = "";
@@ -235,6 +236,7 @@ void ShaderGenerator::_finalize()
 {
 	OGRE_LOCK_AUTO_MUTEX
 	
+    mIsFinalizing = true;
 	
 	// Delete technique entries.
 	for (SGTechniqueMapIterator itTech = mTechniqueEntriesMap.begin(); itTech != mTechniqueEntriesMap.end(); ++itTech)
@@ -1317,6 +1319,14 @@ ShaderGenerator::SGMaterialConstIterator ShaderGenerator::findMaterialEntryIt(co
 	}
 	return itMatEntry;
 }
+
+//-----------------------------------------------------------------------------
+
+bool ShaderGenerator::getIsFinalizing() const
+{
+    return mIsFinalizing;
+}
+
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGPass::SGPass(SGTechnique* parent, Pass* srcPass, Pass* dstPass)
 {
@@ -1497,8 +1507,12 @@ ShaderGenerator::SGTechnique::~SGTechnique()
 				// Remove the generated technique in order to restore the material to its original state.
 				mat->removeTechnique(i);
 
-				// Make sure the material goes back to its original state.
-				mat->touch();
+                // touch when finalizing - will reload the textures - so no touch if finalizing
+                if (ShaderGenerator::getSingleton().getIsFinalizing() == false)
+                {
+                    // Make sure the material goes back to its original state.
+                    mat->touch();
+                }
 				break;
 			}		
 		}
