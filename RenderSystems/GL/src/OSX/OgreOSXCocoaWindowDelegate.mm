@@ -35,40 +35,50 @@ using namespace Ogre;
 
 @implementation OSXCocoaWindowDelegate
 
-@synthesize ogreWindow;
 
-- (id)init
+-(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(RenderWindow*)ogrewin
 {
     if ((self = [super init]))
     {
+		window = nswin;
+		ogreWindow = ogrewin;
+		
         // Register ourselves for several window event notifications
+		// Note that
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowDidResize:)
-                                                     name:@"NSWindowDidResizeNotification" object:nil];
+                                                     name:@"NSWindowDidResizeNotification" 
+												   object:window];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowWillMove:)
-                                                     name:@"NSWindowWillMoveNotification" object:nil];
+                                                     name:@"NSWindowWillMoveNotification"
+												   object:window];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowWillClose:)
-                                                     name:@"NSWindowWillCloseNotification" object:nil];
+                                                     name:@"NSWindowWillCloseNotification"
+												   object:window];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowDidBecomeKey:)
-                                                     name:@"NSWindowDidBecomeKeyNotification" object:nil];
+                                                     name:@"NSWindowDidBecomeKeyNotification" 
+												   object:window];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowDidResignKey:)
-                                                     name:@"NSWindowDidResignKeyNotification" object:nil];
+                                                     name:@"NSWindowDidResignKeyNotification"
+												   object:window];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowDidMiniaturize:)
-                                                     name:@"NSWindowDidMiniaturizeNotification" object:nil];
+                                                     name:@"NSWindowDidMiniaturizeNotification" 
+												   object:window];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowDidDeminiaturize:)
-                                                     name:@"NSWindowDidDeminiaturizeNotification" object:nil];
+                                                     name:@"NSWindowDidDeminiaturizeNotification" 
+												   object:window];
     }
     return self;
 }
@@ -82,16 +92,17 @@ using namespace Ogre;
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-    // Update the Ogre window
-    OSXCocoaWindow * curWindow = static_cast<OSXCocoaWindow *>(ogreWindow);
-    WindowEventUtilities::WindowEventListeners::iterator
-        start = WindowEventUtilities::_msListeners.lower_bound(curWindow),
-        end = WindowEventUtilities::_msListeners.upper_bound(curWindow);
-
-    curWindow->windowMovedOrResized();
-
-    for( ; start != end; ++start )
-        (start->second)->windowResized(curWindow);
+	// Update the Ogre window
+	OSXCocoaWindow * curWindow = static_cast<OSXCocoaWindow *>(ogreWindow);
+	WindowEventUtilities::WindowEventListeners::iterator
+	start = WindowEventUtilities::_msListeners.lower_bound(curWindow),
+	end = WindowEventUtilities::_msListeners.upper_bound(curWindow);
+	
+	curWindow->windowMovedOrResized();
+	
+	for( ; start != end; ++start )
+		(start->second)->windowResized(curWindow);
+		
 }
 
 - (void)windowWillMove:(NSNotification *)notification

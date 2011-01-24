@@ -38,11 +38,8 @@ THE SOFTWARE.
 namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mCGLContext(NULL),
-        mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
+        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""), mUseNSView(false)
     {
-        // Create the window delegate instance to handle window resizing and other window events
-        mWindowDelegate = [[OSXCocoaWindowDelegate alloc] init];
-        [mWindowDelegate setOgreWindow:this];
     }
 
     OSXCocoaWindow::~OSXCocoaWindow()
@@ -272,6 +269,9 @@ namespace Ogre {
         mColourDepth = depth;
         mFSAA = fsaa_samples;
         mIsFullScreen = fullScreen;
+		
+		// Create the window delegate instance to handle window resizing and other window events
+        mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
 
         [pool drain];
     }
