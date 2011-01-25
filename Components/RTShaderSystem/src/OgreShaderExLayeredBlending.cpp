@@ -45,35 +45,35 @@ String LayeredBlending::Type = "LayeredBlendRTSSEx";
     };
 
 const BlendModeDescription _blendModes[(int)LayeredBlending::LB_MaxBlendModes] = {
- 	{ LayeredBlending::LB_FFPBlend ,"blend_default", ""},
-	{ LayeredBlending::LB_BlendNormal ,"blend_normal", "SGX_blend_normal"},
-	{ LayeredBlending::LB_BlendLighten,"blend_lighten", "SGX_blend_lighten"},
-	{ LayeredBlending::LB_BlendDarken ,"blend_darken", "SGX_blend_darken"},
-	{ LayeredBlending::LB_BlendMultiply ,"blend_multiply", "SGX_blend_multiply"},
-	{ LayeredBlending::LB_BlendAverage ,"blend_average", "SGX_blend_average"},
-	{ LayeredBlending::LB_BlendAdd ,"blend_add", "SGX_blend_add"},
-	{ LayeredBlending::LB_BlendSubtract ,"blend_subtract", "SGX_blend_subtract"},
-	{ LayeredBlending::LB_BlendDifference ,"blend_difference", "SGX_blend_difference"},
-	{ LayeredBlending::LB_BlendNegation ,"blend_negation", "SGX_blend_negation"},
-	{ LayeredBlending::LB_BlendExclusion ,"blend_exclusion", "SGX_blend_exclusion"},
-	{ LayeredBlending::LB_BlendScreen ,"blend_screen", "SGX_blend_screen"},
-	{ LayeredBlending::LB_BlendOverlay ,"blend_overlay", "SGX_blend_overlay"},
-	{ LayeredBlending::LB_BlendHardLight ,"blend_hardLight", "SGX_blend_hardLight"},
-	{ LayeredBlending::LB_BlendSoftLight ,"blend_softLight", "SGX_blend_softLight"},
-	{ LayeredBlending::LB_BlendColorDodge ,"blend_colorDodge", "SGX_blend_colorDodge"},
-	{ LayeredBlending::LB_BlendColorBurn ,"blend_colorBurn", "SGX_blend_colorBurn"},
-	{ LayeredBlending::LB_BlendLinearDodge ,"blend_linearDodge", "SGX_blend_linearDodge"},
-	{ LayeredBlending::LB_BlendLinearBurn ,"blend_linearBurn", "SGX_blend_linearBurn"},
-	{ LayeredBlending::LB_BlendLinearLight ,"blend_linearLight", "SGX_blend_linearLight"},
-	{ LayeredBlending::LB_BlendVividLight ,"blend_vividLight", "SGX_blend_vividLight"},
-	{ LayeredBlending::LB_BlendPinLight ,"blend_pinLight", "SGX_blend_pinLight"},
-	{ LayeredBlending::LB_BlendHardMix ,"blend_hardMix", "SGX_blend_hardMix"},
-	{ LayeredBlending::LB_BlendReflect ,"blend_reflect", "SGX_blend_reflect"},
-	{ LayeredBlending::LB_BlendGlow ,"blend_glow", "SGX_blend_glow"},
-	{ LayeredBlending::LB_BlendPhoenix ,"blend_phoenix", "SGX_blend_phoenix"},
-	{ LayeredBlending::LB_BlendSaturation ,"blend_saturation", "SGX_blend_saturation"},
-	{ LayeredBlending::LB_BlendColor ,"blend_color", "SGX_blend_color"},
-	{ LayeredBlending::LB_BlendLuminosity, "blend_luminosity", "SGX_blend_luminosity"}
+ 	{ LayeredBlending::LB_FFPBlend ,"default", ""},
+	{ LayeredBlending::LB_BlendNormal ,"normal", "SGX_blend_normal"},
+	{ LayeredBlending::LB_BlendLighten,"lighten", "SGX_blend_lighten"},
+	{ LayeredBlending::LB_BlendDarken ,"darken", "SGX_blend_darken"},
+	{ LayeredBlending::LB_BlendMultiply ,"multiply", "SGX_blend_multiply"},
+	{ LayeredBlending::LB_BlendAverage ,"average", "SGX_blend_average"},
+	{ LayeredBlending::LB_BlendAdd ,"add", "SGX_blend_add"},
+	{ LayeredBlending::LB_BlendSubtract ,"subtract", "SGX_blend_subtract"},
+	{ LayeredBlending::LB_BlendDifference ,"difference", "SGX_blend_difference"},
+	{ LayeredBlending::LB_BlendNegation ,"negation", "SGX_blend_negation"},
+	{ LayeredBlending::LB_BlendExclusion ,"exclusion", "SGX_blend_exclusion"},
+	{ LayeredBlending::LB_BlendScreen ,"screen", "SGX_blend_screen"},
+	{ LayeredBlending::LB_BlendOverlay ,"overlay", "SGX_blend_overlay"},
+	{ LayeredBlending::LB_BlendHardLight ,"hard_light", "SGX_blend_hardLight"},
+	{ LayeredBlending::LB_BlendSoftLight ,"soft_light", "SGX_blend_softLight"},
+	{ LayeredBlending::LB_BlendColorDodge ,"color_dodge", "SGX_blend_colorDodge"},
+	{ LayeredBlending::LB_BlendColorBurn ,"color_burn", "SGX_blend_colorBurn"},
+	{ LayeredBlending::LB_BlendLinearDodge ,"linear_dodge", "SGX_blend_linearDodge"},
+	{ LayeredBlending::LB_BlendLinearBurn ,"linear_burn", "SGX_blend_linearBurn"},
+	{ LayeredBlending::LB_BlendLinearLight ,"linear_light", "SGX_blend_linearLight"},
+	{ LayeredBlending::LB_BlendVividLight ,"vivid_light", "SGX_blend_vividLight"},
+	{ LayeredBlending::LB_BlendPinLight ,"pin_light", "SGX_blend_pinLight"},
+	{ LayeredBlending::LB_BlendHardMix ,"hard_mix", "SGX_blend_hardMix"},
+	{ LayeredBlending::LB_BlendReflect ,"reflect", "SGX_blend_reflect"},
+	{ LayeredBlending::LB_BlendGlow ,"glow", "SGX_blend_glow"},
+	{ LayeredBlending::LB_BlendPhoenix ,"phoenix", "SGX_blend_phoenix"},
+	{ LayeredBlending::LB_BlendSaturation ,"saturation", "SGX_blend_saturation"},
+	{ LayeredBlending::LB_BlendColor ,"color", "SGX_blend_color"},
+	{ LayeredBlending::LB_BlendLuminosity, "luminosity", "SGX_blend_luminosity"}
 	};
 		
 
@@ -334,13 +334,13 @@ SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
 		if (blendMode == LayeredBlending::LB_Invalid)
 		{
 			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-				"Expected one of the following blend modes: blend_default, blend_normal, " \
-				"blend_lighten, blend_darken, blend_multiply, blend_average, blend_add, " \
-				"blend_subtract, blend_difference, blend_negation, blend_exclusion, " \
-				"blend_screen, blend_overlay, blend_hardLight, blend_softLight, " \
-				"blend_colorDodge, blend_colorBurn, blend_linearDodge, blend_linearBurn, " \
-				"blend_linearLight, blend_vividLight, blend_pinLight, blend_hardMix, " \
-				"blend_reflect, blend_glow, blend_phoenix, blend_saturation, blend_color, blend_luminosity");
+				"Expected one of the following blend modes: default, normal, " \
+				"lighten, darken, multiply, average, add, " \
+				"subtract, difference, negation, exclusion, " \
+				"screen, overlay, hard_light, soft_light, " \
+				"color_dodge, color_burn, linear_dodge, linear_burn, " \
+				"linear_light, vivid_light, pin_light, hard_mix, " \
+				"reflect, glow, phoenix, saturation, color and luminosity");
 			return NULL;
 		}
 
@@ -407,6 +407,8 @@ SubRenderState*	LayeredBlendingFactory::createInstance(ScriptCompiler* compiler,
 		//update the layer sub render state
 		unsigned short texIndex = texState->getParent()->getTextureUnitStateIndex(texState);
 		layeredBlendState->setSourceModifier(texIndex, modType, customNum);
+
+		return layeredBlendState;
 			
 	}
 	
