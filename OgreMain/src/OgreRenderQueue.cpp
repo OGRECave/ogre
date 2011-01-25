@@ -298,29 +298,29 @@ namespace Ogre {
 		bool onlyShadowCasters, 
 		VisibleObjectsBoundsInfo* visibleBounds)
 	{
-		bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
-			&& mo->getReceivesShadows();
-
 		mo->_notifyCurrentCamera(cam);
-		if ( mo->isVisible() &&
-			(!onlyShadowCasters || mo->getCastShadows()))
+		if (mo->isVisible())
 		{
-			mo -> _updateRenderQueue( this );
+			bool receiveShadows = getQueueGroup(mo->getRenderQueueGroup())->getShadowsEnabled()
+				&& mo->getReceivesShadows();
 
-			if (visibleBounds)
+			if (!onlyShadowCasters || mo->getCastShadows())
 			{
-				visibleBounds->merge(mo->getWorldBoundingBox(true), 
-					mo->getWorldBoundingSphere(true), cam, 
-					receiveShadows);
+				mo -> _updateRenderQueue( this );
+				if (visibleBounds)
+				{
+					visibleBounds->merge(mo->getWorldBoundingBox(true), 
+						mo->getWorldBoundingSphere(true), cam, 
+						receiveShadows);
+				}
 			}
-		}
-		// not shadow caster, receiver only?
-		else if (mo->isVisible() &&
-			onlyShadowCasters && !mo->getCastShadows() && 
-			receiveShadows)
-		{
-			visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
-				mo->getWorldBoundingSphere(true), cam);
+			// not shadow caster, receiver only?
+			else if (onlyShadowCasters && !mo->getCastShadows() && 
+				receiveShadows)
+			{
+				visibleBounds->mergeNonRenderedButInFrustum(mo->getWorldBoundingBox(true), 
+					mo->getWorldBoundingSphere(true), cam);
+			}
 		}
 
 	}
