@@ -55,6 +55,14 @@ namespace Ogre {
         {
             *static_cast<GLFrameBufferObject **>(pData) = &mFB;
         }
+		else if (name == "GL_FBOID")
+		{
+            *static_cast<GLuint*>(pData) = mFB.getGLFBOID();
+		}
+		else if (name == "GL_MULTISAMPLEFBOID")
+		{
+            *static_cast<GLuint*>(pData) = mFB.getGLMultisampleFBOID();
+		}
     }
 
 	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
