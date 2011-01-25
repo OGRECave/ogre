@@ -30,8 +30,18 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreEntity.h"
+#include "OgreSubEntity.h"
+#include "OgreMaterial.h"
+#include "OgreSubMesh.h"
+#include "OgreShaderGenerator.h"
+
+#define HS_DATA_BIND_NAME "HS_SRS_DATA"
+
 
 namespace Ogre {
+template<> RTShader::HardwareSkinningFactory* Singleton<RTShader::HardwareSkinningFactory>::ms_Singleton = 0;
+
 namespace RTShader {
 
 /************************************************************************/
@@ -42,7 +52,6 @@ String HardwareSkinning::Type = "SGX_HardwareSkinning";
 HardwareSkinning::HardwareSkinning() :
 	mBoneCount(0),
 	mWeightCount(0),
-	mAllowStateChange(false),
 	mDoBoneCalculations(false),
 	mCreator(NULL)
 {
@@ -83,12 +92,21 @@ ushort HardwareSkinning::getWeightCount()
 //-----------------------------------------------------------------------
 bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	mDoBoneCalculations =  
+	bool isValid = true;
+	Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);
+	const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
+	if (hsAny.isEmpty() == false)
+	{
+		HardwareSkinning::SkinningData pData = 
+			(any_cast<HardwareSkinning::SkinningData>(hsAny));
+		isValid = pData.isValid;
+		mBoneCount = pData.maxBoneCount;
+		mWeightCount = pData.maxWeightCount;
+	}
+	mDoBoneCalculations =  isValid &&
 		(mBoneCount != 0) && (mBoneCount <= 256) &&
 		(mWeightCount != 0) && (mWeightCount <= 4) &&
-		((mAllowStateChange == true) ||
-		((srcPass->hasVertexProgram() == true) &&
-		(srcPass->getVertexProgram()->isSkeletalAnimationIncluded() == true)));
+		((mCreator == NULL) || (mBoneCount <= mCreator->getMaxCalculableBoneCount()));
 
 	if ((mDoBoneCalculations) && (mCreator))
 	{
@@ -116,7 +134,11 @@ bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	Function* vsMain = vsProgram->getEntryPointFunction();
 
-	vsProgram->setSkeletalAnimationIncluded(true);
+	//if needed mark this vertex program as hardware skinned
+	if (mDoBoneCalculations == true)
+	{
+		vsProgram->setSkeletalAnimationIncluded(true);
+	}
 	
 	//
 	// get the parameters we need whether we are doing bone calculations or not
@@ -414,9 +436,23 @@ void HardwareSkinning::copyFrom(const SubRenderState& rhs)
 	const HardwareSkinning& hardSkin = static_cast<const HardwareSkinning&>(rhs);
 	mWeightCount = hardSkin.mWeightCount;
 	mBoneCount = hardSkin.mBoneCount;
-	mAllowStateChange = hardSkin.mAllowStateChange;
 	mDoBoneCalculations = hardSkin.mDoBoneCalculations;
 	mCreator = hardSkin.mCreator;
+}
+
+//-----------------------------------------------------------------------
+void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data)
+{
+	o << data.isValid;
+	o << data.maxBoneCount;
+	o << data.maxWeightCount;
+}
+
+//-----------------------------------------------------------------------
+HardwareSkinningFactory::HardwareSkinningFactory() :
+	mMaxCalculableBoneCount(70)
+{
+
 }
 
 //-----------------------------------------------------------------------
@@ -458,10 +494,6 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
 			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount);
 			
-			//hardware skinning was specificaly asked for in the material
-			//so allow for change no matter what
-			hardSkinSrs->setAllowSkinningStateChange(true);
-
 			return subRenderState;
 		}
 
@@ -524,7 +556,133 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(usho
 }
 
 
+//-----------------------------------------------------------------------
+void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity)
+{
+	if (pEntity != NULL) 
+	{
+		size_t lodLevels = pEntity->getNumManualLodLevels() + 1;
+		for(size_t indexLod = 0 ; indexLod < lodLevels ; ++indexLod)
+		{
+			const Entity* pCurEntity = pEntity;
+			if (indexLod > 0) pCurEntity = pEntity->getManualLodLevel(indexLod - 1);
+
+			ushort boneCount = 0,weightCount = 0;
+			bool isValid = extractSkeletonData(pCurEntity,boneCount,weightCount);
+			unsigned int numSubEntities = pCurEntity->getNumSubEntities();
+			for(unsigned int indexSub = 0 ; indexSub < numSubEntities ; ++indexSub)
+			{
+				SubEntity* pSubEntity = pCurEntity->getSubEntity(indexSub);
+				const MaterialPtr& pMat = pSubEntity->getMaterial();
+				imprintSkeletonData(pMat, isValid, boneCount, weightCount);
+			}
+		}
+	}
+}
+
+//-----------------------------------------------------------------------
+bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort& boneCount,
+												  ushort& weightCount)
+{
+	bool isValidData = false;
+	boneCount = 0;
+	weightCount = 0;
+
+	//gather data on the skeleton
+	if (pEntity->hasSkeleton() == true)
+	{
+		//get weights count
+		MeshPtr pMesh = pEntity->getMesh();
+		boneCount = pMesh->sharedBlendIndexToBoneIndexMap.size();
+
+		short totalMeshes = pMesh->getNumSubMeshes();
+		for(short i = 0 ; i < totalMeshes ; ++i)
+		{
+			RenderOperation ro;
+			SubMesh* pSubMesh = pMesh->getSubMesh(i);
+			pSubMesh->_getRenderOperation(ro,0);
+
+			//get the largest bone assignment
+			boneCount = std::max<ushort>(boneCount, pSubMesh->blendIndexToBoneIndexMap.size());
+			
+			//go over vertex deceleration 
+			//check that they have blend indices and blend weights
+			const VertexElement* pDeclWeights = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS,0);
+			const VertexElement* pDeclIndexes = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES,0);
+			if ((pDeclWeights != NULL) && (pDeclWeights != NULL))
+			{
+				isValidData = true;
+				switch (pDeclWeights->getType())
+				{
+				case VET_FLOAT1: weightCount = std::max<ushort>(weightCount, 1); break;
+				case VET_FLOAT2: weightCount = std::max<ushort>(weightCount, 2); break;
+				case VET_FLOAT3: weightCount = std::max<ushort>(weightCount, 3); break;
+				case VET_FLOAT4: weightCount = std::max<ushort>(weightCount, 4); break;
+				default: isValidData = false; 
+				}
+				if (isValidData == false)
+				{
+					break;
+				}
+			}
+		}
+	}
+	return isValidData;
+}
+
+//-----------------------------------------------------------------------
+bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, bool isVaild, 
+												  ushort boneCount, ushort weightCount)
+{
+	bool isUpdated = false;
+	if (pMaterial->getNumTechniques() > 0) 
+	{
+		HardwareSkinning::SkinningData data;
+
+		//get the previous skinning data if available
+		UserObjectBindings& binding = pMaterial->getTechnique(0)->getUserObjectBindings();
+		const Any& hsAny = binding.getUserAny(HS_DATA_BIND_NAME);
+		if (hsAny.isEmpty() == false)
+		{
+			data = (any_cast<HardwareSkinning::SkinningData>(hsAny));
+		}
+
+		//check if we need to update the data
+		if (((data.isValid == true) && (isVaild == false)) ||
+			(data.maxBoneCount < boneCount) ||
+			(data.maxWeightCount < weightCount))
+		{
+			//update the data
+			isUpdated = true;
+			data.isValid &= isVaild;
+			data.maxBoneCount = std::max<ushort>(data.maxBoneCount, boneCount);
+			data.maxWeightCount = std::max<ushort>(data.maxWeightCount, weightCount);
+
+			//update the data in the material and invalidate it in the RTShader system
+			//do it will be regenerated
+			binding.setUserAny(HS_DATA_BIND_NAME, Any(data));
+
+			size_t schemeCount = ShaderGenerator::getSingleton().getRTShaderSchemeCount();
+			for(size_t i = 0 ; i < schemeCount ; ++i)
+			{
+				//invalidate the material so it will be recreated with the correct
+				//amount of bones and weights
+				const String& schemeName = ShaderGenerator::getSingleton().getRTShaderScheme(i);
+				ShaderGenerator::getSingleton().invalidateMaterial(
+					schemeName,	pMaterial->getName(), pMaterial->getGroup());
+
+			}
+
+		}
+	}
+	return isUpdated;
+
+}
+
+
 }
 }
 
 #endif
+
+

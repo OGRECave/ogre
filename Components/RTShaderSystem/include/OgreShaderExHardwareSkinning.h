@@ -53,6 +53,17 @@ the points and normals by thier assigned bone matricies.
 */
 class _OgreRTSSExport HardwareSkinning : public SubRenderState
 {
+public:
+	struct SkinningData
+	{
+		SkinningData() : 
+			isValid(true), maxBoneCount(0), maxWeightCount(0)
+		{}
+
+		bool isValid;
+		ushort maxBoneCount;
+		ushort maxWeightCount;
+	};
 
 // Interface.
 public:
@@ -102,26 +113,6 @@ public:
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
-	
-	/**
-	Sets whether skinning will be enabled for materials not containing hardware
-	skinning in their original material.
-	@note 
-	This value is by default false. However the value is automaticly changed
-	to true if the render state was created as a result of material script
-	parsing.
-	*/
-	void setAllowSkinningStateChange(bool value) { mAllowStateChange = value; }
-	
-
-	/**
-	Returns whether skinning will be enabled for materials not containing hardware
-	skinning in their original material.
-	@see setAllowSkinningStateChange
-	*/
-	bool getAllowSkinningStateChange() const {	return mAllowStateChange; }
-	
 
 	/**
 	Set the factory which created this sub render state
@@ -176,8 +167,7 @@ protected:
 	
 	ushort mBoneCount;
 	ushort mWeightCount;
-	bool mAllowStateChange;
-
+	
 	bool mDoBoneCalculations;
 	
 	ParameterPtr mParamInPosition;
@@ -205,15 +195,18 @@ protected:
 
 };
 
+_OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
 
 /** 
 A factory that enables creation of HardwareSkinning instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport HardwareSkinningFactory : public SubRenderStateFactory
+class _OgreRTSSExport HardwareSkinningFactory : public SubRenderStateFactory, 
+	public Singleton<HardwareSkinningFactory>
 {
 public:
-
+	HardwareSkinningFactory();
+	
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
@@ -251,6 +244,67 @@ public:
 	*/
 	const MaterialPtr& getCustomShadowReceiverMaterial(ushort index) const;
 
+	/**
+		@brief
+			prepares an entity's material for use in the hardware skinning (HS).
+		
+		This function prepares an entity's material for use by the HS sub-render
+		state. This function scans the entity and extracts the information of the amount
+		of bones and weights in the entity. This function replaces the need specify in 
+		the material script the  amount of bones and weights needed to make the HS work.
+		
+		Note that this class does not save the the bone and weight count information 
+		internally. Rather this information is stored in the entity's materials as a 
+		user binded object.
+		
+		@param pEntity A pointer to an entity who's materials need preparing.
+	*/
+	void prepareEntityForSkinning(const Entity* pEntity);
+
+	/** 
+		@brief
+			The maximum number of bones for which hardware skinning is performed.
+
+		This number should be limited to avoid problems of using to many parameters
+		in a shader. For example, in pixel shader 3 this should be around 70-90 
+		dependent on other sub-render states in the shader.
+
+		The default value for this property is 70 which correspond to pixel shader model 3 limitations
+	*/
+	ushort getMaxCalculableBoneCount() const {
+		return mMaxCalculableBoneCount; }
+	/** 
+		Sets the maximum number of bones for which hardware skinning is performed.
+		@see getMaxCalculableBoneCount()
+	*/
+	void setMaxCalculableBoneCount(ushort count) {
+		mMaxCalculableBoneCount = count; }
+
+protected:
+	/** 
+		@brief
+			Extracts the maximum amount of bones and weights used in an entity.
+		
+		@param pEntity The entity from which the information needs to be extracted.
+		@param boneCount The maximum number of bones used by the entity.
+		@param weightCount The maximum number of weights used by the entity.
+		@return Returns true if the entity can use HS. False if not. 
+	*/
+	bool extractSkeletonData(const Entity* pEntity, ushort& boneCount,
+		ushort& weightCount);
+
+	/** 
+		@brief
+			Updates an entity's the skeleton data onto one of it's materials.
+		
+		@param pMaterial The material to update with the information.
+		@param isVaild Tells if the material can be used with HS.
+		@param boneCount The maximum number of bones used by the entity.
+		@param weightCount The maximum number of weights used by the entity.
+		@return Returns true if the data was updated on the material. False if not.
+	*/
+	bool imprintSkeletonData(const MaterialPtr& pMaterial, bool isVaild, 
+		ushort boneCount, ushort weightCount);
 
 protected:
 
@@ -263,6 +317,10 @@ protected:
 	MaterialPtr	mCustomShadowCasterMaterials[HS_MAX_WEIGHT_COUNT];
 	/// A set of custom shadow receiver materials
 	MaterialPtr	mCustomShadowReceiverMaterials[HS_MAX_WEIGHT_COUNT];
+
+	///The maximum number of bones for which hardware skinning is performed.
+	///@see getMaxCalculableBoneCount()
+	ushort mMaxCalculableBoneCount;
 };
 
 /** @} */
