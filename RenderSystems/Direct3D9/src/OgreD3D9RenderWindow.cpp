@@ -86,7 +86,9 @@ namespace Ogre
 		mUseNVPerfHUD = false;
 		size_t fsaaSamples = 0;
 		String fsaaHint;
+		bool enableDoubleClick = false;
 		int monitorIndex = -1;	//Default by detecting the adapter from left / top position
+		
 
 		if(miscParams)
 		{
@@ -171,6 +173,10 @@ namespace Ogre
 			opt = miscParams->find("show");
 			if(opt != miscParams->end())
 				mHidden = !StringConverter::parseBool(opt->second);
+			// enable double click messages
+			opt = miscParams->find("enableDoubleClick");
+			if(opt != miscParams->end())
+				enableDoubleClick = StringConverter::parseBool(opt->second);
 
 		}
 		mIsFullScreen = fullScreen;
@@ -315,10 +321,14 @@ namespace Ogre
 				}
 			}
 			
+			UINT classStyle = 0;
+			if (enableDoubleClick)
+				classStyle |= CS_DBLCLKS;
+
 
 			// Register the window class
 			// NB allow 4 bytes of window data for D3D9RenderWindow pointer
-			WNDCLASS wc = { 0, WindowEventUtilities::_WndProc, 0, 0, hInst,
+			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, "OgreD3D9Wnd" };
 			RegisterClass(&wc);

@@ -101,6 +101,7 @@ namespace Ogre
 		bool depthBuffer = true;
 		String border = "";
 		bool outerSize = false;
+		bool enableDoubleClick = false;
 		mUseNVPerfHUD = false;
 
 		if(miscParams)
@@ -177,6 +178,11 @@ namespace Ogre
 			opt = miscParams->find("gamma");
 			if(opt != miscParams->end())
 				mHwGamma = StringConverter::parseBool(opt->second);
+			// enable double click messages
+			opt = miscParams->find("enableDoubleClick");
+			if(opt != miscParams->end())
+				enableDoubleClick = StringConverter::parseBool(opt->second);
+
 
 
 		}
@@ -240,9 +246,13 @@ namespace Ogre
 				mTop = mLeft = 0;
 			}
 
+			UINT classStyle = 0;
+			if (enableDoubleClick)
+				classStyle |= CS_DBLCLKS;
+
 			// Register the window class
 			// NB allow 4 bytes of window data for D3D11RenderWindow pointer
-			WNDCLASS wc = { 0, WindowEventUtilities::_WndProc, 0, 0, hInst,
+			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
 				LoadIcon(0, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), 0, "OgreD3D11Wnd" };
 			RegisterClass(&wc);

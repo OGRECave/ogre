@@ -474,6 +474,14 @@ namespace Ogre
 			colour space on rendering to the window.</td>
 			<td>&nbsp;</td>
 		</tr>
+		<tr>
+			<td>enableDoubleClick</td>
+			<td>true, false</td>
+			<td>false</td>
+			<td>Enable the window to keep track and transmit double click messages.</td>
+			<td>Win32 Specific</td>
+		</tr>
+		
 		*/
 		virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
 			bool fullScreen, const NameValuePairList *miscParams = 0) = 0;

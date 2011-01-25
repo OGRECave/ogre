@@ -105,6 +105,7 @@ namespace Ogre {
 		String border;
 		bool outerSize = false;
 		bool hwGamma = false;
+		bool enableDoubleClick = false;
 		int monitorIndex = -1;
 		HMONITOR hMonitor = NULL;
 
@@ -201,7 +202,12 @@ namespace Ogre {
 			
 			// monitor handle
 			if ((opt = miscParams->find("monitorHandle")) != end)
-				hMonitor = (HMONITOR)StringConverter::parseInt(opt->second);			
+				hMonitor = (HMONITOR)StringConverter::parseInt(opt->second);
+
+			// enable double click messages
+			if ((opt = miscParams->find("enableDoubleClick")) != end)
+				enableDoubleClick = StringConverter::parseBool(opt->second);
+
 		}
 
 		if (!mIsExternal)
@@ -323,9 +329,13 @@ namespace Ogre {
 						mHeight = monitorInfoEx.rcWork.bottom - mTop;		
 				}			
 			}
+ 
+			UINT classStyle = CS_OWNDC;
+			if (enableDoubleClick)
+				classStyle |= CS_DBLCLKS;
 
 			// register class and create window
-			WNDCLASS wc = { CS_OWNDC, WindowEventUtilities::_WndProc, 0, 0, hInst,
+			WNDCLASS wc = { classStyle, WindowEventUtilities::_WndProc, 0, 0, hInst,
 				LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
 				(HBRUSH)GetStockObject(BLACK_BRUSH), NULL, "OgreGLWindow" };
 			RegisterClass(&wc);
