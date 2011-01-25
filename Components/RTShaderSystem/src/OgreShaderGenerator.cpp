@@ -45,6 +45,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+const String cBlankString;
+
 //-----------------------------------------------------------------------
 template<> 
 RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::ms_Singleton = 0;
@@ -677,7 +679,6 @@ bool ShaderGenerator::hasShaderBasedTechnique(const String& materialName,
 		{
 			// Check requested mapping already exists.
 			if ((*itTechEntry)->getSourceTechnique()->getSchemeName() == srcTechniqueSchemeName &&
-				(*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName &&
 				(*itTechEntry)->getDestinationTechniqueSchemeName() == dstTechniqueSchemeName)
 			{
 				return true;
@@ -884,6 +885,124 @@ bool ShaderGenerator::removeAllShaderBasedTechniques(const String& materialName,
 	OGRE_DELETE itMatEntry->second;
 	mMaterialEntriesMap.erase(itMatEntry);
 	
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName, 
+												 const String& srcGroupName, 
+												 const String& dstMaterialName, 
+												 const String& dstGroupName)
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	//
+	// Check that both source and destination material exist
+	//
+
+	// Make sure material exists.
+	MaterialPtr srcMat = MaterialManager::getSingleton().getByName(srcMaterialName, srcGroupName);
+	MaterialPtr dstMat = MaterialManager::getSingleton().getByName(dstMaterialName, dstGroupName);
+	if ((srcMat.isNull() == true) || (dstMat.isNull() == true) || (srcMat == dstMat))
+		return false;
+
+	// Update group name in case it is AUTODETECT_RESOURCE_GROUP_NAME
+	const String& trueSrcGroupName = srcMat->getGroup();
+	const String& trueDstGroupName = dstMat->getGroup();
+
+	// Case the requested material belongs to different group and it is not AUTODETECT_RESOURCE_GROUP_NAME.
+	if ((trueSrcGroupName != srcGroupName && srcGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME) ||
+		(trueSrcGroupName != dstGroupName && dstGroupName != ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME))
+	{
+		return false;
+	}
+
+	SGMaterialIterator itSrcMatEntry = findMaterialEntryIt(srcMaterialName, trueSrcGroupName);
+
+	//remove any techniques in the destination material so the new techniques may be copied
+	removeAllShaderBasedTechniques(dstMaterialName, trueDstGroupName);
+	
+	//
+	//remove any techniques from the destination material which have RTSS associated schemes from
+	//the source material. This code is performed in case the user performed a clone of a material
+	//which has already generated RTSS techniques in the source material.
+	//
+
+	//first gather the techniques to remove
+	set<unsigned short>::type schemesToRemove;
+	unsigned short techCount = srcMat->getNumTechniques();
+	for(unsigned short ti = 0 ; ti < techCount ; ++ti)
+	{
+		Technique* pSrcTech = srcMat->getTechnique(ti);
+		Pass* pSrcPass = pSrcTech->getNumPasses() > 0 ? pSrcTech->getPass(0) : NULL;
+		if (pSrcPass)
+		{
+			const Any& passUserData = pSrcPass->getUserObjectBindings().getUserAny(SGPass::UserKey);
+			if (!passUserData.isEmpty())	
+			{
+				schemesToRemove.insert(pSrcTech->_getSchemeIndex());
+			}
+		}
+	}
+	//remove the techniques from the destination material
+	techCount = dstMat->getNumTechniques();
+	for(unsigned short ti = techCount - 1 ; ti != (unsigned short)-1 ; --ti)
+	{
+		Technique* pDstTech = dstMat->getTechnique(ti);
+		if (schemesToRemove.find(pDstTech->_getSchemeIndex()) != schemesToRemove.end())
+		{
+			dstMat->removeTechnique(ti);
+		}
+	}
+	
+	//
+	// Clone the render states from source to destination
+	//
+
+	// Check if RTSS techniques exist in the source material 
+	if (itSrcMatEntry != mMaterialEntriesMap.end())
+	{
+		const SGTechniqueList& techniqueEntires = itSrcMatEntry->second->getTechniqueList();
+		SGTechniqueConstIterator itTechEntry = techniqueEntires.begin();
+
+		//Go over all rtss techniques in the source material
+		for (; itTechEntry != techniqueEntires.end(); ++itTechEntry)
+		{
+			String srcFromTechniqueScheme = (*itTechEntry)->getSourceTechnique()->getSchemeName();
+			String srcToTechniqueScheme = (*itTechEntry)->getDestinationTechniqueSchemeName();
+			
+			//for every technique in the source material create a shader based technique in the 
+			//destination material
+			if (createShaderBasedTechnique(dstMaterialName, trueDstGroupName, srcFromTechniqueScheme, srcToTechniqueScheme))
+			{
+				//check for custom render states in the source material
+				unsigned short passCount =  (*itTechEntry)->getSourceTechnique()->getNumPasses();
+				for(unsigned short pi = 0 ; pi < passCount ; ++pi)
+				{
+					if ((*itTechEntry)->hasRenderState(pi))
+					{
+						//copy the custom render state from the source material to the destination material
+						RenderState* srcRenderState = (*itTechEntry)->getRenderState(pi);
+						RenderState* dstRenderState = getRenderState(srcToTechniqueScheme, dstMaterialName, trueDstGroupName, pi);
+
+						const SubRenderStateList& srcSubRenderState = 
+							srcRenderState->getTemplateSubRenderStateList();
+
+						SubRenderStateList::const_iterator itSubState = srcSubRenderState.begin(),
+							itSubStateEnd = srcSubRenderState.end();
+						for(;itSubState != itSubStateEnd ; ++itSubState)
+						{
+							SubRenderState* srcSubState = *itSubState;
+							SubRenderState* dstSubState = createSubRenderState(srcSubState->getType());
+							(*dstSubState) = (*srcSubState);
+							dstRenderState->addTemplateSubRenderState(dstSubState);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -1319,6 +1438,29 @@ ShaderGenerator::SGMaterialConstIterator ShaderGenerator::findMaterialEntryIt(co
 	}
 	return itMatEntry;
 }
+//-----------------------------------------------------------------------------
+size_t ShaderGenerator::getRTShaderSchemeCount() const
+{
+	OGRE_LOCK_AUTO_MUTEX
+	return mSchemeEntriesMap.size();
+}
+//-----------------------------------------------------------------------------
+const String& ShaderGenerator::getRTShaderScheme(size_t index) const
+{
+	OGRE_LOCK_AUTO_MUTEX
+
+	SGSchemeMap::const_iterator it = mSchemeEntriesMap.begin();
+	while ((index != 0) && (it != mSchemeEntriesMap.end()))
+	{
+		--index;
+		++it;
+	}
+
+	assert((it != mSchemeEntriesMap.end()) && "Index out of bounds");
+	if (it != mSchemeEntriesMap.end())
+		return it->first;
+	else return cBlankString;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -1640,6 +1782,12 @@ RenderState* ShaderGenerator::SGTechnique::getRenderState(unsigned short passInd
 	
 	return renderState;
 }
+//-----------------------------------------------------------------------------
+bool ShaderGenerator::SGTechnique::hasRenderState(unsigned short passIndex)
+{
+	return (passIndex < mCustomRenderStates.size()) && (mCustomRenderStates[passIndex] != NULL);
+}
+
 
 //-----------------------------------------------------------------------------
 ShaderGenerator::SGScheme::SGScheme(const String& schemeName)

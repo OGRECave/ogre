@@ -312,6 +312,19 @@ public:
 	bool			removeAllShaderBasedTechniques	(const String& materialName, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
 
 	/** 
+	Clone all shader based techniques from one material to another.
+	This function can be used in conjunction with the Material::clone() function to copy 
+	both material properties and RTSS state from one material to another.
+	@param srcMaterialName The source material name.	
+	@param srcGroupName The source group name.	
+	@param dstMaterialName The destination material name.	
+	@param dstGroupName The destination group name.	
+	@return True if successful
+	*/
+	bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName, 
+		const String& srcGroupName,	const String& dstMaterialName, const String& dstGroupName);
+
+	/** 
 	Remove all shader based techniques that created by this shader generator.	
 	*/
 	void			removeAllShaderBasedTechniques	();
@@ -401,6 +414,15 @@ public:
 	@see setCreateShaderOverProgrammablePass().	
 	*/
 	bool							getCreateShaderOverProgrammablePass		() const { return mCreateShaderOverProgrammablePass; }
+
+
+	/** Returns the amount of schemes used in the for RT shader generation
+	*/
+	size_t							getRTShaderSchemeCount					() const;
+
+	/** Returns the scheme name used in the for RT shader generation by index
+	*/
+	const String&					getRTShaderScheme						(size_t index) const;
 
 	/// Default material scheme of the shader generator.
 	static String DEFAULT_SCHEME_NAME;
@@ -535,6 +557,8 @@ protected:
 		@param passIndex The pass index.
 		*/
 		RenderState*		getRenderState					(unsigned short passIndex);
+		/** Tells if a custom render state exists for the given pass. */
+		bool				hasRenderState					(unsigned short passIndex);
 
 		static String	UserKey;					// Key name for associating with a Technique instance.
 
