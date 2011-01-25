@@ -1114,12 +1114,19 @@ namespace Ogre
 				}
 			}
 
-			//Tell the RS we have a depth buffer we created it needs to add to the default pool
-			D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
-			DepthBuffer *depthBuf = renderSystem->_addManualDepthBuffer( mpDevice, renderWindowResources->depthBuffer );
+			if (renderWindowResources->depthBuffer)
+			{
+				//Tell the RS we have a depth buffer we created it needs to add to the default pool
+				D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+				DepthBuffer *depthBuf = renderSystem->_addManualDepthBuffer( mpDevice, renderWindowResources->depthBuffer );
 
-			//Don't forget we want this window to use _this_ depth buffer
-			renderWindow->attachDepthBuffer( depthBuf );
+				//Don't forget we want this window to use _this_ depth buffer
+				renderWindow->attachDepthBuffer( depthBuf );
+			}
+			else
+			{
+				LogManager::getSingleton().logMessage("D3D9 : WARNING - Depth buffer could not be acquired.");
+			}
 		}
 
 		renderWindowResources->acquired = true; 
