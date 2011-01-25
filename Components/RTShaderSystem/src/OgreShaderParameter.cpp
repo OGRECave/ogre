@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreVector2.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -59,8 +60,11 @@ namespace RTShader {
 		*/
 		virtual String toString () const
 		{
-			return	Ogre::StringConverter::toString(mValue.x) + "," + 
-				Ogre::StringConverter::toString(mValue.y);
+			const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
+			return	
+				((lang.empty() == false) && (lang[0] == 'g') ? String("vec2(") : String("float2(")) +
+				Ogre::StringConverter::toString(mValue.x) + "," + 
+				Ogre::StringConverter::toString(mValue.y) + ")";
 		}
 	};
 
@@ -83,9 +87,12 @@ namespace RTShader {
 		*/
 		virtual String toString () const
 		{
-			return	Ogre::StringConverter::toString(mValue.x) + "," + 
+			const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
+			return	
+				((lang.empty() == false) && (lang[0] == 'g') ? String("vec3(") : String("float3(")) +
+				Ogre::StringConverter::toString(mValue.x) + "," + 
 				Ogre::StringConverter::toString(mValue.y) + "," + 
-				Ogre::StringConverter::toString(mValue.z);
+				Ogre::StringConverter::toString(mValue.z) + ")";
 		}
 	};
 
@@ -108,10 +115,13 @@ namespace RTShader {
 		*/
 		virtual String toString () const
 		{
-			return	Ogre::StringConverter::toString(mValue.x) + "," + 
+			const String& lang = ShaderGenerator::getSingleton().getTargetLanguage();
+			return	
+				((lang.empty() == false) && (lang[0] == 'g') ? String("vec4(") : String("float4(")) +
+				Ogre::StringConverter::toString(mValue.x) + "," + 
 				Ogre::StringConverter::toString(mValue.y) + "," + 
 				Ogre::StringConverter::toString(mValue.z) + "," + 
-				Ogre::StringConverter::toString(mValue.w);
+				Ogre::StringConverter::toString(mValue.w) + ")";
 		}
 	};
 

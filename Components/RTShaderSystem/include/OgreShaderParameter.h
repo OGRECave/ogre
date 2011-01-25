@@ -496,6 +496,33 @@ public:
 		}
 	}
 
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const float *val, size_t count, size_t multiple = 4)  
+	{ 
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstants(mPhysicalIndex, val, count * multiple);
+		}
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const double *val, size_t count, size_t multiple = 4)  
+	{ 
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstants(mPhysicalIndex, val, count * multiple);
+		}
+	}
+
+	/** Update the GPU parameter with the given value. */	
+	void setGpuParameter(const int *val, size_t count, size_t multiple = 4)  
+	{ 
+		if (mParamsPtr != NULL)
+		{
+			mParamsPtr->_writeRawConstants(mPhysicalIndex, val, count * multiple);
+		}
+	}
+
 protected:
 	bool									mIsAutoConstantReal;	// Is it auto constant real based parameter.
 	bool									mIsAutoConstantInt;		// Is it auto constant int based parameter.
