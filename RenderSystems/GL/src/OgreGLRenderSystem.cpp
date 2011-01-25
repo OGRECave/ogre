@@ -2008,7 +2008,12 @@ namespace Ogre {
 	void GLRenderSystem::_setViewport(Viewport *vp)
 	{
 		// Check if viewport is different
-		if (vp != mActiveViewport || vp->_isUpdated())
+		if (!vp)
+		{
+			mActiveViewport = NULL;
+			_setRenderTarget(NULL);
+		}
+		else if (vp != mActiveViewport || vp->_isUpdated())
 		{
 			RenderTarget* target;
 			target = vp->getTarget();
@@ -3520,45 +3525,47 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			mRTTManager->unbind(mActiveRenderTarget);
 
 		mActiveRenderTarget = target;
-
-		// Switch context if different from current one
-		GLContext *newContext = 0;
-		target->getCustomAttribute("GLCONTEXT", &newContext);
-		if(newContext && mCurrentContext != newContext) 
+		if (target)
 		{
-			_switchContext(newContext);
+			// Switch context if different from current one
+			GLContext *newContext = 0;
+			target->getCustomAttribute("GLCONTEXT", &newContext);
+			if(newContext && mCurrentContext != newContext) 
+			{
+				_switchContext(newContext);
+			}
+
+			//Check the FBO's depth buffer status
+			GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(target->getDepthBuffer());
+
+			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+				(!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+			{
+				//Depth is automatically managed and there is no depth buffer attached to this RT
+				//or the Current context doesn't match the one this Depth buffer was created with
+				setDepthBufferFor( target );
+			}
+
+			// Bind frame buffer object
+			mRTTManager->bind(target);
+
+			if (GLEW_EXT_framebuffer_sRGB)
+			{
+				// Enable / disable sRGB states
+				if (target->isHardwareGammaEnabled())
+				{
+					glEnable(GL_FRAMEBUFFER_SRGB_EXT);
+					
+					// Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
+					// enabling, but GL spec says incapable surfaces ignore the setting
+					// anyway. We test the capability to enable isHardwareGammaEnabled.
+				}
+				else
+				{
+					glDisable(GL_FRAMEBUFFER_SRGB_EXT);
+				}
+			}
 		}
-
-		//Check the FBO's depth buffer status
-		GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(target->getDepthBuffer());
-
-		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-			(!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
-		{
-			//Depth is automatically managed and there is no depth buffer attached to this RT
-			//or the Current context doesn't match the one this Depth buffer was created with
-			setDepthBufferFor( target );
-		}
-
-		// Bind frame buffer object
-		mRTTManager->bind(target);
-
-		if (GLEW_EXT_framebuffer_sRGB)
-		{
-		// Enable / disable sRGB states
-		if (target->isHardwareGammaEnabled())
-		{
-			glEnable(GL_FRAMEBUFFER_SRGB_EXT);
-			
-			// Note: could test GL_FRAMEBUFFER_SRGB_CAPABLE_EXT here before
-			// enabling, but GL spec says incapable surfaces ignore the setting
-			// anyway. We test the capability to enable isHardwareGammaEnabled.
-		}
-		else
-		{
-			glDisable(GL_FRAMEBUFFER_SRGB_EXT);
-		}
-	}
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_unregisterContext(GLContext *context)

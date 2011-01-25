@@ -1587,7 +1587,12 @@ namespace Ogre {
     void GLESRenderSystem::_setViewport(Viewport *vp)
     {
 		// Check if viewport is different
-        if (vp != mActiveViewport || vp->_isUpdated())
+		if (!vp)
+		{
+			mActiveViewport = NULL;
+			_setRenderTarget(NULL);
+		}
+		else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
 
@@ -2706,28 +2711,30 @@ namespace Ogre {
             mRTTManager->unbind(mActiveRenderTarget);
 
         mActiveRenderTarget = target;
-
-		// Switch context if different from current one
-        GLESContext *newContext = 0;
-        target->getCustomAttribute("GLCONTEXT", &newContext);
-        if (newContext && mCurrentContext != newContext)
-        {
-            _switchContext(newContext);
-        }
-
-        // Check the FBO's depth buffer status
-		GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(target->getDepthBuffer());
-
-		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-			(!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+		if (target)
 		{
-			// Depth is automatically managed and there is no depth buffer attached to this RT
-			// or the Current context doesn't match the one this Depth buffer was created with
-			setDepthBufferFor( target );
-		}
+			// Switch context if different from current one
+			GLESContext *newContext = 0;
+			target->getCustomAttribute("GLCONTEXT", &newContext);
+			if (newContext && mCurrentContext != newContext)
+			{
+				_switchContext(newContext);
+			}
 
-		// Bind frame buffer object
-        mRTTManager->bind(target);
+			// Check the FBO's depth buffer status
+			GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(target->getDepthBuffer());
+
+			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+				(!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+			{
+				// Depth is automatically managed and there is no depth buffer attached to this RT
+				// or the Current context doesn't match the one this Depth buffer was created with
+				setDepthBufferFor( target );
+			}
+
+			// Bind frame buffer object
+			mRTTManager->bind(target);
+		}
     }
 
     void GLESRenderSystem::makeGLMatrix(GLfloat gl_matrix[16], const Matrix4& m)

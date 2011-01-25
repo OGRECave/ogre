@@ -1644,57 +1644,64 @@ namespace Ogre
 	void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
 	{
 		mActiveRenderTarget = target;
-		ID3D11RenderTargetView * pRTView = NULL;
-		target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
-
-		//Retrieve depth buffer
-		D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
-
-		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+		if (mActiveRenderTarget)
 		{
-			//Depth is automatically managed and there is no depth buffer attached to this RT
-			//or the Current D3D device doesn't match the one this Depth buffer was created
-			setDepthBufferFor( target );
+			ID3D11RenderTargetView * pRTView = NULL;
+			target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+			//Retrieve depth buffer
+			D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+			{
+				//Depth is automatically managed and there is no depth buffer attached to this RT
+				//or the Current D3D device doesn't match the one this Depth buffer was created
+				setDepthBufferFor( target );
+			}
+
+			//Retrieve depth buffer again (it may have changed)
+			depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
+
+
+			// we need to clear the state 
+			mDevice.GetImmediateContext()->ClearState();
+
+			if (mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription();
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"D3D11 device cannot Clear State\nError Description:" + errorDescription,
+					"D3D11RenderSystem::_setViewport");
+			}
+
+
+
+			// now switch to the new render target
+			mDevice.GetImmediateContext()->OMSetRenderTargets(1,
+				&pRTView,
+				depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
+
+
+			if (mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription();
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"D3D11 device cannot set render target\nError Description:" + errorDescription,
+					"D3D11RenderSystem::_setViewport");
+			}
 		}
-
-		//Retrieve depth buffer again (it may have changed)
-		depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
-
-
-		// we need to clear the state 
-		mDevice.GetImmediateContext()->ClearState();
-
-		if (mDevice.isError())
-		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot Clear State\nError Description:" + errorDescription,
-				"D3D11RenderSystem::_setViewport");
-		}
-
-
-
-		// now switch to the new render target
-		mDevice.GetImmediateContext()->OMSetRenderTargets(1,
-			&pRTView,
-			depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
-
-
-		if (mDevice.isError())
-		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set render target\nError Description:" + errorDescription,
-				"D3D11RenderSystem::_setViewport");
-		}
-
 		// TODO - support MRT
 
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setViewport( Viewport *vp )
 	{
-		if( vp != mActiveViewport || vp->_isUpdated() )
+		if (!vp)
+		{
+			mActiveViewport = NULL;
+			_setRenderTarget(NULL);
+		}
+		else if( vp != mActiveViewport || vp->_isUpdated() )
 		{
 			mActiveViewport = vp;
 			

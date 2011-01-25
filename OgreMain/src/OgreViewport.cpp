@@ -87,7 +87,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Viewport::~Viewport()
     {
-
+		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+		if ((rs) && (rs->_getViewport() == this))
+		{
+			rs->_setViewport(NULL);
+		}
     }
     //---------------------------------------------------------------------
     bool Viewport::_isUpdated(void) const

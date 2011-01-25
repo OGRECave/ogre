@@ -2959,72 +2959,79 @@ namespace Ogre
 	{
 		mActiveRenderTarget = target;
 
-		HRESULT hr;
-
-
-		// If this is called without going through RenderWindow::update, then 
-		// the device will not have been set. Calling it twice is safe, the 
-		// implementation ensures nothing happens if the same device is set twice
-		if (std::find(mRenderWindows.begin(), mRenderWindows.end(), target) != mRenderWindows.end())
+		if (mActiveRenderTarget)
 		{
-			D3D9RenderWindow *window = static_cast<D3D9RenderWindow*>(target);
-			mDeviceManager->setActiveRenderTargetDevice(window->getDevice());
-			// also make sure we validate the device; if this never went 
-			// through update() it won't be set
-			window->_validateDevice();
-		}
+			HRESULT hr;
 
-		// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
-		IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		memset(pBack, 0, sizeof(pBack));
-		target->getCustomAttribute( "DDBACKBUFFER", &pBack );
-		if (!pBack[0])
-			return;
+			// If this is called without going through RenderWindow::update, then 
+			// the device will not have been set. Calling it twice is safe, the 
+			// implementation ensures nothing happens if the same device is set twice
+			if (std::find(mRenderWindows.begin(), mRenderWindows.end(), target) != mRenderWindows.end())
+			{
+				D3D9RenderWindow *window = static_cast<D3D9RenderWindow*>(target);
+				mDeviceManager->setActiveRenderTargetDevice(window->getDevice());
+				// also make sure we validate the device; if this never went 
+				// through update() it won't be set
+				window->_validateDevice();
+			}
 
-		D3D9DepthBuffer *depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
+			// Retrieve render surfaces (up to OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+			IDirect3DSurface9* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+			memset(pBack, 0, sizeof(pBack));
+			target->getCustomAttribute( "DDBACKBUFFER", &pBack );
+			if (!pBack[0])
+				return;
 
-		if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-			(!depthBuffer || depthBuffer->getDeviceCreator() != getActiveD3D9Device() ) )
-		{
-			//Depth is automatically managed and there is no depth buffer attached to this RT
-			//or the Current D3D device doesn't match the one this Depth buffer was created
-			setDepthBufferFor( target );
-			
-			//Retrieve depth buffer again
-			depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
-		}
+			D3D9DepthBuffer *depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
 
-		if ((depthBuffer != NULL) && ( depthBuffer->getDeviceCreator() != getActiveD3D9Device()))
-		{
-			OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-				"Can't use a depth buffer from a diffrent device!",
-				"D3D9RenderSystem::_setRenderTarget" );
-		}
+			if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+				(!depthBuffer || depthBuffer->getDeviceCreator() != getActiveD3D9Device() ) )
+			{
+				//Depth is automatically managed and there is no depth buffer attached to this RT
+				//or the Current D3D device doesn't match the one this Depth buffer was created
+				setDepthBufferFor( target );
+				
+				//Retrieve depth buffer again
+				depthBuffer = static_cast<D3D9DepthBuffer*>(target->getDepthBuffer());
+			}
 
-		IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
+			if ((depthBuffer != NULL) && ( depthBuffer->getDeviceCreator() != getActiveD3D9Device()))
+			{
+				OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+					"Can't use a depth buffer from a diffrent device!",
+					"D3D9RenderSystem::_setRenderTarget" );
+			}
 
-		// Bind render targets
-		uint count = mCurrentCapabilities->getNumMultiRenderTargets();
-		for(uint x=0; x<count; ++x)
-		{
-			hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
+			IDirect3DSurface9 *depthSurface = depthBuffer ? depthBuffer->getDepthBufferSurface() : NULL;
+
+			// Bind render targets
+			uint count = mCurrentCapabilities->getNumMultiRenderTargets();
+			for(uint x=0; x<count; ++x)
+			{
+				hr = getActiveD3D9Device()->SetRenderTarget(x, pBack[x]);
+				if (FAILED(hr))
+				{
+					String msg = DXGetErrorDescription(hr);
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+				}
+			}
+			hr = getActiveD3D9Device()->SetDepthStencilSurface( depthSurface );
 			if (FAILED(hr))
 			{
 				String msg = DXGetErrorDescription(hr);
-				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setRenderTarget : " + msg, "D3D9RenderSystem::_setViewport" );
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
 			}
-		}
-		hr = getActiveD3D9Device()->SetDepthStencilSurface( depthSurface );
-		if (FAILED(hr))
-		{
-			String msg = DXGetErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Failed to setDepthStencil : " + msg, "D3D9RenderSystem::_setViewport" );
 		}
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::_setViewport( Viewport *vp )
 	{
-		if( vp != mActiveViewport || vp->_isUpdated() )
+		if (!vp)
+		{
+			mActiveViewport = NULL;
+			_setRenderTarget(NULL);
+		}
+		else if( vp != mActiveViewport || vp->_isUpdated() )
 		{
 			mActiveViewport = vp;
 
