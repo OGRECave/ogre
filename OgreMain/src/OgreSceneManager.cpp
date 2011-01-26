@@ -6518,7 +6518,7 @@ InstancedEntity* SceneManager::createInstancedEntity( const String &materialName
 {
 	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
 
-	if (itor != mInstanceManagerMap.end())
+	if (itor == mInstanceManagerMap.end())
 	{
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
 				"InstancedManager with name '" + managerName + "' not found", 
