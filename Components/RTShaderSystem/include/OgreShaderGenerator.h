@@ -321,7 +321,7 @@ public:
 	@param dstGroupName The destination group name.	
 	@return True if successful
 	*/
-	bool ShaderGenerator::cloneShaderBasedTechniques(const String& srcMaterialName, 
+	bool cloneShaderBasedTechniques(const String& srcMaterialName, 
 		const String& srcGroupName,	const String& dstMaterialName, const String& dstGroupName);
 
 	/** 
