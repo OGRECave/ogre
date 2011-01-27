@@ -73,6 +73,15 @@ namespace Ogre {
 		*/
 		void setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight);
 
+		/** Sets the UVs of the rectangle
+		@remarks
+		Doesn't do anything if the rectangle wasn't built with texture coordinates
+		*/
+		void setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
+					 const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight);
+
+		void setDefaultUVs();
+
         Real getSquaredViewDepth(const Camera* cam) const
         { (void)cam; return 0; }
 

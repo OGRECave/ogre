@@ -250,6 +250,10 @@ void CompositorManager::_reconstructAllCompositorResources()
 		}
 	}
 
+	//UVs are lost, and will never be reconstructed unless we do them again, now
+	if( mRectangle )
+		mRectangle->setDefaultUVs();
+
 	for (InstVec::iterator i = instancesToReenable.begin(); i != instancesToReenable.end(); ++i)
 	{
 		CompositorInstance* inst = *i;
