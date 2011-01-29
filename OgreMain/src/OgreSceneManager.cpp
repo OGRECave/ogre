@@ -6458,10 +6458,11 @@ void SceneManager::destroyAllInstancedGeometry(void)
 InstanceManager* SceneManager::createInstanceManager( const String &customName, const String &meshName,
 													  const String &groupName,
 													  InstanceManager::InstancingTechnique technique,
-													  size_t numInstancesPerBatch, uint16 flags )
+													  size_t numInstancesPerBatch, uint16 flags,
+													  unsigned short subMeshIdx )
 {
-	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName,
-													technique, flags, numInstancesPerBatch );
+	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
+													flags, numInstancesPerBatch, subMeshIdx );
 	
 	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
 	{
@@ -6506,10 +6507,11 @@ void SceneManager::destroyAllInstanceManagers(void)
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,
 											  const String &materialName,
 											  InstanceManager::InstancingTechnique technique,
-											  size_t numInstancesPerBatch, uint16 flags )
+											  size_t numInstancesPerBatch, uint16 flags,
+											  unsigned short subMeshIdx )
 {
 	InstanceManager tmpMgr( "TmpInstanceManager", this, meshName, groupName,
-							technique, flags, numInstancesPerBatch );
+							technique, flags, numInstancesPerBatch, subMeshIdx );
 	
 	return tmpMgr.getMaxOrBestNumInstancesPerBatch( materialName, numInstancesPerBatch, flags );
 }

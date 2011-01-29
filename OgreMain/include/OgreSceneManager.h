@@ -3106,12 +3106,15 @@ namespace Ogre {
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
 		may end up being lower if the technique doesn't support having so many. It can't be zero
 		@param flags @See InstanceManagerFlags
+		@param InstanceManager only supports using one submesh from the base mesh. This parameter
+		says which submesh to pick (must be <= Mesh::getNumSubMeshes())
 		@returns The new InstanceManager instance
 		*/
 		virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
 														const String &groupName,
 														InstanceManager::InstancingTechnique technique,
-														size_t numInstancesPerBatch, uint16 flags=0 );
+														size_t numInstancesPerBatch, uint16 flags=0,
+														unsigned short subMeshIdx=0 );
 
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks
@@ -3139,7 +3142,8 @@ namespace Ogre {
 		virtual size_t getNumInstancesPerBatch( const String &meshName, const String &groupName,
 												const String &materialName,
 												InstanceManager::InstancingTechnique technique,
-												size_t numInstancesPerBatch, uint16 flags=0 );
+												size_t numInstancesPerBatch, uint16 flags=0,
+												unsigned short subMeshIdx=0 );
 
 		/** Creates an InstancedEntity based on an existing InstanceManager (@see createInstanceManager)
 		@remarks

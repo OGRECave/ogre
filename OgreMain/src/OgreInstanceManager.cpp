@@ -42,19 +42,20 @@ namespace Ogre
 	InstanceManager::InstanceManager( const String &customName, SceneManager *sceneManager,
 										const String &meshName, const String &groupName,
 										InstancingTechnique instancingTechnique, uint16 instancingFlags,
-										size_t instancesPerBatch ) :
+										size_t instancesPerBatch, unsigned short subMeshIdx ) :
 				m_name( customName ),
 				m_idCount( 0 ),
 				m_instancesPerBatch( instancesPerBatch ),
 				m_instancingTechnique( instancingTechnique ),
 				m_instancingFlags( instancingFlags ),
+				m_subMeshIdx( subMeshIdx ),
 				m_showBoundingBoxes( false ),
                 m_sceneManager( sceneManager )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
 
 		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
-			m_meshReference->getSubMesh(0)->_compileBoneAssignments();
+			m_meshReference->getSubMesh(m_subMeshIdx)->_compileBoneAssignments();
 	}
 
 	InstanceManager::~InstanceManager()
@@ -129,7 +130,8 @@ namespace Ogre
 					"InstanceBatch::getMaxOrBestNumInstancesPerBatches()");
 		}
 
-		const size_t retVal = batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0), flags );
+		const size_t retVal = batch->calculateMaxNumInstances( m_meshReference->getSubMesh(m_subMeshIdx),
+																flags );
 
 		OGRE_DELETE batch;
 
@@ -169,7 +171,7 @@ namespace Ogre
 	InstanceBatch* InstanceManager::buildNewBatch( const String &materialName, bool firstTime )
 	{
 		//Get the bone to index map for the batches
-		Mesh::IndexMap &idxMap = m_meshReference->getSubMesh(0)->blendIndexToBoneIndexMap;
+		Mesh::IndexMap &idxMap = m_meshReference->getSubMesh(m_subMeshIdx)->blendIndexToBoneIndexMap;
 		idxMap = idxMap.empty() ? m_meshReference->sharedBlendIndexToBoneIndexMap : idxMap;
 
 		//Get the material
@@ -215,21 +217,21 @@ namespace Ogre
 		{
 			//TODO: Check different materials have the same m_instancesPerBatch upper limit
 			//otherwise we can't share
-			batch->buildFrom( m_meshReference->getSubMesh(0), m_sharedRenderOperation );
+			batch->buildFrom( m_meshReference->getSubMesh(m_subMeshIdx), m_sharedRenderOperation );
 		}
 		else
 		{
 			//Ensure we don't request more than we can
-			m_instancesPerBatch = std::min(batch->calculateMaxNumInstances( m_meshReference->getSubMesh(0),
-																			m_instancingFlags ),
-																			m_instancesPerBatch );
+			const size_t maxInstPerBatch = batch->calculateMaxNumInstances( m_meshReference->
+														getSubMesh(m_subMeshIdx), m_instancingFlags );
+			m_instancesPerBatch = std::min( maxInstPerBatch, m_instancesPerBatch );
 			batch->_setInstancesPerBatch( m_instancesPerBatch );
 
 			//TODO: Create a "merge" function that merges all submeshes into one big submesh
 			//instead of just sending submesh #0
 
 			//Get the RenderOperation to be shared with further instances.
-			m_sharedRenderOperation = batch->build( m_meshReference->getSubMesh(0) );
+			m_sharedRenderOperation = batch->build( m_meshReference->getSubMesh(m_subMeshIdx) );
 		}
 
 		//Batches need to be part of a scene node so that their renderable can be rendered

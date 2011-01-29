@@ -85,6 +85,7 @@ namespace Ogre
 		size_t					m_instancesPerBatch;
 		InstancingTechnique		m_instancingTechnique;
 		uint16					m_instancingFlags;		//@see InstanceManagerFlags
+		unsigned short			m_subMeshIdx;
 
 		bool					m_showBoundingBoxes;
 		SceneManager			*m_sceneManager;
@@ -114,7 +115,7 @@ namespace Ogre
 		InstanceManager( const String &customName, SceneManager *sceneManager,
 						 const String &meshName, const String &groupName,
 						 InstancingTechnique instancingTechnique, uint16 instancingFlags,
-						 size_t instancesPerBatch );
+						 size_t instancesPerBatch, unsigned short subMeshIdx );
 		virtual ~InstanceManager();
 
 		const String& getName() const { return m_name; }

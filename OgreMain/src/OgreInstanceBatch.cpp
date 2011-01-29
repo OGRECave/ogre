@@ -234,6 +234,7 @@ namespace Ogre
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
 
 		instancedEntity->m_inUse = false;
+		instancedEntity->stopSharingTransform();
 
 		//Put it back into the queue
 		m_unusedEntities.push_back( instancedEntity );
@@ -393,11 +394,20 @@ namespace Ogre
 		//Clear the camera cache
 		mCachedCamera = 0;
 
+		//See DistanceLodStrategy::getValueImpl()
+		//We use our own because our SceneNode is just filled with zeroes, and updating it
+		//with real values is expensive, plus we would need to make sure it doesn't get to
+		//the shader
+		Real squaredDepth = getSquaredViewDepth(cam) -
+							Math::Sqr( m_meshReference->getBoundingSphereRadius() );
+        squaredDepth = std::max( squaredDepth, Real(0) );
+        Real lodValue = squaredDepth * cam->_getLodBiasInverse();
+
 		//Now calculate Material LOD
-        const LodStrategy *materialStrategy = m_material->getLodStrategy();
+        /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
         
         //Calculate lod value for given strategy
-        Real lodValue =  materialStrategy->getValue( this, cam );
+        Real lodValue = materialStrategy->getValue( this, cam );*/
 
         //Get the index at this depth
         unsigned short idx = m_material->getLodIndex( lodValue );

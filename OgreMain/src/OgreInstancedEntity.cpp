@@ -48,44 +48,80 @@ namespace Ogre
 				mAnimationState( 0 ),
 				m_skeletonInstance( 0 ),
 				mLastParentXform( Matrix4::ZERO ),
-				mFrameAnimationLastUpdated( std::numeric_limits<unsigned long>::max() )
+				mFrameAnimationLastUpdated( std::numeric_limits<unsigned long>::max() ),
+				mSharedTransform( false )
 	{
 		//Use a static name generator to ensure this name stays unique (which may not happen
 		//otherwise due to reparenting when defragmenting)
 		mName = batchOwner->getName() + "/InstancedEntity_" + StringConverter::toString(m_instanceID) + "/"+
 				msNameGenerator.generate();
 
-		//Is mesh skeletally animated?
-		if( m_batchOwner->_getMeshRef()->hasSkeleton() &&
-			!m_batchOwner->_getMeshRef()->getSkeleton().isNull() &&
-			m_batchOwner->_supportsSkeletalAnimation() )
-		{
-			m_skeletonInstance = OGRE_NEW SkeletonInstance( m_batchOwner->_getMeshRef()->getSkeleton() );
-			m_skeletonInstance->load();
-
-			mBoneMatrices		= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
-																	m_skeletonInstance->getNumBones(),
-																	MEMCATEGORY_ANIMATION));
-			mBoneWorldMatrices	= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
-																	m_skeletonInstance->getNumBones(),
-																	MEMCATEGORY_ANIMATION));
-
-			mAnimationState = OGRE_NEW AnimationStateSet();
-			m_batchOwner->_getMeshRef()->_initAnimationState( mAnimationState );
-		}
+		createSkeletonInstance();
 	}
 
 	InstancedEntity::~InstancedEntity()
 	{
-		if( m_skeletonInstance )
-		{
-			OGRE_DELETE m_skeletonInstance;
-			OGRE_DELETE mAnimationState;
-			OGRE_FREE_SIMD( mBoneMatrices, MEMCATEGORY_ANIMATION );
-			OGRE_FREE_SIMD( mBoneWorldMatrices, MEMCATEGORY_ANIMATION );
-		}
+		unlinkTransform();
+		destroySkeletonInstance();
 	}
 
+	void InstancedEntity::shareTransformWith( InstancedEntity *slave )
+	{
+		if( !this->m_batchOwner->_getMeshRef()->hasSkeleton() ||
+			this->m_batchOwner->_getMeshRef()->getSkeleton().isNull() ||
+			!this->m_batchOwner->_supportsSkeletalAnimation() )
+		{
+			return;
+		}
+
+		if( this->mSharedTransform || slave->mSharedTransform )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Attempted to share '" + mName + "' transforms "
+											"with slave '" + slave->mName + "' but one of them is "
+											"already sharing. Only one master is allowed",
+											"InstancedEntity::shareTransformWith" );
+		}
+
+		if( this->m_batchOwner->_getMeshRef()->getSkeleton() !=
+			slave->m_batchOwner->_getMeshRef()->getSkeleton() )
+		{
+			OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Sharing transforms requires both instanced"
+											" entities to have the same skeleton",
+											"InstancedEntity::shareTransformWith" );
+		}
+
+		slave->destroySkeletonInstance();
+		slave->m_skeletonInstance	= this->m_skeletonInstance;
+		slave->mAnimationState		= this->mAnimationState;
+		slave->mBoneMatrices		= this->mBoneMatrices;
+		slave->mBoneWorldMatrices	= this->mBoneWorldMatrices;
+		slave->mSharedTransform		= true;
+
+		this->m_sharingPartners.push_back( slave );
+		slave->m_sharingPartners.push_back( this );
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::stopSharingTransform()
+	{
+		if( mSharedTransform )
+		{
+			unlinkTransform();
+			createSkeletonInstance();
+		}
+		else
+		{
+			//Tell the ones sharing skeleton with us to use their own
+			InstancedEntityVec::const_iterator itor = m_sharingPartners.begin();
+			InstancedEntityVec::const_iterator end  = m_sharingPartners.end();
+			while( itor != end )
+			{
+				(*itor)->stopSharingTransform();
+				++itor;
+			}
+			m_sharingPartners.clear();
+		}
+	}
+	//-----------------------------------------------------------------------
 	const String& InstancedEntity::getMovableType(void) const
 	{
 		static String sType = "InstancedEntity";
@@ -189,6 +225,89 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------
+	void InstancedEntity::createSkeletonInstance()
+	{
+		//Is mesh skeletally animated?
+		if( m_batchOwner->_getMeshRef()->hasSkeleton() &&
+			!m_batchOwner->_getMeshRef()->getSkeleton().isNull() &&
+			m_batchOwner->_supportsSkeletalAnimation() )
+		{
+			m_skeletonInstance = OGRE_NEW SkeletonInstance( m_batchOwner->_getMeshRef()->getSkeleton() );
+			m_skeletonInstance->load();
+
+			mBoneMatrices		= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
+																	m_skeletonInstance->getNumBones(),
+																	MEMCATEGORY_ANIMATION));
+			mBoneWorldMatrices	= static_cast<Matrix4*>(OGRE_MALLOC_SIMD( sizeof(Matrix4) *
+																	m_skeletonInstance->getNumBones(),
+																	MEMCATEGORY_ANIMATION));
+
+			mAnimationState = OGRE_NEW AnimationStateSet();
+			m_batchOwner->_getMeshRef()->_initAnimationState( mAnimationState );
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::destroySkeletonInstance()
+	{
+		if( m_skeletonInstance )
+		{
+			//Tell the ones sharing skeleton with us to use their own
+			InstancedEntityVec::const_iterator itor = m_sharingPartners.begin();
+			InstancedEntityVec::const_iterator end  = m_sharingPartners.end();
+			while( itor != end )
+			{
+				(*itor)->stopSharingTransform();
+				++itor;
+			}
+			m_sharingPartners.clear();
+
+			OGRE_DELETE m_skeletonInstance;
+			OGRE_DELETE mAnimationState;
+			OGRE_FREE_SIMD( mBoneMatrices, MEMCATEGORY_ANIMATION );
+			OGRE_FREE_SIMD( mBoneWorldMatrices, MEMCATEGORY_ANIMATION );
+
+			m_skeletonInstance	= 0;
+			mAnimationState		= 0;
+			mBoneMatrices		= 0;
+			mBoneWorldMatrices	= 0;
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::unlinkTransform()
+	{
+		if( mSharedTransform )
+		{
+			m_skeletonInstance	= 0;
+			mAnimationState		= 0;
+			mBoneMatrices		= 0;
+			mBoneWorldMatrices	= 0;
+
+			mSharedTransform		= false;
+
+			//Tell our master we're no longer his slave
+			m_sharingPartners.back()->notifyUnlink( this );
+			m_sharingPartners.clear();
+		}
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::notifyUnlink( const InstancedEntity *slave )
+	{
+		//Find the slave and remove it
+		InstancedEntityVec::iterator itor = m_sharingPartners.begin();
+		InstancedEntityVec::iterator end  = m_sharingPartners.end();
+		while( itor != end )
+		{
+			if( *itor == slave )
+			{
+				*itor = m_sharingPartners.back();
+				m_sharingPartners.pop_back();
+				break;
+			}
+
+			++itor;
+		}
+	}
+	//-----------------------------------------------------------------------
     const AxisAlignedBox& InstancedEntity::getBoundingBox(void) const
     {
 		//TODO: Add attached objects (TagPoints) to the bbox
@@ -200,7 +319,7 @@ namespace Ogre
 	{
 		Real rad = m_batchOwner->_getMeshReference()->getBoundingSphereRadius();
         // Scale by largest scale factor
-        if(mParentNode )
+        if( mParentNode )
         {
             const Vector3& s = mParentNode->_getDerivedScale();
 			rad *=  std::max( Math::Abs(s.x), std::max( Math::Abs(s.y), Math::Abs(s.z) ) );
@@ -255,16 +374,19 @@ namespace Ogre
 
 		if( animationDirty || mLastParentXform != _getParentNodeFullTransform() )
         {
-			m_skeletonInstance->setAnimationState( *mAnimationState );
-			m_skeletonInstance->_getBoneMatrices( mBoneMatrices );
+			if( !mSharedTransform )
+			{
+				m_skeletonInstance->setAnimationState( *mAnimationState );
+				m_skeletonInstance->_getBoneMatrices( mBoneMatrices );
 
-			// Cache last parent transform for next frame use too.
-			mLastParentXform = _getParentNodeFullTransform();
-			OptimisedUtil::getImplementation()->concatenateAffineMatrices(
-												mLastParentXform,
-												mBoneMatrices,
-												mBoneWorldMatrices,
-												m_skeletonInstance->getNumBones() );
+				// Cache last parent transform for next frame use too.
+				mLastParentXform = _getParentNodeFullTransform();
+				OptimisedUtil::getImplementation()->concatenateAffineMatrices(
+													mLastParentXform,
+													mBoneMatrices,
+													mBoneWorldMatrices,
+													m_skeletonInstance->getNumBones() );
+			}
 
 			mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
 
