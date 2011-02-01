@@ -329,11 +329,11 @@ namespace Ogre {
         virtual ~VertexDeclaration();
 
         /** Get the number of elements in the declaration. */
-        size_t getElementCount(void) { return mElementList.size(); }
+        size_t getElementCount(void) const { return mElementList.size(); }
         /** Gets read-only access to the list of vertex elements. */
         const VertexElementList& getElements(void) const;
         /** Get a single element. */
-        const VertexElement* getElement(unsigned short index);
+        const VertexElement* getElement(unsigned short index) const;
 
         /** Sorts the elements in this list to be compatible with the maximum
             number of rendering APIs / graphics cards.
@@ -369,7 +369,7 @@ namespace Ogre {
 		@param vertexAnimationNormals Whether vertex data animation is going to include normals animation
         */
         VertexDeclaration* getAutoOrganisedDeclaration(bool skeletalAnimation,
-			bool vertexAnimation, bool vertexAnimationNormals);
+			bool vertexAnimation, bool vertexAnimationNormals) const;
 
         /** Gets the index of the highest source value referenced by this declaration. */
         unsigned short getMaxSource(void) const;
@@ -435,7 +435,7 @@ namespace Ogre {
         @remarks
             If the element is not found, this method returns null.
 		*/
-		virtual const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0);
+		virtual const VertexElement* findElementBySemantic(VertexElementSemantic sem, unsigned short index = 0) const;
 		/** Based on the current elements, gets the size of the vertex for a given buffer source.
 		@param source The buffer binding index for which to get the vertex size.
 		*/
@@ -445,10 +445,10 @@ namespace Ogre {
 			Note that the list of elements is returned by value therefore is separate from
 			the declaration as soon as this method returns.
 		*/
-		virtual VertexElementList findElementsBySource(unsigned short source);
+		virtual VertexElementList findElementsBySource(unsigned short source) const;
 
 		/** Gets the vertex size defined by this declaration for a given source. */
-        virtual size_t getVertexSize(unsigned short source);
+        virtual size_t getVertexSize(unsigned short source) const;
 		
 		/** Return the index of the next free texture coordinate set which may be added
 			to this declaration.
@@ -459,7 +459,7 @@ namespace Ogre {
 		@param mgr Optional HardwareBufferManager to use for creating the clone
 			(if null, use the current default).
 		*/
-        virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0);
+        virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
 
         inline bool operator== (const VertexDeclaration& rhs) const
         {

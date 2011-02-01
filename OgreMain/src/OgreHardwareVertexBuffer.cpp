@@ -355,11 +355,11 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    const VertexElement* VertexDeclaration::getElement(unsigned short index)
+    const VertexElement* VertexDeclaration::getElement(unsigned short index) const
     {
         assert(index < mElementList.size() && "Index out of bounds");
 
-        VertexElementList::iterator i = mElementList.begin();
+        VertexElementList::const_iterator i = mElementList.begin();
         for (unsigned short n = 0; n < index; ++n)
             ++i;
 
@@ -406,7 +406,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------
 	const VertexElement* VertexDeclaration::findElementBySemantic(
-		VertexElementSemantic sem, unsigned short index)
+		VertexElementSemantic sem, unsigned short index) const
 	{
 		VertexElementList::const_iterator ei, eiend;
 		eiend = mElementList.end();
@@ -424,7 +424,7 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------------
 	VertexDeclaration::VertexElementList VertexDeclaration::findElementsBySource(
-		unsigned short source)
+		unsigned short source) const
 	{
 		VertexElementList retList;
 		VertexElementList::const_iterator ei, eiend;
@@ -441,7 +441,7 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	size_t VertexDeclaration::getVertexSize(unsigned short source)
+	size_t VertexDeclaration::getVertexSize(unsigned short source) const
 	{
 		VertexElementList::const_iterator i, iend;
 		iend = mElementList.end();
@@ -458,7 +458,7 @@ namespace Ogre {
 		return sz;
 	}
     //-----------------------------------------------------------------------------
-    VertexDeclaration* VertexDeclaration::clone(HardwareBufferManagerBase* mgr)
+    VertexDeclaration* VertexDeclaration::clone(HardwareBufferManagerBase* mgr) const
     {
 		HardwareBufferManagerBase* pManager = mgr ? mgr : HardwareBufferManager::getSingletonPtr(); 
         VertexDeclaration* ret = pManager->createVertexDeclaration();
@@ -535,7 +535,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     VertexDeclaration* VertexDeclaration::getAutoOrganisedDeclaration(
-		bool skeletalAnimation, bool vertexAnimation, bool vertexAnimationNormals)
+		bool skeletalAnimation, bool vertexAnimation, bool vertexAnimationNormals) const
     {
         VertexDeclaration* newDecl = this->clone();
         // Set all sources to the same buffer (for now)
