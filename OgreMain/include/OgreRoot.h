@@ -655,13 +655,21 @@ namespace Ogre
 		bool createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions,
 			RenderWindowList& createdWindows);
 	
-        /** Destroys a rendering window.
+        /** Detaches a RenderTarget from the active render system.
         */
         void detachRenderTarget( RenderTarget* pWin );
 
-        /** Destroys a named rendering window.
+        /** Detaches a named RenderTarget from the active render system.
         */
         void detachRenderTarget( const String & name );
+
+        /** Destroys the given RenderTarget.
+        */
+        void destroyRenderTarget(RenderTarget* target);
+
+        /** Destroys the given named RenderTarget.
+        */
+        void destroyRenderTarget(const String &name);
 
         /** Retrieves a pointer to the a named render window.
         */
