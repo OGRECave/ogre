@@ -1251,6 +1251,18 @@ namespace Ogre {
         mActiveRenderer->detachRenderTarget( name );
     }
     //-----------------------------------------------------------------------
+    void Root::destroyRenderTarget(RenderTarget* target)
+    {
+        detachRenderTarget(target);
+        OGRE_DELETE target;
+    }
+    //-----------------------------------------------------------------------
+    void Root::destroyRenderTarget(const String &name)
+    {
+        RenderTarget* target = getRenderTarget(name);
+        destroyRenderTarget(target);
+    }
+    //-----------------------------------------------------------------------
     RenderTarget* Root::getRenderTarget(const String &name)
     {
         if (!mActiveRenderer)

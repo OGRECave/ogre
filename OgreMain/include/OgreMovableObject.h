@@ -378,7 +378,7 @@ namespace Ogre {
             
         /** As setQueryFlags, except the flags passed as parameters are removed from the
         existing flags on this object. */
-        virtual void removeQueryFlags(unsigned long flags) { mQueryFlags &= ~flags; }
+        virtual void removeQueryFlags(uint32 flags) { mQueryFlags &= ~flags; }
         
         /// Returns the query flags relevant for this object
         virtual uint32 getQueryFlags(void) const { return mQueryFlags; }
@@ -613,7 +613,7 @@ namespace Ogre {
 			A type flag is like a query flag, except that it applies to all instances
 			of a certain type of object.
 		*/
-		unsigned long getTypeFlags(void) const { return mTypeFlag; }
+		uint32 getTypeFlags(void) const { return mTypeFlag; }
 
 	};
 	/** @} */

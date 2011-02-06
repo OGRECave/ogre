@@ -82,8 +82,8 @@ public:
 };
 
 
-Julia::Julia(float global_real, float global_imag, float global_theta):
-		global_real(global_real), global_imag(global_imag), global_theta(global_theta)  {
+Julia::Julia(float in_global_real, float in_global_imag, float in_global_theta):
+		global_real(in_global_real), global_imag(in_global_imag), global_theta(in_global_theta)  {
 
 	oc.r = global_real;
 	oc.i = global_imag;

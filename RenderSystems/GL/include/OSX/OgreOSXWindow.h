@@ -85,7 +85,7 @@ namespace Ogre
 #endif
 	};
     
-    #define ENABLE_CG_CHECK 1
+    #define ENABLE_CG_CHECK 0
     #if ENABLE_CG_CHECK
     #define CG_CHECK_ERROR(e) \
     { \

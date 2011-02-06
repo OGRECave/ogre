@@ -64,6 +64,11 @@ namespace Ogre {
 		*/
 		void attachDepthBuffer( DepthBuffer *depthBuffer );
 		void detachDepthBuffer();
+		
+		/// Get the GL id for the FBO
+		GLuint getGLFBOID() const { return mFB; }
+		/// Get the GL id for the multisample FBO
+		GLuint getGLMultisampleFBOID() const { return mMultisampleFB; }
         
         /// Accessors
         size_t getWidth();

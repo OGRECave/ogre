@@ -26,6 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+// 64-bit Mac OS X doesn't support Carbon UI API
+#ifndef __LP64__
+
 #include "OgreOSXCarbonWindow.h"
 #include "OgreRoot.h"
 #include "OgreGLRenderSystem.h"
@@ -702,3 +705,5 @@ namespace Ogre
         }
     }
 }
+
+#endif // __LP64__

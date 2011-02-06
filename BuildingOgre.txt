@@ -172,10 +172,6 @@ OGRE_BUILD_PLATFORM_APPLE_IOS in cmake-gui before you generate the Xcode
 project. Unfortunately, you will now have to do a few manual steps to
 make the generated build system work properly.
 
-The linker paths are not correctly generated so now you must run the
-following script to take care of this.  Type:
-> ../SDK/iPhone/fix_linker_paths.sh
-Then press return or enter.
 A Xcode project has now been generated in the build directory, so
 to start the Ogre build, open OGRE.xcodeproj and build as usual.
 To run samples on your device you will need to have a valid iPhone Developer

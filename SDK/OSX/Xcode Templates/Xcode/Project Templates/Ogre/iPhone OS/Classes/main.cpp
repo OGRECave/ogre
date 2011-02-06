@@ -98,6 +98,7 @@ int main(int argc, char **argv)
 
 - (void)go;
 - (void)renderOneFrame:(id)sender;
+- (void)orientationChanged:(NSNotification *)notification;
 
 @property (retain) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
@@ -162,6 +163,11 @@ int main(int argc, char **argv)
                                                     userInfo:nil
                                                      repeats:YES];
         }
+        
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
+                                                     name:UIDeviceOrientationDidChangeNotification object:nil];
+        
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -170,6 +176,14 @@ int main(int argc, char **argv)
         [pool release];
         }
         
+- (void)orientationChanged:(NSNotification *)notification
+{
+    size_t v = 0;
+    Ogre::Root::getSingleton().getAutoCreatedWindow()->getCustomAttribute("VIEW", &v);
+    
+    [(UIView *)v setNeedsLayout];
+}
+
         - (void)renderOneFrame:(id)sender
         {
 #pragma unused(sender)
@@ -234,6 +248,21 @@ int main(int argc, char **argv)
             Ogre::Root::getSingleton().queueEndRendering();
         }
         
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    Ogre::Root::getSingleton().saveConfig();
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
+                                                 name:UIDeviceOrientationDidChangeNotification object:nil];
+}
+
         - (void)dealloc {
             if (mDisplayLinkSupported)
             {

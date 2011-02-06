@@ -7074,6 +7074,11 @@ void SceneManager::bindGpuProgram(GpuProgram* prog)
 	mDestRenderSystem->bindGpuProgram(prog);
 }
 //---------------------------------------------------------------------
+void SceneManager::_markGpuParamsDirty(uint16 mask)
+{
+	mGpuParamsDirty |= mask;
+}
+//---------------------------------------------------------------------
 void SceneManager::updateGpuProgramParameters(const Pass* pass)
 {
 	if (pass->isProgrammable())

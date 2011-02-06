@@ -74,12 +74,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
         return false;
     
 	m_pRenderWnd = m_pRoot->initialise(true, wndTitle);
-    
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
-    m_pRenderWnd->reposition(0, 0);
-    m_pRenderWnd->resize(m_pRenderWnd->getHeight(), m_pRenderWnd->getWidth());
-#endif
-    
+
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7, 0.7, 0.7));
 	
@@ -92,7 +87,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pViewport->setBackgroundColour(ColourValue(0.8, 0.7, 0.6, 1.0));
     
 	m_pCamera->setAspectRatio(Real(m_pViewport->getActualWidth()) / Real(m_pViewport->getActualHeight()));
-	
+
 	m_pViewport->setCamera(m_pCamera);
     
 	unsigned long hWnd = 0;

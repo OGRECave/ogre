@@ -534,7 +534,6 @@ elseif (APPLE)
       include/OSX/OgreConfigDialogImp.h
       include/OSX/OgreErrorDialogImp.h
       include/OSX/OgreTimerImp.h
-      include/OSX/OgreOSXCocoaView.h
 	  include/OgreZip.h
     )
     set(PLATFORM_SOURCE_FILES
@@ -542,7 +541,6 @@ elseif (APPLE)
       src/OSX/OgreErrorDialog.mm
       src/OSX/OgreTimer.cpp
       src/OSX/macUtils.cpp
-      src/OSX/OgreOSXCocoaView.mm
       src/OgreSearchOps.cpp
 	  include/OSX/ogrelogo.png
     )

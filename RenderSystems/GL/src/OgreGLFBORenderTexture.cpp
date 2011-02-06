@@ -55,6 +55,14 @@ namespace Ogre {
         {
             *static_cast<GLFrameBufferObject **>(pData) = &mFB;
         }
+		else if (name == "GL_FBOID")
+		{
+            *static_cast<GLuint*>(pData) = mFB.getGLFBOID();
+		}
+		else if (name == "GL_MULTISAMPLEFBOID")
+		{
+            *static_cast<GLuint*>(pData) = mFB.getGLMultisampleFBOID();
+		}
     }
 
 	void GLFBORenderTexture::swapBuffers(bool waitForVSync)
@@ -196,7 +204,7 @@ static const size_t depthBits[] =
     */
     bool GLFBOManager::_tryPackedFormat(GLenum packedFormat)
     {
-        GLuint packedRB;
+        GLuint packedRB = 0;
         bool failed = false; // flag on GL errors
 
         /// Generate renderbuffer
@@ -238,8 +246,8 @@ static const size_t depthBits[] =
     void GLFBOManager::detectFBOFormats()
     {
         // Try all formats, and report which ones work as target
-        GLuint fb, tid;
-        GLint old_drawbuffer, old_readbuffer;
+        GLuint fb = 0, tid = 0;
+        GLint old_drawbuffer = 0, old_readbuffer = 0;
         GLenum target = GL_TEXTURE_2D;
 
         glGetIntegerv (GL_DRAW_BUFFER, &old_drawbuffer);
@@ -379,7 +387,7 @@ static const size_t depthBits[] =
         glDrawBuffer(old_drawbuffer);
         glReadBuffer(old_readbuffer);
 
-		String fmtstring;
+		String fmtstring = "";
         for(size_t x=0; x<PF_COUNT; ++x)
         {
             if(mProps[x].valid)

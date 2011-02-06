@@ -25,19 +25,16 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
+
+#ifndef __SampleBrowser_iOS_H__
+#define __SampleBrowser_iOS_H__
+
 #include "OgrePlatform.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-#include <coecntrl.h>
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#error This header is for use with iOS only
 #endif
 
-#include "SampleBrowser.h"
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define WIN32_LEAN_AND_MEAN
-#include "windows.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "SampleBrowser_OSX.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
 
@@ -45,55 +42,9 @@
 // the following line or define it to 1.  Use with caution, it can
 // sometimes cause input lag.
 #define USE_CADISPLAYLINK 1
-#endif
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
+#ifdef __OBJC__
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-#else
-int main(int argc, char *argv[])
-#endif
-{
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-	int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
-	[pool release];
-	return retVal;
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    mAppDelegate = [[AppDelegate alloc] init];
-    [[NSApplication sharedApplication] setDelegate:mAppDelegate];
-	int retVal = NSApplicationMain(argc, (const char **) argv);
-
-	[pool release];
-
-	return retVal;
-#else
-
-	try
-	{
-		OgreBites::SampleBrowser sb;
-		sb.go();
-	}
-	catch (Ogre::Exception& e)
-	{
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
-#else
-		std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
-#endif
-	}
-
-#endif
-	return 0;
-}
-
-#endif // OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   ifdef __OBJC__
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
     NSTimer *mTimer;
@@ -111,6 +62,7 @@ int main(int argc, char *argv[])
 
 - (void)go;
 - (void)renderOneFrame:(id)sender;
+- (void)orientationChanged:(NSNotification *)notification;
 
 @property (retain) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
@@ -146,7 +98,12 @@ int main(int argc, char *argv[])
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
     try {
-        sb.initApp();
+        sb.go();
+
+        Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
+
+        // Clear event times
+		Ogre::Root::getSingleton().clearEventTimes();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
@@ -161,7 +118,7 @@ int main(int argc, char *argv[])
         mLastFrameTime = -[mDate timeIntervalSinceNow];
         
         mDisplayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
-        [mDisplayLink setFrameInterval:(1.0f/60.0f)];
+        [mDisplayLink setFrameInterval:mLastFrameTime];
         [mDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     }
     else
@@ -172,15 +129,20 @@ int main(int argc, char *argv[])
                                                 userInfo:nil
                                                  repeats:YES];
     }
-    
+
+    // Register for orientation notifications
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
+                                                 name:UIDeviceOrientationDidChangeNotification object:nil];
     [pool release];
 }
 
-- (void)applicationDidFinishLaunching:(UIApplication *)application {
+- (void)applicationDidFinishLaunching:(UIApplication *)application
+{
     // Hide the status bar
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
 
-    mDisplayLinkSupported = NO;
+    mDisplayLinkSupported = FALSE;
     mLastFrameTime = 1;
     mDisplayLink = nil;
     mTimer = nil;
@@ -191,10 +153,55 @@ int main(int argc, char *argv[])
     NSString *reqSysVer = @"3.1";
     NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
     if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
-        mDisplayLinkSupported = YES;
+        mDisplayLinkSupported = TRUE;
 #endif
     
     [self go];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    Ogre::Root::getSingleton().queueEndRendering();
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+
+    if (mDisplayLinkSupported)
+    {
+        [mDate release];
+        mDate = nil;
+        
+        [mDisplayLink invalidate];
+        mDisplayLink = nil;
+    }
+    else
+    {
+        [mTimer invalidate];
+        mTimer = nil;
+    }
+    
+    sb.shutdown();
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    Ogre::Root::getSingleton().saveConfig();
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
+                                                 name:UIDeviceOrientationDidChangeNotification object:nil];
+}
+
+- (void)orientationChanged:(NSNotification *)notification
+{
+    size_t v = 0;
+    Ogre::Root::getSingleton().getAutoCreatedWindow()->getCustomAttribute("VIEW", &v);
+
+    [(UIView *)v setNeedsLayout];
 }
 
 - (void)renderOneFrame:(id)sender
@@ -215,30 +222,9 @@ int main(int argc, char *argv[])
         Root::getSingleton().renderOneFrame((Real)[mTimer timeInterval]);
     }
 }
-        
-- (void)applicationWillTerminate:(UIApplication *)application {
-    sb.closeApp();
-}
-
-- (void)dealloc {
-    if (mDisplayLinkSupported)
-    {
-        [mDate release];
-        mDate = nil;
-
-        [mDisplayLink invalidate];
-        mDisplayLink = nil;
-    }
-    else
-    {
-        [mTimer invalidate];
-        mTimer = nil;
-    }
-
-    [super dealloc];
-}
 
 @end
-#   endif
-        
+
+#endif
+
 #endif

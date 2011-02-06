@@ -202,12 +202,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     // Detect whether or not os support Streaming SIMD Extension.
 #if OGRE_COMPILER == OGRE_COMPILER_GNUC
+    #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
     static jmp_buf sIllegalJmpBuf;
     static void _illegalHandler(int x)
     {
         (void)(x); // Unused
         longjmp(sIllegalJmpBuf, 1);
     }
+    #endif
 #endif
     static bool _checkOperatingSystemSupportSSE(void)
     {

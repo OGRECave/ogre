@@ -474,7 +474,16 @@ protected:
 				// reset with new settings if necessary
 				if (reset) reconfigure(mRendererMenu->getSelectedItem(), newOptions);
 			}
-			else mRoot->queueEndRendering();   // exit browser
+			else
+            {
+                mRoot->queueEndRendering();   // exit browser
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+				mRoot->saveConfig();
+				shutdown();
+				if (mRoot) OGRE_DELETE mRoot;
+#endif
+            }
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -1463,7 +1472,7 @@ protected:
 
 			SampleContext::reconfigure(renderer, options);
 		}
-
+    public:
 		/*-----------------------------------------------------------------------------
 		| Extends shutdown to destroy dummy scene and tray interface.
 		-----------------------------------------------------------------------------*/
@@ -1510,7 +1519,7 @@ protected:
 #endif // USE_RTSHADER_SYSTEM
 
 		}
-
+    protected:
 		/*-----------------------------------------------------------------------------
 		| Destroys dummy scene.
 		-----------------------------------------------------------------------------*/

@@ -76,7 +76,7 @@ namespace Ogre {
         optOrientation.possibleValues.push_back("Landscape Left");
         optOrientation.possibleValues.push_back("Landscape Right");
         optOrientation.possibleValues.push_back("Portrait");
-        optOrientation.currentValue = "Landscape Left";
+        optOrientation.currentValue = "Landscape Right";
         optOrientation.immutable = false;
         
         optDisplayFrequency.name = "Display Frequency";
