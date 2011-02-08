@@ -386,17 +386,24 @@ namespace Ogre {
             GL_CHECK_ERROR
             glResolveMultisampleFramebufferAPPLE();
             GL_CHECK_ERROR
-        }
-#endif
 
-#if GL_EXT_discard_framebuffer
-        // Framebuffer discard is only supported on devices running iOS 4+
-        if(mCurrentOSVersion >= 4.0)
-        {
             GLenum attachments[] = { GL_COLOR_ATTACHMENT0_OES, GL_DEPTH_ATTACHMENT_OES, GL_STENCIL_ATTACHMENT_OES };
             glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
             GL_CHECK_ERROR
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
         }
+        else
+        {
+            GLenum attachments[] = { GL_COLOR_ATTACHMENT0_OES, GL_DEPTH_ATTACHMENT_OES };
+            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
+            GL_CHECK_ERROR
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+        }
+#else
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+        GL_CHECK_ERROR
 #endif
 
         glBindRenderbufferOES(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
