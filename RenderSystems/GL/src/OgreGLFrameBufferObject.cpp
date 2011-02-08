@@ -126,12 +126,13 @@ namespace Ogre {
         size_t height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
         PixelFormat ogreFormat = mColour[0].buffer->getFormat();
+        ushort maxSupportedMRTs = Root::getSingleton().getRenderSystem()->getCapabilities()->getNumMultiRenderTargets();
 
 		// Bind simple buffer to add colour attachments
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
 
         /// Bind all attachment points to frame buffer
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        for(size_t x=0; x<maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
             {
