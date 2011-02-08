@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class OSXPBuffer : public GLPBuffer
+    class OSXPBuffer : public GLPBuffer, public GeneralAllocatedObject
     {
     public:
         OSXPBuffer(PixelComponentType format, size_t width, size_t height );
