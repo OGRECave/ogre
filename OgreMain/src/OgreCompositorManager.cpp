@@ -509,6 +509,19 @@ void CompositorManager::registerCompositorLogic(const String& name, CompositorLo
 	mCompositorLogics[name] = logic;
 }
 //---------------------------------------------------------------------
+void CompositorManager::unregisterCompositorLogic(const String& name)
+{
+	CompositorLogicMap::iterator itor = mCompositorLogics.find(name);
+	if( itor == mCompositorLogics.end() )
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+			"Compositor logic '" + name + "' not registered.",
+			"CompositorManager::unregisterCompositorLogic");
+	}
+
+	mCompositorLogics.erase( itor );
+}
+//---------------------------------------------------------------------
 CompositorLogic* CompositorManager::getCompositorLogic(const String& name)
 {
 	CompositorLogicMap::iterator it = mCompositorLogics.find(name);

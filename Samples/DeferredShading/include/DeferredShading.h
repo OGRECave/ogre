@@ -109,6 +109,10 @@ protected:
 	DSMode mCurrentMode;
 	bool mSSAO;
 
+	//Used to unregister compositor logics and free memory
+	typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+	CompositorLogicMap mCompositorLogics;
+
 	void createResources();
 	
 	void logCurrentMode(void);

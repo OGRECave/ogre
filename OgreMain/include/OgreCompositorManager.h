@@ -142,6 +142,10 @@ namespace Ogre {
 			techniques.
 		*/
 		void registerCompositorLogic(const String& name, CompositorLogic* logic);
+
+		/** Removes a listener for compositor logic registered with registerCompositorLogic
+		*/
+		void unregisterCompositorLogic(const String& name);
 		
 		/** Get a compositor logic by its name
 		*/

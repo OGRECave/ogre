@@ -57,6 +57,10 @@ protected:
 	size_t mActiveCompositorPage;
 	size_t mNumCompositorPages;	
 
+	//Used to unregister compositor logics and free memory
+	typedef map<String, CompositorLogic*>::type CompositorLogicMap;
+	CompositorLogicMap mCompositorLogics;
+
 	String mDebugCompositorName;
 	SelectMenu* mDebugTextureSelectMenu;
 	TextureUnitState* mDebugTextureTUS;
@@ -102,17 +106,15 @@ void Sample_Compositor::setupView()
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupContent(void)
 {
-	static bool firstTime = true;
-	if (firstTime)
-	{
-		// Register the compositor logics
-		// See comment in beginning of HelperLogics.h for explanation
-		Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-		compMgr.registerCompositorLogic("GaussianBlur", new GaussianBlurLogic);
-		compMgr.registerCompositorLogic("HDR", new HDRLogic);
-		compMgr.registerCompositorLogic("HeatVision", new HeatVisionLogic);
-		firstTime = false;
-	}
+	// Register the compositor logics
+	// See comment in beginning of HelperLogics.h for explanation
+	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+	mCompositorLogics["GaussianBlur"]	= new GaussianBlurLogic;
+	mCompositorLogics["HDR"]			= new HDRLogic;
+	mCompositorLogics["HeatVision"]		= new HeatVisionLogic;
+	compMgr.registerCompositorLogic("GaussianBlur", mCompositorLogics["GaussianBlur"]);
+	compMgr.registerCompositorLogic("HDR", mCompositorLogics["HDR"]);
+	compMgr.registerCompositorLogic("HeatVision", mCompositorLogics["HeatVision"]);
 	
 	createTextures();
     /// Create a couple of hard coded postfilter effects as an example of how to do it
@@ -216,6 +218,17 @@ void Sample_Compositor::cleanupContent(void)
 	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
 	CompositorManager::getSingleton().removeCompositorChain(mViewport);
 	mCompositorNames.clear();
+
+	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+	CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
+	CompositorLogicMap::const_iterator end  = mCompositorLogics.end();
+	while( itor != end )
+	{
+		compMgr.unregisterCompositorLogic( itor->first );
+		delete itor->second;
+		++itor;
+	}
+	mCompositorLogics.clear();
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupControls(void) 

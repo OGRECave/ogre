@@ -83,6 +83,17 @@ DeferredShadingSystem::~DeferredShadingSystem()
 	for(int i=0; i<DSM_COUNT; ++i)
 		chain->_removeInstance(mInstance[i]);
 	CompositorManager::getSingleton().removeCompositorChain(mViewport);
+
+	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+	CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
+	CompositorLogicMap::const_iterator end  = mCompositorLogics.end();
+	while( itor != end )
+	{
+		compMgr.unregisterCompositorLogic( itor->first );
+		delete itor->second;
+		++itor;
+	}
+	mCompositorLogics.clear();
 }
 
 void DeferredShadingSystem::setMode(DSMode mode)
@@ -155,12 +166,14 @@ void DeferredShadingSystem::createResources(void)
 		MaterialManager::getSingleton().addListener(new GBufferSchemeHandler, "GBuffer");
 		MaterialManager::getSingleton().addListener(new NullSchemeHandler, "NoGBuffer");
 
-		compMan.registerCompositorLogic("SSAOLogic", new SSAOLogic);
 		compMan.registerCustomCompositionPass("DeferredLight", new DeferredLightCompositionPass);
+
 		firstTime = false;
 	}
-	
-	
+
+	mCompositorLogics["SSAOLogic"] = new SSAOLogic;
+	compMan.registerCompositorLogic("SSAOLogic", mCompositorLogics["SSAOLogic"]);
+
 	// Create the main GBuffer compositor
 	mGBufferInstance = compMan.addCompositor(mViewport, "DeferredShading/GBuffer");
 	
