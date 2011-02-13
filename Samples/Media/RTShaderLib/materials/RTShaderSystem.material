@@ -210,7 +210,7 @@ material RTSS/LayeredBlending
 				// RT Shader system section - required by the layered blend extension.
 				rtshader_system
 				{
-					layered_blend blend_luminosity
+					layered_blend luminosity
 					source_modifier src1_inverse_modulate custom 2
 				}
 				texture ogrelogo.png
