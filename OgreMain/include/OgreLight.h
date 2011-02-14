@@ -277,6 +277,18 @@ namespace Ogre {
 		*/
 		void setSpotlightFalloff(Real val);
 
+		/** Set the near clip plane distance to be used by spotlights that use light
+		 clipping, allowing you to render spots as if they start from further
+		 down their frustum. 
+		 @param near The near distance
+		 */
+		void setSpotlightNearClipDistance(Real nearClip) { mSpotNearClip = nearClip; }
+		
+		/** Get the near clip plane distance to be used by spotlights that use light
+		 clipping.
+		 */
+		Real getSpotlightNearClipDistance() const { return mSpotNearClip; }
+		
 		/** Set a scaling factor to indicate the relative power of a light.
 		@remarks
 			This factor is only useful in High Dynamic Range (HDR) rendering.
@@ -525,6 +537,7 @@ namespace Ogre {
         Radian mSpotOuter;
         Radian mSpotInner;
         Real mSpotFalloff;
+		Real mSpotNearClip;
         Real mRange;
         Real mAttenuationConst;
         Real mAttenuationLinear;

@@ -5305,7 +5305,7 @@ void SceneManager::buildLightClip(const Light* l, PlaneList& planes)
 		{
 			Vector3 dir = l->getDerivedDirection();
 			// near & far planes
-			planes.push_back(Plane(dir, pos));
+			planes.push_back(Plane(dir, pos + dir * l->getSpotlightNearClipDistance()));
 			planes.push_back(Plane(-dir, pos + dir * r));
 			// 4 sides of pyramids
 			// derive orientation
