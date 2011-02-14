@@ -3623,7 +3623,7 @@ namespace Ogre
 			fireMaterialEvent(MSE_WRITE_BEGIN, skipWriting, pMat.get());
 
             // Write LOD information
-            Material::LodValueIterator valueIt = pMat->getLodValueIterator();
+            Material::LodValueIterator valueIt = pMat->getUserLodValueIterator();
             // Skip zero value
             if (valueIt.hasMoreElements())
                 valueIt.getNext();

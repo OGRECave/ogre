@@ -789,6 +789,11 @@ namespace Ogre {
     {
         return LodValueIterator(mLodValues.begin(), mLodValues.end());
     }
+    // --------------------------------------------------------------------
+    Material::LodValueIterator Material::getUserLodValueIterator(void) const
+    {
+        return LodValueIterator(mUserLodValues.begin(), mUserLodValues.end());
+    }
 
     //-----------------------------------------------------------------------
     bool Material::applyTextureAliases(const AliasTextureNamePairList& aliasList, const bool apply) const

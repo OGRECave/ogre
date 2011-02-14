@@ -613,7 +613,8 @@ namespace Ogre {
 			unsquared distance for example.
         */
         void setLodLevels(const LodValueList& lodValues);
-        /** Gets an iterator over the list of values at which each LOD comes into effect. 
+
+        /** Gets an iterator over the list of values transformed by the LodStrategy at which each LOD comes into effect. 
         @remarks
             Note that the iterator returned from this method is not totally analogous to 
             the one passed in by calling setLodLevels - the list includes a zero
@@ -621,6 +622,15 @@ namespace Ogre {
 			values returned are after being transformed by LodStrategy::transformUserValue.
         */
         LodValueIterator getLodValueIterator(void) const;
+
+        /** Gets an iterator over the user-defined list of values which are internally transfomed by the LodStrategy. 
+        @remarks
+            Note that the iterator returned from this method is not totally analogous to 
+            the one passed in by calling setLodLevels - the list includes a zero
+            entry at the start (since the highest LOD starts at value 0). Also, the
+			values returned are after being transformed by LodStrategy::transformUserValue.
+        */
+        LodValueIterator getUserLodValueIterator(void) const;
 
         /** Gets the LOD index to use at the given value. 
 		@note The value passed in is the 'transformed' value. If you are dealing with
