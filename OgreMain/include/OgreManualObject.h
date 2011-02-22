@@ -264,6 +264,12 @@ namespace Ogre
 		*/
 		virtual void quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4);
 
+		/// Get the number of vertices in the section currently being defined (returns 0 if no section is in progress).
+		virtual size_t getCurrentVertexCount() const;
+
+		/// Get the number of indices in the section currently being defined (returns 0 if no section is in progress).
+		virtual size_t getCurrentIndexCount() const;
+		
 		/** Finish defining the object and compile the final renderable version. 
 		@note
 			Will return a pointer to the finished section or NULL if the section was discarded (i.e. has zero vertices/indices).
