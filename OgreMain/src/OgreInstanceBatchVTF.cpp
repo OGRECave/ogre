@@ -50,8 +50,8 @@ namespace Ogre
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
 				m_numWorldMatrices( instancesPerBatch ),
-				m_maxFloatsPerLine( std::numeric_limits<size_t>::max() ),
-				m_widthFloatsPadding( 0 )
+				m_widthFloatsPadding( 0 ),
+				m_maxFloatsPerLine( std::numeric_limits<size_t>::max() )
 	{
 		cloneMaterial( m_material );
 	}
@@ -243,7 +243,7 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
 
-		size_t currentPixel = 0; //Resets on each line
+		//size_t currentPixel = 0; //Resets on each line
 
 		while( itor != end )
 		{
