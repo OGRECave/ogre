@@ -42,11 +42,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   include(CMakeForceCompiler)
   CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
   CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
-elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-  # Force gcc <= 4.0 on Mac OS X because 4.2 is not supported prior to Mac OS X 10.5
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
 endif ()
 
 project(OGRE)
@@ -229,17 +224,13 @@ elseif (UNIX AND OGRE_BUILD_PLATFORM_TEGRA2)
   include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/Tegra2")
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
-  # Set 10.4 as the base SDK by default
-  set(XCODE_ATTRIBUTE_SDKROOT macosx10.4)
+  # Set 10.5 as the base SDK by default
+  set(XCODE_ATTRIBUTE_SDKROOT macosx)
+  set(CMAKE_OSX_SYSROOT macosx)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 
   if (NOT CMAKE_OSX_ARCHITECTURES)
-    set(CMAKE_OSX_ARCHITECTURES "i386 x86_64")
-  endif()
-  
-  # 10.6 sets x86_64 as the default architecture.
-  # Because Carbon isn't supported on 64-bit and we still need it, force the architectures to ppc and i386
-  if(CMAKE_OSX_ARCHITECTURES MATCHES "ppc64")
-	  string(REPLACE "ppc64" "" CMAKE_OSX_ARCHITECTURES ${CMAKE_OSX_ARCHITECTURES})
+    set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
   endif()
 
   # Make sure that the OpenGL render system is selected for non-iPhone Apple builds

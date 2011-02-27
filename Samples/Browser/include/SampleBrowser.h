@@ -40,6 +40,7 @@
 #ifdef OGRE_STATIC_LIB
 #ifdef USE_RTSHADER_SYSTEM
 #include "ShaderSystem.h"
+#endif
 #include "BSP.h"
 #include "CelShading.h"
 #include "Compositor.h"
@@ -50,7 +51,7 @@
 #include "OceanDemo.h"
 #include "Terrain.h"
 #include "Water.h"
-#endif
+//#endif
 #include "BezierPatch.h"
 #include "CameraTrack.h"
 #include "CharacterSample.h"
@@ -262,7 +263,9 @@ protected:
 
 				try
 				{
+#ifdef USE_RTSHADER_SYSTEM
 					s->setShaderGenerator(mShaderGenerator);
+#endif
 					SampleContext::runSample(s);
 				}
 				catch (Ogre::Exception e)   // if failed to start, show error and fall back to menu
@@ -1526,7 +1529,9 @@ protected:
 		virtual void destroyDummyScene()
 		{
 			Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
+#ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->removeSceneManager(dummyScene);
+#endif
 			mWindow->removeAllViewports();
 			mRoot->destroySceneManager(dummyScene);
 		}	

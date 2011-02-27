@@ -151,10 +151,10 @@ if (WIN32)
   set(OGRE_SAMPLES_DIR_DBG ".")
 elseif (APPLE)
   # iPhone needs to use relative paths in the config files
-  if(OGRE_BUILD_PLATFORM_IPHONE)
+  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
     set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
-  endif(OGRE_BUILD_PLATFORM_IPHONE)
+  endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # not used on OS X, uses Resources
   set(OGRE_PLUGIN_DIR_REL "")

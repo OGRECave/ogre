@@ -31,7 +31,7 @@
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 #error This header is for use with iOS only
 #endif
 
