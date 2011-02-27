@@ -48,6 +48,11 @@ namespace Ogre {
 	*  @{
 	*/
 	/** Implementation of a Quaternion, i.e. a rotation around an axis.
+		For more information about Quaternions and the theory behind it, we recomend reading:
+		http://www.ogre3d.org/tikiwiki/Quaternion+and+Rotation+Primer
+		http://www.cprogramming.com/tutorial/3d/quaternions.html
+		http://www.gamedev.net/page/resources/_/reference/programming/math-and-physics/
+		quaternions/quaternion-powers-r1095
     */
     class _OgreExport Quaternion
     {
@@ -130,6 +135,9 @@ namespace Ogre {
 
 		void FromRotationMatrix (const Matrix3& kRot);
         void ToRotationMatrix (Matrix3& kRot) const;
+		/** Setups the quaternion using the supplied vector, and "roll" around
+			that vector by the specified radians.
+		*/
         void FromAngleAxis (const Radian& rfAngle, const Vector3& rkAxis);
         void ToAngleAxis (Radian& rfAngle, Vector3& rkAxis) const;
         inline void ToAngleAxis (Degree& dAngle, Vector3& rkAxis) const {
@@ -137,15 +145,28 @@ namespace Ogre {
             ToAngleAxis ( rAngle, rkAxis );
             dAngle = rAngle;
         }
+		/** Constructs the quaternion using 3 axes, the axes are assumed to be orthonormal
+			@See FromAxes
+		*/
         void FromAxes (const Vector3* akAxis);
         void FromAxes (const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
+		/** Gets the 3 orthonormal axes defining the quaternion. @See FromAxes */
         void ToAxes (Vector3* akAxis) const;
         void ToAxes (Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const;
-        /// Get the local x-axis
+
+		/** Returns the X orthonormal axis defining the quaternion. Same as doing
+			xAxis = Vector3::UNIT_X * this. Also called the local X-axis
+		*/
         Vector3 xAxis(void) const;
-        /// Get the local y-axis
+
+        /** Returns the Y orthonormal axis defining the quaternion. Same as doing
+			yAxis = Vector3::UNIT_Y * this. Also called the local Y-axis
+		*/
         Vector3 yAxis(void) const;
-        /// Get the local z-axis
+
+		/** Returns the Z orthonormal axis defining the quaternion. Same as doing
+			zAxis = Vector3::UNIT_Z * this. Also called the local Z-axis
+		*/
         Vector3 zAxis(void) const;
 
         inline Quaternion& operator= (const Quaternion& rkQ)
@@ -215,10 +236,25 @@ namespace Ogre {
 		/// Equality with tolerance (tolerance is max angle difference)
 		bool equals(const Quaternion& rhs, const Radian& tolerance) const;
 		
-	    // spherical linear interpolation
+	    /** Performs Spherical linear interpolation between two quaternions, and returns the result.
+			Slerp ( 0.0f, A, B ) = A
+			Slerp ( 1.0f, A, B ) = B
+			@returns Interpolated quaternion
+			@remarks
+			Slerp has the proprieties of performing the interpolation at constant
+			velocity, and being torque-minimal (unless shortestPath=false).
+			However, it's NOT commutative, which means
+			Slerp ( 0.75f, A, B ) != Slerp ( 0.25f, B, A );
+			therefore be careful if your code relies in the order of the operands.
+			This is specially important in IK animation.
+		*/
         static Quaternion Slerp (Real fT, const Quaternion& rkP,
             const Quaternion& rkQ, bool shortestPath = false);
 
+		/** @See Slerp. It adds extra "spins" (i.e. rotates several times) specified
+			by parameter 'iExtraSpins' while interpolating before arriving to the
+			final values
+		*/
         static Quaternion SlerpExtraSpins (Real fT,
             const Quaternion& rkP, const Quaternion& rkQ,
             int iExtraSpins);
@@ -233,7 +269,20 @@ namespace Ogre {
             const Quaternion& rkA, const Quaternion& rkB,
             const Quaternion& rkQ, bool shortestPath = false);
 
-        // normalised linear interpolation - faster but less accurate (non-constant rotation velocity)
+        /** Performs Normalised linear interpolation between two quaternions, and returns the result.
+			nlerp ( 0.0f, A, B ) = A
+			nlerp ( 1.0f, A, B ) = B
+			@remarks
+			Nlerp is faster than Slerp.
+			Nlerp has the proprieties of being commutative (@See Slerp;
+			commutativity is desired in certain places, like IK animation), and
+			being torque-minimal (unless shortestPath=false). However, it's performing
+			the interpolation at non-constant velocity; sometimes this is desired,
+			sometimes it is not. Having a non-constant velocity can produce a more
+			natural rotation feeling without the need of tweaking the weights; however
+			if your scene relies on the timing of the rotation or assumes it will point
+			at a specific angle at a specific weight value, Slerp is a better choice.
+		*/
         static Quaternion nlerp(Real fT, const Quaternion& rkP, 
             const Quaternion& rkQ, bool shortestPath = false);
 

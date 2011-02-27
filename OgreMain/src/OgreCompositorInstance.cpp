@@ -53,7 +53,8 @@ namespace Ogre {
 CompositorInstance::CompositorInstance(CompositionTechnique *technique,
     CompositorChain *chain):
     mCompositor(technique->getParent()), mTechnique(technique), mChain(chain),
-		mEnabled(false)
+		mEnabled(false),
+		mAlive(false)
 {
 	const String& logicName = mTechnique->getCompositorLogicName();
 	if (!logicName.empty())
@@ -77,9 +78,24 @@ CompositorInstance::~CompositorInstance()
 //-----------------------------------------------------------------------
 void CompositorInstance::setEnabled(bool value)
 {
-    if (mEnabled != value)
+	if (mEnabled != value)
     {
         mEnabled = value;
+
+	    //Probably first time enabling, create resources.
+	    if( mEnabled && !mAlive )
+    		setAlive( true );
+
+		/// Notify chain state needs recompile.
+        mChain->_markDirty();
+	}
+}
+//-----------------------------------------------------------------------
+void CompositorInstance::setAlive(bool value)
+{
+    if (mAlive != value)
+    {
+        mAlive = value;
 
         // Create of free resource.
         if (value)
@@ -89,16 +105,12 @@ void CompositorInstance::setEnabled(bool value)
         else
         {
             freeResources(false, true);
+			setEnabled(false);
         }
 
 		/// Notify chain state needs recompile.
         mChain->_markDirty();
     }
-}
-//-----------------------------------------------------------------------
-bool CompositorInstance::getEnabled()
-{
-    return mEnabled;
 }
 //-----------------------------------------------------------------------
 
@@ -510,7 +522,7 @@ void CompositorInstance::setTechnique(CompositionTechnique* tech, bool reuseText
 		// replace technique
 		mTechnique = tech;
 
-		if (mEnabled)
+		if (mAlive)
 		{
 			// free up resources, but keep reserves if reusing
 			freeResources(false, !reuseTextures);

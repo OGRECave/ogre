@@ -444,7 +444,9 @@ namespace Ogre
             Real fLength = Math::Sqrt( x * x + y * y + z * z );
 
             // Will also work for zero-sized vectors, but will change nothing
-            if ( fLength > 1e-08 )
+			// We're not using epsilons because we don't need to.
+            // Read http://www.ogre3d.org/forums/viewtopic.php?f=4&t=61259
+            if ( fLength > Real(0.0f) )
             {
                 Real fInvLength = 1.0f / fLength;
                 x *= fInvLength;

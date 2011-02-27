@@ -243,8 +243,6 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
 
-		//size_t currentPixel = 0; //Resets on each line
-
 		while( itor != end )
 		{
 			pDest += (*itor)->getTransforms3x4( pDest );
@@ -300,7 +298,6 @@ namespace Ogre
 
 		thisVertexData->vertexStart = 0;
 		thisVertexData->vertexCount = baseVertexData->vertexCount * m_instancesPerBatch;
-		m_renderOperation.numberOfInstances = m_instancesPerBatch;
 
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration( thisVertexData->vertexDeclaration );
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
