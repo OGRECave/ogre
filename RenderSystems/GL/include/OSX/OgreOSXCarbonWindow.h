@@ -29,6 +29,9 @@ THE SOFTWARE.
 #ifndef __OSXCarbonWindow_H__
 #define __OSXCarbonWindow_H__
 
+// 64-bit Mac OS X doesn't support Carbon UI API
+#ifndef __LP64__
+
 #include "OgreOSXWindow.h"
 
 #include "OgreOSXCarbonContext.h"
@@ -103,5 +106,7 @@ namespace Ogre
         bool mVisible;
 	};
 }
+
+#endif // __LP64__
 
 #endif

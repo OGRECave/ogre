@@ -248,9 +248,15 @@ namespace Ogre {
         // Get face identifier
         mFaceTarget = mTarget;
 
-        // TODO verify who get this
-        mWidth = width;
-        mHeight = height;
+        // Calculate the width and height of the texture at this mip level
+        mWidth = mLevel == 0 ? width : width / pow(2, level);
+        mHeight = mLevel == 0 ? height : height / pow(2, level);
+        if(mWidth < 1)
+            mWidth = 1;
+        if(mHeight < 1)
+            mHeight = 1;
+        
+        // Only 2D is supported so depth is always 1
         mDepth = 1;
 
         mGLInternalFormat = internalFormat;
@@ -263,9 +269,9 @@ namespace Ogre {
         // Log a message
 //        std::stringstream str;
 //        str << "GLESHardwarePixelBuffer constructed for texture " << mTextureID 
-//            << " face " << face << " level " << level << ":"
-//            << " width=" << width << " height="<< height << " depth=" << mDepth
-//            << " format=" << PixelUtil::getFormatName(mFormat);
+//            << " face " << mFace << " level " << mLevel << ": "
+//            << "width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
+//            << "format=" << PixelUtil::getFormatName(mFormat);
 //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
         // Set up a pixel box

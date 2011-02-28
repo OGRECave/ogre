@@ -138,7 +138,7 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \

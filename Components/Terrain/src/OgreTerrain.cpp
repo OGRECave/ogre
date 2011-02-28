@@ -713,7 +713,7 @@ namespace Ogre
 			&& Bitwise::isPO2(importData.maxBatchSize - 1)))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-				"terrainSise, minBatchSize and maxBatchSize must all be n^2 + 1", 
+				"terrainSize, minBatchSize and maxBatchSize must all be 2^n + 1", 
 				"Terrain::prepare");
 		}
 

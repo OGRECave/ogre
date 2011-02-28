@@ -45,6 +45,7 @@ GLHardwarePixelBuffer::GLHardwarePixelBuffer(size_t inWidth, size_t inHeight, si
       mBuffer(inWidth, inHeight, inDepth, inFormat),
       mGLInternalFormat(GL_NONE)
 {
+    mCurrentLockOptions = (LockOptions)0;
 }
 
 //-----------------------------------------------------------------------------  
@@ -197,10 +198,11 @@ GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint i
 								 GLint face, GLint level, Usage usage, bool crappyCard, 
 								 bool writeGamma, uint fsaa):
 	GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
-	mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
+	mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
+    mSoftwareMipmap(crappyCard), mSliceTRT(0)
 {
 	// devise mWidth, mHeight and mDepth and mFormat
-	GLint value;
+	GLint value = 0;
 	
 	glBindTexture( mTarget, mTextureID );
 	
@@ -707,7 +709,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
         /// Calculate source slice for this destination slice
         float w = (float)(slice - dstBox.front) / (float)dstBox.getDepth();
         /// Get slice # in source
-        w = w * (float)srcBox.getDepth() + srcBox.front;
+        w = w * (float)(srcBox.getDepth() + srcBox.front);
         /// Normalise to texture coordinate in 0.0 .. 1.0
         w = (w+0.5f) / (float)src->mDepth;
         
@@ -871,7 +873,8 @@ RenderTexture *GLTextureBuffer::getRenderTarget(size_t zoffset)
 //********* GLRenderBuffer
 //----------------------------------------------------------------------------- 
 GLRenderBuffer::GLRenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
-    GLHardwarePixelBuffer(width, height, 1, GLPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY)
+    GLHardwarePixelBuffer(width, height, 1, GLPixelUtil::getClosestOGREFormat(format),HBU_WRITE_ONLY),
+    mRenderbufferID(0)
 {
     mGLInternalFormat = format;
     /// Generate renderbuffer

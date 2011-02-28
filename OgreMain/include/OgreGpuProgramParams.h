@@ -851,6 +851,8 @@ namespace Ogre {
 			ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY,
 			/// The view/projection matrix of a given spotlight
 			ACT_SPOTLIGHT_VIEWPROJ_MATRIX,
+			/// Array of view/projection matrix of a given spotlight
+			ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY,
 			/** The view/projection matrix of a given spotlight projection frustum, 
 			combined with the current world matrix
 			*/

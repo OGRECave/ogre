@@ -75,34 +75,12 @@ THE SOFTWARE.
 
 - (BOOL)acceptsFirstResponder
 {
-    return YES;
+    return NO;
 }
 
 - (BOOL)canBecomeKeyView
 {
-    return YES;
+    return NO;
 }
-
-#pragma mark Mouse Event Handling
-- (void)mouseDown:(NSEvent *)theEvent {
-    [super mouseDown:theEvent];
-}
-
-- (void)mouseUp:(NSEvent *)theEvent {
-    [super mouseUp:theEvent];
-}
-
-- (void)mouseDragged:(NSEvent *)theEvent {
-    [super mouseDragged:theEvent];
-}
-
-#pragma mark Keyboard Event Handling
-//- (void)keyDown:(NSEvent *)theEvent {
-//    [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
-//}
-//
-//- (void)keyUp:(NSEvent *)theEvent {
-//    [self interpretKeyEvents:[NSArray arrayWithObject:theEvent]];
-//}
 
 @end

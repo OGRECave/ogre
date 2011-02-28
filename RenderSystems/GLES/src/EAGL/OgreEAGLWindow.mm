@@ -33,40 +33,10 @@ THE SOFTWARE.
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESPixelFormat.h"
 
-@implementation EAGLView
-
-- (id)initWithFrame:(CGRect)frame
-{
-	if((self = [super initWithFrame:frame]))
-	{
-	}
-	return self;
-}
-
-+ (Class)layerClass
-{
-    return [CAEAGLLayer class];
-}
-
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"EAGLView frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
-            [self frame].origin.x,
-            [self frame].origin.y,
-            [self frame].size.width,
-            [self frame].size.height];
-}
-
-@end
-
-// Constant to limit framerate to 60 FPS
-#define kSwapInterval 1.0f / 60.0f
-
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
         :   mClosed(false),
             mVisible(false),
-            mIsTopLevel(true),
             mIsExternalGLControl(false),
             mIsContentScalingSupported(false),
             mContentScalingFactor(1.0),
@@ -117,26 +87,21 @@ namespace Ogre {
         }
         
         [mWindow release];
+        mWindow = nil;
     }
 
     void EAGLWindow::setFullscreen(bool fullscreen, uint width, uint height)
     {
-#pragma unused(fullscreen, width, height)
     }
 
     void EAGLWindow::reposition(int left, int top)
 	{
-#pragma unused(left, top)
 	}
     
 	void EAGLWindow::resize(unsigned int width, unsigned int height)
 	{
         if(!mWindow) return;
 
-		CGRect frame = [mWindow frame];
-		frame.size.width = width;
-		frame.size.height = height;
-		[mWindow setFrame:frame];
         mWidth = width;
         mHeight = height;
 
@@ -162,7 +127,6 @@ namespace Ogre {
 
 	void EAGLWindow::switchFullScreen( bool fullscreen )
 	{
-#pragma unused(fullscreen)
 	}
 
     void EAGLWindow::_beginUpdate(void)
@@ -280,7 +244,7 @@ namespace Ogre {
                                 bool fullScreen, const NameValuePairList *miscParams)
     {
         String title = name;
-        String orientation = "Landscape Left";
+        String orientation = "Landscape Right";
         int gamma;
         short frequency = 0;
         bool vsync = false;
@@ -350,34 +314,34 @@ namespace Ogre {
 
         // Set viewport's default orientation mode
 		if (orientation == "Landscape Left")
-			Viewport::setDefaultOrientationMode(OR_LANDSCAPELEFT);
-		else if (orientation == "Landscape Right")
-			Viewport::setDefaultOrientationMode(OR_LANDSCAPERIGHT);
-		else if (orientation == "Portrait")
-			Viewport::setDefaultOrientationMode(OR_PORTRAIT);
-
-        left = top = 0;
-        mIsExternal = false;    // Cannot use external displays on iPhone
-        mHwGamma = false;
-        
-        if (!mIsTopLevel)
         {
-            mIsFullScreen = false;
-            left = top = 0;
+            [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeRight animated:NO];
+			Viewport::setDefaultOrientationMode(OR_LANDSCAPELEFT);
         }
+		else if (orientation == "Landscape Right")
+        {
+            [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeLeft animated:NO];
+			Viewport::setDefaultOrientationMode(OR_LANDSCAPERIGHT);
+        }
+		else if (orientation == "Portrait")
+        {
+            [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait animated:NO];
+			Viewport::setDefaultOrientationMode(OR_PORTRAIT);
+        }
+
+        mIsExternal = false;
+        mHwGamma = false;
 
 		mName = name;
 		mLeft = left;
 		mTop = top;
         if (orientation == "Portrait")
         {
-            mWidth = width * mContentScalingFactor;
-            mHeight = height * mContentScalingFactor;
+            resize(width * mContentScalingFactor, height * mContentScalingFactor);
         }
         else
         {
-            mWidth = height * mContentScalingFactor;
-            mHeight = width * mContentScalingFactor;
+            resize(height * mContentScalingFactor, width * mContentScalingFactor);
         }
 
 		mActive = true;

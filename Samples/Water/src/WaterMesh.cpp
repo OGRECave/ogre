@@ -17,12 +17,12 @@ same license as the rest of the engine.
 
 #define ANIMATIONS_PER_SECOND 100.0f
 
-WaterMesh::WaterMesh(const String& meshName, Real planeSize, int complexity)
+WaterMesh::WaterMesh(const String& inMeshName, Real planeSize, int inComplexity)
 {
 	int x,y,b; // I prefer to initialize for() variables inside it, but VC doesn't like it ;(
 
-	this->meshName = meshName ;
-	this->complexity =  complexity ;
+	this->meshName = inMeshName ;
+	this->complexity = inComplexity ;
 	numFaces = 2 * complexity * complexity;
 	numVertices = (complexity + 1) * (complexity + 1) ;
 	lastTimeStamp = 0 ;
@@ -104,7 +104,7 @@ WaterMesh::WaterMesh(const String& meshName, Real planeSize, int complexity)
 	unsigned short *faceVertexIndices = (unsigned short*)
 		indexBuffer->lock(0, numFaces*3*2, HardwareBuffer::HBL_DISCARD);
 	for(y=0 ; y<complexity ; y++) {
-		for(int x=0 ; x<complexity ; x++) {
+		for(x=0 ; x<complexity ; x++) {
 			unsigned short *twoface = faceVertexIndices + (y*complexity+x)*2*3;
 			int p0 = y*(complexity+1) + x ;
 			int p1 = y*(complexity+1) + x + 1 ;

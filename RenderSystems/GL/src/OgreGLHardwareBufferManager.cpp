@@ -48,7 +48,7 @@ namespace Ogre {
 	#define SCRATCH_ALIGNMENT 32
 	//---------------------------------------------------------------------
     GLHardwareBufferManagerBase::GLHardwareBufferManagerBase() 
-		: mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
+		: mScratchBufferPool(NULL), mMapBufferThreshold(OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD)
     {
 		// Init scratch pool
 		// TODO make it a configurable size?
@@ -182,7 +182,7 @@ namespace Ogre {
 				// split? And enough space for control block
 				if(pNext->size > size + sizeof(GLScratchBufferAlloc))
 				{
-					uint32 offset = sizeof(GLScratchBufferAlloc) + size;
+					uint32 offset = (uint32)sizeof(GLScratchBufferAlloc) + size;
 
 					GLScratchBufferAlloc* pSplitAlloc = (GLScratchBufferAlloc*)
 						(mScratchBufferPool + bufferPos + offset);
@@ -201,7 +201,7 @@ namespace Ogre {
 
 			}
 
-			bufferPos += sizeof(GLScratchBufferAlloc) + pNext->size;
+			bufferPos += (uint32)sizeof(GLScratchBufferAlloc) + pNext->size;
 
 		}
 
@@ -232,14 +232,14 @@ namespace Ogre {
 				if (pLast && pLast->free)
 				{
 					// adjust buffer pos
-					bufferPos -= (pLast->size + sizeof(GLScratchBufferAlloc));
+					bufferPos -= (pLast->size + (uint32)sizeof(GLScratchBufferAlloc));
 					// merge free space
 					pLast->size += pCurrent->size + sizeof(GLScratchBufferAlloc);
 					pCurrent = pLast;
 				}
 
 				// merge with next
-				uint32 offset = bufferPos + pCurrent->size + sizeof(GLScratchBufferAlloc);
+				uint32 offset = bufferPos + pCurrent->size + (uint32)sizeof(GLScratchBufferAlloc);
 				if (offset < SCRATCH_POOL_SIZE)
 				{
 					GLScratchBufferAlloc* pNext = (GLScratchBufferAlloc*)(
@@ -254,7 +254,7 @@ namespace Ogre {
 				return;
 			}
 
-			bufferPos += sizeof(GLScratchBufferAlloc) + pCurrent->size;
+			bufferPos += (uint32)sizeof(GLScratchBufferAlloc) + pCurrent->size;
 			pLast = pCurrent;
 
 		}

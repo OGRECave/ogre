@@ -272,8 +272,12 @@ void OSXGLSupport::addConfig( void )
 
     optMacAPI.name = "macAPI";
     optMacAPI.possibleValues.push_back( "cocoa" );
-    optMacAPI.possibleValues.push_back( "carbon" );
+#ifndef __LP64__
+	optMacAPI.possibleValues.push_back( "carbon" );
     optMacAPI.currentValue = "carbon";
+#else
+	optMacAPI.currentValue = "cocoa";
+#endif
     optMacAPI.immutable = false;
 
     mOptions[optMacAPI.name] = optMacAPI;
@@ -342,6 +346,12 @@ RenderWindow* OSXGLSupport::createWindow( bool autoCreateWindow, GLRenderSystem*
 			renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
 #endif
 
+        opt = mOptions.find( "macAPI" );
+        if( opt != mOptions.end() )
+        {
+			winOptions[ "macAPI" ] = opt->second.currentValue;
+        }
+        
 		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
 	}
 	else
@@ -361,32 +371,40 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	if(miscParams)
 	{
         NameValuePairList::const_iterator opt(NULL);
-        
+
         // First we must determine if this is a Carbon or a Cocoa window
         // that we wish to create
         opt = miscParams->find("macAPI");
         if(opt != miscParams->end() && opt->second == "cocoa")
-		{
-			// Our user wants a Cocoa compatible system
-			mAPI = "cocoa";
-			mContextType = "NSOpenGL";
-		}
+        {
+            // Our user wants a Cocoa compatible system
+            mAPI = "cocoa";
+            mContextType = "NSOpenGL";
+        }
 	}
 	
 	// Create the window, if Cocoa return a Cocoa window
 	if(mAPI == "cocoa")
 	{
 		LogManager::getSingleton().logMessage("Creating a Cocoa Compatible Render System");
-		OSXCocoaWindow* window = OGRE_NEW OSXCocoaWindow();
+		OSXCocoaWindow *window = OGRE_NEW OSXCocoaWindow();
 		window->create(name, width, height, fullScreen, miscParams);
+
 		return window;
 	}
-	
-	// Otherwise default to Carbon
-	LogManager::getSingleton().logMessage("Creating a Carbon Compatible Render System");
-	OSXCarbonWindow* window = OGRE_NEW OSXCarbonWindow();
-	window->create(name, width, height, fullScreen, miscParams);
-	return window;
+#ifndef __LP64__
+    else
+    {
+        // Otherwise default to Carbon
+        LogManager::getSingleton().logMessage("Creating a Carbon Compatible Render System");
+        OSXCarbonWindow *window = OGRE_NEW OSXCarbonWindow();
+        window->create(name, width, height, fullScreen, miscParams);
+
+		return window;
+    }
+#endif
+
+   return NULL;
 }
 
 void OSXGLSupport::start()

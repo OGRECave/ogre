@@ -171,16 +171,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String DataStream::getAsString(void)
     {
-        // Read the entire buffer
-        char* pBuf = OGRE_ALLOC_T(char, mSize+1, MEMCATEGORY_GENERAL);
+        // Read the entire buffer - ideally in one read, but if the size of
+        // the buffer is unknown, do multiple fixed size reads.
+        size_t bufSize = (mSize > 0 ? mSize : 4096);
+        char* pBuf = OGRE_ALLOC_T(char, bufSize, MEMCATEGORY_GENERAL);
         // Ensure read from begin of stream
         seek(0);
-        read(pBuf, mSize);
-        pBuf[mSize] = '\0';
-        String str;
-        str.insert(0, pBuf, mSize);
+        String result;
+        while (!eof())
+        {
+            size_t nr = read(pBuf, bufSize);
+            result.append(pBuf, nr);
+        }
         OGRE_FREE(pBuf, MEMCATEGORY_GENERAL);
-        return str;
+        return result;
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -211,10 +215,23 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
-        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
-        mPos = mData;
-        mEnd = mData + sourceStream.read(mData, mSize);
-        mFreeOnClose = freeOnClose;
+        if (mSize == 0 && !sourceStream.eof())
+        {
+            // size of source is unknown, read all of it into memory
+            String contents = sourceStream.getAsString();
+            mSize = contents.size();
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            memcpy(mData, contents.data(), mSize);
+            mEnd = mData + mSize;
+        }
+        else
+        {
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            mEnd = mData + sourceStream.read(mData, mSize);
+            mFreeOnClose = freeOnClose;
+        }
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -224,10 +241,23 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
-        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
-        mPos = mData;
-        mEnd = mData + sourceStream->read(mData, mSize);
-        mFreeOnClose = freeOnClose;
+        if (mSize == 0 && !sourceStream->eof())
+        {
+            // size of source is unknown, read all of it into memory
+            String contents = sourceStream->getAsString();
+            mSize = contents.size();
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            memcpy(mData, contents.data(), mSize);
+            mEnd = mData + mSize;
+        }
+        else
+        {
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            mEnd = mData + sourceStream->read(mData, mSize);
+            mFreeOnClose = freeOnClose;
+        }
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -237,10 +267,23 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream.size();
-        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
-        mPos = mData;
-        mEnd = mData + sourceStream.read(mData, mSize);
-        mFreeOnClose = freeOnClose;
+        if (mSize == 0 && !sourceStream.eof())
+        {
+            // size of source is unknown, read all of it into memory
+            String contents = sourceStream.getAsString();
+            mSize = contents.size();
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            memcpy(mData, contents.data(), mSize);
+            mEnd = mData + mSize;
+        }
+        else
+        {
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            mEnd = mData + sourceStream.read(mData, mSize);
+            mFreeOnClose = freeOnClose;
+        }
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------
@@ -250,10 +293,23 @@ namespace Ogre {
     {
         // Copy data from incoming stream
         mSize = sourceStream->size();
-        mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
-        mPos = mData;
-        mEnd = mData + sourceStream->read(mData, mSize);
-        mFreeOnClose = freeOnClose;
+        if (mSize == 0 && !sourceStream->eof())
+        {
+            // size of source is unknown, read all of it into memory
+            String contents = sourceStream->getAsString();
+            mSize = contents.size();
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            memcpy(mData, contents.data(), mSize);
+            mEnd = mData + mSize;
+        }
+        else
+        {
+            mData = OGRE_ALLOC_T(uchar, mSize, MEMCATEGORY_GENERAL);
+            mPos = mData;
+            mEnd = mData + sourceStream->read(mData, mSize);
+            mFreeOnClose = freeOnClose;
+        }
         assert(mEnd >= mPos);
     }
     //-----------------------------------------------------------------------

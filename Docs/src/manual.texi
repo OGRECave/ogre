@@ -2425,6 +2425,8 @@ As texture_viewproj_matrix except it also includes the world matrix.
 As texture_worldviewproj_matrix, except an array of matrices is passed, up to the number that you specify as the 'extra_params' value.
 @item spotlight_viewproj_matrix
 Provides a view / projection matrix which matches the set up of a given spotlight (requires an 'extra_params' entry to indicate the light index, which must be a spotlight). Can be used to project a texture from a given spotlight.
+@item spotlight_viewproj_matrix_array
+As spotlight_viewproj_matrix, except an array of matrices is passed, up to the number that you specify as the 'extra_params' value.
 @item spotlight_worldviewproj_matrix
 As spotlight_viewproj_matrix except it also includes the world matrix.
 @item scene_depth_range

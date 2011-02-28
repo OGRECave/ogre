@@ -342,7 +342,7 @@ namespace Ogre {
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 
                 // If format is PVRTC then every mipmap is a custom one so to allow the upload of the compressed data 
-                // provided by the file we need to adjust the current mip level's dimention
+                // provided by the file we need to adjust the current mip level's dimension
 				if (mFormat == PF_PVRTC_RGB2 || mFormat == PF_PVRTC_RGBA2 ||
                     mFormat == PF_PVRTC_RGB4 || mFormat == PF_PVRTC_RGBA4)
 				{

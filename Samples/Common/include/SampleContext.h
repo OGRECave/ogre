@@ -31,7 +31,6 @@
 #include "Ogre.h"
 #include "OgreLogManager.h"
 #include "OgrePlugin.h"
-#include "Sample.h"
 #include "FileSystemLayerImpl.h"
 
 // Static plugins declaration section
@@ -85,6 +84,8 @@
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
+
+#include "Sample.h"
 
 #include "OIS.h"
 
@@ -285,6 +286,20 @@ namespace OgreBites
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 		virtual void go(Sample* initialSample = 0)
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__)
+            createRoot();
+
+			if (!oneTimeConfig()) return;
+
+            if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+
+            setup();
+
+            if (!mFirstRun) recoverLastSample();
+            else if (initialSample) runSample(initialSample);
+
+            mRoot->saveConfig();
+#else
 			while (!mLastRun)
 			{
 				mLastRun = true;  // assume this is our last run
@@ -300,6 +315,7 @@ namespace OgreBites
 
 				mFirstRun = false;
 			}
+#endif
 		}
 #endif
         

@@ -3365,6 +3365,15 @@ namespace Ogre {
         */
         virtual const Pass* _setPass(const Pass* pass, 
 			bool evenIfSuppressed = false, bool shadowDerivation = true);
+		
+		/** Method to allow you to mark gpu parameters as dirty, causing them to 
+			be updated according to the mask that you set when updateGpuProgramParameters is
+			next called. Only really useful if you're controlling parameter state in 
+			inner rendering loop callbacks.
+			@param mask Some combination of GpuParamVariability which is bitwise OR'ed with the
+				current dirty state.
+		*/
+		virtual void _markGpuParamsDirty(uint16 mask);
 
 
 		/** Indicates to the SceneManager whether it should suppress the 
