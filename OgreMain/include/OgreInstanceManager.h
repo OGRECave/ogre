@@ -69,9 +69,35 @@ namespace Ogre
 			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @See InstanceBatchHW_VTF
 			InstancingTechniquesCount,
 		};
+
+		/** Values to be used in setSetting() & BatchSettings::setting */
+		enum BatchSettingId
+		{
+			/// Makes all batches from same material cast shadows
+			CAST_SHADOWS		= 0,
+			/// Makes each batch to display it's bounding box. Useful for debugging or profiling
+			SHOW_BOUNDINGBOX,
+
+			NUM_SETTINGS
+		};
+
 	private:
+		struct BatchSettings
+		{
+			//These are all per material
+			bool				setting[NUM_SETTINGS];
+
+			BatchSettings()
+			{
+				setting[CAST_SHADOWS]				= true;
+				setting[SHOW_BOUNDINGBOX]			= false;
+			}
+		};
+
 		typedef vector<InstanceBatch*>::type		InstanceBatchVec;	//vec[batchN] = Batch
 		typedef map<String, InstanceBatchVec>::type	InstanceBatchMap;	//map[materialName] = Vec
+
+		typedef map<String, BatchSettings>::type	BatchSettingsMap;
 
 		const String			m_name;					//Not the name of the mesh
 		MeshPtr					m_meshReference;
@@ -87,7 +113,7 @@ namespace Ogre
 		uint16					m_instancingFlags;		//@see InstanceManagerFlags
 		unsigned short			m_subMeshIdx;
 
-		bool					m_showBoundingBoxes;
+		BatchSettingsMap		m_batchSettings;
 		SceneManager			*m_sceneManager;
 
 		/** Finds a batch with at least one free instanced entity we can use.
@@ -110,6 +136,11 @@ namespace Ogre
 			for a specific material */
 		void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
 								InstanceBatchVec &fragmentedBatches );
+
+		/** @See setSetting. This function helps it by setting the given parameter to all batches
+			in container.
+		*/
+		void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
 
 	public:
 		InstanceManager( const String &customName, SceneManager *sceneManager,
@@ -184,12 +215,31 @@ namespace Ogre
         */
 		void defragmentBatches( bool optimizeCulling );
 
-		/** Toggles display of batches' bounding boxes on and off (not the individual instances).
-			Useful for debugging or profiling
+		/** Applies a setting for all batches using the same material_ existing ones and
+			those that will be created in the future.
+		@par
+			For example setSetting( BatchSetting::CAST_SHADOWS, false ) disables shadow
+			casting for all instanced entities (@See MovableObject::setCastShadow)
+		@par
+			For example setSetting( BatchSetting::SHOW_BOUNDINGBOX, true, "MyMat" )
+			will display the bounding box of the batch (not individual InstancedEntities)
+			from all batches using material "MyMat"
+		@note If the material name hasn't been used, the settings are still stored
+		This allows setting up batches before they get even created.
+		@param id Setting Id to setup, @see BatchSettings::BatchSettingId
+		@param enabled Boolean value. It's meaning depends on the id.
+		@param materialName When Blank, the setting is applied to all existing materials
 		*/
-		void showBoundingBoxes( bool bShow );
+		void setSetting( BatchSettingId id, bool value, const String &materialName = StringUtil::BLANK );
 
-		bool getShowBoundingBoxes() const { return m_showBoundingBoxes; }
+		/// If settings for the given material didn't exist, default value is returned
+		bool getSetting( BatchSettingId id, const String &materialName ) const;
+
+		/** Returns true if settings were already created for the given material name.
+			If false is returned, it means getSetting will return default settings.
+		*/
+		bool hasSettings( const String &materialName ) const
+		{ return m_batchSettings.find( materialName ) != m_batchSettings.end(); }
 
 		/**	@copydoc InstanceBatch::setStaticAndUpdate */
 		void setBatchesAsStaticAndUpdate( bool bStatic );
@@ -201,6 +251,25 @@ namespace Ogre
 
 		/** Called by SceneManager when we told it we have at least one dirty batch */
 		void _updateDirtyBatches(void);
+
+		typedef ConstMapIterator<InstanceBatchMap> InstanceBatchMapIterator;
+		typedef ConstVectorIterator<InstanceBatchVec> InstanceBatchIterator;
+
+		/// Get non-updateable iterator over instance batches per material
+		InstanceBatchMapIterator getInstanceBatchMapIterator(void) const
+		{ return InstanceBatchMapIterator( m_instanceBatches.begin(), m_instanceBatches.end() ); }
+
+		/** Get non-updateable iterator over instance batches for given material
+			@remarks
+			Each InstanceBatch pointer may be modified for low level usage (i.e.
+			setCustomParameter), but there's no synchronization mechanism when
+			multithreading or creating more instances, that's up to the user.
+		*/
+		InstanceBatchIterator getInstanceBatchIterator( const String &materialName ) const
+		{
+			InstanceBatchMap::const_iterator it = m_instanceBatches.find( materialName );
+			return InstanceBatchIterator( it->second.begin(), it->second.end() );
+		}
 	};
 }
 

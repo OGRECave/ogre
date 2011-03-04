@@ -6475,6 +6475,20 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 	return retVal;
 }
 //---------------------------------------------------------------------
+InstanceManager* SceneManager::getInstanceManager( const String &managerName ) const
+{
+	InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+
+	if (itor == mInstanceManagerMap.end())
+	{
+		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
+				"InstancedManager with name '" + managerName + "' not found", 
+				"SceneManager::getInstanceManager");
+	}
+
+	return itor->second;
+}
+//---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
 	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);

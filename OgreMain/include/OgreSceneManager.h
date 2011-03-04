@@ -3116,6 +3116,11 @@ namespace Ogre {
 														size_t numInstancesPerBatch, uint16 flags=0,
 														unsigned short subMeshIdx=0 );
 
+		/** Retrieves an existing InstanceManager by it's name.
+		@note Throws an exception if the named InstanceManager does not exist
+		*/
+		virtual InstanceManager* getInstanceManager( const String &managerName ) const;
+
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks
 			Be sure you don't have any InstancedEntity referenced somewhere which was created with

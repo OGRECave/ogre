@@ -66,7 +66,11 @@ public:
 	{
 		//Toggle bounding boxes with B key unless the help dialog is visible
 		if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible() && mCurrentManager)
-			mCurrentManager->showBoundingBoxes( !mCurrentManager->getShowBoundingBoxes() );
+		{
+			bool oldShow = mCurrentManager->getSetting( InstanceManager::SHOW_BOUNDINGBOX,
+														c_materialsTechniques[mInstancingTechnique] );
+			mCurrentManager->setSetting( InstanceManager::SHOW_BOUNDINGBOX, !oldShow );
+		}
 
 		//Switch to next instancing technique with space bar
 		if (evt.key == OIS::KC_SPACE && !mTrayMgr->isDialogVisible())

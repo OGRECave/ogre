@@ -969,7 +969,7 @@ namespace Ogre {
 						sub->getSubMesh()->getVertexAnimationIncludesNormals());
 
 					if (sub->getSubMesh()->getVertexAnimationType() == VAT_POSE && 
-						supportedCount < mHardwarePoseCount)
+						supportedCount < sub->mHardwarePoseCount)
 					{
 						LogManager::getSingleton().stream() <<
 						"Vertex program assigned to SubEntity of '" << mName << 

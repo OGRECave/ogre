@@ -49,7 +49,6 @@ namespace Ogre
 				m_instancingTechnique( instancingTechnique ),
 				m_instancingFlags( instancingFlags ),
 				m_subMeshIdx( subMeshIdx ),
-				m_showBoundingBoxes( false ),
                 m_sceneManager( sceneManager )
 	{
 		m_meshReference = MeshManager::getSingleton().load( meshName, groupName );
@@ -234,10 +233,13 @@ namespace Ogre
 			m_sharedRenderOperation = batch->build( m_meshReference->getSubMesh(m_subMeshIdx) );
 		}
 
+		const BatchSettings &batchSettings = m_batchSettings[materialName];
+		batch->setCastShadows( batchSettings.setting[CAST_SHADOWS] );
+
 		//Batches need to be part of a scene node so that their renderable can be rendered
 		SceneNode *sceneNode = m_sceneManager->getRootSceneNode()->createChildSceneNode();
 		sceneNode->attachObject( batch );
-		sceneNode->showBoundingBox( m_showBoundingBoxes );
+		sceneNode->showBoundingBox( batchSettings.setting[SHOW_BOUNDINGBOX] );
 
 		materialInstanceBatch.push_back( batch );
 
@@ -358,24 +360,65 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceManager::showBoundingBoxes( bool bShow )
+	void InstanceManager::setSetting( BatchSettingId id, bool value, const String &materialName )
 	{
-		m_showBoundingBoxes = bShow;
+		assert( id < NUM_SETTINGS );
 
-		InstanceBatchMap::iterator itor = m_instanceBatches.begin();
-		InstanceBatchMap::iterator end  = m_instanceBatches.end();
+		if( materialName == StringUtil::BLANK )
+		{
+			//Setup all existing materials
+			InstanceBatchMap::iterator itor = m_instanceBatches.begin();
+			InstanceBatchMap::iterator end  = m_instanceBatches.end();
+
+			while( itor != end )
+			{
+				m_batchSettings[itor->first].setting[id] = value;
+				applySettingToBatches( id, value, itor->second );
+
+				++itor;
+			}
+		}
+		else
+		{
+			//Setup a given material
+			m_batchSettings[materialName].setting[id] = value;
+
+			InstanceBatchMap::const_iterator itor = m_instanceBatches.find( materialName );
+			//Don't crash or throw if the batch with that material hasn't been created yet
+			if( itor != m_instanceBatches.end() )
+				applySettingToBatches( id, value, itor->second );
+		}
+	}
+	//-----------------------------------------------------------------------
+	bool InstanceManager::getSetting( BatchSettingId id, const String &materialName ) const
+	{
+		assert( id < NUM_SETTINGS );
+
+		BatchSettingsMap::const_iterator itor = m_batchSettings.find( materialName );
+		if( itor != m_batchSettings.end() )
+			return itor->second.setting[id]; //Return current setting
+
+		//Return default
+		return BatchSettings().setting[id];
+	}
+	//-----------------------------------------------------------------------
+	void InstanceManager::applySettingToBatches( BatchSettingId id, bool value,
+												 const InstanceBatchVec &container )
+	{
+		InstanceBatchVec::const_iterator itor = container.begin();
+		InstanceBatchVec::const_iterator end  = container.end();
 
 		while( itor != end )
 		{
-			InstanceBatchVec::iterator it = itor->second.begin();
-			InstanceBatchVec::iterator en = itor->second.end();
-
-			while( it != en )
+			switch( id )
 			{
-				(*it)->getParentSceneNode()->showBoundingBox( bShow );
-				++it;
+			case CAST_SHADOWS:
+				(*itor)->setCastShadows( value );
+				break;
+			case SHOW_BOUNDINGBOX:
+				(*itor)->getParentSceneNode()->showBoundingBox( value );
+				break;
 			}
-
 			++itor;
 		}
 	}
