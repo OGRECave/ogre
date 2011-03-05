@@ -536,10 +536,12 @@ void reorganiseVertexBuffers(Mesh& mesh)
 			}
 			else
 			{
+				const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
+
 				// Automatic
 				VertexDeclaration* newDcl = 
 					sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-					mesh.hasSkeleton(), mesh.hasVertexAnimation(), sm->getVertexAnimationIncludesNormals());
+					mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
 				if (*newDcl != *(sm->vertexData->vertexDeclaration))
 				{
 					// Usages don't matter here since we're onlly exporting

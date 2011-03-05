@@ -485,10 +485,12 @@ void XMLToBinary(XmlOptions opts)
                 SubMesh* sm = smIt.getNext();
                 if (!sm->useSharedVertices)
                 {
+					const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::VAT_NONE;
+
                     // Automatic
                     VertexDeclaration* newDcl = 
                         sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
-                            newMesh->hasSkeleton(), newMesh->hasVertexAnimation(), sm->getVertexAnimationIncludesNormals());
+                            newMesh->hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals());
                     if (*newDcl != *(sm->vertexData->vertexDeclaration))
                     {
                         // Usages don't matter here since we're onlly exporting
