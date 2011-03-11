@@ -281,6 +281,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX,  			"texture_worldviewproj_matrix",				GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY,		"texture_worldviewproj_matrix_array",		GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX,				"spotlight_viewproj_matrix",				GCT_MATRIX_4X4),
+        AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_VIEWPROJ_MATRIX_ARRAY,          "spotlight_viewproj_matrix_array",          GCT_MATRIX_4X4),      
 		AutoShaderParameter(GpuProgramParameters::ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX,			"spotlight_worldviewproj_matrix",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_CUSTOM,									"custom",											GCT_FLOAT4),  // *** needs to be tested
 		AutoShaderParameter(GpuProgramParameters::ACT_TIME,										"time",											GCT_FLOAT1),
