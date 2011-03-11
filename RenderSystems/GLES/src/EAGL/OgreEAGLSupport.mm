@@ -289,9 +289,9 @@ namespace Ogre {
         return window;
     }
 
-    EAGLESContext * EAGLSupport::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable) const //, EAGLESContext shareList) const
+    EAGLESContext * EAGLSupport::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
-        EAGLESContext *context = OGRE_NEW EAGLESContext(drawable);
+        EAGLESContext *context = OGRE_NEW EAGLESContext(drawable, group);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

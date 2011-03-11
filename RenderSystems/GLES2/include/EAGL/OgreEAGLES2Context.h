@@ -36,7 +36,6 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    class EAGLSupport;
 
     class _OgrePrivate EAGLES2Context : public GLES2Context
     {
@@ -48,7 +47,7 @@ namespace Ogre {
 
         public:
 #ifdef __OBJC__
-            EAGLES2Context(CAEAGLLayer *drawable);
+            EAGLES2Context(CAEAGLLayer *drawable, EAGLSharegroup *group);
             CAEAGLLayer * getDrawable() const;
             EAGLContext * getContext() const;
 #endif

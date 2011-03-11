@@ -112,11 +112,15 @@ elseif (APPLE)
   set(PLATFORM_HEADERS 
     include/EAGL/OgreEAGLES2Context.h
     include/EAGL/OgreEAGL2Support.h
+    include/EAGL/OgreEAGL2View.h
+    include/EAGL/OgreEAGL2ViewController.h
     include/EAGL/OgreEAGL2Window.h
     include/EAGL/OgreGLES2Util.h
   )
   set(PLATFORM_SOURCES
     src/EAGL/OgreEAGL2Support.mm
+    src/EAGL/OgreEAGL2View.mm
+    src/EAGL/OgreEAGL2ViewController.mm
     src/EAGL/OgreEAGL2Window.mm
     src/EAGL/OgreEAGLES2Context.mm
   )

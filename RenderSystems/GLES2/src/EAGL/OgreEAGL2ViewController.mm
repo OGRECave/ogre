@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
@@ -26,18 +26,55 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EAGLView_H__
-#define __EAGLView_H__
+#import "OgreEAGL2ViewController.h"
 
-#ifdef __OBJC__
+#import "OgreFrustum.h"
 
-#import <UIKit/UIKit.h>
+using namespace Ogre;
 
-@interface EAGLView : UIView {
+@implementation EAGL2ViewController
+
+- (id)init
+{
+    if ((self = [super init]))
+    {
+    }
+    return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
+    {
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [super dealloc];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    // Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+}
+
+- (void)loadView
+{
+    [super loadView];
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    // FIXME: Add checks for modes supported in the info plist
+    return YES;
 }
 
 @end
-
-#endif
-
-#endif

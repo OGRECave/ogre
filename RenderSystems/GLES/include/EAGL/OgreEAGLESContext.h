@@ -47,7 +47,7 @@ namespace Ogre {
 
         public:
 #ifdef __OBJC__
-            EAGLESContext(CAEAGLLayer *drawable);
+            EAGLESContext(CAEAGLLayer *drawable, EAGLSharegroup *group);
             CAEAGLLayer * getDrawable() const;
             EAGLContext * getContext() const;
 #endif

@@ -83,6 +83,7 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
+#import <UIKit/UIKit.h>
 #endif
 
 #include "Sample.h"
@@ -431,7 +432,7 @@ namespace OgreBites
 			return true;
 		}
 
-#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+#if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0)
     #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
         void transformInputState(OIS::MultiTouchState &state)
     #else
@@ -469,6 +470,42 @@ namespace OgreBites
                 break;
             }
         }
+#elif (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 1) && (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
+    // Variation based upon device orientation for use with a view controller
+    void transformInputState(OIS::MultiTouchState &state)
+    {
+        int w = mWindow->getViewport(0)->getActualWidth();
+        int h = mWindow->getViewport(0)->getActualHeight();
+        int absX = state.X.abs;
+        int absY = state.Y.abs;
+        int relX = state.X.rel;
+        int relY = state.Y.rel;
+
+        UIInterfaceOrientation interfaceOrientation = [UIApplication sharedApplication].statusBarOrientation;
+        switch (interfaceOrientation)
+        {
+            case UIInterfaceOrientationPortrait:
+                break;
+            case UIInterfaceOrientationLandscapeLeft:
+                state.X.abs = w - absY;
+                state.Y.abs = absX;
+                state.X.rel = -relY;
+                state.Y.rel = relX;
+                break;
+            case UIInterfaceOrientationPortraitUpsideDown:
+                state.X.abs = w - absX;
+                state.Y.abs = h - absY;
+                state.X.rel = -relX;
+                state.Y.rel = -relY;
+                break;
+            case UIInterfaceOrientationLandscapeRight:
+                state.X.abs = absY;
+                state.Y.abs = h - absX;
+                state.X.rel = relY;
+                state.Y.rel = -relX;
+                break;
+        }
+    }
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)

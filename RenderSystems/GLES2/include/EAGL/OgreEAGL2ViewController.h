@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2009 Torus Knot Software Ltd
@@ -26,18 +26,17 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EAGLView_H__
-#define __EAGLView_H__
-
-#ifdef __OBJC__
+#ifndef __EAGL2ViewController_H__
+#define __EAGL2ViewController_H__
 
 #import <UIKit/UIKit.h>
+#import "OgreRoot.h"
 
-@interface EAGLView : UIView {
+using namespace Ogre;
+
+@interface EAGL2ViewController : UIViewController {
 }
 
 @end
-
-#endif
 
 #endif

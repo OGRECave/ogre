@@ -30,9 +30,8 @@ THE SOFTWARE.
 #include "OgreGLESRenderSystem.h"
 #include "OgreRoot.h"
 
-// TODO: DJR - Add support for EAGLSharegroups if deemed necessary
 namespace Ogre {
-    EAGLESContext::EAGLESContext(CAEAGLLayer *drawable)
+    EAGLESContext::EAGLESContext(CAEAGLLayer *drawable, EAGLSharegroup *group)
         : 
         mBackingWidth(0),
         mBackingHeight(0),
@@ -47,13 +46,22 @@ namespace Ogre {
 
         mDrawable = [drawable retain];
 
-        mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
+        // is to be used and a context is created using that group.
+        if(group)
+        {
+            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1 sharegroup:group];
+        }
+        else
+        {
+            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        }
         
         if (!mContext || ![EAGLContext setCurrentContext:mContext])
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Unable to create a suitable EAGLContext",
-                        "EAGLContext::EAGLContext");
+                        __FUNCTION__);
         }
     }
 
@@ -145,7 +153,7 @@ namespace Ogre {
             {
                 GL_CHECK_ERROR
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Failed to make complete FSAA framebuffer object",
+                            "Failed to make a complete FSAA framebuffer object",
                             __FUNCTION__);
                 return false;
             }
@@ -168,7 +176,7 @@ namespace Ogre {
         {
             GL_CHECK_ERROR
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to make complete framebuffer object",
+                        "Failed to make a complete framebuffer object",
                         __FUNCTION__);
             return false;
         }
@@ -208,7 +216,7 @@ namespace Ogre {
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to make context current",
+                        "Failed to make context current",
                         __FUNCTION__);
         }
     }

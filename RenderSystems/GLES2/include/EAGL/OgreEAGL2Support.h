@@ -74,7 +74,7 @@ namespace Ogre {
                                         const NameValuePairList *miscParams = 0);
 
 #ifdef __OBJC__
-            EAGLES2Context * createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable) const;
+            EAGLES2Context * createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const;
             CFDictionaryRef getGLConfigFromContext(EAGLES2Context context);
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif

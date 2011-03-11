@@ -66,7 +66,7 @@ namespace Ogre {
 	bool GLESFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		bool result;
-		if( result = GLESRenderTexture::attachDepthBuffer( depthBuffer ) )
+		if( (result = GLESRenderTexture::attachDepthBuffer( depthBuffer )) )
 			mFB.attachDepthBuffer( depthBuffer );
 
 		return result;

@@ -25,23 +25,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 --------------------------------------------------------------------------*/
 
-#include "OgreEAGLView.h"
+#include "OgreEAGL2View.h"
 
-#include "OgreGLESPrerequisites.h"
+#include "OgreGLES2Prerequisites.h"
 
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2RenderSystem.h"
 
 #import <QuartzCore/QuartzCore.h>
 
 using namespace Ogre;
 
-@implementation EAGLView
+@implementation EAGL2View
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"EAGLView frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
+    return [NSString stringWithFormat:@"EAGL2View frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
             [self frame].origin.x,
             [self frame].origin.y,
             [self frame].size.width,

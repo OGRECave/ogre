@@ -26,14 +26,14 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EAGLView_H__
-#define __EAGLView_H__
+#ifndef __EAGL2View_H__
+#define __EAGL2View_H__
 
 #ifdef __OBJC__
 
 #import <UIKit/UIKit.h>
 
-@interface EAGLView : UIView {
+@interface EAGL2View : UIView {
 }
 
 @end

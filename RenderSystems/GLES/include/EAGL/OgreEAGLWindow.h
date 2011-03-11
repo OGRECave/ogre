@@ -30,11 +30,18 @@ THE SOFTWARE.
 #define __EAGLWindow_H__
 
 #include "OgreRenderWindow.h"
-#include "OgreEAGLSupport.h"
-#include "OgreEAGLESContext.h"
 
 #ifdef __OBJC__
-#import "OgreEAGLView.h"
+#import <UIKit/UIKit.h>
+
+// Forward declarations
+@class CAEAGLLayer;
+@class EAGLView;
+@class EAGLViewController;
+
+// Define the native window type
+typedef UIWindow *NativeWindowType;
+
 #endif
 
 namespace Ogre {
@@ -43,13 +50,16 @@ namespace Ogre {
 
     class _OgrePrivate EAGLWindow : public RenderWindow
     {
-        private:
         protected:
             bool mClosed;
             bool mVisible;
+            /// Is this using an external window handle?
             bool mIsExternal;
-            bool mIsExternalGLControl;
-            
+            /// Is this using an external view handle?
+            bool mUsingExternalView;
+            /// Is this using an external view controller handle?
+            bool mUsingExternalViewController;
+
             // iOS 4 content scaling
             bool mIsContentScalingSupported;
             float mContentScalingFactor;
@@ -60,9 +70,10 @@ namespace Ogre {
 #ifdef __OBJC__
 			NativeWindowType mWindow;
             EAGLView *mView;
+            EAGLViewController *mViewController;
 #endif
 
-            void switchFullScreen(bool fullscreen);
+            void switchFullScreen(bool fullscreen) { }
 			void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
 			void initNativeCreatedWindow(const NameValuePairList *miscParams);
 			void createNativeWindow(int &left, int &top, uint &width, uint &height, String &title);
@@ -80,11 +91,11 @@ namespace Ogre {
 
 			virtual void setFullscreen(bool fullscreen, uint width, uint height);
             void destroy(void);
-            bool isClosed(void) const;
-            bool isVisible(void) const;
+            bool isClosed(void) const { return mClosed; }
+            bool isVisible(void) const { return mVisible; }
 
-            void setVisible(bool visible);
-            void setClosed(bool closed);
+            void setVisible(bool visible) { mVisible = visible; }
+            void setClosed(bool closed) { mClosed = closed; }
             void swapBuffers(bool waitForVSync);
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 
@@ -92,12 +103,14 @@ namespace Ogre {
                @remarks
                * Get custom attribute; the following attributes are valid:
                * WINDOW         The NativeWindowType target for rendering.
+               * VIEW           The EAGLView object that is drawn into.
+               * VIEWCONTROLLER The UIViewController used for handling view rotation.
                * GLCONTEXT      The Ogre GLESContext used for rendering.
-               * VIEW           EAGLView that the context is drawn in.
+               * SHAREGROUP     The EAGLShareGroup object associated with the main context.
                */
             virtual void getCustomAttribute(const String& name, void* pData);
 
-            bool requiresTextureFlipping() const;
+            bool requiresTextureFlipping() const { return false; }
     };
 }
 

@@ -77,7 +77,7 @@ namespace Ogre {
 	bool GLESFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
 		bool result;
-		if( result = MultiRenderTarget::attachDepthBuffer( depthBuffer ) )
+		if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
 			fbo.attachDepthBuffer( depthBuffer );
 
 		return result;

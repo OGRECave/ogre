@@ -30,9 +30,8 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
 
-// TODO: DJR - Add support for EAGLSharegroups if deemed necessary
 namespace Ogre {
-    EAGLES2Context::EAGLES2Context(CAEAGLLayer *drawable)
+    EAGLES2Context::EAGLES2Context(CAEAGLLayer *drawable, EAGLSharegroup *group)
         : 
         mBackingWidth(0),
         mBackingHeight(0),
@@ -47,13 +46,22 @@ namespace Ogre {
 
         mDrawable = [drawable retain];
 
-        mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-        
+        // If the group argument is not NULL, then we assume that an externally created EAGLSharegroup
+        // is to be used and a context is created using that group.
+        if(group)
+        {
+            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:group];
+        }
+        else
+        {
+            mContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        }
+
         if (!mContext || ![EAGLContext setCurrentContext:mContext])
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Unable to create a suitable EAGLContext",
-                        "EAGLES2Context::EAGLES2Context");
+                        __FUNCTION__);
         }
     }
 
@@ -105,9 +113,7 @@ namespace Ogre {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, mViewRenderbuffer);
         GL_CHECK_ERROR
 
-
-
-        #if GL_APPLE_framebuffer_multisample
+#if GL_APPLE_framebuffer_multisample
         if(mIsMultiSampleSupported && mNumSamples > 0)
         {
             // Determine how many MSAS samples to use
@@ -147,7 +153,7 @@ namespace Ogre {
             {
                 GL_CHECK_ERROR
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Failed to make complete FSAA framebuffer object",
+                            "Failed to make a complete FSAA framebuffer object",
                             __FUNCTION__);
                 return false;
             }
@@ -170,7 +176,7 @@ namespace Ogre {
         {
             GL_CHECK_ERROR
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to make complete framebuffer object",
+                        "Failed to make a complete framebuffer object",
                         __FUNCTION__);
             return false;
         }
@@ -210,7 +216,7 @@ namespace Ogre {
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to make context current",
+                        "Failed to make context current",
                         __FUNCTION__);
         }
     }

@@ -77,7 +77,7 @@ namespace Ogre {
         optOrientation.possibleValues.push_back("Landscape Left");
         optOrientation.possibleValues.push_back("Landscape Right");
         optOrientation.possibleValues.push_back("Portrait");
-        optOrientation.currentValue = "Landscape Left";
+        optOrientation.currentValue = "Landscape Right";
         optOrientation.immutable = false;
         
         optDisplayFrequency.name = "Display Frequency";
@@ -293,9 +293,9 @@ namespace Ogre {
         return window;
     }
 
-    EAGLES2Context * EAGL2Support::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable) const //, EAGLES2Context shareList) const
+    EAGLES2Context * EAGL2Support::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
-        EAGLES2Context *context = OGRE_NEW EAGLES2Context(drawable);
+        EAGLES2Context *context = OGRE_NEW EAGLES2Context(drawable, group);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

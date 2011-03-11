@@ -62,7 +62,6 @@
 
 - (void)go;
 - (void)renderOneFrame:(id)sender;
-- (void)orientationChanged:(NSNotification *)notification;
 
 @property (retain) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
@@ -130,10 +129,6 @@
                                                  repeats:YES];
     }
 
-    // Register for orientation notifications
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
-                                                 name:UIDeviceOrientationDidChangeNotification object:nil];
     [pool release];
 }
 
@@ -162,7 +157,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     Ogre::Root::getSingleton().queueEndRendering();
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 
     if (mDisplayLinkSupported)
     {
@@ -184,24 +178,6 @@
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     Ogre::Root::getSingleton().saveConfig();
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:)
-                                                 name:UIDeviceOrientationDidChangeNotification object:nil];
-}
-
-- (void)orientationChanged:(NSNotification *)notification
-{
-    size_t v = 0;
-    Ogre::Root::getSingleton().getAutoCreatedWindow()->getCustomAttribute("VIEW", &v);
-
-    [(UIView *)v setNeedsLayout];
 }
 
 - (void)renderOneFrame:(id)sender

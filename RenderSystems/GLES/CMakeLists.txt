@@ -115,6 +115,7 @@ elseif (APPLE)
     include/EAGL/OgreEAGLSupport.h
     include/EAGL/OgreEAGLRenderTexture.h
     include/EAGL/OgreEAGLView.h
+    include/EAGL/OgreEAGLViewController.h
     include/EAGL/OgreEAGLWindow.h
     include/EAGL/OgreGLESUtil.h
   )
@@ -122,6 +123,7 @@ elseif (APPLE)
     src/EAGL/OgreEAGLSupport.mm
     src/EAGL/OgreEAGLRenderTexture.mm
     src/EAGL/OgreEAGLView.mm
+    src/EAGL/OgreEAGLViewController.mm
     src/EAGL/OgreEAGLWindow.mm
     src/EAGL/OgreEAGLESContext.mm
   )

@@ -76,7 +76,7 @@ namespace Ogre {
                                                    size_t width, size_t height);
 
 #ifdef __OBJC__
-            EAGLESContext * createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable) const;
+            EAGLESContext * createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const;
             CFDictionaryRef getGLConfigFromContext(EAGLESContext context);
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);
 #endif

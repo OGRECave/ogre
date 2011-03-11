@@ -207,13 +207,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
-  set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iOS" FORCE)
-
-  # CMake 2.8.1 added the ability to specify per-target architectures.
-  # As a side effect, it creates corrupt Xcode projects if you try do it for the whole project.
-  if(VERSION STRLESS "2.8.1")
-    set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
-  endif()
 
   set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
   add_definitions(-fno-regmove)

@@ -189,15 +189,15 @@ namespace Ogre {
             /** See
               RenderSystem
              */
-            void setAmbientLight(float r, float g, float b);
+            void setAmbientLight(float r, float g, float b) { };   // Not supported
             /** See
               RenderSystem
              */
-            void setShadingType(ShadeOptions so);
+            void setShadingType(ShadeOptions so) { };   // Not supported
             /** See
               RenderSystem
              */
-            void setLightingEnabled(bool enabled);
+            void setLightingEnabled(bool enabled) { };   // Not supported
 
             /// @copydoc RenderSystem::_createRenderWindow
             RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
@@ -228,7 +228,7 @@ namespace Ogre {
             /** See
               RenderSystem
              */
-            void setNormaliseNormals(bool normalise);
+            void setNormaliseNormals(bool normalise) { };   // Not supported
 
             // -----------------------------
             // Low-level overridden members
@@ -236,7 +236,7 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void _useLights(const LightList& lights, unsigned short limit);
+            void _useLights(const LightList& lights, unsigned short limit) { };   // Not supported
             /** See
              RenderSystem
              */
@@ -281,11 +281,11 @@ namespace Ogre {
              RenderSystem
              */
             void _setTextureCoordCalculation(size_t stage, TexCoordCalcMethod m,
-                    const Frustum* frustum = 0);
+                    const Frustum* frustum = 0) { };   // Not supported
             /** See
              RenderSystem
              */
-            void _setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm);
+            void _setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm) { };   // Not supported
             /** See
              RenderSystem
              */
@@ -293,15 +293,15 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void _setTextureBorderColour(size_t stage, const ColourValue& colour);
+            void _setTextureBorderColour(size_t stage, const ColourValue& colour) { };   // Not supported
             /** See
              RenderSystem
              */
-            void _setTextureMipmapBias(size_t unit, float bias);
+            void _setTextureMipmapBias(size_t unit, float bias) { };   // Not supported
             /** See
              RenderSystem
              */
-            void _setTextureMatrix(size_t stage, const Matrix4& xform);
+            void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
             /** See
              RenderSystem
              */
@@ -425,11 +425,11 @@ namespace Ogre {
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
                 Real depth = 1.0f, unsigned short stencil = 0);
-            HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
-            Real getHorizontalTexelOffset(void);
-            Real getVerticalTexelOffset(void);
-            Real getMinimumDepthInputValue(void);
-            Real getMaximumDepthInputValue(void);
+            HardwareOcclusionQuery* createHardwareOcclusionQuery(void) { return NULL; }   // Not supported
+            Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
+            Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
+            Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]
+            Real getMaximumDepthInputValue(void) { return 1.0f; }             // Range [-1.0f, 1.0f]
             void registerThread() {}
             void unregisterThread() {}
             void preExtraThreadsStarted() {}
