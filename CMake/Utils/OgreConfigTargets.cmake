@@ -293,14 +293,17 @@ function(ogre_config_sample_common SAMPLENAME)
       endif()
     endif(NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   endif (APPLE)
-  if (CMAKE_COMPILER_IS_GNUCXX)
-    # add GCC visibility flags to shared library build
-    set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-    set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
-    set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
-    # disable "lib" prefix on Unix
-    set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
-  endif (CMAKE_COMPILER_IS_GNUCXX)	
+  if (NOT OGRE_STATIC)
+    if (CMAKE_COMPILER_IS_GNUCXX)
+      # add GCC visibility flags to shared library build
+      set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+      set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
+      set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
+      # disable "lib" prefix on Unix
+      set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
+    endif (CMAKE_COMPILER_IS_GNUCXX)
+  endif()
+
   if (OGRE_INSTALL_SAMPLES)
 	ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
   endif()
