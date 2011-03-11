@@ -92,10 +92,6 @@ macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "
 find_package(OpenGLES)
 macro_log_feature(OPENGLES_FOUND "OpenGL ES" "Support for the OpenGL ES 1.x render system" "http://www.khronos.org/opengles/" FALSE "" "")
 
-# Find OpenGL ES 2.x
-#find_package(OpenGLES2)
-#macro_log_feature(OPENGLES2_FOUND "OpenGL ES 2" "Support for the OpenGL ES 2.x render system" "http://www.khronos.org/opengles/" FALSE "" "")
-
 # Find DirectX
 if(WIN32)
 	find_package(DirectX)
