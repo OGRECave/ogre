@@ -460,21 +460,6 @@ namespace Ogre {
         mGLInitialised = 0;
     }
 
-    void GLES2RenderSystem::setAmbientLight(float r, float g, float b)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::setShadingType(ShadeOptions so)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::setLightingEnabled(bool enabled)
-    {
-        // Not supported
-    }
-
     RenderWindow* GLES2RenderSystem::_createRenderWindow(const String &name, unsigned int width, unsigned int height,
                                                         bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -687,16 +672,6 @@ namespace Ogre {
         return VET_COLOUR_ABGR;
     }
 
-    void GLES2RenderSystem::setNormaliseNormals(bool normalise)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::_useLights(const LightList& lights, unsigned short limit)
-    {
-        // Not supported
-    }
-
     void GLES2RenderSystem::_setWorldMatrix(const Matrix4 &m)
     {
         mWorldMatrix = m;
@@ -763,18 +738,6 @@ namespace Ogre {
 		mTextureCoordIndex[stage] = index;
     }
 
-    void GLES2RenderSystem::_setTextureCoordCalculation(size_t stage,
-                                                       TexCoordCalcMethod m,
-                                                       const Frustum* frustum)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::_setTextureBlendMode(size_t stage, const LayerBlendModeEx& bm)
-    {
-        // Not supported
-    }
-
     GLint GLES2RenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
     {
         switch (tam)
@@ -799,21 +762,6 @@ namespace Ogre {
 		glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
         GL_CHECK_ERROR;
         activateGLTextureUnit(0);
-    }
-
-    void GLES2RenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
-    {
-        // Not supported
-    }
-
-    void GLES2RenderSystem::_setTextureMatrix(size_t stage, const Matrix4& xform)
-    {
-        // Not supported
     }
 
     GLenum GLES2RenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
@@ -1571,12 +1519,13 @@ namespace Ogre {
         {
             if (!op.vertexData->vertexBufferBinding->isBufferBound(elem->getSource()))
                 continue; // skip unbound elements
+        GL_CHECK_ERROR;
 
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elem->getSource());
+
             _bindGLBuffer(GL_ARRAY_BUFFER,
                 static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get())->getGLBufferId());
-            GL_CHECK_ERROR;
             pBufferData = VBO_BUFFER_OFFSET(elem->getOffset());
 
             if (op.vertexData->vertexStart)
@@ -1627,7 +1576,6 @@ namespace Ogre {
 
 		if (multitexturing)
             activateGLTextureUnit(GL_TEXTURE0);
-        GL_CHECK_ERROR;
 
         // Find the correct type to render
         GLint primType;
@@ -1659,7 +1607,6 @@ namespace Ogre {
             _bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER,
                          static_cast<GLES2HardwareIndexBuffer*>(op.indexData->indexBuffer.get())->getGLBufferId());
 
-            GL_CHECK_ERROR;
             pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                             op.indexData->indexBuffer->getIndexSize());
 
@@ -1849,36 +1796,6 @@ namespace Ogre {
             glStencilMask(mStencilMask);
             GL_CHECK_ERROR;
         }
-    }
-
-    HardwareOcclusionQuery* GLES2RenderSystem::createHardwareOcclusionQuery(void)
-    {
-        // Not supported
-        return 0;
-    }
-
-    Real GLES2RenderSystem::getHorizontalTexelOffset(void)
-    {
-		// No offset in GL
-        return 0.0;
-    }
-
-    Real GLES2RenderSystem::getVerticalTexelOffset(void)
-    {
-		// No offset in GL
-        return 0.0;
-    }
-
-    Real GLES2RenderSystem::getMinimumDepthInputValue(void)
-    {
-		// Range [-1.0f, 1.0f]
-        return -1.0f;
-    }
-
-    Real GLES2RenderSystem::getMaximumDepthInputValue(void)
-    {
-		// Range [-1.0f, 1.0f]
-        return 1.0f;
     }
 
     void GLES2RenderSystem::_switchContext(GLES2Context *context)
