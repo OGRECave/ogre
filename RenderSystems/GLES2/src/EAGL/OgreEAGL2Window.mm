@@ -414,22 +414,17 @@ namespace Ogre {
                 GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
                 glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
                 GL_CHECK_ERROR
-                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-                GL_CHECK_ERROR
             }
             else
             {
                 GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
                 glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
                 GL_CHECK_ERROR
-                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-                GL_CHECK_ERROR
             }
         }
-#else
+#endif
         glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
         GL_CHECK_ERROR
-#endif
 
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
