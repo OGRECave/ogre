@@ -398,18 +398,21 @@ void Sample_ShaderSystem::setupContent()
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
 
+    // OpenGL ES 2.0 does not support texture atlases
+	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") == String::npos)
+    {
+        RTShader::RenderState* pMainRenderState = 
+            RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
+        pMainRenderState->addTemplateSubRenderState(
+            Ogre::RTShader::ShaderGenerator::getSingleton().createSubRenderState(
+            Ogre::RTShader::TextureAtlasSampler::Type));
 
-	RTShader::RenderState* pMainRenderState = 
-		RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
-	pMainRenderState->addTemplateSubRenderState(
-		Ogre::RTShader::ShaderGenerator::getSingleton().createSubRenderState(
-		Ogre::RTShader::TextureAtlasSampler::Type));
-
-	// Create texture atlas object and node
-	ManualObject* atlasObject = createTextureAtlasObject();
-	childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	childNode->setPosition(-600.0, 0, -850.0);
-	childNode->attachObject(atlasObject);
+        // Create texture atlas object and node
+        ManualObject* atlasObject = createTextureAtlasObject();
+        childNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        childNode->setPosition(-600.0, 0, -850.0);
+        childNode->attachObject(atlasObject);
+    }
 
 	createDirectionalLight();
 	createPointLight();
