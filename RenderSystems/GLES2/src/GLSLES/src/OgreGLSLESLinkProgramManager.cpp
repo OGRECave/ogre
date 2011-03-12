@@ -268,15 +268,13 @@ namespace Ogre {
             }
             else
             {
-//                LogManager::getSingleton().logMessage("OPTIMISER ERROR!");
+                LogManager::getSingleton().logMessage("Error from GLSL Optimiser, disabling optimisation for program: " + gpuProgram->getName());
+                gpuProgram->getGLSLProgram()->setParameter("use_optimiser", "false");
 //                LogManager::getSingleton().logMessage(String(glslopt_get_log(shader)));
 //                LogManager::getSingleton().logMessage("Original Shader");
 //                LogManager::getSingleton().logMessage(gpuProgram->getGLSLProgram()->getSource());
 //                LogManager::getSingleton().logMessage("Optimized Shader");
 //                LogManager::getSingleton().logMessage(os.str());
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                            "Internal GLSL-Optimiser error: " + StringConverter::toString(glslopt_get_log(shader)),
-                            __FUNCTION__ );
             }
             glslopt_shader_delete(shader);
         }
