@@ -73,8 +73,22 @@ using namespace Ogre;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    // FIXME: Add checks for modes supported in the info plist
-    return YES;
+    NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+    
+    NSString *rotateToOrientation = @"";
+    if(interfaceOrientation == UIInterfaceOrientationPortrait)
+        rotateToOrientation = @"UIInterfaceOrientationPortrait";
+    else if(interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        rotateToOrientation = @"UIInterfaceOrientationPortraitUpsideDown";
+    else if(interfaceOrientation == UIInterfaceOrientationLandscapeLeft)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeLeft";
+    else if(interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+        rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
+    
+    if([supportedOrientations containsObject:rotateToOrientation])
+        return YES;
+    else
+        return NO;
 }
 
 @end
