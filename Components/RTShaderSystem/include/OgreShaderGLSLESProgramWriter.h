@@ -145,7 +145,6 @@ protected:
 	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
 	FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
     StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
-    FunctionVector              mInlinedFunctions;
 	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes
 	int							mGLSLVersion;					// Holds the current glsl es version
 	StringVector				mFragInputParams;				// Holds the fragment input params 

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGLSLESProgram.h"
 
 namespace Ogre {
 
@@ -66,6 +67,8 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat2", GL_FLOAT_MAT2));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
+        
+        mGLSLOptimiserContext = glslopt_initialize(true);
 	}
 
 	//-----------------------------------------------------------------------
@@ -77,6 +80,11 @@ namespace Ogre {
 		{
 			OGRE_DELETE currentProgram->second;
 		}
+        if(mGLSLOptimiserContext)
+        {
+            glslopt_cleanup(mGLSLOptimiserContext);
+            mGLSLOptimiserContext = NULL;
+        }
 	}
 
 	//-----------------------------------------------------------------------
@@ -233,9 +241,47 @@ namespace Ogre {
 			}
 		}
 		return false;
-
-
 	}
+
+    void GLSLESLinkProgramManager::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
+    {
+        if(!gpuProgram->getGLSLProgram()->getIsOptimised())
+        {
+            GpuProgramType gpuType = gpuProgram->getType();
+            const glslopt_shader_type shaderType = (gpuType == GPT_VERTEX_PROGRAM) ? kGlslOptShaderVertex : kGlslOptShaderFragment;
+            String shaderSource = gpuProgram->getGLSLProgram()->getSource();
+            glslopt_shader* shader = glslopt_optimize(mGLSLOptimiserContext, shaderType, shaderSource.c_str(), 0);
+
+            std::stringstream os;
+            if(glslopt_get_status(shader))
+            {
+                // Write the current version (this forces the driver to fulfill the glsl es standard)
+                // TODO: Need to insert the current or compatibility version.  This is not future-proof
+                os << "#version 100" << std::endl;
+                
+                // Default precision declaration is required in fragment and vertex shaders.
+                os << "precision mediump float;" << std::endl;
+                os << "precision highp int;" << std::endl;
+                os << glslopt_get_output(shader);
+                gpuProgram->getGLSLProgram()->setSource(os.str());
+                gpuProgram->getGLSLProgram()->setIsOptimised(true);
+            }
+            else
+            {
+//                LogManager::getSingleton().logMessage("OPTIMISER ERROR!");
+//                LogManager::getSingleton().logMessage(String(glslopt_get_log(shader)));
+//                LogManager::getSingleton().logMessage("Original Shader");
+//                LogManager::getSingleton().logMessage(gpuProgram->getGLSLProgram()->getSource());
+//                LogManager::getSingleton().logMessage("Optimized Shader");
+//                LogManager::getSingleton().logMessage(os.str());
+                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                            "Internal GLSL-Optimiser error: " + StringConverter::toString(glslopt_get_log(shader)),
+                            __FUNCTION__ );
+            }
+            glslopt_shader_delete(shader);
+        }
+    }
+
 	//---------------------------------------------------------------------
 	void GLSLESLinkProgramManager::extractUniforms(GLuint programObject, 
 		const GpuConstantDefinitionMap* vertexConstantDefs, 
@@ -369,6 +415,12 @@ namespace Ogre {
 						// if this is not a type, and not empty, it should be a name
 						StringUtil::trim(*i);
 						if (i->empty()) continue;
+
+                        // Skip over precision keywords
+                        if(StringUtil::match((*i), "lowp") ||
+                           StringUtil::match((*i), "mediump") ||
+                           StringUtil::match((*i), "highp"))
+                            continue;
 
 						String::size_type arrayStart = i->find("[", 0);
 						if (arrayStart != String::npos)

@@ -296,6 +296,11 @@ namespace Ogre {
         rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
+        // Geometry programs are not supported, report 0
+        rsc->setGeometryProgramConstantFloatCount(0);
+        rsc->setGeometryProgramConstantBoolCount(0);
+        rsc->setGeometryProgramConstantIntCount(0);
+        
         // Check for Float textures
 //        rsc->setCapability(RSC_TEXTURE_FLOAT);
 

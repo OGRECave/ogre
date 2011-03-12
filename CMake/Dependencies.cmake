@@ -173,6 +173,13 @@ macro_log_feature(POCO_FOUND "POCO" "POCO framework" "http://pocoproject.org/" F
 find_package(TBB)
 macro_log_feature(TBB_FOUND "tbb" "Threading Building Blocks" "http://www.threadingbuildingblocks.org/" FALSE "" "")
 
+# GLSL-Optimizer
+find_package(GLSLOptimizer)
+macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http://github.com/aras-p/glsl-optimizer/" FALSE "" "")
+
+# HLSL2GLSL
+find_package(HLSL2GLSL)
+macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
 
 
 #######################################################################
@@ -252,6 +259,8 @@ include_directories(
   ${CppUnit_INCLUDE_DIRS}
   ${Carbon_INCLUDE_DIRS}
   ${Cocoa_INCLUDE_DIRS}
+  ${GLSL_Optimizer_INCLUDE_DIRS}
+  ${HLSL2GLSL_INCLUDE_DIRS}
 )
 
 link_directories(

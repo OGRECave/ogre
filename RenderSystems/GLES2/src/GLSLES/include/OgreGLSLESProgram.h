@@ -56,14 +56,22 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram
     {
     public:
-        /// Command object for attaching another GLSL Program 
-        class CmdAttach : public ParamCommand
+        /// Command object for running the GLSL optimiser 
+        class CmdOptimisation : public ParamCommand
         {
         public:
             String doGet(const void* target) const;
-            void doSet(void* target, const String& shaderNames);
+			void doSet(void* target, const String& val);
         };
 
+		/// Command object for setting macro defines
+		class CmdPreprocessorDefines : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
+        
         GLSLESProgram(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
@@ -72,20 +80,26 @@ namespace Ogre {
 		const GLuint getGLHandle() const { return mGLHandle; }
 		void attachToProgramObject( const GLuint programObject );
 		void detachFromProgramObject( const GLuint programObject );
-		String getAttachedShaderNames() const { return mAttachedShaderNames; }
 
 		/// Overridden
 		bool getPassTransformStates(void) const;
 		bool getPassSurfaceAndLightStates(void) const;
 		bool getPassFogStates(void) const;
 
-        /// Attach another GLSL ES Shader to this one.
-        void attachChildShader(const String& name);
-
 		/// Sets the preprocessor defines use to compile the program.
 		void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
 		/// Sets the preprocessor defines use to compile the program.
 		const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
+
+        /// Sets if the GLSL optimiser is enabled.
+		void setOptimiserEnabled(bool enabled) { mOptimiserEnabled = enabled; }
+		/// Gets if the GLSL optimiser is enabled.
+		bool getOptimiserEnabled(void) const { return mOptimiserEnabled; }
+        
+        /// Sets if the GLSL source has been optimised successfully
+        void setIsOptimised(bool flag) { mIsOptimised = flag; }
+        /// Gets if the GLSL source has been optimised successfully
+        bool getIsOptimised(void) { return mIsOptimised; }
 
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
@@ -95,16 +109,9 @@ namespace Ogre {
 		/// compile source into shader object
 		bool compile( const bool checkErrors = false);
 
-		/// Command object for setting macro defines
-		class CmdPreprocessorDefines : public ParamCommand
-		{
-		public:
-			String doGet(const void* target) const;
-			void doSet(void* target, const String& val);
-		};
 	protected:
 		static CmdPreprocessorDefines msCmdPreprocessorDefines;
-        static CmdAttach msCmdAttach;
+		static CmdOptimisation msCmdOptimisation;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
@@ -135,10 +142,11 @@ namespace Ogre {
 		GLuint mGLHandle;
 		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
-		/// Attached Shader names
-		String mAttachedShaderNames;
+        /// Flag indicating if shader has been successfully optimised
+        bool mIsOptimised;
 		/// Preprocessor options
 		String mPreprocessorDefines;
+        bool mOptimiserEnabled;
     };
 }
 

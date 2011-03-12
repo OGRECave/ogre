@@ -42,7 +42,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
 	GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
-    GLSLESProgram::CmdAttach GLSLESProgram::msCmdAttach;
+    GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
 
     //-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
@@ -52,23 +52,23 @@ namespace Ogre {
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
 		, mGLHandle(0)
         , mCompiled(0)
+        , mIsOptimised(false)
+        , mOptimiserEnabled(true)
     {
-		// Add parameter command "attach" to the material serializer dictionary
         if (createParamDictionary("GLSLESProgram"))
         {
             setupBaseParamDictionary();
             ParamDictionary* dict = getParamDictionary();
 
 			dict->addParameter(ParameterDef("preprocessor_defines", 
-				"Preprocessor defines use to compile the program.",
-				PT_STRING),&msCmdPreprocessorDefines);
-            dict->addParameter(ParameterDef("attach", 
-                "name of another GLSL ES program needed by this program",
-                PT_STRING),&msCmdAttach);
+                                            "Preprocessor defines use to compile the program.",
+                                            PT_STRING),&msCmdPreprocessorDefines);
+			dict->addParameter(ParameterDef("use_optimiser", 
+                                            "Should the GLSL optimiser be used. Default is true.",
+                                            PT_BOOL),&msCmdOptimisation);
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsles";
-        
     }
     //---------------------------------------------------------------------------
     GLSLESProgram::~GLSLESProgram()
@@ -204,8 +204,6 @@ namespace Ogre {
 		{
             String message = logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
 			checkAndFixInvalidDefaultPrecisionError(message);
-
-			
 		}
 
 		// Log a message that the shader compiled successfully.
@@ -277,14 +275,14 @@ namespace Ogre {
 		return true;
 	}
 	//-----------------------------------------------------------------------
-    String GLSLESProgram::CmdAttach::doGet(const void *target) const
-    {
-        return (static_cast<const GLSLESProgram*>(target))->getAttachedShaderNames();
-    }
-	//-----------------------------------------------------------------------
-    void GLSLESProgram::CmdAttach::doSet(void *target, const String& shaderNames)
-    {
-    }
+	String GLSLESProgram::CmdOptimisation::doGet(const void *target) const
+	{
+        return StringConverter::toString(static_cast<const GLSLESProgram*>(target)->getOptimiserEnabled());
+	}
+	void GLSLESProgram::CmdOptimisation::doSet(void *target, const String& val)
+	{
+        static_cast<GLSLESProgram*>(target)->setOptimiserEnabled(StringConverter::parseBool(val));
+	}
 	//-----------------------------------------------------------------------
 	String GLSLESProgram::CmdPreprocessorDefines::doGet(const void *target) const
 	{
@@ -293,11 +291,6 @@ namespace Ogre {
 	void GLSLESProgram::CmdPreprocessorDefines::doSet(void *target, const String& val)
 	{
 		static_cast<GLSLESProgram*>(target)->setPreprocessorDefines(val);
-	}
-
-	//-----------------------------------------------------------------------
-    void GLSLESProgram::attachChildShader(const String& name)
-	{
 	}
 
 	//-----------------------------------------------------------------------

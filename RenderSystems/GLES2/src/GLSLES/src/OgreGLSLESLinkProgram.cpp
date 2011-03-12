@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreStringVector.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
@@ -100,6 +101,17 @@ namespace Ogre {
 			}
 			else
 			{
+                // check CmdParams for each shader type to see if we should optimize
+                String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
+                if((paramStr == "true") || paramStr.empty())
+                {
+                    GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mVertexProgram);
+                }
+                paramStr = mFragmentProgram->getGLSLProgram()->getParameter("use_optimiser");
+                if((paramStr == "true") || paramStr.empty())
+                {
+                    GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mFragmentProgram);
+                }
 				compileAndLink();
 			}
 

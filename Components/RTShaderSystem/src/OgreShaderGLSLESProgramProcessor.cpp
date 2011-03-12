@@ -107,9 +107,12 @@ void GLSLESProgramProcessor::bindTextureSamplers(Program* pCpuProgram, GpuProgra
 		const UniformParameterPtr pCurParam = *itParams;
 		
 		if (pCurParam->isSampler())
-		{		
-			pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());						
-		}		
+		{
+            // The optimizer may remove some unnecessary parameters, so we should ignore them
+            pGpuParams->setIgnoreMissingParams(true);
+
+            pGpuParams->setNamedConstant(pCurParam->getName(), pCurParam->getIndex());
+		}
 	}
 }
 

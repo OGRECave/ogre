@@ -279,7 +279,7 @@ namespace Ogre {
 
                                         String::size_type rparen_pos = itParam->find(')', 0);
                                         if(rparen_pos == String::npos)
-                                            functionSig += ", ";
+                                            functionSig += ",";
                                     }
 
                                     String::size_type space_pos = line.find(')', 0);
@@ -319,7 +319,6 @@ namespace Ogre {
                                         functionBody.erase(pos, 1);
                                         pos = functionBody.rfind("}");
                                         functionBody.erase(pos, 1);
-
                                         mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
                                     }
                                     functionBody += "\n";
@@ -375,6 +374,10 @@ namespace Ogre {
                         }
                     }
                 }
+            }
+            else
+            {
+            LogManager::getSingleton().logMessage("ERROR: Cached function not found " + invoc.getFunctionName());
             }
         }
         
@@ -435,9 +438,6 @@ namespace Ogre {
             // Clear out old input params
             mFragInputParams.clear();
             
-            // Clear out old inlined functions
-            mInlinedFunctions.clear();
-
             const ShaderFunctionList& functionList = program->getFunctions();
             ShaderFunctionConstIterator itFunction;
 
@@ -450,11 +450,6 @@ namespace Ogre {
             // Default precision declaration is required in fragment and vertex shaders.
             os << "precision highp float;" << ENDL;
             os << "precision highp int;" << ENDL;
-// not supported on the AMD emulation on win32 - and doesn't really matter to the PowerVR and ARM. 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_WIN32)
-            os << "precision lowp sampler2D;" << ENDL;
-            os << "precision lowp samplerCube;" << ENDL;
-#endif
 
             // Generate source code header.
             writeProgramTitle(os, program);
@@ -527,45 +522,9 @@ namespace Ogre {
                     FunctionInvocation*  pFuncInvoc = (FunctionInvocation*)*itAtom;
                     FunctionInvocation::OperandVector::iterator itOperand = pFuncInvoc->getOperandList().begin();
                     FunctionInvocation::OperandVector::const_iterator itOperandEnd = pFuncInvoc->getOperandList().end();
-                    FunctionInvocation::OperandVector::const_iterator itInlinedOperand;
-
-                    bool inlineable = false;
-                    String inlinedFuncBody = StringUtil::BLANK;
-                    StringVector bodyTokens;
-                    FunctionInvocation pInlinedFuncInvoc = FunctionInvocation("", 0, 0);
 
                     // Reset the iterator
                     itOperand = pFuncInvoc->getOperandList().begin();
-                    
-                    FunctionVectorIterator itInline = mInlinedFunctions.begin();
-                    FunctionVectorIterator itInlineEnd = mInlinedFunctions.end();
-                    for (; itInline != itInlineEnd; ++itInline)
-                    {
-                        // See if this is a function that we should inline
-                        if(FunctionInvocation::FunctionInvocationCompare()(*itInline, *pFuncInvoc))
-                        {
-                            inlineable = true;
-
-                            // Now go through the cache and find the function body,
-                            // function invocation and operand pointers
-                            FunctionMapIterator itCache = mFunctionCacheMap.begin();
-                            FunctionMapIterator itCacheEnd = mFunctionCacheMap.end();
-                            for (; itCache != itCacheEnd; ++itCache)
-                            {
-                                if(FunctionInvocation::FunctionInvocationCompare()((*itCache).first, *itInline))
-                                {
-                                    inlinedFuncBody = (*itCache).second;
-                                    pInlinedFuncInvoc = (*itCache).first;
-                                    itInlinedOperand = pInlinedFuncInvoc.getOperandList().begin();
-                                    break;
-                                }
-                            }
-                           
-                            continue;
-                        }
-                    }
-
-                    bodyTokens = StringUtil::split(inlinedFuncBody, "_(),+-*/<>;^=!%?{}[]\n", 0, true);
 
                     // Local string stream
                     std::stringstream localOs;
@@ -733,54 +692,12 @@ namespace Ogre {
 						{
 							localOs << "int(";
 						}
-                       
-                        if(inlineable)
-                        {
-                            // Replace the variable
-                            String oldParam = (*itInlinedOperand).getParameter()->getName();
-
-                            // Remove ) and ; to make token matching easier
-                            size_t pos = oldParam.find(")");
-                            if(pos != String::npos)
-                                oldParam.erase(pos, 1);
-
-                            pos = oldParam.find(";");
-                            if(pos != String::npos)
-                                oldParam.erase(pos, 1);
-
-                            for (StringVector::iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
-                            {
-                                // Remove whitespace
-                                StringUtil::trim(*it);
-                                StringVector paramTokens = StringUtil::split(*it, ".");
-
-                                if(paramTokens[0] == oldParam)
-                                {
-                                    *it = StringUtil::replaceAll(*it, paramTokens[0], newParam);
-                                }
-                            }
-
-                            ++itInlinedOperand;
-                        }
                     }
 
                     // Write function call closer.
-                    if(inlineable)
-                    {
-                        inlinedFuncBody.clear();
-                        // Reconstruct the line with variable replaced
-                        for (StringVector::const_iterator it = bodyTokens.begin(); it != bodyTokens.end(); ++it)
-                            inlinedFuncBody += *it;
-
-                        os << "\t" << inlinedFuncBody << ENDL;
-                    }
-                    else
-                    {
-                        localOs << ");" << ENDL;
-                        localOs << ENDL;
-                        os << localOs.str();
-                    }
-
+                    localOs << ");" << ENDL;
+                    localOs << ENDL;
+                    os << localOs.str();
                 }
                 os << "}" << ENDL;
             }
@@ -987,13 +904,6 @@ namespace Ogre {
             // Parse the source shader and write out only the needed functions
             for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
             {
-                // Only cache basic Fixed Function library functions.  These all start with "FFP"
-                // Except for lighting functions which start with "FFP_Light"
-                bool inlineable = false;
-                if(StringUtil::startsWith((*it).getFunctionName(), "FFP", false) && 
-                   !StringUtil::startsWith((*it).getFunctionName(), "FFP_Light", false))
-                    inlineable = true;
-
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
                 FunctionInvocation invoc = FunctionInvocation("", 0, 0);
                 String body = StringUtil::BLANK;
@@ -1009,77 +919,70 @@ namespace Ogre {
                     break;
                 }
 
-                if(inlineable)
-                {
-                    mInlinedFunctions.push_back(invoc);
-                }
-                else
-                {
-                    // Write out the function from the cached FunctionInvocation;
-                    os << invoc.getReturnType();
-                    os << " ";
-                    os << invoc.getFunctionName();
-                    os << "(";
+                // Write out the function from the cached FunctionInvocation;
+                os << invoc.getReturnType();
+                os << " ";
+                os << invoc.getFunctionName();
+                os << "(";
 
-                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
-                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
-                    for (; itOperand != itOperandEnd;)
+                FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
+                FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
+                for (; itOperand != itOperandEnd;)
+                {
+                    Operand op = *itOperand;
+                    Operand::OpSemantic opSemantic = op.getSemantic();
+                    String paramName = op.getParameter()->getName();
+                    int opMask = (*itOperand).getMask();
+                    GpuConstantType gpuType = GCT_UNKNOWN;
+
+                    switch(opSemantic)
                     {
-                        Operand op = *itOperand;
-                        Operand::OpSemantic opSemantic = op.getSemantic();
-                        String paramName = op.getParameter()->getName();
-                        int opMask = (*itOperand).getMask();
-                        GpuConstantType gpuType = GCT_UNKNOWN;
+                    case Operand::OPS_IN:
+                        os << "in ";
+                        break;
 
-                        switch(opSemantic)
-                        {
-                        case Operand::OPS_IN:
-                            os << "in ";
-                            break;
+                    case Operand::OPS_OUT:
+                        os << "out ";
+                        break;
 
-                        case Operand::OPS_OUT:
-                            os << "out ";
-                            break;
+                    case Operand::OPS_INOUT:
+                        os << "inout ";
+                        break;
 
-                        case Operand::OPS_INOUT:
-                            os << "inout ";
-                            break;
-
-                        default:
-                            break;
-                        }
-
-                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
-                        if (opMask == Operand::OPM_ALL)
-                        {
-                            gpuType = op.getParameter()->getType();
-                        }
-                        else
-                        {
-                            // Now we have to convert the mask to operator
-                            gpuType = Operand::getGpuConstantType(opMask);
-                        }
-
-                        // We need a valid type otherwise glsl compilation will not work
-                        if (gpuType == GCT_UNKNOWN)
-                        {
-                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                                "Can not convert Operand::OpMask to GpuConstantType", 
-                                "GLSLESProgramWriter::writeProgramDependencies" );	
-                        }
-
-                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
-
-                        ++itOperand;
-
-                        // Prepare for the next operand
-                        if (itOperand != itOperandEnd)
-                        {
-                            os << ", ";
-                        }
+                    default:
+                        break;
                     }
-                    os << ENDL << "{" << ENDL << body << ENDL << "}" << ENDL;
+
+                    // Swizzle masks are only defined for types like vec2, vec3, vec4.
+                    if (opMask == Operand::OPM_ALL)
+                    {
+                        gpuType = op.getParameter()->getType();
+                    }
+                    else
+                    {
+                        // Now we have to convert the mask to operator
+                        gpuType = Operand::getGpuConstantType(opMask);
+                    }
+
+                    // We need a valid type otherwise glsl compilation will not work
+                    if (gpuType == GCT_UNKNOWN)
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                            "Can not convert Operand::OpMask to GpuConstantType", 
+                            "GLSLESProgramWriter::writeProgramDependencies" );	
+                    }
+
+                    os << mGpuConstTypeMap[gpuType] << " " << paramName;
+
+                    ++itOperand;
+
+                    // Prepare for the next operand
+                    if (itOperand != itOperandEnd)
+                    {
+                        os << ", ";
+                    }
                 }
+                os << ENDL << "{" << ENDL << body << ENDL << "}" << ENDL;
             }
         }
 
