@@ -1,8 +1,6 @@
 #version 100
-precision highp int;
-precision highp float;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 /* Cel shading fragment program for single-pass rendering */
 uniform vec4 diffuse;

@@ -1,8 +1,6 @@
 #version 100
-precision highp int;
-precision highp float;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 uniform vec4 lightDiffuse;
 uniform sampler2D normalMap;

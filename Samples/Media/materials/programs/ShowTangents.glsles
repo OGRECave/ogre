@@ -1,8 +1,6 @@
 #version 100
-precision highp int;
-precision highp float;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 attribute vec4 position;
 attribute vec3 tangent;

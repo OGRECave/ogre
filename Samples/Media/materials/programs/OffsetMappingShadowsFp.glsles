@@ -1,8 +1,6 @@
 #version 100
 precision mediump int;
 precision mediump float;
-precision lowp sampler2D;
-precision lowp samplerCube;
 
 uniform vec4 lightDiffuse;
 uniform vec4 scaleBias;

@@ -1,8 +1,6 @@
 #version 100
-precision highp int;
-precision highp float;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 /* Bump mapping vertex program
    In this program, we want to calculate the tangent space light vector
@@ -40,13 +38,9 @@ void main()
 	// NB looks like nvidia cross params are BACKWARDS to what you'd expect
 	// this equates to NxT, not TxN
 
-#if TANGENTS_HAVE_PARITY
-	vec3 binormal = cross(tangent.xyz, normal) * tangent.www;
-#else
 	// Fixed handedness
 	vec3 binormal = cross(tangent.xyz, normal);
-#endif
-	
+
 	// Form a rotation matrix out of the vectors
 	mat3 rotation = mat3(tangent.xyz, binormal, normal);
 	

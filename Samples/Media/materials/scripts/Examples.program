@@ -154,6 +154,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
 {
 	source skinningTwoWeightsShadowCasterVp.glsles
 	includes_skeletal_animation true
+	use_optimiser false
 	default_params
 	{
 		// assign samplers as required by GLSL
@@ -189,6 +190,7 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
 {
    source skinningTwoWeightsVp.glsles
    includes_skeletal_animation true
+	use_optimiser false
 	default_params
 	{
 		// assign samplers as required by GLSL

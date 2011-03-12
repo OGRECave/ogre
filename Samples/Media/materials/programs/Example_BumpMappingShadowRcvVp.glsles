@@ -1,8 +1,6 @@
 #version 100
-precision highp int;
-precision highp float;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 /* Bump mapping vertex program for shadow receiving
    In this program, we want to calculate the tangent space light vector

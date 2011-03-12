@@ -1,8 +1,6 @@
 #version 100
 precision mediump int;
 precision mediump float;
-precision lowp sampler2D;
-precision lowp samplerCube;
 
 uniform sampler2D RT;
 uniform sampler2D Sum;

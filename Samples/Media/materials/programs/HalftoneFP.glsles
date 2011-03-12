@@ -1,9 +1,7 @@
 #version 100
 
-precision highp float;
-precision highp int;
-precision lowp sampler2D;
-precision lowp samplerCube;
+precision mediump int;
+precision mediump float;
 
 sampler2D RT : register(s0);
 sampler3D pattern : register(s1);

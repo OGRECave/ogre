@@ -1,8 +1,6 @@
 #version 100
 precision mediump int;
 precision mediump float;
-precision lowp sampler2D;
-precision lowp samplerCube;
 
 // Note, this won't work on ATI which is why it's not used
 // the issue is with the array initializers
