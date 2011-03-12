@@ -155,11 +155,14 @@ namespace Ogre {
         RenderTarget::_beginUpdate();
         
 #if __IPHONE_4_0
-        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+        if(mCurrentOSVersion >= 4.0)
         {
-            // Bind the FSAA buffer if we're doing multisampling
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
+            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+            {
+                // Bind the FSAA buffer if we're doing multisampling
+                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
+                GL_CHECK_ERROR
+            }
         }
 #endif
     }
@@ -396,24 +399,36 @@ namespace Ogre {
         }
 
 #if __IPHONE_4_0
-        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-        {
-            glDisable(GL_SCISSOR_TEST);     
-            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
-            glResolveMultisampleFramebufferAPPLE();
-            GL_CHECK_ERROR
-        }
-
-        // Framebuffer discard is only supported on devices running iOS 4+
         if(mCurrentOSVersion >= 4.0)
         {
-            GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
-            GL_CHECK_ERROR
+            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+            {
+                glDisable(GL_SCISSOR_TEST);     
+                glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
+                GL_CHECK_ERROR
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
+                GL_CHECK_ERROR
+                glResolveMultisampleFramebufferAPPLE();
+                GL_CHECK_ERROR
+                
+                GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
+                glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
+                GL_CHECK_ERROR
+                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+                GL_CHECK_ERROR
+            }
+            else
+            {
+                GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
+                glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
+                GL_CHECK_ERROR
+                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+                GL_CHECK_ERROR
+            }
         }
+#else
+        glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+        GL_CHECK_ERROR
 #endif
 
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
