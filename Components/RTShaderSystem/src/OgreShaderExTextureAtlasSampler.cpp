@@ -59,7 +59,6 @@ TextureAtlasSampler::TextureAtlasSampler() :
 	mAtlasTextureCount(0),
 	mIsTableDataUpdated(false)
 {
-
 }
 
 //-----------------------------------------------------------------------
@@ -345,7 +344,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 {
 	stream->seek(0);
 
-	bool isSucess = false;
+	bool isSuccess = false;
 	if (stream->isReadable() == true)
 	{
 		TextureAtlasMap tmpMap;
@@ -388,7 +387,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 						textureAtlasTable->push_back(newRecord);
 					}
 
-					isSucess = true;
+					isSuccess = true;
 				}
 			}
 		}
@@ -401,7 +400,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 			mAtlases[it->first] = it->second;
 		}
 	}
-	return isSucess;
+	return isSuccess;
 }
 
 //-----------------------------------------------------------------------

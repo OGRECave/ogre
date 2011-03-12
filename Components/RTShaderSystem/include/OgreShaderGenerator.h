@@ -599,15 +599,15 @@ protected:
 		const String& getGroupName					() const	{ return mGroup; }
 
 		/** Get the const techniques list of this material. */
-		const SGTechniqueList&	getTechniqueList	() const	 { return mTechniqueEntires; }
+		const SGTechniqueList&	getTechniqueList	() const	 { return mTechniqueEntries; }
 
 		/** Get the techniques list of this material. */
-		SGTechniqueList&	getTechniqueList		() 			 { return mTechniqueEntires; }
+		SGTechniqueList&	getTechniqueList		() 			 { return mTechniqueEntries; }
 	
 	protected:
 		String				mName;					// The material name.
 		String				mGroup;					// The group name.
-		SGTechniqueList		mTechniqueEntires;		// All passes entries.
+		SGTechniqueList		mTechniqueEntries;		// All passes entries.
 	};
 
 	
@@ -621,7 +621,7 @@ protected:
 
 		/** Return true if this scheme dose not contains any techniques.
 		*/
-		bool					empty				() const  { return mTechniqueEntires.empty(); }
+		bool					empty				() const  { return mTechniqueEntries.empty(); }
 		
 		/** Invalidate the whole scheme.
 		@see ShaderGenerator::invalidateScheme.
@@ -670,7 +670,7 @@ protected:
 
 	protected:
 		String					mName;					// Scheme name.
-		SGTechniqueList			mTechniqueEntires;		// Technique entries.
+		SGTechniqueList			mTechniqueEntries;		// Technique entries.
 		bool					mOutOfDate;				// Tells if this scheme is out of date.
 		RenderState*			mRenderState;			// The global render state of this scheme.
 		FogMode					mFogMode;				// Current fog mode.

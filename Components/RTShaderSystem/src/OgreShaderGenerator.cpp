@@ -1824,7 +1824,7 @@ RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialNam
 
 	// Find the desired technique.
 	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 		Material* curMat = curTechEntry->getSourceTechnique()->getParent();
@@ -1842,7 +1842,7 @@ RenderState* ShaderGenerator::SGScheme::getRenderState(const String& materialNam
 //-----------------------------------------------------------------------------
 void ShaderGenerator::SGScheme::addTechniqueEntry(SGTechnique* techEntry)
 {
-	mTechniqueEntires.push_back(techEntry);
+	mTechniqueEntries.push_back(techEntry);
 
 	// Mark as out of data.
 	mOutOfDate = true;
@@ -1854,13 +1854,13 @@ void ShaderGenerator::SGScheme::removeTechniqueEntry(SGTechnique* techEntry)
 	SGTechniqueIterator itTech;
 
 	// Build render state for each technique.
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 
 		if (curTechEntry == techEntry)
 		{
-			mTechniqueEntires.erase(itTech);
+			mTechniqueEntries.erase(itTech);
 			break;
 		}		
 	}
@@ -1882,7 +1882,7 @@ void ShaderGenerator::SGScheme::validate()
 	SGTechniqueIterator itTech;
 
 	// Build render state for each technique.
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 
@@ -1891,7 +1891,7 @@ void ShaderGenerator::SGScheme::validate()
 	}
 
 	// Acquire GPU programs for each technique.
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 		
@@ -1900,7 +1900,7 @@ void ShaderGenerator::SGScheme::validate()
 	}
 
 	// Turn off the build destination technique flag.
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 
@@ -1968,7 +1968,7 @@ bool ShaderGenerator::SGScheme::validate(const String& materialName, const Strin
 	
 	// Find the desired technique.
 	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 		const SGMaterial* curMat = curTechEntry->getParent();
@@ -1998,7 +1998,7 @@ void ShaderGenerator::SGScheme::invalidate(const String& materialName, const Str
 
 	// Find the desired technique.
 	bool doAutoDetect = groupName == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 		const SGMaterial* curMaterial = curTechEntry->getParent();
@@ -2020,7 +2020,7 @@ void ShaderGenerator::SGScheme::invalidate()
 	SGTechniqueIterator itTech;
 	
 	// Turn on the build destination technique flag of all techniques.
-	for (itTech = mTechniqueEntires.begin(); itTech != mTechniqueEntires.end(); ++itTech)
+	for (itTech = mTechniqueEntries.begin(); itTech != mTechniqueEntries.end(); ++itTech)
 	{
 		SGTechnique* curTechEntry = *itTech;
 
