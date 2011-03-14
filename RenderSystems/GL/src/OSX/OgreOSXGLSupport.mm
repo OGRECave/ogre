@@ -104,6 +104,12 @@ void OSXGLSupport::addConfig( void )
 
 	switch( maxSamples )
 	{
+		case 8:
+            optFSAA.possibleValues.push_back( "2" );
+            optFSAA.possibleValues.push_back( "4" );
+            optFSAA.possibleValues.push_back( "6" );
+            optFSAA.possibleValues.push_back( "8" );
+            break;
 		case 6:
 			optFSAA.possibleValues.push_back( "2" );
 			optFSAA.possibleValues.push_back( "4" );
