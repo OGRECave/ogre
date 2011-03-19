@@ -222,6 +222,24 @@ namespace Ogre {
 			Listener() {}
 			virtual ~Listener() {}
 
+			/** Called prior to updating the scene graph in this SceneManager.
+			@remarks
+				This is called before updating the scene graph for a camera.
+			@param source The SceneManager instance raising this event.
+			@param camera The camera being updated.
+			*/
+			virtual void preUpdateSceneGraph(SceneManager* source, Camera* camera)
+                        { (void)source; (void)camera; }
+
+			/** Called after updating the scene graph in this SceneManager.
+			@remarks
+				This is called after updating the scene graph for a camera.
+			@param source The SceneManager instance raising this event.
+			@param camera The camera being updated.
+			*/
+			virtual void postUpdateSceneGraph(SceneManager* source, Camera* camera)
+                        { (void)source; (void)camera; }
+
 			/** Called prior to searching for visible objects in this SceneManager.
 			@remarks
 				Note that the render queue at this stage will be full of the last
@@ -653,6 +671,10 @@ namespace Ogre {
         virtual void fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration);
 		/// Internal method for firing the pre receiver texture shadows event
         virtual void fireShadowTexturesPreReceiver(Light* light, Frustum* f);
+		/// Internal method for firing pre update scene graph event
+		virtual void firePreUpdateSceneGraph(Camera* camera);
+		/// Internal method for firing post update scene graph event
+		virtual void firePostUpdateSceneGraph(Camera* camera);
 		/// Internal method for firing find visible objects event
 		virtual void firePreFindVisibleObjects(Viewport* v);
 		/// Internal method for firing find visible objects event

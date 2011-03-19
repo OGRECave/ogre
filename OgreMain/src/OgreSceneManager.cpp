@@ -2178,6 +2178,8 @@ MeshPtr SceneManager::createSkydomePlane(
 //-----------------------------------------------------------------------
 void SceneManager::_updateSceneGraph(Camera* cam)
 {
+	firePreUpdateSceneGraph(cam);
+
 	// Process queued needUpdate calls 
 	Node::processQueuedUpdates();
 
@@ -2187,7 +2189,7 @@ void SceneManager::_updateSceneGraph(Camera* cam)
     //   certain scene graph branches
     getRootSceneNode()->_update(true, false);
 
-
+	firePostUpdateSceneGraph(cam);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_findVisibleObjects(
@@ -4092,6 +4094,29 @@ void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
         (*i)->shadowTextureReceiverPreViewProj(light, f);
     }
 }
+//---------------------------------------------------------------------
+void SceneManager::firePreUpdateSceneGraph(Camera* camera)
+{
+	ListenerList::iterator i, iend;
+
+	iend = mListeners.end();
+	for (i = mListeners.begin(); i != iend; ++i)
+	{
+		(*i)->preUpdateSceneGraph(this, camera);
+	}
+}
+//---------------------------------------------------------------------
+void SceneManager::firePostUpdateSceneGraph(Camera* camera)
+{
+	ListenerList::iterator i, iend;
+
+	iend = mListeners.end();
+	for (i = mListeners.begin(); i != iend; ++i)
+	{
+		(*i)->postUpdateSceneGraph(this, camera);
+	}
+}
+
 //---------------------------------------------------------------------
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
