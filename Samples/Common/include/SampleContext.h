@@ -83,7 +83,11 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
-#import <UIKit/UIKit.h>
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#   ifdef __OBJC__
+#       import <UIKit/UIKit.h>
+#   endif
+#endif
 #endif
 
 #include "Sample.h"
