@@ -46,7 +46,13 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 				"Inconsistent calls to addVertex, must include normals always or never",
 				"Pose::addVertex");
-		mVertexOffsetMap[index] = offset;
+
+        if(offset.squaredLength() < 1e-6f)
+        {
+            return;
+        }
+
+        mVertexOffsetMap[index] = offset;
 		mBuffer.setNull();
 	}
 	//---------------------------------------------------------------------
@@ -56,7 +62,13 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 				"Inconsistent calls to addVertex, must include normals always or never",
 				"Pose::addVertex");
-		mVertexOffsetMap[index] = offset;
+
+        if(offset.squaredLength() < 1e-6f && normal.squaredLength() < 1e-6f)
+        {
+            return;
+        }
+
+        mVertexOffsetMap[index] = offset;
 		mNormalsMap[index] = normal;
 		mBuffer.setNull();
 	}
@@ -183,6 +195,7 @@ namespace Ogre {
 	{
 		Pose* newPose = OGRE_NEW Pose(mTarget, mName);
 		newPose->mVertexOffsetMap = mVertexOffsetMap;
+        newPose->mNormalsMap = mNormalsMap;
 		// Allow buffer to recreate itself, contents may change anyway
 		return newPose;
 	}
