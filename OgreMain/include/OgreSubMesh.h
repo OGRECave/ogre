@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreMaterial.h"
 #include "OgreRenderOperation.h"
 #include "OgreVertexBoneAssignment.h"
-#include "OgreProgressiveMesh.h"
 #include "OgreAnimationTrack.h"
 #include "OgreResourceGroupManager.h"
 
@@ -110,7 +109,8 @@ namespace Ogre {
         typedef vector<unsigned short>::type IndexMap;
         IndexMap blendIndexToBoneIndexMap;
 
-        ProgressiveMesh::LODFaceList mLodFaceList;
+		typedef vector<IndexData*>::type LODFaceList;
+		LODFaceList mLodFaceList;
 
         /** A list of extreme points on the submesh (optional).
             @remarks

@@ -229,6 +229,7 @@ set (HEADER_FILES
   include/OgreSkeletonInstance.h
   include/OgreSkeletonManager.h
   include/OgreSkeletonSerializer.h
+  include/OgreSmallVector.h
   include/OgreSphere.h
   include/OgreSpotShadowFadePng.h
   include/OgreStableHeaders.h
@@ -434,6 +435,7 @@ set (SOURCE_FILES
   src/OgreSkeletonInstance.cpp
   src/OgreSkeletonManager.cpp
   src/OgreSkeletonSerializer.cpp
+  src/OgreSmallVector.cpp
   src/OgreStaticGeometry.cpp
   src/OgreStreamSerialiser.cpp
   src/OgreString.cpp

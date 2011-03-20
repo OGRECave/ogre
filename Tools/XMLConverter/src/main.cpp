@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSkeletonSerializer.h"
 #include "OgreXMLPrerequisites.h"
 #include "OgreDefaultHardwareBufferManager.h"
+#include "OgreProgressiveMesh.h"
 #include <iostream>
 #include <sys/stat.h>
 
@@ -653,7 +654,7 @@ void XMLToBinary(XmlOptions opts)
             }
 
             newMesh->setLodStrategy(LodStrategyManager::getSingleton().getStrategy(opts.lodStrategy));
-            newMesh->generateLodLevels(valueList, quota, reduction);
+			ProgressiveMesh::generateLodLevels(newMesh.get(), valueList, quota, reduction);
         }
 
         if (opts.interactiveMode)
