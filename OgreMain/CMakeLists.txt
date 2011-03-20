@@ -584,7 +584,7 @@ elseif (UNIX)
       src/GLX/OgreTimer.cpp
       src/OgreSearchOps.cpp
     )
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread dl)
+    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
     set(PLATFORM_HEADER_INSTALL "GLX")
     # some platforms require explicit linking to libdl, see if it's available
     find_library(DL_LIBRARY NAMES dl dlsym)
