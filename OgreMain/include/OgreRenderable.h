@@ -244,7 +244,7 @@ namespace Ogre {
 
         /** Gets the custom value associated with this Renderable at the given index.
         @param
-            @see setCustomParaemter for full details.
+            @see setCustomParameter for full details.
         */
         const Vector4& getCustomParameter(size_t index) const
         {
