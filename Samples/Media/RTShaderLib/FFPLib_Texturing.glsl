@@ -64,7 +64,7 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT,
 						   out vec3 vOut)
 {
 	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView, vec4(vWorldNormal, 1.0)).xyz;
+	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
 
 	vOut = vViewNormal;
 }
@@ -77,7 +77,7 @@ void FFP_GenerateTexCoord_EnvMap_Normal(in mat4 mWorldIT,
 						   out vec3 vOut)
 {
 	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 1.0)).xyz;
-	vec3 vViewNormal  = (mView, vec4(vWorldNormal, 1.0)).xyz;
+	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 1.0)).xyz;
 	
 	vOut = (mTexture * vec4(vViewNormal, 1.0)).xyz;
 }
@@ -128,8 +128,8 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	
 	mat4 matViewT = transpose(mView);
 
-	vec3 vWorldNormal = mat3(mWorldIT) * vNormal;
-	vec3 vViewNormal  = mat3(mView) * vWorldNormal;
+	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 0.0)).xyz;
+	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 0.0)).xyz;
 	vec4 vWorldPos    = mWorld * vPos;
 	vec3 vNormViewPos  = normalize((mView * vWorldPos).xyz);
 	
@@ -138,8 +138,8 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
   	matViewT[0][2] = -matViewT[0][2];
  	matViewT[1][2] = -matViewT[1][2];
   	matViewT[2][2] = -matViewT[2][2];
- 	vReflect = mat3(matViewT) * vReflect;
- 	
+ 	vReflect = (matViewT * vec4(vReflect, 1.0)).xyz;
+		
 	vOut = vReflect;
 }
 
@@ -159,8 +159,8 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
 	
 	mat4 matViewT = transpose(mView);
 
-	vec3 vWorldNormal = mat3(mWorldIT) * vNormal;
-	vec3 vViewNormal  = mat3(mView) * vWorldNormal;
+	vec3 vWorldNormal = (mWorldIT * vec4(vNormal, 0.0)).xyz;
+	vec3 vViewNormal  = (mView * vec4(vWorldNormal, 0.0)).xyz;
 	vec4 vWorldPos    = mWorld * vPos;
 	vec3 vNormViewPos  = normalize((mView * vWorldPos).xyz);
 	
@@ -169,7 +169,7 @@ void FFP_GenerateTexCoord_EnvMap_Reflect(in mat4 mWorld,
   	matViewT[0][2] = -matViewT[0][2];
  	matViewT[1][2] = -matViewT[1][2];
   	matViewT[2][2] = -matViewT[2][2];
- 	vReflect = mat3(matViewT) * vReflect;
+ 	vReflect = (matViewT * vec4(vReflect, 1.0)).xyz;
 
  	vReflect = (mTexture * vec4(vReflect, 1.0)).xyz;
  	
