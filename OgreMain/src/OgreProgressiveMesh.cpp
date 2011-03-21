@@ -1994,13 +1994,12 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void ProgressiveMesh::PMVertex::notifyRemoved(void)
     {
-        NeighborList::iterator i, iend;
-        iend = neighbor.end();
-        for (i = neighbor.begin(); i != iend; )
-        {
-            // Remove me from neighbor
-            (*(i++))->neighbor.erase(this);
-        }
+		PMVertex::NeighborList::iterator nend = neighbor.end();
+		for (PMVertex::NeighborList::iterator n = neighbor.begin(); n != nend; ++n)
+		{
+			// Remove me from neighbor
+			(*n)->neighbor.erase(std::remove((*n)->neighbor.begin(), (*n)->neighbor.end(), this), (*n)->neighbor.end());
+		}
         removed = true;
 		collapseTo = NULL;
         collapseCost = NEVER_COLLAPSE_COST;
