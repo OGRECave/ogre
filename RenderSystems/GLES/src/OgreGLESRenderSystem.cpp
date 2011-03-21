@@ -1625,6 +1625,20 @@ namespace Ogre {
                 
                 if (pos != String::npos)
                 {
+					// Convert x,y since glViewport is expecting the x,y to be lower-left of the portrait orientation
+					if (val.find("Left") != String::npos)
+					{
+						GLsizei temp = x;
+						x = y;
+						y = target->getWidth() - w - temp;
+					}
+					else
+					{
+						GLsizei temp = x;
+						x = target->getHeight() - h - y;
+						y = temp;
+					}
+					
                     GLsizei temp = h;
                     h = w;
                     w = temp;

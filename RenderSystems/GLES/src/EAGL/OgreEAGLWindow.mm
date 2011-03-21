@@ -155,11 +155,14 @@ namespace Ogre {
         RenderTarget::_beginUpdate();
 
 #if __IPHONE_4_0
-        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+        if(mCurrentOSVersion >= 4.0)
         {
-            // Bind the FSAA buffer if we're doing multisampling
-            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
+            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+            {
+                // Bind the FSAA buffer if we're doing multisampling
+                glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mFSAAFramebuffer);
+                GL_CHECK_ERROR
+            }
         }
 #endif
     }
@@ -415,6 +418,8 @@ namespace Ogre {
             GL_CHECK_ERROR
         }
 #endif
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+        GL_CHECK_ERROR
 
         glBindRenderbufferOES(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR

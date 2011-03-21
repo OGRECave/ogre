@@ -112,7 +112,7 @@ namespace Ogre
         {
             size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
             size_t height = dst.getHeight();
-            uchar *tmpData = OGRE_NEW uchar[rowSpan * height];
+            uchar *tmpData = (uchar *)OGRE_MALLOC_ALIGN(rowSpan * height, MEMCATEGORY_GENERAL, false);
             uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
             
             while (tmpRow >= tmpData)
@@ -123,7 +123,7 @@ namespace Ogre
             }
             memcpy(dst.data, tmpData, rowSpan * height);
             
-            OGRE_DELETE [] tmpData;
+            OGRE_FREE_ALIGN(tmpData, MEMCATEGORY_GENERAL, false);
         }
     }
     

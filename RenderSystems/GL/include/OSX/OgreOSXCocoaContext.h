@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class OSXCocoaContext: public OSXContext
+    class OSXCocoaContext: public OSXContext, public GeneralAllocatedObject
     {
     public:
         OSXCocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat);

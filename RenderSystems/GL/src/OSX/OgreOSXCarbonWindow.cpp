@@ -176,14 +176,22 @@ namespace Ogre
             if(fsaa_samples > 1)
             {
                 attribs[ i++ ] = AGL_MULTISAMPLE;
-                attribs[ i++ ] = 1;
                 attribs[ i++ ] = AGL_SAMPLE_BUFFERS_ARB;
+                attribs[ i++ ] = 1;
+                attribs[ i++ ] = AGL_SAMPLES_ARB;
                 attribs[ i++ ] = fsaa_samples;
             }
             
             attribs[ i++ ] = AGL_NONE;
             
             mAGLPixelFormat = aglChoosePixelFormat( NULL, 0, attribs );
+
+            if(!mAGLPixelFormat)
+            {
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "Unable to create a valid pixel format with selected attributes.",
+                            "OSXCarbonWindow::createAGLContext" );
+            }
             
             // Create the AGLContext from our pixel format
             // Share it with main

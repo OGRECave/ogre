@@ -45,7 +45,7 @@ void FFP_Light_Directional_Diffuse(in mat4 mWorldViewIT,
 				   in vec3 vBaseColour, 
 				   out vec3 vOut)
 {
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);	
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 
 	float nDotL = dot(vNormalView, vNegLightDirView);
 	
 	vOut = vBaseColour + vDiffuseColour * clamp(nDotL, 0.0, 1.0);
@@ -69,7 +69,7 @@ void FFP_Light_Directional_DiffuseSpecular(in mat4 mWorldView,
 	vOutDiffuse  = vBaseDiffuseColour;
 	vOutSpecular = vBaseSpecularColour;
 	
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);		
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 	
 	float nDotL		   = dot(vNormalView, vNegLightDirView);			
 	vec3 vView       = -normalize((mWorldView* vPos).xyz);
 	vec3 vHalfWay    = normalize(vView + vNegLightDirView);
@@ -99,7 +99,7 @@ void FFP_Light_Point_Diffuse(in mat4 mWorldView,
 	vec3 vViewPos    = (mWorldView * vPos).xyz;
 	vec3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);	
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 
 	float nDotL        = dot(vNormalView, normalize(vLightView));
 	
 	if (nDotL > 0.0 && fLightD <= vAttParams.x)
@@ -133,7 +133,7 @@ void FFP_Light_Point_DiffuseSpecular(in mat4 mWorldView,
 	float fLightD      = length(vLightView);
 	
 	vLightView		   = normalize(vLightView);	
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);	
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 
 	float nDotL        = dot(vNormalView, vLightView);	
 		
 	if (nDotL > 0.0 && fLightD <= vAttParams.x)
@@ -167,7 +167,7 @@ void FFP_Light_Spot_Diffuse(in mat4 mWorldView,
 	vec3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);	
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 	
 	float nDotL        = dot(vNormalView, vLightView);
 	
 	if (nDotL > 0.0 && fLightD <= vAttParams.x)
@@ -205,7 +205,7 @@ void FFP_Light_Spot_DiffuseSpecular(in mat4 mWorldView,
 	vec3 vLightView  = vLightPosView - vViewPos;
 	float fLightD      = length(vLightView);
 	vLightView		   = normalize(vLightView);
-	vec3 vNormalView = normalize(mat3(mWorldViewIT) * vNormal);	
+	vec3 vNormalView = normalize((mWorldViewIT * vec4(vNormal.xyz, 1.0)).xyz); 	
 	float nDotL        = dot(vNormalView, vLightView);
 	
 	

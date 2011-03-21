@@ -40,8 +40,8 @@ endif()
 if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   # Force gcc <= 4.2 on iPhone
   include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.2 GNU)
-  CMAKE_FORCE_CXX_COMPILER(gcc-4.2 GNU)
+  CMAKE_FORCE_C_COMPILER(g++-4.2 GNU)
+  CMAKE_FORCE_CXX_COMPILER(g++-4.2 GNU)
 endif ()
 
 project(OGRE)
@@ -208,9 +208,9 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 
-  #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
   # armv7 only
-  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
+  #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
 
   add_definitions(-fno-regmove)
   add_definitions(-falign-loops=16)

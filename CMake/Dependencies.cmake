@@ -89,7 +89,7 @@ find_package(Freetype)
 macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.freetype.org" TRUE "" "")
 
 # Find X11
-if (UNIX)
+if (UNIX AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
   if (NOT OGRE_BUILD_PLATFORM_TEGRA2)
