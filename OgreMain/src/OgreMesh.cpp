@@ -393,7 +393,7 @@ namespace Ogre {
 
             // Copy lod face lists
             newSub->mLodFaceList.reserve((*subi)->mLodFaceList.size());
-            ProgressiveMesh::LODFaceList::const_iterator facei;
+            SubMesh::LODFaceList::const_iterator facei;
             for (facei = (*subi)->mLodFaceList.begin(); facei != (*subi)->mLodFaceList.end(); ++facei) {
                 IndexData* newIndexData = (*facei)->clone();
                 newSub->mLodFaceList.push_back(newIndexData);
@@ -915,63 +915,6 @@ namespace Ogre {
     const String& Mesh::getSkeletonName(void) const
     {
         return mSkeletonName;
-    }
-    //---------------------------------------------------------------------
-    void Mesh::generateLodLevels(const LodValueList& lodValues,
-        ProgressiveMesh::VertexReductionQuota reductionMethod, Real reductionValue)
-    {
-#if OGRE_DEBUG_MODE
-        mLodStrategy->assertSorted(lodValues);
-#endif
-
-        removeLodLevels();
-
-		LogManager::getSingleton().stream()
-			<< "Generating " << lodValues.size()
-			<< " lower LODs for mesh " << mName;
-
-        SubMeshList::iterator isub, isubend;
-        isubend = mSubMeshList.end();
-        for (isub = mSubMeshList.begin(); isub != isubend; ++isub)
-        {
-            // check if triangles are present
-            if ((*isub)->indexData->indexCount > 0)
-            {
-                // Set up data for reduction
-                VertexData* pVertexData = (*isub)->useSharedVertices ? sharedVertexData : (*isub)->vertexData;
-
-                ProgressiveMesh pm(pVertexData, (*isub)->indexData);
-                pm.build(
-                static_cast<ushort>(lodValues.size()),
-                    &((*isub)->mLodFaceList),
-                    reductionMethod, reductionValue);
-
-            }
-            else
-            {
-                // create empty index data for each lod
-                for (size_t i = 0; i < lodValues.size(); ++i)
-                {
-                    (*isub)->mLodFaceList.push_back(OGRE_NEW IndexData);
-                }
-            }
-        }
-
-        // Iterate over the lods and record usage
-        LodValueList::const_iterator ivalue, ivalueend;
-        ivalueend = lodValues.end();
-        mMeshLodUsageList.resize(lodValues.size() + 1);
-        MeshLodUsageList::iterator ilod = mMeshLodUsageList.begin();
-        for (ivalue = lodValues.begin(); ivalue != ivalueend; ++ivalue)
-        {
-            // Record usage
-            MeshLodUsage& lod = *++ilod;
-            lod.userValue = (*ivalue);
-            lod.value = mLodStrategy->transformUserValue(lod.userValue);
-            lod.edgeData = 0;
-            lod.manualMesh.setNull();
-        }
-        mNumLods = static_cast<ushort>(lodValues.size() + 1);
     }
     //---------------------------------------------------------------------
     ushort Mesh::getNumLodLevels(void) const

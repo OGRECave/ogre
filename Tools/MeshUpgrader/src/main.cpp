@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
+#include "OgreProgressiveMesh.h"
 #include "OgreHardwareVertexBuffer.h"
 
 #include <iostream>
@@ -727,7 +728,7 @@ void buildLod(Mesh* mesh)
 
 		}
 
-		mesh->generateLodLevels(distanceList, quota, reduction);
+		ProgressiveMesh::generateLodLevels(mesh, distanceList, quota, reduction);
 	}
 
 }

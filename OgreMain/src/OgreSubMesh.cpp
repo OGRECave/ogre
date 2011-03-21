@@ -212,7 +212,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
-        ProgressiveMesh::LODFaceList::iterator lodi, lodend;
+        LODFaceList::iterator lodi, lodend;
 		lodend = mLodFaceList.end();
 		for (lodi = mLodFaceList.begin(); lodi != lodend; ++lodi)
 		{

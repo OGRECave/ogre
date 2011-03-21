@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexBoneAssignment.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreProgressiveMesh.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreSkeleton.h"
 #include "OgreAnimationTrack.h"
@@ -420,34 +419,6 @@ namespace Ogre {
 		*/
 		const VertexBoneAssignmentList& getBoneAssignments() const { return mBoneAssignments; }
 
-
-		/** Automatically generates lower level of detail versions of this mesh for use
-			when a simpler version of the model is acceptable for rendering.
-		@remarks
-			There are 2 ways that you can create level-of-detail (LOD) versions of a mesh;
-			the first is to call this method, which does fairly extensive calculations to
-			work out how to simplify the mesh whilst having the minimum affect on the model.
-			The alternative is to actually create simpler versions of the mesh yourself in 
-			a modelling tool, and having exported them, tell the 'master' mesh to use these
-			alternative meshes for lower detail versions; this is done by calling the 
-			createManualLodLevel method.
-		@par
-			As well as creating the lower detail versions of the mesh, this method will
-			also associate them with depth values. As soon as an object is at least as far
-			away from the camera as the depth value associated with it's LOD, it will drop 
-			to that level of detail. 
-		@par
-			I recommend calling this method before mesh export, not at runtime.
-		@param lodValues A list of lod values indicating the values at which new lods should be
-		generated. These are 'user values', before being potentially 
-		transformed by the strategy, so for the distance strategy this is an
-		unsquared distance for example.
-		@param reductionMethod The way to determine the number of vertices collapsed per LOD
-		@param reductionValue Meaning depends on reductionMethod, typically either the proportion
-			of remaining vertices to collapse or a fixed number of vertices.
-		*/
-		void generateLodLevels(const LodValueList& lodValues, 
-			ProgressiveMesh::VertexReductionQuota reductionMethod, Real reductionValue);
 
 		/** Returns the number of levels of detail that this mesh supports. 
 		@remarks
