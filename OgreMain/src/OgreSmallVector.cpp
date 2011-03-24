@@ -54,6 +54,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include "OgreStableHeaders.h"
+
 #include "OgreSmallVector.h"
 
 namespace Ogre {
