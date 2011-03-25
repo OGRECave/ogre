@@ -35,7 +35,7 @@ namespace Ogre {
 	D3D11GpuProgram::D3D11GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
 		const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
 		: GpuProgram(creator, name, handle, group, isManual, loader), 
-		mDevice(device), mpExternalMicrocode(NULL)
+		mDevice(device)
 	{
 		if (createParamDictionary("D3D11GpuProgram"))
 		{
@@ -45,26 +45,18 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D11GpuProgram::loadImpl(void)
 	{
-		if (mpExternalMicrocode)
+		// Normal load-from-source approach
+		if (mLoadFromFile)
 		{
-			loadFromMicrocode(mpExternalMicrocode);
-		}
-		else
-		{
-			// Normal load-from-source approach
-			if (mLoadFromFile)
-			{
-				// find & load source code
-				DataStreamPtr stream = 
-					ResourceGroupManager::getSingleton().openResource(
-					mFilename, mGroup, true, this);
-				mSource = stream->getAsString();
-			}
-
-			// Call polymorphic load
-			loadFromSource();
+			// find & load source code
+			DataStreamPtr stream = 
+				ResourceGroupManager::getSingleton().openResource(
+				mFilename, mGroup, true, this);
+			mSource = stream->getAsString();
 		}
 
+		// Call polymorphic load
+		loadFromSource();
 	}
 	//-----------------------------------------------------------------------------
 	void D3D11GpuProgram::loadFromSource(void)
@@ -72,46 +64,6 @@ namespace Ogre {
 		String message = "AIZ:D3D11 dosn't support assembly shaders. Shader name:" + mName + "\n" ;
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
 			"D3D11GpuProgram::loadFromSource");
-
-		/*  // Create the shader
-		// Assemble source into microcode
-		ID3D10Blob *  microcode;
-		ID3D10Blob *  errors;
-		HRESULT hr = D3DX11CompileFromMemory(
-		mSource.c_str(),
-		static_cast<UINT>(mSource.length()),
-		mFilename.c_str(),
-		NULL,               // no #define support
-		NULL,               // no #include support
-		0,                  // standard compile options
-		&microcode,
-		&errors);
-
-		if (FAILED(hr))
-		{
-		String message = "Cannot assemble D3D11 shader " + mName + " Errors:\n" +
-		static_cast<const char*>(errors->GetBufferPointer());
-		errors->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
-		"D3D11GpuProgram::loadFromSource");
-
-		}
-
-		loadFromMicrocode(microcode);
-
-		SAFE_RELEASE(microcode);
-		SAFE_RELEASE(errors);
-		*/
-	}
-	//-----------------------------------------------------------------------------
-	void D3D11GpuProgram::setExternalMicrocode( ID3D10Blob * pMicrocode )
-	{
-		mpExternalMicrocode = pMicrocode;
-	}
-	//-----------------------------------------------------------------------------
-	ID3D10Blob * D3D11GpuProgram::getExternalMicrocode( void )
-	{
-		return mpExternalMicrocode;
 	}
 	//-----------------------------------------------------------------------------
 	D3D11GpuVertexProgram::D3D11GpuVertexProgram(ResourceManager* creator, 

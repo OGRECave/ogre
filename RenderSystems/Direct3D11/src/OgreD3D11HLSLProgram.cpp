@@ -80,12 +80,8 @@ namespace Ogre {
 		GpuProgramManager::Microcode cacheMicrocode = 
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 		
-		HRESULT hr=D3D10CreateBlob(cacheMicrocode->size(), &mpMicroCode); 
-
-		if(mpMicroCode)
-		{
-			cacheMicrocode->read(mpMicroCode->GetBufferPointer(), cacheMicrocode->size());
-		}
+		mpMicroCode.resize(cacheMicrocode->size());
+		cacheMicrocode->read(&mpMicroCode[0], cacheMicrocode->size());
 		
 		analizeMicrocode();
 	}
@@ -241,6 +237,8 @@ namespace Ogre {
 		if (mEnableBackwardsCompatibility)
 			compileFlags |= D3D10_SHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 
+		ID3D10Blob * pMicroCode;
+
 		HRESULT hr = D3DX11CompileFromMemory(
 			mSource.c_str(),	// [in] Pointer to the shader in memory. 
 			mSource.size(),		// [in] Size of the shader in memory.  
@@ -252,7 +250,7 @@ namespace Ogre {
 			compileFlags,				// [in] Effect compile flags - no D3D11_SHADER_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
 			NULL,				// [in] Effect compile flags
 			NULL,				// [in] A pointer to a thread pump interface (see ID3DX11ThreadPump Interface). Use NULL to specify that this function should not return until it is completed. 
-			&mpMicroCode,		// [out] A pointer to an ID3D10Blob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
+			&pMicroCode,		// [out] A pointer to an ID3D10Blob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
 			&errors,			// [out] A pointer to an ID3D10Blob Interface which contains a listing of errors and warnings that occured during compilation. These errors and warnings are identical to the the debug output from a debugger.
 			NULL				// [out] A pointer to the return value. May be NULL. If pPump is not NULL, then pHResult must be a valid memory location until the asynchronous execution completes. 
 			);
@@ -283,10 +281,10 @@ namespace Ogre {
 		LPCSTR commentString = NULL;
 		ID3D10Blob* pIDisassembly = NULL;
 		char* pDisassembly = NULL;
-		if( mpMicroCode )
+		if( pMicroCode )
 		{
-			D3D11DisassembleShader( (UINT*) mpMicroCode->GetBufferPointer(), 
-				mpMicroCode->GetBufferSize(), TRUE, commentString, &pIDisassembly );
+			D3D11DisassembleShader( (UINT*) &mpMicroCode[0], 
+				pMicroCode->GetBufferSize(), TRUE, commentString, &pIDisassembly );
 		}
 
 		const char* assemblyCode =  static_cast<const char*>(pIDisassembly->GetBufferPointer());
@@ -302,14 +300,18 @@ namespace Ogre {
 		}
 		else
 		{
+			mpMicroCode.resize(pMicroCode->GetBufferSize());
+			memcpy(&mpMicroCode[0], pMicroCode->GetBufferPointer(), pMicroCode->GetBufferSize());
+			SAFE_RELEASE(pMicroCode);
+
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 		        // create microcode
 		        GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(mpMicroCode->GetBufferSize());
+                    GpuProgramManager::getSingleton().createMicrocode(mpMicroCode.size());
 
         		// save microcode
-				newMicrocode->write(mpMicroCode->GetBufferPointer(), mpMicroCode->GetBufferSize());
+				newMicrocode->write(&mpMicroCode[0], mpMicroCode.size());
 
         		// add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
@@ -321,9 +323,9 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::analizeMicrocode()
 	{
-		SIZE_T BytecodeLength = mpMicroCode->GetBufferSize();
+		SIZE_T BytecodeLength = mpMicroCode.size();
 
-		HRESULT hr = D3DReflect( (void*) mpMicroCode->GetBufferPointer(), BytecodeLength,
+		HRESULT hr = D3DReflect( (void*) &mpMicroCode[0], BytecodeLength,
 			IID_ID3D11ShaderReflection, // can't do __uuidof(ID3D11ShaderReflection) here...
 			(void**) &mpIShaderReflection );
 
@@ -437,20 +439,10 @@ namespace Ogre {
 	{
 		// Create a low-level program, give it the same name as us
 		mAssemblerProgram =GpuProgramPtr(dynamic_cast<GpuProgram*>(this));
-		/*
-		GpuProgramManager::getSingleton().createProgramFromString(
-		mName, 
-		mGroup,
-		"",// dummy source, since we'll be using microcode
-		mType, 
-		mTarget);
-		//        static_cast<D3D11GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mpMicroCode);*/
-
 	}
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::unloadHighLevelImpl(void)
 	{
-		SAFE_RELEASE(mpMicroCode);
         SAFE_RELEASE(mpVertexShader);
         SAFE_RELEASE(mpPixelShader);
         SAFE_RELEASE(mpGeometryShader);
@@ -685,14 +677,10 @@ namespace Ogre {
 		ResourceHandle handle, const String& group, bool isManual, 
 		ManualResourceLoader* loader, D3D11Device & device)
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-		, mpMicroCode(NULL), mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
+		, mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
 		mpIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mpVertexShader(NULL)//, mpConstTable(NULL)
 		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mInputVertexDeclaration(device)
 	{
-		if ("Hatch_ps_hlsl" == name)
-		{
-			mpMicroCode = NULL;
-		}
 		ZeroMemory(&mConstantBufferDesc, sizeof(mConstantBufferDesc)) ;
 		ZeroMemory(&mShaderDesc, sizeof(mShaderDesc)) ;
 
@@ -830,8 +818,8 @@ namespace Ogre {
 		{
 			// Create the shader
 			HRESULT hr = mDevice->CreateVertexShader( 
-				static_cast<DWORD*>(mpMicroCode->GetBufferPointer()),
-				mpMicroCode->GetBufferSize(),
+				&mpMicroCode[0],
+				mpMicroCode.size(),
 				NULL,
 				&mpVertexShader);
 
@@ -860,8 +848,8 @@ namespace Ogre {
 		{
 			// Create the shader
 			HRESULT hr = mDevice->CreatePixelShader( 
-				static_cast<DWORD*>(mpMicroCode->GetBufferPointer()), 
-				mpMicroCode->GetBufferSize(),
+				&mpMicroCode[0], 
+				mpMicroCode.size(),
 				NULL,
 				&mpPixelShader);
 
@@ -887,8 +875,8 @@ namespace Ogre {
 		{
 			// Create the shader
 			HRESULT hr = mDevice->CreateGeometryShader( 
-				static_cast<DWORD*>(mpMicroCode->GetBufferPointer()), 
-				mpMicroCode->GetBufferSize(),
+				&mpMicroCode[0], 
+				mpMicroCode.size(),
 				NULL,
 				&mpGeometryShader);
 
@@ -990,9 +978,9 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------------
-	ID3D10Blob* D3D11HLSLProgram::getMicroCode(void) const 
+	const MicroCode & D3D11HLSLProgram::getMicroCode(void) const 
 	{ 
-		assert(mpMicroCode);
+		assert(mpMicroCode.size() > 0);
 		return mpMicroCode; 
 	}
 

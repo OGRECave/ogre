@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+	typedef vector<byte>::type MicroCode;
+
 	/** Specialization of HighLevelGpuProgram to provide support for D3D11 
 	High-Level Shader Language (HLSL).
 	@remarks
@@ -110,7 +112,7 @@ namespace Ogre {
 		bool mEnableBackwardsCompatibility;
 
 		bool mErrorsInCompile;
-		ID3D10Blob * mpMicroCode;
+		MicroCode mpMicroCode;
 		ID3D11Buffer* mConstantBuffer;
 		
 		D3D11Device & mDevice;
@@ -182,7 +184,7 @@ namespace Ogre {
 		ID3D11VertexShader* getVertexShader(void) const;
 		ID3D11PixelShader* getPixelShader(void) const; 
 		ID3D11GeometryShader* getGeometryShader(void) const; 
-		ID3D10Blob * getMicroCode(void) const;  
+		const MicroCode &  getMicroCode(void) const;  
 
 		ID3D11Buffer* getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask);
 

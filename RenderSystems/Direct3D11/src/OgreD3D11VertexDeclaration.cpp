@@ -165,13 +165,13 @@ namespace Ogre {
 			// if not found - create
 
 			DWORD dwShaderFlags = 0;
-			ID3D10Blob* pVSBuf = boundVertexProgram->getMicroCode();
+			const MicroCode &  vSBuf = boundVertexProgram->getMicroCode();
 			D3D11_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration(binding);
 			HRESULT hr = mlpD3DDevice->CreateInputLayout( 
 				pVertexDecl, 
 				(UINT)getElementCount(), 
-				pVSBuf->GetBufferPointer(), 
-				pVSBuf->GetBufferSize(),
+				&vSBuf[0], 
+				vSBuf.size(),
 				&pVertexLayout );
 
 			if (FAILED(hr)|| mlpD3DDevice.isError())

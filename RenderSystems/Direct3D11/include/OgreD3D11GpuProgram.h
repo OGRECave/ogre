@@ -39,19 +39,10 @@ namespace Ogre {
 	{
 	protected:
 		D3D11Device & mDevice;
-		ID3D10Blob *  mpExternalMicrocode; // microcode from elsewhere, we do NOT delete this ourselves
 	public:
 		D3D11GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
 			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
 
-
-		/** Tells the program to load from some externally created microcode instead of a file or source. 
-		@remarks
-		It is the callers responsibility to delete the microcode buffer.
-		*/ 
-		void setExternalMicrocode(ID3D10Blob *  pMicrocode);
-		/** Gets the external microcode buffer, if any. */
-		ID3D10Blob *  getExternalMicrocode(void);
 	protected:
 		/** @copydoc Resource::loadImpl */
 		void loadImpl(void);
