@@ -413,22 +413,7 @@ namespace Ogre {
 
                 mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buf));
 
-                // If format is PVRTC then every mipmap is a custom one so to allow the upload of the compressed data 
-                // provided by the file we need to adjust the current mip level's dimention
-				if (mFormat == PF_PVRTC_RGB2 || mFormat == PF_PVRTC_RGBA2 ||
-                    mFormat == PF_PVRTC_RGB4 || mFormat == PF_PVRTC_RGBA4)
-				{
-					if(width > 1)
-					{
-						width = width / 2;
-					}
-					if(height > 1)
-					{
-						height = height / 2;
-					}
-				}				
-
-                /// Check for error
+                // Check for error
                 if (buf->getWidth() == 0 ||
                     buf->getHeight() == 0 ||
                     buf->getDepth() == 0)
@@ -438,7 +423,7 @@ namespace Ogre {
                         "Zero sized texture surface on texture "+getName()+
                             " face "+StringConverter::toString(face)+
                             " mipmap "+StringConverter::toString(mip)+
-                            ". The GL probably driver refused to create the texture.",
+                            ". The GL driver probably refused to create the texture.",
                             "GLES2Texture::_createSurfaceList");
                 }
             }
