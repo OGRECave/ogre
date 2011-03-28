@@ -1275,7 +1275,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const
 	{
-		return VET_COLOUR_ARGB;
+		return VET_COLOUR_ABGR;
 	}
    	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
