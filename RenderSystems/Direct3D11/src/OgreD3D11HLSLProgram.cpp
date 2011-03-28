@@ -377,13 +377,15 @@ namespace Ogre {
 						ID3D11ShaderReflectionVariable* varRef;
 						varRef = mShaderReflectionConstantBuffer->GetVariableByIndex(i);
 
-						D3D11_SHADER_VARIABLE_DESC shaderVerDesc;
-						HRESULT hr = varRef->GetDesc(&shaderVerDesc);
+                        // a hack to fix a buffer overrun with some AMD\ATI or D3D drivers
+                        char dummyBuffer[sizeof(D3D11_SHADER_VARIABLE_DESC) * 10];
+						D3D11_SHADER_VARIABLE_DESC * shaderVerDesc = (D3D11_SHADER_VARIABLE_DESC *) &dummyBuffer;
+						HRESULT hr = varRef->GetDesc(shaderVerDesc);
 
 						ShaderVarWithPosInBuf newVar;
-						newVar.var = shaderVerDesc;
+						newVar.var = *shaderVerDesc;
 						newVar.wasInit = false;
-						newVar.name = shaderVerDesc.Name;
+						newVar.name = shaderVerDesc->Name;
 
 						// A hack for cg to get the "original name" of the var in the "auto comments"
 						// that cg adds to the hlsl 4 output. This is to solve the issue that
@@ -399,11 +401,11 @@ namespace Ogre {
 							if(endPosOfVarOrgNameInSource != -1)
 							{
 								// find space before var;
-								for (size_t i = endPosOfVarOrgNameInSource - 1 ; i > 0 ; i-- )
+								for (size_t stringPosIndex = endPosOfVarOrgNameInSource - 1 ; stringPosIndex > 0 ; stringPosIndex-- )
 								{
-									if (mSource[i] == ' ')
+									if (mSource[stringPosIndex] == ' ')
 									{
-										startPosOfVarOrgNameInSource = i + 1;
+										startPosOfVarOrgNameInSource = stringPosIndex + 1;
 										break;
 									}
 								}
@@ -469,15 +471,17 @@ namespace Ogre {
 					ID3D11ShaderReflectionVariable* varRef;
 					varRef = mShaderReflectionConstantBuffer->GetVariableByIndex(i);
 
-					D3D11_SHADER_VARIABLE_DESC shaderVerDesc;
+					// a hack to fix a buffer overrun with some AMD\ATI or D3D drivers
+					char dummyBuffer[sizeof(D3D11_SHADER_VARIABLE_DESC) * 10];
+					D3D11_SHADER_VARIABLE_DESC * shaderVerDesc = (D3D11_SHADER_VARIABLE_DESC *) &dummyBuffer;
 					unsigned int numParams = 1;
-					HRESULT hr = varRef->GetDesc(&shaderVerDesc);
+					HRESULT hr = varRef->GetDesc(shaderVerDesc);
 
 					ID3D11ShaderReflectionType* varRefType;
 					varRefType = varRef->GetType();
 
 					// Recursively descend through the structure levels
-					processParamElement( "", shaderVerDesc.Name, i, varRefType);
+					processParamElement( "", shaderVerDesc->Name, i, varRefType);
 
 				}
 			}
