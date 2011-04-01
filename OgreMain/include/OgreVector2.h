@@ -550,6 +550,38 @@ namespace Ogre
 			return Math::isNaN(x) || Math::isNaN(y);
 		}
 
+		/**	 Gets the angle between 2 vectors.
+		@remarks
+			Vectors do not have to be unit-length but must represent directions.
+		*/
+		inline Ogre::Radian angleBetween(const Ogre::Vector2& other)
+		{		
+			Ogre::Real lenProduct = length() * other.length();
+			// Divide by zero check
+			if(lenProduct < 1e-6f)
+				lenProduct = 1e-6f;
+		
+			Ogre::Real f = dotProduct(other) / lenProduct;
+	
+			f = Ogre::Math::Clamp(f, (Ogre::Real)-1.0, (Ogre::Real)1.0);
+			return Ogre::Math::ACos(f);
+		}
+
+		/**	 Gets the oriented angle between 2 vectors.
+		@remarks
+			Vectors do not have to be unit-length but must represent directions.
+			The angle is comprised between 0 and 2 PI.
+		*/
+		inline Ogre::Radian angleTo(const Ogre::Vector2& other)
+		{
+			Ogre::Radian angle = angleBetween(other);
+		
+			if (crossProduct(other)<0)			
+				angle = (Ogre::Radian)Ogre::Math::TWO_PI - angle;		
+
+			return angle;
+		}
+
         // special points
         static const Vector2 ZERO;
         static const Vector2 UNIT_X;
