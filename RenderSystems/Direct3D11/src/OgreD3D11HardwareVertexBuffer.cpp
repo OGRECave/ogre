@@ -140,6 +140,9 @@ namespace Ogre {
 		return mBufferImpl->getD3DBuffer();
 	}
 	//---------------------------------------------------------------------
-
+	void D3D11HardwareVertexBuffer::reinterpretForStreamOutput(void)
+	{
+		mBufferImpl->reinterpretForStreamOutput();
+	}
 }
 

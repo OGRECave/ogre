@@ -58,9 +58,12 @@ namespace Ogre {
 		*/
 		virtual void update(SceneManager* sceneMgr);
 		void reallocateBuffer(size_t index);
-	private:
-		D3D11Device & mDevice;
+	protected:
+		void setupGeometryShaderLinkageToStreamOut(Pass* pass);
 
+		ID3D11GeometryShader* mpGeometryShader;
+		ID3D11Query * mDeviceStatsQuery;
+        D3D11Device & mDevice;
 		HardwareVertexBufferSharedPtr mVertexBuffers[2];
 		size_t mFrontBufferIndex;
 		D3D11HardwareBufferManagerBase * mBufManager;

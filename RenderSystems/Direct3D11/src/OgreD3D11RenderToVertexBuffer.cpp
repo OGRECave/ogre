@@ -42,15 +42,31 @@ namespace Ogre {
 
 	D3D11RenderToVertexBuffer::D3D11RenderToVertexBuffer(D3D11Device & device, 
 														 D3D11HardwareBufferManagerBase * bufManager) 
-		: mDevice(device),  mFrontBufferIndex(-1), mBufManager(bufManager)
+		: mDevice(device)
+        ,  mFrontBufferIndex(-1)
+        , mBufManager(bufManager)
+        , mpGeometryShader(0)
 	{
 		mVertexBuffers[0].setNull();
 		mVertexBuffers[1].setNull();
+
+		D3D11_QUERY_DESC queryDesc;
+		queryDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
+		queryDesc.MiscFlags = 0;
+
+		mDeviceStatsQuery = NULL;
+		HRESULT hr = mDevice->CreateQuery( &queryDesc, &mDeviceStatsQuery);
+		if (FAILED(hr) || mDevice.isError())
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create query", 
+			"D3D11RenderToVertexBuffer::D3D11RenderToVertexBuffer");
+		}
 	}
 
 	D3D11RenderToVertexBuffer::~D3D11RenderToVertexBuffer(void)
 	{
 	}
+
 	void D3D11RenderToVertexBuffer::getRenderOperation(RenderOperation& op)
 	{
 		op.operationType = mOperationType;
@@ -58,20 +74,48 @@ namespace Ogre {
         op.useGlobalInstancingVertexBufferIsAvailable = false;
 		op.vertexData = mVertexData;
 	}
+
+    void D3D11RenderToVertexBuffer::setupGeometryShaderLinkageToStreamOut(Pass* pass)
+	{
+		static bool done =  false;
+
+		if (done)
+			return;
+
+		assert(pass->hasGeometryProgram());
+		const GpuProgramPtr& program = pass->getGeometryProgram();
+
+		D3D11HLSLProgram* dx11Program = 0;
+		if (program->getSyntaxCode()=="unified")
+		{
+			dx11Program = static_cast<D3D11HLSLProgram*>(program->_getBindingDelegate());
+		}
+		else
+		{
+			dx11Program = static_cast<D3D11HLSLProgram*>(program.getPointer());
+		}
+		dx11Program->reinterpretGSForStreamOut();
+
+		done = true;
+		
+	}
 	void D3D11RenderToVertexBuffer::update(SceneManager* sceneMgr)
 	{
+
+		//Single pass only for now
+		Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
+
+		setupGeometryShaderLinkageToStreamOut(r2vbPass);
+
 		size_t bufSize = mVertexData->vertexDeclaration->getVertexSize(0) * mMaxVertexCount;
 		if (mVertexBuffers[0].isNull() || mVertexBuffers[0]->getSizeInBytes() != bufSize)
 		{
 			//Buffers don't match. Need to reallocate.
 			mResetRequested = true;
 		}
-	
-		//Single pass only for now
-		Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
+
 		//Set pass before binding buffers to activate the GPU programs
 		sceneMgr->_setPass(r2vbPass);
-		
 
 		RenderOperation renderOp;
 		size_t targetBufferIndex;
@@ -84,7 +128,9 @@ namespace Ogre {
 		else
 		{
 			//Use current front buffer to render to back buffer
-			this->getRenderOperation(renderOp);
+			renderOp.operationType = mOperationType;
+			renderOp.useIndexes = false;
+			renderOp.vertexData = mVertexData;
 			targetBufferIndex = 1 - mFrontBufferIndex;
 		}
 
@@ -94,54 +140,33 @@ namespace Ogre {
 			reallocateBuffer(targetBufferIndex);
 		}
 
+		RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
+		//Draw the object
+		targetRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
+		targetRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
+		targetRenderSystem->_setProjectionMatrix(Matrix4::IDENTITY);
 
-
-		const D3D11HardwareVertexBuffer* d3d11buf = 
-			static_cast<const D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
-
-		ID3D11Buffer * pVertexBuffers = d3d11buf->getD3DVertexBuffer();
-
-		mDevice.GetImmediateContext()->SOSetTargets(1, &pVertexBuffers, 0);
-		if (mDevice.isError())
-		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set vertex buffer\nError Description:" + errorDescription,
-				"D3D11RenderToVertexBuffer::getRenderOperation");
-		}
-
-		D3D11RenderSystem* targetRenderSystem = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
-
-		D3D11HLSLProgram* originalVertexProgram = targetRenderSystem->_getBoundVertexProgram();
-		targetRenderSystem->bindGpuProgram(r2vbPass->getVertexProgram().getPointer());
-		targetRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
-			r2vbPass->getVertexProgramParameters(), GPV_ALL);
-
-		D3D11HLSLProgram* originalGeometryProgram = targetRenderSystem->_getBoundGeometryProgram();
-		targetRenderSystem->bindGpuProgram(r2vbPass->getGeometryProgram().getPointer());
-		targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
-			r2vbPass->getGeometryProgramParameters(), GPV_ALL);
-
-		// no fragment program!
-		mDevice.GetImmediateContext()->PSSetShader(NULL, NULL, 0);
-		if (mDevice.isError())
-		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set Stream-Output Stage to NULL\nError Description:" + errorDescription,
-				"D3D11RenderToVertexBuffer::getRenderOperation");
-		}
+		D3D11HardwareVertexBuffer* vertexBuffer = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[targetBufferIndex].getPointer());
 	
-		// save depth buffer check value 
-		bool depthBufferCheckValue = targetRenderSystem->_getDepthBufferCheckEnabled();
+		UINT offset[1] = { 0 };
+		ID3D11Buffer* iBuffer[1];
+		iBuffer[0] = vertexBuffer->getD3DVertexBuffer();
+		mDevice.GetImmediateContext()->SOSetTargets( 1, iBuffer, offset );
 
-		// disable depth test
-		targetRenderSystem->_setDepthBufferCheckEnabled(false);
+		if (r2vbPass->hasVertexProgram())
+		{
+			targetRenderSystem->bindGpuProgramParameters(GPT_VERTEX_PROGRAM, 
+				r2vbPass->getVertexProgramParameters(), GPV_ALL);
+		}
+		if (r2vbPass->hasGeometryProgram())
+		{
+			targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
+				r2vbPass->getGeometryProgramParameters(), GPV_ALL);
+		}
 
-		targetRenderSystem->_render(renderOp);
+		mDevice.GetImmediateContext()->Begin(mDeviceStatsQuery);
 
-
-		mVertexData->vertexCount = -1; // -1 means we will use DrawAuto later when rendering...
+		targetRenderSystem->_render(renderOp);	
 
 		//Switch the vertex binding if necessary
 		if (targetBufferIndex != mFrontBufferIndex)
@@ -151,40 +176,31 @@ namespace Ogre {
 			mFrontBufferIndex = targetBufferIndex;
 		}
 
-		// get back to the original value
-		targetRenderSystem->_setDepthBufferCheckEnabled(depthBufferCheckValue);
-
-		// go back to the original shaders
-		targetRenderSystem->bindGpuProgram(originalVertexProgram);
-		targetRenderSystem->bindGpuProgram(originalGeometryProgram);
-
-		// get back to normal render
-		ID3D11Buffer* dummyBuffer = NULL;
-		mDevice.GetImmediateContext()->SOSetTargets(1, &dummyBuffer, 0);
-		if (mDevice.isError())
-		{
-			String errorDescription = mDevice.getErrorDescription();
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"D3D11 device cannot set vertex buffer output to NULL\nError Description:" + errorDescription,
-				"D3D11RenderToVertexBuffer::getRenderOperation");
-		}
-
+		ID3D11Buffer* nullBuffer[1];
+		nullBuffer[0]=NULL;
+		mDevice.GetImmediateContext()->SOSetTargets( 1, nullBuffer, offset );
 		//Clear the reset flag
 		mResetRequested = false;
 
+		mDevice.GetImmediateContext()->End(mDeviceStatsQuery);
+
+		D3D11_QUERY_DATA_PIPELINE_STATISTICS stats;
+		while( S_OK != mDevice.GetImmediateContext()->GetData(mDeviceStatsQuery, &stats, mDeviceStatsQuery->GetDataSize(), 0 ) ){}
 	}
 	//-----------------------------------------------------------------------------
-	void D3D11RenderToVertexBuffer::reallocateBuffer(size_t index)
-	{
-		assert(index == 0 || index == 1);
-		if (!mVertexBuffers[index].isNull())
-		{
-			mVertexBuffers[index].setNull();
-		}
-		
-		mVertexBuffers[index] = mBufManager->createStreamOutputVertexBuffer(
-			mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, 
-			HardwareBuffer::HBU_STATIC_WRITE_ONLY
-			);
-	}
+    void D3D11RenderToVertexBuffer::reallocateBuffer(size_t index)
+    {
+        assert(index == 0 || index == 1);
+        if (!mVertexBuffers[index].isNull())
+        {
+            mVertexBuffers[index].setNull();
+        }
+
+        mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
+            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, HardwareBuffer::HBU_STATIC
+            );
+
+        D3D11HardwareVertexBuffer* vbuf = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[index].getPointer());
+        vbuf->reinterpretForStreamOutput();
+    }
 }

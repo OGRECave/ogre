@@ -161,6 +161,7 @@ namespace Ogre {
 		void setTarget(const String& target);
 		/** Gets the shader target to compile down to, e.g. 'vs_1_1'. */
 		const String& getTarget(void) const { return mTarget; }
+
 		/** Sets the preprocessor defines use to compile the program. */
 		void setPreprocessorDefines(const String& defines) { mPreprocessorDefines = defines; }
 		/** Sets the preprocessor defines use to compile the program. */
@@ -197,6 +198,15 @@ namespace Ogre {
 		void loadFromSource(void);
 
 		D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
+
+		void reinterpretGSForStreamOut(void);
+		bool mReinterpretingGS;
+
+		unsigned int getNumInputs(void)const {return mShaderDesc.InputParameters;}
+		unsigned int getNumOutputs(void)const {return mShaderDesc.OutputParameters;}
+
+		D3D11_SIGNATURE_PARAMETER_DESC getInputParamDesc(unsigned int index) const;
+		D3D11_SIGNATURE_PARAMETER_DESC getOutputParamDesc(unsigned int index) const;	
 	};
 }
 

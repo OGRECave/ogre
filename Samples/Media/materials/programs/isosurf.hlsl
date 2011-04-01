@@ -9,14 +9,14 @@ cbuffer cBuffer0
 
 struct SampleData
 {
-	float4 Pos   : SV_Position;
+	float4 Pos   : POSITION;
 	float3 N     : TEXCOORD0;
 	float2 Field : TEXCOORD1;
 };
 
 struct SurfaceVertex
 {
-	float4 Pos	: SV_Position;
+	float4 Pos	: POSITION;
 	float3 N	: TEXCOORD0;
 };
 

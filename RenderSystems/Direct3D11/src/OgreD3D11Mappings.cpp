@@ -583,7 +583,7 @@ namespace Ogre
 			break;
 		}
 		// to keep compiler happy
-		return "POSITION";
+		return "";
 	}
 	//---------------------------------------------------------------------
 	void D3D11Mappings::get(const ColourValue& inColour, float * outColour )

@@ -80,7 +80,7 @@ namespace Ogre {
 			VertexElementSemantic semantic, unsigned short index = 0);
 
 
-		D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(VertexBufferBinding* binding);
+		D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 		void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
 	};

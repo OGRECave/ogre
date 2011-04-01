@@ -102,6 +102,24 @@ namespace Ogre {
 		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
 
 	}
+   	void D3D11HardwareBuffer::reinterpretForStreamOutput(void)
+	{
+		SAFE_RELEASE(mlpD3DBuffer);
+		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
+
+		assert(mDesc.Usage!=D3D11_USAGE_STAGING);
+
+		mDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
+
+		HRESULT hr = mDevice->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
+		if (FAILED(hr) || mDevice.isError())
+		{
+			String msg = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Cannot create D3D11 buffer: " + msg, 
+				"D3D11HardwareBuffer::reinterpretForStreamOutput");
+		}
+ 	}
 	//---------------------------------------------------------------------
 	void* D3D11HardwareBuffer::lockImpl(size_t offset, 
 		size_t length, LockOptions options)
