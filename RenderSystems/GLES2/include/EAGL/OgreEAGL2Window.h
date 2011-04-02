@@ -33,11 +33,11 @@ THE SOFTWARE.
 
 #ifdef __OBJC__
 #import <UIKit/UIKit.h>
+#import "OgreEAGL2View.h"
+#import "OgreEAGL2ViewController.h"
 
 // Forward declarations
 @class CAEAGLLayer;
-@class EAGL2View;
-@class EAGL2ViewController;
 
 // Define the native window type
 typedef UIWindow *NativeWindowType;

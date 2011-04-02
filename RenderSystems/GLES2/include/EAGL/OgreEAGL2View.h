@@ -29,12 +29,20 @@ THE SOFTWARE.
 #ifndef __EAGL2View_H__
 #define __EAGL2View_H__
 
+#include "OgreString.h"
+
+using namespace Ogre;
+
 #ifdef __OBJC__
 
 #import <UIKit/UIKit.h>
 
+
 @interface EAGL2View : UIView {
+    String mWindowName;
 }
+
+@property (assign) String mWindowName;
 
 @end
 

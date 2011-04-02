@@ -27,8 +27,6 @@ THE SOFTWARE.
 
 #include "OgreEAGLWindow.h"
 
-#include "OgreEAGLView.h"
-#include "OgreEAGLViewController.h"
 #include "OgreEAGLSupport.h"
 #include "OgreEAGLESContext.h"
 
@@ -216,6 +214,8 @@ namespace Ogre {
         }
 
         OgreAssert(mView != nil, "EAGLWindow: Failed to create view");
+
+        mView.mWindowName = mName;
 
         OgreAssert([mView.layer isKindOfClass:[CAEAGLLayer class]], "EAGLWindow: View's Core Animation layer is not a CAEAGLLayer. This is a requirement for using OpenGL ES for drawing.");
         
