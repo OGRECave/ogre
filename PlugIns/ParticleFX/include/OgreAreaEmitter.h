@@ -96,13 +96,6 @@ namespace Ogre {
             points along it's direction (see setDirection)
         */
         void setSize(Real x, Real y, Real z);
-        /** Sets the size of the clear space inside the area from where NO particles are emitted.
-        @param x,y,z
-            Individual axis lengths describing the size of the clear space.
-            The clear space is aligned like the outer area.
-            (see setDirection and setSize)
-        */
-//        void setClearSpace(Real x, Real y, Real z);
 
         /** Sets the width (local x size) of the emitter. */
         void setWidth(Real width);
