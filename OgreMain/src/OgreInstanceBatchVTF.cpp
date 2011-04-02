@@ -476,7 +476,6 @@ namespace Ogre
 			{
 				const size_t instancesPerBatch = std::min( retVal, m_instancesPerBatch );
 				//Do the same as in createVertexTexture()
-				const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 				const size_t numWorldMatrices = instancesPerBatch * numBones;
 
 				size_t texWidth  = std::min<size_t>( numWorldMatrices * 3, c_maxTexWidth );
