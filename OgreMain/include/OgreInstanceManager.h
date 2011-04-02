@@ -171,15 +171,7 @@ namespace Ogre
 		*/
 		size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
 
-		/** Returns whether the specified RenderTarget is compatible with this DepthBuffer
-			That is, this DepthBuffer can be attached to that RenderTarget
-            @remarks
-                Most APIs impose the following restrictions:
-				Width & height must be equal or higher than the render target's
-				They must be of the same bit depth.
-				They need to have the same FSAA setting
-			@param renderTarget The render target to test against
-        */
+		/** @copydoc SceneManager::createInstancedEntity */
 		InstancedEntity* createInstancedEntity( const String &materialName );
 
 		/** This function can be usefull to improve CPU speed after having too many instances
