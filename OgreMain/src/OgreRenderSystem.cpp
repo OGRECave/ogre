@@ -668,17 +668,12 @@ namespace Ogre {
 		}
     }
     //-----------------------------------------------------------------------
-	bool RenderSystem::getInvertVertexWinding(void)
-	{
-		return mInvertVertexWinding;
-	}
-    //-----------------------------------------------------------------------
     void RenderSystem::setInvertVertexWinding(bool invert)
     {
         mInvertVertexWinding = invert;
     }
 	//-----------------------------------------------------------------------
-	bool RenderSystem::getVertexWindingInverted(void) const
+	bool RenderSystem::getInvertVertexWinding(void) const
 	{
 		return mInvertVertexWinding;
 	}

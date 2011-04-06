@@ -49,18 +49,6 @@ namespace Ogre {
 
         destroy();
 
-        if(mGLPixelFormat)
-        {
-            [mGLPixelFormat release];
-            mGLPixelFormat = nil;
-        }
-
-        if(mCGLContext)
-        {
-            OGRE_DELETE mCGLContext;
-            mCGLContext = NULL;
-        }
-        
         if(mWindow)
         {
             [mWindow release];
@@ -289,6 +277,12 @@ namespace Ogre {
         {
             // Handle fullscreen destruction
 			destroyCGLFullscreen();
+
+            if(mCGLContext)
+            {
+                OGRE_DELETE mCGLContext;
+                mCGLContext = NULL;
+            }
         }
         else
         {
@@ -310,6 +304,13 @@ namespace Ogre {
             if(mWindow)
             {
                 [mWindow performClose:nil];
+
+                if(mGLPixelFormat)
+                {
+                    [mGLPixelFormat release];
+                    mGLPixelFormat = nil;
+                }
+
             }
 		}
 		
