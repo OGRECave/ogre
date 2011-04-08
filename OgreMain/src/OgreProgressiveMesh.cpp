@@ -1201,11 +1201,11 @@ namespace Ogre {
 				if(mVertexComponentFlags & (1 << VES_TEXTURE_COORDINATES))
 				{
 					Vector2 newUV = v1->uv * b1 + v0->uv * b2 + dest->uv * b3;
-					uvCost = std::max(1.0f, (newUV - src->uv).squaredLength());
+					uvCost = std::max(Real(1.0f), (newUV - src->uv).squaredLength());
 				}
 
 				Vector3 newNormal = (b1 * v1->normal + b2 * v0->normal + b3 * dest->normal).normalisedCopy();					
-				normalCost = std::max(0.0f, 0.5f - 0.5f * newNormal.dotProduct(src->normal));
+				normalCost = std::max(Real(0.0f), 0.5f - 0.5f * newNormal.dotProduct(src->normal));
 
 				assert(cost >= 0.0f && uvCost >= 0.0f && normalCost >= 0.0f);
 				break;
