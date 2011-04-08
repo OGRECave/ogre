@@ -504,126 +504,54 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------  
 	void D3D11HardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
 	{
-		/*
 		// Decide on pixel format of temp surface
 		PixelFormat tmpFormat = mFormat; 
-		if(D3D11Mappings::_getPF(dst.format) != D3DFMT_UNKNOWN)
+		if(D3D11Mappings::_getPF(dst.format) != DXGI_FORMAT_UNKNOWN)
 		{
-		tmpFormat = dst.format;
+			tmpFormat = dst.format;
 		}
-		if(mSurface)
-		{
 		assert(srcBox.getDepth() == 1 && dst.getDepth() == 1);
-		// Create temp texture
-		ID3D11Resource  *tmp;
-		IDirect3DSurface9 *surface;
 
-		if(D3DXCreateTexture(
-		mDevice,
-		dst.getWidth(), dst.getHeight(), 
-		1, // 1 mip level ie topmost, generate no mipmaps
-		0, D3D11Mappings::_getPF(tmpFormat), D3DPOOL_SCRATCH,
-		&tmp
-		) != D3D_OK)
-		{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Create temporary texture failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		if(tmp->GetSurfaceLevel(0, &surface) != D3D_OK)
-		{
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get surface level failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Copy texture to this temp surface
-		RECT destRect, srcRect;
-		srcRect = toD3DRECT(srcBox);
-		destRect = toD3DRECTExtent(dst);
+		//This is a pointer to the texture we're trying to copy
+		//Only implemented for 2D at the moment...
+		ID3D11Texture2D *textureResource = mParentTexture->GetTex2D();
 
-		if(D3DXLoadSurfaceFromSurface(
-		surface, NULL, &destRect, 
-		mSurface, NULL, &srcRect,
-		D3DX_DEFAULT, 0) != D3D_OK)
-		{
-		surface->Release();
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "D3DXLoadSurfaceFromSurface failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Lock temp surface and copy it to memory
-		DXGI_MAPPED_RECT lrect; // Filled in by D3D
-		if(surface->LockRect(&lrect, NULL,  D3DLOCK_READONLY) != D3D_OK)
-		{
-		surface->Release();
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "surface->LockRect",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Copy it
+		// get the description of the texture
+		D3D11_TEXTURE2D_DESC desc = {0};
+		textureResource->GetDesc( &desc );
+		//Alter the description to set up a staging texture
+		desc.Usage = D3D11_USAGE_STAGING;
+		//This texture is not bound to any part of the pipeline
+		desc.BindFlags = 0;
+		//Allow CPU Access
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		//No Misc Flags
+		desc.MiscFlags = 0;
+		//Create the staging texture
+		ID3D11Texture2D* pStagingTexture = NULL;
+		mDevice->CreateTexture2D( &desc, NULL, &pStagingTexture );
+		//Copy our texture into the staging texture
+		mDevice.GetImmediateContext()->CopyResource( pStagingTexture, textureResource );
+		//Create a mapped resource and map the staging texture to the resource
+		D3D11_MAPPED_SUBRESOURCE mapped = {0};
+		mDevice.GetImmediateContext()->Map( pStagingTexture, 0, D3D11_MAP_READ , 0, &mapped );
+		
+		// read the data out of the texture.
+		unsigned int rPitch = mapped.RowPitch;
+		BYTE *data = ((BYTE *)mapped.pData);
+
+		//Using existing OGRE functions
+		DXGI_MAPPED_RECT lrect;	
+		lrect.pBits = data;
+		lrect.Pitch = rPitch;
+
+
 		PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(), tmpFormat);
 		fromD3DLock(locked, lrect);
 		PixelUtil::bulkPixelConversion(locked, dst);
-		surface->UnlockRect();
-		// Release temporary surface and texture
-		surface->Release();
-		tmp->Release();
-		}
-		else
-		{
-		// Create temp texture
-		IDirect3DVolumeTexture9 *tmp;
-		IDirect3DVolume9 *surface;
 
-		if(D3DXCreateVolumeTexture(
-		mDevice,
-		dst.getWidth(), dst.getHeight(), dst.getDepth(), 0,
-		0, D3D11Mappings::_getPF(tmpFormat), D3DPOOL_SCRATCH,
-		&tmp
-		) != D3D_OK)
-		{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Create temporary texture failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		if(tmp->GetVolumeLevel(0, &surface) != D3D_OK)
-		{
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Get volume level failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Volume
-		D3D11_BOX ddestBox, dsrcBox;
-		ddestBox = toD3DBOXExtent(dst);
-		dsrcBox = toD3DBOX(srcBox);
-
-		if(D3DXLoadVolumeFromVolume(
-		surface, NULL, &ddestBox, 
-		mVolume, NULL, &dsrcBox,
-		D3DX_DEFAULT, 0) != D3D_OK)
-		{
-		surface->Release();
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "D3DXLoadVolumeFromVolume failed",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Lock temp surface and copy it to memory
-		D3DLOCKED_BOX lbox; // Filled in by D3D
-		if(surface->LockBox(&lbox, NULL,  D3DLOCK_READONLY) != D3D_OK)
-		{
-		surface->Release();
-		tmp->Release();
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "surface->LockBox",
-		"D3D11HardwarePixelBuffer::blitToMemory");
-		}
-		// Copy it
-		PixelBox locked(dst.getWidth(), dst.getHeight(), dst.getDepth(), tmpFormat);
-		fromD3DLock(locked, lbox);
-		PixelUtil::bulkPixelConversion(locked, dst);
-		surface->UnlockBox();
-		// Release temporary surface and texture
-		surface->Release();
-		tmp->Release();
-		}
-		*/
+		//Release the staging texture
+		mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
 	}
 
 	//-----------------------------------------------------------------------------  

@@ -608,7 +608,6 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort&
 			//go over vertex deceleration 
 			//check that they have blend indices and blend weights
 			const VertexElement* pDeclWeights = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS,0);
-			const VertexElement* pDeclIndexes = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES,0);
 			if ((pDeclWeights != NULL) && (pDeclWeights != NULL))
 			{
 				isValidData = true;

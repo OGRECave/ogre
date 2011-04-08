@@ -185,6 +185,7 @@ namespace Ogre {
     class Light;
     class Log;
     class LogManager;
+	class LodStrategy;
 	class ManualResourceLoader;
 	class ManualObject;
     class Material;

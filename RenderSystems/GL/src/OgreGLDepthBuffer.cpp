@@ -35,8 +35,8 @@ namespace Ogre
 	GLDepthBuffer::GLDepthBuffer( uint16 poolId, GLRenderSystem *renderSystem, GLContext *creatorContext,
 									GLRenderBuffer *depth, GLRenderBuffer *stencil,
 									uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-									bool isManual ) :
-				DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+									bool manual ) :
+				DepthBuffer( poolId, 0, width, height, fsaa, "", manual ),
 				mMultiSampleQuality( multiSampleQuality ),
 				mCreatorContext( creatorContext ),
 				mDepthBuffer( depth ),

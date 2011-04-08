@@ -39,6 +39,8 @@ using namespace Ogre;
 
 @implementation EAGLView
 
+@synthesize mWindowName;
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"EAGLView frame dimensions x: %.0f y: %.0f w: %.0f h: %.0f", 
@@ -64,37 +66,39 @@ using namespace Ogre;
     if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
         return;
 
-    // The window that we're looking for is most likely the very first render target
+    // Get the window using the name that we saved
     RenderSystem *sys = Root::getSingleton().getRenderSystem();
-    RenderSystem::RenderTargetIterator::iterator it = sys->getRenderTargetIterator().begin();
-    RenderWindow *window = static_cast<RenderWindow *>((*it).second);
+    RenderWindow *window = static_cast<RenderWindow *>(Root::getSingleton().getRenderSystem()->getRenderTarget(mWindowName));
 
-    // Get the window size and initialize temp variables
-    unsigned int w = 0, h = 0;
-    unsigned int width = self.bounds.size.width;
-    unsigned int height = self.bounds.size.height;
-
-    Ogre::Viewport *viewPort = window->getViewport(0);
-
-    if (UIDeviceOrientationIsLandscape(deviceOrientation))
+    if(window != NULL)
     {
-        w = std::max(width, height);
-        h = std::min(width, height);
+        // Get the window size and initialize temp variables
+        unsigned int w = 0, h = 0;
+        unsigned int width = self.bounds.size.width;
+        unsigned int height = self.bounds.size.height;
+
+        Ogre::Viewport *viewPort = window->getViewport(0);
+
+        if (UIDeviceOrientationIsLandscape(deviceOrientation))
+        {
+            w = std::max(width, height);
+            h = std::min(width, height);
+        }
+        else
+        {
+            h = std::max(width, height);
+            w = std::min(width, height);
+        }
+
+        width = w;
+        height = h;
+
+        // Resize the window
+        window->resize(width, height);
+
+        // After rotation the aspect ratio of the viewport has changed, update that as well.
+        viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
     }
-    else
-    {
-        h = std::max(width, height);
-        w = std::min(width, height);
-    }
-
-    width = w;
-    height = h;
-
-    // Resize the window
-    window->resize(width, height);
-
-    // After rotation the aspect ratio of the viewport has changed, update that as well.
-    viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
 }
 
 @end

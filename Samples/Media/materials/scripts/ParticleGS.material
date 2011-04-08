@@ -35,36 +35,41 @@ fragment_program Ogre/ParticleGS/DisplayPScg cg
 
 vertex_program Ogre/ParticleGS/GenerateVShlsl4 hlsl
 {
-	source particlesgs.fx
-	entry_point VSPassThroughmain
+	source ParticleGS.hlsl
+	entry_point GenerateParticles_VS
+	enable_backwards_compatibility no
 	target vs_4_0
 }
 
 geometry_program Ogre/ParticleGS/GenerateGShlsl4 hlsl
 {
-	source particlesgs.fx
-	entry_point GSAdvanceParticlesMain
+	source ParticleGS.hlsl
+	entry_point GenerateParticles_GS
+	enable_backwards_compatibility no
 	target gs_4_0
 }
 
 vertex_program Ogre/ParticleGS/DisplayVShlsl4 hlsl
 {
-	source particlesgs.fx
-	entry_point VSScenemain
+	source ParticleGS.hlsl
+	entry_point DisplayParticles_VS
+	enable_backwards_compatibility no
 	target vs_4_0
 }
 
 geometry_program Ogre/ParticleGS/DisplayGShlsl4 hlsl
 {
-	source particlesgs.fx
-	entry_point GSScenemain
+	source ParticleGS.hlsl
+	entry_point DisplayParticles_GS
+	enable_backwards_compatibility no
 	target gs_4_0
 }
 
 fragment_program Ogre/ParticleGS/DisplayPShlsl4 hlsl
 {
-	source particlesgs.fx
-	entry_point PSScenemain
+	source ParticleGS.hlsl
+	entry_point DisplayParticles_PS
+	enable_backwards_compatibility no
 	target ps_4_0
 }
 
@@ -119,6 +124,9 @@ material Ogre/ParticleGS/Generate
 				tex_address_mode wrap
 				filtering none
 			}
+			// This is needed if you render to a stream out buffer, otherwise, atleast DX 11 complains
+			depth_write off
+			depth_check off
 		}
 	}
 }

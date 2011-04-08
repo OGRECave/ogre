@@ -165,11 +165,19 @@ protected:
 		GpuProgramParametersSharedPtr geomParams = particleSystem->
 			getRenderToVertexBuffer()->getRenderToBufferMaterial()->
 			getBestTechnique()->getPass(0)->getGeometryProgramParameters();
-		geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
-		demoTime += evt.timeSinceLastFrame;
-		geomParams->setNamedConstant("globalTime", demoTime);
-		geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
-		
+        if (geomParams->_findNamedConstantDefinition("elapsedTime"))
+        {
+            geomParams->setNamedConstant("elapsedTime", evt.timeSinceLastFrame);
+		}		
+        demoTime += evt.timeSinceLastFrame;
+		if (geomParams->_findNamedConstantDefinition("globalTime"))
+		{
+			geomParams->setNamedConstant("globalTime", demoTime);
+		}
+		if (geomParams->_findNamedConstantDefinition("frameGravity"))
+		{
+			geomParams->setNamedConstant("frameGravity", GRAVITY_VECTOR * evt.timeSinceLastFrame);
+		}		
 		return SdkSample::frameStarted(evt); 
 	}
 

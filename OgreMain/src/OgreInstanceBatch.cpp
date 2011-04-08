@@ -301,23 +301,23 @@ namespace Ogre
 		while( !usedEntities.empty() && m_instancedEntities.size() < m_instancesPerBatch )
 		{
 			InstancedEntityVec::iterator closest	= usedEntities.begin();
-			InstancedEntityVec::iterator itor		= usedEntities.begin();
-			InstancedEntityVec::iterator end		= usedEntities.end();
+			InstancedEntityVec::iterator it         = usedEntities.begin();
+			InstancedEntityVec::iterator e          = usedEntities.end();
 
 			Vector3 closestPos;
 			closestPos = (*closest)->getParentNode()->_getDerivedPosition();
 
-			while( itor != end )
+			while( it != e )
 			{
-				const Vector3 &vPos	= (*itor)->getParentNode()->_getDerivedPosition();
+				const Vector3 &vPos	= (*it)->getParentNode()->_getDerivedPosition();
 
 				if( firstPos.squaredDistance( vPos ) < firstPos.squaredDistance( closestPos ) )
 				{
-					closest		= itor;
+					closest		= it;
 					closestPos	= vPos;
 				}
 
-				++itor;
+				++it;
 			}
 
 			m_instancedEntities.push_back( *closest );

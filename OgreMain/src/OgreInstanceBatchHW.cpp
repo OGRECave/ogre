@@ -245,7 +245,7 @@ namespace Ogre
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
-			if( m_renderOperation.numberOfInstances = updateVertexBuffer( m_currentCamera ) )
+			if( (m_renderOperation.numberOfInstances = updateVertexBuffer( m_currentCamera )) )
 				queue->addRenderable( this );
 		}
 		else

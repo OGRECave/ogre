@@ -221,10 +221,10 @@ namespace Ogre {
         {
             ColourValue kProd;
 
-            kProd.r = rhs.r / r;
-            kProd.g = rhs.g / g;
-            kProd.b = rhs.b / b;
-            kProd.a = rhs.a / a;
+            kProd.r = r / rhs.r;
+            kProd.g = g / rhs.g;
+            kProd.b = b / rhs.b;
+            kProd.a = a / rhs.a;
 
             return kProd;
         }

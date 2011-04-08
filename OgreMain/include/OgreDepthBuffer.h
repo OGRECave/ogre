@@ -89,7 +89,7 @@ namespace Ogre
 		};
 
 		DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-					 uint32 fsaa, const String &fsaaHint, bool isManual );
+					 uint32 fsaa, const String &fsaaHint, bool manual );
 		virtual ~DepthBuffer();
 
 		//Sets the pool id in which this DepthBuffer lives

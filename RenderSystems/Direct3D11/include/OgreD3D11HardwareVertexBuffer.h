@@ -66,7 +66,7 @@ namespace Ogre {
 		/// Get the D3D-specific vertex buffer
 		ID3D11Buffer * getD3DVertexBuffer(void) const;
 
-
+        void reinterpretForStreamOutput(void);
 	};
 
 }

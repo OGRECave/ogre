@@ -677,7 +677,7 @@ namespace Ogre
         */
         void destroyRenderTarget(const String &name);
 
-        /** Retrieves a pointer to the a named render window.
+        /** Retrieves a pointer to a named render target.
         */
         RenderTarget * getRenderTarget(const String &name);
 

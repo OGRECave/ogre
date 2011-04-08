@@ -322,7 +322,7 @@ namespace Ogre
 		if( !m_keepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
-			if( m_renderOperation.numberOfInstances = updateVertexTexture( m_currentCamera ) )
+			if( (m_renderOperation.numberOfInstances = updateVertexTexture( m_currentCamera )) )
 				queue->addRenderable( this );
 		}
 		else

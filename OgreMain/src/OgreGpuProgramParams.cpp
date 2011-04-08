@@ -1681,7 +1681,7 @@ namespace Ogre
 				case ACT_VERTEX_WINDING:
 					{
 						RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-						_writeRawConstant(i->physicalIndex, rsys->getVertexWindingInverted() ? -1.f : +1.f);
+						_writeRawConstant(i->physicalIndex, rsys->getInvertVertexWinding() ? -1.f : +1.f);
 					}
 					break;
 

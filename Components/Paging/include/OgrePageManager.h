@@ -407,7 +407,7 @@ namespace Ogre
 		bool hasCamera(Camera* c) const;
 
 		typedef vector<Camera*>::type CameraList;
-		/** Returns a list of camerasl being tracked. */
+		/** Returns a list of cameras being tracked. */
 		const CameraList& getCameraList() const;
 
 		/** Set the debug display level.

@@ -333,7 +333,7 @@ namespace Ogre {
 			vector< String >::type errors = StringUtil::split(message, "\n");
 
 			// going from the end so when we delete a line the numbers of the lines before will not change
-			for(size_t i = errors.size() - 1 ; i != -1 ; i--)
+			for(int i = errors.size() - 1 ; i != -1 ; i--)
 			{
 				String & curError = errors[i];
 				size_t foundPos = curError.find(precisionQualifierErrorString);

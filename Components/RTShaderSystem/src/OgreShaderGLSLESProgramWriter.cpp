@@ -264,8 +264,8 @@ namespace Ogre {
                                     String::size_type lparen_pos = line.find('(', 0);
                                     if(lparen_pos != String::npos)
                                     {
-                                        StringVector tokens = StringUtil::split(line, "(");
-                                        paramTokens = StringUtil::split(tokens[1], ",");
+                                        StringVector lineTokens = StringUtil::split(line, "(");
+                                        paramTokens = StringUtil::split(lineTokens[1], ",");
                                     }
                                     else
                                     {

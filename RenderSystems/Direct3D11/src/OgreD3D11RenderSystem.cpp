@@ -1858,8 +1858,10 @@ namespace Ogre
 	{
 
 		// Exit immediately if there is nothing to render
-		if (op.vertexData->vertexCount == 0)
+		if (op.vertexData==0 || op.vertexData->vertexCount == 0)
+        {
 			return;
+        }
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
@@ -1961,7 +1963,31 @@ namespace Ogre
 					"D3D11 device cannot set blend state\nError Description:" + errorDescription,
 					"D3D11RenderSystem::_render");
 			}
+            // PPP: TO DO. Must bind only if the Geometry shader expects this
+			if (mBoundGeometryProgram)
+			{
+				{
+					mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+							"D3D11RenderSystem::_render");
+					}
+				}
+				mDevice.GetImmediateContext()->GSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+						"D3D11RenderSystem::_render");
+				}
+			}
 		}
+
+
 
 		//if (opState->mRasterizer != mBoundRasterizer)
 		{
@@ -2020,9 +2046,12 @@ namespace Ogre
 			}
 		}
 
+		ID3D11Buffer* pSOTarget=0;
+		// Mustn't bind a emulated vertex, pixel shader (see below), if we are rendering to a stream out buffer
+		mDevice.GetImmediateContext()->SOGetTargets(1, &pSOTarget);
 
 	 	if (!mBoundVertexProgram ||
-			 (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST) 
+			 (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST && pSOTarget==0 ) 
 		   ) 
 		{
 			
@@ -2288,6 +2317,7 @@ namespace Ogre
 				mActiveVertexGpuProgramParameters.setNull();
 				mBoundVertexProgram = NULL;
 				//mDevice->VSSetShader(NULL);
+                mDevice.GetImmediateContext()->VSSetShader(NULL, NULL, 0);
 			}
 			break;
 		case GPT_FRAGMENT_PROGRAM:
@@ -2295,6 +2325,7 @@ namespace Ogre
 				mActiveFragmentGpuProgramParameters.setNull();
 				mBoundFragmentProgram = NULL;
 				//mDevice->PSSetShader(NULL);
+                mDevice.GetImmediateContext()->PSSetShader(NULL, NULL, 0);
 			}
 
 			break;

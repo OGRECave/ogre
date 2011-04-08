@@ -6581,16 +6581,35 @@ void SceneManager::_addDirtyInstanceManager( InstanceManager *dirtyManager )
 //---------------------------------------------------------------------
 void SceneManager::updateDirtyInstanceManagers(void)
 {
-	InstanceManagerVec::const_iterator itor = mDirtyInstanceManagers.begin();
-	InstanceManagerVec::const_iterator end  = mDirtyInstanceManagers.end();
-
-	while( itor != end )
-	{
-		(*itor)->_updateDirtyBatches();
-		++itor;
-	}
-
+	//Copy all dirty mgrs to a temporary buffer to iterate through them. We need this because
+	//if two InstancedEntities from different managers belong to the same SceneNode, one of the
+	//managers may have been tagged as dirty while the other wasn't, and _addDirtyInstanceManager
+	//will get called while iterating through them. The "while" loop will update all mgrs until
+	//no one is dirty anymore (i.e. A makes B aware it's dirty, B makes C aware it's dirty)
+	//mDirtyInstanceMgrsTmp isn't a local variable to prevent allocs & deallocs every frame.
+	mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
+									mDirtyInstanceManagers.end() );
 	mDirtyInstanceManagers.clear();
+
+	while( !mDirtyInstanceMgrsTmp.empty() )
+	{
+		InstanceManagerVec::const_iterator itor = mDirtyInstanceMgrsTmp.begin();
+		InstanceManagerVec::const_iterator end  = mDirtyInstanceMgrsTmp.end();
+
+		while( itor != end )
+		{
+			(*itor)->_updateDirtyBatches();
+			++itor;
+		}
+
+		//Clear temp buffer
+		mDirtyInstanceMgrsTmp.clear();
+
+		//Do it again?
+		mDirtyInstanceMgrsTmp.insert( mDirtyInstanceMgrsTmp.end(), mDirtyInstanceManagers.begin(),
+									mDirtyInstanceManagers.end() );
+		mDirtyInstanceManagers.clear();
+	}
 }
 //---------------------------------------------------------------------
 AxisAlignedBoxSceneQuery* 

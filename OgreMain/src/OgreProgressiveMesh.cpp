@@ -1994,14 +1994,16 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void ProgressiveMesh::PMVertex::notifyRemoved(void)
     {
-		PMVertex::NeighborList::iterator nend = neighbor.end();
-		for (PMVertex::NeighborList::iterator n = neighbor.begin(); n != nend; ++n)
-		{
-			// Remove me from neighbor
-			(*n)->neighbor.erase(std::remove((*n)->neighbor.begin(), (*n)->neighbor.end(), this), (*n)->neighbor.end());
-		}
+        // Removes possible self listing as neighbor first
+        neighbor.erase(std::remove(neighbor.begin(), neighbor.end(), this), neighbor.end());
+        PMVertex::NeighborList::iterator nend = neighbor.end();
+        for (PMVertex::NeighborList::iterator n = neighbor.begin(); n != nend; ++n)
+        {
+            // Remove me from neighbor
+            (*n)->neighbor.erase(std::remove((*n)->neighbor.begin(), (*n)->neighbor.end(), this), (*n)->neighbor.end());
+        }
         removed = true;
-		collapseTo = NULL;
+        collapseTo = NULL;
         collapseCost = NEVER_COLLAPSE_COST;
     }
     //---------------------------------------------------------------------
@@ -2099,23 +2101,23 @@ namespace Ogre {
 
 		for(WorstCostList::iterator it = mWorstCosts.begin(), end_it = mWorstCosts.end(); it != end_it; ++it)
 		{
-			PMVertex* vi = &worki->mVertList[it->second];
+			PMVertex* vert = &worki->mVertList[it->second];
 			
-			const char* isBorder = (vi->mBorderStatus == PMVertex::BS_BORDER) ? "yes" : "no";
+			const char* isBorder = (vert->mBorderStatus == PMVertex::BS_BORDER) ? "yes" : "no";
 			
-			ofdump << "Vertex " << (unsigned int)vi->index << " pos: " << vi->position << " removed: " 
-				<< vi->removed << " isborder: " << isBorder << std::endl;
+			ofdump << "Vertex " << (unsigned int)vert->index << " pos: " << vert->position << " removed: " 
+				<< vert->removed << " isborder: " << isBorder << std::endl;
 			ofdump << "    Faces:" << std::endl;
 			
-			PMVertex::FaceList::iterator fend = vi->face.end();
-			for(PMVertex::FaceList::iterator f = vi->face.begin(); f != fend; ++f)
+			PMVertex::FaceList::iterator fend = vert->face.end();
+			for(PMVertex::FaceList::iterator f = vert->face.begin(); f != fend; ++f)
 			{
 				ofdump << "    Triangle index " << (unsigned int)(*f)->index << std::endl;
 			}
 			
 			ofdump << "    Neighbours:" << std::endl;			
-			PMVertex::NeighborList::iterator nend = vi->neighbor.end();
-			for (PMVertex::NeighborList::iterator n = vi->neighbor.begin(); n != nend; ++n)
+			PMVertex::NeighborList::iterator nend = vert->neighbor.end();
+			for (PMVertex::NeighborList::iterator n = vert->neighbor.begin(); n != nend; ++n)
 			{
 				ofdump << "    Vertex index " << (unsigned int)(*n)->index << std::endl;
 			}
@@ -2136,12 +2138,12 @@ namespace Ogre {
 		
 		for(WorstCostList::iterator it = mWorstCosts.begin(), end_it = mWorstCosts.end(); it != end_it; ++it)
 		{
-			PMVertex* vi = &worki->mVertList[it->second];
+			PMVertex* vert = &worki->mVertList[it->second];
 			
-			const char* isBorder = (vi->mBorderStatus == PMVertex::BS_BORDER) ? "yes" : "no";
+			const char* isBorder = (vert->mBorderStatus == PMVertex::BS_BORDER) ? "yes" : "no";
 			
-			ofdump << "Vertex " << (unsigned int)vi->index << ", pos: " << vi->position << ", cost: " << vi->collapseCost << ", removed: " 
-			<< vi->removed << ", isborder: " << isBorder << std::endl;
+			ofdump << "Vertex " << (unsigned int)vert->index << ", pos: " << vert->position << ", cost: " << vert->collapseCost << ", removed: " 
+			<< vert->removed << ", isborder: " << isBorder << std::endl;
 			
 		}
 

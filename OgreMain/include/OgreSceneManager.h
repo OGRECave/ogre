@@ -794,6 +794,7 @@ namespace Ogre {
 
 		typedef vector<InstanceManager*>::type		InstanceManagerVec;
 		InstanceManagerVec mDirtyInstanceManagers;
+		InstanceManagerVec mDirtyInstanceMgrsTmp;
 
 		/** Updates all instance managaers with dirty instance batches. @See _addDirtyInstanceManager */
 		void updateDirtyInstanceManagers(void);

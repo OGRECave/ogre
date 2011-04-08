@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreVector3.h"
+#include "OgreVector2.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreRenderOperation.h"
