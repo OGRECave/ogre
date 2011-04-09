@@ -620,7 +620,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up OIS input.
 		-----------------------------------------------------------------------------*/
-		virtual void setupInput()
+		virtual void setupInput(bool nograb = false)
 		{
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			OIS::ParamList pl;
@@ -631,6 +631,11 @@ namespace OgreBites
 			winHandleStr << winHandle;
 
 			pl.insert(std::make_pair("WINDOW", winHandleStr.str()));
+            if (nograb)
+            {
+                pl.insert(std::make_pair("x11_keyboard_grab", "false"));
+                pl.insert(std::make_pair("x11_mouse_grab", "false"));
+            }
 
 			mInputMgr = OIS::InputManager::createInputSystem(pl);
 

@@ -185,8 +185,9 @@ protected:
 	{
 	public:
 
-		SampleBrowser() : SampleContext()
+		SampleBrowser(bool nograb) : SampleContext()
 		{
+            mNoGrabInput = nograb;
 			mTrayMgr = 0;
 			mLastViewCategory = 0;
 			mLastViewTitle = 0;
@@ -936,7 +937,7 @@ protected:
 		virtual void setup()
 		{
 			mWindow = createWindow();
-			setupInput();
+			setupInput(mNoGrabInput);
 			locateResources();
 
 #ifdef OGRE_STATIC_LIB
@@ -1662,6 +1663,7 @@ protected:
 		}
 #endif // USE_RTSHADER_SYSTEM
 
+        bool mNoGrabInput;                             // don't grab input devices
 		SdkTrayManager* mTrayMgr;                      // SDK tray interface
 #ifdef OGRE_STATIC_LIB
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
