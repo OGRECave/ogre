@@ -37,11 +37,12 @@ THE SOFTWARE.
 void GLXProc( Ogre::RenderWindow *win, const XEvent &event );
 #endif
 
-using namespace Ogre;
+//using namespace Ogre;
 
-WindowEventUtilities::WindowEventListeners WindowEventUtilities::_msListeners;
-WindowEventUtilities::Windows WindowEventUtilities::_msWindows;
+Ogre::WindowEventUtilities::WindowEventListeners Ogre::WindowEventUtilities::_msListeners;
+Ogre::WindowEventUtilities::Windows Ogre::WindowEventUtilities::_msWindows;
 
+namespace Ogre {
 //--------------------------------------------------------------------------------//
 void WindowEventUtilities::messagePump()
 {
@@ -447,3 +448,4 @@ OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHand
     return status;
 }
 #endif
+}
