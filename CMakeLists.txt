@@ -321,7 +321,7 @@ set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for librari
 # A Unity build includes all sources files in just a few actual compilation units
 # to potentially speed up the compilation.
 option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
-set(OGRE_UNITY_FILES_PER_UNIT "20" CACHE STRING "Number of files per compilation unit in Unity build.")
+set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
 
 if (SYMBIAN)
 SET (CMAKE_SYMBIAN_UID_3 "0xA0007218" CACHE STRING 
