@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "nvparse.h"
 
-using namespace Ogre;
+namespace Ogre {
 
 GLGpuNvparseProgram::GLGpuNvparseProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle, 
@@ -114,3 +114,4 @@ void GLGpuNvparseProgram::loadFromSource(void)
     glEndList();
 }
 
+}

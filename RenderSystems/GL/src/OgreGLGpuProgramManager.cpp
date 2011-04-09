@@ -30,7 +30,8 @@ THE SOFTWARE.
 #include "OgreGLGpuProgram.h"
 #include "OgreLogManager.h"
 
-using namespace Ogre;
+
+namespace Ogre {
 
 GLGpuProgramManager::GLGpuProgramManager()
 {
@@ -113,3 +114,4 @@ Resource* GLGpuProgramManager::createImpl(const String& name, ResourceHandle han
     return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);
 }
 
+}

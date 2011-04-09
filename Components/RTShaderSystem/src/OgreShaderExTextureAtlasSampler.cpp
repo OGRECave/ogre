@@ -49,7 +49,7 @@ namespace RTShader {
 
 
 const TextureAtlasTablePtr c_BlankAtlasTable;
-const String c_ParamTexel("texel_");
+const String c_ParamTexelEx("texel_");
 String TextureAtlasSampler::Type = "SGX_TextureAtlasSampler";
 
 //-----------------------------------------------------------------------
@@ -173,7 +173,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 		
 		//Find the texture coordinates texel and sampler from the original FFPTexturing
 		ParameterPtr texcoord = psMain->getParameterBySemantic(inpParams, Parameter::SPS_TEXTURE_COORDINATES, texNum);
-		ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexel + Ogre::StringConverter::toString(texNum));
+		ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexelEx + Ogre::StringConverter::toString(texNum));
 		UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, texNum);
 			
 		const char* addressUFuncName = getAdressingFunctionName(mTextureAddressings[j].u);
