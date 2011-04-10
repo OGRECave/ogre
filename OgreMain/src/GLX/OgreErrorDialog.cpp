@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "OgreErrorDialog.h"
 #include <iostream>
 
-using namespace Ogre;
+namespace Ogre {
 
 //---------------------------------------------------------------------------//
 ErrorDialog::ErrorDialog()
@@ -39,4 +39,6 @@ ErrorDialog::ErrorDialog()
 void ErrorDialog::display(const String& errorMessage, String logName)
 {
 	std::cout << "*** ERROR: " << errorMessage << std::endl;
+}
+
 }

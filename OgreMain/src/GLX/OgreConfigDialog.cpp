@@ -35,7 +35,6 @@ THE SOFTWARE.
 
 #include <string>
 
-extern "C" {
 #include <X11/X.h>
 #include <X11/Xutil.h>
 #include <X11/Xlib.h>
@@ -50,7 +49,6 @@ extern "C" {
 #include <X11/Xaw/MenuButton.h>
 #include <X11/Xaw/SimpleMenu.h>
 #include <X11/Xaw/SmeBSB.h>
-}
 
 #include <list>
 
