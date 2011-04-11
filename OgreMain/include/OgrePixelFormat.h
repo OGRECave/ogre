@@ -278,6 +278,20 @@ namespace Ogre {
       		@throws	Exception(ERR_INVALIDPARAMS) if def is not fully contained
       	*/
       	PixelBox getSubVolume(const Box &def) const;
+        
+        /**
+         * Get colour value from a certain location in the PixelBox. The z coordinate
+         * is only valid for cubemaps and volume textures. This uses the first (largest)
+         * mipmap.
+         */
+        ColourValue getColourAt(size_t x, size_t y, size_t z);
+
+        /**
+         * Set colour value at a certain location in the PixelBox. The z coordinate
+         * is only valid for cubemaps and volume textures. This uses the first (largest)
+         * mipmap.
+         */
+        void setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z);
     };
     
 
