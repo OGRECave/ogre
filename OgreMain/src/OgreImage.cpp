@@ -693,12 +693,20 @@ namespace Ogre {
 
 	//-----------------------------------------------------------------------------    
 
-	ColourValue Image::getColourAt(int x, int y, int z) const
+	ColourValue Image::getColourAt(size_t x, size_t y, size_t z) const
 	{
 		ColourValue rval;
 		PixelUtil::unpackColour(&rval, m_eFormat, &m_pBuffer[m_ucPixelSize * (z * m_uWidth * m_uHeight + m_uWidth * y + x)]);
 		return rval;
 	}
+
+	//-----------------------------------------------------------------------------    
+    
+    void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
+    {
+        unsigned char pixelSize = PixelUtil::getNumElemBytes(getFormat());
+        PixelUtil::packColour(cv, getFormat(), &((unsigned char *)getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
+    }
 
 	//-----------------------------------------------------------------------------    
 
