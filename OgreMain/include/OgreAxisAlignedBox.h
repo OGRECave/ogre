@@ -759,6 +759,34 @@ namespace Ogre {
                    mMinimum.y <= v.y && v.y <= mMaximum.y &&
                    mMinimum.z <= v.z && v.z <= mMaximum.z;
         }
+		
+		/** Returns the minimum distance between a given point and any part of the box. */
+		Real distance(const Vector3& v) const
+		{
+			
+			if (this->contains(v))
+				return 0;
+			else
+			{
+				Real maxDist = std::numeric_limits<Real>::min();
+
+				if (v.x < mMinimum.x)
+					maxDist = std::max(maxDist, mMinimum.x - v.x);
+				if (v.y < mMinimum.y)
+					maxDist = std::max(maxDist, mMinimum.y - v.y);
+				if (v.z < mMinimum.z)
+					maxDist = std::max(maxDist, mMinimum.z - v.z);
+				
+				if (v.x > mMaximum.x)
+					maxDist = std::max(maxDist, v.x - mMaximum.x);
+				if (v.y > mMaximum.y)
+					maxDist = std::max(maxDist, v.y - mMaximum.y);
+				if (v.z > mMaximum.z)
+					maxDist = std::max(maxDist, v.z - mMaximum.z);
+				
+				return maxDist;
+			}
+		}
 
         /** Tests whether another box contained by this box.
         */
