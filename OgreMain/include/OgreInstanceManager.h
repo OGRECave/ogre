@@ -159,23 +159,23 @@ namespace Ogre
 		*/
 		void setInstancesPerBatch( size_t instancesPerBatch );
 
-		/**	Calculates the maximum (or the best ammount, depending on flags) of instances
+		/**	Calculates the maximum (or the best amount, depending on flags) of instances
 			per batch given the suggested size for the technique this manager was created for.
 			@remarks
 			This is done automatically when creating an instanced entity, but this function in conjunction
-			with @see setInstancesPerBatch allows more flexible control over the ammount of instances
+			with @see setInstancesPerBatch allows more flexible control over the amount of instances
 			per batch
 			@param materialName Name of the material to base on
-			@param suggestedSize Suggested ammount of instances per batch
+			@param suggestedSize Suggested amount of instances per batch
 			@param flags @See InstanceManagerFlags
-			@returns The max/best ammount of instances per batch given the suggested size and flags
+			@returns The max/best amount of instances per batch given the suggested size and flags
 		*/
 		size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
 
 		/** @copydoc SceneManager::createInstancedEntity */
 		InstancedEntity* createInstancedEntity( const String &materialName );
 
-		/** This function can be usefull to improve CPU speed after having too many instances
+		/** This function can be useful to improve CPU speed after having too many instances
 			created, which where now removed, thus freeing many batches with zero used Instanced Entities
 			However the batches aren't automatically removed from memory until the InstanceManager is
 			destroyed, or this function is called. This function removes those batches which are completely
@@ -200,7 +200,7 @@ namespace Ogre
 			Static batches won't be defragmented. If you want to degragment them, set them
 			to dynamic again, and switch back to static after calling this function.
 
-			@param optimizeCulling When true, entities close toghether will be reorganized
+			@param optimizeCulling When true, entities close together will be reorganized
 			in the same batch for more efficient CPU culling. This can take more CPU
 			time. You want this to be false if you now you're entities are moving very
 			randomly which tends them to get separated and spread all over the scene

@@ -120,7 +120,7 @@ float3 HSLToRGB(float3 hsl)
 // For all settings: 1.0 = 100% 0.5=50% 1.5 = 150%
 float3 ContrastSaturationBrightness(float3 color, float brt, float sat, float con)
 {
-	// Increase or decrease theese values to adjust r, g and b color channels seperately
+	// Increase or decrease these values to adjust r, g and b color channels separately
 	const float AvgLumR = 0.5;
 	const float AvgLumG = 0.5;
 	const float AvgLumB = 0.5;

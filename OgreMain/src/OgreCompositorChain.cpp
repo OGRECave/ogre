@@ -470,8 +470,8 @@ void CompositorChain::RQListener::renderQueueStarted(uint8 id,
 		return;
 
 	flushUpTo(id);
-	/// If noone wants to render this queue, skip it
-	/// Don't skip the OVERLAY queue because that's handled seperately
+	/// If no one wants to render this queue, skip it
+	/// Don't skip the OVERLAY queue because that's handled separately
 	if(!mOperation->renderQueues.test(id) && id!=RENDER_QUEUE_OVERLAY)
 	{
 		skipThisQueue = true;

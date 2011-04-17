@@ -172,7 +172,7 @@ namespace Ogre
 			if((*iter)->getPortalsUpdated()) return true;   // return immediately to prevent further iterating
 		}
 
-		return false;   // light hasnt moved, and no zones have updated portals. no light update.
+		return false;   // light hasn't moved, and no zones have updated portals. no light update.
 	}
 
 

@@ -451,7 +451,7 @@ void CompositorInstance::_compileTargetOperations(CompiledState &compiledState)
         if(target->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
         {
             /// Collect target state for previous compositor
-            /// The TargetOperation for the final target is collected seperately as it is merged
+            /// The TargetOperation for the final target is collected separately as it is merged
             /// with later operations
             mPreviousInstance->_compileOutputOperation(ts);
         }
@@ -475,7 +475,7 @@ void CompositorInstance::_compileOutputOperation(TargetOperation &finalState)
     if(tpass->getInputMode() == CompositionTargetPass::IM_PREVIOUS)
     {
         /// Collect target state for previous compositor
-        /// The TargetOperation for the final target is collected seperately as it is merged
+        /// The TargetOperation for the final target is collected separately as it is merged
         /// with later operations
         mPreviousInstance->_compileOutputOperation(finalState);
     }

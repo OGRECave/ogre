@@ -91,7 +91,7 @@ protected:
 	  uint mContextPatternClear;// Contexts bits to clear Active Context bits
 
 	  int mDefTextID;			// index into text table for default name : set at runtime
-	  uint mRuleID;				// index into Rule database for non-terminal toke rulepath
+	  uint mRuleID;				// index into Rule database for non-terminal took rulepath
 								// if RuleID is zero the token is terminal
 
 	};
@@ -184,7 +184,7 @@ protected:
 	bool isFloatValue(float & fvalue, int & charsize);
 
 	/** check to see if the text is in the symbol text library
-	@param symbol points to begining of text where a symbol token might exist
+	@param symbol points to beginning of text where a symbol token might exist
 	@param symbolsize reference that will receive the size value of the symbol found
 	@return
 		true if a matching token could be found in the token type library
@@ -259,7 +259,7 @@ public:
 		Pass 2 only gets executed if Pass 1 has no errors
 	@param source a pointer to the source text to be compiled
 	@return
-		true if Pass 1 and Pass 2 are successfull
+		true if Pass 1 and Pass 2 are successful
 		false if any errors occur in Pass 1 or Pass 2
 	*/
 	bool compile(const char* source);

@@ -115,7 +115,7 @@ namespace Ogre {
         /** Returns the index to the face group index list for this leaf node.
             The contents of this buffer is a list of indexes which point to the
             actual face groups held in a central buffer in the BspLevel class (in
-            actual fact for efficency the indexes themselves are also held in a single
+            actual fact for efficiency the indexes themselves are also held in a single
             buffer in BspLevel too). The reason for this indirection is that the buffer
             of indexes to face groups is organised in chunks relative to nodes, whilst the
             main buffer of face groups may not be.

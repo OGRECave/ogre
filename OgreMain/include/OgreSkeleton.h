@@ -366,10 +366,10 @@ namespace Ogre {
             will adjust keyframes of the source skeleton to match this skeleton
             automatically.
         @par
-            It's useful for export skeleton animations seperately. i.e. export
+            It's useful for exporting skeleton animations separately. i.e. export
             mesh and 'master' skeleton at the same time, and then other animations
-            will export seperately (even if used completely difference binding
-            pose), finally, merge seperately exported animations into 'master'
+            will export separately (even if used completely difference binding
+            pose), finally, merge separately exported animations into 'master'
             skeleton.
         @param
             source Pointer to source skeleton. It'll keep unmodified.

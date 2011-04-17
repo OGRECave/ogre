@@ -250,7 +250,7 @@ namespace Ogre {
 			NULL,				// [in] Effect compile flags
 			NULL,				// [in] A pointer to a thread pump interface (see ID3DX11ThreadPump Interface). Use NULL to specify that this function should not return until it is completed. 
 			&pMicroCode,		// [out] A pointer to an ID3D10Blob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
-			&errors,			// [out] A pointer to an ID3D10Blob Interface which contains a listing of errors and warnings that occured during compilation. These errors and warnings are identical to the the debug output from a debugger.
+			&errors,			// [out] A pointer to an ID3D10Blob Interface which contains a listing of errors and warnings that occurred during compilation. These errors and warnings are identical to the the debug output from a debugger.
 			NULL				// [out] A pointer to the return value. May be NULL. If pPump is not NULL, then pHResult must be a valid memory location until the asynchronous execution completes. 
 			);
 

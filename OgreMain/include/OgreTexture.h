@@ -302,7 +302,7 @@ namespace Ogre {
         }
 
         /** Returns the pixel format of the original input texture (may differ due to
-            hardware requirements and pixel format convertion).
+            hardware requirements and pixel format conversion).
         */
         virtual PixelFormat getSrcFormat(void) const
         {

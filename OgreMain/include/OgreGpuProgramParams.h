@@ -77,7 +77,7 @@ namespace Ogre {
 		GCT_UNKNOWN = 99
 	};
 
-	/** The variability of a GPU parameter, as derived from auto-params targetting it.
+	/** The variability of a GPU parameter, as derived from auto-params targeting it.
 	These values must be powers of two since they are used in masks.
 	*/
 	enum GpuParamVariability

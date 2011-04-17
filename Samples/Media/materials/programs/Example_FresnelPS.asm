@@ -47,10 +47,10 @@ mad r0.xyz, r0_bx2, c0.x, r1
 
 phase
 
-  // do dependant texture reads
+  // do dependent texture reads
   // Cg:	reflectionColour = tex2D(reflectMap, final);
   // arbfp1:	TEX R0, R0, texture[1], 2D;
-  // sampe reflectMap using dependant read : texunit 1 
+  // sampe reflectMap using dependent read : texunit 1 
 
 texld r1, r0.xyz
 

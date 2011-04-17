@@ -1008,7 +1008,7 @@ namespace Ogre
 		// we must have those defined here
 		assert(mSrcWidth > 0 || mSrcHeight > 0);
 
-		// determine wich D3D9 pixel format we'll use
+		// determine which D3D9 pixel format we'll use
 		HRESULT hr;
 		D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
 
@@ -1168,7 +1168,7 @@ namespace Ogre
 		// we must have those defined here
 		assert(mSrcWidth > 0 || mSrcHeight > 0);
 
-		// determine wich D3D9 pixel format we'll use
+		// determine which D3D9 pixel format we'll use
 		HRESULT hr;
 		D3DFORMAT d3dPF = _chooseD3DFormat(d3d9Device);
 

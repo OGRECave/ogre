@@ -236,7 +236,7 @@ protected:
 		{
 			//Create the non-instanced entity. Use the same shader as shader-based because:
 			//a. To prove we can (runs without modification! :-) )
-			//b. Make a fair comparision
+			//b. Make a fair comparison
 			Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
 			ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES] );
 			mEntities.push_back( ent );

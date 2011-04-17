@@ -338,7 +338,7 @@ namespace Ogre
 	};
 
 	/** This is a listener for the compiler. The compiler can be customized with
-		this listener. It lets you listen in on events occuring during compilation,
+		this listener. It lets you listen in on events occurring during compilation,
 		hook them, and change the behavior.
 	*/
 	class _OgreExport ScriptCompilerListener

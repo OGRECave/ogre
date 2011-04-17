@@ -3211,7 +3211,7 @@ namespace Ogre
             logParseError("Unexpected end of file.", mScriptContext);
         }
 
-		// Make sure we invalidate our context shared pointer (don't wanna hold on)
+		// Make sure we invalidate our context shared pointer (don't want to hold on)
 		mScriptContext.material.setNull();
 
     }

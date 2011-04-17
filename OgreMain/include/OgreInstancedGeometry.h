@@ -72,7 +72,7 @@ namespace Ogre {
 			Therefore you won't gain as much benefit from the batching if you 
 			use many different materials; try to keep the number down.
 	@par
-		The bounding box information is computed whith object position only. 
+		The bounding box information is computed with object position only. 
 		It doesn't take account of the object orientation. 
 	@par
 		The LOD settings of both the Mesh and the Materials used in 
@@ -90,7 +90,7 @@ namespace Ogre {
 		There are 2 ways you can add geometry to this class; you can add
 		Entity objects directly with predetermined positions, scales and 
 		orientations, or you can add an entire SceneNode and it's subtree, 
-		including all the objects attached to it. Once you've added everthing
+		including all the objects attached to it. Once you've added everything
 		you need to, you have to call build() the fix the geometry in place. 
 	@par
 		You should not construct instances of this class directly; instead, call 
@@ -244,7 +244,7 @@ namespace Ogre {
 			void build();
 			/// Dump contents for diagnostics
 			void dump(std::ofstream& of) const;
-			/// retun the BoundingBox information. Usefull when cloning the batch instance.
+			/// Return the BoundingBox information. Useful when cloning the batch instance.
 			AxisAlignedBox & getAABB(void){return mAABB;}
 			/// @copydoc MovableObject::visitRenderables
 			void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);

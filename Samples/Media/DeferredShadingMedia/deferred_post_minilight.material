@@ -1,4 +1,4 @@
-// Auxilary lights
+// Auxiliary lights
 
 // Reference material [geometry]
 material DeferredShading/LightMaterial/Geometry

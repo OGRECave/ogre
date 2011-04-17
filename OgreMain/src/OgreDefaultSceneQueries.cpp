@@ -173,7 +173,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultRaySceneQuery::execute(RaySceneQueryListener* listener)
 	{
-		// Note that becuase we have no scene partitioning, we actually
+		// Note that because we have no scene partitioning, we actually
 		// perform a complete scene search even if restricted results are
 		// requested; smarter scene manager queries can utilise the paritioning 
 		// of the scene in order to reduce the number of intersection tests 

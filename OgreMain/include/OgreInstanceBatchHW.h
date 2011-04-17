@@ -45,7 +45,7 @@ namespace Ogre
 		That will be used for each instance data.
 		@par
 		The main advantage of this technique is that it's <u>VERY</u> fast; but it doesn't support
-		skeletal animation at all. Very reduced memory consumption and bandwith. Great for particles,
+		skeletal animation at all. Very reduced memory consumption and bandwidth. Great for particles,
 		debris, bricks, trees, sprites.
 		This batch is one of the few (if not the only) techniques that allows culling on an individual
 		basis. This means we can save vertex shader performance for instances that aren't in scene or

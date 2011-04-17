@@ -1,7 +1,7 @@
 //------------------------------------------------------
 //Radial_Blur_FP.cg
 //  Implements radial blur to be used with the compositor
-//  It's very dependant on screen resolution
+//  It's very dependent on screen resolution
 //------------------------------------------------------
 
 uniform sampler2D tex: register(s0);

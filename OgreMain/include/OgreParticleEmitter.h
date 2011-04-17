@@ -151,7 +151,7 @@ namespace Ogre {
         String mEmittedEmitter;
 
 		// If 'true', this emitter is emitted by another emitter.
-		// NB. That doesn´t imply that the emitter itself emits other emitters (that could or could not be the case)
+		// NB. That doesn't imply that the emitter itself emits other emitters (that could or could not be the case)
 		bool mEmitted;
 
 		// NB Method below here are to help out people implementing emitters by providing the

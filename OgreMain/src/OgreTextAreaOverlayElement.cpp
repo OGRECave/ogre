@@ -127,7 +127,7 @@ namespace Ogre {
 
             mRenderOp.vertexData->vertexCount = numChars * 6;
 
-            // Create dynamic since text tends to change alot
+            // Create dynamic since text tends to change a lot
             // positions & texcoords
             HardwareVertexBufferSharedPtr vbuf = 
                 HardwareBufferManager::getSingleton().

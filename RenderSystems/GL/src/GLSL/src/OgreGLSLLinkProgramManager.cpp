@@ -435,7 +435,7 @@ namespace Ogre {
 				line = src.substr(currPos, endPos - currPos);
 
 				// Remove spaces before opening square braces, otherwise
-				// the following split() can split the line at inappropiate
+				// the following split() can split the line at inappropriate
 				// places (e.g. "vec3 something [3]" won't work).
 				for (String::size_type sqp = line.find (" ["); sqp != String::npos;
 					 sqp = line.find (" ["))

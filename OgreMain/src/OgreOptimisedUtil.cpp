@@ -58,7 +58,7 @@ namespace Ogre {
     static FORCEINLINE uint64 getCpuTimestamp(void)
     {
         __asm rdtsc
-        // Return values in edx:eax, No return statment requirement here for VC.
+        // Return values in edx:eax, No return statement requirement here for VC.
     }
 #pragma warning(pop)
 

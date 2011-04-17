@@ -12,10 +12,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <HEAD>
-<TITLE>OGRE Manual v1.7 ('Cthugha'): Script Inheritence</TITLE>
+<TITLE>OGRE Manual v1.7 ('Cthugha'): Script Inheritance</TITLE>
 
-<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Script Inheritence">
-<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Script Inheritence">
+<META NAME="description" CONTENT="OGRE Manual v1.7 ('Cthugha'): Script Inheritance">
+<META NAME="keywords" CONTENT="OGRE Manual v1.7 ('Cthugha'): Script Inheritance">
 <META NAME="resource-type" CONTENT="document">
 <META NAME="distribution" CONTENT="global">
 <META NAME="Generator" CONTENT="texi2html 1.66">
@@ -37,16 +37,16 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="manual_abt.html#SEC_About"> ? </A>]</TD>
 </TR></TABLE>
 <HR SIZE=1>
-<H3> 3.1.11 Script Inheritence </H3>
+<H3> 3.1.11 Script Inheritance </H3>
 <!--docid::SEC139::-->
 
-When creating new script objects that are only slight variations of another object, it's good to avoid copying and pasting between scripts.  Script inheritence lets you do this; in this section we'll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.<BR><BR>
+When creating new script objects that are only slight variations of another object, it's good to avoid copying and pasting between scripts.  Script inheritance lets you do this; in this section we'll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.<BR><BR>
 
 For example, to make a new material that is based on one previously defined, add a <EM>colon</EM> <STRONG>:</STRONG> after the new material name followed by the name of the material that is to be copied.<BR><BR>
 
 Format: material &lt;NewUniqueChildName&gt; : &lt;ReferanceParentMaterial&gt;<BR><BR>
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (See section <A HREF="manual_28.html#SEC145">3.1.14 Script Import Directive</A>). Note that inheritence is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.<BR><BR>
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (See section <A HREF="manual_28.html#SEC145">3.1.14 Script Import Directive</A>). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.<BR><BR>
 
 Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier.  Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them,  Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, See section <A HREF="manual_27.html#SEC144">3.1.13 Script Variables</A>.<BR><BR>
 
@@ -125,7 +125,7 @@ A specific texture unit state (TUS) can be given a unique name within a pass of 
 }
 </pre></td></tr></table>
 <A NAME="SEC142"></A>
-<H3> Advanced Script Inheritence </H3>
+<H3> Advanced Script Inheritance </H3>
 <!--docid::SEC142::-->
 Starting with Ogre 1.6, script objects can now inherit from each other more generally. The previous concept of inheritance, material copying, was restricted only to the top-level material objects. Now, any level of object can take advantage of inheritance (for instance, techniques, passes, and compositor targets).<BR><BR>
 

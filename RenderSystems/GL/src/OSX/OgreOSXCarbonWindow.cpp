@@ -286,7 +286,7 @@ namespace Ogre
     void OSXCarbonWindow::createWindowFromExternal(HIViewRef viewRef)
     {
         // TODO: The Control is going to report the incorrect location with a
-        // Metalic / Textured window.  The default windows work just fine.
+        // Metallic / Textured window.  The default windows work just fine.
         
         // First get the HIViewRef / ControlRef
         mView = viewRef;

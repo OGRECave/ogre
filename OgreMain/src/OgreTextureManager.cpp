@@ -165,7 +165,7 @@ namespace Ogre {
 
         if (reloadTextures)
         {
-            // Iterate throught all textures
+            // Iterate through all textures
             for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
             {
                 Texture* texture = static_cast<Texture*>(it->second.get());
@@ -195,7 +195,7 @@ namespace Ogre {
 
         if (reloadTextures)
         {
-            // Iterate throught all textures
+            // Iterate through all textures
             for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
             {
                 Texture* texture = static_cast<Texture*>(it->second.get());
@@ -226,7 +226,7 @@ namespace Ogre {
 
         if (reloadTextures)
         {
-            // Iterate throught all textures
+            // Iterate through all textures
             for (ResourceMap::iterator it = mResources.begin(); it != mResources.end(); ++it)
             {
                 Texture* texture = static_cast<Texture*>(it->second.get());

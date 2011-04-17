@@ -473,7 +473,7 @@ namespace Ogre {
         // empty string is reserved for designating an empty parent
         assert ((profileName != "") && ("Profile name can't be an empty string"));
       
-        // stack shouldnt be empty
+        // stack shouldn't be empty
         assert (!mProfiles.empty());
 
         // get the start of this profile

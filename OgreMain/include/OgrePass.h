@@ -578,7 +578,7 @@ namespace Ogre {
 
         /** Sets the kind of blending this pass has with the existing contents of the scene.
         @remarks
-        Wheras the texture blending operations seen in the TextureUnitState class are concerned with
+        Whereas the texture blending operations seen in the TextureUnitState class are concerned with
         blending between texture layers, this blending is about combining the output of the Pass
         as a whole with the existing contents of the rendering target. This blending therefore allows
         object transparency and other special effects. If all passes in a technique have a scene
@@ -640,7 +640,7 @@ namespace Ogre {
 
         /** Allows very fine control of blending this Pass with the existing contents of the scene.
         @remarks
-        Wheras the texture blending operations seen in the TextureUnitState class are concerned with
+        Whereas the texture blending operations seen in the TextureUnitState class are concerned with
         blending between texture layers, this blending is about combining the output of the material
         as a whole with the existing contents of the rendering target. This blending therefore allows
         object transparency and other special effects.
@@ -1550,7 +1550,7 @@ namespace Ogre {
             Only applicable for programmable passes.
         @param count number of iterations to perform fast multi pass operations.
             A value greater than 1 will cause the pass to be executed count number of
-            times without changing the render state.  This is very usefull for passes
+            times without changing the render state.  This is very useful for passes
             that use programmable shaders that have to iterate more than once but don't
             need a render state change.  Using multi pass can dramatically speed up rendering
             for materials that do things like fur, blur.

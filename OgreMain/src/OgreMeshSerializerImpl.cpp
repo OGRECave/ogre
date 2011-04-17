@@ -3006,7 +3006,7 @@ namespace Ogre {
 
         if (edgeData->edgeGroups.size() == 1)
         {
-            // Special case for only one edge group in the edge list, which occuring
+            // Special case for only one edge group in the edge list, which occurring
             // most time. In this case, all triangles belongs to that group.
             edgeData->edgeGroups.front().triStart = 0;
             edgeData->edgeGroups.front().triCount = numTriangles;

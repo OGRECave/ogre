@@ -105,7 +105,7 @@ bool Compiler2Pass::doPass1()
 
 	// start with a clean slate
 	mTokenInstructions.clear();
-	// tokenize and check semantics untill an error occurs or end of source is reached
+	// tokenize and check semantics until an error occurs or end of source is reached
 	// assume RootRulePath has pointer to rules so start at index + 1 for first rule path
 	// first rule token would be a rule definition so skip over it
 	bool passed = processRulePath(0);

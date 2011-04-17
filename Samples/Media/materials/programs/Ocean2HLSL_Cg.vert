@@ -89,7 +89,7 @@ v2f main(a2v IN,
 		ddy -= deriv * wave[i].dir.y;
 	}
 
-	// compute the 3x3 tranform from tangent space to object space
+	// compute the 3x3 transform from tangent space to object space
 	// first rows are the tangent and binormal scaled by the bump scale
 
 	OUT.rotMatrix1.xyz = BumpScale * normalize(float3(1, ddy, 0)); // Binormal

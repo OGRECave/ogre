@@ -98,9 +98,9 @@ namespace Ogre
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 		InstancedEntityVec m_sharingPartners;
 
-		//Returns number of matrices writen to xform, assumes xform has enough space
+		//Returns number of matrices written to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
-		//Returns number of 32-bit values writen
+		//Returns number of 32-bit values written
 		size_t getTransforms3x4( float *xform ) const;
 
 		//Returns true if this InstancedObject is visible to the current camera
@@ -123,7 +123,7 @@ namespace Ogre
 		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID );
 		virtual ~InstancedEntity();
 
-		/** Shares the entire transformation with another InstancedEntity. This is usefull when a mesh
+		/** Shares the entire transformation with another InstancedEntity. This is useful when a mesh
 			has more than one submeshes, therefore creating multiple InstanceManagers (one for each
 			submesh). With this function, sharing makes the skeleton to be shared (less memory) and
 			updated once (performance optimization).

@@ -2998,7 +2998,7 @@ namespace Ogre
 			if ((depthBuffer != NULL) && ( depthBuffer->getDeviceCreator() != getActiveD3D9Device()))
 			{
 				OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-					"Can't use a depth buffer from a diffrent device!",
+					"Can't use a depth buffer from a different device!",
 					"D3D9RenderSystem::_setRenderTarget" );
 			}
 

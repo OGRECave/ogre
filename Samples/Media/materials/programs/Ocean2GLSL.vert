@@ -71,7 +71,7 @@ void main(void)
 		ddy -= deriv * wave[i].dir.y;
 	}
 
-	// compute the 3x3 tranform from tangent space to object space
+	// compute the 3x3 transform from tangent space to object space
 	// compute tangent basis
     vec3 T = normalize(vec3(1.0, ddy, 0.0)) * BumpScale;
     vec3 B = normalize(vec3(0.0, ddx, 1.0)) * BumpScale;

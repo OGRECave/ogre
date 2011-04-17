@@ -92,7 +92,7 @@ namespace Ogre
 						{
 							LogManager::getSingleton().logMessage( "InstanceBatchShader: Mesh " +
 										m_meshReference->getName() + " using material " +
-										m_material->getName() + " contains many bones. The ammount of "
+										m_material->getName() + " contains many bones. The amount of "
 										"instances per batch is very low. Performance benefits will "
 										"be minimal, if any. It might be even slower!",
 										LML_NORMAL );

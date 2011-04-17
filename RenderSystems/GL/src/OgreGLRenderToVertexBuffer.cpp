@@ -209,7 +209,7 @@ namespace Ogre {
 
 		checkGLError(true, true, "GLRenderToVertexBuffer::update");
 
-		//Switch the vertex binding if neccesary
+		//Switch the vertex binding if necessary
 		if (targetBufferIndex != mFrontBufferIndex)
 		{
 			mVertexData->vertexBufferBinding->unsetAllBindings();

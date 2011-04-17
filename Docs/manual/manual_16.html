@@ -41,7 +41,7 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <!--docid::SEC39::-->
 A pass is a single render of the geometry in question; a single call to the rendering API with a certain set of rendering properties. A technique can have between one and 16 passes, although clearly the more passes you use, the more expensive the technique will be to render.<BR><BR>
 
-To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be &quot;0&quot; if it was not given a name in the script.  The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (See section <A HREF="manual_25.html#SEC139">3.1.11 Script Inheritence</A>)<BR><BR>
+To help clearly identify what each pass is used for, the pass can be named but its optional.  Passes not named within the script will take on a name that is the pass index number.  For example: the first pass in a technique is index 0 so its name would be &quot;0&quot; if it was not given a name in the script.  The pass name must be unique within the technique or else the final pass is the resulting merge of all passes with the same name in the technique.  A warning message is posted in the Ogre.log if this occurs.  Named passes can help when inheriting a material and modifying an existing pass: (See section <A HREF="manual_25.html#SEC139">3.1.11 Script Inheritance</A>)<BR><BR>
 
 Passes have a set of global attributes (described below), zero or more nested texture_unit entries (See section <A HREF="manual_17.html#SEC77">3.1.3 Texture Units</A>), and optionally a reference to a vertex and / or a fragment program (See section <A HREF="manual_23.html#SEC125">3.1.9 Using Vertex/Geometry/Fragment Programs in a Pass</A>).
 
@@ -203,7 +203,7 @@ Default: emissive 0.0 0.0 0.0 0.0<BR><BR>
 <H3> scene_blend </H3>
 <!--docid::SEC45::-->
 
-Sets the kind of blending this pass has with the existing contents of the scene. Wheras the texture blending operations seen in the texture_unit entries are concerned with blending between texture layers, this blending is about combining the output of this pass as a whole with the existing contents of the rendering target. This blending therefore allows object transparency and other special effects. There are 2 formats, one using predefined blend types, the other allowing a roll-your-own approach using source and destination factors.<BR><BR>
+Sets the kind of blending this pass has with the existing contents of the scene. Whereas the texture blending operations seen in the texture_unit entries are concerned with blending between texture layers, this blending is about combining the output of this pass as a whole with the existing contents of the rendering target. This blending therefore allows object transparency and other special effects. There are 2 formats, one using predefined blend types, the other allowing a roll-your-own approach using source and destination factors.<BR><BR>
 
 Format1: scene_blend &lt;add|modulate|alpha_blend|colour_blend&gt;<BR><BR>
 

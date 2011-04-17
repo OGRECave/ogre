@@ -113,7 +113,7 @@ namespace Ogre {
             the camera's local axes. This is fine for 'point' style billboards (e.g. flares,
             smoke, anything which is symmetrical about a central point) but does not look good for
             billboards which have an orientation (e.g. an elongated raindrop). In this case, the
-            oriented billboards are more suitable (BBT_ORIENTED_COMMON or BBT_ORIENTED_SELF) since they retain an independant Y axis
+            oriented billboards are more suitable (BBT_ORIENTED_COMMON or BBT_ORIENTED_SELF) since they retain an independent Y axis
             and only the X axis is generated, perpendicular to both the local Y and the camera Z.
         @param bbt The type of billboard to render
         */

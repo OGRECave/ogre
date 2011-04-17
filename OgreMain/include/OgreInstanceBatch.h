@@ -67,7 +67,7 @@ namespace Ogre
 		<b>As it happens with instancing in general, all instanced entities from the same batch will share
 		the same textures and materials</b>
 		@par
-		Each InstanceBatch preallocates a fixed ammount of m_instancesPerBatch instances once it's been
+		Each InstanceBatch preallocates a fixed amount of m_instancesPerBatch instances once it's been
 		built (@see build, @see buildFrom).
 		@See createInstancedEntity and @see removeInstancedEntity on how to retrieve those instances
 		remove them from scene.
@@ -192,7 +192,7 @@ namespace Ogre
 				Caller is responsable for freeing buffers in this RenderOperation
 				Buffers inside the RenderOp may be null if the built failed.
 			@returns
-				A render operation which is very usefull to pass to other InstanceBatches
+				A render operation which is very useful to pass to other InstanceBatches
 				(@see buildFrom) so that they share the same vertex buffers and indices,
 				when possible
         */
@@ -256,7 +256,7 @@ namespace Ogre
 		/** Tells this batch to stop updating animations, positions, rotations, and display
 			all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
 			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
-			memory advantages (less VRAM, less bandwidth) and not LOD support. Very usefull for
+			memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
 			billboards of trees, repeating vegetation, etc.
 			@remarks
 				This function moves a lot of processing time from the CPU to the GPU. If the GPU

@@ -1202,7 +1202,7 @@ namespace Ogre {
                 }
                 else    // Not 'packed' form or wrong order between position and normal
                 {
-                    // Should never occuring, do nothing here just in case
+                    // Should never occur, do nothing here just in case
                 }
             }
             else    // !pSrcNorm
@@ -1260,7 +1260,7 @@ namespace Ogre {
                 }
                 else    // Not 'packed' form
                 {
-                    // Might occuring only if user forced software blending position only
+                    // Might occur only if user forced software blending position only
                 }
             }
         }
@@ -1393,7 +1393,7 @@ namespace Ogre {
                 break;
             }
         }
-        else    // Should never occuring, just in case buggy driver
+        else    // Should never occur, just in case of buggy drivers
         {
             // Assume all data unaligned
 

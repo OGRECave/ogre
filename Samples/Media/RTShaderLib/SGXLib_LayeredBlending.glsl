@@ -122,7 +122,7 @@ vec3 HSLToRGB(in vec3 hsl)
 // For all settings: 1.0 = 100% 0.5=50% 1.5 = 150%
 vec3 ContrastSaturationBrightness(in vec3 color, in float brt, in float sat, in float con)
 {
-	// Increase or decrease theese values to adjust r, g and b color channels seperately
+	// Increase or decrease these values to adjust r, g and b color channels separately
 	const float AvgLumR = 0.5;
 	const float AvgLumG = 0.5;
 	const float AvgLumB = 0.5;

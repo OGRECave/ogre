@@ -8895,9 +8895,9 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //        app.go();
 //	} catch( Ogre::Exception& e ) {
 //#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-//        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+//        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 //#else
-//        std::cerr << "An exception has occured: " << e.getFullDescription();
+//        std::cerr << "An exception has occurred: " << e.getFullDescription();
 //#endif
 //    }
 //
@@ -8923,7 +8923,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //    try {
 //        app.go();
 //    } catch( Ogre::Exception& e ) {
-//        std::cerr << "An exception has occured: " <<
+//        std::cerr << "An exception has occurred: " <<
 //        e.getFullDescription().c_str() << std::endl;
 //    }
 //}

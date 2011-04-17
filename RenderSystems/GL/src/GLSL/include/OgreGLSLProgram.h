@@ -50,7 +50,7 @@ namespace Ogre {
 		GLSL supports multiple modular shader objects that can be attached to one program
 		object to form a single shader.  This is supported through the "attach" material script
 		command.  All the modules to be attached are listed on the same line as the attach command
-		seperated by white space.
+		separated by white space.
         
     */
     class _OgreGLExport GLSLProgram : public HighLevelGpuProgram

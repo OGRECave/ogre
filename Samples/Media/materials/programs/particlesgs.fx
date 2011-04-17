@@ -2,7 +2,7 @@
 // File: ParticlesGS.fx
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// this is the orginal shader from the dx sdk with a few minor changes so the sample will work.
+// this is the original shader from the dx sdk with a few minor changes so the sample will work.
 //--------------------------------------------------------------------------------------
 struct VSParticleIn
 {

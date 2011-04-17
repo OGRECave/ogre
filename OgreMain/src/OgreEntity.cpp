@@ -264,7 +264,7 @@ namespace Ogre {
                 {
                     (*mSharedSkeletonEntities->begin())->stopSharingSkeletonInstance();
                 }
-                // Should never occuring, just in case
+                // Should never occur, just in case
                 else if (mSharedSkeletonEntities->empty())
                 {
                     OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);

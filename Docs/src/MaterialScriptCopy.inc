@@ -1,13 +1,13 @@
-@node Script Inheritence
-@subsection Script Inheritence
+@node Script Inheritance
+@subsection Script Inheritance
 
-When creating new script objects that are only slight variations of another object, it's good to avoid copying and pasting between scripts.  Script inheritence lets you do this; in this section we'll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.@*@*
+When creating new script objects that are only slight variations of another object, it's good to avoid copying and pasting between scripts.  Script inheritance lets you do this; in this section we'll use material scripts as an example, but this applies to all scripts parsed with the script compilers in Ogre 1.6 onwards.@*@*
 
 For example, to make a new material that is based on one previously defined, add a @emph{colon} @strong{:} after the new material name followed by the name of the material that is to be copied.@*@*
 
 Format: material <NewUniqueChildName> : <ReferanceParentMaterial>@*@*
 
-The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritence is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
+The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
 
 Material copying within the script alleviates some drudgery from copy/paste but having the ability to identify specific techniques, passes, and texture units to modify makes material copying easier.  Techniques, passes, texture units can be identified directly in the child material without having to layout previous techniques, passes, texture units by associating a name with them,  Techniques and passes can take a name and texture units can be numbered within the material script. You can also use variables, @xref{Script Variables}.@*@*
 
@@ -87,7 +87,7 @@ material BumpMap2 : BumpMap1
 }
 @end example
 
-@subheading Advanced Script Inheritence
+@subheading Advanced Script Inheritance
 Starting with Ogre 1.6, script objects can now inherit from each other more generally. The previous concept of inheritance, material copying, was restricted only to the top-level material objects. Now, any level of object can take advantage of inheritance (for instance, techniques, passes, and compositor targets).@*@*
 
 @example
@@ -354,5 +354,5 @@ import Parent from "parent.material"
 
 If there were other definitions in the parent.material file, they would not be imported.@*@*
 
-Note, however that importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritence. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).@*@*
+Note, however that importing does not actually cause objects in the imported script to be fully parsed & created, it just makes the definitions available for inheritance. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).@*@*
 

@@ -219,7 +219,7 @@ namespace Ogre {
     void GLESTexture::createRenderTexture(void)
     {
         // Create the GL texture
-        // This already does everything neccessary
+        // This already does everything necessary
         createInternalResources();
     }
 

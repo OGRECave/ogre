@@ -278,7 +278,7 @@ namespace Ogre {
 		/** calculates the kind of vertex processing in use
 		@remarks
 		This function's return value is calculated according to the current 
-		active scheme. This is due to the fact that RTSS schemes may be diffrent
+		active scheme. This is due to the fact that RTSS schemes may be different
 		in their handling of hardware animation.
 		*/
 		bool calcVertexProcessing(void);
@@ -310,13 +310,13 @@ namespace Ogre {
 		{
 		protected:
 			Entity* mParent;
-			// Shared link to position buffer
+			/// Shared link to position buffer
 			HardwareVertexBufferSharedPtr mPositionBuffer;
-			// Shared link to w-coord buffer (optional)
+			/// Shared link to w-coord buffer (optional)
 			HardwareVertexBufferSharedPtr mWBuffer;
-			// Link to current vertex data used to bind (maybe changes)
+			/// Link to current vertex data used to bind (maybe changes)
 			const VertexData* mCurrentVertexData;
-			// Original position buffer source binding
+			/// Original position buffer source binding
 			unsigned short mOriginalPosBufferBinding;
 			/// Link to SubEntity, only present if SubEntity has it's own geometry
 			SubEntity* mSubEntity;
@@ -328,7 +328,7 @@ namespace Ogre {
 				bool createSeparateLightCap, SubEntity* subent, bool isLightCap = false);
 			~EntityShadowRenderable();
 			
-			/// create the seperate light cap if it doesn't already exists
+			/// Create the separate light cap if it doesn't already exists
 			void _createSeparateLightCap();
 			/// Overridden from ShadowRenderable
 			void getWorldTransforms(Matrix4* xform) const;
@@ -600,7 +600,7 @@ namespace Ogre {
         and 'includes_skeletal_animation true' if using skeletal animation.
 
 		Also note the the function returns value according to the current active
-		scheme. This is due to the fact that RTSS schemes may be diffrent in their
+		scheme. This is due to the fact that RTSS schemes may be different in their
 		handling of hardware animation.
 		*/
 		bool isHardwareAnimationEnabled(void);
@@ -781,7 +781,7 @@ namespace Ogre {
 			This method builds the internal structures of the Entity based on it
 			resources (Mesh, Skeleton). This may or may not succeed if the 
 			resources it references have been earmarked for background loading,
-			so you should check isInitialised afterwards to see if it was sucessful.
+			so you should check isInitialised afterwards to see if it was successful.
 		@param forceReinitialise If true, this forces the Entity to tear down it's
 			internal structures and try to rebuild them. Useful if you changed the
 			content of a Mesh or Skeleton at runtime.

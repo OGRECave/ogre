@@ -108,7 +108,7 @@ namespace Ogre
 		/// If true, it's not safe to access this Page at this time, contents may be changing
 		bool isDeferredProcessInProgress() const { return mDeferredProcessInProgress; }
 
-		/// Get the ID of this page, unique withing the parent
+		/// Get the ID of this page, unique within the parent
 		virtual PageID getID() const { return mID; }
 		/// Get the PagedWorldSection this page belongs to
 		virtual PagedWorldSection* getParentSection() const { return mParent; }

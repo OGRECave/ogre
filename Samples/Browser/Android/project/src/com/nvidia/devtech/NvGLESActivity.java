@@ -4,7 +4,7 @@
 // Email:           tegradev@nvidia.com
 // Forum:           http://developer.nvidia.com/tegra/forums/tegra-forums/android-development
 //
-// Copyright 2010-2011 NVIDIA® Corporation 
+// Copyright 2010-2011 NVIDIAÂ® Corporation 
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -561,7 +561,7 @@ public abstract class NvGLESActivity extends NvActivity
     }
 
     /**
-     * When the activity is running, this function will be continously called to render
+     * When the activity is running, this function will be continuously called to render
      * to the screen.
      * 
      * @param time The current time in seconds.

@@ -140,7 +140,7 @@ Sample_Ocean::Sample_Ocean()
 *************************************************************************/
 void Sample_Ocean::cleanupContent()
 {
-	// get rid of the shared pointers before shutting down ogre or exceptions occure
+	// get rid of the shared pointers before shutting down ogre or exceptions occur
     mActiveFragmentProgram.setNull();
     mActiveFragmentParameters.setNull();
     mActiveVertexProgram.setNull();
@@ -381,7 +381,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
 											mActiveVertexParameters : mActiveFragmentParameters;
 									if(!activeParameters.isNull())
 									{
-										// use param name to get index : use appropiate paramters ptr
+										// use param name to get index : use appropriate paramters ptr
 										const Ogre::GpuConstantDefinition& def = 
 											activeParameters->getConstantDefinition(ActiveShaderDef.ParamName);
 										ActiveShaderDef.PhysicalIndex = def.physicalIndex;

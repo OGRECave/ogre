@@ -300,7 +300,7 @@ namespace Ogre
 		ZoneData(PCZSceneNode *, PCZone * );
 		/** Standard destructor */
 		virtual ~ZoneData();
-		/** Update data if neccessary */
+		/** Update data if necessary */
 		virtual void update(void);
 	public:
 		PCZone *		mAssociatedZone;

@@ -633,7 +633,7 @@ namespace Ogre {
             smoke, anything which is symmetrical about a central point) but does not look good for
             billboards which have an orientation (e.g. an elongated raindrop). In this case, the
             oriented billboards are more suitable (BBT_ORIENTED_COMMON or BBT_ORIENTED_SELF) since
-            they retain an independant Y axis and only the X axis is generated, perpendicular to both
+            they retain an independent Y axis and only the X axis is generated, perpendicular to both
             the local Y and the camera Z.
         @par
             In some case you might want the billboard has fixed Z axis and doesn't need to face to

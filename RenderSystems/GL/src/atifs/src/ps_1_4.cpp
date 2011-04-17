@@ -1286,9 +1286,9 @@ bool PS_1_4::BuildMachineInst()
 
 	
 
-	passed = true; // assume everything will go okay untill proven otherwise
+	passed = true; // assume everything will go okay until proven otherwise
 
-	// start with machine NOP instuction
+	// start with machine NOP instruction
 	// this is used after the switch to see if an instruction was set up
 	// determine which MachineInstID is required based on the op instruction
 	mOpType = mi_NOP;

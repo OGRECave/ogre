@@ -42,7 +42,7 @@ set(TBB_INC_SEARCH_PATH ${TBB_INC_SEARCH_PATH} ${TBB_PREFIX_PATH})
 # For Windows, let's assume that the user might be using the precompiled
 # TBB packages from the main website. These use a rather awkward directory
 # structure (at least for automatically finding the right files) depending
-# on platform and compiler, but we'll do our best to accomodate it.
+# on platform and compiler, but we'll do our best to accommodate it.
 # Not adding the same effort for the precompiled linux builds, though. Those
 # have different versions for CC compiler versions and linux kernels which
 # will never adequately match the user's setup, so there is no feasible way

@@ -40,7 +40,7 @@ namespace Ogre {
 		and provide an interface for GLRenderSystem calls.  GLSL does not provide access to the
 		low level code of the shader so this class is really just a dummy place holder.
 		GLSL uses a program object to represent the active vertex and fragment programs used
-		but Ogre materials maintain seperate instances of the active vertex and fragment programs
+		but Ogre materials maintain separate instances of the active vertex and fragment programs
 		which creates a small problem for GLSL integration.  The GLSLGpuProgram class provides the
 		interface between the GLSLLinkProgramManager , GLRenderSystem, and the active GLSLProgram
 		instances.

@@ -84,7 +84,7 @@ namespace Ogre
 		~TerrainLayerBlendMap();
 		/// Get the parent terrain
 		Terrain* getParent() const { return mParent; }
-		/// Get the index of the layer this is targetting
+		/// Get the index of the layer this is targeting
 		uint8 getLayerIndex() const { return mLayerIdx; }
 
 		/** Helper method - convert a point in world space to UV space based on the

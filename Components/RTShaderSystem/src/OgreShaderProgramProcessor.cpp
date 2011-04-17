@@ -294,7 +294,7 @@ void ProgramProcessor::mergeParametersByPredefinedCombinations(ShaderParameterLi
 		buildMergeCombinations();
 	}
 
-	// Create the full used merged params - means FLOAT4 params that all of thier components are used.
+	// Create the full used merged params - means FLOAT4 params that all of their components are used.
 	for (unsigned int i=0; i < mParamMergeCombinations.size(); ++i)
 	{
 		const MergeCombination& curCombination = mParamMergeCombinations[i];

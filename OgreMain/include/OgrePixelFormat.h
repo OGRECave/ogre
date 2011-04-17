@@ -326,7 +326,7 @@ namespace Ogre {
                A bitfield combination of PFF_HASALPHA, PFF_ISCOMPRESSED,
                PFF_FLOAT, PFF_DEPTH, PFF_NATIVEENDIAN, PFF_LUMINANCE
           @remarks
-               This replaces the seperate functions for formatHasAlpha, formatIsFloat, ...
+               This replaces the separate functions for formatHasAlpha, formatIsFloat, ...
         */
         static unsigned int getFlags( PixelFormat format );
 
@@ -406,7 +406,7 @@ namespace Ogre {
         static PixelFormat getFormatFromName(const String& name, bool accessibleOnly = false, bool caseSensitive = false);
 
         /** Gets the BNF expression of the pixel-formats.
-            @note                   The string returned by this function is intented to use as a BNF expression
+            @note                   The string returned by this function is intended to be used as a BNF expression
                                     to work with Compiler2Pass.
             @param  accessibleOnly  If true, only accessible pixel format will take into account, otherwise all
                                     pixel formats list in PixelFormat enumeration will being returned.
@@ -421,7 +421,7 @@ namespace Ogre {
             @param floatBits Preferred bit depth (channel bits) for float pixel format.
                             Available values: 0, 16 and 32, where 0 (the default) means as it is.
             @returns        The format that similar original format with bit depth according
-                            with preferred bit depth, or original format if no convertion occuring.
+                            with preferred bit depth, or original format if no conversion occurring.
         */
         static PixelFormat getFormatForBitDepths(PixelFormat fmt, ushort integerBits, ushort floatBits);
 

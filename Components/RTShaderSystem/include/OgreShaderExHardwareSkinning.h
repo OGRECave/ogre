@@ -47,9 +47,9 @@ class HardwareSkinningFactory;
 *  @{
 */
 
-/** Implement a sub render state which performes hardware skinning.
+/** Implement a sub render state which performs hardware skinning.
 Meaning, this sub render states adds calculations which multiply
-the points and normals by thier assigned bone matricies.
+the points and normals by their assigned bone matricies.
 */
 class _OgreRTSSExport HardwareSkinning : public SubRenderState
 {

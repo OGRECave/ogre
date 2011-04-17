@@ -133,7 +133,7 @@ public:
 	/** Returns the level of indirection. 
 	The greater the indirection level the more the parameter needs to be nested in brackets.
 	For example given 4 parameters x1...x4 with the indirections levels 0,1,1,2 
-	respectivly. The parameters should form the following string: x1[x2][x3[x4]].
+	respectively. The parameters should form the following string: x1[x2][x3[x4]].
 	*/
 	ushort				getIndirectionLevel()	const { return mIndirectionLevel; }
 

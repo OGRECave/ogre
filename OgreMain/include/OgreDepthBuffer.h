@@ -40,7 +40,7 @@ namespace Ogre
 	*/
 
 	/** An abstract class that contains a depth/stencil buffer.
-		Depth Buffers can be attached to render targets. Note we handle Depth & Stencil toghether.
+		Depth Buffers can be attached to render targets. Note we handle Depth & Stencil together.
 		DepthBuffer sharing is handled automatically for you. However, there are times where you want
 		to specifically control depth buffers to achieve certain effects or increase performance.
 		You can control this by hinting Ogre with POOL IDs. Created depth buffers can live in different
@@ -57,7 +57,7 @@ namespace Ogre
 		still manually attach a depth buffer though as internally POOL_NO_DEPTH & POOL_MANUAL_USAGE are
 		handled in the same way.
 
-		Behavior is consistent accross all render systems, if, and only if, the same RSC flags are set
+		Behavior is consistent across all render systems, if, and only if, the same RSC flags are set
 		RSC flags that affect this class are:
 			* RSC_RTT_SEPARATE_DEPTHBUFFER:
 				The RTT can create a custom depth buffer different from the main depth buffer. This means,

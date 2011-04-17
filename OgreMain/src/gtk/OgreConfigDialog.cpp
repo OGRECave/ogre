@@ -68,7 +68,7 @@ bool _OgrePrivate __gtk_init_once ()
     char **argv = NULL;
     // Avoid gtk calling setlocale() otherwise
     // scanf("%f") won't work on some locales etc.
-    // Leave this on application developer's responsability.
+    // Leave this on application developer's responsibility.
     gtk_disable_setlocale ();
     return gtk_init_check (&argc, &argv);
 }

@@ -145,7 +145,7 @@ namespace Ogre
 		A positive value is applied as the distance between viewer and near clipping plane.
 		In case null is returned uniform shadow mapping will be applied.
 		@param lightSpace: matrix of the light space transformation
-		@param bodyBABB_ls: bounding box of the tranformed (light space) bodyB
+		@param bodyBABB_ls: bounding box of the transformed (light space) bodyB
 		@param bodyLVS: point list of the bodyLVS which describes the scene space which is in 
 		front of the light and the camera
 		@param cam: currently active camera

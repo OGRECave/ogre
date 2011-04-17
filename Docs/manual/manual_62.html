@@ -39,7 +39,7 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 <HR SIZE=1>
 <H3> 5.7.2 Updating Index Buffers </H3>
 <!--docid::SEC291::-->
-Updating index buffers can only be done when you lock the buffer for writing; See section <A HREF="manual_53.html#SEC277">5.4 Locking buffers</A> for details. Locking returns a void pointer, which must be cast to the apropriate type; with index buffers this is either an unsigned short (for 16-bit indexes) or an unsigned long (for 32-bit indexes). For example:
+Updating index buffers can only be done when you lock the buffer for writing; See section <A HREF="manual_53.html#SEC277">5.4 Locking buffers</A> for details. Locking returns a void pointer, which must be cast to the appropriate type; with index buffers this is either an unsigned short (for 16-bit indexes) or an unsigned long (for 32-bit indexes). For example:
 <TABLE><tr><td>&nbsp;</td><td class=example><pre>unsigned short* pIdx = static_cast&lt;unsigned short*&gt;(ibuf-&gt;lock(HardwareBuffer::HBL_DISCARD));
 </pre></td></tr></table>You can then write to the buffer using the usual pointer semantics, just remember to unlock the buffer when you're finished!
 

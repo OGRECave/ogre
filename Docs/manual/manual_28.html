@@ -53,7 +53,7 @@ The material &quot;Parent&quot; is defined in parent.material and the import ens
 </pre></td></tr></table>
 If there were other definitions in the parent.material file, they would not be imported.<BR><BR>
 
-Note, however that importing does not actually cause objects in the imported script to be fully parsed &amp; created, it just makes the definitions available for inheritence. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).<BR><BR>
+Note, however that importing does not actually cause objects in the imported script to be fully parsed &amp; created, it just makes the definitions available for inheritance. This has a specific ramification for vertex / fragment program definitions, which must be loaded before any parameters can be specified. You should continue to put common program definitions in .program files to ensure they are fully parsed before being referenced in multiple .material files. The 'import' command just makes sure you can resolve dependencies between equivalent script definitions (e.g. material to material).<BR><BR>
 
 
 <A NAME="Compositor Scripts"></A>

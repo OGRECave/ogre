@@ -250,7 +250,7 @@ namespace Ogre {
             }
 			else
             {
-                // No inheritence
+                // No inheritance
                 mDerivedOrientation = mOrientation;
             }
 
@@ -264,7 +264,7 @@ namespace Ogre {
             }
             else
             {
-                // No inheritence
+                // No inheritance
                 mDerivedScale = mScale;
             }
 
@@ -816,7 +816,7 @@ namespace Ogre {
     {
         mChildrenToUpdate.erase(child);
 
-        // Propogate this up if we're done
+        // Propagate this up if we're done
         if (mChildrenToUpdate.empty() && mParent && !mNeedChildUpdate)
         {
             mParent->cancelUpdate(this);

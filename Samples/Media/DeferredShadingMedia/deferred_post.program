@@ -54,7 +54,7 @@ fragment_program DeferredShading/post/ShowColour_ps cg
 	entry_point main
 }
 
-// Auxilary lights
+// Auxiliary lights
 // cg
 vertex_program DeferredShading/post/LightMaterial_vs cg
 {

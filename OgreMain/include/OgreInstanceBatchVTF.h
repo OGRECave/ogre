@@ -42,7 +42,7 @@ namespace Ogre
 
 	/** Instancing implementation using vertex texture through Vertex Texture Fetch (VTF)
 		This implementation has the following advantages:
-		  * Supports huge ammount of instances per batch
+		  * Supports huge amount of instances per batch
 		  * Supports skinning even with huge ammounts of instances per batch
 		  * Doesn't need shader constants registers.
 		  * Best suited for skinned entities
@@ -60,7 +60,7 @@ namespace Ogre
 		Mobility Radeon HD 4650, but went 0.75x slower on an AthlonX2 5000+ integrated nForce 6150 SE
 		Each BaseInstanceBatchVTF has it's own texture, which occupies memory in VRAM.
 		Approx VRAM usage can be computed by doing 12 bytes * 3 * numInstances * numBones
-		Use flag IM_VTFBESTFIT to avoid wasting VRAM (but may reduce ammount of instances per batch).
+		Use flag IM_VTFBESTFIT to avoid wasting VRAM (but may reduce amount of instances per batch).
 		@par
 		The material requires at least a texture unit stage named "InstancingVTF"
 
@@ -91,7 +91,7 @@ namespace Ogre
 		*/
 		void cloneMaterial( const MaterialPtr &material );
 
-		/** Retrieves bone data from the original sub mesh and puts it into an appropiate buffer,
+		/** Retrieves bone data from the original sub mesh and puts it into an appropriate buffer,
 			later to be read when creating the vertex semantics.
 			Assumes outBoneIdx has enough space (base submesh vertex count)
 		*/

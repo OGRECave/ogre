@@ -48,7 +48,7 @@ namespace Ogre {
 	*  @{
 	*/
 	/** Implementation of a Quaternion, i.e. a rotation around an axis.
-		For more information about Quaternions and the theory behind it, we recomend reading:
+		For more information about Quaternions and the theory behind it, we recommend reading:
 		http://www.ogre3d.org/tikiwiki/Quaternion+and+Rotation+Primer
 		http://www.cprogramming.com/tutorial/3d/quaternions.html
 		http://www.gamedev.net/page/resources/_/reference/programming/math-and-physics/

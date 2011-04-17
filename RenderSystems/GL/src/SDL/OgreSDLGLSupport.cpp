@@ -36,14 +36,14 @@ void SDLGLSupport::addConfig(void)
 	ConfigOption optEnableFixedPipeline;
 #endif
 
-    // FS setting possiblities
+    // FS setting possibilities
     optFullScreen.name = "Full Screen";
     optFullScreen.possibleValues.push_back("Yes");
     optFullScreen.possibleValues.push_back("No");
     optFullScreen.currentValue = "Yes";
     optFullScreen.immutable = false;
 
-    // Video mode possiblities
+    // Video mode possibilities
     optVideoMode.name = "Video Mode";
     optVideoMode.immutable = false;
     for (size_t i = 0; mVideoModes[i]; i++)

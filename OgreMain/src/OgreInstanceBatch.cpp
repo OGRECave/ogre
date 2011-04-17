@@ -138,7 +138,7 @@ namespace Ogre
 			//Trick to force Ogre not to render us if none of our instances is visible
 			//Because we do Camera::isVisible(), it is better if the SceneNode from the
 			//InstancedEntity is not part of the scene graph (i.e. ultimate parent is root node)
-			//to avoid unnecesary wasteful calculations
+			//to avoid unnecessary wasteful calculations
 			mVisible |= (*itor)->findVisible( m_currentCamera );
 			++itor;
 		}

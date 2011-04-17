@@ -1890,7 +1890,7 @@ namespace Ogre {
 				bow If zero, the plane will be completely flat (like previous
 				versions.  If above zero, the plane will be curved, allowing
 				the sky to appear below camera level.  Curved sky planes are 
-				simular to skydomes, but are more compatable with fog.
+				simular to skydomes, but are more compatible with fog.
             @param xsegments, ysegments
                 Determines the number of segments the plane will have to it. This
                 is most important when you are bowing the plane, but may also be useful
@@ -1940,7 +1940,7 @@ namespace Ogre {
 				bow If zero, the plane will be completely flat (like previous
 				versions.  If above zero, the plane will be curved, allowing
 				the sky to appear below camera level.  Curved sky planes are 
-				simular to skydomes, but are more compatable with fog.
+				simular to skydomes, but are more compatible with fog.
             @param xsegments, ysegments
                 Determines the number of segments the plane will have to it. This
                 is most important when you are bowing the plane, but may also be useful
@@ -2071,7 +2071,7 @@ namespace Ogre {
                 backdrop with an overlayed curved cloud layer.
             @par
                 Sky domes work well with 2D repeating textures like clouds. You
-                can change the apparant 'curvature' of the sky depending on how
+                can change the apparent 'curvature' of the sky depending on how
                 your scene is viewed - lower curvatures are better for 'open'
                 scenes like landscapes, whilst higher curvatures are better for
                 say FPS levels where you don't see a lot of the sky at once and
@@ -2133,7 +2133,7 @@ namespace Ogre {
                 backdrop with an overlayed curved cloud layer.
             @par
                 Sky domes work well with 2D repeating textures like clouds. You
-                can change the apparant 'curvature' of the sky depending on how
+                can change the apparent 'curvature' of the sky depending on how
                 your scene is viewed - lower curvatures are better for 'open'
                 scenes like landscapes, whilst higher curvatures are better for
                 say FPS levels where you don't see a lot of the sky at once and
@@ -2663,7 +2663,7 @@ namespace Ogre {
             simple decal approach. The 2 stencil approaches differ in the amount of multipass work 
             that is required - the modulative approach simply 'darkens' areas in shadow after the 
             main render, which is the least expensive, whilst the additive approach has to perform 
-            a render per light and adds the cumulative effect, whcih is more expensive but more 
+            a render per light and adds the cumulative effect, which is more expensive but more 
             accurate. The texture based shadows both work in roughly the same way, the only difference is
             that the shadowmap approach is slightly more accurate, but requires a more recent
             graphics card.
@@ -3159,7 +3159,7 @@ namespace Ogre {
 		@remarks
 			If you've already created an InstanceManager, you can call it's
 			getMaxOrBestNumInstancesPerBatch() function directly.
-			Another (not recomended) way to know if the technique is unsupported is by creating
+			Another (not recommended) way to know if the technique is unsupported is by creating
 			an InstanceManager and use createInstancedEntity, which will return null pointer.
 			The input parameter "numInstancesPerBatch" is a suggested value when using IM_VTFBESTFIT
 			flag (in that case it should be non-zero)

@@ -40,7 +40,7 @@ namespace Ogre {
 		and provide an interface for GLES2RenderSystem calls.  GLSL ES does not provide access to the
 		low level code of the shader so this class is really just a dummy place holder.
 		GLSL ES uses a program object to represent the active vertex and fragment programs used
-		but Ogre materials maintain seperate instances of the active vertex and fragment programs
+		but Ogre materials maintain separate instances of the active vertex and fragment programs
 		which creates a small problem for GLSL integration.  The GLSLESGpuProgram class provides the
 		interface between the GLSLESLinkProgramManager , GLES2RenderSystem, and the active GLSLESProgram
 		instances.

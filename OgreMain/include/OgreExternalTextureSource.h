@@ -31,12 +31,12 @@ THE SOFTWARE.
 /***************************************************************************
 OgreExternalTextureSource.h  -  
 	Base class that texture plugins need to derive from. This provides the hooks
-	neccessary for a plugin developer to easily extend the functionality of dynamic textures.
+	necessary for a plugin developer to easily extend the functionality of dynamic textures.
 	It makes creation/destruction of dynamic textures more streamlined. While the plugin
 	will need to talk with Ogre for the actual modification of textures, this class allows
 	easy integration with Ogre apps. Material script files can be used to aid in the 
 	creation of dynamic textures. Functionality can be added that is not defined here
-	through the use of the base dictionary. For an exmaple of how to use this class and the
+	through the use of the base dictionary. For an example of how to use this class and the
 	string interface see ffmpegVideoPlugIn.
 
 -------------------

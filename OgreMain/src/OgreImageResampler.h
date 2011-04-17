@@ -45,7 +45,7 @@ namespace Ogre {
 // stepx = difference between adjacent sx_48 values
 // sx1 = lower-bound integer x-position in source
 // sx2 = upper-bound integer x-position in source
-// sxf = fractional weight beween sx1 and sx2
+// sxf = fractional weight between sx1 and sx2
 // x,y,z = location of output pixel in destination
 
 // nearest-neighbor resampler, does not convert formats.

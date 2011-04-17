@@ -302,7 +302,7 @@ namespace Ogre {
 	/** Flags for the Instance Manager when calculating ideal number of instances per batch */
 	enum InstanceManagerFlags
 	{
-		/** Forces an ammount of instances per batch low enough so that vertices * numInst < 65535
+		/** Forces an amount of instances per batch low enough so that vertices * numInst < 65535
 			since usually improves performance. In HW instanced techniques, this flag is ignored
 		*/
 		IM_USE16BIT		= 0x0001,

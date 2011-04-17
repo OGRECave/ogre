@@ -67,21 +67,21 @@ void OSXGLSupport::addConfig( void )
 	ConfigOption optEnableFixedPipeline;
 #endif
 
-	// FS setting possiblities
+	// FS setting possibilities
 	optFullScreen.name = "Full Screen";
 	optFullScreen.possibleValues.push_back( "Yes" );
 	optFullScreen.possibleValues.push_back( "No" );
 	optFullScreen.currentValue = "No";
 	optFullScreen.immutable = false;
 
-    // Hidden window setting possiblities
+    // Hidden window setting possibilities
 	optHiddenWindow.name = "hidden";
 	optHiddenWindow.possibleValues.push_back( "Yes" );
 	optHiddenWindow.possibleValues.push_back( "No" );
 	optHiddenWindow.currentValue = "No";
 	optHiddenWindow.immutable = false;
 
-    // FS setting possiblities
+    // FS setting possibilities
 	optVsync.name = "vsync";
 	optVsync.possibleValues.push_back( "Yes" );
 	optVsync.possibleValues.push_back( "No" );
@@ -168,7 +168,7 @@ void OSXGLSupport::addConfig( void )
 
     mOptions[ optFSAA.name ] = optFSAA;
 
-	// Video mode possiblities
+	// Video mode possibilities
 	optVideoMode.name = "Video Mode";
 	optVideoMode.immutable = false;
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6

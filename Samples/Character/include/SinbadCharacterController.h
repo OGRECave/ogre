@@ -360,7 +360,7 @@ private:
 				}
 			}
 
-			// don't sway hips from side to side when slicing. that's just embarrasing.
+			// don't sway hips from side to side when slicing. that's just embarrassing.
 			if (mBaseAnimID == ANIM_IDLE_BASE) baseAnimSpeed = 0;
 		}
 		else if (mBaseAnimID == ANIM_JUMP_START)

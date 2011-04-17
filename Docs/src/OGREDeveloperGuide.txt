@@ -15,7 +15,7 @@ later on.
 Recommended Mercurial Configuration
 -----------------------------------
 OGRE uses Mercurial for source control, this is a Distributed Version Control System (DVCS), which means that
-while there is a central repository which is considered 'authorative', in fact everyone is able to clone their own
+while there is a central repository which is considered 'authoritative', in fact everyone is able to clone their own
 copy of the repository and commit to it themselves too, with changes being exchanged by 'pushing' and 'pulling' changesets
 (commits) between repository clones. 
 
@@ -344,7 +344,7 @@ hg export --git -o %b_patch%nof%N_%h.patch REVS
 -------------------------------------------------------------
 
 Replace REVS with a list of revisions, or a range such as REV1:REV2. It will create one file per changeset named something like ogre_patch1of2_f0c47360a828.diff. You should zip them 
-up and send them to the patch list. If you've configured Mercurial the way we recommended in the <<HgCfgDiff,Mercurial configuration section>>, the --git is unecessary because it's the default,
+up and send them to the patch list. If you've configured Mercurial the way we recommended in the <<HgCfgDiff,Mercurial configuration section>>, the --git is unnecessary because it's the default,
 but it's included for completeness. 
 
 Other Ways
@@ -429,7 +429,7 @@ hg rebase --continue
 -------------------------------------------------------------
 The "--continue" means that any conflicts will be resolved in your working copy, which will then need committing.
 
-Rebase is usually automatic in the common case where the divergence has been caused by pulling from the master, but if they've occurred for another reason (e.g. hg import --exact) then you may need to explictly specify the rebase options. For example, in the example image, the specific command for performing the rebase is:
+Rebase is usually automatic in the common case where the divergence has been caused by pulling from the master, but if they've occurred for another reason (e.g. hg import --exact) then you may need to explicitly specify the rebase options. For example, in the example image, the specific command for performing the rebase is:
 -------------------------------------------------------------
 hg rebase -s492385cab361 -da638fcd23823 --continue
 -------------------------------------------------------------

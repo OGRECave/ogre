@@ -326,7 +326,7 @@ namespace Ogre {
 	void QueuedRenderableCollection::sort(const Camera* cam)
     {
 		// ascending and descending sort both set bit 1
-		// We always sort descending, becuase the only difference is in the
+		// We always sort descending, because the only difference is in the
 		// acceptVisitor method, where we iterate in reverse in ascending mode
 		if (mOrganisationMode & OM_SORT_DESCENDING)
 		{

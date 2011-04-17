@@ -195,7 +195,7 @@ Lets start with a vert simple example. Lets say you have a buffer which only con
 Real* pReal = static_cast<Real*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
 @end example
 ... then you just write positions in chunks of 3 reals. If you have other floating point data in there, it's a little more complex but the principle is largely the same, you just need to write alternate elements. But what if you have elements of different types, or you need to derive how to write the vertex data from the elements themselves? Well, there are some useful methods on the VertexElement class to help you out.@*@*
-Firstly, you lock the buffer but assign the result to a unsigned char* rather than a specific type. Then, for each element whcih is sourcing from this buffer (which you can find out by calling VertexDeclaration::findElementsBySource) you call VertexElement::baseVertexPointerToElement. This offsets a pointer which points at the base of a vertex in a buffer to the beginning of the element in question, and allows you to use a pointer of the right type to boot. Here's a full example:
+Firstly, you lock the buffer but assign the result to a unsigned char* rather than a specific type. Then, for each element which is sourcing from this buffer (which you can find out by calling VertexDeclaration::findElementsBySource) you call VertexElement::baseVertexPointerToElement. This offsets a pointer which points at the base of a vertex in a buffer to the beginning of the element in question, and allows you to use a pointer of the right type to boot. Here's a full example:
 @example
 // Get base pointer
 unsigned char* pVert = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
@@ -266,7 +266,7 @@ Tells the system whether you want this buffer backed by a system-memory copy. @x
 
 @node Updating Index Buffers
 @subsection Updating Index Buffers
-Updating index buffers can only be done when you lock the buffer for writing; @xref{Locking buffers} for details. Locking returns a void pointer, which must be cast to the apropriate type; with index buffers this is either an unsigned short (for 16-bit indexes) or an unsigned long (for 32-bit indexes). For example:
+Updating index buffers can only be done when you lock the buffer for writing; @xref{Locking buffers} for details. Locking returns a void pointer, which must be cast to the appropriate type; with index buffers this is either an unsigned short (for 16-bit indexes) or an unsigned long (for 32-bit indexes). For example:
 @example
 unsigned short* pIdx = static_cast<unsigned short*>(ibuf->lock(HardwareBuffer::HBL_DISCARD));
 @end example
@@ -321,7 +321,7 @@ defined, but you can assume it to be a 2x2 box filter.
 @item TU_RENDERTARGET
 This texture will be a render target, ie. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU_AUTOMIPMAP.
 @item TU_DEFAULT
-This is actualy a combination of usage flags, and is equivalent to TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY. The resource
+This is actually a combination of usage flags, and is equivalent to TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY. The resource
 system uses these flags for textures that are loaded from images.
 
 @end table

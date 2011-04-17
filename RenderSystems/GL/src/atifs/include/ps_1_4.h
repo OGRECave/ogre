@@ -78,7 +78,7 @@ THE SOFTWARE.
 	and converts it to a form that can be used by ATI_fragment_shader OpenGL API
 @remarks
 	all ps_1_1, ps_1_2, ps_1_3, ps_1_4 assembly instructions are recognized but not all are passed
-	on to ATI_fragment_shader.	ATI_fragment_shader does not have an equivelant directive for
+	on to ATI_fragment_shader.	ATI_fragment_shader does not have an equivalent directive for
 	texkill or texdepth instructions.
 
 	The user must provide the GL binding interfaces.
@@ -268,7 +268,7 @@ private:
 	/// keeps track of which registers are written to in each phase
 	/// if a register is read from but has not been written to in phase 2
 	/// then if it was written to in phase 1 perform a register pass function
-	/// at the begining of phase2 so that the register has something worthwhile in it
+	/// at the beginning of phase2 so that the register has something worthwhile in it
 	/// NB: check ALU and TEX section of phase 1 and phase 2
 	/// there are 6 temp registers r0 to r5 to keep track off
 	/// checks are performed in pass 2 when building machine instructions

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //These materials/shaders are part of the NEW InstanceManager implementation
-//Writen by Matias N. Goldberg ("dark_sylinc")
+//Written by Matias N. Goldberg ("dark_sylinc")
 //---------------------------------------------------------------------------
 
 //This shader is not instancing related, but is used in the Instancing tests for lighting

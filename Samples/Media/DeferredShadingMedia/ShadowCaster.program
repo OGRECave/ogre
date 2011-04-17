@@ -1,4 +1,4 @@
-// Auxilary lights
+// Auxiliary lights
 vertex_program DeferredShading/Shadows/CasterVP cg
 {
 	source ShadowCaster.cg

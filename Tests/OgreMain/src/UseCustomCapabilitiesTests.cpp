@@ -44,7 +44,7 @@ void UseCustomCapabilitiesTests::setUp()
 {
     using namespace Ogre;
 
-	// set up silent logging to not polute output
+	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	
@@ -67,7 +67,7 @@ void UseCustomCapabilitiesTests::setUp()
 	if(Ogre::ResourceGroupManager::getSingletonPtr())
 		OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
 
-	// set up silent logging to not polute output
+	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 }
@@ -75,7 +75,7 @@ void UseCustomCapabilitiesTests::setUp()
 void UseCustomCapabilitiesTests::tearDown()
 {
 	using namespace Ogre;
-	// set up silent logging to not polute output
+	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 
@@ -184,7 +184,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 {
     using namespace Ogre;
 
-	// set up silent logging to not polute output
+	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	
@@ -239,7 +239,7 @@ void setUpD3D9RenderSystemOptions(Ogre::RenderSystem* rs)
 
 void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 {
-	// set up silent logging to not polute output
+	// set up silent logging to not pollute output
 	if(LogManager::getSingletonPtr())
 		OGRE_DELETE Ogre::LogManager::getSingletonPtr();
 	

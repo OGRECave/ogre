@@ -62,14 +62,14 @@ void GTKGLSupport::addConfig()
     ConfigOption optFullScreen;
     ConfigOption optVideoMode;
 
-     // FS setting possiblities
+     // FS setting possibilities
     optFullScreen.name = "Full Screen";
     optFullScreen.possibleValues.push_back("Yes");
     optFullScreen.possibleValues.push_back("No");
     optFullScreen.currentValue = "No";
     optFullScreen.immutable = false;
  
-    // Video mode possiblities
+    // Video mode possibilities
     // XXX Actually do this
     optVideoMode.name = "Video Mode";
     optVideoMode.immutable = false;

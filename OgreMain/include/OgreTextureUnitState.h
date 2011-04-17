@@ -313,7 +313,7 @@ namespace Ogre {
         @par
         You can change the active frame on a texture layer by calling the setCurrentFrame method.
         @note
-        If you can't make your texture images conform to the naming standard layed out here, you
+        If you can't make your texture images conform to the naming standard laid out here, you
         can call the alternative setAnimatedTextureName method which takes an array of names instead.
         @note
         Applies to both fixed-function and programmable pipeline.
@@ -803,7 +803,7 @@ namespace Ogre {
         This works in exactly the same way as setColourOperation, except
         that the effect is applied to the level of alpha (i.e. transparency)
         of the texture rather than its colour. When the alpha of a texel (a pixel
-        on a texture) is 1.0, it is opaque, wheras it is fully transparent if the
+        on a texture) is 1.0, it is opaque, whereas it is fully transparent if the
         alpha is 0.0. Please refer to the setColourOperation method for more info.
         @param
         op The operation to be used, e.g. modulate (multiply), add, subtract
@@ -1063,7 +1063,7 @@ namespace Ogre {
 
         /** Set the name of the Texture Unit State
         @remarks
-            The name of the Texture Unit State is optional.  Its usefull in material scripts where a material could inherit
+            The name of the Texture Unit State is optional.  Its useful in material scripts where a material could inherit
             from another material and only want to modify a particalar Texture Unit State.
         */
         void setName(const String& name);

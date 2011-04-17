@@ -344,7 +344,7 @@ namespace Ogre {
 		@remarks
 			Saving and loading are implemented by back end (sometimes third 
 			party) codecs.  Implemented saving functionality is more limited
-			than loading in some cases.	Particulary DDS file format support 
+			than loading in some cases.	Particularly DDS file format support 
 			is currently limited to true colour or single channel float32, 
 			square, power of two textures with no mipmaps.  Volumetric support
 			is currently limited to DDS files.

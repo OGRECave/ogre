@@ -133,7 +133,7 @@ namespace Ogre {
         */
         void logMessage( const String& message, LogMessageLevel lml = LML_NORMAL, bool maskDebug = false );
 
-		/** Get a stream object targetting this log. */
+		/** Get a stream object targeting this log. */
 		Stream stream(LogMessageLevel lml = LML_NORMAL, bool maskDebug = false);
 
         /**

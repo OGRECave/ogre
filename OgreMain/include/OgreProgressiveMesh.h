@@ -377,7 +377,7 @@ namespace Ogre {
 		typedef std::pair<unsigned, PMVertex*> IndexVertexPair;
 		/// Optionally discards first LOD level (i.e. original geometry), removes unused vertices, remaps indexes.
 		static void bakeSimplifiedMesh(Mesh* destMesh, Mesh* srcMesh, ProgressiveMeshList& pmList, bool dropFirstLodLevel = false);
-		/// Defragments vertices, removing unused. Usefull if original geometry is redundant or dropped at all.
+		/// Defragments vertices, removing unused. Useful if original geometry is redundant or dropped at all.
 		static void	createSimplifiedVertexData(vector<IndexVertexPair>::type& usedVertices, VertexData* inVData, VertexData*& outVData, AxisAlignedBox& aabox);
 		/// During vertices defragmentation vertices are re-indexed, so old-to-new mapping is stored in index map by this function.
 		static void createIndexMap(vector<IndexVertexPair>::type& usedVertices, unsigned allVertexCount, vector<unsigned>::type& indexMap);
