@@ -8,18 +8,41 @@
 #-------------------------------------------------------------------
 
 # add a new library target
+# usage: ogre_add_library(TARGETNAME LIBTYPE SOURCE_FILES [SEPARATE SOURCE_FILES])
 function(ogre_add_library TARGETNAME LIBTYPE)
-  set(_SOURCES ${ARGN})
+  # first step: build the primary and separate lists
+  set(_PRIMARY "")
+  set(_EXCLUDES "")
+  set(_SEP FALSE)
+  foreach(_FILE ${ARGN})
+    if (_FILE STREQUAL "SEPARATE")
+      set(_SEP TRUE)
+    else ()
+      if (_SEP)
+        list(APPEND _EXCLUDES ${_FILE})
+      else ()
+        list(APPEND _PRIMARY ${_FILE})
+      endif ()
+    endif()
+  endforeach()
+  set(_SOURCES ${_PRIMARY})
+
   if (OGRE_UNITY_BUILD)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
     # create Unity compilation units
+    # all source files given will be put into a certain number of
+    # compilation units.
+    # if certain source files should be excluded from the unity build
+    # and built separately, they need to also be named in the SEPARATE
+    # list.
     set(_FILE_NUM 0)
     set(_FILE_CNT 0)
     set(_FILE_CONTENTS "")
-    foreach(_FILE ${ARGN})
+    foreach(_FILE ${_PRIMARY})
       # test if file is more than just a header
       get_filename_component(_EXT ${_FILE} EXT)
-      if (_EXT STREQUAL ".cpp")
+      list(FIND _EXCLUDES ${_FILE} _EXCLUDED)
+      if ((_EXT STREQUAL ".cpp") AND (_EXCLUDED EQUAL "-1"))
         set(_FILE_CONTENTS "${_FILE_CONTENTS}\#include \"${_FILE}\"\n")
         math(EXPR _FILE_CNT "${_FILE_CNT}+1")
         if(_FILE_CNT EQUAL OGRE_UNITY_FILES_PER_UNIT)
