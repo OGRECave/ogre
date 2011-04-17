@@ -44,8 +44,10 @@ namespace Ogre {
 
 		typedef map<D3D11HLSLProgram*, ID3D11InputLayout*>::type ShaderToILayoutMap;
 		typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
+        typedef map<D3D11HLSLProgram*, D3D11_INPUT_ELEMENT_DESC*>::type ShaderToInputDesc;
+        typedef ShaderToInputDesc::iterator ShaderToInputDescIterator;
 
-		D3D11_INPUT_ELEMENT_DESC*  mD3delems;
+		ShaderToInputDesc  mD3delems;
 
 		ShaderToILayoutMap mShaderToILayoutMap;
 

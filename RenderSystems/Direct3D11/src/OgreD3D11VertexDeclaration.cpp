@@ -38,25 +38,31 @@ namespace Ogre {
 		: 
 	mlpD3DDevice(device)
 	, mNeedsRebuild(true)
-	, mD3delems(NULL)
 	{
 
 	}
 	//-----------------------------------------------------------------------
 	D3D11VertexDeclaration::~D3D11VertexDeclaration()
 	{
-		ShaderToILayoutMapIterator iter = mShaderToILayoutMap.begin();
-		ShaderToILayoutMapIterator iterE = mShaderToILayoutMap.end();
+        {
+		    ShaderToILayoutMapIterator iter = mShaderToILayoutMap.begin();
+		    ShaderToILayoutMapIterator iterE = mShaderToILayoutMap.end();
 
-		for ( ; iter != iterE ; iter++)
-		{
-			iter->second->Release();
-		}
+		    for ( ; iter != iterE ; iter++)
+		    {
+			    iter->second->Release();
+		    }
+        }
 
-		if (mD3delems)
-		{
-			SAFE_DELETE_ARRAY(mD3delems);
-		}
+        {
+            ShaderToInputDescIterator iter = mD3delems.begin();
+            ShaderToInputDescIterator iterE = mD3delems.end();
+            for( ; iter != iterE ; iter++ )
+            {
+                SAFE_DELETE_ARRAY(iter->second);
+
+            }
+        }
 
 
 	}
@@ -108,9 +114,10 @@ namespace Ogre {
 		// Create D3D elements
 		size_t iNumElements = boundVertexProgram->getNumInputs();
 
-		if (!mD3delems)
+		if (mD3delems.find(boundVertexProgram) == mD3delems.end())
 		{
 			D3D11_INPUT_ELEMENT_DESC*  D3delems = new D3D11_INPUT_ELEMENT_DESC[iNumElements];
+            ZeroMemory(D3delems, sizeof(D3D11_INPUT_ELEMENT_DESC) * iNumElements);
 
 			unsigned int idx;
        		for (unsigned int idx = 0; idx < iNumElements; ++idx)
@@ -180,11 +187,11 @@ namespace Ogre {
 				}				
 			}
 
-			mD3delems = D3delems;
+			mD3delems[boundVertexProgram] = D3delems;
 
 		}
 
-		return mD3delems;
+		return mD3delems[boundVertexProgram];
 	}
 	//-----------------------------------------------------------------------
 	ID3D11InputLayout*  D3D11VertexDeclaration::getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
@@ -199,6 +206,10 @@ namespace Ogre {
 
 			DWORD dwShaderFlags = 0;
 			const MicroCode &  vSBuf = boundVertexProgram->getMicroCode();
+            if (boundVertexProgram->getName() == "595364079_VS")
+            {
+                int u = 1;
+            }
 			D3D11_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration(boundVertexProgram, binding);
 			HRESULT hr = mlpD3DDevice->CreateInputLayout( 
 				pVertexDecl, 
