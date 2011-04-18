@@ -55,7 +55,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /// stream overhead = ID + size
-    const long STREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
+    const long MSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
     //---------------------------------------------------------------------
     MeshSerializerImpl::MeshSerializerImpl()
     {
@@ -218,7 +218,7 @@ namespace Ogre {
 		while(it != pMesh->mSubMeshNameMap.end())
 		{
 			// Header
-			writeChunkHeader(M_SUBMESH_NAME_TABLE_ELEMENT, STREAM_OVERHEAD_SIZE +
+			writeChunkHeader(M_SUBMESH_NAME_TABLE_ELEMENT, MSTREAM_OVERHEAD_SIZE +
 				sizeof(unsigned short) + (unsigned long)it->first.length() + 1);
 
 			// write the index
@@ -320,7 +320,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshExtremes(unsigned short idx, const SubMesh* s)
     {
-        size_t chunkSize = STREAM_OVERHEAD_SIZE + sizeof (unsigned short) +
+        size_t chunkSize = MSTREAM_OVERHEAD_SIZE + sizeof (unsigned short) +
             s->extremityPoints.size () * sizeof (float) * 3;
         writeChunkHeader(M_TABLE_EXTREMES, chunkSize);
 
@@ -352,7 +352,7 @@ namespace Ogre {
         for (i = s->mTextureAliases.begin(); i != s->mTextureAliases.end(); ++i)
         {
             // calculate chunk size based on string length + 1.  Add 1 for the line feed.
-            chunkSize = STREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
+            chunkSize = MSTREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
 			writeChunkHeader(M_SUBMESH_TEXTURE_ALIAS, chunkSize);
             // write out alias name
             writeString(i->first);
@@ -383,13 +383,13 @@ namespace Ogre {
             vertexData->vertexBufferBinding->getBindings();
         VertexBufferBinding::VertexBufferBindingMap::const_iterator vbi, vbiend;
 
-		size_t size = STREAM_OVERHEAD_SIZE + sizeof(unsigned int) + // base
-			(STREAM_OVERHEAD_SIZE + elemList.size() * (STREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5)); // elements
+		size_t size = MSTREAM_OVERHEAD_SIZE + sizeof(unsigned int) + // base
+			(MSTREAM_OVERHEAD_SIZE + elemList.size() * (MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5)); // elements
         vbiend = bindings.end();
 		for (vbi = bindings.begin(); vbi != vbiend; ++vbi)
 		{
 			const HardwareVertexBufferSharedPtr& vbuf = vbi->second;
-			size += (STREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbuf->getSizeInBytes();
+			size += (MSTREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbuf->getSizeInBytes();
 		}
 
 		// Header
@@ -399,13 +399,13 @@ namespace Ogre {
         writeInts(&vertexCount, 1);
 
 		// Vertex declaration
-		size = STREAM_OVERHEAD_SIZE + elemList.size() * (STREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5);
+		size = MSTREAM_OVERHEAD_SIZE + elemList.size() * (MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5);
 		writeChunkHeader(M_GEOMETRY_VERTEX_DECLARATION, size);
 
         VertexDeclaration::VertexElementList::const_iterator vei, veiend;
 		veiend = elemList.end();
 		unsigned short tmp;
-		size = STREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5;
+		size = MSTREAM_OVERHEAD_SIZE + sizeof(unsigned short) * 5;
 		for (vei = elemList.begin(); vei != veiend; ++vei)
 		{
 			const VertexElement& elem = *vei;
@@ -433,7 +433,7 @@ namespace Ogre {
 		for (vbi = bindings.begin(); vbi != vbiend; ++vbi)
 		{
 			const HardwareVertexBufferSharedPtr& vbuf = vbi->second;
-			size = (STREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbuf->getSizeInBytes();
+			size = (MSTREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbuf->getSizeInBytes();
 			writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER,  size);
 			// unsigned short bindIndex;	// Index to bind this buffer to
 			tmp = vbi->first;
@@ -443,7 +443,7 @@ namespace Ogre {
 			writeShorts(&tmp, 1);
 
 			// Data
-			size = STREAM_OVERHEAD_SIZE + vbuf->getSizeInBytes();
+			size = MSTREAM_OVERHEAD_SIZE + vbuf->getSizeInBytes();
 			writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER_DATA, size);
 			void* pBuf = vbuf->lock(HardwareBuffer::HBL_READ_ONLY);
 
@@ -473,14 +473,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcSubMeshNameTableSize(const Mesh* pMesh)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// Figure out the size of the Name table.
 		// Iterate through the subMeshList & add up the size of the indexes and names.
 		Mesh::SubMeshNameMap::const_iterator it = pMesh->mSubMeshNameMap.begin();
 		while(it != pMesh->mSubMeshNameMap.end())
 		{
 			// size of the index + header size for each element chunk
-			size += STREAM_OVERHEAD_SIZE + sizeof(uint16);
+			size += MSTREAM_OVERHEAD_SIZE + sizeof(uint16);
 			// name
 			size += it->first.length() + 1;
 
@@ -493,7 +493,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcMeshSize(const Mesh* pMesh)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         // Num shared vertices
         size += sizeof(uint32);
@@ -537,7 +537,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcSubMeshSize(const SubMesh* pSub)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 		
 		bool idx32bit = (!pSub->indexData->indexBuffer.isNull() &&
 						 pSub->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
@@ -581,7 +581,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcSubMeshOperationSize(const SubMesh* pSub)
     {
-        return STREAM_OVERHEAD_SIZE + sizeof(uint16);
+        return MSTREAM_OVERHEAD_SIZE + sizeof(uint16);
     }
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcSubMeshTextureAliasesSize(const SubMesh* pSub)
@@ -593,7 +593,7 @@ namespace Ogre {
         for (i = pSub->mTextureAliases.begin(); i != pSub->mTextureAliases.end(); ++i)
         {
             // calculate chunk size based on string length + 1.  Add 1 for the line feed.
-            chunkSize += STREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
+            chunkSize += MSTREAM_OVERHEAD_SIZE + i->first.length() + i->second.length() + 2;
         }
 
         return chunkSize;
@@ -601,7 +601,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcGeometrySize(const VertexData* vertexData)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         // Num vertices
         size += sizeof(unsigned int);
@@ -656,7 +656,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of non-submesh stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
 
@@ -696,7 +696,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of non-submesh stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
 
@@ -810,7 +810,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 
@@ -875,7 +875,7 @@ namespace Ogre {
 							OGRE_DELETE pMesh->sharedVertexData;
 							pMesh->sharedVertexData = 0;
 							// Skip this stream (pointer will have been returned to just after header)
-							stream->skip(mCurrentstreamLen - STREAM_OVERHEAD_SIZE);
+							stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
 						}
 						else
 						{
@@ -924,7 +924,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
 
@@ -1035,7 +1035,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
 
@@ -1084,7 +1084,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcSkeletonLinkSize(const String& skelName)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         size += skelName.length() + 1;
 
@@ -1149,7 +1149,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcBoneAssignmentSize(void)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         // Vert index
         size += sizeof(unsigned int);
@@ -1189,7 +1189,7 @@ namespace Ogre {
     void MeshSerializerImpl::writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy)
     {
         // Header
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
         // unsigned short numLevels;
         size += sizeof(unsigned short);
         // bool manual;  (true for manual alternate meshes, false for generated)
@@ -1210,8 +1210,8 @@ namespace Ogre {
     void MeshSerializerImpl::writeLodUsageManual(const MeshLodUsage& usage)
     {
         // Header
-        size_t size = STREAM_OVERHEAD_SIZE;
-        size_t manualSize = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
+        size_t manualSize = MSTREAM_OVERHEAD_SIZE;
         // float lodValue;
         size += sizeof(float);
         // Manual part size
@@ -1234,7 +1234,7 @@ namespace Ogre {
 		unsigned short lodNum)
     {
 		// Usage Header
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 		unsigned short subidx;
 
         // float fromDepthSquared;
@@ -1244,7 +1244,7 @@ namespace Ogre {
 		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
 		{
 			// header
-			size += STREAM_OVERHEAD_SIZE;
+			size += MSTREAM_OVERHEAD_SIZE;
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
@@ -1274,7 +1274,7 @@ namespace Ogre {
         // Calc generated SubMesh sections size
 		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
 		{
-			size = STREAM_OVERHEAD_SIZE;
+			size = MSTREAM_OVERHEAD_SIZE;
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
@@ -1327,7 +1327,7 @@ namespace Ogre {
     void MeshSerializerImpl::writeBoundsInfo(const Mesh* pMesh)
     {
 		// Usage Header
-        unsigned long size = STREAM_OVERHEAD_SIZE;
+        unsigned long size = MSTREAM_OVERHEAD_SIZE;
 
         size += sizeof(float) * 7;
         writeChunkHeader(M_MESH_BOUNDS, size);
@@ -1572,7 +1572,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcEdgeListSize(const Mesh* pMesh)
 	{
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         for (ushort i = 0; i < pMesh->getNumLodLevels(); ++i)
         {
@@ -1589,7 +1589,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcEdgeListLodSize(const EdgeData* edgeData, bool isManual)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         // unsigned short lodIndex
         size += sizeof(uint16);
@@ -1630,7 +1630,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     size_t MeshSerializerImpl::calcEdgeGroupSize(const EdgeData::EdgeGroup& group)
     {
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 
         // unsigned long vertexSet
         size += sizeof(uint32);
@@ -1820,7 +1820,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
 
@@ -1918,7 +1918,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcAnimationsSize(const Mesh* pMesh)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 
 		for (unsigned short a = 0; a < pMesh->getNumAnimations(); ++a)
 		{
@@ -1931,7 +1931,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcAnimationSize(const Animation* anim)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// char* name
 		size += anim->getName().length() + 1;
 
@@ -1950,7 +1950,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcAnimationTrackSize(const VertexAnimationTrack* track)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// uint16 type
 		size += sizeof(uint16);
 		// unsigned short target		// 0 for shared geometry,
@@ -1978,7 +1978,7 @@ namespace Ogre {
 	size_t MeshSerializerImpl::calcMorphKeyframeSize(const VertexMorphKeyFrame* kf,
 		size_t vertexCount)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// float time
 		size += sizeof(float);
 		// float x,y,z[,nx,ny,nz]
@@ -1990,7 +1990,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcPoseKeyframeSize(const VertexPoseKeyFrame* kf)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 
 		// float time
 		size += sizeof(float);
@@ -2003,7 +2003,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcPoseKeyframePoseRefSize(void)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// unsigned short poseIndex
 		size += sizeof(uint16);
 		// float influence
@@ -2015,7 +2015,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcPosesSize(const Mesh* pMesh)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 
 		Mesh::ConstPoseIterator poseIt = pMesh->getPoseIterator();
 		while (poseIt.hasMoreElements())
@@ -2027,7 +2027,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcPoseSize(const Pose* pose)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 
 		// char* name (may be blank)
 		size += pose->getName().length() + 1;
@@ -2045,7 +2045,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl::calcPoseVertexSize(const Pose* pose)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// unsigned long vertexIndex
 		size += sizeof(uint32);
 		// float xoffset, yoffset, zoffset
@@ -2242,7 +2242,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 	}
@@ -2304,7 +2304,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 
@@ -2338,7 +2338,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 
@@ -2380,7 +2380,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 	}
@@ -2428,7 +2428,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 
@@ -2502,7 +2502,7 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 
@@ -2515,7 +2515,7 @@ namespace Ogre {
 		
 		SubMesh *sm = pMesh->getSubMesh (idx);
 		
-		int n_floats = (mCurrentstreamLen - STREAM_OVERHEAD_SIZE -
+		int n_floats = (mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE -
 						sizeof (unsigned short)) / sizeof (float);
 		
         assert ((n_floats % 3) == 0);
@@ -2644,14 +2644,14 @@ namespace Ogre {
 			if (!stream->eof())
 			{
 				// Backpedal back to start of stream
-				stream->skip(-STREAM_OVERHEAD_SIZE);
+				stream->skip(-MSTREAM_OVERHEAD_SIZE);
 			}
 		}
 	}
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl_v1_41::calcPoseSize(const Pose* pose)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 
 		// char* name (may be blank)
 		size += pose->getName().length() + 1;
@@ -2667,7 +2667,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	size_t MeshSerializerImpl_v1_41::calcPoseVertexSize(void)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// unsigned long vertexIndex
 		size += sizeof(uint32);
 		// float xoffset, yoffset, zoffset
@@ -2679,7 +2679,7 @@ namespace Ogre {
 	size_t MeshSerializerImpl_v1_41::calcMorphKeyframeSize(const VertexMorphKeyFrame* kf,
 		size_t vertexCount)
 	{
-		size_t size = STREAM_OVERHEAD_SIZE;
+		size_t size = MSTREAM_OVERHEAD_SIZE;
 		// float time
 		size += sizeof(float);
 		// float x,y,z
@@ -2703,7 +2703,7 @@ namespace Ogre {
     void MeshSerializerImpl_v1_4::writeLodSummary(unsigned short numLevels, bool manual, const LodStrategy *strategy)
     {
         // Header
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
         // unsigned short numLevels;
         size += sizeof(unsigned short);
         // bool manual;  (true for manual alternate meshes, false for generated)
@@ -2722,8 +2722,8 @@ namespace Ogre {
     void MeshSerializerImpl_v1_4::writeLodUsageManual(const MeshLodUsage& usage)
     {
         // Header
-        size_t size = STREAM_OVERHEAD_SIZE;
-        size_t manualSize = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
+        size_t manualSize = MSTREAM_OVERHEAD_SIZE;
         // float fromDepthSquared;
         size += sizeof(float);
         // Manual part size
@@ -2748,7 +2748,7 @@ namespace Ogre {
 													unsigned short lodNum)
     {
 		// Usage Header
-        size_t size = STREAM_OVERHEAD_SIZE;
+        size_t size = MSTREAM_OVERHEAD_SIZE;
 		unsigned short subidx;
 		
         // float fromDepthSquared;
@@ -2758,7 +2758,7 @@ namespace Ogre {
 		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
 		{
 			// header
-			size += STREAM_OVERHEAD_SIZE;
+			size += MSTREAM_OVERHEAD_SIZE;
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
@@ -2790,7 +2790,7 @@ namespace Ogre {
         // Calc generated SubMesh sections size
 		for(subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
 		{
-			size = STREAM_OVERHEAD_SIZE;
+			size = MSTREAM_OVERHEAD_SIZE;
 			// unsigned int numFaces;
 			size += sizeof(unsigned int);
 			SubMesh* sm = pMesh->getSubMesh(subidx);
@@ -3290,7 +3290,7 @@ namespace Ogre {
             if (!stream->eof())
             {
                 // Backpedal back to start of non-submesh stream
-                stream->skip(-STREAM_OVERHEAD_SIZE);
+                stream->skip(-MSTREAM_OVERHEAD_SIZE);
             }
         }
     }

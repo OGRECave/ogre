@@ -25,8 +25,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __SearchOps_H_
+#define __SearchOps_H_
 
 // Emulate _findfirst, _findnext on non-Windows platforms
+
 
 
 #include <string.h>
@@ -65,5 +68,7 @@ struct _finddata_t
 long _findfirst(const char *pattern, struct _finddata_t *data);
 int _findnext(long id, struct _finddata_t *data);
 int _findclose(long id);
+
+#endif
 
 #endif

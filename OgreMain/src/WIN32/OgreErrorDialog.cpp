@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "resource.h"
 
 namespace {
-    Ogre::ErrorDialog* dlg;  // This is a pointer to instance, since this is a static member
+    Ogre::ErrorDialog* errdlg;  // This is a pointer to instance, since this is a static member
 }
 
 namespace Ogre
@@ -75,7 +75,7 @@ namespace Ogre
 
             // Fill in details of error
             hwndDlgItem = GetDlgItem(hDlg, IDC_ERRMSG);
-            SetWindowText(hwndDlgItem, dlg->mErrorMsg.c_str());
+            SetWindowText(hwndDlgItem, errdlg->mErrorMsg.c_str());
 
             return TRUE;
         case WM_COMMAND:
@@ -97,7 +97,7 @@ namespace Ogre
     {
         // Display dialog
         // Don't return to caller until dialog dismissed
-        dlg = this;
+        errdlg = this;
         mErrorMsg = errorMessage;
         DialogBox(mHInstance, MAKEINTRESOURCE(IDD_DLG_ERROR), NULL, DlgProc);
 

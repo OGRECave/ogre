@@ -68,7 +68,12 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		OgreBites::SampleBrowser sb;
+        bool nograb = false;
+#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+        if (argc >= 2 && Ogre::String(argv[1]) == "nograb")
+            nograb = true;
+#endif
+		OgreBites::SampleBrowser sb (nograb);
 		sb.go();
 	}
 	catch (Ogre::Exception& e)

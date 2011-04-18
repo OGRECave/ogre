@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include <sys/time.h>
 
-using namespace Ogre;
+namespace Ogre {
 
 //--------------------------------------------------------------------------------//
 Timer::Timer()
@@ -76,4 +76,6 @@ unsigned long Timer::getMicrosecondsCPU()
 {
 	clock_t newClock = clock();
 	return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
+}
+
 }

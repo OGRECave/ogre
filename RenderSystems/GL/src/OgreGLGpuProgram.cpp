@@ -30,7 +30,8 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
-using namespace Ogre;
+
+namespace Ogre {
 
 GLenum getGLShaderType(GpuProgramType programType)
 {
@@ -239,3 +240,4 @@ void GLArbGpuProgram::loadFromSource(void)
     glBindProgramARB(mProgramType, 0);
 }
 
+}

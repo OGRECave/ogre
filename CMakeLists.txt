@@ -56,6 +56,7 @@ set(CMAKE_MODULE_PATH
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 include(MacroLogFeature)
+include(OgreAddTargets)
 include(OgreConfigTargets)
 include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
@@ -113,6 +114,10 @@ if (MSVC)
 	# this flag is set...
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
+  endif ()
+  if (OGRE_UNITY_BUILD)
+    # object files can get large with Unity builds
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
   endif ()
 endif ()
 if (MINGW)
@@ -311,6 +316,12 @@ cmake_dependent_option(OGRE_FULL_RPATH "Build executables with the full required
 option(OGRE_PROFILING "Enable internal profiling support." FALSE)
 cmake_dependent_option(OGRE_CONFIG_STATIC_LINK_CRT "Statically link the MS CRT dlls (msvcrt)" FALSE "MSVC" FALSE)
 set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for libraries, e.g. 'lib64' on some 64-bit Linux distros.")
+
+# Unity build options
+# A Unity build includes all sources files in just a few actual compilation units
+# to potentially speed up the compilation.
+option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
+set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
 
 if (SYMBIAN)
 SET (CMAKE_SYMBIAN_UID_3 "0xA0007218" CACHE STRING 

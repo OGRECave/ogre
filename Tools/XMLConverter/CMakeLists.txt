@@ -29,6 +29,6 @@ set(SOURCE_FILES
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-DTIXML_USE_STL)
-add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
+ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES})
 ogre_config_tool(OgreXMLConverter)

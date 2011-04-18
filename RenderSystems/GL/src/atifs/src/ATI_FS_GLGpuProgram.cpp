@@ -34,8 +34,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "ATI_FS_GLGpuProgram.h"
 
-using namespace Ogre;
 
+namespace Ogre {
 
 ATI_FS_GLGpuProgram::ATI_FS_GLGpuProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle, 
@@ -150,3 +150,4 @@ void ATI_FS_GLGpuProgram::loadFromSource(void)
 
 }
 
+}
