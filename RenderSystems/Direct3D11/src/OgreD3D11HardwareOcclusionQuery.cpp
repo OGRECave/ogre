@@ -49,6 +49,7 @@ namespace Ogre {
 	{ 
 		D3D11_QUERY_DESC queryDesc;
 		queryDesc.Query = D3D11_QUERY_OCCLUSION;
+        queryDesc.MiscFlags = 0;
 		// create the occlusion query
 		const HRESULT hr = mDevice->CreateQuery(&queryDesc, &mpQuery);
 
@@ -91,8 +92,8 @@ namespace Ogre {
         if (mIsQueryResultStillOutstanding)
         {
             // Loop until the data becomes available
-            DWORD pixels;
-            const size_t dataSize = sizeof( DWORD );
+            UINT64 pixels;
+            const size_t dataSize = sizeof( UINT64 );
 			while (1)
             {
                 const HRESULT hr = mDevice.GetImmediateContext()->GetData(mpQuery, (void *)&pixels, dataSize, 0);//D3DGETDATA_FLUSH
@@ -133,8 +134,8 @@ namespace Ogre {
         if (!mIsQueryResultStillOutstanding)
             return false;
 
-        DWORD pixels;
-        const HRESULT hr = mDevice.GetImmediateContext()->GetData(mpQuery, (void *) &pixels, sizeof( DWORD ), 0);
+        UINT64 pixels;
+        const HRESULT hr = mDevice.GetImmediateContext()->GetData(mpQuery, (void *) &pixels, sizeof( UINT64 ), 0);
 
         if (hr  == S_FALSE)
             return true;
