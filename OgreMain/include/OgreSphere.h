@@ -96,6 +96,43 @@ namespace Ogre {
 		{
             return ((v - mCenter).squaredLength() <= Math::Sqr(mRadius));
 		}
+		/** Merges another Sphere into the current sphere */
+		void merge(const Sphere& oth)
+		{
+			Vector3 diff =  oth.getCenter() - mCenter;
+			float lengthSq = diff.squaredLength();
+			float radiusDiff = oth.getRadius() - mRadius;
+			
+			// Early-out
+			if (Math::Sqr(radiusDiff) >= lengthSq) 
+			{
+				// One fully contains the other
+				if (radiusDiff <= 0.0f) 
+					return; // no change
+				else 
+				{
+					mCenter = oth.getCenter();
+					mRadius = oth.getRadius();
+					return;
+				}
+			}
+			
+			float length = Math::Sqrt(lengthSq);
+			
+			Vector3 newCenter;
+			float newRadius;
+			if ((length + oth.getRadius()) > mRadius) 
+			{
+				float t = (length + radiusDiff) / (2.0f * length);
+				newCenter = mCenter + diff * t;
+			} 
+			// otherwise, we keep our existing center
+			
+			newRadius = 0.5f * (length + mRadius + oth.getRadius());
+			
+			mCenter = newCenter;
+			mRadius = newRadius;
+		}
         
 
     };
