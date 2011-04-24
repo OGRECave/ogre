@@ -133,7 +133,7 @@ namespace Ogre
 		size_t retVal = 1;
 
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( mParentNode )
+		if( mParentNode && isVisible() )
 		{
 			if( !m_skeletonInstance )
 				*xform = mParentNode->_getFullTransform();
@@ -165,7 +165,7 @@ namespace Ogre
 		size_t retVal;
 
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( mParentNode )
+		if( mParentNode && isVisible() )
 		{
 			if( !m_skeletonInstance )
 			{

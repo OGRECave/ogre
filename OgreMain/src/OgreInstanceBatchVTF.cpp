@@ -245,7 +245,13 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			pDest += (*itor)->getTransforms3x4( pDest );
+			const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+
+			if( mManager->getCameraRelativeRendering() )
+				makeMatrixCameraRelative3x4( pDest, floatsWritten );
+
+			pDest += floatsWritten;
+
 			++itor;
 		}
 
@@ -266,7 +272,7 @@ namespace Ogre
 	{
 		InstanceBatch::_updateRenderQueue( queue );
 
-		if( m_boundsUpdated || m_dirtyAnimation )
+		if( m_boundsUpdated || m_dirtyAnimation || mManager->getCameraRelativeRendering() )
 			updateVertexTexture();
 
 		m_boundsUpdated = false;

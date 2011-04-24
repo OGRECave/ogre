@@ -58,6 +58,11 @@ namespace Ogre
 	{
 		assert( m_instancesPerBatch );
 
+		//Force batch visibility to be always visible. The instanced entities
+		//have individual visibility flags. If none matches the scene's current,
+		//then this batch won't rendered.
+		mVisibilityFlags = std::numeric_limits<Ogre::uint32>::max();
+
 		if( indexToBoneMap )
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
 
@@ -180,6 +185,22 @@ namespace Ogre
 			OGRE_DELETE *itor++;
 
 		m_unusedEntities.clear();
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats )
+	{
+		const Vector3 &cameraRelativePosition = m_currentCamera->getDerivedPosition();
+
+		for( size_t i=0; i<numFloats >> 2; i += 3 )
+		{
+			const Vector3 worldTrans( mat3x4[(i+0) * 4 + 3], mat3x4[(i+1) * 4 + 3],
+										mat3x4[(i+2) * 4 + 3] );
+			const Vector3 newPos( worldTrans - cameraRelativePosition );
+
+			mat3x4[(i+0) * 4 + 3] = newPos.x;
+			mat3x4[(i+1) * 4 + 3] = newPos.y;
+			mat3x4[(i+2) * 4 + 3] = newPos.z;
+		}
 	}
 	//-----------------------------------------------------------------------
 	RenderOperation InstanceBatch::build( const SubMesh* baseSubMesh )
@@ -391,9 +412,6 @@ namespace Ogre
 	{
 		m_currentCamera = cam;
 
-		//Clear the camera cache
-		mCachedCamera = 0;
-
 		//See DistanceLodStrategy::getValueImpl()
 		//We use our own because our SceneNode is just filled with zeroes, and updating it
 		//with real values is expensive, plus we would need to make sure it doesn't get to
@@ -454,6 +472,8 @@ namespace Ogre
 				mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
 				++itor;
 			}
+
+			mCachedCamera = cam;
 		}
 
         return mCachedCameraDist;

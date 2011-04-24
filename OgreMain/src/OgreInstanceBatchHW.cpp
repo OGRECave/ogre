@@ -193,7 +193,13 @@ namespace Ogre
 			//No need to use null matrices at all!
 			if( (*itor)->findVisible( currentCamera ) )
 			{
-				pDest += (*itor)->getTransforms3x4( pDest );
+				const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+
+				if( mManager->getCameraRelativeRendering() )
+					makeMatrixCameraRelative3x4( pDest, floatsWritten );
+
+				pDest += floatsWritten;
+
 				++retVal;
 			}
 			++itor;
@@ -250,6 +256,13 @@ namespace Ogre
 		}
 		else
 		{
+			if( mManager->getCameraRelativeRendering() )
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Camera-relative rendering is incompatible"
+					" with Instancing's static batches. Disable at least one of them",
+					"InstanceBatch::_updateRenderQueue");
+			}
+
 			//Don't update when we're static
 			if( m_renderOperation.numberOfInstances )
 				queue->addRenderable( this );

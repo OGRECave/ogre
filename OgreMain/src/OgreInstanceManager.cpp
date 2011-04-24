@@ -211,6 +211,8 @@ namespace Ogre
 					"InstanceBatch::buildNewBatch()");
 		}
 
+		batch->_notifyManager( m_sceneManager );
+
 
 		if( !firstTime )
 		{
