@@ -185,7 +185,7 @@ protected:
 	{
 	public:
 
-		SampleBrowser(bool nograb) : SampleContext()
+		SampleBrowser(bool nograb = false) : SampleContext()
 		{
             mNoGrabInput = nograb;
 			mTrayMgr = 0;
