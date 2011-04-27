@@ -53,8 +53,6 @@ namespace Ogre {
 		mHardwareVertexAnimVertexData = 0;
 		mHardwarePoseCount = 0;
 
-        mIndexStart = 0;
-        mIndexEnd = mSubMesh->indexData->indexCount;
 
 
     }
@@ -156,32 +154,6 @@ namespace Ogre {
 		// Deal with any vertex data overrides
 		op.vertexData = getVertexDataForBinding();
 
-        // make sure the client is asking for a reasonable result
-        if( mIndexStart <= mIndexEnd )
-        {
-            op.indexData->indexStart = mIndexStart;
-            op.indexData->indexCount = (mIndexEnd <= op.indexData->indexCount) ? mIndexEnd : op.indexData->indexCount;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void SubEntity::setIndexDataStartIndex(size_t start_index)
-    {
-        mIndexStart = start_index;
-    }
-    //-----------------------------------------------------------------------
-    size_t SubEntity::getIndexDataStartIndex() const
-    {
-        return mIndexStart;
-    }
-    //-----------------------------------------------------------------------
-    void SubEntity::setIndexDataEndIndex(size_t end_index)
-    {
-        mIndexEnd = end_index;
-    }
-    //-----------------------------------------------------------------------
-    size_t SubEntity::getIndexDataEndIndex() const
-    {
-        return mIndexEnd;
     }
 	//-----------------------------------------------------------------------
 	VertexData* SubEntity::getVertexDataForBinding(void)
