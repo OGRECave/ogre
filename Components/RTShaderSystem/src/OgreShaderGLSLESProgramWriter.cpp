@@ -901,6 +901,7 @@ namespace Ogre {
                 }
             }
 
+            endIt = forwardDecl.end();
             // Parse the source shader and write out only the needed functions
             for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
             {
