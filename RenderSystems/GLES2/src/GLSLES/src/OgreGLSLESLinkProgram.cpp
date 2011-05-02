@@ -101,6 +101,7 @@ namespace Ogre {
 			}
 			else
 			{
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
                 // check CmdParams for each shader type to see if we should optimize
                 String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
                 if((paramStr == "true") || paramStr.empty())
@@ -112,6 +113,7 @@ namespace Ogre {
                 {
                     GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mFragmentProgram);
                 }
+#endif
 				compileAndLink();
 			}
 

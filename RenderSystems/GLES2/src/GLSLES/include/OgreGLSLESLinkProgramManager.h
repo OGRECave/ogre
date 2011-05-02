@@ -34,7 +34,9 @@ THE SOFTWARE.
 #include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESLinkProgram.h"
 
-#include "glsl_optimizer.h"
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#   include "glsl_optimizer.h"
+#endif
 
 namespace Ogre {
 
@@ -69,8 +71,9 @@ namespace Ogre {
 
 		typedef map<String, GLenum>::type StringToEnumMap;
 		StringToEnumMap mTypeEnumMap;
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
         struct glslopt_ctx *mGLSLOptimiserContext;
-
+#endif
 		/// Use type to complete other information
 		void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
 		/// Find where the data for a specific uniform should come from, populate
@@ -102,10 +105,12 @@ namespace Ogre {
 		*/
 		void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
 
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
         /**
          
         */
         void optimiseShaderSource(GLSLESGpuProgram* gpuProgram);
+#endif
 
 		/** Populate a list of uniforms based on a program object.
 		@param programObject Handle to the program object to query
