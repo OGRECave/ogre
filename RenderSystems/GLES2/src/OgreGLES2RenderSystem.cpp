@@ -1894,7 +1894,7 @@ namespace Ogre {
     void GLES2RenderSystem::_setRenderTarget(RenderTarget *target)
     {
         // Unbind frame buffer object
-        if(mActiveRenderTarget)
+        if(mActiveRenderTarget && mRTTManager)
             mRTTManager->unbind(mActiveRenderTarget);
 
         mActiveRenderTarget = target;
