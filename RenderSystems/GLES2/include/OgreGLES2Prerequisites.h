@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #	if !defined( __MINGW32__ )
+#		define __PRETTY_FUNCTION__ __FUNCTION__
 #		ifndef WIN32_LEAN_AND_MEAN
 #			define WIN32_LEAN_AND_MEAN 1
 #		endif
@@ -104,6 +105,11 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 
 #ifndef GL_BGRA
 #   define GL_BGRA  0x80E1
+#endif
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+// an error in all windows gles sdks...
+#   undef GL_OES_get_program_binary
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
