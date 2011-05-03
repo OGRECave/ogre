@@ -67,7 +67,6 @@ using namespace Ogre;
         return;
 
     // Get the window using the name that we saved
-    RenderSystem *sys = Root::getSingleton().getRenderSystem();
     RenderWindow *window = static_cast<RenderWindow *>(Root::getSingleton().getRenderSystem()->getRenderTarget(mWindowName));
 
     if(window != NULL)
