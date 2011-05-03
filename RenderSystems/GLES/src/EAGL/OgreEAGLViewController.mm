@@ -28,11 +28,11 @@ THE SOFTWARE.
 
 #import "OgreEAGLViewController.h"
 
-#import "OgreFrustum.h"
-
 using namespace Ogre;
 
 @implementation EAGLViewController
+
+@synthesize mGLSupport;
 
 - (id)init
 {
@@ -73,8 +73,6 @@ using namespace Ogre;
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
-    
     NSString *rotateToOrientation = @"";
     if(interfaceOrientation == UIInterfaceOrientationPortrait)
         rotateToOrientation = @"UIInterfaceOrientationPortrait";
@@ -85,7 +83,10 @@ using namespace Ogre;
     else if(interfaceOrientation == UIInterfaceOrientationLandscapeRight)
         rotateToOrientation = @"UIInterfaceOrientationLandscapeRight";
     
-    if([supportedOrientations containsObject:rotateToOrientation])
+    // Inform the view that it needs to call layoutSubviews
+    [self.view setNeedsDisplay];
+    
+    if(mGLSupport->interfaceOrientationIsSupported(rotateToOrientation))
         return YES;
     else
         return NO;

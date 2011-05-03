@@ -31,11 +31,15 @@ THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
 #import "OgreRoot.h"
+#import "OgreEAGL2Support.h"
 
 using namespace Ogre;
 
 @interface EAGL2ViewController : UIViewController {
+    EAGL2Support *mGLSupport;
 }
+
+@property (assign) EAGL2Support *mGLSupport;
 
 @end
 

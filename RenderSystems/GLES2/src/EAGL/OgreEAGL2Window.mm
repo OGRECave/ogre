@@ -265,6 +265,8 @@ namespace Ogre {
 
         [mWindow addSubview:mViewController.view];
         
+        mViewController.mGLSupport = mGLSupport;
+        
         if(!mUsingExternalViewController)
             mWindow.rootViewController = mViewController;
         
@@ -301,8 +303,21 @@ namespace Ogre {
         
         mIsFullScreen = fullScreen;
         mName = name;
-        mWidth = width;
-        mHeight = height;
+        NSString *initialOrientation = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIInterfaceOrientation"];
+
+        if(mGLSupport->portraitIsSupported() && 
+           initialOrientation && 
+           ([initialOrientation isEqualToString:@"UIInterfaceOrientationPortrait"] || 
+            [initialOrientation isEqualToString:@"UIInterfaceOrientationPortraitUpsideDown" ]))
+        {
+            mWidth = width;
+            mHeight = height;
+        }
+        else
+        {
+            mWidth = height;
+            mHeight = width;
+        }
 
         if (miscParams)
         {
