@@ -319,4 +319,19 @@ namespace Ogre {
     void EAGL2Support::stop()
     {
     }
+
+    bool EAGL2Support::interfaceOrientationIsSupported(NSString *orientation)
+    {
+        NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+        return [supportedOrientations containsObject:orientation];
+    }
+
+    bool EAGL2Support::portraitIsSupported()
+    {
+        NSArray *supportedOrientations = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UISupportedInterfaceOrientations"];
+
+        return ([supportedOrientations containsObject:@"UIInterfaceOrientationPortrait"] || 
+                [supportedOrientations containsObject:@"UIInterfaceOrientationPortraitUpsideDown"]);
+    }
 }
