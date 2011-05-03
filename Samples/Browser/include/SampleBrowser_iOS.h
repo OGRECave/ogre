@@ -132,12 +132,9 @@
     [pool release];
 }
 
-- (void)applicationDidFinishLaunching:(UIApplication *)application
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Hide the status bar
-    [[UIApplication sharedApplication] setStatusBarHidden:YES];
-
-    mDisplayLinkSupported = FALSE;
+    mDisplayLinkSupported = NO;
     mLastFrameTime = 1;
     mDisplayLink = nil;
     mTimer = nil;
@@ -148,10 +145,12 @@
     NSString *reqSysVer = @"3.1";
     NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
     if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
-        mDisplayLinkSupported = TRUE;
+        mDisplayLinkSupported = YES;
 #endif
     
     [self go];
+
+    return YES;
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
