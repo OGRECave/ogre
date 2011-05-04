@@ -211,7 +211,6 @@ if (OGRE_BUILD_PLATFORM_IPHONE)
   # armv7 only
   #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
 
-  add_definitions(-fno-regmove)
   remove_definitions(-msse)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_IPHONE)
 
