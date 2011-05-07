@@ -123,7 +123,7 @@ namespace Ogre {
         PF_FLOAT16_RGB = 22,
         // 64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
         PF_FLOAT16_RGBA = 23,
-		// 16-bit pixel format, 16 bits (float) for red
+		// 32-bit pixel format, 32 bits (float) for red
         PF_FLOAT32_R = 33,
         // 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
         PF_FLOAT32_RGB = 24,
