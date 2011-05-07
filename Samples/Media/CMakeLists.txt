@@ -12,8 +12,10 @@
 ###############################################################
 
 # Set media target directory
-if (WIN32 OR APPLE)
+if (WIN32)
   set(OGRE_MEDIA_PATH "media")
+elseif (APPLE)
+  set(OGRE_MEDIA_PATH "Media")
 elseif (UNIX)
   set(OGRE_MEDIA_PATH "share/OGRE/media")
 endif ()
