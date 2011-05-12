@@ -6,7 +6,7 @@
 LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
 SDKBUILDDIR=`pwd`
 
-set IPHONEOS_DEPLOYMENT_TARGET 4.0
+set IPHONEOS_DEPLOYMENT_TARGET 3.2
 
 # Clean up files from previous builds
 echo Cleaning previous builds...
@@ -26,7 +26,7 @@ OGRE_VERSION=`cat version.txt`
 echo Building API docs...
 
 # Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
+xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=3.2 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
 
 pushd api/html
 
@@ -50,12 +50,12 @@ echo API generation done.
 # location that the target expects them then copy them to the correct location
 
 echo Building for devices...
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=3.2 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
 mkdir -p sdk/lib/Release-iphoneos
 mv -v lib/Release/*.a sdk/lib/Release-iphoneos
 
 echo Building for simulator...
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=4.0 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=3.2 GCC_VERSION=com.apple.compilers.llvm.clang.1_0
 mkdir -p sdk/lib/Release-iphonesimulator
 mv -v lib/Release/*.a sdk/lib/Release-iphonesimulator
 

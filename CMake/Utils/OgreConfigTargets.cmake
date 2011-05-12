@@ -44,8 +44,7 @@ elseif (UNIX)
   set(OGRE_LIB_MINSIZE_PATH "")
   set(OGRE_LIB_DEBUG_PATH "")
   if(APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
-    set(OGRE_RELEASE_PATH "/release")
-    set(OGRE_LIB_RELEASE_PATH "/release")
+    set(OGRE_LIB_RELEASE_PATH "/Release")
   endif(APPLE AND OGRE_BUILD_PLATFORM_IPHONE)
   if (APPLE)
     set(OGRE_PLUGIN_PATH "/")
@@ -258,12 +257,6 @@ endfunction(ogre_config_plugin)
 
 # setup Ogre sample build
 function(ogre_config_sample_common SAMPLENAME)
-  # The PRODUCT_NAME target setting cannot contain underscores.  Just remove them
-  # Known bug in Xcode CFBundleIdentifier processing rdar://6187020
-  # Can cause an instant App Store rejection. Also, code signing will fail. 
-  #if (OGRE_BUILD_PLATFORM_IPHONE)
-#    string (REPLACE "_" "" SAMPLENAME ${SAMPLENAME})
-  #endif()
   ogre_config_common(${SAMPLENAME})
 
   # set install RPATH for Unix systems
