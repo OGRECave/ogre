@@ -34,6 +34,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    const String GLRenderTexture::CustomAttributeString_FBO = "FBO";
+    const String GLRenderTexture::CustomAttributeString_TARGET = "TARGET";
+    const String GLRenderTexture::CustomAttributeString_GLCONTEXT = "GLCONTEXT";
 
 //-----------------------------------------------------------------------------
 
@@ -83,7 +86,7 @@ template<> GLRTTManager* Singleton<GLRTTManager>::ms_Singleton = 0;
     }
     void GLCopyingRenderTexture::getCustomAttribute(const String& name, void* pData)
     {
-        if(name=="TARGET")
+        if( name == GLRenderTexture::CustomAttributeString_TARGET )
         {
 			GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
 			target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
@@ -119,7 +122,7 @@ template<> GLRTTManager* Singleton<GLRTTManager>::ms_Singleton = 0;
         // Copy on unbind
         GLSurfaceDesc surface;
 		surface.buffer = 0;
-        target->getCustomAttribute("TARGET", &surface);
+        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_TARGET, &surface);
         if(surface.buffer)
             static_cast<GLTextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
     }

@@ -51,7 +51,7 @@ namespace Ogre {
 
     void GLFBORenderTexture::getCustomAttribute(const String& name, void* pData)
     {
-        if(name=="FBO")
+        if( name == GLRenderTexture::CustomAttributeString_FBO )
         {
             *static_cast<GLFrameBufferObject **>(pData) = &mFB;
         }
@@ -455,7 +455,7 @@ static const size_t depthBits[] =
     {
         /// Check if the render target is in the rendertarget->FBO map
         GLFrameBufferObject *fbo = 0;
-        target->getCustomAttribute("FBO", &fbo);
+        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
         if(fbo)
             fbo->bind();
         else

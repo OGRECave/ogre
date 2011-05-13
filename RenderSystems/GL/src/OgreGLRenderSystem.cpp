@@ -1083,7 +1083,7 @@ namespace Ogre {
 			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			//Only Copy does, but Copy means only one depth buffer...
 			GLContext *windowContext;
-			win->getCustomAttribute( "GLCONTEXT", &windowContext );
+			win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 
  			GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 															windowContext, 0, 0,
@@ -1106,7 +1106,7 @@ namespace Ogre {
 		//else creates dummy (empty) containers
 		//retVal = mRTTManager->_createDepthBufferFor( renderTarget );
 		GLFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute("FBO", &fbo);
+        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
 
 		if( fbo )
 		{
@@ -1144,7 +1144,7 @@ namespace Ogre {
 	{
 		// Set main and current context
 		mMainContext = 0;
-		primary->getCustomAttribute("GLCONTEXT", &mMainContext);
+		primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
 		mCurrentContext = mMainContext;
 
 		// Set primary context as active
@@ -1185,7 +1185,7 @@ namespace Ogre {
 			if (i->second == pWin)
 			{
 				GLContext *windowContext;
-				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
+				pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
 				//1 Window <-> 1 Context, should be always true
 				assert( windowContext );
@@ -3532,7 +3532,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		{
 			// Switch context if different from current one
 			GLContext *newContext = 0;
-			target->getCustomAttribute("GLCONTEXT", &newContext);
+			target->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
 			if(newContext && mCurrentContext != newContext) 
 			{
 				_switchContext(newContext);

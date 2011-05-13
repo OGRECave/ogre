@@ -53,6 +53,10 @@ namespace Ogre {
         virtual ~GLRenderTexture();
         
         bool requiresTextureFlipping() const { return true; }
+
+        static const String CustomAttributeString_FBO;
+        static const String CustomAttributeString_TARGET;
+        static const String CustomAttributeString_GLCONTEXT;
     };
     
     /** Manager/factory for RenderTextures.

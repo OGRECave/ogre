@@ -62,13 +62,13 @@ namespace Ogre {
     }
     void GLPBRenderTexture::getCustomAttribute(const String& name, void* pData)
     {
-        if(name=="TARGET")
+        if( name == GLRenderTexture::CustomAttributeString_TARGET )
         {
 			GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
 			target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
 			target.zoffset = mZOffset;
         }
-        else if(name=="GLCONTEXT")
+        else if (name == GLRenderTexture::CustomAttributeString_GLCONTEXT )
         {
             // Get PBuffer for our internal format
             *static_cast<GLContext**>(pData) = mManager->getContextFor(mPBFormat, mWidth, mHeight);
@@ -80,7 +80,7 @@ namespace Ogre {
 		mMainWindow(mainwindow),
 		mMainContext(0)
     {
-		mMainWindow->getCustomAttribute("GLCONTEXT", &mMainContext);
+		mMainWindow->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
     }  
     GLPBRTTManager::~GLPBRTTManager()
     {
@@ -113,7 +113,7 @@ namespace Ogre {
 		// Copy on unbind
         GLSurfaceDesc surface;
 		surface.buffer = 0;
-        target->getCustomAttribute("TARGET", &surface);
+        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_TARGET, &surface);
         if(surface.buffer)
             static_cast<GLTextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
     }
