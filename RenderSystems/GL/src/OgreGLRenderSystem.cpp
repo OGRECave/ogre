@@ -111,6 +111,9 @@ namespace Ogre {
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
 
+        mRenderAttribsBound.reserve(100);
+        mRenderInstanceAttribsBound.reserve(100);
+
 		// Get our GLSupport
 		mGLSupport = getGLSupport();
 
@@ -2878,8 +2881,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-		vector<GLuint>::type attribsBound;
-		vector<GLuint>::type instanceAttribsBound;
         size_t maxSource = 0;
 
 		for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
@@ -2898,7 +2899,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				op.vertexData->vertexBufferBinding->getBuffer(source);
 
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, 
-                                   attribsBound, instanceAttribsBound);
+                                   mRenderAttribsBound, mRenderInstanceAttribsBound);
         }
 
         if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
@@ -2908,7 +2909,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		    {
                 const VertexElement & elem = *elemIter;
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, 
-                                       attribsBound, instanceAttribsBound);
+                                       mRenderAttribsBound, mRenderInstanceAttribsBound);
             
             }
         }
@@ -3031,19 +3032,22 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			glDisableClientState( GL_SECONDARY_COLOR_ARRAY );
 		}
  		// unbind any custom attributes
-		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArrayARB(*ai); 
  
   		}
 		
 		// unbind any instance attributes
-		for (vector<GLuint>::type::iterator ai = instanceAttribsBound.begin(); ai != instanceAttribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
 		{
 			glVertexAttribDivisor(*ai, 0); 
 
 		}
 		
+        mRenderAttribsBound.clear();
+        mRenderInstanceAttribsBound.clear();
+
 		glColor4f(1,1,1,1);
 		if (GLEW_EXT_secondary_color)
 		{
