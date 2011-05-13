@@ -37,6 +37,7 @@
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "OgreStringSerialiser.h"
 #endif
+#include "OgreTimer.h"
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // TODO - remove this
@@ -1708,6 +1709,9 @@ namespace OgreBites
                 mNo(0), mCursorWasVisible(false), mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),
 				mGroupInitProportion(0.0f), mGroupLoadProportion(0.0f), mLoadInc(0.0f)
 		{
+            mTimer = Ogre::Root::getSingleton().getTimer();
+            mLastStatUpdateTime = 0;
+
 			Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
 			Ogre::String nameBase = mName + "/";
@@ -2749,10 +2753,14 @@ namespace OgreBites
 			}
 			mWidgetDeathRow.clear();
 
-			Ogre::RenderTarget::FrameStats stats = mWindow->getStatistics();
 
-			if (areFrameStatsVisible())
+            unsigned long currentTime = mTimer->getMilliseconds();
+			if (areFrameStatsVisible() && currentTime - mLastStatUpdateTime > 250)
 			{
+                Ogre::RenderTarget::FrameStats stats = mWindow->getStatistics();
+
+                mLastStatUpdateTime = currentTime;
+
 				Ogre::String s("FPS: ");
 				s += Ogre::StringConverter::toString((int)stats.lastFPS);
 				
@@ -3155,6 +3163,9 @@ namespace OgreBites
 		Ogre::Real mGroupLoadProportion;      // proportion of load job assigned to loading one resource group
 		Ogre::Real mLoadInc;                  // loading increment
 		Ogre::GuiHorizontalAlignment mTrayWidgetAlign[10];   // tray widget alignments
+        Ogre::Timer* mTimer;                  // Root::getSingleton().getTimer()
+        unsigned long mLastStatUpdateTime;    // The last time the stat text were updated
+
     };
 }
 
