@@ -34,14 +34,12 @@ namespace Ogre
 {
 
     //-----------------------------------------------------------------------------
-    void checkForGLSLError(const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog, const bool forceException)
+    void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog, const bool forceException)
     {
-		GLenum glErr;
 		bool errorsFound = false;
 		String msg = errorTextPrefix;
 
 		// get all the GL errors
-		glErr = glGetError();
 		while (glErr != GL_NO_ERROR)
         {
 			const char* glerrStr = (const char*)gluErrorString(glErr);

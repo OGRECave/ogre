@@ -86,7 +86,11 @@ namespace Ogre {
 		// only create a shader object if glsl is supported
 		if (isSupported())
 		{
-			checkForGLSLError( "GLSLProgram::loadFromSource", "GL Errors before creating shader object", 0 );
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "GL Errors before creating shader object", 0 );
+            }
 			// create shader object
 
 			GLenum shaderType = 0x0000;
@@ -104,7 +108,11 @@ namespace Ogre {
 			}
 			mGLHandle = glCreateShaderObjectARB(shaderType);
 
-			checkForGLSLError( "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
+            glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
+            }
 		}
 
 		// Preprocess the GLSL shader in order to get a clean source
@@ -180,7 +188,11 @@ namespace Ogre {
 			const char *source = mSource.c_str();
 			glShaderSourceARB(mGLHandle, 1, &source, NULL);
 			// check for load errors
-			checkForGLSLError( "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
+            }
 		}
 
 
@@ -190,7 +202,11 @@ namespace Ogre {
 		// force exception if not compiled
 		if (checkErrors)
 		{
-			checkForGLSLError( "GLSLProgram::compile", "Cannot compile GLSL high-level shader : " + mName + " ", mGLHandle, !mCompiled, !mCompiled );
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::compile", "Cannot compile GLSL high-level shader : " + mName + " ", mGLHandle, !mCompiled, !mCompiled );
+            }
 			
 			if (mCompiled)
 			{
@@ -388,16 +404,25 @@ namespace Ogre {
 			++childprogramcurrent;
 		}
 		glAttachObjectARB( programObject, mGLHandle );
-		checkForGLSLError( "GLSLProgram::attachToProgramObject",
-			"Error attaching " + mName + " shader object to GLSL Program Object", programObject );
+        GLenum glErr = glGetError();
+        if(glErr != GL_NO_ERROR)
+        {
+		    reportGLSLError( glErr, "GLSLProgram::attachToProgramObject",
+			    "Error attaching " + mName + " shader object to GLSL Program Object", programObject );
+        }
 
 	}
 	//-----------------------------------------------------------------------
 	void GLSLProgram::detachFromProgramObject( const GLhandleARB programObject )
 	{
 		glDetachObjectARB(programObject, mGLHandle);
-		checkForGLSLError( "GLSLProgram::detachFromProgramObject",
-			"Error detaching " + mName + " shader object from GLSL Program Object", programObject );
+
+        GLenum glErr = glGetError();
+        if(glErr != GL_NO_ERROR)
+        {
+		    reportGLSLError( glErr, "GLSLProgram::detachFromProgramObject",
+			    "Error detaching " + mName + " shader object from GLSL Program Object", programObject );
+        }
 		// attach child objects
 		GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
 		GLSLProgramContainerIterator childprogramend = mAttachedGLSLPrograms.end();

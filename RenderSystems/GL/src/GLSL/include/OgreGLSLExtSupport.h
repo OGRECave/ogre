@@ -52,7 +52,7 @@ namespace Ogre
 	@param forceInfoLog if true then message from GL info log is obtained
 	@param forceException if true then exception is generated if a GL error found
 	*/
-    void checkForGLSLError(const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog = false, const bool forceException = false);
+    void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog = false, const bool forceException = false);
 
 	/** if there is a message in GL info log then post it in the Ogre Log
 	@param msg the info log message string is appended to this string
