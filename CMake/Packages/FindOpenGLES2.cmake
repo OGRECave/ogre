@@ -31,7 +31,8 @@ IF (WIN32)
       SET (OPENGLES2_gl_LIBRARY import32 CACHE STRING "OpenGL ES 2.x library for win32")
     ELSE(BORLAND)
 	  #MS compiler - todo - fix the following line:
-      SET (OPENGLES_gl_LIBRARY ${OGRE_SOURCE_DIR}/Dependencies/lib/release/libGLESv2.lib CACHE STRING "OpenGL ES 2.x library for win32")
+      SET (OPENGLES2_gl_LIBRARY ${OGRE_DEPENDENCIES_DIR}/lib/release/libGLESv2.lib CACHE STRING "OpenGL ES 2.x library for win32")
+      SET (EGL_egl_LIBRARY      ${OGRE_DEPENDENCIES_DIR}/lib/release/libEGL.lib CACHE STRING "EGL library for win32")	  
     ENDIF(BORLAND)
 
   ENDIF (CYGWIN)
