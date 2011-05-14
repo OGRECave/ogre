@@ -82,6 +82,8 @@ namespace Ogre {
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
 
+        mRenderAttribsBound.reserve(100);
+
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mEnableFixedPipeline = false;
 #endif
@@ -1518,7 +1520,6 @@ namespace Ogre {
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
         elemEnd = decl.end();
-        vector<GLuint>::type attribsBound;
 
         for (elem = decl.begin(); elem != elemEnd; ++elem)
         {
@@ -1576,7 +1577,7 @@ namespace Ogre {
             glEnableVertexAttribArray(attrib);
             GL_CHECK_ERROR;
  			
-			attribsBound.push_back(attrib);
+			mRenderAttribsBound.push_back(attrib);
         }	
 
 		if (multitexturing)
@@ -1648,11 +1649,13 @@ namespace Ogre {
         }
 
  		// Unbind all attributes
-		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArray(*ai);
             GL_CHECK_ERROR;
   		}
+
+        mRenderAttribsBound.clear();
     }
 
     void GLES2RenderSystem::setScissorTest(bool enabled, size_t left,

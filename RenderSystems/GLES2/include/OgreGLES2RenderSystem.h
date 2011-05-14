@@ -130,6 +130,10 @@ namespace Ogre {
              */
             GLenum mPolygonMode;
 
+            // local data member of _render that were moved here to improve performance
+            // (save allocations)
+            vector<GLuint>::type mRenderAttribsBound;
+
             GLint getCombinedMinMipFilter(void) const;
 
             GLES2GpuProgram* mCurrentVertexProgram;
