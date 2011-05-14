@@ -48,17 +48,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void CgPlugin::install()
 	{
-		// Create new factory
-		mCgProgramFactory = OGRE_NEW CgProgramFactory();
-		// Register
-		HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
-
-		OGRE_NEW CgFxScriptLoader();
 	}
 	//---------------------------------------------------------------------
 	void CgPlugin::initialise()
 	{
-		// nothing to do
+        // check for gles2 by the glsles factory (this plugin is not supported on embedded systems for now)
+        if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles") == false)
+        {
+            // Create new factory
+            mCgProgramFactory = OGRE_NEW CgProgramFactory();
+
+            // Register
+            HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
+
+            OGRE_NEW CgFxScriptLoader();
+        }
 	}
 	//---------------------------------------------------------------------
 	void CgPlugin::shutdown()
@@ -79,6 +83,4 @@ namespace Ogre
 		    mCgProgramFactory = 0;
         }
 	}
-
-
 }
