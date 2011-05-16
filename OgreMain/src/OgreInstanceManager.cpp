@@ -420,6 +420,8 @@ namespace Ogre
 			case SHOW_BOUNDINGBOX:
 				(*itor)->getParentSceneNode()->showBoundingBox( value );
 				break;
+			default:
+				break;
 			}
 			++itor;
 		}
