@@ -173,7 +173,7 @@ public:
 			if (userPerPixelLightModel)
 			{
 				RTShader::SubRenderState* perPixelLightModel = shaderGenerator->createSubRenderState(RTShader::PerPixelLighting::Type);
-				renderState->addSubRenderState(perPixelLightModel);
+				renderState->addTemplateSubRenderState(perPixelLightModel);
 
 				mDebugText = "Per pixel lighting model applied to shader generator default scheme";
 			}

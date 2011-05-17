@@ -249,10 +249,10 @@ protected:
 			mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
 
 			// Set the scene manager.
-			mShaderGenerator->setSceneManager(sceneMgr);
+			mShaderGenerator->addSceneManager(sceneMgr);
 
 			// Setup core libraries and shader cache path.
-			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList("Popular");
 			ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
 			ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
 			String shaderCoreLibsPath;
