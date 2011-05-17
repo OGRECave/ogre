@@ -1454,7 +1454,13 @@ namespace Ogre
 				// Finally try to map the cls to an id
 				ScriptCompiler::IdMap::const_iterator iter2 = mCompiler->mIds.find(impl->cls);
 				if(iter2 != mCompiler->mIds.end())
+                {
 					impl->id = iter2->second;
+                }
+                else
+                {
+                    mCompiler->addError(CE_UNEXPECTEDTOKEN, impl->file, impl->line, "token class, " + impl->cls + ", unrecognized.");
+                }
 
 				asn = AbstractNodePtr(impl);
 				mCurrent = impl;
