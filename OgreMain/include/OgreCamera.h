@@ -402,6 +402,9 @@ namespace Ogre {
             rotation inherited from a node attachment. */
         Vector3 getRealRight(void) const;
 
+        /** Overridden from Frustum/Renderable */
+        void getWorldTransforms(Matrix4* mat) const;
+
         /** Overridden from MovableObject */
         const String& getMovableType(void) const;
 
