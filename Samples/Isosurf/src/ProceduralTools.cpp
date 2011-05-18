@@ -92,9 +92,9 @@ MeshPtr ProceduralTools::generateTetrahedra()
 		pos[1] = (i >> X_SIZE_LOG2) & ((1<<Y_SIZE_LOG2)-1);
 		pos[2] = (i >> (X_SIZE_LOG2+Y_SIZE_LOG2)) & ((1<<Z_SIZE_LOG2)-1);
 
-		*positions++ = (float(pos[0]) / float(1<<X_SIZE_LOG2))*2.0-1.0;
-		*positions++ = (float(pos[1]) / float(1<<Y_SIZE_LOG2))*2.0-1.0;
-		*positions++ = (float(pos[2]) / float(1<<Z_SIZE_LOG2))*2.0-1.0;
+		*positions++ = (float(pos[0]) / float(1<<X_SIZE_LOG2))*2.0f-1.0f;
+		*positions++ = (float(pos[1]) / float(1<<Y_SIZE_LOG2))*2.0f-1.0f;
+		*positions++ = (float(pos[2]) / float(1<<Z_SIZE_LOG2))*2.0f-1.0f;
 		*positions++ = 1.0f;
 	}
 	vertexBuffer->unlock();

@@ -121,8 +121,8 @@ void VolumeRenderable::initialise()
 	{
 		for(size_t y=0; y<4; y++)
 		{
-			float xcoord = coords[y][0]-0.5;
-			float ycoord = coords[y][1]-0.5;
+			float xcoord = coords[y][0]-0.5f;
+			float ycoord = coords[y][1]-0.5f;
 			float zcoord = -((float)x/(float)(mSlices-1)  - 0.5f);
 			// 1.0f .. a/(a+1)
 			// coordinate
