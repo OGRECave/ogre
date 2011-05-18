@@ -92,35 +92,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void GLSLESProgram::loadFromSource(void)
 	{
-		// we want to compile only if we need to link - else it is a waste of CPU
-	}
-    
-    //---------------------------------------------------------------------------
-	bool GLSLESProgram::compile(const bool checkErrors)
-	{
-		if (mCompiled == 1)
-		{
-			return true;
-		}
-		// Only create a shader object if glsl es is supported
-		if (isSupported())
-		{
-            GL_CHECK_ERROR
-
-			// Create shader object
-			GLenum shaderType = 0x0000;
-			if (mType == GPT_VERTEX_PROGRAM)
-			{
-				shaderType = GL_VERTEX_SHADER;
-			}
-            else if (mType == GPT_FRAGMENT_PROGRAM)
-            {
-				shaderType = GL_FRAGMENT_SHADER;
-			}
-			mGLHandle = glCreateShader(shaderType);
-            GL_CHECK_ERROR
-		}
-
 		// Preprocess the GLSL ES shader in order to get a clean source
 		CPreprocessor cpp;
 
@@ -187,6 +158,32 @@ namespace Ogre {
 		mSource = String (out, out_size);
 		if (out < src || out > src + src_len)
 			free (out);
+    }
+
+	bool GLSLESProgram::compile(const bool checkErrors)
+	{
+		if (mCompiled == 1)
+		{
+			return true;
+		}
+		// Only create a shader object if glsl es is supported
+		if (isSupported())
+		{
+            GL_CHECK_ERROR
+
+			// Create shader object
+			GLenum shaderType = 0x0000;
+			if (mType == GPT_VERTEX_PROGRAM)
+			{
+				shaderType = GL_VERTEX_SHADER;
+			}
+            else if (mType == GPT_FRAGMENT_PROGRAM)
+            {
+				shaderType = GL_FRAGMENT_SHADER;
+			}
+			mGLHandle = glCreateShader(shaderType);
+            GL_CHECK_ERROR
+		}
 
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
