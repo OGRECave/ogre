@@ -140,7 +140,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         int e = glGetError(); \
         if (e != 0) \
         { \
-            char * errorString = ""; \
+            const char * errorString = ""; \
             switch(e) \
             { \
             case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
