@@ -67,54 +67,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void GLSLProgram::loadFromSource(void)
 	{
-		// we want to compile only if we need to link - else it is a waste of CPU
-	}
-    
-    //---------------------------------------------------------------------------
-	bool GLSLProgram::compile(const bool checkErrors)
-	{
-		if (mCompiled == 1)
-		{
-			return true;
-		}
-
-		if (checkErrors)
-        {
-            logObjectInfo("GLSL compiling: " + mName, mGLHandle);
-        }
-
-		// only create a shader object if glsl is supported
-		if (isSupported())
-		{
-            GLenum glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "GL Errors before creating shader object", 0 );
-            }
-			// create shader object
-
-			GLenum shaderType = 0x0000;
-			switch (mType)
-			{
-			case GPT_VERTEX_PROGRAM:
-				shaderType = GL_VERTEX_SHADER_ARB;
-				break;
-			case GPT_FRAGMENT_PROGRAM:
-				shaderType = GL_FRAGMENT_SHADER_ARB;
-				break;
-			case GPT_GEOMETRY_PROGRAM:
-				shaderType = GL_GEOMETRY_SHADER_EXT;
-				break;
-			}
-			mGLHandle = glCreateShaderObjectARB(shaderType);
-
-            glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
-            }
-		}
-
 		// Preprocess the GLSL shader in order to get a clean source
 		CPreprocessor cpp;
 
@@ -181,6 +133,53 @@ namespace Ogre {
 		mSource = String (out, out_size);
 		if (out < src || out > src + src_len)
 			free (out);
+	}
+    
+    //---------------------------------------------------------------------------
+	bool GLSLProgram::compile(const bool checkErrors)
+	{
+		if (mCompiled == 1)
+		{
+			return true;
+		}
+
+		if (checkErrors)
+        {
+            logObjectInfo("GLSL compiling: " + mName, mGLHandle);
+        }
+
+		// only create a shader object if glsl is supported
+		if (isSupported())
+		{
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "GL Errors before creating shader object", 0 );
+            }
+
+			// create shader object
+
+			GLenum shaderType = 0x0000;
+			switch (mType)
+			{
+			case GPT_VERTEX_PROGRAM:
+				shaderType = GL_VERTEX_SHADER_ARB;
+				break;
+			case GPT_FRAGMENT_PROGRAM:
+				shaderType = GL_FRAGMENT_SHADER_ARB;
+				break;
+			case GPT_GEOMETRY_PROGRAM:
+				shaderType = GL_GEOMETRY_SHADER_EXT;
+				break;
+			}
+			mGLHandle = glCreateShaderObjectARB(shaderType);
+
+            glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
+            }
+		}
 
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
