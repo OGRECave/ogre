@@ -40,7 +40,7 @@ THE SOFTWARE.
 @class OSXCocoaWindowDelegate;
 
 namespace Ogre {
-    _OgreGLExport class OSXCocoaWindow : public OSXWindow
+    class _OgreGLExport OSXCocoaWindow : public OSXWindow
     {
     private:
         NSWindow *mWindow;
