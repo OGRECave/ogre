@@ -704,8 +704,7 @@ namespace Ogre {
     
     void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        unsigned char pixelSize = PixelUtil::getNumElemBytes(getFormat());
-        PixelUtil::packColour(cv, getFormat(), &((unsigned char *)getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
+        PixelUtil::packColour(cv, m_eFormat, &m_pBuffer[m_ucPixelSize * (z * m_uWidth * m_uHeight + y * m_uWidth + x)]);
     }
 
 	//-----------------------------------------------------------------------------    
