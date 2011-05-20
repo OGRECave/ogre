@@ -5796,12 +5796,13 @@ void SceneManager::setShadowIndexBufferSize(size_t size)
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-	unsigned short height, PixelFormat format, uint16 depthBufferPoolId )
+	unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
 {
 	ShadowTextureConfig conf;
 	conf.width = width;
 	conf.height = height;
 	conf.format = format;
+    conf.fsaa = fsaa;
 	conf.depthBufferPoolId = depthBufferPoolId;
 
 	setShadowTextureConfig(shadowIndex, conf);
@@ -5876,18 +5877,31 @@ void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
 		}
 	}
 }
+void SceneManager::setShadowTextureFSAA(unsigned short fsaa)
+{
+    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
+                i != mShadowTextureConfigList.end(); ++i)
+    {
+        if (i->fsaa != fsaa)
+        {
+            i->fsaa = fsaa;
+            mShadowTextureConfigDirty = true;
+        }
+    }
+}
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureSettings(unsigned short size, 
-	unsigned short count, PixelFormat fmt, uint16 depthBufferPoolId)
+	unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
 {
 	setShadowTextureCount(count);
 	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
 		i != mShadowTextureConfigList.end(); ++i)
 	{
-		if (i->width != size || i->height != size || i->format != fmt)
+		if (i->width != size || i->height != size || i->format != fmt || i->fsaa != fsaa)
 		{
 			i->width = i->height = size;
 			i->format = fmt;
+            i->fsaa = fsaa;
 			i->depthBufferPoolId = depthBufferPoolId;
 			mShadowTextureConfigDirty = true;
 		}

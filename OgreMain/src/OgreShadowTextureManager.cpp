@@ -94,7 +94,7 @@ namespace Ogre
 					continue;
 
 				if (config.width == tex->getWidth() && config.height == tex->getHeight()
-					&& config.format == tex->getFormat())
+					&& config.format == tex->getFormat() && config.fsaa == tex->getFSAA())
 				{
 					// Ok, a match
 					listToPopulate.push_back(tex);
@@ -112,7 +112,7 @@ namespace Ogre
 					targName, 
 					ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, 
 					TEX_TYPE_2D, config.width, config.height, 0, config.format, 
-					TU_RENDERTARGET);
+					TU_RENDERTARGET, NULL, false, config.fsaa);
 				// Ensure texture loaded
 				shadowTex->load();
 				listToPopulate.push_back(shadowTex);
