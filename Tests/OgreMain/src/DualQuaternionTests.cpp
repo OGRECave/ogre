@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "DualQuaternionTests.h"
 #include "OgreDualQuaternion.h"
 #include "OgreVector3.h"
+#include "OgreMatrix4.h"
 
 // Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( DualQuaternionTests );
@@ -68,4 +69,28 @@ void DualQuaternionTests::testDefaultValue()
 
 	CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
 	CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
+}
+
+void DualQuaternionTests::testMatrix()
+{
+	Matrix4 transform;
+	Vector3 translation(10, 4, 0);
+	Vector3 scale = Vector3::UNIT_SCALE;
+	Quaternion rotation;
+	rotation.FromAngleAxis(Radian(Math::PI), Vector3::UNIT_Z);
+	transform.makeTransform(translation, scale, rotation);
+
+	DualQuaternion dQuat;
+	dQuat.FromTransformationMatrix(transform);
+	Matrix4 transformResult;
+	dQuat.ToTransformationMatrix(transformResult);
+
+	Vector3 translationResult;
+	Vector3 scaleResult;
+	Quaternion rotationResult;
+	transformResult.decomposition(translationResult, scaleResult, rotationResult);
+
+	CPPUNIT_ASSERT(translationResult.positionEquals(translation));
+	CPPUNIT_ASSERT(scaleResult.positionEquals(scale));
+	CPPUNIT_ASSERT(rotationResult.equals(rotation, Radian(0.001)));
 }
