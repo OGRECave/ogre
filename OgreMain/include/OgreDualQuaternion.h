@@ -70,13 +70,13 @@ namespace Ogre {
 		/// Construct a dual quaternion from a transformation matrix
         inline DualQuaternion(const Matrix4& rot)
         {
-            this->FromTransformationMatrix(rot);
+            this->fromTransformationMatrix(rot);
         }
 		
 		/// Construct a dual quaternion from a unit quaternion and a translation vector
 		inline DualQuaternion(const Quaternion& q, const Vector3& trans)
 		{
-			this->FromRotationTranslation(q, trans);
+			this->fromRotationTranslation(q, trans);
 		}
 		
 		/// Construct a dual quaternion from 8 manual w/x/y/z/dw/dx/dy/dz values
@@ -127,11 +127,11 @@ namespace Ogre {
 		}
 
 		/// Setup the dual quaternion with a certain rotation described by a Quaternion and a translation described by a Vector3
-		void FromRotationTranslation (const Quaternion& q, const Vector3& trans);
-		void ToRotationTranslation (Quaternion& q, Vector3& translation) const;
+		void fromRotationTranslation (const Quaternion& q, const Vector3& trans);
+		void toRotationTranslation (Quaternion& q, Vector3& translation) const;
 
-		void FromTransformationMatrix (const Matrix4& kTrans);
-        void ToTransformationMatrix (Matrix4& kTrans) const;
+		void fromTransformationMatrix (const Matrix4& kTrans);
+        void toTransformationMatrix (Matrix4& kTrans) const;
 
         inline DualQuaternion& operator= (const DualQuaternion& rkQ)
 		{

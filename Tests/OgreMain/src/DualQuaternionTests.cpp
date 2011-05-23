@@ -48,11 +48,11 @@ void DualQuaternionTests::testConversion()
 	DualQuaternion dQuat;
 	Quaternion quat(Radian(Degree(60)), Vector3::UNIT_Y);
 	Vector3 translation(0, 0, 10);
-	dQuat.FromRotationTranslation(quat, translation);
+	dQuat.fromRotationTranslation(quat, translation);
 		
 	Quaternion result;
 	Vector3 resTrans;
-	dQuat.ToRotationTranslation(result, resTrans);
+	dQuat.toRotationTranslation(result, resTrans);
 
 	CPPUNIT_ASSERT_EQUAL(result, quat);
 	CPPUNIT_ASSERT(resTrans.positionEquals(translation));
@@ -65,7 +65,7 @@ void DualQuaternionTests::testDefaultValue()
 	Quaternion quatDefault;
 	Vector3 transDefault;
 	
-	dQuatDefault.ToRotationTranslation(quatDefault, transDefault);
+	dQuatDefault.toRotationTranslation(quatDefault, transDefault);
 
 	CPPUNIT_ASSERT_EQUAL(quatDefault, Quaternion::IDENTITY); 
 	CPPUNIT_ASSERT(transDefault.positionEquals(Vector3::ZERO));
@@ -81,9 +81,9 @@ void DualQuaternionTests::testMatrix()
 	transform.makeTransform(translation, scale, rotation);
 
 	DualQuaternion dQuat;
-	dQuat.FromTransformationMatrix(transform);
+	dQuat.fromTransformationMatrix(transform);
 	Matrix4 transformResult;
-	dQuat.ToTransformationMatrix(transformResult);
+	dQuat.toTransformationMatrix(transformResult);
 
 	Vector3 translationResult;
 	Vector3 scaleResult;

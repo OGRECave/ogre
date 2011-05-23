@@ -38,7 +38,7 @@ namespace Ogre {
 
 	//Based on dqconv.c from http://isg.cs.tcd.ie/projects/DualQuaternions/
 	//-----------------------------------------------------------------------
-	void DualQuaternion::FromRotationTranslation (const Quaternion& q, const Vector3& trans)
+	void DualQuaternion::fromRotationTranslation (const Quaternion& q, const Vector3& trans)
 	{
 		// non-dual part (just copy the quaternion):
 		w = q.w;
@@ -56,7 +56,7 @@ namespace Ogre {
 
 	//Based on dqconv.c from http://isg.cs.tcd.ie/projects/DualQuaternions/
 	//-----------------------------------------------------------------------
-	void DualQuaternion::ToRotationTranslation (Quaternion& q, Vector3& translation) const
+	void DualQuaternion::toRotationTranslation (Quaternion& q, Vector3& translation) const
 	{
 		// regular quaternion (just copy the non-dual part):
 		q.w = w;
@@ -72,22 +72,22 @@ namespace Ogre {
 	}
 
 	//-----------------------------------------------------------------------
-	void DualQuaternion::FromTransformationMatrix (const Matrix4& kTrans)
+	void DualQuaternion::fromTransformationMatrix (const Matrix4& kTrans)
 	{
 		Vector3 pos;
 		Vector3 scale;
 		Quaternion rot;
 
 		kTrans.decomposition(pos, scale, rot);
-		FromRotationTranslation(rot, pos);
+		fromRotationTranslation(rot, pos);
 	}
 
 	//-----------------------------------------------------------------------
-	void DualQuaternion::ToTransformationMatrix (Matrix4& kTrans) const
+	void DualQuaternion::toTransformationMatrix (Matrix4& kTrans) const
 	{
 		Vector3 pos;
 		Quaternion rot;
-		ToRotationTranslation(rot, pos);
+		toRotationTranslation(rot, pos);
 
 		Vector3 scale = Vector3::UNIT_SCALE;
 		kTrans.makeTransform(pos, scale, rot);
