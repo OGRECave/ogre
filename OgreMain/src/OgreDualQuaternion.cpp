@@ -86,10 +86,10 @@ namespace Ogre {
 	void DualQuaternion::ToTransformationMatrix (Matrix4& kTrans) const
 	{
 		Vector3 pos;
-		Vector3 scale;
 		Quaternion rot;
-
 		ToRotationTranslation(rot, pos);
+
+		Vector3 scale = Vector3::UNIT_SCALE;
 		kTrans.makeTransform(pos, scale, rot);
 	}
 }
