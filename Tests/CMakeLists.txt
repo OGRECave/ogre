@@ -16,6 +16,7 @@ if (OGRE_BUILD_TESTS)
 	
 	set(HEADER_FILES 
 		OgreMain/include/BitwiseTests.h
+		OgreMain/include/DualQuaternionTests.h
 		OgreMain/include/EdgeBuilderTests.h
 		OgreMain/include/FileSystemArchiveTests.h
 		OgreMain/include/MeshWithoutIndexDataTests.h
@@ -30,6 +31,7 @@ if (OGRE_BUILD_TESTS)
 	)
 	set(SOURCE_FILES 
 		OgreMain/src/BitwiseTests.cpp
+		OgreMain/src/DualQuaternionTests.cpp
 		OgreMain/src/EdgeBuilderTests.cpp
 		OgreMain/src/FileSystemArchiveTests.cpp
 		OgreMain/src/MeshWithoutIndexDataTests.cpp

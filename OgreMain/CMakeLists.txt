@@ -66,6 +66,7 @@ set (HEADER_FILES
   include/OgreDeflate.h
   include/OgreDepthBuffer.h
   include/OgreDistanceLodStrategy.h
+  include/OgreDualQuaternion.h
   include/OgreDynLib.h
   include/OgreDynLibManager.h
   include/OgreEdgeListBuilder.h
@@ -300,6 +301,7 @@ set (SOURCE_FILES
   src/OgreDeflate.cpp
   src/OgreDepthBuffer.cpp
   src/OgreDistanceLodStrategy.cpp
+  src/OgreDualQuaternion.cpp
   src/OgreDynLib.cpp
   src/OgreDynLibManager.cpp
   src/OgreEdgeListBuilder.cpp
