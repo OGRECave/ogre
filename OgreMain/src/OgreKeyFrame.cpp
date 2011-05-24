@@ -208,6 +208,31 @@ namespace Ogre
 		return newKf;
 	}	
 	//---------------------------------------------------------------------
+	void VertexPoseKeyFrame::_applyBaseKeyFrame(const VertexPoseKeyFrame* base)
+	{
+		// We subtract the matching pose influences in the base keyframe from the
+		// influences in this keyframe
+		for (PoseRefList::iterator i = mPoseRefs.begin(); i != mPoseRefs.end(); ++i)
+		{
+			PoseRef& myPoseRef = *i;
+			
+			VertexPoseKeyFrame::ConstPoseRefIterator basePoseIt = base->getPoseReferenceIterator();
+			Real baseInfluence = 0.0f;
+			while (basePoseIt.hasMoreElements())
+			{
+				const VertexPoseKeyFrame::PoseRef& basePoseRef = basePoseIt.getNext();
+				if (basePoseRef.poseIndex == myPoseRef.poseIndex)
+				{
+					baseInfluence = basePoseRef.influence;
+					break;
+				}
+			}
+			
+			myPoseRef.influence -= baseInfluence;
+			
+		}
+		
+	}
 
 
 }

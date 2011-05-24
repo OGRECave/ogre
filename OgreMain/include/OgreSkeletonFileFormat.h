@@ -78,6 +78,11 @@ namespace Ogre {
 
             // char* name                       : Name of the animation
             // float length                      : Length of the animation in seconds
+		
+			SKELETON_ANIMATION_BASEINFO = 0x4010,
+			// [Optional] base keyframe information
+			// char* baseAnimationName (blank for self)
+			// float baseKeyFrameTime
 
             SKELETON_ANIMATION_TRACK = 0x4100,
             // A single animation track (relates to a single bone)

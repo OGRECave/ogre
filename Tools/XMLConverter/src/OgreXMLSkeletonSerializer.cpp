@@ -235,8 +235,17 @@ namespace Ogre {
 			anim->setInterpolationMode(Animation::IM_LINEAR) ;
 
 			
-			LogManager::getSingleton().logMessage("Animation: nom: " + name + " et longueur: "
-				+ StringConverter::toString(length) );
+			//LogManager::getSingleton().logMessage("Animation: nom: " + name + " et longueur: "
+			//	+ StringConverter::toString(length) );
+			TiXmlElement* baseInfoNode = animElem->FirstChildElement("baseinfo");
+			if (baseInfoNode)
+			{
+				String baseName = baseInfoNode->Attribute("baseanimationname");
+				Real baseTime = StringConverter::parseReal(baseInfoNode->Attribute("basekeyframetime"));
+				anim->setUseBaseKeyFrame(true, baseTime, baseName);
+			}
+			
+			
 			
 			// lecture des tracks
 			int trackIndex = 0;
@@ -529,6 +538,15 @@ namespace Ogre {
 
         animNode->SetAttribute("name", anim->getName());
         animNode->SetAttribute("length", StringConverter::toString(anim->getLength()));
+		
+		// Optional base keyframe information
+		if (anim->getUseBaseKeyFrame())
+		{
+			TiXmlElement* baseInfoNode = 
+				animNode->InsertEndChild(TiXmlElement("baseinfo"))->ToElement();
+			baseInfoNode->SetAttribute("baseanimationname", anim->getBaseKeyFrameAnimationName());
+			baseInfoNode->SetAttribute("basekeyframetime", StringConverter::toString(anim->getBaseKeyFrameTime()));
+		}
 
         // Write all tracks
         TiXmlElement* tracksNode = 

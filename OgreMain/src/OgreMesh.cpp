@@ -2012,6 +2012,7 @@ namespace Ogre {
 		}
 
 		Animation* ret = OGRE_NEW Animation(name, length);
+		ret->_notifyContainer(this);
 
 		// Add to list
 		mAnimationsList[name] = ret;
@@ -2054,7 +2055,7 @@ namespace Ogre {
 		return static_cast<unsigned short>(mAnimationsList.size());
 	}
 	//---------------------------------------------------------------------
-	bool Mesh::hasAnimation(const String& name)
+	bool Mesh::hasAnimation(const String& name) const
 	{
 		return _getAnimationImpl(name) != 0;
 	}

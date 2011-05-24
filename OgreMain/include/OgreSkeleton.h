@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
+#include "OgreAnimation.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -82,7 +83,7 @@ namespace Ogre {
         Skeleton definitions are loaded from datafiles, namely the .skeleton file format. They
         are loaded on demand, especially when referenced by a Mesh.
     */
-    class _OgreExport Skeleton : public Resource
+    class _OgreExport Skeleton : public Resource, public AnimationContainer
     {
 		friend class SkeletonInstance;
 	protected:
@@ -220,7 +221,15 @@ namespace Ogre {
 			where this is coming from.
 		*/
         virtual Animation* getAnimation(const String& name, 
-			const LinkedSkeletonAnimationSource** linker = 0) const;
+			const LinkedSkeletonAnimationSource** linker) const;
+
+		/** Returns the named Animation object.
+		 @remarks
+			 Will pick up animations in linked skeletons 
+			 (@see addLinkedSkeletonAnimationSource). 
+		 @param name The name of the animation
+		 */
+		virtual Animation* getAnimation(const String& name) const;
 
 		/// Internal accessor for animations (returns null if animation does not exist)
 		virtual Animation* _getAnimationImpl(const String& name, 
@@ -228,7 +237,7 @@ namespace Ogre {
 
 
 		/** Returns whether this skeleton contains the named animation. */
-		virtual bool hasAnimation(const String& name);
+		virtual bool hasAnimation(const String& name) const;
 
         /** Removes an Animation from this skeleton. */
         virtual void removeAnimation(const String& name);

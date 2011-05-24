@@ -215,6 +215,24 @@ namespace Ogre {
         // float length                      : Length of the animation in seconds
         float len = anim->getLength();
         writeFloats(&len, 1);
+		
+		if (anim->getUseBaseKeyFrame())
+		{
+			size_t size = SSTREAM_OVERHEAD_SIZE;
+			// char* baseAnimationName (including terminator)
+			size += anim->getBaseKeyFrameAnimationName().length() + 1;
+			// float baseKeyFrameTime
+			size += sizeof(float);
+			
+			writeChunkHeader(SKELETON_ANIMATION_BASEINFO, size);
+			
+			// char* baseAnimationName (blank for self)
+			writeString(anim->getBaseKeyFrameAnimationName());
+			
+			// float baseKeyFrameTime
+			float t = (float)anim->getBaseKeyFrameTime();
+			writeFloats(&t, 1);
+		}
 
         // Write all tracks
         Animation::NodeTrackIterator trackIt = anim->getNodeTrackIterator();
@@ -447,11 +465,29 @@ namespace Ogre {
         readFloats(stream, &len, 1);
 
         Animation *pAnim = pSkel->createAnimation(name, len);
-
+		
         // Read all tracks
         if (!stream->eof())
         {
             unsigned short streamID = readChunk(stream);
+			// Optional base info is possible
+			if (streamID == SKELETON_ANIMATION_BASEINFO)
+			{
+				// char baseAnimationName
+				String baseAnimName = readString(stream);
+				// float baseKeyFrameTime
+				float baseKeyTime;
+				readFloats(stream, &baseKeyTime, 1);
+				
+				pAnim->setUseBaseKeyFrame(true, baseKeyTime, baseAnimName);
+				
+                if (!stream->eof())
+                {
+                    // Get next stream
+                    streamID = readChunk(stream);
+                }
+			}
+			
             while(streamID == SKELETON_ANIMATION_TRACK && !stream->eof())
             {
                 readAnimationTrack(stream, pAnim, pSkel);
