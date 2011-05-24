@@ -174,6 +174,9 @@ if (OGRE_BUILD_TESTS)
 	  # PlayPen gets included always
 	add_subdirectory(PlayPen)
 
+	# add VisualTests directory
+	add_subdirectory(VisualTests)
+
     endif (OIS_FOUND)
 
 endif (OGRE_BUILD_TESTS)
