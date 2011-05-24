@@ -122,8 +122,8 @@ namespace Ogre {
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
         
-        mWidth = width * mContentScalingFactor;
-        mHeight = height * mContentScalingFactor;
+        mWidth = width;
+        mHeight = height;
         
         mContext->createFramebuffer();
 
