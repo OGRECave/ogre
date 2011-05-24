@@ -65,8 +65,8 @@ public:
      *    and signals that the test is done after the final shot is complete. */
     void testFrameEnded()
     {
-		std::list<unsigned int>::iterator it = mScreenshotFrames.begin();
-		while (it != mScreenshotFrames.end())
+        std::list<unsigned int>::iterator it = mScreenshotFrames.begin();
+        while (it != mScreenshotFrames.end())
         {
             if (mFrameNr == (*it))
             {
@@ -75,15 +75,15 @@ public:
                 mWindow->writeContentsToFile(filename);
                 it = mScreenshotFrames.erase(it);
             }
-			else
-			{
-				++it;
-			}
+            else
+            {
+                ++it;
+            }
         }
 
-		// if all the shots have been taken, the test can exit
-		if(mScreenshotFrames.empty())
-			mDone = true;
+        // if all the shots have been taken, the test can exit
+        if(mScreenshotFrames.empty())
+            mDone = true;
 
         return true;
     }
@@ -99,14 +99,14 @@ public:
     {
         // temporary, this will be called by the TestContext once it's set up
         testFrameStarted();
-		return true;
+        return true;
     }
 
     virtual bool frameEnded(const Ogre::FrameEvent& evt)
     {
         // temporary, this will be called by the TestContext once it's set up
         testFrameEnded();
-		return true;
+        return true;
     }
 
 protected:
