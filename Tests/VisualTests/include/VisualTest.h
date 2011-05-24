@@ -55,7 +55,7 @@ public:
 
     /** Called at the start of each test frame; increments frame count
      *    and handles any other housekeeping details for the test. */
-    bool testFrameStarted(const Ogre::FrameEvent& evt)
+    void testFrameStarted()
     {
         ++mFrameNr;
         return true;
@@ -63,9 +63,28 @@ public:
 
     /** Called at the end of each test frame, takes the actual screenshots
      *    and signals that the test is done after the final shot is complete. */
-    bool testFrameEnded(const Ogre::FrameEvent& evt)
+    void testFrameEnded()
     {
-        // TODO: take screenshots here
+		std::list<unsigned int>::iterator it = mScreenshotFrames.begin();
+		while (it != mScreenshotFrames.end())
+        {
+            if (mFrameNr == (*it))
+            {
+                Ogre::String filename = "TestShots/" + mInfo["Title"] + 
+                    "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
+                mWindow->writeContentsToFile(filename);
+                it = mScreenshotFrames.erase(it);
+            }
+			else
+			{
+				++it;
+			}
+        }
+
+		// if all the shots have been taken, the test can exit
+		if(mScreenshotFrames.empty())
+			mDone = true;
+
         return true;
     }
 
@@ -74,6 +93,20 @@ public:
     void addScreenshotFrame(unsigned int frame)
     {
         mScreenshotFrames.push_back(frame);
+    }
+
+    virtual bool frameStarted(const Ogre::FrameEvent& evt)
+    {
+        // temporary, this will be called by the TestContext once it's set up
+        testFrameStarted();
+		return true;
+    }
+
+    virtual bool frameEnded(const Ogre::FrameEvent& evt)
+    {
+        // temporary, this will be called by the TestContext once it's set up
+        testFrameEnded();
+		return true;
     }
 
 protected:
