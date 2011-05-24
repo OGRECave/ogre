@@ -26,3 +26,65 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#ifndef __VisualTest_H__
+#define __VisualTest_H__
+
+#include "SdkSample.h"
+
+/** The base class for a visual test scene */
+class VisualTest : public OgreBites::SdkSample
+{
+public:
+
+    VisualTest()
+        :mFrameNr(0)
+    {
+        mInfo["Title"] = "Untitled Test";
+        mInfo["Description"] = "";
+        mInfo["Category"] = "Unsorted";
+        mInfo["Thumbnail"] = "";
+        mInfo["Help"] = "";
+
+        // Seed rand with a predictable value
+        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
+        // Give a fixed timestep for particles and other time-dependent things in OGRE
+        Ogre::ControllerManager::getSingleton().setFrameDelay(0.01f);
+    }
+
+    virtual ~VisualTest() {}
+
+    /** Called at the start of each test frame; increments frame count
+     *    and handles any other housekeeping details for the test. */
+    bool testFrameStarted(const Ogre::FrameEvent& evt)
+    {
+        ++mFrameNr;
+        return true;
+    }
+
+    /** Called at the end of each test frame, takes the actual screenshots
+     *    and signals that the test is done after the final shot is complete. */
+    bool testFrameEnded(const Ogre::FrameEvent& evt)
+    {
+        // TODO: take screenshots here
+        return true;
+    }
+
+    /** Adds a screenshot frame to the list - this should
+     *    be done during setup of the test. */
+    void addScreenshotFrame(unsigned int frame)
+    {
+        mScreenshotFrames.push_back(frame);
+    }
+
+protected:
+
+    // The current frame number - in order to keep things deterministic, 
+    // we track frame numbers, rather than actual timings.
+    unsigned int mFrameNr;
+    
+    // a list of frame numbers at which to trigger screenshots
+    std::list<unsigned int> mScreenshotFrames;
+
+};
+
+#endif
