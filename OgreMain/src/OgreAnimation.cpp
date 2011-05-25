@@ -52,7 +52,6 @@ namespace Ogre {
 		, mUseBaseKeyFrame(false)
 		, mBaseKeyFrameTime(0.0f)
 		, mBaseKeyFrameAnimationName(StringUtil::BLANK)
-		, mHasBaseKeyFrameBeenApplied(false)
 		, mContainer(0)
     {
     }
@@ -719,7 +718,6 @@ namespace Ogre {
 			mUseBaseKeyFrame = useBaseKeyFrame;
 			mBaseKeyFrameTime = keyframeTime;
 			mBaseKeyFrameAnimationName = baseAnimName;
-			mHasBaseKeyFrameBeenApplied = false;
 		}
 	}
     //-----------------------------------------------------------------------
@@ -738,14 +736,9 @@ namespace Ogre {
 		return mBaseKeyFrameAnimationName;
 	}
     //-----------------------------------------------------------------------
-	bool Animation::hasBaseKeyFrameBeenApplied() const
-	{
-		return mHasBaseKeyFrameBeenApplied;
-	}
-    //-----------------------------------------------------------------------
 	void Animation::_applyBaseKeyFrame()
 	{
-		if (mUseBaseKeyFrame && !mHasBaseKeyFrameBeenApplied)
+		if (mUseBaseKeyFrame)
 		{
 			Animation* baseAnim = this;
 			if (mBaseKeyFrameAnimationName != StringUtil::BLANK && mContainer)
@@ -789,7 +782,8 @@ namespace Ogre {
 				
 			}
 			
-			mHasBaseKeyFrameBeenApplied = true;
+			// Re-base has been done, this is a one-way translation
+			mUseBaseKeyFrame = false;
 		}
 		
 	}

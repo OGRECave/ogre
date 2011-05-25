@@ -492,8 +492,6 @@ namespace Ogre {
 		Real getBaseKeyFrameTime() const;
 		/** If a base keyframe is being used, the Animation that provides that keyframe. */
 		const String& getBaseKeyFrameAnimationName() const;
-		/** If a base keyframe is being used, whether the animation has been re-based against it already. */
-		bool hasBaseKeyFrameBeenApplied() const;
 		
 		/// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
 		void _applyBaseKeyFrame();
@@ -528,7 +526,6 @@ namespace Ogre {
 		bool mUseBaseKeyFrame;
 		Real mBaseKeyFrameTime;
 		String mBaseKeyFrameAnimationName;
-		bool mHasBaseKeyFrameBeenApplied;
 		AnimationContainer* mContainer;
 
 		void optimiseNodeTracks(bool discardIdentityTracks);
