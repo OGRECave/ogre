@@ -676,7 +676,21 @@ namespace Ogre {
 		newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
 		populateClone(newTrack);
 		return newTrack;
-	}	
+	}
+	//--------------------------------------------------------------------------
+	void NodeAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	{
+		const TransformKeyFrame* base = static_cast<const TransformKeyFrame*>(b);
+		
+        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        {
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			kf->setTranslate(kf->getTranslate() - base->getTranslate());
+			kf->setRotation(kf->getRotation() * base->getRotation().Inverse());
+			kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
+		}
+			
+	}
 	//--------------------------------------------------------------------------
 	VertexAnimationTrack::VertexAnimationTrack(Animation* parent,
 		unsigned short handle, VertexAnimationType animType)
@@ -979,7 +993,20 @@ namespace Ogre {
 		populateClone(newTrack);
 		return newTrack;
 	}	
-
+	//--------------------------------------------------------------------------
+	void VertexAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	{
+		const VertexPoseKeyFrame* base = static_cast<const VertexPoseKeyFrame*>(b);
+		
+        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        {
+			VertexPoseKeyFrame* kf = static_cast<VertexPoseKeyFrame*>(*i);
+			
+			kf->_applyBaseKeyFrame(base);
+		}
+		
+	}
+	
 
 }
 

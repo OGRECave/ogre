@@ -184,6 +184,11 @@ namespace Ogre {
 				M_ANIMATION = 0xD100,
 				// char* name
 				// float length
+				M_ANIMATION_BASEINFO = 0xD105,
+				// [Optional] base keyframe information (pose animation only)
+				// char* baseAnimationName (blank for self)
+				// float baseKeyFrameTime
+		
 				M_ANIMATION_TRACK = 0xD110,
 					// unsigned short type			// 1 == morph, 2 == pose
 					// unsigned short target		// 0 for shared geometry, 

@@ -1878,6 +1878,14 @@ namespace Ogre {
 
 			Animation* anim = pMesh->createAnimation(name, len);
 
+			TiXmlElement* baseInfoNode = animElem->FirstChildElement("baseinfo");
+			if (baseInfoNode)
+			{
+				String baseName = baseInfoNode->Attribute("baseanimationname");
+				Real baseTime = StringConverter::parseReal(baseInfoNode->Attribute("basekeyframetime"));
+				anim->setUseBaseKeyFrame(true, baseTime, baseName);
+			}
+			
 			TiXmlElement* tracksNode = animElem->FirstChildElement("tracks");
 			if (tracksNode)
 			{
@@ -2179,6 +2187,15 @@ namespace Ogre {
 			animNode->SetAttribute("length", 
 				StringConverter::toString(anim->getLength()));
 
+			// Optional base keyframe information
+			if (anim->getUseBaseKeyFrame())
+			{
+				TiXmlElement* baseInfoNode = 
+				animNode->InsertEndChild(TiXmlElement("baseinfo"))->ToElement();
+				baseInfoNode->SetAttribute("baseanimationname", anim->getBaseKeyFrameAnimationName());
+				baseInfoNode->SetAttribute("basekeyframetime", StringConverter::toString(anim->getBaseKeyFrameTime()));
+			}
+			
 			TiXmlElement* tracksNode = 
 				animNode->InsertEndChild(TiXmlElement("tracks"))->ToElement();
 			Animation::VertexTrackIterator iter = anim->getVertexTrackIterator();
