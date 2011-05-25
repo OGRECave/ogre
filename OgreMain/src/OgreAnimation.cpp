@@ -761,7 +761,7 @@ namespace Ogre {
 					if (baseAnim == this)
 						baseTrack = track;
 					else
-						baseAnim->getNodeTrack(track->getHandle());
+						baseTrack = baseAnim->getNodeTrack(track->getHandle());
 					
 					TransformKeyFrame kf(baseTrack, mBaseKeyFrameTime);
 					baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);

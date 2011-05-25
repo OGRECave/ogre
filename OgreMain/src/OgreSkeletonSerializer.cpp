@@ -129,6 +129,14 @@ namespace Ogre {
             streamID = readChunk(stream);
             switch (streamID)
             {
+			case SKELETON_BLENDMODE:
+			{
+				// Optional blend mode
+				uint16 blendMode;
+				readShorts(stream, &blendMode, 1);
+				pSkel->setBlendMode(static_cast<SkeletonAnimationBlendMode>(blendMode));
+				break;
+			}
             case SKELETON_BONE:
                 readBone(stream, pSkel);
                 break;
@@ -152,6 +160,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void SkeletonSerializer::writeSkeleton(const Skeleton* pSkel)
     {
+		// Write blend mode
+		writeChunkHeader(SKELETON_BLENDMODE, SSTREAM_OVERHEAD_SIZE + sizeof(unsigned short));
+		uint16 blendMode = static_cast<uint16>(pSkel->getBlendMode());
+		writeShorts(&blendMode, 1);
+		
         // Write each bone
         unsigned short numBones = pSkel->getNumBones();
         unsigned short i;

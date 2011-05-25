@@ -48,9 +48,9 @@ namespace Ogre {
     /**  */
     enum SkeletonAnimationBlendMode {
         /// Animations are applied by calculating a weighted average of all animations
-	    ANIMBLEND_AVERAGE,
+	    ANIMBLEND_AVERAGE = 0,
         /// Animations are applied by calculating a weighted cumulative total
-	    ANIMBLEND_CUMULATIVE
+	    ANIMBLEND_CUMULATIVE = 1
     };
 
 #define OGRE_MAX_NUM_BONES 256

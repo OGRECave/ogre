@@ -62,6 +62,18 @@ namespace Ogre {
 		TiXmlElement* elem;
 
         TiXmlElement* rootElem = mXMLDoc->RootElement();
+		
+		// Optional blend mode
+		const char* blendModeStr = rootElem->Attribute("blendmode");
+		if (blendModeStr)
+		{
+			if (String(blendModeStr) == "cumulative")
+				pSkeleton->setBlendMode(ANIMBLEND_CUMULATIVE);
+			else 
+				pSkeleton->setBlendMode(ANIMBLEND_AVERAGE);
+
+		}
+		
 
         // Bones
         elem = rootElem->FirstChildElement("bones");
@@ -430,6 +442,10 @@ namespace Ogre {
     void XMLSkeletonSerializer::writeSkeleton(const Skeleton* pSkel)
     {
         TiXmlElement* rootNode = mXMLDoc->RootElement();
+		
+		// Blend mode
+		String blendModeStr = pSkel->getBlendMode() == ANIMBLEND_CUMULATIVE ? "cumulative" : "average";
+		rootNode->SetAttribute("blendmode", blendModeStr);
 
         TiXmlElement* bonesElem = 
             rootNode->InsertEndChild(TiXmlElement("bones"))->ToElement();

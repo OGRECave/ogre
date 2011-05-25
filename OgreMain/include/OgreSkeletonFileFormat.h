@@ -55,6 +55,9 @@ namespace Ogre {
     enum SkeletonChunkID {
         SKELETON_HEADER            = 0x1000,
             // char* version           : Version number check
+			SKELETON_BLENDMODE		   = 0x1010, // optional
+				// unsigned short blendmode		: SkeletonAnimationBlendMode
+		
         SKELETON_BONE              = 0x2000,
         // Repeating section defining each bone in the system. 
         // Bones are assigned indexes automatically based on their order of declaration
