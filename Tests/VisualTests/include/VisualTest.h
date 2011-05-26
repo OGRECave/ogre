@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 #include "SdkSample.h"
 
+#define VISUAL_TEST_TIMESTEP 0.01f
+
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::SdkSample
 {
@@ -44,11 +46,6 @@ public:
         mInfo["Category"] = "Unsorted";
         mInfo["Thumbnail"] = "";
         mInfo["Help"] = "";
-
-        // Seed rand with a predictable value
-        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
-        // Give a fixed timestep for particles and other time-dependent things in OGRE
-        Ogre::ControllerManager::getSingleton().setFrameDelay(0.01f);
     }
 
     virtual ~VisualTest() {}
@@ -58,7 +55,6 @@ public:
     void testFrameStarted()
     {
         ++mFrameNr;
-        return true;
     }
 
     /** Called at the end of each test frame, takes the actual screenshots
@@ -84,8 +80,6 @@ public:
         // if all the shots have been taken, the test can exit
         if(mScreenshotFrames.empty())
             mDone = true;
-
-        return true;
     }
 
     /** Adds a screenshot frame to the list - this should
@@ -107,6 +101,28 @@ public:
         // temporary, this will be called by the TestContext once it's set up
         testFrameEnded();
         return true;
+    }
+
+    // NOTE: This is temporary, for the sake of making these work with the existing Sample Browser
+    // the timing stuff will be moved to the TestContext, and the cameraman/tray stuff will be disabled entirely
+    virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, 
+        OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
+    {
+        OgreBites::SdkSample::_setup(window, keyboard, mouse, fsLayer);
+
+        // rest frame count
+        mFrameNr = 0;
+        
+        // Seed rand with a predictable value
+        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
+
+        // Give a fixed timestep for particles and other time-dependent things in OGRE
+        Ogre::ControllerManager::getSingleton().setFrameDelay(VISUAL_TEST_TIMESTEP);
+
+        // disable extraneous SdkSample stuff
+        mTrayMgr->hideFrameStats();
+        mTrayMgr->hideCursor();
+        mCameraMan->setStyle(OgreBites::CS_MANUAL);
     }
 
 protected:

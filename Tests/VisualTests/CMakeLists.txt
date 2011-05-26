@@ -10,10 +10,13 @@
 # Configure Visual Test build
 
 set(HEADER_FILES 
-	VisualTest.h)
+	include/VisualTest.h
+	include/VisualTestPlugin.h
+	include/PlayPenTests.h)
 
-# nothing here just yet:
-set(SOURCE_FILES )
+set(SOURCE_FILES 
+	src/PlayPenTests.cpp
+	src/VisualTestPlugin.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
@@ -22,9 +25,9 @@ ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
 
-#add_library(VisualTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
-#target_link_libraries(VisualTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-#ogre_config_sample_lib(VisualTests)
+add_library(VisualTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
+target_link_libraries(VisualTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(VisualTests)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
