@@ -67,17 +67,18 @@ public:
      *    and signals that the test is done after the final shot is complete. */
     void testFrameEnded()
     {
-        if(*(mScreenshotFrames.begin()) == mFrameNr)
+        // if all the shots have been taken, the test can exit
+        if(mScreenshotFrames.empty())
+		{
+            mDone = true;
+		}
+        else if(*(mScreenshotFrames.begin()) == mFrameNr)
         {
             Ogre::String filename = "TestShots/" + mInfo["Title"] + 
                 "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
             mWindow->writeContentsToFile(filename);
             mScreenshotFrames.erase(mScreenshotFrames.begin());
         }
-
-        // if all the shots have been taken, the test can exit
-        if(mScreenshotFrames.empty())
-            mDone = true;
     }
 
     /** Adds a screenshot frame to the list - this should
@@ -108,7 +109,7 @@ public:
     {
         OgreBites::SdkSample::_setup(window, keyboard, mouse, fsLayer);
 
-        // rest frame count
+        // reset frame count
         mFrameNr = 0;
         
         // Seed rand with a predictable value
@@ -121,6 +122,9 @@ public:
         mTrayMgr->hideFrameStats();
         mTrayMgr->hideCursor();
         mCameraMan->setStyle(OgreBites::CS_MANUAL);
+
+		// always take one after 1000 frames for now, for testing...
+		addScreenshotFrame(1000);
     }
 
     virtual void _shutdown()
