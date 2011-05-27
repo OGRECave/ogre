@@ -38,6 +38,8 @@ class VisualTest : public OgreBites::SdkSample
 {
 public:
 
+    static Ogre::String TRANSIENT_RESOURCE_GROUP;
+
     VisualTest()
         :mFrameNr(0)
     {
@@ -123,6 +125,14 @@ public:
         mTrayMgr->hideFrameStats();
         mTrayMgr->hideCursor();
         mCameraMan->setStyle(OgreBites::CS_MANUAL);
+    }
+
+    virtual void _shutdown()
+    {
+        // set frame delay back to zero, so the sample browser's
+        // time dependent animations and such behave.
+        Ogre::ControllerManager::getSingleton().setFrameDelay(0.f);
+        SdkSample::_shutdown();
     }
 
 protected:

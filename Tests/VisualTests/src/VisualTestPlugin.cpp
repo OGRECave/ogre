@@ -33,8 +33,16 @@ THE SOFTWARE.
 VisualTestPlugin::VisualTestPlugin()
     :SamplePlugin("VisualTestPlugin")
 {
-    // only one for now:
+    // add the playpen tests
     addSample(new PlayPen_ManualLOD());
+    addSample(new PlayPen_ManualLODFromFile());
+    addSample(new PlayPen_ManualBlend());
+    addSample(new PlayPen_ProjectSphere());
+    addSample(new PlayPen_CameraSetDirection());
+    addSample(new PlayPen_MorphAnimationWithNormals());
+    addSample(new PlayPen_MorphAnimationWithoutNormals());
+    addSample(new PlayPen_PoseAnimationWithNormals());
+    addSample(new PlayPen_PoseAnimationWithoutNormals());
 }
 //---------------------------------------------------------------------
 
@@ -63,4 +71,5 @@ extern "C" _OgreSampleExport void dllStopPlugin()
     Ogre::Root::getSingleton().uninstallPlugin(visualTestPlugin); 
     OGRE_DELETE visualTestPlugin;
 }
+
 #endif
