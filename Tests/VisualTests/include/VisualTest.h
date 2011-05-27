@@ -45,9 +45,13 @@ public:
     {
         mInfo["Title"] = "Untitled Test";
         mInfo["Description"] = "";
-        mInfo["Category"] = "Unsorted";
-        mInfo["Thumbnail"] = "";
+        mInfo["Category"] = "Tests";
+        mInfo["Thumbnail"] = "thumb_playpen.png";
         mInfo["Help"] = "";
+
+        Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
+        if (!rgm.resourceGroupExists(TRANSIENT_RESOURCE_GROUP))
+            rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
     }
 
     virtual ~VisualTest() {}
@@ -125,6 +129,13 @@ public:
         // time dependent animations and such behave.
         Ogre::ControllerManager::getSingleton().setFrameDelay(0.f);
         SdkSample::_shutdown();
+    }
+
+    // cleanup after the test
+    void unloadResources()
+    {
+        Ogre::ResourceGroupManager::getSingleton().clearResourceGroup(TRANSIENT_RESOURCE_GROUP);
+        SdkSample::unloadResources();
     }
 
 protected:
