@@ -63,20 +63,12 @@ public:
      *    and signals that the test is done after the final shot is complete. */
     void testFrameEnded()
     {
-        std::list<unsigned int>::iterator it = mScreenshotFrames.begin();
-        while (it != mScreenshotFrames.end())
+        if(*(mScreenshotFrames.begin()) == mFrameNr)
         {
-            if (mFrameNr == (*it))
-            {
-                Ogre::String filename = "TestShots/" + mInfo["Title"] + 
-                    "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
-                mWindow->writeContentsToFile(filename);
-                it = mScreenshotFrames.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
+            Ogre::String filename = "TestShots/" + mInfo["Title"] + 
+                "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
+            mWindow->writeContentsToFile(filename);
+            mScreenshotFrames.erase(mScreenshotFrames.begin());
         }
 
         // if all the shots have been taken, the test can exit
@@ -88,7 +80,7 @@ public:
      *    be done during setup of the test. */
     void addScreenshotFrame(unsigned int frame)
     {
-        mScreenshotFrames.push_back(frame);
+        mScreenshotFrames.insert(frame);
     }
 
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
@@ -142,7 +134,7 @@ protected:
     unsigned int mFrameNr;
     
     // a list of frame numbers at which to trigger screenshots
-    std::list<unsigned int> mScreenshotFrames;
+    std::set<unsigned int> mScreenshotFrames;
 
 };
 
