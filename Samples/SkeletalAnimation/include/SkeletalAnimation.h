@@ -2,6 +2,7 @@
 #define __SkeletalAnimation_H__
 
 #include "SdkSample.h"
+#include "OgreDualQuaternion.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -10,7 +11,7 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
 public:
 
-	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
+	Sample_SkeletalAnimation() : NUM_MODELS(2), ANIM_CHOP(8)
 	{
 		mInfo["Title"] = "Skeletal Animation";
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
@@ -31,16 +32,16 @@ public:
 				Position is calculated from an offset to the end position, and rotation is calculated
 				from how much the animation turns the character. */
 
-				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+				//Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
 
 				// find current end position and the offset
-				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+				//Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+				//Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
 
-				mModelNodes[i]->setPosition(currEnd + offset);
-				mModelNodes[i]->rotate(rot);
+				//mModelNodes[i]->setPosition(currEnd + offset);
+				//mModelNodes[i]->rotate(rot);
 
-				mAnimStates[i]->setTimePosition(0);   // reset animation time
+				//mAnimStates[i]->setTimePosition(0);   // reset animation time
 			}
         }
 
@@ -49,7 +50,6 @@ public:
 
 
 protected:
-
 	void setupContent()
 	{
 		// set shadow properties
@@ -91,9 +91,6 @@ protected:
 		l->setDirection(dir);
         l->setDiffuseColour(0.0, 0.5, 0.0);		
 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
-			
-	
-	
 
 		// create a floor mesh resource
 		MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -115,7 +112,7 @@ protected:
 
 	void setupModels()
 	{
-		tweakSneakAnim();
+		//tweakSneakAnim();
 
 		SceneNode* sn = NULL;
 		Entity* ent = NULL;
@@ -130,13 +127,14 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "robot.mesh");
+			ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
 			
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
-			as = ent->getAnimationState("Sneak");
+			as = ent->getAnimationState("Walk");
             as->setEnabled(true);
-			as->setLoop(false);
+			as->setLoop(true);
 			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
 			mAnimStates.push_back(as);
         }
