@@ -602,12 +602,13 @@ namespace Ogre {
 			/// The current world matrix, inverted & transposed
 			ACT_INVERSE_TRANSPOSE_WORLD_MATRIX,
 
-
 			/// The current array of world matrices, as a 3x4 matrix, used for blending
 			ACT_WORLD_MATRIX_ARRAY_3x4,
 			/// The current array of world matrices, used for blending
 			ACT_WORLD_MATRIX_ARRAY,
-
+			/// The current array of world matrices transformed to an array of dual quaternions, represented as a 2x4 matrix
+			ACT_WORLD_DUALQUATERNION_ARRAY_2x4,
+			
 			/// The current view matrix
 			ACT_VIEW_MATRIX,
 			/// The current view matrix, inverted

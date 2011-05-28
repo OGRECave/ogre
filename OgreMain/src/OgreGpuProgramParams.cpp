@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
+#include "OgreDualQuaternion.h"
 #include "OgreAutoParamDataSource.h"
 #include "OgreLight.h"
 #include "OgreRoot.h"
@@ -52,6 +53,7 @@ namespace Ogre
 
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_WORLD_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
 
 		AutoConstantDefinition(ACT_VIEW_MATRIX,                   "view_matrix",                 16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_INVERSE_VIEW_MATRIX,           "inverse_view_matrix",         16, ET_REAL, ACDT_NONE),
@@ -1053,6 +1055,7 @@ namespace Ogre
 		case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
 		case ACT_WORLD_MATRIX_ARRAY_3x4:
 		case ACT_WORLD_MATRIX_ARRAY:
+		case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
 		case ACT_WORLDVIEW_MATRIX:
 		case ACT_INVERSE_WORLDVIEW_MATRIX:
 		case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
@@ -1625,6 +1628,7 @@ namespace Ogre
 		Vector3 vec3;
 		Vector4 vec4;
 		Matrix3 m3;
+		DualQuaternion dQuat;
 
 		mActivePassIterationIndex = std::numeric_limits<size_t>::max();
 
@@ -1975,6 +1979,19 @@ namespace Ogre
 				case ACT_WORLD_MATRIX_ARRAY:
 					_writeRawConstant(i->physicalIndex, source->getWorldMatrixArray(), 
 						source->getWorldMatrixCount());
+					break;
+				case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+					// Loop over matrices
+					pMatrix = source->getWorldMatrixArray();
+					numMatrices = source->getWorldMatrixCount();
+					index = i->physicalIndex;
+					for (m = 0; m < numMatrices; ++m)
+					{
+						dQuat.fromTransformationMatrix(*pMatrix);
+						_writeRawConstants(index, dQuat.ptr(), 8);
+						index += 8;
+						++pMatrix;
+					}
 					break;
 				case ACT_WORLDVIEW_MATRIX:
 					_writeRawConstant(i->physicalIndex, source->getWorldViewMatrix(),i->elementCount);
