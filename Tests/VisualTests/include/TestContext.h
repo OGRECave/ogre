@@ -30,6 +30,9 @@ THE SOFTWARE.
 #define __TestContext_H__
 
 #include "SampleContext.h"
+#include "VisualTest.h"
+
+#define VISUAL_TEST_TIMESTEP 0.01f
 
 class TestContext : public OgreBites::SampleContext
 {
@@ -40,12 +43,14 @@ public:
 
     virtual void setup();
     virtual bool frameStarted(const Ogre::FrameEvent& evt);
+    virtual bool frameEnded(const Ogre::FrameEvent& evt);
     virtual void runSample(OgreBites::Sample* s);
     OgreBites::Sample* loadTests();
 
 protected:
 
     std::deque<OgreBites::Sample*> mTests;
+	VisualTest* mCurrentTest;
 
 };
 

@@ -31,8 +31,6 @@ THE SOFTWARE.
 
 #include "SdkSample.h"
 
-#define VISUAL_TEST_TIMESTEP 0.01f
-
 /** The base class for a visual test scene */
 class VisualTest : public OgreBites::SdkSample
 {
@@ -88,20 +86,6 @@ public:
         mScreenshotFrames.insert(frame);
     }
 
-    virtual bool frameStarted(const Ogre::FrameEvent& evt)
-    {
-        // temporary, this will be called by the TestContext once it's set up
-        testFrameStarted();
-        return true;
-    }
-
-    virtual bool frameEnded(const Ogre::FrameEvent& evt)
-    {
-        // temporary, this will be called by the TestContext once it's set up
-        testFrameEnded();
-        return true;
-    }
-
     // NOTE: This is temporary, for the sake of making these work with the existing Sample Browser
     // the timing stuff will be moved to the TestContext, and the cameraman/tray stuff will be disabled entirely
     virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, 
@@ -112,12 +96,6 @@ public:
         // reset frame count
         mFrameNr = 0;
         
-        // Seed rand with a predictable value
-        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
-
-        // Give a fixed timestep for particles and other time-dependent things in OGRE
-        Ogre::ControllerManager::getSingleton().setFrameDelay(VISUAL_TEST_TIMESTEP);
-
         // disable extraneous SdkSample stuff
         mTrayMgr->hideFrameStats();
         mTrayMgr->hideCursor();
@@ -125,16 +103,6 @@ public:
 
         // always take one after 1000 frames for now, for testing...
         addScreenshotFrame(1000);
-    }
-
-    virtual void _shutdown()
-    {
-        // set frame delay back to zero and reset time factor, so the sample browser's
-        // time dependent animations and such behave.
-        Ogre::ControllerManager::getSingleton().setFrameDelay(0);
-        Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
-
-        SdkSample::_shutdown();
     }
 
     // cleanup after the test

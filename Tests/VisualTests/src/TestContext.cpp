@@ -99,26 +99,97 @@ OgreBites::Sample* TestContext::loadTests()
 
 bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 {
-    return !mCurrentSample ? false : SampleContext::frameStarted(evt);
+    captureInputDevices();
+
+    // pass a fixed timestep along to the tests
+    Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();
+    fixed_evt.timeSinceLastFrame = VISUAL_TEST_TIMESTEP;
+    fixed_evt.timeSinceLastEvent = VISUAL_TEST_TIMESTEP;
+
+    if(mCurrentTest) // if a test is running
+    {
+        // handles timing
+        mCurrentTest->testFrameStarted();
+        // regular update function
+        return mCurrentTest->frameStarted(fixed_evt);
+    }
+    else if(mCurrentSample) // if a generic sample is running
+    {
+        return mCurrentSample->frameStarted(evt);
+    }
+
+    // quit if nothing else is running
+    return false;
+}
+
+bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
+{
+    // pass a fixed timestep along to the tests
+    Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();
+    fixed_evt.timeSinceLastFrame = VISUAL_TEST_TIMESTEP;
+    fixed_evt.timeSinceLastEvent = VISUAL_TEST_TIMESTEP;
+
+    if(mCurrentTest) // if a test is running
+    {
+        // handles screen captures and such
+        mCurrentTest->testFrameEnded();
+
+        // move onto the next test
+        if(mCurrentTest->isDone())
+        {
+            runSample(0);
+            return true;
+        }
+
+        // regular update function
+        return mCurrentTest->frameEnded(fixed_evt);
+    }
+    else if(mCurrentSample) // if a generic sample is running
+    {
+        return mCurrentSample->frameEnded(evt);
+    }
+
+    // quit if nothing else is running
+    return false;
 }
 
 void TestContext::runSample(OgreBites::Sample* s)
 {
+    // reset frame timing
+    Ogre::ControllerManager::getSingleton().setFrameDelay(0);
+    Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
+
+    OgreBites::Sample* sampleToRun = s;
+
+    // if a valid test is passed, then run it, if null, grab the next one from the deque
     if(s)
     {
-        SampleContext::runSample(s);
+        sampleToRun = s;
     }
-    else
+    else if(!mTests.empty())
     {
         mTests.pop_front();
-        if(mTests.empty())
-        {
-            mCurrentSample = 0;
-            return;
-        }
-        SampleContext::runSample(mTests.front());
+        if(!mTests.empty())
+            sampleToRun = mTests.front();
     }
+
+    // check if this is a VisualTest
+    mCurrentTest = dynamic_cast<VisualTest*>(sampleToRun);
+
+    // set things up to be deterministic
+    if(mCurrentTest)
+    {
+       // Seed rand with a predictable value
+        srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
+
+        // Give a fixed timestep for particles and other time-dependent things in OGRE
+        Ogre::ControllerManager::getSingleton().setFrameDelay(VISUAL_TEST_TIMESTEP);
+    }
+
+    SampleContext::runSample(sampleToRun);
 }
+
+// main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
 
