@@ -419,6 +419,14 @@ namespace Ogre {
 			buffer += (" " + val);
 		}
 
+		String quoteWord(const String& val)
+		{
+			if (val.find_first_of(" \t") != String::npos)
+				return ("\"" + val + "\"");
+			else return val;
+		}
+
+
 		void writeComment(unsigned short level, const String& comment, const bool useMainBuffer = true)
 		{
             String& buffer = (useMainBuffer ? mBuffer : mGpuProgramBuffer);
