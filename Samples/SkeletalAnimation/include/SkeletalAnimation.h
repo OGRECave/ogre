@@ -11,6 +11,9 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 public:
 
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		, mSrsHardwareSkinning(0)
+#endif
 	{
 		mInfo["Title"] = "Skeletal Animation";
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
@@ -52,6 +55,26 @@ protected:
 
 	void setupContent()
 	{
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		//To make glsles work the program will need to be provided with proper
+		//shadow caster materials
+		if (mShaderGenerator->getTargetLanguage() != "glsles")
+		{
+			//Add the hardware skinning to the shader generator default render state
+			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+			
+			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
+			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
+			Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
+			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
+
+			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+				pCast1, pCast2, pCast3, pCast4);
+		}
+#endif
 		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 		mSceneMgr->setShadowTextureSize(512);
@@ -132,7 +155,24 @@ protected:
 			// create and attach a jaiqua entity
             ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
 			sn->attachObject(ent);
-			
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+			//To make glsles work the program will need to be provided with proper
+			//shadow caster materials
+			if (mShaderGenerator->getTargetLanguage() != "glsles")
+			{
+				//In case the system uses the RTSS, the following line will ensure
+				//that the entity is using hardware animation in RTSS as well.
+				RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+				//The following line is needed only because the Jaiqua model material has shaders and
+				//as such is not automatically reflected in the RTSS system
+				RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+					ent->getSubEntity(0)->getMaterialName(),
+					Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
+					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+					true);
+			}
+#endif
+		
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
 			as = ent->getAnimationState("Sneak");
             as->setEnabled(true);
@@ -209,6 +249,16 @@ protected:
 		mAnimStates.clear();
 		mAnimSpeeds.clear();
 		MeshManager::getSingleton().remove("floor");
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		//To make glsles work the program will need to be provided with proper
+		//shadow caster materials
+		if (mShaderGenerator->getTargetLanguage() != "glsles")
+		{
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
+		}
+#endif
 	}
 
 	const unsigned int NUM_MODELS;
@@ -220,6 +270,10 @@ protected:
 
 	Vector3 mSneakStartPos;
 	Vector3 mSneakEndPos;
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	RTShader::SubRenderState* mSrsHardwareSkinning;
+#endif
 };
 
 #endif
