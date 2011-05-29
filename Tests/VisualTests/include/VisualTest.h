@@ -46,7 +46,7 @@ public:
         mInfo["Title"] = "Untitled Test";
         mInfo["Description"] = "";
         mInfo["Category"] = "Tests";
-        mInfo["Thumbnail"] = "thumb_playpen.png";
+        mInfo["Thumbnail"] = "thumb_visual_tests.png";
         mInfo["Help"] = "";
 
         Ogre::ResourceGroupManager& rgm = Ogre::ResourceGroupManager::getSingleton();
@@ -69,9 +69,9 @@ public:
     {
         // if all the shots have been taken, the test can exit
         if(mScreenshotFrames.empty())
-		{
+        {
             mDone = true;
-		}
+        }
         else if(*(mScreenshotFrames.begin()) == mFrameNr)
         {
             Ogre::String filename = "TestShots/" + mInfo["Title"] + 
@@ -123,15 +123,17 @@ public:
         mTrayMgr->hideCursor();
         mCameraMan->setStyle(OgreBites::CS_MANUAL);
 
-		// always take one after 1000 frames for now, for testing...
-		addScreenshotFrame(1000);
+        // always take one after 1000 frames for now, for testing...
+        addScreenshotFrame(1000);
     }
 
     virtual void _shutdown()
     {
-        // set frame delay back to zero, so the sample browser's
+        // set frame delay back to zero and reset time factor, so the sample browser's
         // time dependent animations and such behave.
-        Ogre::ControllerManager::getSingleton().setFrameDelay(0.f);
+        Ogre::ControllerManager::getSingleton().setFrameDelay(0);
+        Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
+
         SdkSample::_shutdown();
     }
 
