@@ -165,6 +165,8 @@ namespace Ogre {
 		/// Any compositors enabled?
 		bool mAnyCompositorsEnabled;
 
+		String mOriginalSceneScheme;
+
         /// Compiled state (updated with _compile)
         CompositorInstance::CompiledState mCompiledState;
         CompositorInstance::TargetOperation mOutputOperation;
@@ -184,6 +186,9 @@ namespace Ogre {
         /** Restore a viewport, the camera and the scene after a rendering operation
          */
         void postTargetOperation(CompositorInstance::TargetOperation &op, Viewport *vp, Camera *cam);
+
+		void createOriginalScene();
+		void destroyOriginalScene();
 
 		/// destroy internal resources
 		void destroyResources(void);

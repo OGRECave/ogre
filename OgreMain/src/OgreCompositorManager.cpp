@@ -84,44 +84,6 @@ Resource* CompositorManager::createImpl(const String& name, ResourceHandle handl
 //-----------------------------------------------------------------------
 void CompositorManager::initialise(void)
 {
-    /// Create "default" compositor
-    /** Compositor that is used to implicitly represent the original
-        render in the chain. This is an identity compositor with only an output pass:
-    compositor Ogre/Scene
-    {
-        technique
-        {
-            target_output
-            {
-				pass clear
-				{
-					/// Clear frame
-				}
-                pass render_scene
-                {
-					visibility_mask FFFFFFFF
-					render_queues SKIES_EARLY SKIES_LATE
-                }
-            }
-        }
-    };
-    */
-    CompositorPtr scene = create("Ogre/Scene", ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-    CompositionTechnique *t = scene->createTechnique();
-    CompositionTargetPass *tp = t->getOutputTargetPass();
-    tp->setVisibilityMask(0xFFFFFFFF);
-	{
-		CompositionPass *pass = tp->createPass();
-		pass->setType(CompositionPass::PT_CLEAR);
-	}
-	{
-		CompositionPass *pass = tp->createPass();
-		pass->setType(CompositionPass::PT_RENDERSCENE);
-		/// Render everything, including skies
-		pass->setFirstRenderQueue(RENDER_QUEUE_BACKGROUND);
-		pass->setLastRenderQueue(RENDER_QUEUE_SKIES_LATE);
-	}
-
 }
 //-----------------------------------------------------------------------
 void CompositorManager::parseScript(DataStreamPtr& stream, const String& groupName)
