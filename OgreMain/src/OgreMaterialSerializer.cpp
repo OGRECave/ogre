@@ -3616,7 +3616,9 @@ namespace Ogre
 			return;		
 
         // Material name
-		writeAttribute(0, "material " + outMaterialName);
+		writeAttribute(0, "material");
+		writeValue(quoteWord(outMaterialName));
+		
         beginSection(0);
         {
 			// Fire write begin event.
@@ -3688,7 +3690,7 @@ namespace Ogre
         writeAttribute(1, "technique");
         // only output technique name if it exists.
         if (!pTech->getName().empty())
-            writeValue(pTech->getName());
+            writeValue(quoteWord(pTech->getName()));
 
         beginSection(1);
         {
@@ -3708,20 +3710,20 @@ namespace Ogre
 				pTech->getSchemeName() != MaterialManager::DEFAULT_SCHEME_NAME)
 			{
 				writeAttribute(2, "scheme");
-				writeValue(pTech->getSchemeName());
+				writeValue(quoteWord(pTech->getSchemeName()));
 			}
 
 			// ShadowCasterMaterial name
 			if (!pTech->getShadowCasterMaterial().isNull())
 			{
 				writeAttribute(2, "shadow_caster_material");
-				writeValue(pTech->getShadowCasterMaterial()->getName());
+				writeValue(quoteWord(pTech->getShadowCasterMaterial()->getName()));
 			}
 			// ShadowReceiverMaterial name
 			if (!pTech->getShadowReceiverMaterial().isNull())
 			{
 				writeAttribute(2, "shadow_receiver_material");
-				writeValue(pTech->getShadowReceiverMaterial()->getName());
+				writeValue(quoteWord(pTech->getShadowReceiverMaterial()->getName()));
 			}
 			// GPU vendor rules
 			Technique::GPUVendorRuleIterator vrit = pTech->getGPUVendorRuleIterator();
@@ -3733,7 +3735,7 @@ namespace Ogre
 					writeValue("include");
 				else
 					writeValue("exclude");
-				writeValue(RenderSystemCapabilities::vendorToString(rule.vendor));
+				writeValue(quoteWord(RenderSystemCapabilities::vendorToString(rule.vendor)));
 			}
 			// GPU device rules
 			Technique::GPUDeviceNameRuleIterator dnit = pTech->getGPUDeviceNameRuleIterator();
@@ -3745,7 +3747,7 @@ namespace Ogre
 					writeValue("include");
 				else
 					writeValue("exclude");
-				writeValue(rule.devicePattern);
+				writeValue(quoteWord(rule.devicePattern));
 				writeValue(StringConverter::toString(rule.caseSensitive));
 			}
             // Iterate over passes
@@ -3778,7 +3780,7 @@ namespace Ogre
         writeAttribute(2, "pass");
         // only output pass name if its not the default name
         if (pPass->getName() != StringConverter::toString(pPass->getIndex()))
-            writeValue(pPass->getName());
+            writeValue(quoteWord(pPass->getName()));
 
         beginSection(2);
         {
@@ -4325,7 +4327,7 @@ namespace Ogre
         writeAttribute(3, "texture_unit");
         // only write out name if its not equal to the default name
         if (pTex->getName() != StringConverter::toString(pTex->getParent()->getTextureUnitStateIndex(pTex)))
-            writeValue(pTex->getName());
+            writeValue(quoteWord(pTex->getName()));
 
         beginSection(3);
         {
@@ -4336,14 +4338,14 @@ namespace Ogre
             if (!pTex->getTextureNameAlias().empty())
             {
                 writeAttribute(4, "texture_alias");
-                writeValue(pTex->getTextureNameAlias());
+                writeValue(quoteWord(pTex->getTextureNameAlias()));
             }
 
             //texture name
             if (pTex->getNumFrames() == 1 && !pTex->getTextureName().empty() && !pTex->isCubic())
             {
                 writeAttribute(4, "texture");
-                writeValue(pTex->getTextureName());
+                writeValue(quoteWord(pTex->getTextureName()));
 
                 switch (pTex->getTextureType())
                 {
@@ -4384,7 +4386,7 @@ namespace Ogre
             {
                 writeAttribute(4, "anim_texture");
                 for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
-                    writeValue(pTex->getFrameTextureName(n));
+                    writeValue(quoteWord(pTex->getFrameTextureName(n)));
                 writeValue(StringConverter::toString(pTex->getAnimationDuration()));
             }
 
@@ -4393,7 +4395,7 @@ namespace Ogre
             {
                 writeAttribute(4, "cubic_texture");
                 for (unsigned int n = 0; n < pTex->getNumFrames(); n++)
-                    writeValue(pTex->getFrameTextureName(n));
+                    writeValue(quoteWord(pTex->getFrameTextureName(n)));
 
                 //combinedUVW/separateUW
                 if (pTex->getTextureType() == TEX_TYPE_CUBE_MAP)
@@ -4641,8 +4643,8 @@ namespace Ogre
 					break;
 				case TextureUnitState::CONTENT_COMPOSITOR:
 					writeValue("compositor");
-					writeValue(pTex->getReferencedCompositorName());
-					writeValue(pTex->getReferencedTextureName());
+					writeValue(quoteWord(pTex->getReferencedCompositorName()));
+					writeValue(quoteWord(pTex->getReferencedTextureName()));
 					writeValue(StringConverter::toString(pTex->getReferencedMRTIndex()));
 					break;
 				};
@@ -4975,7 +4977,7 @@ namespace Ogre
 
         mBuffer += "\n";
         writeAttribute(3, attrib);
-        writeValue(program->getName());
+        writeValue(quoteWord(program->getName()));
         beginSection(3);
         {
             // write out paramters
@@ -5180,7 +5182,7 @@ namespace Ogre
 
 			writeAttribute(level, label, useMainBuffer);
 			// output param index / name
-			writeValue(identifier, useMainBuffer);
+			writeValue(quoteWord(identifier), useMainBuffer);
 
 			// if auto output auto type name and data if needed
 			if (autoEntry)
@@ -5190,7 +5192,7 @@ namespace Ogre
 
 				assert(autoConstDef && "Bad auto constant Definition Table");
 				// output auto constant name
-				writeValue(autoConstDef->name, useMainBuffer);
+				writeValue(quoteWord(autoConstDef->name), useMainBuffer);
 				// output data if it uses it
 				switch(autoConstDef->dataType)
 				{
@@ -5263,7 +5265,7 @@ namespace Ogre
             writeAttribute(0, program->getParameter("type"), false);
 
             // write program name
-            writeValue( program->getName(), false);
+            writeValue( quoteWord(program->getName()), false);
             // write program language
             const String language = program->getLanguage();
             writeValue( language, false );
@@ -5272,7 +5274,7 @@ namespace Ogre
             {
                 // write program source + filename
                 writeAttribute(1, "source", false);
-                writeValue(program->getSourceFile(), false);
+                writeValue(quoteWord(program->getSourceFile()), false);
                 // write special parameters based on language
                 const ParameterList& params = program->getParameters();
                 ParameterList::const_iterator currentParam = params.begin();
