@@ -72,7 +72,7 @@ public:
         }
         else if(*(mScreenshotFrames.begin()) == mFrameNr)
         {
-            Ogre::String filename = "TestShots/" + mInfo["Title"] + 
+            Ogre::String filename = mInfo["Title"] + 
                 "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
             mWindow->writeContentsToFile(filename);
             mScreenshotFrames.erase(mScreenshotFrames.begin());
@@ -86,8 +86,6 @@ public:
         mScreenshotFrames.insert(frame);
     }
 
-    // NOTE: This is temporary, for the sake of making these work with the existing Sample Browser
-    // the timing stuff will be moved to the TestContext, and the cameraman/tray stuff will be disabled entirely
     virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, 
         OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
     {
