@@ -113,8 +113,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void D3D9ResourceManager::_notifyResourceCreated(D3D9Resource* pResource)
 	{		
-		OGRE_LOCK_MUTEX(mResourcesMutex)		
-		mResources.push_back(pResource);
+		OGRE_LOCK_MUTEX(mResourcesMutex)	
+		mResources.insert(pResource);
 	}
 	
 	//-----------------------------------------------------------------------
@@ -122,17 +122,7 @@ namespace Ogre
 	{		
 		OGRE_LOCK_MUTEX(mResourcesMutex)
 
-		ResourceContainerIterator it = mResources.begin();
-
-		while (it != mResources.end())
-		{
-			if ((*it) == pResource)
-			{
-				mResources.erase(it);
-				break;
-			}			
-			++it;
-		}	
+		mResources.erase(pResource);
 	}
 	
 	//-----------------------------------------------------------------------

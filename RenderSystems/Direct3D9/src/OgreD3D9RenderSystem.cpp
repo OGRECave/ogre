@@ -3043,6 +3043,9 @@ namespace Ogre
 			RenderTarget* target = vp->getTarget();
 			_setRenderTarget(target);
 
+			//Reset the viewport after the render target has been set. If the device
+			//had been reset the viewport would have been set to NULL.
+			mActiveViewport = vp;
 
 			_setCullingMode( mCullingMode );
 
