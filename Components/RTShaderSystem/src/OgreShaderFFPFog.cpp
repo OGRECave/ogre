@@ -415,7 +415,7 @@ SubRenderState*	FFPFogFactory::createInstance(ScriptCompiler* compiler,
 
 			if (strValue == "ffp")
 			{
-				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+				SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 				FFPFog* fogSubRenderState = static_cast<FFPFog*>(subRenderState);
 				AbstractNodeList::const_iterator it = prop->values.begin();
 

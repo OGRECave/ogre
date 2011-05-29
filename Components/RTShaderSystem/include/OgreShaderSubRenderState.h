@@ -263,6 +263,12 @@ public:
 	*/
 	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) { return NULL; }
 
+	/** Retrieve the previous instance the SRS in the script translator or
+	* create a new instance if not found 
+	@param translator The translator instance holding existing scripts.
+	*/
+	virtual SubRenderState*	createOrRetrieveInstance(SGScriptTranslator* translator);
+
 	/** Destroy the given instance.	
 	@param subRenderState The instance to destroy.
 	*/
