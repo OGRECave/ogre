@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "SdkSample.h"
 
 /** The base class for a visual test scene */
-class VisualTest : public OgreBites::SdkSample
+class VisualTest : public OgreBites::Sample
 {
 public:
 
@@ -86,28 +86,47 @@ public:
         mScreenshotFrames.insert(frame);
     }
 
+    /** Does some basic setup tasks */
     virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, 
         OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
     {
-        OgreBites::SdkSample::_setup(window, keyboard, mouse, fsLayer);
+        OgreBites::Sample::_setup(window, keyboard, mouse, fsLayer);
 
         // reset frame count
         mFrameNr = 0;
         
-        // disable extraneous SdkSample stuff
-        mTrayMgr->hideFrameStats();
-        mTrayMgr->hideCursor();
-        mCameraMan->setStyle(OgreBites::CS_MANUAL);
-
-        // always take one after 1000 frames for now, for testing...
+        // always take a screenshot after 1000 frames for now, for testing...
         addScreenshotFrame(1000);
     }
 
-    // cleanup after the test
-    void unloadResources()
+    /** Clean up */
+    virtual void _shutdown()
+    {
+        mSceneMgr->destroyCamera(mCamera);
+        OgreBites::Sample::_shutdown();
+    }
+
+    /** set up the camera and viewport */
+    virtual void setupView()
+    {
+        mCamera = mSceneMgr->createCamera("MainCamera");
+        mViewport = mWindow->addViewport(mCamera);
+        mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+        mCamera->setNearClipDistance(0.5f);
+        mCamera->setFarClipDistance(10000.f);
+    }
+
+    /** Unload all resources used by this sample */
+    virtual void unloadResources()
     {
         Ogre::ResourceGroupManager::getSingleton().clearResourceGroup(TRANSIENT_RESOURCE_GROUP);
-        SdkSample::unloadResources();
+        Sample::unloadResources();
+    }
+
+    /** Changes aspect ratio to match any window resizings */
+    virtual void windowResized(Ogre::RenderWindow* rw)
+    {
+        mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
     }
 
 protected:
@@ -118,6 +137,11 @@ protected:
     
     // a list of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
+
+    // The camera for this sample
+    Ogre::Camera* mCamera;
+    // The viewport for this sample
+    Ogre::Viewport* mViewport;
 
 };
 
