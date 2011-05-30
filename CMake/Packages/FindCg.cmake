@@ -26,7 +26,8 @@ getenv_path(OGRE_HOME)
 set(Cg_PREFIX_PATH ${Cg_HOME} ${ENV_Cg_HOME}
   ${OGRE_SOURCE}/Dependencies
   ${ENV_OGRE_SOURCE}/Dependencies
-  ${OGRE_HOME} ${ENV_OGRE_HOME})
+  ${OGRE_HOME} ${ENV_OGRE_HOME}
+  /opt/nvidia-cg-toolkit)
 create_search_paths(Cg)
 # redo search if prefix path changed
 clear_if_changed(Cg_PREFIX_PATH

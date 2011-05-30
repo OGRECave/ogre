@@ -1,0 +1,34 @@
+//
+// «FILENAME»
+// «PROJECTNAME»
+//
+// Created by «FULLUSERNAME» on «DATE».
+// Copyright «YEAR» «ORGANIZATIONNAME». All rights reserved.
+//
+
+// The name of the overlay comes first
+MyOverlays/ANewOverlay
+{
+    zorder 200
+
+    container Panel(MyOverlayElements/TestPanel)
+    {
+        // Center it horzontally, put it at the top
+        left 0.25
+        top 0
+        width 0.5
+        height 0.1
+        material MyMaterials/APanelMaterial
+
+        // Another panel nested in this one
+        container Panel(MyOverlayElements/AnotherPanel)
+        {
+             left 0
+             top 0
+             width 0.1
+             height 0.1
+             material MyMaterials/NestedPanel
+        }
+    }
+
+}

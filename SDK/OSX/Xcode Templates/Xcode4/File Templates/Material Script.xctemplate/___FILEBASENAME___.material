@@ -1,0 +1,44 @@
+//
+// «FILENAME»
+// «PROJECTNAME»
+//
+// Created by «FULLUSERNAME» on «DATE».
+// Copyright «YEAR» «ORGANIZATIONNAME». All rights reserved.
+//
+
+// This is a comment
+material walls/funkywall1
+{
+    // first, preferred technique
+    technique
+    {
+        // first pass
+        pass
+        {
+            ambient 0.5 0.5 0.5
+            diffuse 1.0 1.0 1.0
+
+            // Texture unit 0
+            texture_unit 
+            {
+                texture wibbly.jpg
+                scroll_anim 0.1 0.0
+                wave_xform scale sine 0.0 0.7 0.0 1.0
+            }
+            // Texture unit 1 (this is a multitexture pass)
+            texture_unit
+            {
+                texture wobbly.png
+                rotate_anim 0.25
+                colour_op add
+            }
+        }
+    }
+
+    // Second technique, can be used as a fallback or LOD level
+    technique
+    {
+        // .. and so on
+    }
+
+}

@@ -582,6 +582,12 @@ namespace Ogre {
         */
         virtual const MaterialPtr& getMaterial(void) const;
 
+        /** Sets the name of the material to be used for this billboard set.
+             @param
+                material The new material to use for this set.
+         */
+		virtual void setMaterial( const MaterialPtr& material );
+
         /** Overridden from MovableObject
             @see
                 MovableObject
@@ -598,7 +604,7 @@ namespace Ogre {
         */
         virtual void _notifyBillboardResized(void);
 
-        /** Internal callback used by Billboards to notify their parent that they have been rotated..
+        /** Internal callback used by Billboards to notify their parent that they have been rotated.
         */
         virtual void _notifyBillboardRotated(void);
 

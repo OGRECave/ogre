@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
 #include "OgreLodStrategyManager.h"
+#include <cstddef>
 
 namespace Ogre {
 
