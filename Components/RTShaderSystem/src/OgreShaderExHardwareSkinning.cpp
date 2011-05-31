@@ -44,6 +44,15 @@ template<> RTShader::HardwareSkinningFactory* Singleton<RTShader::HardwareSkinni
 
 namespace RTShader {
 
+HardwareSkinningFactory* HardwareSkinningFactory::getSingletonPtr(void)
+{
+    return ms_Singleton;
+}
+HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
+{  
+    assert( ms_Singleton );  return ( *ms_Singleton );  
+}
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
