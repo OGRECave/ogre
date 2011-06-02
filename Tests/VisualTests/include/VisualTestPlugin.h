@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "SdkSample.h"
 #include "SamplePlugin.h"
 
-// Plugin class for visual tests
+/** Plugin class for visual tests */
 class _OgreSampleClassExport VisualTestPlugin : public OgreBites::SamplePlugin
 {
 public:

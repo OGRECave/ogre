@@ -36,6 +36,7 @@ class VisualTest : public OgreBites::Sample
 {
 public:
 
+    // resource group that will be automatically unloaded after the close of the sample
     static Ogre::String TRANSIENT_RESOURCE_GROUP;
 
     VisualTest()
@@ -135,7 +136,7 @@ protected:
     // we track frame numbers, rather than actual timings.
     unsigned int mFrameNr;
     
-    // a list of frame numbers at which to trigger screenshots
+    // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
 
     // The camera for this sample

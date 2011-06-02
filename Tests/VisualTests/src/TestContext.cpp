@@ -43,18 +43,19 @@ THE SOFTWARE.
 void TestContext::setup()
 {
     SampleContext::setup();
+    // for now we just go right into the tests, eventually there'll be a menu screen beforehand
     runSample(loadTests());
 }
 
 OgreBites::Sample* TestContext::loadTests()
 {
     OgreBites::Sample* startSample = 0;
-
     Ogre::StringVector sampleList;
 
-    // just the one for now:
+    // Just the one for now:
     sampleList.push_back("VisualTests");
 
+    // This should eventually be loaded from a config file or something to that effect
     Ogre::String sampleDir = "../lib/";
 
     for (Ogre::StringVector::iterator i = sampleList.begin(); i != sampleList.end(); i++)
@@ -103,8 +104,8 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 
     // pass a fixed timestep along to the tests
     Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();
-    fixed_evt.timeSinceLastFrame = VISUAL_TEST_TIMESTEP;
-    fixed_evt.timeSinceLastEvent = VISUAL_TEST_TIMESTEP;
+    fixed_evt.timeSinceLastFrame = mTimestep;
+    fixed_evt.timeSinceLastEvent = mTimestep;
 
     if(mCurrentTest) // if a test is running
     {
@@ -126,8 +127,8 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 {
     // pass a fixed timestep along to the tests
     Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();
-    fixed_evt.timeSinceLastFrame = VISUAL_TEST_TIMESTEP;
-    fixed_evt.timeSinceLastEvent = VISUAL_TEST_TIMESTEP;
+    fixed_evt.timeSinceLastFrame = mTimestep;
+    fixed_evt.timeSinceLastEvent = mTimestep;
 
     if(mCurrentTest) // if a test is running
     {
@@ -183,10 +184,21 @@ void TestContext::runSample(OgreBites::Sample* s)
         srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
 
         // Give a fixed timestep for particles and other time-dependent things in OGRE
-        Ogre::ControllerManager::getSingleton().setFrameDelay(VISUAL_TEST_TIMESTEP);
+        Ogre::ControllerManager::getSingleton().setFrameDelay(mTimestep);
     }
 
     SampleContext::runSample(sampleToRun);
+}
+
+Ogre::Real TestContext::getTimestep()
+{
+    return mTimestep;
+}
+
+void TestContext::setTimestep(Ogre::Real timestep)
+{
+    // ensure we're getting a positive value
+    mTimestep = timestep >= 0.f ? timestep : mTimestep;
 }
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...

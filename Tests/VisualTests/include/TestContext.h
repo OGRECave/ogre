@@ -32,25 +32,54 @@ THE SOFTWARE.
 #include "SampleContext.h"
 #include "VisualTest.h"
 
-#define VISUAL_TEST_TIMESTEP 0.01f
-
+/** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
 {
 public:
 
-    TestContext() {}
+    TestContext() :mTimestep(0.01f) {}
     virtual ~TestContext() {}
 
+    /** Does basic setup for the context */
     virtual void setup();
+
+    /** Frame listener callback, handles updating of the tests at the start of frames 
+     *        @param evt The frame event (passed in for the framelistener) */
     virtual bool frameStarted(const Ogre::FrameEvent& evt);
+
+    /** Frame listener callback, handles updating of the tests at the end of frames 
+     *        @param evt The frame event (passed in for the framelistener) */
     virtual bool frameEnded(const Ogre::FrameEvent& evt);
+
+    /** Runs a given test or sample
+     *        @param s The OgreBites::Sample to run 
+     *        @remarks If s is a VisualTest, then timing and rand will be setup for
+     *            determinism. */
     virtual void runSample(OgreBites::Sample* s);
+
+    /** Loads test plugins
+     *        @return The initial tets or sample to run */
     OgreBites::Sample* loadTests();
+
+    /** Sets the timstep value
+     *        @param timestep The time to simulate elapsed between each frame 
+     *        @remarks Use with care! Screenshots produced at different timesteps
+     *            will almost certainly turn out different. */
+    void setTimestep(Ogre::Real timestep);
+
+    /** Gets the current timestep value */
+    Ogre::Real getTimestep();
 
 protected:
 
+    // The tests to be run
     std::deque<OgreBites::Sample*> mTests;
-	VisualTest* mCurrentTest;
+
+    // The active test (0 if none is active)
+    VisualTest* mCurrentTest;
+
+    // The timestep
+    Ogre::Real mTimestep;
 
 };
 
