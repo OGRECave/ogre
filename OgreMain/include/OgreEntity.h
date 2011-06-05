@@ -342,7 +342,8 @@ namespace Ogre {
 			void rebindPositionBuffer(const VertexData* vertexData, bool force);
 			/// Overridden from ShadowRenderable
 			bool isVisible(void) const;
-
+			/// Overridden from ShadowRenderable
+			virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
 		};
 	public:
 		/** Default destructor.

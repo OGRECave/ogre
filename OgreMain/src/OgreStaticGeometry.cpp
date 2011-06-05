@@ -1015,6 +1015,12 @@ namespace Ogre {
 		// pretransformed
 		*xform = mParent->getParent()->_getParentNodeFullTransform();
 	}
+	//-----------------------------------------------------------------------
+	void StaticGeometry::LODBucket::LODShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
+	{
+		mRenderOp.indexData->indexBuffer = indexBuffer;
+		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
+	}
 	//--------------------------------------------------------------------------
 	//--------------------------------------------------------------------------
 	StaticGeometry::LODBucket::LODBucket(Region* parent, unsigned short lod,

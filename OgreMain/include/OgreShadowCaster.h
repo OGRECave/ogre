@@ -91,6 +91,13 @@ namespace Ogre {
         /// Should this ShadowRenderable be treated as visible?
         virtual bool isVisible(void) const { return true; }
 
+		/** This function informs the shadow renderable that the global index buffer
+		from the SceneManager has been updated. As all shadow use this buffer their pointer 
+		must be updated as well
+		@indexBuffer pointer to the new index buffer
+		*/
+		virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) = 0;
+
     };
 
     /** A set of flags that can be used to influence ShadowRenderable creation. */

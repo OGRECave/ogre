@@ -2168,6 +2168,13 @@ namespace Ogre {
             return ShadowRenderable::isVisible();
         }
     }
+	//-----------------------------------------------------------------------
+	void Entity::EntityShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
+	{
+		mRenderOp.indexData->indexBuffer = indexBuffer;
+		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
+	}
+
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroup(uint8 queueID)
     {
