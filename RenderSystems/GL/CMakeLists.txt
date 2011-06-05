@@ -40,7 +40,6 @@ set(HEADER_FILES
 
 
 set(SOURCE_FILES
-  src/glew.cpp
   src/OgreGLATIFSInit.cpp
   src/OgreGLContext.cpp
   src/OgreGLDefaultHardwareBufferManager.cpp
@@ -66,6 +65,7 @@ set(SOURCE_FILES
   src/OgreGLSupport.cpp
   src/OgreGLTexture.cpp
   src/OgreGLTextureManager.cpp
+  src/glew.cpp
 )
 
 set(NVPARSE_FILES
