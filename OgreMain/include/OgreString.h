@@ -137,6 +137,19 @@ namespace Ogre {
         /** Method for standardising paths - use forward slashes only, end with slash.
         */
         static String standardisePath( const String &init);
+		/** Returns a normalized version of a file path
+		This method can be used to make file path strings which point to the same directory  
+		but have different texts to be normalized to the same text. The function:
+		- Transforms all backward slashes to forward slashes.
+		- Removes repeating slashes.
+		- Removes initial slashes from the beginning of the path.
+		- Removes ".\" and "..\" meta directories.
+		- Sets all characters to lowercase (if requested)
+		@param init The file path to normalize.
+		@param makeLowerCase If true, transforms all characters in the string to lowercase.
+		*/
+       static String normalizeFilePath(const String& init, bool makeLowerCase = true);
+
 
         /** Method for splitting a fully qualified filename into the base name
             and path.
