@@ -190,7 +190,12 @@ namespace Ogre {
                 h = StringConverter::parseUnsignedInt(val.substr(pos + 1));
             }
         }
-        
+
+        if ((opt = mGLSupport->getConfigOptions().find("Content Scaling Factor")) != end)
+        {
+            mContentScalingFactor = StringConverter::parseReal(opt->second.currentValue);
+        }
+
         // Set us up with an external window, or create our own.
         if(!mIsExternal)
         {
