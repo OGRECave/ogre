@@ -43,10 +43,10 @@ namespace Ogre {
     {
         /// Unknown pixel format.
         PF_UNKNOWN = 0,
-        /// 8-bit pixel format, all bits luminace.
+        /// 8-bit pixel format, all bits luminance.
         PF_L8 = 1,
 		PF_BYTE_L = PF_L8,
-        /// 16-bit pixel format, all bits luminace.
+        /// 16-bit pixel format, all bits luminance.
         PF_L16 = 2,
 		PF_SHORT_L = PF_L16,
         /// 8-bit pixel format, all bits alpha.
