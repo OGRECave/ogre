@@ -1187,6 +1187,17 @@ namespace Ogre
 			}			
 		}
 
+		// In case we didn't found any vertex shader support
+		// try the IDirect3DDevice9 caps instead of the IDirect3D9
+		// software vertex processing is reported there
+		if (major == 0 && minor == 0)
+		{
+			IDirect3DDevice9* lpD3DDevice9 = getActiveD3D9Device();
+			D3DCAPS9 d3dDeviceCaps9;
+			lpD3DDevice9->GetDeviceCaps(&d3dDeviceCaps9);
+			major = static_cast<ushort>((d3dDeviceCaps9.VertexShaderVersion & 0x0000FF00) >> 8);
+			minor = static_cast<ushort>(d3dDeviceCaps9.VertexShaderVersion & 0x000000FF);
+		}
 		
 		bool vs2x = false;
 		bool vs2a = false;
