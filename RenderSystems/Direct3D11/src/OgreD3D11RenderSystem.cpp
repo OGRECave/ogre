@@ -541,7 +541,6 @@ namespace Ogre
 			}
 
 
-
 			UINT deviceFlags = 0;
 			if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
 			{
@@ -580,8 +579,9 @@ namespace Ogre
 
 			}
 
-			ID3D11Device * device;
 
+			// Since June 2010 SDK, there's no need to load any other DLL
+			/*
 			HMODULE Software3d310Dll = NULL;
 			if (mDriverType == DT_SOFTWARE)
 			{
@@ -616,15 +616,33 @@ namespace Ogre
 					}
 				}
 			}
+			*/
 
-			if(FAILED(D3D11CreateDevice(pSelectedAdapter, driverType , Software3d310Dll, deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0, 0)))         
+			D3D_FEATURE_LEVEL RequestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
+			unsigned int RequestedLevelsSize = sizeof( RequestedLevels ) / sizeof( RequestedLevels[0] );
+			ID3D11Device * device;
+			// But, if creating WARP or software, don't use a selected adapter, it will be selected automatically
+
+			 
+			if(FAILED(D3D11CreateDevice(mDriverType == DT_HARDWARE ? pSelectedAdapter :
+										mDriverType == DT_SOFTWARE ? pSelectedAdapter :
+																	 NULL, 
+										driverType,
+										NULL,
+										deviceFlags, 
+										RequestedLevels, 
+										RequestedLevelsSize,
+										D3D11_SDK_VERSION, 
+										&device, 
+										0, 
+										0)))         
 			{
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 					"Failed to create Direct3D11 object", 
 					"D3D11RenderSystem::D3D11RenderSystem" );
 			}
 
-			if (Software3d310Dll != NULL)
+			if (mDriverType != DT_HARDWARE)
 			{
 				// get the IDXGIFactory1 from the device for software drivers
 				// Remark(dec-09):
@@ -632,6 +650,8 @@ namespace Ogre
 				// D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
 				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
 				// the device - else CreateSwapChain fails later.
+				//  Update (Jun 12, 2011)
+				// If 
 				SAFE_RELEASE(mpDXGIFactory);
 
 				IDXGIDevice1 * pDXGIDevice;
@@ -2223,7 +2243,6 @@ namespace Ogre
 
 				} while (updatePassIterationRenderState());
 			} 
-
 		}
 
 

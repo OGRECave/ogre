@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __D3D8TEXTURE_H__
-#define __D3D8TEXTURE_H__
+#ifndef __D3D11TEXTURE_H__
+#define __D3D11TEXTURE_H__
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreTexture.h"

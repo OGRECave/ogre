@@ -360,10 +360,10 @@ namespace Ogre
 			numMips = 0;
 			mNumMipmaps = 0; // Will get this value from the created texture
 		}
-		else
-		{
-			numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
-		}
+		//else
+		//{
+		//	numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+		//}
 
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -779,7 +779,7 @@ namespace Ogre
 			return;
 		}
 
-		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		//D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 		
         LoadedStreams loadedStreams;
 
@@ -886,7 +886,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Texture::postLoadImpl()
 	{
-		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		//D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 		mLoadedStreams.setNull();	
 	}
 	//---------------------------------------------------------------------

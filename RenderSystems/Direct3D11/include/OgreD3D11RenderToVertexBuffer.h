@@ -62,7 +62,6 @@ namespace Ogre {
 		void setupGeometryShaderLinkageToStreamOut(Pass* pass);
 
 		ID3D11GeometryShader* mpGeometryShader;
-		ID3D11Query * mDeviceStatsQuery;
         D3D11Device & mDevice;
 		HardwareVertexBufferSharedPtr mVertexBuffers[2];
 		size_t mFrontBufferIndex;

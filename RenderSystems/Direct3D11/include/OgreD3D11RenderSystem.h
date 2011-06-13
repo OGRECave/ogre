@@ -58,9 +58,6 @@ namespace Ogre
 
 		OGRE_D3D11_DRIVER_TYPE mDriverType; // d3d11 driver type
 
-
-
-
 		/// Direct3D
 		//int			mpD3D;
 		/// Direct3D rendering device
@@ -82,7 +79,6 @@ namespace Ogre
 		bool mPerStageConstantSupport;
 
 		/// structure holding texture unit settings for every stage
-
 
 
 		D3D11DriverList* getDirect3DDrivers(void);
