@@ -84,55 +84,6 @@ void hardwareSkinningOneWeightCaster_vp(
 	
 }	
 
-void dualQuaternionHardwareSkinningTwoWeights_vp(
-	float4 position : POSITION,
-	float3 normal   : NORMAL,
-	float2 uv       : TEXCOORD0,
-	float4 blendIdx : BLENDINDICES,
-	float4 blendWgt : BLENDWEIGHT,
-	
-
-	out float4 oPosition : POSITION,
-	out float2 oUv       : TEXCOORD0,
-	out float4 colour           : COLOR,
-	// Support up to 24 bones of float3x4
-	// vs_1_1 only supports 96 params so more than this is not feasible
-	uniform float2x4 worldDualQuaternion2x4Array[24],
-	uniform float4x4 viewProjectionMatrix,
-	uniform float4   lightPos[2],
-	uniform float4   lightDiffuseColour[2],
-	uniform float4   ambient)
-{
-	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
-	blendDQ += blendWgt.y * worldDualQuaternion2x4Array[blendIdx.y];
-	blendDQ += blendWgt.z * worldDualQuaternion2x4Array[blendIdx.z];
-	blendDQ += blendWgt.w * worldDualQuaternion2x4Array[blendIdx.w];	
-		
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
-
-	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
-	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
-	blendPosition += trans;
-
-	float3 blendNormal = normal.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal.xyz) + blendDQ[0].x*normal.xyz);
-
-	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
-	//OUT.hNormal = mul(modelViewIT, float4(normal, 0.0));
-
-	// Lighting - support point and directional
-	float3 lightDir0 = 	normalize(
-		lightPos[0].xyz -  (blendPosition.xyz * lightPos[0].w));
-	float3 lightDir1 = 	normalize(
-		lightPos[1].xyz -  (blendPosition.xyz * lightPos[1].w));
-
-	
-	oUv = uv;
-	colour = float4(0.5, 0.5, 0.5, 1);// + 
-		//(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
-		//(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
-}
-
 /*
   Two-weight-per-vertex hardware skinning, 2 lights
   The trouble with vertex programs is they're not general purpose, but
@@ -165,7 +116,7 @@ void hardwareSkinningTwoWeights_vp(
 		blendPos += float4(mul(worldMatrix3x4Array[blendIdx[i]], position).xyz, 1.0) * blendWgt[i];
 	}
 	// view / projection
-	oPosition = mul(viewProjectionMatrix, position);
+	oPosition = mul(viewProjectionMatrix, blendPos);
 	// transform normal
 	float3 norm = float3(0,0,0);
 	for (i = 0; i < 2; ++i)

@@ -1807,29 +1807,6 @@ material Examples/TudorHouse
 	}
 }
 
-material jaiquaDualQuatTest
-{
-// Hardware skinning technique - GLES2 passthrough fragment program
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
-			{
-				param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-
-			texture_unit
-			{
-				texture blue_jaiqua.jpg
-				tex_address_mode clamp
-			}
-		}
-	}
-}
-
 material jaiqua
 {
 	// Hardware skinning technique - GLES2 passthrough fragment program
@@ -1888,17 +1865,17 @@ material jaiqua
 		}
 	}
 	// Software blending technique
-	//technique
-	//{
-	//	pass
-	//	{
-	//		texture_unit
-	//		{
-	//			texture blue_jaiqua.jpg
-	//			tex_address_mode clamp
-	//		}
-	//	}
-	//}
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
 	
 }
 

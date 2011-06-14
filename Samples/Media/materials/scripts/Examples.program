@@ -198,38 +198,12 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
 	}
 }
 
-vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
-{
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
-	
-   default_params
-   {
-   		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto lightPos[0] light_position 0
-		param_named_auto lightPos[1] light_position 1
-		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
-		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
-		param_named_auto ambient ambient_light_colour
-   }
-}
-
-// Basic hardware skinning using four indexed weights per vertex
-vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
-{
-   source Example_Basic.cg
-   entry_point dualQuaternionHardwareSkinningTwoWeights_vp
-   profiles vs_4_0 vs_1_1 arbvp1
-   includes_skeletal_animation true
-}
-
 vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
+	delegate Ogre/HardwareSkinningTwoWeightsGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
+	delegate Ogre/HardwareSkinningTwoWeightsHLSL
 	delegate Ogre/HardwareSkinningTwoWeightsCg
-	//delegate Ogre/HardwareSkinningTwoWeightsGLSL
-	//delegate Ogre/HardwareSkinningTwoWeightsGLSLES
-	//delegate Ogre/HardwareSkinningTwoWeightsHLSL
-	
 	
    default_params
    {

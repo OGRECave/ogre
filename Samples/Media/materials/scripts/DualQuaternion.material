@@ -1,0 +1,44 @@
+material jaiquaDualQuatTest
+{
+	// Hardware skinning technique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
+			{
+				param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+
+			texture_unit
+			{
+				texture blue_jaiqua.jpg
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material spineDualQuatTest
+{
+	// Hardware skinning technique
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
+			{
+				param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+
+			ambient 0.101961 0.313726 0.745098 1
+			diffuse 0.117647 0.572549 0.862745 1
+			specular 0.72549 0.898039 0.898039 1 31
+		}
+
+	}
+}

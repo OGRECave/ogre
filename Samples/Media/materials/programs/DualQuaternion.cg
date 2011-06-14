@@ -1,0 +1,100 @@
+// per-vertex antipodality handling (this is the most robust, but not the most efficient way):
+void dualQuaternionHardwareSkinningTwoWeightsAntipod_vp(	
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float3 oNormal   : NORMAL,
+	out float2 oUv       : TEXCOORD0,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   lightPos[2],
+	uniform float4   lightDiffuseColour[2],
+	uniform float4   ambient)
+{		
+	float2x4 dq0 = worldDualQuaternion2x4Array[blendIdx.x];
+	float2x4 dq1 = worldDualQuaternion2x4Array[blendIdx.y];
+
+	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	
+	float2x4 blendDQ = blendWgt.x*dq0;
+	blendDQ += blendWgt.y*dq1;
+	
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
+	blendPosition += trans;
+
+	float3 blendNormal = normal.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal.xyz) + blendDQ[0].x*normal.xyz);
+
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	//oNormal = mul(modelViewIT, float4(normal, 0.0));
+
+	// Lighting - support point and directional
+	float3 lightDir0 = 	normalize(
+		lightPos[0].xyz -  (blendPosition.xyz * lightPos[0].w));
+	float3 lightDir1 = 	normalize(
+		lightPos[1].xyz -  (blendPosition.xyz * lightPos[1].w));
+
+	oUv = uv;
+	colour = float4(0.5, 0.5, 0.5, 1);// + 
+		//(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+		//(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+	
+	return OUT;			
+}
+
+void dualQuaternionHardwareSkinningTwoWeights_vp(
+	float4 position : POSITION,
+	float3 normal   : NORMAL,
+	float2 uv       : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+
+	out float4 oPosition : POSITION,
+	out float2 oUv       : TEXCOORD0,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   lightPos[2],
+	uniform float4   lightDiffuseColour[2],
+	uniform float4   ambient)
+{
+	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
+	blendDQ += blendWgt.y * worldDualQuaternion2x4Array[blendIdx.y];
+		
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
+	blendPosition += trans;
+
+	float3 blendNormal = normal.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal.xyz) + blendDQ[0].x*normal.xyz);
+
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	//OUT.hNormal = mul(modelViewIT, float4(normal, 0.0));
+
+	// Lighting - support point and directional
+	float3 lightDir0 = 	normalize(
+		lightPos[0].xyz -  (blendPosition.xyz * lightPos[0].w));
+	float3 lightDir1 = 	normalize(
+		lightPos[1].xyz -  (blendPosition.xyz * lightPos[1].w));
+
+	
+	oUv = uv;
+	colour = float4(0.5, 0.5, 0.5, 1);// + 
+		//(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
+		//(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+}
