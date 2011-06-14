@@ -42,44 +42,17 @@ THE SOFTWARE.
 
 void TestContext::setup()
 {
+    // standard setup
     SampleContext::setup();
-
-    char temp[19];
-    time_t raw = time(0);
-    strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     
-    Ogre::String timestamp = Ogre::String(temp, 18);
+    // set up output directories
+    setupDirectories();
 
-    // name the output image set based on GM time
-    mTestSetName = "TestSet_" + timestamp;
-
-    // make a directory for the set
-    mOutputDir = mFSLayer->getWritablePath("") + mTestSetName + "/";
-    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
-
+    // load up the tests
     OgreBites::Sample* firstTest = loadTests();
 
-    // save a small .cfg file with some details about the set
-    std::ofstream config;
-    config.open(Ogre::String(mOutputDir + "/info.cfg").c_str());
-
-    if(config.is_open())
-    {
-        config<<"[Info]\n";
-        config<<"Time="<<timestamp<<"\n";
-        config<<"Resolution="<<mWindow->getHeight()<<"x"<<mWindow->getWidth()<<"\n";
-        config<<"Comment="<<"None"<<"\n";
-        config<<"Num_Tests="<<mTests.size()<<"\n";
-        config<<"[Tests]\n";
-        int i = 0;
-        for(std::deque<OgreBites::Sample*>::iterator it = mTests.begin(); 
-            it != mTests.end(); ++it)
-        {
-            ++i;
-            config<<"Test_"<<i<<"="<<(*it)->getInfo()["Title"]<<"\n";
-        }
-        config.close();
-    }
+    // write out some extra data to be used in comparisons
+    writeConfig();
     
     // for now we just go right into the tests, eventually there'll be a menu screen beforehand
     runSample(firstTest);
@@ -253,6 +226,7 @@ void TestContext::createRoot()
     #ifndef OGRE_STATIC_LIB
         pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
     #endif
+    // we use separate config and log files for the tests
     mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogretests.cfg"), 
         mFSLayer->getWritablePath("ogretests.log"));
 #endif
@@ -260,6 +234,67 @@ void TestContext::createRoot()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.load();
 #endif
+}
+//-----------------------------------------------------------------------
+
+virtual void TestContext::setupDirectories()
+{
+    // name the output image set based on GM time
+    char temp[19];
+    time_t raw = time(0);
+    
+    // timestamp for the filename
+    strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
+    Ogre::String filestamp = Ogre::String(temp, 18);
+    mTestSetName = "VisualTests_" + filestamp;
+    
+    // a nicer formatted version
+    strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
+    mTimestamp = Ogre::String(temp, 19);
+
+    // try to create a root directory for the tests
+    mOutputDir = mFSLayer->getWritablePath("VisualTests/");
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+    
+    // add a directory for the render system
+    Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
+    // strip spaces from render system name
+    for(int i = 0;i < rsysName.size(); ++i)
+        if(rsysName[i] != ' ')
+            mOutputDir += rsysName[i];
+    mOutputDir += "/";
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+
+    // and finally a directory for the test run itself
+    mOutputDir += mTestSetName + "/";
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+
+}
+//-----------------------------------------------------------------------
+
+void TestContext::writeConfig()
+{
+    // save a small .cfg file with some details about the set
+    std::ofstream config;
+    config.open(Ogre::String(mOutputDir + "/info.cfg").c_str());
+
+    if(config.is_open())
+    {
+        config<<"[Info]\n";
+        config<<"Time="<<mTimestamp<<"\n";
+        config<<"Resolution="<<mWindow->getWidth()<<"x"<<mWindow->getHeight()<<"\n";
+        config<<"Comment="<<"None"<<"\n";
+        config<<"Num_Tests="<<mTests.size()<<"\n";
+        config<<"[Tests]\n";
+        int i = 0;
+        for(std::deque<OgreBites::Sample*>::iterator it = mTests.begin(); 
+            it != mTests.end(); ++it)
+        {
+            ++i;
+            config<<"Test_"<<i<<"="<<(*it)->getInfo()["Title"]<<"\n";
+        }
+        config.close();
+    }
 }
 //-----------------------------------------------------------------------
 

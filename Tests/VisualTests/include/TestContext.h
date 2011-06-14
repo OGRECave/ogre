@@ -64,6 +64,12 @@ public:
     /** Setup the Root */
     virtual void createRoot();
 
+    /** Set up directories for the tests to output to */
+    virtual void setupDirectories();
+
+    /** Writes a config file with some metadata about the test run */
+    virtual void writeConfig();
+
     /** Called after tests successfully complete, generates output */
     virtual void finishedTests();
 
@@ -92,6 +98,9 @@ protected:
 
     // name of this set
     Ogre::String mTestSetName;
+
+    // This run's timestamp
+    Ogre::String mTimestamp;
     
     // path to the output directory
     Ogre::String mOutputDir;
