@@ -61,6 +61,12 @@ public:
      *        @return The initial tets or sample to run */
     OgreBites::Sample* loadTests();
 
+    /** Setup the Root */
+    virtual void createRoot();
+
+    /** Called after tests successfully complete, generates output */
+    virtual void finishedTests();
+
     /** Sets the timstep value
      *        @param timestep The time to simulate elapsed between each frame 
      *        @remarks Use with care! Screenshots produced at different timesteps
@@ -78,9 +84,17 @@ protected:
     // The active test (0 if none is active)
     VisualTest* mCurrentTest;
 
+    // The current frame of a running test
+    unsigned int mCurrentFrame;
+
     // The timestep
     Ogre::Real mTimestep;
 
+    // name of this set
+    Ogre::String mTestSetName;
+    
+    // path to the output directory
+    Ogre::String mOutputDir;
 };
 
 #endif

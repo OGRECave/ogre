@@ -48,4 +48,9 @@ namespace OgreBites
 	{
 		return access(path.c_str(), R_OK) == 0;
 	}
+    //---------------------------------------------------------------------
+	bool FileSystemLayerImpl::createDirectory(const Ogre::String& path)
+	{
+		return false;
+	}
 }

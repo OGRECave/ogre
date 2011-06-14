@@ -46,4 +46,10 @@ namespace OgreBites
 		// always assume true
 		return true;
 	}
+    //---------------------------------------------------------------------
+	bool FileSystemLayerImpl::createDirectory(const Ogre::String& path)
+	{
+		// always return false (nothing was created...)
+		return false;
+	}
 }

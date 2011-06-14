@@ -40,7 +40,6 @@ public:
     static Ogre::String TRANSIENT_RESOURCE_GROUP;
 
     VisualTest()
-        :mFrameNr(0)
     {
         mInfo["Title"] = "Untitled Test";
         mInfo["Description"] = "";
@@ -55,31 +54,6 @@ public:
 
     virtual ~VisualTest() {}
 
-    /** Called at the start of each test frame; increments frame count
-     *    and handles any other housekeeping details for the test. */
-    void testFrameStarted()
-    {
-        ++mFrameNr;
-    }
-
-    /** Called at the end of each test frame, takes the actual screenshots
-     *    and signals that the test is done after the final shot is complete. */
-    void testFrameEnded()
-    {
-        // if all the shots have been taken, the test can exit
-        if(mScreenshotFrames.empty())
-        {
-            mDone = true;
-        }
-        else if(*(mScreenshotFrames.begin()) == mFrameNr)
-        {
-            Ogre::String filename = mInfo["Title"] + 
-                "_VisualTest_"+Ogre::StringConverter::toString(mFrameNr)+".png";
-            mWindow->writeContentsToFile(filename);
-            mScreenshotFrames.erase(mScreenshotFrames.begin());
-        }
-    }
-
     /** Adds a screenshot frame to the list - this should
      *    be done during setup of the test. */
     void addScreenshotFrame(unsigned int frame)
@@ -93,9 +67,6 @@ public:
     {
         OgreBites::Sample::_setup(window, keyboard, mouse, fsLayer);
 
-        // reset frame count
-        mFrameNr = 0;
-        
         // always take a screenshot after 1000 frames for now, for testing...
         addScreenshotFrame(1000);
     }
@@ -130,12 +101,21 @@ public:
         mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
     }
 
+    /** Returns whether or not a screenshot should be taken at the given frame */
+    virtual bool isScreenshotFrame(unsigned int frame)
+    {
+        if(frame == *(mScreenshotFrames.begin()))
+        {
+            mScreenshotFrames.erase(mScreenshotFrames.begin());
+            if(mScreenshotFrames.empty())
+                mDone = true;
+            return true;
+        }
+        return false;
+    }
+
 protected:
 
-    // The current frame number - in order to keep things deterministic, 
-    // we track frame numbers, rather than actual timings.
-    unsigned int mFrameNr;
-    
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
 

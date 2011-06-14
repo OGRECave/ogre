@@ -91,6 +91,9 @@ namespace OgreBites
 			mHomePath = path;
 		}
 
+		/** Create a directory */
+		bool createDirectory(const Ogre::String& name);
+
 	private:
 		Ogre::StringVector mConfigPaths;
 		Ogre::String mHomePath;
@@ -103,7 +106,6 @@ namespace OgreBites
 
 		/** Test if the given file exists. */
 		const bool fileExists(const Ogre::String& path) const;
-
 	};
 }
 

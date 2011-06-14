@@ -122,4 +122,10 @@ namespace OgreBites
 	{
 		return _access(path.c_str(), 00) == 0;
 	}
+    //---------------------------------------------------------------------
+	bool FileSystemLayerImpl::createDirectory(const Ogre::String& path)
+	{
+		return CreateDirectory(path.c_str(), NULL) != 0 || 
+			GetLastError() == ERROR_ALREADY_EXISTS;
+	}
 }

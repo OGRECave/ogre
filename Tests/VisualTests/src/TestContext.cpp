@@ -43,9 +43,48 @@ THE SOFTWARE.
 void TestContext::setup()
 {
     SampleContext::setup();
+
+    char temp[19];
+    time_t raw = time(0);
+    strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
+    
+    Ogre::String timestamp = Ogre::String(temp, 18);
+
+    // name the output image set based on GM time
+    mTestSetName = "TestSet_" + timestamp;
+
+    // make a directory for the set
+    mOutputDir = mFSLayer->getWritablePath("") + mTestSetName + "/";
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+
+    OgreBites::Sample* firstTest = loadTests();
+
+    // save a small .cfg file with some details about the set
+    std::ofstream config;
+    config.open(Ogre::String(mOutputDir + "/info.cfg").c_str());
+
+    if(config.is_open())
+    {
+        config<<"[Info]\n";
+        config<<"Time="<<timestamp<<"\n";
+        config<<"Resolution="<<mWindow->getHeight()<<"x"<<mWindow->getWidth()<<"\n";
+        config<<"Comment="<<"None"<<"\n";
+        config<<"Num_Tests="<<mTests.size()<<"\n";
+        config<<"[Tests]\n";
+        int i = 0;
+        for(std::deque<OgreBites::Sample*>::iterator it = mTests.begin(); 
+            it != mTests.end(); ++it)
+        {
+            ++i;
+            config<<"Test_"<<i<<"="<<(*it)->getInfo()["Title"]<<"\n";
+        }
+        config.close();
+    }
+    
     // for now we just go right into the tests, eventually there'll be a menu screen beforehand
-    runSample(loadTests());
+    runSample(firstTest);
 }
+//-----------------------------------------------------------------------
 
 OgreBites::Sample* TestContext::loadTests()
 {
@@ -97,6 +136,7 @@ OgreBites::Sample* TestContext::loadTests()
 
     return startSample;
 }
+//-----------------------------------------------------------------------
 
 bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 {
@@ -109,8 +149,9 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 
     if(mCurrentTest) // if a test is running
     {
-        // handles timing
-        mCurrentTest->testFrameStarted();
+        // track frame number for screenshot purposes
+        ++mCurrentFrame;
+
         // regular update function
         return mCurrentTest->frameStarted(fixed_evt);
     }
@@ -122,6 +163,7 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
     // quit if nothing else is running
     return false;
 }
+//-----------------------------------------------------------------------
 
 bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 {
@@ -132,33 +174,43 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
 
     if(mCurrentTest) // if a test is running
     {
-        // handles screen captures and such
-        mCurrentTest->testFrameEnded();
+        if(mCurrentTest->isScreenshotFrame(mCurrentFrame))
+        {
+            // take a screenshot
+            Ogre::String filename = mOutputDir + mCurrentTest->getInfo()["Title"] + "_" +
+                Ogre::StringConverter::toString(mCurrentFrame) + ".png";
+            mWindow->writeContentsToFile(filename);
+        }
 
-        // move onto the next test
         if(mCurrentTest->isDone())
         {
+            // continue onto the next test
             runSample(0);
             return true;
         }
 
-        // regular update function
+        // standard update function
         return mCurrentTest->frameEnded(fixed_evt);
     }
     else if(mCurrentSample) // if a generic sample is running
     {
         return mCurrentSample->frameEnded(evt);
     }
-
-    // quit if nothing else is running
-    return false;
+    else
+    {
+        // if no more tests are queued, generate output and exit
+        finishedTests();
+        return false;
+    }
 }
+//-----------------------------------------------------------------------
 
 void TestContext::runSample(OgreBites::Sample* s)
 {
     // reset frame timing
     Ogre::ControllerManager::getSingleton().setFrameDelay(0);
     Ogre::ControllerManager::getSingleton().setTimeFactor(1.f);
+    mCurrentFrame = 0;
 
     OgreBites::Sample* sampleToRun = s;
 
@@ -189,17 +241,46 @@ void TestContext::runSample(OgreBites::Sample* s)
 
     SampleContext::runSample(sampleToRun);
 }
+//-----------------------------------------------------------------------
+
+void TestContext::createRoot()
+{
+// note that we use a separate config file here
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    mRoot = Ogre::Root::getSingletonPtr();
+#else
+    Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
+    #ifndef OGRE_STATIC_LIB
+        pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+    #endif
+    mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogretests.cfg"), 
+        mFSLayer->getWritablePath("ogretests.log"));
+#endif
+
+#ifdef OGRE_STATIC_LIB
+    mStaticPluginLoader.load();
+#endif
+}
+//-----------------------------------------------------------------------
+
+void TestContext::finishedTests()
+{
+    // TODO: run comparisons and generate output
+}
+//-----------------------------------------------------------------------
 
 Ogre::Real TestContext::getTimestep()
 {
     return mTimestep;
 }
+//-----------------------------------------------------------------------
 
 void TestContext::setTimestep(Ogre::Real timestep)
 {
     // ensure we're getting a positive value
     mTimestep = timestep >= 0.f ? timestep : mTimestep;
 }
+//-----------------------------------------------------------------------
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 
