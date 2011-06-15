@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "TestContext.h"
 #include "VisualTest.h"
 #include "SamplePlugin.h"
+#include "ImageCompare.h"
 
 #include "OgrePlatform.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
@@ -132,9 +133,12 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
     {
         return mCurrentSample->frameStarted(evt);
     }
-
-    // quit if nothing else is running
-    return false;
+    else
+    {
+        // if no more tests are queued, generate output and exit
+        finishedTests();
+        return false;
+    }
 }
 //-----------------------------------------------------------------------
 
@@ -150,7 +154,8 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
         if(mCurrentTest->isScreenshotFrame(mCurrentFrame))
         {
             // take a screenshot
-            Ogre::String filename = mOutputDir + mCurrentTest->getInfo()["Title"] + "_" +
+            Ogre::String filename = mOutputDir + mTestSetName + "/" +
+                mCurrentTest->getInfo()["Title"] + "_" + 
                 Ogre::StringConverter::toString(mCurrentFrame) + ".png";
             mWindow->writeContentsToFile(filename);
         }
@@ -237,7 +242,7 @@ void TestContext::createRoot()
 }
 //-----------------------------------------------------------------------
 
-virtual void TestContext::setupDirectories()
+void TestContext::setupDirectories()
 {
     // name the output image set based on GM time
     char temp[19];
@@ -266,9 +271,9 @@ virtual void TestContext::setupDirectories()
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
 
     // and finally a directory for the test run itself
-    mOutputDir += mTestSetName + "/";
-    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
-
+    //mOutputDir += mTestSetName + "/";
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir
+        + mTestSetName + "/");
 }
 //-----------------------------------------------------------------------
 
@@ -276,7 +281,7 @@ void TestContext::writeConfig()
 {
     // save a small .cfg file with some details about the set
     std::ofstream config;
-    config.open(Ogre::String(mOutputDir + "/info.cfg").c_str());
+    config.open(Ogre::String(mOutputDir + mTestSetName + "/info.cfg").c_str());
 
     if(config.is_open())
     {
@@ -300,7 +305,8 @@ void TestContext::writeConfig()
 
 void TestContext::finishedTests()
 {
-    // TODO: run comparisons and generate output
+    // run comparison against the most recent test output (if one exists)
+    compareTestSets(mOutputDir, mTestSetName);
 }
 //-----------------------------------------------------------------------
 
