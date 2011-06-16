@@ -12,7 +12,7 @@
 		<string>org.ogre3d.objectiveCApplication</string>
 	</array>
 	<key>Description</key>
-	<string>This template builds an Ogre based project for Mac OS X using the Basic Ogre Framework.</string>
+	<string>This template builds an Ogre based project for iOS using the Basic Ogre Framework.</string>
 	<key>Concrete</key>
 	<true/>
 	<key>Definitions</key>
@@ -21,7 +21,7 @@
 		<string>&lt;key&gt;LSApplicationCategoryType&lt;/key&gt;
 &lt;string&gt;___VARIABLE_applicationCategory___&lt;/string&gt;
 		</string>
-		<key>___PACKAGENAME___-Info.plist:Mac</key>
+		<key>___PACKAGENAME___-Info.plist:iPhone</key>
 		<string>&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
 &lt;string&gt;1.0&lt;/string&gt;
 &lt;key&gt;CFBundleVersion&lt;/key&gt;
@@ -141,6 +141,57 @@
 		</dict>
 		<dict>
 			<key>Description</key>
+			<string>Use the OpenGL ES 2.0 RenderSystem</string>
+			<key>Identifier</key>
+			<string>ogreUseGLES2</string>
+			<key>Name</key>
+			<string>Use OpenGL ES 2.0</string>
+			<key>Type</key>
+			<string>checkbox</string>
+			<key>Default</key>
+			<string>false</string>
+			<key>Units</key>
+			<dict>
+				<key>false</key>
+				<array>
+					<dict>
+						<key>Targets</key>
+						<array>
+							<dict>
+								<key>SharedSettings</key>
+								<dict>
+									<key>HEADER_SEARCH_PATHS</key>
+									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<key>OTHER_LDFLAGS</key>
+									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLESStatic -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
+								</dict>
+							</dict>
+						</array>
+					</dict>
+				</array>
+				<key>true</key>
+				<array>
+					<dict>
+						<key>Targets</key>
+						<array>
+							<dict>
+								<key>SharedSettings</key>
+								<dict>
+									<key>HEADER_SEARCH_PATHS</key>
+									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES2" "___VARIABLE_ogrePathiOS___/include/OGRE/RTShaderSystem" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<key>OTHER_CFLAGS</key>
+									<string>-DOGRE_USE_GLES2=1</string>
+									<key>OTHER_LDFLAGS</key>
+									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lmesaglsl2 -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
+								</dict>
+							</dict>
+						</array>
+					</dict>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>Description</key>
 			<string>The category for your application in the App Store.</string>
 			<key>Identifier</key>
 			<string>applicationCategory</string>
@@ -175,12 +226,8 @@
 		<string>iphoneos</string>
 		<key>SharedSettings</key>
 		<dict>
-			<key>HEADER_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
 			<key>LIBRARY_SEARCH_PATHS</key>
 			<string>"___VARIABLE_ogrePathiOS___/lib/Release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib/release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib"</string>
-			<key>OTHER_LDFLAGS</key>
-			<string>-lOIS -lOgreMainStatic -lRenderSystem_GLESStatic -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
 			<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
 			<string>iPhone Developer</string>
 			<key>GCC_THUMB_SUPPORT</key>
