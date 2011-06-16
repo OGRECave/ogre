@@ -3,7 +3,10 @@
 
 using namespace Ogre; 
 
-template<> OgreFramework* Ogre::Singleton<OgreFramework>::ms_Singleton = 0;
+namespace Ogre
+{
+    template<> OgreFramework* Ogre::Singleton<OgreFramework>::ms_Singleton = 0;
+};
 
 OgreFramework::OgreFramework()
 {
@@ -27,7 +30,7 @@ OgreFramework::OgreFramework()
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     m_ResourcePath = macBundlePath() + "/Contents/Resources/";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#elif defined(OGRE_IS_IOS)
     m_ResourcePath = macBundlePath() + "/";
 #else
     m_ResourcePath = "";
@@ -37,7 +40,7 @@ OgreFramework::OgreFramework()
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if defined(OGRE_IS_IOS)
 bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MultiTouchListener *pMouseListener)
 #else
 bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListener, OIS::MouseListener *pMouseListener)
@@ -87,7 +90,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     
 	m_pInputMgr = OIS::InputManager::createInputSystem(paramList);
     
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if !defined(OGRE_IS_IOS)
     m_pKeyboard = static_cast<OIS::Keyboard*>(m_pInputMgr->createInputObject(OIS::OISKeyboard, true));
 	m_pMouse = static_cast<OIS::Mouse*>(m_pInputMgr->createInputObject(OIS::OISMouse, true));
     
@@ -97,7 +100,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pMouse = static_cast<OIS::MultiTouch*>(m_pInputMgr->createInputObject(OIS::OISMultiTouch, true));
 #endif
     
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if !defined(OGRE_IS_IOS)
 	if(pKeyListener == 0)
 		m_pKeyboard->setEventCallback(this);
 	else
@@ -123,7 +126,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
         {
             typeName = i->first;
             archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || defined(OGRE_IS_IOS)
             // OS X does not set the working directory relative to the app,
             // In order to make things portable on OS X we need to provide
             // the loading with it's own bundle path location
@@ -161,7 +164,7 @@ OgreFramework::~OgreFramework()
 
 bool OgreFramework::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if !defined(OGRE_IS_IOS)
 	
 	if(m_pKeyboard->isKeyDown(OIS::KC_ESCAPE))
 	{
@@ -221,11 +224,12 @@ bool OgreFramework::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if defined(OGRE_IS_IOS)
 bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
 {
     OIS::MultiTouchState state = evt.state;
     int origTransX = 0, origTransY = 0;
+#if !OGRE_NO_VIEWPORT_ORIENTATIONMODE
     switch(m_pCamera->getViewport()->getOrientationMode())
     {
         case Ogre::OR_LANDSCAPELEFT:
@@ -247,6 +251,7 @@ bool OgreFramework::touchMoved(const OIS::MultiTouchEvent &evt)
         default:
             break;
     }
+#endif
 	m_pCamera->yaw(Degree(state.X.rel * -0.1));
 	m_pCamera->pitch(Degree(state.Y.rel * -0.1));
 	
@@ -298,6 +303,10 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 {
 	m_MoveScale = m_MoveSpeed   * (float)timeSinceLastFrame;
 	m_RotScale  = m_RotateSpeed * (float)timeSinceLastFrame;
+
+#if OGRE_VERSION >= 0x10800
+    m_pSceneMgr->setSkyBoxEnabled(true);
+#endif
     
 	m_TranslateVector = Vector3::ZERO;
     
@@ -310,17 +319,18 @@ void OgreFramework::updateOgre(double timeSinceLastFrame)
 
 void OgreFramework::moveCamera()
 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if !defined(OGRE_IS_IOS)
 	if(m_pKeyboard->isKeyDown(OIS::KC_LSHIFT)) 
 		m_pCamera->moveRelative(m_TranslateVector);
 	else
 #endif
+
 		m_pCamera->moveRelative(m_TranslateVector / 10);
 }
 
 void OgreFramework::getInput()
 {
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+#if !defined(OGRE_IS_IOS)
 	if(m_pKeyboard->isKeyDown(OIS::KC_A))
 		m_TranslateVector.x = -m_MoveScale;
 	
