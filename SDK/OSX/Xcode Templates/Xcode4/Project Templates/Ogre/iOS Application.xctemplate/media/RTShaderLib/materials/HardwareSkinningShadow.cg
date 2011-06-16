@@ -1,0 +1,111 @@
+void shadow_caster_vs(
+	float4 position		 : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	
+	uniform float4x4 wvpMatrix)
+{
+	// output position.
+	oPosition = mul(wvpMatrix, position);
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+void shadow_caster_skinning_1weight_vs(
+	float4 position		 : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	float4  blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	uniform float4x4 viewProjectionMatrix,
+	uniform float3x4  worldMatrix3x4Array[80])
+{
+	// output position.
+	oPosition.xyz = mul(worldMatrix3x4Array[blendIdx.x], position) * blendWgt.x;
+	oPosition.w = 1;
+	oPosition = mul(viewProjectionMatrix, oPosition);
+
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+void shadow_caster_skinning_2weight_vs(
+	float4 position		 : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	uniform float4x4 viewProjectionMatrix,
+	uniform float3x4  worldMatrix3x4Array[80])
+{
+	// output position.
+	oPosition.xyz = mul(worldMatrix3x4Array[blendIdx.x], position) * blendWgt.x +
+				mul(worldMatrix3x4Array[blendIdx.y], position) * blendWgt.y;
+	oPosition.w = 1;
+	oPosition = mul(viewProjectionMatrix, oPosition);
+
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+
+void shadow_caster_skinning_3weight_vs(
+	float4 position		 : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	uniform float4x4 viewProjectionMatrix,
+	uniform float3x4  worldMatrix3x4Array[80])
+{
+	// output position.
+	oPosition.xyz = mul(worldMatrix3x4Array[blendIdx.x], position) * blendWgt.x +
+				mul(worldMatrix3x4Array[blendIdx.y], position) * blendWgt.y +
+				mul(worldMatrix3x4Array[blendIdx.z], position) * blendWgt.z;
+	oPosition.w = 1;
+	oPosition = mul(viewProjectionMatrix, oPosition);
+
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+
+void shadow_caster_skinning_4weight_vs(
+	float4 position		 : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	uniform float4x4 viewProjectionMatrix,
+	uniform float3x4  worldMatrix3x4Array[80])
+{
+	// output position.
+	oPosition.xyz = mul(worldMatrix3x4Array[blendIdx.x], position) * blendWgt.x +
+				mul(worldMatrix3x4Array[blendIdx.y], position) * blendWgt.y +
+				mul(worldMatrix3x4Array[blendIdx.z], position) * blendWgt.z +
+				mul(worldMatrix3x4Array[blendIdx.w], position) * blendWgt.w;
+	oPosition.w = 1;
+	oPosition = mul(viewProjectionMatrix, oPosition);
+
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+void shadow_caster_ps(
+	out float4 oColour	: COLOR)
+{	
+	oColour = 0.5;
+}
