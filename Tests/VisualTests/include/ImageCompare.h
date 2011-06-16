@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __ImageCompare_H__
 
 #include "Ogre.h"
+#include "tinyhtml.h"
 
 /** A set of functions and structs used in comparing images,
  *    these will be used by the TestContext for generating output, 
@@ -39,8 +40,10 @@ THE SOFTWARE.
 // Results of comparing two test images
 struct ComparisonResult
 {
-    ComparisonResult(bool _passed):passed(_passed){}
     bool passed;
+    Ogre::String image;
+    Ogre::String testName;
+    size_t frame;
     // more info to be added later.
 };
 //-----------------------------------------------------------------------
@@ -106,8 +109,147 @@ bool setsComparable(const TestImageSet& set1, const TestImageSet& set2)
 /** compares two images */
 ComparisonResult compareImages(Ogre::String image1, Ogre::String image2)
 {
-    // haha, 50/50 chance of being right... actual image comparison will come later.
-    return ComparisonResult(rand()%2);
+    ComparisonResult out;
+    out.image = image1.substr(image1.find_last_of("/") + 1);
+
+    // find end of name
+    size_t end = out.image.find_last_of("_");
+    
+    // extract test name from image filename
+    out.testName = out.image.substr(12, end - 12);
+    out.frame = atoi(out.image.substr(end+1).c_str());
+
+    // actual image comparison will come later.
+    out.passed = rand()%5;
+
+    return out;
+}
+//-----------------------------------------------------------------------
+
+/** Writes a table with some info about a test set */
+HtmlElement* writeSetInfoTable(TestImageSet& set)
+{
+    HtmlElement* column = new HtmlElement("div");
+    column->pushAttribute("class", "img_column");
+    HtmlElement* table = column->appendElement("table");
+    HtmlElement* row = table->appendElement("tr");
+    row->appendElement("th")->appendText("Time:");
+    row->appendElement("td")->appendText("N/A");
+    row = table->appendElement("tr");
+    row->appendElement("th")->appendText("Version:");
+    row->appendElement("td")->appendText("N/A");
+    row = table->appendElement("tr");
+    row->appendElement("th")->appendText("Resolution:");
+    row->appendElement("td")->appendText("N/A");
+    row = table->appendElement("tr");
+    row->appendElement("th")->appendText("Comment:");
+    row->appendElement("td")->appendText("N/A");
+    return column;
+}
+//-----------------------------------------------------------------------
+
+/** Summarizes the results of a single test (side-by-side images, pass/fail,
+ *    more stats and such to come...). Returns an html div with summary markup */
+HtmlElement* summarizeSingleResult(ComparisonResult& result, TestImageSet& set1, TestImageSet& set2)
+{
+    HtmlElement* container = new HtmlElement("div");
+    container->pushAttribute("id",result.testName);
+    container->appendElement("h2")->appendText(result.testName);
+    HtmlElement* content = container->appendElement("div");
+    content->pushAttribute("class", Ogre::String("contentarea") 
+        + (result.passed ? "" : " failed_test"));
+
+    // first image
+    HtmlElement* column1 = content->appendElement("div");
+    column1->pushAttribute("class", "img_column");
+    column1->appendElement("h3")->appendText("Original:");
+    HtmlElement* img = column1->appendElement("img");
+    img->pushAttribute("alt", result.testName + " original");
+    img->pushAttribute("src", set1.name + "/" + result.image);
+
+    // second image
+    HtmlElement* column2 = content->appendElement("div");
+    column2->pushAttribute("class", "img_column");
+    column2->appendElement("h3")->appendText("New:");
+    img = column2->appendElement("img");
+    img->pushAttribute("alt", result.testName + " new");
+    img->pushAttribute("src", set2.name + "/" + result.image);
+
+    // summary
+    content->appendElement("hr");
+    HtmlElement* status = content->appendElement("h3");
+    status->appendText("Status: ");
+    HtmlElement* span = status->appendElement("span");
+    span->appendText(result.passed ? "Passed" : "Failed");
+    span->pushAttribute("class", result.passed ? "passed" : "failed");
+
+    return container;
+}
+//-----------------------------------------------------------------------
+
+/** Writes HTML summary of a comparison */
+void writeHTML(Ogre::String outputFile, TestImageSet& set1, TestImageSet& set2, std::vector<ComparisonResult>& results)
+{
+    std::ofstream output;
+    output.open(outputFile.c_str());
+    if(output.is_open())
+    {
+        // just dump the doctype in beforehand, since it's formatted strangely
+        output<<"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\t"
+            <<"\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n";
+
+        // root 'html' tag
+        HtmlElement html = HtmlElement("html");
+        // add the head
+        HtmlElement* head = html.appendElement("head");
+        head->appendElement("title")->appendText("OGRE Visual Testing Ouput");
+        // link the stylesheet
+        HtmlElement* css = head->appendElement("link");
+        css->pushAttribute("rel","stylesheet");
+        css->pushAttribute("href","output.css");
+        css->pushAttribute("type","text/css");
+        // add body
+        HtmlElement* body = html.appendElement("body");
+        // title
+        body->appendElement("h1")->appendText("OGRE Visual Test Output");
+        // div for summary
+        HtmlElement* summaryDiv = body->appendElement("div");
+        summaryDiv->appendElement("h2")->appendText("Overall:");
+        HtmlElement* contentDiv = summaryDiv->appendElement("div");
+        contentDiv->pushAttribute("class", "contentarea");
+        contentDiv->appendElement("hr");
+        // add info tables about the sets
+        contentDiv->pushChild(writeSetInfoTable(set1));
+        contentDiv->pushChild(writeSetInfoTable(set2));
+        contentDiv->appendElement("hr");
+        // summarize results
+        size_t numPassed = 0;
+        for(int i = 0; i < results.size(); ++i)
+            if(results[i].passed)
+                ++numPassed;
+        contentDiv->appendElement("p")->appendText(
+            Ogre::StringConverter::toString(numPassed) + " of " 
+            + Ogre::StringConverter::toString(results.size()) + " tests passed.");
+        contentDiv->appendElement("hr");
+        // add thumbnails
+        HtmlElement* thumbs = contentDiv->appendElement("p");
+        for(int i = 0; i < results.size(); ++i)
+        {
+            HtmlElement* anchor = thumbs->appendElement("a");
+            anchor->pushAttribute("href", Ogre::String("#") + results[i].testName);
+            anchor->pushAttribute("title", results[i].testName);
+            HtmlElement* img = anchor->appendElement("img");
+            img->pushAttribute("src",set2.name + "/" + results[i].image);
+            img->pushAttribute("class", results[i].passed ? "thumb" : "thumb_fail");
+        }
+        // add side-by-side images and summary for each test
+        for(int i = 0; i < results.size(); ++i)
+            body->pushChild(summarizeSingleResult(results[i], set1, set2));
+
+        // print to the file and close
+        output<<html.print();
+        output.close();
+    }
 }
 //-----------------------------------------------------------------------
 
@@ -167,23 +309,7 @@ void compareTestSets(Ogre::String testDirectory, Ogre::String set1, Ogre::String
             testDirectory+testSet2.name+"/"+testSet2.images[i]));
     }
 
-    // brief test output, this will probably use TinyXML when I start actual HTML output
-    std::ofstream output;
-    output.open(Ogre::String(testDirectory + "out.html").c_str());
-    if(output.is_open())
-    {
-        output<<"Testing\n";
-        output<<"Set 1: "<<testSet1.name<<"\n";
-        output<<"Set 2: "<<testSet2.name<<"\n";
-        for(int i = 0; i < comparisons.size(); ++i)
-        {
-            if(comparisons[i].passed)
-                output<<"Test: "<<testSet1.images[i]<<" passed!\n";
-            else
-                output<<"Test: "<<testSet1.images[i]<<" failed!\n";
-        }
-        output.close();
-    }
+    writeHTML(testDirectory + "out.html", testSet1, testSet2, comparisons);
 }
 
 #endif
