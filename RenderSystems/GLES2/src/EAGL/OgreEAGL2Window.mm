@@ -220,7 +220,7 @@ namespace Ogre {
     
         OgreAssert(mView != nil, "EAGL2Window: Failed to create view");
         
-        mView.mWindowName = mName;
+        [mView setMWindowName:mName];
 
         OgreAssert([mView.layer isKindOfClass:[CAEAGLLayer class]], "EAGL2Window: View's Core Animation layer is not a CAEAGLLayer. This is a requirement for using OpenGL ES for drawing.");
         
