@@ -54,7 +54,7 @@ namespace Ogre
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_WORLD_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
-
+		AutoConstantDefinition(ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, "world_scale_shear_matrix_array_3x4", 9, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_VIEW_MATRIX,                   "view_matrix",                 16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_INVERSE_VIEW_MATRIX,           "inverse_view_matrix",         16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_TRANSPOSE_VIEW_MATRIX,              "transpose_view_matrix",             16, ET_REAL, ACDT_NONE),
@@ -1056,6 +1056,7 @@ namespace Ogre
 		case ACT_WORLD_MATRIX_ARRAY_3x4:
 		case ACT_WORLD_MATRIX_ARRAY:
 		case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+		case ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
 		case ACT_WORLDVIEW_MATRIX:
 		case ACT_INVERSE_WORLDVIEW_MATRIX:
 		case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
@@ -1628,6 +1629,7 @@ namespace Ogre
 		Vector3 vec3;
 		Vector4 vec4;
 		Matrix3 m3;
+		Matrix4 scaleM;
 		DualQuaternion dQuat;
 
 		mActivePassIterationIndex = std::numeric_limits<size_t>::max();
@@ -1990,6 +1992,29 @@ namespace Ogre
 						dQuat.fromTransformationMatrix(*pMatrix);
 						_writeRawConstants(index, dQuat.ptr(), 8);
 						index += 8;
+						++pMatrix;
+					}
+					break;
+				case ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
+					// Loop over matrices
+					pMatrix = source->getWorldMatrixArray();
+					numMatrices = source->getWorldMatrixCount();
+					index = i->physicalIndex;
+					
+					scaleM = Matrix4::IDENTITY;
+					
+					for (m = 0; m < numMatrices; ++m)
+					{
+						Vector3 position;
+						Vector3 scale;
+						Quaternion rotation;
+						(*pMatrix).decomposition(position, scale, rotation);
+
+						scaleM[0][0] = scale.x;
+						scaleM[1][1] = scale.y;
+						scaleM[2][2] = scale.z;
+						_writeRawConstants(index, scaleM[0], 12);
+						index += 12;
 						++pMatrix;
 					}
 					break;

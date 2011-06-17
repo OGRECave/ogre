@@ -131,7 +131,7 @@ namespace Ogre {
 		void toRotationTranslation (Quaternion& q, Vector3& translation) const;
 
 		void fromTransformationMatrix (const Matrix4& kTrans);
-        void toTransformationMatrix (Matrix4& kTrans) const;
+		void toTransformationMatrix (Matrix4& kTrans) const;
 
         inline DualQuaternion& operator= (const DualQuaternion& rkQ)
 		{

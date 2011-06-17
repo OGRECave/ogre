@@ -207,6 +207,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4,				"world_matrix_array_3x4",				GCT_MATRIX_3X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY,					"world_matrix_array",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4,		"world_dualquaternion_array_2x4",		GCT_MATRIX_2X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4,	"world_scale_shear_matrix_array_3x4",		GCT_MATRIX_3X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_VIEW_MATRIX,							"view_matrix",							GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX,					"inverse_view_matrix",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_TRANSPOSE_VIEW_MATRIX,          		"transpose_view_matrix",				GCT_MATRIX_4X4),
