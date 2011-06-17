@@ -2005,14 +2005,30 @@ namespace Ogre
 					
 					for (m = 0; m < numMatrices; ++m)
 					{
-						Vector3 position;
-						Vector3 scale;
-						Quaternion rotation;
-						(*pMatrix).decomposition(position, scale, rotation);
+						//Based on Matrix4::decompostion, but we don't need the rotation or position components
+						//but do need the scaling and shearing. Shearing isn't available from Matrix4::decomposition
+						assert((*pMatrix).isAffine());
+						
+						(*pMatrix).extract3x3Matrix(m3);
 
+						Matrix3 matQ;
+						Vector3 scale;
+						
+						//vecU is the scaling component with vecU[0] = u01, vecU[1] = u02, vecU[2] = u12
+						//vecU[0] is shearing (x,y), vecU[1] is shearing (x,z), and vecU[2] is shearing (y,z)
+						//The first component represents the coordinate that is being sheared,
+						//while the second component represents the coordinate which performs the shearing.
+						Vector3 vecU;
+						m3.QDUDecomposition( matQ, scale, vecU );
+						
 						scaleM[0][0] = scale.x;
 						scaleM[1][1] = scale.y;
 						scaleM[2][2] = scale.z;
+
+						scaleM[0][1] = vecU[0];
+						scaleM[0][2] = vecU[1];
+						scaleM[1][2] = vecU[2];
+						
 						_writeRawConstants(index, scaleM[0], 12);
 						index += 12;
 						++pMatrix;
