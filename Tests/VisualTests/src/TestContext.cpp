@@ -289,6 +289,8 @@ void TestContext::writeConfig()
         config<<"Time="<<mTimestamp<<"\n";
         config<<"Resolution="<<mWindow->getWidth()<<"x"<<mWindow->getHeight()<<"\n";
         config<<"Comment="<<"None"<<"\n";
+        config<<"Version="<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
+			OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX<<"\n";
         config<<"Num_Tests="<<mTests.size()<<"\n";
         config<<"[Tests]\n";
         int i = 0;

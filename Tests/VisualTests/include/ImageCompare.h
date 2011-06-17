@@ -52,6 +52,9 @@ struct ComparisonResult
 struct TestImageSet
 {
     Ogre::String name;
+    Ogre::String version;
+    Ogre::String timestamp;
+    Ogre::String comment;
     unsigned int resolution_x;
     unsigned int resolution_y;
     std::vector<Ogre::String> images;
@@ -76,9 +79,14 @@ bool getTestSetInfo(Ogre::String location, TestImageSet& set)
     set.resolution_x = atoi(res.c_str());
     set.resolution_y = atoi(res.substr(res.find('x')+1).c_str());
 
+	set.version = info.getSetting("Version","Info");
+	set.timestamp = info.getSetting("Time","Info");
+	set.comment = info.getSetting("Comment","Info");
+
     Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(location+set.name+"/", "FileSystem");
     // get a list of the directory's contents
     Ogre::StringVectorPtr files = testDir->list(false);
+	std::sort(files->begin(),files->end(),std::less<Ogre::String>());
 
     // find test images for the set
     for(int i = 0; i < files->size(); ++i)
@@ -119,31 +127,54 @@ ComparisonResult compareImages(Ogre::String image1, Ogre::String image2)
     out.testName = out.image.substr(12, end - 12);
     out.frame = atoi(out.image.substr(end+1).c_str());
 
-    // actual image comparison will come later.
-    out.passed = rand()%5;
+	// placeholder, not exactly elegant, but it's better than nothing for the moment
+	std::ifstream img1;
+	std::ifstream img2;
+
+	img1.open(image1.c_str());
+	img2.open(image2.c_str());
+
+    out.passed = false;
+
+	if(img1.is_open() && img2.is_open())
+	{
+		bool foundDiff = false;
+		while(img1.good())
+		{
+			// compare byte by byte...
+			if((img1.get() != img2.get()) || (img2.good() != img1.good()))
+			{
+				foundDiff = true;
+				break;
+			}
+		}
+		out.passed = !foundDiff;
+	}
 
     return out;
 }
 //-----------------------------------------------------------------------
 
 /** Writes a table with some info about a test set */
-HtmlElement* writeSetInfoTable(TestImageSet& set)
+HtmlElement* writeSetInfoTable(TestImageSet& set, Ogre::String name)
 {
     HtmlElement* column = new HtmlElement("div");
-    column->pushAttribute("class", "img_column");
+    column->appendAttribute("class", "img_column");
+    column->appendElement("h3")->appendText(name);
     HtmlElement* table = column->appendElement("table");
     HtmlElement* row = table->appendElement("tr");
     row->appendElement("th")->appendText("Time:");
-    row->appendElement("td")->appendText("N/A");
+    row->appendElement("td")->appendText(set.timestamp);
     row = table->appendElement("tr");
     row->appendElement("th")->appendText("Version:");
-    row->appendElement("td")->appendText("N/A");
+    row->appendElement("td")->appendText(set.version);
     row = table->appendElement("tr");
     row->appendElement("th")->appendText("Resolution:");
-    row->appendElement("td")->appendText("N/A");
+    row->appendElement("td")->appendText(Ogre::StringConverter::toString(set.resolution_x) 
+		+ " x " + Ogre::StringConverter::toString(set.resolution_y));
     row = table->appendElement("tr");
     row->appendElement("th")->appendText("Comment:");
-    row->appendElement("td")->appendText("N/A");
+    row->appendElement("td")->appendText(set.comment);
     return column;
 }
 //-----------------------------------------------------------------------
@@ -153,27 +184,27 @@ HtmlElement* writeSetInfoTable(TestImageSet& set)
 HtmlElement* summarizeSingleResult(ComparisonResult& result, TestImageSet& set1, TestImageSet& set2)
 {
     HtmlElement* container = new HtmlElement("div");
-    container->pushAttribute("id",result.testName);
+    container->appendAttribute("id",result.testName);
     container->appendElement("h2")->appendText(result.testName);
     HtmlElement* content = container->appendElement("div");
-    content->pushAttribute("class", Ogre::String("contentarea") 
+    content->appendAttribute("class", Ogre::String("contentarea") 
         + (result.passed ? "" : " failed_test"));
 
     // first image
     HtmlElement* column1 = content->appendElement("div");
-    column1->pushAttribute("class", "img_column");
+    column1->appendAttribute("class", "img_column");
     column1->appendElement("h3")->appendText("Original:");
     HtmlElement* img = column1->appendElement("img");
-    img->pushAttribute("alt", result.testName + " original");
-    img->pushAttribute("src", set1.name + "/" + result.image);
+    img->appendAttribute("alt", result.testName + " original");
+    img->appendAttribute("src", set1.name + "/" + result.image);
 
     // second image
     HtmlElement* column2 = content->appendElement("div");
-    column2->pushAttribute("class", "img_column");
+    column2->appendAttribute("class", "img_column");
     column2->appendElement("h3")->appendText("New:");
     img = column2->appendElement("img");
-    img->pushAttribute("alt", result.testName + " new");
-    img->pushAttribute("src", set2.name + "/" + result.image);
+    img->appendAttribute("alt", result.testName + " new");
+    img->appendAttribute("src", set2.name + "/" + result.image);
 
     // summary
     content->appendElement("hr");
@@ -181,7 +212,9 @@ HtmlElement* summarizeSingleResult(ComparisonResult& result, TestImageSet& set1,
     status->appendText("Status: ");
     HtmlElement* span = status->appendElement("span");
     span->appendText(result.passed ? "Passed" : "Failed");
-    span->pushAttribute("class", result.passed ? "passed" : "failed");
+    span->appendAttribute("class", result.passed ? "passed" : "failed");
+    content->appendElement("p")->appendText("Frame: " + 
+		Ogre::StringConverter::toString(result.frame));
 
     return container;
 }
@@ -205,9 +238,9 @@ void writeHTML(Ogre::String outputFile, TestImageSet& set1, TestImageSet& set2, 
         head->appendElement("title")->appendText("OGRE Visual Testing Ouput");
         // link the stylesheet
         HtmlElement* css = head->appendElement("link");
-        css->pushAttribute("rel","stylesheet");
-        css->pushAttribute("href","output.css");
-        css->pushAttribute("type","text/css");
+        css->appendAttribute("rel","stylesheet");
+        css->appendAttribute("href","output.css");
+        css->appendAttribute("type","text/css");
         // add body
         HtmlElement* body = html.appendElement("body");
         // title
@@ -216,11 +249,11 @@ void writeHTML(Ogre::String outputFile, TestImageSet& set1, TestImageSet& set2, 
         HtmlElement* summaryDiv = body->appendElement("div");
         summaryDiv->appendElement("h2")->appendText("Overall:");
         HtmlElement* contentDiv = summaryDiv->appendElement("div");
-        contentDiv->pushAttribute("class", "contentarea");
+        contentDiv->appendAttribute("class", "contentarea");
         contentDiv->appendElement("hr");
         // add info tables about the sets
-        contentDiv->pushChild(writeSetInfoTable(set1));
-        contentDiv->pushChild(writeSetInfoTable(set2));
+        contentDiv->pushChild(writeSetInfoTable(set1, "Reference Set:"));
+        contentDiv->pushChild(writeSetInfoTable(set2, "Test Set:"));
         contentDiv->appendElement("hr");
         // summarize results
         size_t numPassed = 0;
@@ -236,11 +269,11 @@ void writeHTML(Ogre::String outputFile, TestImageSet& set1, TestImageSet& set2, 
         for(int i = 0; i < results.size(); ++i)
         {
             HtmlElement* anchor = thumbs->appendElement("a");
-            anchor->pushAttribute("href", Ogre::String("#") + results[i].testName);
-            anchor->pushAttribute("title", results[i].testName);
+            anchor->appendAttribute("href", Ogre::String("#") + results[i].testName);
+            anchor->appendAttribute("title", results[i].testName);
             HtmlElement* img = anchor->appendElement("img");
-            img->pushAttribute("src",set2.name + "/" + results[i].image);
-            img->pushAttribute("class", results[i].passed ? "thumb" : "thumb_fail");
+            img->appendAttribute("src",set2.name + "/" + results[i].image);
+            img->appendAttribute("class", results[i].passed ? "thumb" : "thumb_fail");
         }
         // add side-by-side images and summary for each test
         for(int i = 0; i < results.size(); ++i)
@@ -309,7 +342,7 @@ void compareTestSets(Ogre::String testDirectory, Ogre::String set1, Ogre::String
             testDirectory+testSet2.name+"/"+testSet2.images[i]));
     }
 
-    writeHTML(testDirectory + "out.html", testSet1, testSet2, comparisons);
+    writeHTML(testDirectory + "out.html", testSet2, testSet1, comparisons);
 }
 
 #endif

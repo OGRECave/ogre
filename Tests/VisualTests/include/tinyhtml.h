@@ -79,7 +79,7 @@ struct HtmlElement : public HtmlNode
     }
     //-------------------------------------------------------------------
 
-    void pushAttribute(Ogre::String name, Ogre::String value)
+    void appendAttribute(Ogre::String name, Ogre::String value)
     {
         attributes.push_back(std::pair<Ogre::String,Ogre::String>(name,value));
     }
@@ -129,7 +129,7 @@ struct HtmlElement : public HtmlNode
         // self-closing is done here
         if(children.empty())
         {
-            out<<"/>\n";
+            out<<"/>";
             return out.str();
         }
         // closing bracket
@@ -142,6 +142,7 @@ struct HtmlElement : public HtmlNode
             out<<(*it)->print(indent + "\t");
         }
 
+		// if the last child was an actual element start a newline (otherwise, if text, we'll close on the same line)
         if(dynamic_cast<HtmlElement*>(children.back()))
             out<<"\n"<<indent;
 
@@ -152,5 +153,3 @@ struct HtmlElement : public HtmlNode
 };
 
 #endif
-
-
