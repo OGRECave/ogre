@@ -11,7 +11,7 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
 public:
 
-	Sample_SkeletalAnimation() : NUM_MODELS(2), ANIM_CHOP(8)
+	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
 	{
 		mInfo["Title"] = "Skeletal Animation";
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
@@ -23,26 +23,26 @@ public:
     {
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
-			// update sneaking animation based on speed
-			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
-
-			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-			{
-				/* We need reposition the scene node origin, since the animation includes translation.
-				Position is calculated from an offset to the end position, and rotation is calculated
-				from how much the animation turns the character. */
-
-				//Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-
-				// find current end position and the offset
-				//Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-				//Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-
-				//mModelNodes[i]->setPosition(currEnd + offset);
-				//mModelNodes[i]->rotate(rot);
-
-				//mAnimStates[i]->setTimePosition(0);   // reset animation time
-			}
+// 			// update sneaking animation based on speed
+// 			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
+// 
+// 			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
+// 			{
+// 				/* We need reposition the scene node origin, since the animation includes translation.
+// 				Position is calculated from an offset to the end position, and rotation is calculated
+// 				from how much the animation turns the character. */
+// 
+// 				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+// 
+// 				// find current end position and the offset
+// 				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+// 				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+// 
+// 				mModelNodes[i]->setPosition(currEnd + offset);
+// 				mModelNodes[i]->rotate(rot);
+// 
+// 				mAnimStates[i]->setTimePosition(0);   // reset animation time
+// 			}
         }
 
 		return SdkSample::frameRenderingQueued(evt);
@@ -118,8 +118,8 @@ protected:
 		Entity* ent = NULL;
 		AnimationState* as = NULL;
 
-        for (unsigned int i = 0; i < NUM_MODELS; i++)
-        {
+		for (unsigned int i = 0; i < NUM_MODELS; i++)
+		{
 			// create scene nodes for the models at regular angular intervals
 			sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 			sn->yaw(Radian(Math::TWO_PI * (float)i / (float)NUM_MODELS));
@@ -127,17 +127,18 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "robot.mesh");
-			ent->setMaterialName("jaiquaDualQuatTest");
+			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "spine.mesh");
+			ent->setMaterialName("spineDualQuatTest");
 			sn->attachObject(ent);
+			sn->setScale(Vector3(20, 20, 20));
 			
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
-			as = ent->getAnimationState("Walk");
-            as->setEnabled(true);
-			as->setLoop(true);
-			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
-			mAnimStates.push_back(as);
-        }
+			//as = ent->getAnimationState("Sneak");
+			//as->setEnabled(true);
+			//as->setLoop(false);
+			//mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
+			//mAnimStates.push_back(as);
+		}
 
 		// create name and value for skinning mode
 		StringVector names;
@@ -146,7 +147,7 @@ protected:
 
 		// change the value if hardware skinning is enabled
         Pass* pass = ent->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
-		if (pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+		if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
 
 		// create a params panel to display the skinning mode
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
