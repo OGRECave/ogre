@@ -201,6 +201,13 @@ namespace Ogre {
 			const EdgeData::EdgeGroup& eg = *egi;
 			// Initialise the index start for this shadow renderable
 			IndexData* indexData = (*si)->getRenderOperationForUpdate()->indexData;
+
+			if (indexData->indexBuffer != indexBuffer)
+			{
+				(*si)->rebindIndexBuffer(indexBuffer);
+				indexData = (*si)->getRenderOperationForUpdate()->indexData;
+			}
+
 			indexData->indexStart = numIndices;
 			// original number of verts (without extruded copy)
 			size_t originalVertexCount = eg.vertexData->vertexCount;

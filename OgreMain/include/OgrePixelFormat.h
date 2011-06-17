@@ -123,7 +123,7 @@ namespace Ogre {
         PF_FLOAT16_RGB = 22,
         // 64-bit pixel format, 16 bits (float) for red, 16 bits (float) for green, 16 bits (float) for blue, 16 bits (float) for alpha
         PF_FLOAT16_RGBA = 23,
-		// 16-bit pixel format, 16 bits (float) for red
+		// 32-bit pixel format, 32 bits (float) for red
         PF_FLOAT32_R = 33,
         // 96-bit pixel format, 32 bits (float) for red, 32 bits (float) for green, 32 bits (float) for blue
         PF_FLOAT32_RGB = 24,
@@ -278,6 +278,20 @@ namespace Ogre {
       		@throws	Exception(ERR_INVALIDPARAMS) if def is not fully contained
       	*/
       	PixelBox getSubVolume(const Box &def) const;
+        
+        /**
+         * Get colour value from a certain location in the PixelBox. The z coordinate
+         * is only valid for cubemaps and volume textures. This uses the first (largest)
+         * mipmap.
+         */
+        ColourValue getColourAt(size_t x, size_t y, size_t z);
+
+        /**
+         * Set colour value at a certain location in the PixelBox. The z coordinate
+         * is only valid for cubemaps and volume textures. This uses the first (largest)
+         * mipmap.
+         */
+        void setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z);
     };
     
 

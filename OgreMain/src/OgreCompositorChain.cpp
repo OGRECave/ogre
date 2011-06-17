@@ -49,6 +49,9 @@ CompositorChain::CompositorChain(Viewport *vp):
 	assert(vp);
 	mOldClearEveryFrameBuffers = vp->getClearBuffers();
 	vp->addListener(this);
+
+	createOriginalScene();
+	vp->getTarget()->addListener(this);
 }
 //-----------------------------------------------------------------------
 CompositorChain::~CompositorChain()
@@ -62,31 +65,86 @@ void CompositorChain::destroyResources(void)
 
 	if (mViewport)
 	{
+		mViewport->getTarget()->removeListener(this);
 		mViewport->removeListener(this);
 		removeAllCompositors();
-		/// Destroy "original scene" compositor instance
-		if (mOriginalScene)
-		{
-			mViewport->getTarget()->removeListener(this);
-			OGRE_DELETE mOriginalScene;
-			mOriginalScene = 0;
-		}
+		destroyOriginalScene();
+
 		mViewport = 0;
 	}
 }
 //-----------------------------------------------------------------------
+void CompositorChain::createOriginalScene()
+{
+    /// Create "default" compositor
+    /** Compositor that is used to implicitly represent the original
+        render in the chain. This is an identity compositor with only an output pass:
+    compositor Ogre/Scene
+    {
+        technique
+        {
+            target_output
+            {
+				pass clear
+				{
+					/// Clear frame
+				}
+                pass render_scene
+                {
+					visibility_mask FFFFFFFF
+					render_queues SKIES_EARLY SKIES_LATE
+                }
+            }
+        }
+    };
+    */
+
+	mOriginalSceneScheme = mViewport->getMaterialScheme();
+	String compName = "Ogre/Scene/" + mOriginalSceneScheme;
+	CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+	if (scene.isNull())
+	{
+		scene = CompositorManager::getSingleton().create(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+		CompositionTechnique *t = scene->createTechnique();
+		t->setSchemeName(StringUtil::BLANK);
+		CompositionTargetPass *tp = t->getOutputTargetPass();
+		tp->setVisibilityMask(0xFFFFFFFF);
+		{
+			CompositionPass *pass = tp->createPass();
+			pass->setType(CompositionPass::PT_CLEAR);
+		}
+		{
+			CompositionPass *pass = tp->createPass();
+			pass->setType(CompositionPass::PT_RENDERSCENE);
+			/// Render everything, including skies
+			pass->setFirstRenderQueue(RENDER_QUEUE_BACKGROUND);
+			pass->setLastRenderQueue(RENDER_QUEUE_SKIES_LATE);
+		}
+
+
+		/// Create base "original scene" compositor
+		scene = CompositorManager::getSingleton().load(compName,
+			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+
+
+
+	}
+	mOriginalScene = OGRE_NEW CompositorInstance(scene->getSupportedTechnique(), this);
+}
+//-----------------------------------------------------------------------
+void CompositorChain::destroyOriginalScene()
+{
+	/// Destroy "original scene" compositor instance
+	if (mOriginalScene)
+	{
+		OGRE_DELETE mOriginalScene;
+		mOriginalScene = 0;
+	}
+}
+
+//-----------------------------------------------------------------------
 CompositorInstance* CompositorChain::addCompositor(CompositorPtr filter, size_t addPosition, const String& scheme)
 {
-	// Init on demand
-	if (!mOriginalScene)
-	{
-		mViewport->getTarget()->addListener(this);
-		
-		/// Create base "original scene" compositor
-		CompositorPtr base = CompositorManager::getSingleton().load("Ogre/Scene",
-			ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-		mOriginalScene = OGRE_NEW CompositorInstance(base->getSupportedTechnique(), this);
-	}
 
 
 	filter->touch();
@@ -391,6 +449,13 @@ void CompositorChain::clearCompiledState()
 //-----------------------------------------------------------------------
 void CompositorChain::_compile()
 {
+	// remove original scene if it has the wrong material scheme
+	if( mOriginalSceneScheme != mViewport->getMaterialScheme() )
+	{
+		destroyOriginalScene();
+		createOriginalScene();
+	}
+
 	clearCompiledState();
 
 	bool compositorsEnabled = false;

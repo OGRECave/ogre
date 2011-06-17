@@ -61,81 +61,6 @@ namespace Ogre {
     */
     class _OgreExport Renderable
     {
-	protected:
-		class CustomParameterData
-		{
-		public:
-			CustomParameterData() : data(0), elementCount(0), bufferLength(0)
-			{
-			}
-
-			~CustomParameterData()
-			{
-				tryReleaseThis();
-			}
-			
-			CustomParameterData(const CustomParameterData& o) : data(0), elementCount(0)
-			{
-				*this = o;
-			}
-
-			CustomParameterData& operator =(const CustomParameterData& o)
-			{
-				if(o.data)
-				{
-					setData(o.data, o.elementCount);
-				}
-				else
-				{
-					tryReleaseThis();
-				}
-				return *this;
-			}
-
-			void setData(const Real* ptr,size_t _elementCount)
-			{
-				elementCount = _elementCount;
-				if((data == NULL) || (bufferLength < elementCount) )
-				{
-					tryReleaseThis();
-					bufferLength = _elementCount;
-					data = OGRE_NEW_ARRAY_T(Real, bufferLength, MEMCATEGORY_GENERAL);
-				}
-				memcpy(data, ptr, sizeof(Real) * elementCount);
-			}
-			
-			const Real* getDataPtr()const
-			{
-				return data;
-			}
-
-			size_t getElementCount()const
-			{
-				return elementCount;
-			}
-
-			size_t getBufferLength()const
-			{
-				return bufferLength;
-			}
-		protected:
-			void tryReleaseThis()
-			{
-				if(data)
-				{
-					OGRE_DELETE_ARRAY_T(data, Real, bufferLength, MEMCATEGORY_GENERAL);
-					data = 0;
-					bufferLength = 0;
-					elementCount = 0;
-				}
-			}
-
-			Real* data;
-			size_t elementCount;
-			size_t bufferLength;
-		};
-        typedef map<size_t, CustomParameterData>::type CustomParameterMap;
-
 	public:
 		/** An internal class that should be used only by a render system for internal use 
 		@remarks
@@ -314,69 +239,44 @@ namespace Ogre {
         */
         void setCustomParameter(size_t index, const Vector4& value) 
         {
-            mCustomParameters[index].setData(value.ptr(), 4);
+            mCustomParameters[index] = value;
         }
 
-         /** Sets a custom parameter for this Renderable, which may be used to 
-             drive calculations for this specific Renderable, like GPU program parameters.
-         @remarks
-             Calling this method simply associates a numeric index with a 4-dimensional
-             value for this specific Renderable. This is most useful if the material
-             which this Renderable uses a vertex or fragment program, and has an 
-             ACT_CUSTOM parameter entry. This parameter entry can refer to the
-             index you specify as part of this call, thereby mapping a custom
-             parameter for this renderable to a program parameter.
-         @param index The index with which to associate the value. Note that this
-             does not have to start at 0, and can include gaps. It also has no direct
-             correlation with a GPU program parameter index - the mapping between the
-             two is performed by the ACT_CUSTOM entry, if that is used.
-         @param ptr The data ptr to associate.
-         @param elementCount The element count of data ptr to associate.
-         */
-         void setCustomParameter(size_t index, const Real* ptr, size_t elementCount) 
-         {
-             mCustomParameters[index].setData(ptr, elementCount);
-         }
-
-        /** Gets the custom data ptr associated with this Renderable at the given index.
-         @remarks For compatibility, this data pointer can be used to directly create a Vector4
-                  or many other types of objects.
-         @param
-         @see setCustomParameter for full details.
-         */
-        const Real* getCustomParameterPtr(size_t index) const
-        {
-            CustomParameterMap::const_iterator i = mCustomParameters.find(index);
-            if (i != mCustomParameters.end())
-            {
-                return i->second.getDataPtr();
-            }
-            else
-            {
-                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
-                            "Parameter at the given index was not found.",
-                            "Renderable::getCustomParameterPtr");
-            }
-        }
-
-        /** Gets the custom data size associated with this Renderable at the given index.
+		/** Removes a custom value which is associated with this Renderable at the given index.
         @param
             @see setCustomParameter for full details.
         */
-        const size_t getCustomParameterElementCount(size_t index) const
+        void removeCustomParameter(size_t index)
+        {
+            mCustomParameters.erase(index);
+        }
+
+		/** Checks whether a custom value is associated with this Renderable at the given index.
+        @param
+            @see setCustomParameter for full details.
+        */
+        bool hasCustomParameter(size_t index) const
+        {
+            return mCustomParameters.find(index) != mCustomParameters.end();
+        }
+
+        /** Gets the custom value associated with this Renderable at the given index.
+        @param
+            @see setCustomParameter for full details.
+        */
+        const Vector4& getCustomParameter(size_t index) const
         {
             CustomParameterMap::const_iterator i = mCustomParameters.find(index);
             if (i != mCustomParameters.end())
             {
-                return i->second.getElementCount();
+                return i->second;
             }
             else
             {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, 
                     "Parameter at the given index was not found.",
-                    "Renderable::getCustomParameterElementCount");
+                    "Renderable::getCustomParameter");
             }
-            return 0;
         }
 
         /** Update a custom GpuProgramParameters constant which is derived from 
@@ -410,12 +310,8 @@ namespace Ogre {
             CustomParameterMap::const_iterator i = mCustomParameters.find(constantEntry.data);
             if (i != mCustomParameters.end())
             {
-				const CustomParameterData& data=i->second;
-				if(data.getElementCount()>=constantEntry.elementCount)
-				{
-					params->_writeRawConstants(constantEntry.physicalIndex, data.getDataPtr(), 
-						constantEntry.elementCount);
-				}
+                params->_writeRawConstant(constantEntry.physicalIndex, i->second, 
+					constantEntry.elementCount);
             }
         }
 
@@ -514,7 +410,7 @@ namespace Ogre {
 
 
     protected:
-
+        typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
 		bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;

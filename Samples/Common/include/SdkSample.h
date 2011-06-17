@@ -465,9 +465,9 @@ namespace OgreBites
 			items.push_back("Generated FS");														
 
 			// fix scene compositor for d3d11
-			Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-			Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
+			// Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+			// Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene/Default", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+			// scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
 #endif
 
 			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);

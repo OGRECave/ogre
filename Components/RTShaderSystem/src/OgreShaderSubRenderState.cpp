@@ -67,6 +67,19 @@ SubRenderState*	SubRenderStateFactory::createInstance()
 }
 
 //-----------------------------------------------------------------------
+SubRenderState*	SubRenderStateFactory::createOrRetrieveInstance(SGScriptTranslator* translator)
+{
+	//check if we already create a SRS 
+	SubRenderState*	subRenderState = translator->getGeneratedSubRenderState(getType());
+	if (subRenderState == NULL)
+	{
+		//create a new sub render state
+		subRenderState = SubRenderStateFactory::createInstance();
+	}
+	return subRenderState;
+}
+
+//-----------------------------------------------------------------------
 void SubRenderStateFactory::destroyInstance(SubRenderState* subRenderState)
 {
 	SubRenderStateSetIterator it = mSubRenderStateList.find(subRenderState);

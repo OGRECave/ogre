@@ -928,7 +928,7 @@ SubRenderState*	PerPixelLightingFactory::createInstance(ScriptCompiler* compiler
 			
 			if (modelType == "per_pixel")
 			{
-				return SubRenderStateFactory::createInstance();
+				return createOrRetrieveInstance(translator);
 			}
 		}		
 	}

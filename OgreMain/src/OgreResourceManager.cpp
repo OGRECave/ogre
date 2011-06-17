@@ -480,16 +480,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceLoaded(Resource* res)
 	{
-		OGRE_LOCK_AUTO_MUTEX
-
 		mMemoryUsage += res->getSize();
 	}
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceUnloaded(Resource* res)
 	{
-		OGRE_LOCK_AUTO_MUTEX
-
-		mMemoryUsage -= res->getSize();
+		mMemoryUsage += -(res->getSize());
 	}
 	//---------------------------------------------------------------------
 	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)

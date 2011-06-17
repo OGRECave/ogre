@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSkeleton.h"
 #include "OgreBone.h"
-#include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
@@ -302,6 +301,7 @@ namespace Ogre {
         }
 
         Animation* ret = OGRE_NEW Animation(name, length);
+		ret->_notifyContainer(this);
 
         // Add to list
         mAnimationsList[name] = ret;
@@ -323,7 +323,12 @@ namespace Ogre {
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	bool Skeleton::hasAnimation(const String& name)
+	Animation* Skeleton::getAnimation(const String& name) const
+	{
+		return getAnimation(name, 0);
+	}
+	//---------------------------------------------------------------------
+	bool Skeleton::hasAnimation(const String& name) const
 	{
 		return _getAnimationImpl(name) != 0;
 	}

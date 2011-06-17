@@ -40,6 +40,7 @@ THE SOFTWARE.
 #define SGX_FUNC_ATLAS_MIRROR "SGX_Atlas_Mirror"
 #define SGX_FUNC_ATLAS_CLAMP "SGX_Atlas_Clamp"
 #define SGX_FUNC_ATLAS_BORDER "SGX_Atlas_Border"
+#define TAS_MAX_SAFE_ATLASED_TEXTURES 250
 
 namespace Ogre {
 template<> RTShader::TextureAtlasSamplerFactory* Singleton<RTShader::TextureAtlasSamplerFactory>::ms_Singleton = 0;
@@ -49,16 +50,15 @@ namespace RTShader {
 
 
 const TextureAtlasTablePtr c_BlankAtlasTable;
-const String c_ParamTexelEx("texel_");
+const String c_ParamTexel("texel_");
 String TextureAtlasSampler::Type = "SGX_TextureAtlasSampler";
 
 //-----------------------------------------------------------------------
 TextureAtlasSampler::TextureAtlasSampler() :
 	mAtlasTexcoordPos(0),
-	mAtlasTextureStart(0),
-	mAtlasTextureCount(0),
 	mIsTableDataUpdated(false)
 {
+	memset(mIsAtlasTextureUnits, 0, sizeof(bool) * TAS_MAX_TEXTURES);
 }
 
 //-----------------------------------------------------------------------
@@ -87,23 +87,27 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
 	// Define vertex shader parameters used to find the position of the textures in the atlas
 	//
 	Parameter::Content indexContent = (Parameter::Content)((int)Parameter::SPC_TEXTURE_COORDINATE0 + mAtlasTexcoordPos);
-	GpuConstantType indexType = (GpuConstantType)((ushort)GCT_FLOAT1 + std::min<ushort>(mAtlasTextureCount,4) - 1);
+	GpuConstantType indexType = GCT_FLOAT4;
 
 	mVSInpTextureTableIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 				mAtlasTexcoordPos, indexContent, indexType);
 		
-	mVSTextureTable = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "AtlasData", mAtlasTableData->size());
 	
 	//
 	// Define parameters to carry the information on the location of the texture from the vertex to
 	// the pixel shader
 	//
-	for(ushort i = 0 ; i < mAtlasTextureCount ; ++ i)
+	for(ushort i = 0 ; i < TAS_MAX_TEXTURES ; ++ i)
 	{
-		mVSOutTextureDatas[i] = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
-				-1, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mPSInpTextureDatas[i] = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
-			mVSOutTextureDatas[i]->getIndex(), Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+		if (mIsAtlasTextureUnits[i] == true)
+		{
+			mVSTextureTable[i] = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "AtlasData", mAtlasTableDatas[i]->size());
+			mVSOutTextureDatas[i] = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES,
+					-1, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+			mPSInpTextureDatas[i] = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
+				mVSOutTextureDatas[i]->getIndex(), Parameter::SPC_UNKNOWN, GCT_FLOAT4);
+			mPSTextureSizes[i] = psProgram->resolveParameter(GCT_FLOAT2,-1, (uint16)GPV_PER_OBJECT, "AtlasSize");
+		}
 	}
 	return true;
 }
@@ -135,21 +139,24 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 	int groupOrder = (FFP_VS_TEXTURING - FFP_VS_LIGHTING) / 2;
 	int internalCounter = 0;
 
-	for(ushort i = 0 ; i < mAtlasTextureCount ; ++i)
+	for(ushort i = 0 ; i <  TAS_MAX_TEXTURES; ++i)
 	{
-		Operand::OpMask textureIndexMask = Operand::OPM_X;
-		switch (i)
+		if (mIsAtlasTextureUnits[i] == true)
 		{
-		case 1: textureIndexMask = Operand::OPM_Y; break;
-		case 2: textureIndexMask = Operand::OPM_Z; break;
-		case 3: textureIndexMask = Operand::OPM_W; break;
+			Operand::OpMask textureIndexMask = Operand::OPM_X;
+			switch (i)
+			{
+			case 1: textureIndexMask = Operand::OPM_Y; break;
+			case 2: textureIndexMask = Operand::OPM_Z; break;
+			case 3: textureIndexMask = Operand::OPM_W; break;
+			}
+			
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
+			curFuncInvocation->pushOperand(mVSTextureTable[i], Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mVSInpTextureTableIndex, Operand::OPS_IN, textureIndexMask, 1);
+			curFuncInvocation->pushOperand(mVSOutTextureDatas[i], Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
-		
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++);
-		curFuncInvocation->pushOperand(mVSTextureTable, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mVSInpTextureTableIndex, Operand::OPS_IN, textureIndexMask, 1);
-		curFuncInvocation->pushOperand(mVSOutTextureDatas[i], Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);
 	}
 
 	//
@@ -167,42 +174,44 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 	ParameterPtr psAtlasTextureCoord = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 
 		-1, "atlasCoord", GCT_FLOAT2);
 
-	for(ushort j = 0 ; j < mAtlasTextureCount ; ++j)
+	for(ushort j = 0 ; j <  TAS_MAX_TEXTURES; ++j)
 	{
-		int texNum = mAtlasTextureStart + j;
-		
-		//Find the texture coordinates texel and sampler from the original FFPTexturing
-		ParameterPtr texcoord = psMain->getParameterBySemantic(inpParams, Parameter::SPS_TEXTURE_COORDINATES, texNum);
-		ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexelEx + Ogre::StringConverter::toString(texNum));
-		UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, texNum);
-			
-		const char* addressUFuncName = getAdressingFunctionName(mTextureAddressings[j].u);
-		const char* addressVFuncName = getAdressingFunctionName(mTextureAddressings[j].v);
-		
-		//Create a function which will replace the texel with the texture texel
-		if ((texcoord.isNull() == false) && (texel.isNull() == false) && 
-			(sampler.isNull() == false) && (addressUFuncName != NULL) && (addressVFuncName != NULL))
+		if (mIsAtlasTextureUnits[j] == true)
 		{
-			//calculate the U value due to addressing mode
-			curFuncInvocation = OGRE_NEW FunctionInvocation(addressUFuncName, groupOrder, internalCounter++);
-			curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X);
-			curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_X);
-			psMain->addAtomInstance(curFuncInvocation);
+			//Find the texture coordinates texel and sampler from the original FFPTexturing
+			ParameterPtr texcoord = psMain->getParameterByContent(inpParams, (Parameter::Content)(Parameter::SPC_TEXTURE_COORDINATE0 + j), GCT_FLOAT2);
+			ParameterPtr texel = psMain->getParameterByName(localParams, c_ParamTexel + Ogre::StringConverter::toString(j));
+			UniformParameterPtr sampler = psProgram->getParameterByType(GCT_SAMPLER2D, j);
+				
+			const char* addressUFuncName = getAdressingFunctionName(mTextureAddressings[j].u);
+			const char* addressVFuncName = getAdressingFunctionName(mTextureAddressings[j].v);
+			
+			//Create a function which will replace the texel with the texture texel
+			if ((texcoord.isNull() == false) && (texel.isNull() == false) && 
+				(sampler.isNull() == false) && (addressUFuncName != NULL) && (addressVFuncName != NULL))
+			{
+				//calculate the U value due to addressing mode
+				curFuncInvocation = OGRE_NEW FunctionInvocation(addressUFuncName, groupOrder, internalCounter++);
+				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X);
+				curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_X);
+				psMain->addAtomInstance(curFuncInvocation);
 
-			//calculate the V value due to addressing mode
-			curFuncInvocation = OGRE_NEW FunctionInvocation(addressVFuncName, groupOrder, internalCounter++);
-			curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_Y);
-			curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_Y);
-			psMain->addAtomInstance(curFuncInvocation);
+				//calculate the V value due to addressing mode
+				curFuncInvocation = OGRE_NEW FunctionInvocation(addressVFuncName, groupOrder, internalCounter++);
+				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_Y);
+				curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_OUT, Operand::OPM_Y);
+				psMain->addAtomInstance(curFuncInvocation);
 
-			//sample the texel color
-			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ATLAS_SAMPLE, groupOrder, internalCounter++);
-			curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y);
-			curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mPSInpTextureDatas[j], Operand::OPS_IN);
-			curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
-			psMain->addAtomInstance(curFuncInvocation);
+				//sample the texel color
+				curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ATLAS_SAMPLE, groupOrder, internalCounter++);
+				curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
+				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y);
+				curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_IN);
+				curFuncInvocation->pushOperand(mPSInpTextureDatas[j], Operand::OPS_IN);
+				curFuncInvocation->pushOperand(mPSTextureSizes[j], Operand::OPS_IN);
+				curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
+				psMain->addAtomInstance(curFuncInvocation);
+			}
 		}
 	}
 	return true;
@@ -228,9 +237,13 @@ void TextureAtlasSampler::copyFrom(const SubRenderState& rhs)
 	const TextureAtlasSampler& rhsColour = static_cast<const TextureAtlasSampler&>(rhs);
 
 	mAtlasTexcoordPos = rhsColour.mAtlasTexcoordPos;
-	mAtlasTextureStart = rhsColour.mAtlasTextureStart;
-	mAtlasTextureCount = rhsColour.mAtlasTextureCount;
-	mAtlasTableData = rhsColour.mAtlasTableData;
+	for(ushort j = 0 ; j < TAS_MAX_TEXTURES ; ++j)
+	{
+		mIsAtlasTextureUnits[j] = rhsColour.mIsAtlasTextureUnits[j];
+		mTextureAddressings[j] = rhsColour.mTextureAddressings[j];
+		mAtlasTableDatas[j] = rhsColour.mAtlasTableDatas[j];
+		mIsAtlasTextureUnits[j] = rhsColour.mIsAtlasTextureUnits[j];
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -239,18 +252,32 @@ void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
 	if (mIsTableDataUpdated == false)
 	{
 		mIsTableDataUpdated = true;
-		GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
-		vector<float>::type buffer(mAtlasTableData->size() * 4);
-		for(size_t i = 0 ; i < mAtlasTableData->size() ; ++i)
+		for(ushort j = 0 ; j < TAS_MAX_TEXTURES ; ++j)
 		{
-			buffer[i*4] = (*mAtlasTableData)[i].posU;
-			buffer[i*4 + 1] = (*mAtlasTableData)[i].posV;
-			buffer[i*4 + 2] = (*mAtlasTableData)[i].width;
-			buffer[i*4 + 3] = (*mAtlasTableData)[i].height;
-		}
-				
+			if (mIsAtlasTextureUnits[j] == true)
+			{
+				//
+				// Update the information of the size of the atlas textures 
+				//
+				std::pair< size_t, size_t > texSizeInt = pass->getTextureUnitState(j)->getTextureDimensions();
+				Vector2 texSize(texSizeInt.first, texSizeInt.second);
+				mPSTextureSizes[j]->setGpuParameter(texSize); 
 
-		vsGpuParams->setNamedConstant(mVSTextureTable->getName(), (const float*)(&(buffer[0])), mAtlasTableData->size()); 
+				//
+				//Update the information of which texture exist where in the atlas
+				//
+				GpuProgramParametersSharedPtr vsGpuParams = pass->getVertexProgramParameters();
+				vector<float>::type buffer(mAtlasTableDatas[j]->size() * 4);
+				for(size_t i = 0 ; i < mAtlasTableDatas[j]->size() ; ++i)
+				{
+					buffer[i*4] = (*(mAtlasTableDatas[j]))[i].posU;
+					buffer[i*4 + 1] = (*(mAtlasTableDatas[j]))[i].posV;
+					buffer[i*4 + 2] = (float)Ogre::Math::Log2((*(mAtlasTableDatas[j]))[i].width * texSize.x);
+					buffer[i*4 + 3] = (float)Ogre::Math::Log2((*(mAtlasTableDatas[j]))[i].height * texSize.y);
+				}
+				vsGpuParams->setNamedConstant(mVSTextureTable[j]->getName(), (const float*)(&(buffer[0])), (mAtlasTableDatas[j])->size()); 
+			}
+		}
 	}
 }
 
@@ -258,12 +285,10 @@ void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
 bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
 	mAtlasTexcoordPos = 0; 
-	mAtlasTextureStart = 0;
-	mAtlasTextureCount = 0;
-	mAtlasTableData.setNull();
-
+	
 	const TextureAtlasSamplerFactory& factory = TextureAtlasSamplerFactory::getSingleton();
 
+	bool hasAtlas = false;
 	unsigned short texCount = srcPass->getNumTextureUnitStates();
 	for(unsigned short i = 0 ; i < texCount ; ++i)
 	{
@@ -272,34 +297,29 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
 		const TextureAtlasTablePtr& table = factory.getTextureAtlasTable(pState->getTextureName()); 
 		if (table.isNull() == false)
 		{
-			//atlas texture only support 2d textures
-			assert(pState->getTextureType() == TEX_TYPE_2D);
+			if (table->size() > TAS_MAX_SAFE_ATLASED_TEXTURES)
+			{
+				LogManager::getSingleton().logMessage(LML_CRITICAL,
+					"Warning : Compiling atlas texture has to many internally defined textures. Shader may fail to compile.");
+			}
+			if (i >= TAS_MAX_TEXTURES)
+			{
+				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+					"Texture atlas sub-render does not support more than TAS_MAX_TEXTURES (4) atlas textures",
+					"TextureAtlasSampler::preAddToRenderState" );
+			}
 			if (pState->getTextureType() != TEX_TYPE_2D)
 			{
-				mAtlasTextureCount = 0;
-				break;
-			}
+				OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+					"Texture atlas sub-render state only supports 2d textures.",
+					"TextureAtlasSampler::preAddToRenderState" );
 
-			if (mAtlasTableData.isNull())
-			{
-				mAtlasTableData = table;
-				mAtlasTextureStart = i;
 			}
 			
-			assert(mAtlasTableData == table);
-			mTextureAddressings[mAtlasTextureCount] = pState->getTextureAddressingMode();
-			++mAtlasTextureCount;
-
-			if (mAtlasTextureCount == TAS_MAX_TEXTURES)
-			{
-				//At this time the shader does not support more than TAS_MAX_TEXTURES (4) atlas textures
-				break;
-			}
-		}
-		else if (mAtlasTableData.isNull() == false)
-		{
-			//only support consecutive textures in texture atlas
-			break;
+			mAtlasTableDatas[i] = table;
+			mTextureAddressings[i] = pState->getTextureAddressingMode();
+			mIsAtlasTextureUnits[i] = true;
+			hasAtlas = true;
 		}
 	}
 	
@@ -310,7 +330,7 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
 		mAtlasTexcoordPos += texCount - 1;
 	}
 	
-	return mAtlasTextureCount != 0;
+	return hasAtlas;
 }
 
 TextureAtlasSamplerFactory::TextureAtlasSamplerFactory() :
@@ -340,7 +360,7 @@ void TextureAtlasSamplerFactory::writeInstance(MaterialSerializer* ser, SubRende
 }
 
 //-----------------------------------------------------------------------
-bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTable * textureAtlasTable )
+bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable )
 {
 	stream->seek(0);
 
@@ -382,7 +402,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 						);
 
 					it->second->push_back(newRecord);
-					if (textureAtlasTable != NULL)
+					if (!textureAtlasTable.isNull())
 					{
 						textureAtlasTable->push_back(newRecord);
 					}
@@ -393,11 +413,20 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 		}
 
 		//place the information in the main texture
+		size_t maxTextureCount = 0;
 		TextureAtlasMap::const_iterator it = tmpMap.begin();
 		TextureAtlasMap::const_iterator itEnd = tmpMap.end();
 		for(;it != itEnd; ++it)
 		{
 			mAtlases[it->first] = it->second;
+			maxTextureCount = std::max<size_t>(maxTextureCount, it->second->size());
+		}
+
+		if (maxTextureCount > TAS_MAX_SAFE_ATLASED_TEXTURES)
+		{
+			LogManager::getSingleton().logMessage(LML_CRITICAL, 
+				("Warning : " + stream->getName() +
+				" atlas texture has to many internally defined textures. Shader may fail to compile."));
 		}
 	}
 	return isSuccess;

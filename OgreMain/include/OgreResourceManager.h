@@ -133,7 +133,7 @@ namespace Ogre {
         virtual size_t getMemoryBudget(void) const;
 
 		/** Gets the current memory usage, in bytes. */
-		virtual size_t getMemoryUsage(void) const { return mMemoryUsage; }
+		virtual size_t getMemoryUsage(void) const { return mMemoryUsage.get(); }
 
 		/** Unloads a single resource by name.
 		@remarks
@@ -498,7 +498,7 @@ namespace Ogre {
 		ResourceWithGroupMap mResourcesWithGroup;
         ResourceHandle mNextHandle;
         size_t mMemoryBudget; // In bytes
-        size_t mMemoryUsage; // In bytes
+        AtomicScalar<size_t> mMemoryUsage; // In bytes
 
         bool mVerbose;
 

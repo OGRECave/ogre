@@ -97,7 +97,7 @@ namespace Ogre {
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
 					"to SubEntity of " + mParentEntity->getName() + ". Did "
 					"you forget to call MaterialManager::initialise()?",
-					"SubEntity.setMaterialName");
+					"SubEntity::setMaterialName");
 			}
 		}
 
@@ -122,7 +122,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
                     "to SubEntity of " + mParentEntity->getName() + ". Did "
                     "you forget to call MaterialManager::initialise()?",
-                    "SubEntity.setMaterialName");
+                    "SubEntity::setMaterial");
             }
         }
 		

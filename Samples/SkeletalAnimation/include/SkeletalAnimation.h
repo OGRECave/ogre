@@ -12,6 +12,9 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 public:
 
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		, mSrsHardwareSkinning(0)
+#endif
 	{
 		mInfo["Title"] = "Skeletal Animation";
 		mInfo["Description"] = "A demo of the skeletal animation feature, including spline animation.";
@@ -23,26 +26,26 @@ public:
     {
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
-// 			// update sneaking animation based on speed
-// 			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
-// 
-// 			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-// 			{
-// 				/* We need reposition the scene node origin, since the animation includes translation.
-// 				Position is calculated from an offset to the end position, and rotation is calculated
-// 				from how much the animation turns the character. */
-// 
-// 				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-// 
-// 				// find current end position and the offset
-// 				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-// 				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-// 
-// 				mModelNodes[i]->setPosition(currEnd + offset);
-// 				mModelNodes[i]->rotate(rot);
-// 
-// 				mAnimStates[i]->setTimePosition(0);   // reset animation time
-// 			}
+			// update sneaking animation based on speed
+			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
+
+			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
+			{
+				/* We need reposition the scene node origin, since the animation includes translation.
+				Position is calculated from an offset to the end position, and rotation is calculated
+				from how much the animation turns the character. */
+
+				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+
+				// find current end position and the offset
+				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+
+				mModelNodes[i]->setPosition(currEnd + offset);
+				mModelNodes[i]->rotate(rot);
+
+				mAnimStates[i]->setTimePosition(0);   // reset animation time
+			}
         }
 
 		return SdkSample::frameRenderingQueued(evt);
@@ -50,8 +53,29 @@ public:
 
 
 protected:
+
 	void setupContent()
 	{
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		//To make glsles work the program will need to be provided with proper
+		//shadow caster materials
+		if (mShaderGenerator->getTargetLanguage() != "glsles")
+		{
+			//Add the hardware skinning to the shader generator default render state
+			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+			
+			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
+			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
+			Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
+			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
+
+			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+				pCast1, pCast2, pCast3, pCast4);
+		}
+#endif
 		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 		mSceneMgr->setShadowTextureSize(512);
@@ -112,7 +136,7 @@ protected:
 
 	void setupModels()
 	{
-		//tweakSneakAnim();
+		tweakSneakAnim();
 
 		SceneNode* sn = NULL;
 		Entity* ent = NULL;
@@ -127,18 +151,33 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "spine.mesh");
-			ent->setMaterialName("spineDualQuatTest");
+            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
 			sn->attachObject(ent);
-			sn->setScale(Vector3(20, 20, 20));
-			
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+			//To make glsles work the program will need to be provided with proper
+			//shadow caster materials
+			if (mShaderGenerator->getTargetLanguage() != "glsles")
+			{
+				//In case the system uses the RTSS, the following line will ensure
+				//that the entity is using hardware animation in RTSS as well.
+				RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+				//The following line is needed only because the Jaiqua model material has shaders and
+				//as such is not automatically reflected in the RTSS system
+				RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+					ent->getSubEntity(0)->getMaterialName(),
+					Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
+					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+					true);
+			}
+#endif
+		
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
-			//as = ent->getAnimationState("Sneak");
-			//as->setEnabled(true);
-			//as->setLoop(false);
-			//mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
-			//mAnimStates.push_back(as);
-		}
+			as = ent->getAnimationState("Sneak");
+            as->setEnabled(true);
+			as->setLoop(false);
+			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
+			mAnimStates.push_back(as);
+        }
 
 		// create name and value for skinning mode
 		StringVector names;
@@ -208,6 +247,16 @@ protected:
 		mAnimStates.clear();
 		mAnimSpeeds.clear();
 		MeshManager::getSingleton().remove("floor");
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+		//To make glsles work the program will need to be provided with proper
+		//shadow caster materials
+		if (mShaderGenerator->getTargetLanguage() != "glsles")
+		{
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
+		}
+#endif
 	}
 
 	const unsigned int NUM_MODELS;
@@ -219,6 +268,10 @@ protected:
 
 	Vector3 mSneakStartPos;
 	Vector3 mSneakEndPos;
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	RTShader::SubRenderState* mSrsHardwareSkinning;
+#endif
 };
 
 #endif

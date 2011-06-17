@@ -396,7 +396,7 @@ namespace Ogre {
 		virtual void removeListener(Listener* lis);
 
 		/// Gets the group which this resource is a member of
-		virtual const String& getGroup(void) { return mGroup; }
+		virtual const String& getGroup(void) const { return mGroup; }
 
 		/** Change the resource group ownership of a Resource.
 		@remarks

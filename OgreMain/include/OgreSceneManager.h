@@ -1955,6 +1955,9 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1, 
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+		/** Enables / disables a 'sky plane' */
+		virtual void setSkyPlaneEnabled(bool enable) { mSkyPlaneEnabled = enable; }
+
 		/** Return whether a key plane is enabled */
 		virtual bool isSkyPlaneEnabled(void) const { return mSkyPlaneEnabled; }
 
@@ -2046,6 +2049,9 @@ namespace Ogre {
             bool enable, const String& materialName, Real distance = 5000,
             uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		/** Enables / disables a 'sky box' */
+		virtual void setSkyBoxEnabled(bool enable) { mSkyBoxEnabled = enable; }
 
 		/** Return whether a skybox is enabled */
 		virtual bool isSkyBoxEnabled(void) const { return mSkyBoxEnabled; }
@@ -2170,6 +2176,9 @@ namespace Ogre {
             const Quaternion& orientation = Quaternion::IDENTITY,
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		/** Enables / disables a 'sky dome' */
+		virtual void setSkyDomeEnabled(bool enable) { mSkyDomeEnabled = enable; }
 
 		/** Return whether a skydome is enabled */
 		virtual bool isSkyDomeEnabled(void) const { return mSkyDomeEnabled; }

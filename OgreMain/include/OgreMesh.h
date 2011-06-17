@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreSkeleton.h"
+#include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgrePose.h"
 #include "OgreDataStream.h"
@@ -87,7 +88,7 @@ namespace Ogre {
     struct MeshLodUsage;
     class LodStrategy;
 
-    class _OgreExport Mesh: public Resource
+    class _OgreExport Mesh: public Resource, public AnimationContainer
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
@@ -782,7 +783,7 @@ namespace Ogre {
 		virtual Animation* _getAnimationImpl(const String& name) const;
 
 		/** Returns whether this mesh contains the named vertex animation. */
-		virtual bool hasAnimation(const String& name);
+		virtual bool hasAnimation(const String& name) const;
 
         /** Removes vertex Animation from this mesh. */
         virtual void removeAnimation(const String& name);

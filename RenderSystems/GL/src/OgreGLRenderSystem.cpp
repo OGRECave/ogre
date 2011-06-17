@@ -460,8 +460,8 @@ namespace Ogre {
 			rsc->setGeometryProgramConstantBoolCount(0);
 			rsc->setGeometryProgramConstantIntCount(0);
 
-			GLint floatConstantCount;
-			glGetProgramivARB(GL_GEOMETRY_PROGRAM_NV, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
+			GLint floatConstantCount = 0;
+            glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT, &floatConstantCount);
 			rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
 
 			GLint maxOutputVertices;
@@ -2407,7 +2407,9 @@ namespace Ogre {
 		}
 		else
 		{
-			glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+            if(!GLEW_VERSION_2_0)
+                glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+
 			flip = false;
 			glStencilMask(mask);
 			glStencilFunc(convertCompareFunction(func), refValue, mask);

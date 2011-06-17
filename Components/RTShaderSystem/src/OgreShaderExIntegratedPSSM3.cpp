@@ -425,7 +425,7 @@ SubRenderState*	IntegratedPSSM3Factory::createInstance(ScriptCompiler* compiler,
 
 			if (splitPointList.size() == 4)
 			{
-				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+				SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 				IntegratedPSSM3* pssmSubRenderState = static_cast<IntegratedPSSM3*>(subRenderState);
 
 				pssmSubRenderState->setSplitPoints(splitPointList);

@@ -45,6 +45,37 @@ namespace Ogre {
 	*  @{
 	*/
 
+	class Animation;
+	
+	/** An animation container interface, which allows generic access to sibling animations.
+	 @remarks
+		Because Animation instances can be held by different kinds of classes, and
+		there are sometimes instances when you need to reference other Animation 
+		instances within the same container, this class allows generic access to
+		named animations within that container, whatever it may be.
+	*/
+	class _OgreExport AnimationContainer
+	{
+	public:
+		/** Gets the number of animations in this container. */
+        virtual unsigned short getNumAnimations(void) const = 0;
+		
+        /** Retrieve an animation by index.  */
+        virtual Animation* getAnimation(unsigned short index) const = 0;
+		
+		/** Retrieve an animation by name. */
+		virtual Animation* getAnimation(const String& name) const = 0;
+		
+		/** Create a new animation with a given length owned by this container. */
+		virtual Animation* createAnimation(const String& name, Real length) = 0;
+		
+		/** Returns whether this object contains the named animation. */
+		virtual bool hasAnimation(const String& name) const = 0;
+		
+        /** Removes an Animation from this container. */
+        virtual void removeAnimation(const String& name) = 0;
+		
+	};
     /** An animation sequence. 
     @remarks
         This class defines the interface for a sequence of animation, whether that
@@ -426,7 +457,49 @@ namespace Ogre {
             global keyframe time list.
         */
         TimeIndex _getTimeIndex(Real timePos) const;
-
+		
+		/** Sets a base keyframe which for the skeletal / pose keyframes 
+			in this animation. 
+		 @remarks
+			Skeletal and pose animation keyframes are expressed as deltas from a 
+			given base state. By default, that is the binding setup of the skeleton, 
+			or the object space mesh positions for pose animation. However, sometimes
+			it is useful for animators to create animations with a different starting
+			pose, because that's more convenient, and the animation is designed to
+			simply be added to the existing animation state and not globally averaged
+			with other animations (this is always the case with pose animations, but
+			is activated for skeletal animations via ANIMBLEND_CUMULATIVE).
+		 @par
+			In order for this to work, the keyframes need to be 're-based' against
+			this new starting state, for example by treating the first keyframe as
+			the reference point (and therefore representing no change). This can 
+			be achieved by applying the inverse of this reference keyframe against
+			all other keyframes. Since this fundamentally changes the animation, 
+			this method just marks the animation as requiring this rebase, which 
+			is performed at the next Animation 'apply' call. This is to allow the
+			Animation to be re-saved with this flag set, but without having altered
+			the keyframes yet, so no data is lost unintentionally. If you wish to
+			save the animation after the adjustment has taken place, you can
+			(@see _applyBaseKeyFrame)
+		 @param useBaseKeyFrame Whether a base keyframe should be used
+		 @param keyframeTime The time corresponding to the base keyframe, if any
+		 @param baseAnimName Optionally a different base animation (must contain the same tracks)
+		*/
+		void setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime = 0.0f, const String& baseAnimName = StringUtil::BLANK);
+		/** Whether a base keyframe is being used for this Animation. */
+		bool getUseBaseKeyFrame() const;
+		/** If a base keyframe is being used, the time of that keyframe. */
+		Real getBaseKeyFrameTime() const;
+		/** If a base keyframe is being used, the Animation that provides that keyframe. */
+		const String& getBaseKeyFrameAnimationName() const;
+		
+		/// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
+		void _applyBaseKeyFrame();
+		
+		void _notifyContainer(AnimationContainer* c);
+		/** Retrieve the container of this animation. */
+		AnimationContainer* getContainer();
+		
     protected:
         /// Node tracks, indexed by handle
         NodeTrackList mNodeTrackList;
@@ -437,7 +510,7 @@ namespace Ogre {
         String mName;
 
         Real mLength;
-
+		
         InterpolationMode mInterpolationMode;
         RotationInterpolationMode mRotationInterpolationMode;
 
@@ -449,6 +522,11 @@ namespace Ogre {
         mutable KeyFrameTimeList mKeyFrameTimes;
         /// Dirty flag indicate that keyframe time list need to rebuild
         mutable bool mKeyFrameTimesDirty;
+
+		bool mUseBaseKeyFrame;
+		Real mBaseKeyFrameTime;
+		String mBaseKeyFrameAnimationName;
+		AnimationContainer* mContainer;
 
 		void optimiseNodeTracks(bool discardIdentityTracks);
 		void optimiseVertexTracks(void);

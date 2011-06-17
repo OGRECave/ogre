@@ -32,7 +32,7 @@
 
 using namespace Ogre;
 
-@interface OSXCocoaWindowDelegate : NSObject
+_OgreGLExport @interface OSXCocoaWindowDelegate : NSObject
 {
 @private
     RenderWindow *ogreWindow;

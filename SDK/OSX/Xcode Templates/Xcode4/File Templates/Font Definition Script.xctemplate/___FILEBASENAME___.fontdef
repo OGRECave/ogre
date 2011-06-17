@@ -1,0 +1,17 @@
+//
+// «FILENAME»
+// «PROJECTNAME»
+//
+// Created by «FULLUSERNAME» on «DATE».
+// Copyright «YEAR» «ORGANIZATIONNAME». All rights reserved.
+//
+
+StarWars
+{
+	// Now this one I agree with ;)
+	// A Star Wars font :)
+	type 		truetype
+	source 		solo5.ttf
+	size 		16
+	resolution 	96
+}

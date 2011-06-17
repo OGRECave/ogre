@@ -241,6 +241,8 @@ namespace Ogre
 		/** Clone a keyframe (internal use only) */
 		KeyFrame* _clone(AnimationTrack* newParent) const;
 		
+		void _applyBaseKeyFrame(const VertexPoseKeyFrame* base);
+		
 	protected:
 		PoseRefList mPoseRefs;
 

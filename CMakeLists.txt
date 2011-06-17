@@ -217,8 +217,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   # armv7 only
   #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
 
-  add_definitions(-fno-regmove)
-  add_definitions(-falign-loops=16)
   remove_definitions(-msse)
 elseif (UNIX AND OGRE_BUILD_PLATFORM_TEGRA2)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for NVIDIA Tegra 2" FORCE)

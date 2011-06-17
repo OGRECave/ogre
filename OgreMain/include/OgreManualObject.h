@@ -462,6 +462,10 @@ namespace Ogre
 			void getWorldTransforms(Matrix4* xform) const;
 			HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
 			HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
+			/// Overridden from ShadowRenderable
+			virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
+
+			
 
 		};
 

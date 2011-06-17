@@ -44,6 +44,15 @@ template<> RTShader::HardwareSkinningFactory* Singleton<RTShader::HardwareSkinni
 
 namespace RTShader {
 
+HardwareSkinningFactory* HardwareSkinningFactory::getSingletonPtr(void)
+{
+    return ms_Singleton;
+}
+HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
+{  
+    assert( ms_Singleton );  return ( *ms_Singleton );  
+}
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -177,13 +186,21 @@ bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 	
 	if (mDoBoneCalculations == true)
 	{
+		GpuProgramParameters::AutoConstantType worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4;
+		if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
+		{
+			//given that hlsl shaders use column major matrices which are not compatible with the cg
+			//and glsl method of row major matrices, we will use a full matrix instead.
+			worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY;
+		}
+
 		//input parameters
 		mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);	
 		mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);	
 		mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);	
 		mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
 		mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4, 0, mBoneCount);
+		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(worldMatrixType, 0, mBoneCount);
 		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
 		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
 		
@@ -329,12 +346,18 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 	
 	FunctionInvocation* curFuncInvocation;
 
+	int outputMask = Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z;
+	if (mParamInWorldMatrices->getType() == GCT_MATRIX_4X4)
+	{
+		outputMask = Operand::OPM_ALL;
+	}
+	
 	//multiply position with world matrix and put into temporary param
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
 	curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);	
+	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, outputMask);	
 	vsMain->addAtomInstance(curFuncInvocation);	
 
 	//set w value of temporary param to 1
@@ -363,9 +386,9 @@ void HardwareSkinning::addIndexedPositionWeight(Function* vsMain,
 	{
 		//add the local param as the value of the world param
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);	
-		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
 		vsMain->addAtomInstance(curFuncInvocation);	
 	}
 }
@@ -387,7 +410,7 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN, Operand::OPM_ALL);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
 	curFuncInvocation->pushOperand(pNormalParam, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);	
+	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);	
 	vsMain->addAtomInstance(curFuncInvocation);	
 
 	//multiply temporary param with weight
@@ -410,9 +433,9 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 	{
 		//add the local param as the value of the world normal
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
+		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);	
 		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);	
-		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
 		vsMain->addAtomInstance(curFuncInvocation);	
 	}
 }
@@ -490,7 +513,7 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		else
 		{
 			//create and update the hardware skinning sub render state
-			SubRenderState*	subRenderState = SubRenderStateFactory::createInstance();
+			SubRenderState*	subRenderState = createOrRetrieveInstance(translator);
 			HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
 			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount);
 			
@@ -588,8 +611,12 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort&
 	boneCount = 0;
 	weightCount = 0;
 
+	//Check if we have pose animation which the HS sub render state does not 
+	//know how to handle
+	bool hasVertexAnim = pEntity->getMesh()->hasVertexAnimation();
+
 	//gather data on the skeleton
-	if (pEntity->hasSkeleton() == true)
+	if (!hasVertexAnim && pEntity->hasSkeleton())
 	{
 		//get weights count
 		MeshPtr pMesh = pEntity->getMesh();
@@ -608,7 +635,8 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort&
 			//go over vertex deceleration 
 			//check that they have blend indices and blend weights
 			const VertexElement* pDeclWeights = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_WEIGHTS,0);
-			if ((pDeclWeights != NULL) && (pDeclWeights != NULL))
+			const VertexElement* pDeclIndexes = ro.vertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES,0);
+			if ((pDeclWeights != NULL) && (pDeclIndexes != NULL))
 			{
 				isValidData = true;
 				switch (pDeclWeights->getType())

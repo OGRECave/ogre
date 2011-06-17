@@ -643,6 +643,34 @@ namespace Ogre {
         return mpMaterial;
     }
 
+    void BillboardSet::setMaterial( const MaterialPtr& material )
+	{
+		mpMaterial = material;
+		
+        if (mpMaterial.isNull())
+        {
+			LogManager::getSingleton().logMessage("Can't assign material "  
+                                                  " to BillboardSet of " + getName() + " because this "
+                                                  "Material does not exist. Have you forgotten to define it in a "
+                                                  ".material script?");
+			
+            mpMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+			
+            if (mpMaterial.isNull())
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
+                            "to BillboardSet " + getName() + ". Did "
+                            "you forget to call MaterialManager::initialise()?",
+                            "BillboardSet::setMaterial");
+            }
+        }
+		
+		mMaterialName = mpMaterial->getName();
+        
+        // Ensure new material loaded (will not load again if already loaded)
+        mpMaterial->load();
+	}
+
     //-----------------------------------------------------------------------
     void BillboardSet::getRenderOperation(RenderOperation& op)
     {

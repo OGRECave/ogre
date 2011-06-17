@@ -1163,6 +1163,12 @@ namespace Ogre {
 		// pretransformed
 		*xform = mParent->_getParentNodeFullTransform();
 	}
+	//-----------------------------------------------------------------------
+	void ManualObject::ManualObjectSectionShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
+	{
+		mRenderOp.indexData->indexBuffer = indexBuffer;
+		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
+	}
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
 	String ManualObjectFactory::FACTORY_TYPE_NAME = "ManualObject";

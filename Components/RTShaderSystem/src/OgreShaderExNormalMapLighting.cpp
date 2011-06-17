@@ -1318,7 +1318,7 @@ SubRenderState*	NormalMapLightingFactory::createInstance(ScriptCompiler* compile
 				}
 
 				
-				SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+				SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 				NormalMapLighting* normalMapSubRenderState = static_cast<NormalMapLighting*>(subRenderState);
 				
 				normalMapSubRenderState->setNormalMapTextureName(strValue);

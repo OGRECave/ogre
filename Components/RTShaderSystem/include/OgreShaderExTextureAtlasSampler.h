@@ -168,16 +168,15 @@ protected:
 	TextureUnitState::UVWAddressingMode mTextureAddressings[TAS_MAX_TEXTURES]; // The addressing mode for each texture
 	ParameterPtr mVSOutTextureDatas[TAS_MAX_TEXTURES]; // The position and size of the texture in the atlas 
 	ParameterPtr mPSInpTextureDatas[TAS_MAX_TEXTURES]; // The position and size of the texture in the atlas
-	UniformParameterPtr mVSTextureTable; // The table containing information on the textures in the atlas
+	UniformParameterPtr mPSTextureSizes[TAS_MAX_TEXTURES]; //A parameter carrying the sizes of the atlas textures
+	UniformParameterPtr mVSTextureTable[TAS_MAX_TEXTURES]; // The table containing information on the textures in the atlas
 
 	//The position of the texture coordinates containing the index information 
 	ushort mAtlasTexcoordPos; 
-	//The first texture number which use atlas texture
-	ushort mAtlasTextureStart;
-	//The number of indexes which use atlas texture 
-	ushort mAtlasTextureCount;
 	//The texture atlas table data
-	TextureAtlasTablePtr mAtlasTableData;
+	TextureAtlasTablePtr mAtlasTableDatas[TAS_MAX_TEXTURES];
+	//For each texture unit in the pass tells if it uses atlas texture
+	bool mIsAtlasTextureUnits[TAS_MAX_TEXTURES];
 	//Tells if the data in mAtlasTableData has been uploaded to the corresponding mVSTextureTable parameter
 	bool mIsTableDataUpdated;
 };
@@ -225,9 +224,14 @@ public:
 		The ".tai" format consist of lines, where each line corresponds to a specific texture
 		in the texture atlas. Each line has the following format:
 		# <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
-	*/
-	bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTable * textureAtlasTable = 0 );
 	
+		@param stream A stream to a file containing ".tai" format data
+		@param textureAtlasTable A table into which the data in the stream will be filled. This
+			parameter will be filled only if it is not null. The system factory keeps a copy of this
+			information in any case.
+	*/
+	bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
+
 	/**
 		Set the texture atlas information for a given texture
 		@param textureName Name of an atlas texture

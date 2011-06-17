@@ -122,7 +122,7 @@ SubRenderState*	FFPTransformFactory::createInstance(ScriptCompiler* compiler,
 
 			if (modelType == "ffp")
 			{
-				return SubRenderStateFactory::createInstance();
+				return createOrRetrieveInstance(translator);
 			}
 		}		
 	}

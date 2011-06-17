@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Kind</key>
+	<string>Xcode.Xcode3.ProjectTemplateUnitKind</string>
+	<key>Identifier</key>
+	<string>org.ogre3d.objectiveCApplication</string>
+	<key>Ancestors</key>
+	<array>
+		<string>org.ogre3d.bundleBase</string>
+	</array>
+	<key>Targets</key>
+	<array>
+		<dict>
+			<key>ProductType</key>
+			<string>com.apple.product-type.application</string>
+			<key>SharedSettings</key>
+			<dict>
+				<key>WRAPPER_EXTENSION</key>
+				<string>app</string>
+			</dict>
+			<key>Configurations</key>
+			<dict>
+				<key>Debug</key>
+				<dict>
+					<key>COPY_PHASE_STRIP</key>
+					<string>NO</string>
+				</dict>
+				<key>Release</key>
+				<dict>
+					<key>COPY_PHASE_STRIP</key>
+					<string>YES</string>
+				</dict>
+			</dict>
+			<key>BuildPhases</key>
+			<array>
+				<dict>
+					<key>Class</key>
+					<string>Sources</string>
+				</dict>
+				<dict>
+					<key>Class</key>
+					<string>Frameworks</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>Nodes</key>
+	<array>
+		<string>___PACKAGENAME___-Info.plist:Basics</string>
+		<string>___PACKAGENAME___-Prefix.pch:Availability</string>
+		<string>___PACKAGENAME___-Prefix.pch:objC:importCocoa</string>
+	</array>
+	<key>Definitions</key>
+	<dict>
+		<key>___PACKAGENAME___-Info.plist:Basics</key>
+		<string>&lt;key&gt;CFBundleDevelopmentRegion&lt;/key&gt;
+&lt;string&gt;en&lt;/string&gt;
+&lt;key&gt;CFBundleExecutable&lt;/key&gt;
+&lt;string&gt;${EXECUTABLE_NAME}&lt;/string&gt;
+&lt;key&gt;CFBundleIconFile&lt;/key&gt;
+&lt;string&gt;&lt;/string&gt;
+&lt;key&gt;CFBundleInfoDictionaryVersion&lt;/key&gt;
+&lt;string&gt;6.0&lt;/string&gt;
+&lt;key&gt;CFBundleName&lt;/key&gt;
+&lt;string&gt;${PRODUCT_NAME}&lt;/string&gt;
+&lt;key&gt;CFBundlePackageType&lt;/key&gt;
+&lt;string&gt;APPL&lt;/string&gt;
+&lt;key&gt;CFBundleSignature&lt;/key&gt;
+&lt;string&gt;????&lt;/string&gt;
+</string>
+		<key>*:*:importFoundation</key>
+		<string>#import &lt;Foundation/Foundation.h&gt;
+</string>
+	</dict>
+</dict>
+</plist>

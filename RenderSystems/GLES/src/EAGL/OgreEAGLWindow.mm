@@ -122,8 +122,8 @@ namespace Ogre {
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
 
-        mWidth = width * mContentScalingFactor;
-        mHeight = height * mContentScalingFactor;
+        mWidth = width;
+        mHeight = height;
 
         mContext->createFramebuffer();
 
@@ -215,7 +215,7 @@ namespace Ogre {
 
         OgreAssert(mView != nil, "EAGLWindow: Failed to create view");
 
-        mView.mWindowName = mName;
+        [mView setMWindowName:mName];
 
         OgreAssert([mView.layer isKindOfClass:[CAEAGLLayer class]], "EAGLWindow: View's Core Animation layer is not a CAEAGLLayer. This is a requirement for using OpenGL ES for drawing.");
         

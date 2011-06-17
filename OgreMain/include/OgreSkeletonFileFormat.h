@@ -55,6 +55,9 @@ namespace Ogre {
     enum SkeletonChunkID {
         SKELETON_HEADER            = 0x1000,
             // char* version           : Version number check
+			SKELETON_BLENDMODE		   = 0x1010, // optional
+				// unsigned short blendmode		: SkeletonAnimationBlendMode
+		
         SKELETON_BONE              = 0x2000,
         // Repeating section defining each bone in the system. 
         // Bones are assigned indexes automatically based on their order of declaration
@@ -78,6 +81,11 @@ namespace Ogre {
 
             // char* name                       : Name of the animation
             // float length                      : Length of the animation in seconds
+		
+			SKELETON_ANIMATION_BASEINFO = 0x4010,
+			// [Optional] base keyframe information
+			// char* baseAnimationName (blank for self)
+			// float baseKeyFrameTime
 
             SKELETON_ANIMATION_TRACK = 0x4100,
             // A single animation track (relates to a single bone)

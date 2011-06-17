@@ -141,10 +141,14 @@
 	nz		CDATA	""
 	>
 <!ELEMENT animations (animation+)>
-<!ELEMENT animation (tracks)>
+<!ELEMENT animation (baseinfo?, tracks)>
 <!ATTLIST animation
 	name	CDATA	#REQUIRED 
 	length  CDATA   #REQUIRED >
+<!ELEMENT baseinfo EMPTY>
+<!ATTLIST baseinfo
+    baseanimationname   CDATA   #REQUIRED
+    basekeyframetime    CDATA   #REQUIRED>
 <!ELEMENT tracks (track+)>
 <!ELEMENT track (keyframes)>
 <!-- Morph animation is a keyframed set of absolute vertex positions/normals. Cannot

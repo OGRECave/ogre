@@ -517,7 +517,7 @@ LayeredBlending* LayeredBlendingFactory::createOrRetrieveSubRenderState(SGScript
 	}
 	else
 	{
-		SubRenderState* subRenderState = SubRenderStateFactory::createInstance();
+		SubRenderState* subRenderState = createOrRetrieveInstance(translator);
 		layeredBlendState = static_cast<LayeredBlending*>(subRenderState);
 	}
 	return layeredBlendState;

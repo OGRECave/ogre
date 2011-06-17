@@ -98,6 +98,13 @@ namespace Ogre {
             return mField--;
         }
 
+		T operator+=(const T &add)
+		{
+			OGRE_LOCK_AUTO_MUTEX
+			mField += add;
+			return mField;
+		}
+
         protected:
 
         OGRE_AUTO_MUTEX
@@ -177,6 +184,10 @@ namespace Ogre {
             __sync_fetch_and_add (&mField, -1);
         }
 
+		T operator+=(const T &add)
+		{
+			__sync_fetch_and_add (&mField, add);
+		}
 
         volatile T mField;
 
@@ -305,6 +316,21 @@ namespace Ogre {
             }
         }
 
+		T operator+=(const T &add)
+		{
+			//The function InterlockedExchangeAdd is not available for 64 and 16 bit version
+			//We will use the cas operation instead. 
+			T newVal;
+			do {
+				//Create a value of the current field plus the added value
+				newVal = mField + add;
+				//Replace the current field value with the new value. Ensure that the value 
+				//of the field hasn't changed in the mean time by comparing it to the new value
+				//minus the added value. 
+			} while (!cas(newVal - add, newVal)); //repeat until successful
+			return newVal;
+		}
+
         volatile T mField;
 
     };
@@ -389,6 +415,13 @@ namespace Ogre {
             OGRE_LOCK_AUTO_MUTEX
             return mField--;
         }
+
+		T operator+=(const T &add)
+		{
+			OGRE_LOCK_AUTO_MUTEX
+			mField += add;
+			return mField;
+		}
 
         protected:
 

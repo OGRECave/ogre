@@ -252,6 +252,91 @@ namespace Ogre {
 
         return path;
     }
+	//-----------------------------------------------------------------------
+	String StringUtil::normalizeFilePath(const String& init, bool makeLowerCase)
+	{
+		const char* bufferSrc = init.c_str();
+		int pathLen = (int)init.size();
+		int indexSrc = 0;
+		int indexDst = 0;
+		int metaPathArea = 0;
+
+		char reservedBuf[1024];
+		char* bufferDst = reservedBuf;
+		bool isDestAllocated = false;
+		if (pathLen > 1023)
+		{
+			//if source path is to long ensure we don't do a buffer overrun by allocating some
+			//new memory
+			isDestAllocated = true;
+			bufferDst = new char[pathLen + 1];
+		}
+
+		//The outer loop loops over directories
+		while (indexSrc < pathLen)
+		{		
+			if ((bufferSrc[indexSrc] == '\\') || (bufferSrc[indexSrc] == '/'))
+			{
+				//check if we have a directory delimiter if so skip it (we should already
+				//have written such a delimiter by this point
+				++indexSrc;
+				continue;
+			}
+			else
+			{
+				//check if there is a directory to skip of type ".\"
+				if ((bufferSrc[indexSrc] == '.') && 
+					((bufferSrc[indexSrc + 1] == '\\') || (bufferSrc[indexSrc + 1] == '/')))
+				{
+					indexSrc += 2;
+					continue;			
+				}
+
+				//check if there is a directory to skip of type "..\"
+				else if ((bufferSrc[indexSrc] == '.') && (bufferSrc[indexSrc + 1] == '.') &&
+					((bufferSrc[indexSrc + 2] == '\\') || (bufferSrc[indexSrc + 2] == '/')))
+				{
+					if (indexDst > metaPathArea)
+					{
+						//skip a directory backward in the destination path
+						do {
+							--indexDst;
+						}
+						while ((indexDst > metaPathArea) && (bufferDst[indexDst - 1] != '\\'));
+						indexSrc += 3;
+						continue;
+					}
+					else
+					{
+						//we are about to write "..\" to the destination buffer
+						//ensure we will not remove this in future "skip directories"
+						metaPathArea += 3;
+					}
+				}
+			}
+
+			//transfer the current directory name from the source to the destination
+			while (indexSrc < pathLen)
+			{
+				char curChar = bufferSrc[indexSrc];
+				if (makeLowerCase) curChar = tolower(curChar);
+				if (curChar == '\\') curChar = '/';
+				bufferDst[indexDst] = curChar;
+				++indexDst;
+				++indexSrc;
+				if (curChar == '/') break;
+			}
+		}
+		bufferDst[indexDst] = 0;
+
+		String normalized(bufferDst); 
+		if (isDestAllocated)
+		{
+			delete[] bufferDst;
+		}
+
+		return normalized;		
+	}
     //-----------------------------------------------------------------------
     void StringUtil::splitFilename(const String& qualifiedName, 
         String& outBasename, String& outPath)
