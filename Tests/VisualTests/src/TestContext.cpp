@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "TestContext.h"
 #include "VisualTest.h"
 #include "SamplePlugin.h"
-#include "ImageCompare.h"
+#include "TestResults.h"
 
 #include "OgrePlatform.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
@@ -52,9 +52,6 @@ void TestContext::setup()
     // load up the tests
     OgreBites::Sample* firstTest = loadTests();
 
-    // write out some extra data to be used in comparisons
-    writeConfig();
-    
     // for now we just go right into the tests, eventually there'll be a menu screen beforehand
     runSample(firstTest);
 }
@@ -154,9 +151,11 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
         if(mCurrentTest->isScreenshotFrame(mCurrentFrame))
         {
             // take a screenshot
-            Ogre::String filename = mOutputDir + mTestSetName + "/" +
+            Ogre::String filename = mOutputDir + mBatchName + "/" +
                 mCurrentTest->getInfo()["Title"] + "_" + 
                 Ogre::StringConverter::toString(mCurrentFrame) + ".png";
+            mImages.push_back(mCurrentTest->getInfo()["Title"] + "_" + 
+                Ogre::StringConverter::toString(mCurrentFrame));
             mWindow->writeContentsToFile(filename);
         }
 
@@ -251,7 +250,7 @@ void TestContext::setupDirectories()
     // timestamp for the filename
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     Ogre::String filestamp = Ogre::String(temp, 18);
-    mTestSetName = "VisualTests_" + filestamp;
+    mBatchName = "VisualTests_" + filestamp;
     
     // a nicer formatted version
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
@@ -271,35 +270,33 @@ void TestContext::setupDirectories()
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
 
     // and finally a directory for the test run itself
-    //mOutputDir += mTestSetName + "/";
+    //mOutputDir += mBatchName + "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir
-        + mTestSetName + "/");
+        + mBatchName + "/");
 }
 //-----------------------------------------------------------------------
 
 void TestContext::writeConfig()
 {
-    // save a small .cfg file with some details about the set
+    // save a small .cfg file with some details about the run
     std::ofstream config;
-    config.open(Ogre::String(mOutputDir + mTestSetName + "/info.cfg").c_str());
+    config.open(Ogre::String(mOutputDir + mBatchName + "/info.cfg").c_str());
 
     if(config.is_open())
     {
         config<<"[Info]\n";
+        config<<"Name="<<mBatchName<<"\n";
         config<<"Time="<<mTimestamp<<"\n";
         config<<"Resolution="<<mWindow->getWidth()<<"x"<<mWindow->getHeight()<<"\n";
         config<<"Comment="<<"None"<<"\n";
         config<<"Version="<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
-			OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX<<"\n";
-        config<<"Num_Tests="<<mTests.size()<<"\n";
+            OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX<<"\n";
         config<<"[Tests]\n";
-        int i = 0;
-        for(std::deque<OgreBites::Sample*>::iterator it = mTests.begin(); 
-            it != mTests.end(); ++it)
-        {
-            ++i;
-            config<<"Test_"<<i<<"="<<(*it)->getInfo()["Title"]<<"\n";
-        }
+
+        // add entries for each image
+        for(int i = 0; i < mImages.size(); ++i)
+            config<<"Test_"<<i<<"="<<mImages[i]<<"\n";
+
         config.close();
     }
 }
@@ -307,8 +304,23 @@ void TestContext::writeConfig()
 
 void TestContext::finishedTests()
 {
+    writeConfig();
+    
     // run comparison against the most recent test output (if one exists)
-    compareTestSets(mOutputDir, mTestSetName);
+    TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
+
+    // this batch will be the latest in chronological order
+    const TestBatch& thisBatch = *batches->begin();
+    TestBatchSet::iterator i = batches->begin();
+    ++i;// advance past the current batch
+    for(i; i != batches->end(); ++i)
+    {
+        if((*i).canCompareWith(thisBatch))
+        {
+            writeHTML(mOutputDir + "out.html", (*i), thisBatch, (*i).compare(thisBatch));
+            break;
+        }
+    }
 }
 //-----------------------------------------------------------------------
 

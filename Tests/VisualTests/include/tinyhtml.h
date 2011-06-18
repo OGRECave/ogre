@@ -142,7 +142,7 @@ struct HtmlElement : public HtmlNode
             out<<(*it)->print(indent + "\t");
         }
 
-		// if the last child was an actual element start a newline (otherwise, if text, we'll close on the same line)
+        // if the last child was an actual element start a newline (otherwise, if text, we'll close on the same line)
         if(dynamic_cast<HtmlElement*>(children.back()))
             out<<"\n"<<indent;
 

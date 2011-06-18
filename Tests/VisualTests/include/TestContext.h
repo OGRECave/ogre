@@ -96,14 +96,17 @@ protected:
     // The timestep
     Ogre::Real mTimestep;
 
-    // name of this set
-    Ogre::String mTestSetName;
+    // name of this batch
+    Ogre::String mBatchName;
 
     // This run's timestamp
     Ogre::String mTimestamp;
     
     // path to the output directory
     Ogre::String mOutputDir;
+
+    // list of screenshots taken
+    std::vector<Ogre::String> mImages;
 };
 
 #endif

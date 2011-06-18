@@ -12,7 +12,11 @@
 set(HEADER_FILES 
     include/VisualTest.h
     include/VisualTestPlugin.h
-    include/PlayPenTests.h)
+    include/PlayPenTests.h
+    include/TestBatch.h
+    include/tinyhtml.h
+    include/TestResults.h
+    include/ImageCompare.h)
 
 set(SOURCE_FILES 
     src/PlayPenTests.cpp
