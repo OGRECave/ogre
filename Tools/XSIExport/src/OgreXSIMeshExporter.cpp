@@ -375,11 +375,11 @@ namespace Ogre {
 			int usedDims = 0;
 			for (int j = 0; j < xsiMesh->geometry.GetNodeCount(); ++j)
 			{
-				if (samplerUVs[j].x = uvValues[j * 3] != 0)
+				if ((samplerUVs[j].x = uvValues[j * 3]) != 0)
 					usedDims |= 1; //u
-				if (samplerUVs[j].y = 1.0f - uvValues[j * 3 + 1] != 0)
+				if ((samplerUVs[j].y = 1.0f - uvValues[j * 3 + 1]) != 0)
 					usedDims |= 2; //v (invert)
-				if (samplerUVs[j].z = uvValues[j * 3 + 2] != 0)
+				if ((samplerUVs[j].z = uvValues[j * 3 + 2]) != 0)
 					usedDims |= 4; //w
 			}
 
@@ -450,10 +450,10 @@ namespace Ogre {
 			XSI::Cluster cluster = XSI::Cluster(polygonClusters[c]);
 			XSI::CRef clsvisibility;
 
-			if (cluster.GetProperties().Find(CString("clsvisibility"), clsvisibility) == CStatus::OK)
+			if (cluster.GetProperties().Find(L"clsvisibility", clsvisibility) == CStatus::OK)
 			{
 				Property p(clsvisibility);
-				if (!p.GetParameterValue(CString("viewvis")))
+				if (!p.GetParameterValue(L"viewvis"))
 				{
 					XSI::CBitArray clusterPolys;
 					cluster.GetGeometryElementFlags(clusterPolys);
@@ -1295,10 +1295,10 @@ namespace Ogre {
 					// Find the current level of subdivision
 					LONG subd = 0;
 					XSI::CRef geomapprox;
-					if (x3dObj.GetProperties().Find(CString("geomapprox"), geomapprox) == CStatus::OK)
+					if (x3dObj.GetProperties().Find(L"geomapprox", geomapprox) == CStatus::OK)
 					{
 						Property p(geomapprox);
-						subd = p.GetParameterValue(CString("gapproxmosl"));
+						subd = p.GetParameterValue(L"gapproxmosl");
 					}
 
 					// add it to the list
