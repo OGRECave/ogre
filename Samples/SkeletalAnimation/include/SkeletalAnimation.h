@@ -151,7 +151,8 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-            ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+			ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			//To make glsles work the program will need to be provided with proper
