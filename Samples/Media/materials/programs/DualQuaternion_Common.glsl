@@ -1,4 +1,4 @@
-#version 140
+#version 120
 
 mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24])
 {

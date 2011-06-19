@@ -1,4 +1,4 @@
-#version 140
+#version 120
 
 mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24]);
 vec3 calculateBlendPosition(vec4 position, mat2x4 blendDQ);
@@ -10,10 +10,11 @@ uniform vec4   lightPos[2];
 uniform vec4   lightDiffuseColour[2];
 uniform vec4   ambient;
 
-in vec4 vertex;
-in vec3 normal;
-in vec4 blendIndices;
-in vec4 blendWeights;
+attribute vec4 vertex;
+attribute vec3 normal;
+attribute vec4 blendIndices;
+attribute vec4 blendWeights;
+attribute vec4 uv0;
 
 void main()
 {	
@@ -33,6 +34,8 @@ void main()
 	vec3 lightDir0 = normalize(lightPos[0].xyz - (blendPosition.xyz * lightPos[0].w));
 	vec3 lightDir1 = normalize(lightPos[1].xyz - (blendPosition.xyz * lightPos[1].w));
 
+	gl_TexCoord[0] = uv0;
+	
 	gl_FrontColor = ambient + (clamp(dot(lightDir0, blendNormal), 0.0, 1.0) * lightDiffuseColour[0]) + 
 		(clamp(dot(lightDir1, blendNormal), 0.0, 1.0) * lightDiffuseColour[1]);			
 }

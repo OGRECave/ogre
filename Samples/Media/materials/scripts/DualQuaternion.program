@@ -1,13 +1,13 @@
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 {	
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 }
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
 {
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL	
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 }
 
 // Same as below, but for use when rendering texture shadows

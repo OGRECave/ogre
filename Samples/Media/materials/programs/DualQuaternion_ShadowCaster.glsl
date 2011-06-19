@@ -1,4 +1,4 @@
-#version 140
+#version 120
 
 mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24]);
 vec3 calculateBlendPosition(vec4 position, mat2x4 blendDQ);
@@ -7,9 +7,9 @@ uniform mat4x2 worldDualQuaternion2x4Array[24];
 uniform mat4x4 viewProjectionMatrix;
 uniform vec4   ambient;
 
-in vec4 vertex;
-in vec4 blendIndices;
-in vec4 blendWeights;
+attribute vec4 vertex;
+attribute vec4 blendIndices;
+attribute vec4 blendWeights;
 
 //Shadow caster pass
 void main()
