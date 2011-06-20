@@ -74,6 +74,9 @@ namespace Ogre {
     {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
+        
+        // Delete the cached value
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
     }
 
     void GLES2HardwareIndexBuffer::unlockImpl(void)
