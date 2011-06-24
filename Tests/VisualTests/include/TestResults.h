@@ -108,69 +108,67 @@ HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& se
 }
 //-----------------------------------------------------------------------
 
-/** Writes HTML summary of a comparison */
-void writeHTML(Ogre::String outputFile, const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
+/** Gets HTML summary of a comparison (as a string) */
+Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
 {
-    std::ofstream output;
-    output.open(outputFile.c_str());
-    if(output.is_open())
+    std::stringstream output;
+
+    // just dump the doctype in beforehand, since it's formatted strangely
+    output<<"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\t"
+        <<"\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n";
+
+    // root 'html' tag
+    HtmlElement html = HtmlElement("html");
+    // add the head
+    HtmlElement* head = html.appendElement("head");
+    head->appendElement("title")->appendText("OGRE Visual Testing Ouput");
+    // link the stylesheet
+    HtmlElement* css = head->appendElement("link");
+    css->appendAttribute("rel","stylesheet");
+    // For the moment it's hosted on my personal site, for convenience
+    css->appendAttribute("href","http://www.rileyadams.net/gsoc/output.css");
+    css->appendAttribute("type","text/css");
+    // add body
+    HtmlElement* body = html.appendElement("body");
+    // title
+    body->appendElement("h1")->appendText("OGRE Visual Test Output");
+    // div for summary
+    HtmlElement* summaryDiv = body->appendElement("div");
+    summaryDiv->appendElement("h2")->appendText("Overall:");
+    HtmlElement* contentDiv = summaryDiv->appendElement("div");
+    contentDiv->appendAttribute("class", "contentarea");
+    contentDiv->appendElement("hr");
+    // add info tables about the sets
+    contentDiv->pushChild(writeBatchInfoTable(set1, "Reference Set:"));
+    contentDiv->pushChild(writeBatchInfoTable(set2, "Test Set:"));
+    contentDiv->appendElement("hr");
+    // summarize results
+    size_t numPassed = 0;
+    for(int i = 0; i < results->size(); ++i)
+        if((*results)[i].passed)
+            ++numPassed;
+    contentDiv->appendElement("p")->appendText(
+        Ogre::StringConverter::toString(numPassed) + " of " 
+        + Ogre::StringConverter::toString(results->size()) + " tests passed.");
+    contentDiv->appendElement("hr");
+    // add thumbnails
+    HtmlElement* thumbs = contentDiv->appendElement("p");
+    for(int i = 0; i < results->size(); ++i)
     {
-        // just dump the doctype in beforehand, since it's formatted strangely
-        output<<"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"\n\t"
-            <<"\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n";
-
-        // root 'html' tag
-        HtmlElement html = HtmlElement("html");
-        // add the head
-        HtmlElement* head = html.appendElement("head");
-        head->appendElement("title")->appendText("OGRE Visual Testing Ouput");
-        // link the stylesheet
-        HtmlElement* css = head->appendElement("link");
-        css->appendAttribute("rel","stylesheet");
-        css->appendAttribute("href","output.css");
-        css->appendAttribute("type","text/css");
-        // add body
-        HtmlElement* body = html.appendElement("body");
-        // title
-        body->appendElement("h1")->appendText("OGRE Visual Test Output");
-        // div for summary
-        HtmlElement* summaryDiv = body->appendElement("div");
-        summaryDiv->appendElement("h2")->appendText("Overall:");
-        HtmlElement* contentDiv = summaryDiv->appendElement("div");
-        contentDiv->appendAttribute("class", "contentarea");
-        contentDiv->appendElement("hr");
-        // add info tables about the sets
-        contentDiv->pushChild(writeBatchInfoTable(set1, "Reference Set:"));
-        contentDiv->pushChild(writeBatchInfoTable(set2, "Test Set:"));
-        contentDiv->appendElement("hr");
-        // summarize results
-        size_t numPassed = 0;
-        for(int i = 0; i < results->size(); ++i)
-            if((*results)[i].passed)
-                ++numPassed;
-        contentDiv->appendElement("p")->appendText(
-            Ogre::StringConverter::toString(numPassed) + " of " 
-            + Ogre::StringConverter::toString(results->size()) + " tests passed.");
-        contentDiv->appendElement("hr");
-        // add thumbnails
-        HtmlElement* thumbs = contentDiv->appendElement("p");
-        for(int i = 0; i < results->size(); ++i)
-        {
-            HtmlElement* anchor = thumbs->appendElement("a");
-            anchor->appendAttribute("href", Ogre::String("#") + (*results)[i].testName);
-            anchor->appendAttribute("title", (*results)[i].testName);
-            HtmlElement* img = anchor->appendElement("img");
-            img->appendAttribute("src",set2.name + "/" + (*results)[i].image);
-            img->appendAttribute("class", (*results)[i].passed ? "thumb" : "thumb_fail");
-        }
-        // add side-by-side images and summary for each test
-        for(int i = 0; i < results->size(); ++i)
-            body->pushChild(summarizeSingleResult((*results)[i], set1, set2));
-
-        // print to the file and close
-        output<<html.print();
-        output.close();
+        HtmlElement* anchor = thumbs->appendElement("a");
+        anchor->appendAttribute("href", Ogre::String("#") + (*results)[i].testName);
+        anchor->appendAttribute("title", (*results)[i].testName);
+        HtmlElement* img = anchor->appendElement("img");
+        img->appendAttribute("src",set2.name + "/" + (*results)[i].image);
+        img->appendAttribute("class", (*results)[i].passed ? "thumb" : "thumb_fail");
     }
+    // add side-by-side images and summary for each test
+    for(int i = 0; i < results->size(); ++i)
+        body->pushChild(summarizeSingleResult((*results)[i], set1, set2));
+
+    // print to the stream and return
+    output<<html.print();
+    return output.str();
 }
 //-----------------------------------------------------------------------
 

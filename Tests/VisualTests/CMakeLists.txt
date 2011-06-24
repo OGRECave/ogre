@@ -11,19 +11,19 @@
 
 set(HEADER_FILES 
     include/VisualTest.h
-    include/VisualTestPlugin.h
-    include/PlayPenTests.h
+    include/PlaypenTestPlugin.h
+    include/PlayPenTests.h)
+
+set(SOURCE_FILES 
+    src/PlayPenTests.cpp
+    src/PlaypenTestPlugin.cpp)
+
+set(HEADER_FILES_CONTEXT
+    include/TestContext.h
     include/TestBatch.h
     include/tinyhtml.h
     include/TestResults.h
     include/ImageCompare.h)
-
-set(SOURCE_FILES 
-    src/PlayPenTests.cpp
-    src/VisualTestPlugin.cpp)
-
-set(HEADER_FILES_CONTEXT
-    include/TestContext.h)
 
 set(SOURCE_FILES_CONTEXT
     src/TestContext.cpp)
@@ -53,13 +53,13 @@ ogre_add_executable(TestContext ${HEADER_FILES_CONTEXT} ${SOURCE_FILES_CONTEXT})
 target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 ogre_config_common(TestContext)
 
-add_library(VisualTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
-target_link_libraries(VisualTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
-ogre_config_sample_lib(VisualTests)
+add_library(PlaypenTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
+target_link_libraries(PlaypenTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+ogre_config_sample_lib(PlaypenTests)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
-    set_target_properties(VisualTests
+    set_target_properties(PlaypenTests
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
        INSTALL_NAME_DIR "@executable_path/../Plugins"
     )

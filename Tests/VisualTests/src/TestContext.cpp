@@ -41,69 +41,99 @@ THE SOFTWARE.
 #include "windows.h"
 #endif
 
+TestContext::TestContext() :mTimestep(0.01f), mBatch(0) {}
+//-----------------------------------------------------------------------
+
+TestContext::~TestContext()
+{
+    if(mBatch)
+        delete mBatch;
+}
+//-----------------------------------------------------------------------
+
 void TestContext::setup()
 {
     // standard setup
     SampleContext::setup();
+
+    // get the path and list of test plugins from the config file
+    Ogre::ConfigFile testConfig;
+    testConfig.load("tests.cfg");
+    mPluginDirectory = testConfig.getSetting("TestFolder");
+    mTestPlugins = testConfig.getMultiSetting("TestPlugin");
+
+    // Eventually there will be a brief menu screen for selecting options,
+    // for now, just hardcode this here and jump into a batch of tests immediatly:
+    Ogre::String plugin = "PlaypenTests";
+    
+    // name of the plugin we'll be running
+    mPluginName = plugin;
+
+    // timestamp for the filename
+    char temp[19];
+    time_t raw = time(0);
+    strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
+    Ogre::String filestamp = Ogre::String(temp, 18);
+    Ogre::String batchName = mPluginName + "_" + filestamp;
+    
+    // a nicer formatted version for display
+    strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
+    Ogre::String timestamp = Ogre::String(temp, 19);
     
     // set up output directories
-    setupDirectories();
+    setupDirectories(batchName);
 
-    // load up the tests
-    OgreBites::Sample* firstTest = loadTests();
+    // an object storing info about this set
+    mBatch = new TestBatch(batchName, mPluginName, timestamp, 
+        mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
 
-    // for now we just go right into the tests, eventually there'll be a menu screen beforehand
+    OgreBites::Sample* firstTest = loadTests(mPluginName);
     runSample(firstTest);
 }
 //-----------------------------------------------------------------------
 
-OgreBites::Sample* TestContext::loadTests()
+OgreBites::Sample* TestContext::loadTests(Ogre::String plugin)
 {
     OgreBites::Sample* startSample = 0;
     Ogre::StringVector sampleList;
 
-    // Just the one for now:
-    sampleList.push_back("VisualTests");
-
-    // This should eventually be loaded from a config file or something to that effect
-    Ogre::String sampleDir = "../lib/";
-
-    for (Ogre::StringVector::iterator i = sampleList.begin(); i != sampleList.end(); i++)
+    // try loading up the test plugin
+    try
     {
-        try   // try to load the plugin
-        {
-            mRoot->loadPlugin(sampleDir + *i);
-        }
-        catch (Ogre::Exception e)   // plugin couldn't be loaded
-        {
-            continue;
-        }
-
-        Ogre::Plugin* p = mRoot->getInstalledPlugins().back();   // acquire plugin instance
-        OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
-
-        if (!sp)
-            continue;
-        
-        // go through every sample in the plugin...
-        OgreBites::SampleSet newSamples = sp->getSamples();
-        for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
-        {
-            mTests.push_back(*j);
-            Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-            Ogre::NameValuePairList::iterator k;
-
-            // give sample default title and category if none found
-            k= info.find("Title");
-            if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-            k = info.find("Category");
-            if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-            k = info.find("Thumbnail");
-            if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
-        }
-
-        startSample = *newSamples.begin();
+        mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
     }
+    // if it fails, just return right away
+    catch (Ogre::Exception e)
+    {
+        return 0;
+    }
+
+    // grab the plugin and cast to SamplePlugin
+    Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
+    OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
+
+    // if something's gone wrong return null
+    if (!sp)
+        return 0;
+    
+    // go through every sample (test) in the plugin...
+    OgreBites::SampleSet newSamples = sp->getSamples();
+    for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
+    {
+        mTests.push_back(*j);
+        Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
+        Ogre::NameValuePairList::iterator k;
+
+        // give sample default title and category if none found
+        k= info.find("Title");
+        if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
+        k = info.find("Category");
+        if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
+        k = info.find("Thumbnail");
+        if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
+    }
+
+    startSample = *newSamples.begin();
 
     return startSample;
 }
@@ -151,10 +181,11 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
         if(mCurrentTest->isScreenshotFrame(mCurrentFrame))
         {
             // take a screenshot
-            Ogre::String filename = mOutputDir + mBatchName + "/" +
+            Ogre::String filename = mOutputDir + mBatch->name + "/" +
                 mCurrentTest->getInfo()["Title"] + "_" + 
                 Ogre::StringConverter::toString(mCurrentFrame) + ".png";
-            mImages.push_back(mCurrentTest->getInfo()["Title"] + "_" + 
+            // remember the name of the shot, for later comparison purposes
+            mBatch->images.push_back(mCurrentTest->getInfo()["Title"] + "_" + 
                 Ogre::StringConverter::toString(mCurrentFrame));
             mWindow->writeContentsToFile(filename);
         }
@@ -241,23 +272,14 @@ void TestContext::createRoot()
 }
 //-----------------------------------------------------------------------
 
-void TestContext::setupDirectories()
+void TestContext::setupDirectories(Ogre::String batchName)
 {
-    // name the output image set based on GM time
-    char temp[19];
-    time_t raw = time(0);
-    
-    // timestamp for the filename
-    strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
-    Ogre::String filestamp = Ogre::String(temp, 18);
-    mBatchName = "VisualTests_" + filestamp;
-    
-    // a nicer formatted version
-    strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
-    mTimestamp = Ogre::String(temp, 19);
-
-    // try to create a root directory for the tests
+    // ensure there's a root directory for visual tests
     mOutputDir = mFSLayer->getWritablePath("VisualTests/");
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+    
+    // make sure there's a directory for the test plugin
+    mOutputDir += mPluginName + "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
     
     // add a directory for the render system
@@ -269,58 +291,41 @@ void TestContext::setupDirectories()
     mOutputDir += "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
 
-    // and finally a directory for the test run itself
-    //mOutputDir += mBatchName + "/";
+    // and finally a directory for the test batch itself
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir
-        + mBatchName + "/");
-}
-//-----------------------------------------------------------------------
-
-void TestContext::writeConfig()
-{
-    // save a small .cfg file with some details about the run
-    std::ofstream config;
-    config.open(Ogre::String(mOutputDir + mBatchName + "/info.cfg").c_str());
-
-    if(config.is_open())
-    {
-        config<<"[Info]\n";
-        config<<"Name="<<mBatchName<<"\n";
-        config<<"Time="<<mTimestamp<<"\n";
-        config<<"Resolution="<<mWindow->getWidth()<<"x"<<mWindow->getHeight()<<"\n";
-        config<<"Comment="<<"None"<<"\n";
-        config<<"Version="<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
-            OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX<<"\n";
-        config<<"[Tests]\n";
-
-        // add entries for each image
-        for(int i = 0; i < mImages.size(); ++i)
-            config<<"Test_"<<i<<"="<<mImages[i]<<"\n";
-
-        config.close();
-    }
+        + batchName + "/");
 }
 //-----------------------------------------------------------------------
 
 void TestContext::finishedTests()
 {
-    writeConfig();
-    
     // run comparison against the most recent test output (if one exists)
     TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
-
-    // this batch will be the latest in chronological order
-    const TestBatch& thisBatch = *batches->begin();
     TestBatchSet::iterator i = batches->begin();
-    ++i;// advance past the current batch
     for(i; i != batches->end(); ++i)
     {
-        if((*i).canCompareWith(thisBatch))
+        if(mBatch->canCompareWith((*i)))
         {
-            writeHTML(mOutputDir + "out.html", (*i), thisBatch, (*i).compare(thisBatch));
+            // we save a generally named "out.html" that gets overwritten each run, 
+            // plus a uniquely named one for this run
+            std::ofstream out1;
+            std::ofstream out2;
+            out1.open(Ogre::String(mOutputDir + "out.html").c_str());
+            out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
+            if(out1.is_open() && out2.is_open())
+            {
+                Ogre::String html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
+                out1<<html;
+                out2<<html;
+                out1.close();
+                out2.close();
+            }
             break;
         }
     }
+
+    // write this batch's config file
+    mBatch->writeConfig();
 }
 //-----------------------------------------------------------------------
 

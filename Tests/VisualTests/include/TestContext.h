@@ -32,13 +32,15 @@ THE SOFTWARE.
 #include "SampleContext.h"
 #include "VisualTest.h"
 
+class TestBatch;
+
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
 {
 public:
 
-    TestContext() :mTimestep(0.01f) {}
-    virtual ~TestContext() {}
+    TestContext();
+    virtual ~TestContext();
 
     /** Does basic setup for the context */
     virtual void setup();
@@ -58,17 +60,15 @@ public:
     virtual void runSample(OgreBites::Sample* s);
 
     /** Loads test plugins
+     *        @param plugin The name of the test plugin to load
      *        @return The initial tets or sample to run */
-    OgreBites::Sample* loadTests();
+    OgreBites::Sample* loadTests(Ogre::String plugin);
 
     /** Setup the Root */
     virtual void createRoot();
 
     /** Set up directories for the tests to output to */
-    virtual void setupDirectories();
-
-    /** Writes a config file with some metadata about the test run */
-    virtual void writeConfig();
+    virtual void setupDirectories(Ogre::String batchName);
 
     /** Called after tests successfully complete, generates output */
     virtual void finishedTests();
@@ -83,9 +83,24 @@ public:
     Ogre::Real getTimestep();
 
 protected:
+    
+    // The timestep
+    Ogre::Real mTimestep;
+
+    // Path to the test plugin directory
+    Ogre::String mPluginDirectory;
+
+    // List of available test plugins
+    Ogre::StringVector mTestPlugins;
+    
+    // The test plugin that's being run
+    Ogre::String mPluginName;
 
     // The tests to be run
     std::deque<OgreBites::Sample*> mTests;
+    
+    // Path to the output directory for the running test
+    Ogre::String mOutputDir;
 
     // The active test (0 if none is active)
     VisualTest* mCurrentTest;
@@ -93,20 +108,11 @@ protected:
     // The current frame of a running test
     unsigned int mCurrentFrame;
 
-    // The timestep
-    Ogre::Real mTimestep;
+    // Info about the running batch of tests
+    TestBatch* mBatch;
 
-    // name of this batch
-    Ogre::String mBatchName;
-
-    // This run's timestamp
-    Ogre::String mTimestamp;
-    
-    // path to the output directory
-    Ogre::String mOutputDir;
-
-    // list of screenshots taken
-    std::vector<Ogre::String> mImages;
+    // List of screenshots taken
+    // std::vector<Ogre::String> mImages;
 };
 
 #endif

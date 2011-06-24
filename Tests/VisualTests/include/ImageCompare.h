@@ -57,7 +57,7 @@ ComparisonResult compareImages(Ogre::String image1, Ogre::String image2)
     size_t end = out.image.find_last_of("_");
     
     // extract test name from image filename
-    out.testName = out.image.substr(12, end - 12);
+    out.testName = out.image.substr(0, end);
     out.frame = atoi(out.image.substr(end+1).c_str());
 
     // placeholder, not exactly elegant, but it's better than nothing for the moment

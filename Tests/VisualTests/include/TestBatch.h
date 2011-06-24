@@ -46,6 +46,8 @@ public:
     std::vector<Ogre::String> images;
     // This set's name (usually of the form: [TestPluginName]_[Timestamp])
     Ogre::String name;
+    // name of the tets plugin 
+    Ogre::String plugin;
     // version string
     Ogre::String version;
     // timestamp (when the batch was run)
@@ -73,6 +75,29 @@ public:
         Ogre::ConfigFile::SettingsIterator it = info.getSettingsIterator("Tests");
         while(it.hasMoreElements())
             images.push_back(it.getNext());
+    }
+
+    /** Manually initialize a batch object
+     *        @param batchName The name of the overall test batch
+     *        @param pluginName The name of the test plugin being used 
+     *        @param timestamp The time the test was begun
+     *        @param resx The width of the render window used
+     *        @param resy The height of the render window used 
+     *        @param directory The directory this batch is saved to */
+    TestBatch(Ogre::String batchName, Ogre::String pluginName,
+        Ogre::String timestamp, size_t resx, size_t resy, Ogre::String directory)
+        :mDirectory(directory)
+        ,resolutionX(resx)
+        ,resolutionY(resy)
+        ,timestamp(timestamp)
+        ,plugin(pluginName)
+        ,comment("")
+        ,name(batchName)
+    {
+        std::stringstream ver;
+        ver<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
+            OGRE_VERSION_NAME<<") "<<OGRE_VERSION_SUFFIX;
+        version = ver.str();
     }
 
     /** Returns whether or not the passed in set is comparable
@@ -112,6 +137,31 @@ public:
                 out->push_back(compareImages(getImagePath(i), other.getImagePath(i)));
         }
         return out;
+    }
+
+    // write the config file for this set
+    void writeConfig()
+    {
+        // save a small .cfg file with some details about the batch
+        std::ofstream config;
+        config.open(Ogre::String(mDirectory + "/info.cfg").c_str());
+
+        if(config.is_open())
+        {
+            config<<"[Info]\n";
+            config<<"Name="<<name<<"\n";
+            config<<"Time="<<timestamp<<"\n";
+            config<<"Resolution="<<resolutionX<<"x"<<resolutionY<<"\n";
+            config<<"Comment="<<comment<<"\n";
+            config<<"Version="<<version<<"\n";
+            config<<"[Tests]\n";
+
+            // add entries for each image
+            for(int i = 0; i < images.size(); ++i)
+                config<<"Test="<<images[i]<<"\n";
+
+            config.close();
+        }
     }
 
     /** Greater than operator, so they can be sorted chronologically */
