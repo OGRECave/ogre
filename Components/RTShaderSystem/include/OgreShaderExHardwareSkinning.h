@@ -28,17 +28,18 @@ THE SOFTWARE.
 #define _ShaderExHardwareSkinning_
 
 #include "OgreShaderPrerequisites.h"
+#include "OgreShaderExHardwareSkinningTechnique.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
+
 #include "OgreShaderParameter.h"
 #include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
 
 #define HS_MAX_WEIGHT_COUNT 4
+
 namespace Ogre {
 namespace RTShader {
-
-class HardwareSkinningFactory;
 
 /** \addtogroup Core
 *  @{
@@ -51,151 +52,53 @@ class HardwareSkinningFactory;
 Meaning, this sub render states adds calculations which multiply
 the points and normals by their assigned bone matricies.
 */
-class _OgreRTSSExport HardwareSkinning : public SubRenderState
+class _OgreRTSSExport HardwareSkinning : public HardwareSkinningTechnique
 {
-public:
-	struct SkinningData
-	{
-		SkinningData() : 
-			isValid(true), maxBoneCount(0), maxWeightCount(0)
-		{}
-
-		bool isValid;
-		ushort maxBoneCount;
-		ushort maxWeightCount;
-	};
-
 // Interface.
 public:
 
 	/** Class default constructor */
 	HardwareSkinning();
-
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual const String& getType() const;
-
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual int getExecutionOrder() const;
-
-	/** 
-	@see SubRenderState::copyFrom.
-	*/
-	virtual void copyFrom(const SubRenderState& rhs);
-
-		/** 
-	Set the hardware skinning parameters.
-	@param boneCount The maximum number of bones in the model this material
-		 is assigned to. Note that this parameter can be higher but not
-		 lower than the actual number of bones.
-	 @param weightCount The maximum number of weights/bones affecting
-		a vertex. Note that this parameter can be higher but not
-		 lower than the actual number of affecting bones.
-	*/
-	void setHardwareSkinningParam(ushort boneCount, ushort weightCount);
-
-	/** 
-	Returns the number of bones in the model assigned to the material.
-	@see setHardwareSkinningParam().
-	*/
-	ushort getBoneCount();
-
-	/** 
-	Returns the number of weights/bones affecting a vertex.
-	@see setHardwareSkinningParam().
-	*/
-	ushort getWeightCount();
 	
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-
-	/**
-	Set the factory which created this sub render state
-	*/
-	void _setCreator(const HardwareSkinningFactory* pCreator) { mCreator = pCreator; }
-
-	static String Type;
-
 	
 // Protected methods
 protected:
-
-
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
+	virtual bool resolveParameters (ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies (ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations (ProgramSet* programSet);
 
 	/** Adds functions to calculate position data in world, object and projective space */
-	void addPositionCalculations(Function* vsMain, int& funcCounter);
+	void addPositionCalculations (Function* vsMain, int& funcCounter);
 
 	/** Adds the weight of a given position for a given index */
-	void addIndexedPositionWeight(Function* vsMain, int index, int& funcCounter);
+	void addIndexedPositionWeight (Function* vsMain, int index, int& funcCounter);
 
 	/** Adds the calculations for calculating a normal related element */
-	void addNormalRelatedCalculations(Function* vsMain,
-								ParameterPtr& pNormalRelatedParam, 
-								ParameterPtr& pNormalWorldRelatedParam, 
-								int& funcCounter);
+	void addNormalRelatedCalculations (Function* vsMain,
+						ParameterPtr& pNormalRelatedParam,
+						ParameterPtr& pNormalWorldRelatedParam,
+						int& funcCounter);
 
 	/** Adds the weight of a given normal related parameter for a given index */
-	void addIndexedNormalRelatedWeight(Function* vsMain, ParameterPtr& pNormalRelatedParam, 
+	void addIndexedNormalRelatedWeight (Function* vsMain, ParameterPtr& pNormalRelatedParam, 
 						ParameterPtr& pNormalWorldRelatedParam, 
 						int index, int& funcCounter);
-
-	/** Translates an index number to a mask value */
-	Operand::OpMask indexToMask(int index);
-
-
-// Attributes.
-protected:
-	
-	ushort mBoneCount;
-	ushort mWeightCount;
-	
-	bool mDoBoneCalculations;
-	
-	ParameterPtr mParamInPosition;
-	ParameterPtr mParamInNormal;
-	ParameterPtr mParamInBiNormal;
-	ParameterPtr mParamInTangent;		
-	ParameterPtr mParamInIndices;
-	ParameterPtr mParamInWeights;
-	UniformParameterPtr mParamInWorldMatrices;
-	UniformParameterPtr mParamInInvWorldMatrix;
-	UniformParameterPtr mParamInViewProjMatrix;
-	UniformParameterPtr mParamInWorldMatrix;
-	UniformParameterPtr mParamInWorldViewProjMatrix;
-	
-	ParameterPtr mParamTempFloat4;
-	ParameterPtr mParamTempFloat3;
-	ParameterPtr mParamLocalPositionWorld;
-	ParameterPtr mParamLocalNormalWorld;
-	ParameterPtr mParamLocalTangentWorld;
-	ParameterPtr mParamLocalBinormalWorld;
-	ParameterPtr mParamOutPositionProj;
-
-	const HardwareSkinningFactory* mCreator; ///The factory which created this sub render state
-
-
 };
-
-_OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data);
 
 /** 
 A factory that enables creation of HardwareSkinning instances.
@@ -346,14 +249,16 @@ protected:
 	*/
 	virtual SubRenderState* createInstanceImpl();
 
-	/// A set of custom shadow caster materials
-	MaterialPtr	mCustomShadowCasterMaterials[HS_MAX_WEIGHT_COUNT];
+	/// A set of custom shadow caste materials
+	MaterialPtr mCustomShadowCasterMaterials[HS_MAX_WEIGHT_COUNT];
 	/// A set of custom shadow receiver materials
-	MaterialPtr	mCustomShadowReceiverMaterials[HS_MAX_WEIGHT_COUNT];
+	MaterialPtr mCustomShadowReceiverMaterials[HS_MAX_WEIGHT_COUNT];
 
 	///The maximum number of bones for which hardware skinning is performed.
 	///@see getMaxCalculableBoneCount()
 	ushort mMaxCalculableBoneCount;
+
+	HardwareSkinningTechnique::SkinningType mSkinningType;
 };
 
 /** @} */

@@ -26,6 +26,7 @@ THE SOFTWARE.
 */
 #include "OgreShaderExHardwareSkinning.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
@@ -56,46 +57,8 @@ HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-String HardwareSkinning::Type = "SGX_HardwareSkinning";
-
-HardwareSkinning::HardwareSkinning() :
-	mBoneCount(0),
-	mWeightCount(0),
-	mDoBoneCalculations(false),
-	mCreator(NULL)
+HardwareSkinning::HardwareSkinning() : HardwareSkinningTechnique()
 {
-}
-
-//-----------------------------------------------------------------------
-const String& HardwareSkinning::getType() const
-{
-	return Type;
-}
-
-
-//-----------------------------------------------------------------------
-int	HardwareSkinning::getExecutionOrder() const
-{
-	return FFP_TRANSFORM;
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::setHardwareSkinningParam(ushort boneCount, ushort weightCount)
-{
-	mBoneCount = std::min<ushort>(boneCount,256);
-	mWeightCount = std::min<ushort>(weightCount,4);
-}
-
-//-----------------------------------------------------------------------
-ushort HardwareSkinning::getBoneCount()
-{
-	return mBoneCount;
-}
-
-//-----------------------------------------------------------------------
-ushort HardwareSkinning::getWeightCount()
-{
-	return mWeightCount;
 }
 
 //-----------------------------------------------------------------------
@@ -106,8 +69,8 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
 	const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
 	if (hsAny.isEmpty() == false)
 	{
-		HardwareSkinning::SkinningData pData = 
-			(any_cast<HardwareSkinning::SkinningData>(hsAny));
+		HardwareSkinningTechnique::SkinningData pData =
+			(any_cast<HardwareSkinningTechnique::SkinningData>(hsAny));
 		isValid = pData.isValid;
 		mBoneCount = pData.maxBoneCount;
 		mWeightCount = pData.maxWeightCount;
@@ -441,39 +404,8 @@ void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
 }
 
 //-----------------------------------------------------------------------
-Operand::OpMask HardwareSkinning::indexToMask(int index)
-{
-	switch(index)
-	{
-	case 0: return Operand::OPM_X; 
-	case 1: return Operand::OPM_Y; 
-	case 2: return Operand::OPM_Z; 
-	case 3: return Operand::OPM_W; 
-	default: OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Illegal value", "HardwareSkinning::indexToMask");
-	}
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::copyFrom(const SubRenderState& rhs)
-{
-	const HardwareSkinning& hardSkin = static_cast<const HardwareSkinning&>(rhs);
-	mWeightCount = hardSkin.mWeightCount;
-	mBoneCount = hardSkin.mBoneCount;
-	mDoBoneCalculations = hardSkin.mDoBoneCalculations;
-	mCreator = hardSkin.mCreator;
-}
-
-//-----------------------------------------------------------------------
-void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data)
-{
-	o << data.isValid;
-	o << data.maxBoneCount;
-	o << data.maxWeightCount;
-}
-
-//-----------------------------------------------------------------------
 HardwareSkinningFactory::HardwareSkinningFactory() :
-	mMaxCalculableBoneCount(70)
+	mMaxCalculableBoneCount(70), mSkinningType(HardwareSkinningTechnique::ST_LINEAR)
 {
 
 }
@@ -481,18 +413,20 @@ HardwareSkinningFactory::HardwareSkinningFactory() :
 //-----------------------------------------------------------------------
 const String& HardwareSkinningFactory::getType() const
 {
-	return HardwareSkinning::Type;
+	return HardwareSkinningTechnique::Type;
 }
 
 //-----------------------------------------------------------------------
-SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler, 
-												   PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
+SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator)
 {
 	if (prop->name == "hardware_skinning")
 	{
 		bool hasError = false;
 		uint32 boneCount = 0;
 		uint32 weightCount = 0;
+		String skinningType = "";
+		bool correctAntipodalityHandling = false;
+		bool scalingShearingSupport = false;
 		
 		if(prop->values.size() >= 2)
 		{
@@ -503,19 +437,39 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			++it;
 			if(false == SGScriptTranslator::getUInt(*it, &weightCount))
 				hasError = true;
+
+			++it;
+			SGScriptTranslator::getString(*it, &skinningType);
+
+			//If the skinningType is not specified or is specified incorrectly, default to linear skinning.
+			//Needs to be set before createOrRetrieveInstance is called because it determines which type of instance is created.
+			if(skinningType == "dual_quaternion")
+			{
+				mSkinningType = HardwareSkinningTechnique::ST_DUAL_QUATERNION;
+			}
+			else
+			{
+				mSkinningType = HardwareSkinningTechnique::ST_LINEAR;
+			}
+			
+			++it;
+			SGScriptTranslator::getBoolean(*it, &correctAntipodalityHandling);
+
+			++it;
+			SGScriptTranslator::getBoolean(*it, &scalingShearingSupport);
 		}
 
 		if (hasError == true)
 		{
-			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, "Expected the format: hardware_skinning <bone count> <weight count>.");
+			compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line, "Expected the format: hardware_skinning <bone count> <weight count> [skinning type] [correct antipodality handling] [scaling/shearing support]");
 			return NULL;
 		}
 		else
 		{
 			//create and update the hardware skinning sub render state
 			SubRenderState*	subRenderState = createOrRetrieveInstance(translator);
-			HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
-			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount);
+			HardwareSkinningTechnique* hardSkinSrs = static_cast<HardwareSkinningTechnique*>(subRenderState);
+			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount, mSkinningType, correctAntipodalityHandling, scalingShearingSupport);
 			
 			return subRenderState;
 		}
@@ -531,15 +485,33 @@ void HardwareSkinningFactory::writeInstance(MaterialSerializer* ser, SubRenderSt
 {
 	ser->writeAttribute(4, "hardware_skinning");
 	
-	HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
+	HardwareSkinningTechnique* hardSkinSrs = static_cast<HardwareSkinningTechnique*>(subRenderState);
 	ser->writeValue(StringConverter::toString(hardSkinSrs->getBoneCount()));
 	ser->writeValue(StringConverter::toString(hardSkinSrs->getWeightCount()));
+
+	//Correct antipodality handling and scaling and shearing support are only really valid for dual quaternion skinning
+	if(hardSkinSrs->getSkinningType() == HardwareSkinningTechnique::ST_DUAL_QUATERNION)
+	{
+		ser->writeValue("dual_quaternion");
+		ser->writeValue(StringConverter::toString(hardSkinSrs->hasCorrectAntipodalityHandling()));
+		ser->writeValue(StringConverter::toString(hardSkinSrs->hasScalingShearingSupport()));
+	}
 }
 
 //-----------------------------------------------------------------------
-SubRenderState*	HardwareSkinningFactory::createInstanceImpl()
+SubRenderState* HardwareSkinningFactory::createInstanceImpl()
 {
-	HardwareSkinning* pSkin = OGRE_NEW HardwareSkinning;
+	HardwareSkinningTechnique* pSkin;
+
+	if(mSkinningType == HardwareSkinningTechnique::ST_DUAL_QUATERNION)
+	{
+		pSkin = OGRE_NEW DualQuaternionSkinning;
+	}
+	else
+	{
+		pSkin = OGRE_NEW HardwareSkinning;
+	}
+	
 	pSkin->_setCreator(this);
 	return pSkin;
 }
@@ -577,7 +549,6 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(usho
 	assert(index < HS_MAX_WEIGHT_COUNT);
 	return mCustomShadowReceiverMaterials[index];
 }
-
 
 //-----------------------------------------------------------------------
 void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity)
@@ -664,14 +635,14 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
 	bool isUpdated = false;
 	if (pMaterial->getNumTechniques() > 0) 
 	{
-		HardwareSkinning::SkinningData data;
+		HardwareSkinningTechnique::SkinningData data;
 
 		//get the previous skinning data if available
 		UserObjectBindings& binding = pMaterial->getTechnique(0)->getUserObjectBindings();
 		const Any& hsAny = binding.getUserAny(HS_DATA_BIND_NAME);
 		if (hsAny.isEmpty() == false)
 		{
-			data = (any_cast<HardwareSkinning::SkinningData>(hsAny));
+			data = (any_cast<HardwareSkinningTechnique::SkinningData>(hsAny));
 		}
 
 		//check if we need to update the data

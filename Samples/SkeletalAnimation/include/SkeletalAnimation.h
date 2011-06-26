@@ -11,6 +11,37 @@ class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
 public:
 
+	//-----------------------------------------------------------------------
+void exportRTShaderSystemMaterial(const String& fileName, const String& materialName)
+{
+	// Grab material pointer.
+	MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
+
+	// Create shader based technique.
+	bool success = mShaderGenerator->createShaderBasedTechnique(materialName,
+		MaterialManager::DEFAULT_SCHEME_NAME,
+		RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
+	// Case creation of shader based technique succeeded.
+	if (success)
+	{
+		// Force shader generation of the given material.
+		RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName);
+
+		// Grab the RTSS material serializer listener.
+		MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
+		MaterialSerializer matSer;
+
+		// Add the custom RTSS listener to the serializer.
+		// It will make sure that every custom parameter needed by the RTSS
+		// will be added to the exported material script.
+		matSer.addListener(matRTSSListener);
+
+		// Simply export the material.
+		matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS_Export");
+	}
+}
+
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		, mSrsHardwareSkinning(0)
@@ -26,26 +57,26 @@ public:
     {
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
-			// update sneaking animation based on speed
-			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
-
-			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-			{
-				/* We need reposition the scene node origin, since the animation includes translation.
-				Position is calculated from an offset to the end position, and rotation is calculated
-				from how much the animation turns the character. */
-
-				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-
-				// find current end position and the offset
-				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-
-				mModelNodes[i]->setPosition(currEnd + offset);
-				mModelNodes[i]->rotate(rot);
-
-				mAnimStates[i]->setTimePosition(0);   // reset animation time
-			}
+// 			// update sneaking animation based on speed
+// 			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
+// 
+// 			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
+// 			{
+// 				/* We need reposition the scene node origin, since the animation includes translation.
+// 				Position is calculated from an offset to the end position, and rotation is calculated
+// 				from how much the animation turns the character. */
+// 
+// 				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+// 
+// 				// find current end position and the offset
+// 				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+// 				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+// 
+// 				mModelNodes[i]->setPosition(currEnd + offset);
+// 				mModelNodes[i]->rotate(rot);
+// 
+// 				mAnimStates[i]->setTimePosition(0);   // reset animation time
+// 			}
         }
 
 		return SdkSample::frameRenderingQueued(evt);
@@ -63,17 +94,17 @@ protected:
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
 		{
 			//Add the hardware skinning to the shader generator default render state
-			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
-			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+			//mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			//Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			//renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 			
-			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
-			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
-			Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
-			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
+			//Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
+			//Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
+			//Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
+			//Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
 
-			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-				pCast1, pCast2, pCast3, pCast4);
+			//Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+			//	pCast1, pCast2, pCast3, pCast4);
 		}
 #endif
 		// set shadow properties
@@ -83,7 +114,7 @@ protected:
 		mSceneMgr->setShadowTextureCount(2);
 
 		// add a little ambient lighting
-        mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+		mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
 		SceneNode* lightsBbsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		BillboardSet* bbs;
@@ -136,7 +167,7 @@ protected:
 
 	void setupModels()
 	{
-		tweakSneakAnim();
+		//tweakSneakAnim();
 
 		SceneNode* sn = NULL;
 		Entity* ent = NULL;
@@ -151,9 +182,10 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-			ent->setMaterialName("jaiquaDualQuatTest");
+			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "spine.mesh");
+			ent->setMaterialName("spineDualQuatTest");
 			sn->attachObject(ent);
+			sn->scale(20, 20, 20);
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
@@ -161,21 +193,21 @@ protected:
 			{
 				//In case the system uses the RTSS, the following line will ensure
 				//that the entity is using hardware animation in RTSS as well.
-				RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+				//RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
 				//The following line is needed only because the Jaiqua model material has shaders and
 				//as such is not automatically reflected in the RTSS system
-				RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-					ent->getSubEntity(0)->getMaterialName(),
-					Ogre::MaterialManager::DEFAULT_SCHEME_NAME, 
-					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-					true);
+				//RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+				//	ent->getSubEntity(0)->getMaterialName(),
+				//	Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+				//	Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+				//	true);
 			}
 #endif
 		
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
-			as = ent->getAnimationState("Sneak");
-            as->setEnabled(true);
-			as->setLoop(false);
+			//as = ent->getAnimationState("Sneak");
+			//as->setEnabled(true);
+			//as->setLoop(false);
 			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
 			mAnimStates.push_back(as);
         }
@@ -184,6 +216,8 @@ protected:
 		StringVector names;
 		names.push_back("Skinning");
 		String value = "Software";
+
+		exportRTShaderSystemMaterial("test.material", ent->getSubEntity(0)->getMaterialName());
 
 		// change the value if hardware skinning is enabled
         Pass* pass = ent->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
