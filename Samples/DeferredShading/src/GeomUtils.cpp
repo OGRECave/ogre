@@ -74,7 +74,6 @@ void GeomUtils::createSphere(VertexData*& vertexData, IndexData*& indexData
 	if (bTexCoords)
 	{
 		vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-		currOffset += VertexElement::getTypeSize(VET_FLOAT2);
 	}
 
 	// allocate the vertex buffer

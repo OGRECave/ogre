@@ -563,11 +563,10 @@ namespace Ogre
 				offset += dcl->addElement(POSITION_BUFFER, offset, VET_SHORT2, VES_POSITION).getSize();
 				// UV0 - height
 				// float(height)
-				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
+				dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT1, VES_TEXTURE_COORDINATES, 0).getSize();
 				// UV1 delta information
 				// float2(delta, deltaLODthreshold)
-				offset = 0;
-				offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
+				dcl->addElement(DELTA_BUFFER, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
 			}
 			else 
 			{
@@ -577,11 +576,10 @@ namespace Ogre
 				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT3, VES_POSITION).getSize();
 				// UV0
 				// float2(u, v)
-				offset += dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
+				dcl->addElement(POSITION_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0).getSize();
 				// UV1 delta information
 				// float2(delta, deltaLODthreshold)
-				offset = 0;
-				offset += dcl->addElement(DELTA_BUFFER, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
+				dcl->addElement(DELTA_BUFFER, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES, 1).getSize();
 			}
 
 			// Calculate number of vertices

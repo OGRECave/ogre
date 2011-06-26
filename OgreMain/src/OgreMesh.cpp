@@ -1351,7 +1351,6 @@ namespace Ogre {
                     {
                         // This is a 3D set, might be tangents
                         foundExisting = true;
-						foundSemantic = VES_TEXTURE_COORDINATES;
                     }
 
                 }
@@ -1368,7 +1367,6 @@ namespace Ogre {
 				if (testElem)
 				{
 					foundExisting = true;
-					foundSemantic = targetSemantic;
 				}
 
 			}
@@ -1813,10 +1811,6 @@ namespace Ogre {
 			posElem->getSource());
 
 		size_t elemsPerVertex = destBuf->getVertexSize()/sizeof(float);
-		size_t dstSkip = elemsPerVertex - 3;
-		if (normals)
-			dstSkip -= 3;
-			
 
 		// Have to lock in normal mode since this is incremental
 		float* pBase = static_cast<float*>(

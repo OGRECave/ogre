@@ -194,15 +194,12 @@ namespace Ogre {
 
 		/// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		GLsizei n=0;
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
 			{
 				bufs[x] = GL_COLOR_ATTACHMENT0_OES + x;
-				// Keep highest used buffer + 1
-				n = x+1;
 			}
 			else
 			{

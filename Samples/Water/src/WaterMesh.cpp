@@ -232,7 +232,7 @@ void WaterMesh::calculateFakeNormals()
 void WaterMesh::calculateNormals()
 {
 	int i,x,y;
-	float *buf = vertexBuffers[currentBuffNumber] + 1;
+	float *buf = NULL;
 	// zero normals
 	for(i=0;i<numVertices;i++) {
 		vNormals[i] = Vector3::ZERO;

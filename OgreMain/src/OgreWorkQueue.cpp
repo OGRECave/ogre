@@ -489,7 +489,7 @@ namespace Ogre {
 	void DefaultWorkQueueBase::processResponses() 
 	{
 		unsigned long msStart = Root::getSingleton().getTimer()->getMilliseconds();
-		unsigned long msCurrent = msStart;
+		unsigned long msCurrent = 0;
 
 		// keep going until we run out of responses or out of time
 		while(true)

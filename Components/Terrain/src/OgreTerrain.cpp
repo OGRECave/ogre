@@ -2922,7 +2922,7 @@ namespace Ogre
 		if (lightMap != mLightMapRequired || shadowsOnly != mLightMapShadowsOnly)
 		{
 			mLightMapRequired = lightMap;
-			mLightMapShadowsOnly = mLightMapShadowsOnly;
+			mLightMapShadowsOnly = shadowsOnly;
 
 			createOrDestroyGPULightmap();
 
@@ -4273,7 +4273,6 @@ namespace Ogre
 				*pI++ = currentVertex;
 				*pI++ = skirtIndex;
 				currentVertex += edgeIncrement;
-				skirtIndex += skirtIncrement;
 			}
 		}
 

@@ -479,7 +479,6 @@ namespace Ogre {
 				fiBitmap = newBitmap;
 				// get new formats
 				bpp = FreeImage_GetBPP(fiBitmap);
-				colourType = FreeImage_GetColorType(fiBitmap);
 			}
 			// Perform any colour conversions for RGB
 			else if (bpp < 8 || colourType == FIC_PALETTE || colourType == FIC_CMYK)
@@ -502,7 +501,6 @@ namespace Ogre {
 				fiBitmap = newBitmap;
 				// get new formats
 				bpp = FreeImage_GetBPP(fiBitmap);
-				colourType = FreeImage_GetColorType(fiBitmap);
 			}
 
 			// by this stage, 8-bit is greyscale, 16/24/32 bit are RGB[A]

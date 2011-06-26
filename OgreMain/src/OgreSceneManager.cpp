@@ -3332,7 +3332,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						if (pass->getStartLight() > 0 &&
 							pass->getStartLight() >= rendLightList.size())
 						{
-							lightsLeft = 0;
 							break;
 						}
 						else

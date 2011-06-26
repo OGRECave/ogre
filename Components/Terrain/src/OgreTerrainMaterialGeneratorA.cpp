@@ -376,9 +376,9 @@ namespace Ogre
 			for (uint i = 0; i < numLayers; ++i)
 			{
 				// diffuse / specular
-				tu = pass->createTextureUnitState(terrain->getLayerTextureName(i, 0));
+				pass->createTextureUnitState(terrain->getLayerTextureName(i, 0));
 				// normal / height
-				tu = pass->createTextureUnitState(terrain->getLayerTextureName(i, 1));
+				pass->createTextureUnitState(terrain->getLayerTextureName(i, 1));
 			}
 
 		}

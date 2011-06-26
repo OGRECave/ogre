@@ -496,7 +496,6 @@ namespace Ogre
 					result.hit = true;
 					result.terrain = slot->instance;
 					result.position = raypair.second;
-					break;
 				}
 				else
 				{

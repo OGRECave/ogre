@@ -394,8 +394,8 @@ Real Segment::squaredDistance(const Segment& otherSegment) const
             fLambda = fE0pE1;
         }
 
-        fS1 = -fSign*fLambda*otherSegment.mExtent/fE0pE1;
-        fS0 = fLambda + fSign*fS1;
+//        fS1 = -fSign*fLambda*otherSegment.mExtent/fE0pE1;
+//        fS0 = fLambda + fSign*fS1;
         fSqrDist = fLambda*(fLambda + ((Real)2.0)*fB0Avr) + fC;
     }
 	// we don't need the following stuff - it's for calculating closest point

@@ -400,18 +400,12 @@ namespace Ogre {
 
 			VertexData* swVertexData;
 			VertexData* hwVertexData;
-			VertexData* origVertexData;
-			bool firstAnim = false;
-			bool normals = false;
 			if (handle == 0)
 			{
 				// shared vertex data
-				firstAnim = !entity->_getBuffersMarkedForAnimation();
 				swVertexData = entity->_getSoftwareVertexAnimVertexData();
 				hwVertexData = entity->_getHardwareVertexAnimVertexData();
-				origVertexData = entity->getMesh()->sharedVertexData;
 				entity->_markBuffersUsedForAnimation();
-				normals = entity->getMesh()->getSharedVertexDataAnimationIncludesNormals();
 			}
 			else
 			{
@@ -420,12 +414,9 @@ namespace Ogre {
 				// Skip this track if subentity is not visible
 				if (!s->isVisible())
 					continue;
-				firstAnim = !s->_getBuffersMarkedForAnimation();
 				swVertexData = s->_getSoftwareVertexAnimVertexData();
 				hwVertexData = s->_getHardwareVertexAnimVertexData();
-				origVertexData = s->getSubMesh()->vertexData;
 				s->_markBuffersUsedForAnimation();
-				normals = s->getSubMesh()->getVertexAnimationIncludesNormals();
 			}
 			// Apply to both hardware and software, if requested
 			if (software)

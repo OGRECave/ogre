@@ -119,7 +119,7 @@ namespace Ogre {
             if (pos < readCount)
             {
                 // Trim off trailing CR if this was a CR/LF entry
-                if (trimCR && totalCount && buf[totalCount-1] == '\r')
+                if (trimCR && totalCount && buf && buf[totalCount-1] == '\r')
                 {
                     --totalCount;
                 }
@@ -133,7 +133,8 @@ namespace Ogre {
         }
 
         // Terminate
-        buf[totalCount] = '\0';
+        if(buf)
+            buf[totalCount] = '\0';
 
         return totalCount;
     }

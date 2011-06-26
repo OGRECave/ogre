@@ -226,8 +226,6 @@ namespace Ogre
 
                 preLoadImpl();
 
-                old = LOADSTATE_PREPARED;
-
 				if (mGroup == ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME)
 				{
 					// Derive resource group

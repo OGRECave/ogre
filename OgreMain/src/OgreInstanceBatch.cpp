@@ -311,7 +311,6 @@ namespace Ogre
 
 			if( vMinPos.squaredDistance( vPos ) < vMinPos.squaredDistance( firstPos ) )
 			{
-				first		= *itor;
 				firstPos	= vPos;
 			}
 
