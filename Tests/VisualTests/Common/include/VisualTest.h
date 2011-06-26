@@ -66,9 +66,6 @@ public:
         OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
     {
         OgreBites::Sample::_setup(window, keyboard, mouse, fsLayer);
-
-        // always take a screenshot after 1000 frames for now, for testing...
-        addScreenshotFrame(1000);
     }
 
     /** Clean up */
@@ -104,7 +101,11 @@ public:
     /** Returns whether or not a screenshot should be taken at the given frame */
     virtual bool isScreenshotFrame(unsigned int frame)
     {
-        if(frame == *(mScreenshotFrames.begin()))
+		if(mScreenshotFrames.empty())
+		{
+			mDone = true;
+		}
+        else if(frame == *(mScreenshotFrames.begin()))
         {
             mScreenshotFrames.erase(mScreenshotFrames.begin());
             if(mScreenshotFrames.empty())

@@ -34,6 +34,10 @@ ParticleTest::ParticleTest()
 {
     mInfo["Title"] = "VTests_Particles";
     mInfo["Description"] = "Tests basic particle system functionality.";
+	// take screenshot early, when emitters are just beginning
+	addScreenshotFrame(200);
+	// and another after particles have died, extra emitters emitted, etc
+	addScreenshotFrame(2000);
 }
 //---------------------------------------------------------------------------
 
