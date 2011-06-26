@@ -16,4 +16,4 @@ add_subdirectory(Context)
 add_subdirectory(PlayPen)
 
 # add VTests plugin directory
-#add_subdirectory(VTests)
+add_subdirectory(VTests)

@@ -64,7 +64,7 @@ void TestContext::setup()
 
     // Eventually there will be a brief menu screen for selecting options,
     // for now, just hardcode this here and jump into a batch of tests immediatly:
-    Ogre::String plugin = "PlaypenTests";
+    Ogre::String plugin = "VTests";
     
     // name of the plugin we'll be running
     mPluginName = plugin;
@@ -74,6 +74,7 @@ void TestContext::setup()
     time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     Ogre::String filestamp = Ogre::String(temp, 18);
+	// name for this batch (used for naming the directory, and uniquely identifying this batch)
     Ogre::String batchName = mPluginName + "_" + filestamp;
     
     // a nicer formatted version for display
@@ -346,11 +347,12 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-#else
+// TODO: setup CMake to use winmain rather than console
+//#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+//INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+//#else
 int main(int argc, char *argv[])
-#endif
+//#endif
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
