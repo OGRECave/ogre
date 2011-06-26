@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __tinyhtml_H__
-#define __tinyhtml_H__
+#ifndef __TinyHTML_H__
+#define __TinyHTML_H__
 
 /** The following is a very simple representation of the HTML DOM.
  *    It's sole purpose is outputting formatted html documents, there

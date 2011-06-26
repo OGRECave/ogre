@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define __TestResults_H__
 
 #include "Ogre.h"
-#include "tinyhtml.h"
+#include "TinyHTML.h"
 #include "ImageCompare.h"
 #include "TestBatch.h"
 
