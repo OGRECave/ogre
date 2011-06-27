@@ -67,11 +67,11 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
-	D3D9Device::RenderWindowToResorucesIterator D3D9Device::getRenderWindowIterator(D3D9RenderWindow* renderWindow)
+	D3D9Device::RenderWindowToResourcesIterator D3D9Device::getRenderWindowIterator(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.find(renderWindow);
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.find(renderWindow);
 
-		if (it == mMapRenderWindowToResoruces.end())
+		if (it == mMapRenderWindowToResources.end())
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Render window was not attached to this device !!", 
@@ -85,16 +85,16 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::attachRenderWindow(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.find(renderWindow);
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.find(renderWindow);
 
-		if (it == mMapRenderWindowToResoruces.end())
+		if (it == mMapRenderWindowToResources.end())
 		{
 			RenderWindowResources* renderWindowResources = OGRE_NEW_T(RenderWindowResources, MEMCATEGORY_RENDERSYS);
 
 			memset(renderWindowResources, 0, sizeof(RenderWindowResources));						
 			renderWindowResources->adapterOrdinalInGroupIndex = 0;					
 			renderWindowResources->acquired = false;
-			mMapRenderWindowToResoruces[renderWindow] = renderWindowResources;			
+			mMapRenderWindowToResources[renderWindow] = renderWindowResources;			
 		}
 		updateRenderWindowsIndices();
 	}
@@ -102,9 +102,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::detachRenderWindow(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.find(renderWindow);
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.find(renderWindow);
 
-		if (it != mMapRenderWindowToResoruces.end())
+		if (it != mMapRenderWindowToResources.end())
 		{		
 			// The focus window in which the d3d9 device created on is detached.
 			// resources must be acquired again.
@@ -123,7 +123,7 @@ namespace Ogre
 
 			OGRE_DELETE_T(renderWindowResources, RenderWindowResources, MEMCATEGORY_RENDERSYS);
 			
-			mMapRenderWindowToResoruces.erase(it);		
+			mMapRenderWindowToResources.erase(it);		
 		}
 		updateRenderWindowsIndices();
 	}
@@ -144,7 +144,7 @@ namespace Ogre
 		// Case device already exists.
 		else
 		{
-			RenderWindowToResorucesIterator itPrimary = getRenderWindowIterator(getPrimaryWindow());
+			RenderWindowToResourcesIterator itPrimary = getRenderWindowIterator(getPrimaryWindow());
 
 			if (itPrimary->second->swapChain != NULL)
 			{
@@ -187,9 +187,9 @@ namespace Ogre
 		else
 		{
 			// Update resources of each window.
-			RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+			RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-			while (it != mMapRenderWindowToResoruces.end())
+			while (it != mMapRenderWindowToResources.end())
 			{
 				acquireRenderWindowResources(it);
 				++it;
@@ -206,9 +206,9 @@ namespace Ogre
 		{
 			D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
 
-			RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+			RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-			while (it != mMapRenderWindowToResoruces.end())
+			while (it != mMapRenderWindowToResources.end())
 			{
 				RenderWindowResources* renderWindowResources = it->second;
 
@@ -223,7 +223,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9Device::acquire(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		
 		acquireRenderWindowResources(it);
 
@@ -248,7 +248,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	IDirect3DSurface9* D3D9Device::getDepthBuffer(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);		
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);		
 
 		return it->second->depthBuffer;
 	}
@@ -256,7 +256,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	IDirect3DSurface9* D3D9Device::getBackBuffer(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 	
 		return it->second->backBuffer;		
 	}
@@ -264,22 +264,22 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	uint D3D9Device::getRenderWindowCount() const
 	{
-		return static_cast<uint>(mMapRenderWindowToResoruces.size());
+		return static_cast<uint>(mMapRenderWindowToResources.size());
 	}
 
 	//---------------------------------------------------------------------
 	D3D9RenderWindow* D3D9Device::getRenderWindow(uint index)
 	{
-		if (index >= mMapRenderWindowToResoruces.size())
+		if (index >= mMapRenderWindowToResources.size())
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Index of render window is out of bounds!", 
 				"D3D9RenderWindow::getRenderWindow");
 		}
 		
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-		while (it != mMapRenderWindowToResoruces.end())
+		while (it != mMapRenderWindowToResources.end())
 		{
 			if (index == 0)			
 				break;			
@@ -294,7 +294,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::setAdapterOrdinalIndex(D3D9RenderWindow* renderWindow, uint adapterOrdinalInGroupIndex)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 
 		it->second->adapterOrdinalInGroupIndex = adapterOrdinalInGroupIndex;
 
@@ -313,9 +313,9 @@ namespace Ogre
 
 		release();
 		
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-		if (it != mMapRenderWindowToResoruces.end())
+		if (it != mMapRenderWindowToResources.end())
 		{	
 			if (it->first->getWindowHandle() == msSharedFocusWindow)
 				setSharedWindowHandle(NULL);
@@ -323,7 +323,7 @@ namespace Ogre
 			OGRE_DELETE(it->second);
 			++it;
 		}
-		mMapRenderWindowToResoruces.clear();
+		mMapRenderWindowToResources.clear();
 		
 		// Reset dynamic attributes.		
 		mFocusWindow			= NULL;		
@@ -396,9 +396,9 @@ namespace Ogre
 
 		updatePresentationParameters();
 
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-		while (it != mMapRenderWindowToResoruces.end())
+		while (it != mMapRenderWindowToResources.end())
 		{
 			RenderWindowResources* renderWindowResources = it->second;
 
@@ -433,9 +433,9 @@ namespace Ogre
 		setupDeviceStates();
 
 		// Update resources of each window.
-		it = mMapRenderWindowToResoruces.begin();
+		it = mMapRenderWindowToResources.begin();
 
-		while (it != mMapRenderWindowToResoruces.end())
+		while (it != mMapRenderWindowToResources.end())
 		{
 			acquireRenderWindowResources(it);
 			++it;
@@ -533,13 +533,13 @@ namespace Ogre
 		}	
 		mPresentationParamsCount = 0;		
 
-		if (mMapRenderWindowToResoruces.size() > 0)
+		if (mMapRenderWindowToResources.size() > 0)
 		{
-			mPresentationParams = OGRE_ALLOC_T(D3DPRESENT_PARAMETERS, mMapRenderWindowToResoruces.size(), MEMCATEGORY_RENDERSYS);
+			mPresentationParams = OGRE_ALLOC_T(D3DPRESENT_PARAMETERS, mMapRenderWindowToResources.size(), MEMCATEGORY_RENDERSYS);
 
-			RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+			RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
-			while (it != mMapRenderWindowToResoruces.end())
+			while (it != mMapRenderWindowToResources.end())
 			{
 				D3D9RenderWindow* renderWindow = it->first;
 				RenderWindowResources* renderWindowResources = it->second;
@@ -591,9 +591,9 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9Device::isMultihead() const
 	{
-		RenderWindowToResorucesMap::const_iterator it = mMapRenderWindowToResoruces.begin();
+		RenderWindowToResourcesMap::const_iterator it = mMapRenderWindowToResources.begin();
 
-		while (it != mMapRenderWindowToResoruces.end())				
+		while (it != mMapRenderWindowToResources.end())				
 		{
 			RenderWindowResources* renderWindowResources = it->second;
 			
@@ -812,7 +812,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::invalidate(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 
 		it->second->acquired = false;		
 	}
@@ -858,7 +858,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9Device::validateDeviceState(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);		
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);		
 		RenderWindowResources* renderWindowResources =  it->second;
 		HRESULT hr;
 
@@ -921,7 +921,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::validateBackBufferSize(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		RenderWindowResources*	renderWindowResources = it->second;
 	
 
@@ -948,7 +948,7 @@ namespace Ogre
 		if (renderWindow->isFullScreen())
 			return true;
 
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		HMONITOR	hRenderWindowMonitor = NULL;
 
 		// Find the monitor this render window belongs to.
@@ -979,7 +979,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::present(D3D9RenderWindow* renderWindow)
 	{		
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		RenderWindowResources*	renderWindowResources = it->second;				
 
 
@@ -1023,7 +1023,7 @@ namespace Ogre
 	}
 
 	//---------------------------------------------------------------------
-	void D3D9Device::acquireRenderWindowResources(RenderWindowToResorucesIterator it)
+	void D3D9Device::acquireRenderWindowResources(RenderWindowToResourcesIterator it)
 	{
 		RenderWindowResources*	renderWindowResources = it->second;
 		D3D9RenderWindow*		renderWindow = it->first;			
@@ -1148,7 +1148,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D9Device::isSwapChainWindow(D3D9RenderWindow* renderWindow)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		
 		if (it->second->presentParametersIndex == 0 || renderWindow->isFullScreen())			
 			return false;
@@ -1159,12 +1159,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D9RenderWindow* D3D9Device::getPrimaryWindow()
 	{		
-		RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+		RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 	
-		while (it != mMapRenderWindowToResoruces.end() && it->second->presentParametersIndex != 0)				
+		while (it != mMapRenderWindowToResources.end() && it->second->presentParametersIndex != 0)				
 			++it;		
 
-		assert(it != mMapRenderWindowToResoruces.end());
+		assert(it != mMapRenderWindowToResources.end());
 
 		return it->first;
 	}
@@ -1182,11 +1182,11 @@ namespace Ogre
 		// Update present parameters index attribute per render window.
 		if (isMultihead())
 		{
-			RenderWindowToResorucesIterator it = mMapRenderWindowToResoruces.begin();
+			RenderWindowToResourcesIterator it = mMapRenderWindowToResources.begin();
 
 			// Multi head device case -  
 			// Present parameter index is based on adapter ordinal in group index.
-			while (it != mMapRenderWindowToResoruces.end())			
+			while (it != mMapRenderWindowToResources.end())			
 			{
 				it->second->presentParametersIndex = it->second->adapterOrdinalInGroupIndex;
 				++it;
@@ -1202,7 +1202,7 @@ namespace Ogre
 
 			uint nextPresParamIndex = 0;
 
-			RenderWindowToResorucesIterator it;
+			RenderWindowToResourcesIterator it;
 			D3D9RenderWindow* deviceFocusWindow = NULL;
 
 			// In case a d3d9 device exists - try to keep the present parameters order
@@ -1210,8 +1210,8 @@ namespace Ogre
 			// will avoid device re-creation.
 			if (mpDevice != NULL)
 			{
-				it = mMapRenderWindowToResoruces.begin();
-				while (it != mMapRenderWindowToResoruces.end())			
+				it = mMapRenderWindowToResources.begin();
+				while (it != mMapRenderWindowToResources.end())			
 				{
 					//This "if" handles the common case of a single device
 					if (it->first->getWindowHandle() == mCreationParams.hFocusWindow)
@@ -1233,8 +1233,8 @@ namespace Ogre
 			
 		
 
-			it = mMapRenderWindowToResoruces.begin();
-			while (it != mMapRenderWindowToResoruces.end())			
+			it = mMapRenderWindowToResources.begin();
+			while (it != mMapRenderWindowToResources.end())			
 			{
 				if (it->first != deviceFocusWindow)
 				{
@@ -1249,7 +1249,7 @@ namespace Ogre
 	void D3D9Device::copyContentsToMemory(D3D9RenderWindow* renderWindow, 
 		const PixelBox &dst, RenderTarget::FrameBuffer buffer)
 	{
-		RenderWindowToResorucesIterator it = getRenderWindowIterator(renderWindow);
+		RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
 		RenderWindowResources* resources = it->second;
 		bool swapChain = isSwapChainWindow(renderWindow);
 
