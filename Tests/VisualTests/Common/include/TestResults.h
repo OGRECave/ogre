@@ -128,6 +128,10 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     // For the moment it's hosted on my personal site, for convenience
     css->appendAttribute("href","http://www.rileyadams.net/gsoc/output.css");
     css->appendAttribute("type","text/css");
+	// link a little javascript
+	HtmlElement* js = head->appendElement("script");
+	js->appendAttribute("src","http://www.rileyadams.net/gsoc/out.js");
+	js->appendText("");// so it doesn't self close
     // add body
     HtmlElement* body = html.appendElement("body");
     // title

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "VisualTest.h"
 #include "SamplePlugin.h"
 #include "TestResults.h"
+#include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
@@ -60,14 +61,28 @@ void TestContext::setup()
     Ogre::ConfigFile testConfig;
     testConfig.load("tests.cfg");
     mPluginDirectory = testConfig.getSetting("TestFolder");
-    mTestPlugins = testConfig.getMultiSetting("TestPlugin");
 
-    // Eventually there will be a brief menu screen for selecting options,
-    // for now, just hardcode this here and jump into a batch of tests immediatly:
-    Ogre::String plugin = "VTests";
+	Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
+
+	// parse for the test sets and plugins that they're made up of
+	for(sections; sections.hasMoreElements(); sections.moveNext())
+	{
+		Ogre::String setName = sections.peekNextKey();
+		if(setName != "")
+		{
+			std::cout<<setName<<" is a section.\n";
+			mTestSets[setName] = Ogre::StringVector();
+			std::multimap<Ogre::String,Ogre::String>::iterator it = sections.peekNextValue()->begin();
+			for(it; it != sections.peekNextValue()->end(); ++it)
+				mTestSets[setName].push_back(it->second);
+		}
+	}
+
+	// eventually this will be selectable via a command line option
+    Ogre::String set = "VTests";
     
-    // name of the plugin we'll be running
-    mPluginName = plugin;
+    // name of the test set we'll be running
+    mTestSetName = set;
 
     // timestamp for the filename
     char temp[19];
@@ -75,7 +90,7 @@ void TestContext::setup()
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     Ogre::String filestamp = Ogre::String(temp, 18);
 	// name for this batch (used for naming the directory, and uniquely identifying this batch)
-    Ogre::String batchName = mPluginName + "_" + filestamp;
+    Ogre::String batchName = mTestSetName + "_" + filestamp;
     
     // a nicer formatted version for display
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
@@ -85,57 +100,63 @@ void TestContext::setup()
     setupDirectories(batchName);
 
     // an object storing info about this set
-    mBatch = new TestBatch(batchName, mPluginName, timestamp, 
+    mBatch = new TestBatch(batchName, mTestSetName, timestamp, 
         mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
 
-    OgreBites::Sample* firstTest = loadTests(mPluginName);
+    OgreBites::Sample* firstTest = loadTests(mTestSetName);
     runSample(firstTest);
 }
 //-----------------------------------------------------------------------
 
-OgreBites::Sample* TestContext::loadTests(Ogre::String plugin)
+OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 {
     OgreBites::Sample* startSample = 0;
     Ogre::StringVector sampleList;
 
-    // try loading up the test plugin
-    try
-    {
-        mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
-    }
-    // if it fails, just return right away
-    catch (Ogre::Exception e)
-    {
-        return 0;
-    }
+	for(Ogre::StringVector::iterator it = mTestSets[set].begin(); it != 
+		mTestSets[set].end(); ++it)
+	{
+		Ogre::String plugin = *it;
 
-    // grab the plugin and cast to SamplePlugin
-    Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
-    OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
+		// try loading up the test plugin
+		try
+		{
+			mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
+		}
+		// if it fails, just return right away
+		catch (Ogre::Exception e)
+		{
+			return 0;
+		}
 
-    // if something's gone wrong return null
-    if (!sp)
-        return 0;
-    
-    // go through every sample (test) in the plugin...
-    OgreBites::SampleSet newSamples = sp->getSamples();
-    for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
-    {
-        mTests.push_back(*j);
-        Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-        Ogre::NameValuePairList::iterator k;
+		// grab the plugin and cast to SamplePlugin
+		Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
+		OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
 
-        // give sample default title and category if none found
-        k= info.find("Title");
-        if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-        k = info.find("Category");
-        if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-        k = info.find("Thumbnail");
-        if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
-    }
+		// if something's gone wrong return null
+		if (!sp)
+			return 0;
+		
+		// go through every sample (test) in the plugin...
+		OgreBites::SampleSet newSamples = sp->getSamples();
+		for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
+		{
+			mTests.push_back(*j);
+			Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
+			Ogre::NameValuePairList::iterator k;
 
-    startSample = *newSamples.begin();
+			// give sample default title and category if none found
+			k= info.find("Title");
+			if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
+			k = info.find("Category");
+			if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
+			k = info.find("Thumbnail");
+			if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
+		}
+	}
 
+	// start with the first one on the list
+    startSample = mTests.front();
     return startSample;
 }
 //-----------------------------------------------------------------------
@@ -279,8 +300,8 @@ void TestContext::setupDirectories(Ogre::String batchName)
     mOutputDir = mFSLayer->getWritablePath("VisualTests/");
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
     
-    // make sure there's a directory for the test plugin
-    mOutputDir += mPluginName + "/";
+    // make sure there's a directory for the test set
+    mOutputDir += mTestSetName + "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
     
     // add a directory for the render system

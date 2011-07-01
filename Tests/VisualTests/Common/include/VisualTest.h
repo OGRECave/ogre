@@ -52,7 +52,7 @@ public:
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
     }
 
-    virtual ~VisualTest() {}
+    virtual ~VisualTest(){}
 
     /** Adds a screenshot frame to the list - this should
      *    be done during setup of the test. */

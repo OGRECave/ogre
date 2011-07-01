@@ -60,9 +60,9 @@ public:
     virtual void runSample(OgreBites::Sample* s);
 
     /** Loads test plugins
-     *        @param plugin The name of the test plugin to load
+     *        @param set The name of the test set to load
      *        @return The initial tets or sample to run */
-    OgreBites::Sample* loadTests(Ogre::String plugin);
+    OgreBites::Sample* loadTests(Ogre::String set);
 
     /** Setup the Root */
     virtual void createRoot();
@@ -90,11 +90,11 @@ protected:
     // Path to the test plugin directory
     Ogre::String mPluginDirectory;
 
-    // List of available test plugins
-    Ogre::StringVector mTestPlugins;
+    // List of available test sets
+    std::map<Ogre::String, Ogre::StringVector> mTestSets;
     
-    // The test plugin that's being run
-    Ogre::String mPluginName;
+    // The test set that's being run
+    Ogre::String mTestSetName;
 
     // The tests to be run
     std::deque<OgreBites::Sample*> mTests;
@@ -110,9 +110,6 @@ protected:
 
     // Info about the running batch of tests
     TestBatch* mBatch;
-
-    // List of screenshots taken
-    // std::vector<Ogre::String> mImages;
 };
 
 #endif

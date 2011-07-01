@@ -28,7 +28,6 @@
 #ifndef __SampleContext_H__
 #define __SampleContext_H__
 
-#include "Ogre.h"
 #include "OgreLogManager.h"
 #include "OgrePlugin.h"
 #include "FileSystemLayerImpl.h"
