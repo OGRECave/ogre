@@ -101,14 +101,14 @@ public:
     /** Returns whether or not a screenshot should be taken at the given frame */
     virtual bool isScreenshotFrame(unsigned int frame)
     {
-		if(mScreenshotFrames.empty())
-		{
-			mDone = true;
-		}
-        else if(frame == *(mScreenshotFrames.begin()))
+        if (mScreenshotFrames.empty())
+        {
+            mDone = true;
+        }
+        else if (frame == *(mScreenshotFrames.begin()))
         {
             mScreenshotFrames.erase(mScreenshotFrames.begin());
-            if(mScreenshotFrames.empty())
+            if (mScreenshotFrames.empty())
                 mDone = true;
             return true;
         }

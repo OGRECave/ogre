@@ -105,12 +105,12 @@ public:
         names. */
     bool canCompareWith(const TestBatch& other) const
     {
-        if(resolutionX != other.resolutionX ||
+        if (resolutionX != other.resolutionX ||
             resolutionY != other.resolutionY ||
             images.size() != other.images.size())
             return false;
 
-        for(int i = 0; i < images.size(); ++i)
+        for (int i = 0; i < images.size(); ++i)
             if(images[i] != other.images[i])
                 return false;
 
@@ -127,13 +127,13 @@ public:
     ComparisonResultVectorPtr compare(const TestBatch& other) const
     {
         ComparisonResultVectorPtr out(OGRE_NEW_T(ComparisonResultVector, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
-        if(!canCompareWith(other))
+        if (!canCompareWith(other))
         {
             out.setNull();
         }
         else
         {
-            for(int i = 0; i < images.size(); ++i)
+            for (int i = 0; i < images.size(); ++i)
                 out->push_back(compareImages(getImagePath(i), other.getImagePath(i)));
         }
         return out;
@@ -146,7 +146,7 @@ public:
         std::ofstream config;
         config.open(Ogre::String(mDirectory + "/info.cfg").c_str());
 
-        if(config.is_open())
+        if (config.is_open())
         {
             config<<"[Info]\n";
             config<<"Name="<<name<<"\n";
@@ -157,7 +157,7 @@ public:
             config<<"[Tests]\n";
 
             // add entries for each image
-            for(int i = 0; i < images.size(); ++i)
+            for (int i = 0; i < images.size(); ++i)
                 config<<"Test="<<images[i]<<"\n";
 
             config.close();
@@ -179,7 +179,7 @@ public:
         // use ArchiveManager to get a list of all subdirectories
         Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem");
         Ogre::StringVectorPtr tests = testDir->list(false, true);
-        for(int i = 0; i < tests->size(); ++i)
+        for (int i = 0; i < tests->size(); ++i)
         {
             Ogre::ConfigFile info;
             
@@ -188,7 +188,7 @@ public:
             {
                 info.load(directory + (*tests)[i] + "/info.cfg");
             }
-            catch(Ogre::FileNotFoundException e)
+            catch (Ogre::FileNotFoundException e)
             {
                 continue;
             }

@@ -69,13 +69,13 @@ ComparisonResult compareImages(Ogre::String image1, Ogre::String image2)
 
     out.passed = false;
 
-    if(img1.is_open() && img2.is_open())
+    if (img1.is_open() && img2.is_open())
     {
         bool foundDiff = false;
-        while(img1.good())
+        while (img1.good())
         {
             // compare byte by byte...
-            if((img1.get() != img2.get()) || (img2.good() != img1.good()))
+            if ((img1.get() != img2.get()) || (img2.good() != img1.good()))
             {
                 foundDiff = true;
                 break;

@@ -46,30 +46,30 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
-	
-	// prepopulate expected options
-	unOpt["-r"] = false;        // generate reference set
-	unOpt["--no-html"] = false; // whether or not to generate html
-	binOpt["-m"] = "";          // optional comment
-	binOpt["-ts"] = "VTests";   // name of the test set to use
-	binOpt["-c"] = "Reference"; // name of batch to compare against
-	binOpt["-n"] = "AUTO";      // name for this batch
+    
+    // prepopulate expected options
+    unOpt["-r"] = false;        // generate reference set
+    unOpt["--no-html"] = false; // whether or not to generate html
+    binOpt["-m"] = "";          // optional comment
+    binOpt["-ts"] = "VTests";   // name of the test set to use
+    binOpt["-c"] = "Reference"; // name of batch to compare against
+    binOpt["-n"] = "AUTO";      // name for this batch
 
-	// parse
+    // parse
     findCommandLineOpts(argc, argv, unOpt, binOpt);
 
-	mReferenceSet = unOpt["-r"];
-	mTestSetName = binOpt["-ts"];
-	mComment = binOpt["-m"];
-	mGenerateHtml = !unOpt["--no-html"];
-	mBatchName = binOpt["-n"];
-	mCompareWith = binOpt["-c"];
+    mReferenceSet = unOpt["-r"];
+    mTestSetName = binOpt["-ts"];
+    mComment = binOpt["-m"];
+    mGenerateHtml = !unOpt["--no-html"];
+    mBatchName = binOpt["-n"];
+    mCompareWith = binOpt["-c"];
 }
 //-----------------------------------------------------------------------
 
 TestContext::~TestContext()
 {
-    if(mBatch)
+    if (mBatch)
         delete mBatch;
 }
 //-----------------------------------------------------------------------
@@ -84,37 +84,37 @@ void TestContext::setup()
     testConfig.load("tests.cfg");
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
-	Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
+    Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
-	// parse for the test sets and plugins that they're made up of
-	for(sections; sections.hasMoreElements(); sections.moveNext())
-	{
-		Ogre::String setName = sections.peekNextKey();
-		if(setName != "")
-		{
-			mTestSets[setName] = Ogre::StringVector();
-			std::multimap<Ogre::String,Ogre::String>::iterator it = sections.peekNextValue()->begin();
-			for(it; it != sections.peekNextValue()->end(); ++it)
-				mTestSets[setName].push_back(it->second);
-		}
-	}
+    // parse for the test sets and plugins that they're made up of
+    for (sections; sections.hasMoreElements(); sections.moveNext())
+    {
+        Ogre::String setName = sections.peekNextKey();
+        if (setName != "")
+        {
+            mTestSets[setName] = Ogre::StringVector();
+            std::multimap<Ogre::String,Ogre::String>::iterator it = sections.peekNextValue()->begin();
+            for (it; it != sections.peekNextValue()->end(); ++it)
+                mTestSets[setName].push_back(it->second);
+        }
+    }
 
     // timestamp for the filename
     char temp[19];
     time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
     Ogre::String filestamp = Ogre::String(temp, 18);
-	// name for this batch (used for naming the directory, and uniquely identifying this batch)
+    // name for this batch (used for naming the directory, and uniquely identifying this batch)
     Ogre::String batchName = mTestSetName + "_" + filestamp;
     
     // a nicer formatted version for display
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp, 19);
  
-	if(mReferenceSet)
-		batchName = "Reference";
-	else if(mBatchName != "AUTO")
-		batchName = mBatchName;
+    if (mReferenceSet)
+        batchName = "Reference";
+    else if (mBatchName != "AUTO")
+        batchName = mBatchName;
 
     // set up output directories
     setupDirectories(batchName);
@@ -122,7 +122,7 @@ void TestContext::setup()
     // an object storing info about this set
     mBatch = new TestBatch(batchName, mTestSetName, timestamp, 
         mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
-	mBatch->comment = mComment;
+    mBatch->comment = mComment;
 
     OgreBites::Sample* firstTest = loadTests(mTestSetName);
     runSample(firstTest);
@@ -134,50 +134,50 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
     OgreBites::Sample* startSample = 0;
     Ogre::StringVector sampleList;
 
-	// load all of the plugins in the set
-	for(Ogre::StringVector::iterator it = mTestSets[set].begin(); it != 
-		mTestSets[set].end(); ++it)
-	{
-		Ogre::String plugin = *it;
+    // load all of the plugins in the set
+    for (Ogre::StringVector::iterator it = mTestSets[set].begin(); it != 
+        mTestSets[set].end(); ++it)
+    {
+        Ogre::String plugin = *it;
 
-		// try loading up the test plugin
-		try
-		{
-			mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
-		}
-		// if it fails, just return right away
-		catch (Ogre::Exception e)
-		{
-			return 0;
-		}
+        // try loading up the test plugin
+        try
+        {
+            mRoot->loadPlugin(mPluginDirectory + "/" + plugin);
+        }
+        // if it fails, just return right away
+        catch (Ogre::Exception e)
+        {
+            return 0;
+        }
 
-		// grab the plugin and cast to SamplePlugin
-		Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
-		OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
+        // grab the plugin and cast to SamplePlugin
+        Ogre::Plugin* p = mRoot->getInstalledPlugins().back();
+        OgreBites::SamplePlugin* sp = dynamic_cast<OgreBites::SamplePlugin*>(p);
 
-		// if something's gone wrong return null
-		if (!sp)
-			return 0;
-		
-		// go through every sample (test) in the plugin...
-		OgreBites::SampleSet newSamples = sp->getSamples();
-		for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
-		{
-			mTests.push_back(*j);
-			Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-			Ogre::NameValuePairList::iterator k;
+        // if something's gone wrong return null
+        if (!sp)
+            return 0;
+        
+        // go through every sample (test) in the plugin...
+        OgreBites::SampleSet newSamples = sp->getSamples();
+        for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
+        {
+            mTests.push_back(*j);
+            Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
+            Ogre::NameValuePairList::iterator k;
 
-			// give sample default title and category if none found
-			k= info.find("Title");
-			if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-			k = info.find("Category");
-			if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-			k = info.find("Thumbnail");
-			if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
-		}
-	}
+            // give sample default title and category if none found
+            k= info.find("Title");
+            if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
+            k = info.find("Category");
+            if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
+            k = info.find("Thumbnail");
+            if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
+        }
+    }
 
-	// start with the first one on the list
+    // start with the first one on the list
     startSample = mTests.front();
     return startSample;
 }
@@ -192,7 +192,7 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
     fixed_evt.timeSinceLastFrame = mTimestep;
     fixed_evt.timeSinceLastEvent = mTimestep;
 
-    if(mCurrentTest) // if a test is running
+    if (mCurrentTest) // if a test is running
     {
         // track frame number for screenshot purposes
         ++mCurrentFrame;
@@ -200,7 +200,7 @@ bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
         // regular update function
         return mCurrentTest->frameStarted(fixed_evt);
     }
-    else if(mCurrentSample) // if a generic sample is running
+    else if (mCurrentSample) // if a generic sample is running
     {
         return mCurrentSample->frameStarted(evt);
     }
@@ -220,9 +220,9 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
     fixed_evt.timeSinceLastFrame = mTimestep;
     fixed_evt.timeSinceLastEvent = mTimestep;
 
-    if(mCurrentTest) // if a test is running
+    if (mCurrentTest) // if a test is running
     {
-        if(mCurrentTest->isScreenshotFrame(mCurrentFrame))
+        if (mCurrentTest->isScreenshotFrame(mCurrentFrame))
         {
             // take a screenshot
             Ogre::String filename = mOutputDir + mBatch->name + "/" +
@@ -234,7 +234,7 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
             mWindow->writeContentsToFile(filename);
         }
 
-        if(mCurrentTest->isDone())
+        if (mCurrentTest->isDone())
         {
             // continue onto the next test
             runSample(0);
@@ -244,7 +244,7 @@ bool TestContext::frameEnded(const Ogre::FrameEvent& evt)
         // standard update function
         return mCurrentTest->frameEnded(fixed_evt);
     }
-    else if(mCurrentSample) // if a generic sample is running
+    else if (mCurrentSample) // if a generic sample is running
     {
         return mCurrentSample->frameEnded(evt);
     }
@@ -267,14 +267,14 @@ void TestContext::runSample(OgreBites::Sample* s)
     OgreBites::Sample* sampleToRun = s;
 
     // if a valid test is passed, then run it, if null, grab the next one from the deque
-    if(s)
+    if (s)
     {
         sampleToRun = s;
     }
-    else if(!mTests.empty())
+    else if (!mTests.empty())
     {
         mTests.pop_front();
-        if(!mTests.empty())
+        if (!mTests.empty())
             sampleToRun = mTests.front();
     }
 
@@ -282,7 +282,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     mCurrentTest = dynamic_cast<VisualTest*>(sampleToRun);
 
     // set things up to be deterministic
-    if(mCurrentTest)
+    if (mCurrentTest)
     {
        // Seed rand with a predictable value
         srand(5); // 5 is completely arbitrary, the idea is simply to use a constant
@@ -329,8 +329,8 @@ void TestContext::setupDirectories(Ogre::String batchName)
     // add a directory for the render system
     Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
     // strip spaces from render system name
-    for(int i = 0;i < rsysName.size(); ++i)
-        if(rsysName[i] != ' ')
+    for (int i = 0;i < rsysName.size(); ++i)
+        if (rsysName[i] != ' ')
             mOutputDir += rsysName[i];
     mOutputDir += "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
@@ -343,58 +343,58 @@ void TestContext::setupDirectories(Ogre::String batchName)
 
 void TestContext::finishedTests()
 {
-	Ogre::String html = "";
+    Ogre::String html = "";
 
-	if(mGenerateHtml && !mReferenceSet)
-	{
-		// look for a reference set first
-		Ogre::ConfigFile info;
-		bool foundReference = true;
-		
-		try
-		{
-			info.load(mOutputDir + mCompareWith + "/info.cfg");
-		}
-		catch(Ogre::FileNotFoundException e)
-		{
-			foundReference = false;
-			TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
+    if (mGenerateHtml && !mReferenceSet)
+    {
+        // look for a reference set first
+        Ogre::ConfigFile info;
+        bool foundReference = true;
+        
+        try
+        {
+            info.load(mOutputDir + mCompareWith + "/info.cfg");
+        }
+        catch (Ogre::FileNotFoundException e)
+        {
+            foundReference = false;
+            TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
 
-			TestBatchSet::iterator i = batches->begin();
-			for(i; i != batches->end(); ++i)
-			{
-				if(mBatch->canCompareWith((*i)))
-				{
-					html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
-					break;
-				}
-			}
-		}
+            TestBatchSet::iterator i = batches->begin();
+            for (i; i != batches->end(); ++i)
+            {
+                if (mBatch->canCompareWith((*i)))
+                {
+                    html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
+                    break;
+                }
+            }
+        }
 
-		if(foundReference)
-		{
-			TestBatch ref = TestBatch(info, mOutputDir + mCompareWith);
-			if(mBatch->canCompareWith(ref))
-				html = writeHTML(ref, *mBatch, mBatch->compare(ref));
-		}
+        if (foundReference)
+        {
+            TestBatch ref = TestBatch(info, mOutputDir + mCompareWith);
+            if (mBatch->canCompareWith(ref))
+                html = writeHTML(ref, *mBatch, mBatch->compare(ref));
+        }
 
-		if(!html.empty())
-		{
-			// we save a generally named "out.html" that gets overwritten each run, 
-			// plus a uniquely named one for this run
-			std::ofstream out1;
-			std::ofstream out2;
-			out1.open(Ogre::String(mOutputDir + "out.html").c_str());
-			out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
-			if(out1.is_open() && out2.is_open())
-			{
-				out1<<html;
-				out2<<html;
-				out1.close();
-				out2.close();
-			}
-		}
-	}
+        if (!html.empty())
+        {
+            // we save a generally named "out.html" that gets overwritten each run, 
+            // plus a uniquely named one for this run
+            std::ofstream out1;
+            std::ofstream out2;
+            out1.open(Ogre::String(mOutputDir + "out.html").c_str());
+            out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
+            if (out1.is_open() && out2.is_open())
+            {
+                out1<<html;
+                out2<<html;
+                out1.close();
+                out2.close();
+            }
+        }
+    }
 
     // write this batch's config file
     mBatch->writeConfig();

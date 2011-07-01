@@ -42,7 +42,7 @@ THE SOFTWARE.
 HtmlElement* writeBatchInfoTable(const TestBatch& set, Ogre::String name)
 {
     // main div
-    HtmlElement* column = new HtmlElement("div");
+    HtmlElement* column = OGRE_NEW HtmlElement("div");
     column->appendAttribute("class", "img_column");
     // add a bit of header text
     column->appendElement("h3")->appendText(name);
@@ -71,7 +71,7 @@ HtmlElement* writeBatchInfoTable(const TestBatch& set, Ogre::String name)
 HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& set1, const TestBatch& set2)
 {
     // container and header
-    HtmlElement* container = new HtmlElement("div");
+    HtmlElement* container = OGRE_NEW HtmlElement("div");
     container->appendAttribute("id",result.testName + "_" + Ogre::StringConverter::toString(result.frame));
     container->appendElement("h2")->appendText(result.testName 
         + " (frame " + Ogre::StringConverter::toString(result.frame) + ")");
@@ -128,10 +128,10 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     // For the moment it's hosted on my personal site, for convenience
     css->appendAttribute("href","http://www.rileyadams.net/gsoc/output.css");
     css->appendAttribute("type","text/css");
-	// link a little javascript
-	HtmlElement* js = head->appendElement("script");
-	js->appendAttribute("src","http://www.rileyadams.net/gsoc/out.js");
-	js->appendText("");// so it doesn't self close
+    // link a little javascript
+    HtmlElement* js = head->appendElement("script");
+    js->appendAttribute("src","http://www.rileyadams.net/gsoc/out.js");
+    js->appendText("");// so it doesn't self close
     // add body
     HtmlElement* body = html.appendElement("body");
     // title
@@ -148,8 +148,8 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     contentDiv->appendElement("hr");
     // summarize results
     size_t numPassed = 0;
-    for(int i = 0; i < results->size(); ++i)
-        if((*results)[i].passed)
+    for (int i = 0; i < results->size(); ++i)
+        if ((*results)[i].passed)
             ++numPassed;
     contentDiv->appendElement("p")->appendText(
         Ogre::StringConverter::toString(numPassed) + " of " 
@@ -157,18 +157,18 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     contentDiv->appendElement("hr");
     // add thumbnails
     HtmlElement* thumbs = contentDiv->appendElement("p");
-    for(int i = 0; i < results->size(); ++i)
+    for (int i = 0; i < results->size(); ++i)
     {
         HtmlElement* anchor = thumbs->appendElement("a");
         anchor->appendAttribute("href", Ogre::String("#") + (*results)[i].testName + "_" 
-			+ Ogre::StringConverter::toString((*results)[i].frame));
+            + Ogre::StringConverter::toString((*results)[i].frame));
         anchor->appendAttribute("title", (*results)[i].testName);
         HtmlElement* img = anchor->appendElement("img");
         img->appendAttribute("src",set2.name + "/" + (*results)[i].image);
         img->appendAttribute("class", (*results)[i].passed ? "thumb" : "thumb_fail");
     }
     // add side-by-side images and summary for each test
-    for(int i = 0; i < results->size(); ++i)
+    for (int i = 0; i < results->size(); ++i)
         body->pushChild(summarizeSingleResult((*results)[i], set1, set2));
 
     // print to the stream and return

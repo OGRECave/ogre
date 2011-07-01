@@ -44,7 +44,7 @@ public:
 protected:
 
     void setupContent();
-	Ogre::Entity* mGroundPlane;
+    Ogre::Entity* mGroundPlane;
 
 };
 

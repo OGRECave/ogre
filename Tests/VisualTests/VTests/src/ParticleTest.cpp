@@ -34,25 +34,25 @@ ParticleTest::ParticleTest()
 {
     mInfo["Title"] = "VTests_Particles";
     mInfo["Description"] = "Tests basic particle system functionality.";
-	// take screenshot early, when emitters are just beginning
-	addScreenshotFrame(35);
-	// and another after particles have died, extra emitters emitted, etc
-	addScreenshotFrame(2000);
+    // take screenshot early, when emitters are just beginning
+    addScreenshotFrame(35);
+    // and another after particles have died, extra emitters emitted, etc
+    addScreenshotFrame(2000);
 }
 //---------------------------------------------------------------------------
 
 void ParticleTest::setupContent()
 {
-	// create a bunch of random particle systems
-	Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
-	mSceneMgr->getRootSceneNode()->attachObject(ps);
-	ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
-	mSceneMgr->getRootSceneNode()->attachObject(ps);
-	ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);
-	ps = mSceneMgr->createParticleSystem("Nimbus2", "Examples/GreenyNimbus");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-150, 0, 0))->attachObject(ps);
-	mCamera->setPosition(0,150,500);
+    // create a bunch of random particle systems
+    Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
+    mSceneMgr->getRootSceneNode()->attachObject(ps);
+    ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
+    mSceneMgr->getRootSceneNode()->attachObject(ps);
+    ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);
+    ps = mSceneMgr->createParticleSystem("Nimbus2", "Examples/GreenyNimbus");
+    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-150, 0, 0))->attachObject(ps);
+    mCamera->setPosition(0,150,500);
 }
 //-----------------------------------------------------------------------
 

@@ -71,9 +71,9 @@ struct HtmlElement : public HtmlNode
 
     virtual ~HtmlElement()
     {
-        while(!children.empty())
+        while (!children.empty())
         {
-            delete children.back();
+            OGRE_DELETE children.back();
             children.pop_back();
         }
     }
@@ -93,7 +93,7 @@ struct HtmlElement : public HtmlNode
 
     HtmlElement* appendElement(Ogre::String type)
     {
-        HtmlElement* newNode = new HtmlElement(type);
+        HtmlElement* newNode = OGRE_NEW HtmlElement(type);
         children.push_back(newNode);
         return newNode;
     }
@@ -101,7 +101,7 @@ struct HtmlElement : public HtmlNode
 
     HtmlTextNode* appendText(Ogre::String text)
     {
-        HtmlTextNode* newNode = new HtmlTextNode(text);
+        HtmlTextNode* newNode = OGRE_NEW HtmlTextNode(text);
         children.push_back(newNode);
         return newNode;
     }
@@ -119,7 +119,7 @@ struct HtmlElement : public HtmlNode
         out<<"<"<<tagname;
 
         // attributes
-        for(std::list<std::pair<Ogre::String,Ogre::String> >::iterator it = attributes.begin();
+        for (std::list<std::pair<Ogre::String,Ogre::String> >::iterator it = attributes.begin();
             it != attributes.end(); ++it)
         {
             // name="value"
@@ -127,7 +127,7 @@ struct HtmlElement : public HtmlNode
         }
 
         // self-closing is done here
-        if(children.empty())
+        if (children.empty())
         {
             out<<"/>";
             return out.str();
@@ -136,14 +136,14 @@ struct HtmlElement : public HtmlNode
         out<<">";
 
         // print children
-        for(std::list<HtmlNode*>::iterator it = children.begin();
+        for (std::list<HtmlNode*>::iterator it = children.begin();
             it != children.end(); ++it)
         {
             out<<(*it)->print(indent + "\t");
         }
 
         // if the last child was an actual element start a newline (otherwise, if text, we'll close on the same line)
-        if(dynamic_cast<HtmlElement*>(children.back()))
+        if (dynamic_cast<HtmlElement*>(children.back()))
             out<<"\n"<<indent;
 
         // print closing tag
