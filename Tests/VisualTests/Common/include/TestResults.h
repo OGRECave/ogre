@@ -72,7 +72,7 @@ HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& se
 {
     // container and header
     HtmlElement* container = new HtmlElement("div");
-    container->appendAttribute("id",result.testName);
+    container->appendAttribute("id",result.testName + "_" + Ogre::StringConverter::toString(result.frame));
     container->appendElement("h2")->appendText(result.testName 
         + " (frame " + Ogre::StringConverter::toString(result.frame) + ")");
     HtmlElement* content = container->appendElement("div");
@@ -160,7 +160,8 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     for(int i = 0; i < results->size(); ++i)
     {
         HtmlElement* anchor = thumbs->appendElement("a");
-        anchor->appendAttribute("href", Ogre::String("#") + (*results)[i].testName);
+        anchor->appendAttribute("href", Ogre::String("#") + (*results)[i].testName + "_" 
+			+ Ogre::StringConverter::toString((*results)[i].frame));
         anchor->appendAttribute("title", (*results)[i].testName);
         HtmlElement* img = anchor->appendElement("img");
         img->appendAttribute("src",set2.name + "/" + (*results)[i].image);

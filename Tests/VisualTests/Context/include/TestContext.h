@@ -39,7 +39,7 @@ class TestContext : public OgreBites::SampleContext
 {
 public:
 
-    TestContext();
+    TestContext(int argc, char** argv);
     virtual ~TestContext();
 
     /** Does basic setup for the context */
@@ -92,7 +92,22 @@ protected:
 
     // List of available test sets
     std::map<Ogre::String, Ogre::StringVector> mTestSets;
-    
+
+	// if we're generating the 'reference' set
+	bool mReferenceSet;
+
+	// if we're generating the 'reference' set
+	bool mGenerateHtml;
+	
+	// optional custom name for this batch
+    Ogre::String mBatchName;
+	
+	// which test batch we'll compare with
+    Ogre::String mCompareWith;
+
+	// An optional comment to be saved with this test set
+    Ogre::String mComment;
+	
     // The test set that's being run
     Ogre::String mTestSetName;
 

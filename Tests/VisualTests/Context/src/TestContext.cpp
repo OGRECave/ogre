@@ -42,7 +42,29 @@ THE SOFTWARE.
 #include "windows.h"
 #endif
 
-TestContext::TestContext() :mTimestep(0.01f), mBatch(0) {}
+TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0) 
+{
+    Ogre::UnaryOptionList unOpt;
+    Ogre::BinaryOptionList binOpt;
+	
+	// prepopulate expected options
+	unOpt["-r"] = false;        // generate reference set
+	unOpt["--no-html"] = false; // whether or not to generate html
+	binOpt["-m"] = "";          // optional comment
+	binOpt["-ts"] = "VTests";   // name of the test set to use
+	binOpt["-c"] = "Reference"; // name of batch to compare against
+	binOpt["-n"] = "AUTO";      // name for this batch
+
+	// parse
+    findCommandLineOpts(argc, argv, unOpt, binOpt);
+
+	mReferenceSet = unOpt["-r"];
+	mTestSetName = binOpt["-ts"];
+	mComment = binOpt["-m"];
+	mGenerateHtml = !unOpt["--no-html"];
+	mBatchName = binOpt["-n"];
+	mCompareWith = binOpt["-c"];
+}
 //-----------------------------------------------------------------------
 
 TestContext::~TestContext()
@@ -70,19 +92,12 @@ void TestContext::setup()
 		Ogre::String setName = sections.peekNextKey();
 		if(setName != "")
 		{
-			std::cout<<setName<<" is a section.\n";
 			mTestSets[setName] = Ogre::StringVector();
 			std::multimap<Ogre::String,Ogre::String>::iterator it = sections.peekNextValue()->begin();
 			for(it; it != sections.peekNextValue()->end(); ++it)
 				mTestSets[setName].push_back(it->second);
 		}
 	}
-
-	// eventually this will be selectable via a command line option
-    Ogre::String set = "VTests";
-    
-    // name of the test set we'll be running
-    mTestSetName = set;
 
     // timestamp for the filename
     char temp[19];
@@ -95,13 +110,19 @@ void TestContext::setup()
     // a nicer formatted version for display
     strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp, 19);
-    
+ 
+	if(mReferenceSet)
+		batchName = "Reference";
+	else if(mBatchName != "AUTO")
+		batchName = mBatchName;
+
     // set up output directories
     setupDirectories(batchName);
 
     // an object storing info about this set
     mBatch = new TestBatch(batchName, mTestSetName, timestamp, 
         mWindow->getWidth(), mWindow->getHeight(), mOutputDir + batchName + "/");
+	mBatch->comment = mComment;
 
     OgreBites::Sample* firstTest = loadTests(mTestSetName);
     runSample(firstTest);
@@ -113,6 +134,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
     OgreBites::Sample* startSample = 0;
     Ogre::StringVector sampleList;
 
+	// load all of the plugins in the set
 	for(Ogre::StringVector::iterator it = mTestSets[set].begin(); it != 
 		mTestSets[set].end(); ++it)
 	{
@@ -321,30 +343,58 @@ void TestContext::setupDirectories(Ogre::String batchName)
 
 void TestContext::finishedTests()
 {
-    // run comparison against the most recent test output (if one exists)
-    TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
-    TestBatchSet::iterator i = batches->begin();
-    for(i; i != batches->end(); ++i)
-    {
-        if(mBatch->canCompareWith((*i)))
-        {
-            // we save a generally named "out.html" that gets overwritten each run, 
-            // plus a uniquely named one for this run
-            std::ofstream out1;
-            std::ofstream out2;
-            out1.open(Ogre::String(mOutputDir + "out.html").c_str());
-            out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
-            if(out1.is_open() && out2.is_open())
-            {
-                Ogre::String html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
-                out1<<html;
-                out2<<html;
-                out1.close();
-                out2.close();
-            }
-            break;
-        }
-    }
+	Ogre::String html = "";
+
+	if(mGenerateHtml && !mReferenceSet)
+	{
+		// look for a reference set first
+		Ogre::ConfigFile info;
+		bool foundReference = true;
+		
+		try
+		{
+			info.load(mOutputDir + mCompareWith + "/info.cfg");
+		}
+		catch(Ogre::FileNotFoundException e)
+		{
+			foundReference = false;
+			TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
+
+			TestBatchSet::iterator i = batches->begin();
+			for(i; i != batches->end(); ++i)
+			{
+				if(mBatch->canCompareWith((*i)))
+				{
+					html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
+					break;
+				}
+			}
+		}
+
+		if(foundReference)
+		{
+			TestBatch ref = TestBatch(info, mOutputDir + mCompareWith);
+			if(mBatch->canCompareWith(ref))
+				html = writeHTML(ref, *mBatch, mBatch->compare(ref));
+		}
+
+		if(!html.empty())
+		{
+			// we save a generally named "out.html" that gets overwritten each run, 
+			// plus a uniquely named one for this run
+			std::ofstream out1;
+			std::ofstream out2;
+			out1.open(Ogre::String(mOutputDir + "out.html").c_str());
+			out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
+			if(out1.is_open() && out2.is_open())
+			{
+				out1<<html;
+				out2<<html;
+				out1.close();
+				out2.close();
+			}
+		}
+	}
 
     // write this batch's config file
     mBatch->writeConfig();
@@ -394,7 +444,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        TestContext tc = TestContext();
+        TestContext tc = TestContext(argc, argv);
         tc.go();
     }
     catch (Ogre::Exception& e)
