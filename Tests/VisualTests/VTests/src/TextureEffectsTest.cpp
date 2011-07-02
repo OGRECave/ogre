@@ -26,50 +26,40 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "VTestPlugin.h"
-#include "StencilShadowTest.h"
-#include "ParticleTest.h"
-#include "TransparencyTest.h"
 #include "TextureEffectsTest.h"
-#include "CubeMappingTest.h"
-#include "OgreResourceGroupManager.h"
 
-VTestPlugin::VTestPlugin()
-    :SamplePlugin("VTestPlugin")
+TextureEffectsTest::TextureEffectsTest()
 {
-    // add the playpen tests
-    addSample(new ParticleTest());
-    addSample(new StencilShadowTest());
-    addSample(new TransparencyTest());
-    addSample(new CubeMappingTest());
-    addSample(new TextureEffectsTest());
+    mInfo["Title"] = "VTests_TextureEffects";
+    mInfo["Description"] = "Tests texture effects.";
+    addScreenshotFrame(500);
 }
-//---------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-VTestPlugin::~VTestPlugin()
+void TextureEffectsTest::setupContent()
 {
-    for (OgreBites::SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
+    mViewport->setBackgroundColour(ColourValue(0.8,0.8,0.8));
+
+    // the names of the four materials we will use
+    String matNames[] = {"Examples/OgreDance", "Examples/OgreParade", "Examples/OgreSpin", "Examples/OgreWobble"};
+
+    for (unsigned int i = 0; i < 4; i++)
     {
-        delete *i;
+        // create a standard plane entity
+        Entity* ent = mSceneMgr->createEntity("Plane" + StringConverter::toString(i + 1), SceneManager::PT_PLANE);
+
+        // attach it to a node, scale it, and position appropriately
+        SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+        node->setPosition(i % 2 ? 25 : -25, i / 2 ? -25 : 25, 0);
+        node->setScale(0.25, 0.25, 0.25);
+        node->attachObject(ent);
+
+        ent->setMaterialName(matNames[i]);  // give it the material we prepared
     }
-    mSamples.clear();
+
+    mCamera->setPosition(0,0,125);
+    mCamera->setDirection(0,0,-1);
 }
-//---------------------------------------------------------------------
+//-----------------------------------------------------------------------
 
-#ifndef OGRE_STATIC_LIB
 
-VTestPlugin* testPlugin = 0;
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    testPlugin = OGRE_NEW VTestPlugin();
-    Ogre::Root::getSingleton().installPlugin(testPlugin);
-}
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Ogre::Root::getSingleton().uninstallPlugin(testPlugin); 
-    OGRE_DELETE testPlugin;
-}
-
-#endif

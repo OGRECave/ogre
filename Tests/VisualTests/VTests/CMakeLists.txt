@@ -14,6 +14,9 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/StencilShadowTest.cpp
+    src/TextureEffectsTest.cpp
+    src/CubeMappingTest.cpp
+    src/TransparencyTest.cpp
     src/ParticleTest.cpp
     src/VTestPlugin.cpp)
 

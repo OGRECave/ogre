@@ -26,50 +26,29 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "VTestPlugin.h"
-#include "StencilShadowTest.h"
-#include "ParticleTest.h"
 #include "TransparencyTest.h"
-#include "TextureEffectsTest.h"
-#include "CubeMappingTest.h"
-#include "OgreResourceGroupManager.h"
 
-VTestPlugin::VTestPlugin()
-    :SamplePlugin("VTestPlugin")
+TransparencyTest::TransparencyTest()
 {
-    // add the playpen tests
-    addSample(new ParticleTest());
-    addSample(new StencilShadowTest());
-    addSample(new TransparencyTest());
-    addSample(new CubeMappingTest());
-    addSample(new TextureEffectsTest());
+    mInfo["Title"] = "VTests_Transparency";
+    mInfo["Description"] = "Tests basic alpha blending.";
+    addScreenshotFrame(500);
 }
-//---------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-VTestPlugin::~VTestPlugin()
+void TransparencyTest::setupContent()
 {
-    for (OgreBites::SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
-    {
-        delete *i;
-    }
-    mSamples.clear();
+    mSceneMgr->setSkyBox(true, "Examples/TrippySkyBox");
+
+    mCamera->setPosition(0, 0, 300);   // set camera's starting position
+
+    mSceneMgr->createLight()->setPosition(20, 80, 50);   // add basic point light
+
+    // create a torus knot model, give it the translucent texture, and attach it to the origin
+    Entity* ent = mSceneMgr->createEntity("Knot", "knot.mesh");
+    ent->setMaterialName("Examples/WaterStream");
+    mSceneMgr->getRootSceneNode()->attachObject(ent);
 }
-//---------------------------------------------------------------------
+//-----------------------------------------------------------------------
 
-#ifndef OGRE_STATIC_LIB
 
-VTestPlugin* testPlugin = 0;
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    testPlugin = OGRE_NEW VTestPlugin();
-    Ogre::Root::getSingleton().installPlugin(testPlugin);
-}
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Ogre::Root::getSingleton().uninstallPlugin(testPlugin); 
-    OGRE_DELETE testPlugin;
-}
-
-#endif

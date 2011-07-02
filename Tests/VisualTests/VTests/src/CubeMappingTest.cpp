@@ -26,50 +26,25 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "VTestPlugin.h"
-#include "StencilShadowTest.h"
-#include "ParticleTest.h"
-#include "TransparencyTest.h"
-#include "TextureEffectsTest.h"
 #include "CubeMappingTest.h"
-#include "OgreResourceGroupManager.h"
 
-VTestPlugin::VTestPlugin()
-    :SamplePlugin("VTestPlugin")
+CubeMappingTest::CubeMappingTest()
 {
-    // add the playpen tests
-    addSample(new ParticleTest());
-    addSample(new StencilShadowTest());
-    addSample(new TransparencyTest());
-    addSample(new CubeMappingTest());
-    addSample(new TextureEffectsTest());
+    mInfo["Title"] = "VTests_CubeMapping";
+    mInfo["Description"] = "Tests basic fixed-function cube mapping.";
+    addScreenshotFrame(200);
 }
-//---------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
-VTestPlugin::~VTestPlugin()
+void CubeMappingTest::setupContent()
 {
-    for (OgreBites::SampleSet::iterator i = mSamples.begin(); i != mSamples.end(); ++i)
-    {
-        delete *i;
-    }
-    mSamples.clear();
+    mSceneMgr->setSkyBox(true, "Examples/MorningSkyBox");
+    Ogre::SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+    Ogre::Entity* head = mSceneMgr->createEntity("ogrehead.mesh");
+    node->attachObject(head);
+    head->setMaterialName("Examples/MorningCubeMap");
+    mCamera->setPosition(0,0,100);
 }
-//---------------------------------------------------------------------
+//-----------------------------------------------------------------------
 
-#ifndef OGRE_STATIC_LIB
 
-VTestPlugin* testPlugin = 0;
-
-extern "C" _OgreSampleExport void dllStartPlugin()
-{
-    testPlugin = OGRE_NEW VTestPlugin();
-    Ogre::Root::getSingleton().installPlugin(testPlugin);
-}
-
-extern "C" _OgreSampleExport void dllStopPlugin()
-{
-    Ogre::Root::getSingleton().uninstallPlugin(testPlugin); 
-    OGRE_DELETE testPlugin;
-}
-
-#endif
