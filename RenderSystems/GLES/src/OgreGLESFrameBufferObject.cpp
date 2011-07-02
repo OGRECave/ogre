@@ -274,17 +274,13 @@ namespace Ogre {
 			GLESRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GLESRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-			//Truly attach depth buffer
-			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_OES, 0 );
+			//Attach depth buffer, if it has one.
+			if( depthBuf )
+				depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_OES, 0 );
 
-			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
-			if( depthBuf != stencilBuf )
+			//Attach stencil buffer, if it has one.
+			if( stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT_OES, 0 );
-			else
-			{
-				glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
-											  GL_RENDERBUFFER_OES, 0);
-			}
 		}
 		else
 		{
