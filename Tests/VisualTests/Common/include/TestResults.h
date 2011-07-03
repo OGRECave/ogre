@@ -103,6 +103,32 @@ HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& se
     HtmlElement* span = status->appendElement("span");
     span->appendText(result.passed ? "Passed" : "Failed");
     span->appendAttribute("class", result.passed ? "passed" : "failed");
+    
+    if(!result.passed)
+    {
+        // This will need to be formatted nicely, but for now this works for debugging...
+        HtmlElement* summary = content->appendElement("ul");
+        summary->appendElement("li")->appendText("Pixels differed: " +
+            Ogre::StringConverter::toString(result.incorrectPixels));
+        summary->appendElement("li")->appendText("<strong>Mean Squared Error</strong>");
+        summary->appendElement("li")->appendText("Red: " +
+            Ogre::StringConverter::toString(result.mseChannels.r, 4, 4));
+        summary->appendElement("li")->appendText("Green: " +
+            Ogre::StringConverter::toString(result.mseChannels.g, 4, 4));
+        summary->appendElement("li")->appendText("Blue: " +
+            Ogre::StringConverter::toString(result.mseChannels.b, 4, 4));
+        summary->appendElement("li")->appendText("Overall: " +
+            Ogre::StringConverter::toString(result.mse, 4, 4));
+        summary->appendElement("li")->appendText("<strong>Peak Signal-to-Noise Ratio</strong>");
+        summary->appendElement("li")->appendText("Red: " +
+            Ogre::StringConverter::toString(result.psnrChannels.r, 4, 4));
+        summary->appendElement("li")->appendText("Green: " +
+            Ogre::StringConverter::toString(result.psnrChannels.g, 4, 4));
+        summary->appendElement("li")->appendText("Blue: " +
+            Ogre::StringConverter::toString(result.psnrChannels.b, 4, 4));
+        summary->appendElement("li")->appendText("Overall: " +
+            Ogre::StringConverter::toString(result.psnr, 4, 4));
+    }
 
     return container;
 }

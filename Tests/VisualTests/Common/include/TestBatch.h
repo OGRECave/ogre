@@ -133,8 +133,9 @@ public:
         }
         else
         {
+			ImageValidator validator = ImageValidator(mDirectory, other.mDirectory);
             for (int i = 0; i < images.size(); ++i)
-                out->push_back(compareImages(getImagePath(i), other.getImagePath(i)));
+                out->push_back(validator.compare(images[i]));
         }
         return out;
     }

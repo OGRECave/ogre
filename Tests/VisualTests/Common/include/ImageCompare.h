@@ -39,52 +39,110 @@ struct ComparisonResult
     bool passed;
     Ogre::String image;
     Ogre::String testName;
-    size_t frame;
+    unsigned int frame;
+
+	// various metrics of image difference
+    unsigned int incorrectPixels;
+	float mse;                      // mean squared error
+	Ogre::ColourValue mseChannels;
+	float psnr;                     // peak signal-to-noise ratio
+	Ogre::ColourValue psnrChannels;
 };
 
 typedef std::vector<ComparisonResult> ComparisonResultVector;
 typedef Ogre::SharedPtr<ComparisonResultVector> ComparisonResultVectorPtr;
 
-/** Compares two images 
- *        @param image1 Full path to the first image
- *        @param image2 Full path to the second image */
-ComparisonResult compareImages(Ogre::String image1, Ogre::String image2)
+/** Simple object for doing image comparison between two image sets */
+class ImageValidator
 {
-    ComparisonResult out;
-    out.image = image1.substr(image1.find_last_of("/") + 1);
+public:
 
-    // find end of name
-    size_t end = out.image.find_last_of("_");
-    
-    // extract test name from image filename
-    out.testName = out.image.substr(0, end);
-    out.frame = atoi(out.image.substr(end+1).c_str());
+    /** Constructor, takes paths to each set's directory */
+    ImageValidator(Ogre::String directory1, Ogre::String directory2)
+        :mDirectory1(directory1),mDirectory2(directory2) {}
 
-    // placeholder, not exactly elegant, but it's better than nothing for the moment
-    std::ifstream img1;
-    std::ifstream img2;
-
-    img1.open(image1.c_str());
-    img2.open(image2.c_str());
-
-    out.passed = false;
-
-    if (img1.is_open() && img2.is_open())
+    /** Compare the the two set's versions of the specified image name
+     *        @param name filename of the image (filename only, no path) */
+    ComparisonResult compare(Ogre::String image)
     {
-        bool foundDiff = false;
-        while (img1.good())
-        {
-            // compare byte by byte...
-            if ((img1.get() != img2.get()) || (img2.good() != img1.good()))
-            {
-                foundDiff = true;
-                break;
-            }
-        }
-        out.passed = !foundDiff;
+        ComparisonResult out;
+        out.image = image + ".png";
+
+        // extract test name and frame from image filename
+        size_t end = image.find_last_of("_");
+        out.testName = image.substr(0, end);
+        out.frame = atoi(image.substr(end+1).c_str());
+
+        // load manually, so this can be done without all of Ogre initialized (i.e. for a 
+        // command line utility for comparing test sets or something to that effect)
+        // The FreeImage codecs must be loaded for this to work, but no resource stuff is needed.
+        std::ifstream file1(Ogre::String(mDirectory1 + "/" + image + ".png").c_str());
+        std::ifstream file2(Ogre::String(mDirectory2 + "/" + image + ".png").c_str());
+        Ogre::DataStreamPtr data1 = Ogre::DataStreamPtr(
+            OGRE_NEW Ogre::FileStreamDataStream(&file1, false));
+        Ogre::DataStreamPtr data2 = Ogre::DataStreamPtr(
+            OGRE_NEW Ogre::FileStreamDataStream(&file2, false));
+        Ogre::Image img1 = Ogre::Image();
+        Ogre::Image img2 = Ogre::Image();
+        img1.load(data1);
+        img2.load(data2);
+
+        // do the actual comparison
+        compare(img1,img2,out);
+
+        return out;
     }
 
-    return out;
-}
+
+protected:
+
+    /** Do the actual comparison, override this if you wish to do some
+     *    alternate method of comparison 
+     *        @param img1 The image data for the first image 
+     *        @param img2 The image data for the second image
+     *        @param out The struct we'll write results to */
+    virtual void compare(const Ogre::Image& img1, const Ogre::Image& img2,
+        ComparisonResult& out)
+    {
+        out.incorrectPixels = 0;
+        Ogre::ColourValue disparity = Ogre::ColourValue(0,0,0);
+
+		int width = img1.getWidth();
+		int height = img1.getHeight();
+
+        // just go pixel by pixel and keep track of how many are different
+        for(int i = 0; i < width; ++i)
+        {
+            for(int j = 0; j < height; ++j)
+            {
+                Ogre::ColourValue c1 = img1.getColourAt(i, j, 0);
+                Ogre::ColourValue c2 = img2.getColourAt(i, j, 0);
+                if(c1 != c2)
+                {
+                    ++out.incorrectPixels;
+					disparity += (c1 + c2) * (c1 + c2);
+                }
+            }
+        }
+        
+		// only bother with these calculations if the images aren't identical
+        if(out.incorrectPixels != 0)
+        {
+			out.mseChannels = disparity / (width*height);
+			out.mse = (out.mseChannels.r + out.mseChannels.g + out.mseChannels.b) / 3.f;
+			for(int i = 0; i < 3; ++i)
+				out.psnrChannels[i] = 20 * log10(1.f / sqrt(out.mseChannels[i]));
+			out.psnr = 20 * log10(1.f / sqrt(out.mse));
+        }
+
+        out.passed = out.incorrectPixels == 0;
+    }
+
+private:
+
+    Ogre::String mDirectory1;
+    Ogre::String mDirectory2;
+
+};
 
 #endif
