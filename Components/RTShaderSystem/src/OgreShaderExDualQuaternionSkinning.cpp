@@ -252,7 +252,6 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);
 			vsMain->addAtomInstance(curFuncInvocation);
 		}
-		//Else assign position to tempfloat4?
 		
 		//set functions to calculate world position
 		for(int i = 0 ; i < getWeightCount() ; ++i)

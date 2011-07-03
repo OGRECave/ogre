@@ -101,7 +101,7 @@ public:
 	@param weightCount The maximum number of weights/bones affecting
 		a vertex. Note that this parameter can be higher but not
 		 lower than the actual number of affecting bones.
-	@param dualQuaternionSkinning
+	@param skinningType
 	@param correctAntipodalityHandling Only applicable for dual quaternion skinning.
 	@param scalingShearingSupport Only applicable for dual quaternion skinning.
 	*/
@@ -109,18 +109,19 @@ public:
 
 	/**
 	Returns the number of bones in the model assigned to the material.
-	@see setHardwareSkinningParam().
+	@see setHardwareSkinningParam()
 	*/
 	ushort getBoneCount();
 
 	/**
 	Returns the number of weights/bones affecting a vertex.
-	@see setHardwareSkinningParam().
+	@see setHardwareSkinningParam()
 	*/
 	ushort getWeightCount();
 
 	/**
-	
+	Returns the current skinning type in use.
+	@see setHardwareSkinningParam()
 	 */
 	SkinningType getSkinningType();
 

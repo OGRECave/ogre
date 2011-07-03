@@ -54,9 +54,9 @@ namespace RTShader {
 #define SGX_FUNC_NORMALIZE_DUAL_QUATERNION		"SGX_NormalizeDualQuaternion"
 #define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX		"SGX_AdjointTransposeMatrix"
 
-/** Implement a sub render state which performs hardware skinning.
-Meaning, this sub render states adds calculations which multiply
-the points and normals by their assigned bone matricies.
+/** Implement a sub render state which performs dual quaternion hardware skinning.
+This sub render state uses bone matrices converted to dual quaternions and adds calculations
+to transform the points and normals using their associated dual quaternions.
 */
 class _OgreRTSSExport DualQuaternionSkinning : public HardwareSkinningTechnique
 {
@@ -90,9 +90,14 @@ protected:
 	/** Adds functions to calculate position data in world, object and projective space */
 	void addPositionCalculations(Function* vsMain, int& funcCounter);
 
+	/** Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion */
 	void adjustForCorrectAntipodality(Function* vsMain, int index, int& funcCounter);
 
-	/** Adds the weight of a given position for a given index */
+	/**
+	 Adds the weight of a given position for a given index
+	 
+	 @param pPositionTempParameter Requires a temp parameter with a matrix the same size of pPositionRelatedParam
+	*/
 	void addIndexedPositionWeight(Function* vsMain, int index, UniformParameterPtr& pPositionRelatedParam,
 				      ParameterPtr& pPositionTempParameter, ParameterPtr& pPositionRelatedOutputParam, int& funcCounter);
 	

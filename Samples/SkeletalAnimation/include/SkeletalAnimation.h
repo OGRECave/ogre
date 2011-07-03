@@ -57,26 +57,26 @@ void exportRTShaderSystemMaterial(const String& fileName, const String& material
     {
         for (unsigned int i = 0; i < NUM_MODELS; i++)
         {
-// 			// update sneaking animation based on speed
-// 			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
-// 
-// 			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
-// 			{
-// 				/* We need reposition the scene node origin, since the animation includes translation.
-// 				Position is calculated from an offset to the end position, and rotation is calculated
-// 				from how much the animation turns the character. */
-// 
-// 				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
-// 
-// 				// find current end position and the offset
-// 				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
-// 				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
-// 
-// 				mModelNodes[i]->setPosition(currEnd + offset);
-// 				mModelNodes[i]->rotate(rot);
-// 
-// 				mAnimStates[i]->setTimePosition(0);   // reset animation time
-// 			}
+			// update sneaking animation based on speed
+			mAnimStates[i]->addTime(mAnimSpeeds[i] * evt.timeSinceLastFrame);
+
+			if (mAnimStates[i]->getTimePosition() >= ANIM_CHOP)   // when it's time to loop...
+			{
+				/* We need reposition the scene node origin, since the animation includes translation.
+				Position is calculated from an offset to the end position, and rotation is calculated
+				from how much the animation turns the character. */
+
+				Quaternion rot(Degree(-60), Vector3::UNIT_Y);   // how much the animation turns the character
+
+				// find current end position and the offset
+				Vector3 currEnd = mModelNodes[i]->getOrientation() * mSneakEndPos + mModelNodes[i]->getPosition();
+				Vector3 offset = rot * mModelNodes[i]->getOrientation() * -mSneakStartPos;
+
+				mModelNodes[i]->setPosition(currEnd + offset);
+				mModelNodes[i]->rotate(rot);
+
+				mAnimStates[i]->setTimePosition(0);   // reset animation time
+			}
         }
 
 		return SdkSample::frameRenderingQueued(evt);
@@ -98,13 +98,13 @@ protected:
 			//Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			//renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 			
-			//Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
-			//Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
-			//Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
-			//Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
+			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
+			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
+			Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
+			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");
 
-			//Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-			//	pCast1, pCast2, pCast3, pCast4);
+			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+				pCast1, pCast2, pCast3, pCast4);
 		}
 #endif
 		// set shadow properties
@@ -167,7 +167,7 @@ protected:
 
 	void setupModels()
 	{
-		//tweakSneakAnim();
+		tweakSneakAnim();
 
 		SceneNode* sn = NULL;
 		Entity* ent = NULL;
@@ -182,10 +182,9 @@ protected:
 			mModelNodes.push_back(sn);
 
 			// create and attach a jaiqua entity
-			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "spine.mesh");
-			ent->setMaterialName("spineDualQuatTest");
+			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+			ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
-			sn->scale(20, 20, 20);
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
@@ -205,9 +204,9 @@ protected:
 #endif
 		
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
-			//as = ent->getAnimationState("Sneak");
-			//as->setEnabled(true);
-			//as->setLoop(false);
+			as = ent->getAnimationState("Sneak");
+			as->setEnabled(true);
+			as->setLoop(false);
 			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
 			mAnimStates.push_back(as);
         }
