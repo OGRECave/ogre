@@ -66,6 +66,24 @@ HtmlElement* writeBatchInfoTable(const TestBatch& set, Ogre::String name)
 }
 //-----------------------------------------------------------------------
 
+// helper that formats a float nicely for output
+Ogre::String formatFloat(float num, int length=6)
+{
+    std::stringstream ss;
+    ss.setf(std::ios::fixed, std::ios::floatfield);
+    ss.setf(std::ios::showpoint);
+    ss.precision(6);
+    ss<<num;
+    Ogre::String out = "";
+    ss>>out;
+    out = out.substr(0, length);
+    if(out.size() < length)
+        while(out.size() < length)
+            out += "0";
+    return out;
+}
+//-----------------------------------------------------------------------
+
 /** Summarizes the results of a single test (side-by-side images, pass/fail,
  *    more stats and such to come...). Returns an html div with summary markup */
 HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& set1, const TestBatch& set2)
@@ -103,31 +121,40 @@ HtmlElement* summarizeSingleResult(ComparisonResult& result, const TestBatch& se
     HtmlElement* span = status->appendElement("span");
     span->appendText(result.passed ? "Passed" : "Failed");
     span->appendAttribute("class", result.passed ? "passed" : "failed");
+    content->appendElement("hr");
+
+    content->appendElement("h4")->appendText("Comparison Summary:");
     
-    if(!result.passed)
+    if(result.incorrectPixels)
     {
-        // This will need to be formatted nicely, but for now this works for debugging...
-        HtmlElement* summary = content->appendElement("ul");
-        summary->appendElement("li")->appendText("Pixels differed: " +
-            Ogre::StringConverter::toString(result.incorrectPixels));
-        summary->appendElement("li")->appendText("<strong>Mean Squared Error</strong>");
-        summary->appendElement("li")->appendText("Red: " +
-            Ogre::StringConverter::toString(result.mseChannels.r, 4, 4));
-        summary->appendElement("li")->appendText("Green: " +
-            Ogre::StringConverter::toString(result.mseChannels.g, 4, 4));
-        summary->appendElement("li")->appendText("Blue: " +
-            Ogre::StringConverter::toString(result.mseChannels.b, 4, 4));
-        summary->appendElement("li")->appendText("Overall: " +
-            Ogre::StringConverter::toString(result.mse, 4, 4));
-        summary->appendElement("li")->appendText("<strong>Peak Signal-to-Noise Ratio</strong>");
-        summary->appendElement("li")->appendText("Red: " +
-            Ogre::StringConverter::toString(result.psnrChannels.r, 4, 4));
-        summary->appendElement("li")->appendText("Green: " +
-            Ogre::StringConverter::toString(result.psnrChannels.g, 4, 4));
-        summary->appendElement("li")->appendText("Blue: " +
-            Ogre::StringConverter::toString(result.psnrChannels.b, 4, 4));
-        summary->appendElement("li")->appendText("Overall: " +
-            Ogre::StringConverter::toString(result.psnr, 4, 4));
+        HtmlElement* absDiff = content->appendElement("p");
+        absDiff->appendAttribute("class", "diffreport");
+        absDiff->appendText(Ogre::StringConverter::toString(result.incorrectPixels) +
+            " pixels differed.");
+
+        HtmlElement* mse = content->appendElement("p");
+        mse->appendAttribute("class", "diffreport");
+        mse->appendElement("strong")->appendText(" MSE | ");
+        mse->appendText("Overall: " + formatFloat(result.mse) + " | ");
+        mse->appendText("R: " + formatFloat(result.mseChannels.r) + " | ");
+        mse->appendText("G: " + formatFloat(result.mseChannels.g) + " | ");
+        mse->appendText("B: " + formatFloat(result.mseChannels.b) + " |");
+
+        HtmlElement* psnr = content->appendElement("p");
+        psnr->appendAttribute("class", "diffreport");
+        psnr->appendElement("strong")->appendText("PSNR| ");
+        psnr->appendText("Overall: " + formatFloat(result.psnr) + " | ");
+        psnr->appendText("R: " + formatFloat(result.psnrChannels.r) + " | ");
+        psnr->appendText("G: " + formatFloat(result.psnrChannels.g) + " | ");
+        psnr->appendText("B: " + formatFloat(result.psnrChannels.b) + " |");
+
+        HtmlElement* ssim = content->appendElement("p");
+        ssim->appendAttribute("class", "diffreport");
+        ssim->appendText("Structural Similarity Index: " + formatFloat(result.ssim));
+    }
+    else
+    {
+        content->appendElement("p")->appendText("Images are identical.");
     }
 
     return container;
@@ -177,7 +204,7 @@ Ogre::String writeHTML(const TestBatch& set1, const TestBatch& set2, ComparisonR
     for (int i = 0; i < results->size(); ++i)
         if ((*results)[i].passed)
             ++numPassed;
-    contentDiv->appendElement("p")->appendText(
+    contentDiv->appendElement("h3")->appendText(
         Ogre::StringConverter::toString(numPassed) + " of " 
         + Ogre::StringConverter::toString(results->size()) + " tests passed.");
     contentDiv->appendElement("hr");

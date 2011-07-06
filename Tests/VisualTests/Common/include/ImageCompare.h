@@ -41,12 +41,13 @@ struct ComparisonResult
     Ogre::String testName;
     unsigned int frame;
 
-	// various metrics of image difference
+    // various metrics of image difference
     unsigned int incorrectPixels;
-	float mse;                      // mean squared error
-	Ogre::ColourValue mseChannels;
-	float psnr;                     // peak signal-to-noise ratio
-	Ogre::ColourValue psnrChannels;
+    float mse;                      // mean squared error
+    Ogre::ColourValue mseChannels;
+    float psnr;                     // peak signal-to-noise ratio
+    Ogre::ColourValue psnrChannels;
+    float ssim;                     // structural similarity index
 };
 
 typedef std::vector<ComparisonResult> ComparisonResultVector;
@@ -104,35 +105,94 @@ protected:
     virtual void compare(const Ogre::Image& img1, const Ogre::Image& img2,
         ComparisonResult& out)
     {
+        // This computes the MSE, PSNR and SSIM for the two images
+
         out.incorrectPixels = 0;
         Ogre::ColourValue disparity = Ogre::ColourValue(0,0,0);
+        Ogre::Real ssim = 0.0;
 
-		int width = img1.getWidth();
-		int height = img1.getHeight();
+        int width = img1.getWidth();
+        int height = img1.getHeight();
 
-        // just go pixel by pixel and keep track of how many are different
-        for(int i = 0; i < width; ++i)
+        // iterate through in 8x8 chunks, so we can calc SSIM at the same time as MSE
+        for(int i = 0; i < width / 8; ++i)
         {
-            for(int j = 0; j < height; ++j)
+            for(int j = 0; j < height / 8; ++j)
             {
-                Ogre::ColourValue c1 = img1.getColourAt(i, j, 0);
-                Ogre::ColourValue c2 = img2.getColourAt(i, j, 0);
-                if(c1 != c2)
+                // number of pixels processed
+                int n = 0;
+                // dynamic range (just 0.0-1.0, since we're using floats)
+                Ogre::Real L = 1.f;
+                // constants
+                Ogre::Real c1 = (0.01f * L)*(0.01f * L);
+                Ogre::Real c2 = (0.03f * L)*(0.03f * L);
+                // averages
+                Ogre::Real avg_x = 0.f;
+                Ogre::Real avg_y = 0.f;
+                // variances
+                Ogre::Real var_x = 0.f;
+                Ogre::Real var_y = 0.f;
+                // covariance
+                Ogre::Real covar = 0.f;
+
+                // iterate through the 8x8 window
+                for(int k = 0; k < 8 && i * 8 + k < width; ++k)
                 {
-                    ++out.incorrectPixels;
-					disparity += (c1 + c2) * (c1 + c2);
+                    for(int l = 0; l < 8 && j * 8 + l < height; ++l)
+                    {
+                        ++n;
+                        
+                        Ogre::ColourValue col1 = img1.getColourAt(i*8 + k, j*8 + l, 0);
+                        Ogre::ColourValue col2 = img2.getColourAt(i*8 + k, j*8 + l, 0);
+
+                        if(col1 != col2)
+                        {
+                            ++out.incorrectPixels;
+                            disparity += (col1 - col2) * (col1 - col2);
+                        }
+
+                        // calculations for SSIM:
+                        // we'll be working with the luminosity for SSIM (computed by standard Rec. 709 definition)
+                        Ogre::Real lum1 = 0.2126f * col1.r + 0.7152f * col1.g + 0.0722f * col1.b;
+                        Ogre::Real lum2 = 0.2126f * col2.r + 0.7152f * col2.g + 0.0722f * col2.b;
+                        Ogre::Real delta_x = lum1 - avg_x;
+                        Ogre::Real delta_y = lum2 - avg_y;
+                        avg_x += delta_x/(k*8+l+1);
+                        avg_y += delta_y/(k*8+l+1);
+                        var_x += delta_x * (lum1 - avg_x);
+                        var_y += delta_y * (lum2 - avg_y);
+                        covar += lum1 * lum2;                    
+                    }
                 }
+
+                // more SSIM stuff:
+                var_x = var_x/n;
+                var_y = var_y/n;
+                covar = covar/n - avg_x * avg_y;
+
+                // calculation based on: Z. Wang, A. C. Bovik, H. R. Sheikh and E. P. Simoncelli, 
+                // "Image quality assessment: From error visibility to structural 
+                // similarity," IEEE Transactions on Image Processing, vol. 13,
+                // no. 4, pp. 600-612, Apr. 2004.
+                ssim += ((2 * avg_x * avg_y + c1) * (2 * covar + c2)) /
+                        ((avg_x*avg_x + avg_y*avg_y + c1) * (var_x + var_y + c2));            
             }
         }
-        
-		// only bother with these calculations if the images aren't identical
+
+        // only bother with these calculations if the images aren't identical
         if(out.incorrectPixels != 0)
         {
-			out.mseChannels = disparity / (width*height);
-			out.mse = (out.mseChannels.r + out.mseChannels.g + out.mseChannels.b) / 3.f;
-			for(int i = 0; i < 3; ++i)
-				out.psnrChannels[i] = 20 * log10(1.f / sqrt(out.mseChannels[i]));
-			out.psnr = 20 * log10(1.f / sqrt(out.mse));
+            // average and clamp to [-1,1]
+            out.ssim = std::max(-1.0f, std::min(1.0f, ssim/(width*height/64.f)));
+
+            // average the raw deviance value to get MSE
+            out.mseChannels = disparity / (width*height);
+            out.mse = (out.mseChannels.r + out.mseChannels.g + out.mseChannels.b) / 3.f;
+
+            // PSNR = 20 * log10(range/sqrt(mse))
+            for(int i = 0; i < 3; ++i)
+                out.psnrChannels[i] = 20 * log10(1.f / sqrt(out.mseChannels[i]));
+            out.psnr = 20 * log10(1.f / sqrt(out.mse));
         }
 
         out.passed = out.incorrectPixels == 0;
