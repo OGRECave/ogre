@@ -67,6 +67,16 @@ void FFP_Assign(in vec4 vIn, out vec3 vOut)
 	vOut = vIn.xyz;
 }
 //-----------------------------------------------------------------------------
+void FFP_Assign(in mat2x4 vIn, out mat2x4 vOut)
+{
+	vOut = vIn;
+}
+//-----------------------------------------------------------------------------
+void FFP_Assign(in mat3x4 vIn, out mat3x4 vOut)
+{
+	vOut = vIn;
+}
+//-----------------------------------------------------------------------------
 void FFP_Construct(in float r, 
 			 in float g,
 			 in float b,
@@ -148,6 +158,17 @@ void FFP_Add(in vec4 vIn0, in vec4 vIn1, out vec4 vOut)
 	vOut = vIn0 + vIn1;
 }
 
+//-----------------------------------------------------------------------------
+void FFP_Add(in mat2x4 vIn0, in mat2x4 vIn1, out mat2x4 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
+
+//-----------------------------------------------------------------------------
+void FFP_Add(in mat3x4 vIn0, in mat3x4 vIn1, out mat3x4 vOut)
+{
+	vOut = vIn0 + vIn1;
+}
 //-----------------------------------------------------------------------------
 void FFP_Subtract(in float vIn0, in float vIn1, out float vOut)
 {

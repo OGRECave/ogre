@@ -2,8 +2,63 @@
 /// Declare shaders for casters
 ///////////////////////////////////////////////////////////////////////////
 
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs unified
+{	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_glsl	
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs unified
+{
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_glsl
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs unified
+{
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_glsl	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs unified
+{
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_glsl	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg
+}
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs unified
+{	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs_cg	
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs unified
+{
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase_vs unified
+{	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase_vs_cg
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs unified
+{	
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs_cg
+}
+
+fragment_program Ogre/RTShader/shadow_caster_dq_ps unified
+{
+	delegate Ogre/RTShader/shadow_caster_dq_ps_cg
+	delegate Ogre/RTShader/shadow_caster_dq_ps_glsl
+}
+
+// declare the fragment shader (GLSL for the language)
+fragment_program Ogre/RTShader/shadow_caster_dq_ps_glsl glsl
+{
+	source DualQuaternionSkinning_ShadowPassThrough_ps.glsl
+}
+
 // declare the fragment shader (CG for the language)
-fragment_program Ogre/RTShader/shadow_caster_dq_ps cg
+fragment_program Ogre/RTShader/shadow_caster_dq_ps_cg cg
 {
 	// source file
 	source DualQuaternionSkinning_Shadow.cg
@@ -11,13 +66,47 @@ fragment_program Ogre/RTShader/shadow_caster_dq_ps cg
 	profiles ps_2_0 arbfp1
 	// entry function
 	entry_point shadow_caster_dq_ps
+
  	default_params
 	{
 		
 	}
 }
 
-vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs cg
+vertex_program Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon glsl
+{
+	source DualQuaternion_Common.glsl
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_glsl glsl
+{
+	source DualQuaternionSkinning_ShadowOneWeight.glsl
+	attach Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_glsl glsl
+{
+	source DualQuaternionSkinning_ShadowTwoWeights.glsl
+	attach Ogre/RTShader/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accomodate the amount of registers
@@ -32,12 +121,13 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs cg
 	}
 }
 
-vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs cg
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accomodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_2weight_vs
+	includes_skeletal_animation true
 
 	default_params
 	{
@@ -47,7 +137,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs cg
 	}
 }
 
-vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs cg
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accomodate the amount of registers
@@ -63,7 +153,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs cg
 }
 
 
-vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs cg
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accomodate the amount of registers
@@ -73,6 +163,39 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs cg
 	default_params
 	{
 		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs_cg cg
+{
+	source DualQuaternionSkinning_Shadow.cg
+	//will run on 3 to accomodate the amount of registers
+	profiles vs_3_0 vp40 arbvp1
+	entry_point shadow_caster_dq_skinning_1weight_twophase_vs
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg cg
+{
+	source DualQuaternionSkinning_Shadow.cg
+	//will run on 3 to accomodate the amount of registers
+	profiles vs_3_0 vp40 arbvp1
+	entry_point shadow_caster_dq_skinning_2weight_twophase_vs
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
 		param_named_auto viewProjectionMatrix viewproj_matrix
 		param_named_auto ambient ambient_light_colour
 	}
@@ -157,4 +280,77 @@ material Ogre/RTShader/shadow_caster_dq_skinning_4weight
 	}
 }
 
+material Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase
+{
+	technique
+	{
+		// all this will do is write depth and depth² to red and green
+		pass
+		{
+			vertex_program_ref Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs
+			{
+			}
 
+			fragment_program_ref Ogre/RTShader/shadow_caster_dq_ps
+			{				
+			}
+		}
+	}
+}
+
+
+material Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase
+{
+	technique
+	{
+		// all this will do is write depth and depth² to red and green
+		pass
+		{
+			vertex_program_ref Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs
+			{				
+			}
+
+			fragment_program_ref Ogre/RTShader/shadow_caster_dq_ps
+			{				
+			}
+		}
+	}
+}
+
+
+material Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase
+{
+	technique
+	{
+		// all this will do is write depth and depth² to red and green
+		pass
+		{
+			vertex_program_ref Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs
+			{				
+			}
+
+			fragment_program_ref Ogre/RTShader/shadow_caster_dq_ps
+			{				
+			}
+		}
+	}
+}
+
+
+material Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase
+{
+	technique
+	{
+		// all this will do is write depth and depth² to red and green
+		pass
+		{
+			vertex_program_ref Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs
+			{				
+			}
+
+			fragment_program_ref Ogre/RTShader/shadow_caster_dq_ps
+			{				
+			}
+		}
+	}
+}
