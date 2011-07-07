@@ -438,8 +438,17 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			if(false == SGScriptTranslator::getUInt(*it, &weightCount))
 				hasError = true;
 
-			++it;
-			SGScriptTranslator::getString(*it, &skinningType);
+			if(prop->values.size() >= 5)
+			{
+				++it;
+				SGScriptTranslator::getString(*it, &skinningType);
+
+				++it;
+				SGScriptTranslator::getBoolean(*it, &correctAntipodalityHandling);
+
+				++it;
+				SGScriptTranslator::getBoolean(*it, &scalingShearingSupport);
+			}
 
 			//If the skinningType is not specified or is specified incorrectly, default to linear skinning.
 			//Needs to be set before createOrRetrieveInstance is called because it determines which type of instance is created.
@@ -451,12 +460,6 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			{
 				mSkinningType = HardwareSkinningTechnique::ST_LINEAR;
 			}
-			
-			++it;
-			SGScriptTranslator::getBoolean(*it, &correctAntipodalityHandling);
-
-			++it;
-			SGScriptTranslator::getBoolean(*it, &scalingShearingSupport);
 		}
 
 		if (hasError == true)
