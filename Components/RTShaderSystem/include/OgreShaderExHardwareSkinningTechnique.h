@@ -33,8 +33,7 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
-
-#define HS_MAX_WEIGHT_COUNT 4
+#include "OgreShaderExHardwareSkinning.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -52,46 +51,17 @@ class HardwareSkinningFactory;
 Meaning, this sub render states adds calculations which multiply
 the points and normals by their assigned bone matricies.
 */
-class _OgreRTSSExport HardwareSkinningTechnique : public SubRenderState
+class _OgreRTSSExport HardwareSkinningTechnique
 {
-public:
-	struct SkinningData
-	{
-		SkinningData() :
-			isValid(true), maxBoneCount(0), maxWeightCount(0)
-		{}
-
-		bool isValid;
-		ushort maxBoneCount;
-		ushort maxWeightCount;
-	};
-
-	enum SkinningType
-	{
-		ST_LINEAR,
-		ST_DUAL_QUATERNION
-	};
-
 // Interface.
 public:
-
 	/** Class default constructor */
 	HardwareSkinningTechnique();
 
 	/**
-	@see SubRenderState::getType.
-	*/
-	virtual const String& getType() const;
-
-	/**
-	@see SubRenderState::getType.
-	*/
-	virtual int getExecutionOrder() const;
-
-	/**
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void copyFrom(const SubRenderState& rhs);
+	virtual void copyFrom(const HardwareSkinningTechnique* hardSkin);
 
 	/**
 	Set the hardware skinning parameters.
@@ -105,7 +75,7 @@ public:
 	@param correctAntipodalityHandling Only applicable for dual quaternion skinning.
 	@param scalingShearingSupport Only applicable for dual quaternion skinning.
 	*/
-	void setHardwareSkinningParam(ushort boneCount, ushort weightCount, SkinningType skinningType = ST_LINEAR,  bool correctAntipodalityHandling = false, bool scalingShearingSupport = false);
+	void setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling = false, bool scalingShearingSupport = false);
 
 	/**
 	Returns the number of bones in the model assigned to the material.
@@ -118,12 +88,6 @@ public:
 	@see setHardwareSkinningParam()
 	*/
 	ushort getWeightCount();
-
-	/**
-	Returns the current skinning type in use.
-	@see setHardwareSkinningParam()
-	 */
-	SkinningType getSkinningType();
 
 	/**
 	Only applicable for dual quaternion skinning.
@@ -140,17 +104,8 @@ public:
 	/**
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) = 0;
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, HardwareSkinning::SkinningType skinningType, const HardwareSkinningFactory* creator);
 
-	/**
-	Set the factory which created this sub render state
-	*/
-	void _setCreator(const HardwareSkinningFactory* pCreator) { mCreator = pCreator; }
-	
-	static String Type;
-
-// Protected methods
-protected:
 	/**
 	@see SubRenderState::resolveParameters.
 	*/
@@ -166,6 +121,7 @@ protected:
 	*/
 	virtual bool addFunctionInvocations (ProgramSet* programSet) = 0;
 
+protected:
 	/** Translates an index number to a mask value */
 	Operand::OpMask indexToMask (int index);
 
@@ -173,12 +129,12 @@ protected:
 protected:
 	ushort mBoneCount;
 	ushort mWeightCount;
-	SkinningType mSkinningType;
+
 	bool mCorrectAntipodalityHandling;
 	bool mScalingShearingSupport;
 
 	bool mDoBoneCalculations;
-
+	
 	ParameterPtr mParamInPosition;
 	ParameterPtr mParamInNormal;
 	ParameterPtr mParamInBiNormal;
@@ -198,11 +154,7 @@ protected:
 	ParameterPtr mParamLocalTangentWorld;
 	ParameterPtr mParamLocalBinormalWorld;
 	ParameterPtr mParamOutPositionProj;
-
-	const HardwareSkinningFactory* mCreator; ///The factory which created this sub render state
 };
-
-_OgreRTSSExport void operator<<(std::ostream& o, const HardwareSkinningTechnique::SkinningData& data);
 
 }
 }

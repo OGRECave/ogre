@@ -24,8 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderExHardwareSkinningTechnique.h"
+#include "OgreShaderExHardwareSkinning.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
@@ -36,45 +37,30 @@ THE SOFTWARE.
 #include "OgreSubMesh.h"
 #include "OgreShaderGenerator.h"
 
+#define HS_DATA_BIND_NAME "HS_SRS_DATA"
+
+
 namespace Ogre {
 
 namespace RTShader {
 
-String HardwareSkinningTechnique::Type = "SGX_HardwareSkinning";
-
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-
 HardwareSkinningTechnique::HardwareSkinningTechnique() :
 	mBoneCount(0),
 	mWeightCount(0),
-	mSkinningType(ST_LINEAR),
 	mCorrectAntipodalityHandling(false),
 	mScalingShearingSupport(false),
-	mDoBoneCalculations(false),
-	mCreator(NULL)
+	mDoBoneCalculations(false)
 {
 }
 
 //-----------------------------------------------------------------------
-const String& HardwareSkinningTechnique::getType() const
-{
-	return Type;
-}
-
-//-----------------------------------------------------------------------
-int HardwareSkinningTechnique::getExecutionOrder() const
-{
-	return FFP_TRANSFORM;
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushort weightCount, SkinningType skinningType, bool correctAntipodalityHandling, bool scalingShearingSupport)
+void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling, bool scalingShearingSupport)
 {
 	mBoneCount = std::min<ushort>(boneCount,256);
 	mWeightCount = std::min<ushort>(weightCount,4);
-	mSkinningType = skinningType;
 	mCorrectAntipodalityHandling = correctAntipodalityHandling;
 	mScalingShearingSupport = scalingShearingSupport;
 }
@@ -89,12 +75,6 @@ ushort HardwareSkinningTechnique::getBoneCount()
 ushort HardwareSkinningTechnique::getWeightCount()
 {
 	return mWeightCount;
-}
-
-//-----------------------------------------------------------------------
-HardwareSkinningTechnique::SkinningType HardwareSkinningTechnique::getSkinningType()
-{
-	return mSkinningType;
 }
 
 //-----------------------------------------------------------------------
@@ -123,24 +103,53 @@ Operand::OpMask HardwareSkinningTechnique::indexToMask(int index)
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningTechnique::copyFrom(const SubRenderState& rhs)
+void HardwareSkinningTechnique::copyFrom(const HardwareSkinningTechnique* hardSkin)
 {
-	const HardwareSkinningTechnique& hardSkin = static_cast<const HardwareSkinningTechnique&>(rhs);
-	mWeightCount = hardSkin.mWeightCount;
-	mBoneCount = hardSkin.mBoneCount;
-	mDoBoneCalculations = hardSkin.mDoBoneCalculations;
-	mSkinningType = hardSkin.mSkinningType;
-	mCorrectAntipodalityHandling = hardSkin.mCorrectAntipodalityHandling;
-	mScalingShearingSupport = hardSkin.mScalingShearingSupport;
-	mCreator = hardSkin.mCreator;
+	mWeightCount = hardSkin->mWeightCount;
+	mBoneCount = hardSkin->mBoneCount;
+	mDoBoneCalculations = hardSkin->mDoBoneCalculations;
+	mCorrectAntipodalityHandling = hardSkin->mCorrectAntipodalityHandling;
+	mScalingShearingSupport = hardSkin->mScalingShearingSupport;
 }
 
 //-----------------------------------------------------------------------
-void operator<<(std::ostream& o, const HardwareSkinningTechnique::SkinningData& data)
+bool HardwareSkinningTechnique::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, HardwareSkinning::SkinningType skinningType, const HardwareSkinningFactory* creator)
 {
-	o << data.isValid;
-	o << data.maxBoneCount;
-	o << data.maxWeightCount;
+	bool isValid = true;
+	Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);
+	const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
+	
+	if (hsAny.isEmpty() == false)
+	{
+		HardwareSkinning::SkinningData pData =
+			(any_cast<HardwareSkinning::SkinningData>(hsAny));
+		isValid = pData.isValid;
+		mBoneCount = pData.maxBoneCount;
+		mWeightCount = pData.maxWeightCount;
+	}
+	
+	mDoBoneCalculations =  isValid &&
+		(mBoneCount != 0) && (mBoneCount <= 256) &&
+		(mWeightCount != 0) && (mWeightCount <= 4) &&
+		((creator == NULL) || (mBoneCount <= creator->getMaxCalculableBoneCount()));
+
+	if ((mDoBoneCalculations) && (creator))
+	{
+		//update the receiver and caster materials
+		if (dstPass->getParent()->getShadowCasterMaterial().isNull())
+		{
+			dstPass->getParent()->setShadowCasterMaterial(
+				creator->getCustomShadowCasterMaterial(skinningType, mWeightCount - 1));
+		}
+
+		if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
+		{
+			dstPass->getParent()->setShadowReceiverMaterial(
+				creator->getCustomShadowReceiverMaterial(skinningType, mWeightCount - 1));
+		}
+	}
+
+	return true;
 }
 
 }

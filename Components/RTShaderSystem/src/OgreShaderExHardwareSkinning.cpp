@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "OgreShaderExHardwareSkinning.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExDualQuaternionSkinning.h"
+#include "OgreShaderExLinearSkinning.h"
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
@@ -51,361 +52,146 @@ HardwareSkinningFactory* HardwareSkinningFactory::getSingletonPtr(void)
 }
 HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
 {  
-    assert( ms_Singleton );  return ( *ms_Singleton );  
+    assert( ms_Singleton );  return ( *ms_Singleton );
 }
+
+String HardwareSkinning::Type = "SGX_HardwareSkinning";
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-HardwareSkinning::HardwareSkinning() : HardwareSkinningTechnique()
+HardwareSkinning::HardwareSkinning() :
+	mSkinningType(ST_LINEAR),
+	mCreator(NULL)
 {
+}
+
+//-----------------------------------------------------------------------
+const String& HardwareSkinning::getType() const
+{
+	return Type;
+}
+
+//-----------------------------------------------------------------------
+int HardwareSkinning::getExecutionOrder() const
+{
+	return FFP_TRANSFORM;
+}
+
+//-----------------------------------------------------------------------
+void HardwareSkinning::setHardwareSkinningParam(ushort boneCount, ushort weightCount, SkinningType skinningType, bool correctAntipodalityHandling, bool scalingShearingSupport)
+{
+	mSkinningType = skinningType;
+	
+	if(skinningType == ST_DUAL_QUATERNION)
+	{
+		if(mDualQuat.isNull())
+		{
+			mDualQuat.bind(OGRE_NEW DualQuaternionSkinning);
+		}
+		
+		mActiveTechnique = mDualQuat;
+	}
+	else //if(skinningType == ST_LINEAR)
+	{
+		if(mLinear.isNull())
+		{
+			mLinear.bind(OGRE_NEW LinearSkinning);
+		}
+		
+		mActiveTechnique = mLinear;
+	}
+	
+	mActiveTechnique->setHardwareSkinningParam(boneCount, weightCount, correctAntipodalityHandling, scalingShearingSupport);
+}
+
+//-----------------------------------------------------------------------
+ushort HardwareSkinning::getBoneCount()
+{
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->getBoneCount();
+}
+
+//-----------------------------------------------------------------------
+ushort HardwareSkinning::getWeightCount()
+{
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->getWeightCount();
+}
+
+//-----------------------------------------------------------------------
+HardwareSkinning::SkinningType HardwareSkinning::getSkinningType()
+{
+	assert(!mActiveTechnique.isNull());
+	return mSkinningType;
+}
+
+//-----------------------------------------------------------------------
+bool HardwareSkinning::hasCorrectAntipodalityHandling()
+{
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->hasCorrectAntipodalityHandling();
+}
+
+//-----------------------------------------------------------------------
+bool HardwareSkinning::hasScalingShearingSupport()
+{
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->hasScalingShearingSupport();
+}
+
+//-----------------------------------------------------------------------
+void HardwareSkinning::copyFrom(const SubRenderState& rhs)
+{
+	const HardwareSkinning& hardSkin = static_cast<const HardwareSkinning&>(rhs);
+
+	mDualQuat = hardSkin.mDualQuat;
+	mLinear = hardSkin.mLinear;
+	mActiveTechnique = hardSkin.mActiveTechnique;
+	
+	mCreator = hardSkin.mCreator;
+	mSkinningType = hardSkin.mSkinningType;
+}
+
+//-----------------------------------------------------------------------
+void operator<<(std::ostream& o, const HardwareSkinning::SkinningData& data)
+{
+	o << data.isValid;
+	o << data.maxBoneCount;
+	o << data.maxWeightCount;
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	bool isValid = true;
-	Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);
-	const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
-	if (hsAny.isEmpty() == false)
-	{
-		HardwareSkinningTechnique::SkinningData pData =
-			(any_cast<HardwareSkinningTechnique::SkinningData>(hsAny));
-		isValid = pData.isValid;
-		mBoneCount = pData.maxBoneCount;
-		mWeightCount = pData.maxWeightCount;
-	}
-	mDoBoneCalculations =  isValid &&
-		(mBoneCount != 0) && (mBoneCount <= 256) &&
-		(mWeightCount != 0) && (mWeightCount <= 4) &&
-		((mCreator == NULL) || (mBoneCount <= mCreator->getMaxCalculableBoneCount()));
-
-	if ((mDoBoneCalculations) && (mCreator))
-	{
-		//update the receiver and caster materials
-		if (dstPass->getParent()->getShadowCasterMaterial().isNull())
-		{
-			dstPass->getParent()->setShadowCasterMaterial(
-				mCreator->getCustomShadowCasterMaterial(mWeightCount - 1));
-		}
-
-		if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
-		{
-			dstPass->getParent()->setShadowReceiverMaterial(
-				mCreator->getCustomShadowReceiverMaterial(mWeightCount - 1));
-		}
-	}
-
-	return true;
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->preAddToRenderState(renderState, srcPass, dstPass, mSkinningType, mCreator);
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::resolveParameters(ProgramSet* programSet)
 {
-	
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Function* vsMain = vsProgram->getEntryPointFunction();
-
-	//if needed mark this vertex program as hardware skinned
-	if (mDoBoneCalculations == true)
-	{
-		vsProgram->setSkeletalAnimationIncluded(true);
-	}
-	
-	//
-	// get the parameters we need whether we are doing bone calculations or not
-	//
-	// Note: in order to be consistent we will always output position, normal,
-	// tangent and binormal in both object and world space. And output position
-	// in projective space to cover the responsibility of the transform stage
-
-	//input param
-	mParamInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);	
-	mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);	
-	mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);	
-	mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);	
-	
-	//local param
-	mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);	
-	mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);	
-	mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);	
-	mParamLocalBinormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_WORLD_SPACE, GCT_FLOAT3);	
-	
-	//output param
-	mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);	
-	
-	//check if parameter retrival went well
-	bool isValid = 
-		(mParamInPosition.get() != NULL) &&
-		(mParamInNormal.get() != NULL) &&
-		(mParamInBiNormal.get() != NULL) &&
-		(mParamInTangent.get() != NULL) &&
-		(mParamLocalPositionWorld.get() != NULL) &&
-		(mParamLocalNormalWorld.get() != NULL) &&
-		(mParamLocalTangentWorld.get() != NULL) &&
-		(mParamLocalBinormalWorld.get() != NULL) &&
-		(mParamOutPositionProj.get() != NULL);
-
-	
-	if (mDoBoneCalculations == true)
-	{
-		GpuProgramParameters::AutoConstantType worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4;
-		if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
-		{
-			//given that hlsl shaders use column major matrices which are not compatible with the cg
-			//and glsl method of row major matrices, we will use a full matrix instead.
-			worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY;
-		}
-
-		//input parameters
-		mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);	
-		mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);	
-		mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);	
-		mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(worldMatrixType, 0, mBoneCount);
-		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
-		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
-		
-		mParamTempFloat4 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal4", GCT_FLOAT4);	
-		mParamTempFloat3 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "TempVal3", GCT_FLOAT3);	
-			
-		//check if parameter retrival went well
-		isValid &= 
-			(mParamInIndices.get() != NULL) &&
-			(mParamInWeights.get() != NULL) &&
-			(mParamInWorldMatrices.get() != NULL) &&
-			(mParamInViewProjMatrix.get() != NULL) &&
-			(mParamInInvWorldMatrix.get() != NULL) &&
-			(mParamTempFloat4.get() != NULL) &&
-			(mParamTempFloat3.get() != NULL);
-	}
-	else
-	{
-		mParamInWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		mParamInWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
-	
-		//check if parameter retrival went well
-		isValid &= 
-			(mParamInWorldMatrix.get() != NULL) &&
-			(mParamInWorldViewProjMatrix.get() != NULL);
-	}
-	return isValid;
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->resolveParameters(programSet);
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::resolveDependencies(ProgramSet* programSet)
 {
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	vsProgram->addDependency(FFP_LIB_COMMON);
-	vsProgram->addDependency(FFP_LIB_TRANSFORM);
-	
-	return true;
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->resolveDependencies(programSet);
 }
 
 //-----------------------------------------------------------------------
 bool HardwareSkinning::addFunctionInvocations(ProgramSet* programSet)
 {
-	
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Function* vsMain = vsProgram->getEntryPointFunction();
-	int internalCounter = 0;
-
-	//add functions to calculate position data in world, object and projective space
-	addPositionCalculations(vsMain, internalCounter);
-	
-	//add functions to calculate normal and normal related data in world and object space
-	addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
-	return true;
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::addPositionCalculations(Function* vsMain, int& funcCounter)
-{
-	FunctionInvocation* curFuncInvocation = NULL;	
-	
-	if (mDoBoneCalculations == true)
-	{
-		//set functions to calculate world position
-		for(int i = 0 ; i < getWeightCount() ; ++i)
-		{
-			addIndexedPositionWeight(vsMain, i, funcCounter);
-		}
-		
-		//update back the original position relative to the object
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-
-		//update the projective position thereby filling the transform stage role
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInViewProjMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-	else
-	{
-		//update from object to world space
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-
-		//update from object to projective space
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInWorldViewProjMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamOutPositionProj, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::addNormalRelatedCalculations(Function* vsMain,
-								ParameterPtr& pNormalRelatedParam, 
-								ParameterPtr& pNormalWorldRelatedParam, 
-								int& funcCounter)
-{
-	FunctionInvocation* curFuncInvocation;
-	
-	if (mDoBoneCalculations == true)
-	{
-		//set functions to calculate world normal
-		for(int i = 0 ; i < getWeightCount() ; ++i)
-		{
-			addIndexedNormalRelatedWeight(vsMain, pNormalRelatedParam, pNormalWorldRelatedParam, i, funcCounter);
-		}
-
-		//update back the original position relative to the object
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-	else
-	{
-		//update from object to world space
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamInWorldMatrix, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-
-}
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::addIndexedPositionWeight(Function* vsMain, 
-								int index, int& funcCounter)
-{
-	Operand::OpMask indexMask = indexToMask(index);
-	
-	FunctionInvocation* curFuncInvocation;
-
-	int outputMask = Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z;
-	if (mParamInWorldMatrices->getType() == GCT_MATRIX_4X4)
-	{
-		outputMask = Operand::OPM_ALL;
-	}
-	
-	//multiply position with world matrix and put into temporary param
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
-	curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, outputMask);	
-	vsMain->addAtomInstance(curFuncInvocation);	
-
-	//set w value of temporary param to 1
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
-	curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0f), Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT, Operand::OPM_W);	
-	vsMain->addAtomInstance(curFuncInvocation);	
-
-	//multiply temporary param with  weight
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++); 								
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
-	curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT);	
-	vsMain->addAtomInstance(curFuncInvocation);	
-
-	//check if on first iteration
-	if (index == 0)
-	{
-		//set the local param as the value of the world param
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);	
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-	else
-	{
-		//add the local param as the value of the world param
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_IN);	
-		curFuncInvocation->pushOperand(mParamLocalPositionWorld, Operand::OPS_OUT);	
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-}
-
-
-//-----------------------------------------------------------------------
-void HardwareSkinning::addIndexedNormalRelatedWeight(Function* vsMain,
-								ParameterPtr& pNormalParam, 
-								ParameterPtr& pNormalWorldRelatedParam, 
-								int index, int& funcCounter)
-{
-
-	FunctionInvocation* curFuncInvocation;
-
-	Operand::OpMask indexMask = indexToMask(index);
-	
-	//multiply position with world matrix and put into temporary param
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++); 								
-	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN, Operand::OPM_ALL);
-	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
-	curFuncInvocation->pushOperand(pNormalParam, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);	
-	vsMain->addAtomInstance(curFuncInvocation);	
-
-	//multiply temporary param with weight
-	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++); 								
-	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
-	curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_OUT);	
-	vsMain->addAtomInstance(curFuncInvocation);	
-
-	//check if on first iteration
-	if (index == 0)
-	{
-		//set the local param as the value of the world normal
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);	
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
-	else
-	{
-		//add the local param as the value of the world normal
-		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++); 								
-		curFuncInvocation->pushOperand(mParamTempFloat3, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);	
-		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_OUT);	
-		vsMain->addAtomInstance(curFuncInvocation);	
-	}
+	assert(!mActiveTechnique.isNull());
+	return mActiveTechnique->addFunctionInvocations(programSet);
 }
 
 //-----------------------------------------------------------------------
 HardwareSkinningFactory::HardwareSkinningFactory() :
-	mMaxCalculableBoneCount(70), mSkinningType(HardwareSkinningTechnique::ST_LINEAR)
+	mMaxCalculableBoneCount(70)
 {
 
 }
@@ -413,7 +199,7 @@ HardwareSkinningFactory::HardwareSkinningFactory() :
 //-----------------------------------------------------------------------
 const String& HardwareSkinningFactory::getType() const
 {
-	return HardwareSkinningTechnique::Type;
+	return HardwareSkinning::Type;
 }
 
 //-----------------------------------------------------------------------
@@ -425,6 +211,7 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		uint32 boneCount = 0;
 		uint32 weightCount = 0;
 		String skinningType = "";
+		HardwareSkinning::SkinningType skinType;
 		bool correctAntipodalityHandling = false;
 		bool scalingShearingSupport = false;
 		
@@ -454,11 +241,11 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			//Needs to be set before createOrRetrieveInstance is called because it determines which type of instance is created.
 			if(skinningType == "dual_quaternion")
 			{
-				mSkinningType = HardwareSkinningTechnique::ST_DUAL_QUATERNION;
+				skinType = HardwareSkinning::ST_DUAL_QUATERNION;
 			}
 			else
 			{
-				mSkinningType = HardwareSkinningTechnique::ST_LINEAR;
+				skinType = HardwareSkinning::ST_LINEAR;
 			}
 		}
 
@@ -471,8 +258,8 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		{
 			//create and update the hardware skinning sub render state
 			SubRenderState*	subRenderState = createOrRetrieveInstance(translator);
-			HardwareSkinningTechnique* hardSkinSrs = static_cast<HardwareSkinningTechnique*>(subRenderState);
-			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount, mSkinningType, correctAntipodalityHandling, scalingShearingSupport);
+			HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
+			hardSkinSrs->setHardwareSkinningParam(boneCount, weightCount, skinType, correctAntipodalityHandling, scalingShearingSupport);
 			
 			return subRenderState;
 		}
@@ -488,12 +275,12 @@ void HardwareSkinningFactory::writeInstance(MaterialSerializer* ser, SubRenderSt
 {
 	ser->writeAttribute(4, "hardware_skinning");
 	
-	HardwareSkinningTechnique* hardSkinSrs = static_cast<HardwareSkinningTechnique*>(subRenderState);
+	HardwareSkinning* hardSkinSrs = static_cast<HardwareSkinning*>(subRenderState);
 	ser->writeValue(StringConverter::toString(hardSkinSrs->getBoneCount()));
 	ser->writeValue(StringConverter::toString(hardSkinSrs->getWeightCount()));
 
 	//Correct antipodality handling and scaling and shearing support are only really valid for dual quaternion skinning
-	if(hardSkinSrs->getSkinningType() == HardwareSkinningTechnique::ST_DUAL_QUATERNION)
+	if(hardSkinSrs->getSkinningType() == HardwareSkinning::ST_DUAL_QUATERNION)
 	{
 		ser->writeValue("dual_quaternion");
 		ser->writeValue(StringConverter::toString(hardSkinSrs->hasCorrectAntipodalityHandling()));
@@ -504,53 +291,80 @@ void HardwareSkinningFactory::writeInstance(MaterialSerializer* ser, SubRenderSt
 //-----------------------------------------------------------------------
 SubRenderState* HardwareSkinningFactory::createInstanceImpl()
 {
-	HardwareSkinningTechnique* pSkin;
-
-	if(mSkinningType == HardwareSkinningTechnique::ST_DUAL_QUATERNION)
-	{
-		pSkin = OGRE_NEW DualQuaternionSkinning;
-	}
-	else
-	{
-		pSkin = OGRE_NEW HardwareSkinning;
-	}
+	HardwareSkinning* pSkin = OGRE_NEW HardwareSkinning;
 	
 	pSkin->_setCreator(this);
 	return pSkin;
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningFactory::setCustomShadowCasterMaterials(const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
+void HardwareSkinningFactory::setCustomShadowCasterMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
 											const MaterialPtr& caster3Weight, const MaterialPtr& caster4Weight)
 {
-	mCustomShadowCasterMaterials[0] = caster1Weight;
-	mCustomShadowCasterMaterials[1] = caster2Weight;
-	mCustomShadowCasterMaterials[2] = caster3Weight;
-	mCustomShadowCasterMaterials[3] = caster4Weight;
+	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	{
+		mCustomShadowCasterMaterialsDualQuaternion[0] = caster1Weight;
+		mCustomShadowCasterMaterialsDualQuaternion[1] = caster2Weight;
+		mCustomShadowCasterMaterialsDualQuaternion[2] = caster3Weight;
+		mCustomShadowCasterMaterialsDualQuaternion[3] = caster4Weight;
+	}
+	else //if(skinningType == HardwareSkinning::ST_LINEAR)
+	{
+		mCustomShadowCasterMaterialsLinear[0] = caster1Weight;
+		mCustomShadowCasterMaterialsLinear[1] = caster2Weight;
+		mCustomShadowCasterMaterialsLinear[2] = caster3Weight;
+		mCustomShadowCasterMaterialsLinear[3] = caster4Weight;
+	}
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
+void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
 											  const MaterialPtr& receiver3Weight, const MaterialPtr& receiver4Weight)
 {
-	mCustomShadowReceiverMaterials[0] = receiver1Weight;
-	mCustomShadowReceiverMaterials[1] = receiver2Weight;
-	mCustomShadowReceiverMaterials[2] = receiver3Weight;
-	mCustomShadowReceiverMaterials[3] = receiver4Weight;
+	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	{
+		mCustomShadowReceiverMaterialsDualQuaternion[0] = receiver1Weight;
+		mCustomShadowReceiverMaterialsDualQuaternion[1] = receiver2Weight;
+		mCustomShadowReceiverMaterialsDualQuaternion[2] = receiver3Weight;
+		mCustomShadowReceiverMaterialsDualQuaternion[3] = receiver4Weight;
+	}
+	else //if(skinningType == HardwareSkinning::ST_LINEAR)
+	{
+		mCustomShadowReceiverMaterialsLinear[0] = receiver1Weight;
+		mCustomShadowReceiverMaterialsLinear[1] = receiver2Weight;
+		mCustomShadowReceiverMaterialsLinear[2] = receiver3Weight;
+		mCustomShadowReceiverMaterialsLinear[3] = receiver4Weight;
+	}
 }
 
 //-----------------------------------------------------------------------
-const MaterialPtr& HardwareSkinningFactory::getCustomShadowCasterMaterial(ushort index) const
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowCasterMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const
 {
 	assert(index < HS_MAX_WEIGHT_COUNT);
-	return mCustomShadowCasterMaterials[index];
+
+	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	{
+		return mCustomShadowCasterMaterialsDualQuaternion[index];
+	}
+	else //if(skinningType = HardwareSkinning::ST_LINEAR)
+	{
+		return mCustomShadowCasterMaterialsLinear[index];
+	}
 }
 
 //-----------------------------------------------------------------------
-const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(ushort index) const
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const
 {
 	assert(index < HS_MAX_WEIGHT_COUNT);
-	return mCustomShadowReceiverMaterials[index];
+
+	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	{
+		return mCustomShadowReceiverMaterialsDualQuaternion[index];
+	}
+	else //if(skinningType = HardwareSkinning::ST_LINEAR)
+	{
+		return mCustomShadowReceiverMaterialsLinear[index];
+	}
 }
 
 //-----------------------------------------------------------------------
@@ -638,14 +452,14 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
 	bool isUpdated = false;
 	if (pMaterial->getNumTechniques() > 0) 
 	{
-		HardwareSkinningTechnique::SkinningData data;
+		HardwareSkinning::SkinningData data;
 
 		//get the previous skinning data if available
 		UserObjectBindings& binding = pMaterial->getTechnique(0)->getUserObjectBindings();
 		const Any& hsAny = binding.getUserAny(HS_DATA_BIND_NAME);
 		if (hsAny.isEmpty() == false)
 		{
-			data = (any_cast<HardwareSkinningTechnique::SkinningData>(hsAny));
+			data = (any_cast<HardwareSkinning::SkinningData>(hsAny));
 		}
 
 		//check if we need to update the data
@@ -670,7 +484,7 @@ bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, 
 				//amount of bones and weights
 				const String& schemeName = ShaderGenerator::getSingleton().getRTShaderScheme(i);
 				ShaderGenerator::getSingleton().invalidateMaterial(
-					schemeName,	pMaterial->getName(), pMaterial->getGroup());
+					schemeName, pMaterial->getName(), pMaterial->getGroup());
 
 			}
 

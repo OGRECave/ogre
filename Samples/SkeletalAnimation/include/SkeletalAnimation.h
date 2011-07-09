@@ -3,6 +3,7 @@
 
 #include "SdkSample.h"
 #include "OgreDualQuaternion.h"
+#include "OgreShaderExHardwareSkinning.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -104,7 +105,7 @@ protected:
 			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");
 
 			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-				pCast1, pCast2, pCast3, pCast4);
+				RTShader::HardwareSkinning::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 		}
 #endif
 		// set shadow properties

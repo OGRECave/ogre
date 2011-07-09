@@ -24,10 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderExDualQuaternionSkinning_
-#define _ShaderExDualQuaternionSkinning_
+#ifndef _ShaderExLinearSkinning_
+#define _ShaderExLinearSkinning_
 
 #include "OgreShaderPrerequisites.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinningTechnique.h"
 #include "OgreShaderParameter.h"
@@ -44,24 +45,16 @@ namespace RTShader {
 *  @{
 */
 
-#define SGX_LIB_DUAL_QUATERNION				"SGXLib_DualQuaternion"
-#define SGX_FUNC_BLEND_WEIGHT				"SGX_BlendWeight"
-#define SGX_FUNC_ANTIPODALITY_ADJUSTMENT		"SGX_AntipodalityAdjustment"
-#define SGX_FUNC_CALCULATE_BLEND_POSITION		"SGX_CalculateBlendPosition"
-#define SGX_FUNC_CALCULATE_BLEND_NORMAL			"SGX_CalculateBlendNormal"
-#define SGX_FUNC_NORMALIZE_DUAL_QUATERNION		"SGX_NormalizeDualQuaternion"
-#define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX		"SGX_AdjointTransposeMatrix"
-
-/** Implement a sub render state which performs dual quaternion hardware skinning.
-This sub render state uses bone matrices converted to dual quaternions and adds calculations
-to transform the points and normals using their associated dual quaternions.
+/** Implement a sub render state which performs hardware skinning.
+Meaning, this sub render states adds calculations which multiply
+the points and normals by their assigned bone matricies.
 */
-class _OgreRTSSExport DualQuaternionSkinning : public HardwareSkinningTechnique
+class _OgreRTSSExport LinearSkinning : public HardwareSkinningTechnique
 {
 // Interface.
 public:
 	/** Class default constructor */
-	DualQuaternionSkinning();
+	LinearSkinning();
 
 	/**
 	@see SubRenderState::resolveParameters.
@@ -78,36 +71,23 @@ public:
 	*/
 	virtual bool addFunctionInvocations (ProgramSet* programSet);
 
-// Protected methods
 protected:
 	/** Adds functions to calculate position data in world, object and projective space */
-	void addPositionCalculations(Function* vsMain, int& funcCounter);
+	void addPositionCalculations (Function* vsMain, int& funcCounter);
 
-	/** Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion */
-	void adjustForCorrectAntipodality(Function* vsMain, int index, int& funcCounter);
+	/** Adds the weight of a given position for a given index */
+	void addIndexedPositionWeight (Function* vsMain, int index, int& funcCounter);
 
-	/**
-	 Adds the weight of a given position for a given index
-	 
-	 @param pPositionTempParameter Requires a temp parameter with a matrix the same size of pPositionRelatedParam
-	*/
-	void addIndexedPositionWeight(Function* vsMain, int index, UniformParameterPtr& pPositionRelatedParam,
-				      ParameterPtr& pPositionTempParameter, ParameterPtr& pPositionRelatedOutputParam, int& funcCounter);
-	
 	/** Adds the calculations for calculating a normal related element */
-	void addNormalRelatedCalculations(Function* vsMain,
+	void addNormalRelatedCalculations (Function* vsMain,
 						ParameterPtr& pNormalRelatedParam,
 						ParameterPtr& pNormalWorldRelatedParam,
 						int& funcCounter);
 
-protected:
-	UniformParameterPtr mParamInScaleShearMatrices;
-	ParameterPtr mParamBlendS;
-	ParameterPtr mParamBlendDQ;
-	
-	ParameterPtr mParamTempFloat2x4;
-	ParameterPtr mParamTempFloat3x3;
-	ParameterPtr mParamTempFloat3x4;
+	/** Adds the weight of a given normal related parameter for a given index */
+	void addIndexedNormalRelatedWeight (Function* vsMain, ParameterPtr& pNormalRelatedParam,
+						ParameterPtr& pNormalWorldRelatedParam,
+						int index, int& funcCounter);
 };
 
 }
@@ -115,4 +95,3 @@ protected:
 
 #endif
 #endif
-
