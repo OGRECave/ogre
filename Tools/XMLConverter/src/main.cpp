@@ -784,7 +784,7 @@ void XMLToBinary(XmlOptions opts)
 		{
 			newSkel->optimiseAllAnimations();
 		}
-        skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, opts.endian);
+        skeletonSerializer->exportSkeleton(newSkel.getPointer(), opts.dest, SKELETON_VERSION_LATEST, opts.endian);
     }
     else
     {
