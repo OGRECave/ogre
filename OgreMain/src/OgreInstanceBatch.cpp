@@ -54,7 +54,8 @@ namespace Ogre
 				m_currentCamera( 0 ),
 				m_materialLodIndex( 0 ),
 				m_technSupportsSkeletal( true ),
-				mCachedCamera( 0 )
+				mCachedCamera( 0 ),
+				mTransformSharingDirty(true)
 	{
 		assert( m_instancesPerBatch );
 
@@ -156,10 +157,15 @@ namespace Ogre
 
 		for( size_t i=0; i<m_instancesPerBatch; ++i )
 		{
-			InstancedEntity *instance = OGRE_NEW InstancedEntity( this, i );
+			InstancedEntity *instance = generateInstancedEntity(i);
 			m_instancedEntities.push_back( instance );
 			m_unusedEntities.push_back( instance );
 		}
+	}
+	//-----------------------------------------------------------------------
+	InstancedEntity* InstanceBatch::generateInstancedEntity(size_t num)
+	{
+		return OGRE_NEW InstancedEntity( this, num);
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatch::deleteAllInstancedEntities()
@@ -235,7 +241,7 @@ namespace Ogre
 			retVal = m_unusedEntities.back();
 			m_unusedEntities.pop_back();
 
-			retVal->m_inUse = true;
+			retVal->mInUse = true;
 		}
 
 		return retVal;
@@ -243,7 +249,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::removeInstancedEntity( InstancedEntity *instancedEntity )
 	{
-		if( instancedEntity->m_batchOwner != this )
+		if( instancedEntity->mBatchOwner != this )
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 						"Trying to remove an InstancedEntity from scene created"
@@ -254,7 +260,7 @@ namespace Ogre
 		if( instancedEntity->getParentSceneNode() )
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
 
-		instancedEntity->m_inUse = false;
+		instancedEntity->mInUse = false;
 		instancedEntity->stopSharingTransform();
 
 		//Put it back into the queue
@@ -268,7 +274,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			if( (*itor)->m_inUse )
+			if( (*itor)->mInUse )
 				outEntities.push_back( *itor );
 			++itor;
 		}
@@ -366,8 +372,8 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			(*itor)->m_instanceID = instanceId++;
-			(*itor)->m_batchOwner = this;
+			(*itor)->mInstanceId = instanceId++;
+			(*itor)->mBatchOwner = this;
 			++itor;
 		}
 
@@ -377,7 +383,7 @@ namespace Ogre
 		m_unusedEntities.reserve( m_instancesPerBatch );
 		for( size_t i=m_instancedEntities.size(); i<m_instancesPerBatch; ++i )
 		{
-			InstancedEntity *instance = OGRE_NEW InstancedEntity( this, i );
+			InstancedEntity *instance = generateInstancedEntity(i);
 			m_instancedEntities.push_back( instance );
 			m_unusedEntities.push_back( instance );
 		}

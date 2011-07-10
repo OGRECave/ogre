@@ -100,23 +100,24 @@ namespace Ogre
 
 		typedef map<String, BatchSettings>::type	BatchSettingsMap;
 
-		const String			m_name;					//Not the name of the mesh
-		MeshPtr					m_meshReference;
-		InstanceBatchMap		m_instanceBatches;
-		size_t					m_idCount;
+		const String			mName;					//Not the name of the mesh
+		MeshPtr					mMeshReference;
+		InstanceBatchMap		mInstanceBatches;
+		size_t					mIdCount;
 
-		InstanceBatchVec		m_dirtyBatches;
+		InstanceBatchVec		mDirtyBatches;
 
-		RenderOperation			m_sharedRenderOperation;
+		RenderOperation			mSharedRenderOperation;
 
-		size_t					m_instancesPerBatch;
-		InstancingTechnique		m_instancingTechnique;
-		uint16					m_instancingFlags;		//@see InstanceManagerFlags
-		unsigned short			m_subMeshIdx;
+		size_t					mInstancesPerBatch;
+		InstancingTechnique		mInstancingTechnique;
+		uint16					mInstancingFlags;		//@see InstanceManagerFlags
+		unsigned short			mSubMeshIdx;
+		
+		BatchSettingsMap		mBatchSettings;
+		SceneManager*			mSceneManager;
 
-		BatchSettingsMap		m_batchSettings;
-		SceneManager			*m_sceneManager;
-
+		size_t					mMaxLookupTableInstances;
 		/** Finds a batch with at least one free instanced entity we can use.
 			If none found, creates one.
 		*/
@@ -147,10 +148,10 @@ namespace Ogre
 		InstanceManager( const String &customName, SceneManager *sceneManager,
 						 const String &meshName, const String &groupName,
 						 InstancingTechnique instancingTechnique, uint16 instancingFlags,
-						 size_t instancesPerBatch, unsigned short subMeshIdx );
+						 size_t instancesPerBatch, unsigned short subMeshIdx, bool useBoneMatrixLookup = false);
 		virtual ~InstanceManager();
 
-		const String& getName() const { return m_name; }
+		const String& getName() const { return mName; }
 
 		/** Raises an exception if trying to change it after creating the first InstancedEntity
 			@remarks The actual value may be less if the technique doesn't support having so much
@@ -158,6 +159,16 @@ namespace Ogre
 			@param instancesPerBatch New instances per batch number
 		*/
 		void setInstancesPerBatch( size_t instancesPerBatch );
+
+		/** Sets the size of the lookup table for techniques supporting bone lookup table.
+			Raises an exception if trying to change it after creating the first InstancedEntity.
+			Setting this value below the number of unique (non-sharing) entity instance animations
+			will produce a crash during runtime. Setting this value above will increase memory
+			consumption and reduce framerate.
+			@remarks The value should be as close but not below the actual value. 
+			@param maxLookupTableInstances New size of the lookup table
+		*/
+		void setMaxLookupTableInstances( size_t maxLookupTableInstances );
 
 		/**	Calculates the maximum (or the best amount, depending on flags) of instances
 			per batch given the suggested size for the technique this manager was created for.
@@ -232,7 +243,7 @@ namespace Ogre
 			If false is returned, it means getSetting will return default settings.
 		*/
 		bool hasSettings( const String &materialName ) const
-		{ return m_batchSettings.find( materialName ) != m_batchSettings.end(); }
+		{ return mBatchSettings.find( materialName ) != mBatchSettings.end(); }
 
 		/**	@copydoc InstanceBatch::setStaticAndUpdate */
 		void setBatchesAsStaticAndUpdate( bool bStatic );
@@ -250,7 +261,7 @@ namespace Ogre
 
 		/// Get non-updateable iterator over instance batches per material
 		InstanceBatchMapIterator getInstanceBatchMapIterator(void) const
-		{ return InstanceBatchMapIterator( m_instanceBatches.begin(), m_instanceBatches.end() ); }
+		{ return InstanceBatchMapIterator( mInstanceBatches.begin(), mInstanceBatches.end() ); }
 
 		/** Get non-updateable iterator over instance batches for given material
 			@remarks
@@ -260,7 +271,7 @@ namespace Ogre
 		*/
 		InstanceBatchIterator getInstanceBatchIterator( const String &materialName ) const
 		{
-			InstanceBatchMap::const_iterator it = m_instanceBatches.find( materialName );
+			InstanceBatchMap::const_iterator it = mInstanceBatches.find( materialName );
 			return InstanceBatchIterator( it->second.begin(), it->second.end() );
 		}
 	};

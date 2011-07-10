@@ -125,11 +125,17 @@ namespace Ogre
 		/// The camera for which the cached distance is valid
 		mutable const Camera *mCachedCamera;
 
+		/// Tells that the list of entity instances with shared transforms has changed
+		bool mTransformSharingDirty;
+
+
 		virtual void setupVertices( const SubMesh* baseSubMesh ) = 0;
 		virtual void setupIndices( const SubMesh* baseSubMesh ) = 0;
 		virtual void createAllInstancedEntities(void);
 		virtual void deleteAllInstancedEntities(void);
 		virtual void deleteUnusedInstancedEntities(void);
+		/// Creates a new InstancedEntity instance
+		virtual InstancedEntity* generateInstancedEntity(size_t num);
 
 		/** Takes an array of 3x4 matrices and makes it camera relative. Note the second argument
 			takes number of floats in the array, not number of matrices. Assumes mCachedCamera
@@ -293,6 +299,14 @@ namespace Ogre
 				Removed instanced entities save little CPU time, but _not_ GPU
         */
 		void removeInstancedEntity( InstancedEntity *instancedEntity );
+
+		/** Tells whether world bone matrices need to be calculated.
+			This does not include bone matrices which are calculated regardless
+        */
+		virtual bool useBoneWorldMatrices() const { return true; }
+
+		/** Tells that the list of entity instances with shared transforms has changed */
+		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
 		//Renderable overloads
 		const MaterialPtr& getMaterial(void) const		{ return m_material; }
