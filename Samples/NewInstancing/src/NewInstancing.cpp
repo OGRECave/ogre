@@ -429,7 +429,7 @@ void Sample_NewInstancing::defragmentBatches()
 void Sample_NewInstancing::setupGUI()
 {
 	mTechniqueMenu = mTrayMgr->createLongSelectMenu(
-		TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 300, 200, 5);
+		TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 450, 350, 5);
 	for( int i=0; i<NUM_TECHNIQUES+1; ++i )
 	{
 		String text = c_instancingTechniques[i];
@@ -457,9 +457,9 @@ void Sample_NewInstancing::setupGUI()
 	mSetStatic->setChecked(false);
 
 	//Controls to control batch defragmentation on the fly
-	mDefragmentBatches =  mTrayMgr->createButton(TL_TOP, "DefragmentBatches",
+	mDefragmentBatches =  mTrayMgr->createButton(TL_RIGHT, "DefragmentBatches",
 		"Defragment Batches", 175);
-	mDefragmentOptimumCull = mTrayMgr->createCheckBox(TL_TOP, "DefragmentOptimumCull",
+	mDefragmentOptimumCull = mTrayMgr->createCheckBox(TL_RIGHT, "DefragmentOptimumCull",
 		"Optimum Cull", 175);
 	mDefragmentOptimumCull->setChecked(true);
 
