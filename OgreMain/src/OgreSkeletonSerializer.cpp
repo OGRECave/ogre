@@ -44,7 +44,7 @@ THE SOFTWARE.
 namespace Ogre {
     /// stream overhead = ID + size
     const long SSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
-	const uint16 HEADER_STREAM_ID = 0x1000;
+	const uint16 HEADER_STREAM_ID_EXT = 0x1000;
 	//---------------------------------------------------------------------
     SkeletonSerializer::SkeletonSerializer()
     {
@@ -445,7 +445,7 @@ namespace Ogre {
 		// Read header ID
 		readShorts(stream, &headerID, 1);
 
-		if (headerID == HEADER_STREAM_ID)
+		if (headerID == HEADER_STREAM_ID_EXT)
 		{
 			// Read version
 			String ver = readString(stream);
