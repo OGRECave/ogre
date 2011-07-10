@@ -59,29 +59,33 @@ namespace Ogre
 		OGRE_LOCK_AUTO_MUTEX
         if ((mLogLevel + lml) >= OGRE_LOG_THRESHOLD)
         {
+			bool skipThisMessage = false;
             for( mtLogListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
-                (*i)->messageLogged( message, lml, maskDebug, mLogName );
-
-			if (mDebugOut && !maskDebug)
-                std::cerr << message << std::endl;
-
-            // Write time into log
-			if (!mSuppressFile)
+                (*i)->messageLogged( message, lml, maskDebug, mLogName, skipThisMessage);
+			
+			if (!skipThisMessage)
 			{
-				if (mTimeStamp)
-			    {
-                    struct tm *pTime;
-                    time_t ctTime; time(&ctTime);
-                    pTime = localtime( &ctTime );
-                    mfpLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
-                        << ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
-                        << ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
-                        << ": ";
-                }
-                mfpLog << message << std::endl;
+				if (mDebugOut && !maskDebug)
+					std::cerr << message << std::endl;
 
-				// Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
-				mfpLog.flush();
+				// Write time into log
+				if (!mSuppressFile)
+				{
+					if (mTimeStamp)
+					{
+						struct tm *pTime;
+						time_t ctTime; time(&ctTime);
+						pTime = localtime( &ctTime );
+						mfpLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
+							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
+							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
+							<< ": ";
+					}
+					mfpLog << message << std::endl;
+
+					// Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
+					mfpLog.flush();
+				}
 			}
         }
     }
