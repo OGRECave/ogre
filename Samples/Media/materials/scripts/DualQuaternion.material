@@ -35,15 +35,16 @@ material spine
 	{
 		pass
 		{
-			ambient 0.101961 0.313726 0.745098 1
+			//ambient 0.101961 0.313726 0.745098 1
 			diffuse 0.117647 0.572549 0.862745 1
-			specular 0.72549 0.898039 0.898039 1 31
+			specular 0 0 0 1 0
+			ambient 0 0 0 1
 
 			// RT Shader system section.
  			rtshader_system
  			{	 	
  				// Override lighting stage with per pixel lighting. 			
- 				hardware_skinning 2 2 linear			
+ 				hardware_skinning 2 2 linear	
  			}
 		}
 	}
@@ -56,15 +57,16 @@ material spineDualQuat
 	{
 		pass
 		{
-			ambient 0.101961 0.313726 0.745098 1
+			ambient 0 0 0 1
 			diffuse 0.117647 0.572549 0.862745 1
-			specular 0.72549 0.898039 0.898039 1 31
+			specular 0 0 0 1 0
+			//specular 0.72549 0.898039 0.898039 1 31
 
 			// RT Shader system section.
  			rtshader_system
  			{	 	
  				// Override lighting stage with per pixel lighting. 			
- 				hardware_skinning 2 2 dual_quaternion true true				
+ 				hardware_skinning 2 2 dual_quaternion true true			
  			}
 		}
 	}

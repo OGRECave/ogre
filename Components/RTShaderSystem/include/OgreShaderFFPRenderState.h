@@ -84,6 +84,7 @@ enum FFPShaderStage
 #define FFP_FUNC_SUBTRACT							"FFP_Subtract"
 #define FFP_FUNC_LERP								"FFP_Lerp"
 #define FFP_FUNC_DOTPRODUCT							"FFP_DotProduct"
+#define FFP_FUNC_NORMALIZE							"FFP_Normalize"
 
 // Fixed Function Library: Transform functions
 #define FFP_LIB_TRANSFORM							"FFPLib_Transform"

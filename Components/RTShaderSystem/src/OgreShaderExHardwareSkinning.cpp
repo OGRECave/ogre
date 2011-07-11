@@ -361,7 +361,7 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(cons
 	{
 		return mCustomShadowReceiverMaterialsDualQuaternion[index];
 	}
-	else //if(skinningType = HardwareSkinning::ST_LINEAR)
+	else //if(skinningType == HardwareSkinning::ST_LINEAR)
 	{
 		return mCustomShadowReceiverMaterialsLinear[index];
 	}

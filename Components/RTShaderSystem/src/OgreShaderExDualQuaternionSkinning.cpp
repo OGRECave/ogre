@@ -83,7 +83,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 
 	//output param
 	mParamOutPositionProj = vsMain->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
-
+	
 	//check if parameter retrival went well
 	bool isValid =
 		(mParamInPosition.get() != NULL) &&
@@ -188,6 +188,7 @@ bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
 	addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
 	addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
 	addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
+
 	return true;
 }
 
@@ -277,14 +278,24 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 	{
 		if(mScalingShearingSupport)
 		{
-			//curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_CALCULATE_BLEND_NORMAL, FFP_VS_TRANSFORM, funcCounter++);
-			//curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
-			//curFuncInvocation->pushOperand(mParamBlendDQ, Operand::OPS_IN);
-			//curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
-			//vsMain->addAtomInstance(curFuncInvocation);
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(mParamBlendS, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamTempFloat3x3, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(mParamTempFloat3x3, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+
+			//Need to normalize again after transforming the normal
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_NORMALIZE, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_INOUT);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 		
-		//update back the original position relative to the object
+		//Transform the normal according to the dual quaternion
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_CALCULATE_BLEND_NORMAL, FFP_VS_TRANSFORM, funcCounter++);
 		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mParamBlendDQ, Operand::OPS_IN);
@@ -296,7 +307,7 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 		curFuncInvocation->pushOperand(mParamInInvWorldMatrix, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(pNormalWorldRelatedParam, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_OUT);
-		vsMain->addAtomInstance(curFuncInvocation);	
+		vsMain->addAtomInstance(curFuncInvocation);
 	}
 	else
 	{

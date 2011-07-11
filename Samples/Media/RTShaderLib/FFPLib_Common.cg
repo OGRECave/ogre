@@ -239,5 +239,10 @@ void FFP_DotProduct(in float4 vIn0, in float4 vIn1, out float4 vOut)
 	vOut = dot(vIn0, vIn1);
 }
 
+//-----------------------------------------------------------------------------
+void FFP_Normalize(inout float3 vIn)
+{
+	vIn /= length(vIn);
+}
 
 

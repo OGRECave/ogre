@@ -94,7 +94,7 @@ protected:
 		mSceneMgr->setShadowTextureCount(2);
 
 		// add a little ambient lighting
-		mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+		mSceneMgr->setAmbientLight(ColourValue(0.0,0.0,0.0));//ColourValue(0.5, 0.5, 0.5));
 
 		SceneNode* lightsBbsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		BillboardSet* bbs;
@@ -105,22 +105,22 @@ protected:
 		lightsBbsNode->attachObject(bbs);
 
 
-		// add a blue spotlight
-		Light* l = mSceneMgr->createLight();
+// 		// add a blue spotlight
+ 		Light* l = mSceneMgr->createLight();
 		Vector3 dir;
-		l->setType(Light::LT_SPOTLIGHT);
-		l->setPosition(-40, 180, -10);
-		dir = -l->getPosition();
-		dir.normalise();
-		l->setDirection(dir);
-		l->setDiffuseColour(0.0, 0.0, 0.5);
-		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+// 		l->setType(Light::LT_SPOTLIGHT);
+// 		l->setPosition(-40, 180, -10);
+// 		dir = -l->getPosition();
+// 		dir.normalise();
+// 		l->setDirection(dir);
+// 		l->setDiffuseColour(0.0, 0.0, 0.5);
+// 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
 
 
 		// add a green spotlight.
 		l = mSceneMgr->createLight();
 		l->setType(Light::LT_SPOTLIGHT);
-		l->setPosition(0, 150, -100);
+		l->setPosition(0, 150, 100);
 		dir = -l->getPosition();
 		dir.normalise();
 		l->setDirection(dir);
@@ -148,7 +148,7 @@ protected:
 	void setupModels()
 	{
 		SceneNode* sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		sn->translate(0, 0, -20, Node::TS_LOCAL);
+		sn->translate(0, 0, 20, Node::TS_LOCAL);
 
 		//Create and attach a spine entity with standard skinning
 		ent = mSceneMgr->createEntity("Spine", "spine.mesh");
@@ -158,7 +158,7 @@ protected:
 		sn->scale(Vector3(20,20,20));
 
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		sn->translate(0, 0, 20, Node::TS_LOCAL);
+		sn->translate(0, 0, -20, Node::TS_LOCAL);
 
 		//Create and attach a spine entity with dual quaternion skinning
 		entDQ = mSceneMgr->createEntity("SpineDQ", "spine.mesh");

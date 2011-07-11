@@ -24,9 +24,9 @@ void SGX_CalculateBlendPosition(in float4 position, in float2x4 blendDQ, out flo
 	vOut = float4(blendPosition, 1.0);
 }
 
-void SGX_CalculateBlendNormal(in float3 normal, in float2x4 blendDQ, out float3 vOut)
+void SGX_CalculateBlendNormal(in float3 vIn, in float2x4 blendDQ, out float3 vOut)
 {
-	vOut = normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal) + blendDQ[0].x*normal);
+	vOut = (vIn + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, vIn) + blendDQ[0].x*vIn));
 }
 
 void SGX_NormalizeDualQuaternion(inout float2x4 dq)
@@ -34,7 +34,7 @@ void SGX_NormalizeDualQuaternion(inout float2x4 dq)
 	dq /= length(dq[0]);
 }
 
-void SGX_AdjointTransposeMatrix(in float3x3 M, out float3x3 vOut)
+void SGX_AdjointTransposeMatrix(in float3x4 M, out float3x3 vOut)
 {
 	float3x3 atM;
 	atM._m00 = M._m22 * M._m11 - M._m12 * M._m21;
