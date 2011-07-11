@@ -99,7 +99,7 @@ namespace Ogre
 
 		//Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
-		InstancedEntityVec m_sharingPartners;
+		InstancedEntityVec mSharingPartners;
 
 		//Returns number of matrices written to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;

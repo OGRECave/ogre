@@ -78,14 +78,14 @@ namespace Ogre
 		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					mMatricesPerInstance; //number of bone matrices per instance
-		size_t					m_numWorldMatrices;	//Num bones * num instances
-		TexturePtr				m_matrixTexture;	//The VTF
+		size_t					mNumWorldMatrices;	//Num bones * num instances
+		TexturePtr				mMatrixTexture;	//The VTF
 
 		//Used when all matrices from each instance must be in the same row (i.e. HW Instancing).
 		//A few pixels are wasted, but resizing the texture puts the danger of not sampling the
 		//right pixel... (in theory it should work, but in practice doesn't)
-		size_t					m_widthFloatsPadding;
-		size_t					m_maxFloatsPerLine;
+		size_t					mWidthFloatsPadding;
+		size_t					mMaxFloatsPerLine;
 
 		// The state of the usage of bone matrix lookup
 		bool mUseBoneMatrixLookup;
@@ -152,7 +152,7 @@ namespace Ogre
 		Note this feature only works in VTF_HW for now.
 		This value needs to be set before adding any instanced entities
 		*/
-		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances) { assert(m_instancedEntities.empty()); 
+		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances) { assert(mInstancedEntities.empty()); 
 			mUseBoneMatrixLookup = enable; }
 
 		/** Tells whether to use bone matrix lookup

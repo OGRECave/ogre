@@ -215,7 +215,8 @@ void Sample_NewInstancing::switchInstancingTechnique()
 
 	//Show/hide "static" button, and restore config. Do this _after_ createSceneNodes()
 	if( mInstancingTechnique == InstanceManager::HWInstancingBasic ||
-		mInstancingTechnique == InstanceManager::HWInstancingVTF )
+		mInstancingTechnique == InstanceManager::HWInstancingVTF ||
+		mInstancingTechnique == InstanceManager::HWInstancingVTF + 1) // instancing with lookup
 	{
 		if( mSetStatic->isChecked() )
 			mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );

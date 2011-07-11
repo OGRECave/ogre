@@ -113,7 +113,7 @@ namespace Ogre
 		}
 		slave->mSharedTransformEntity = this;
 		//The sharing partners are kept in the parent entity 
-		this->m_sharingPartners.push_back( slave );
+		this->mSharingPartners.push_back( slave );
 		
 		slave->mBatchOwner->_markTransformSharingDirty();
 	}
@@ -128,14 +128,14 @@ namespace Ogre
 		else
 		{
 			//Tell the ones sharing skeleton with us to use their own
-			InstancedEntityVec::const_iterator itor = m_sharingPartners.begin();
-			InstancedEntityVec::const_iterator end  = m_sharingPartners.end();
+			InstancedEntityVec::const_iterator itor = mSharingPartners.begin();
+			InstancedEntityVec::const_iterator end  = mSharingPartners.end();
 			while( itor != end )
 			{
 				(*itor)->stopSharingTransform();
 				++itor;
 			}
-			m_sharingPartners.clear();
+			mSharingPartners.clear();
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -279,11 +279,11 @@ namespace Ogre
 		{
 			//Tell the ones sharing skeleton with us to use their own
 			//sharing partners will remove themselves from notifyUnlink
-			while( m_sharingPartners.empty() == false )
+			while( mSharingPartners.empty() == false )
 			{
-				m_sharingPartners.front()->stopSharingTransform();
+				mSharingPartners.front()->stopSharingTransform();
 			}
-			m_sharingPartners.clear();
+			mSharingPartners.clear();
 
 			OGRE_DELETE mSkeletonInstance;
 			OGRE_DELETE mAnimationState;
@@ -318,14 +318,14 @@ namespace Ogre
 	void InstancedEntity::notifyUnlink( const InstancedEntity *slave )
 	{
 		//Find the slave and remove it
-		InstancedEntityVec::iterator itor = m_sharingPartners.begin();
-		InstancedEntityVec::iterator end  = m_sharingPartners.end();
+		InstancedEntityVec::iterator itor = mSharingPartners.begin();
+		InstancedEntityVec::iterator end  = mSharingPartners.end();
 		while( itor != end )
 		{
 			if( *itor == slave )
 			{
-				std::swap(*itor,m_sharingPartners.back());
-				m_sharingPartners.pop_back();
+				std::swap(*itor,mSharingPartners.back());
+				mSharingPartners.pop_back();
 				break;
 			}
 

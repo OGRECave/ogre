@@ -60,8 +60,8 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW : public InstanceBatch
 	{
-		bool	m_removeOwnVertexData;
-		bool	m_keepStatic;
+		bool	mRemoveOwnVertexData;
+		bool	mKeepStatic;
 
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
@@ -96,7 +96,7 @@ namespace Ogre
 		*/
 		void setStaticAndUpdate( bool bStatic );
 
-		bool isStatic() const						{ return m_keepStatic; }
+		bool isStatic() const						{ return mKeepStatic; }
 
 		//Renderable overloads
 		void getWorldTransforms( Matrix4* xform ) const;
