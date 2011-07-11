@@ -51,12 +51,14 @@ class HardwareSkinningFactory;
 Meaning, this sub render states adds calculations which multiply
 the points and normals by their assigned bone matricies.
 */
-class _OgreRTSSExport HardwareSkinningTechnique
+class _OgreRTSSExport HardwareSkinningTechnique : public RTShaderSystemAlloc
 {
 // Interface.
 public:
 	/** Class default constructor */
 	HardwareSkinningTechnique();
+
+	virtual ~HardwareSkinningTechnique();
 
 	/**
 	@see SubRenderState::copyFrom.

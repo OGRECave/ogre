@@ -57,6 +57,11 @@ HardwareSkinningTechnique::HardwareSkinningTechnique() :
 }
 
 //-----------------------------------------------------------------------
+HardwareSkinningTechnique::~HardwareSkinningTechnique()
+{
+}
+
+//-----------------------------------------------------------------------
 void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling, bool scalingShearingSupport)
 {
 	mBoneCount = std::min<ushort>(boneCount,256);
