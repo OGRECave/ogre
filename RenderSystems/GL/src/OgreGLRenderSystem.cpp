@@ -48,6 +48,7 @@ THE SOFTWARE.s
 #include "OgreGLDepthBuffer.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLContext.h"
+#include "OgreGLSLProgramFactory.h"
 
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLPBRenderTexture.h"

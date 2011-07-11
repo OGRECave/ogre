@@ -817,8 +817,6 @@ namespace Ogre {
         scaled.front = data.front;
         scaled.back = data.back;
 
-        GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(data.format);
-        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(data.format);
         width = data.getWidth();
         height = data.getHeight();
 
@@ -828,8 +826,8 @@ namespace Ogre {
 
         for (int mip = 0; mip <= level; mip++)
         {
-            glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
-            dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
+            GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
+            GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
 
             glTexImage2D(mFaceTarget,
                          mip,

@@ -116,14 +116,14 @@ namespace Ogre {
 			D3DPRESENT_PARAMETERS	presentParameters;				// Present parameters of the render window.
 			bool					acquired;						// True if resources acquired.			
 		};		
-		typedef map<D3D9RenderWindow*, RenderWindowResources*>::type RenderWindowToResorucesMap;
-		typedef RenderWindowToResorucesMap::iterator				 RenderWindowToResorucesIterator;
+		typedef map<D3D9RenderWindow*, RenderWindowResources*>::type RenderWindowToResourcesMap;
+		typedef RenderWindowToResourcesMap::iterator				 RenderWindowToResourcesIterator;
 
-		RenderWindowToResorucesMap mMapRenderWindowToResoruces;		// Map between render window to resources.
+		RenderWindowToResourcesMap mMapRenderWindowToResources;		// Map between render window to resources.
 
 
 	protected:
-		RenderWindowToResorucesIterator getRenderWindowIterator (D3D9RenderWindow* renderWindow);
+		RenderWindowToResourcesIterator getRenderWindowIterator (D3D9RenderWindow* renderWindow);
 
 		bool					acquire							(D3D9RenderWindow* renderWindow);
 		bool					reset							();
@@ -133,7 +133,7 @@ namespace Ogre {
 		void					createD3D9Device				();
 		void					releaseD3D9Device				();
 		void					releaseRenderWindowResources	(RenderWindowResources* renderWindowResources);
-		void					acquireRenderWindowResources	(RenderWindowToResorucesIterator it);		
+		void					acquireRenderWindowResources	(RenderWindowToResourcesIterator it);		
 		void					setupDeviceStates				();
 		void					notifyDeviceLost				();
 

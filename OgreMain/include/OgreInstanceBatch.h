@@ -67,7 +67,7 @@ namespace Ogre
 		<b>As it happens with instancing in general, all instanced entities from the same batch will share
 		the same textures and materials</b>
 		@par
-		Each InstanceBatch preallocates a fixed amount of m_instancesPerBatch instances once it's been
+		Each InstanceBatch preallocates a fixed amount of mInstancesPerBatch instances once it's been
 		built (@see build, @see buildFrom).
 		@See createInstancedEntity and @see removeInstancedEntity on how to retrieve those instances
 		remove them from scene.
@@ -89,47 +89,53 @@ namespace Ogre
 	public:
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 	protected:
-		RenderOperation		m_renderOperation;
-		size_t				m_instancesPerBatch;
+		RenderOperation		mRenderOperation;
+		size_t				mInstancesPerBatch;
 
-		InstanceManager		*m_creator;
+		InstanceManager		*mCreator;
 
-		MaterialPtr			m_material;
+		MaterialPtr			mMaterial;
 
-		MeshPtr				 m_meshReference;
-		Mesh::IndexMap const *m_indexToBoneMap;
+		MeshPtr				 mMeshReference;
+		Mesh::IndexMap const *mIndexToBoneMap;
 
 		//InstancedEntities are all allocated at build time and kept as "unused"
 		//when they're requested, they're removed from there when requested,
 		//and put back again when they're no longer needed
-		//Note each InstancedEntity has a unique ID ranging from [0; m_instancesPerBatch)
-		InstancedEntityVec	m_instancedEntities;
-		InstancedEntityVec	m_unusedEntities;
+		//Note each InstancedEntity has a unique ID ranging from [0; mInstancesPerBatch)
+		InstancedEntityVec	mInstancedEntities;
+		InstancedEntityVec	mUnusedEntities;
 
 		//This bbox contains all (visible) instanced entities
-		AxisAlignedBox		m_fullBoundingBox;
-		Real				m_boundingRadius;
-		bool				m_boundsDirty;
-		bool				m_boundsUpdated; //Set to false by derived classes that need it
-		Camera				*m_currentCamera;
+		AxisAlignedBox		mFullBoundingBox;
+		Real				mBoundingRadius;
+		bool				mBoundsDirty;
+		bool				mBoundsUpdated; //Set to false by derived classes that need it
+		Camera				*mCurrentCamera;
 
-		unsigned short		m_materialLodIndex;
+		unsigned short		mMaterialLodIndex;
 
-		bool				m_dirtyAnimation; //Set to false at start of each _updateRenderQueue
+		bool				mDirtyAnimation; //Set to false at start of each _updateRenderQueue
 
 		//False if a technique doesn't support skeletal animation
-		bool				m_technSupportsSkeletal;
+		bool				mTechnSupportsSkeletal;
 
 		/// Cached distance to last camera for getSquaredViewDepth
 		mutable Real mCachedCameraDist;
 		/// The camera for which the cached distance is valid
 		mutable const Camera *mCachedCamera;
 
+		/// Tells that the list of entity instances with shared transforms has changed
+		bool mTransformSharingDirty;
+
+
 		virtual void setupVertices( const SubMesh* baseSubMesh ) = 0;
 		virtual void setupIndices( const SubMesh* baseSubMesh ) = 0;
 		virtual void createAllInstancedEntities(void);
 		virtual void deleteAllInstancedEntities(void);
 		virtual void deleteUnusedInstancedEntities(void);
+		/// Creates a new InstancedEntity instance
+		virtual InstancedEntity* generateInstancedEntity(size_t num);
 
 		/** Takes an array of 3x4 matrices and makes it camera relative. Note the second argument
 			takes number of floats in the array, not number of matrices. Assumes mCachedCamera
@@ -158,13 +164,13 @@ namespace Ogre
 						const String &batchName );
 		virtual ~InstanceBatch();
 
-		MeshPtr& _getMeshRef() { return m_meshReference; }
+		MeshPtr& _getMeshRef() { return mMeshReference; }
 
 		/** Raises an exception if trying to change it after being built
 		*/
 		void _setInstancesPerBatch( size_t instancesPerBatch );
 
-		const Mesh::IndexMap* _getIndexToBoneMap() const { return m_indexToBoneMap; }
+		const Mesh::IndexMap* _getIndexToBoneMap() const { return mIndexToBoneMap; }
 
 		/** Returns true if this technique supports skeletal animation
 		@remarks
@@ -172,7 +178,7 @@ namespace Ogre
 			by the derived class is faster than virtual call overhead. And both are clean
 			ways of implementing it.
 		*/
-		bool _supportsSkeletalAnimation() const { return m_technSupportsSkeletal; }
+		bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
 		/** @See InstanceManager::updateDirtyBatches */
 		void _updateBounds(void);
@@ -218,16 +224,16 @@ namespace Ogre
         */
 		virtual void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
-		const Ogre::MeshPtr& _getMeshReference(void) const { return m_meshReference; }
+		const Ogre::MeshPtr& _getMeshReference(void) const { return mMeshReference; }
 
 		/** Returns true if it can not create more InstancedEntities
 			(Num InstancedEntities == m_instancesPerBatch)
 		*/
-		bool isBatchFull(void) const { return m_unusedEntities.empty(); }
+		bool isBatchFull(void) const { return mUnusedEntities.empty(); }
 
 		/** Returns true if it no instanced entity has been requested or all of them have been removed
 		*/
-		bool isBatchUnused(void) const { return m_unusedEntities.size() == m_instancedEntities.size(); }
+		bool isBatchUnused(void) const { return mUnusedEntities.size() == mInstancedEntities.size(); }
 
 		/** Fills the input vector with the instances that are currently being used or were requested
 			Used for defragmentation, @see InstanceManager::defragmentBatches
@@ -236,19 +242,19 @@ namespace Ogre
 
 		/** @See InstanceManager::defragmentBatches
 			This function takes InstancedEntities and pushes back all entities it can fit here
-			Extra entities in m_unusedEntities are destroyed
-			(so that used + unused = m_instancedEntities.size())
+			Extra entities in mUnusedEntities are destroyed
+			(so that used + unused = mInstancedEntities.size())
 			@param optimizeCulling true will call the DoCull version, false the NoCull
 			@param Array of InstancedEntities to parent with this batch. Those reparented
 			are removed from this input vector
 			@remarks:
-			This function assumes caller holds data to m_instancedEntities! Otherwise
+			This function assumes caller holds data to mInstancedEntities! Otherwise
 			you can get memory leaks. Don't call this directly if you don't know what you're doing!
 		*/
 		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
 
 		/** @See InstanceManager::_defragmentBatchDiscard
-			Destroys unused entities and clears the m_instancedEntity container which avoids leaving
+			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
 			dangling pointers from reparented InstancedEntities
 			Usually called before deleting this pointer. Don't call directly!
 		*/
@@ -294,9 +300,17 @@ namespace Ogre
         */
 		void removeInstancedEntity( InstancedEntity *instancedEntity );
 
+		/** Tells whether world bone matrices need to be calculated.
+			This does not include bone matrices which are calculated regardless
+        */
+		virtual bool useBoneWorldMatrices() const { return true; }
+
+		/** Tells that the list of entity instances with shared transforms has changed */
+		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
+
 		//Renderable overloads
-		const MaterialPtr& getMaterial(void) const		{ return m_material; }
-		void getRenderOperation( RenderOperation& op )	{ op = m_renderOperation; }
+		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
+		void getRenderOperation( RenderOperation& op )	{ op = mRenderOperation; }
 
 		Real getSquaredViewDepth( const Camera* cam ) const;
         const LightList& getLights( void ) const;

@@ -10,6 +10,13 @@ attribute vec3 normal;
 attribute vec4 uv0;
 attribute vec4 uv1;
 attribute vec4 uv2;
+	
+#if BONE_MATRIX_LUT
+	attribute vec4 uv3;
+	attribute vec4 uv4;
+	attribute vec4 uv5;
+#endif
+
 attribute vec3 tangent;
 
 //Parameters
@@ -49,6 +56,18 @@ void main(void)
 
 	vec4 worldPos		= vertex * worldMatrix;
 	vec3 worldNorm		= normal * mat3(worldMatrix);
+
+
+#if BONE_MATRIX_LUT
+	mat4 worldCompMatrix;
+	worldCompMatrix[0] = uv3;
+	worldCompMatrix[1] = uv4;
+	worldCompMatrix[2] = uv5;
+	worldCompMatrix[3] = vec4( 0, 0, 0, 1 );
+	
+	worldPos =  worldPos * worldCompMatrix;
+	worldNorm = worldNorm * mat3(worldCompMatrix);
+#endif
 
 	//Transform the position
 	gl_Position			= viewProjMatrix * worldPos;

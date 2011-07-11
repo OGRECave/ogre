@@ -59,7 +59,10 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
-		bool	m_keepStatic;
+		bool	mKeepStatic;
+
+		//Pointer to the buffer containing the per instance vertex data
+		HardwareVertexBufferSharedPtr mInstanceVertexBuffer;
 
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
@@ -67,6 +70,14 @@ namespace Ogre
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
 		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
 			const HWBoneIdxVec &hwBoneIdx );
+
+		/** updates the vertex buffer containing the per instance data 
+		@param[in] isFirstTime Tells if this is the first time the buffer is being updated
+		@param[in] currentCamera The camera being used for render (valid when using bone matrix lookup)
+		@return The number of instances to be rendered
+		*/
+		size_t updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera);
+
 
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
@@ -90,7 +101,7 @@ namespace Ogre
 		/** @copydoc InstanceBatchHW::setStaticAndUpdate */
 		void setStaticAndUpdate( bool bStatic );
 
-		bool isStatic() const						{ return m_keepStatic; }
+		bool isStatic() const { return mKeepStatic; }
 
 		/** Overloaded to visibility on a per unit basis and finally updated the vertex texture */
 		virtual void _updateRenderQueue( RenderQueue* queue );

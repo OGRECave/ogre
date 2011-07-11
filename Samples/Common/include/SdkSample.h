@@ -163,7 +163,7 @@ namespace OgreBites
 				Ogre::TextureFilterOptions tfo;
 				unsigned int aniso;
 
-				switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
+				switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
 				{
 				case 'B':
 					newVal = "Trilinear";

@@ -44,6 +44,11 @@
 #   pragma warning (disable : 4244)
 #endif
 
+#if OGRE_UNICODE_SUPPORT
+	#define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#else
+	#define DISPLAY_STRING_TO_STRING(DS) (DS)
+#endif
 namespace OgreBites
 {
 	enum TrayLocation   // enumerator values for widget tray anchoring locations
@@ -176,7 +181,7 @@ namespace OgreBites
 		static Ogre::Real getCaptionWidth(const Ogre::DisplayString& caption, Ogre::TextAreaOverlayElement* area)
 		{
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
-			Ogre::String current = caption.asUTF8();
+			Ogre::String current = DISPLAY_STRING_TO_STRING(caption);
 			Ogre::Real lineWidth = 0;
 
 			for (unsigned int i = 0; i < current.length(); i++)
@@ -201,7 +206,7 @@ namespace OgreBites
 		static void fitCaptionToArea(const Ogre::DisplayString& caption, Ogre::TextAreaOverlayElement* area, Ogre::Real maxWidth)
 		{
 			Ogre::Font* f = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
-			Ogre::String s = caption.asUTF8();
+			Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
 			int nl = s.find('\n');
 			if (nl != -1) s = s.substr(0, nl);
@@ -448,7 +453,7 @@ namespace OgreBites
 
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName()).getPointer();
             
-			Ogre::String current = text.asUTF8();
+			Ogre::String current = DISPLAY_STRING_TO_STRING(text);
 			bool firstWord = true;
 			unsigned int lastSpace = 0;
 			unsigned int lineBegin = 0;
@@ -1425,15 +1430,15 @@ namespace OgreBites
 		{
 			for (unsigned int i = 0; i < mNames.size(); i++)
 			{
-				if (mNames[i] == paramName.asUTF8())
+				if (mNames[i] == DISPLAY_STRING_TO_STRING(paramName))
 				{
-					mValues[i] = paramValue.asUTF8();
+					mValues[i] = DISPLAY_STRING_TO_STRING(paramValue);
 					updateText();
 					return;
 				}
 			}
 
-			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + DISPLAY_STRING_TO_STRING(paramName) + "\".";
 			OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
 		}
 
@@ -1446,7 +1451,7 @@ namespace OgreBites
 				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
 			}
 
-			mValues[index] = paramValue.asUTF8();
+			mValues[index] = DISPLAY_STRING_TO_STRING(paramValue);
 			updateText();
 		}
 
@@ -1454,10 +1459,10 @@ namespace OgreBites
 		{
 			for (unsigned int i = 0; i < mNames.size(); i++)
 			{
-				if (mNames[i] == paramName.asUTF8()) return mValues[i];
+				if (mNames[i] == DISPLAY_STRING_TO_STRING(paramName)) return mValues[i];
 			}
 			
-			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + DISPLAY_STRING_TO_STRING(paramName) + "\".";
 			OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::getParamValue");
 			return "";
 		}

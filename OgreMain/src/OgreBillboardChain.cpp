@@ -137,7 +137,6 @@ namespace Ogre {
 			if (mUseTexCoords)
 			{
 				decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES);
-				offset += VertexElement::getTypeSize(VET_FLOAT2);
 			}
 
 			if (!mUseTexCoords && !mUseVertexColour)
@@ -591,7 +590,6 @@ namespace Ogre {
 							*pFloat++ = mOtherTexCoordRange[1];
 							*pFloat++ = elem.texCoord;
 						}
-						pBase = static_cast<void*>(pFloat);
 					}
 
 					if (e == seg.tail)

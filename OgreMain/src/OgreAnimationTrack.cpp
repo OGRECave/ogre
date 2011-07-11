@@ -730,6 +730,74 @@ namespace Ogre {
 		return static_cast<VertexPoseKeyFrame*>(createKeyFrame(timePos));
 	}
 	//--------------------------------------------------------------------------
+	void VertexAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
+	{
+		// Only relevant for pose animation
+		if (mAnimationType == VAT_POSE)
+		{
+			// Get keyframes
+			KeyFrame *kf1, *kf2;
+			Real t = getKeyFramesAtTime(timeIndex, &kf1, &kf2);
+			
+			VertexPoseKeyFrame* vkfOut = static_cast<VertexPoseKeyFrame*>(kf);
+			VertexPoseKeyFrame* vkf1 = static_cast<VertexPoseKeyFrame*>(kf1);
+			VertexPoseKeyFrame* vkf2 = static_cast<VertexPoseKeyFrame*>(kf2);
+			
+			// For each pose reference in key 1, we need to locate the entry in
+			// key 2 and interpolate the influence
+			const VertexPoseKeyFrame::PoseRefList& poseList1 = vkf1->getPoseReferences();
+			const VertexPoseKeyFrame::PoseRefList& poseList2 = vkf2->getPoseReferences();
+			for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
+				 p1 != poseList1.end(); ++p1)
+			{
+				Real startInfluence = p1->influence;
+				Real endInfluence = 0;
+				// Search for entry in keyframe 2 list (if not there, will be 0)
+				for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
+					 p2 != poseList2.end(); ++p2)
+				{
+					if (p1->poseIndex == p2->poseIndex)
+					{
+						endInfluence = p2->influence;
+						break;
+					}
+				}
+				// Interpolate influence
+				Real influence = startInfluence + t*(endInfluence - startInfluence);
+				
+				vkfOut->addPoseReference(p1->poseIndex, influence);
+				
+				
+			}
+			// Now deal with any poses in key 2 which are not in key 1
+			for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
+				 p2 != poseList2.end(); ++p2)
+			{
+				bool found = false;
+				for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
+					 p1 != poseList1.end(); ++p1)
+				{
+					if (p1->poseIndex == p2->poseIndex)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					// Need to apply this pose too, scaled from 0 start
+					Real influence = t * p2->influence;
+					
+					vkfOut->addPoseReference(p2->poseIndex, influence);
+
+				}
+			} // key 2 iteration
+			
+		}			
+		
+		
+	}
+	//--------------------------------------------------------------------------
 	bool VertexAnimationTrack::getVertexAnimationIncludesNormals() const
 	{
 		if (mAnimationType == VAT_NONE)

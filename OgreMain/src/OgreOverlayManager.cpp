@@ -214,11 +214,9 @@ namespace Ogre {
 					if (line.substr(0,8) == "template")
 					{
 						isATemplate = true;
-
 					}
 					else
 					{
-			
 						// So first valid data should be overlay name
 						if (StringUtil::startsWith(line, "overlay "))
 						{
@@ -237,15 +235,12 @@ namespace Ogre {
 				    // Already in overlay
                     vector<String>::type params = StringUtil::split(line, "\t\n ()");
 
-
 				    if (line == "}")
 				    {
 					    // Finished overlay
 					    pOverlay = 0;
-						isATemplate = false;
 				    }
 				    else if (parseChildren(stream,line, pOverlay, isATemplate, NULL))
-						
 				    {
 
 				    }
@@ -257,12 +252,8 @@ namespace Ogre {
 							parseAttrib(line, pOverlay);
 						}
 				    }
-
 			    }
-
 		    }
-
-
 	    }
 
 		// record as parsed

@@ -35,6 +35,18 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+	/// Skeleton compatibility versions
+	enum SkeletonVersion 
+	{
+		/// OGRE version v1.0+
+		SKELETON_VERSION_1_0,
+		/// OGRE version v1.8+
+		SKELETON_VERSION_1_8,
+		
+		/// Latest version available
+		SKELETON_VERSION_LATEST = 100
+	};
+
 	/** \addtogroup Core
 	*  @{
 	*/
@@ -55,7 +67,8 @@ namespace Ogre {
     */
     class _OgreExport SkeletonSerializer : public Serializer
     {
-    public:
+		
+	public:
         SkeletonSerializer();
         virtual ~SkeletonSerializer();
 
@@ -69,7 +82,7 @@ namespace Ogre {
 		@param endianMode The endian mode to write in
         */
         void exportSkeleton(const Skeleton* pSkeleton, const String& filename,
-			Endian endianMode = ENDIAN_NATIVE);
+			SkeletonVersion ver = SKELETON_VERSION_LATEST, Endian endianMode = ENDIAN_NATIVE);
 
         /** Exports a skeleton to the stream specified. 
         @remarks
@@ -80,7 +93,7 @@ namespace Ogre {
 		@param endianMode The endian mode to write in
         */
         void exportSkeleton(const Skeleton* pSkeleton, DataStreamPtr stream,
-			Endian endianMode = ENDIAN_NATIVE);
+			SkeletonVersion ver = SKELETON_VERSION_LATEST, Endian endianMode = ENDIAN_NATIVE);
         /** Imports Skeleton and animation data from a .skeleton file DataStream.
         @remarks
             This method imports data from a DataStream opened from a .skeleton file and places it's
@@ -93,18 +106,22 @@ namespace Ogre {
         // TODO: provide Cal3D importer?
 
     protected:
-        // Internal export methods
-        void writeSkeleton(const Skeleton* pSkel);
+		
+		void setWorkingVersion(SkeletonVersion ver);
+		
+		// Internal export methods
+		void writeSkeleton(const Skeleton* pSkel, SkeletonVersion ver);
         void writeBone(const Skeleton* pSkel, const Bone* pBone);
         void writeBoneParent(const Skeleton* pSkel, unsigned short boneId, unsigned short parentId);
-        void writeAnimation(const Skeleton* pSkel, const Animation* anim);
+		void writeAnimation(const Skeleton* pSkel, const Animation* anim, SkeletonVersion ver);
         void writeAnimationTrack(const Skeleton* pSkel, const NodeAnimationTrack* track);
         void writeKeyFrame(const Skeleton* pSkel, const TransformKeyFrame* key);
 		void writeSkeletonAnimationLink(const Skeleton* pSkel, 
 			const LinkedSkeletonAnimationSource& link);
 
         // Internal import methods
-        void readBone(DataStreamPtr& stream, Skeleton* pSkel);
+		void readFileHeader(DataStreamPtr& stream);
+		void readBone(DataStreamPtr& stream, Skeleton* pSkel);
         void readBoneParent(DataStreamPtr& stream, Skeleton* pSkel);
         void readAnimation(DataStreamPtr& stream, Skeleton* pSkel);
         void readAnimationTrack(DataStreamPtr& stream, Animation* anim, Skeleton* pSkel);

@@ -2144,4 +2144,13 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_deleteGLBuffer(GLenum target, GLuint buffer)
+    {
+        BindBufferMap::iterator i = mActiveBufferMap.find(target);
+        if (i != mActiveBufferMap.end())
+        {
+            if((*i).second == buffer)
+                mActiveBufferMap.erase(i);
+        }
+    }
 }

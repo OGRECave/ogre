@@ -49,27 +49,25 @@ namespace Ogre
 		const MaterialPtr &material, size_t instancesPerBatch, 
 		const Mesh::IndexMap *indexToBoneMap, const String &batchName )
 			: BaseInstanceBatchVTF( creator, meshReference, material, 
-									instancesPerBatch, indexToBoneMap, batchName ),
-			  m_keepStatic( false )
+									instancesPerBatch, indexToBoneMap, batchName),
+			  mKeepStatic( false )
 	{
-
 	}
 	//-----------------------------------------------------------------------
 	InstanceBatchHW_VTF::~InstanceBatchHW_VTF()
 	{
-
 	}	
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::setupVertices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.vertexData = OGRE_NEW VertexData();
+		mRenderOperation.vertexData = OGRE_NEW VertexData();
 
-		VertexData *thisVertexData = m_renderOperation.vertexData;
+		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
 
 		thisVertexData->vertexStart = 0;
 		thisVertexData->vertexCount = baseVertexData->vertexCount;
-		m_renderOperation.numberOfInstances = m_instancesPerBatch;
+		mRenderOperation.numberOfInstances = mInstancesPerBatch;
 
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration(
 																	thisVertexData->vertexDeclaration );
@@ -91,7 +89,7 @@ namespace Ogre
 		//Remove the blend weights & indices
 		HWBoneIdxVec hwBoneIdx;
 		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
-		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
 			retrieveBoneIdx( baseVertexData, hwBoneIdx );
 
@@ -108,22 +106,15 @@ namespace Ogre
 	{
 		//We could use just a reference, but the InstanceManager will in the end attampt to delete
 		//the pointer, and we can't give it something that doesn't belong to us.
-		m_renderOperation.indexData = baseSubMesh->indexData->clone( true );
+		mRenderOperation.indexData = baseSubMesh->indexData->clone( true );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::createVertexSemantics( VertexData *thisVertexData,
 														 VertexData *baseVertexData,
 														 const HWBoneIdxVec &hwBoneIdx )
 	{
-		const float texWidth  = static_cast<float>(m_matrixTexture->getWidth());
-		const float texHeight = static_cast<float>(m_matrixTexture->getHeight());
-
-		//Calculate the texel offsets to correct them offline
-		//Akwardly enough, the offset is needed in OpenGL too
-		Vector2 texelOffsets;
-		//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
-		texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
-		texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
+		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
+		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
 
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 16 bytes aligned :-)
@@ -158,48 +149,131 @@ namespace Ogre
 
 		vertexBuffer->unlock();
 
-		const size_t numBones = m_numWorldMatrices / m_instancesPerBatch;
 		//Now create the instance buffer that will be incremented per instance, contains UV offsets
 		newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES,
-									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() );
-
-		//Create our own vertex buffer
-		vertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
-										thisVertexData->vertexDeclaration->getVertexSize(newSource),
-										m_instancesPerBatch,
-										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
-		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
-
-		//Mark this buffer as instanced
-		vertexBuffer->setIsInstanceData( true );
-		vertexBuffer->setInstanceDataStepRate( 1 );
-
-		Vector2 *thisVec = static_cast<Vector2*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
-		const size_t maxPixelsPerLine = std::min( m_matrixTexture->getWidth(), m_maxFloatsPerLine >> 2 );
-
-		//Calculate UV offsets, which change per instance
-		for( size_t i=0; i<m_instancesPerBatch; ++i )
+		size_t offset = thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES,
+									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+		if (useBoneMatrixLookup())
 		{
-			size_t instanceIdx = i * numBones * 3;
-			thisVec->x = (instanceIdx % maxPixelsPerLine) / texWidth;
-			thisVec->y = (instanceIdx / maxPixelsPerLine) / texHeight;
-			*thisVec = *thisVec - texelOffsets;
-			++thisVec;
+			//if using bone matrix lookup we will need to add 3 more float4 to contain the matrix. containing
+			//the personal world transform of each entity.
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+
 		}
 
-		vertexBuffer->unlock();
+		//Create our own vertex buffer
+		mInstanceVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer(
+										thisVertexData->vertexDeclaration->getVertexSize(newSource),
+										mInstancesPerBatch,
+										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+		thisVertexData->vertexBufferBinding->setBinding( newSource, mInstanceVertexBuffer );
+
+		//Mark this buffer as instanced
+		mInstanceVertexBuffer->setIsInstanceData( true );
+		mInstanceVertexBuffer->setInstanceDataStepRate( 1 );
+
+		updateInstanceDataBuffer(true, NULL);
 	}
+
+	//updates the vertex buffer containing the per instance data
+	size_t InstanceBatchHW_VTF::updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera)
+	{
+		size_t visibleEntityCount = 0;
+		bool useMatrixLookup = useBoneMatrixLookup();
+		if (isFirstTime ^ useMatrixLookup)
+		{
+			//update the mTransformLookupNumber value in the entities if needed 
+			updateSharedLookupIndexes();
+
+			const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
+			const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
+
+			//Calculate the texel offsets to correct them offline
+			//Awkwardly enough, the offset is needed in OpenGL too
+			Vector2 texelOffsets;
+			//RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
+			texelOffsets.x = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texWidth;
+			texelOffsets.y = /*renderSystem->getHorizontalTexelOffset()*/ -0.5f / texHeight;
+
+			float *thisVec = static_cast<float*>(mInstanceVertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+
+			const size_t maxPixelsPerLine = std::min( mMatrixTexture->getWidth(), mMaxFloatsPerLine >> 2 );
+
+			//Calculate UV offsets, which change per instance
+			for( size_t i=0; i<mInstancesPerBatch; ++i )
+			{
+				InstancedEntity* entity = useMatrixLookup ? mInstancedEntities[i] : NULL;
+				if  //Update if we are not using a lookup bone matrix method. In this case the function will 
+					//be called only once
+					(!useMatrixLookup || 
+					//Update if we are in the visible range of the camera (for look up bone matrix method
+					//and static mode).
+					(entity->findVisible(currentCamera)))
+				{
+					size_t matrixIndex = useMatrixLookup ? entity->mTransformLookupNumber : i;
+					size_t instanceIdx = matrixIndex * mMatricesPerInstance * 3;
+					*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - texelOffsets.x;
+					*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - texelOffsets.y;
+					thisVec += 2;
+
+					if (useMatrixLookup)
+					{
+						const Matrix4& mat =  entity->getParentNode()->_getFullTransform();
+						*(thisVec)     = mat[0][0];
+						*(thisVec + 1) = mat[0][1];
+						*(thisVec + 2) = mat[0][2];
+						*(thisVec + 3) = mat[0][3];
+						*(thisVec + 4) = mat[1][0];
+						*(thisVec + 5) = mat[1][1];
+						*(thisVec + 6) = mat[1][2];
+						*(thisVec + 7) = mat[1][3];
+						*(thisVec + 8) = mat[2][0];
+						*(thisVec + 9) = mat[2][1];
+						*(thisVec + 10) = mat[2][2];
+						*(thisVec + 11) = mat[2][3];
+						if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
+						{
+							const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
+							*(thisVec + 3) -= cameraRelativePosition.x;
+							*(thisVec + 7) -= cameraRelativePosition.y;
+							*(thisVec + 11) -=  cameraRelativePosition.z;
+						}
+						thisVec += 12;
+					}
+					++visibleEntityCount;
+				}
+			}
+
+			mInstanceVertexBuffer->unlock();
+		}
+		else
+		{
+			visibleEntityCount = mInstancedEntities.size();
+		}
+		return visibleEntityCount;
+	}
+	
 	//-----------------------------------------------------------------------
 	bool InstanceBatchHW_VTF::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
 	{
 		//Max number of texture coordinates is _usually_ 8, we need at least 2 available
-		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() > 8-1 )
+		unsigned short neededTextureCoord = 2;
+		if (useBoneMatrixLookup())
 		{
-			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Given mesh must have at "
-														"least 2 free TEXCOORDs",
-						"InstanceBatchHW_VTF::checkSubMeshCompatibility");
+			//we need another 3 for the unique world transform of each instanced entity
+			neededTextureCoord += 3;
+		}
+		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() >= 8 - neededTextureCoord )
+		{
+			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
+					String("Given mesh must have at least ") + 
+					StringConverter::toString(neededTextureCoord) + "free TEXCOORDs",
+					"InstanceBatchHW_VTF::checkSubMeshCompatibility");
 		}
 
 		return InstanceBatch::checkSubMeshCompatibility( baseSubMesh );
@@ -227,7 +301,10 @@ namespace Ogre
 
 			if( flags & IM_VTFBESTFIT )
 			{
-				const size_t instancesPerBatch = std::min( retVal, m_instancesPerBatch );
+				size_t numUsedSkeletons = mInstancesPerBatch;
+				if (flags & IM_VTFBONEMATRIXLOOKUP)
+					numUsedSkeletons = std::min<size_t>(getMaxLookupTableInstances(), numUsedSkeletons);
+				const size_t instancesPerBatch = std::min( retVal, numUsedSkeletons );
 				//Do the same as in createVertexTexture(), but changing c_maxTexWidthHW for maxUsableWidth
 				const size_t numWorldMatrices = instancesPerBatch * numBones;
 
@@ -246,86 +323,116 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	size_t InstanceBatchHW_VTF::updateVertexTexture( Camera *currentCamera )
 	{
-		size_t retVal = 0;
+		size_t renderedInstances = 0;
+		bool useMatrixLookup = useBoneMatrixLookup();
+		if (useMatrixLookup)
+		{
+			//if we are using bone matrix look up we have to update the instance buffer for the 
+			//vertex texture to be relevant
 
-		m_dirtyAnimation = false;
+			//also note that in this case the number of instances to render comes directly from the 
+			//updateInstanceDataBuffer() function, not from this function.
+			renderedInstances = updateInstanceDataBuffer(false, currentCamera);
+		}
+
+		
+		mDirtyAnimation = false;
 
 		//Now lock the texture and copy the 4x3 matrices!
-		m_matrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
-		const PixelBox &pixelBox = m_matrixTexture->getBuffer()->getCurrentLock();
+		mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
+		const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
 
-		float *pDest = static_cast<float*>(pixelBox.data);
+		float *pSource = static_cast<float*>(pixelBox.data);
+		
+		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
+		
+		std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
 
-		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
-
-		size_t currentPixel = 0; //Resets on each line
-
-		while( itor != end )
+		size_t floatPerEntity = mMatricesPerInstance * 3 * 4;
+		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
+		
+		size_t instanceCount = mInstancedEntities.size();
+		size_t updatedInstances = 0;
+		for(size_t i = 0 ; i < instanceCount ; ++i)
 		{
-			//Cull on an individual basis, the less entities are visible, the less instances we draw.
-			//No need to use null matrices at all!
-			if( (*itor)->findVisible( currentCamera ) )
+			InstancedEntity* entity = mInstancedEntities[i];
+			size_t textureLookupPosition = updatedInstances;
+			if (useMatrixLookup)
 			{
-				if( m_meshReference->hasSkeleton() )
-					m_dirtyAnimation |= (*itor)->_updateAnimation();
+				textureLookupPosition = entity->mTransformLookupNumber;
+			}
+			//Check that we are not using a lookup matrix or that we have not already written
+			//The bone data
+			if (((!useMatrixLookup) || !writtenPositions[entity->mTransformLookupNumber]) &&
+				//Cull on an individual basis, the less entities are visible, the less instances we draw.
+				//No need to use null matrices at all!
+				(entity->findVisible( currentCamera )))
+			{
+				float* pDest = pSource + floatPerEntity * textureLookupPosition + 
+					(size_t)(textureLookupPosition / entitiesPerPadding) * mWidthFloatsPadding;
+				if( mMeshReference->hasSkeleton() )
+					mDirtyAnimation |= entity->_updateAnimation();
 
-				const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+				const size_t floatsWritten = entity->getTransforms3x4( pDest );
 
-				if( mManager->getCameraRelativeRendering() )
+				if( !useMatrixLookup && mManager->getCameraRelativeRendering() )
 					makeMatrixCameraRelative3x4( pDest, floatsWritten );
 
-				pDest		 += floatsWritten;
-				currentPixel += floatsWritten;
-
-				if( currentPixel >= m_maxFloatsPerLine )
+				if (useMatrixLookup)
 				{
-					currentPixel = 0;
-					pDest       += m_widthFloatsPadding;
+					writtenPositions[entity->mTransformLookupNumber] = true;
 				}
-
-				++retVal;
+				else
+				{
+					++updatedInstances;
+				}
 			}
 
 			++itor;
 		}
 
-		m_matrixTexture->getBuffer()->unlock();
+		if (!useMatrixLookup)
+		{
+			renderedInstances = updatedInstances;
+		}
 
-		return retVal;
+		mMatrixTexture->getBuffer()->unlock();
+
+		return renderedInstances;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::_boundsDirty(void)
 	{
 		//Don't update if we're static, but still mark we're dirty
-		if( !m_boundsDirty && !m_keepStatic )
-			m_creator->_addDirtyBatch( this );
-		m_boundsDirty = true;
+		if( !mBoundsDirty && !mKeepStatic )
+			mCreator->_addDirtyBatch( this );
+		mBoundsDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::setStaticAndUpdate( bool bStatic )
 	{
 		//We were dirty but didn't update bounds. Do it now.
-		if( m_keepStatic && m_boundsDirty )
-			m_creator->_addDirtyBatch( this );
+		if( mKeepStatic && mBoundsDirty )
+			mCreator->_addDirtyBatch( this );
 
-		m_keepStatic = bStatic;
-		if( m_keepStatic )
+		mKeepStatic = bStatic;
+		if( mKeepStatic )
 		{
 			//One final update, since there will be none from now on
 			//(except further calls to this function). Pass NULL because
 			//we want to include only those who were added to the scene
 			//but we don't want to perform culling
-			m_renderOperation.numberOfInstances = updateVertexTexture( 0 );
+			mRenderOperation.numberOfInstances = updateVertexTexture( 0 );
 		}
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::_updateRenderQueue( RenderQueue* queue )
 	{
-		if( !m_keepStatic )
+		if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
-			if( (m_renderOperation.numberOfInstances = updateVertexTexture( m_currentCamera )) )
+			if( (mRenderOperation.numberOfInstances = updateVertexTexture( mCurrentCamera )) )
 				queue->addRenderable( this );
 		}
 		else
@@ -338,7 +445,7 @@ namespace Ogre
 			}
 
 			//Don't update when we're static
-			if( m_renderOperation.numberOfInstances )
+			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this );
 		}
 	}

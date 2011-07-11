@@ -300,7 +300,6 @@ namespace Ogre {
 		currOffset += VertexElement::getTypeSize(VET_FLOAT3);
 		// two dimensional texture coordinates
 		vertexDecl->addElement(0, currOffset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-		currOffset += VertexElement::getTypeSize(VET_FLOAT2);
 
 		// allocate the vertex buffer
 		vertexData->vertexCount = (NUM_RINGS + 1) * (NUM_SEGMENTS+1);

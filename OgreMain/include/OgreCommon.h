@@ -311,6 +311,10 @@ namespace Ogre {
 			in the vertex texture */
 		IM_VTFBESTFIT	= 0x0002,
 
+		/** Use a limited number of skeleton animations shared among all instances. 
+		Update only that limited amount of animations in the vertex texture.*/
+		IM_VTFBONEMATRIXLOOKUP = 0x0004,
+
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT
 	};
     

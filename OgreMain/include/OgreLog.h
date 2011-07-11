@@ -77,9 +77,11 @@ namespace Ogre {
         @param maskDebug
             If we are printing to the console or not
         @param logName
-            the name of this log (so you can have several listeners for different logs, and identify them)
+            The name of this log (so you can have several listeners for different logs, and identify them)
+		@param skipThisMessage
+			If set to true by the messageLogged() implementation message will not be logged
         */
-        virtual void messageLogged( const String& message, LogMessageLevel lml, bool maskDebug, const String &logName ) = 0;
+        virtual void messageLogged( const String& message, LogMessageLevel lml, bool maskDebug, const String &logName, bool& skipThisMessage ) = 0;
     };
 
 

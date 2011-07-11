@@ -1,0 +1,154 @@
+//---------------------------------------------------------------------------
+//These materials/shaders are part of the NEW InstanceManager implementation
+//Written by Matias N. Goldberg ("dark_sylinc")
+//---------------------------------------------------------------------------
+
+//--------------------------------------------------------------
+// GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HW_VTF_LUT_glsl_vs glsl
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1 BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsl_vs glsl
+{
+	source HW_VTFInstancing.vert
+
+	preprocessor_defines DEPTH_SHADOWCASTER=1 BONE_MATRIX_LUT=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
+//--------------------------------------------------------------
+// CG Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HW_VTF_LUT_cg_vs cg
+{
+	source HW_VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWRECEIVER -DBONE_MATRIX_LUT
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs cg
+{
+	source HW_VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWCASTER -DBONE_MATRIX_LUT
+
+	uses_vertex_texture_fetch true
+}
+
+//--------------------------------------------------------------
+// Unified CG/GLSL Programs
+//--------------------------------------------------------------
+vertex_program Ogre/Instancing/HW_VTF_LUT_vs unified
+{
+	delegate Ogre/Instancing/HW_VTF_LUT_cg_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+
+		param_named_auto	depthRange					shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs unified
+{
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	depthRange					scene_depth_range
+	}
+}
+
+material Examples/Instancing/VTF/HW/LUT/shadow_caster
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs
+			{
+			}
+			fragment_program_ref Ogre/Instancing/shadow_caster_ps
+			{
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
+abstract material Examples/Instancing/VTF_LUT
+{
+	technique
+	{
+		shadow_caster_material Examples/Instancing/VTF/HW/LUT/shadow_caster
+
+		pass
+		{
+			specular	1 1 1 1 12.5
+			vertex_program_ref Ogre/Instancing/HW_VTF_LUT_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
+material Examples/Instancing/VTF/HW/LUT/Robot : Examples/Instancing/VTF_LUT
+{
+	set_texture_alias	DiffuseMap	r2skin.jpg
+}

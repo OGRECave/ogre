@@ -748,8 +748,6 @@ namespace Ogre {
         scaled.front = data.front;
         scaled.back = data.back;
 
-        GLenum glFormat = GLESPixelUtil::getGLOriginFormat(data.format);
-        GLenum dataType = GLESPixelUtil::getGLOriginDataType(data.format);
         width = data.getWidth();
         height = data.getHeight();
 
@@ -759,8 +757,8 @@ namespace Ogre {
 
         for (int mip = 0; mip <= level; mip++)
         {
-            glFormat = GLESPixelUtil::getGLOriginFormat(scaled.format);
-            dataType = GLESPixelUtil::getGLOriginDataType(scaled.format);
+            GLenum glFormat = GLESPixelUtil::getGLOriginFormat(scaled.format);
+            GLenum dataType = GLESPixelUtil::getGLOriginDataType(scaled.format);
 
             glTexImage2D(GL_TEXTURE_2D,
                          mip,

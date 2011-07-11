@@ -93,7 +93,7 @@ void FFPFog::updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoPar
 	}
 
 	// Set fog properties.
-	setFogProperties(mFogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
+	setFogProperties(fogMode, newFogColour, newFogStart, newFogEnd, newFogDensity);
 
 	// Per pixel fog.
 	if (mCalcMode == CM_PER_PIXEL)

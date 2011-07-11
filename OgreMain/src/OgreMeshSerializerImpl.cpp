@@ -3091,7 +3091,8 @@ namespace Ogre {
                 }
 
                 // Count number of triangles for this edge group
-                ++edgeGroup->triCount;
+                if(edgeGroup)
+                    ++edgeGroup->triCount;
             }
 
             //

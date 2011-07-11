@@ -513,11 +513,9 @@ namespace Ogre
 		*/
 		virtual VertexPoseKeyFrame* createVertexPoseKeyFrame(Real timePos);
 
-		/** This method in fact does nothing, since interpolation is not performed
-			inside the keyframes for this type of track. 
+		/** @copydoc AnimationTrack::getInterpolatedKeyFrame
 		*/
-        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
-        { (void)timeIndex; (void)kf; }
+        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
 
 		/// @copydoc AnimationTrack::apply
 		virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f);

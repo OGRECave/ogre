@@ -80,23 +80,26 @@ namespace Ogre
 		friend class InstanceBatchHW_VTF;
 		friend class BaseInstanceBatchVTF;
 
-		uint16				m_instanceID;			//Note it may change after defragmenting!
-		bool				m_inUse;
-		InstanceBatch		*m_batchOwner;
+		uint16 mInstanceId; //Note it may change after defragmenting!
+		bool mInUse;
+		InstanceBatch *mBatchOwner;
 
-		AnimationStateSet	*mAnimationState;
-		SkeletonInstance	*m_skeletonInstance;
-		Matrix4				*mBoneMatrices;			//Local space
-		Matrix4				*mBoneWorldMatrices;	//World space
-		Matrix4				mLastParentXform;
-		unsigned long		mFrameAnimationLastUpdated;
+		AnimationStateSet *mAnimationState;
+		SkeletonInstance *mSkeletonInstance;
+		Matrix4 *mBoneMatrices;	 //Local space
+		Matrix4 *mBoneWorldMatrices; //World space
+		Matrix4 mLastParentXform;
+		unsigned long mFrameAnimationLastUpdated;
 
-		bool				mSharedTransform;		//When true, another InstancedEntity controls
-													//the skeleton
+		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
+												
+		//Used in conjunction with bone matrix lookup. Tells the number of the transform for
+		//as arranged in the vertex texture
+		uint16 mTransformLookupNumber;
 
 		//Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
-		InstancedEntityVec m_sharingPartners;
+		InstancedEntityVec mSharingPartners;
 
 		//Returns number of matrices written to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
@@ -104,7 +107,7 @@ namespace Ogre
 		size_t getTransforms3x4( float *xform ) const;
 
 		//Returns true if this InstancedObject is visible to the current camera
-		bool findVisible( Camera *camera );
+		bool findVisible( Camera *camera ) const;
 
 		//Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
 		void createSkeletonInstance();
@@ -120,7 +123,7 @@ namespace Ogre
         static NameGenerator msNameGenerator;
 
 	public:
-		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID );
+		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL);
 		virtual ~InstancedEntity();
 
 		/** Shares the entire transformation with another InstancedEntity. This is useful when a mesh
@@ -151,7 +154,7 @@ namespace Ogre
 		*/
 		void stopSharingTransform();
 
-		InstanceBatch* _getOwner() const { return m_batchOwner; }
+		InstanceBatch* _getOwner() const { return mBatchOwner; }
 
 		const String& getMovableType(void) const;
 
@@ -171,9 +174,9 @@ namespace Ogre
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
 		/** @see Entity::hasSkeleton */
-		bool hasSkeleton(void) const { return m_skeletonInstance != 0; }
+		bool hasSkeleton(void) const { return mSkeletonInstance != 0; }
 		/** @see Entity::getSkeleton */
-		SkeletonInstance* getSkeleton(void) const { return m_skeletonInstance; }
+		SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
 
 		/** @see Entity::getAnimationState */
 		AnimationState* getAnimationState(const String& name) const;
@@ -186,6 +189,9 @@ namespace Ogre
 			@returns true if something was actually updated
 		*/
 		bool _updateAnimation(void);
+
+		/** Sets the transformation look up number */
+		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
 	};
 }
 

@@ -44,38 +44,41 @@ THE SOFTWARE.
 namespace Ogre {
     /// stream overhead = ID + size
     const long SSTREAM_OVERHEAD_SIZE = sizeof(uint16) + sizeof(uint32);
-    //---------------------------------------------------------------------
+	const uint16 HEADER_STREAM_ID_EXT = 0x1000;
+	//---------------------------------------------------------------------
     SkeletonSerializer::SkeletonSerializer()
     {
         // Version number
         // NB changed to include bone names in 1.1
-        mVersion = "[Serializer_v1.10]";
+        mVersion = "[Unknown]";
     }
     //---------------------------------------------------------------------
     SkeletonSerializer::~SkeletonSerializer()
     {
     }
+
 	//---------------------------------------------------------------------
 	void SkeletonSerializer::exportSkeleton(const Skeleton* pSkeleton, 
-		const String& filename, Endian endianMode)
+		const String& filename, SkeletonVersion ver, Endian endianMode)
 	{
 		std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
 		f->open(filename.c_str(), std::ios::binary | std::ios::out);
 		DataStreamPtr stream(OGRE_NEW FileStreamDataStream(f));
 
-		exportSkeleton(pSkeleton, stream, endianMode);
+		exportSkeleton(pSkeleton, stream, ver, endianMode);
 
 		stream->close();
 	}
     //---------------------------------------------------------------------
     void SkeletonSerializer::exportSkeleton(const Skeleton* pSkeleton, 
-		DataStreamPtr stream, Endian endianMode)
+		DataStreamPtr stream, SkeletonVersion ver, Endian endianMode)
     {
+		setWorkingVersion(ver);
 		// Decide on endian mode
 		determineEndianness(endianMode);
 
         String msg;
-        mStream = stream;
+        mStream = stream; 
 		if (!stream->isWriteable())
 		{
 			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
@@ -83,11 +86,12 @@ namespace Ogre {
 				"SkeletonSerializer::exportSkeleton");
 		}
 
+
         writeFileHeader();
 
         // Write main skeleton data
         LogManager::getSingleton().logMessage("Exporting bones..");
-        writeSkeleton(pSkeleton);
+        writeSkeleton(pSkeleton, ver);
         LogManager::getSingleton().logMessage("Bones exported.");
 
         // Write all animations
@@ -99,7 +103,7 @@ namespace Ogre {
             Animation* pAnim = pSkeleton->getAnimation(i);
 			LogManager::getSingleton().stream()
 				<< "Exporting animation: " << pAnim->getName();
-            writeAnimation(pSkeleton, pAnim);
+            writeAnimation(pSkeleton, pAnim, ver);
             LogManager::getSingleton().logMessage("Animation exported.");
 
         }
@@ -152,18 +156,29 @@ namespace Ogre {
             }
         }
 
-        // Assume bones are stored in the binding pose
+		// Assume bones are stored in the binding pose
         pSkel->setBindingPose();
 
 
     }
-    //---------------------------------------------------------------------
-    void SkeletonSerializer::writeSkeleton(const Skeleton* pSkel)
+	
+	//---------------------------------------------------------------------
+	void SkeletonSerializer::setWorkingVersion(SkeletonVersion ver)
+	{
+		if (ver == SKELETON_VERSION_1_0)
+			mVersion = "[Serializer_v1.10]";
+		else mVersion = "[Serializer_v1.80]";
+	}
+	//---------------------------------------------------------------------
+    void SkeletonSerializer::writeSkeleton(const Skeleton* pSkel, SkeletonVersion ver)
     {
 		// Write blend mode
-		writeChunkHeader(SKELETON_BLENDMODE, SSTREAM_OVERHEAD_SIZE + sizeof(unsigned short));
-		uint16 blendMode = static_cast<uint16>(pSkel->getBlendMode());
-		writeShorts(&blendMode, 1);
+		if ((int)ver > (int)SKELETON_VERSION_1_0)
+		{
+			writeChunkHeader(SKELETON_BLENDMODE, SSTREAM_OVERHEAD_SIZE + sizeof(unsigned short));
+			uint16 blendMode = static_cast<uint16>(pSkel->getBlendMode());
+			writeShorts(&blendMode, 1);
+		}
 		
         // Write each bone
         unsigned short numBones = pSkel->getNumBones();
@@ -219,7 +234,7 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void SkeletonSerializer::writeAnimation(const Skeleton* pSkel, 
-        const Animation* anim)
+        const Animation* anim, SkeletonVersion ver)
     {
         writeChunkHeader(SKELETON_ANIMATION, calcAnimationSize(pSkel, anim));
 
@@ -229,22 +244,25 @@ namespace Ogre {
         float len = anim->getLength();
         writeFloats(&len, 1);
 		
-		if (anim->getUseBaseKeyFrame())
+		if ((int)ver > (int)SKELETON_VERSION_1_0)
 		{
-			size_t size = SSTREAM_OVERHEAD_SIZE;
-			// char* baseAnimationName (including terminator)
-			size += anim->getBaseKeyFrameAnimationName().length() + 1;
-			// float baseKeyFrameTime
-			size += sizeof(float);
-			
-			writeChunkHeader(SKELETON_ANIMATION_BASEINFO, size);
-			
-			// char* baseAnimationName (blank for self)
-			writeString(anim->getBaseKeyFrameAnimationName());
-			
-			// float baseKeyFrameTime
-			float t = (float)anim->getBaseKeyFrameTime();
-			writeFloats(&t, 1);
+			if (anim->getUseBaseKeyFrame())
+			{
+				size_t size = SSTREAM_OVERHEAD_SIZE;
+				// char* baseAnimationName (including terminator)
+				size += anim->getBaseKeyFrameAnimationName().length() + 1;
+				// float baseKeyFrameTime
+				size += sizeof(float);
+				
+				writeChunkHeader(SKELETON_ANIMATION_BASEINFO, size);
+				
+				// char* baseAnimationName (blank for self)
+				writeString(anim->getBaseKeyFrameAnimationName());
+				
+				// float baseKeyFrameTime
+				float t = (float)anim->getBaseKeyFrameTime();
+				writeFloats(&t, 1);
+			}
 		}
 
         // Write all tracks
@@ -419,7 +437,34 @@ namespace Ogre {
 
         return size;
     }
-    //---------------------------------------------------------------------
+	//---------------------------------------------------------------------
+	void SkeletonSerializer::readFileHeader(DataStreamPtr& stream)
+	{
+		unsigned short headerID;
+
+		// Read header ID
+		readShorts(stream, &headerID, 1);
+
+		if (headerID == HEADER_STREAM_ID_EXT)
+		{
+			// Read version
+			String ver = readString(stream);
+			if ((ver != "[Serializer_v1.10]") &&
+				(ver != "[Serializer_v1.80]"))
+			{
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+					"Invalid file: version incompatible, file reports " + String(ver),
+					"Serializer::readFileHeader");
+			}
+			mVersion = ver;
+		}
+		else
+		{
+			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Invalid file: no header", 
+				"Serializer::readFileHeader");
+		}
+	}
+	//---------------------------------------------------------------------
     void SkeletonSerializer::readBone(DataStreamPtr& stream, Skeleton* pSkel)
     {
         // char* name

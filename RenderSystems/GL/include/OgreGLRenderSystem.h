@@ -33,11 +33,14 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreGLHardwareBufferManager.h"
 #include "OgreGLGpuProgramManager.h"
-#include "OgreGLSLProgramFactory.h"
 #include "OgreVector4.h"
 
+
 namespace Ogre {
-    /**
+    
+	class GLSLProgramFactory;
+
+	/**
       Implementation of GL as a rendering system.
      */
     class _OgreGLExport GLRenderSystem : public RenderSystem

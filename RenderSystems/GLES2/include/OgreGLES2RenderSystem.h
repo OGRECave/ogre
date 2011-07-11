@@ -492,6 +492,7 @@ namespace Ogre {
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
             void _bindGLBuffer(GLenum target, GLuint buffer);
+            void _deleteGLBuffer(GLenum target, GLuint buffer);
     };
 }
 

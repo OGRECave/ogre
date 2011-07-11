@@ -96,7 +96,6 @@ namespace Ogre {
 			offset += VertexElement::getTypeSize(VET_FLOAT3);
 			// Texcoords
 			decl->addElement(POS_TEX_BINDING, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-			offset += VertexElement::getTypeSize(VET_FLOAT2);
 			// Colours - store these in a separate buffer because they change less often
 			decl->addElement(COLOUR_BINDING, 0, VET_COLOUR, VES_DIFFUSE);
 
