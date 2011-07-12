@@ -93,7 +93,7 @@ void TestContext::setup()
         if (setName != "")
         {
             mTestSets[setName] = Ogre::StringVector();
-            std::multimap<Ogre::String,Ogre::String>::iterator it = sections.peekNextValue()->begin();
+            Ogre::ConfigFile::SettingsMultiMap::iterator it = sections.peekNextValue()->begin();
             for (it; it != sections.peekNextValue()->end(); ++it)
                 mTestSets[setName].push_back(it->second);
         }
