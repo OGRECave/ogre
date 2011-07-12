@@ -8,7 +8,13 @@
 #-------------------------------------------------------------------
 
 set(HEADER_FILES
-    include/TestContext.h)
+    include/TestContext.h
+	../Common/include/ImageCompare.h
+	../Common/include/TestBatch.h
+	../Common/include/TestResults.h
+	../Common/include/VisualTest.h
+	../Common/include/TinyHTML.h
+	)
 
 set(SOURCE_FILES
     src/TestContext.cpp)

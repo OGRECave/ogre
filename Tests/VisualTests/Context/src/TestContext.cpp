@@ -350,7 +350,7 @@ void TestContext::finishedTests()
         // look for a reference set first
         Ogre::ConfigFile info;
         bool foundReference = true;
-        
+
         try
         {
             info.load(mOutputDir + mCompareWith + "/info.cfg");

@@ -77,16 +77,16 @@ public:
         // load manually, so this can be done without all of Ogre initialized (i.e. for a 
         // command line utility for comparing test sets or something to that effect)
         // The FreeImage codecs must be loaded for this to work, but no resource stuff is needed.
-        std::ifstream file1(Ogre::String(mDirectory1 + "/" + image + ".png").c_str());
-        std::ifstream file2(Ogre::String(mDirectory2 + "/" + image + ".png").c_str());
+        std::ifstream file1(Ogre::String(mDirectory1 + "/" + image + ".png").c_str(), std::ios::in | std::ios::binary);
+        std::ifstream file2(Ogre::String(mDirectory2 + "/" + image + ".png").c_str(), std::ios::in | std::ios::binary);
         Ogre::DataStreamPtr data1 = Ogre::DataStreamPtr(
             OGRE_NEW Ogre::FileStreamDataStream(&file1, false));
         Ogre::DataStreamPtr data2 = Ogre::DataStreamPtr(
             OGRE_NEW Ogre::FileStreamDataStream(&file2, false));
         Ogre::Image img1 = Ogre::Image();
         Ogre::Image img2 = Ogre::Image();
-        img1.load(data1);
-        img2.load(data2);
+        img1.load(data1, "png");
+        img2.load(data2, "png");
 
         // do the actual comparison
         compare(img1,img2,out);
