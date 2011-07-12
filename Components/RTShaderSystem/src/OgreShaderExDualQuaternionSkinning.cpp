@@ -118,7 +118,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
 		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
 		
-		mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatix", GCT_MATRIX_2X4);
+		mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatrix", GCT_MATRIX_2X4);
 		mParamBlendDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendDQ", GCT_MATRIX_2X4);
 				
 		if(mScalingShearingSupport)
@@ -361,7 +361,7 @@ void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int inde
 								ParameterPtr& pWorldMatrix, ParameterPtr& pPositionTempParameter,
 								ParameterPtr& pPositionRelatedOutputParam, int& funcCounter)
 {
-	int indexMask = indexToMask(index);
+	Operand::OpMask indexMask = indexToMask(index);
 	FunctionInvocation* curFuncInvocation;
 
 	//multiply position with world matrix and put into temporary param
