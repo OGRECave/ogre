@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreShaderExHardwareSkinning.h"
+#include "OgreShaderExHardwareSkinningTechnique.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderFFPRenderState.h"
@@ -118,7 +118,7 @@ void HardwareSkinningTechnique::copyFrom(const HardwareSkinningTechnique* hardSk
 }
 
 //-----------------------------------------------------------------------
-bool HardwareSkinningTechnique::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, HardwareSkinning::SkinningType skinningType, const HardwareSkinningFactory* creator)
+bool HardwareSkinningTechnique::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, SkinningType skinningType, const HardwareSkinningFactory* creator)
 {
 	bool isValid = true;
 	Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);

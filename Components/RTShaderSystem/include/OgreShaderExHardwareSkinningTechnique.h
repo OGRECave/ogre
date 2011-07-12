@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreShaderFunctionAtom.h"
 #include "OgreShaderExHardwareSkinning.h"
 
+
 namespace Ogre {
 namespace RTShader {
 
@@ -106,7 +107,7 @@ public:
 	/**
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, HardwareSkinning::SkinningType skinningType, const HardwareSkinningFactory* creator);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, SkinningType skinningType, const HardwareSkinningFactory* creator);
 
 	/**
 	@see SubRenderState::resolveParameters.

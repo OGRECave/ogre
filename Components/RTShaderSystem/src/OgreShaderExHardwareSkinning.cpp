@@ -120,7 +120,7 @@ ushort HardwareSkinning::getWeightCount()
 }
 
 //-----------------------------------------------------------------------
-HardwareSkinning::SkinningType HardwareSkinning::getSkinningType()
+SkinningType HardwareSkinning::getSkinningType()
 {
 	assert(!mActiveTechnique.isNull());
 	return mSkinningType;
@@ -211,7 +211,7 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		uint32 boneCount = 0;
 		uint32 weightCount = 0;
 		String skinningType = "";
-		HardwareSkinning::SkinningType skinType;
+		SkinningType skinType;
 		bool correctAntipodalityHandling = false;
 		bool scalingShearingSupport = false;
 		
@@ -241,11 +241,11 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 			//Needs to be set before createOrRetrieveInstance is called because it determines which type of instance is created.
 			if(skinningType == "dual_quaternion")
 			{
-				skinType = HardwareSkinning::ST_DUAL_QUATERNION;
+				skinType = ST_DUAL_QUATERNION;
 			}
 			else
 			{
-				skinType = HardwareSkinning::ST_LINEAR;
+				skinType = ST_LINEAR;
 			}
 		}
 
@@ -280,7 +280,7 @@ void HardwareSkinningFactory::writeInstance(MaterialSerializer* ser, SubRenderSt
 	ser->writeValue(StringConverter::toString(hardSkinSrs->getWeightCount()));
 
 	//Correct antipodality handling and scaling and shearing support are only really valid for dual quaternion skinning
-	if(hardSkinSrs->getSkinningType() == HardwareSkinning::ST_DUAL_QUATERNION)
+	if(hardSkinSrs->getSkinningType() == ST_DUAL_QUATERNION)
 	{
 		ser->writeValue("dual_quaternion");
 		ser->writeValue(StringConverter::toString(hardSkinSrs->hasCorrectAntipodalityHandling()));
@@ -298,17 +298,17 @@ SubRenderState* HardwareSkinningFactory::createInstanceImpl()
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningFactory::setCustomShadowCasterMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
+void HardwareSkinningFactory::setCustomShadowCasterMaterials(const SkinningType skinningType, const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
 											const MaterialPtr& caster3Weight, const MaterialPtr& caster4Weight)
 {
-	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	if(skinningType == ST_DUAL_QUATERNION)
 	{
 		mCustomShadowCasterMaterialsDualQuaternion[0] = caster1Weight;
 		mCustomShadowCasterMaterialsDualQuaternion[1] = caster2Weight;
 		mCustomShadowCasterMaterialsDualQuaternion[2] = caster3Weight;
 		mCustomShadowCasterMaterialsDualQuaternion[3] = caster4Weight;
 	}
-	else //if(skinningType == HardwareSkinning::ST_LINEAR)
+	else //if(skinningType == ST_LINEAR)
 	{
 		mCustomShadowCasterMaterialsLinear[0] = caster1Weight;
 		mCustomShadowCasterMaterialsLinear[1] = caster2Weight;
@@ -318,17 +318,17 @@ void HardwareSkinningFactory::setCustomShadowCasterMaterials(const HardwareSkinn
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
+void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const SkinningType skinningType, const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
 											  const MaterialPtr& receiver3Weight, const MaterialPtr& receiver4Weight)
 {
-	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	if(skinningType == ST_DUAL_QUATERNION)
 	{
 		mCustomShadowReceiverMaterialsDualQuaternion[0] = receiver1Weight;
 		mCustomShadowReceiverMaterialsDualQuaternion[1] = receiver2Weight;
 		mCustomShadowReceiverMaterialsDualQuaternion[2] = receiver3Weight;
 		mCustomShadowReceiverMaterialsDualQuaternion[3] = receiver4Weight;
 	}
-	else //if(skinningType == HardwareSkinning::ST_LINEAR)
+	else //if(skinningType == ST_LINEAR)
 	{
 		mCustomShadowReceiverMaterialsLinear[0] = receiver1Weight;
 		mCustomShadowReceiverMaterialsLinear[1] = receiver2Weight;
@@ -338,30 +338,30 @@ void HardwareSkinningFactory::setCustomShadowReceiverMaterials(const HardwareSki
 }
 
 //-----------------------------------------------------------------------
-const MaterialPtr& HardwareSkinningFactory::getCustomShadowCasterMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowCasterMaterial(const SkinningType skinningType, ushort index) const
 {
 	assert(index < HS_MAX_WEIGHT_COUNT);
 
-	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	if(skinningType == ST_DUAL_QUATERNION)
 	{
 		return mCustomShadowCasterMaterialsDualQuaternion[index];
 	}
-	else //if(skinningType = HardwareSkinning::ST_LINEAR)
+	else //if(skinningType = ST_LINEAR)
 	{
 		return mCustomShadowCasterMaterialsLinear[index];
 	}
 }
 
 //-----------------------------------------------------------------------
-const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const
+const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(const SkinningType skinningType, ushort index) const
 {
 	assert(index < HS_MAX_WEIGHT_COUNT);
 
-	if(skinningType == HardwareSkinning::ST_DUAL_QUATERNION)
+	if(skinningType == ST_DUAL_QUATERNION)
 	{
 		return mCustomShadowReceiverMaterialsDualQuaternion[index];
 	}
-	else //if(skinningType == HardwareSkinning::ST_LINEAR)
+	else //if(skinningType == ST_LINEAR)
 	{
 		return mCustomShadowReceiverMaterialsLinear[index];
 	}

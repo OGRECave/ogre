@@ -34,15 +34,20 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
+#include "OgreShaderExLinearSkinning.h"
+#include "OgreShaderExHardwareSkinningTechnique.h"
+#include "OgreShaderExDualQuaternionSkinning.h"
+#include "OgreShaderExLinearSkinning.h"
 
 #define HS_MAX_WEIGHT_COUNT 4
 
 namespace Ogre {
 namespace RTShader {
 
-class DualQuaternionSkinning;
-class LinearSkinning;
-class HardwareSkinningTechnique;
+
+//class DualQuaternionSkinning;
+//class LinearSkinning;
+//class HardwareSkinningTechnique;
 class HardwareSkinningFactory;
 
 /** \addtogroup Core
@@ -70,11 +75,6 @@ public:
 		ushort maxWeightCount;
 	};
 
-	enum SkinningType
-	{
-		ST_LINEAR,
-		ST_DUAL_QUATERNION
-	};
 // Interface.
 public:
 	/** Class default constructor */
@@ -206,24 +206,24 @@ public:
 	/** 
 	Sets the list of custom shadow caster materials
 	*/
-	virtual void setCustomShadowCasterMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
+	virtual void setCustomShadowCasterMaterials(const SkinningType skinningType, const MaterialPtr& caster1Weight, const MaterialPtr& caster2Weight,
 		const MaterialPtr& caster3Weight, const MaterialPtr& caster4Weight);
 	
 	/** 
 	Sets the list of custom shadow receiver materials
 	*/
-	virtual void setCustomShadowReceiverMaterials(const HardwareSkinning::SkinningType skinningType, const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
+	virtual void setCustomShadowReceiverMaterials(const SkinningType skinningType, const MaterialPtr& receiver1Weight, const MaterialPtr& receiver2Weight,
 		const MaterialPtr& receiver3Weight, const MaterialPtr& receiver4Weight);
 
 	/** 
 	Returns the name of a custom shadow caster material for a given number of weights
 	*/
-	const MaterialPtr& getCustomShadowCasterMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const;
+	const MaterialPtr& getCustomShadowCasterMaterial(const SkinningType skinningType, ushort index) const;
 
 	/** 
 	Returns the name of a custom shadow receiver material for a given number of weights
 	*/
-	const MaterialPtr& getCustomShadowReceiverMaterial(const HardwareSkinning::SkinningType skinningType, ushort index) const;
+	const MaterialPtr& getCustomShadowReceiverMaterial(const SkinningType skinningType, ushort index) const;
 
 	/**
 		@brief

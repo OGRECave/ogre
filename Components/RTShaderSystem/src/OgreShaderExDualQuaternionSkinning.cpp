@@ -76,6 +76,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 	mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 
 	//local param
+	mParamLocalBlendPosition = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "BlendedPosition", GCT_FLOAT3);
 	mParamLocalPositionWorld = vsMain->resolveLocalParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_WORLD_SPACE, GCT_FLOAT4);
 	mParamLocalNormalWorld = vsMain->resolveLocalParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_WORLD_SPACE, GCT_FLOAT3);
 	mParamLocalTangentWorld = vsMain->resolveLocalParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_WORLD_SPACE, GCT_FLOAT3);
@@ -117,6 +118,7 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
 		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
 		
+		mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatix", GCT_MATRIX_2X4);
 		mParamBlendDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendDQ", GCT_MATRIX_2X4);
 				
 		if(mScalingShearingSupport)
@@ -204,16 +206,24 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			//Construct a scaling and shearing matrix based on the blend weights
 			for(int i = 0 ; i < getWeightCount() ; ++i)
 			{
+				//set the local param as the value of the world param
+				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+				curFuncInvocation->pushOperand(mParamInScaleShearMatrices, Operand::OPS_IN);
+				curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexToMask(i), 1);
+				curFuncInvocation->pushOperand(mParamTempFloat3x4, Operand::OPS_OUT);
+				vsMain->addAtomInstance(curFuncInvocation);
+
 				//Calculate the resultant scaling and shearing based on the weights given
-				addIndexedPositionWeight(vsMain, i, mParamInScaleShearMatrices, mParamTempFloat3x4, mParamBlendS, funcCounter);
+				addIndexedPositionWeight(vsMain, i, mParamTempFloat3x4, mParamTempFloat3x4, mParamBlendS, funcCounter);
 			}
 
 			//Transform the position based by the scaling and shearing matrix
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
 			curFuncInvocation->pushOperand(mParamBlendS, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_OUT, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);
+			curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_OUT);
 			vsMain->addAtomInstance(curFuncInvocation);
+
 		}
 		
 		//Set functions to calculate world position
@@ -222,11 +232,20 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			//Adjust the podalities of the dual quaternions
 			if(mCorrectAntipodalityHandling)
 			{
-				adjustForCorrectAntipodality(vsMain, i, funcCounter);
+				adjustForCorrectAntipodality(vsMain, i, funcCounter, mParamTempFloat2x4);
+			}
+			else
+			{
+				//set the local param as the value of the world param
+				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+				curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
+				curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexToMask(i), 1);
+				curFuncInvocation->pushOperand(mParamTempFloat2x4, Operand::OPS_OUT);
+				vsMain->addAtomInstance(curFuncInvocation);
 			}
 
 			//Calculate the resultant dual quaternion based on the weights given
-			addIndexedPositionWeight(vsMain, i, mParamInWorldMatrices, mParamTempFloat2x4, mParamBlendDQ, funcCounter);
+			addIndexedPositionWeight(vsMain, i, mParamTempFloat2x4, mParamTempFloat2x4, mParamBlendDQ, funcCounter);
 		}
 
 		//Normalize the dual quaternion
@@ -236,7 +255,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 
 		//Calculate the blend position
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_CALCULATE_BLEND_POSITION, FFP_VS_TRANSFORM, funcCounter++);
-		curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mParamBlendDQ, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mParamTempFloat4, Operand::OPS_OUT);
 		vsMain->addAtomInstance(curFuncInvocation);
@@ -322,7 +341,7 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 
 //-----------------------------------------------------------------------
 void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
-								int index, int& funcCounter)
+								int index, int& funcCounter, const ParameterPtr& pTempWorldMatrix)
 {
 	Operand::OpMask indexMask = indexToMask(index);
 	FunctionInvocation* curFuncInvocation;
@@ -333,22 +352,22 @@ void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN, indexToMask(0), 1);
 	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_INOUT);
 	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
+	curFuncInvocation->pushOperand(pTempWorldMatrix, Operand::OPS_OUT);
 	vsMain->addAtomInstance(curFuncInvocation);
 }
 
 //-----------------------------------------------------------------------
-void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain,
-								int index, UniformParameterPtr& pPositionRelatedParam, ParameterPtr& pPositionTempParameter,
+void DualQuaternionSkinning::addIndexedPositionWeight(Function* vsMain, int index,
+								ParameterPtr& pWorldMatrix, ParameterPtr& pPositionTempParameter,
 								ParameterPtr& pPositionRelatedOutputParam, int& funcCounter)
 {
-	Operand::OpMask indexMask = indexToMask(index);
+	int indexMask = indexToMask(index);
 	FunctionInvocation* curFuncInvocation;
 
 	//multiply position with world matrix and put into temporary param
 	curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_BLEND_WEIGHT, FFP_VS_TRANSFORM, funcCounter++);
 	curFuncInvocation->pushOperand(mParamInWeights, Operand::OPS_IN, indexMask);
-	curFuncInvocation->pushOperand(pPositionRelatedParam, Operand::OPS_IN);
-	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
+	curFuncInvocation->pushOperand(pWorldMatrix, Operand::OPS_IN);
 	curFuncInvocation->pushOperand(pPositionTempParameter, Operand::OPS_OUT);
 	vsMain->addAtomInstance(curFuncInvocation);
 

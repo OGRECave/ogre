@@ -10,11 +10,11 @@ void SGX_BlendWeight(in float blendWgt, in mat3x4 scaleShearMatrix, out mat3x4 v
 	vOut = blendWgt*scaleShearMatrix;
 }
 
-mat2x4 SGX_AntipodalityAdjustment(in mat2x4 dq0, inout mat2x4 dq1)
+void SGX_AntipodalityAdjustment(in mat2x4 dq0, in mat2x4 dq1,out mat2x4 dq2)
 {
 	//Accurate antipodality handling. For speed increase, remove the following line, 
 	//though, the results will only be valid for rotations less than 180 degrees.
-	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	dq2 = (dot(dq0[0], dq1[0]) < 0.0) ? dq1 * -1.0 : dq1;
 }
 
 void SGX_CalculateBlendPosition(in vec4 position, in mat2x4 blendDQ, out vec3 vOut)

@@ -84,14 +84,14 @@ protected:
 	void addPositionCalculations(Function* vsMain, int& funcCounter);
 
 	/** Adjusts the sign of a dual quaternion depending on its orientation to the root dual quaternion */
-	void adjustForCorrectAntipodality(Function* vsMain, int index, int& funcCounter);
+	void adjustForCorrectAntipodality(Function* vsMain, int index, int& funcCounter, const ParameterPtr& pTempWorldMatrix);
 
 	/**
 	 Adds the weight of a given position for a given index
 	 
 	 @param pPositionTempParameter Requires a temp parameter with a matrix the same size of pPositionRelatedParam
 	*/
-	void addIndexedPositionWeight(Function* vsMain, int index, UniformParameterPtr& pPositionRelatedParam,
+	void addIndexedPositionWeight(Function* vsMain, int index, ParameterPtr& pWorldMatrix,
 				      ParameterPtr& pPositionTempParameter, ParameterPtr& pPositionRelatedOutputParam, int& funcCounter);
 	
 	/** Adds the calculations for calculating a normal related element */
@@ -102,12 +102,15 @@ protected:
 
 protected:
 	UniformParameterPtr mParamInScaleShearMatrices;
+	ParameterPtr mParamLocalBlendPosition;
 	ParameterPtr mParamBlendS;
 	ParameterPtr mParamBlendDQ;
-	
+	ParameterPtr mParamTempWorldMatrix;
+
 	ParameterPtr mParamTempFloat2x4;
 	ParameterPtr mParamTempFloat3x3;
 	ParameterPtr mParamTempFloat3x4;
+
 };
 
 }

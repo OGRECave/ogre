@@ -8,16 +8,16 @@ void SGX_BlendWeight(in float blendWgt, in float3x4 scaleShearMatrix, out float3
 	vOut = blendWgt*scaleShearMatrix;
 }
 
-void SGX_AntipodalityAdjustment(in float2x4 dq0, inout float2x4 dq1)
+void SGX_AntipodalityAdjustment(in float2x4 dq0, in float2x4 dq1, out float2x4 dq2)
 {
 	//Accurate antipodality handling. For speed increase, remove the following line, 
 	//though, the results will only be valid for rotations less than 180 degrees.
-	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	dq2 = (dot(dq0[0], dq1[0]) < 0.0) ? dq1 * -1.0 : dq1;
 }
 
-void SGX_CalculateBlendPosition(in float4 position, in float2x4 blendDQ, out float4 vOut)
+void SGX_CalculateBlendPosition(in float3 position, in float2x4 blendDQ, out float4 vOut)
 {
-	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	float3 blendPosition = position + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position) + blendDQ[0].x*position);
 	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
 	blendPosition += trans;
 

@@ -105,7 +105,7 @@ protected:
 			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");
 
 			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-				RTShader::HardwareSkinning::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
+				Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 		}
 #endif
 		// set shadow properties

@@ -85,6 +85,13 @@ enum VSOutputCompactPolicy
 	VSOCP_HIGH		= 2,		// VS Outputs will be compacted always including parameter splits.
 };
 
+enum SkinningType
+{
+	ST_LINEAR,
+	ST_DUAL_QUATERNION
+};
+
+
 }
 }
 
