@@ -25,22 +25,27 @@ public:
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
 		Radian angle = Radian(2 * Math::PI * evt.timeSinceLastFrame);
-		
-		if(accumulatedAngle >= Radian(Math::PI - 0.1))
-		{
-			switchPodality = true;
-		}
-		else if(accumulatedAngle <= -Radian(Math::PI - 0.1))
-		{
-			switchPodality = false;
-		}
-
+				
 		if(switchPodality)
 		{
 			angle = -angle;
 		}
-
+		
 		accumulatedAngle += angle;
+		Radian maxAngle = Radian(Math::PI - 0.2);
+		
+		if(accumulatedAngle > maxAngle)
+		{
+			switchPodality = true;
+			angle -= accumulatedAngle - maxAngle;
+			accumulatedAngle = maxAngle;
+		}
+		else if(accumulatedAngle < -maxAngle)
+		{
+			switchPodality = false;
+			angle -= accumulatedAngle + maxAngle;
+			accumulatedAngle = -maxAngle;
+		}		
 		
 		Ogre::Bone* bone = entDQ->getSkeleton()->getBone(0);
 		bone->rotate(Vector3::UNIT_X, angle / 2);
@@ -89,12 +94,12 @@ protected:
 #endif
 		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-		mSceneMgr->setShadowTextureSize(512);
+		mSceneMgr->setShadowTextureSize(2048);
 		mSceneMgr->setShadowColour(ColourValue(0.6, 0.6, 0.6));
-		mSceneMgr->setShadowTextureCount(2);
+		mSceneMgr->setShadowTextureCount(1);
 
 		// add a little ambient lighting
-		mSceneMgr->setAmbientLight(ColourValue(0.0,0.0,0.0));//ColourValue(0.5, 0.5, 0.5));
+		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 		SceneNode* lightsBbsNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		BillboardSet* bbs;
@@ -104,28 +109,15 @@ protected:
 		bbs->setMaterialName("Examples/Flare");
 		lightsBbsNode->attachObject(bbs);
 
-
-// 		// add a blue spotlight
  		Light* l = mSceneMgr->createLight();
 		Vector3 dir;
-// 		l->setType(Light::LT_SPOTLIGHT);
-// 		l->setPosition(-40, 180, -10);
-// 		dir = -l->getPosition();
-// 		dir.normalise();
-// 		l->setDirection(dir);
-// 		l->setDiffuseColour(0.0, 0.0, 0.5);
-// 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
-
-
-		// add a green spotlight.
-		l = mSceneMgr->createLight();
-		l->setType(Light::LT_SPOTLIGHT);
-		l->setPosition(0, 150, 100);
-		dir = -l->getPosition();
-		dir.normalise();
-		l->setDirection(dir);
-		l->setDiffuseColour(0.0, 0.5, 0.0);
-		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
+ 		l->setType(Light::LT_SPOTLIGHT);
+ 		l->setPosition(30, 70, 0);
+ 		dir = -l->getPosition();
+ 		dir.normalise();
+ 		l->setDirection(dir);
+ 		l->setDiffuseColour(1, 1, 1);
+ 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
 
 		// create a floor mesh resource
 		MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
