@@ -251,7 +251,9 @@ namespace Ogre
 		if( (mNumWorldMatrices * 3) % maxUsableWidth )
 			texHeight += 1;
 
-		TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
+		//Don't use 1D textures, as OGL goes crazy because the shader should be calling texture1D()...
+		//TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
+		TextureType texType = TEX_TYPE_2D;
 
 		mMatrixTexture = TextureManager::getSingleton().createManual(
 										mName + "/VTF", mMeshReference->getGroup(), texType,

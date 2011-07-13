@@ -10,7 +10,7 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_glsl_vs glsl
 {
 	source HW_VTFInstancing.vert
 
-	preprocessor_defines DEPTH_SHADOWRECEIVER=1 BONE_MATRIX_LUT=1
+	preprocessor_defines DEPTH_SHADOWRECEIVER=1,BONE_MATRIX_LUT=1
 
 	uses_vertex_texture_fetch true
 
@@ -24,7 +24,7 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsl_vs glsl
 {
 	source HW_VTFInstancing.vert
 
-	preprocessor_defines DEPTH_SHADOWCASTER=1 BONE_MATRIX_LUT=1
+	preprocessor_defines DEPTH_SHADOWCASTER=1,BONE_MATRIX_LUT=1
 
 	uses_vertex_texture_fetch true
 
