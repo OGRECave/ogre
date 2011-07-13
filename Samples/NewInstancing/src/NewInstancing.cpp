@@ -155,6 +155,9 @@ void Sample_NewInstancing::switchInstancingTechnique()
 	//mInstancingTechnique = (mInstancingTechnique+1) % (NUM_TECHNIQUES+1);
 	mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
 
+	if( mCurrentManager )
+		mSceneMgr->destroyInstanceManager(mCurrentManager);
+
 	if( !mSupportedTechniques[mInstancingTechnique] )
 	{
 		//Hide GUI features available only to instancing
@@ -171,7 +174,6 @@ void Sample_NewInstancing::switchInstancingTechnique()
 		//Create the manager if we haven't already (i.e. first time)
 		//Because we use IM_USEALL as flags, the actual num of instances per batch might be much lower
 		//If you're not bandwidth limited, you may want to lift IM_VTFBESTFIT flag away
-		mSceneMgr->destroyInstanceManager(mCurrentManager);
 
 		InstanceManager::InstancingTechnique technique;
 		switch( mInstancingTechnique )

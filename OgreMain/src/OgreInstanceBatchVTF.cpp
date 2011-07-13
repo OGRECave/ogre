@@ -53,7 +53,8 @@ namespace Ogre
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
 				mUseBoneMatrixLookup(false),
-				mMaxLookupTableInstances(16)
+				mMaxLookupTableInstances(16),
+				mRemoveOwnVertexData( false )
 	{
 		cloneMaterial( mMaterial );
 	}
@@ -76,6 +77,14 @@ namespace Ogre
 		//Remove the VTF texture
 		if( !mMatrixTexture.isNull() )
 			TextureManager::getSingleton().remove( mMatrixTexture->getName() );
+
+		if( mRemoveOwnVertexData && useBoneMatrixLookup() )
+		{
+			if( useBoneMatrixLookup() )
+				OGRE_DELETE mRenderOperation.vertexData;
+		}
+
+		mRenderOperation.vertexData = NULL;
 	}
 
 	//-----------------------------------------------------------------------
@@ -95,6 +104,8 @@ namespace Ogre
 			createVertexTexture( baseSubMesh );
 			InstanceBatch::buildFrom( baseSubMesh, renderOperation );
 		}
+
+		mRemoveOwnVertexData = true;
 	}
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::cloneMaterial( const MaterialPtr &material )
@@ -365,8 +376,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstanceBatchVTF::~InstanceBatchVTF()
 	{
-		OGRE_DELETE mRenderOperation.vertexData;
-		mRenderOperation.vertexData = NULL;
 	}	
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupVertices( const SubMesh* baseSubMesh )

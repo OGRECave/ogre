@@ -6535,6 +6535,10 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
+	//The manager we're trying to destroy might have been scheduled for updating
+	//while we haven't yet rendered a frame. Update now to avoid a dangling ptr
+	updateDirtyInstanceManagers();
+
 	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
 	if (i != mInstanceManagerMap.end())
 	{
@@ -6560,6 +6564,7 @@ void SceneManager::destroyAllInstanceManagers(void)
 	}
 
 	mInstanceManagerMap.clear();
+	mDirtyInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,

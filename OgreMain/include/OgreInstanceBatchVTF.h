@@ -91,6 +91,9 @@ namespace Ogre
 		bool mUseBoneMatrixLookup;
 		size_t mMaxLookupTableInstances;
 
+		//When true remove the memory of the VertexData & index we've created because no one else will
+		bool					mRemoveOwnVertexData;
+
 		/** Clones the base material so it can have it's own vertex texture, and also
 			clones it's shadow caster materials, if it has any
 		*/
