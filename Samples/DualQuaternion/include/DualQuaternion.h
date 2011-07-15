@@ -73,9 +73,9 @@ protected:
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
 		{
 			//Add the hardware skinning to the shader generator default render state
-			//mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
-			//Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			//renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 
 			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase");
 			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase");
@@ -166,7 +166,9 @@ protected:
 		{
 			//In case the system uses the RTSS, the following line will ensure
 			//that the entity is using hardware animation in RTSS as well.
-			//RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
+
 			//The following line is needed only because the Jaiqua model material has shaders and
 			//as such is not automatically reflected in the RTSS system
 			//RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
@@ -183,7 +185,7 @@ protected:
 		String value = "Software";
 
 		// change the value if hardware skinning is enabled
-		Pass* pass = ent->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
+		Pass* pass = entDQ->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
 		if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
 
 		// create a params panel to display the skinning mode

@@ -67,12 +67,15 @@ public:
 	struct SkinningData
 	{
 		SkinningData() :
-			isValid(true), maxBoneCount(0), maxWeightCount(0)
+			isValid(true), maxBoneCount(0), maxWeightCount(0), skinningType(ST_LINEAR), correctAntipodalityHandling(false), scalingShearingSupport(false)
 		{}
 
 		bool isValid;
 		ushort maxBoneCount;
 		ushort maxWeightCount;
+		SkinningType skinningType;
+		bool correctAntipodalityHandling;
+		bool scalingShearingSupport;
 	};
 
 // Interface.
@@ -108,6 +111,7 @@ public:
 	@param scalingShearingSupport Only applicable for dual quaternion skinning.
 	*/
 	void setHardwareSkinningParam(ushort boneCount, ushort weightCount, SkinningType skinningType = ST_LINEAR,  bool correctAntipodalityHandling = false, bool scalingShearingSupport = false);
+
 
 	/**
 	Returns the number of bones in the model assigned to the material.
@@ -240,7 +244,7 @@ public:
 		
 		@param pEntity A pointer to an entity who's materials need preparing.
 	*/
-	void prepareEntityForSkinning(const Entity* pEntity);
+	void prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType = ST_LINEAR, bool correctAntidpodalityHandling = false, bool shearScale = false);
 
 	/** 
 		@brief
@@ -318,7 +322,7 @@ protected:
 		@return Returns true if the data was updated on the material. False if not.
 	*/
 	bool imprintSkeletonData(const MaterialPtr& pMaterial, bool isVaild, 
-		ushort boneCount, ushort weightCount);
+		ushort boneCount, ushort weightCount, SkinningType skinningType, bool correctAntidpodalityHandling, bool scalingShearingSupport);
 
 protected:
 

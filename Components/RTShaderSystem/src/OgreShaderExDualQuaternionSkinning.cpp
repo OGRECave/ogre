@@ -343,7 +343,7 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 								int index, int& funcCounter, const ParameterPtr& pTempWorldMatrix)
 {
-	//Antipodality doesn't need to be adjusted for dq0 (used as the basis of antipodality calculations
+	//Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations
 	if(index > 0)
 	{
 		Operand::OpMask indexMask = indexToMask(index);

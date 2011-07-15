@@ -105,9 +105,8 @@ public:
 	bool hasScalingShearingSupport();
 
 	/**
-	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, SkinningType skinningType, const HardwareSkinningFactory* creator);
+	void setDoBoneCalculations(bool doBoneCalculations);
 
 	/**
 	@see SubRenderState::resolveParameters.

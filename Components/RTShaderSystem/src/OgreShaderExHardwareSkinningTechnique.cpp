@@ -71,6 +71,12 @@ void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushor
 }
 
 //-----------------------------------------------------------------------
+void HardwareSkinningTechnique::setDoBoneCalculations(bool doBoneCalculations)
+{
+	mDoBoneCalculations = doBoneCalculations;
+}
+
+//-----------------------------------------------------------------------
 ushort HardwareSkinningTechnique::getBoneCount()
 {
 	return mBoneCount;
@@ -115,46 +121,6 @@ void HardwareSkinningTechnique::copyFrom(const HardwareSkinningTechnique* hardSk
 	mDoBoneCalculations = hardSkin->mDoBoneCalculations;
 	mCorrectAntipodalityHandling = hardSkin->mCorrectAntipodalityHandling;
 	mScalingShearingSupport = hardSkin->mScalingShearingSupport;
-}
-
-//-----------------------------------------------------------------------
-bool HardwareSkinningTechnique::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass, SkinningType skinningType, const HardwareSkinningFactory* creator)
-{
-	bool isValid = true;
-	Technique* pFirstTech = srcPass->getParent()->getParent()->getTechnique(0);
-	const Any& hsAny = pFirstTech->getUserObjectBindings().getUserAny(HS_DATA_BIND_NAME);
-	
-	if (hsAny.isEmpty() == false)
-	{
-		HardwareSkinning::SkinningData pData =
-			(any_cast<HardwareSkinning::SkinningData>(hsAny));
-		isValid = pData.isValid;
-		mBoneCount = pData.maxBoneCount;
-		mWeightCount = pData.maxWeightCount;
-	}
-	
-	mDoBoneCalculations =  isValid &&
-		(mBoneCount != 0) && (mBoneCount <= 256) &&
-		(mWeightCount != 0) && (mWeightCount <= 4) &&
-		((creator == NULL) || (mBoneCount <= creator->getMaxCalculableBoneCount()));
-
-	if ((mDoBoneCalculations) && (creator))
-	{
-		//update the receiver and caster materials
-		if (dstPass->getParent()->getShadowCasterMaterial().isNull())
-		{
-			dstPass->getParent()->setShadowCasterMaterial(
-				creator->getCustomShadowCasterMaterial(skinningType, mWeightCount - 1));
-		}
-
-		if (dstPass->getParent()->getShadowReceiverMaterial().isNull())
-		{
-			dstPass->getParent()->setShadowReceiverMaterial(
-				creator->getCustomShadowReceiverMaterial(skinningType, mWeightCount - 1));
-		}
-	}
-
-	return true;
 }
 
 }
