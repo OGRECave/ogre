@@ -343,17 +343,21 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 								int index, int& funcCounter, const ParameterPtr& pTempWorldMatrix)
 {
-	Operand::OpMask indexMask = indexToMask(index);
-	FunctionInvocation* curFuncInvocation;
-	
-	curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ANTIPODALITY_ADJUSTMENT, FFP_VS_TRANSFORM, funcCounter++);
-	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
-	//This is the base dual quaternion dq0, which the antipodality calculations are based on
-	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN, indexToMask(0), 1);
-	curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_INOUT);
-	curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
-	curFuncInvocation->pushOperand(pTempWorldMatrix, Operand::OPS_OUT);
-	vsMain->addAtomInstance(curFuncInvocation);
+	//Antipodality doesn't need to be adjusted for dq0 (used as the basis of antipodality calculations
+	if(index > 0)
+	{
+		Operand::OpMask indexMask = indexToMask(index);
+		FunctionInvocation* curFuncInvocation;
+
+		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ANTIPODALITY_ADJUSTMENT, FFP_VS_TRANSFORM, funcCounter++);
+		curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
+		//This is the base dual quaternion dq0, which the antipodality calculations are based on
+		curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN, indexToMask(0), 1);
+		curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
+		curFuncInvocation->pushOperand(pTempWorldMatrix, Operand::OPS_OUT);
+		vsMain->addAtomInstance(curFuncInvocation);
+	}
 }
 
 //-----------------------------------------------------------------------
