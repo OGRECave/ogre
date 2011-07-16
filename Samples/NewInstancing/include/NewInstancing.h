@@ -62,6 +62,8 @@ protected:
 	
 	void switchInstancingTechnique();
 
+	void switchSkinningTechnique(int index);
+
 	void createEntities();
 
 	void createInstancedEntities();

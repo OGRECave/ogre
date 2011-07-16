@@ -148,8 +148,8 @@ void Sample_NewInstancing::setupLighting()
 	light->setCastShadows( true );
 	light->setLightMask( 0x00000000 );
 }
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
 void Sample_NewInstancing::switchInstancingTechnique()
 {
 	//mInstancingTechnique = (mInstancingTechnique+1) % (NUM_TECHNIQUES+1);
@@ -227,6 +227,20 @@ void Sample_NewInstancing::switchInstancingTechnique()
 	else
 		mSetStatic->hide();
 }
+
+//------------------------------------------------------------------------------
+void Sample_NewInstancing::switchSkinningTechnique(int index)
+{
+	switch(index)
+	{
+		default:
+		//Linear Skinning
+		case 0: mCurrentMaterialSet = c_materialsTechniques; break;
+		//Dual Quaternion Skinning
+		case 1: mCurrentMaterialSet = c_materialsTechniques_dq; break;
+	};
+}
+
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::createEntities()
 {
@@ -489,14 +503,8 @@ void Sample_NewInstancing::itemSelected( SelectMenu* menu )
 	}
 	else if(menu == mSkinningTechniques)
 	{
-		//Refactor
 		clearScene();
-		switch(menu->getSelectionIndex())
-		{
-			default:
-			case 0: mCurrentMaterialSet = c_materialsTechniques; break;
-			case 1: mCurrentMaterialSet = c_materialsTechniques_dq; break;
-		};
+		switchSkinningTechnique(menu->getSelectionIndex());
 		switchInstancingTechnique();
 	}
 }
