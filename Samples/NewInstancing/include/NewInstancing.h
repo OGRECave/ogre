@@ -27,6 +27,16 @@ static const char *c_materialsTechniques[] =
 	"Examples/Instancing/ShaderBased/Robot"
 };
 
+static const char *c_materialsTechniques_dq[] =
+{
+	"Examples/Instancing/ShaderBased/Robot_dq",
+	"Examples/Instancing/VTF/Robot",
+	"Examples/Instancing/HWBasic/Robot",
+	"Examples/Instancing/VTF/HW/Robot",
+	"Examples/Instancing/VTF/HW/LUT/Robot",
+	"Examples/Instancing/ShaderBased/Robot"
+};
+
 static const char *c_meshNames[] =
 {
 	"robot.mesh"
@@ -106,10 +116,12 @@ protected:
 	std::set<AnimationState*>		mAnimations;
 	InstanceManager					*mCurrentManager;
 	bool							mSupportedTechniques[NUM_TECHNIQUES+1];
+	const char**						mCurrentMaterialSet;
 
 	SelectMenu						*mTechniqueMenu;
 	CheckBox						*mMoveInstances;
 	CheckBox						*mAnimateInstances;
+	SelectMenu						*mSkinningTechniques;
 	CheckBox						*mEnableShadows;
 	CheckBox						*mSetStatic;
 	OgreBites::Button				*mDefragmentBatches;

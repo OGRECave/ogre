@@ -26,7 +26,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 #endif
 //------------------------------------------------------------------------------
-Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0)
+Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mSkinningTechniques(NULL), mCurrentMaterialSet(c_materialsTechniques)
 {
 	mInfo["Title"] = "New Instancing";
 	mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
@@ -61,7 +61,7 @@ bool Sample_NewInstancing::keyPressed(const OIS::KeyEvent& evt)
 	if (evt.key == OIS::KC_B && !mTrayMgr->isDialogVisible() && mCurrentManager)
 	{
 		bool oldShow = mCurrentManager->getSetting( InstanceManager::SHOW_BOUNDINGBOX,
-			c_materialsTechniques[mInstancingTechnique] );
+			mCurrentMaterialSet[mInstancingTechnique] );
 		mCurrentManager->setSetting( InstanceManager::SHOW_BOUNDINGBOX, !oldShow );
 	}
 
@@ -236,7 +236,7 @@ void Sample_NewInstancing::createEntities()
 		//a. To prove we can (runs without modification! :-) )
 		//b. Make a fair comparison
 		Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
-		ent->setMaterialName( c_materialsTechniques[NUM_TECHNIQUES] );
+		ent->setMaterialName( mCurrentMaterialSet[NUM_TECHNIQUES] );
 		mEntities.push_back( ent );
 		
 		//Get the animation
@@ -256,7 +256,7 @@ void Sample_NewInstancing::createInstancedEntities()
 	{
 		//Create the instanced entity
 		InstancedEntity *ent = mCurrentManager->createInstancedEntity(
-			c_materialsTechniques[mInstancingTechnique] );
+			mCurrentMaterialSet[mInstancingTechnique] );
 		mEntities.push_back( ent );
 
 		//HWInstancingBasic is the only technique without animation support
@@ -440,6 +440,11 @@ void Sample_NewInstancing::setupGUI()
 			text = "Unsupported: " + text;
 		mTechniqueMenu->addItem( text );
 	}
+	//Check box to enable dual quaternion skinning
+	mSkinningTechniques = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "SkinningTechnique", "Skinning Technique", 450, 285, 5);
+	mSkinningTechniques->hide();
+	mSkinningTechniques->addItem("Linear Skinning");
+	mSkinningTechniques->addItem("Dual Quaternion Skinning");
 
 	//Check box to move the units
 	mMoveInstances = mTrayMgr->createCheckBox(TL_TOPRIGHT, "MoveInstances", "Move Instances", 175);
@@ -482,6 +487,18 @@ void Sample_NewInstancing::itemSelected( SelectMenu* menu )
 		clearScene();
 		switchInstancingTechnique();
 	}
+	else if(menu == mSkinningTechniques)
+	{
+		//Refactor
+		clearScene();
+		switch(menu->getSelectionIndex())
+		{
+			default:
+			case 0: mCurrentMaterialSet = c_materialsTechniques; break;
+			case 1: mCurrentMaterialSet = c_materialsTechniques_dq; break;
+		};
+		switchInstancingTechnique();
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -493,10 +510,29 @@ void Sample_NewInstancing::buttonHit( OgreBites::Button* button )
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::checkBoxToggled( CheckBox* box )
 {
-	if( box == mEnableShadows ) mSceneMgr->setShadowTechnique( mEnableShadows->isChecked() ?
+	if( box == mEnableShadows )
+	{
+		mSceneMgr->setShadowTechnique( mEnableShadows->isChecked() ?
 SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
+	}
 	else if( box == mSetStatic && mCurrentManager )
+	{
 		mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
+	}
+	else if (box == mAnimateInstances)
+	{
+		if(mSkinningTechniques)
+		{
+			if(box->isChecked())
+			{
+				mSkinningTechniques->show();
+			}
+			else
+			{
+				mSkinningTechniques->hide();
+			}
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -550,7 +586,7 @@ void Sample_NewInstancing::checkHardwareSupport()
 
 		const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
 			ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-			c_materialsTechniques[i], technique, NUM_INST_ROW * NUM_INST_COLUMN,
+			mCurrentMaterialSet[i], technique, NUM_INST_ROW * NUM_INST_COLUMN,
 			flags );
 
 		mSupportedTechniques[i] = numInstances > 0;
