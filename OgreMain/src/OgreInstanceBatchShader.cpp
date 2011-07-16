@@ -77,8 +77,10 @@ namespace Ogre
 						size_t arraySize = constDef.arraySize;
 
 						//Deal with GL "hacky" way of doing 4x3 matrices
-						if( constDef.constType == GCT_FLOAT4 )
+						if(entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 && constDef.constType == GCT_FLOAT4)
 							arraySize /= 3;
+						else if(entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4 && constDef.constType == GCT_FLOAT4)
+							arraySize /= 2;
 
 						//Check the num of arrays
 						size_t retVal = arraySize / numBones;
@@ -89,7 +91,8 @@ namespace Ogre
 								retVal = 0xFFFF / baseSubMesh->vertexData->vertexCount;
 						}
 
-						if( retVal < 3 )
+						if((retVal < 3 && entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4) ||
+							(retVal < 2 && entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4))
 						{
 							LogManager::getSingleton().logMessage( "InstanceBatchShader: Mesh " +
 										mMeshReference->getName() + " using material " +
