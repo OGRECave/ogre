@@ -87,7 +87,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(lastSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
+										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -121,7 +121,7 @@ namespace Ogre
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(newSource),
 										mInstancesPerBatch,
-										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
+										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
