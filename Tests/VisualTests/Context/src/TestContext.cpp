@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "VisualTest.h"
 #include "SamplePlugin.h"
 #include "TestResults.h"
+#include "HTMLWriter.h"
 #include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
@@ -347,6 +348,8 @@ void TestContext::finishedTests()
 
     if (mGenerateHtml && !mReferenceSet)
     {
+        HtmlWriter* writer = 0;
+
         // look for a reference set first
         Ogre::ConfigFile info;
         bool foundReference = true;
@@ -365,7 +368,7 @@ void TestContext::finishedTests()
             {
                 if (mBatch->canCompareWith((*i)))
                 {
-                    html = writeHTML(*i, *mBatch, mBatch->compare((*i)));
+                    writer = OGRE_NEW HtmlWriter(*i, *mBatch, mBatch->compare((*i)));
                     break;
                 }
             }
@@ -375,24 +378,16 @@ void TestContext::finishedTests()
         {
             TestBatch ref = TestBatch(info, mOutputDir + mCompareWith);
             if (mBatch->canCompareWith(ref))
-                html = writeHTML(ref, *mBatch, mBatch->compare(ref));
+                writer = OGRE_NEW HtmlWriter(ref, *mBatch, mBatch->compare(ref));
         }
 
-        if (!html.empty())
+        if (writer)
         {
             // we save a generally named "out.html" that gets overwritten each run, 
             // plus a uniquely named one for this run
-            std::ofstream out1;
-            std::ofstream out2;
-            out1.open(Ogre::String(mOutputDir + "out.html").c_str());
-            out2.open(Ogre::String(mOutputDir + "TestResults_" + mBatch->name + ".html").c_str());
-            if (out1.is_open() && out2.is_open())
-            {
-                out1<<html;
-                out2<<html;
-                out1.close();
-                out2.close();
-            }
+            writer->writeToFile(mOutputDir + "out.html");
+            writer->writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+            OGRE_DELETE writer;
         }
     }
 

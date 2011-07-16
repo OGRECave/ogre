@@ -26,12 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __ImageCompare_H__
-#define __ImageCompare_H__
+#ifndef __ImageValidator_H__
+#define __ImageValidator_H__
 
 #include "Ogre.h"
 
-/** Some functionality for comparing individual images */
+/** Some functionality for comparing images */
 
 /* Results of comparing two test images */
 struct ComparisonResult
