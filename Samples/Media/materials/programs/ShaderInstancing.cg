@@ -19,25 +19,7 @@ struct VS_INPUT
 
 #include "InstancingVertexInterpolators.cg"
 #ifdef ST_DUAL_QUATERNION
-//#include "DualQuaternion_Common.cg"
-
-float3x3 adjointTransposeMatrix(float3x3 M)
-{
-	float3x3 atM;
-	atM._m00 = M._m22 * M._m11 - M._m12 * M._m21;
-	atM._m01 = M._m12 * M._m20 - M._m10 * M._m22;
-	atM._m02 = M._m10 * M._m21 - M._m20 * M._m11;
-
-	atM._m10 = M._m02 * M._m21 - M._m22 * M._m01;
-	atM._m11 = M._m22 * M._m00 - M._m02 * M._m20;
-	atM._m12 = M._m20 * M._m01 - M._m00 * M._m21;
-
-	atM._m20 = M._m12 * M._m01 - M._m02 * M._m11;
-	atM._m21 = M._m10 * M._m02 - M._m12 * M._m00;
-	atM._m22 = M._m00 * M._m11 - M._m10 * M._m01;
-
-	return atM;
-}
+#include "DualQuaternion_Common.cg"
 #endif
 
 //---------------------------------------------
@@ -75,11 +57,8 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
 	float2x4 blendDQ = worldDualQuaternion2x4Array[idx];
-	float3 blendPosition = pass1_position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, pass1_position.xyz) + blendDQ[0].x*pass1_position.xyz);
-	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
-	blendPosition += trans;
-	worldPos = float4(blendPosition, 1.0);
-	worldNorm = pass1_normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, pass1_normal) + blendDQ[0].x*pass1_normal);
+	worldPos = float4(calculateBlendPosition(pass1_position, blendDQ), 1.0);
+	worldNorm = calculateBlendNormal(pass1_normal, blendDQ);
 #else
 	worldPos  = float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f );
 	worldNorm = mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal );
