@@ -65,12 +65,12 @@ set(SOURCE_FILES
     #src/PlayPenRadixSort.cpp  Not Visual!
     #src/PlayPenPoseAnimation2.cpp
     src/PlayPenReflectedBillboards.cpp
-    #src/PlayPenManualObjectNonIndexed.cpp
-    #src/PlayPenManualObjectNonIndexedUpdateSmaller.cpp
-    #src/PlayPenManualObjectNonIndexedUpdateLarger.cpp
-    #src/PlayPenManualObjectIndexed.cpp
-    #src/PlayPenManualObjectIndexedUpdateSmaller.cpp
-    #src/PlayPenManualObjectIndexedUpdateLarger.cpp
+    src/PlayPenManualObjectNonIndexed.cpp
+    src/PlayPenManualObjectNonIndexedUpdateSmaller.cpp
+    src/PlayPenManualObjectNonIndexedUpdateLarger.cpp
+    src/PlayPenManualObjectIndexed.cpp
+    src/PlayPenManualObjectIndexedUpdateSmaller.cpp
+    src/PlayPenManualObjectIndexedUpdateLarger.cpp
     #src/PlayPenBillboardChain.cpp
     #src/PlayPenCubeDDS.cpp
     #src/PlayPenDxt1.cpp
@@ -89,7 +89,7 @@ set(SOURCE_FILES
     #src/PlayPen2bppAlphaPVR.cpp
     #src/PlayPenRibbonTrail.cpp
     #src/PlayPenExportPrecompiledAssemblerProgram.cpp
-    #src/PlayPenMaterial.cpp
+#src/PlayPenMaterial.cpp
     #src/PlayPenBlendDiffuseColour.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
     #src/PlayPenCustomProjectionMatrix.cpp
@@ -98,10 +98,10 @@ set(SOURCE_FILES
     #src/PlayPenViewportNoShadows.cpp
     #src/PlayPenSerialisedColour.cpp
     #src/PlayPenBillboardAccurateFacing.cpp
-    #src/PlayPenMultiSceneManagersSimple.cpp
+	src/PlayPenMultiSceneManagersSimple.cpp
     #src/PlayPenMultiSceneManagersComplex.cpp
     #src/PlayPenManualBoneMovement.cpp
-    #src/PlayPenMaterialSchemes.cpp
+    src/PlayPenMaterialSchemes.cpp
     #src/PlayPenMaterialSchemesListener.cpp
     #src/PlayPenMaterialSchemesWithLOD.cpp
     #src/PlayPenMaterialSchemesWithMismatchedLOD.cpp
