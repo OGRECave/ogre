@@ -73,12 +73,12 @@ set(SOURCE_FILES
     src/PlayPenManualObjectIndexedUpdateLarger.cpp
     src/PlayPenBillboardChain.cpp
     src/PlayPenCubeDDS.cpp
-    #src/PlayPenDxt1.cpp
-    #src/PlayPenDxt1FromMemory.cpp
-    #src/PlayPenDxt1Alpha.cpp
-    #src/PlayPenDxt3.cpp
-    #src/PlayPenDxt3FromMemory.cpp
-    #src/PlayPenDxt5.cpp
+    src/PlayPenDxt1.cpp
+    src/PlayPenDxt1FromMemory.cpp
+    src/PlayPenDxt1Alpha.cpp
+    src/PlayPenDxt3.cpp
+    src/PlayPenDxt3FromMemory.cpp
+    src/PlayPenDxt5.cpp
     #src/PlayPenFloat64DDS.cpp
     #src/PlayPenFloat128DDS.cpp
     #src/PlayPenFloat16DDS.cpp
@@ -87,7 +87,7 @@ set(SOURCE_FILES
     #src/PlayPen4bppAlphaPVR.cpp
     #src/PlayPen2bppPVR.cpp
     #src/PlayPen2bppAlphaPVR.cpp
-    #src/PlayPenRibbonTrail.cpp
+    src/PlayPenRibbonTrail.cpp
     #src/PlayPenExportPrecompiledAssemblerProgram.cpp
 #src/PlayPenMaterial.cpp
     src/PlayPenBlendDiffuseColour.cpp
