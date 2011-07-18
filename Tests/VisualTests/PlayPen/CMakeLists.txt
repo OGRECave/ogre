@@ -61,7 +61,7 @@ set(SOURCE_FILES
     src/PlayPenStaticGeometry.cpp
     src/PlayPenStaticGeometryWithLOD.cpp
     #src/PlayPenReloadResources.cpp
-    #src/PlayPenBillboardTextureCoords.cpp
+    src/PlayPenBillboardTextureCoords.cpp
     #src/PlayPenRadixSort.cpp  Not Visual!
     #src/PlayPenPoseAnimation2.cpp
     src/PlayPenReflectedBillboards.cpp
@@ -72,7 +72,7 @@ set(SOURCE_FILES
     src/PlayPenManualObjectIndexedUpdateSmaller.cpp
     src/PlayPenManualObjectIndexedUpdateLarger.cpp
     src/PlayPenBillboardChain.cpp
-    #src/PlayPenCubeDDS.cpp
+    src/PlayPenCubeDDS.cpp
     #src/PlayPenDxt1.cpp
     #src/PlayPenDxt1FromMemory.cpp
     #src/PlayPenDxt1Alpha.cpp
@@ -111,7 +111,7 @@ set(SOURCE_FILES
     #src/PlayPenBackgroundLoadResourceGroup.cpp
     #src/PlayPenOverlayRelativeMode.cpp
     src/PlayPenBillboardOrigins.cpp
-    #src/PlayPenDepthBias.cpp
+    src/PlayPenDepthBias.cpp
     #src/PlayPenStringTokenising.cpp
     #src/PlayPenTextureShadowsTransparentCaster.cpp
     #src/PlayPenTextureShadowsIntegrated.cpp
@@ -136,7 +136,7 @@ set(SOURCE_FILES
     #src/PlayPenGeometryShaders.cpp
     #src/PlayPenAlphaToCoverage.cpp
     #src/PlayPenLiSPSM.cpp
-    #src/PlayPenBlitSubTextures.cpp
+    src/PlayPenBlitSubTextures.cpp
     #src/PlayPenDepthShadowMap.cpp
     #src/PlayPenSharedGpuParameters.cpp
     #src/PlayPenImageCombine.cpp
