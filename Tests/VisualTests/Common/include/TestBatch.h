@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define __TestBatch_H__
 
 #include "Ogre.h"
-#include "ImageCompare.h"
+#include "ImageValidator.h"
 
 class TestBatch;
 typedef std::set<TestBatch,std::greater<TestBatch> > TestBatchSet;

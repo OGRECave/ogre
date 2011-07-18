@@ -13,6 +13,7 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/PlayPenTests.cpp
+    src/PlayPenStencilGlow.cpp
     src/PlayPenTestPlugin.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

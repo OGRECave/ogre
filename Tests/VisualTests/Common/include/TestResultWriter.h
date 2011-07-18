@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "Ogre.h"
 #include "TinyHTML.h"
-#include "ImageCompare.h"
+#include "ImageValidator.h"
 #include "TestBatch.h"
 
 /** Abstract class for outputting test results in some format */

@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "TestContext.h"
 #include "VisualTest.h"
 #include "SamplePlugin.h"
-#include "TestResults.h"
+#include "TestResultWriter.h"
 #include "HTMLWriter.h"
 #include "OgreConfigFile.h"
 

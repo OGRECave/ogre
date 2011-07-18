@@ -9,9 +9,10 @@
 
 set(HEADER_FILES
     include/TestContext.h
-	../Common/include/ImageCompare.h
+	../Common/include/ImageValidator.h
 	../Common/include/TestBatch.h
-	../Common/include/TestResults.h
+	../Common/include/TestResultWriter.h
+	../Common/include/HTMLWriter.h
 	../Common/include/VisualTest.h
 	../Common/include/TinyHTML.h
 	)

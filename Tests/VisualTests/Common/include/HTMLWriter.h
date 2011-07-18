@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "Ogre.h"
 #include "TinyHTML.h"
-#include "TestResults.h"
+#include "TestResultWriter.h"
 
 class HtmlWriter : public TestResultWriter
 {

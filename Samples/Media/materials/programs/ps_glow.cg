@@ -1,0 +1,14 @@
+
+float4 main(uniform float alpha_value,
+			uniform float time
+) : COLOR
+{
+   float4 color;
+   color.x = 1.0;
+   color.y = 1.0;
+   color.z = 0.0;
+   color.w =  alpha_value * ((sin(time * 5.0) / 3.14 + 1.0) / 2.0 );
+   return color;
+    
+ 
+}
