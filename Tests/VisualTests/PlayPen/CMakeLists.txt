@@ -71,7 +71,7 @@ set(SOURCE_FILES
     src/PlayPenManualObjectIndexed.cpp
     src/PlayPenManualObjectIndexedUpdateSmaller.cpp
     src/PlayPenManualObjectIndexedUpdateLarger.cpp
-    #src/PlayPenBillboardChain.cpp
+    src/PlayPenBillboardChain.cpp
     #src/PlayPenCubeDDS.cpp
     #src/PlayPenDxt1.cpp
     #src/PlayPenDxt1FromMemory.cpp
@@ -90,14 +90,14 @@ set(SOURCE_FILES
     #src/PlayPenRibbonTrail.cpp
     #src/PlayPenExportPrecompiledAssemblerProgram.cpp
 #src/PlayPenMaterial.cpp
-    #src/PlayPenBlendDiffuseColour.cpp
+    src/PlayPenBlendDiffuseColour.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
     #src/PlayPenCustomProjectionMatrix.cpp
     src/PlayPenPointSprites.cpp
     #src/PlayPenSuppressedShadows.cpp
     #src/PlayPenViewportNoShadows.cpp
     #src/PlayPenSerialisedColour.cpp
-    #src/PlayPenBillboardAccurateFacing.cpp
+    src/PlayPenBillboardAccurateFacing.cpp
 	src/PlayPenMultiSceneManagersSimple.cpp
     #src/PlayPenMultiSceneManagersComplex.cpp
     #src/PlayPenManualBoneMovement.cpp
@@ -110,7 +110,7 @@ set(SOURCE_FILES
     #src/PlayPenVertexTexture.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
     #src/PlayPenOverlayRelativeMode.cpp
-    #src/PlayPenBillboardOrigins.cpp
+    src/PlayPenBillboardOrigins.cpp
     #src/PlayPenDepthBias.cpp
     #src/PlayPenStringTokenising.cpp
     #src/PlayPenTextureShadowsTransparentCaster.cpp
