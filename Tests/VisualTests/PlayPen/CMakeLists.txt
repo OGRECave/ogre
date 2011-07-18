@@ -62,9 +62,9 @@ set(SOURCE_FILES
     src/PlayPenStaticGeometryWithLOD.cpp
     #src/PlayPenReloadResources.cpp
     #src/PlayPenBillboardTextureCoords.cpp
-    #src/PlayPenRadixSort.cpp
+    #src/PlayPenRadixSort.cpp  Not Visual!
     #src/PlayPenPoseAnimation2.cpp
-    #src/PlayPenReflectedBillboards.cpp
+    src/PlayPenReflectedBillboards.cpp
     #src/PlayPenManualObjectNonIndexed.cpp
     #src/PlayPenManualObjectNonIndexedUpdateSmaller.cpp
     #src/PlayPenManualObjectNonIndexedUpdateLarger.cpp
@@ -93,7 +93,7 @@ set(SOURCE_FILES
     #src/PlayPenBlendDiffuseColour.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
     #src/PlayPenCustomProjectionMatrix.cpp
-    #src/PlayPenPointSprites.cpp
+    src/PlayPenPointSprites.cpp
     #src/PlayPenSuppressedShadows.cpp
     #src/PlayPenViewportNoShadows.cpp
     #src/PlayPenSerialisedColour.cpp
