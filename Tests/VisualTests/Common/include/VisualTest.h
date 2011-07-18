@@ -115,10 +115,20 @@ public:
         return false;
     }
 
+	virtual bool frameStarted(const Ogre::FrameEvent& evt)
+	{
+		for(int i = 0; i < mAnimStateList.size(); ++i)
+			mAnimStateList[i]->addTime(evt.timeSinceLastFrame);
+		return true;
+	}
+
 protected:
 
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
+
+	// a list of animation states to automatically update
+	std::vector<Ogre::AnimationState*> mAnimStateList;
 
     // The camera for this sample
     Ogre::Camera* mCamera;
