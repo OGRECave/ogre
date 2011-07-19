@@ -21,7 +21,7 @@ set(SOURCE_FILES
     #src/PlayPenTransparencyMipMaps.cpp
     #src/PlayPenCthNewBlending.cpp
     #src/PlayPenMatrices.cpp
-    #src/PlayPenBasicPlane.cpp
+    src/PlayPenBasicPlane.cpp
 	##		src/PlayPenAlpha.cpp
     ##		src/PlayPenBsp.cpp
     #src/PlayPenAnimation.cpp
@@ -29,7 +29,7 @@ set(SOURCE_FILES
     #src/PlayPenGpuPrograms.cpp
     #src/PlayPenProjection.cpp
     #src/PlayPenMultiViewports.cpp
-    #src/PlayPenDistortion.cpp
+    src/PlayPenDistortion.cpp
     #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
@@ -37,7 +37,7 @@ set(SOURCE_FILES
     #src/PlayPenPrepareShadowVolume.cpp
     #src/PlayPenWindowedViewportMode.cpp
     #src/PlayPenSubEntityVisibility.cpp
-    #src/PlayPenAttachObjectsToBones.cpp
+	src/PlayPenAttachObjectsToBones.cpp
     #src/PlayPenOrtho.cpp
     #src/PlayPenFallbackResourceGroup.cpp
     #src/PlayPenGeneratedLOD.cpp
@@ -53,7 +53,7 @@ set(SOURCE_FILES
     #src/PlayPenOverlayZOrder.cpp
     #src/PlayPenIntersectionSceneQuery.cpp
     #src/PlayPenRaySceneQuery.cpp
-    #src/PlayPenLotsAndLotsOfEntities.cpp
+    src/PlayPenLotsAndLotsOfEntities.cpp
     #src/PlayPenSimpleMesh.cpp
     #src/PlayPenGLSLTangent.cpp
     #src/PlayPenInfiniteAAB.cpp
@@ -92,7 +92,7 @@ set(SOURCE_FILES
 #src/PlayPenMaterial.cpp
     src/PlayPenBlendDiffuseColour.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
-    #src/PlayPenCustomProjectionMatrix.cpp
+    src/PlayPenCustomProjectionMatrix.cpp
     src/PlayPenPointSprites.cpp
     #src/PlayPenSuppressedShadows.cpp
     #src/PlayPenViewportNoShadows.cpp
@@ -106,7 +106,7 @@ set(SOURCE_FILES
     #src/PlayPenMaterialSchemesWithLOD.cpp
     #src/PlayPenMaterialSchemesWithMismatchedLOD.cpp
     #src/PlayPenSkeletonAnimationOptimise.cpp
-    #src/PlayPenBuildTangentOnAnimatedMesh.cpp
+    src/PlayPenBuildTangentOnAnimatedMesh.cpp
     #src/PlayPenVertexTexture.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
     #src/PlayPenOverlayRelativeMode.cpp
@@ -121,7 +121,7 @@ set(SOURCE_FILES
     #src/PlayPenLightClipPlanes.cpp
     #src/PlayPenLightClipPlanesMoreLights.cpp
     #src/PlayPenMRT.cpp
-    #src/PlayPen16Textures.cpp
+    src/PlayPen16Textures.cpp
     #src/PlayPenSharedPtrBug.cpp
     #src/PlayPenSpotlightViewProj.cpp
     #src/PlayPenManualIlluminationStage.cpp
