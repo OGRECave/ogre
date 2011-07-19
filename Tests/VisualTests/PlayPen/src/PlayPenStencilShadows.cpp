@@ -151,9 +151,12 @@ void PlayPen_StencilShadows::setupContent()
 	pPlaneEnt->setCastShadows(false);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
 	
-	mCamera->setPosition(180, 34, 223);
-	mCamera->setOrientation(Quaternion(0.7265, -0.2064, 0.6304, 0.1791));
+	//mCamera->setPosition(180, 34, 223);
+	//mCamera->setOrientation(Quaternion(0.7265, -0.2064, 0.6304, 0.1791));
 	
+	mCamera->setPosition(0,0,400);
+	mCamera->setDirection(0,0,-1);
+
 	// Create a render texture
 /*	TexturePtr rtt = TextureManager::getSingleton().createManual("rtt0", 
 	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 

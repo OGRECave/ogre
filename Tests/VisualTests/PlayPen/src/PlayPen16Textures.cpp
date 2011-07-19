@@ -128,7 +128,7 @@ void PlayPen_16Textures::setupContent()
 	e->setMaterialName(mat->getName());
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
 	
-	mCamera->setPosition(0,0,200);
+	mCamera->setPosition(0,0,250);
 	mCamera->lookAt(0,0,0);
 	
 	

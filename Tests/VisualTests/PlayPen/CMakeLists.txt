@@ -18,7 +18,7 @@ set(SOURCE_FILES
     #src/PlayPenMRTCompositorScript.cpp
     #src/PlayPenNormalMapMirroredUVs.cpp
     #src/PlayPenMaterialSerializer.cpp
-    #src/PlayPenTransparencyMipMaps.cpp
+    src/PlayPenTransparencyMipMaps.cpp
     #src/PlayPenCthNewBlending.cpp
     #src/PlayPenMatrices.cpp
     src/PlayPenBasicPlane.cpp
@@ -28,7 +28,7 @@ set(SOURCE_FILES
     #src/PlayPenAnimationBlend.cpp
     #src/PlayPenGpuPrograms.cpp
     #src/PlayPenProjection.cpp
-    #src/PlayPenMultiViewports.cpp
+    src/PlayPenMultiViewports.cpp
     src/PlayPenDistortion.cpp
     #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
@@ -38,13 +38,13 @@ set(SOURCE_FILES
     #src/PlayPenWindowedViewportMode.cpp
     #src/PlayPenSubEntityVisibility.cpp
 	src/PlayPenAttachObjectsToBones.cpp
-    #src/PlayPenOrtho.cpp
+    src/PlayPenOrtho.cpp
     #src/PlayPenFallbackResourceGroup.cpp
     #src/PlayPenGeneratedLOD.cpp
     #src/PlayPenClearScene.cpp
     src/PlayPenStencilShadows.cpp
     #src/PlayPenStencilShadowsMixedOpSubMeshes.cpp
-    #src/PlayPen2Spotlights.cpp
+    src/PlayPen2Spotlights.cpp
     #src/PlayPenTextureShadows.cpp
     #src/PlayPenTextureShadowsCustomCasterMat.cpp
     #src/PlayPenTextureShadowsCustomReceiverMat.cpp
@@ -117,9 +117,9 @@ set(SOURCE_FILES
     #src/PlayPenTextureShadowsIntegrated.cpp
     #src/PlayPenTextureShadowsIntegratedPSSM.cpp
     #src/PlayPenTimeCreateDestroyObject.cpp
-    #src/PlayPenLightScissoring.cpp
-    #src/PlayPenLightClipPlanes.cpp
-    #src/PlayPenLightClipPlanesMoreLights.cpp
+    src/PlayPenLightScissoring.cpp
+    src/PlayPenLightClipPlanes.cpp
+    src/PlayPenLightClipPlanesMoreLights.cpp
     #src/PlayPenMRT.cpp
     src/PlayPen16Textures.cpp
     #src/PlayPenSharedPtrBug.cpp
@@ -132,14 +132,14 @@ set(SOURCE_FILES
     #src/PlayPenBug.cpp
     #src/PlayPenManualObject2D.cpp
     #src/PlayPenShadowLod.cpp
-    #src/PlayPenFarFromOrigin.cpp
+    src/PlayPenFarFromOrigin.cpp
     #src/PlayPenGeometryShaders.cpp
-    #src/PlayPenAlphaToCoverage.cpp
+    src/PlayPenAlphaToCoverage.cpp
     #src/PlayPenLiSPSM.cpp
     src/PlayPenBlitSubTextures.cpp
     #src/PlayPenDepthShadowMap.cpp
     #src/PlayPenSharedGpuParameters.cpp
-    #src/PlayPenImageCombine.cpp
+    src/PlayPenImageCombine.cpp
     #src/PlayPenNewTerrain.cpp
     #src/PlayPenTwoNewTerrains.cpp
     src/PlayPenTestPlugin.cpp)
