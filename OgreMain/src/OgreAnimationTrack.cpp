@@ -686,7 +686,7 @@ namespace Ogre {
         {
 			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
 			kf->setTranslate(kf->getTranslate() - base->getTranslate());
-			kf->setRotation(kf->getRotation() * base->getRotation().Inverse());
+			kf->setRotation(base->getRotation().Inverse() * kf->getRotation());
 			kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
 		}
 			
