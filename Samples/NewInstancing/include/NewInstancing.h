@@ -33,7 +33,7 @@ static const char *c_materialsTechniques_dq[] =
 	"Examples/Instancing/VTF/Robot_dq",
 	"Examples/Instancing/HWBasic/Robot",
 	"Examples/Instancing/VTF/HW/Robot_dq",
-	"Examples/Instancing/VTF/HW/LUT/Robot",
+	"Examples/Instancing/VTF/HW/LUT/Robot_dq",
 	"Examples/Instancing/ShaderBased/Robot_dq"
 };
 
@@ -50,7 +50,7 @@ public:
 
 	Sample_NewInstancing();
 
-    bool frameRenderingQueued(const FrameEvent& evt);
+	bool frameRenderingQueued(const FrameEvent& evt);
 
 	bool keyPressed(const OIS::KeyEvent& evt);
 	

@@ -132,7 +132,31 @@ material Examples/Instancing/VTF/HW/shadow_caster
 	}
 }
 
-abstract material Examples/Instancing/VTF
+material Examples/Instancing/VTF/HW/shadow_caster_dq
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Instancing/VTF/HW/shadow_caster_dq_cg_vs
+			{
+				param_named_auto	viewProjMatrix				viewproj_matrix
+				param_named_auto	depthRange					scene_depth_range
+			}
+			fragment_program_ref Ogre/Instancing/shadow_caster_ps
+			{
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
+abstract material Examples/Instancing/HW_VTF
 {
 	technique
 	{
@@ -170,16 +194,16 @@ abstract material Examples/Instancing/VTF
 	}
 }
 
-material Examples/Instancing/VTF/HW/Robot : Examples/Instancing/VTF
+material Examples/Instancing/VTF/HW/Robot : Examples/Instancing/HW_VTF
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
 }
 
-abstract material Examples/Instancing/VTF_dq
+abstract material Examples/Instancing/HW_VTF_dq
 {
 	technique
 	{
-		shadow_caster_material Examples/Instancing/VTF/HW/shadow_caster
+		shadow_caster_material Examples/Instancing/VTF/HW/shadow_caster_dq
 
 		pass
 		{
@@ -216,7 +240,7 @@ abstract material Examples/Instancing/VTF_dq
 	}
 }
 
-material Examples/Instancing/VTF/HW/Robot_dq : Examples/Instancing/VTF_dq
+material Examples/Instancing/VTF/HW/Robot_dq : Examples/Instancing/HW_VTF_dq
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
 }
