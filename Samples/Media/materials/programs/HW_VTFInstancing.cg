@@ -56,10 +56,9 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	float2x4 blendDQ;	
 	blendDQ[0] = tex2D( matrixTexture, input.m03.xw + input.mOffset );
 	blendDQ[1] = tex2D( matrixTexture, input.m03.yw + input.mOffset );
-	blendDQ /= length(blendDQ[0]);
 	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
 	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
-	worldNorm = calculateBlendNormal(input.Normal.xyz, blendDQ);
+	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
 	float3x4 worldMatrix;
 	worldMatrix[0] = tex2D( matrixTexture, input.m03.xw + input.mOffset );
