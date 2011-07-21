@@ -111,7 +111,7 @@ void Sample_NewInstancing::setupContent()
 	setupLighting();
 
 	// set initial camera position and speed
-	mCamera->setPosition( 0, 50, 100 );
+	mCamera->setPosition( 0, 100, 100 );
 
 	setupGUI();
 
@@ -464,7 +464,6 @@ void Sample_NewInstancing::setupGUI()
 	}
 	//Check box to enable dual quaternion skinning
 	mSkinningTechniques = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "SkinningTechnique", "Skinning Technique", 450, 285, 5);
-	mSkinningTechniques->hide();
 	mSkinningTechniques->addItem("Linear Skinning");
 	mSkinningTechniques->addItem("Dual Quaternion Skinning");
 
@@ -534,20 +533,6 @@ SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
 	else if( box == mSetStatic && mCurrentManager )
 	{
 		mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
-	}
-	else if (box == mAnimateInstances)
-	{
-		if(mSkinningTechniques)
-		{
-			if(box->isChecked())
-			{
-				mSkinningTechniques->show();
-			}
-			else
-			{
-				mSkinningTechniques->hide();
-			}
-		}
 	}
 }
 
