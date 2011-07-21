@@ -315,6 +315,10 @@ namespace Ogre {
 		Update only that limited amount of animations in the vertex texture.*/
 		IM_VTFBONEMATRIXLOOKUP = 0x0004,
 
+		IM_USEBONEDUALQUATERNIONS = 0x0008,
+
+		IM_USETWOWEIGHTS = 0x0016,
+
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT
 	};
     

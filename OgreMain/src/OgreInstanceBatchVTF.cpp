@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
+#include "OgreDualQuaternion.h"
 
 namespace Ogre
 {
@@ -46,14 +47,17 @@ namespace Ogre
 
 	BaseInstanceBatchVTF::BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
 				mNumWorldMatrices( instancesPerBatch ),
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
+				mRowLength(3),
+				mTempTransformsArray3x4(0),
 				mUseBoneMatrixLookup(false),
 				mMaxLookupTableInstances(16),
+				mUseBoneDualQuaternions(false),
 				mRemoveOwnVertexData( false )
 	{
 		cloneMaterial( mMaterial );
@@ -85,6 +89,8 @@ namespace Ogre
 		}
 
 		mRenderOperation.vertexData = NULL;
+
+		OGRE_DELETE mTempTransformsArray3x4;
 	}
 
 	//-----------------------------------------------------------------------
@@ -222,17 +228,24 @@ namespace Ogre
 			uniqueAnimations = std::min<size_t>(getMaxLookupTableInstances(), uniqueAnimations);
 		}
 		mMatricesPerInstance = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
+
+		if(mUseBoneDualQuaternions && !mTempTransformsArray3x4)
+		{
+			mTempTransformsArray3x4 = OGRE_NEW float[mMatricesPerInstance * 3 * 4];
+		}
+		
 		mNumWorldMatrices = uniqueAnimations * mMatricesPerInstance;
 
 		//Calculate the width & height required to hold all the matrices. Start by filling the width
 		//first (i.e. 4096x1 4096x2 4096x3, etc)
-		size_t texWidth			= std::min<size_t>( mNumWorldMatrices * 3, c_maxTexWidth );
+		
+		size_t texWidth			= std::min<size_t>( mNumWorldMatrices * mRowLength, c_maxTexWidth );
 		size_t maxUsableWidth	= texWidth;
 		if( matricesToghetherPerRow() )
 		{
 			//The technique requires all matrices from the same instance in the same row
 			//i.e. 4094 -> 4095 -> skip 4096 -> 0 (next row) contains data from a new instance 
-			mWidthFloatsPadding = texWidth % (mMatricesPerInstance * 3);
+			mWidthFloatsPadding = texWidth % (mMatricesPerInstance * mRowLength);
 
 			if( mWidthFloatsPadding )
 			{
@@ -246,9 +259,9 @@ namespace Ogre
 			}
 		}
 
-		size_t texHeight = mNumWorldMatrices * 3 / maxUsableWidth;
+		size_t texHeight = mNumWorldMatrices * mRowLength / maxUsableWidth;
 
-		if( (mNumWorldMatrices * 3) % maxUsableWidth )
+		if( (mNumWorldMatrices * mRowLength) % maxUsableWidth )
 			texHeight += 1;
 
 		//Don't use 1D textures, as OGL goes crazy because the shader should be calling texture1D()...
@@ -263,6 +276,42 @@ namespace Ogre
 		//Set our cloned material to use this custom texture!
 		setupMaterialToUseVTF( texType, mMaterial );
 	}
+
+	//-----------------------------------------------------------------------
+	size_t BaseInstanceBatchVTF::convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions)
+	{
+		DualQuaternion dQuat;
+		Matrix4 matrix;
+		size_t floatsWritten = 0;
+
+		for (int m = 0; m < numOfMatrices; ++m)
+		{
+			for(int i = 0; i < 3; ++i)
+			{
+				for(int b = 0; b < 4; ++b)
+				{
+					matrix[i][b] = *matrices++;
+				}
+			}
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 1;
+			
+			dQuat.fromTransformationMatrix(matrix);
+			
+			//Copy the 2x4 matrix
+			for(int i = 0; i < 8; ++i)
+			{
+				*outDualQuaternions++ = dQuat[i];
+				++floatsWritten;
+			}
+		}
+
+		return floatsWritten;
+	}
+	
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::updateVertexTexture(void)
 	{
@@ -275,18 +324,38 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
+		float* transforms;
+
+		//If using dual quaternion skinning, write the transforms to a temporary buffer,
+		//then convert to dual quaternions, then later write to the pixel buffer
+		//Otherwise simply write the transforms to the pixel buffer directly
+		if(mUseBoneDualQuaternions)
+		{
+			transforms = mTempTransformsArray3x4;
+		}
+		else
+		{
+			transforms = pDest;
+		}
+
+		
 		while( itor != end )
 		{
-			const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
+			size_t floatsWritten = (*itor)->getTransforms3x4( transforms );
 
 			if( mManager->getCameraRelativeRendering() )
-				makeMatrixCameraRelative3x4( pDest, floatsWritten );
+				makeMatrixCameraRelative3x4( transforms, floatsWritten );
+
+			if(mUseBoneDualQuaternions)
+			{
+				floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+			}
 
 			pDest += floatsWritten;
 
 			++itor;
 		}
-
+		
 		mMatrixTexture->getBuffer()->unlock();
 	}
 	/** update the lookup numbers for entities with shared transforms */
@@ -532,7 +601,7 @@ namespace Ogre
 			{
 				for( size_t k=0; k<4; ++k )
 				{
-					size_t instanceIdx = (hwBoneIdx[j] + i * mMatricesPerInstance) * 3 + k;
+					size_t instanceIdx = (hwBoneIdx[j] + i * mMatricesPerInstance) * mRowLength + k;
 					thisVec->x = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
 					thisVec->y = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
 					++thisVec;
@@ -557,7 +626,7 @@ namespace Ogre
 		{
 			//TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
 			const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
-			retVal = c_maxTexWidth * c_maxTexHeight / 3 / numBones;
+			retVal = c_maxTexWidth * c_maxTexHeight / mRowLength / numBones;
 
 			if( flags & IM_USE16BIT )
 			{
@@ -571,13 +640,13 @@ namespace Ogre
 				//Do the same as in createVertexTexture()
 				const size_t numWorldMatrices = instancesPerBatch * numBones;
 
-				size_t texWidth  = std::min<size_t>( numWorldMatrices * 3, c_maxTexWidth );
-				size_t texHeight = numWorldMatrices * 3 / c_maxTexWidth;
+				size_t texWidth  = std::min<size_t>( numWorldMatrices * mRowLength, c_maxTexWidth );
+				size_t texHeight = numWorldMatrices * mRowLength / c_maxTexWidth;
 
-				const size_t remainder = (numWorldMatrices * 3) % c_maxTexWidth;
+				const size_t remainder = (numWorldMatrices * mRowLength) % c_maxTexWidth;
 
 				if( remainder && texHeight > 0 )
-					retVal = static_cast<size_t>(texWidth * texHeight / 3.0f / (float)(numBones));
+					retVal = static_cast<size_t>(texWidth * texHeight / (float)mRowLength / (float)(numBones));
 			}
 		}
 

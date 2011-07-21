@@ -135,16 +135,19 @@ namespace Ogre
 		//Create the UVs to sample from the right bone/matrix
 		for( size_t j=0; j<baseVertexData->vertexCount; ++j )
 		{
-			for( size_t k=0; k<3; ++k )
+			for( size_t k=0; k < mRowLength; ++k )
 			{
 				//Only calculate U (not V) since all matrices are in the same row. We use the instanced
 				//(repeated) buffer to tell how much U & V we need to offset
-				size_t instanceIdx = hwBoneIdx[j] * 3 + k;
+				size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
 				*thisFloat++ = instanceIdx / texWidth;
 			}
-
-			//Put a zero in the 4th U coordinate (it's not really used, but it's handy)
-			*thisFloat++ = 0;
+			//Maybe can use this for a second dual quaternion, would be faster if IM_TWOWEIGHTS AND IM_USEBONEDUALQUATERNIONS
+			for ( size_t k=mRowLength; k < 4; ++k)
+			{
+				//Put a zero in the 4th (and sometimes 3rd) U coordinate (it's not really used, but it's handy)
+				*thisFloat++ = 0;
+			}
 		}
 
 		vertexBuffer->unlock();
@@ -216,7 +219,7 @@ namespace Ogre
 					(entity->findVisible(currentCamera)))
 				{
 					size_t matrixIndex = useMatrixLookup ? entity->mTransformLookupNumber : i;
-					size_t instanceIdx = matrixIndex * mMatricesPerInstance * 3;
+					size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
 					*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - texelOffsets.x;
 					*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - texelOffsets.y;
 					thisVec += 2;
@@ -294,10 +297,10 @@ namespace Ogre
 			//TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
 			const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
-			const size_t maxUsableWidth = c_maxTexWidthHW - (c_maxTexWidthHW % (numBones * 3));
+			const size_t maxUsableWidth = c_maxTexWidthHW - (c_maxTexWidthHW % (numBones * mRowLength));
 
 			//See InstanceBatchHW::calculateMaxNumInstances for the 65535
-			retVal = std::min<size_t>( 65535, maxUsableWidth * c_maxTexHeightHW / 3 / numBones );
+			retVal = std::min<size_t>( 65535, maxUsableWidth * c_maxTexHeightHW / mRowLength / numBones );
 
 			if( flags & IM_VTFBESTFIT )
 			{
@@ -308,13 +311,13 @@ namespace Ogre
 				//Do the same as in createVertexTexture(), but changing c_maxTexWidthHW for maxUsableWidth
 				const size_t numWorldMatrices = instancesPerBatch * numBones;
 
-				size_t texWidth  = std::min<size_t>( numWorldMatrices * 3, maxUsableWidth );
-				size_t texHeight = numWorldMatrices * 3 / maxUsableWidth;
+				size_t texWidth  = std::min<size_t>( numWorldMatrices * mRowLength, maxUsableWidth );
+				size_t texHeight = numWorldMatrices * mRowLength / maxUsableWidth;
 
-				const size_t remainder = (numWorldMatrices * 3) % maxUsableWidth;
+				const size_t remainder = (numWorldMatrices * mRowLength) % maxUsableWidth;
 
 				if( remainder && texHeight > 0 )
-					retVal = static_cast<size_t>(texWidth * texHeight / 3.0f / (float)(numBones));
+					retVal = static_cast<size_t>(texWidth * texHeight / (float)mRowLength / (float)(numBones));
 			}
 		}
 
@@ -349,11 +352,19 @@ namespace Ogre
 		
 		std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
 
-		size_t floatPerEntity = mMatricesPerInstance * 3 * 4;
+		size_t floatPerEntity = mMatricesPerInstance * mRowLength * 4;
 		size_t entitiesPerPadding = (size_t)(mMaxFloatsPerLine / floatPerEntity);
 		
 		size_t instanceCount = mInstancedEntities.size();
 		size_t updatedInstances = 0;
+
+		float* transforms;
+		//If using dual quaternions, write 3x4 matrices to a temporary buffer, then convert to dual quaternions
+		if(mUseBoneDualQuaternions)
+		{
+			transforms = mTempTransformsArray3x4;
+		}
+		
 		for(size_t i = 0 ; i < instanceCount ; ++i)
 		{
 			InstancedEntity* entity = mInstancedEntities[i];
@@ -371,13 +382,24 @@ namespace Ogre
 			{
 				float* pDest = pSource + floatPerEntity * textureLookupPosition + 
 					(size_t)(textureLookupPosition / entitiesPerPadding) * mWidthFloatsPadding;
+
+				if(!mUseBoneDualQuaternions)
+				{
+					transforms = pDest;
+				}
+				
 				if( mMeshReference->hasSkeleton() )
 					mDirtyAnimation |= entity->_updateAnimation();
 
-				const size_t floatsWritten = entity->getTransforms3x4( pDest );
+				size_t floatsWritten = entity->getTransforms3x4( transforms );
 
 				if( !useMatrixLookup && mManager->getCameraRelativeRendering() )
-					makeMatrixCameraRelative3x4( pDest, floatsWritten );
+					makeMatrixCameraRelative3x4( transforms, floatsWritten );
+
+				if(mUseBoneDualQuaternions)
+				{
+					floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+				}
 
 				if (useMatrixLookup)
 				{

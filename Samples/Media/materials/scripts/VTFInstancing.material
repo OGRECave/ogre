@@ -59,6 +59,28 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_cg_vs cg
 	uses_vertex_texture_fetch true
 }
 
+vertex_program Ogre/Instancing/VTF_dq_cg_vs cg
+{
+	source VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_dq_cg_vs cg
+{
+	source VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION
+
+	uses_vertex_texture_fetch true
+}
+
 //--------------------------------------------------------------
 // Unified CG/GLSL Programs
 //--------------------------------------------------------------
@@ -148,7 +170,54 @@ abstract material Examples/Instancing/VTF
 	}
 }
 
+abstract material Examples/Instancing/VTF_dq
+{
+	technique
+	{
+		shadow_caster_material Examples/Instancing/VTF/shadow_caster
+
+		pass
+		{
+			specular	1 1 1 1 12.5
+			vertex_program_ref Ogre/Instancing/VTF_dq_cg_vs
+			{
+				param_named_auto	viewProjMatrix				viewproj_matrix
+
+				param_named_auto	depthRange					shadow_scene_depth_range 0
+				param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
 material Examples/Instancing/VTF/Robot : Examples/Instancing/VTF
+{
+	set_texture_alias	DiffuseMap	r2skin.jpg
+}
+
+material Examples/Instancing/VTF/Robot_dq : Examples/Instancing/VTF_dq
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
 }

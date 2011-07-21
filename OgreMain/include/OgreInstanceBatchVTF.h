@@ -87,9 +87,15 @@ namespace Ogre
 		size_t					mWidthFloatsPadding;
 		size_t					mMaxFloatsPerLine;
 
+		size_t					mRowLength;
+		//Temporary array used to store 3x4 matrices before they are converted to dual quaternions
+		float* 					mTempTransformsArray3x4;
+
 		// The state of the usage of bone matrix lookup
 		bool mUseBoneMatrixLookup;
 		size_t mMaxLookupTableInstances;
+
+		bool mUseBoneDualQuaternions;
 
 		//When true remove the memory of the VertexData & index we've created because no one else will
 		bool					mRemoveOwnVertexData;
@@ -115,6 +121,8 @@ namespace Ogre
 		virtual void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
 									const HWBoneIdxVec &hwBoneIdx ) = 0;
 
+		size_t convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions);
+									
 		/** Keeps filling the VTF with world matrix data */
 		void updateVertexTexture(void);
 
@@ -130,7 +138,7 @@ namespace Ogre
 	public:
 		BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName );
+							const String &batchName);
 		virtual ~BaseInstanceBatchVTF();
 
 		/** @See InstanceBatch::buildFrom */
@@ -163,6 +171,11 @@ namespace Ogre
 		*/
 		bool useBoneMatrixLookup() const { return mUseBoneMatrixLookup; }
 
+		void setBoneDualQuaternions(bool enable) { assert(mInstancedEntities.empty());
+			mUseBoneDualQuaternions = enable; mRowLength = (mUseBoneDualQuaternions ? 2 : 3); }
+
+		bool useBoneDualQuaternions() const { return mUseBoneDualQuaternions; }
+
 		/** @See InstanceBatch::useBoneWorldMatrices()	*/
 		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
 
@@ -185,7 +198,7 @@ namespace Ogre
 	public:
 		InstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
-							const String &batchName );
+							const String &batchName);
 		virtual ~InstanceBatchVTF();
 
 		/** @See InstanceBatch::calculateMaxNumInstances */

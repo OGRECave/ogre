@@ -18,6 +18,9 @@ struct VS_INPUT
 };
 
 #include "InstancingVertexInterpolators.cg"
+#ifdef ST_DUAL_QUATERNION
+#include "DualQuaternion_Common.cg"
+#endif
 
 //---------------------------------------------
 //Main Vertex Shader
@@ -41,13 +44,25 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 {
 	VS_OUTPUT output;
 
+	float4 worldPos	 = 0;
+	float3 worldNorm = 0;
+
+	#ifdef ST_DUAL_QUATERNION
+	float2x4 blendDQ;	
+	blendDQ[0] = tex2D( matrixTexture, input.m01.xy );
+	blendDQ[1] = tex2D( matrixTexture, input.m01.zw );
+	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
+	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
+	worldNorm = calculateBlendNormal(input.Normal.xyz, blendDQ);
+	#else
 	float3x4 worldMatrix;
 	worldMatrix[0] = tex2D( matrixTexture, input.m01.xy );
 	worldMatrix[1] = tex2D( matrixTexture, input.m01.zw );
 	worldMatrix[2] = tex2D( matrixTexture, input.m23.xy );
 
-	float4 worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
-	float3 worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
+	worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
+	worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
+	#endif
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );
