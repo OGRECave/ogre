@@ -26,59 +26,60 @@ THE SOFTWARE.
 */
 #include "PlayPenTests.h"
 
-PlayPen_FarFromOrigin::PlayPen_FarFromOrigin()
+PlayPen_SkeletonAnimationOptimise::PlayPen_SkeletonAnimationOptimise()
 {
-	mInfo["Title"] = "PlayPen_FarFromOrigin";
+	mInfo["Title"] = "PlayPen_SkeletonAnimationOptimise";
 	mInfo["Description"] = "Tests.";
 	addScreenshotFrame(250);
 }
 //----------------------------------------------------------------------------
 
-void PlayPen_FarFromOrigin::cleanupContent()
-{
-	//clearDebugTextureOverlays();
-}
-
-void PlayPen_FarFromOrigin::setupContent()
+void PlayPen_SkeletonAnimationOptimise::setupContent()
 {
 	SceneNode* mTestNode[5];
-	mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
-	mSceneMgr->setShadowTextureSettings(1024, 2);
+	mSceneMgr->setShadowTextureSize(512);
+	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+	mSceneMgr->setShadowFarDistance(1500);
+	mSceneMgr->setShadowColour(ColourValue(0.35, 0.35, 0.35));
+	//mSceneMgr->setShadowFarDistance(800);
+	// Set ambient light
+	mSceneMgr->setAmbientLight(ColourValue(0.3, 0.3, 0.3));
 	
-	Vector3 offset(100000, 0, 100000);
-	//Vector3 offset(0, 0, 0);
-	
-	mSceneMgr->setAmbientLight(ColourValue(0.1, 0.1, 0.1));
-	
-	// Directional test
 	Light* mLight = mSceneMgr->createLight("MainLight");
+	
+	/*/
+	// Directional test
 	mLight->setType(Light::LT_DIRECTIONAL);
 	Vector3 vec(-1,-1,0);
 	vec.normalise();
 	mLight->setDirection(vec);
-	mLight->setDiffuseColour(ColourValue(0.5, 0.5, 1.0));
-	
-	// Spotlight test
-	mLight = mSceneMgr->createLight("SpotLight");
-	mLight->setType(Light::LT_SPOTLIGHT);
-	mLight->setAttenuation(10000, 1, 0, 0);
-	mLight->setDiffuseColour(1.0, 1.0, 0.5);
-	
-	mTestNode[0] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	mTestNode[0]->setPosition(offset + Vector3(-400,300,1000));
-	mTestNode[0]->lookAt(offset, Node::TS_WORLD, Vector3::UNIT_Z);
-	mTestNode[0]->attachObject(mLight);
-	
-	
-	mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	mTestNode[1]->setPosition(offset);
+	/*/
+	// Point test
+	mLight->setType(Light::LT_POINT);
+	mLight->setPosition(0, 200, 0);
+	//*/
 	
 	Entity* pEnt;
-	pEnt = mSceneMgr->createEntity( "1", "knot.mesh" );
+	
+	// Hardware animation
+	pEnt = mSceneMgr->createEntity( "1", "robot.mesh" );
+	AnimationState* a = pEnt->getAnimationState("Walk");
+	a->setEnabled(true);
+	mAnimStateList.push_back(a);
+	mTestNode[0] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	mTestNode[0]->attachObject( pEnt );
+	mTestNode[0]->translate(+100,-100,0);
+	
+	// Software animation
+	pEnt = mSceneMgr->createEntity( "2", "robot.mesh" );
+	pEnt->setMaterialName("BaseWhite");
+	a = pEnt->getAnimationState("Walk");
+	a->setEnabled(true);
+	mAnimStateList.push_back(a);
+	
+	mTestNode[1] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	mTestNode[1]->attachObject( pEnt );
-	
-	
-	mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
+	mTestNode[1]->translate(-100,-100,0);
 	
 	
 	Plane plane;
@@ -86,26 +87,12 @@ void PlayPen_FarFromOrigin::setupContent()
 	plane.d = 100;
 	MeshManager::getSingleton().createPlane("Myplane",
 	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
-	2500,2500,10,10,true,1,5,5,Vector3::UNIT_Z);
+	1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt;
 	pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("2 - Default");
 	pPlaneEnt->setCastShadows(false);
-	mSceneMgr->getRootSceneNode()->createChildSceneNode(offset)->attachObject(pPlaneEnt);
-	
-	ParticleSystem* pSys2 = mSceneMgr->createParticleSystem("smoke", 
-	"Examples/Smoke");
-	mTestNode[4] = mSceneMgr->getRootSceneNode()->createChildSceneNode(offset + Vector3(-300, -100, 200));
-	mTestNode[4]->attachObject(pSys2);
-	
-	mCamera->setPosition(offset + Vector3(0, 1000, 500));
-	mCamera->lookAt(offset);
-	mCamera->setFarClipDistance(10000);
-	
-	mSceneMgr->setCameraRelativeRendering(true);
-	
-	FocusedShadowCameraSetup* camSetup = new FocusedShadowCameraSetup();
-	mSceneMgr->setShadowCameraSetup(ShadowCameraSetupPtr(camSetup));
-	//addTextureShadowDebugOverlay(1, mSceneMgr);
-	
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
+
+	mCamera->setPosition(0,0,300);
 }

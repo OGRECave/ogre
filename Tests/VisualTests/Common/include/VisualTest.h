@@ -83,6 +83,8 @@ public:
         mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
         mCamera->setNearClipDistance(0.5f);
         mCamera->setFarClipDistance(10000.f);
+		mCamera->setPosition(Ogre::Vector3::ZERO);
+		mCamera->setOrientation(Ogre::Quaternion::IDENTITY);
     }
 
     /** Unload all resources used by this sample */
