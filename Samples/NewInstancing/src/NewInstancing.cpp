@@ -26,7 +26,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 #endif
 //------------------------------------------------------------------------------
-Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mSkinningTechniques(NULL), mCurrentMaterialSet(c_materialsTechniques)
+Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mSkinningTechniques(NULL), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0)
 {
 	mInfo["Title"] = "New Instancing";
 	mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"
@@ -100,7 +100,7 @@ void Sample_NewInstancing::setupContent()
 
 	// create a mesh for our ground
 	MeshManager::getSingleton().createPlane("ground", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		Plane(Vector3::UNIT_Y, 0), 1000, 1000, 20, 20, true, 1, 6, 6, Vector3::UNIT_Z);
+		Plane(Vector3::UNIT_Y, 0), 10000, 10000, 20, 20, true, 1, 6, 6, Vector3::UNIT_Z);
 
 	// create a ground entity from our mesh and attach it to the origin
 	Entity* ground = mSceneMgr->createEntity("Ground", "ground");
@@ -176,6 +176,7 @@ void Sample_NewInstancing::switchInstancingTechnique()
 		//If you're not bandwidth limited, you may want to lift IM_VTFBESTFIT flag away
 
 		InstanceManager::InstancingTechnique technique;
+	
 		switch( mInstancingTechnique )
 		{
 		case 0: technique = InstanceManager::ShaderBased; break;
@@ -191,10 +192,12 @@ void Sample_NewInstancing::switchInstancingTechnique()
 			flags |= IM_VTFBONEMATRIXLOOKUP;
 		}
 
+		flags |= mCurrentFlags;
+
 		mCurrentManager = mSceneMgr->createInstanceManager(
 			"InstanceMgr" + StringConverter::toString(mInstancingTechnique), c_meshNames[mCurrentMesh],
 			ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME, technique,
-			NUM_INST_ROW * NUM_INST_COLUMN, flags );
+			NUM_INST_ROW * NUM_INST_COLUMN, flags);
 
 		createInstancedEntities();
 
@@ -235,9 +238,15 @@ void Sample_NewInstancing::switchSkinningTechnique(int index)
 	{
 		default:
 		//Linear Skinning
-		case 0: mCurrentMaterialSet = c_materialsTechniques; break;
+		case 0:
+			mCurrentMaterialSet = c_materialsTechniques;
+			mCurrentFlags = 0;
+			break;
 		//Dual Quaternion Skinning
-		case 1: mCurrentMaterialSet = c_materialsTechniques_dq; break;
+		case 1:
+			mCurrentMaterialSet = c_materialsTechniques_dq;
+			mCurrentFlags = IM_USEBONEDUALQUATERNIONS;
+			break;
 	};
 }
 
@@ -298,7 +307,6 @@ void Sample_NewInstancing::createSceneNodes()
 			int idx = i * NUM_INST_COLUMN + j;
 			SceneNode *sceneNode = rootNode->createChildSceneNode();
 			sceneNode->attachObject( mEntities[idx] );
-			sceneNode->setScale( Vector3( 0.1f ) );
 			sceneNode->yaw( Radian( (i+1) * (j+1) * (i+1) * (j+1) ) ); //Random orientation
 			sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
 				mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
@@ -383,25 +391,25 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 		//Calculate bounces
 		Vector3 entityPos = (*itor)->getPosition();
 		Vector3 planeNormal = Vector3::ZERO;
-		if( (*itor)->getPosition().x < -500.0f )
+		if( (*itor)->getPosition().x < -5000.0f )
 		{
 			planeNormal = Vector3::UNIT_X;
-			entityPos.x = -499.0f;
+			entityPos.x = -4999.0f;
 		}
-		else if( (*itor)->getPosition().x > 500.0f )
+		else if( (*itor)->getPosition().x > 5000.0f )
 		{
 			planeNormal = Vector3::NEGATIVE_UNIT_X;
-			entityPos.x = 499.0f;
+			entityPos.x = 4999.0f;
 		}
-		else if( (*itor)->getPosition().z < -500.0f )
+		else if( (*itor)->getPosition().z < -5000.0f )
 		{
 			planeNormal = Vector3::UNIT_Z;
-			entityPos.z = -499.0f;
+			entityPos.z = -4999.0f;
 		}
-		else if( (*itor)->getPosition().z > 500.0f )
+		else if( (*itor)->getPosition().z > 5000.0f )
 		{
 			planeNormal = Vector3::NEGATIVE_UNIT_Z;
-			entityPos.z = 499.0f;
+			entityPos.z = 4999.0f;
 		}
 
 		if( planeNormal != Vector3::ZERO )
@@ -594,8 +602,7 @@ void Sample_NewInstancing::checkHardwareSupport()
 
 		const size_t numInstances = mSceneMgr->getNumInstancesPerBatch( c_meshNames[mCurrentMesh],
 			ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-			mCurrentMaterialSet[i], technique, NUM_INST_ROW * NUM_INST_COLUMN,
-			flags );
+			mCurrentMaterialSet[i], technique, NUM_INST_ROW * NUM_INST_COLUMN, flags );
 
 		mSupportedTechniques[i] = numInstances > 0;
 	}

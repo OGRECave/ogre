@@ -30,11 +30,11 @@ static const char *c_materialsTechniques[] =
 static const char *c_materialsTechniques_dq[] =
 {
 	"Examples/Instancing/ShaderBased/Robot_dq",
-	"Examples/Instancing/VTF/Robot",
+	"Examples/Instancing/VTF/Robot_dq",
 	"Examples/Instancing/HWBasic/Robot",
-	"Examples/Instancing/VTF/HW/Robot",
+	"Examples/Instancing/VTF/HW/Robot_dq",
 	"Examples/Instancing/VTF/HW/LUT/Robot",
-	"Examples/Instancing/ShaderBased/Robot"
+	"Examples/Instancing/ShaderBased/Robot_dq"
 };
 
 static const char *c_meshNames[] =
@@ -119,6 +119,7 @@ protected:
 	InstanceManager					*mCurrentManager;
 	bool							mSupportedTechniques[NUM_TECHNIQUES+1];
 	const char**						mCurrentMaterialSet;
+	uint16 							mCurrentFlags;
 
 	SelectMenu						*mTechniqueMenu;
 	CheckBox						*mMoveInstances;
