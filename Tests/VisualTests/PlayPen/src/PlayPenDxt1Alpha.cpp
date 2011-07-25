@@ -39,7 +39,7 @@ void PlayPen_Dxt1Alpha::setupContent()
 	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Tests");
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("testdxt", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setSceneBlending(SBT_TRANSPARENT_ALPHA);
 	p->setAlphaRejectSettings(CMPF_GREATER, 128);

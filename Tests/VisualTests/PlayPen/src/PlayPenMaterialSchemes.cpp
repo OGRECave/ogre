@@ -42,7 +42,7 @@ void PlayPen_MaterialSchemes::setupContent()
 	mSceneMgr->setAmbientLight(ColourValue(0.8, 0.8, 0.8));
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("schemetest", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	// default scheme
 	mat->getTechnique(0)->getPass(0)->createTextureUnitState("GreenSkin.jpg");
 	

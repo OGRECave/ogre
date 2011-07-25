@@ -40,13 +40,13 @@ void PlayPen_ImageCombine::setupContent()
 	
 	// pick 2 files that are the same size, alpha texture will be made greyscale
 	combined.loadTwoImagesAsRGBA("rockwall.tga", "flare.png", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, PF_BYTE_RGBA);
+	TRANSIENT_RESOURCE_GROUP, PF_BYTE_RGBA);
 	
-	TexturePtr tex = TextureManager::getSingleton().createManual("1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 256, 256, 1, 0, PF_BYTE_RGBA);
+	TexturePtr tex = TextureManager::getSingleton().createManual("1", TRANSIENT_RESOURCE_GROUP, TEX_TYPE_2D, 256, 256, 1, 0, PF_BYTE_RGBA);
 	tex->loadImage(combined);
 	
 	MaterialManager& mmgr = MaterialManager::getSingleton();
-	MaterialPtr mat = mmgr.create("m1", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	MaterialPtr mat = mmgr.create("m1", TRANSIENT_RESOURCE_GROUP);
 	Pass* pass = mat->getTechnique(0)->getPass(0);
 	pass->setLightingEnabled(false);
 	pass->setCullingMode(CULL_NONE);

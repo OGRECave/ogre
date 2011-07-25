@@ -37,7 +37,7 @@ PlayPen_PointSprites::PlayPen_PointSprites()
 void PlayPen_PointSprites::setupContent()
 {
 	MaterialPtr mat = MaterialManager::getSingleton().create("spriteTest1", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setPointSpritesEnabled(true);
 	p->createTextureUnitState("flare.png");

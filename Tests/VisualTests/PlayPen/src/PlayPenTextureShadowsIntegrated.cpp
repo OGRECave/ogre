@@ -99,18 +99,18 @@ void PlayPen_TextureShadowsIntegrated::setupContent()
 	Plane plane;
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 100;
-	MeshPtr msh = MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	MeshPtr msh = MeshManager::getSingleton().createPlane("Myplane_IS",
+	TRANSIENT_RESOURCE_GROUP, plane,
 	4500,4500,100,100,true,1,40,40,Vector3::UNIT_Z);
 	msh->buildTangentVectors(VES_TANGENT);
 	Entity* pPlaneEnt;
-	pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
+	pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane_IS" );
 	//pPlaneEnt->setMaterialName("Examples/OffsetMapping/Specular");
 	pPlaneEnt->setMaterialName("Examples/OffsetMapping/IntegratedShadows");
 	pPlaneEnt->setCastShadows(false);
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(pPlaneEnt);
 	
-	pPlaneEnt = mSceneMgr->createEntity( "plane2", "Myplane" );
+	pPlaneEnt = mSceneMgr->createEntity( "plane2", "Myplane_IS" );
 	//pPlaneEnt->setMaterialName("Examples/OffsetMapping/Specular");
 	pPlaneEnt->setMaterialName("Examples/OffsetMapping/IntegratedShadows");
 	pPlaneEnt->setCastShadows(false);
@@ -119,7 +119,7 @@ void PlayPen_TextureShadowsIntegrated::setupContent()
 	n->translate(100,0,0);
 	//n->attachObject(pPlaneEnt);
 	
-	pPlaneEnt = mSceneMgr->createEntity( "plane3", "Myplane" );
+	pPlaneEnt = mSceneMgr->createEntity( "plane3", "Myplane_IS" );
 	//pPlaneEnt->setMaterialName("Examples/OffsetMapping/Specular");
 	pPlaneEnt->setMaterialName("Examples/OffsetMapping/IntegratedShadows");
 	pPlaneEnt->setCastShadows(false);

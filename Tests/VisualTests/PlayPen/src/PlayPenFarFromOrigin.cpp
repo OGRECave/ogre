@@ -85,7 +85,7 @@ void PlayPen_FarFromOrigin::setupContent()
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 100;
 	MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	TRANSIENT_RESOURCE_GROUP, plane,
 	2500,2500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt;
 	pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );

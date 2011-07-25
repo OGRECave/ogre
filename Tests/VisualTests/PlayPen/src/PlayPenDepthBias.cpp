@@ -41,7 +41,7 @@ void PlayPen_DepthBias::setupContent()
 	mSceneMgr->setAmbientLight(ColourValue::White);
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("mat1", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->createTextureUnitState("BumpyMetal.jpg");
 	
@@ -64,7 +64,7 @@ void PlayPen_DepthBias::setupContent()
 		name += StringConverter::toString(i);
 		
 		MaterialPtr pMat = static_cast<MaterialPtr>(MaterialManager::getSingleton().create(
-		name, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME));
+		name, TRANSIENT_RESOURCE_GROUP));
 		
 		pMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
 		pMat->getTechnique(0)->getPass(0)->setAlphaRejectSettings(CMPF_GREATER_EQUAL, 128);

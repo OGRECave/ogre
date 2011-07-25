@@ -37,10 +37,10 @@ PlayPen_BlitSubTextures::PlayPen_BlitSubTextures()
 void PlayPen_BlitSubTextures::setupContent()
 {
 	Image img;
-	img.load("ogrelogo.png", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	img.load("ogrelogo.png", TRANSIENT_RESOURCE_GROUP);
 	
 	TexturePtr tex = TextureManager::getSingleton().createManual("testblitdst", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 1024, 1024, 1, 0, PF_R8G8B8A8);
+	TRANSIENT_RESOURCE_GROUP, TEX_TYPE_2D, 1024, 1024, 1, 0, PF_R8G8B8A8);
 	
 	PixelBox srcBox;
 	// this box should select from halfway through the head, to the 'OG' part of the logo
@@ -71,7 +71,7 @@ void PlayPen_BlitSubTextures::setupContent()
 	tex->getBuffer()->blitFromMemory(srcBox, dstBox);
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("testblit", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setLightingEnabled(false);
 	p->setCullingMode(CULL_NONE);

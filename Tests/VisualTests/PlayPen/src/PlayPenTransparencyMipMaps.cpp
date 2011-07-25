@@ -37,7 +37,7 @@ PlayPen_TransparencyMipMaps::PlayPen_TransparencyMipMaps()
 void PlayPen_TransparencyMipMaps::setupContent()
 {
 	MaterialPtr mat = MaterialManager::getSingleton().create("test", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	// known png with alpha
 	Pass* pass = mat->getTechnique(0)->getPass(0);
 	pass->createTextureUnitState("sdk_logo.png");
@@ -54,7 +54,7 @@ void PlayPen_TransparencyMipMaps::setupContent()
 	p.normal = Vector3::UNIT_Y;
 	p.d = 200;
 	MeshManager::getSingleton().createPlane("FloorPlane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+	TRANSIENT_RESOURCE_GROUP,
 	p,2000,2000,1,1,true,1,5,5,Vector3::UNIT_Z);
 	
 	// Create an entity (the floor)
@@ -70,7 +70,7 @@ void PlayPen_TransparencyMipMaps::setupContent()
 		
 		Real alphaLevel = 0.5f;
 		MaterialPtr alphamat = MaterialManager::getSingleton().create("testy", 
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		TRANSIENT_RESOURCE_GROUP);
 		Pass* pass = alphamat->getTechnique(0)->getPass(0);
 		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);
 		pass->setDepthWriteEnabled(false);

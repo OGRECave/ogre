@@ -42,12 +42,12 @@ void PlayPen_Dxt1FromMemory::setupContent()
 	// manually load into image
 	Image img;
 	img.load(stream, "dds");
-	TextureManager::getSingleton().loadImage("testdxtfrommem", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, img);
+	TextureManager::getSingleton().loadImage("testdxtfrommem", TRANSIENT_RESOURCE_GROUP, img);
 	
 	
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("testdxt", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setLightingEnabled(false);
 	p->setCullingMode(CULL_NONE);

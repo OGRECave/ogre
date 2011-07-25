@@ -115,7 +115,7 @@ void PlayPen_StencilShadows::setupContent()
 	*/
 	
 	MeshPtr msh = MeshManager::getSingleton().load("knot.mesh", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	unsigned short src, dest;
 	if (!msh->suggestTangentVectorBuildParams(VES_TANGENT, src, dest))
 	{
@@ -144,7 +144,7 @@ void PlayPen_StencilShadows::setupContent()
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 100;
 	MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	TRANSIENT_RESOURCE_GROUP, plane,
 	1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("2 - Default");
@@ -159,12 +159,12 @@ void PlayPen_StencilShadows::setupContent()
 
 	// Create a render texture
 /*	TexturePtr rtt = TextureManager::getSingleton().createManual("rtt0", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	TEX_TYPE_2D, 512, 512, 0, PF_R8G8B8, TU_RENDERTARGET);
 	rtt->getBuffer()->getRenderTarget()->addViewport(mCamera);
 	// Create an overlay showing the rtt
 	MaterialPtr debugMat = MaterialManager::getSingleton().create(
-	"DebugRTT", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	"DebugRTT", TRANSIENT_RESOURCE_GROUP);
 	debugMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
 	TextureUnitState *t = debugMat->getTechnique(0)->getPass(0)->createTextureUnitState("rtt0");
 	t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);

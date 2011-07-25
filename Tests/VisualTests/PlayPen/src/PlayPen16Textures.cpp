@@ -40,7 +40,7 @@ void PlayPen_16Textures::setupContent()
 	HighLevelGpuProgramPtr frag;
 	if (StringUtil::match(Root::getSingleton().getRenderSystem()->getName(), "*GL*"))
 	{
-		frag = HighLevelGpuProgramManager::getSingleton().createProgram("frag16", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+		frag = HighLevelGpuProgramManager::getSingleton().createProgram("frag16", TRANSIENT_RESOURCE_GROUP,
 		"glsl", GPT_FRAGMENT_PROGRAM);
 		frag->setSource(" \
 		uniform sampler2D tex0; \
@@ -69,7 +69,7 @@ void PlayPen_16Textures::setupContent()
 	else
 	{
 		// DirectX
-		frag = HighLevelGpuProgramManager::getSingleton().createProgram("frag16", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+		frag = HighLevelGpuProgramManager::getSingleton().createProgram("frag16", TRANSIENT_RESOURCE_GROUP,
 		"hlsl", GPT_FRAGMENT_PROGRAM);
 		frag->setParameter("target", "ps_2_0");
 		frag->setParameter("entry_point", "main");
@@ -100,7 +100,7 @@ void PlayPen_16Textures::setupContent()
 	}
 	frag->load();
 	
-	MaterialPtr mat = MaterialManager::getSingleton().create("test16", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	MaterialPtr mat = MaterialManager::getSingleton().create("test16", TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setVertexProgram("Ogre/BasicVertexPrograms/AmbientOneTextureUnified");
 	p->setFragmentProgram(frag->getName());

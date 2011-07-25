@@ -106,7 +106,7 @@ void PlayPen_Distortion::setupContent()
 	Entity* pEnt;
 	
 	TexturePtr rttTex = TextureManager::getSingleton().createManual("Refraction", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+	TRANSIENT_RESOURCE_GROUP, TEX_TYPE_2D, 
 	512, 512, 1, 0, PF_R8G8B8, TU_RENDERTARGET);
 	{
 		Viewport *v = rttTex->getBuffer()->getRenderTarget()->addViewport( mCamera );
@@ -117,7 +117,7 @@ void PlayPen_Distortion::setupContent()
 	}
 	
 	rttTex = TextureManager::getSingleton().createManual("Reflection", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+	TRANSIENT_RESOURCE_GROUP, TEX_TYPE_2D, 
 	512, 512, 1, 0, PF_R8G8B8, TU_RENDERTARGET);
 	{
 		Viewport *v = rttTex->getBuffer()->getRenderTarget()->addViewport( mCamera );
@@ -131,7 +131,7 @@ void PlayPen_Distortion::setupContent()
 	p.normal = Vector3::UNIT_Y;
 	p.d = 100;
 	MeshManager::getSingleton().createPlane("WallPlane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+	TRANSIENT_RESOURCE_GROUP,
 	p,1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	pPlaneEnt = mSceneMgr->createEntity( "5", "WallPlane" );
 	pPlaneEnt->setMaterialName("Examples/FresnelReflectionRefraction");

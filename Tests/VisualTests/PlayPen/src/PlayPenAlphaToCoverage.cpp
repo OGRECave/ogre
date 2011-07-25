@@ -38,7 +38,7 @@ void PlayPen_AlphaToCoverage::setupContent()
 {
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("testa2c", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setAlphaRejectSettings(CMPF_GREATER, 96);
 	p->setLightingEnabled(false);
@@ -52,7 +52,7 @@ void PlayPen_AlphaToCoverage::setupContent()
 	
 	
 	mat = MaterialManager::getSingleton().create("testnoa2c", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	p = mat->getTechnique(0)->getPass(0);
 	p->setAlphaRejectSettings(CMPF_GREATER, 96);
 	p->setLightingEnabled(false);
@@ -65,7 +65,7 @@ void PlayPen_AlphaToCoverage::setupContent()
 	mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-100, 0, 0))->attachObject(e);
 	
 	mat = MaterialManager::getSingleton().create("bg", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	p = mat->getTechnique(0)->getPass(0);
 	p->setLightingEnabled(false);
 	p->setCullingMode(CULL_NONE);

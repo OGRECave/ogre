@@ -61,7 +61,7 @@ void PlayPen_TextureShadowsCustomReceiverMat::setupContent()
 	
 	HighLevelGpuProgramPtr vp = HighLevelGpuProgramManager::getSingleton()
 	.createProgram("CustomShadowReceiverVp", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	"cg", GPT_VERTEX_PROGRAM);
 	vp->setSource(customReceiverMatVp);
 	vp->setParameter("profiles", "vs_1_1 arbvp1");
@@ -70,7 +70,7 @@ void PlayPen_TextureShadowsCustomReceiverMat::setupContent()
 	
 	HighLevelGpuProgramPtr fp = HighLevelGpuProgramManager::getSingleton()
 	.createProgram("CustomShadowReceiverFp", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	"cg", GPT_FRAGMENT_PROGRAM);
 	fp->setSource(customReceiverMatFp);
 	fp->setParameter("profiles", "ps_1_1 arbfp1");
@@ -78,7 +78,7 @@ void PlayPen_TextureShadowsCustomReceiverMat::setupContent()
 	fp->load();
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("CustomShadowReceiver", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setVertexProgram("CustomShadowReceiverVp");
 	p->getVertexProgramParameters()->setNamedAutoConstant(

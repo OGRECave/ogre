@@ -77,7 +77,7 @@ void PlayPen_StaticGeometryWithLOD::setupContent()
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 0;
 	MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	TRANSIENT_RESOURCE_GROUP, plane,
 	4500,4500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("Examples/GrassFloor");
@@ -88,7 +88,7 @@ void PlayPen_StaticGeometryWithLOD::setupContent()
 	Vector3 max(2000,30,2000);
 	
 	
-	MeshPtr msh = MeshManager::getSingleton().load("knot.mesh", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	MeshPtr msh = MeshManager::getSingleton().load("knot.mesh", TRANSIENT_RESOURCE_GROUP);
 	
 	Entity* e = mSceneMgr->createEntity("1", msh->getName());
 	

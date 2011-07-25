@@ -137,7 +137,7 @@ set(SOURCE_FILES
     src/PlayPenTextureShadowsCustomCasterMat.cpp
     src/PlayPenTextureShadowsCustomReceiverMat.cpp
     src/PlayPenTextureShadowsIntegrated.cpp
-    #src/PlayPenTextureShadowsIntegratedPSSM.cpp
+    src/PlayPenTextureShadowsIntegratedPSSM.cpp
     #src/PlayPenTextureShadowsTransparentCaster.cpp
     #src/PlayPenTimeCreateDestroyObject.cpp
     #src/PlayPenTwoNewTerrains.cpp

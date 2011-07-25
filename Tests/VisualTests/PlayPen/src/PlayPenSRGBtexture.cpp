@@ -39,7 +39,7 @@ void PlayPen_SRGBtexture::setupContent()
 	// NOTE: enable flag only turns on SRGB for texture sampling, you may
 	// need to configure the window for the reverse conversion for consistency!
 	MaterialPtr mat = MaterialManager::getSingleton().create("testsrgb", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setLightingEnabled(false);
 	p->setCullingMode(CULL_NONE);

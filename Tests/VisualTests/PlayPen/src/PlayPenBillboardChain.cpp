@@ -47,7 +47,7 @@ void PlayPen_BillboardChain::setupContent()
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 100;
 	MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	TRANSIENT_RESOURCE_GROUP, plane,
 	1500,1500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
 	pPlaneEnt->setMaterialName("2 - Default");

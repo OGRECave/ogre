@@ -111,7 +111,7 @@ void PlayPen_TextureShadows::setupContent()
 	// Transparent object (can force cast shadows)
 	pEnt = mSceneMgr->createEntity( "3.5", "knot.mesh" );
 	MaterialPtr tmat = MaterialManager::getSingleton().create("TestAlphaTransparency", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	tmat->setTransparencyCastsShadows(true);
 	Pass* tpass = tmat->getTechnique(0)->getPass(0);
 	tpass->setAlphaRejectSettings(CMPF_GREATER, 150);
@@ -124,7 +124,7 @@ void PlayPen_TextureShadows::setupContent()
 	mTestNode[3]->attachObject( pEnt );
 	
 	MeshPtr msh = MeshManager::getSingleton().load("knot.mesh",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	msh->buildTangentVectors(VES_TANGENT, 0, 0);
 	pEnt = mSceneMgr->createEntity( "4", "knot.mesh" );
 	//pEnt->setMaterialName("Examples/BumpMapping/MultiLightSpecular");
@@ -136,7 +136,7 @@ void PlayPen_TextureShadows::setupContent()
 	
 	MovablePlane movablePlane(Vector3::UNIT_Y, 100);
 	MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, movablePlane,
+	TRANSIENT_RESOURCE_GROUP, movablePlane,
 	2500,2500,10,10,true,1,5,5,Vector3::UNIT_Z);
 	Entity* pPlaneEnt;
 	pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );

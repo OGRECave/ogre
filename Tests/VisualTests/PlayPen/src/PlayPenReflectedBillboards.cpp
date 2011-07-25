@@ -55,7 +55,7 @@ void PlayPen_ReflectedBillboards::setupContent()
 	plane.d = 0;
 	plane.normal = Vector3::UNIT_Y;
 	MeshManager::getSingleton().createPlane("ReflectionPlane", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	plane, 2000, 2000, 
 	1, 1, true, 1, 1, 1, Vector3::UNIT_Z);
 	Entity* planeEnt = mSceneMgr->createEntity( "Plane", "ReflectionPlane" );
@@ -71,7 +71,7 @@ void PlayPen_ReflectedBillboards::setupContent()
 	mCamera->lookAt(0,0,0);
 	
 	TexturePtr rttTex = TextureManager::getSingleton().createManual("RttTex", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+	TRANSIENT_RESOURCE_GROUP, TEX_TYPE_2D, 
 	512, 512, 1, 0, PF_R8G8B8, TU_RENDERTARGET);
 	{
 		reflectCam = mSceneMgr->createCamera("ReflectCam");
@@ -89,7 +89,7 @@ void PlayPen_ReflectedBillboards::setupContent()
 		v->setBackgroundColour( ColourValue::Black );
 		
 		MaterialPtr mat = MaterialManager::getSingleton().create("RttMat",
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		TRANSIENT_RESOURCE_GROUP);
 		TextureUnitState* t = mat->getTechnique(0)->getPass(0)->createTextureUnitState("RustedMetal.jpg");
 		t = mat->getTechnique(0)->getPass(0)->createTextureUnitState("RttTex");
 		// Blend with base texture

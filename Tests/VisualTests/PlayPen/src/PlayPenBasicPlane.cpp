@@ -56,7 +56,7 @@ void PlayPen_BasicPlane::setupContent()
 	p.normal = Vector3::UNIT_Y;
 	p.d = 200;
 	MeshManager::getSingleton().createPlane("FloorPlane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+	TRANSIENT_RESOURCE_GROUP,
 	p,2000,2000,1,1,true,1,5,5,Vector3::UNIT_Z);
 	
 	// Create an entity (the floor)

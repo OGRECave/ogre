@@ -54,7 +54,7 @@ void PlayPen_TextureShadowsCustomCasterMat::setupContent()
 	
 	HighLevelGpuProgramPtr vp = HighLevelGpuProgramManager::getSingleton()
 	.createProgram("CustomShadowCasterVp", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	"cg", GPT_VERTEX_PROGRAM);
 	vp->setSource(customCasterMatVp);
 	vp->setParameter("profiles", "vs_1_1 arbvp1");
@@ -63,7 +63,7 @@ void PlayPen_TextureShadowsCustomCasterMat::setupContent()
 	
 	HighLevelGpuProgramPtr fp = HighLevelGpuProgramManager::getSingleton()
 	.createProgram("CustomShadowCasterFp", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
+	TRANSIENT_RESOURCE_GROUP, 
 	"cg", GPT_FRAGMENT_PROGRAM);
 	fp->setSource(customCasterMatFp);
 	fp->setParameter("profiles", "ps_1_1 arbfp1");
@@ -71,7 +71,7 @@ void PlayPen_TextureShadowsCustomCasterMat::setupContent()
 	fp->load();
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("CustomShadowCaster", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setVertexProgram("CustomShadowCasterVp");
 	p->getVertexProgramParameters()->setNamedAutoConstant(

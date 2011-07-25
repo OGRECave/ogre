@@ -39,7 +39,7 @@ void PlayPen_CubeDDS::setupContent()
 	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Tests");
 	
 	MaterialPtr mat = MaterialManager::getSingleton().create("testcube", 
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	TRANSIENT_RESOURCE_GROUP);
 	Pass* p = mat->getTechnique(0)->getPass(0);
 	p->setLightingEnabled(false);
 	TextureUnitState* t = p->createTextureUnitState();

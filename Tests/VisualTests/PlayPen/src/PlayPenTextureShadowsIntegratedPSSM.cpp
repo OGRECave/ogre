@@ -75,7 +75,7 @@ void PlayPen_TextureShadowsIntegratedPSSM::setupContent()
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 100;
 	MeshPtr msh = MeshManager::getSingleton().createPlane("Myplane",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+	TRANSIENT_RESOURCE_GROUP, plane,
 	4500,4500,100,100,true,1,40,40,Vector3::UNIT_Z);
 	msh->buildTangentVectors(VES_TANGENT);
 	Entity* pPlaneEnt;

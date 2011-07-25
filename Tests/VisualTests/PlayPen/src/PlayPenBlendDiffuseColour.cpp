@@ -37,7 +37,7 @@ PlayPen_BlendDiffuseColour::PlayPen_BlendDiffuseColour()
 void PlayPen_BlendDiffuseColour::setupContent()
 {
 	MaterialPtr mat = MaterialManager::getSingleton().create(
-	"testBlendDiffuseColour", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	"testBlendDiffuseColour", TRANSIENT_RESOURCE_GROUP);
 	Pass* pass = mat->getTechnique(0)->getPass(0);
 	// no lighting, it will mess up vertex colours
 	pass->setLightingEnabled(false);
