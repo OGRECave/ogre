@@ -67,6 +67,9 @@ public:
     /** Setup the Root */
     virtual void createRoot();
 
+	/** Handles the config dialog */
+	virtual bool oneTimeConfig();
+
     /** Set up directories for the tests to output to */
     virtual void setupDirectories(Ogre::String batchName);
 
@@ -98,6 +101,12 @@ protected:
 
 	// if we're generating the 'reference' set
 	bool mGenerateHtml;
+	
+	// Force the config dialog to appear
+	bool mForceConfig;
+
+	// Name of the rendersystem to use
+	Ogre::String mRenderSystemName;
 	
 	// optional custom name for this batch
     Ogre::String mBatchName;

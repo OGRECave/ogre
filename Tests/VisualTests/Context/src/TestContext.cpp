@@ -51,10 +51,12 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     // prepopulate expected options
     unOpt["-r"] = false;        // generate reference set
     unOpt["--no-html"] = false; // whether or not to generate html
+    unOpt["-d"] = false;        // force config dialogue
     binOpt["-m"] = "";          // optional comment
     binOpt["-ts"] = "VTests";   // name of the test set to use
     binOpt["-c"] = "Reference"; // name of batch to compare against
     binOpt["-n"] = "AUTO";      // name for this batch
+    binOpt["-rs"] = "SAVED";    // rendersystem to use (default: use name from the config file/dialog)
 
     // parse
     findCommandLineOpts(argc, argv, unOpt, binOpt);
@@ -65,6 +67,8 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mGenerateHtml = !unOpt["--no-html"];
     mBatchName = binOpt["-n"];
     mCompareWith = binOpt["-c"];
+    mForceConfig = unOpt["-d"];
+    mRenderSystemName = binOpt["-rs"];
 }
 //-----------------------------------------------------------------------
 
@@ -314,6 +318,34 @@ void TestContext::createRoot()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.load();
 #endif
+}
+//-----------------------------------------------------------------------
+
+bool TestContext::oneTimeConfig()
+{
+	// if forced, just do it and return
+	if(mForceConfig)
+	{
+		bool temp = mRoot->showConfigDialog();
+		if(!temp)
+			mRoot->setRenderSystem(0);
+		return temp;
+	}
+
+	// try restore
+	bool success = mRoot->restoreConfig();
+
+	// if restoring failed, show the dialog
+	if(!success)
+		success = mRoot->showConfigDialog();
+
+	// set render system if user-defined
+	if(success && mRenderSystemName != "SAVED" && mRoot->getRenderSystemByName(mRenderSystemName))
+		mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
+	else if(!success)
+		mRoot->setRenderSystem(0);
+
+	return success;
 }
 //-----------------------------------------------------------------------
 
