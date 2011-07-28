@@ -68,11 +68,21 @@ set(SOURCE_FILES
     src/PlayPenManualObject2D.cpp
     src/PlayPenSubEntityVisibility.cpp
     src/PlayPenTextureShadows.cpp
+    src/PlayPenTextureShadowsCustomCasterMat.cpp
+    src/PlayPenTextureShadowsCustomReceiverMat.cpp
+    src/PlayPenTextureShadowsIntegrated.cpp
+    src/PlayPenTextureShadowsIntegratedPSSM.cpp
+    src/PlayPenLiSPSM.cpp
+    src/PlayPenMaterialSchemesWithLOD.cpp
+    src/PlayPenMaterialSchemesWithMismatchedLOD.cpp
+    src/PlayPenClearScene.cpp
+    src/PlayPenStencilShadowsMixedOpSubMeshes.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
 
     #src/PlayPenGeneratedLOD.cpp
 	#src/PlayPenAlpha.cpp
+    #src/PlayPenBug.cpp
     #src/PlayPen2Windows.cpp
     #src/PlayPen2bppAlphaPVR.cpp
     #src/PlayPen2bppPVR.cpp
@@ -81,8 +91,6 @@ set(SOURCE_FILES
     #src/PlayPenAnimation.cpp
     #src/PlayPenAnimationBlend.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
-    #src/PlayPenBug.cpp
-    #src/PlayPenClearScene.cpp
     #src/PlayPenCompositorTechniqueSwitch.cpp
     #src/PlayPenCompositorTextureShadows.cpp
     #src/PlayPenCthNewBlending.cpp
@@ -101,16 +109,13 @@ set(SOURCE_FILES
     #src/PlayPenGpuPrograms.cpp
     #src/PlayPenInfiniteAAB.cpp
     #src/PlayPenIntersectionSceneQuery.cpp
-    #src/PlayPenLiSPSM.cpp
     #src/PlayPenLod.cpp
     #src/PlayPenMRT.cpp
     #src/PlayPenMRTCompositorScript.cpp
     #src/PlayPenManualBoneMovement.cpp
-    #src/PlayPenManualIlluminationStage.cpp
+    src/PlayPenManualIlluminationStage.cpp
     #src/PlayPenManualLoader.cpp
     #src/PlayPenMaterialSchemesListener.cpp
-    #src/PlayPenMaterialSchemesWithLOD.cpp
-    #src/PlayPenMaterialSchemesWithMismatchedLOD.cpp
     #src/PlayPenMaterialSerializer.cpp
     #src/PlayPenMatrices.cpp
     #src/PlayPenNewTerrain.cpp
@@ -131,13 +136,8 @@ set(SOURCE_FILES
     #src/PlayPenSimpleMesh.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
     #src/PlayPenSpotlightViewProj.cpp
-    #src/PlayPenStencilShadowsMixedOpSubMeshes.cpp
     #src/PlayPenStringTokenising.cpp
     #src/PlayPenSuppressedShadows.cpp
-    src/PlayPenTextureShadowsCustomCasterMat.cpp
-    src/PlayPenTextureShadowsCustomReceiverMat.cpp
-    src/PlayPenTextureShadowsIntegrated.cpp
-    src/PlayPenTextureShadowsIntegratedPSSM.cpp
     #src/PlayPenTextureShadowsTransparentCaster.cpp
     #src/PlayPenTimeCreateDestroyObject.cpp
     #src/PlayPenTwoNewTerrains.cpp
