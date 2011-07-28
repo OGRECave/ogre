@@ -58,6 +58,7 @@ namespace Ogre
 				mUseBoneMatrixLookup(false),
 				mMaxLookupTableInstances(16),
 				mUseBoneDualQuaternions(false),
+				mUseBoneTwoWeights(false),
 				mRemoveOwnVertexData( false )
 	{
 		cloneMaterial( mMaterial );
@@ -166,8 +167,11 @@ namespace Ogre
 			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 
 			uint8 biggestWeightIdx = 0;
+			uint8 secondBiggestWeightIdx = 0;
 			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+			{
 				biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
+			}
 
 			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
 			outBoneIdx[i] = pIndex[biggestWeightIdx];
@@ -177,6 +181,51 @@ namespace Ogre
 
 		buff->unlock();
 	}
+
+	//-----------------------------------------------------------------------
+	void BaseInstanceBatchVTF::retrieveBoneIdxTwoWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt)
+	{
+		const VertexElement *ve = baseVertexData->vertexDeclaration->
+															findElementBySemantic( VES_BLEND_INDICES );
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
+															findElementBySemantic( VES_BLEND_WEIGHTS );
+
+		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
+		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
+
+		for( size_t i=0; i<baseVertexData->vertexCount * 2; i += 2)
+		{
+			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
+
+			uint8 biggestWeightIdx = 0;
+			uint8 secondBiggestWeightIdx = 0;
+			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+			{
+				if(pWeights[biggestWeightIdx] < pWeights[j])
+				{
+					secondBiggestWeightIdx = biggestWeightIdx;
+					biggestWeightIdx = j;
+				}
+				else if(pWeights[secondBiggestWeightIdx] < pWeights[j])
+				{
+					secondBiggestWeightIdx = j;
+				}
+			}
+
+			outBoneWgt[i] = pWeights[biggestWeightIdx];
+			outBoneWgt[i+1] = pWeights[secondBiggestWeightIdx];
+			
+
+			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
+			outBoneIdx[i] = pIndex[biggestWeightIdx];
+			outBoneIdx[i+1] = pIndex[secondBiggestWeightIdx];
+
+			baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
+		}
+
+		buff->unlock();
+	}
+	
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material )
 	{
@@ -463,10 +512,27 @@ namespace Ogre
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
 
 		HWBoneIdxVec hwBoneIdx;
-		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
+		HWBoneWgtVec hwBoneWgt;
+
+		size_t weightCount = mUseBoneDualQuaternions && mUseBoneTwoWeights ? 2 : 1;
+
+		hwBoneIdx.resize( baseVertexData->vertexCount * weightCount, 0 );
+		
+		if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+		{
+			hwBoneWgt.resize( baseVertexData->vertexCount * weightCount, 0 );
+		}
+		
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			retrieveBoneIdx( baseVertexData, hwBoneIdx );
+			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+			{
+				retrieveBoneIdxTwoWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
+			}
+			else
+			{
+				retrieveBoneIdx( baseVertexData, hwBoneIdx );
+			}
 
 			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
 			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
@@ -503,7 +569,7 @@ namespace Ogre
 		}
 
 		createVertexTexture( baseSubMesh );
-		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx );
+		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx, hwBoneWgt);
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupIndices( const SubMesh* baseSubMesh )
@@ -557,7 +623,7 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::createVertexSemantics( 
-		VertexData *thisVertexData, VertexData *baseVertexData, const HWBoneIdxVec &hwBoneIdx )
+		VertexData *thisVertexData, VertexData *baseVertexData, const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt)
 	{
 		const size_t texWidth  = mMatrixTexture->getWidth();
 		const size_t texHeight = mMatrixTexture->getHeight();

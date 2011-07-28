@@ -88,10 +88,27 @@ namespace Ogre
 
 		//Remove the blend weights & indices
 		HWBoneIdxVec hwBoneIdx;
-		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
+		HWBoneWgtVec hwBoneWgt;
+
+		size_t weightCount = mUseBoneDualQuaternions && mUseBoneTwoWeights ? 2 : 1;
+
+		hwBoneIdx.resize( baseVertexData->vertexCount * weightCount, 0 );
+
+		if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+		{
+			hwBoneWgt.resize( baseVertexData->vertexCount * weightCount, 0 );
+		}
+		
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			retrieveBoneIdx( baseVertexData, hwBoneIdx );
+			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+			{
+				retrieveBoneIdxTwoWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
+			}
+			else
+			{
+				retrieveBoneIdx( baseVertexData, hwBoneIdx );
+			}
 
 			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
 			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
@@ -99,7 +116,7 @@ namespace Ogre
 		}
 
 		createVertexTexture( baseSubMesh );
-		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx );
+		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx, hwBoneWgt);
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::setupIndices( const SubMesh* baseSubMesh )
@@ -111,7 +128,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::createVertexSemantics( VertexData *thisVertexData,
 														 VertexData *baseVertexData,
-														 const HWBoneIdxVec &hwBoneIdx )
+														 const HWBoneIdxVec &hwBoneIdx,
+														 const HWBoneWgtVec& hwBoneWgt)
 	{
 		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
 		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
@@ -119,9 +137,14 @@ namespace Ogre
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 16 bytes aligned :-)
 		unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() );
-
+		size_t offset = thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+		if(mUseBoneTwoWeights)
+		{
+			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() );
+		}
+		
 		//Create our own vertex buffer
 		HardwareVertexBufferSharedPtr vertexBuffer =
 			HardwareBufferManager::getSingleton().createVertexBuffer(
@@ -132,21 +155,54 @@ namespace Ogre
 
 		float *thisFloat = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
+		size_t weightCount = mUseBoneTwoWeights ? 2 : 1;
+		
 		//Create the UVs to sample from the right bone/matrix
-		for( size_t j=0; j<baseVertexData->vertexCount; ++j )
+		for( size_t j=0; j<baseVertexData->vertexCount * weightCount; j += weightCount )
 		{
-			for( size_t k=0; k < mRowLength; ++k )
+			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
 			{
-				//Only calculate U (not V) since all matrices are in the same row. We use the instanced
-				//(repeated) buffer to tell how much U & V we need to offset
-				size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
-				*thisFloat++ = instanceIdx / texWidth;
+				//Write the quaternion for the first dual quat
+				for( size_t k=0; k < 2; ++k)
+				{
+					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
+					//(repeated) buffer to tell how much U & V we need to offset
+					size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
+					*thisFloat++ = instanceIdx / texWidth;
+				}
+
+				//Write the quaternion for the second dual quat
+				for( size_t k=0; k < 2; ++k)
+				{
+					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
+					//(repeated) buffer to tell how much U & V we need to offset
+					size_t instanceIdx = hwBoneIdx[j+1] * mRowLength + k;
+					*thisFloat++ = instanceIdx / texWidth;
+				}
+
+				//Write the two weights
+				*thisFloat++ = hwBoneWgt[j];
+				*thisFloat++ = hwBoneWgt[j+1];
+				*thisFloat++ = 0.0f;
+				*thisFloat++ = 0.0f;
 			}
-			//Maybe can use this for a second dual quaternion, would be faster if IM_TWOWEIGHTS AND IM_USEBONEDUALQUATERNIONS
-			for ( size_t k=mRowLength; k < 4; ++k)
+			else
 			{
-				//Put a zero in the 4th (and sometimes 3rd) U coordinate (it's not really used, but it's handy)
-				*thisFloat++ = 0;
+				//Perhaps could change this to store the indices for two dual quaternions in the same vector
+				for( size_t k=0; k < mRowLength; ++k )
+				{
+					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
+					//(repeated) buffer to tell how much U & V we need to offset
+					size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
+					*thisFloat++ = instanceIdx / texWidth;
+				}
+
+				//If using two weights, use the z and w components of the uv coords for the index of the second dual quaternion
+				for ( size_t k=mRowLength; k < 4; ++k)
+				{
+					//Put a zero in the 4th (and sometimes 3rd) U coordinate (it's not really used, but it's handy)
+					*thisFloat++ = 0.0f;
+				}
 			}
 		}
 
@@ -154,7 +210,7 @@ namespace Ogre
 
 		//Now create the instance buffer that will be incremented per instance, contains UV offsets
 		newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		size_t offset = thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES,
+		offset = thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES,
 									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 		if (useBoneMatrixLookup())
 		{

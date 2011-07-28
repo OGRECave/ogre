@@ -69,7 +69,7 @@ namespace Ogre
 
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
 		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
-			const HWBoneIdxVec &hwBoneIdx );
+			const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec& hwBoneWgt );
 
 		/** updates the vertex buffer containing the per instance data 
 		@param[in] isFirstTime Tells if this is the first time the buffer is being updated

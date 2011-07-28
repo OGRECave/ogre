@@ -239,13 +239,21 @@ void Sample_NewInstancing::switchSkinningTechnique(int index)
 		default:
 		//Linear Skinning
 		case 0:
+			mCurrentMesh = 0;
 			mCurrentMaterialSet = c_materialsTechniques;
 			mCurrentFlags = 0;
 			break;
 		//Dual Quaternion Skinning
 		case 1:
+			mCurrentMesh = 0;
 			mCurrentMaterialSet = c_materialsTechniques_dq;
 			mCurrentFlags = IM_USEBONEDUALQUATERNIONS;
+			break;
+		//Dual Quaternion Skinning with two weights
+		case 2:
+			mCurrentMesh = 1;
+			mCurrentMaterialSet = c_materialsTechniques_dq_two_weights;
+			mCurrentFlags = IM_USEBONEDUALQUATERNIONS | IM_USETWOWEIGHTS;
 			break;
 	};
 }
@@ -261,15 +269,27 @@ void Sample_NewInstancing::createEntities()
 		Entity *ent = mSceneMgr->createEntity( c_meshNames[mCurrentMesh] );
 		ent->setMaterialName( mCurrentMaterialSet[NUM_TECHNIQUES] );
 		mEntities.push_back( ent );
-		
-		//Get the animation
-		AnimationState *anim = ent->getAnimationState( "Walk" );
-		if (mAnimations.insert( anim ).second)
+
+		if(mCurrentMesh == 0)
 		{
-			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f ); //Random start offset
+			//Get the animation
+			AnimationState *anim = ent->getAnimationState( "Walk" );
+			if (mAnimations.insert( anim ).second)
+			{
+				anim->setEnabled( true );
+				anim->addTime( i * i * i * 0.001f ); //Random start offset
+			}
 		}
-		
+		else if(mCurrentMesh == 1)
+		{
+			//Get the animation
+			AnimationState *anim = ent->getAnimationState( "Sneak" );
+			if (mAnimations.insert( anim ).second)
+			{
+				anim->setEnabled( true );
+				anim->addTime( i * i * i * 0.001f ); //Random start offset
+			}
+		}
 	}
 }
 //------------------------------------------------------------------------------
@@ -278,18 +298,26 @@ void Sample_NewInstancing::createInstancedEntities()
 	for( int i=0; i<NUM_INST_ROW * NUM_INST_COLUMN; ++i )
 	{
 		//Create the instanced entity
-		InstancedEntity *ent = mCurrentManager->createInstancedEntity(
-			mCurrentMaterialSet[mInstancingTechnique] );
+		InstancedEntity *ent = mCurrentManager->createInstancedEntity(mCurrentMaterialSet[mInstancingTechnique] );
 		mEntities.push_back( ent );
 
 		//HWInstancingBasic is the only technique without animation support
-		if( mInstancingTechnique != InstanceManager::HWInstancingBasic )
+		if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
 		{
-			//Get the animation
-			AnimationState *anim = ent->getAnimationState( "Walk" );
-			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f  ); //Random start offset
-			mAnimations.insert( anim );
+			if(mCurrentMesh == 0)
+			{
+				AnimationState *anim = ent->getAnimationState( "Walk" );
+				anim->setEnabled( true );
+				anim->addTime( i * i * i * 0.001f  ); //Random start offset
+				mAnimations.insert( anim );
+			}
+			else if(mCurrentMesh == 1)
+			{
+				AnimationState *anim = ent->getAnimationState( "Sneak" );
+				anim->setEnabled( true );
+				anim->addTime( i * i * i * 0.001f  ); //Random start offset
+				mAnimations.insert( anim );
+			}
 		}
 	}
 }
@@ -466,6 +494,7 @@ void Sample_NewInstancing::setupGUI()
 	mSkinningTechniques = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "SkinningTechnique", "Skinning Technique", 450, 285, 5);
 	mSkinningTechniques->addItem("Linear Skinning");
 	mSkinningTechniques->addItem("Dual Quaternion Skinning");
+	mSkinningTechniques->addItem("Dual Quaternion Skinning (2 wgts)");
 
 	//Check box to move the units
 	mMoveInstances = mTrayMgr->createCheckBox(TL_TOPRIGHT, "MoveInstances", "Move Instances", 175);

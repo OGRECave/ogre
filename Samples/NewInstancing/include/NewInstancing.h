@@ -37,9 +37,20 @@ static const char *c_materialsTechniques_dq[] =
 	"Examples/Instancing/ShaderBased/Robot_dq"
 };
 
+static const char *c_materialsTechniques_dq_two_weights[] =
+{
+	"Examples/Instancing/ShaderBased/Robot_dq",
+	"Examples/Instancing/VTF/Robot_dq",
+	"Examples/Instancing/HWBasic/Robot",
+	"Examples/Instancing/VTF/HW/jaiqua_dq_two_weights",
+	"Examples/Instancing/VTF/HW/LUT/Robot_dq",
+	"Examples/Instancing/ShaderBased/Robot_dq"
+};
+
 static const char *c_meshNames[] =
 {
-	"robot.mesh"
+	"robot.mesh",
+	"jaiqua.mesh"
 };
 
 #define NUM_TECHNIQUES (((int)InstanceManager::InstancingTechniquesCount) + 1)
@@ -127,7 +138,7 @@ protected:
 	SelectMenu						*mSkinningTechniques;
 	CheckBox						*mEnableShadows;
 	CheckBox						*mSetStatic;
-	OgreBites::Button				*mDefragmentBatches;
+	OgreBites::Button					*mDefragmentBatches;
 	CheckBox						*mDefragmentOptimumCull;
 	Slider							*mInstancesSlider;
 };

@@ -81,6 +81,28 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_cg_vs cg
 	uses_vertex_texture_fetch true
 }
 
+vertex_program Ogre/Instancing/HW_VTF_dq_two_weights_cg_vs cg
+{
+	source HW_VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
+
+	uses_vertex_texture_fetch true
+}
+
+vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_cg_vs cg
+{
+	source HW_VTFInstancing.cg
+	entry_point main_vs
+	profiles vs_3_0 vp40
+	
+	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
+
+	uses_vertex_texture_fetch true
+}
+
 //--------------------------------------------------------------
 // Unified CG/GLSL Programs
 //--------------------------------------------------------------
@@ -93,7 +115,7 @@ vertex_program Ogre/Instancing/HW_VTF_vs unified
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
 
-		param_named_auto	depthRange					shadow_scene_depth_range 0
+		param_named_auto	depthRange				shadow_scene_depth_range 0
 		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 	}
 }
@@ -106,7 +128,7 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_vs unified
 	default_params
 	{
 		param_named_auto	viewProjMatrix				viewproj_matrix
-		param_named_auto	depthRange					scene_depth_range
+		param_named_auto	depthRange				scene_depth_range
 	}
 }
 
@@ -141,7 +163,7 @@ material Examples/Instancing/VTF/HW/shadow_caster_dq
 			vertex_program_ref Ogre/Instancing/VTF/HW/shadow_caster_dq_cg_vs
 			{
 				param_named_auto	viewProjMatrix				viewproj_matrix
-				param_named_auto	depthRange					scene_depth_range
+				param_named_auto	depthRange				scene_depth_range
 			}
 			fragment_program_ref Ogre/Instancing/shadow_caster_ps
 			{
@@ -150,7 +172,31 @@ material Examples/Instancing/VTF/HW/shadow_caster_dq
 			texture_unit InstancingVTF
 			{
 				binding_type	vertex
-				filtering		none
+				filtering	none
+			}
+		}
+	}
+}
+
+material Examples/Instancing/VTF/HW/shadow_caster_dq_two_weights
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_cg_vs
+			{
+				param_named_auto	viewProjMatrix				viewproj_matrix
+				param_named_auto	depthRange				scene_depth_range
+			}
+			fragment_program_ref Ogre/Instancing/shadow_caster_ps
+			{
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering	none
 			}
 		}
 	}
@@ -188,7 +234,7 @@ abstract material Examples/Instancing/HW_VTF
 			texture_unit InstancingVTF
 			{
 				binding_type	vertex
-				filtering		none
+				filtering	none
 			}
 		}
 	}
@@ -208,11 +254,11 @@ abstract material Examples/Instancing/HW_VTF_dq
 		pass
 		{
 			specular	1 1 1 1 12.5
+
 			vertex_program_ref Ogre/Instancing/HW_VTF_dq_cg_vs
 			{
 				param_named_auto	viewProjMatrix				viewproj_matrix
-
-				param_named_auto	depthRange					shadow_scene_depth_range 0
+				param_named_auto	depthRange				shadow_scene_depth_range 0
 			}
 
 			fragment_program_ref Ogre/Instancing_ps
@@ -243,4 +289,51 @@ abstract material Examples/Instancing/HW_VTF_dq
 material Examples/Instancing/VTF/HW/Robot_dq : Examples/Instancing/HW_VTF_dq
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
+}
+
+abstract material Examples/Instancing/HW_VTF_dq_two_weights
+{
+	technique
+	{
+		shadow_caster_material Examples/Instancing/VTF/HW/shadow_caster_dq_two_weights
+
+		pass
+		{
+			specular	1 1 1 1 12.5
+
+			vertex_program_ref Ogre/Instancing/HW_VTF_dq_two_weights_cg_vs
+			{
+				param_named_auto	viewProjMatrix				viewproj_matrix
+				param_named_auto	depthRange				shadow_scene_depth_range 0
+			}
+
+			fragment_program_ref Ogre/Instancing_ps
+			{
+			}
+
+			texture_unit Diffuse
+			{
+				texture_alias		DiffuseMap
+				tex_address_mode clamp
+			}
+
+			texture_unit shadow0
+			{
+				content_type shadow
+				tex_address_mode border
+				tex_border_colour 1 1 1 1
+			}
+
+			texture_unit InstancingVTF
+			{
+				binding_type	vertex
+				filtering		none
+			}
+		}
+	}
+}
+
+material Examples/Instancing/VTF/HW/jaiqua_dq_two_weights : Examples/Instancing/HW_VTF_dq_two_weights
+{
+	set_texture_alias	DiffuseMap	blue_jaiqua.jpg
 }

@@ -75,6 +75,7 @@ namespace Ogre
 	{
 	protected:
 		typedef vector<uint8>::type HWBoneIdxVec;
+		typedef vector<float>::type HWBoneWgtVec;
 		typedef vector<Matrix4>::type Matrix4Vec;
 
 		size_t					mMatricesPerInstance; //number of bone matrices per instance
@@ -96,6 +97,7 @@ namespace Ogre
 		size_t mMaxLookupTableInstances;
 
 		bool mUseBoneDualQuaternions;
+		bool mUseBoneTwoWeights;
 
 		//When true remove the memory of the VertexData & index we've created because no one else will
 		bool					mRemoveOwnVertexData;
@@ -111,6 +113,12 @@ namespace Ogre
 		*/
 		void retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx );
 
+		/** @see: retrieveBoneIdx()
+			Assumes outBoneIdx has enough space (twice the base submesh vertex count, one for each weight)
+			Assumes outBoneWgt has enough space (twice the base submesh vertex count, one for each weight)
+		*/
+		void retrieveBoneIdxTwoWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt);
+
 		/** Setups the material to use a vertex texture */
 		void setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material );
 
@@ -119,7 +127,7 @@ namespace Ogre
 
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
 		virtual void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
-									const HWBoneIdxVec &hwBoneIdx ) = 0;
+									const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt) = 0;
 
 		size_t convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions);
 									
@@ -176,6 +184,11 @@ namespace Ogre
 
 		bool useBoneDualQuaternions() const { return mUseBoneDualQuaternions; }
 
+		void setBoneTwoWeights(bool enable) {  assert(mInstancedEntities.empty());
+			mUseBoneTwoWeights = enable; }
+
+		bool useBoneTwoWeights() const { return mUseBoneTwoWeights; }
+
 		/** @See InstanceBatch::useBoneWorldMatrices()	*/
 		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
 
@@ -192,7 +205,7 @@ namespace Ogre
 
 		/** Creates 2 TEXCOORD semantics that will be used to sample the vertex texture */
 		void createVertexSemantics( VertexData *thisVertexData, VertexData *baseVertexData,
-			const HWBoneIdxVec &hwBoneIdx );
+			const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt );
 
 		virtual bool matricesToghetherPerRow() const { return false; }
 	public:
