@@ -54,6 +54,9 @@ namespace Ogre {
 
 		size_t mFace;
 
+		Image::Box mLockBox;
+		PixelBox mCurrentLock;
+
 		D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
 		/// Util functions to convert a D3D locked box to a pixel box

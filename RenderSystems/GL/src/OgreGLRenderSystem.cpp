@@ -437,6 +437,12 @@ namespace Ogre {
 			{
 				rsc->addShaderProfile("fp40");
 			}        
+
+			if (GLEW_NV_fragment_program4)
+			{
+				rsc->addShaderProfile("gp4fp");
+				rsc->addShaderProfile("gpu_fp");
+			}
 		}
 
 		// NFZ - Check if GLSL is supported
@@ -798,6 +804,16 @@ namespace Ogre {
 			if(caps->isShaderProfileSupported("fp30"))
 			{
 				mGpuProgramManager->registerProgramFactory("fp30", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gp4fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gp4fp", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gpu_fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gpu_fp", createGLArbGpuProgram);
 			}
 
 		}
