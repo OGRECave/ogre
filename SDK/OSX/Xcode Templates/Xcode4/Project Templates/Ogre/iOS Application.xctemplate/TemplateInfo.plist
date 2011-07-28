@@ -161,7 +161,7 @@
 								<key>SharedSettings</key>
 								<dict>
 									<key>HEADER_SEARCH_PATHS</key>
-									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<string>"/___VARIABLE_ogrePathiOS___/include/OGRE" "/___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "/___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "/___VARIABLE_ogrePathiOS___/include" "/___VARIABLE_ogrePathiOS___/include/OIS" "/___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
 									<key>OTHER_LDFLAGS</key>
 									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLESStatic -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
 								</dict>
@@ -178,7 +178,7 @@
 								<key>SharedSettings</key>
 								<dict>
 									<key>HEADER_SEARCH_PATHS</key>
-									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES2" "___VARIABLE_ogrePathiOS___/include/OGRE/RTShaderSystem" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<string>"/___VARIABLE_ogrePathiOS___/include/OGRE" "/___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES2" "/___VARIABLE_ogrePathiOS___/include/OGRE/RTShaderSystem" "/___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "/___VARIABLE_ogrePathiOS___/include" "/___VARIABLE_ogrePathiOS___/include/OIS" "/___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
 									<key>OTHER_CFLAGS</key>
 									<string>-DOGRE_USE_GLES2=1</string>
 									<key>OTHER_LDFLAGS</key>
@@ -227,7 +227,7 @@
 		<key>SharedSettings</key>
 		<dict>
 			<key>LIBRARY_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathiOS___/lib/Release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib/release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib"</string>
+			<string>"/___VARIABLE_ogrePathiOS___/lib/Release" "/___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib/release" "/___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib"</string>
 			<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
 			<string>iPhone Developer</string>
 			<key>GCC_THUMB_SUPPORT</key>
