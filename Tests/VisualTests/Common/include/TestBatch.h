@@ -110,7 +110,7 @@ public:
             images.size() != other.images.size())
             return false;
 
-        for (int i = 0; i < images.size(); ++i)
+        for (unsigned int i = 0; i < images.size(); ++i)
             if(images[i] != other.images[i])
                 return false;
 
@@ -134,7 +134,7 @@ public:
         else
         {
 			ImageValidator validator = ImageValidator(mDirectory, other.mDirectory);
-            for (int i = 0; i < images.size(); ++i)
+            for (unsigned int i = 0; i < images.size(); ++i)
                 out->push_back(validator.compare(images[i]));
         }
         return out;
@@ -158,7 +158,7 @@ public:
             config<<"[Tests]\n";
 
             // add entries for each image
-            for (int i = 0; i < images.size(); ++i)
+            for (unsigned int i = 0; i < images.size(); ++i)
                 config<<"Test="<<images[i]<<"\n";
 
             config.close();
@@ -180,7 +180,7 @@ public:
         // use ArchiveManager to get a list of all subdirectories
         Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem");
         Ogre::StringVectorPtr tests = testDir->list(false, true);
-        for (int i = 0; i < tests->size(); ++i)
+        for (unsigned int i = 0; i < tests->size(); ++i)
         {
             Ogre::ConfigFile info;
             

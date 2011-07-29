@@ -119,7 +119,7 @@ public:
 
 	virtual bool frameStarted(const Ogre::FrameEvent& evt)
 	{
-		for(int i = 0; i < mAnimStateList.size(); ++i)
+		for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
 			mAnimStateList[i]->addTime(evt.timeSinceLastFrame);
 		return true;
 	}

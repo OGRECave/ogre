@@ -362,7 +362,7 @@ void TestContext::setupDirectories(Ogre::String batchName)
     // add a directory for the render system
     Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
     // strip spaces from render system name
-    for (int i = 0;i < rsysName.size(); ++i)
+    for (unsigned int i = 0;i < rsysName.size(); ++i)
         if (rsysName[i] != ' ')
             mOutputDir += rsysName[i];
     mOutputDir += "/";

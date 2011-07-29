@@ -92,7 +92,7 @@ protected:
 
         // summarize results
         size_t numPassed = 0;
-        for (int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults->size(); ++i)
             if ((*mResults)[i].passed)
                 ++numPassed;
         contentDiv->appendElement("h3")->appendText(
@@ -102,7 +102,7 @@ protected:
         
         // add thumbnails
         HtmlElement* thumbs = contentDiv->appendElement("p");
-        for (int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults->size(); ++i)
         {
             HtmlElement* anchor = thumbs->appendElement("a");
             anchor->appendAttribute("href", Ogre::String("#") + (*mResults)[i].testName + "_" 
@@ -114,7 +114,7 @@ protected:
         }
 
         // add side-by-side images and summary for each test
-        for (int i = 0; i < mResults->size(); ++i)
+        for (unsigned int i = 0; i < mResults->size(); ++i)
             body->pushChild(summarizeSingleResult((*mResults)[i], mSet1, mSet2));
 
         // print to the stream and return
@@ -234,7 +234,7 @@ protected:
     //-----------------------------------------------------------------------
 
     // helper that formats a float nicely for output
-    static Ogre::String formatFloat(float num, int length=6)
+    static Ogre::String formatFloat(float num, unsigned int length=6)
     {
         std::stringstream ss;
         ss.setf(std::ios::fixed, std::ios::floatfield);
