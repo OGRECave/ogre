@@ -77,13 +77,15 @@ set(SOURCE_FILES
     src/PlayPenMaterialSchemesWithMismatchedLOD.cpp
     src/PlayPenClearScene.cpp
     src/PlayPenStencilShadowsMixedOpSubMeshes.cpp
+    src/PlayPenCompositorTechniqueSwitch.cpp
+    src/PlayPenCompositorTextureShadows.cpp
+    src/PlayPenManualIlluminationStage.cpp
+    src/PlayPenProjection.cpp
+    src/PlayPenManualBoneMovement.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
 
     #src/PlayPenGeneratedLOD.cpp
-	#src/PlayPenAlpha.cpp
-    #src/PlayPenBug.cpp
-    #src/PlayPen2Windows.cpp
     #src/PlayPen2bppAlphaPVR.cpp
     #src/PlayPen2bppPVR.cpp
     #src/PlayPen4bppAlphaPVR.cpp
@@ -91,42 +93,28 @@ set(SOURCE_FILES
     #src/PlayPenAnimation.cpp
     #src/PlayPenAnimationBlend.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
-    src/PlayPenCompositorTechniqueSwitch.cpp
-    src/PlayPenCompositorTextureShadows.cpp
-    #src/PlayPenCthNewBlending.cpp
     #src/PlayPenDepthShadowMap.cpp
-    #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
-    #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
-    #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
     #src/PlayPenExportPrecompiledAssemblerProgram.cpp
     #src/PlayPenFallbackResourceGroup.cpp
     #src/PlayPenFloat128DDS.cpp
     #src/PlayPenFloat16DDS.cpp
     #src/PlayPenFloat32DDS.cpp
     #src/PlayPenFloat64DDS.cpp
-    #src/PlayPenGLSLTangent.cpp
     #src/PlayPenGeometryShaders.cpp
     #src/PlayPenGpuPrograms.cpp
     #src/PlayPenInfiniteAAB.cpp
-    #src/PlayPenIntersectionSceneQuery.cpp
+	src/PlayPenIntersectionSceneQuery.cpp
     #src/PlayPenLod.cpp
     #src/PlayPenMRT.cpp
     #src/PlayPenMRTCompositorScript.cpp
-    #src/PlayPenManualBoneMovement.cpp
-    src/PlayPenManualIlluminationStage.cpp
-    #src/PlayPenManualLoader.cpp
     #src/PlayPenMaterialSchemesListener.cpp
-    #src/PlayPenMaterialSerializer.cpp
-    #src/PlayPenMatrices.cpp
     #src/PlayPenNewTerrain.cpp
     #src/PlayPenNormalMapMirroredUVs.cpp
     #src/PlayPenOverlayRelativeMode.cpp
     #src/PlayPenOverlayZOrder.cpp
     #src/PlayPenPoseAnimation2.cpp
     #src/PlayPenPrepareShadowVolume.cpp
-    #src/PlayPenProjection.cpp
-    #src/PlayPenRadixSort.cpp  Not Visual!
-    #src/PlayPenRaySceneQuery.cpp
+    src/PlayPenRaySceneQuery.cpp
     #src/PlayPenReinitialiseEntityAlteredMesh.cpp
     #src/PlayPenReloadResources.cpp
     #src/PlayPenSerialisedColour.cpp
@@ -134,9 +122,7 @@ set(SOURCE_FILES
     #src/PlayPenSharedGpuParameters.cpp
     #src/PlayPenSharedPtrBug.cpp
     #src/PlayPenSimpleMesh.cpp
-    #src/PlayPenSplitPassesTooManyTexUnits.cpp
     #src/PlayPenSpotlightViewProj.cpp
-    #src/PlayPenStringTokenising.cpp
     #src/PlayPenSuppressedShadows.cpp
     #src/PlayPenTextureShadowsTransparentCaster.cpp
     #src/PlayPenTimeCreateDestroyObject.cpp
@@ -144,6 +130,23 @@ set(SOURCE_FILES
     #src/PlayPenVertexTexture.cpp
     #src/PlayPenViewportNoShadows.cpp
 	#src/PlayPenMaterial.cpp
+
+    #src/PlayPenCthNewBlending.cpp
+	#src/PlayPenAlpha.cpp
+    #src/PlayPenGLSLTangent.cpp
+    #src/PlayPenBug.cpp
+
+    #src/PlayPenRadixSort.cpp
+    #src/PlayPen2Windows.cpp
+    #src/PlayPenMatrices.cpp
+    #src/PlayPenSplitPassesTooManyTexUnits.cpp
+    #src/PlayPenManualLoader.cpp
+    #src/PlayPenStringTokenising.cpp
+    #src/PlayPenMaterialSerializer.cpp
+    #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
+    #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
+    #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
+
     src/PlayPenTestPlugin.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
