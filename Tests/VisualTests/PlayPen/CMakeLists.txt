@@ -91,8 +91,8 @@ set(SOURCE_FILES
     #src/PlayPenAnimation.cpp
     #src/PlayPenAnimationBlend.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
-    #src/PlayPenCompositorTechniqueSwitch.cpp
-    #src/PlayPenCompositorTextureShadows.cpp
+    src/PlayPenCompositorTechniqueSwitch.cpp
+    src/PlayPenCompositorTextureShadows.cpp
     #src/PlayPenCthNewBlending.cpp
     #src/PlayPenDepthShadowMap.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
