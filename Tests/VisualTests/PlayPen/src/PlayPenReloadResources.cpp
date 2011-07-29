@@ -56,7 +56,7 @@ bool PlayPen_ReloadResources::frameStarted(const FrameEvent& evt)
 			mReloadTimer = -5.f;
 		}
 	}
-
+	return true;
 }
 //----------------------------------------------------------------------------
 

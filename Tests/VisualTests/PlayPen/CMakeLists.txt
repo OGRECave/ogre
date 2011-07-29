@@ -92,6 +92,7 @@ set(SOURCE_FILES
     src/PlayPenDepthShadowMap.cpp
     src/PlayPenSpotlightViewProj.cpp
     src/PlayPenViewportNoShadows.cpp
+    src/PlayPenNormalMapMirroredUVs.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
 
@@ -116,13 +117,12 @@ set(SOURCE_FILES
     #src/PlayPenMRTCompositorScript.cpp
     #src/PlayPenMaterialSchemesListener.cpp
     #src/PlayPenNewTerrain.cpp
-    #src/PlayPenNormalMapMirroredUVs.cpp
     #src/PlayPenOverlayRelativeMode.cpp
     #src/PlayPenOverlayZOrder.cpp
     #src/PlayPenPoseAnimation2.cpp
     #src/PlayPenPrepareShadowVolume.cpp
     #src/PlayPenReinitialiseEntityAlteredMesh.cpp
-    #src/PlayPenSerialisedColour.cpp
+    src/PlayPenSerialisedColour.cpp
     #src/PlayPenShadowLod.cpp
     #src/PlayPenSharedGpuParameters.cpp
     #src/PlayPenSharedPtrBug.cpp

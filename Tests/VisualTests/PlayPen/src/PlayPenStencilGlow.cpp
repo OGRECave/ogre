@@ -117,6 +117,9 @@ PlayPen_StencilGlow::~PlayPen_StencilGlow()
 
 void PlayPen_StencilGlow::setupContent(void)
 {
+	// test media
+	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Tests");
+	
 	// Set ambient light
 	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
