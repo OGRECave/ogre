@@ -34,6 +34,13 @@ PlayPen_GeometryShaders::PlayPen_GeometryShaders()
 }
 //----------------------------------------------------------------------------
 
+void PlayPen_GeometryShaders::testCapabilities(const Ogre::RenderSystemCapabilities* caps)
+{
+	if(!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
+		throw Ogre::Exception(999, "Video card doesn't support geometry shaders.", "testCapabilities");
+}
+//----------------------------------------------------------------------------
+
 void PlayPen_GeometryShaders::setupContent()
 {
 	const String GLSL_MATERIAL_NAME = "Ogre/GPTest/SwizzleGLSL";

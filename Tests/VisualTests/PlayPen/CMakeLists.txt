@@ -97,9 +97,9 @@ set(SOURCE_FILES
     src/PlayPenMaterialSchemesListener.cpp
     src/PlayPenInfiniteAAB.cpp
     src/PlayPenGeometryShaders.cpp
+    src/PlayPenVertexTexture.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
-
     #src/PlayPenGeneratedLOD.cpp
     #src/PlayPen2bppAlphaPVR.cpp
     #src/PlayPen2bppPVR.cpp
@@ -122,7 +122,6 @@ set(SOURCE_FILES
     #src/PlayPenSharedGpuParameters.cpp
     #src/PlayPenSimpleMesh.cpp
     #src/PlayPenTwoNewTerrains.cpp
-    #src/PlayPenVertexTexture.cpp
 	#src/PlayPenMaterial.cpp
     #src/PlayPenCthNewBlending.cpp
 	#src/PlayPenAlpha.cpp
