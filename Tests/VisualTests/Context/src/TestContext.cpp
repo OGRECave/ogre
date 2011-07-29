@@ -385,6 +385,7 @@ void TestContext::finishedTests()
         // look for a reference set first
         Ogre::ConfigFile info;
         bool foundReference = true;
+		TestBatch* ref = 0;
 
         try
         {
@@ -408,9 +409,9 @@ void TestContext::finishedTests()
 
         if (foundReference)
         {
-            TestBatch ref = TestBatch(info, mOutputDir + mCompareWith);
-            if (mBatch->canCompareWith(ref))
-                writer = OGRE_NEW HtmlWriter(ref, *mBatch, mBatch->compare(ref));
+            ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
+            if (mBatch->canCompareWith(*ref))
+                writer = OGRE_NEW HtmlWriter(*ref, *mBatch, mBatch->compare(*ref));
         }
 
         if (writer)
@@ -421,6 +422,8 @@ void TestContext::finishedTests()
             writer->writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
             OGRE_DELETE writer;
         }
+
+		OGRE_DELETE ref;
     }
 
     // write this batch's config file
