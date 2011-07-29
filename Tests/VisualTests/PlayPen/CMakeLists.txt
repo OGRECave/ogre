@@ -12,10 +12,7 @@ set(HEADER_FILES
     include/PlayPenTests.h)
 
 set(SOURCE_FILES
-
-    src/PlayPenSuppressedShadows.cpp
-    src/PlayPenTextureShadowsTransparentCaster.cpp
-
+    src/PlayPenReinitialiseEntityAlteredMesh.cpp
 	src/PlayPenAttachObjectsToBones.cpp
 	src/PlayPenMultiSceneManagersSimple.cpp
     src/PlayPen16Textures.cpp
@@ -92,7 +89,14 @@ set(SOURCE_FILES
     src/PlayPenDepthShadowMap.cpp
     src/PlayPenSpotlightViewProj.cpp
     src/PlayPenViewportNoShadows.cpp
+    src/PlayPenSuppressedShadows.cpp
+    src/PlayPenTextureShadowsTransparentCaster.cpp
     src/PlayPenNormalMapMirroredUVs.cpp
+    src/PlayPenSerialisedColour.cpp
+    src/PlayPenShadowLod.cpp
+    src/PlayPenMaterialSchemesListener.cpp
+    src/PlayPenInfiniteAAB.cpp
+    src/PlayPenGeometryShaders.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
 
@@ -109,40 +113,32 @@ set(SOURCE_FILES
     #src/PlayPenFloat16DDS.cpp
     #src/PlayPenFloat32DDS.cpp
     #src/PlayPenFloat64DDS.cpp
-    #src/PlayPenGeometryShaders.cpp
     #src/PlayPenGpuPrograms.cpp
-    #src/PlayPenInfiniteAAB.cpp
-    #src/PlayPenLod.cpp
     #src/PlayPenMRT.cpp
     #src/PlayPenMRTCompositorScript.cpp
-    #src/PlayPenMaterialSchemesListener.cpp
-    #src/PlayPenNewTerrain.cpp
     #src/PlayPenOverlayRelativeMode.cpp
     #src/PlayPenOverlayZOrder.cpp
     #src/PlayPenPoseAnimation2.cpp
-    #src/PlayPenPrepareShadowVolume.cpp
-    #src/PlayPenReinitialiseEntityAlteredMesh.cpp
-    src/PlayPenSerialisedColour.cpp
-    #src/PlayPenShadowLod.cpp
     #src/PlayPenSharedGpuParameters.cpp
-    #src/PlayPenSharedPtrBug.cpp
     #src/PlayPenSimpleMesh.cpp
-    #src/PlayPenTimeCreateDestroyObject.cpp
     #src/PlayPenTwoNewTerrains.cpp
     #src/PlayPenVertexTexture.cpp
 	#src/PlayPenMaterial.cpp
-
     #src/PlayPenCthNewBlending.cpp
 	#src/PlayPenAlpha.cpp
     #src/PlayPenGLSLTangent.cpp
     #src/PlayPenBug.cpp
-
+    #src/PlayPenLod.cpp
+    #src/PlayPenNewTerrain.cpp
     #src/PlayPenRadixSort.cpp
     #src/PlayPen2Windows.cpp
+    #src/PlayPenSharedPtrBug.cpp
     #src/PlayPenMatrices.cpp
     #src/PlayPenSplitPassesTooManyTexUnits.cpp
+    #src/PlayPenTimeCreateDestroyObject.cpp
     #src/PlayPenManualLoader.cpp
     #src/PlayPenStringTokenising.cpp
+    #src/PlayPenPrepareShadowVolume.cpp
     #src/PlayPenMaterialSerializer.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp

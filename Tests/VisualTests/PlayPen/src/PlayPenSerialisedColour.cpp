@@ -85,6 +85,6 @@ void PlayPen_SerialisedColour::setupContent()
 	Entity* c = mSceneMgr->createEntity("1", "colourtest.mesh");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(c);
 	
-	
+	mCamera->setPosition(0,0,120);
 	
 }
