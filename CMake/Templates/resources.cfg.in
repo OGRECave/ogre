@@ -33,3 +33,7 @@ FileSystem=@OGRE_MEDIA_DIR_REL@
 # Materials for visual tests
 [Tests]
 FileSystem=@OGRE_MEDIA_DIR_REL@/../../Tests/Media
+FileSystem=@OGRE_MEDIA_DIR_REL@/../../Tests/Media/Model1
+
+[Tests2]
+FileSystem=@OGRE_MEDIA_DIR_REL@/../../Tests/Media/Model2

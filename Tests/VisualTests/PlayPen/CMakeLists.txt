@@ -12,6 +12,10 @@ set(HEADER_FILES
     include/PlayPenTests.h)
 
 set(SOURCE_FILES
+
+    src/PlayPenSuppressedShadows.cpp
+    src/PlayPenTextureShadowsTransparentCaster.cpp
+
 	src/PlayPenAttachObjectsToBones.cpp
 	src/PlayPenMultiSceneManagersSimple.cpp
     src/PlayPen16Textures.cpp
@@ -82,6 +86,12 @@ set(SOURCE_FILES
     src/PlayPenManualIlluminationStage.cpp
     src/PlayPenProjection.cpp
     src/PlayPenManualBoneMovement.cpp
+	src/PlayPenIntersectionSceneQuery.cpp
+    src/PlayPenRaySceneQuery.cpp
+    src/PlayPenReloadResources.cpp
+    src/PlayPenDepthShadowMap.cpp
+    src/PlayPenSpotlightViewProj.cpp
+    src/PlayPenViewportNoShadows.cpp
 
     #src/PlayPenMultiSceneManagersComplex.cpp
 
@@ -93,8 +103,6 @@ set(SOURCE_FILES
     #src/PlayPenAnimation.cpp
     #src/PlayPenAnimationBlend.cpp
     #src/PlayPenBackgroundLoadResourceGroup.cpp
-    #src/PlayPenDepthShadowMap.cpp
-    #src/PlayPenExportPrecompiledAssemblerProgram.cpp
     #src/PlayPenFallbackResourceGroup.cpp
     #src/PlayPenFloat128DDS.cpp
     #src/PlayPenFloat16DDS.cpp
@@ -103,7 +111,6 @@ set(SOURCE_FILES
     #src/PlayPenGeometryShaders.cpp
     #src/PlayPenGpuPrograms.cpp
     #src/PlayPenInfiniteAAB.cpp
-	src/PlayPenIntersectionSceneQuery.cpp
     #src/PlayPenLod.cpp
     #src/PlayPenMRT.cpp
     #src/PlayPenMRTCompositorScript.cpp
@@ -114,21 +121,15 @@ set(SOURCE_FILES
     #src/PlayPenOverlayZOrder.cpp
     #src/PlayPenPoseAnimation2.cpp
     #src/PlayPenPrepareShadowVolume.cpp
-    src/PlayPenRaySceneQuery.cpp
     #src/PlayPenReinitialiseEntityAlteredMesh.cpp
-    #src/PlayPenReloadResources.cpp
     #src/PlayPenSerialisedColour.cpp
     #src/PlayPenShadowLod.cpp
     #src/PlayPenSharedGpuParameters.cpp
     #src/PlayPenSharedPtrBug.cpp
     #src/PlayPenSimpleMesh.cpp
-    #src/PlayPenSpotlightViewProj.cpp
-    #src/PlayPenSuppressedShadows.cpp
-    #src/PlayPenTextureShadowsTransparentCaster.cpp
     #src/PlayPenTimeCreateDestroyObject.cpp
     #src/PlayPenTwoNewTerrains.cpp
     #src/PlayPenVertexTexture.cpp
-    #src/PlayPenViewportNoShadows.cpp
 	#src/PlayPenMaterial.cpp
 
     #src/PlayPenCthNewBlending.cpp
@@ -146,6 +147,7 @@ set(SOURCE_FILES
     #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
     #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
     #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
+    #src/PlayPenExportPrecompiledAssemblerProgram.cpp
 
     src/PlayPenTestPlugin.cpp)
 
