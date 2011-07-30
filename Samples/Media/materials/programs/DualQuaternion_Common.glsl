@@ -37,3 +37,4 @@ vec3 calculateBlendNormal(vec3 normal, mat2x4 blendDQ)
 	return normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal) + blendDQ[0].x*normal);
 }
 
+

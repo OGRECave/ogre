@@ -141,7 +141,7 @@ namespace Ogre
 									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 		if(mUseBoneTwoWeights)
 		{
-			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
 										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() );
 		}
 		

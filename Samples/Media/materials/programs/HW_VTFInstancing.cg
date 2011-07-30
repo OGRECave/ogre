@@ -11,26 +11,17 @@ struct VS_INPUT
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
 	float3 Tangent	:	TANGENT;
-	float2 uv0		:	TEXCOORD0;
-
-	float4 m03		:	TEXCOORD1; //m03.w is always 0
 #ifdef BONE_TWO_WEIGHTS
-	float4 weights		: TEXCOORD2;
-	float2 mOffset	:	TEXCOORD3;
-	
-#ifdef BONE_MATRIX_LUT
-	float4 worldMatrix0	:	TEXCOORD4;
-	float4 worldMatrix1	:	TEXCOORD5;
-	float4 worldMatrix2	:	TEXCOORD6;
+	float4 weights		: 	BLENDWEIGHT;
 #endif
-#else
-	float2 mOffset	:	TEXCOORD2;
+	float2 uv0		:	TEXCOORD0;
+	float4 m03		:	TEXCOORD1; //m03.w is always 0
+	float2 mOffset		:	TEXCOORD2;
 	
 #ifdef BONE_MATRIX_LUT
 	float4 worldMatrix0	:	TEXCOORD3;
 	float4 worldMatrix1	:	TEXCOORD4;
 	float4 worldMatrix2	:	TEXCOORD5;
-#endif
 #endif
 };
 
