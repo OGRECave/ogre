@@ -253,7 +253,7 @@ void Sample_NewInstancing::switchSkinningTechnique(int index)
 		case 2:
 			mCurrentMesh = 1;
 			mCurrentMaterialSet = c_materialsTechniques_dq_two_weights;
-			mCurrentFlags = IM_USEBONEDUALQUATERNIONS | IM_USETWOWEIGHTS;
+			mCurrentFlags = IM_USEBONEDUALQUATERNIONS;
 			break;
 	};
 }

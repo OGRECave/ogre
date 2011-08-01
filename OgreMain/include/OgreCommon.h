@@ -317,9 +317,13 @@ namespace Ogre {
 
 		IM_USEBONEDUALQUATERNIONS = 0x0008,
 
-		IM_USETWOWEIGHTS = 0x0010,
+		/** Use one weight per vertex when recommended (i.e. VTF). */
+		IM_USEONEWEIGHT = 0x0010,
 
-		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT
+		/** All techniques are forced to one weight per vertex. */
+		IM_FORCEONEWEIGHT = 0x0012,
+
+		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
 	};
     
 	

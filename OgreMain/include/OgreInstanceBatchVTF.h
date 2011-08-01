@@ -89,6 +89,7 @@ namespace Ogre
 		size_t					mMaxFloatsPerLine;
 
 		size_t					mRowLength;
+		size_t 					mWeightCount;
 		//Temporary array used to store 3x4 matrices before they are converted to dual quaternions
 		float* 					mTempTransformsArray3x4;
 
@@ -97,7 +98,8 @@ namespace Ogre
 		size_t mMaxLookupTableInstances;
 
 		bool mUseBoneDualQuaternions;
-		bool mUseBoneTwoWeights;
+		bool mForceOneWeight;
+		bool mUseOneWeight;
 
 		//When true remove the memory of the VertexData & index we've created because no one else will
 		bool					mRemoveOwnVertexData;
@@ -117,7 +119,7 @@ namespace Ogre
 			Assumes outBoneIdx has enough space (twice the base submesh vertex count, one for each weight)
 			Assumes outBoneWgt has enough space (twice the base submesh vertex count, one for each weight)
 		*/
-		void retrieveBoneIdxTwoWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt);
+		void retrieveBoneIdxWithWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt);
 
 		/** Setups the material to use a vertex texture */
 		void setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material );
@@ -184,10 +186,15 @@ namespace Ogre
 
 		bool useBoneDualQuaternions() const { return mUseBoneDualQuaternions; }
 
-		void setBoneTwoWeights(bool enable) {  assert(mInstancedEntities.empty());
-			mUseBoneTwoWeights = enable; }
+		void setForceOneWeight(bool enable) {  assert(mInstancedEntities.empty());
+			mForceOneWeight = enable; }
 
-		bool useBoneTwoWeights() const { return mUseBoneTwoWeights; }
+		bool forceOneWeight() const { return mForceOneWeight; }
+
+		void setUseOneWeight(bool enable) {  assert(mInstancedEntities.empty());
+			mUseOneWeight = enable; }
+
+		bool useOneWeight() const { return mUseOneWeight; }
 
 		/** @See InstanceBatch::useBoneWorldMatrices()	*/
 		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }

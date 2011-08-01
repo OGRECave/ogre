@@ -90,20 +90,17 @@ namespace Ogre
 		HWBoneIdxVec hwBoneIdx;
 		HWBoneWgtVec hwBoneWgt;
 
-		size_t weightCount = mUseBoneDualQuaternions && mUseBoneTwoWeights ? 2 : 1;
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );	
+		mWeightCount = forceOneWeight() ? 1 : veWeights->getSize() / sizeof(float);
 
-		hwBoneIdx.resize( baseVertexData->vertexCount * weightCount, 0 );
+		hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 
-		if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
-		{
-			hwBoneWgt.resize( baseVertexData->vertexCount * weightCount, 0 );
-		}
-		
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+			if(mWeightCount > 1)
 			{
-				retrieveBoneIdxTwoWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
+				hwBoneWgt.resize( baseVertexData->vertexCount * mWeightCount, 0 );
+				retrieveBoneIdxWithWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
 			}
 			else
 			{
@@ -137,12 +134,23 @@ namespace Ogre
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 16 bytes aligned :-)
 		unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		size_t offset = thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-									thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
-		if(mUseBoneTwoWeights)
+
+		size_t offset = 0;
+
+		size_t maxFloatsPerVector = 4;
+
+		//Can fit two dual quaternions in every float4, but only one 3x4 matrix
+		for(size_t i = 0; i < mWeightCount; i += maxFloatsPerVector / mRowLength)
 		{
-			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
-										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() );
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+		}
+
+		//Add the weights (supports up to four, which is Ogre's limit)
+		if(mWeightCount > 1)
+		{
+			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 		}
 		
 		//Create our own vertex buffer
@@ -155,52 +163,50 @@ namespace Ogre
 
 		float *thisFloat = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 
-		size_t weightCount = mUseBoneTwoWeights ? 2 : 1;
-		
 		//Create the UVs to sample from the right bone/matrix
-		for( size_t j=0; j<baseVertexData->vertexCount * weightCount; j += weightCount )
+		for( size_t j=0; j < baseVertexData->vertexCount * mWeightCount; j += mWeightCount)
 		{
-			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+			size_t numberOfMatricesInLine = 0;
+			
+			//Write the matrices, adding padding as needed
+			for(size_t i = 0; i < mWeightCount; ++i)
 			{
-				//Write the quaternion for the first dual quat
-				for( size_t k=0; k < 2; ++k)
+				//Write the matrix
+				for( size_t k=0; k < mRowLength; ++k)
 				{
 					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
 					//(repeated) buffer to tell how much U & V we need to offset
-					size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
+					size_t instanceIdx = hwBoneIdx[j+i] * mRowLength + k;
 					*thisFloat++ = instanceIdx / texWidth;
 				}
 
-				//Write the quaternion for the second dual quat
-				for( size_t k=0; k < 2; ++k)
+				++numberOfMatricesInLine;
+
+				//If another matrix can't be fit, we're on another line, or if this is the last weight
+				if((numberOfMatricesInLine + 1) * mRowLength > maxFloatsPerVector || (i+1) == mWeightCount)
 				{
-					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
-					//(repeated) buffer to tell how much U & V we need to offset
-					size_t instanceIdx = hwBoneIdx[j+1] * mRowLength + k;
-					*thisFloat++ = instanceIdx / texWidth;
-				}
+					//Place zeroes in the remaining coordinates
+					for ( size_t k=mRowLength * numberOfMatricesInLine; k < maxFloatsPerVector; ++k)
+					{
+						*thisFloat++ = 0.0f;
+					}
 
-				//Write the two weights
-				*thisFloat++ = hwBoneWgt[j];
-				*thisFloat++ = hwBoneWgt[j+1];
-				*thisFloat++ = 0.0f;
-				*thisFloat++ = 0.0f;
+					numberOfMatricesInLine = 0;
+				}
 			}
-			else
+
+			//Don't need to write weights if there is only one
+			if(mWeightCount > 1)
 			{
-				//Perhaps could change this to store the indices for two dual quaternions in the same vector
-				for( size_t k=0; k < mRowLength; ++k )
+				//Write the weights
+				for(size_t i = 0; i < mWeightCount; ++i)
 				{
-					//Only calculate U (not V) since all matrices are in the same row. We use the instanced
-					//(repeated) buffer to tell how much U & V we need to offset
-					size_t instanceIdx = hwBoneIdx[j] * mRowLength + k;
-					*thisFloat++ = instanceIdx / texWidth;
+					*thisFloat++ = hwBoneWgt[j+i];
 				}
 
-				//If using two weights, use the z and w components of the uv coords for the index of the second dual quaternion
-				for ( size_t k=mRowLength; k < 4; ++k)
+				//Write the empty space
+				for(size_t i = mWeightCount; i < maxFloatsPerVector; ++i)
 				{
-					//Put a zero in the 4th (and sometimes 3rd) U coordinate (it's not really used, but it's handy)
 					*thisFloat++ = 0.0f;
 				}
 			}
@@ -222,6 +228,8 @@ namespace Ogre
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+			//Add two floats of padding here? or earlier?
+			//If not using bone matrix lookup, is it ok that it is 8 bytes since divides evenly into 16
 
 		}
 

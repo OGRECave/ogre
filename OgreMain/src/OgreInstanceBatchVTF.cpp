@@ -54,11 +54,13 @@ namespace Ogre
 				mWidthFloatsPadding( 0 ),
 				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
 				mRowLength(3),
+				mWeightCount(1),
 				mTempTransformsArray3x4(0),
 				mUseBoneMatrixLookup(false),
 				mMaxLookupTableInstances(16),
 				mUseBoneDualQuaternions(false),
-				mUseBoneTwoWeights(false),
+				mForceOneWeight(false),
+				mUseOneWeight(false),
 				mRemoveOwnVertexData( false )
 	{
 		cloneMaterial( mMaterial );
@@ -167,7 +169,6 @@ namespace Ogre
 			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 
 			uint8 biggestWeightIdx = 0;
-			uint8 secondBiggestWeightIdx = 0;
 			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
 			{
 				biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
@@ -183,7 +184,7 @@ namespace Ogre
 	}
 
 	//-----------------------------------------------------------------------
-	void BaseInstanceBatchVTF::retrieveBoneIdxTwoWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt)
+	void BaseInstanceBatchVTF::retrieveBoneIdxWithWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt)
 	{
 		const VertexElement *ve = baseVertexData->vertexDeclaration->
 															findElementBySemantic( VES_BLEND_INDICES );
@@ -193,32 +194,29 @@ namespace Ogre
 		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
 		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
 
-		for( size_t i=0; i<baseVertexData->vertexCount * 2; i += 2)
-		{
-			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
+		size_t weightCount = veWeights->getSize() / sizeof(float);
 
-			uint8 biggestWeightIdx = 0;
-			uint8 secondBiggestWeightIdx = 0;
-			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+		for( size_t i=0; i<baseVertexData->vertexCount * weightCount; i += weightCount)
+		{
+			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());			
+			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
+
+			//Output the weights and indices for each vertex
+			float weightMagnitude = 0.0f;
+			for(size_t k=0; k < weightCount; ++k)
 			{
-				if(pWeights[biggestWeightIdx] < pWeights[j])
-				{
-					secondBiggestWeightIdx = biggestWeightIdx;
-					biggestWeightIdx = j;
-				}
-				else if(pWeights[secondBiggestWeightIdx] < pWeights[j])
-				{
-					secondBiggestWeightIdx = j;
-				}
+				outBoneWgt[i+k] = pWeights[i+k];
+				outBoneIdx[i+k] = pIndex[i+k];
+				weightMagnitude += pIndex[i+k] * pIndex[i+k];
 			}
 
-			outBoneWgt[i] = pWeights[biggestWeightIdx];
-			outBoneWgt[i+1] = pWeights[secondBiggestWeightIdx];
+			weightMagnitude = Math::Sqrt(weightMagnitude);
 			
-
-			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
-			outBoneIdx[i] = pIndex[biggestWeightIdx];
-			outBoneIdx[i+1] = pIndex[secondBiggestWeightIdx];
+			//Normalize the weights (This may be unnecessary)
+			for(size_t k=0; k < weightCount; ++k)
+			{
+				outBoneWgt[i+k] /= weightMagnitude;
+			}
 
 			baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
 		}
@@ -514,20 +512,18 @@ namespace Ogre
 		HWBoneIdxVec hwBoneIdx;
 		HWBoneWgtVec hwBoneWgt;
 
-		size_t weightCount = mUseBoneDualQuaternions && mUseBoneTwoWeights ? 2 : 1;
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		//One weight is recommended for VTF
+		mWeightCount = (forceOneWeight() || useOneWeight()) ? 1 : veWeights->getSize() / sizeof(float);
 
-		hwBoneIdx.resize( baseVertexData->vertexCount * weightCount, 0 );
-		
-		if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
-		{
-			hwBoneWgt.resize( baseVertexData->vertexCount * weightCount, 0 );
-		}
-		
+		hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
+
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			if(mUseBoneDualQuaternions && mUseBoneTwoWeights)
+			if(mWeightCount > 1)
 			{
-				retrieveBoneIdxTwoWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
+				hwBoneWgt.resize( baseVertexData->vertexCount * mWeightCount, 0 );
+				retrieveBoneIdxWithWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
 			}
 			else
 			{
