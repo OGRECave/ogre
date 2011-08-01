@@ -164,6 +164,8 @@ void Sample_Compositor::registerCompositors(void)
 			Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
 			Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
 		} catch (...) {
+			/// Warn user
+			LogManager::getSingleton().logMessage("Could not load compositor " + compositorName);
 		}
     }
 

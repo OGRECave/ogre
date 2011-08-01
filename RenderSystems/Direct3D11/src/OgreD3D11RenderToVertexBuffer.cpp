@@ -183,11 +183,9 @@ namespace Ogre {
             mVertexBuffers[index].setNull();
         }
 
-        mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
-            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, HardwareBuffer::HBU_STATIC
+		mVertexBuffers[index] = mBufManager->createStreamOutputVertexBuffer(
+            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, 
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY
             );
-
-        D3D11HardwareVertexBuffer* vbuf = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[index].getPointer());
-        vbuf->reinterpretForStreamOutput();
     }
 }

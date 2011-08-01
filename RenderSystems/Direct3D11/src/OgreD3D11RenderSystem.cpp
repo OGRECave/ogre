@@ -622,11 +622,7 @@ namespace Ogre
 			unsigned int RequestedLevelsSize = sizeof( RequestedLevels ) / sizeof( RequestedLevels[0] );
 			ID3D11Device * device;
 			// But, if creating WARP or software, don't use a selected adapter, it will be selected automatically
-
-			 
-			if(FAILED(D3D11CreateDevice(mDriverType == DT_HARDWARE ? pSelectedAdapter :
-										mDriverType == DT_SOFTWARE ? pSelectedAdapter :
-																	 NULL, 
+			if(FAILED(D3D11CreateDevice(mDriverType != DT_WARP ? pSelectedAdapter : NULL,
 										driverType,
 										NULL,
 										deviceFlags, 
@@ -651,7 +647,7 @@ namespace Ogre
 				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
 				// the device - else CreateSwapChain fails later.
 				//  Update (Jun 12, 2011)
-				// If 
+				// If using WARP driver, get factory from created device
 				SAFE_RELEASE(mpDXGIFactory);
 
 				IDXGIDevice1 * pDXGIDevice;
@@ -1666,8 +1662,11 @@ namespace Ogre
 		mActiveRenderTarget = target;
 		if (mActiveRenderTarget)
 		{
-			ID3D11RenderTargetView * pRTView = NULL;
+			ID3D11RenderTargetView ** pRTView = NULL;
 			target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+			uint numberOfViews;
+			target->getCustomAttribute( "numberOfViews", &numberOfViews );
 
 			//Retrieve depth buffer
 			D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -1697,10 +1696,10 @@ namespace Ogre
 
 
 			// now switch to the new render target
-			mDevice.GetImmediateContext()->OMSetRenderTargets(1,
-				&pRTView,
+			mDevice.GetImmediateContext()->OMSetRenderTargets(
+				numberOfViews,
+				pRTView,
 				depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
-
 
 			if (mDevice.isError())
 			{
@@ -2482,14 +2481,24 @@ namespace Ogre
     {
 		if (mActiveRenderTarget)
 		{
-			ID3D11RenderTargetView * pRTView;
+			ID3D11RenderTargetView ** pRTView;
 			mActiveRenderTarget->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
 
 			if (buffers & FBT_COLOUR)
 			{
 				float ClearColor[4];
 				D3D11Mappings::get(colour, ClearColor);
-				mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView, ClearColor );
+
+				// Clear all views
+				uint numberOfViews;
+				mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
+				if( numberOfViews == 1 )
+					mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
+				else
+				{
+					for( uint i = 0; i < numberOfViews; ++i )
+						mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
+				}
 
 			}
 			UINT ClearFlags = 0;

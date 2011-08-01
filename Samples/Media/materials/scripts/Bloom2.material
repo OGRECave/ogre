@@ -1,4 +1,4 @@
-//---------------------------------------------------
+﻿//---------------------------------------------------
 //Bloom2: Dark Sylinc's Bloom implementation
 //     Ogre/Compositor/BloomBlend is the final material applied.
 //     it has 2 parameters:
@@ -115,6 +115,47 @@ fragment_program BrightBloom2_ps20_hlsl hlsl
 }
 
 //------------------------
+//DirectX 11 HLSL Definitions
+//------------------------	
+//DirectX 11 HLSL Vertex Shader vs_4_0
+vertex_program Blur_vs40_hlsl hlsl
+{
+	source Blur_vs40.hlsl
+	target vs_4_0
+	entry_point main
+}
+
+//DirectX 11 HLSL Pixel Shader ps_4_0
+fragment_program BlurV_ps40_hlsl hlsl
+{
+	source BlurV_ps40.hlsl
+	target ps_4_0
+	entry_point main
+}
+fragment_program BlurH_ps40_hlsl hlsl
+{
+	source BlurH_ps40.hlsl
+	target ps_4_0
+	entry_point main
+}
+
+//DirectX 11 HLSL Pixel Shader ps_4_0
+fragment_program Bloom2_ps40_hlsl hlsl
+{
+	source Bloom2_ps40.hlsl
+	target ps_4_0
+	entry_point main
+}
+
+//DirectX 11 HLSL Pixel Shader ps_4_0
+fragment_program BrightBloom2_ps40_hlsl hlsl
+{
+	source BrightBloom2_ps40.hlsl
+	target ps_4_0
+	entry_point main
+}
+
+//------------------------
 //NVIDIA Cg Definitions
 //------------------------	
 //NV Cg Vertex Shader vs_1_1
@@ -161,6 +202,7 @@ fragment_program BrightBloom2_ps20_cg cg
 vertex_program Blur_vs unified
 {
 	delegate Blur_vs11_hlsl
+	delegate Blur_vs40_hlsl
 	//delegate Blur_vs_glsl
 	delegate Blur_vs_glsles
 	delegate Blur_vs11_cg
@@ -169,6 +211,7 @@ vertex_program Blur_vs unified
 fragment_program Bloom2_ps unified
 {
 	delegate Bloom2_ps20_hlsl
+	delegate Bloom2_ps40_hlsl
 	//delegate Bloom2_ps20_glsl
 	delegate Bloom2_ps20_glsles
 	delegate Bloom2_ps20_cg
@@ -176,6 +219,7 @@ fragment_program Bloom2_ps unified
 fragment_program BlurV_ps unified
 {
 	delegate BlurV_ps20_hlsl
+	delegate BlurV_ps40_hlsl
 	//delegate BlurV_ps20_glsl
 	delegate BlurV_ps20_glsles
 	delegate BlurV_ps20_cg
@@ -183,6 +227,7 @@ fragment_program BlurV_ps unified
 fragment_program BlurH_ps unified
 {
 	delegate BlurH_ps20_hlsl
+	delegate BlurH_ps40_hlsl
 	//delegate BlurH_ps20_glsl
 	delegate BlurH_ps20_glsles
 	delegate BlurH_ps20_cg
@@ -190,6 +235,7 @@ fragment_program BlurH_ps unified
 fragment_program BrightBloom2_ps unified
 {
 	delegate BrightBloom2_ps20_hlsl
+	delegate BrightBloom2_ps40_hlsl
 	delegate BrightBloom2_ps20_glsles
 	delegate BrightBloom2_ps20_cg
 }

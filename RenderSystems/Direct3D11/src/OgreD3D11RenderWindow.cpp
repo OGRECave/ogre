@@ -874,14 +874,18 @@ namespace Ogre
 		}
 		else if( name == "ID3D11RenderTargetView" )
 		{
-			ID3D11RenderTargetView * *pRTView = (ID3D11RenderTargetView **)pData;
-			*pRTView = mRenderTargetView;
+			*static_cast<ID3D11RenderTargetView***>(pData) = &mRenderTargetView;
 			return;
 		}
 		else if( name == "ID3D11Texture2D" )
 		{
 			ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
 			*pBackBuffer = mpBackBuffer;
+		}
+		else if( name == "numberOfViews" )
+		{
+			unsigned int* n = reinterpret_cast<unsigned int*>(pData);
+			*n = 1;
 		}
 
 	}

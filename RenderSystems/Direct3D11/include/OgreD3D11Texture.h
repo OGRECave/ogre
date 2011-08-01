@@ -42,7 +42,6 @@ namespace Ogre {
 		/// D3DDevice pointer
 		D3D11Device	&	mDevice;	
 
-
 		/// D3D11 pointer
 		//LPDIRECT3D11				*mpD3D;
 		// 1D texture pointer
@@ -89,6 +88,8 @@ namespace Ogre {
 		/// internal method, return a D3D pixel format for texture creation
 		DXGI_FORMAT _chooseD3DFormat();
 
+		/// @copydoc Texture::createInternalResources
+		void createInternalResources(void);
 		/// @copydoc Texture::createInternalResourcesImpl
 		void createInternalResourcesImpl(void);
 		/// @copydoc Texture::freeInternalResources

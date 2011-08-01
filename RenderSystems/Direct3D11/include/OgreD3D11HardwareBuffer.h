@@ -76,7 +76,6 @@ namespace Ogre {
 
 		/// Get the D3D-specific buffer
 		ID3D11Buffer* getD3DBuffer(void) { return mlpD3DBuffer; }
-        void reinterpretForStreamOutput(void);
 	};
 
 
