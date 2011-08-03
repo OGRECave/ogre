@@ -321,7 +321,7 @@ namespace Ogre {
 		IM_USEONEWEIGHT = 0x0010,
 
 		/** All techniques are forced to one weight per vertex. */
-		IM_FORCEONEWEIGHT = 0x0012,
+		IM_FORCEONEWEIGHT = 0x0020,
 
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT|IM_USEONEWEIGHT
 	};
