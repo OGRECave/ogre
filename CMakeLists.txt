@@ -379,6 +379,11 @@ add_subdirectory(Components)
 
 # Setup tests (before samples so that PlayPen is included in browser)
 if (OGRE_BUILD_TESTS)
+  # enable CTest
+  ENABLE_TESTING()
+  INCLUDE(CTest)
+  # add ctest config
+  #CONFIGURE_FILE(CTestCustom.cmake)
   add_subdirectory(Tests)
 endif ()
 

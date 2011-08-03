@@ -1,8 +1,10 @@
+
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
+
 Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,46 +26,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "PlayPenTests.h"
-#include "FileSystemLayer.h"
 
-PlayPen_Bsp::PlayPen_Bsp()
+#ifndef __SimpleResultWriter_H__
+#define __SimpleResultWriter_H__
+
+#include "Ogre.h"
+#include "TinyHTML.h"
+#include "ImageValidator.h"
+#include "TestBatch.h"
+#include "TestResultWriter.h"
+
+/** Writes a simple plaintext file with pass/fail result for each test */
+class SimpleResultWriter : public TestResultWriter
 {
-	mInfo["Title"] = "PlayPen_Bsp";
-	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
-}
-//----------------------------------------------------------------------------
+public:
 
-void PlayPen_Bsp::setupContent()
-{
-	// Load Quake3 locations from a file
-	ConfigFile cf;
-	
-	cf.load(mFSLayer->getConfigFilePath("quakemap.cfg"));
-	
-	String quakePk3 = cf.getSetting("Archive");
-	String quakeLevel = cf.getSetting("Map");
-	
-	ResourceGroupManager::getSingleton().addResourceLocation(quakePk3, "Zip");
-	
-	
-	// Load world geometry
-	mSceneMgr->setWorldGeometry(quakeLevel);
-	
-	// modify camera for close work
-	mCamera->setNearClipDistance(4);
-	mCamera->setFarClipDistance(4000);
-	
-	// Also change position, and set Quake-type orientation
-	// Get random player start point
-	ViewPoint vp = mSceneMgr->getSuggestedViewpoint(true);
-	mCamera->setPosition(vp.position);
-	mCamera->pitch(Degree(90)); // Quake uses X/Y horizon, Z up
-	mCamera->rotate(vp.orientation);
-	// Don't yaw along variable axis, causes leaning
-	mCamera->setFixedYawAxis(true, Vector3::UNIT_Z);
+    SimpleResultWriter(const TestBatch& set1, const TestBatch& set2, ComparisonResultVectorPtr results)
+        :TestResultWriter(set1, set2, results){}
 
-	mCamera->yaw(Ogre::Degree(-90.f));
-	
-}
+protected:
+
+    virtual Ogre::String getOutput()
+	{
+		std::stringstream out;
+
+		for(int i = 0; i < mResults->size(); ++i)
+			out<<(*mResults)[i].testName<<"="<<((*mResults)[i].passed?"Passed":"Failed")<<"\n";
+
+		return out.str();
+	}
+
+};
+
+#endif

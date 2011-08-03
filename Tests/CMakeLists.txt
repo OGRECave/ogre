@@ -179,4 +179,8 @@ if (OGRE_BUILD_TESTS)
 
     endif (OIS_FOUND)
 
+# setup test scripting
+configure_file(CTestCustom.cmake ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
+configure_file(PreTest.cmake ${CMAKE_BINARY_DIR}/Tests/PreTest.cmake)
+
 endif (OGRE_BUILD_TESTS)

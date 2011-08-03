@@ -12,6 +12,7 @@ set(HEADER_FILES
 	../Common/include/ImageValidator.h
 	../Common/include/TestBatch.h
 	../Common/include/TestResultWriter.h
+	../Common/include/SimpleResultWriter.h
 	../Common/include/HTMLWriter.h
 	../Common/include/VisualTest.h
 	../Common/include/TinyHTML.h

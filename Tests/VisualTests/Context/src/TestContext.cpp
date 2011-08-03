@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
 #include "HTMLWriter.h"
+#include "SimpleResultWriter.h"
 #include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
@@ -86,7 +87,7 @@ void TestContext::setup()
 
     // get the path and list of test plugins from the config file
     Ogre::ConfigFile testConfig;
-    testConfig.load("tests.cfg");
+    testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
@@ -360,6 +361,8 @@ bool TestContext::oneTimeConfig()
 	else if(!success)
 		mRoot->setRenderSystem(0);
 
+	mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
+
 	return success;
 }
 //-----------------------------------------------------------------------
@@ -396,6 +399,7 @@ void TestContext::finishedTests()
     if (mGenerateHtml && !mReferenceSet)
     {
         HtmlWriter* writer = 0;
+        SimpleResultWriter* simpleWriter = 0;
 
         // look for a reference set first
         Ogre::ConfigFile info;
@@ -417,6 +421,7 @@ void TestContext::finishedTests()
                 if (mBatch->canCompareWith((*i)))
                 {
                     writer = OGRE_NEW HtmlWriter(*i, *mBatch, mBatch->compare((*i)));
+                    simpleWriter = OGRE_NEW SimpleResultWriter(*i, *mBatch, mBatch->compare((*i)));
                     break;
                 }
             }
@@ -426,7 +431,10 @@ void TestContext::finishedTests()
         {
             ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
             if (mBatch->canCompareWith(*ref))
+			{
                 writer = OGRE_NEW HtmlWriter(*ref, *mBatch, mBatch->compare(*ref));
+                simpleWriter = OGRE_NEW SimpleResultWriter(*ref, *mBatch, mBatch->compare(*ref));
+			}
         }
 
         if (writer)
@@ -435,7 +443,17 @@ void TestContext::finishedTests()
             // plus a uniquely named one for this run
             writer->writeToFile(mOutputDir + "out.html");
             writer->writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+
+			// also save a summary file for CTest to parse (in the bin directory for now, 
+			// since I'm unsure of how to get the path to the writable area from a CMake script)
+			Ogre::String rs;
+			for(int i = 0; i < mRenderSystemName.size(); ++i)
+				if(mRenderSystemName[i]!=' ')
+					rs += mRenderSystemName[i];
+            simpleWriter->writeToFile("TestResults_" + rs + ".txt");
+
             OGRE_DELETE writer;
+            OGRE_DELETE simpleWriter;
         }
 
 		OGRE_DELETE ref;
