@@ -207,12 +207,10 @@ namespace Ogre
 			{
 				outBoneWgt[i+k] = pWeights[i+k];
 				outBoneIdx[i+k] = pIndex[i+k];
-				weightMagnitude += pIndex[i+k] * pIndex[i+k];
+				weightMagnitude += pWeights[i+k];
 			}
-
-			weightMagnitude = Math::Sqrt(weightMagnitude);
 			
-			//Normalize the weights (This may be unnecessary)
+			//Normalize the weights so they add to one (This may be unnecessary)
 			for(size_t k=0; k < weightCount; ++k)
 			{
 				outBoneWgt[i+k] /= weightMagnitude;
