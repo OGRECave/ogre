@@ -93,7 +93,7 @@ namespace Ogre
 
 		mRenderOperation.vertexData = NULL;
 
-		OGRE_DELETE mTempTransformsArray3x4;
+		OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
 	}
 
 	//-----------------------------------------------------------------------
@@ -278,7 +278,7 @@ namespace Ogre
 
 		if(mUseBoneDualQuaternions && !mTempTransformsArray3x4)
 		{
-			mTempTransformsArray3x4 = OGRE_NEW float[mMatricesPerInstance * 3 * 4];
+			mTempTransformsArray3x4 = OGRE_ALLOC_T(float, mMatricesPerInstance * 3 * 4, MEMCATEGORY_GENERAL);
 		}
 		
 		mNumWorldMatrices = uniqueAnimations * mMatricesPerInstance;

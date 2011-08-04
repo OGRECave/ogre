@@ -33,8 +33,6 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreRenderSystem.h"
 #include "OgreShaderFunctionAtom.h"
-#include "OgreShaderExHardwareSkinning.h"
-
 
 namespace Ogre {
 namespace RTShader {

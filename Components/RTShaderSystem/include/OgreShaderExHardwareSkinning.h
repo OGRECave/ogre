@@ -45,9 +45,6 @@ namespace Ogre {
 namespace RTShader {
 
 
-//class DualQuaternionSkinning;
-//class LinearSkinning;
-//class HardwareSkinningTechnique;
 class HardwareSkinningFactory;
 
 /** \addtogroup Core

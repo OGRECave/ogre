@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreMath.h"
 #include "OgreMatrix3.h"
+#include "OgreMatrix4.h"
 #include "OgreVector3.h"
 
 namespace Ogre {
