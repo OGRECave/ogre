@@ -9,9 +9,6 @@
 
 # Configure Visual Test build
 
-# Setup CTest
-#ENABLE_TESTING()
-
 # add Context directory
 add_subdirectory(Context)
 
@@ -21,23 +18,77 @@ add_subdirectory(PlayPen)
 # add VTests plugin directory
 add_subdirectory(VTests)
 
-# now add our tests
-
 # Since CTest expects one command per test, but the Visual Testing setup runs all at once
-# (since unloading and reloading everything for each test wouldn't be practical) we simply
-# check an output file for passage of each test using CTest's regex checking
+# (since unloading and reloading everything for each test wouldn't be practical) we
+# run the context first, outputting a file of results, then the tests themselves just
+# cat ('type' in win32) the file out and CTest's regex checking does the rest
 
-# What we'll use to output the file (cat in Unix, type in Windows)
-set(TESTING_READ_FILE cat)
+# Figure out the home directory for this system (this is where the context outputs result data for now)
+if (UNIX)
+	set(USER_HOME_DIRECTORY ~)
+elseif (WIN32)
+	string (REPLACE "\\" "/" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
+# other platforms?
+endif ()
 
-# define a macro for these tests:
+# a macro for test context runs
+macro (TestContextRun render_system)
+
+	# Run a CMake script that handles the test context
+	add_test(NAME "TestContext_${render_system}"
+		COMMAND "cmake" 
+		"-D" 
+			"TEST_CONTEXT_EXECUTABLE=$<TARGET_FILE_NAME:TestContext>"
+		"-D" 
+			"TEST_CONTEXT_PATH=$<TARGET_FILE_DIR:TestContext>"
+		"-D" 
+			"TEST_CONTEXT_RENDER_SYSTEM=${render_system}"
+		"-D" 
+			"TEST_CONTEXT_RESULT_DIR=${USER_HOME_DIRECTORY}"
+		"-P" 
+			"../RunVTests.cmake")
+
+	# so we're extra sure this gets run first
+	set_tests_properties("TestContext_${render_system}" 
+		PROPERTIES COST 1000)
+
+endmacro (TestContextRun)
+
+# define a macro for tests
 macro (VisualTest test_name render_system)
-	add_test("${test_name}_${render_system}" ${TESTING_READ_FILE} 
-		"${CMAKE_BINARY_DIR}/Tests/TestResults_${render_system}.txt")
+
+	if (UNIX)
+
+		# In Unix we can just cat the file
+		add_test("${test_name}_${render_system}" cat 
+			"${USER_HOME_DIRECTORY}/TestResults_${render_system}.txt")
+
+	else (UNIX)
+
+		# In Windows we'll have to call a separate script (which does cmd /c type "[result file].txt")
+		add_test("${test_name}_${render_system}" cmake
+			"-D" "TEST_RESULT_FILE=${USER_HOME_DIRECTORY}/TestResults_${render_system}.txt" 
+			"-P" "../CheckResult.cmake")
+
+	endif (UNIX)
+
+	# look for failure message
 	set_tests_properties("${test_name}_${render_system}" 
 		PROPERTIES FAIL_REGULAR_EXPRESSION 
 		"${test_name}=Failed")
+
+	# this test must be run after the appropriate test context has run
+	set_tests_properties("${test_name}_${render_system}" 
+		PROPERTIES DEPENDS
+		"TestContext_${render_system}")
+
+	# an extra measure to be sure the context runs first
+	set_tests_properties("${test_name}_${render_system}" 
+		PROPERTIES COST 1)
+
 endmacro (VisualTest)
+
+TestContextRun("OpenGLRenderingSubsystem")
 
 # and the list of tests itself:
 VisualTest("PlayPen_16Textures" "OpenGLRenderingSubsystem")
@@ -134,7 +185,6 @@ VisualTest("PlayPen_TextureShadowsTransparentCaster" "OpenGLRenderingSubsystem")
 VisualTest("PlayPen_TransparencyMipMaps" "OpenGLRenderingSubsystem")
 VisualTest("PlayPen_VertexTexture" "OpenGLRenderingSubsystem")
 VisualTest("PlayPen_ViewportNoShadows" "OpenGLRenderingSubsystem")
-
 VisualTest("VTests_StencilShadows" "OpenGLRenderingSubsystem")
 VisualTest("VTests_Transparency" "OpenGLRenderingSubsystem")
 VisualTest("VTests_TextureEffects" "OpenGLRenderingSubsystem")

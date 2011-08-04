@@ -444,13 +444,18 @@ void TestContext::finishedTests()
             writer->writeToFile(mOutputDir + "out.html");
             writer->writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
 
-			// also save a summary file for CTest to parse (in the bin directory for now, 
-			// since I'm unsure of how to get the path to the writable area from a CMake script)
+			// also save a summary file for CTest to parse
 			Ogre::String rs;
 			for(int i = 0; i < mRenderSystemName.size(); ++i)
 				if(mRenderSystemName[i]!=' ')
 					rs += mRenderSystemName[i];
-            simpleWriter->writeToFile("TestResults_" + rs + ".txt");
+
+			// output to the home directory, this needs work
+#ifdef OGRE_PLATFORM_WIN32
+			simpleWriter->writeToFile(mFSLayer->getWritablePath("../../../TestResults_" + rs + ".txt"));
+#else
+			simpleWriter->writeToFile(mFSLayer->getWritablePath("../../TestResults_" + rs + ".txt"));
+#endif
 
             OGRE_DELETE writer;
             OGRE_DELETE simpleWriter;
@@ -488,6 +493,7 @@ void TestContext::setTimestep(Ogre::Real timestep)
 int main(int argc, char *argv[])
 //#endif
 {
+	std::cout<<"\n\nPATH: "<<argv[0]<<"\n\n\n";
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");

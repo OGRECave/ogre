@@ -382,8 +382,6 @@ if (OGRE_BUILD_TESTS)
   # enable CTest
   ENABLE_TESTING()
   INCLUDE(CTest)
-  # add ctest config
-  #CONFIGURE_FILE(CTestCustom.cmake)
   add_subdirectory(Tests)
 endif ()
 
