@@ -83,7 +83,16 @@ TestContext::~TestContext()
 void TestContext::setup()
 {
     // standard setup
-    SampleContext::setup();
+	mWindow = createWindow();
+	setupInput(false);// grab input, since moving the window seemed to change the results (in Linux anyways)
+	locateResources();
+	loadResources();
+	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+	mRoot->addFrameListener(this);
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
+#endif
 
     // get the path and list of test plugins from the config file
     Ogre::ConfigFile testConfig;
@@ -106,16 +115,16 @@ void TestContext::setup()
     }
 
     // timestamp for the filename
-    char temp[19];
+    char temp[25];
     time_t raw = time(0);
     strftime(temp, 19, "%Y_%m_%d_%H%M_%S", gmtime(&raw));
-    Ogre::String filestamp = Ogre::String(temp, 18);
+    Ogre::String filestamp = Ogre::String(temp);
     // name for this batch (used for naming the directory, and uniquely identifying this batch)
     Ogre::String batchName = mTestSetName + "_" + filestamp;
     
     // a nicer formatted version for display
-    strftime(temp, 19, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
-    Ogre::String timestamp = Ogre::String(temp, 19);
+    strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
+    Ogre::String timestamp = Ogre::String(temp);
  
     if (mReferenceSet)
         batchName = "Reference";

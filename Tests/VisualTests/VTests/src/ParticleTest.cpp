@@ -46,12 +46,14 @@ void ParticleTest::setupContent()
     // create a bunch of random particle systems
     Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
     mSceneMgr->getRootSceneNode()->attachObject(ps);
-    ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
-    mSceneMgr->getRootSceneNode()->attachObject(ps);
-    ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
-    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);
-    ps = mSceneMgr->createParticleSystem("Nimbus2", "Examples/GreenyNimbus");
-    mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-150, 0, 0))->attachObject(ps);
+    
+	// Multiple systems didn't seem to stay deterministic... (in gcc at least...)
+	//ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
+    //mSceneMgr->getRootSceneNode()->attachObject(ps);
+    //ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
+    //mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);
+    //ps = mSceneMgr->createParticleSystem("Nimbus2", "Examples/GreenyNimbus");
+    //mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(-150, 0, 0))->attachObject(ps);
     mCamera->setPosition(0,150,500);
 }
 //-----------------------------------------------------------------------
