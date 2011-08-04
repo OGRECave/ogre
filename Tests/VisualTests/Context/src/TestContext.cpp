@@ -451,10 +451,26 @@ void TestContext::finishedTests()
 					rs += mRenderSystemName[i];
 
 			// output to the home directory, this needs work
-#ifdef OGRE_PLATFORM_WIN32
-			simpleWriter->writeToFile(mFSLayer->getWritablePath("../../../TestResults_" + rs + ".txt"));
+			Ogre::String path = mFSLayer->getWritablePath("");
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+
+			for(int i = 0; i < 4; ++i)
+			{
+				int p = path.find_last_of("/");
+				path = path.substr(0, p);
+			}
+
+			simpleWriter->writeToFile(mFSLayer->getWritablePath(path + "/TestResults_" + rs + ".txt"));
 #else
-			simpleWriter->writeToFile(mFSLayer->getWritablePath("../../TestResults_" + rs + ".txt"));
+			
+			for(int i = 0; i < 3; ++i)
+			{
+				int p = path.find_last_of("/");
+				path = path.substr(0, p);
+			}
+
+			simpleWriter->writeToFile(path + "/TestResults_" + rs + ".txt");
 #endif
 
             OGRE_DELETE writer;

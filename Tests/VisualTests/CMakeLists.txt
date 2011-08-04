@@ -25,7 +25,7 @@ add_subdirectory(VTests)
 
 # Figure out the home directory for this system (this is where the context outputs result data for now)
 if (UNIX)
-	set(USER_HOME_DIRECTORY ~)
+	set(USER_HOME_DIRECTORY $ENV{HOME})
 elseif (WIN32)
 	string (REPLACE "\\" "/" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
 # other platforms?
@@ -37,15 +37,15 @@ macro (TestContextRun render_system)
 	# Run a CMake script that handles the test context
 	add_test(NAME "TestContext_${render_system}"
 		COMMAND "cmake" 
-		"-D" 
+		"-D" # executable name
 			"TEST_CONTEXT_EXECUTABLE=$<TARGET_FILE_NAME:TestContext>"
-		"-D" 
+		"-D" # path to executable (this one's tricker than it seems, since it'll vary based on build config)
 			"TEST_CONTEXT_PATH=$<TARGET_FILE_DIR:TestContext>"
-		"-D" 
+		"-D" # the render system to use
 			"TEST_CONTEXT_RENDER_SYSTEM=${render_system}"
-		"-D" 
+		"-D" # the directory where the output file will go
 			"TEST_CONTEXT_RESULT_DIR=${USER_HOME_DIRECTORY}"
-		"-P" 
+		"-P" # the script that carries this out
 			"../RunVTests.cmake")
 
 	# so we're extra sure this gets run first
@@ -60,8 +60,7 @@ macro (VisualTest test_name render_system)
 	if (UNIX)
 
 		# In Unix we can just cat the file
-		add_test("${test_name}_${render_system}" cat 
-			"${USER_HOME_DIRECTORY}/TestResults_${render_system}.txt")
+		add_test("${test_name}_${render_system}" cat ${USER_HOME_DIRECTORY}/TestResults_${render_system}.txt)
 
 	else (UNIX)
 

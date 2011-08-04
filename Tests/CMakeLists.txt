@@ -180,7 +180,7 @@ if (OGRE_BUILD_TESTS)
     endif (OIS_FOUND)
 
 # setup test script files
-configure_file(PreTest.cmake ${CMAKE_BINARY_DIR}/Tests/RunVTests.cmake COPYONLY)
+configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/RunVTests.cmake COPYONLY)
 configure_file(CheckResult.cmake ${CMAKE_BINARY_DIR}/Tests/CheckResult.cmake COPYONLY)
 
 endif (OGRE_BUILD_TESTS)
