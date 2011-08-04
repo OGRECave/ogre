@@ -114,7 +114,7 @@ void TestContext::setup()
     Ogre::String batchName = mTestSetName + "_" + filestamp;
     
     // a nicer formatted version for display
-    strftime(temp, 20, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
+    strftime(temp, 19, "%Y-%m-%d %H:%M:%S", gmtime(&raw));
     Ogre::String timestamp = Ogre::String(temp, 19);
  
     if (mReferenceSet)
