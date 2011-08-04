@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "TestBatch.h"
 
 /** Abstract class for outputting test results in some format */
-class TestResultWriter
+class TestResultWriter : public Ogre::GeneralAllocatedObject
 {
 public:
 

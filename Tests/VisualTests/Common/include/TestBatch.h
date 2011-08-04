@@ -38,7 +38,7 @@ typedef Ogre::SharedPtr<TestBatchSet> TestBatchSetPtr;
 
 /** Represents the output from running a batch of tests
  *        (i.e. a single run of the TestContext) */
-class TestBatch
+class TestBatch : public Ogre::GeneralAllocatedObject
 {
 public:
 
