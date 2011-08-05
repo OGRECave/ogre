@@ -158,9 +158,8 @@ namespace Ogre
 	{
 		const VertexElement *ve = baseVertexData->vertexDeclaration->
 															findElementBySemantic( VES_BLEND_INDICES );
-		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
-															findElementBySemantic( VES_BLEND_WEIGHTS );
-
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		
 		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
 		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
 
@@ -169,7 +168,7 @@ namespace Ogre
 			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 
 			uint8 biggestWeightIdx = 0;
-			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+			for( size_t j=1; j< mWeightCount; ++j )
 			{
 				biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
 			}
@@ -186,34 +185,29 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::retrieveBoneIdxWithWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt)
 	{
-		const VertexElement *ve = baseVertexData->vertexDeclaration->
-															findElementBySemantic( VES_BLEND_INDICES );
-		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
-															findElementBySemantic( VES_BLEND_WEIGHTS );
-
+		const VertexElement *ve = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_INDICES );
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		
 		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
 		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
 
-		size_t weightCount = veWeights->getSize() / sizeof(float);
-
-		for( size_t i=0; i<baseVertexData->vertexCount * weightCount; i += weightCount)
+		for( size_t i=0; i<baseVertexData->vertexCount * mWeightCount; i += mWeightCount)
 		{
-			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());			
+			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
 
-			//Output the weights and indices for each vertex
 			float weightMagnitude = 0.0f;
-			for(size_t k=0; k < weightCount; ++k)
+			for( size_t j=0; j < mWeightCount; ++j )
 			{
-				outBoneWgt[i+k] = pWeights[i+k];
-				outBoneIdx[i+k] = pIndex[i+k];
-				weightMagnitude += pWeights[i+k];
+				outBoneWgt[i+j] = pWeights[j];
+				weightMagnitude += pWeights[j];
+				outBoneIdx[i+j] = pIndex[j];
 			}
-			
-			//Normalize the weights so they add to one (This may be unnecessary)
-			for(size_t k=0; k < weightCount; ++k)
+
+			//Normalize the bone weights so they add to one
+			for(size_t j=0; j < mWeightCount; ++j)
 			{
-				outBoneWgt[i+k] /= weightMagnitude;
+				outBoneWgt[i+j] /= weightMagnitude;
 			}
 
 			baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
@@ -518,7 +512,7 @@ namespace Ogre
 
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			if(mWeightCount > 1)
+			if(!mForceOneWeight && !mUseOneWeight)
 			{
 				hwBoneWgt.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 				retrieveBoneIdxWithWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
