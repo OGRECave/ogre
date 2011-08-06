@@ -30,7 +30,7 @@ PlayPen_WindowedViewportMode::PlayPen_WindowedViewportMode()
 {
 	mInfo["Title"] = "PlayPen_WindowedViewportMode";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

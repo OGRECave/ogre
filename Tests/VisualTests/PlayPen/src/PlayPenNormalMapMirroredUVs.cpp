@@ -30,7 +30,7 @@ PlayPen_NormalMapMirroredUVs::PlayPen_NormalMapMirroredUVs()
 {
 	mInfo["Title"] = "PlayPen_NormalMapMirroredUVs";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

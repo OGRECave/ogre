@@ -30,7 +30,7 @@ PlayPen_StencilShadows::PlayPen_StencilShadows()
 {
 	mInfo["Title"] = "PlayPen_StencilShadows";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(20);
 }
 //----------------------------------------------------------------------------
 

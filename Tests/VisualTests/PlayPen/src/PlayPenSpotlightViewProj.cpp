@@ -30,7 +30,7 @@ PlayPen_SpotlightViewProj::PlayPen_SpotlightViewProj()
 {
 	mInfo["Title"] = "PlayPen_SpotlightViewProj";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

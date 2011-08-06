@@ -30,7 +30,7 @@ PlayPen_TextureShadowsCustomReceiverMat::PlayPen_TextureShadowsCustomReceiverMat
 {
 	mInfo["Title"] = "PlayPen_TextureShadowsCustomReceiverMat";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

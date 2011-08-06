@@ -30,7 +30,7 @@ PlayPen_GeometryShaders::PlayPen_GeometryShaders()
 {
 	mInfo["Title"] = "PlayPen_GeometryShaders";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

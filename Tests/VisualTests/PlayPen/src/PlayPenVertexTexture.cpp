@@ -30,7 +30,7 @@ PlayPen_VertexTexture::PlayPen_VertexTexture()
 {
 	mInfo["Title"] = "PlayPen_VertexTexture";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

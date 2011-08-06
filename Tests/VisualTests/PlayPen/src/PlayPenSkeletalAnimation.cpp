@@ -30,7 +30,7 @@ PlayPen_SkeletalAnimation::PlayPen_SkeletalAnimation()
 {
 	mInfo["Title"] = "PlayPen_SkeletalAnimation";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(100);
 }
 //----------------------------------------------------------------------------
 

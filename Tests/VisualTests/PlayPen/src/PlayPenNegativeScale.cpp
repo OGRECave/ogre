@@ -30,7 +30,7 @@ PlayPen_NegativeScale::PlayPen_NegativeScale()
 {
 	mInfo["Title"] = "PlayPen_NegativeScale";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

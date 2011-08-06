@@ -32,7 +32,7 @@ TextureEffectsTest::TextureEffectsTest()
 {
     mInfo["Title"] = "VTests_TextureEffects";
     mInfo["Description"] = "Tests texture effects.";
-    addScreenshotFrame(500);
+    addScreenshotFrame(50);
 }
 //---------------------------------------------------------------------------
 

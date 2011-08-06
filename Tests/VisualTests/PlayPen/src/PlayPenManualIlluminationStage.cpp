@@ -30,7 +30,7 @@ PlayPen_ManualIlluminationStage::PlayPen_ManualIlluminationStage()
 {
 	mInfo["Title"] = "PlayPen_ManualIlluminationStage";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

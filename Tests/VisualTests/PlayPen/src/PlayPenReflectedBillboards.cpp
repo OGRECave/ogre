@@ -30,7 +30,7 @@ PlayPen_ReflectedBillboards::PlayPen_ReflectedBillboards()
 {
 	mInfo["Title"] = "PlayPen_ReflectedBillboards";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(400);
+	addScreenshotFrame(175); // needs to run for a bit so there are particles to be reflected...
 }
 //----------------------------------------------------------------------------
 

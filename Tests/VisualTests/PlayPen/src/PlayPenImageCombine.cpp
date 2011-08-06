@@ -30,7 +30,7 @@ PlayPen_ImageCombine::PlayPen_ImageCombine()
 {
 	mInfo["Title"] = "PlayPen_ImageCombine";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_TextureShadowsCustomCasterMat::PlayPen_TextureShadowsCustomCasterMat()
 {
 	mInfo["Title"] = "PlayPen_TextureShadowsCustomCasterMat";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

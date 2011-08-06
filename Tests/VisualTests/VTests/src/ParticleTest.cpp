@@ -37,7 +37,7 @@ ParticleTest::ParticleTest()
     // take screenshot early, when emitters are just beginning
     addScreenshotFrame(35);
     // and another after particles have died, extra emitters emitted, etc
-    addScreenshotFrame(2000);
+    addScreenshotFrame(500);
 }
 //---------------------------------------------------------------------------
 

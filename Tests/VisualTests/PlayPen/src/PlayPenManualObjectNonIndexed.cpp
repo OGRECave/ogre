@@ -30,7 +30,7 @@ PlayPen_ManualObjectNonIndexed::PlayPen_ManualObjectNonIndexed()
 {
 	mInfo["Title"] = "PlayPen_ManualObjectNonIndexed";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

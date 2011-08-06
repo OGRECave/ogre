@@ -30,7 +30,7 @@ PlayPen_AttachObjectsToBones::PlayPen_AttachObjectsToBones()
 {
 	mInfo["Title"] = "PlayPen_AttachObjectsToBones";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(120);
 }
 //----------------------------------------------------------------------------
 

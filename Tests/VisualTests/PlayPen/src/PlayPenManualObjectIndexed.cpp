@@ -30,7 +30,7 @@ PlayPen_ManualObjectIndexed::PlayPen_ManualObjectIndexed()
 {
 	mInfo["Title"] = "PlayPen_ManualObjectIndexed";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

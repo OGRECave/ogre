@@ -30,7 +30,7 @@ PlayPen_ManualObject2D::PlayPen_ManualObject2D()
 {
 	mInfo["Title"] = "PlayPen_ManualObject2D";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

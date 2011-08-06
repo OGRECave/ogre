@@ -30,7 +30,7 @@ PlayPen_MaterialSchemesWithLOD::PlayPen_MaterialSchemesWithLOD()
 {
 	mInfo["Title"] = "PlayPen_MaterialSchemesWithLOD";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

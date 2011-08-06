@@ -30,7 +30,7 @@ PlayPen_CubeDDS::PlayPen_CubeDDS()
 {
 	mInfo["Title"] = "PlayPen_CubeDDS";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

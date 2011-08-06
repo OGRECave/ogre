@@ -30,7 +30,7 @@ PlayPen_RibbonTrail::PlayPen_RibbonTrail()
 {
 	mInfo["Title"] = "PlayPen_RibbonTrail";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(150);
 }
 //----------------------------------------------------------------------------
 

@@ -31,7 +31,7 @@ PlayPen_Bsp::PlayPen_Bsp()
 {
 	mInfo["Title"] = "PlayPen_Bsp";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

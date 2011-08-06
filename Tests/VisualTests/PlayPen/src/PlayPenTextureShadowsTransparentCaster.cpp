@@ -30,7 +30,7 @@ PlayPen_TextureShadowsTransparentCaster::PlayPen_TextureShadowsTransparentCaster
 {
 	mInfo["Title"] = "PlayPen_TextureShadowsTransparentCaster";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

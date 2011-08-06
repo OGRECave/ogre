@@ -30,7 +30,7 @@ PlayPen_LightClipPlanesMoreLights::PlayPen_LightClipPlanesMoreLights()
 {
 	mInfo["Title"] = "PlayPen_LightClipPlanesMoreLights";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_TransparencyMipMaps::PlayPen_TransparencyMipMaps()
 {
 	mInfo["Title"] = "PlayPen_TransparencyMipMaps";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

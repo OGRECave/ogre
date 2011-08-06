@@ -34,7 +34,7 @@ StencilShadowTest::StencilShadowTest()
     mInfo["Description"] = "Tests basic stencil shadow functionality.";
     
     // take screenshot almost immediately, since the scene is static
-    addScreenshotFrame(50);
+    addScreenshotFrame(10);
 }
 //---------------------------------------------------------------------------
 

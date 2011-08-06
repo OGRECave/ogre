@@ -30,7 +30,7 @@ PlayPen_SRGBtexture::PlayPen_SRGBtexture()
 {
 	mInfo["Title"] = "PlayPen_SRGBtexture";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

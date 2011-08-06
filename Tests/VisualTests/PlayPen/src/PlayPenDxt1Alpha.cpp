@@ -30,7 +30,7 @@ PlayPen_Dxt1Alpha::PlayPen_Dxt1Alpha()
 {
 	mInfo["Title"] = "PlayPen_Dxt1Alpha";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

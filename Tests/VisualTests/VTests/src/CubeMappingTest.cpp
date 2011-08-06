@@ -32,7 +32,7 @@ CubeMappingTest::CubeMappingTest()
 {
     mInfo["Title"] = "VTests_CubeMapping";
     mInfo["Description"] = "Tests basic fixed-function cube mapping.";
-    addScreenshotFrame(200);
+    addScreenshotFrame(10);
 }
 //---------------------------------------------------------------------------
 

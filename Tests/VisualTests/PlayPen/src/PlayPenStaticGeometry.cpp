@@ -30,7 +30,7 @@ PlayPen_StaticGeometry::PlayPen_StaticGeometry()
 {
 	mInfo["Title"] = "PlayPen_StaticGeometry";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_LiSPSM::PlayPen_LiSPSM()
 {
 	mInfo["Title"] = "PlayPen_LiSPSM";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

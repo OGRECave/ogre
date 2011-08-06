@@ -30,7 +30,7 @@ PlayPen_MaterialSchemesWithMismatchedLOD::PlayPen_MaterialSchemesWithMismatchedL
 {
 	mInfo["Title"] = "PlayPen_MaterialSchemesWithMismatchedLOD";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

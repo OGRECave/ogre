@@ -30,7 +30,7 @@ PlayPen_BlendDiffuseColour::PlayPen_BlendDiffuseColour()
 {
 	mInfo["Title"] = "PlayPen_BlendDiffuseColour";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

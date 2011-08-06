@@ -30,7 +30,7 @@ PlayPen_ViewportNoShadows::PlayPen_ViewportNoShadows()
 {
 	mInfo["Title"] = "PlayPen_ViewportNoShadows";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

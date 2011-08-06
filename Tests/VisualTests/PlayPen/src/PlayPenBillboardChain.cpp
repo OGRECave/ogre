@@ -30,7 +30,7 @@ PlayPen_BillboardChain::PlayPen_BillboardChain()
 {
 	mInfo["Title"] = "PlayPen_BillboardChain";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

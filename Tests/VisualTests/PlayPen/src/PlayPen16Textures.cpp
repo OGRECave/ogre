@@ -30,7 +30,7 @@ PlayPen_16Textures::PlayPen_16Textures()
 {
 	mInfo["Title"] = "PlayPen_16Textures";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

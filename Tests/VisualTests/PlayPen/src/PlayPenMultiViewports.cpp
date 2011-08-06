@@ -30,7 +30,7 @@ PlayPen_MultiViewports::PlayPen_MultiViewports()
 {
 	mInfo["Title"] = "PlayPen_MultiViewports";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

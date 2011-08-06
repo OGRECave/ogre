@@ -32,7 +32,7 @@ TransparencyTest::TransparencyTest()
 {
     mInfo["Title"] = "VTests_Transparency";
     mInfo["Description"] = "Tests basic alpha blending.";
-    addScreenshotFrame(500);
+    addScreenshotFrame(25);
 }
 //---------------------------------------------------------------------------
 

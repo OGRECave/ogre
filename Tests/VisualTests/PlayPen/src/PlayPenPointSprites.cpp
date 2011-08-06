@@ -30,7 +30,7 @@ PlayPen_PointSprites::PlayPen_PointSprites()
 {
 	mInfo["Title"] = "PlayPen_PointSprites";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

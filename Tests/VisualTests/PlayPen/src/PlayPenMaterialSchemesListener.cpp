@@ -30,7 +30,7 @@ PlayPen_MaterialSchemesListener::PlayPen_MaterialSchemesListener()
 {
 	mInfo["Title"] = "PlayPen_MaterialSchemesListener";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

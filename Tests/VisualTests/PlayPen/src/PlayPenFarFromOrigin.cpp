@@ -30,7 +30,7 @@ PlayPen_FarFromOrigin::PlayPen_FarFromOrigin()
 {
 	mInfo["Title"] = "PlayPen_FarFromOrigin";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_MultiSceneManagersSimple::PlayPen_MultiSceneManagersSimple()
 {
 	mInfo["Title"] = "PlayPen_MultiSceneManagersSimple";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

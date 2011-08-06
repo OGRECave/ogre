@@ -30,7 +30,7 @@ PlayPen_DepthBias::PlayPen_DepthBias()
 {
 	mInfo["Title"] = "PlayPen_DepthBias";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

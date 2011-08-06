@@ -30,7 +30,7 @@ PlayPen_BillboardTextureCoords::PlayPen_BillboardTextureCoords()
 {
 	mInfo["Title"] = "PlayPen_BillboardTextureCoords";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

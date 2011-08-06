@@ -30,7 +30,7 @@ PlayPen_Dxt3FromMemory::PlayPen_Dxt3FromMemory()
 {
 	mInfo["Title"] = "PlayPen_Dxt3FromMemory";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_AlphaToCoverage::PlayPen_AlphaToCoverage()
 {
 	mInfo["Title"] = "PlayPen_AlphaToCoverage";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

@@ -104,7 +104,7 @@ PlayPen_StencilGlow::PlayPen_StencilGlow()
 {
     mInfo["Title"] = "PlayPen_StencilGlow";
     mInfo["Description"] = "Tests stencil glow effect";
-	addScreenshotFrame(150);
+	addScreenshotFrame(50);
 }
 //---------------------------------------------------------------------------
 

@@ -30,7 +30,7 @@ PlayPen_TextureShadowsIntegrated::PlayPen_TextureShadowsIntegrated()
 {
 	mInfo["Title"] = "PlayPen_TextureShadowsIntegrated";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

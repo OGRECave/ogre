@@ -30,7 +30,7 @@ PlayPen_LightScissoring::PlayPen_LightScissoring()
 {
 	mInfo["Title"] = "PlayPen_LightScissoring";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

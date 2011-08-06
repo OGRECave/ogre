@@ -30,7 +30,7 @@ PlayPen_Ortho::PlayPen_Ortho()
 {
 	mInfo["Title"] = "PlayPen_Ortho";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

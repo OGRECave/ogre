@@ -30,7 +30,7 @@ PlayPen_SuppressedShadows::PlayPen_SuppressedShadows()
 {
 	mInfo["Title"] = "PlayPen_SuppressedShadows";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

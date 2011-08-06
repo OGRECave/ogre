@@ -30,7 +30,7 @@ PlayPen_BuildTangentOnAnimatedMesh::PlayPen_BuildTangentOnAnimatedMesh()
 {
 	mInfo["Title"] = "PlayPen_BuildTangentOnAnimatedMesh";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(50);
 }
 //----------------------------------------------------------------------------
 

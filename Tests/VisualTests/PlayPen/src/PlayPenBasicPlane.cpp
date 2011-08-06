@@ -30,7 +30,7 @@ PlayPen_BasicPlane::PlayPen_BasicPlane()
 {
 	mInfo["Title"] = "PlayPen_BasicPlane";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

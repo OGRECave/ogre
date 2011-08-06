@@ -30,7 +30,7 @@ PlayPen_TextureShadowsIntegratedPSSM::PlayPen_TextureShadowsIntegratedPSSM()
 {
 	mInfo["Title"] = "PlayPen_TextureShadowsIntegratedPSSM";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

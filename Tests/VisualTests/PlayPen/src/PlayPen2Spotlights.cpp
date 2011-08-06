@@ -30,7 +30,7 @@ PlayPen_2Spotlights::PlayPen_2Spotlights()
 {
 	mInfo["Title"] = "PlayPen_2Spotlights";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

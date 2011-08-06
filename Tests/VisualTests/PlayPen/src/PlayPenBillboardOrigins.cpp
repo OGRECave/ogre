@@ -30,7 +30,7 @@ PlayPen_BillboardOrigins::PlayPen_BillboardOrigins()
 {
 	mInfo["Title"] = "PlayPen_BillboardOrigins";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

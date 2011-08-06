@@ -30,7 +30,7 @@ PlayPen_BlitSubTextures::PlayPen_BlitSubTextures()
 {
 	mInfo["Title"] = "PlayPen_BlitSubTextures";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

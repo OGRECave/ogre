@@ -30,7 +30,7 @@ PlayPen_DepthShadowMap::PlayPen_DepthShadowMap()
 {
 	mInfo["Title"] = "PlayPen_DepthShadowMap";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

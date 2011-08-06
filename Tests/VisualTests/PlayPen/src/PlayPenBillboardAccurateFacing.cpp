@@ -30,7 +30,7 @@ PlayPen_BillboardAccurateFacing::PlayPen_BillboardAccurateFacing()
 {
 	mInfo["Title"] = "PlayPen_BillboardAccurateFacing";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

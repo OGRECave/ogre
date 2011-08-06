@@ -30,7 +30,7 @@ PlayPen_StaticGeometryWithLOD::PlayPen_StaticGeometryWithLOD()
 {
 	mInfo["Title"] = "PlayPen_StaticGeometryWithLOD";
 	mInfo["Description"] = "Tests static geometry with LODs.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

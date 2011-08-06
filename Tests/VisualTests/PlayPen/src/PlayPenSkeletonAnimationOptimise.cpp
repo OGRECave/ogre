@@ -30,7 +30,7 @@ PlayPen_SkeletonAnimationOptimise::PlayPen_SkeletonAnimationOptimise()
 {
 	mInfo["Title"] = "PlayPen_SkeletonAnimationOptimise";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(250);
+	addScreenshotFrame(100);
 }
 //----------------------------------------------------------------------------
 
