@@ -10,6 +10,7 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
+
   if (CppUnit_FOUND)
 	# unit tests are go!
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include)
@@ -178,9 +179,5 @@ if (OGRE_BUILD_TESTS)
 	add_subdirectory(VisualTests)
 
     endif (OIS_FOUND)
-
-# setup test script files
-configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/RunVTests.cmake COPYONLY)
-configure_file(CheckResult.cmake ${CMAKE_BINARY_DIR}/Tests/CheckResult.cmake COPYONLY)
 
 endif (OGRE_BUILD_TESTS)
