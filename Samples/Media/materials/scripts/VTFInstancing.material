@@ -34,6 +34,62 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_glsl_vs glsl
 	}
 }
 
+vertex_program Ogre/Instancing/VTF_dq_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWRECEIVER=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_dq_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,DEPTH_SHADOWCASTER=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
+vertex_program Ogre/Instancing/VTF_dq_two_weights_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWRECEIVER=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 2
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_dq_two_weights_glsl_vs glsl
+{
+	source VTFInstancing.vert
+
+	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWCASTER=1
+
+	uses_vertex_texture_fetch true
+
+	default_params
+	{
+		param_named			matrixTexture				int 0
+	}
+}
+
 //--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
@@ -132,6 +188,58 @@ vertex_program Ogre/Instancing/VTF/shadow_caster_vs unified
 	}
 }
 
+vertex_program Ogre/Instancing/VTF_dq_vs unified
+{
+	delegate Ogre/Instancing/VTF_dq_cg_vs
+	delegate Ogre/Instancing/VTF_dq_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+
+		param_named_auto	depthRange				shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_dq_vs unified
+{
+	delegate Ogre/Instancing/VTF/shadow_caster_dq_cg_vs
+	delegate Ogre/Instancing/VTF/shadow_caster_dq_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	depthRange				scene_depth_range
+	}
+}
+
+vertex_program Ogre/Instancing/VTF_dq_two_weights_vs unified
+{
+	delegate Ogre/Instancing/VTF_dq_two_weights_cg_vs
+	delegate Ogre/Instancing/VTF_dq_two_weights_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+
+		param_named_auto	depthRange				shadow_scene_depth_range 0
+		param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
+	}
+}
+
+vertex_program Ogre/Instancing/VTF/shadow_caster_dq_two_weights_vs unified
+{
+	delegate Ogre/Instancing/VTF/shadow_caster_dq_two_weights_cg_vs
+	delegate Ogre/Instancing/VTF/shadow_caster_dq_two_weights_glsl_vs
+
+	default_params
+	{
+		param_named_auto	viewProjMatrix				viewproj_matrix
+		param_named_auto	depthRange				scene_depth_range
+	}
+}
+
 material Examples/Instancing/VTF/shadow_caster
 {
 	technique
@@ -160,10 +268,8 @@ material Examples/Instancing/VTF/shadow_caster_dq
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_dq_cg_vs
+			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_dq_vs
 			{
-				param_named_auto	viewProjMatrix				viewproj_matrix
-				param_named_auto	depthRange					scene_depth_range
 			}
 			fragment_program_ref Ogre/Instancing/shadow_caster_ps
 			{
@@ -184,10 +290,8 @@ material Examples/Instancing/VTF/shadow_caster_dq_two_weights
 	{
 		pass
 		{
-			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_dq_two_weights_cg_vs
+			vertex_program_ref Ogre/Instancing/VTF/shadow_caster_dq_two_weights_vs
 			{
-				param_named_auto	viewProjMatrix				viewproj_matrix
-				param_named_auto	depthRange					scene_depth_range
 			}
 			fragment_program_ref Ogre/Instancing/shadow_caster_ps
 			{
@@ -249,12 +353,8 @@ abstract material Examples/Instancing/VTF_dq
 		pass
 		{
 			specular	1 1 1 1 12.5
-			vertex_program_ref Ogre/Instancing/VTF_dq_cg_vs
+			vertex_program_ref Ogre/Instancing/VTF_dq_vs
 			{
-				param_named_auto	viewProjMatrix				viewproj_matrix
-
-				param_named_auto	depthRange					shadow_scene_depth_range 0
-				param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 			}
 
 			fragment_program_ref Ogre/Instancing_ps
@@ -291,12 +391,8 @@ abstract material Examples/Instancing/VTF_dq_two_weights
 		pass
 		{
 			specular	1 1 1 1 12.5
-			vertex_program_ref Ogre/Instancing/VTF_dq_two_weights_cg_vs
+			vertex_program_ref Ogre/Instancing/VTF_dq_two_weights_vs
 			{
-				param_named_auto	viewProjMatrix				viewproj_matrix
-
-				param_named_auto	depthRange					shadow_scene_depth_range 0
-				param_named_auto	texViewProjMatrix			texture_viewproj_matrix 0
 			}
 
 			fragment_program_ref Ogre/Instancing_ps
