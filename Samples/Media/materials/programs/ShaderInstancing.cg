@@ -28,8 +28,7 @@ struct VS_INPUT
 VS_OUTPUT main_vs( in VS_INPUT input,
 				   uniform float4x4 viewProjMatrix,
 #ifdef ST_DUAL_QUATERNION
-				   uniform float2x4 worldDualQuaternion2x4Array[48],
-				   uniform float3x4 scaleM[48]
+				   uniform float2x4 worldDualQuaternion2x4Array[120]
 #else
 				   uniform float3x4 worldMatrix3x4Array[80]
 #endif
@@ -48,17 +47,22 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 	int idx = int(input.BlendIdx[0]);
 #ifdef ST_DUAL_QUATERNION
-	//First phase - applies scaling and shearing:
-	float3x4 blendS = scaleM[idx];
-		
-	float3 pass1_position = mul(blendS, input.Position);
-	float3x3 blendSrotAT = adjointTransposeMatrix(float3x3(blendS));
-	float3 pass1_normal = normalize(mul(blendSrotAT, input.Normal.xyz));
-
 	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
 	float2x4 blendDQ = worldDualQuaternion2x4Array[idx];
-	worldPos = float4(calculateBlendPosition(pass1_position, blendDQ), 1.0);
-	worldNorm = calculateBlendNormal(pass1_normal, blendDQ);
+#ifdef BONE_TWO_WEIGHTS
+	float2x4 blendDQ2 = worldDualQuaternion2x4Array[int(input.BlendIdx[1])];
+	
+	//Accurate antipodality handling. For speed increase, remove the following line
+	if (dot(blendDQ[0], blendDQ2[0]) < 0.0) blendDQ2 *= -1.0;
+	
+	//Blend the dual quaternions based on the weights
+	blendDQ *= input.BlendWgt.x;
+	blendDQ += input.BlendWgt.y*blendDQ2;
+	//Normalize the resultant dual quaternion
+	blendDQ /= length(blendDQ[0]);
+#endif
+	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
+	worldNorm = calculateBlendNormal(input.Normal, blendDQ);
 #else
 	worldPos  = float4( mul( worldMatrix3x4Array[idx], input.Position ).xyz, 1.0f );
 	worldNorm = mul( (float3x3)(worldMatrix3x4Array[idx]), input.Normal );
