@@ -96,30 +96,6 @@ protected:
     // List of available test sets
     std::map<Ogre::String, Ogre::StringVector> mTestSets;
 
-	// if we're generating the 'reference' set
-	bool mReferenceSet;
-
-	// if we're generating the 'reference' set
-	bool mGenerateHtml;
-	
-	// Force the config dialog to appear
-	bool mForceConfig;
-
-	// Name of the rendersystem to use
-	Ogre::String mRenderSystemName;
-	
-	// optional custom name for this batch
-    Ogre::String mBatchName;
-	
-	// which test batch we'll compare with
-    Ogre::String mCompareWith;
-
-	// An optional comment to be saved with this test set
-    Ogre::String mComment;
-	
-    // The test set that's being run
-    Ogre::String mTestSetName;
-
     // The tests to be run
     std::deque<OgreBites::Sample*> mTests;
     
@@ -134,6 +110,18 @@ protected:
 
     // Info about the running batch of tests
     TestBatch* mBatch;
+
+	// command line options
+	bool mReferenceSet; // is a reference set being generated
+	bool mGenerateHtml; // should html output be created
+	bool mForceConfig; // force the config dialog
+	Ogre::String mRenderSystemName; // render system to use
+    Ogre::String mBatchName;// optional name for this batch
+    Ogre::String mCompareWith;// set to compare against
+    Ogre::String mComment;// optional comment
+    Ogre::String mTestSetName;// name of the test set to use
+    Ogre::String mSummaryOutputDir;// location to output a test summary (used for CTest)
+
 };
 
 #endif

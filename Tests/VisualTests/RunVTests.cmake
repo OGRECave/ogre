@@ -18,5 +18,7 @@ if (UNIX)
   set (TEST_CONTEXT_EXECUTABLE ./${TEST_CONTEXT_EXECUTABLE})
 endif (UNIX)
 
-# now run the context (TODO: add commandline args (namely rendersystem...))
-exec_program("cmake -E chdir ${TEST_CONTEXT_PATH} ${TEST_CONTEXT_EXECUTABLE}")
+# now run the context
+exec_program("cmake" ARGS -E chdir ${TEST_CONTEXT_PATH} ${TEST_CONTEXT_EXECUTABLE} 
+  -rs "\"${TEST_CONTEXT_RENDER_SYSTEM}\""
+  -o "\"${TEST_CONTEXT_RESULT_DIR}\"")

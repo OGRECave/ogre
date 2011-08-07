@@ -58,6 +58,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     binOpt["-c"] = "Reference"; // name of batch to compare against
     binOpt["-n"] = "AUTO";      // name for this batch
     binOpt["-rs"] = "SAVED";    // rendersystem to use (default: use name from the config file/dialog)
+    binOpt["-o"] = "NONE";      // path to output a summary file to (default: don't output a file)
 
     // parse
     findCommandLineOpts(argc, argv, unOpt, binOpt);
@@ -70,6 +71,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mCompareWith = binOpt["-c"];
     mForceConfig = unOpt["-d"];
     mRenderSystemName = binOpt["-rs"];
+    mSummaryOutputDir = binOpt["-o"];
 }
 //-----------------------------------------------------------------------
 
@@ -369,7 +371,7 @@ bool TestContext::oneTimeConfig()
 		mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
 	else if(!success)
 		mRoot->setRenderSystem(0);
-
+	
 	mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
 
 	return success;
@@ -403,10 +405,10 @@ void TestContext::setupDirectories(Ogre::String batchName)
 
 void TestContext::finishedTests()
 {
-    Ogre::String html = "";
-
     if (mGenerateHtml && !mReferenceSet)
     {
+		const TestBatch* compareTo = 0;
+
         HtmlWriter* writer = 0;
         SimpleResultWriter* simpleWriter = 0;
 
@@ -429,8 +431,7 @@ void TestContext::finishedTests()
             {
                 if (mBatch->canCompareWith((*i)))
                 {
-                    writer = OGRE_NEW HtmlWriter(*i, *mBatch, mBatch->compare((*i)));
-                    simpleWriter = OGRE_NEW SimpleResultWriter(*i, *mBatch, mBatch->compare((*i)));
+					compareTo = &(*i);
                     break;
                 }
             }
@@ -441,49 +442,32 @@ void TestContext::finishedTests()
             ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
             if (mBatch->canCompareWith(*ref))
 			{
+				compareTo = ref;
                 writer = OGRE_NEW HtmlWriter(*ref, *mBatch, mBatch->compare(*ref));
                 simpleWriter = OGRE_NEW SimpleResultWriter(*ref, *mBatch, mBatch->compare(*ref));
 			}
         }
 
-        if (writer)
+        if (compareTo)
         {
+            HtmlWriter writer(*compareTo, *mBatch, mBatch->compare((*compareTo)));
+
             // we save a generally named "out.html" that gets overwritten each run, 
             // plus a uniquely named one for this run
-            writer->writeToFile(mOutputDir + "out.html");
-            writer->writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+            writer.writeToFile(mOutputDir + "out.html");
+            writer.writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
 
-			// also save a summary file for CTest to parse
-			Ogre::String rs;
-			for(int i = 0; i < mRenderSystemName.size(); ++i)
-				if(mRenderSystemName[i]!=' ')
-					rs += mRenderSystemName[i];
-
-			// output to the home directory, this needs work
-			Ogre::String path = mFSLayer->getWritablePath("");
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-
-			for(int i = 0; i < 4; ++i)
+			// also save a summary file for CTest to parse, if required
+			if(mSummaryOutputDir != "NONE")
 			{
-				int p = path.find_last_of("/");
-				path = path.substr(0, p);
+				Ogre::String rs;
+				for(int i = 0; i < mRenderSystemName.size(); ++i)
+					if(mRenderSystemName[i]!=' ')
+						rs += mRenderSystemName[i];
+				
+	            SimpleResultWriter simpleWriter(*compareTo, *mBatch, mBatch->compare((*compareTo)));
+				simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
 			}
-
-			simpleWriter->writeToFile(mFSLayer->getWritablePath(path + "/TestResults_" + rs + ".txt"));
-#else
-			
-			for(int i = 0; i < 3; ++i)
-			{
-				int p = path.find_last_of("/");
-				path = path.substr(0, p);
-			}
-
-			simpleWriter->writeToFile(path + "/TestResults_" + rs + ".txt");
-#endif
-
-            OGRE_DELETE writer;
-            OGRE_DELETE simpleWriter;
         }
 
 		OGRE_DELETE ref;
@@ -518,7 +502,6 @@ void TestContext::setTimestep(Ogre::Real timestep)
 int main(int argc, char *argv[])
 //#endif
 {
-	std::cout<<"\n\nPATH: "<<argv[0]<<"\n\n\n";
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
