@@ -106,6 +106,7 @@ abstract material Examples/Instancing/HWBasic
 			texture_unit Diffuse
 			{
 				texture_alias		DiffuseMap
+				tex_address_mode	clamp
 			}
 
 			texture_unit shadow0
@@ -121,4 +122,9 @@ abstract material Examples/Instancing/HWBasic
 material Examples/Instancing/HWBasic/Robot : Examples/Instancing/HWBasic
 {
 	set_texture_alias	DiffuseMap	r2skin.jpg
+}
+
+material Examples/Instancing/HWBasic/jaiqua : Examples/Instancing/HWBasic
+{
+	set_texture_alias	DiffuseMap	blue_jaiqua.jpg
 }
