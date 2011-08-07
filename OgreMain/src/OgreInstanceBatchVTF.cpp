@@ -388,10 +388,13 @@ namespace Ogre
 			if(mUseBoneDualQuaternions)
 			{
 				floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+				pDest += floatsWritten;
 			}
-
-			pDest += floatsWritten;
-
+			else
+			{
+				transforms += floatsWritten;
+			}
+			
 			++itor;
 		}
 		
@@ -626,13 +629,18 @@ namespace Ogre
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 32 bytes aligned :-)
 		const unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
+		size_t maxFloatsPerVector = 4;
 		size_t offset = 0;
-		offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() ).getSize();
-		offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() ).getSize();
+
+		for(size_t i = 0; i < mWeightCount; i += maxFloatsPerVector / mRowLength)
+		{
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->
+				getNextFreeTextureCoordinate() ).getSize();
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->
+				getNextFreeTextureCoordinate() ).getSize();
+		}
 
 		//Add the weights (supports up to four, which is Ogre's limit)
 		if(mWeightCount > 1)
@@ -649,15 +657,7 @@ namespace Ogre
 			HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 
-		size_t maxFloatsPerVector = 4;
-
-		struct Float2
-		{
-			float x;
-			float y;
-		};
-		Float2 *thisVec = static_cast<Float2*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-		size_t num = mWeightCount * mRowLength * 2; //need u and v for each row, 3 rows in a matrix, and mWeightCount matrices
+		float *thisFloat = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
 		
 		//Copy and repeat
 		for( size_t i=0; i<mInstancesPerBatch; ++i )
@@ -671,9 +671,10 @@ namespace Ogre
 					for( size_t k=0; k < mRowLength; ++k)
 					{
 						size_t instanceIdx = (hwBoneIdx[j+wgtIdx] + i * mMatricesPerInstance) * mRowLength + k;
-						thisVec->x = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
-						thisVec->y = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
-						++thisVec;
+						//x
+						*thisFloat++ = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
+						//y
+						*thisFloat++ = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
 					}
 
 					++numberOfMatricesInLine;
@@ -684,9 +685,8 @@ namespace Ogre
 						//Place zeroes in the remaining coordinates
 						for ( size_t k=mRowLength * numberOfMatricesInLine; k < maxFloatsPerVector; ++k)
 						{
-							thisVec->x = 0.0f;
-							thisVec->y = 0.0f;
-							++thisVec;
+							*thisFloat++ = 0.0f;
+							*thisFloat++ = 0.0f;
 						}
 
 						numberOfMatricesInLine = 0;
@@ -697,19 +697,15 @@ namespace Ogre
 				if(mWeightCount > 1)
 				{
 					//Write the weights
-					for(size_t wgtIdx = 0; wgtIdx < mWeightCount; wgtIdx += 2)
+					for(size_t wgtIdx = 0; wgtIdx < mWeightCount; ++wgtIdx)
 					{
-						thisVec->x = hwBoneWgt[j+wgtIdx];
-						thisVec->y = hwBoneWgt[j+wgtIdx+1];
-						thisVec++;
+						*thisFloat++ = hwBoneWgt[j+wgtIdx];
 					}
 
-					//If the weight count isn't even, write one final weight
-					if(mWeightCount % 2 != 0)
+					//Fill the rest of the line with zeros
+					for(size_t wgtIdx = mWeightCount; wgtIdx < maxFloatsPerVector; ++wgtIdx)
 					{
-						thisVec->x = hwBoneWgt[j+mWeightCount];
-						thisVec->y = 0.0f;
-						thisVec++;
+						*thisFloat++ = 0.0f;
 					}
 				}
 			}
