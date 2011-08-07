@@ -11,6 +11,9 @@ struct VS_INPUT
 	float4 Position	:	POSITION;
 	float3 Normal	:	NORMAL;
 	float3 Tangent	:	TANGENT;
+#ifdef BONE_TWO_WEIGHTS
+	float4 weights		: 	BLENDWEIGHT;
+#endif
 	float2 uv0		:	TEXCOORD0;
 
 	float4 m01		:	TEXCOORD1;
@@ -47,14 +50,29 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 	float4 worldPos	 = 0;
 	float3 worldNorm = 0;
 
-	#ifdef ST_DUAL_QUATERNION
+#ifdef ST_DUAL_QUATERNION
 	float2x4 blendDQ;	
 	blendDQ[0] = tex2D( matrixTexture, input.m01.xy );
 	blendDQ[1] = tex2D( matrixTexture, input.m01.zw );
+#ifdef BONE_TWO_WEIGHTS
+	float2x4 blendDQ2;
+	//Use the empty parts of m03, z and w, for the second dual quaternion
+	blendDQ2[0] = tex2D( matrixTexture, input.m23.xy );
+	blendDQ2[1] = tex2D( matrixTexture, input.m23.zw );
+	
+	//Accurate antipodality handling. For speed increase, remove the following line
+	if (dot(blendDQ[0], blendDQ2[0]) < 0.0) blendDQ2 *= -1.0;
+	
+	//Blend the dual quaternions based on the weights
+	blendDQ *= input.weights.x;
+	blendDQ += input.weights.y*blendDQ2;
+	//Normalize the resultant dual quaternion
+	blendDQ /= length(blendDQ[0]);
+#endif
 	//Only dealing with one weight so normalization of the dual quaternion and weighting are unnecessary
 	worldPos = float4(calculateBlendPosition(input.Position.xyz, blendDQ), 1.0);
 	worldNorm = calculateBlendNormal(input.Normal.xyz, blendDQ);
-	#else
+#else
 	float3x4 worldMatrix;
 	worldMatrix[0] = tex2D( matrixTexture, input.m01.xy );
 	worldMatrix[1] = tex2D( matrixTexture, input.m01.zw );
@@ -62,7 +80,7 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 	worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
 	worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
-	#endif
+#endif
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );

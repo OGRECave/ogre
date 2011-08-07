@@ -40,7 +40,7 @@ static const char *c_materialsTechniques_dq[] =
 static const char *c_materialsTechniques_dq_two_weights[] =
 {
 	"Examples/Instancing/ShaderBased/Robot_dq",
-	"Examples/Instancing/VTF/Robot_dq",
+	"Examples/Instancing/VTF/jaiqua_dq_two_weights",
 	"Examples/Instancing/HWBasic/Robot",
 	"Examples/Instancing/VTF/HW/jaiqua_dq_two_weights",
 	"Examples/Instancing/VTF/HW/LUT/jaiqua_dq_two_weights",

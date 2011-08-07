@@ -16,6 +16,7 @@ struct VS_INPUT
 #endif
 	float2 uv0		:	TEXCOORD0;
 	float4 m03		:	TEXCOORD1; //m03.w is always 0
+
 	float2 mOffset		:	TEXCOORD2;
 	
 #ifdef BONE_MATRIX_LUT

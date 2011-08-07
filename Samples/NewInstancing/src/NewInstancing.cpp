@@ -187,12 +187,17 @@ void Sample_NewInstancing::switchInstancingTechnique()
 		}
 
 		uint16 flags = IM_USEALL;
+		flags |= mCurrentFlags;
+		
 		if (mInstancingTechnique == 4)
 		{
 			flags |= IM_VTFBONEMATRIXLOOKUP;
 		}
-
-		flags |= mCurrentFlags;
+		//Only one weight is recommended for the VTF technique, but force the use of more for the demo
+		if(mInstancingTechnique == 1 && (flags & IM_USEBONEDUALQUATERNIONS))
+		{
+			flags &= ~IM_USEONEWEIGHT;
+		}
 
 		mCurrentManager = mSceneMgr->createInstanceManager(
 			"InstanceMgr" + StringConverter::toString(mInstancingTechnique), c_meshNames[mCurrentMesh],

@@ -512,7 +512,7 @@ namespace Ogre
 
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
-			if(!mForceOneWeight && !mUseOneWeight)
+			if(mWeightCount > 1)
 			{
 				hwBoneWgt.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 				retrieveBoneIdxWithWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
@@ -626,12 +626,20 @@ namespace Ogre
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 32 bytes aligned :-)
 		const unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+		size_t offset = 0;
+		offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() );
-		thisVertexData->vertexDeclaration->addElement( newSource, 16, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+			getNextFreeTextureCoordinate() ).getSize();
+		offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() );
+			getNextFreeTextureCoordinate() ).getSize();
+
+		//Add the weights (supports up to four, which is Ogre's limit)
+		if(mWeightCount > 1)
+		{
+			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+		}
 
 		//Create our own vertex buffer
 		HardwareVertexBufferSharedPtr vertexBuffer =
@@ -641,24 +649,68 @@ namespace Ogre
 			HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 
+		size_t maxFloatsPerVector = 4;
+
 		struct Float2
 		{
 			float x;
 			float y;
 		};
 		Float2 *thisVec = static_cast<Float2*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
+		size_t num = mWeightCount * mRowLength * 2; //need u and v for each row, 3 rows in a matrix, and mWeightCount matrices
+		
 		//Copy and repeat
 		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
-			for( size_t j=0; j<baseVertexData->vertexCount; ++j )
+			for( size_t j=0; j<baseVertexData->vertexCount * mWeightCount; j += mWeightCount )
 			{
-				for( size_t k=0; k<4; ++k )
+				size_t numberOfMatricesInLine = 0;
+
+				for(size_t wgtIdx = 0; wgtIdx < mWeightCount; ++wgtIdx)
 				{
-					size_t instanceIdx = (hwBoneIdx[j] + i * mMatricesPerInstance) * mRowLength + k;
-					thisVec->x = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
-					thisVec->y = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
-					++thisVec;
+					for( size_t k=0; k < mRowLength; ++k)
+					{
+						size_t instanceIdx = (hwBoneIdx[j+wgtIdx] + i * mMatricesPerInstance) * mRowLength + k;
+						thisVec->x = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
+						thisVec->y = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
+						++thisVec;
+					}
+
+					++numberOfMatricesInLine;
+
+					//If another matrix can't be fit, we're on another line, or if this is the last weight
+					if((numberOfMatricesInLine + 1) * mRowLength > maxFloatsPerVector || (wgtIdx+1) == mWeightCount)
+					{
+						//Place zeroes in the remaining coordinates
+						for ( size_t k=mRowLength * numberOfMatricesInLine; k < maxFloatsPerVector; ++k)
+						{
+							thisVec->x = 0.0f;
+							thisVec->y = 0.0f;
+							++thisVec;
+						}
+
+						numberOfMatricesInLine = 0;
+					}
+				}
+
+				//Don't need to write weights if there is only one
+				if(mWeightCount > 1)
+				{
+					//Write the weights
+					for(size_t wgtIdx = 0; wgtIdx < mWeightCount; wgtIdx += 2)
+					{
+						thisVec->x = hwBoneWgt[j+wgtIdx];
+						thisVec->y = hwBoneWgt[j+wgtIdx+1];
+						thisVec++;
+					}
+
+					//If the weight count isn't even, write one final weight
+					if(mWeightCount % 2 != 0)
+					{
+						thisVec->x = hwBoneWgt[j+mWeightCount];
+						thisVec->y = 0.0f;
+						thisVec++;
+					}
 				}
 			}
 		}
