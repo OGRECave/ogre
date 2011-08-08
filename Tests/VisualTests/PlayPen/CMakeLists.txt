@@ -98,52 +98,16 @@ set(SOURCE_FILES
     src/PlayPenInfiniteAAB.cpp
     src/PlayPenGeometryShaders.cpp
     src/PlayPenVertexTexture.cpp
-
-    #src/PlayPenMultiSceneManagersComplex.cpp
-    #src/PlayPenGeneratedLOD.cpp
     #src/PlayPen2bppAlphaPVR.cpp
     #src/PlayPen2bppPVR.cpp
     #src/PlayPen4bppAlphaPVR.cpp
     #src/PlayPen4bppPVR.cpp
-    #src/PlayPenAnimation.cpp
-    #src/PlayPenAnimationBlend.cpp
-    #src/PlayPenBackgroundLoadResourceGroup.cpp
-    #src/PlayPenFallbackResourceGroup.cpp
     #src/PlayPenFloat128DDS.cpp
     #src/PlayPenFloat16DDS.cpp
     #src/PlayPenFloat32DDS.cpp
     #src/PlayPenFloat64DDS.cpp
-    #src/PlayPenGpuPrograms.cpp
     #src/PlayPenMRT.cpp
     #src/PlayPenMRTCompositorScript.cpp
-    #src/PlayPenOverlayRelativeMode.cpp
-    #src/PlayPenOverlayZOrder.cpp
-    #src/PlayPenPoseAnimation2.cpp
-    #src/PlayPenSharedGpuParameters.cpp
-    #src/PlayPenSimpleMesh.cpp
-    #src/PlayPenTwoNewTerrains.cpp
-	#src/PlayPenMaterial.cpp
-    #src/PlayPenCthNewBlending.cpp
-	#src/PlayPenAlpha.cpp
-    #src/PlayPenGLSLTangent.cpp
-    #src/PlayPenBug.cpp
-    #src/PlayPenLod.cpp
-    #src/PlayPenNewTerrain.cpp
-    #src/PlayPenRadixSort.cpp
-    #src/PlayPen2Windows.cpp
-    #src/PlayPenSharedPtrBug.cpp
-    #src/PlayPenMatrices.cpp
-    #src/PlayPenSplitPassesTooManyTexUnits.cpp
-    #src/PlayPenTimeCreateDestroyObject.cpp
-    #src/PlayPenManualLoader.cpp
-    #src/PlayPenStringTokenising.cpp
-    #src/PlayPenPrepareShadowVolume.cpp
-    #src/PlayPenMaterialSerializer.cpp
-    #src/PlayPenEdgeBuilderMultiIndexBufMultiVertexBuf.cpp
-    #src/PlayPenEdgeBuilderMultiIndexBufSingleVertexBuf.cpp
-    #src/PlayPenEdgeBuilderSingleIndexBufSingleVertexBuf.cpp
-    #src/PlayPenExportPrecompiledAssemblerProgram.cpp
-
     src/PlayPenTestPlugin.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

@@ -405,24 +405,22 @@ void TestContext::setupDirectories(Ogre::String batchName)
 
 void TestContext::finishedTests()
 {
-    if (mGenerateHtml && !mReferenceSet)
+    if ((mGenerateHtml || mSummaryOutputDir != "NONE") && !mReferenceSet)
     {
 		const TestBatch* compareTo = 0;
 
-        HtmlWriter* writer = 0;
-        SimpleResultWriter* simpleWriter = 0;
-
-        // look for a reference set first
         Ogre::ConfigFile info;
         bool foundReference = true;
 		TestBatch* ref = 0;
 
+        // look for a reference set first (either "Reference" or a user-specified image set)
         try
         {
             info.load(mOutputDir + mCompareWith + "/info.cfg");
         }
         catch (Ogre::FileNotFoundException e)
         {
+			// if no luck, just grab the most recent compatible set
             foundReference = false;
             TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
 
@@ -441,21 +439,22 @@ void TestContext::finishedTests()
         {
             ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
             if (mBatch->canCompareWith(*ref))
-			{
 				compareTo = ref;
-                writer = OGRE_NEW HtmlWriter(*ref, *mBatch, mBatch->compare(*ref));
-                simpleWriter = OGRE_NEW SimpleResultWriter(*ref, *mBatch, mBatch->compare(*ref));
-			}
         }
 
         if (compareTo)
         {
-            HtmlWriter writer(*compareTo, *mBatch, mBatch->compare((*compareTo)));
+			ComparisonResultVectorPtr results = mBatch->compare(*compareTo);
 
-            // we save a generally named "out.html" that gets overwritten each run, 
-            // plus a uniquely named one for this run
-            writer.writeToFile(mOutputDir + "out.html");
-            writer.writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+			if(mGenerateHtml)
+			{
+				HtmlWriter writer(*compareTo, *mBatch, results);
+
+				// we save a generally named "out.html" that gets overwritten each run, 
+				// plus a uniquely named one for this run
+				writer.writeToFile(mOutputDir + "out.html");
+				writer.writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+			}
 
 			// also save a summary file for CTest to parse, if required
 			if(mSummaryOutputDir != "NONE")
@@ -465,7 +464,7 @@ void TestContext::finishedTests()
 					if(mRenderSystemName[i]!=' ')
 						rs += mRenderSystemName[i];
 				
-	            SimpleResultWriter simpleWriter(*compareTo, *mBatch, mBatch->compare((*compareTo)));
+	            SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
 				simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
 			}
         }
@@ -495,12 +494,11 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
 
-// TODO: setup CMake to use winmain rather than console
-//#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-//INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-//#else
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+#else
 int main(int argc, char *argv[])
-//#endif
+#endif
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];

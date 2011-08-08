@@ -33,5 +33,3 @@ SamplePlugin=Sample_TextureFX
 SamplePlugin=Sample_Transparency
 SamplePlugin=Sample_VolumeTex
 SamplePlugin=Sample_Water
-SamplePlugin=PlayPenTests
-SamplePlugin=VTests
