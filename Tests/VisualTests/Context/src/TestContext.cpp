@@ -494,11 +494,12 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
-#else
+// since getting commandline args out of WinMain isn't pretty, just use plain main for now...
+//#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+//INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+//#else
 int main(int argc, char *argv[])
-#endif
+//#endif
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];

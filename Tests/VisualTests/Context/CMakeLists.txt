@@ -43,6 +43,6 @@ ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
 
-ogre_add_executable(TestContext WIN32 ${HEADER_FILES} ${SOURCE_FILES})
+ogre_add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 ogre_config_common(TestContext)
