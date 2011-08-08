@@ -29,7 +29,7 @@ THE SOFTWARE.
 PlayPen_ReloadResources::PlayPen_ReloadResources()
 {
 	mInfo["Title"] = "PlayPen_ReloadResources";
-	mInfo["Description"] = "Tests.";
+	mInfo["Description"] = "Tests unloading and reloading resources.";
 	addScreenshotFrame(100);
 	mReloadTimer = 0.5f;
 }
@@ -47,7 +47,7 @@ bool PlayPen_ReloadResources::frameStarted(const FrameEvent& evt)
 			Entity* e = mSceneMgr->getEntity("1");
 			e->getParentSceneNode()->detachObject("1");
 			mSceneMgr->destroyAllEntities();
-			ResourceGroupManager::getSingleton().unloadResourceGroup("Tests2");
+			ResourceGroupManager::getSingleton().unloadResourceGroup("TestReload");
 
 			// reload
 			e = mSceneMgr->createEntity("1", "UniqueModel.MESH");
@@ -63,10 +63,22 @@ bool PlayPen_ReloadResources::frameStarted(const FrameEvent& evt)
 void PlayPen_ReloadResources::setupContent()
 {
 	mSceneMgr->setAmbientLight(ColourValue::White);
-	Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Tests2");
+
+	// get path to test resources
+	const Ogre::ResourceGroupManager::LocationList& ll = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList("Tests");
+	const Ogre::ResourceGroupManager::ResourceLocation* loc = ll.front();
+	Ogre::String testResourcePath = loc->archive->getName();
+
+	// add a new group
+	Ogre::String meshFilePath = testResourcePath + "/TestReload";
+	Ogre::ResourceGroupManager& resMgr = Ogre::ResourceGroupManager::getSingleton();
+	String newGroup = meshFilePath;
+	resMgr.createResourceGroup("TestReload", false);
+	resMgr.addResourceLocation(meshFilePath, "FileSystem", "TestReload");
+	resMgr.initialiseResourceGroup("TestReload");
 
 	MeshManager& mmgr = MeshManager::getSingleton();
-	mmgr.load("UniqueModel.MESH", "Tests2");
+	mmgr.load("UniqueModel.MESH", "TestReload");
 	
 	Entity* e = mSceneMgr->createEntity("1", "UniqueModel.MESH");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(e);
