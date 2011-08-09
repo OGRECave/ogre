@@ -30,7 +30,6 @@ PlayPen_ManualObjectNonIndexedUpdateSmaller::PlayPen_ManualObjectNonIndexedUpdat
 {
 	mInfo["Title"] = "PlayPen_ManualObjectNonIndexedUpdateSmaller";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 

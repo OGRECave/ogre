@@ -115,6 +115,7 @@ set (VISUAL_TEST_LIST
   PlayPen_MultiSceneManagersSimple
   PlayPen_MultiViewports
   PlayPen_NegativeScale
+  PlayPen_NonUniqueResourceNames
   PlayPen_NormalMapMirroredUVs
   PlayPen_Ortho
   PlayPen_PointSprites

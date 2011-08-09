@@ -51,7 +51,23 @@ protected:
 		std::stringstream out;
 
 		for(int i = 0; i < mResults->size(); ++i)
-			out<<(*mResults)[i].testName<<"="<<((*mResults)[i].passed?"Passed":"Failed")<<"\n";
+		{
+			Ogre::String test = (*mResults)[i].testName;
+			bool passed = true;
+			
+			int j = i;
+
+			// a test may have multiple images, so we check all, and fail the whole test if any one fails
+			for(; j < mResults->size() && (*mResults)[j].testName == test; ++j)
+			{
+				if(!(*mResults)[j].passed)
+					passed = false;
+			}
+
+			i = j - 1;
+
+			out<<test<<"="<<(passed ? "Passed" : "Failed")<<"\n";
+		}
 
 		return out.str();
 	}

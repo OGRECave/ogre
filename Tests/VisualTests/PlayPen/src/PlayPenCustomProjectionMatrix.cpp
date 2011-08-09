@@ -30,7 +30,6 @@ PlayPen_CustomProjectionMatrix::PlayPen_CustomProjectionMatrix()
 {
 	mInfo["Title"] = "PlayPen_CustomProjectionMatrix";
 	mInfo["Description"] = "Tests.";
-	addScreenshotFrame(10);
 }
 //----------------------------------------------------------------------------
 
