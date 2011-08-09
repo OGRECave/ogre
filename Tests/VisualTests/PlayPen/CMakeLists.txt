@@ -98,10 +98,10 @@ set(SOURCE_FILES
     src/PlayPenInfiniteAAB.cpp
     src/PlayPenGeometryShaders.cpp
     src/PlayPenVertexTexture.cpp
-    #src/PlayPen2bppAlphaPVR.cpp
-    #src/PlayPen2bppPVR.cpp
-    #src/PlayPen4bppAlphaPVR.cpp
-    #src/PlayPen4bppPVR.cpp
+    src/PlayPen2bppAlphaPVR.cpp
+    src/PlayPen2bppPVR.cpp
+    src/PlayPen4bppAlphaPVR.cpp
+    src/PlayPen4bppPVR.cpp
     #src/PlayPenFloat128DDS.cpp
     #src/PlayPenFloat16DDS.cpp
     #src/PlayPenFloat32DDS.cpp
