@@ -67,6 +67,9 @@ public:
     /** Setup the Root */
     virtual void createRoot();
 
+	/** Start it up */
+	virtual void go(OgreBites::Sample* initialSample = 0);
+
 	/** Handles the config dialog */
 	virtual bool oneTimeConfig();
 
@@ -115,6 +118,7 @@ protected:
 	bool mReferenceSet; // is a reference set being generated
 	bool mGenerateHtml; // should html output be created
 	bool mForceConfig; // force the config dialog
+	bool mHelp; // show usage details
 	Ogre::String mRenderSystemName; // render system to use
     Ogre::String mBatchName;// optional name for this batch
     Ogre::String mCompareWith;// set to compare against

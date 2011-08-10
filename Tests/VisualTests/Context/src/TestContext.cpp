@@ -53,6 +53,8 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     unOpt["-r"] = false;        // generate reference set
     unOpt["--no-html"] = false; // whether or not to generate html
     unOpt["-d"] = false;        // force config dialogue
+    unOpt["-h"] = false;        // help, give usage details
+    unOpt["--help"] = false;    // help, give usage details
     binOpt["-m"] = "";          // optional comment
     binOpt["-ts"] = "VTests";   // name of the test set to use
     binOpt["-c"] = "Reference"; // name of batch to compare against
@@ -72,6 +74,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mForceConfig = unOpt["-d"];
     mRenderSystemName = binOpt["-rs"];
     mSummaryOutputDir = binOpt["-o"];
+	mHelp = unOpt["-h"] || unOpt["--help"];
 }
 //-----------------------------------------------------------------------
 
@@ -345,6 +348,33 @@ void TestContext::createRoot()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.load();
 #endif
+}
+//-----------------------------------------------------------------------
+
+void TestContext::go(OgreBites::Sample* initialSample)
+{
+	// either print usage details, or start up as usual
+	if(mHelp)
+	{
+		std::cout<<"\nOgre Visual Testing Context:\n";
+		std::cout<<"Runs sets of visual test scenes, taking screenshots, and running comparisons.\n\n";
+		std::cout<<"Usage: TestContext [opts]\n\n";
+		std::cout<<"Options:\n";
+		std::cout<<"\t-r           Generate reference set.\n";
+		std::cout<<"\t--no-html    Suppress html output.\n";
+		std::cout<<"\t-d           Force config dialog.\n";
+		std::cout<<"\t-h, --help   Show usage details.\n";
+		std::cout<<"\t-m [comment] Optional comment.\n";
+		std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg)\n";
+		std::cout<<"\t-c [name]    Name of the test result batch to compare against.\n";
+		std::cout<<"\t-n [name]    Name for this result image set.\n";
+		std::cout<<"\t-rs [name]   Render system to use.\n";
+		std::cout<<"\t-o [path]    Path to output a simple summary file to\n\n";
+	}
+	else
+	{
+		SampleContext::go(initialSample);
+	}
 }
 //-----------------------------------------------------------------------
 
