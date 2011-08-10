@@ -21,6 +21,9 @@ add_subdirectory(VTests)
 # setup cmake scripts
 configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/RunVTests.cmake COPYONLY)
 configure_file(CheckResult.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/CheckResult.cmake COPYONLY)
+configure_file(PostTest.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/PostTest.cmake COPYONLY)
+# CTest configuration
+configure_file(CTestCustom.cmake ${CMAKE_BINARY_DIR}/Tests/CTestCustom.cmake COPYONLY)
 
 # build a list of render systems to test
 set(TEST_RENDER_SYSTEMS "")
