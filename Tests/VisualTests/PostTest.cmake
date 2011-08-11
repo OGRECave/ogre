@@ -8,9 +8,10 @@
 
 if (UNIX)
   # escape spaces
-  string(REPLACE " " "\ " USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
+  string(REPLACE " " "\ " USER_HOME_DIRECTORY "$ENV{HOME}")
 elseif (WIN32)
-  string(REPLACE "\\" "/" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
+  # make sure we've got backslashes
+  string(REPLACE "/" "\\" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
 # other platforms?
 endif ()
 
@@ -18,6 +19,6 @@ endif ()
 if (UNIX)
   exec_program("rm ${USER_HOME_DIRECTORY}/TestResults_*RenderingSubsystem.txt")
 elseif (WIN32)
-  exec_program("cmd /c del \"${USER_HOME_DIRECTORY}\TestResults_*RenderingSubsystem.txt\"")
+  exec_program("cmd /c del \"${USER_HOME_DIRECTORY}\\TestResults_*RenderingSubsystem.txt\"")
 # other platforms?
 endif ()
