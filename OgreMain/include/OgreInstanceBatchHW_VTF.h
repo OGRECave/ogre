@@ -59,6 +59,7 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW_VTF : public BaseInstanceBatchVTF
 	{
+	protected:
 		bool	mKeepStatic;
 
 		//Pointer to the buffer containing the per instance vertex data
@@ -76,7 +77,7 @@ namespace Ogre
 		@param[in] currentCamera The camera being used for render (valid when using bone matrix lookup)
 		@return The number of instances to be rendered
 		*/
-		size_t updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera);
+		virtual size_t updateInstanceDataBuffer(bool isFirstTime, Camera* currentCamera);
 
 
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
