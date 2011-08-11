@@ -1611,7 +1611,7 @@ protected:
 					{
 						if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
 						{
-							shaderCoreLibsPath = (*it)->archive->getName() + "/";
+							shaderCoreLibsPath = (*it)->archive->getName() + "/cache/";
 							shaderCachePath = shaderCoreLibsPath;
 							coreLibsFound = true;
 							break;
