@@ -114,6 +114,7 @@ namespace Ogre
         unsigned long mNextFrame;
 		Real mFrameSmoothingTime;
 		bool mRemoveQueueStructuresOnClear;
+		Real mDefaultMinPixelSize;
 
 	public:
 		typedef vector<DynLib*>::type PluginLibList;
@@ -1049,6 +1050,17 @@ namespace Ogre
 		see setBlendWeightsGpuRedundant() for more information
 		*/
 		bool isBlendWeightsGpuRedundant() const { return mIsBlendWeightsGpuRedundant; }
+	
+		/** Set the default minimum pixel size for object to be rendered by
+		@note
+			To use this feature see Camera::setUseMinPixelSize()
+		*/
+		void setDefaultMinPixelSize(Real pixelSize) { mDefaultMinPixelSize = pixelSize; }
+
+		/** Get the default minimum pixel size for object to be rendered by
+		*/
+		Real getDefaultMinPixelSize() { return mDefaultMinPixelSize; }
+	
 
     };
 	/** @} */

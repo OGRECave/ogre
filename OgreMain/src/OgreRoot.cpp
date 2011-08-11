@@ -123,6 +123,7 @@ namespace Ogre {
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
+	  , mDefaultMinPixelSize(0)
 	  , mNextMovableObjectTypeFlag(1)
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
