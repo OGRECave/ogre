@@ -93,9 +93,20 @@ namespace Ogre
 		{
 			retrieveBoneIdx( baseVertexData, hwBoneIdx );
 
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-			thisVertexData->vertexDeclaration->closeGapsInSource();
+			const VertexElement* pElement = thisVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
+			if (pElement) 
+			{
+				unsigned short skelDataSource = pElement->getSource();
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+				if (thisVertexData->vertexDeclaration->findElementsBySource(skelDataSource).empty())
+				{
+					thisVertexData->vertexDeclaration->closeGapsInSource();
+					thisVertexData->vertexBufferBinding->unsetBinding(skelDataSource);
+					VertexBufferBinding::BindingIndexMap tmpMap;
+					thisVertexData->vertexBufferBinding->closeGaps(tmpMap);
+				}
+			}
 		}
 
 		createVertexTexture( baseSubMesh );
@@ -268,7 +279,7 @@ namespace Ogre
 			//we need another 3 for the unique world transform of each instanced entity
 			neededTextureCoord += 3;
 		}
-		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() >= 8 - neededTextureCoord )
+		if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() > 8 - neededTextureCoord )
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
 					String("Given mesh must have at least ") + 
@@ -405,7 +416,7 @@ namespace Ogre
 	void InstanceBatchHW_VTF::_boundsDirty(void)
 	{
 		//Don't update if we're static, but still mark we're dirty
-		if( !mBoundsDirty && !mKeepStatic )
+		if( !mBoundsDirty && !mKeepStatic && mCreator)
 			mCreator->_addDirtyBatch( this );
 		mBoundsDirty = true;
 	}

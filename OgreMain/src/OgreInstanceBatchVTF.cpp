@@ -306,14 +306,21 @@ namespace Ogre
 					itEntEnd = mInstancedEntities.end();
 				for(;itEnt != itEntEnd ; ++itEnt)
 				{
-					Matrix4* transformUniqueId = (*itEnt)->mBoneMatrices;
-					MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
-					if (itLu == transformToId.end())
+					if ((*itEnt)->isInScene())
 					{
-						itLu = transformToId.insert(MapTransformId::value_type(transformUniqueId,lookupCounter)).first;
-						++lookupCounter;
+						Matrix4* transformUniqueId = (*itEnt)->mBoneMatrices;
+						MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
+						if (itLu == transformToId.end())
+						{
+							itLu = transformToId.insert(MapTransformId::value_type(transformUniqueId,lookupCounter)).first;
+							++lookupCounter;
+						}
+						(*itEnt)->setTransformLookupNumber(itLu->second);
 					}
-					(*itEnt)->setTransformLookupNumber(itLu->second);
+					else 
+					{
+						(*itEnt)->setTransformLookupNumber(0);
+					}
 				}
 
 				if (lookupCounter > getMaxLookupTableInstances())
@@ -399,9 +406,20 @@ namespace Ogre
 		{
 			retrieveBoneIdx( baseVertexData, hwBoneIdx );
 
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-			thisVertexData->vertexDeclaration->closeGapsInSource();
+			const VertexElement* pElement = thisVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
+			if (pElement) 
+			{
+				unsigned short skelDataSource = pElement->getSource();
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+				if (thisVertexData->vertexDeclaration->findElementsBySource(skelDataSource).empty())
+				{
+					thisVertexData->vertexDeclaration->closeGapsInSource();
+					thisVertexData->vertexBufferBinding->unsetBinding(skelDataSource);
+					VertexBufferBinding::BindingIndexMap tmpMap;
+					thisVertexData->vertexBufferBinding->closeGaps(tmpMap);
+				}
+			}
 		}
 
 		for( unsigned short i=0; i<thisVertexData->vertexDeclaration->getMaxSource()+1; ++i )
