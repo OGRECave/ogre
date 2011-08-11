@@ -278,6 +278,9 @@ protected:
         // make the table, and rows for each stat
         HtmlElement* table = column->appendElement("table");
         HtmlElement* row = table->appendElement("tr");
+        row->appendElement("th")->appendText("Name:");
+        row->appendElement("td")->appendText(set.name);
+        row = table->appendElement("tr");
         row->appendElement("th")->appendText("Time:");
         row->appendElement("td")->appendText(set.timestamp);
         row = table->appendElement("tr");
