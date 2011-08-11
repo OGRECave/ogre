@@ -206,6 +206,12 @@ protected:
 	*/
 	bool					needsTextureMatrix		(TextureUnitState* textureUnitState);
 
+	/** 
+	Determines whether a given texture unit needs to be processed by this srs
+	*/
+	virtual bool isProcessingNeeded(TextureUnitState* texUnitState);
+
+
 // Attributes.
 protected:
 	TextureUnitParamsList	mTextureUnitParamsList;		// Texture units list. 		
