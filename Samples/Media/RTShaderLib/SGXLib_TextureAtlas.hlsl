@@ -16,7 +16,7 @@ float mipmapLevel(float2 coords, float2 texSize)
 	
 
 //-----------------------------------------------------------------------------
-void SGX_Atlas_Sample(in sampler2D sample, 
+void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample, 
 		in float2 origTexcoord, 
 		in float2 atlasTexcoord, 
 		in float4 textureData, 
@@ -40,9 +40,12 @@ void SGX_Atlas_Sample(in sampler2D sample,
 	
 	
 	// calculate the tileSize by using the power of 2 value
-	//float2 pwrs = float2(6,6);
 	float2 pwrs = textureData.zw;
 
+	//Calculate the power of 2 size of the maximum avialable Mipmap
+	//Note: We limit the amount of available LODs to [actual number] - 2
+	//as some atlas packaging tools do not include the last 2 LODs
+	//when packeging DXT format atlas textures.
 	float pwr = min(pwrs.x,pwrs.y) - 2;	
 	float2 tileSize = pow(float2(2.0,2.0),pwrs);
 	
@@ -61,6 +64,23 @@ void SGX_Atlas_Sample(in sampler2D sample,
 	
 	//return the pixel from the correct mip surface of the atlas
 	texel = tex2Dlod(sample, float4(atlasTexcoord, 0, lod));
+}
+//-----------------------------------------------------------------------------
+void SGX_Atlas_Sample_Normal(in sampler2D sample, 
+		in float2 origTexcoord, 
+		in float2 atlasTexcoord, 
+		in float4 textureData, 
+		in float2 imageSize,
+		out float4 texel)
+{
+	//texcoord contain:
+	// x = texture atlas u
+	// y = texture atlas v
+	// z = derivative of original u
+	// w = derivative of original v
+	atlasTexcoord = textureData.xy + (atlasTexcoord * pow(float2(2.0,2.0),textureData.zw) / imageSize);
+	//texel = tex2Dlod(sample, float4(atlasTexcoord, 0,0));
+	texel = tex2D(sample, atlasTexcoord);
 }
 
 //-----------------------------------------------------------------------------

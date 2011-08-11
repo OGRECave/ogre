@@ -120,6 +120,9 @@ protected:
 	/** Set fog per pixel enable state. */
 	void setPerPixelFogEnable(bool enable);
 
+	/** Set auto border adjustment mode in texture atlasing. */
+	void setAtlasBorderMode( bool enable );
+
 	/** Set instanced viewports enable state. */
 	void setInstancedViewportsEnable( bool enable );
 
