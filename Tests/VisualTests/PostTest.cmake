@@ -7,10 +7,17 @@
 #-------------------------------------------------------------------
 
 if (UNIX)
-  set(USER_HOME_DIRECTORY $ENV{HOME})
+  # escape spaces
+  string(REPLACE " " "\ " USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
 elseif (WIN32)
   string(REPLACE "\\" "/" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
 # other platforms?
 endif ()
 
-exec_program("cmake -E remove ${USER_HOME_DIRECTORY}/TestResults_*RenderingSubsystem.txt")
+# Use platform-specific utils, since 'cmake -E remove' didn't seem to handle wildcards in Windows
+if (UNIX)
+  exec_program("rm ${USER_HOME_DIRECTORY}/TestResults_*RenderingSubsystem.txt")
+elseif (WIN32)
+  exec_program("cmd /c del \"${USER_HOME_DIRECTORY}\TestResults_*RenderingSubsystem.txt\"")
+# other platforms?
+endif ()
