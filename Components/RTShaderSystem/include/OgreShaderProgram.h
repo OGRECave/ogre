@@ -62,6 +62,15 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
 	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, Real data, size_t size = 0);
+	
+	/** Resolve uniform auto constant parameter with associated real data of this program.
+	@param autoType The auto type of the desired parameter.	
+	@param type The desired data type of the auto parameter.
+	@param data The data to associate with the auto parameter.
+	@param size number of elements in the parameter.	
+	Return parameter instance in case of that resolve operation succeeded.	
+	*/
+	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
 
 	/** Resolve uniform auto constant parameter with associated int data of this program.
 	@param autoType The auto type of the desired parameter.	
@@ -70,6 +79,15 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
 	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, size_t data, size_t size = 0);
+	
+	/** Resolve uniform auto constant parameter with associated int data of this program.
+	@param autoType The auto type of the desired parameter.
+	@param type The desired data type of the auto parameter.
+	@param data The data to associate with the auto parameter.
+	@param size number of elements in the parameter.
+	Return parameter instance in case of that resolve operation succeeded.	
+	*/
+	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, size_t data, size_t size = 0);
 
 	/** Resolve uniform parameter of this program.
 	@param type The type of the desired parameter.

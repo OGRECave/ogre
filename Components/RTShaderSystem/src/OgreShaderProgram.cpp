@@ -128,7 +128,32 @@ UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::Auto
 }
 
 //-----------------------------------------------------------------------------
-UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, 
+UniformParameterPtr Program::resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type,
+												Real data, size_t size)
+{
+	UniformParameterPtr param;
+
+	// Check if parameter already exists.
+	param = getParameterByAutoType(autoType);
+	if (param.get() != NULL)
+	{
+		if (param->isAutoConstantRealParameter() &&
+			param->getAutoConstantRealData() == data)
+		{
+			param->setSize(std::max(size, param->getSize()));
+			return param;
+		}
+	}
+	
+	// Create new parameter.
+	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
+	addParameter(param);
+
+	return param;
+}
+
+//-----------------------------------------------------------------------------
+UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType,
 										   size_t data, size_t size)
 {
 	UniformParameterPtr param;
@@ -147,6 +172,31 @@ UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoC
 
 	// Create new parameter.
 	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size));
+	addParameter(param);
+
+	return param;
+}
+
+//-----------------------------------------------------------------------------
+UniformParameterPtr Program::resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, 
+										   size_t data, size_t size)
+{
+	UniformParameterPtr param;
+
+	// Check if parameter already exists.
+	param = getParameterByAutoType(autoType);
+	if (param.get() != NULL)
+	{
+		if (param->isAutoConstantIntParameter() &&
+			param->getAutoConstantIntData() == data)
+		{
+			param->setSize(std::max(size, param->getSize()));
+			return param;
+		}
+	}
+
+	// Create new parameter.
+	param = UniformParameterPtr(OGRE_NEW UniformParameter(autoType, data, size, type));
 	addParameter(param);
 
 	return param;

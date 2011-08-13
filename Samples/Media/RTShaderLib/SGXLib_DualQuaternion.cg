@@ -51,3 +51,8 @@ void SGX_AdjointTransposeMatrix(in float3x4 M, out float3x3 vOut)
 
 	vOut = atM;
 }
+
+void SGX_BuildDualQuaternionMatrix(in float4 r1, in float4 r2, out float2x4 vOut)
+{
+	vOut = float2x4(r1, r2);
+}

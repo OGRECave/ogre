@@ -51,6 +51,7 @@ namespace RTShader {
 #define SGX_FUNC_CALCULATE_BLEND_NORMAL			"SGX_CalculateBlendNormal"
 #define SGX_FUNC_NORMALIZE_DUAL_QUATERNION		"SGX_NormalizeDualQuaternion"
 #define SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX		"SGX_AdjointTransposeMatrix"
+#define SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX		"SGX_BuildDualQuaternionMatrix"
 
 /** Implement a sub render state which performs dual quaternion hardware skinning.
 This sub render state uses bone matrices converted to dual quaternions and adds calculations
@@ -105,11 +106,15 @@ protected:
 	ParameterPtr mParamLocalBlendPosition;
 	ParameterPtr mParamBlendS;
 	ParameterPtr mParamBlendDQ;
+	ParameterPtr mParamInitialDQ;
 	ParameterPtr mParamTempWorldMatrix;
 
 	ParameterPtr mParamTempFloat2x4;
 	ParameterPtr mParamTempFloat3x3;
 	ParameterPtr mParamTempFloat3x4;
+	
+	ParameterPtr mParamIndex1;
+	ParameterPtr mParamIndex2;
 
 };
 

@@ -17,13 +17,13 @@ void SGX_AntipodalityAdjustment(in mat2x4 dq0, in mat2x4 dq1,out mat2x4 dq2)
 	dq2 = (dot(dq0[0], dq1[0]) < 0.0) ? dq1 * -1.0 : dq1;
 }
 
-void SGX_CalculateBlendPosition(in vec4 position, in mat2x4 blendDQ, out vec3 vOut)
+void SGX_CalculateBlendPosition(in vec3 position, in mat2x4 blendDQ, out vec4 vOut)
 {
-	vec3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	vec3 blendPosition = position + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position) + blendDQ[0].x*position);
 	vec3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
 	blendPosition += trans;
 
-	vOut = blendPosition;
+	vOut = vec4(blendPosition, 1.0);
 }
 
 void SGX_CalculateBlendNormal(in vec3 normal, in mat2x4 blendDQ, out vec3 vOut)
@@ -52,4 +52,9 @@ void SGX_AdjointTransposeMatrix(in mat3x3 M, out mat3x3 vOut)
 	atM._m22 = M._m00 * M._m11 - M._m10 * M._m01;
 
 	vOut = atM;
+}
+
+void SGX_BuildDualQuaternionMatrix(in vec4 r1, in vec4 r2, out mat2x4 vOut)
+{
+	vOut = mat2x4(r1, r2);
 }

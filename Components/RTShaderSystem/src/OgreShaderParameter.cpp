@@ -422,6 +422,32 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 }
 
 //-----------------------------------------------------------------------
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type)
+{
+	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
+
+	mName				= parameterDef->name;
+	if (fAutoConstantData != 0.0)
+	{
+		mName += StringConverter::toString(fAutoConstantData);
+		//replace possible illegal point character in name
+		std::replace(mName.begin(), mName.end(), '.', '_'); 
+	}
+	mType				= type;
+	mSemantic			= SPS_UNKNOWN;
+	mIndex				= -1;
+	mContent			= SPC_UNKNOWN;
+	mIsAutoConstantReal	= true;	
+	mIsAutoConstantInt	= false;
+	mAutoConstantType	= autoType;
+	mAutoConstantRealData = fAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
+	mParamsPtr			 = NULL;
+	mPhysicalIndex		 = -1;
+	mSize				 = size;
+}
+
+//-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
 	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
@@ -430,6 +456,28 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 	if (nAutoConstantData != 0)
 		mName += StringConverter::toString(nAutoConstantData);
 	mType				= parameterDef->type;
+	mSemantic			= SPS_UNKNOWN;
+	mIndex				= -1;
+	mContent			= SPC_UNKNOWN;
+	mIsAutoConstantReal	= false;	
+	mIsAutoConstantInt	= true;
+	mAutoConstantType	= autoType;
+	mAutoConstantIntData = nAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
+	mParamsPtr			 = NULL;
+	mPhysicalIndex		 = -1;
+	mSize				 = size;
+}
+
+//-----------------------------------------------------------------------
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
+{
+	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
+
+	mName				= parameterDef->name;
+	if (nAutoConstantData != 0)
+		mName += StringConverter::toString(nAutoConstantData);
+	mType				= type;
 	mSemantic			= SPS_UNKNOWN;
 	mIndex				= -1;
 	mContent			= SPC_UNKNOWN;

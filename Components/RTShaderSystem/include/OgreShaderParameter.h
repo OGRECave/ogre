@@ -392,6 +392,14 @@ public:
 	@param size number of elements in the parameter.	
 	*/
 	UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size);
+	
+	/** Class constructor.
+	@param autoType The auto type of this parameter.
+	@param fAutoConstantData The real data for this auto constant parameter.	
+	@param size number of elements in the parameter.
+	@param type The desired data type of this auto constant parameter.
+	*/
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type);
 
 	/** Class constructor.
 	@param autoType The auto type of this parameter.
@@ -399,6 +407,14 @@ public:
 	@param size number of elements in the parameter.	
 	*/
 	UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size);
+	
+	/** Class constructor.
+	@param autoType The auto type of this parameter.
+	@param nAutoConstantData The int data for this auto constant parameter.	
+	@param size number of elements in the parameter.
+	@param type The desired data type of this auto constant parameter.
+	*/
+	UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type);
 
 	
 	/** Get auto constant int data of this parameter, in case it is auto constant parameter. */

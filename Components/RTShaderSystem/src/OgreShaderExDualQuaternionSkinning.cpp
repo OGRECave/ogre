@@ -100,26 +100,22 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 
 	if (mDoBoneCalculations == true)
 	{
-		GpuProgramParameters::AutoConstantType worldMatrixType = GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4;
-		//if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
-		//{
-			//given that hlsl shaders use column major matrices which are not compatible with the cg
-			//and glsl method of row major matrices, we will use a full matrix instead.
-		//	worldMatrixType = GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY;
-		//}
-
 		//input parameters
 		mParamInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 		mParamInBiNormal = vsMain->resolveInputParameter(Parameter::SPS_BINORMAL, 0, Parameter::SPC_BINORMAL_OBJECT_SPACE, GCT_FLOAT3);
 		mParamInTangent = vsMain->resolveInputParameter(Parameter::SPS_TANGENT, 0, Parameter::SPC_TANGENT_OBJECT_SPACE, GCT_FLOAT3);
 		mParamInIndices = vsMain->resolveInputParameter(Parameter::SPS_BLEND_INDICES, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
 		mParamInWeights = vsMain->resolveInputParameter(Parameter::SPS_BLEND_WEIGHTS, 0, Parameter::SPC_UNKNOWN, GCT_FLOAT4);
-		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(worldMatrixType, 0, mBoneCount);
+		//ACT_WORLD_DUALQUATERNION_ARRAY_2x4 is an array of float4s, so there are two indices for each bone
+		mParamInWorldMatrices = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4, GCT_FLOAT4, 0, mBoneCount * 2);
 		mParamInInvWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX, 0);
 		mParamInViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEWPROJ_MATRIX, 0);
 		
 		mParamTempWorldMatrix = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "worldMatrix", GCT_MATRIX_2X4);
 		mParamBlendDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "blendDQ", GCT_MATRIX_2X4);
+		mParamInitialDQ = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "initialDQ", GCT_MATRIX_2X4);
+		mParamIndex1 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "index1", GCT_FLOAT1);
+		mParamIndex2 = vsMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, -1, "index2", GCT_FLOAT1);
 				
 		if(mScalingShearingSupport)
 		{
@@ -141,6 +137,9 @@ bool DualQuaternionSkinning::resolveParameters(ProgramSet* programSet)
 			(mParamInViewProjMatrix.get() != NULL) &&
 			(mParamInInvWorldMatrix.get() != NULL) &&
 			(mParamBlendDQ.get() != NULL) &&
+			(mParamInitialDQ.get() != NULL) &&
+			(mParamIndex1.get() != NULL) &&
+			(mParamIndex2.get() != NULL) &&
 						
 			(!mScalingShearingSupport || (mScalingShearingSupport &&
 			(mParamInScaleShearMatrices.get() != NULL &&
@@ -187,9 +186,9 @@ bool DualQuaternionSkinning::addFunctionInvocations(ProgramSet* programSet)
 	addPositionCalculations(vsMain, internalCounter);
 
 	//add functions to calculate normal and normal related data in world and object space
-	addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
-	addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
+	//addNormalRelatedCalculations(vsMain, mParamInNormal, mParamLocalNormalWorld, internalCounter);
+	//addNormalRelatedCalculations(vsMain, mParamInTangent, mParamLocalTangentWorld, internalCounter);
+	//addNormalRelatedCalculations(vsMain, mParamInBiNormal, mParamLocalBinormalWorld, internalCounter);
 
 	return true;
 }
@@ -223,25 +222,51 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_OUT);
 			vsMain->addAtomInstance(curFuncInvocation);
-
+		}
+		else
+		{
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);
+			curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
 		}
 		
 		//Set functions to calculate world position
 		for(int i = 0 ; i < getWeightCount() ; ++i)
 		{
+			//Set the index of the matrix
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexToMask(i));
+			curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+			
+			//Multiply the index by 2
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_MODULATE, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(2.0f), Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+			
+			//Add 1 to the index and assign as the second row's index
+			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(1.0f), Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex2, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+			
+			//Build the dual quaternion matrix
+			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_BUILD_DUAL_QUATERNION_MATRIX, FFP_VS_TRANSFORM, funcCounter++);
+			curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex1, Operand::OPS_IN,  Operand::OPM_ALL, 1);
+			curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamIndex2, Operand::OPS_IN,  Operand::OPM_ALL, 1);
+			curFuncInvocation->pushOperand(mParamTempFloat2x4, Operand::OPS_OUT);
+			vsMain->addAtomInstance(curFuncInvocation);
+			
 			//Adjust the podalities of the dual quaternions
 			if(mCorrectAntipodalityHandling)
-			{
+			{	
 				adjustForCorrectAntipodality(vsMain, i, funcCounter, mParamTempFloat2x4);
-			}
-			else
-			{
-				//set the local param as the value of the world param
-				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
-				curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
-				curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexToMask(i), 1);
-				curFuncInvocation->pushOperand(mParamTempFloat2x4, Operand::OPS_OUT);
-				vsMain->addAtomInstance(curFuncInvocation);
 			}
 
 			//Calculate the resultant dual quaternion based on the weights given
@@ -343,19 +368,26 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 								int index, int& funcCounter, const ParameterPtr& pTempWorldMatrix)
 {
+	FunctionInvocation* curFuncInvocation;
+	
 	//Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations
 	if(index > 0)
 	{
 		Operand::OpMask indexMask = indexToMask(index);
-		FunctionInvocation* curFuncInvocation;
 
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ANTIPODALITY_ADJUSTMENT, FFP_VS_TRANSFORM, funcCounter++);
-		curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
 		//This is the base dual quaternion dq0, which the antipodality calculations are based on
-		curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN, indexToMask(0), 1);
-		curFuncInvocation->pushOperand(mParamInWorldMatrices, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexMask, 1);
+		curFuncInvocation->pushOperand(mParamInitialDQ, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamTempFloat2x4, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(pTempWorldMatrix, Operand::OPS_OUT);
+		vsMain->addAtomInstance(curFuncInvocation);
+	}
+	else if(index == 0)
+	{	
+		//Set the first dual quaternion as the initial dq
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
+		curFuncInvocation->pushOperand(mParamTempFloat2x4, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(mParamInitialDQ, Operand::OPS_OUT);
 		vsMain->addAtomInstance(curFuncInvocation);
 	}
 }

@@ -18,7 +18,6 @@ material jaiquaDualQuatTest
  				hardware_skinning 24 2 dual_quaternion true true				
  			}
 
-
 			texture_unit
 			{
 				texture blue_jaiqua.jpg
@@ -38,6 +37,14 @@ material spine
 			ambient 0.101961 0.313726 0.745098 1
 			diffuse 0.117647 0.572549 0.862745 1		
 			specular 0.72549 0.898039 0.898039 1 31
+
+			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			{
+			}
+
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+			}
 		}
 	}
 }
@@ -52,6 +59,14 @@ material spineDualQuat
 			ambient 0.101961 0.313726 0.745098 1
 			diffuse 0.117647 0.572549 0.862745 1		
 			specular 0.72549 0.898039 0.898039 1 31
+
+			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
+			{
+			}
+
+			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
+			{
+			}
 		}
 	}
 }
