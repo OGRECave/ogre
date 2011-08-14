@@ -60,11 +60,11 @@ material spineDualQuat
 			diffuse 0.117647 0.572549 0.862745 1		
 			specular 0.72549 0.898039 0.898039 1 31
 
-			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
+			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase
 			{
 			}
 
-			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
+			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 			{
 			}
 		}

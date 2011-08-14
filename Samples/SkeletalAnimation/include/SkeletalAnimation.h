@@ -2,8 +2,10 @@
 #define __SkeletalAnimation_H__
 
 #include "SdkSample.h"
-#include "OgreDualQuaternion.h"
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinning.h"
+#endif
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -11,38 +13,6 @@ using namespace OgreBites;
 class _OgreSampleClassExport Sample_SkeletalAnimation : public SdkSample
 {
 public:
-
-	//-----------------------------------------------------------------------
-void exportRTShaderSystemMaterial(const String& fileName, const String& materialName)
-{
-	// Grab material pointer.
-	MaterialPtr materialPtr = MaterialManager::getSingleton().getByName(materialName);
-
-	// Create shader based technique.
-	bool success = mShaderGenerator->createShaderBasedTechnique(materialName,
-		MaterialManager::DEFAULT_SCHEME_NAME,
-		RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-	// Case creation of shader based technique succeeded.
-	if (success)
-	{
-		// Force shader generation of the given material.
-		RTShader::ShaderGenerator::getSingleton().validateMaterial(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, materialName);
-
-		// Grab the RTSS material serializer listener.
-		MaterialSerializer::Listener* matRTSSListener = RTShader::ShaderGenerator::getSingleton().getMaterialSerializerListener();
-		MaterialSerializer matSer;
-
-		// Add the custom RTSS listener to the serializer.
-		// It will make sure that every custom parameter needed by the RTSS
-		// will be added to the exported material script.
-		matSer.addListener(matRTSSListener);
-
-		// Simply export the material.
-		matSer.exportMaterial(materialPtr, fileName, false, false, "", materialPtr->getName() + "_RTSS_Export");
-	}
-}
-
 	Sample_SkeletalAnimation() : NUM_MODELS(6), ANIM_CHOP(8)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		, mSrsHardwareSkinning(0)
@@ -95,9 +65,9 @@ protected:
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
 		{
 			//Add the hardware skinning to the shader generator default render state
-			//mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
-			//Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			//renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 			
 			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
 			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
@@ -127,25 +97,25 @@ protected:
 
 
 		// add a blue spotlight
-        Light* l = mSceneMgr->createLight();
+		Light* l = mSceneMgr->createLight();
 		Vector3 dir;
 		l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(-40, 180, -10);
+		l->setPosition(-40, 180, -10);
 		dir = -l->getPosition();
 		dir.normalise();
 		l->setDirection(dir);
-        l->setDiffuseColour(0.0, 0.0, 0.5);
+		l->setDiffuseColour(0.0, 0.0, 0.5);
 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
 		
 
 		// add a green spotlight.
-        l = mSceneMgr->createLight();
+		l = mSceneMgr->createLight();
 		l->setType(Light::LT_SPOTLIGHT);
-        l->setPosition(0, 150, -100);
+		l->setPosition(0, 150, -100);
 		dir = -l->getPosition();
 		dir.normalise();
 		l->setDirection(dir);
-        l->setDiffuseColour(0.0, 0.5, 0.0);		
+		l->setDiffuseColour(0.0, 0.5, 0.0);		
 		bbs->createBillboard(l->getPosition())->setColour(l->getDiffuseColour());
 
 		// create a floor mesh resource
@@ -159,8 +129,8 @@ protected:
 		mSceneMgr->getRootSceneNode()->attachObject(floor);
 
 		// set camera initial transform and speed
-        mCamera->setPosition(100, 20, 0);
-        mCamera->lookAt(0, 10, 0);
+		mCamera->setPosition(100, 20, 0);
+		mCamera->lookAt(0, 10, 0);
 		mCameraMan->setTopSpeed(50);
 
 		setupModels();
@@ -184,8 +154,8 @@ protected:
 
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-			ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
+			
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
@@ -193,14 +163,15 @@ protected:
 			{
 				//In case the system uses the RTSS, the following line will ensure
 				//that the entity is using hardware animation in RTSS as well.
-				//RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+				RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
+				
 				//The following line is needed only because the Jaiqua model material has shaders and
 				//as such is not automatically reflected in the RTSS system
-				//RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-				//	ent->getSubEntity(0)->getMaterialName(),
-				//	Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-				//	Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-				//	true);
+				RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+					ent->getSubEntity(0)->getMaterialName(),
+					Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+					true);
 			}
 #endif
 		
@@ -210,19 +181,25 @@ protected:
 			as->setLoop(false);
 			mAnimSpeeds.push_back(Math::RangeRandom(0.5, 1.5));
 			mAnimStates.push_back(as);
-        }
+		}
 
 		// create name and value for skinning mode
 		StringVector names;
 		names.push_back("Skinning");
 		String value = "Software";
 
-		exportRTShaderSystemMaterial("test.material", ent->getSubEntity(0)->getMaterialName());
-
 		// change the value if hardware skinning is enabled
-        Pass* pass = ent->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
-		if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
-
+		MaterialPtr entityMaterial = ent->getSubEntity(0)->getMaterial();
+		if(!entityMaterial.isNull())
+		{
+			Technique* bestTechnique = entityMaterial->getBestTechnique();
+			if(bestTechnique)
+			{
+				Pass* pass = bestTechnique->getPass(0);
+				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+			}
+		}
+		
 		// create a params panel to display the skinning mode
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
 	}

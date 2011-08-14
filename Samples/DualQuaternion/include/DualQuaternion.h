@@ -2,8 +2,10 @@
 #define __DualQuaternion_Sample_H__
 
 #include "SdkSample.h"
-#include "OgreDualQuaternion.h"
+
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinning.h"
+#endif
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -169,13 +171,19 @@ protected:
 			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
 			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
 
-			//The following line is needed only because the Jaiqua model material has shaders and
-			//as such is not automatically reflected in the RTSS system
-			//RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-			//	ent->getSubEntity(0)->getMaterialName(),
-			//	Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-			//	Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-			//	true);
+			//The following line is needed only because the spine models' materials have shaders and
+			//as such is not automatically reflected in the RTSS system		
+			RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+				ent->getSubEntity(0)->getMaterialName(),
+				Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+				Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+				true);
+			
+			RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+				entDQ->getSubEntity(0)->getMaterialName(),
+				Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+				Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+				true);
 		}
 #endif
 
@@ -185,8 +193,12 @@ protected:
 		String value = "Software";
 
 		// change the value if hardware skinning is enabled
-		Pass* pass = entDQ->getSubEntity(0)->getMaterial()->getBestTechnique()->getPass(0);
-		if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+		MaterialPtr dqMat = entDQ->getSubEntity(0)->getMaterial();
+		if(dqMat.isNull())
+		{
+			Pass* pass = dqMat->getBestTechnique()->getPass(0);
+			if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+		}
 
 		// create a params panel to display the skinning mode
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
