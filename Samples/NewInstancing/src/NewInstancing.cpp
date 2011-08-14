@@ -152,6 +152,7 @@ void Sample_NewInstancing::setupLighting()
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::switchInstancingTechnique()
 {
+	randGenerator.randomize();
 	//mInstancingTechnique = (mInstancingTechnique+1) % (NUM_TECHNIQUES+1);
 	mInstancingTechnique = mTechniqueMenu->getSelectionIndex();
 
@@ -234,6 +235,14 @@ void Sample_NewInstancing::switchInstancingTechnique()
 	}
 	else
 		mSetStatic->hide();
+	if( mInstancingTechnique < NUM_TECHNIQUES)
+	{
+		mUseSceneNodes->show();
+	}
+	else
+	{
+		mUseSceneNodes->hide();
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -280,26 +289,39 @@ void Sample_NewInstancing::createEntities()
 		if (mAnimations.insert( anim ).second)
 		{
 			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f ); //Random start offset
+			anim->addTime( randGenerator.nextFloat() * 10 ); //Random start offset
 		}
 	}
 }
 //------------------------------------------------------------------------------
 void Sample_NewInstancing::createInstancedEntities()
 {
-	for( int i=0; i<NUM_INST_ROW * NUM_INST_COLUMN; ++i )
-	{
-		//Create the instanced entity
-		InstancedEntity *ent = mCurrentManager->createInstancedEntity(mCurrentMaterialSet[mInstancingTechnique] );
-		mEntities.push_back( ent );
 
-		//HWInstancingBasic is the only technique without animation support
-		if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
+	for( int i=0; i<NUM_INST_ROW; ++i )
+	{
+		for( int j=0; j<NUM_INST_COLUMN; ++j )
 		{
-			AnimationState *anim = ent->getAnimationState( "Walk" );
-			anim->setEnabled( true );
-			anim->addTime( i * i * i * 0.001f  ); //Random start offset
-			mAnimations.insert( anim );
+			//Create the instanced entity
+		InstancedEntity *ent = mCurrentManager->createInstancedEntity(mCurrentMaterialSet[mInstancingTechnique] );
+			mEntities.push_back( ent );
+
+			//HWInstancingBasic is the only technique without animation support
+			if( mInstancingTechnique != InstanceManager::HWInstancingBasic )
+			{
+				//Get the animation
+				AnimationState *anim = ent->getAnimationState( "Walk" );
+				anim->setEnabled( true );
+				anim->addTime( randGenerator.nextFloat() * 10); //Random start offset
+				mAnimations.insert( anim );
+			}
+
+			if ((mInstancingTechnique < NUM_TECHNIQUES) && (!mUseSceneNodes->isChecked()))
+			{
+				ent->setScale( Vector3( 0.1f ) );
+				ent->setOrientation(Quaternion(Radian(randGenerator.nextFloat() * 10 * 3.14159265359f), Vector3::UNIT_Y));
+				ent->setPosition( Ogre::Vector3(mEntities[0]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
+					mEntities[0]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f)) );
+			}
 		}
 	}
 }
@@ -315,13 +337,17 @@ void Sample_NewInstancing::createSceneNodes()
 		for( int j=0; j<NUM_INST_COLUMN; ++j )
 		{
 			int idx = i * NUM_INST_COLUMN + j;
-			SceneNode *sceneNode = rootNode->createChildSceneNode();
-			sceneNode->attachObject( mEntities[idx] );
-			sceneNode->yaw( Radian( (i+1) * (j+1) * (i+1) * (j+1) ) ); //Random orientation
-			sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
-				mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
+			if ((mInstancingTechnique >= NUM_TECHNIQUES) || (mUseSceneNodes->isChecked()))
+			{
+				SceneNode *sceneNode = rootNode->createChildSceneNode();
+				sceneNode->attachObject( mEntities[idx] );
+				sceneNode->yaw( Radian( randGenerator.nextFloat() * 10 * 3.14159265359f )); //Random orientation
+				sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
+					mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
 
-			mSceneNodes.push_back( sceneNode );
+				mSceneNodes.push_back( sceneNode );
+			}
+			
 		}
 	}
 }
@@ -336,9 +362,11 @@ void Sample_NewInstancing::clearScene()
 	while( itor != end )
 	{
 		SceneNode *sceneNode = (*itor)->getParentSceneNode();
-		sceneNode->detachAllObjects();
-		sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
-
+		if (sceneNode)
+		{
+			sceneNode->detachAllObjects();
+			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
+		}
 		if( mInstancingTechnique == NUM_TECHNIQUES )
 			mSceneMgr->destroyEntity( (*itor)->getName() );
 		else
@@ -392,46 +420,98 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 	if( !mEntities.empty() )
 		fMovSpeed = mEntities[0]->getBoundingRadius() * 0.30f;
 
-	//Randomly move the units along their normal, bouncing around invisible walls
-	std::vector<SceneNode*>::const_iterator itor = mSceneNodes.begin();
-	std::vector<SceneNode*>::const_iterator end  = mSceneNodes.end();
-
-	while( itor != end )
+	if (!mSceneNodes.empty())
 	{
-		//Calculate bounces
-		Vector3 entityPos = (*itor)->getPosition();
-		Vector3 planeNormal = Vector3::ZERO;
-		if( (*itor)->getPosition().x < -5000.0f )
+		//Randomly move the units along their normal, bouncing around invisible walls
+		std::vector<SceneNode*>::const_iterator itor = mSceneNodes.begin();
+		std::vector<SceneNode*>::const_iterator end  = mSceneNodes.end();
+
+		while( itor != end )
 		{
-			planeNormal = Vector3::UNIT_X;
-			entityPos.x = -4999.0f;
-		}
-		else if( (*itor)->getPosition().x > 5000.0f )
-		{
-			planeNormal = Vector3::NEGATIVE_UNIT_X;
-			entityPos.x = 4999.0f;
-		}
-		else if( (*itor)->getPosition().z < -5000.0f )
-		{
-			planeNormal = Vector3::UNIT_Z;
+			//Calculate bounces
+			Vector3 entityPos = (*itor)->getPosition();
+			Vector3 planeNormal = Vector3::ZERO;
+			if( (*itor)->getPosition().x < -5000.0f )
+			{
+				planeNormal = Vector3::UNIT_X;
+				entityPos.x = -4999.0f;
+			}
+			else if( (*itor)->getPosition().x > 5000.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_X;
+				entityPos.x = 4999.0f;
+			}
+			else if( (*itor)->getPosition().z < -5000.0f )
+			{
+				planeNormal = Vector3::UNIT_Z;
 			entityPos.z = -4999.0f;
-		}
-		else if( (*itor)->getPosition().z > 5000.0f )
-		{
-			planeNormal = Vector3::NEGATIVE_UNIT_Z;
-			entityPos.z = 4999.0f;
-		}
+			}
+			else if( (*itor)->getPosition().z > 5000.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_Z;
+				entityPos.z = 4999.0f;
+			}
 
-		if( planeNormal != Vector3::ZERO )
-		{
-			const Vector3 vDir( (*itor)->getOrientation().xAxis().normalisedCopy() );
-			(*itor)->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
-			(*itor)->setPosition( entityPos );
-		}
+			if( planeNormal != Vector3::ZERO )
+			{
+				const Vector3 vDir( (*itor)->getOrientation().xAxis().normalisedCopy() );
+				(*itor)->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
+				(*itor)->setPosition( entityPos );
+			}
 
-		//Move along the direction we're looking to
-		(*itor)->translate( Vector3::UNIT_X * timeSinceLast * fMovSpeed, Node::TS_LOCAL );
-		++itor;
+			//Move along the direction we're looking to
+			(*itor)->translate( Vector3::UNIT_X * timeSinceLast * fMovSpeed, Node::TS_LOCAL );
+			++itor;
+		}
+	}
+	else
+	{
+		//No scene nodes (instanced entities only) 
+		//Update instanced entities directly
+
+		//Randomly move the units along their normal, bouncing around invisible walls
+		std::vector<MovableObject*>::const_iterator itor = mEntities.begin();
+		std::vector<MovableObject*>::const_iterator end  = mEntities.end();
+
+		while( itor != end )
+		{
+			//Calculate bounces
+			InstancedEntity* pEnt = static_cast<InstancedEntity*>(*itor);
+			Vector3 entityPos = pEnt->getPosition();
+			Vector3 planeNormal = Vector3::ZERO;
+			if( pEnt->getPosition().x < -500.0f )
+			{
+				planeNormal = Vector3::UNIT_X;
+				entityPos.x = -499.0f;
+			}
+			else if( pEnt->getPosition().x > 500.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_X;
+				entityPos.x = 499.0f;
+			}
+			else if( pEnt->getPosition().z < -500.0f )
+			{
+				planeNormal = Vector3::UNIT_Z;
+				entityPos.z = -499.0f;
+			}
+			else if( pEnt->getPosition().z > 500.0f )
+			{
+				planeNormal = Vector3::NEGATIVE_UNIT_Z;
+				entityPos.z = 499.0f;
+			}
+
+			if( planeNormal != Vector3::ZERO )
+			{
+				const Vector3 vDir(pEnt->getOrientation().xAxis().normalisedCopy() );
+				pEnt->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
+				pEnt->setPosition( entityPos );
+			}
+
+			//Move along the direction we're looking to
+			Vector3 transAmount = Vector3::UNIT_X * timeSinceLast * fMovSpeed;
+			pEnt->setPosition( pEnt->getPosition() + pEnt->getOrientation() * transAmount );
+			++itor;
+		}
 	}
 }
 
@@ -496,6 +576,11 @@ void Sample_NewInstancing::setupGUI()
 	mSetStatic = mTrayMgr->createCheckBox(TL_TOPRIGHT, "SetStatic", "Set Static", 175);
 	mSetStatic->setChecked(false);
 
+	//Checkbox to toggle use of scene nodes
+	mUseSceneNodes = mTrayMgr->createCheckBox(TL_TOPRIGHT, "UseSceneNodes",
+		"Use Scene Nodes", 175);
+	mUseSceneNodes->setChecked(true, false);
+
 	//Controls to control batch defragmentation on the fly
 	mDefragmentBatches =  mTrayMgr->createButton(TL_RIGHT, "DefragmentBatches",
 		"Defragment Batches", 175);
@@ -544,6 +629,11 @@ SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
 	else if( box == mSetStatic && mCurrentManager )
 	{
 		mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
+	else if (box == mUseSceneNodes)
+	{
+		clearScene();
+		switchInstancingTechnique();
+	}
 	}
 }
 

@@ -88,7 +88,6 @@ namespace Ogre
 		SkeletonInstance *mSkeletonInstance;
 		Matrix4 *mBoneMatrices;	 //Local space
 		Matrix4 *mBoneWorldMatrices; //World space
-		Matrix4 mLastParentXform;
 		unsigned long mFrameAnimationLastUpdated;
 
 		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
@@ -100,6 +99,27 @@ namespace Ogre
 		//Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 		InstancedEntityVec mSharingPartners;
+
+		//////////////////////////////////////////////////////////////////////////
+		// Parameters used for local transformation offset information
+		//////////////////////////////////////////////////////////////////////////
+
+		///Object position
+		Vector3 mPosition;
+		mutable Vector3 mDerivedPosition;
+		///Object orientation
+		Quaternion mOrientation;
+		///Object scale
+		Vector3 mScale;
+		///The maximum absolute scale for all dimension
+		mutable Real mMaxScale;
+		///Full world transform
+		mutable Matrix4 mFullTransform;
+		///Tells if mFullTransform needs an updated
+		mutable bool mNeedTransformUpdate;
+		/// Tells if the animation world transform needs an update
+		mutable bool mNeedAnimTransformUpdate;
+
 
 		//Returns number of matrices written to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
@@ -118,6 +138,9 @@ namespace Ogre
 
 		//Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
+
+		//Update the world transform
+		void updateTransforms() const;
 
 		/// Incremented count for next name extension
         static NameGenerator msNameGenerator;
@@ -192,6 +215,50 @@ namespace Ogre
 
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
+
+
+		const Vector3& getPosition() const { return mPosition; }
+		void setPosition(const Vector3& position) 
+		{ 
+			mPosition = position; 
+			mDerivedPosition = position;
+			_notifyMoved();
+		} 
+
+		const Quaternion& getOrientation() const { return mOrientation; }
+		void setOrientation(const Quaternion& orientation) 
+		{ 
+			mOrientation = orientation;  
+			_notifyMoved();
+		} 
+
+		const Vector3& getScale() const { return mScale; }
+		void setScale(const Vector3& scale) 
+		{ 
+			mScale = scale; 
+			mMaxScale = std::max<Real>(std::max<Real>(Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
+			_notifyMoved();
+		} 
+		Real getMaxScale() const { return mMaxScale; }
+
+		virtual const Matrix4& _getParentNodeFullTransform(void) const
+		{ 
+			if (mNeedTransformUpdate) updateTransforms();
+			return mFullTransform;
+		}
+
+		const Vector3& _getDerivedPosition() const
+		{
+			if ((mNeedTransformUpdate) && (mParentNode)) 
+				updateTransforms();
+			return mDerivedPosition;
+		}
+
+		/** @copydoc MovableObject::isInScene. */
+		virtual bool isInScene(void) const;
+
+
+
 	};
 }
 

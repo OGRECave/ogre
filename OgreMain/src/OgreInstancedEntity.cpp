@@ -49,10 +49,17 @@ namespace Ogre
 				mSkeletonInstance( 0 ),
 				mBoneMatrices(0),
 				mBoneWorldMatrices(0),
-				mLastParentXform( Matrix4::ZERO ),
 				mFrameAnimationLastUpdated(std::numeric_limits<unsigned long>::max()),
 				mSharedTransformEntity( 0 ),
-				mTransformLookupNumber(instanceID)
+				mTransformLookupNumber(instanceID),
+				mPosition(Vector3::ZERO),
+				mDerivedPosition(Vector3::ZERO),
+				mOrientation(Quaternion::IDENTITY),
+				mScale(Vector3::UNIT_SCALE),
+				mMaxScale(1),
+				mNeedTransformUpdate(true),
+				mNeedAnimTransformUpdate(true)
+
 	
 	{
 		//Use a static name generator to ensure this name stays unique (which may not happen
@@ -150,12 +157,12 @@ namespace Ogre
 		size_t retVal = 1;
 
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( mParentNode && isVisible() )
+		if( isVisible() )
 		{
 			if( !mSkeletonInstance )
 			{
 				*xform = mBatchOwner->useBoneWorldMatrices() ? 
-						mParentNode->_getFullTransform() : Matrix4::IDENTITY;
+						_getParentNodeFullTransform() : Matrix4::IDENTITY;
 			}
 			else
 			{
@@ -185,12 +192,12 @@ namespace Ogre
 	{
 		size_t retVal;
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( mParentNode && isVisible() )
+		if( isVisible() )
 		{
 			if( !mSkeletonInstance )
 			{
 				const Matrix4& mat = mBatchOwner->useBoneWorldMatrices() ? 
-					mParentNode->_getFullTransform() : Matrix4::IDENTITY;
+					_getParentNodeFullTransform() : Matrix4::IDENTITY;
 				for( int i=0; i<3; ++i )
 				{
 					Real const *row = mat[i];
@@ -241,9 +248,8 @@ namespace Ogre
 		bool retVal = isVisible() & isInScene();
 
 		//Object's bounding box is viewed by the camera
-		const SceneNode *parentSceneNode = getParentSceneNode();
-		if( parentSceneNode && camera )
-			retVal &= camera->isVisible( parentSceneNode->_getWorldAABB() );
+		if(  camera )
+			retVal &= camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
 
 		return retVal;
 	}
@@ -342,31 +348,22 @@ namespace Ogre
 	//-----------------------------------------------------------------------
     Real InstancedEntity::getBoundingRadius(void) const
 	{
-		Real rad = mBatchOwner->_getMeshReference()->getBoundingSphereRadius();
-        // Scale by largest scale factor
-        if( mParentNode )
-        {
-            const Vector3& s = mParentNode->_getDerivedScale();
-			rad *=  std::max( Math::Abs(s.x), std::max( Math::Abs(s.y), Math::Abs(s.z) ) );
-        }
-
-		return rad;
+		if ((mNeedTransformUpdate) && (mParentNode)) 
+			updateTransforms();
+		return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * mMaxScale;
 	}
 	//-----------------------------------------------------------------------
 	Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
 	{
-		Real retVal = std::numeric_limits<Real>::infinity();
-
-		if( mParentNode )
-			retVal = mParentNode->getSquaredViewDepth( cam );
-
-		return retVal;
+		return _getDerivedPosition().squaredDistance(cam->getDerivedPosition());
 	}
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyMoved(void)
 	{
+		mNeedTransformUpdate = true;
+		mNeedAnimTransformUpdate = true; 
 		mBatchOwner->_boundsDirty();
-		MovableObject::_notifyMoved();
+		//MovableObject::_notifyMoved();
 	}
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
@@ -403,17 +400,16 @@ namespace Ogre
 				(mFrameAnimationLastUpdated != mAnimationState->getDirtyFrameNumber()) ||
 				(mSkeletonInstance->getManualBonesDirty());
 
-			if( animationDirty || mLastParentXform != _getParentNodeFullTransform() )
+			if( animationDirty || (mNeedAnimTransformUpdate &&  mBatchOwner->useBoneWorldMatrices()))
 			{
 				mSkeletonInstance->setAnimationState( *mAnimationState );
 				mSkeletonInstance->_getBoneMatrices( mBoneMatrices );
 
 				// Cache last parent transform for next frame use too.
-				mLastParentXform = _getParentNodeFullTransform();
 				if (mBatchOwner->useBoneWorldMatrices())
 				{
 					OptimisedUtil::getImplementation()->concatenateAffineMatrices(
-													mLastParentXform,
+													_getParentNodeFullTransform(),
 													mBoneMatrices,
 													mBoneWorldMatrices,
 													mSkeletonInstance->getNumBones() );
@@ -426,5 +422,37 @@ namespace Ogre
 		}
 
 		return false;
+	}
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::updateTransforms() const
+	{
+		if (mParentNode)
+		{
+			const Vector3& parentPosition = mParentNode->_getDerivedPosition();
+			const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
+			const Vector3& parentScale = mParentNode->_getDerivedScale();
+			
+			Quaternion derivedOrientation = parentOrientation * mOrientation;
+			Vector3 derivedScale = parentScale * mScale;
+			mDerivedPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
+		
+			mFullTransform.makeTransform(mDerivedPosition, derivedScale, derivedOrientation);
+			mMaxScale = std::max<Real>(std::max<Real>(
+				Math::Abs(derivedScale.x), Math::Abs(derivedScale.y)), Math::Abs(derivedScale.z)); 
+		}
+		else
+		{
+			mFullTransform.makeTransform(mPosition,mScale,mOrientation);
+		}
+		mNeedTransformUpdate = false;
+	}
+
+	//---------------------------------------------------------------------------
+	bool InstancedEntity::isInScene(void) const
+	{
+		//We assume that the instanced entity is in the scene if it is in use
+		//It is in the scene whether it has a parent node or not
+		return mInUse;
 	}
 }

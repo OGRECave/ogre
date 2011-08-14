@@ -300,7 +300,7 @@ namespace Ogre
 
 					if (useMatrixLookup)
 					{
-						const Matrix4& mat =  entity->getParentNode()->_getFullTransform();
+						const Matrix4& mat =  entity->_getParentNodeFullTransform();
 						*(thisVec)     = mat[0][0];
 						*(thisVec + 1) = mat[0][1];
 						*(thisVec + 2) = mat[0][2];

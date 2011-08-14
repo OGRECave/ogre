@@ -114,14 +114,24 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
+		Real maxScale = 0;
 		while( itor != end )
 		{
+			InstancedEntity* ent = (*itor);
 			//Only increase the bounding box for those objects we know are in the scene
-			if( (*itor)->isInScene() )
-				mFullBoundingBox.merge( (*itor)->getWorldBoundingBox(true) );
+			if( ent->isInScene() )
+			{
+				maxScale = std::max(maxScale, ent->getMaxScale());
+				mFullBoundingBox.merge( ent->_getDerivedPosition() );
+			}
 
 			++itor;
 		}
+
+		Real addToBound = maxScale * _getMeshReference()->getBoundingSphereRadius();
+		mFullBoundingBox.setMaximum(mFullBoundingBox.getMaximum() + addToBound);
+		mFullBoundingBox.setMinimum(mFullBoundingBox.getMinimum() - addToBound);
+
 
 		mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
 
