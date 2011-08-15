@@ -19,7 +19,7 @@ public:
 #endif
 	{
 		mInfo["Title"] = "Dual Quaternion Skinning";
-		mInfo["Description"] = "A demo of the dual quaternion skinning feature, including instancing support";
+		mInfo["Description"] = "A demo of the dual quaternion skinning feature in conjunction with the linear skinning feature.";
 		mInfo["Thumbnail"] = "thumb_skelanim.png";
 		mInfo["Category"] = "Animation";
 	}
@@ -193,11 +193,18 @@ protected:
 		String value = "Software";
 
 		// change the value if hardware skinning is enabled
-		MaterialPtr dqMat = entDQ->getSubEntity(0)->getMaterial();
-		if(dqMat.isNull())
+		MaterialPtr dqMat = ent->getSubEntity(0)->getMaterial();
+		if(!dqMat.isNull())
 		{
-			Pass* pass = dqMat->getBestTechnique()->getPass(0);
-			if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+			Technique* bestTechnique = dqMat->getBestTechnique();
+			if(bestTechnique)
+			{
+				Pass* pass = bestTechnique->getPass(0);
+				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded())
+				{
+					value = "Hardware";
+				}
+			}
 		}
 
 		// create a params panel to display the skinning mode
