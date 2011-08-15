@@ -164,14 +164,14 @@ vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
 
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 {
-	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
+	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
 	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
 }
 
 // Basic hardware skinning using two indexed weights per vertex
-vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl	
+vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
    source Example_Basic.hlsl
    entry_point hardwareSkinningTwoWeights_vp
@@ -198,32 +198,33 @@ vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
 	}
 }
 
-vertex_program Ogre/HardwareSkinningTwoWeights unified
-{
-	delegate Ogre/HardwareSkinningTwoWeightsGLSL
-	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
-	delegate Ogre/HardwareSkinningTwoWeightsHLSL
-	delegate Ogre/HardwareSkinningTwoWeightsCg
-	
-   default_params
-   {
-   		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto lightPos[0] light_position 0
-		param_named_auto lightPos[1] light_position 1
-		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
-		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
-		param_named_auto ambient ambient_light_colour
-   }
-}
-
-// Basic hardware skinning using four indexed weights per vertex
 vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
 {
    source Example_Basic.cg
    entry_point hardwareSkinningTwoWeights_vp
    profiles vs_4_0 vs_1_1 arbvp1
    includes_skeletal_animation true
+}
+
+vertex_program Ogre/HardwareSkinningTwoWeights unified
+{
+	delegate Ogre/HardwareSkinningTwoWeightsCg
+	delegate Ogre/HardwareSkinningTwoWeightsGLSL
+	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
+	delegate Ogre/HardwareSkinningTwoWeightsHLSL
+	
+	default_params
+	{
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto lightPos[0] light_position 0
+		param_named_auto lightPos[1] light_position 1
+		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+		param_named_auto ambient ambient_light_colour
+		//This property isn't relevant for GLSL, uses the GLSL material state instead
+		param_named_auto diffuse surface_diffuse_colour
+	}
 }
 
 // Basic hardware skinning using four indexed weights per vertex

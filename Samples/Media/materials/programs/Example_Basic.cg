@@ -106,7 +106,8 @@ void hardwareSkinningTwoWeights_vp(
 	uniform float4x4 viewProjectionMatrix,
 	uniform float4   lightPos[2],
 	uniform float4   lightDiffuseColour[2],
-	uniform float4   ambient)
+	uniform float4   ambient,
+	uniform float4   diffuse)
 {
 	// transform by indexed matrix
 	float4 blendPos = float4(0,0,0,0);
@@ -133,9 +134,9 @@ void hardwareSkinningTwoWeights_vp(
 
 	
 	oUv = uv;
-	colour = ambient + 
+	colour = diffuse * (ambient + 
 		(saturate(dot(lightDir0, norm)) * lightDiffuseColour[0]) + 
-		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]);
+		(saturate(dot(lightDir1, norm)) * lightDiffuseColour[1]));
 	
 }
 

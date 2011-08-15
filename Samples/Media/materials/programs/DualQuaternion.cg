@@ -17,7 +17,8 @@ void dualQuaternionHardwareSkinningTwoWeights_vp(
 	uniform float4x4 viewProjectionMatrix,
 	uniform float4   lightPos[2],
 	uniform float4   lightDiffuseColour[2],
-	uniform float4   ambient)
+	uniform float4   ambient,
+	uniform float4   diffuse)
 {		
 	float2x4 blendDQ = blendTwoWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
 
@@ -37,8 +38,8 @@ void dualQuaternionHardwareSkinningTwoWeights_vp(
 
 	oUv = uv;
 
-	colour = ambient + (saturate(dot(lightDir0, blendNormal)) * lightDiffuseColour[0]) + 
-		(saturate(dot(lightDir1, blendNormal)) * lightDiffuseColour[1]);		
+	colour = diffuse * (ambient + (saturate(dot(lightDir0, blendNormal)) * lightDiffuseColour[0]) + 
+		(saturate(dot(lightDir1, blendNormal)) * lightDiffuseColour[1]));		
 }
 
 
@@ -88,7 +89,8 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 	uniform float4x4 viewProjectionMatrix,
 	uniform float4   lightPos[2],
 	uniform float4   lightDiffuseColour[2],
-	uniform float4   ambient)
+	uniform float4   ambient,
+	uniform float4   diffuse)
 {
 	//First phase - applies scaling and shearing:
 	float3x4 blendS = blendWgt.x*scaleM[blendIdx.x];
@@ -116,8 +118,8 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 	float3 lightDir1 = normalize(lightPos[1].xyz - (blendPosition.xyz * lightPos[1].w));
 
 	oUv = uv;
-	colour = ambient + (saturate(dot(lightDir0, blendNormal)) * lightDiffuseColour[0]) + 
-		(saturate(dot(lightDir1, blendNormal)) * lightDiffuseColour[1]);
+	colour = diffuse * (ambient + (saturate(dot(lightDir0, blendNormal)) * lightDiffuseColour[0]) + 
+		(saturate(dot(lightDir1, blendNormal)) * lightDiffuseColour[1]));
 }
 
 //Two-phase skinning shadow caster pass

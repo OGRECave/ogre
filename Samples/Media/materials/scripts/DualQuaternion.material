@@ -5,19 +5,14 @@ material jaiquaDualQuatTest
 	{
 		pass
 		{
-			//vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
-			//{
-			//}
+			vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeights
+			{
+			}
 
-			//shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
-			//{
-			//}
- 			rtshader_system
- 			{	 	
- 				// Override lighting stage with per pixel lighting. 			
- 				hardware_skinning 24 2 dual_quaternion true true				
- 			}
-
+			shadow_caster_vertex_program_ref Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster
+			{
+			}
+ 
 			texture_unit
 			{
 				texture blue_jaiqua.jpg
@@ -29,7 +24,7 @@ material jaiquaDualQuatTest
 
 material spine
 {
-	// Hardware skinning technique
+	// Hardware skinning technique - GLES2 passthrough fragment program
 	technique
 	{
 		pass
@@ -40,11 +35,55 @@ material spine
 
 			vertex_program_ref Ogre/HardwareSkinningTwoWeights
 			{
+			
 			}
-
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
 			}
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
+			{
+			}
+		}
+	}
+
+	// Hardware skinning technique - no fragment program
+	technique
+	{
+		pass
+		{
+			ambient 0.101961 0.313726 0.745098 1
+			diffuse 0.117647 0.572549 0.862745 1		
+			specular 0.72549 0.898039 0.898039 1 31
+
+			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			{
+			
+			}
+	
+			// alternate shadow caster program
+			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
+			{
+				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+				param_named_auto viewProjectionMatrix viewproj_matrix
+				param_named_auto ambient ambient_light_colour
+			}
+		}
+	}
+
+	// Software blending technique
+	technique
+	{
+		pass
+		{
+			ambient 0.101961 0.313726 0.745098 1
+			diffuse 0.117647 0.572549 0.862745 1		
+			specular 0.72549 0.898039 0.898039 1 31
 		}
 	}
 }
