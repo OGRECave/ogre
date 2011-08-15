@@ -154,8 +154,9 @@ protected:
 
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
+			ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
-			
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
@@ -196,7 +197,10 @@ protected:
 			if(bestTechnique)
 			{
 				Pass* pass = bestTechnique->getPass(0);
-				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) value = "Hardware";
+				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) 
+				{
+					value = "Hardware";
+				}
 			}
 		}
 		
