@@ -61,14 +61,14 @@ protected:
         HtmlElement* css = head->appendElement("link");
         css->appendAttribute("rel","stylesheet");
 
-        // For the moment it's hosted on my personal site, for convenience
-        css->appendAttribute("href","http://www.rileyadams.net/gsoc/out.css");
+        // Hosted as an attachment on the wiki
+        css->appendAttribute("href","http://www.ogre3d.org/tikiwiki/tiki-download_wiki_attachment.php?attId=142");
         css->appendAttribute("type","text/css");
         
         // link a little javascript
-        //HtmlElement* js = head->appendElement("script");
-        //js->appendAttribute("src","http://www.rileyadams.net/gsoc/output.js");
-        //js->appendText("");// so it doesn't self close
+        HtmlElement* js = head->appendElement("script");
+        js->appendAttribute("src","http://www.ogre3d.org/tikiwiki/tiki-download_wiki_attachment.php?attId=143");
+        js->appendText("");// so it doesn't self close
         
         // </head>
 
@@ -202,11 +202,11 @@ protected:
 			// add a divider
 			content->appendElement("hr");
 
-			HtmlElement* imageBox = content->appendElement("div");
-
 			// add a frame label if more than one image
 			if(result.size() > 1)
-				imageBox->appendElement("h4")->appendText("Frame " + Ogre::StringConverter::toString(result[i]->frame) + ":");
+				content->appendElement("h4")->appendText("Frame " + Ogre::StringConverter::toString(result[i]->frame) + ":");
+
+			HtmlElement* imageBox = content->appendElement("div");
 
 			// first image
 			HtmlElement* column1 = imageBox->appendElement("div");
