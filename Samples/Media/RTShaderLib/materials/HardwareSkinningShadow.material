@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////
-/// Declare shaders for casters
+/// Declare CG shaders for casters
 ///////////////////////////////////////////////////////////////////////////
 
 // declare the fragment shader (CG for the language)
-fragment_program Ogre/RTShader/shadow_caster_ps cg
+fragment_program Ogre/RTShader/shadow_caster_ps_cg cg
 {
 	// source file
 	source HardwareSkinningShadow.cg
@@ -31,7 +31,7 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_1weight_vs cg
 	}
 }
 
-vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs cg
+vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg cg
 {
 	source HardwareSkinningShadow.cg
 	//will run on 3 to accomodate the amount of registers
@@ -72,6 +72,48 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_4weight_vs cg
 		param_named_auto viewProjectionMatrix viewproj_matrix	
 		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Declare GLSL shaders for casters
+///////////////////////////////////////////////////////////////////////////
+
+fragment_program Ogre/RTShader/shadow_caster_ps_glsl glsl
+{
+	source HardwareSkinningShadow_Fragment.glsl
+
+ 	default_params
+	{
+		
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl glsl
+{
+	source HardwareSkinningShadow_TwoWeights.glsl
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto viewProjectionMatrix viewproj_matrix	
+		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Unified program declarations
+///////////////////////////////////////////////////////////////////////////
+fragment_program Ogre/RTShader/shadow_caster_ps unified
+{
+	delegate Ogre/RTShader/shadow_caster_ps_cg
+	delegate Ogre/RTShader/shadow_caster_ps_glsl
+}
+
+vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs unified
+{
+	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg
+	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl
 }
 
 ///////////////////////////////////////////////////////////////////////////

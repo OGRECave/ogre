@@ -8,10 +8,15 @@ mat2x4 blendTwoWeights(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24])
 	return transpose(blendDQ);
 }
 
-mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuaternions[24])
+mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions[48])
 {
-	mat2x4 dq0 = transpose(dualQuaternions[int(blendIdx.x)]);
-	mat2x4 dq1 = transpose(dualQuaternions[int(blendIdx.y)]);
+	mat2x4 dq0;
+	dq0[0] = dualQuaternions[(int(blendIdx.x) * 2)];
+	dq0[1] = dualQuaternions[(int(blendIdx.x) * 2) + 1];
+	
+	mat2x4 dq1;
+	dq1[0] = dualQuaternions[(int(blendIdx.y) * 2)];
+	dq1[1] = dualQuaternions[(int(blendIdx.y) * 2) + 1];
 
 	//Accurate antipodality handling. For speed increase, remove the following line, 
 	//though, the results will only be valid for rotations less than 180 degrees.
@@ -39,9 +44,9 @@ mat2x4 blendThreeWeightsAntipod(vec4 blendWgt, vec4 blendIdx, mat4x2 dualQuatern
 	return blendDQ;
 }
 
-vec3 calculateBlendPosition(vec4 position, mat2x4 blendDQ)
+vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ)
 {
-	vec3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	vec3 blendPosition = position + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position);
 	vec3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
 	blendPosition += trans;
 
