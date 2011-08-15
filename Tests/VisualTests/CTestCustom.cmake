@@ -9,4 +9,4 @@
 
 # set pre/post commands:
 #set(CTEST_CUSTOM_PRE_TEST "")
-set(CTEST_CUSTOM_POST_TEST "cmake -P VisualTests/PostTest.cmake")
+set(CTEST_CUSTOM_POST_TEST "cmake -P Tests/VisualTests/PostTest.cmake")

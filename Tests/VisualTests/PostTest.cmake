@@ -8,14 +8,16 @@
 
 if (UNIX)
   # escape spaces
-  string(REPLACE " " "\ " USER_HOME_DIRECTORY "$ENV{HOME}")
+  string(REPLACE " " "\\ " USER_HOME_DIRECTORY "$ENV{HOME}")
+  set(USER_HOME_DIRECTORY "$ENV{HOME}")
 elseif (WIN32)
-  # make sure we've got backslashes
+  # make sure to use backslashes
   string(REPLACE "/" "\\" USER_HOME_DIRECTORY "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
 # other platforms?
 endif ()
 
-# Use platform-specific utils, since 'cmake -E remove' didn't seem to handle wildcards in Windows
+# clean up output files
+# Use platform-specific utils, since 'cmake -E remove' didn't seem to handle spaces in filepaths properly
 if (UNIX)
   exec_program("rm ${USER_HOME_DIRECTORY}/TestResults_*RenderingSubsystem.txt")
 elseif (WIN32)
