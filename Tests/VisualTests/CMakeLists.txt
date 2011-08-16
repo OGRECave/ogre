@@ -22,7 +22,8 @@ add_subdirectory(VTests)
 configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/RunVTests.cmake COPYONLY)
 configure_file(CheckResult.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/CheckResult.cmake COPYONLY)
 configure_file(PostTest.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/PostTest.cmake COPYONLY)
-# CTest configuration
+
+# CTest configuration (this seems to need to be placed in the root of the build dir to be found)
 configure_file(CTestCustom.cmake ${CMAKE_BINARY_DIR}/CTestCustom.cmake COPYONLY)
 
 # build a list of render systems to test
@@ -43,11 +44,6 @@ endif ()
 if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   list(APPEND TEST_RENDER_SYSTEMS "OpenGL ES 2.x Rendering Subsystem")
 endif ()
-
-# Since CTest expects one command per test, but the Visual Testing setup runs all at once
-# (since unloading and reloading everything for each test wouldn't be practical) we
-# run the context first, outputting a file of results, then the tests themselves just
-# cat (or 'type' in windows) the file out and CTest's regex checking does the rest
 
 # Figure out the home directory for this system (this is where the context outputs result data for now)
 if (UNIX)
@@ -159,6 +155,11 @@ set (VISUAL_TEST_LIST
   VTests_TextureEffects
   VTests_Particles
   VTests_CubeMapping)
+
+# Since CTest expects one command per test, but the Visual Testing setup runs all at once
+# (since unloading and reloading everything for each test wouldn't be practical) we
+# run the context first, outputting a file of results, then the tests themselves just
+# cat (or 'type' in windows) the file out and CTest's regex checking does the rest
 
 # define a macro for tests
 macro (VisualTest test_name render_system)
