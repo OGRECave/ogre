@@ -233,15 +233,7 @@ namespace Ogre
 		void setScale(const Vector3& scale, bool doUpdate = true);
 
 		/** Returns the maximum derived scale coefficient among the xyz values */
-		Real getMaxScaleCoef() const { 
-			if (mParentNode)
-			{
-				const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
-				return mMaxScaleLocal * std::max<Real>(std::max<Real>(
-					Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
-			}
-			return mMaxScaleLocal; 
-		}
+		Real getMaxScaleCoef() const;
 
 		/** Update the world transform and derived values */
 		void updateTransforms();

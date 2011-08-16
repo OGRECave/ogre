@@ -460,6 +460,18 @@ namespace Ogre
 	} 
 
 	//---------------------------------------------------------------------------
+	Real InstancedEntity::getMaxScaleCoef() const 
+	{ 
+		if (mParentNode)
+		{
+			const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
+			return mMaxScaleLocal * std::max<Real>(std::max<Real>(
+				Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
+		}
+		return mMaxScaleLocal; 
+	}
+
+	//---------------------------------------------------------------------------
 	void InstancedEntity::updateTransforms()
 	{
 		if (mNeedTransformUpdate)
