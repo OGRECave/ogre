@@ -101,9 +101,6 @@ namespace Ogre
 		bool mForceOneWeight;
 		bool mUseOneWeight;
 
-		//When true remove the memory of the VertexData & index we've created because no one else will
-		bool					mRemoveOwnVertexData;
-
 		/** Clones the base material so it can have it's own vertex texture, and also
 			clones it's shadow caster materials, if it has any
 		*/
@@ -174,7 +171,7 @@ namespace Ogre
 		This value needs to be set before adding any instanced entities
 		*/
 		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances) { assert(mInstancedEntities.empty()); 
-			mUseBoneMatrixLookup = enable; }
+			mUseBoneMatrixLookup = enable; mMaxLookupTableInstances = maxLookupTableInstances; }
 
 		/** Tells whether to use bone matrix lookup
 		@See setBoneMatrixLookup()

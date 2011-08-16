@@ -42,7 +42,6 @@ namespace Ogre
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
-				mRemoveOwnVertexData( false ),
 				mKeepStatic( false )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance
@@ -51,10 +50,6 @@ namespace Ogre
 
 	InstanceBatchHW::~InstanceBatchHW()
 	{
-		//Remove the memory of our own VertexData. This happens if this isn't the first batch created
-		//Everything but the vertex data is shared.
-		if( mRemoveOwnVertexData )
-			OGRE_DELETE mRenderOperation.vertexData;
 	}
 
 	//-----------------------------------------------------------------------
@@ -91,15 +86,13 @@ namespace Ogre
 		thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
-
-		//Remove the memory of the VertexData we just created because no one else will
-		mRemoveOwnVertexData = true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::setupVertices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.vertexData = baseSubMesh->vertexData->clone();
-
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
+		
 		VertexData *thisVertexData = mRenderOperation.vertexData;
 
 		//No skeletal animation support in this technique, sorry
@@ -132,6 +125,7 @@ namespace Ogre
 		//We could use just a reference, but the InstanceManager will in the end attampt to delete
 		//the pointer, and we can't give it something that doesn't belong to us.
 		mRenderOperation.indexData = baseSubMesh->indexData->clone( true );
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::removeBlendData()

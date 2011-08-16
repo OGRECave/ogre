@@ -74,12 +74,6 @@ namespace Ogre
 
 			++itor;
 		}
-
-		//Free the shared RenderOperation since it's our responsibility
-		if( mSharedRenderOperation.vertexData )
-			OGRE_DELETE mSharedRenderOperation.vertexData;
-		if( mSharedRenderOperation.indexData )
-			OGRE_DELETE mSharedRenderOperation.indexData;
 	}
 	//----------------------------------------------------------------------
 	void InstanceManager::setInstancesPerBatch( size_t instancesPerBatch )

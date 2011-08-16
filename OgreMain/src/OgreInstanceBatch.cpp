@@ -55,7 +55,9 @@ namespace Ogre
 				mMaterialLodIndex( 0 ),
 				mTechnSupportsSkeletal( true ),
 				mCachedCamera( 0 ),
-				mTransformSharingDirty(true)
+				mTransformSharingDirty(true),
+				mRemoveOwnVertexData(false),
+				mRemoveOwnIndexData(false)
 	{
 		assert( mInstancesPerBatch );
 
@@ -83,6 +85,12 @@ namespace Ogre
 			sceneNode->detachAllObjects();
 			sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode->getName() );
 		}
+
+		if( mRemoveOwnVertexData )
+			OGRE_DELETE mRenderOperation.vertexData;
+		if( mRemoveOwnIndexData )
+			OGRE_DELETE mRenderOperation.indexData;
+
 	}
 
 	void InstanceBatch::_setInstancesPerBatch( size_t instancesPerBatch )
@@ -121,7 +129,7 @@ namespace Ogre
 			//Only increase the bounding box for those objects we know are in the scene
 			if( ent->isInScene() )
 			{
-				maxScale = std::max(maxScale, ent->getMaxScale());
+				maxScale = std::max(maxScale, ent->getMaxScaleCoef());
 				mFullBoundingBox.merge( ent->_getDerivedPosition() );
 			}
 

@@ -60,7 +60,6 @@ namespace Ogre
      */
 	class _OgreExport InstanceBatchHW : public InstanceBatch
 	{
-		bool	mRemoveOwnVertexData;
 		bool	mKeepStatic;
 
 		void setupVertices( const SubMesh* baseSubMesh );

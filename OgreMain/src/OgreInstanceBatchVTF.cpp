@@ -57,7 +57,7 @@ namespace Ogre
 				mWeightCount(1),
 				mTempTransformsArray3x4(0),
 				mUseBoneMatrixLookup(false),
-				mMaxLookupTableInstances(16),
+				mMaxLookupTableInstances(16)
 				mUseBoneDualQuaternions(false),
 				mForceOneWeight(false),
 				mUseOneWeight(false),
@@ -85,14 +85,6 @@ namespace Ogre
 		if( !mMatrixTexture.isNull() )
 			TextureManager::getSingleton().remove( mMatrixTexture->getName() );
 
-		if( mRemoveOwnVertexData && useBoneMatrixLookup() )
-		{
-			if( useBoneMatrixLookup() )
-				OGRE_DELETE mRenderOperation.vertexData;
-		}
-
-		mRenderOperation.vertexData = NULL;
-
 		OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
 	}
 
@@ -113,8 +105,6 @@ namespace Ogre
 			createVertexTexture( baseSubMesh );
 			InstanceBatch::buildFrom( baseSubMesh, renderOperation );
 		}
-
-		mRemoveOwnVertexData = true;
 	}
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::cloneMaterial( const MaterialPtr &material )
@@ -501,6 +491,7 @@ namespace Ogre
 	void InstanceBatchVTF::setupVertices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.vertexData = OGRE_NEW VertexData();
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
 		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
@@ -573,6 +564,7 @@ namespace Ogre
 	void InstanceBatchVTF::setupIndices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.indexData = OGRE_NEW IndexData();
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 
 		IndexData *thisIndexData = mRenderOperation.indexData;
 		IndexData *baseIndexData = baseSubMesh->indexData;

@@ -128,6 +128,7 @@ namespace Ogre
 	void InstanceBatchShader::setupVertices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.vertexData = OGRE_NEW VertexData();
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
 		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
@@ -209,6 +210,7 @@ namespace Ogre
 	void InstanceBatchShader::setupIndices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.indexData = OGRE_NEW IndexData();
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 
 		IndexData *thisIndexData = mRenderOperation.indexData;
 		IndexData *baseIndexData = baseSubMesh->indexData;

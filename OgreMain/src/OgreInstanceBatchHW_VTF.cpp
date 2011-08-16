@@ -61,6 +61,7 @@ namespace Ogre
 	void InstanceBatchHW_VTF::setupVertices( const SubMesh* baseSubMesh )
 	{
 		mRenderOperation.vertexData = OGRE_NEW VertexData();
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
 		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
@@ -131,6 +132,7 @@ namespace Ogre
 		//We could use just a reference, but the InstanceManager will in the end attampt to delete
 		//the pointer, and we can't give it something that doesn't belong to us.
 		mRenderOperation.indexData = baseSubMesh->indexData->clone( true );
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW_VTF::createVertexSemantics( VertexData *thisVertexData,
