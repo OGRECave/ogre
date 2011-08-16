@@ -317,6 +317,7 @@ void Sample_NewInstancing::createInstancedEntities()
 
 			if ((mInstancingTechnique < NUM_TECHNIQUES) && (!mUseSceneNodes->isChecked()))
 			{
+				mMovedInstances.push_back( ent );
 				ent->setScale( Vector3( 0.1f ) );
 				ent->setOrientation(Quaternion(Radian(randGenerator.nextFloat() * 10 * 3.14159265359f), Vector3::UNIT_Y));
 				ent->setPosition( Ogre::Vector3(mEntities[0]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
@@ -344,7 +345,6 @@ void Sample_NewInstancing::createSceneNodes()
 				sceneNode->yaw( Radian( randGenerator.nextFloat() * 10 * 3.14159265359f )); //Random orientation
 				sceneNode->setPosition( mEntities[idx]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
 					mEntities[idx]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f) );
-
 				mSceneNodes.push_back( sceneNode );
 			}
 			
@@ -381,6 +381,7 @@ void Sample_NewInstancing::clearScene()
 		mCurrentManager->cleanupEmptyBatches();
 
 	mEntities.clear();
+	mMovedInstances.clear();
 	mSceneNodes.clear();
 	mAnimations.clear();
 }
@@ -470,13 +471,13 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 		//Update instanced entities directly
 
 		//Randomly move the units along their normal, bouncing around invisible walls
-		std::vector<MovableObject*>::const_iterator itor = mEntities.begin();
-		std::vector<MovableObject*>::const_iterator end  = mEntities.end();
+		std::vector<InstancedEntity*>::const_iterator itor = mMovedInstances.begin();
+		std::vector<InstancedEntity*>::const_iterator end  = mMovedInstances.end();
 
 		while( itor != end )
 		{
 			//Calculate bounces
-			InstancedEntity* pEnt = static_cast<InstancedEntity*>(*itor);
+			InstancedEntity* pEnt = *itor;
 			Vector3 entityPos = pEnt->getPosition();
 			Vector3 planeNormal = Vector3::ZERO;
 			if( pEnt->getPosition().x < -500.0f )
@@ -503,8 +504,8 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 			if( planeNormal != Vector3::ZERO )
 			{
 				const Vector3 vDir(pEnt->getOrientation().xAxis().normalisedCopy() );
-				pEnt->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ) );
-				pEnt->setPosition( entityPos );
+				pEnt->setOrientation( lookAt( planeNormal.reflect( vDir ).normalisedCopy() ), false );
+				pEnt->setPosition( entityPos, false);
 			}
 
 			//Move along the direction we're looking to

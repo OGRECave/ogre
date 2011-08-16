@@ -82,6 +82,7 @@ private:
 public:
 	MersenneTwister()
 	{
+		index = 0;
 		randomize();
 	}
 
@@ -186,6 +187,7 @@ protected:
 	int								mInstancingTechnique;
 	int								mCurrentMesh;
 	std::vector<MovableObject*>		mEntities;
+	std::vector<InstancedEntity*>	mMovedInstances;
 	std::vector<SceneNode*>			mSceneNodes;
 	std::set<AnimationState*>		mAnimations;
 	InstanceManager					*mCurrentManager;
