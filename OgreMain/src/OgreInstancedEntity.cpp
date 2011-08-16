@@ -56,7 +56,7 @@ namespace Ogre
 				mDerivedPosition(Vector3::ZERO),
 				mOrientation(Quaternion::IDENTITY),
 				mScale(Vector3::UNIT_SCALE),
-				mMaxScale(1),
+				mMaxScaleLocal(1),
 				mNeedTransformUpdate(true),
 				mNeedAnimTransformUpdate(true)
 
@@ -75,6 +75,7 @@ namespace Ogre
 		{
 			createSkeletonInstance();
 		}
+		updateTransforms();
 	}
 
 	InstancedEntity::~InstancedEntity()
@@ -348,9 +349,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
     Real InstancedEntity::getBoundingRadius(void) const
 	{
-		if ((mNeedTransformUpdate) && (mParentNode)) 
-			updateTransforms();
-		return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * mMaxScale;
+		return mBatchOwner->_getMeshReference()->getBoundingSphereRadius() * getMaxScaleCoef();
 	}
 	//-----------------------------------------------------------------------
 	Real InstancedEntity::getSquaredViewDepth( const Camera* cam ) const
@@ -360,16 +359,17 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyMoved(void)
 	{
-		mNeedTransformUpdate = true;
-		mNeedAnimTransformUpdate = true; 
-		mBatchOwner->_boundsDirty();
-		//MovableObject::_notifyMoved();
+		markTransformDirty();
+		MovableObject::_notifyMoved();
+		updateTransforms();
 	}
+
 	//-----------------------------------------------------------------------
 	void InstancedEntity::_notifyAttached( Node* parent, bool isTagPoint )
 	{
-		mBatchOwner->_boundsDirty();
+		markTransformDirty();
 		MovableObject::_notifyAttached( parent, isTagPoint );
+		updateTransforms();
 	}
 	//-----------------------------------------------------------------------
 	AnimationState* InstancedEntity::getAnimationState(const String& name) const
@@ -424,28 +424,64 @@ namespace Ogre
 		return false;
 	}
 
-	//---------------------------------------------------------------------------
-	void InstancedEntity::updateTransforms() const
+	//-----------------------------------------------------------------------
+	void InstancedEntity::markTransformDirty()
 	{
-		if (mParentNode)
+		mNeedTransformUpdate = true;
+		mNeedAnimTransformUpdate = true; 
+		mBatchOwner->_boundsDirty();
+	}
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::setPosition(const Vector3& position, bool doUpdate) 
+	{ 
+		mPosition = position; 
+		mDerivedPosition = position;
+		markTransformDirty();
+		if (doUpdate) updateTransforms();
+	} 
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::setOrientation(const Quaternion& orientation, bool doUpdate) 
+	{ 
+		mOrientation = orientation;  
+		markTransformDirty();
+		if (doUpdate) updateTransforms();
+	} 
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::setScale(const Vector3& scale, bool doUpdate) 
+	{ 
+		mScale = scale; 
+		mMaxScaleLocal = std::max<Real>(std::max<Real>(
+			Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
+		markTransformDirty();
+		if (doUpdate) updateTransforms();
+	} 
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::updateTransforms()
+	{
+		if (mNeedTransformUpdate)
 		{
-			const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-			const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-			const Vector3& parentScale = mParentNode->_getDerivedScale();
+			if (mParentNode)
+			{
+				const Vector3& parentPosition = mParentNode->_getDerivedPosition();
+				const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
+				const Vector3& parentScale = mParentNode->_getDerivedScale();
+				
+				Quaternion derivedOrientation = parentOrientation * mOrientation;
+				Vector3 derivedScale = parentScale * mScale;
+				mDerivedPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
 			
-			Quaternion derivedOrientation = parentOrientation * mOrientation;
-			Vector3 derivedScale = parentScale * mScale;
-			mDerivedPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
-		
-			mFullTransform.makeTransform(mDerivedPosition, derivedScale, derivedOrientation);
-			mMaxScale = std::max<Real>(std::max<Real>(
-				Math::Abs(derivedScale.x), Math::Abs(derivedScale.y)), Math::Abs(derivedScale.z)); 
+				mFullTransform.makeTransform(mDerivedPosition, derivedScale, derivedOrientation);
+			}
+			else
+			{
+				mFullTransform.makeTransform(mPosition,mScale,mOrientation);
+			}
+			mNeedTransformUpdate = false;
 		}
-		else
-		{
-			mFullTransform.makeTransform(mPosition,mScale,mOrientation);
-		}
-		mNeedTransformUpdate = false;
 	}
 
 	//---------------------------------------------------------------------------

@@ -102,23 +102,24 @@ namespace Ogre
 
 		//////////////////////////////////////////////////////////////////////////
 		// Parameters used for local transformation offset information
+		// The 
 		//////////////////////////////////////////////////////////////////////////
 
 		///Object position
 		Vector3 mPosition;
-		mutable Vector3 mDerivedPosition;
+		Vector3 mDerivedPosition;
 		///Object orientation
 		Quaternion mOrientation;
 		///Object scale
 		Vector3 mScale;
 		///The maximum absolute scale for all dimension
-		mutable Real mMaxScale;
+		Real mMaxScaleLocal;
 		///Full world transform
-		mutable Matrix4 mFullTransform;
+		Matrix4 mFullTransform;
 		///Tells if mFullTransform needs an updated
-		mutable bool mNeedTransformUpdate;
+		bool mNeedTransformUpdate;
 		/// Tells if the animation world transform needs an update
-		mutable bool mNeedAnimTransformUpdate;
+		bool mNeedAnimTransformUpdate;
 
 
 		//Returns number of matrices written to xform, assumes xform has enough space
@@ -139,8 +140,8 @@ namespace Ogre
 		//Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
 
-		//Update the world transform
-		void updateTransforms() const;
+		//Mark the transformation matrixes as dirty
+		inline void markTransformDirty();
 
 		/// Incremented count for next name extension
         static NameGenerator msNameGenerator;
@@ -216,41 +217,44 @@ namespace Ogre
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
 
-
+		/** Retrieve the position */
 		const Vector3& getPosition() const { return mPosition; }
-		void setPosition(const Vector3& position) 
-		{ 
-			mPosition = position; 
-			mDerivedPosition = position;
-			_notifyMoved();
-		} 
+		/** Set the position or the offset from the parent node if a parent node exists */ 
+		void setPosition(const Vector3& position, bool doUpdate = true);
 
+		/** Retrieve the orientation */
 		const Quaternion& getOrientation() const { return mOrientation; }
-		void setOrientation(const Quaternion& orientation) 
-		{ 
-			mOrientation = orientation;  
-			_notifyMoved();
-		} 
+		/** Set the orientation or the offset from the parent node if a parent node exists */
+		void setOrientation(const Quaternion& orientation, bool doUpdate = true);
 
+		/** Retrieve the local scale */ 
 		const Vector3& getScale() const { return mScale; }
-		void setScale(const Vector3& scale) 
-		{ 
-			mScale = scale; 
-			mMaxScale = std::max<Real>(std::max<Real>(Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
-			_notifyMoved();
-		} 
-		Real getMaxScale() const { return mMaxScale; }
+		/** Set the  scale or the offset from the parent node if a parent node exists  */ 
+		void setScale(const Vector3& scale, bool doUpdate = true);
 
-		virtual const Matrix4& _getParentNodeFullTransform(void) const
-		{ 
-			if (mNeedTransformUpdate) updateTransforms();
+		/** Returns the maximum derived scale coefficient among the xyz values */
+		Real getMaxScaleCoef() const { 
+			if (mParentNode)
+			{
+				const Ogre::Vector3& parentScale = mParentNode->_getDerivedScale();
+				return mMaxScaleLocal * std::max<Real>(std::max<Real>(
+					Math::Abs(parentScale.x), Math::Abs(parentScale.y)), Math::Abs(parentScale.z)); 
+			}
+			return mMaxScaleLocal; 
+		}
+
+		/** Update the world transform and derived values */
+		void updateTransforms();
+
+		/** Returns the world transform of the instanced entity including local transform */
+		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
+			assert(!mNeedTransformUpdate && "Tranform data should be updated at this point");
 			return mFullTransform;
 		}
 
-		const Vector3& _getDerivedPosition() const
-		{
-			if ((mNeedTransformUpdate) && (mParentNode)) 
-				updateTransforms();
+		/** Returns the derived position of the instanced entity including local transform */
+		const Vector3& _getDerivedPosition() const {
+			assert(!mNeedTransformUpdate && "Tranform data should be updated at this point");
 			return mDerivedPosition;
 		}
 
