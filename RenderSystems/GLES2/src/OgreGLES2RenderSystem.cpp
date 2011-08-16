@@ -47,6 +47,8 @@ THE SOFTWARE.
 #   include "OgreEAGL2Window.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #	include "OgreAndroidWindow.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#	include "OgreNaClWindow.h"
 #else
 #   include "OgreEGLWindow.h"
 #	ifndef GL_GLEXT_PROTOTYPES

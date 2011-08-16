@@ -44,6 +44,8 @@ THE SOFTWARE.
 # include "GLX/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
 # include "Tegra2/OgreConfigDialogImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+# include "NaCl/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 # include "OSX/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS

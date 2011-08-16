@@ -10,7 +10,9 @@
 # Configure Browser demo build
 
 set(SOURCE_FILES src/SampleBrowser.cpp)
-if (WIN32)
+if (OGRE_BUILD_PLATFORM_NACL)
+  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_NaCl.cpp)
+elseif (WIN32)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
 elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iPhone.mm)

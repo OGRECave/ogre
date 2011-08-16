@@ -128,6 +128,7 @@ namespace Ogre
 			mD3D9Plugin = OGRE_NEW D3D9Plugin();
 			root.installPlugin(mD3D9Plugin);
 #endif
+
 #ifdef OGRE_STATIC_Direct3D11
 			mD3D11Plugin = OGRE_NEW D3D11Plugin();
 			root.installPlugin(mD3D11Plugin);

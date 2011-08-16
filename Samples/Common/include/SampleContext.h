@@ -252,7 +252,11 @@ namespace OgreBites
 
 #else
 			createRoot();
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            mNextRenderer = mRoot->getAvailableRenderers()[0]->getName();
+#else
 			if (!oneTimeConfig()) return;
+#endif
 
 			// if the context was reconfigured, set requested renderer
 			if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
@@ -288,7 +292,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| This function encapsulates the entire lifetime of the context.
 		-----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		virtual void go(Sample* initialSample = 0)
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__)
@@ -622,7 +626,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setupInput(bool nograb = false)
 		{
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 			OIS::ParamList pl;
 			size_t winHandle = 0;
 			std::ostringstream winHandleStr;
@@ -672,7 +676,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void locateResources()
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL
 			// TODO: This is handled externally for now
 #else
 			// load resource paths from config file

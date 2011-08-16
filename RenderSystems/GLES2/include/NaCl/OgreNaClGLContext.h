@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,27 +25,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __OgreCommonTimer_H__
-#define __OgreCommonTimer_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+#ifndef __NaClGLContext_H__
+#define __NaClGLContext_H__
 
-//Bring in the specific platform's header file
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreTimerImp.h"
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN)
-# include "GLX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
-# include "Tegra2/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL  
-# include "NaCl/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iPhone/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreTimerImp.h"
-#endif
+#include "OgreGLES2Context.h"
+
+namespace Ogre {
+    class NaClGLSupport;
+
+    class _OgrePrivate NaClGLContext : public GLES2Context, public pp::Graphics3DClient_Dev
+    {
+		private:
+			const NaClGLSupport *mGLSupport;
+            pp::Instance* mInstance;
+            pp::Context3D_Dev mContext;
+            pp::Surface3D_Dev mSurface;
+            bool mFlushPending;
+        public:
+            NaClGLContext(const NaClGLSupport *glsupport, pp::Instance* instance);
+            virtual ~NaClGLContext();
+
+			virtual void setCurrent();
+            virtual void endCurrent();
+            GLES2Context* clone() const;
+
+            void swapBuffers(bool waitForVSync);
+            void invalidate();
+
+            void setFlushPending(const bool flag);
+
+            /// The Graphics3DClient interfcace - pp::Graphics3DClient_Dev
+            virtual void Graphics3DContextLost();
+
+    };
+}
 
 #endif

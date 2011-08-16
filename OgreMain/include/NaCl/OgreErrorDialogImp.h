@@ -1,10 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2009 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,27 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __OgreCommonTimer_H__
-#define __OgreCommonTimer_H__
+#ifndef __OGRE_NACL_ERROR_DIALOG_H__
+#define __OGRE_NACL_ERROR_DIALOG_H__
 
-#include "OgrePrerequisites.h"
-#include "OgrePlatform.h"
+#include "../OgrePrerequisites.h"
 
-//Bring in the specific platform's header file
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreTimerImp.h"
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN)
-# include "GLX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
-# include "Tegra2/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL  
-# include "NaCl/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iPhone/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreTimerImp.h"
-#endif
+namespace Ogre
+{
+	/** Class for displaying the error dialog if Ogre fails badly. */
+	class _OgreExport ErrorDialog
+	{
+	public:
+		ErrorDialog();
 
+		/**
+		@remarks
+			Displays the error dialog.
+		@param
+			errorMessage The error message which has caused the failure.
+		@param
+			logName Optional name of the log to display in the detail pane.
+		*/
+		void display(const String& errorMessage, String logName = "");
+	};
+}
 #endif

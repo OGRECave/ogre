@@ -260,6 +260,7 @@ cmake_dependent_option(OGRE_CG_SUPPORT_FOR_GLES2 "Enable Cg support to ES 2 rend
 cmake_dependent_option(OGRE_USE_GLES2_GLSL_OPTIMISER "Enable GLSL optimiser use in GLES 2 render system" TRUE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_TEGRA2 "Build Ogre for NVIDIA Tegra 2 with Linux" FALSE "OGRE_BUILD_PLATFORM_TEGRA2;OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_NACL "Build Ogre for Google's Native Client (NaCl)" FALSE "OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)

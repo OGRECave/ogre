@@ -43,7 +43,7 @@ THE SOFTWARE.
 #		endif
 #	endif
 #	define OGRE_NEW_FIX_FOR_WIN32 new 
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	define OGRE_NEW_FIX_FOR_WIN32 new
 #else
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
@@ -59,13 +59,24 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	ifndef GL_GLEXT_PROTOTYPES
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
 #	include <GLES2/gl2platform.h>
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
+#	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#       include "ppapi/cpp/instance.h"
+#       include "ppapi/c/dev/ppb_opengles_dev.h"
+#       include "ppapi/cpp/dev/context_3d_dev.h"
+#       include "ppapi/cpp/dev/graphics_3d_client_dev.h"
+#       include "ppapi/cpp/dev/graphics_3d_dev.h"
+#       include "ppapi/cpp/dev/surface_3d_dev.h"
+#		include "ppapi/gles2/gl2ext_ppapi.h"
+#       undef GL_OES_get_program_binary
+#       undef GL_OES_mapbuffer
+#	endif
 #else
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>

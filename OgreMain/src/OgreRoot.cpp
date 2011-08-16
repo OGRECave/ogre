@@ -367,6 +367,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::saveConfig(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "saveConfig is not supported on NaCl",
+            "Root::saveConfig");
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Check the Documents directory within the application sandbox
         Ogre::String outBaseName, extension, configFileName;
@@ -414,6 +418,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::restoreConfig(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "restoreConfig is not supported on NaCl",
+            "Root::restoreConfig");
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Read the config from Documents first(user config) if it exists on iPhone.
         // If it doesn't exist or is invalid then use mConfigFileName
@@ -526,6 +535,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::showConfigDialog(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "showConfigDialog is not supported on NaCl",
+            "Root::showConfigDialog");
+#endif
+
         // Displays the standard config dialog
         // Will use stored defaults if available
         ConfigDialog* dlg;

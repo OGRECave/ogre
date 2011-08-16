@@ -40,6 +40,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_APPLE_IOS 5
 #define OGRE_PLATFORM_ANDROID 6
 #define OGRE_PLATFORM_TEGRA2 7
+#define OGRE_PLATFORM_NACL 8
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -113,6 +114,8 @@ namespace Ogre {
 #   define OGRE_PLATFORM OGRE_PLATFORM_TEGRA2
 #elif defined(__ANDROID__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
+#elif defined( __native_client__ ) 
+#   define OGRE_PLATFORM OGRE_PLATFORM_NACL
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
@@ -229,8 +232,9 @@ namespace Ogre {
 #endif
 */
 //----------------------------------------------------------------------------
-// Linux/Apple/Symbian/Tegra2 Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
+// Linux/Apple/iOs/Android/Symbian/Tegra2/NaCl Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -267,8 +271,6 @@ namespace Ogre {
 #define OGRE_UNICODE_SUPPORT 1
 
 #endif
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // Endian Settings
