@@ -92,28 +92,28 @@ protected:
 
         // summarize results
 
-		// tests may include multiple images
+        // tests may include multiple images
         size_t numPassed = 0;
         size_t numTests = 0;
 
         for (unsigned int i = 0; i < mResults->size(); ++i)
-		{
-			++numTests;
-			Ogre::String testName = (*mResults)[i].testName;
-			bool passed = true;
-			unsigned int j = i;
+        {
+            ++numTests;
+            Ogre::String testName = (*mResults)[i].testName;
+            bool passed = true;
+            unsigned int j = i;
 
             for (; j < mResults->size() && (*mResults)[j].testName == testName; ++j)
-			{
-				if(!(*mResults)[j].passed)
-					passed = false;
-			}
+            {
+                if(!(*mResults)[j].passed)
+                    passed = false;
+            }
 
-			i = j - 1;
+            i = j - 1;
 
-			if(passed)
-				++numPassed;
-		}
+            if(passed)
+                ++numPassed;
+        }
 
         contentDiv->appendElement("h3")->appendText(
             Ogre::StringConverter::toString(numPassed) + " of " 
@@ -134,25 +134,25 @@ protected:
 
         // add side-by-side images and summary for each test
         for (unsigned int i = 0; i < mResults->size(); ++i)
-		{
-			
-			// since a test can have multiple images, we find all images with this tets name
-			Ogre::String testName = (*mResults)[i].testName;
-			bool passed = true;
-			unsigned int j = i;
-			std::vector<ComparisonResult*> results;
+        {
+            
+            // since a test can have multiple images, we find all images with this tets name
+            Ogre::String testName = (*mResults)[i].testName;
+            bool passed = true;
+            unsigned int j = i;
+            std::vector<ComparisonResult*> results;
 
             for (; j < mResults->size() && (*mResults)[j].testName == testName; ++j)
-			{
-				results.push_back(&(*mResults)[j]);
-				if(!(*mResults)[j].passed)
-					passed = false;
-			}
+            {
+                results.push_back(&(*mResults)[j]);
+                if(!(*mResults)[j].passed)
+                    passed = false;
+            }
 
-			i = j - 1;
+            i = j - 1;
 
             body->pushChild(summarizeSingleResult(results, passed, mSet1, mSet2));
-		}
+        }
 
         // print to the stream and return
         output<<html.print();
@@ -182,82 +182,82 @@ protected:
         span->appendText(passed ? "Passed" : "Failed");
         span->appendAttribute("class", passed ? "passed" : "failed");
 
-		// if more than one image for this test, and it failed, report how many passed
-		if(!passed && result.size() > 1)
-		{
-			int p = 0;
+        // if more than one image for this test, and it failed, report how many passed
+        if(!passed && result.size() > 1)
+        {
+            int p = 0;
 
-			for(unsigned int i = 0; i < result.size(); ++i)
-				if(result[i]->passed)
-					++p;
+            for(unsigned int i = 0; i < result.size(); ++i)
+                if(result[i]->passed)
+                    ++p;
 
-			content->appendElement("h4")->appendText(
-				Ogre::StringConverter::toString(p) + " of " + 
-				Ogre::StringConverter::toString(result.size()) + " images passed.");
-		}
+            content->appendElement("h4")->appendText(
+                Ogre::StringConverter::toString(p) + " of " + 
+                Ogre::StringConverter::toString(result.size()) + " images passed.");
+        }
 
-		// loop over images
-		for(unsigned int i = 0; i < result.size(); ++i)
-		{
-			// add a divider
-			content->appendElement("hr");
+        // loop over images
+        for(unsigned int i = 0; i < result.size(); ++i)
+        {
+            // add a divider
+            content->appendElement("hr");
 
-			// add a frame label if more than one image
-			if(result.size() > 1)
-				content->appendElement("h4")->appendText("Frame " + Ogre::StringConverter::toString(result[i]->frame) + ":");
+            // add a frame label if more than one image
+            if(result.size() > 1)
+                content->appendElement("h4")->appendText("Frame " + Ogre::StringConverter::toString(result[i]->frame) + ":");
 
-			HtmlElement* imageBox = content->appendElement("div");
+            HtmlElement* imageBox = content->appendElement("div");
 
-			// first image
-			HtmlElement* column1 = imageBox->appendElement("div");
-			column1->appendAttribute("class", Ogre::String("img_column") + (result[i]->passed ? "" : " failed_test"));
-			column1->appendElement("h3")->appendText("Original:");
-			HtmlElement* img = column1->appendElement("img");
-			img->appendAttribute("alt", result[i]->testName + Ogre::StringConverter::toString(result[i]->frame) + " original");
-			img->appendAttribute("src", set1.name + "/" + result[i]->image);
+            // first image
+            HtmlElement* column1 = imageBox->appendElement("div");
+            column1->appendAttribute("class", Ogre::String("img_column") + (result[i]->passed ? "" : " failed_test"));
+            column1->appendElement("h3")->appendText("Original:");
+            HtmlElement* img = column1->appendElement("img");
+            img->appendAttribute("alt", result[i]->testName + Ogre::StringConverter::toString(result[i]->frame) + " original");
+            img->appendAttribute("src", set1.name + "/" + result[i]->image);
 
-			// second image
-			HtmlElement* column2 = imageBox->appendElement("div");
-			column2->appendAttribute("class", Ogre::String("img_column") + (result[i]->passed ? "" : " failed_test"));
-			column2->appendElement("h3")->appendText("New:");
-			img = column2->appendElement("img");
-			img->appendAttribute("alt", result[i]->testName + Ogre::StringConverter::toString(result[i]->frame) + " new");
-			img->appendAttribute("src", set2.name + "/" + result[i]->image);
+            // second image
+            HtmlElement* column2 = imageBox->appendElement("div");
+            column2->appendAttribute("class", Ogre::String("img_column") + (result[i]->passed ? "" : " failed_test"));
+            column2->appendElement("h3")->appendText("New:");
+            img = column2->appendElement("img");
+            img->appendAttribute("alt", result[i]->testName + Ogre::StringConverter::toString(result[i]->frame) + " new");
+            img->appendAttribute("src", set2.name + "/" + result[i]->image);
 
-			imageBox->appendElement("h4")->appendText("Comparison Summary:");
-			
-			if(result[i]->incorrectPixels)
-			{
-				HtmlElement* absDiff = imageBox->appendElement("p");
-				absDiff->appendAttribute("class", "diffreport");
-				absDiff->appendText(Ogre::StringConverter::toString(result[i]->incorrectPixels) +
-					" pixels differed.");
+            imageBox->appendElement("h4")->appendText("Comparison Summary:");
+            
+            if(result[i]->incorrectPixels)
+            {
+                HtmlElement* absDiff = imageBox->appendElement("p");
+                absDiff->appendAttribute("class", "diffreport");
+                absDiff->appendText(Ogre::StringConverter::toString(result[i]->incorrectPixels) +
+                    " pixels differed.");
 
-				HtmlElement* mse = imageBox->appendElement("p");
-				mse->appendAttribute("class", "diffreport");
-				mse->appendElement("strong")->appendText(" MSE | ");
-				mse->appendText("Overall: " + formatFloat(result[i]->mse) + " | ");
-				mse->appendText("R: " + formatFloat(result[i]->mseChannels.r) + " | ");
-				mse->appendText("G: " + formatFloat(result[i]->mseChannels.g) + " | ");
-				mse->appendText("B: " + formatFloat(result[i]->mseChannels.b) + " |");
+                HtmlElement* mse = imageBox->appendElement("p");
+                mse->appendAttribute("class", "diffreport");
+                mse->appendElement("strong")->appendText(" MSE | ");
+                mse->appendText("Overall: " + formatFloat(result[i]->mse) + " | ");
+                mse->appendText("R: " + formatFloat(result[i]->mseChannels.r) + " | ");
+                mse->appendText("G: " + formatFloat(result[i]->mseChannels.g) + " | ");
+                mse->appendText("B: " + formatFloat(result[i]->mseChannels.b) + " |");
 
-				HtmlElement* psnr = imageBox->appendElement("p");
-				psnr->appendAttribute("class", "diffreport");
-				psnr->appendElement("strong")->appendText("PSNR| ");
-				psnr->appendText("Overall: " + formatFloat(result[i]->psnr) + " | ");
-				psnr->appendText("R: " + formatFloat(result[i]->psnrChannels.r) + " | ");
-				psnr->appendText("G: " + formatFloat(result[i]->psnrChannels.g) + " | ");
-				psnr->appendText("B: " + formatFloat(result[i]->psnrChannels.b) + " |");
+                HtmlElement* psnr = imageBox->appendElement("p");
+                psnr->appendAttribute("class", "diffreport");
+                psnr->appendElement("strong")->appendText("PSNR| ");
+                psnr->appendText("Overall: " + formatFloat(result[i]->psnr) + " | ");
+                psnr->appendText("R: " + formatFloat(result[i]->psnrChannels.r) + " | ");
+                psnr->appendText("G: " + formatFloat(result[i]->psnrChannels.g) + " | ");
+                psnr->appendText("B: " + formatFloat(result[i]->psnrChannels.b) + " |");
 
-				HtmlElement* ssim = imageBox->appendElement("p");
-				ssim->appendAttribute("class", "diffreport");
-				ssim->appendText("Structural Similarity Index: " + formatFloat(result[i]->ssim));
-			}
-			else
-			{
-				imageBox->appendElement("p")->appendText("Images are identical.");
-			}
-		}
+                HtmlElement* ssim = imageBox->appendElement("p");
+                ssim->appendAttribute("class", "diffreport");
+                ssim->appendText("Structural Similarity Index: " + formatFloat(result[i]->ssim));
+            }
+            else
+            {
+                imageBox->appendElement("p")->appendText("Images are identical.");
+            }
+        }
 
         return container;
     }

@@ -83,8 +83,8 @@ public:
         mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
         mCamera->setNearClipDistance(0.5f);
         mCamera->setFarClipDistance(10000.f);
-		mCamera->setPosition(Ogre::Vector3::ZERO);
-		mCamera->setOrientation(Ogre::Quaternion::IDENTITY);
+        mCamera->setPosition(Ogre::Vector3::ZERO);
+        mCamera->setOrientation(Ogre::Quaternion::IDENTITY);
     }
 
     /** Unload all resources used by this sample */
@@ -117,20 +117,20 @@ public:
         return false;
     }
 
-	virtual bool frameStarted(const Ogre::FrameEvent& evt)
-	{
-		for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
-			mAnimStateList[i]->addTime(evt.timeSinceLastFrame);
-		return true;
-	}
+    virtual bool frameStarted(const Ogre::FrameEvent& evt)
+    {
+        for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
+            mAnimStateList[i]->addTime(evt.timeSinceLastFrame);
+        return true;
+    }
 
 protected:
 
     // a set of frame numbers at which to trigger screenshots
     std::set<unsigned int> mScreenshotFrames;
 
-	// a list of animation states to automatically update
-	std::vector<Ogre::AnimationState*> mAnimStateList;
+    // a list of animation states to automatically update
+    std::vector<Ogre::AnimationState*> mAnimStateList;
 
     // The camera for this sample
     Ogre::Camera* mCamera;

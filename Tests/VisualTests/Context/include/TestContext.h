@@ -67,11 +67,11 @@ public:
     /** Setup the Root */
     virtual void createRoot();
 
-	/** Start it up */
-	virtual void go(OgreBites::Sample* initialSample = 0);
+    /** Start it up */
+    virtual void go(OgreBites::Sample* initialSample = 0);
 
-	/** Handles the config dialog */
-	virtual bool oneTimeConfig();
+    /** Handles the config dialog */
+    virtual bool oneTimeConfig();
 
     /** Set up directories for the tests to output to */
     virtual void setupDirectories(Ogre::String batchName);
@@ -114,12 +114,12 @@ protected:
     // Info about the running batch of tests
     TestBatch* mBatch;
 
-	// command line options
-	bool mReferenceSet; // is a reference set being generated
-	bool mGenerateHtml; // should html output be created
-	bool mForceConfig; // force the config dialog
-	bool mHelp; // show usage details
-	Ogre::String mRenderSystemName; // render system to use
+    // command line options
+    bool mReferenceSet; // is a reference set being generated
+    bool mGenerateHtml; // should html output be created
+    bool mForceConfig; // force the config dialog
+    bool mHelp; // show usage details
+    Ogre::String mRenderSystemName; // render system to use
     Ogre::String mBatchName;// optional name for this batch
     Ogre::String mCompareWith;// set to compare against
     Ogre::String mComment;// optional comment

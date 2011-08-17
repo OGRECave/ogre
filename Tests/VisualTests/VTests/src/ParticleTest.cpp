@@ -47,8 +47,8 @@ void ParticleTest::setupContent()
     Ogre::ParticleSystem* ps = mSceneMgr->createParticleSystem("Fireworks", "Examples/Fireworks");
     mSceneMgr->getRootSceneNode()->attachObject(ps);
     
-	// Multiple systems didn't seem to stay deterministic... (in gcc at least...)
-	//ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
+    // Multiple systems didn't seem to stay deterministic... (in gcc at least...)
+    //ps = mSceneMgr->createParticleSystem("Fountain", "Examples/PurpleFountain");
     //mSceneMgr->getRootSceneNode()->attachObject(ps);
     //ps = mSceneMgr->createParticleSystem("Nimbus", "Examples/GreenyNimbus");
     //mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(150, 0, 0))->attachObject(ps);

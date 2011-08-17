@@ -133,7 +133,7 @@ public:
         }
         else
         {
-			ImageValidator validator = ImageValidator(mDirectory, other.mDirectory);
+            ImageValidator validator = ImageValidator(mDirectory, other.mDirectory);
             for (unsigned int i = 0; i < images.size(); ++i)
                 out->push_back(validator.compare(images[i]));
         }

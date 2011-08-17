@@ -74,7 +74,7 @@ TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0)
     mForceConfig = unOpt["-d"];
     mRenderSystemName = binOpt["-rs"];
     mSummaryOutputDir = binOpt["-o"];
-	mHelp = unOpt["-h"] || unOpt["--help"];
+    mHelp = unOpt["-h"] || unOpt["--help"];
 }
 //-----------------------------------------------------------------------
 
@@ -88,15 +88,15 @@ TestContext::~TestContext()
 void TestContext::setup()
 {
     // standard setup
-	mWindow = createWindow();
-	setupInput(false);// grab input, since moving the window seemed to change the results (in Linux anyways)
-	locateResources();
-	loadResources();
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-	mRoot->addFrameListener(this);
+    mWindow = createWindow();
+    setupInput(false);// grab input, since moving the window seemed to change the results (in Linux anyways)
+    locateResources();
+    loadResources();
+    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+    mRoot->addFrameListener(this);
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
+    Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 #endif
 
     // get the path and list of test plugins from the config file
@@ -183,20 +183,20 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
         OgreBites::SampleSet newSamples = sp->getSamples();
         for (OgreBites::SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
         {
-			// skip it if using wrong rendersystem
-			Ogre::String rs = (*j)->getRequiredRenderSystem();
-			if(!rs.empty() && rs != mRoot->getRenderSystem()->getName())
-				continue;
+            // skip it if using wrong rendersystem
+            Ogre::String rs = (*j)->getRequiredRenderSystem();
+            if(!rs.empty() && rs != mRoot->getRenderSystem()->getName())
+                continue;
 
-			// capability check
-			try
-			{
-				(*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
-			}
-			catch(Ogre::Exception e)
-			{
-				continue;
-			}
+            // capability check
+            try
+            {
+                (*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
+            }
+            catch(Ogre::Exception e)
+            {
+                continue;
+            }
 
             mTests.push_back(*j);
             Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
@@ -353,58 +353,58 @@ void TestContext::createRoot()
 
 void TestContext::go(OgreBites::Sample* initialSample)
 {
-	// either print usage details, or start up as usual
-	if(mHelp)
-	{
-		std::cout<<"\nOgre Visual Testing Context:\n";
-		std::cout<<"Runs sets of visual test scenes, taking screenshots, and running comparisons.\n\n";
-		std::cout<<"Usage: TestContext [opts]\n\n";
-		std::cout<<"Options:\n";
-		std::cout<<"\t-r           Generate reference set.\n";
-		std::cout<<"\t--no-html    Suppress html output.\n";
-		std::cout<<"\t-d           Force config dialog.\n";
-		std::cout<<"\t-h, --help   Show usage details.\n";
-		std::cout<<"\t-m [comment] Optional comment.\n";
-		std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg)\n";
-		std::cout<<"\t-c [name]    Name of the test result batch to compare against.\n";
-		std::cout<<"\t-n [name]    Name for this result image set.\n";
-		std::cout<<"\t-rs [name]   Render system to use.\n";
-		std::cout<<"\t-o [path]    Path to output a simple summary file to\n\n";
-	}
-	else
-	{
-		SampleContext::go(initialSample);
-	}
+    // either print usage details, or start up as usual
+    if(mHelp)
+    {
+        std::cout<<"\nOgre Visual Testing Context:\n";
+        std::cout<<"Runs sets of visual test scenes, taking screenshots, and running comparisons.\n\n";
+        std::cout<<"Usage: TestContext [opts]\n\n";
+        std::cout<<"Options:\n";
+        std::cout<<"\t-r           Generate reference set.\n";
+        std::cout<<"\t--no-html    Suppress html output.\n";
+        std::cout<<"\t-d           Force config dialog.\n";
+        std::cout<<"\t-h, --help   Show usage details.\n";
+        std::cout<<"\t-m [comment] Optional comment.\n";
+        std::cout<<"\t-ts [name]   Name of the test set to use (defined in tests.cfg)\n";
+        std::cout<<"\t-c [name]    Name of the test result batch to compare against.\n";
+        std::cout<<"\t-n [name]    Name for this result image set.\n";
+        std::cout<<"\t-rs [name]   Render system to use.\n";
+        std::cout<<"\t-o [path]    Path to output a simple summary file to\n\n";
+    }
+    else
+    {
+        SampleContext::go(initialSample);
+    }
 }
 //-----------------------------------------------------------------------
 
 bool TestContext::oneTimeConfig()
 {
-	// if forced, just do it and return
-	if(mForceConfig)
-	{
-		bool temp = mRoot->showConfigDialog();
-		if(!temp)
-			mRoot->setRenderSystem(0);
-		return temp;
-	}
+    // if forced, just do it and return
+    if(mForceConfig)
+    {
+        bool temp = mRoot->showConfigDialog();
+        if(!temp)
+            mRoot->setRenderSystem(0);
+        return temp;
+    }
 
-	// try restore
-	bool success = mRoot->restoreConfig();
+    // try restore
+    bool success = mRoot->restoreConfig();
 
-	// if restoring failed, show the dialog
-	if(!success)
-		success = mRoot->showConfigDialog();
+    // if restoring failed, show the dialog
+    if(!success)
+        success = mRoot->showConfigDialog();
 
-	// set render system if user-defined
-	if(success && mRenderSystemName != "SAVED" && mRoot->getRenderSystemByName(mRenderSystemName))
-		mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
-	else if(!success)
-		mRoot->setRenderSystem(0);
-	
-	mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
+    // set render system if user-defined
+    if(success && mRenderSystemName != "SAVED" && mRoot->getRenderSystemByName(mRenderSystemName))
+        mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
+    else if(!success)
+        mRoot->setRenderSystem(0);
+    
+    mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
 
-	return success;
+    return success;
 }
 //-----------------------------------------------------------------------
 
@@ -437,11 +437,11 @@ void TestContext::finishedTests()
 {
     if ((mGenerateHtml || mSummaryOutputDir != "NONE") && !mReferenceSet)
     {
-		const TestBatch* compareTo = 0;
+        const TestBatch* compareTo = 0;
 
         Ogre::ConfigFile info;
         bool foundReference = true;
-		TestBatch* ref = 0;
+        TestBatch* ref = 0;
 
         // look for a reference set first (either "Reference" or a user-specified image set)
         try
@@ -450,7 +450,7 @@ void TestContext::finishedTests()
         }
         catch (Ogre::FileNotFoundException e)
         {
-			// if no luck, just grab the most recent compatible set
+            // if no luck, just grab the most recent compatible set
             foundReference = false;
             TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
 
@@ -459,7 +459,7 @@ void TestContext::finishedTests()
             {
                 if (mBatch->canCompareWith((*i)))
                 {
-					compareTo = &(*i);
+                    compareTo = &(*i);
                     break;
                 }
             }
@@ -469,37 +469,37 @@ void TestContext::finishedTests()
         {
             ref = OGRE_NEW TestBatch(info, mOutputDir + mCompareWith);
             if (mBatch->canCompareWith(*ref))
-				compareTo = ref;
+                compareTo = ref;
         }
 
         if (compareTo)
         {
-			ComparisonResultVectorPtr results = mBatch->compare(*compareTo);
+            ComparisonResultVectorPtr results = mBatch->compare(*compareTo);
 
-			if(mGenerateHtml)
-			{
-				HtmlWriter writer(*compareTo, *mBatch, results);
+            if(mGenerateHtml)
+            {
+                HtmlWriter writer(*compareTo, *mBatch, results);
 
-				// we save a generally named "out.html" that gets overwritten each run, 
-				// plus a uniquely named one for this run
-				writer.writeToFile(mOutputDir + "out.html");
-				writer.writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
-			}
+                // we save a generally named "out.html" that gets overwritten each run, 
+                // plus a uniquely named one for this run
+                writer.writeToFile(mOutputDir + "out.html");
+                writer.writeToFile(mOutputDir + "TestResults_" + mBatch->name + ".html");
+            }
 
-			// also save a summary file for CTest to parse, if required
-			if(mSummaryOutputDir != "NONE")
-			{
-				Ogre::String rs;
-				for(int i = 0; i < mRenderSystemName.size(); ++i)
-					if(mRenderSystemName[i]!=' ')
-						rs += mRenderSystemName[i];
-				
-	            SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
-				simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
-			}
+            // also save a summary file for CTest to parse, if required
+            if(mSummaryOutputDir != "NONE")
+            {
+                Ogre::String rs;
+                for(int i = 0; i < mRenderSystemName.size(); ++i)
+                    if(mRenderSystemName[i]!=' ')
+                        rs += mRenderSystemName[i];
+                
+                SimpleResultWriter simpleWriter(*compareTo, *mBatch, results);
+                simpleWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".txt");
+            }
         }
 
-		OGRE_DELETE ref;
+        OGRE_DELETE ref;
     }
 
     // write this batch's config file
