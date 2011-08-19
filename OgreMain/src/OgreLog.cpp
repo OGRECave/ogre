@@ -30,10 +30,17 @@ THE SOFTWARE.
 #include "OgreLog.h"
 #include "OgreLogManager.h"
 #include "OgreString.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#   include "ppapi/cpp/var.h"
+#   include "ppapi/cpp/instance.h"
+#endif
 
 namespace Ogre
 {
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    pp::Instance* Log::mInstance = NULL;    
+#endif
+    
     //-----------------------------------------------------------------------
     Log::Log( const String& name, bool debuggerOuput, bool suppressFile ) : 
         mLogLevel(LL_NORMAL), mDebugOut(debuggerOuput),
@@ -65,8 +72,15 @@ namespace Ogre
 			
 			if (!skipThisMessage)
 			{
-				if (mDebugOut && !maskDebug)
-					std::cerr << message << std::endl;
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+                if(mInstance != NULL)
+                {
+                    mInstance->PostMessage(message.c_str());
+                }
+#else
+                if (mDebugOut && !maskDebug)
+                    std::cerr << message << std::endl;
+#endif
 
 				// Write time into log
 				if (!mSuppressFile)

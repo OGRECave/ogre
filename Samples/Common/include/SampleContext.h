@@ -626,7 +626,7 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void setupInput(bool nograb = false)
 		{
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 			OIS::ParamList pl;
 			size_t winHandle = 0;
 			std::ostringstream winHandleStr;
@@ -661,7 +661,8 @@ namespace OgreBites
 			mMouse = static_cast<OIS::MultiTouch*>(mInputMgr->createInputObject(OIS::OISMultiTouch, true));
 			mAccelerometer = static_cast<OIS::JoyStick*>(mInputMgr->createInputObject(OIS::OISJoyStick, true));
 #else
-			mKeyboard = static_cast<OIS::Keyboard*>(mInputMgr->createInputObject(OIS::OISKeyboard, true));
+            OIS::Object* obj = mInputMgr->createInputObject(OIS::OISKeyboard, true);
+			mKeyboard = static_cast<OIS::Keyboard*>(obj);
 			mMouse = static_cast<OIS::Mouse*>(mInputMgr->createInputObject(OIS::OISMouse, true));
 
 			mKeyboard->setEventCallback(this);
@@ -676,8 +677,11 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void locateResources()
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			// TODO: This is handled externally for now
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Essential.zip", "EmbeddedZip", "Essential");
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "Popular");
 #else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;

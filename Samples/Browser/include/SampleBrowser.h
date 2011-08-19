@@ -207,6 +207,9 @@ protected:
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             mNaClInstance = 0;
+            mOisFactory = 0;
+            mInitWidth = 0;
+            mInitHeight = 0;
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -232,10 +235,19 @@ protected:
 		| init data members needed only by NaCl
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-		void initAppForNaCl( pp::Instance* NaClInstance )
+		void initAppForNaCl( pp::Instance* NaClInstance, OIS::FactoryCreator * oisFactory, uint32 initWidth, uint32 initHeight )
 		{
             mNaClInstance = NaClInstance;
+            mOisFactory = oisFactory;
+            mInitWidth = initWidth;
+            mInitHeight = initHeight;
 		}
+
+        void createInputDevices()
+        {
+            mInputMgr->addFactoryCreator(mOisFactory);
+            SampleContext::createInputDevices();
+        }
 #endif
 
 		/*-----------------------------------------------------------------------------
@@ -1001,7 +1013,6 @@ protected:
 #endif
 
 			Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            
 			mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mMouse, this);
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
@@ -1086,7 +1097,7 @@ protected:
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
             miscParams["pp::Instance"] = StringConverter::toString((unsigned long)mNaClInstance);
             // create 1x1 window - we will resize later
-            res = mRoot->createRenderWindow("OGRE Sample Browser Window", 1, 1, false, &miscParams);
+            res = mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 #endif
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -1202,6 +1213,29 @@ protected:
 			//sampleList.push_back("Sample_SkyDome"); 
 			//sampleList.push_back("Sample_SkyPlane"); 
 			//sampleList.push_back("Sample_Smoke");      		
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            Ogre::String startupSampleTitle = "";
+            Ogre::String sampleDir = "";
+            Ogre::StringVector sampleList;
+            sampleList.push_back("Sample_BezierPatch");
+            sampleList.push_back("Sample_CameraTrack");
+            sampleList.push_back("Sample_CelShading");
+            sampleList.push_back("Sample_Character");     
+            sampleList.push_back("Sample_CubeMapping");    
+            sampleList.push_back("Sample_Dot3Bump");
+            sampleList.push_back("Sample_DynTex");      
+            sampleList.push_back("Sample_FacialAnimation");
+            sampleList.push_back("Sample_Fresnel");
+            sampleList.push_back("Sample_Grass");
+            sampleList.push_back("Sample_ParticleFX");
+#   ifdef USE_RTSHADER_SYSTEM
+            sampleList.push_back("Sample_ShaderSystem");
+#	endif
+            sampleList.push_back("Sample_Lighting");       
+            sampleList.push_back("Sample_SkyBox"); 
+            sampleList.push_back("Sample_SkyDome"); 
+            sampleList.push_back("Sample_SkyPlane"); 
+            sampleList.push_back("Sample_Smoke");      		
 #else
 			Ogre::ConfigFile cfg;
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
@@ -1381,9 +1415,11 @@ protected:
 			mTrayMgr->showLogo(TL_RIGHT);
 			mTrayMgr->createSeparator(TL_RIGHT, "LogoSep");
 			mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample");
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 			mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
-			mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
+            mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
 			mTrayMgr->createButton(TL_RIGHT, "Quit", "Quit");
+#endif
 
 			// create sample viewing controls
 			mTitleLabel = mTrayMgr->createLabel(TL_LEFT, "SampleTitle", "");
@@ -1607,7 +1643,7 @@ protected:
 
 				mShaderGenerator->addSceneManager(sceneMgr);
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 				// Setup core libraries and shader cache path.
 				Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
 				Ogre::StringVector::iterator itGroup = groupVector.begin();
@@ -1711,6 +1747,9 @@ protected:
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
+        OIS::FactoryCreator * mOisFactory;
+        uint32 mInitWidth;
+        uint32 mInitHeight;
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     public:

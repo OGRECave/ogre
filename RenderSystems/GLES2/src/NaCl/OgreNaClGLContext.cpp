@@ -27,7 +27,20 @@ THE SOFTWARE.
 */
 
 #include "OgreNaClGLContext.h"
-#include "..\..\..\..\OgreMain\include\OgreException.h"
+#include "OgreLog.h"
+#include "OgreException.h"
+#include "OgreRoot.h"
+#include "OgreException.h"
+#include "OgreLogManager.h"
+#include "OgreStringConverter.h"
+#include "OgreWindowEventUtilities.h"
+
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLES2RenderSystem.h"
+
+#include "OgreNaClGLSupport.h"
+#include "OgreNaClWindow.h"
+#include "OgreNaClGLContext.h"
 
 namespace {
     // This is called by the browser when the 3D context has been flushed to the
@@ -60,16 +73,23 @@ namespace Ogre {
             return;
         }
         // Lazily create the Pepper context.
-        if (mContext.is_null()) {
+        if (mContext.is_null()) 
+        {
             mContext = pp::Context3D_Dev(*mInstance, 0, pp::Context3D_Dev(), NULL);
-            if (mContext.is_null()) {
+            if (mContext.is_null()) 
+            {
                 glSetCurrentContextPPAPI(0);
                 return;
             }
-            mSurface = pp::Surface3D_Dev(*mInstance, 0, NULL);
+        }
+
+        if (mSurface.is_null()) 
+        {
+            mSurface = pp::Surface3D_Dev(*mInstance, PP_GRAPHICS3DATTRIBVALUE_OPENGL_ES2_BIT, NULL);
             mContext.BindSurfaces(mSurface, mSurface);
             mInstance->BindGraphics(mSurface);
         }
+
         glSetCurrentContextPPAPI(mContext.pp_resource());
         return;
     }
@@ -118,8 +138,8 @@ namespace Ogre {
         // Unbind the existing surface and re-bind to null surfaces.
         mInstance->BindGraphics(pp::Surface3D_Dev());
         mContext.BindSurfaces(pp::Surface3D_Dev(), pp::Surface3D_Dev());
+        mSurface = pp::Surface3D_Dev();
         glSetCurrentContextPPAPI(0);
-
     }
 
 

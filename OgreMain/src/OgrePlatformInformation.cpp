@@ -116,10 +116,9 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
-        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
            return true;
        #else
-
         unsigned oldFlags, newFlags;
         __asm__
         (
@@ -171,7 +170,7 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
-        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
         __asm__
         (
             "cpuid": "=a" (result._eax), "=b" (result._ebx), "=c" (result._ecx), "=d" (result._edx) : "a" (query)
@@ -245,7 +244,7 @@ namespace Ogre {
         }
 	#endif
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC
-        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64
+        #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
             return true;
         #else
         // Does gcc have __try/__except similar mechanism?
