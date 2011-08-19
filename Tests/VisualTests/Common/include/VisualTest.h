@@ -117,6 +117,7 @@ public:
         return false;
     }
 
+	/** Default frame started callback, advances animations */
     virtual bool frameStarted(const Ogre::FrameEvent& evt)
     {
         for(unsigned int i = 0; i < mAnimStateList.size(); ++i)
