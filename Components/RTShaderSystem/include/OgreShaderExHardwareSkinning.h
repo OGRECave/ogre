@@ -103,12 +103,11 @@ public:
 	@param weightCount The maximum number of weights/bones affecting
 		a vertex. Note that this parameter can be higher but not
 		 lower than the actual number of affecting bones.
-	@param skinningType
-	@param correctAntipodalityHandling Only applicable for dual quaternion skinning.
-	@param scalingShearingSupport Only applicable for dual quaternion skinning.
+	@param skinningType The type of skinning desired.
+	@param correctAntipodalityHandling If correct antipodality handling should be utilized (Only applicable for dual quaternion skinning).
+	@param scalingShearingSupport If scaling and shearing support should be enabled (Only applicable for dual quaternion skinning).
 	*/
 	void setHardwareSkinningParam(ushort boneCount, ushort weightCount, SkinningType skinningType = ST_LINEAR,  bool correctAntipodalityHandling = false, bool scalingShearingSupport = false);
-
 
 	/**
 	Returns the number of bones in the model assigned to the material.
@@ -227,8 +226,8 @@ public:
 	const MaterialPtr& getCustomShadowReceiverMaterial(const SkinningType skinningType, ushort index) const;
 
 	/**
-		@brief
-			prepares an entity's material for use in the hardware skinning (HS).
+		@brief 
+			Prepares an entity's material for use in the hardware skinning (HS).
 		
 		This function prepares an entity's material for use by the HS sub-render
 		state. This function scans the entity and extracts the information of the amount
@@ -262,38 +261,43 @@ public:
 	void setMaxCalculableBoneCount(ushort count) {
 		mMaxCalculableBoneCount = count; }
 
-    /** Override standard Singleton retrieval.
-     @remarks
-     Why do we do this? Well, it's because the Singleton
-     implementation is in a .h file, which means it gets compiled
-     into anybody who includes it. This is needed for the
-     Singleton template to work, but we actually only want it
-     compiled into the implementation of the class based on the
-     Singleton, not all of them. If we don't change this, we get
-     link errors when trying to use the Singleton-based class from
-     an outside dll.
-     @par
-     This method just delegates to the template version anyway,
-     but the implementation stays in this single compilation unit,
-     preventing link errors.
-     */
-    static HardwareSkinningFactory& getSingleton(void);
-    /** Override standard Singleton retrieval.
-     @remarks
-     Why do we do this? Well, it's because the Singleton
-     implementation is in a .h file, which means it gets compiled
-     into anybody who includes it. This is needed for the
-     Singleton template to work, but we actually only want it
-     compiled into the implementation of the class based on the
-     Singleton, not all of them. If we don't change this, we get
-     link errors when trying to use the Singleton-based class from
-     an outside dll.
-     @par
-     This method just delegates to the template version anyway,
-     but the implementation stays in this single compilation unit,
-     preventing link errors.
-     */
-    static HardwareSkinningFactory* getSingletonPtr(void);
+	/** 
+	Override standard Singleton retrieval.
+	
+	@remarks Why do we do this? Well, it's because the Singleton
+		implementation is in a .h file, which means it gets compiled
+		into anybody who includes it. This is needed for the
+		Singleton template to work, but we actually only want it
+		compiled into the implementation of the class based on the
+		Singleton, not all of them. If we don't change this, we get
+		link errors when trying to use the Singleton-based class from
+		an outside dll.
+		
+	@par 
+		This method just delegates to the template version anyway,
+		but the implementation stays in this single compilation unit,
+		preventing link errors.
+	*/
+	static HardwareSkinningFactory& getSingleton(void);
+	
+	/** 
+	Override standard Singleton retrieval.
+	
+	@remarks Why do we do this? Well, it's because the Singleton
+		implementation is in a .h file, which means it gets compiled
+		into anybody who includes it. This is needed for the
+		Singleton template to work, but we actually only want it
+		compiled into the implementation of the class based on the
+		Singleton, not all of them. If we don't change this, we get
+		link errors when trying to use the Singleton-based class from
+		an outside dll.
+		
+	@par
+		This method just delegates to the template version anyway,
+		but the implementation stays in this single compilation unit,
+		preventing link errors.
+	*/
+	static HardwareSkinningFactory* getSingletonPtr(void);
 
 protected:
 	/** 

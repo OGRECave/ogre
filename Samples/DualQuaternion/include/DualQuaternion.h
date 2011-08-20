@@ -211,9 +211,9 @@ protected:
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
 	}
 
-	void manuallyControlBones(Entity* ent)
+	void manuallyControlBones(Entity* entity)
 	{
-		for(Skeleton::BoneIterator it = ent->getSkeleton()->getBoneIterator(); it.hasMoreElements(); it.moveNext())
+		for(Skeleton::BoneIterator it = entity->getSkeleton()->getBoneIterator(); it.hasMoreElements(); it.moveNext())
 		{
 			(*it.current())->setManuallyControlled(true);
 		}

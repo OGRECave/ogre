@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define _ShaderExHardwareSkinningTechnique_
 
 #include "OgreShaderPrerequisites.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderSubRenderState.h"
 #include "OgreShaderParameter.h"
@@ -65,16 +66,7 @@ public:
 	virtual void copyFrom(const HardwareSkinningTechnique* hardSkin);
 
 	/**
-	Set the hardware skinning parameters.
-	@param boneCount The maximum number of bones in the model this material
-		 is assigned to. Note that this parameter can be higher but not
-		 lower than the actual number of bones.
-	@param weightCount The maximum number of weights/bones affecting
-		a vertex. Note that this parameter can be higher but not
-		 lower than the actual number of affecting bones.
-	@param skinningType
-	@param correctAntipodalityHandling Only applicable for dual quaternion skinning.
-	@param scalingShearingSupport Only applicable for dual quaternion skinning.
+	@see HardwareSkinning::setHardwareSkinningParam.
 	*/
 	void setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling = false, bool scalingShearingSupport = false);
 

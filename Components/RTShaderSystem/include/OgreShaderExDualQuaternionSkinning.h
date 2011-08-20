@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define _ShaderExDualQuaternionSkinning_
 
 #include "OgreShaderPrerequisites.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinningTechnique.h"
 #include "OgreShaderParameter.h"

@@ -24,7 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "OgreShaderExDualQuaternionSkinning.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPRenderState.h"
 #include "OgreShaderProgram.h"
@@ -205,14 +207,14 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			//Construct a scaling and shearing matrix based on the blend weights
 			for(int i = 0 ; i < getWeightCount() ; ++i)
 			{
-				//set the local param as the value of the world param
+				//Assign the local param based on the current index of the scaling and shearing matrices
 				curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
 				curFuncInvocation->pushOperand(mParamInScaleShearMatrices, Operand::OPS_IN);
 				curFuncInvocation->pushOperand(mParamInIndices, Operand::OPS_IN,  indexToMask(i), 1);
 				curFuncInvocation->pushOperand(mParamTempFloat3x4, Operand::OPS_OUT);
 				vsMain->addAtomInstance(curFuncInvocation);
 
-				//Calculate the resultant scaling and shearing based on the weights given
+				//Calculate the resultant scaling and shearing matrix based on the weights given
 				addIndexedPositionWeight(vsMain, i, mParamTempFloat3x4, mParamTempFloat3x4, mParamBlendS, funcCounter);
 			}
 
@@ -225,6 +227,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 		}
 		else
 		{
+			//Assign the input position to the local blended position
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TRANSFORM, funcCounter++);
 			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);
 			curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_OUT);
@@ -322,11 +325,13 @@ void DualQuaternionSkinning::addNormalRelatedCalculations(Function* vsMain,
 	{
 		if(mScalingShearingSupport)
 		{
+			//Calculate the adjoint transpose of the blended scaling and shearing matrix
 			curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ADJOINT_TRANSPOSE_MATRIX, FFP_VS_TRANSFORM, funcCounter++);
 			curFuncInvocation->pushOperand(mParamBlendS, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(mParamTempFloat3x3, Operand::OPS_OUT);
 			vsMain->addAtomInstance(curFuncInvocation);
 
+			//Transform the normal by the adjoint transpose of the blended scaling and shearing matrix
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
 			curFuncInvocation->pushOperand(mParamTempFloat3x3, Operand::OPS_IN);
 			curFuncInvocation->pushOperand(pNormalRelatedParam, Operand::OPS_IN);
@@ -370,7 +375,7 @@ void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 {
 	FunctionInvocation* curFuncInvocation;
 	
-	//Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations
+	//Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations)
 	if(index > 0)
 	{
 		Operand::OpMask indexMask = indexToMask(index);

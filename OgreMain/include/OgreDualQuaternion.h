@@ -25,13 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-// This file is based on material originally from:
-// Geometric Tools, LLC
-// Copyright (c) 1998-2010
-// Distributed under the Boost Software License, Version 1.0.
-// http://www.boost.org/LICENSE_1_0.txt
-// http://www.geometrictools.com/License/Boost/LICENSE_1_0.txt
-
 
 #ifndef __DualQuaternion_H__
 #define __DualQuaternion_H__
@@ -47,12 +40,13 @@ namespace Ogre {
 	/** \addtogroup Math
 	*  @{
 	*/
-	/** Implementation of a Dual Quaternion, i.e. a rotation around an axis and a translation.
-		For more information about Dual Quaternions and the theory behind it, we recommend reading:
-    */
-    class _OgreExport DualQuaternion
-    {
-    public:
+	/** Implementation of a dual quaternion, i.e. a rotation around an axis and a translation.
+	    This implementation may note be appropriate as a general implementation, but is intended for use with
+	    dual quaternion skinning.
+	*/
+	class _OgreExport DualQuaternion
+	{
+	public:
 		/// Default constructor, initializes to identity rotation (aka 0°), and zero translation (0,0,0)
 		inline DualQuaternion ()
 			: w(1), x(0), y(0), z(0), dw(1), dx(0), dy(0), dz(0)
@@ -60,18 +54,17 @@ namespace Ogre {
 		}
 		
 		/// Construct from an explicit list of values
-		inline DualQuaternion (
-			Real fW,
-			Real fX, Real fY, Real fZ, Real fdW, Real fdX, Real fdY, Real fdZ)
+		inline DualQuaternion (Real fW, Real fX, Real fY, Real fZ, 
+				Real fdW, Real fdX, Real fdY, Real fdZ)
 			: w(fW), x(fX), y(fY), z(fZ), dw(fdW), dx(fdX), dy(fdY), dz(fdZ)
 		{
 		}
         
 		/// Construct a dual quaternion from a transformation matrix
-        inline DualQuaternion(const Matrix4& rot)
-        {
-            this->fromTransformationMatrix(rot);
-        }
+		inline DualQuaternion(const Matrix4& rot)
+		{
+			this->fromTransformationMatrix(rot);
+		}
 		
 		/// Construct a dual quaternion from a unit quaternion and a translation vector
 		inline DualQuaternion(const Quaternion& q, const Vector3& trans)
@@ -83,19 +76,6 @@ namespace Ogre {
 		inline DualQuaternion(Real* valptr)
 		{
 			memcpy(&w, valptr, sizeof(Real)*8);
-		}
-
-		/// Exchange the contents of this dual quaternion with another. 
-		inline void swap(DualQuaternion& other)
-		{
-			std::swap(w, other.w);
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-			std::swap(z, other.z);
-			std::swap(dw, other.dw);
-			std::swap(dx, other.dx);
-			std::swap(dy, other.dy);
-			std::swap(dz, other.dz);
 		}
 
 		/// Array accessor operator
@@ -113,6 +93,31 @@ namespace Ogre {
 
 			return *(&w+i);
 		}
+		
+		inline DualQuaternion& operator= (const DualQuaternion& rkQ)
+		{
+			w = rkQ.w;
+			x = rkQ.x;
+			y = rkQ.y;
+			z = rkQ.z;
+			dw = rkQ.dw;
+			dx = rkQ.dx;
+			dy = rkQ.dy;
+			dz = rkQ.dz;
+			
+			return *this;
+		}
+
+		inline bool operator== (const DualQuaternion& rhs) const
+		{
+			return (rhs.w == w) && (rhs.x == x) && (rhs.y == y) && (rhs.z == z) && 
+				(rhs.dw == dw) && (rhs.dx == dx) && (rhs.dy == dy) && (rhs.dz == dz);
+		}
+
+		inline bool operator!= (const DualQuaternion& rhs) const
+		{
+			return !operator==(rhs);
+		}
 
 		/// Pointer accessor for direct copying
 		inline Real* ptr()
@@ -125,58 +130,52 @@ namespace Ogre {
 		{
 			return &w;
 		}
-
-		/// Setup the dual quaternion with a certain rotation described by a Quaternion and a translation described by a Vector3
-		void fromRotationTranslation (const Quaternion& q, const Vector3& trans);
-		void toRotationTranslation (Quaternion& q, Vector3& translation) const;
-
-		void fromTransformationMatrix (const Matrix4& kTrans);
-		void toTransformationMatrix (Matrix4& kTrans) const;
-
-        inline DualQuaternion& operator= (const DualQuaternion& rkQ)
+		
+		/// Exchange the contents of this dual quaternion with another. 
+		inline void swap(DualQuaternion& other)
 		{
-			w = rkQ.w;
-			x = rkQ.x;
-			y = rkQ.y;
-			z = rkQ.z;
-			dw = rkQ.dw;
-			dx = rkQ.dx;
-			dy = rkQ.dy;
-			dz = rkQ.dz;
-			return *this;
+			std::swap(w, other.w);
+			std::swap(x, other.x);
+			std::swap(y, other.y);
+			std::swap(z, other.z);
+			std::swap(dw, other.dw);
+			std::swap(dx, other.dx);
+			std::swap(dy, other.dy);
+			std::swap(dz, other.dz);
 		}
-
-        inline bool operator== (const DualQuaternion& rhs) const
-		{
-			return (rhs.x == x) && (rhs.y == y) &&
-				(rhs.z == z) && (rhs.w == w) && (rhs.dx == dx) && (rhs.dy == dy) &&
-				(rhs.dz == dz) && (rhs.dw == dw);
-		}
-
-        inline bool operator!= (const DualQuaternion& rhs) const
-		{
-			return !operator==(rhs);
-		}
-
-		Real w, x, y, z, dw, dx, dy, dz;
-
+		
 		/// Check whether this dual quaternion contains valid values
 		inline bool isNaN() const
 		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w) || Math::isNaN(dx) || Math::isNaN(dy) || Math::isNaN(dz) || Math::isNaN(dw);
+			return Math::isNaN(w) || Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) ||  
+				Math::isNaN(dw) || Math::isNaN(dx) || Math::isNaN(dy) || Math::isNaN(dz);
 		}
 
-        /** Function for writing to a stream. Outputs "DualQuaternion(w, x, y, z, dw, dx, dy, dz)" with w, x, y, z, dw, dx, dy, dz
-            being the member values of the dual quaternion.
-        */
-        inline _OgreExport friend std::ostream& operator <<
-            ( std::ostream& o, const DualQuaternion& q )
-        {
-			o << "DualQuaternion(" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << ", " << q.dw << ", " << q.dx << ", " << q.dy << ", " << q.dz << ")";
-            return o;
-        }
+		/// Construct a dual quaternion from a rotation described by a Quaternion and a translation described by a Vector3
+		void fromRotationTranslation (const Quaternion& q, const Vector3& trans);
+		
+		/// Convert a dual quaternion into its two components, a Quaternion representing the rotation and a Vector3 representing the translation
+		void toRotationTranslation (Quaternion& q, Vector3& translation) const;
 
-    };
+		/// Construct a dual quaternion from a 4x4 transformation matrix
+		void fromTransformationMatrix (const Matrix4& kTrans);
+		
+		/// Convert a dual quaternion to a 4x4 transformation matrix
+		void toTransformationMatrix (Matrix4& kTrans) const;
+
+		Real w, x, y, z, dw, dx, dy, dz;
+
+		/** 
+		Function for writing to a stream. Outputs "DualQuaternion(w, x, y, z, dw, dx, dy, dz)" with w, x, y, z, dw, dx, dy, dz
+		being the member values of the dual quaternion.
+		*/
+		inline _OgreExport friend std::ostream& operator <<
+		( std::ostream& o, const DualQuaternion& q )
+		{
+			o << "DualQuaternion(" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << ", " << q.dw << ", " << q.dx << ", " << q.dy << ", " << q.dz << ")";
+			return o;
+		}
+	};
 	/** @} */
 	/** @} */
 

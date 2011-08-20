@@ -25,6 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderExHardwareSkinning.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderExLinearSkinning.h"
@@ -179,7 +180,8 @@ bool HardwareSkinning::preAddToRenderState(const RenderState* renderState, Pass*
 		
 		//If the skinning data is being passed through the material, we need to create an instance of the appropriate
 		//skinning type and set its parameters here
-		setHardwareSkinningParam(pData.maxBoneCount, pData.maxWeightCount, pData.skinningType, pData.correctAntipodalityHandling, pData.scalingShearingSupport);
+		setHardwareSkinningParam(pData.maxBoneCount, pData.maxWeightCount, pData.skinningType, 
+					 pData.correctAntipodalityHandling, pData.scalingShearingSupport);
 	}
 
 	//If there is no associated technique, default to linear skinning as a pass-through
@@ -416,7 +418,8 @@ const MaterialPtr& HardwareSkinningFactory::getCustomShadowReceiverMaterial(cons
 }
 
 //-----------------------------------------------------------------------
-void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType, bool correctAntidpodalityHandling, bool shearScale)
+void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, SkinningType skinningType, 
+						       bool correctAntidpodalityHandling, bool shearScale)
 {
 	if (pEntity != NULL) 
 	{
@@ -440,8 +443,7 @@ void HardwareSkinningFactory::prepareEntityForSkinning(const Entity* pEntity, Sk
 }
 
 //-----------------------------------------------------------------------
-bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort& boneCount,
-												  ushort& weightCount)
+bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort& boneCount, ushort& weightCount)
 {
 	bool isValidData = false;
 	boneCount = 0;
@@ -495,7 +497,7 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, ushort&
 
 //-----------------------------------------------------------------------
 bool HardwareSkinningFactory::imprintSkeletonData(const MaterialPtr& pMaterial, bool isVaild, 
-												  ushort boneCount, ushort weightCount, SkinningType skinningType, bool correctAntidpodalityHandling, bool scalingShearingSupport)
+				ushort boneCount, ushort weightCount, SkinningType skinningType, bool correctAntidpodalityHandling, bool scalingShearingSupport)
 {
 	bool isUpdated = false;
 	if (pMaterial->getNumTechniques() > 0) 

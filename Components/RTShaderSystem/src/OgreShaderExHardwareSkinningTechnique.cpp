@@ -24,7 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #include "OgreShaderExHardwareSkinningTechnique.h"
+
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExDualQuaternionSkinning.h"
 #include "OgreShaderFFPRenderState.h"
@@ -64,8 +66,8 @@ HardwareSkinningTechnique::~HardwareSkinningTechnique()
 //-----------------------------------------------------------------------
 void HardwareSkinningTechnique::setHardwareSkinningParam(ushort boneCount, ushort weightCount, bool correctAntipodalityHandling, bool scalingShearingSupport)
 {
-	mBoneCount = std::min<ushort>(boneCount,256);
-	mWeightCount = std::min<ushort>(weightCount,4);
+	mBoneCount = std::min<ushort>(boneCount, 256);
+	mWeightCount = std::min<ushort>(weightCount, 4);
 	mCorrectAntipodalityHandling = correctAntipodalityHandling;
 	mScalingShearingSupport = scalingShearingSupport;
 }
