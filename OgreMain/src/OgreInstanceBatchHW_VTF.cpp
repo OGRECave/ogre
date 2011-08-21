@@ -105,11 +105,10 @@ namespace Ogre
 			else
 			{
 				retrieveBoneIdx( baseVertexData, hwBoneIdx );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+				thisVertexData->vertexDeclaration->closeGapsInSource();
 			}
-
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-			thisVertexData->vertexDeclaration->closeGapsInSource();
 		}
 
 		createVertexTexture( baseSubMesh );
