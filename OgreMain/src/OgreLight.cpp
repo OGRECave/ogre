@@ -64,6 +64,8 @@ namespace Ogre {
           mDerivedTransformDirty(false),
 		  mCustomShadowCameraSetup()
     {
+		//mMinPixelSize should always be zero for lights otherwise lights will disapear
+    	mMinPixelSize = 0;
     }
     //-----------------------------------------------------------------------
 	Light::Light(const String& name) : MovableObject(name),
@@ -94,6 +96,8 @@ namespace Ogre {
         mDerivedTransformDirty(false),
 		mCustomShadowCameraSetup()
     {
+		//mMinPixelSize should always be zero for lights otherwise lights will disapear
+    	mMinPixelSize = 0;
     }
     //-----------------------------------------------------------------------
     Light::~Light()
