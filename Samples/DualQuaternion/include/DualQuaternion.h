@@ -20,7 +20,7 @@ public:
 	{
 		mInfo["Title"] = "Dual Quaternion Skinning";
 		mInfo["Description"] = "A demo of the dual quaternion skinning feature in conjunction with the linear skinning feature.";
-		mInfo["Thumbnail"] = "thumb_skelanim.png";
+		mInfo["Thumbnail"] = "thumb_dualquaternionskinning.png";
 		mInfo["Category"] = "Animation";
 	}
 
