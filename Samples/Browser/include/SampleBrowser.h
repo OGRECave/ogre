@@ -235,7 +235,7 @@ protected:
 		| init data members needed only by NaCl
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-		void initAppForNaCl( pp::Instance* NaClInstance, OIS::FactoryCreator * oisFactory, uint32 initWidth, uint32 initHeight )
+		void initAppForNaCl( pp::Instance* NaClInstance, OIS::FactoryCreator * oisFactory, Ogre::uint32 initWidth, Ogre::uint32 initHeight )
 		{
             mNaClInstance = NaClInstance;
             mOisFactory = oisFactory;
@@ -1089,13 +1089,13 @@ protected:
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_NACL
 			Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
-			NameValuePairList miscParams;
+			Ogre::NameValuePairList miscParams;
 #if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-			miscParams["NativeWindow"] = StringConverter::toString((unsigned long)mNativeWindow);
-			miscParams["NativeControl"] = StringConverter::toString((unsigned long)mNativeControl);
+			miscParams["NativeWindow"] = Ogre::StringConverter::toString((unsigned long)mNativeWindow);
+			miscParams["NativeControl"] = Ogre::StringConverter::toString((unsigned long)mNativeControl);
             res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Size().iWidth, mNativeWindow->Size().iHeight, false, &miscParams);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-            miscParams["pp::Instance"] = StringConverter::toString((unsigned long)mNaClInstance);
+            miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
             // create 1x1 window - we will resize later
             res = mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 #endif
@@ -1748,8 +1748,8 @@ protected:
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
         OIS::FactoryCreator * mOisFactory;
-        uint32 mInitWidth;
-        uint32 mInitHeight;
+        Ogre::uint32 mInitWidth;
+        Ogre::uint32 mInitHeight;
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     public:

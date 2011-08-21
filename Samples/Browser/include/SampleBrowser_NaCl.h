@@ -63,16 +63,14 @@
 #include "ppapi/cpp/completion_callback.h"
 #include "ppapi/cpp/input_event.h"
 #include "OgreZip.h"
+#include <GLES2\gl2.h>
 
-// These are the method names as JavaScript sees them.
-namespace {
+namespace Ogre {
+    // These are the method names as JavaScript sees them.
     static const String kLoadUrlMethodId = "loadResourcesFromUrl";
     static const String kInitOgreId = "initOgre";
     static const String kRenderOneFrameId = "renderOneFrame";
     static const String kMessageArgumentSeparator = ":";
-}  // namespace
-
-namespace Ogre {
 
     bool IsError(int32_t result) {
         return ((PP_OK != result) && (PP_OK_COMPLETIONPENDING != result));
@@ -856,7 +854,7 @@ public:
     /// @param[in] instance The browser-side instance.
     /// @return the plugin-side instance.
     virtual pp::Instance* CreateInstance(PP_Instance instance) {
-        return new AppDelegate(instance);
+        return new Ogre::AppDelegate(instance);
     }
 };
 
