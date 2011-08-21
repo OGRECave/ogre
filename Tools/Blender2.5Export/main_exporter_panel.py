@@ -49,7 +49,6 @@ class MainExporterPanel(bpy.types.Panel):
 			row = col.row()
 			row.split()
 			row.operator("ogre3d.preferences_apply_static_config", icon = 'LIBRARY_DATA_DIRECT')
-			#row.operator("ogre3d.preferences_apply_static_config", icon = 'LIBRARY_DATA_DIRECT')
 
 			xmlConverterOptionsBox = layout.column(True)
 			xmlConverterOptionsBox.label("Global XML Converter Options:")
@@ -78,9 +77,7 @@ class MainExporterPanel(bpy.types.Panel):
 			row.operator("ogre3d.preferences_back", icon = 'BACK')
 			return
 
-		#~ objects = context.selected_objects
-
-		#~ layout.template_list(objects, "name", objects, "name")
+		# display selection list.
 		col = layout.column()
 		selectedObjectList = globalSettings.selectedObjectList
 		row = col.row()
@@ -134,9 +131,6 @@ class MainExporterPanel(bpy.types.Panel):
 		row.operator("ogre3d.export", icon = 'SCRIPTWIN')
 		row.operator("ogre3d.preferences", icon = 'SETTINGS')
 		row.operator("ogre3d.help", icon = 'HELP')
-		#~ row.label(text="Active object is: " + obj.name)
-		#~ row = layout.row()
-		#~ row.prop(obj, "name")
 
 class OperatorRefreshSelection(bpy.types.Operator):
 	bl_idname = "ogre3d.refresh_selection"
