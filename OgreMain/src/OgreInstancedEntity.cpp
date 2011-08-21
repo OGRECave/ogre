@@ -245,12 +245,17 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	bool InstancedEntity::findVisible( Camera *camera ) const
 	{
-		//Object is explicitly visible and attached to a Node
-		bool retVal = isVisible() & isInScene();
+		//Object is active
+		bool retVal = isInScene();
+		if (retVal) 
+		{
+			//check object is explicitly visible
+			retVal = isVisible();
 
-		//Object's bounding box is viewed by the camera
-		if(  camera )
-			retVal &= camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
+			//Object's bounding box is viewed by the camera
+			if( retVal && camera )
+				retVal = camera->isVisible(Sphere(_getDerivedPosition(),getBoundingRadius()));
+		}
 
 		return retVal;
 	}
@@ -413,6 +418,7 @@ namespace Ogre
 													mBoneMatrices,
 													mBoneWorldMatrices,
 													mSkeletonInstance->getNumBones() );
+					mNeedAnimTransformUpdate = false;
 				}
 				
 				mFrameAnimationLastUpdated = mAnimationState->getDirtyFrameNumber();
