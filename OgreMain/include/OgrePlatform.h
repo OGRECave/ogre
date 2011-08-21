@@ -116,6 +116,18 @@ namespace Ogre {
 #	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
 #elif defined( __native_client__ ) 
 #   define OGRE_PLATFORM OGRE_PLATFORM_NACL
+#   ifndef OGRE_STATIC_LIB
+#       error OGRE must be built as static for NaCl (OGRE_STATIC=true in cmake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
+#       error d3d9 is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_D3D9 false in cmake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_GL
+#       error gl is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_GL=false in cmake)
+#   endif
+#   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
+#       error GLES2 render system is needed for NaCl (OOGRE_BUILD_RENDERSYSTEM_GLES2=false in cmake)
+#   endif
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
