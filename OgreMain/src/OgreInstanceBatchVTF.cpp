@@ -406,20 +406,9 @@ namespace Ogre
 		{
 			retrieveBoneIdx( baseVertexData, hwBoneIdx );
 
-			const VertexElement* pElement = thisVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
-			if (pElement) 
-			{
-				unsigned short skelDataSource = pElement->getSource();
-				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-				if (thisVertexData->vertexDeclaration->findElementsBySource(skelDataSource).empty())
-				{
-					thisVertexData->vertexDeclaration->closeGapsInSource();
-					thisVertexData->vertexBufferBinding->unsetBinding(skelDataSource);
-					VertexBufferBinding::BindingIndexMap tmpMap;
-					thisVertexData->vertexBufferBinding->closeGaps(tmpMap);
-				}
-			}
+			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+			thisVertexData->vertexDeclaration->closeGapsInSource();
 		}
 
 		for( unsigned short i=0; i<thisVertexData->vertexDeclaration->getMaxSource()+1; ++i )
