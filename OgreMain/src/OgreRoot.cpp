@@ -112,8 +112,10 @@ namespace Ogre {
         assert( ms_Singleton );  return ( *ms_Singleton );
     }
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
     typedef void (*DLL_START_PLUGIN)(void);
     typedef void (*DLL_STOP_PLUGIN)(void);
+#endif
 
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
@@ -1084,6 +1086,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Root::unloadPlugins(void)
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		// unload dynamic libs first
         for (PluginLibList::reverse_iterator i = mPluginLibs.rbegin(); i != mPluginLibs.rend(); ++i)
         {
@@ -1105,7 +1108,7 @@ namespace Ogre {
 			(*i)->uninstall();
 		}
 		mPlugins.clear();
-
+#endif
     }
     //-----------------------------------------------------------------------
     void Root::addResourceLocation(const String& name, const String& locType,
@@ -1324,6 +1327,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Root::loadPlugin(const String& pluginName)
 	{
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		// Load plugin library
         DynLib* lib = DynLibManager::getSingleton().load( pluginName );
 		// Store for later unload
@@ -1342,11 +1346,12 @@ namespace Ogre {
 			// This must call installPlugin
 			pFunc();
 		}
-
+#endif
 	}
     //-----------------------------------------------------------------------
 	void Root::unloadPlugin(const String& pluginName)
 	{
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         PluginLibList::iterator i;
 
         for (i = mPluginLibs.begin(); i != mPluginLibs.end(); ++i)
@@ -1364,7 +1369,8 @@ namespace Ogre {
 			}
 
         }
-	}
+#endif
+    }
     //-----------------------------------------------------------------------
     Timer* Root::getTimer(void)
     {
