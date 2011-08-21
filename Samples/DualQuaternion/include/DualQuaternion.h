@@ -113,8 +113,8 @@ protected:
 
  		Light* l = mSceneMgr->createLight();
 		Vector3 dir;
- 		l->setType(Light::LT_SPOTLIGHT);
- 		l->setPosition(30, 70, 0);
+ 		l->setType(Light::LT_POINT);
+ 		l->setPosition(30, 70, 40);
  		dir = -l->getPosition();
  		dir.normalise();
  		l->setDirection(dir);
