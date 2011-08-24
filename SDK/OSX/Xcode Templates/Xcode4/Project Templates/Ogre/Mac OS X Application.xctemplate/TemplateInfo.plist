@@ -170,11 +170,11 @@
 			<key>ARCHS</key>
 			<string>$(ARCHS_STANDARD_32_64_BIT)</string>
 			<key>HEADER_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/include/OGRE" "___VARIABLE_ogrePathOSX___/include/OGRE/OSX" "___VARIABLE_ogrePathOSX___/include/OIS" "___VARIABLE_ogrePathOSX___/Dependencies/include" "___VARIABLE_ogrePathOSX___/boost_1_46_1"</string>
+			<string>"/___VARIABLE_ogrePathOSX___/include/OGRE" "/___VARIABLE_ogrePathOSX___/include/OGRE/OSX" "/___VARIABLE_ogrePathOSX___/include/OIS" "/___VARIABLE_ogrePathOSX___/Dependencies/include" "/___VARIABLE_ogrePathOSX___/boost_1_46_1"</string>
 			<key>LIBRARY_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/lib" "___VARIABLE_ogrePathOSX___/Dependencies/lib/Release"</string>
+			<string>"/___VARIABLE_ogrePathOSX___/lib" "/___VARIABLE_ogrePathOSX___/Dependencies/lib/Release"</string>
 			<key>FRAMEWORK_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathOSX___/lib/release" "___VARIABLE_ogrePathOSX___/Dependencies"</string>
+			<string>"/___VARIABLE_ogrePathOSX___/lib/release" "/___VARIABLE_ogrePathOSX___/Dependencies"</string>
 			<key>OTHER_LDFLAGS</key>
 			<string>-lOIS</string>
 		</dict>
@@ -203,8 +203,8 @@
 					<key>ShellScript</key>
 					<string># This shell script simply copies resources into their respective locations
 
-ditto &quot;___VARIABLE_ogrePathOSX___/lib/release/Ogre.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/Ogre.framework&quot;
-ditto &quot;___VARIABLE_ogrePathOSX___/lib/RenderSystem_GL.dylib&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins/&quot;
+ditto &quot;/___VARIABLE_ogrePathOSX___/lib/release/Ogre.framework&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Frameworks/Ogre.framework&quot;
+ditto &quot;/___VARIABLE_ogrePathOSX___/lib/RenderSystem_GL.dylib&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Plugins/&quot;
 ditto &quot;$PROJECT_DIR/$PROJECT_NAME/media/&quot; &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/media/&quot;
 ditto $PROJECT_DIR/$PROJECT_NAME/*.cfg &quot;$BUILT_PRODUCTS_DIR/___PACKAGENAME___.app/Contents/Resources/&quot;
 </string>

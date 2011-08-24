@@ -518,7 +518,7 @@ namespace Ogre {
     void OSXCocoaWindow::createNewWindow(unsigned int width, unsigned int height, String title)
     {
         mWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, width, height)
-                                              styleMask:NSResizableWindowMask
+                                              styleMask:NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:NO];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];
