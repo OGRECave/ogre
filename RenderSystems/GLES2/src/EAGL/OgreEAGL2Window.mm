@@ -115,15 +115,29 @@ namespace Ogre {
 	{
         if(!mWindow) return;
 
+        unsigned int w = 0, h = 0;
+
+        // Check the orientation of the view controller and adjust dimensions
+        if (UIInterfaceOrientationIsPortrait(mViewController.interfaceOrientation))
+        {
+            h = std::max(width, height);
+            w = std::min(width, height);
+        }
+        else
+        {
+            w = std::max(width, height);
+            h = std::min(width, height);
+        }
+
         // Check if the window size really changed
-        if(mWidth == width && mHeight == height)
+        if(mWidth == w && mHeight == h)
             return;
         
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
         
-        mWidth = width * mContentScalingFactor;
-        mHeight = height * mContentScalingFactor;
+        mWidth = w * mContentScalingFactor;
+        mHeight = h * mContentScalingFactor;
         
         mContext->createFramebuffer();
 
@@ -308,21 +322,8 @@ namespace Ogre {
         
         mIsFullScreen = fullScreen;
         mName = name;
-        NSString *initialOrientation = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIInterfaceOrientation"];
-
-        if(mGLSupport->portraitIsSupported() && 
-           initialOrientation && 
-           ([initialOrientation isEqualToString:@"UIInterfaceOrientationPortrait"] || 
-            [initialOrientation isEqualToString:@"UIInterfaceOrientationPortraitUpsideDown" ]))
-        {
-            mWidth = width;
-            mHeight = height;
-        }
-        else
-        {
-            mWidth = height;
-            mHeight = width;
-        }
+        mWidth = width;
+        mHeight = height;
 
         if (miscParams)
         {
