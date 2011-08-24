@@ -115,18 +115,18 @@ namespace Ogre {
 	{
         if(!mWindow) return;
         
-        unsigned int w = 0, h = 0;
+        Real w = mContentScalingFactor, h = mContentScalingFactor;
         
         // Check the orientation of the view controller and adjust dimensions
         if (UIInterfaceOrientationIsPortrait(mViewController.interfaceOrientation))
         {
-            h = std::max(width, height);
-            w = std::min(width, height);
+            h *= std::max(width, height);
+            w *= std::min(width, height);
         }
         else
         {
-            w = std::max(width, height);
-            h = std::min(width, height);
+            w *= std::max(width, height);
+            h *= std::min(width, height);
         }
         
         // Check if the window size really changed
@@ -136,8 +136,8 @@ namespace Ogre {
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
         
-        mWidth = w * mContentScalingFactor;
-        mHeight = h * mContentScalingFactor;
+        mWidth = w;
+        mHeight = h;
         
         mContext->createFramebuffer();
         
