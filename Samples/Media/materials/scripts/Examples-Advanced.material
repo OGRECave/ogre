@@ -745,3 +745,61 @@ material Examples/Athene/NormalMappedSpecular : Examples/BumpMapping/MultiLightS
 
 	}
 }
+
+
+vertex_program Examples/TextureArrayVScg cg
+{
+	source Example_TextureArrayVS.cg
+	entry_point textureArray_v
+	profiles vs_4_0
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+	
+}
+
+
+fragment_program Examples/TextureArrayPShlsl4 hlsl
+{
+	entry_point textureArray_p
+	source Example_TextureArrayPS.hlsl4
+	target ps_4_0
+}
+
+fragment_program Examples/TextureArrayPSasm asm
+{
+	source Example_TextureArrayPS.asm
+	syntax gp4fp
+}
+
+material Examples/TextureArray
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Examples/TextureArrayPSasm
+			{
+			}
+
+		}
+	}
+
+
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVScg
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPShlsl4
+			{
+			}
+		}
+	}
+
+}
