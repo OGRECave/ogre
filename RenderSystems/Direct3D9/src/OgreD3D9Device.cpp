@@ -1274,7 +1274,7 @@ namespace Ogre
 		if (buffer == RenderTarget::FB_AUTO)
 		{
 			//buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-			buffer = RenderTarget::FB_FRONT;
+			buffer = RenderTarget::FB_BACK;
 		}
 
 		if (buffer == RenderTarget::FB_FRONT)
