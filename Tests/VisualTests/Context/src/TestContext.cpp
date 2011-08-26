@@ -89,6 +89,7 @@ void TestContext::setup()
 {
     // standard setup
     mWindow = createWindow();
+    mWindow->setDeactivateOnFocusChange(false);
     setupInput(false);// grab input, since moving the window seemed to change the results (in Linux anyways)
     locateResources();
     loadResources();
