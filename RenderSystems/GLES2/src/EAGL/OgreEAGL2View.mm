@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,9 @@ using namespace Ogre;
     // Change the viewport orientation based upon the current device orientation.
     // Note: This only operates on the main viewport, usually the main view.
 
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 
     // Return if the orientation is not a valid interface orientation(face up, face down)
     if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))

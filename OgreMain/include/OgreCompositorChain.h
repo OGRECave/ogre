@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -165,6 +165,8 @@ namespace Ogre {
 		/// Any compositors enabled?
 		bool mAnyCompositorsEnabled;
 
+		String mOriginalSceneScheme;
+
         /// Compiled state (updated with _compile)
         CompositorInstance::CompiledState mCompiledState;
         CompositorInstance::TargetOperation mOutputOperation;
@@ -184,6 +186,9 @@ namespace Ogre {
         /** Restore a viewport, the camera and the scene after a rendering operation
          */
         void postTargetOperation(CompositorInstance::TargetOperation &op, Viewport *vp, Camera *cam);
+
+		void createOriginalScene();
+		void destroyOriginalScene();
 
 		/// destroy internal resources
 		void destroyResources(void);

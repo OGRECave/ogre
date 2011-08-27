@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -137,7 +137,6 @@ namespace Ogre {
 			if (mUseTexCoords)
 			{
 				decl->addElement(0, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES);
-				offset += VertexElement::getTypeSize(VET_FLOAT2);
 			}
 
 			if (!mUseTexCoords && !mUseVertexColour)
@@ -591,7 +590,6 @@ namespace Ogre {
 							*pFloat++ = mOtherTexCoordRange[1];
 							*pFloat++ = elem.texCoord;
 						}
-						pBase = static_cast<void*>(pFloat);
 					}
 
 					if (e == seg.tail)

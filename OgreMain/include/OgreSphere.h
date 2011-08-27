@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -100,8 +100,8 @@ namespace Ogre {
 		void merge(const Sphere& oth)
 		{
 			Vector3 diff =  oth.getCenter() - mCenter;
-			float lengthSq = diff.squaredLength();
-			float radiusDiff = oth.getRadius() - mRadius;
+			Real lengthSq = diff.squaredLength();
+			Real radiusDiff = oth.getRadius() - mRadius;
 			
 			// Early-out
 			if (Math::Sqr(radiusDiff) >= lengthSq) 
@@ -117,13 +117,13 @@ namespace Ogre {
 				}
 			}
 			
-			float length = Math::Sqrt(lengthSq);
+			Real length = Math::Sqrt(lengthSq);
 			
 			Vector3 newCenter;
-			float newRadius;
+			Real newRadius;
 			if ((length + oth.getRadius()) > mRadius) 
 			{
-				float t = (length + radiusDiff) / (2.0f * length);
+				Real t = (length + radiusDiff) / (2.0f * length);
 				newCenter = mCenter + diff * t;
 			} 
 			// otherwise, we keep our existing center

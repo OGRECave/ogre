@@ -42,19 +42,19 @@ namespace Ogre
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
-				m_removeOwnVertexData( false ),
-				m_keepStatic( false )
+				mRemoveOwnVertexData( false ),
+				mKeepStatic( false )
 	{
 		//Override defaults, so that InstancedEntities don't create a skeleton instance
-		m_technSupportsSkeletal = false;
+		mTechnSupportsSkeletal = false;
 	}
 
 	InstanceBatchHW::~InstanceBatchHW()
 	{
 		//Remove the memory of our own VertexData. This happens if this isn't the first batch created
 		//Everything but the vertex data is shared.
-		if( m_removeOwnVertexData )
-			OGRE_DELETE m_renderOperation.vertexData;
+		if( mRemoveOwnVertexData )
+			OGRE_DELETE mRenderOperation.vertexData;
 	}
 
 	//-----------------------------------------------------------------------
@@ -80,27 +80,27 @@ namespace Ogre
 
 		//We need to clone the VertexData (but just reference all buffers, except the last one)
 		//because last buffer contains data specific to this batch, we need a different binding
-		m_renderOperation.vertexData	= m_renderOperation.vertexData->clone( false );
-		VertexData *thisVertexData		= m_renderOperation.vertexData;
+		mRenderOperation.vertexData	= mRenderOperation.vertexData->clone( false );
+		VertexData *thisVertexData		= mRenderOperation.vertexData;
 		const unsigned short lastSource	= thisVertexData->vertexDeclaration->getMaxSource();
 		HardwareVertexBufferSharedPtr vertexBuffer =
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(lastSource),
-										m_instancesPerBatch,
-										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
+										mInstancesPerBatch,
+										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
 
 		//Remove the memory of the VertexData we just created because no one else will
-		m_removeOwnVertexData = true;
+		mRemoveOwnVertexData = true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::setupVertices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.vertexData = baseSubMesh->vertexData->clone();
+		mRenderOperation.vertexData = baseSubMesh->vertexData->clone();
 
-		VertexData *thisVertexData = m_renderOperation.vertexData;
+		VertexData *thisVertexData = mRenderOperation.vertexData;
 
 		//No skeletal animation support in this technique, sorry
 		removeBlendData();
@@ -120,8 +120,8 @@ namespace Ogre
 		HardwareVertexBufferSharedPtr vertexBuffer =
 										HardwareBufferManager::getSingleton().createVertexBuffer(
 										thisVertexData->vertexDeclaration->getVertexSize(newSource),
-										m_instancesPerBatch,
-										HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
+										mInstancesPerBatch,
+										HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 		vertexBuffer->setIsInstanceData( true );
 		vertexBuffer->setInstanceDataStepRate( 1 );
@@ -131,12 +131,12 @@ namespace Ogre
 	{
 		//We could use just a reference, but the InstanceManager will in the end attampt to delete
 		//the pointer, and we can't give it something that doesn't belong to us.
-		m_renderOperation.indexData = baseSubMesh->indexData->clone( true );
+		mRenderOperation.indexData = baseSubMesh->indexData->clone( true );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::removeBlendData()
 	{
-		VertexData *thisVertexData = m_renderOperation.vertexData;
+		VertexData *thisVertexData = mRenderOperation.vertexData;
 
 		unsigned short safeSource = 0xFFFF;
 		const VertexElement* blendIndexElem = thisVertexData->vertexDeclaration->findElementBySemantic(
@@ -180,12 +180,12 @@ namespace Ogre
 		size_t retVal = 0;
 
 		//Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
-		const size_t bufferIdx = m_renderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
-		float *pDest = static_cast<float*>(m_renderOperation.vertexData->vertexBufferBinding->
+		const size_t bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
+		float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
 											getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
 
-		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
 		while( itor != end )
 		{
@@ -205,7 +205,7 @@ namespace Ogre
 			++itor;
 		}
 
-		m_renderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
+		mRenderOperation.vertexData->vertexBufferBinding->getBuffer(bufferIdx)->unlock();
 
 		return retVal;
 	}
@@ -213,25 +213,25 @@ namespace Ogre
 	void InstanceBatchHW::_boundsDirty(void)
 	{
 		//Don't update if we're static, but still mark we're dirty
-		if( !m_boundsDirty && !m_keepStatic )
-			m_creator->_addDirtyBatch( this );
-		m_boundsDirty = true;
+		if( !mBoundsDirty && !mKeepStatic )
+			mCreator->_addDirtyBatch( this );
+		mBoundsDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::setStaticAndUpdate( bool bStatic )
 	{
 		//We were dirty but didn't update bounds. Do it now.
-		if( m_keepStatic && m_boundsDirty )
-			m_creator->_addDirtyBatch( this );
+		if( mKeepStatic && mBoundsDirty )
+			mCreator->_addDirtyBatch( this );
 
-		m_keepStatic = bStatic;
-		if( m_keepStatic )
+		mKeepStatic = bStatic;
+		if( mKeepStatic )
 		{
 			//One final update, since there will be none from now on
 			//(except further calls to this function). Pass NULL because
 			//we want to include only those who were added to the scene
 			//but we don't want to perform culling
-			m_renderOperation.numberOfInstances = updateVertexBuffer( 0 );
+			mRenderOperation.numberOfInstances = updateVertexBuffer( 0 );
 		}
 	}
 	//-----------------------------------------------------------------------
@@ -247,11 +247,11 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchHW::_updateRenderQueue( RenderQueue* queue )
 	{
-		if( !m_keepStatic )
+		if( !mKeepStatic )
 		{
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
-			if( (m_renderOperation.numberOfInstances = updateVertexBuffer( m_currentCamera )) )
+			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )
 				queue->addRenderable( this );
 		}
 		else
@@ -264,7 +264,7 @@ namespace Ogre
 			}
 
 			//Don't update when we're static
-			if( m_renderOperation.numberOfInstances )
+			if( mRenderOperation.numberOfInstances )
 				queue->addRenderable( this );
 		}
 	}

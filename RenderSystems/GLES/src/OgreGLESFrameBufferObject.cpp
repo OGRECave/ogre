@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -194,15 +194,12 @@ namespace Ogre {
 
 		/// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-		GLsizei n=0;
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
 			{
 				bufs[x] = GL_COLOR_ATTACHMENT0_OES + x;
-				// Keep highest used buffer + 1
-				n = x+1;
 			}
 			else
 			{
@@ -277,17 +274,13 @@ namespace Ogre {
 			GLESRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GLESRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-			//Truly attach depth buffer
-			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_OES, 0 );
+			//Attach depth buffer, if it has one.
+			if( depthBuf )
+				depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_OES, 0 );
 
-			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
-			if( depthBuf != stencilBuf )
+			//Attach stencil buffer, if it has one.
+			if( stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT_OES, 0 );
-			else
-			{
-				glFramebufferRenderbufferOES( GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES,
-											  GL_RENDERBUFFER_OES, 0);
-			}
 		}
 		else
 		{

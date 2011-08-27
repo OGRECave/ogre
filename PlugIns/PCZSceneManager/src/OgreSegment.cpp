@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -394,8 +394,8 @@ Real Segment::squaredDistance(const Segment& otherSegment) const
             fLambda = fE0pE1;
         }
 
-        fS1 = -fSign*fLambda*otherSegment.mExtent/fE0pE1;
-        fS0 = fLambda + fSign*fS1;
+//        fS1 = -fSign*fLambda*otherSegment.mExtent/fE0pE1;
+//        fS0 = fLambda + fSign*fS1;
         fSqrDist = fLambda*(fLambda + ((Real)2.0)*fB0Avr) + fC;
     }
 	// we don't need the following stuff - it's for calculating closest point

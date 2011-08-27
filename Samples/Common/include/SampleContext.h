@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2009 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -251,7 +251,11 @@ namespace OgreBites
 
 #else
 			createRoot();
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            mNextRenderer = mRoot->getAvailableRenderers()[0]->getName();
+#else
 			if (!oneTimeConfig()) return;
+#endif
 
 			// if the context was reconfigured, set requested renderer
 			if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
@@ -287,7 +291,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| This function encapsulates the entire lifetime of the context.
 		-----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
+#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		virtual void go(Sample* initialSample = 0)
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || ((OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__)
@@ -656,7 +660,8 @@ namespace OgreBites
 			mMouse = static_cast<OIS::MultiTouch*>(mInputMgr->createInputObject(OIS::OISMultiTouch, true));
 			mAccelerometer = static_cast<OIS::JoyStick*>(mInputMgr->createInputObject(OIS::OISJoyStick, true));
 #else
-			mKeyboard = static_cast<OIS::Keyboard*>(mInputMgr->createInputObject(OIS::OISKeyboard, true));
+            OIS::Object* obj = mInputMgr->createInputObject(OIS::OISKeyboard, true);
+			mKeyboard = static_cast<OIS::Keyboard*>(obj);
 			mMouse = static_cast<OIS::Mouse*>(mInputMgr->createInputObject(OIS::OISMouse, true));
 
 			mKeyboard->setEventCallback(this);
@@ -673,6 +678,9 @@ namespace OgreBites
 		{
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			// TODO: This is handled externally for now
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Essential.zip", "EmbeddedZip", "Essential");
+            Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "Popular");
 #else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;

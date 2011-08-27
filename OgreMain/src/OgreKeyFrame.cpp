@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -208,6 +208,31 @@ namespace Ogre
 		return newKf;
 	}	
 	//---------------------------------------------------------------------
+	void VertexPoseKeyFrame::_applyBaseKeyFrame(const VertexPoseKeyFrame* base)
+	{
+		// We subtract the matching pose influences in the base keyframe from the
+		// influences in this keyframe
+		for (PoseRefList::iterator i = mPoseRefs.begin(); i != mPoseRefs.end(); ++i)
+		{
+			PoseRef& myPoseRef = *i;
+			
+			VertexPoseKeyFrame::ConstPoseRefIterator basePoseIt = base->getPoseReferenceIterator();
+			Real baseInfluence = 0.0f;
+			while (basePoseIt.hasMoreElements())
+			{
+				const VertexPoseKeyFrame::PoseRef& basePoseRef = basePoseIt.getNext();
+				if (basePoseRef.poseIndex == myPoseRef.poseIndex)
+				{
+					baseInfluence = basePoseRef.influence;
+					break;
+				}
+			}
+			
+			myPoseRef.influence -= baseInfluence;
+			
+		}
+		
+	}
 
 
 }

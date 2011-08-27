@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -201,6 +201,13 @@ namespace Ogre {
 			const EdgeData::EdgeGroup& eg = *egi;
 			// Initialise the index start for this shadow renderable
 			IndexData* indexData = (*si)->getRenderOperationForUpdate()->indexData;
+
+			if (indexData->indexBuffer != indexBuffer)
+			{
+				(*si)->rebindIndexBuffer(indexBuffer);
+				indexData = (*si)->getRenderOperationForUpdate()->indexData;
+			}
+
 			indexData->indexStart = numIndices;
 			// original number of verts (without extruded copy)
 			size_t originalVertexCount = eg.vertexData->vertexCount;

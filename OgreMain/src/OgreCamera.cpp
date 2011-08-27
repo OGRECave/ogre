@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,9 @@ namespace Ogre {
 		mAutoAspectRatio(false),
 		mCullFrustum(0),
 		mUseRenderingDistance(true),
-		mLodCamera(0)
+		mLodCamera(0),
+		mUseMinPixelSize(false),
+		mPixelDisplayRatio(0)
     {
 
         // Reasonable defaults to camera params
@@ -404,13 +406,26 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::_renderScene(Viewport *vp, bool includeOverlays)
     {
+		//update the pixel display ratio
+		if (mProjType == Ogre::PT_PERSPECTIVE)
+		{
+			mPixelDisplayRatio = (2 * Ogre::Math::Tan(mFOVy * 0.5f)) / vp->getActualHeight();
+		}
+		else
+		{
+			mPixelDisplayRatio = (mTop - mBottom) / vp->getActualHeight();
+		}
+
+		//notify prerender scene
 		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
 		{
 			(*i)->cameraPreRenderScene(this);
 		}
 
-        mSceneMgr->_renderScene(this, vp, includeOverlays);
+		//render scene
+		mSceneMgr->_renderScene(this, vp, includeOverlays);
 
+		//notify postrender scene
 		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
 		{
 			(*i)->cameraPostRenderScene(this);
@@ -553,6 +568,20 @@ namespace Ogre {
     {
         updateView();
         return mRealOrientation * Vector3::UNIT_X;
+    }
+    //-----------------------------------------------------------------------
+    void Camera::getWorldTransforms(Matrix4* mat) const 
+    {
+        updateView();
+
+        Vector3 scale(1.0, 1.0, 1.0);
+        if (mParentNode)
+          scale = mParentNode->_getDerivedScale();
+
+        mat->makeTransform(
+                mDerivedPosition,
+                scale,
+                mDerivedOrientation);
     }
     //-----------------------------------------------------------------------
     const String& Camera::getMovableType(void) const

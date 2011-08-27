@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,18 @@ namespace Ogre {
 		TiXmlElement* elem;
 
         TiXmlElement* rootElem = mXMLDoc->RootElement();
+		
+		// Optional blend mode
+		const char* blendModeStr = rootElem->Attribute("blendmode");
+		if (blendModeStr)
+		{
+			if (String(blendModeStr) == "cumulative")
+				pSkeleton->setBlendMode(ANIMBLEND_CUMULATIVE);
+			else 
+				pSkeleton->setBlendMode(ANIMBLEND_AVERAGE);
+
+		}
+		
 
         // Bones
         elem = rootElem->FirstChildElement("bones");
@@ -235,8 +247,17 @@ namespace Ogre {
 			anim->setInterpolationMode(Animation::IM_LINEAR) ;
 
 			
-			LogManager::getSingleton().logMessage("Animation: nom: " + name + " et longueur: "
-				+ StringConverter::toString(length) );
+			//LogManager::getSingleton().logMessage("Animation: nom: " + name + " et longueur: "
+			//	+ StringConverter::toString(length) );
+			TiXmlElement* baseInfoNode = animElem->FirstChildElement("baseinfo");
+			if (baseInfoNode)
+			{
+				String baseName = baseInfoNode->Attribute("baseanimationname");
+				Real baseTime = StringConverter::parseReal(baseInfoNode->Attribute("basekeyframetime"));
+				anim->setUseBaseKeyFrame(true, baseTime, baseName);
+			}
+			
+			
 			
 			// lecture des tracks
 			int trackIndex = 0;
@@ -421,6 +442,10 @@ namespace Ogre {
     void XMLSkeletonSerializer::writeSkeleton(const Skeleton* pSkel)
     {
         TiXmlElement* rootNode = mXMLDoc->RootElement();
+		
+		// Blend mode
+		String blendModeStr = pSkel->getBlendMode() == ANIMBLEND_CUMULATIVE ? "cumulative" : "average";
+		rootNode->SetAttribute("blendmode", blendModeStr);
 
         TiXmlElement* bonesElem = 
             rootNode->InsertEndChild(TiXmlElement("bones"))->ToElement();
@@ -529,6 +554,15 @@ namespace Ogre {
 
         animNode->SetAttribute("name", anim->getName());
         animNode->SetAttribute("length", StringConverter::toString(anim->getLength()));
+		
+		// Optional base keyframe information
+		if (anim->getUseBaseKeyFrame())
+		{
+			TiXmlElement* baseInfoNode = 
+				animNode->InsertEndChild(TiXmlElement("baseinfo"))->ToElement();
+			baseInfoNode->SetAttribute("baseanimationname", anim->getBaseKeyFrameAnimationName());
+			baseInfoNode->SetAttribute("basekeyframetime", StringConverter::toString(anim->getBaseKeyFrameTime()));
+		}
 
         // Write all tracks
         TiXmlElement* tracksNode = 

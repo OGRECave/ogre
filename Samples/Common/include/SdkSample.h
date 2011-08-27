@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2009 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -163,7 +163,7 @@ namespace OgreBites
 				Ogre::TextureFilterOptions tfo;
 				unsigned int aniso;
 
-				switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
+				switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
 				{
 				case 'B':
 					newVal = "Trilinear";
@@ -465,9 +465,9 @@ namespace OgreBites
 			items.push_back("Generated FS");														
 
 			// fix scene compositor for d3d11
-			Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
-			Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-			scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
+			// Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
+			// Ogre::CompositorPtr scene = compMgr.getByName("Ogre/Scene/Default", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
+			// scene->getTechnique(0)->getOutputTargetPass()->setMaterialScheme(Ogre::Root::getSingleton().getRenderSystem()->_getDefaultViewportMaterialScheme());
 #endif
 
 			mDetailsPanel = mTrayMgr->createParamsPanel(TL_NONE, "DetailsPanel", 200, items);

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -249,10 +249,10 @@ protected:
 			mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
 
 			// Set the scene manager.
-			mShaderGenerator->setSceneManager(sceneMgr);
+			mShaderGenerator->addSceneManager(sceneMgr);
 
 			// Setup core libraries and shader cache path.
-			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList("Popular");
 			ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
 			ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
 			String shaderCoreLibsPath;

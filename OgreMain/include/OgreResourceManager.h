@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -133,7 +133,7 @@ namespace Ogre {
         virtual size_t getMemoryBudget(void) const;
 
 		/** Gets the current memory usage, in bytes. */
-		virtual size_t getMemoryUsage(void) const { return mMemoryUsage; }
+		virtual size_t getMemoryUsage(void) const { return mMemoryUsage.get(); }
 
 		/** Unloads a single resource by name.
 		@remarks
@@ -498,7 +498,7 @@ namespace Ogre {
 		ResourceWithGroupMap mResourcesWithGroup;
         ResourceHandle mNextHandle;
         size_t mMemoryBudget; // In bytes
-        size_t mMemoryUsage; // In bytes
+        AtomicScalar<size_t> mMemoryUsage; // In bytes
 
         bool mVerbose;
 

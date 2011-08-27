@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -322,10 +322,14 @@ namespace Ogre {
 		if (rs)
 		{
 			Viewport* currentvp = rs->_getViewport();
-			rs->_setViewport(this);
-			rs->clearFrameBuffer(buffers, col, depth, stencil);
-			if (currentvp && currentvp != this)
+			if (currentvp && currentvp == this)
+				rs->clearFrameBuffer(buffers, col, depth, stencil);
+			else if (currentvp)
+			{
+				rs->_setViewport(this);
+				rs->clearFrameBuffer(buffers, col, depth, stencil);
 				rs->_setViewport(currentvp);
+			}
 		}
 	}
     //---------------------------------------------------------------------

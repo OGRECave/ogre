@@ -212,10 +212,10 @@ macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "h
 # Apple-specific
 #######################################################################
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    find_package(iPhoneSDK)
-    macro_log_feature(iPhoneSDK_FOUND "iPhone SDK" "iPhone SDK" "http://developer.apple.com/iphone" FALSE "" "")
-  else()
+  find_package(iPhoneSDK)
+  macro_log_feature(iPhoneSDK_FOUND "iOS SDK" "iOS SDK" "http://developer.apple.com/ios" FALSE "" "")
+  
+  if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     find_package(Carbon)
     macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://developer.apple.com/mac" TRUE "" "")
 
@@ -224,7 +224,7 @@ if (APPLE)
 
     find_package(IOKit)
     macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
-  endif (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 endif(APPLE)
 
 

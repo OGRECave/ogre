@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,10 @@ namespace Ogre {
         , mInterpolationMode(msDefaultInterpolationMode)
         , mRotationInterpolationMode(msDefaultRotationInterpolationMode)
         , mKeyFrameTimesDirty(false)
+		, mUseBaseKeyFrame(false)
+		, mBaseKeyFrameTime(0.0f)
+		, mBaseKeyFrameAnimationName(StringUtil::BLANK)
+		, mContainer(0)
     {
     }
     //---------------------------------------------------------------------
@@ -307,6 +311,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Animation::apply(Real timePos, Real weight, Real scale)
     {
+		_applyBaseKeyFrame();
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -330,6 +336,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Animation::applyToNode(Node* node, Real timePos, Real weight, Real scale)
     {
+		_applyBaseKeyFrame();
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -343,6 +351,8 @@ namespace Ogre {
     void Animation::apply(Skeleton* skel, Real timePos, Real weight, 
 		Real scale)
     {
+		_applyBaseKeyFrame();
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -360,7 +370,9 @@ namespace Ogre {
     void Animation::apply(Skeleton* skel, Real timePos, float weight,
       const AnimationState::BoneBlendMask* blendMask, Real scale)
     {
-      // Calculate time index for fast keyframe search
+		_applyBaseKeyFrame();
+
+		// Calculate time index for fast keyframe search
       TimeIndex timeIndex = _getTimeIndex(timePos);
 
       NodeTrackList::iterator i;
@@ -375,6 +387,8 @@ namespace Ogre {
 	void Animation::apply(Entity* entity, Real timePos, Real weight, 
 		bool software, bool hardware)
 	{
+		_applyBaseKeyFrame();
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -386,18 +400,12 @@ namespace Ogre {
 
 			VertexData* swVertexData;
 			VertexData* hwVertexData;
-			VertexData* origVertexData;
-			bool firstAnim = false;
-			bool normals = false;
 			if (handle == 0)
 			{
 				// shared vertex data
-				firstAnim = !entity->_getBuffersMarkedForAnimation();
 				swVertexData = entity->_getSoftwareVertexAnimVertexData();
 				hwVertexData = entity->_getHardwareVertexAnimVertexData();
-				origVertexData = entity->getMesh()->sharedVertexData;
 				entity->_markBuffersUsedForAnimation();
-				normals = entity->getMesh()->getSharedVertexDataAnimationIncludesNormals();
 			}
 			else
 			{
@@ -406,12 +414,9 @@ namespace Ogre {
 				// Skip this track if subentity is not visible
 				if (!s->isVisible())
 					continue;
-				firstAnim = !s->_getBuffersMarkedForAnimation();
 				swVertexData = s->_getSoftwareVertexAnimVertexData();
 				hwVertexData = s->_getHardwareVertexAnimVertexData();
-				origVertexData = s->getSubMesh()->vertexData;
 				s->_markBuffersUsedForAnimation();
-				normals = s->getSubMesh()->getVertexAnimationIncludesNormals();
 			}
 			// Apply to both hardware and software, if requested
 			if (software)
@@ -432,6 +437,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Animation::applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight, Real scale)
     {
+		_applyBaseKeyFrame();
+
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -444,6 +451,8 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void Animation::applyToVertexData(VertexData* data, Real timePos, Real weight)
     {
+		_applyBaseKeyFrame();
+		
         // Calculate time index for fast keyframe search
         TimeIndex timeIndex = _getTimeIndex(timePos);
 
@@ -690,6 +699,96 @@ namespace Ogre {
         // Reset dirty flag
         mKeyFrameTimesDirty = false;
     }
+    //-----------------------------------------------------------------------
+	void Animation::setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime, const String& baseAnimName)
+	{
+		if (useBaseKeyFrame != mUseBaseKeyFrame ||
+			keyframeTime != mBaseKeyFrameTime ||
+			baseAnimName != mBaseKeyFrameAnimationName)
+		{
+			mUseBaseKeyFrame = useBaseKeyFrame;
+			mBaseKeyFrameTime = keyframeTime;
+			mBaseKeyFrameAnimationName = baseAnimName;
+		}
+	}
+    //-----------------------------------------------------------------------
+	bool Animation::getUseBaseKeyFrame() const
+	{
+		return mUseBaseKeyFrame;
+	}
+    //-----------------------------------------------------------------------
+	Real Animation::getBaseKeyFrameTime() const
+	{
+		return mBaseKeyFrameTime;
+	}
+    //-----------------------------------------------------------------------
+	const String& Animation::getBaseKeyFrameAnimationName() const
+	{
+		return mBaseKeyFrameAnimationName;
+	}
+    //-----------------------------------------------------------------------
+	void Animation::_applyBaseKeyFrame()
+	{
+		if (mUseBaseKeyFrame)
+		{
+			Animation* baseAnim = this;
+			if (mBaseKeyFrameAnimationName != StringUtil::BLANK && mContainer)
+				baseAnim = mContainer->getAnimation(mBaseKeyFrameAnimationName);
+			
+			if (baseAnim)
+			{
+				for (NodeTrackList::iterator i = mNodeTrackList.begin(); i != mNodeTrackList.end(); ++i)
+				{
+					NodeAnimationTrack* track = i->second;
+					
+					NodeAnimationTrack* baseTrack;
+					if (baseAnim == this)
+						baseTrack = track;
+					else
+						baseTrack = baseAnim->getNodeTrack(track->getHandle());
+					
+					TransformKeyFrame kf(baseTrack, mBaseKeyFrameTime);
+					baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
+					track->_applyBaseKeyFrame(&kf);
+				}
+				
+				for (VertexTrackList::iterator i = mVertexTrackList.begin(); i != mVertexTrackList.end(); ++i)
+				{
+					VertexAnimationTrack* track = i->second;
+					
+					if (track->getAnimationType() == VAT_POSE)
+					{
+						VertexAnimationTrack* baseTrack;
+						if (baseAnim == this)
+							baseTrack = track;
+						else
+							baseTrack = baseAnim->getVertexTrack(track->getHandle());
+						
+						VertexPoseKeyFrame kf(baseTrack, mBaseKeyFrameTime);
+						baseTrack->getInterpolatedKeyFrame(baseAnim->_getTimeIndex(mBaseKeyFrameTime), &kf);
+						track->_applyBaseKeyFrame(&kf);
+						
+					}
+				}
+				
+			}
+			
+			// Re-base has been done, this is a one-way translation
+			mUseBaseKeyFrame = false;
+		}
+		
+	}
+    //-----------------------------------------------------------------------
+	void Animation::_notifyContainer(AnimationContainer* c)
+	{
+		mContainer = c;
+	}
+	//-----------------------------------------------------------------------
+	AnimationContainer* Animation::getContainer()
+	{
+		return mContainer;
+	}
+	
 
 }
 

@@ -15,6 +15,12 @@ struct VS_INPUT
 
 	float4 m03		:	TEXCOORD1; //m03.w is always 0
 	float2 mOffset	:	TEXCOORD2;
+	
+#ifdef BONE_MATRIX_LUT
+	float4 worldMatrix0	:	TEXCOORD3;
+	float4 worldMatrix1	:	TEXCOORD4;
+	float4 worldMatrix2	:	TEXCOORD5;
+#endif
 };
 
 #include "InstancingVertexInterpolators.cg"
@@ -48,6 +54,18 @@ VS_OUTPUT main_vs( in VS_INPUT input,
 
 	float4 worldPos = float4( mul( worldMatrix, input.Position ).xyz, 1.0f );
 	float3 worldNorm= mul( (float3x3)(worldMatrix), input.Normal );
+
+#ifdef BONE_MATRIX_LUT
+	float3x4 worldCompMatrix;
+	worldCompMatrix[0] = input.worldMatrix0;
+	worldCompMatrix[1] = input.worldMatrix1;
+	worldCompMatrix[2] = input.worldMatrix2;
+	
+	worldPos =  float4( mul( worldCompMatrix, worldPos ).xyz, 1.0f );
+	worldNorm = mul( (float3x3)(worldCompMatrix), worldNorm );
+	
+#endif
+
 
 	//Transform the position
 	output.Position		= mul( viewProjMatrix, worldPos );

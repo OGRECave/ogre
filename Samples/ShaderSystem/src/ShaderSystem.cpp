@@ -14,6 +14,7 @@ const String INSTANCED_VIEWPORTS_NAME	= "InstancedViewports";
 const String ADD_LOTS_OF_MODELS_NAME	= "AddLotsOfModels";
 const String SPOT_LIGHT_NAME			= "SpotLight";
 const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
+const String ATLAS_AUTO_BORDER_MODE		= "AutoBorderAtlasing";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
@@ -135,6 +136,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	else if (cbName == PER_PIXEL_FOG_BOX)
 	{
 		setPerPixelFogEnable(box->isChecked());
+	}
+	else if (cbName == ATLAS_AUTO_BORDER_MODE)
+	{
+		setAtlasBorderMode(box->isChecked());
 	}
 }
 
@@ -491,6 +496,11 @@ void Sample_ShaderSystem::setupUI()
 	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog", 220)->setChecked(mPerPixelFogEnable);
 #endif
 
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	mTrayMgr->createCheckBox(TL_TOPLEFT, ATLAS_AUTO_BORDER_MODE, "Atlas auto border", 220)->setChecked(true);
+	setAtlasBorderMode(true);
+#endif
+
 	// Create fog widgets.
 	mFogModeMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "FogMode", "Fog Mode", 220, 120, 10);	
 	mFogModeMenu->addItem("None");
@@ -661,6 +671,16 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 #endif
 
 }
+
+void Sample_ShaderSystem::setAtlasBorderMode( bool enable )
+{
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	TextureAtlasSamplerFactory::getSingleton().setDefaultAtlasingAttributes(
+		TextureAtlasSamplerFactory::ipmRelative, 1, enable);
+	mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
+}
+
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateSystemShaders() 
@@ -1676,11 +1696,11 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 {
 	TextureAtlasSamplerFactory * textureAtlasSamplerFactory = 
 		static_cast<TextureAtlasSamplerFactory *>(mShaderGenerator->getSubRenderStateFactory(TextureAtlasSampler::Type));
-	TextureAtlasTable textureAtlasTable;
+	TextureAtlasTablePtr textureAtlasTable(new TextureAtlasTable);
 
 	DataStreamPtr taiFile = Ogre::ResourceGroupManager::getSingleton().openResource("TextureAtlasSampleWrap.tai");
 
-	textureAtlasSamplerFactory->addTexutreAtlasDefinition(taiFile, &textureAtlasTable);
+	textureAtlasSamplerFactory->addTexutreAtlasDefinition(taiFile, textureAtlasTable);
 
 	//Generate the geometry that will seed the particle system
 	ManualObject* textureAtlasObject = mSceneMgr->createManualObject("TextureAtlasObject");
@@ -1691,9 +1711,9 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 	String curMatName;
 
 	// create original texture geometry
-	for( size_t i = 0 ; i < textureAtlasTable.size() ; i++ )
+	for( size_t i = 0 ; i < textureAtlasTable->size() ; i++ )
 	{
-		bool changeMat = (curMatName != textureAtlasTable[i].atlasTextureName);
+		bool changeMat = (curMatName != (*textureAtlasTable)[i].atlasTextureName);
 
 		if (changeMat)
 		{
@@ -1702,7 +1722,7 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 				textureAtlasObject->end();
 			}
 
-			curMatName = textureAtlasTable[i].originalTextureName;
+			curMatName = (*textureAtlasTable)[i].originalTextureName;
 			createMaterialForTexture(curMatName, false);
 			textureAtlasObject->begin(curMatName, RenderOperation::OT_TRIANGLE_LIST);
 		}
@@ -1730,9 +1750,9 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 	}
 
 	// create texture atlas geometry
-	for( size_t i = 0 ; i < textureAtlasTable.size() ; i++ )
+	for( size_t i = 0 ; i < (*textureAtlasTable).size() ; i++ )
 	{
-		bool changeMat = (curMatName != textureAtlasTable[i].atlasTextureName);
+		bool changeMat = (curMatName != (*textureAtlasTable)[i].atlasTextureName);
 
 		if (changeMat)
 		{
@@ -1741,7 +1761,7 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 				textureAtlasObject->end();
 			}
 
-			curMatName = textureAtlasTable[i].atlasTextureName;
+			curMatName = (*textureAtlasTable)[i].atlasTextureName;
 			createMaterialForTexture(curMatName, true);
 			textureAtlasObject->begin(curMatName, RenderOperation::OT_TRIANGLE_LIST);
 		}
@@ -1749,28 +1769,28 @@ ManualObject* Sample_ShaderSystem::createTextureAtlasObject()
 		// triangle 0
 		textureAtlasObject->position(i * sliceSize, 0, sliceSize); //Position
 		textureAtlasObject->textureCoord(0,0); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 		textureAtlasObject->position(i * sliceSize, 0, sliceSize * 2); //Position
 		textureAtlasObject->textureCoord(0,wrapSize); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 		textureAtlasObject->position((i + 1) * sliceSize, 0 , sliceSize * 2); //Position
 		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 		// triangle 1
 		textureAtlasObject->position(i * sliceSize, 0, sliceSize); //Position
 		textureAtlasObject->textureCoord(0,0); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 		textureAtlasObject->position((i + 1) * sliceSize, 0, sliceSize * 2); //Position
 		textureAtlasObject->textureCoord(wrapSize,wrapSize); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 		textureAtlasObject->position((i + 1) * sliceSize, 0, sliceSize); //Position
 		textureAtlasObject->textureCoord(wrapSize, 0); //UV
-		textureAtlasObject->textureCoord(textureAtlasTable[i].indexInAtlas); //Texture ID
+		textureAtlasObject->textureCoord((*textureAtlasTable)[i].indexInAtlas); //Texture ID
 
 	}
 

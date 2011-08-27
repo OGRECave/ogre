@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,9 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
 	GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
-
+#endif
     //-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
     GLSLESProgram::GLSLESProgram(ResourceManager* creator, 
@@ -53,7 +54,9 @@ namespace Ogre {
 		, mGLHandle(0)
         , mCompiled(0)
         , mIsOptimised(false)
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
         , mOptimiserEnabled(true)
+#endif
     {
         if (createParamDictionary("GLSLESProgram"))
         {
@@ -63,9 +66,11 @@ namespace Ogre {
 			dict->addParameter(ParameterDef("preprocessor_defines", 
                                             "Preprocessor defines use to compile the program.",
                                             PT_STRING),&msCmdPreprocessorDefines);
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
 			dict->addParameter(ParameterDef("use_optimiser", 
                                             "Should the GLSL optimiser be used. Default is true.",
                                             PT_BOOL),&msCmdOptimisation);
+#endif
         }
         // Manually assign language now since we use it immediately
         mSyntaxCode = "glsles";
@@ -87,35 +92,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void GLSLESProgram::loadFromSource(void)
 	{
-		// we want to compile only if we need to link - else it is a waste of CPU
-	}
-    
-    //---------------------------------------------------------------------------
-	bool GLSLESProgram::compile(const bool checkErrors)
-	{
-		if (mCompiled == 1)
-		{
-			return true;
-		}
-		// Only create a shader object if glsl es is supported
-		if (isSupported())
-		{
-            GL_CHECK_ERROR
-
-			// Create shader object
-			GLenum shaderType = 0x0000;
-			if (mType == GPT_VERTEX_PROGRAM)
-			{
-				shaderType = GL_VERTEX_SHADER;
-			}
-            else if (mType == GPT_FRAGMENT_PROGRAM)
-            {
-				shaderType = GL_FRAGMENT_SHADER;
-			}
-			mGLHandle = glCreateShader(shaderType);
-            GL_CHECK_ERROR
-		}
-
 		// Preprocess the GLSL ES shader in order to get a clean source
 		CPreprocessor cpp;
 
@@ -182,6 +158,32 @@ namespace Ogre {
 		mSource = String (out, out_size);
 		if (out < src || out > src + src_len)
 			free (out);
+    }
+
+	bool GLSLESProgram::compile(const bool checkErrors)
+	{
+		if (mCompiled == 1)
+		{
+			return true;
+		}
+		// Only create a shader object if glsl es is supported
+		if (isSupported())
+		{
+            GL_CHECK_ERROR
+
+			// Create shader object
+			GLenum shaderType = 0x0000;
+			if (mType == GPT_VERTEX_PROGRAM)
+			{
+				shaderType = GL_VERTEX_SHADER;
+			}
+            else if (mType == GPT_FRAGMENT_PROGRAM)
+            {
+				shaderType = GL_FRAGMENT_SHADER;
+			}
+			mGLHandle = glCreateShader(shaderType);
+            GL_CHECK_ERROR
+		}
 
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
@@ -275,6 +277,7 @@ namespace Ogre {
 		return true;
 	}
 	//-----------------------------------------------------------------------
+#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
 	String GLSLESProgram::CmdOptimisation::doGet(const void *target) const
 	{
         return StringConverter::toString(static_cast<const GLSLESProgram*>(target)->getOptimiserEnabled());
@@ -283,6 +286,7 @@ namespace Ogre {
 	{
         static_cast<GLSLESProgram*>(target)->setOptimiserEnabled(StringConverter::parseBool(val));
 	}
+#endif
 	//-----------------------------------------------------------------------
 	String GLSLESProgram::CmdPreprocessorDefines::doGet(const void *target) const
 	{

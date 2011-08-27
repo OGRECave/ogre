@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #	if !defined( __MINGW32__ )
+#		define __PRETTY_FUNCTION__ __FUNCTION__
 #		ifndef WIN32_LEAN_AND_MEAN
 #			define WIN32_LEAN_AND_MEAN 1
 #		endif
@@ -42,7 +43,7 @@ THE SOFTWARE.
 #		endif
 #	endif
 #	define OGRE_NEW_FIX_FOR_WIN32 new 
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	define OGRE_NEW_FIX_FOR_WIN32 new
 #else
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
@@ -58,13 +59,24 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	ifndef GL_GLEXT_PROTOTYPES
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
 #	include <GLES2/gl2platform.h>
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
+#	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#       include "ppapi/cpp/instance.h"
+#       include "ppapi/c/dev/ppb_opengles_dev.h"
+#       include "ppapi/cpp/dev/context_3d_dev.h"
+#       include "ppapi/cpp/dev/graphics_3d_client_dev.h"
+#       include "ppapi/cpp/dev/graphics_3d_dev.h"
+#       include "ppapi/cpp/dev/surface_3d_dev.h"
+#		include "ppapi/gles2/gl2ext_ppapi.h"
+#       undef GL_OES_get_program_binary
+#       undef GL_OES_mapbuffer
+#	endif
 #else
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
@@ -106,6 +118,11 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 #   define GL_BGRA  0x80E1
 #endif
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
+// an error in all windows gles sdks...
+#   undef GL_OES_get_program_binary
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLES2PLUGIN_EXPORTS
 #       define _OgreGLES2Export __declspec(dllexport)
@@ -127,14 +144,25 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
         int e = glGetError(); \
         if (e != 0) \
         { \
-            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+            const char * errorString = ""; \
+            switch(e) \
+            { \
+            case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
+            case GL_INVALID_VALUE:      errorString = "GL_INVALID_VALUE";       break; \
+            case GL_INVALID_OPERATION:  errorString = "GL_INVALID_OPERATION";   break; \
+            case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
+            default:                                                            break; \
+            } \
+            char msgBuf[10000]; \
+            sprintf(msgBuf, "OpenGL ES2 error 0x%04X %s in %s at line %i\n", e, errorString, __PRETTY_FUNCTION__, __LINE__); \
+            LogManager::getSingleton().logMessage(msgBuf); \
         } \
     }
 #else
@@ -147,8 +175,10 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            fprintf(stderr, "EGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
-            assert(false); \
+            char msgBuf[10000]; \
+            sprintf(msgBuf, "EGL error 0x%04X in %s at line %i\n", e, __PRETTY_FUNCTION__, __LINE__); \
+            LogManager::getSingleton().logMessage(msgBuf); \
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msgBuf, __PRETTY_FUNCTION__); \
         } \
     }
 #else

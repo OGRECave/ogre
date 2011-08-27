@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +52,7 @@ namespace Ogre {
 		, mDebugDisplay(false)
         , mUpperDistance(0)
         , mSquaredUpperDistance(0)
+		, mMinPixelSize(0)
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
@@ -65,6 +66,8 @@ namespace Ogre {
         , mLightListUpdated(0)
 		, mLightMask(0xFFFFFFFF)
     {
+		if (Root::getSingletonPtr())
+			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
     //-----------------------------------------------------------------------
     MovableObject::MovableObject(const String& name)
@@ -77,6 +80,7 @@ namespace Ogre {
 		, mDebugDisplay(false)
         , mUpperDistance(0)
         , mSquaredUpperDistance(0)
+		, mMinPixelSize(0)
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
@@ -90,6 +94,8 @@ namespace Ogre {
         , mLightListUpdated(0)
 		, mLightMask(0xFFFFFFFF)
     {
+		if (Root::getSingletonPtr())
+			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
     //-----------------------------------------------------------------------
     MovableObject::~MovableObject()
@@ -242,6 +248,8 @@ namespace Ogre {
 	{
 		if (mParentNode)
 		{
+			mBeyondFarDistance = false;
+
 			if (cam->getUseRenderingDistance() && mUpperDistance > 0)
 			{
 				Real rad = getBoundingRadius();
@@ -256,16 +264,44 @@ namespace Ogre {
 				{
 					mBeyondFarDistance = true;
 				}
-				else
-				{
-					mBeyondFarDistance = false;
-				}
-			}
-			else
-			{
-				mBeyondFarDistance = false;
 			}
 
+			if (!mBeyondFarDistance && cam->getUseMinPixelSize() && mMinPixelSize > 0)
+			{
+
+				Real pixelRatio = cam->getPixelDisplayRatio();
+				
+				//if ratio is relative to distance than the distance at which the object should be displayed
+				//is the size of the radius divided by the ratio
+				//get the size of the entity in the world
+				Ogre::Vector3 objBound = getBoundingBox().getSize() * 
+							getParentNode()->_getDerivedScale();
+				
+				//We object are projected from 3 dimensions to 2. The shortest displayed dimension of 
+				//as object will always be at most the second largest dimension of the 3 dimensional
+				//bounding box.
+				//The square calculation come both to get rid of minus sign and for improve speed
+				//in the final calculation
+				objBound.x = Math::Sqr(objBound.x);
+				objBound.y = Math::Sqr(objBound.y);
+				objBound.z = Math::Sqr(objBound.z);
+				float sqrObjMedianSize = std::max(std::max(
+									std::min(objBound.x,objBound.y),
+									std::min(objBound.x,objBound.z)),
+									std::min(objBound.y,objBound.z));
+
+				//If we have a perspective camera calculations are done relative to distance
+				Real sqrDistance = 1;
+				if (cam->getProjectionType() == PT_PERSPECTIVE)
+				{
+					sqrDistance = mParentNode->getSquaredViewDepth(cam->getLodCamera());
+				}
+
+				//Final Calculation to tell whether the object is to small
+				mBeyondFarDistance =  sqrObjMedianSize < 
+							sqrDistance * Math::Sqr(pixelRatio * mMinPixelSize); 
+			}
+			
             // Construct event object
             MovableObjectLodChangedEvent evt;
             evt.movableObject = this;

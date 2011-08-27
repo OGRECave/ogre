@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ THE SOFTWARE.
 // Forward declarations
 @class CAEAGLLayer;
 @class UIWindow;
+@class NSString;
 typedef UIWindow *NativeWindowType;
 #endif
 
@@ -74,6 +75,9 @@ namespace Ogre {
                                         const NameValuePairList *miscParams = 0);
 
 #ifdef __OBJC__
+            bool portraitIsSupported(void);
+            bool interfaceOrientationIsSupported(NSString *orientation);
+
             EAGLES2Context * createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const;
             CFDictionaryRef getGLConfigFromContext(EAGLES2Context context);
             CFDictionaryRef getGLConfigFromDrawable(CAEAGLLayer *drawable, unsigned int *w, unsigned int *h);

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,13 +62,13 @@ namespace Ogre {
     }
     void GLPBRenderTexture::getCustomAttribute(const String& name, void* pData)
     {
-        if(name=="TARGET")
+        if( name == GLRenderTexture::CustomAttributeString_TARGET )
         {
 			GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
 			target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
 			target.zoffset = mZOffset;
         }
-        else if(name=="GLCONTEXT")
+        else if (name == GLRenderTexture::CustomAttributeString_GLCONTEXT )
         {
             // Get PBuffer for our internal format
             *static_cast<GLContext**>(pData) = mManager->getContextFor(mPBFormat, mWidth, mHeight);
@@ -80,7 +80,7 @@ namespace Ogre {
 		mMainWindow(mainwindow),
 		mMainContext(0)
     {
-		mMainWindow->getCustomAttribute("GLCONTEXT", &mMainContext);
+		mMainWindow->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
     }  
     GLPBRTTManager::~GLPBRTTManager()
     {
@@ -113,7 +113,7 @@ namespace Ogre {
 		// Copy on unbind
         GLSurfaceDesc surface;
 		surface.buffer = 0;
-        target->getCustomAttribute("TARGET", &surface);
+        target->getCustomAttribute(GLRenderTexture::CustomAttributeString_TARGET, &surface);
         if(surface.buffer)
             static_cast<GLTextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
     }

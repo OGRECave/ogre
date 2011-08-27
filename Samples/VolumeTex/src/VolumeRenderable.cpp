@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -121,8 +121,8 @@ void VolumeRenderable::initialise()
 	{
 		for(size_t y=0; y<4; y++)
 		{
-			float xcoord = coords[y][0]-0.5;
-			float ycoord = coords[y][1]-0.5;
+			float xcoord = coords[y][0]-0.5f;
+			float ycoord = coords[y][1]-0.5f;
 			float zcoord = -((float)x/(float)(mSlices-1)  - 0.5f);
 			// 1.0f .. a/(a+1)
 			// coordinate

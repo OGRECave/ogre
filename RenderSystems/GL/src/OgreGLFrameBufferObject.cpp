@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -278,17 +278,13 @@ namespace Ogre {
 			GLRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GLRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-			//Truly attach depth buffer
-			depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_EXT, 0 );
+			//Attach depth buffer, if it has one.
+			if( depthBuf )
+				depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_EXT, 0 );
 
-			//Truly attach stencil buffer, if it has one and isn't included w/ the depth buffer
-			if( depthBuf != stencilBuf )
+			//Attach stencil buffer, if it has one.
+			if( stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT_EXT, 0 );
-			else
-			{
-				glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT,
-											  GL_RENDERBUFFER_EXT, 0);
-			}
 		}
 		else
 		{

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -676,7 +676,21 @@ namespace Ogre {
 		newTrack->mUseShortestRotationPath = mUseShortestRotationPath;
 		populateClone(newTrack);
 		return newTrack;
-	}	
+	}
+	//--------------------------------------------------------------------------
+	void NodeAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	{
+		const TransformKeyFrame* base = static_cast<const TransformKeyFrame*>(b);
+		
+        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        {
+			TransformKeyFrame* kf = static_cast<TransformKeyFrame*>(*i);
+			kf->setTranslate(kf->getTranslate() - base->getTranslate());
+			kf->setRotation(base->getRotation().Inverse() * kf->getRotation());
+			kf->setScale(kf->getScale() * (Vector3::UNIT_SCALE / base->getScale()));
+		}
+			
+	}
 	//--------------------------------------------------------------------------
 	VertexAnimationTrack::VertexAnimationTrack(Animation* parent,
 		unsigned short handle, VertexAnimationType animType)
@@ -714,6 +728,74 @@ namespace Ogre {
 				"VertexAnimationTrack::createVertexPoseKeyFrame");
 		}
 		return static_cast<VertexPoseKeyFrame*>(createKeyFrame(timePos));
+	}
+	//--------------------------------------------------------------------------
+	void VertexAnimationTrack::getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
+	{
+		// Only relevant for pose animation
+		if (mAnimationType == VAT_POSE)
+		{
+			// Get keyframes
+			KeyFrame *kf1, *kf2;
+			Real t = getKeyFramesAtTime(timeIndex, &kf1, &kf2);
+			
+			VertexPoseKeyFrame* vkfOut = static_cast<VertexPoseKeyFrame*>(kf);
+			VertexPoseKeyFrame* vkf1 = static_cast<VertexPoseKeyFrame*>(kf1);
+			VertexPoseKeyFrame* vkf2 = static_cast<VertexPoseKeyFrame*>(kf2);
+			
+			// For each pose reference in key 1, we need to locate the entry in
+			// key 2 and interpolate the influence
+			const VertexPoseKeyFrame::PoseRefList& poseList1 = vkf1->getPoseReferences();
+			const VertexPoseKeyFrame::PoseRefList& poseList2 = vkf2->getPoseReferences();
+			for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
+				 p1 != poseList1.end(); ++p1)
+			{
+				Real startInfluence = p1->influence;
+				Real endInfluence = 0;
+				// Search for entry in keyframe 2 list (if not there, will be 0)
+				for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
+					 p2 != poseList2.end(); ++p2)
+				{
+					if (p1->poseIndex == p2->poseIndex)
+					{
+						endInfluence = p2->influence;
+						break;
+					}
+				}
+				// Interpolate influence
+				Real influence = startInfluence + t*(endInfluence - startInfluence);
+				
+				vkfOut->addPoseReference(p1->poseIndex, influence);
+				
+				
+			}
+			// Now deal with any poses in key 2 which are not in key 1
+			for (VertexPoseKeyFrame::PoseRefList::const_iterator p2 = poseList2.begin();
+				 p2 != poseList2.end(); ++p2)
+			{
+				bool found = false;
+				for (VertexPoseKeyFrame::PoseRefList::const_iterator p1 = poseList1.begin();
+					 p1 != poseList1.end(); ++p1)
+				{
+					if (p1->poseIndex == p2->poseIndex)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					// Need to apply this pose too, scaled from 0 start
+					Real influence = t * p2->influence;
+					
+					vkfOut->addPoseReference(p2->poseIndex, influence);
+
+				}
+			} // key 2 iteration
+			
+		}			
+		
+		
 	}
 	//--------------------------------------------------------------------------
 	bool VertexAnimationTrack::getVertexAnimationIncludesNormals() const
@@ -979,7 +1061,20 @@ namespace Ogre {
 		populateClone(newTrack);
 		return newTrack;
 	}	
-
+	//--------------------------------------------------------------------------
+	void VertexAnimationTrack::_applyBaseKeyFrame(const KeyFrame* b)
+	{
+		const VertexPoseKeyFrame* base = static_cast<const VertexPoseKeyFrame*>(b);
+		
+        for (KeyFrameList::iterator i = mKeyFrames.begin(); i != mKeyFrames.end(); ++i)
+        {
+			VertexPoseKeyFrame* kf = static_cast<VertexPoseKeyFrame*>(*i);
+			
+			kf->_applyBaseKeyFrame(base);
+		}
+		
+	}
+	
 
 }
 

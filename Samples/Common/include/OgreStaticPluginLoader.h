@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -128,6 +128,7 @@ namespace Ogre
 			mD3D9Plugin = OGRE_NEW D3D9Plugin();
 			root.installPlugin(mD3D9Plugin);
 #endif
+
 #ifdef OGRE_STATIC_Direct3D11
 			mD3D11Plugin = OGRE_NEW D3D11Plugin();
 			root.installPlugin(mD3D11Plugin);

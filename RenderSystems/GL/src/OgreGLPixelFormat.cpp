@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -351,21 +351,23 @@ namespace Ogre  {
 	size_t GLPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format)
 	{
 		size_t count = 0;
-		do {
-			if(width>1)		width = width/2;
-			if(height>1)	height = height/2;
-			if(depth>1)		depth = depth/2;
-			/*
-			NOT needed, compressed formats will have mipmaps up to 1x1
-			if(PixelUtil::isValidExtent(width, height, depth, format))
-				count ++;
-			else
-				break;
-			*/
-				
-			count ++;
-		} while(!(width == 1 && height == 1 && depth == 1));
-		
+        if((width > 0) && (height > 0))
+        {
+            do {
+                if(width>1)		width = width/2;
+                if(height>1)	height = height/2;
+                if(depth>1)		depth = depth/2;
+                /*
+                NOT needed, compressed formats will have mipmaps up to 1x1
+                if(PixelUtil::isValidExtent(width, height, depth, format))
+                    count ++;
+                else
+                    break;
+                */
+                    
+                count ++;
+            } while(!(width == 1 && height == 1 && depth == 1));
+        }		
 		return count;
 	}
     //-----------------------------------------------------------------------------    

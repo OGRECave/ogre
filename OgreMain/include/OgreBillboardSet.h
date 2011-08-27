@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -582,6 +582,12 @@ namespace Ogre {
         */
         virtual const MaterialPtr& getMaterial(void) const;
 
+        /** Sets the name of the material to be used for this billboard set.
+             @param
+                material The new material to use for this set.
+         */
+		virtual void setMaterial( const MaterialPtr& material );
+
         /** Overridden from MovableObject
             @see
                 MovableObject
@@ -598,7 +604,7 @@ namespace Ogre {
         */
         virtual void _notifyBillboardResized(void);
 
-        /** Internal callback used by Billboards to notify their parent that they have been rotated..
+        /** Internal callback used by Billboards to notify their parent that they have been rotated.
         */
         virtual void _notifyBillboardRotated(void);
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -480,16 +480,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceLoaded(Resource* res)
 	{
-		OGRE_LOCK_AUTO_MUTEX
-
 		mMemoryUsage += res->getSize();
 	}
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceUnloaded(Resource* res)
 	{
-		OGRE_LOCK_AUTO_MUTEX
-
-		mMemoryUsage -= res->getSize();
+		mMemoryUsage += -(res->getSize());
 	}
 	//---------------------------------------------------------------------
 	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)

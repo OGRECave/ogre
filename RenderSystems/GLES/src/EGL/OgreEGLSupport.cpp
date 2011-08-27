@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -141,7 +141,7 @@ namespace Ogre {
 
                 if (mode == optVideoMode->second.currentValue)
                 {
-                    String frequency = StringConverter::toString(value->second) + " MHz";
+                    String frequency = StringConverter::toString(value->second) + " Hz";
 
                     optDisplayFrequency->second.possibleValues.push_back(frequency);
                 }
@@ -154,7 +154,7 @@ namespace Ogre {
             else
             {
                 optVideoMode->second.currentValue = StringConverter::toString(mVideoModes[0].first.first,4) + " x " + StringConverter::toString(mVideoModes[0].first.second,4);
-                optDisplayFrequency->second.currentValue = StringConverter::toString(mVideoModes[0].second) + " MHz";
+                optDisplayFrequency->second.currentValue = StringConverter::toString(mVideoModes[0].second) + " Hz";
             }
         }
     }

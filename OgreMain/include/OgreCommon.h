@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -310,6 +310,10 @@ namespace Ogre {
 		/** The num. of instances is adjusted so that as few pixels as possible are wasted
 			in the vertex texture */
 		IM_VTFBESTFIT	= 0x0002,
+
+		/** Use a limited number of skeleton animations shared among all instances. 
+		Update only that limited amount of animations in the vertex texture.*/
+		IM_VTFBONEMATRIXLOOKUP = 0x0004,
 
 		IM_USEALL		= IM_USE16BIT|IM_VTFBESTFIT
 	};

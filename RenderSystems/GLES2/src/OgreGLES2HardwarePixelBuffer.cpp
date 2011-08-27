@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -817,8 +817,6 @@ namespace Ogre {
         scaled.front = data.front;
         scaled.back = data.back;
 
-        GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(data.format);
-        GLenum dataType = GLES2PixelUtil::getGLOriginDataType(data.format);
         width = data.getWidth();
         height = data.getHeight();
 
@@ -828,8 +826,8 @@ namespace Ogre {
 
         for (int mip = 0; mip <= level; mip++)
         {
-            glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
-            dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
+            GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
+            GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
 
             glTexImage2D(mFaceTarget,
                          mip,

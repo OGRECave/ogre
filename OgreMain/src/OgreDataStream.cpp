@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -119,7 +119,7 @@ namespace Ogre {
             if (pos < readCount)
             {
                 // Trim off trailing CR if this was a CR/LF entry
-                if (trimCR && totalCount && buf[totalCount-1] == '\r')
+                if (trimCR && totalCount && buf && buf[totalCount-1] == '\r')
                 {
                     --totalCount;
                 }
@@ -133,7 +133,8 @@ namespace Ogre {
         }
 
         // Terminate
-        buf[totalCount] = '\0';
+        if(buf)
+            buf[totalCount] = '\0';
 
         return totalCount;
     }

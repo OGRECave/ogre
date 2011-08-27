@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -96,7 +96,6 @@ namespace Ogre {
 			offset += VertexElement::getTypeSize(VET_FLOAT3);
 			// Texcoords
 			decl->addElement(POS_TEX_BINDING, offset, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
-			offset += VertexElement::getTypeSize(VET_FLOAT2);
 			// Colours - store these in a separate buffer because they change less often
 			decl->addElement(COLOUR_BINDING, 0, VET_COLOUR, VES_DIFFUSE);
 

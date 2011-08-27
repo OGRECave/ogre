@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -232,7 +232,7 @@ void WaterMesh::calculateFakeNormals()
 void WaterMesh::calculateNormals()
 {
 	int i,x,y;
-	float *buf = vertexBuffers[currentBuffNumber] + 1;
+	float *buf = NULL;
 	// zero normals
 	for(i=0;i<numVertices;i++) {
 		vNormals[i] = Vector3::ZERO;

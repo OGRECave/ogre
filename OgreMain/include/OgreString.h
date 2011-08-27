@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -137,6 +137,19 @@ namespace Ogre {
         /** Method for standardising paths - use forward slashes only, end with slash.
         */
         static String standardisePath( const String &init);
+		/** Returns a normalized version of a file path
+		This method can be used to make file path strings which point to the same directory  
+		but have different texts to be normalized to the same text. The function:
+		- Transforms all backward slashes to forward slashes.
+		- Removes repeating slashes.
+		- Removes initial slashes from the beginning of the path.
+		- Removes ".\" and "..\" meta directories.
+		- Sets all characters to lowercase (if requested)
+		@param init The file path to normalize.
+		@param makeLowerCase If true, transforms all characters in the string to lowercase.
+		*/
+       static String normalizeFilePath(const String& init, bool makeLowerCase = true);
+
 
         /** Method for splitting a fully qualified filename into the base name
             and path.

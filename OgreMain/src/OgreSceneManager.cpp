@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3332,7 +3332,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						if (pass->getStartLight() > 0 &&
 							pass->getStartLight() >= rendLightList.size())
 						{
-							lightsLeft = 0;
 							break;
 						}
 						else
@@ -3908,43 +3907,49 @@ void SceneManager::resetViewProjMode(bool fixedFunction)
 //---------------------------------------------------------------------
 void SceneManager::_queueSkiesForRendering(Camera* cam)
 {
-    // Update nodes
-    // Translate the box by the camera position (constant distance)
-    if (mSkyPlaneNode)
-    {
-        // The plane position relative to the camera has already been set up
-        mSkyPlaneNode->setPosition(cam->getDerivedPosition());
-    }
+	// Update nodes
+	// Translate the box by the camera position (constant distance)
+	if (mSkyPlaneNode)
+	{
+		// The plane position relative to the camera has already been set up
+		mSkyPlaneNode->setPosition(cam->getDerivedPosition());
+	}
 
-    if (mSkyBoxNode)
-    {
-        mSkyBoxNode->setPosition(cam->getDerivedPosition());
-    }
+	if (mSkyBoxNode)
+	{
+		mSkyBoxNode->setPosition(cam->getDerivedPosition());
+	}
 
-    if (mSkyDomeNode)
-    {
-        mSkyDomeNode->setPosition(cam->getDerivedPosition());
-    }
+	if (mSkyDomeNode)
+	{
+		mSkyDomeNode->setPosition(cam->getDerivedPosition());
+	}
 
-    if (mSkyPlaneEnabled)
-    {
-        getRenderQueue()->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
-    }
+	if (mSkyPlaneEnabled
+		&& mSkyPlaneEntity && mSkyPlaneEntity->isVisible()
+		&& mSkyPlaneEntity->getSubEntity(0) && mSkyPlaneEntity->getSubEntity(0)->isVisible())
+	{
+		getRenderQueue()->addRenderable(mSkyPlaneEntity->getSubEntity(0), mSkyPlaneRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+	}
 
-    if (mSkyBoxEnabled)
-    {
+	if (mSkyBoxEnabled
+		&& mSkyBoxObj && mSkyBoxObj->isVisible())
+	{
 		mSkyBoxObj->_updateRenderQueue(getRenderQueue());
-    }
+	}
 
-	uint plane;
-    if (mSkyDomeEnabled)
-    {
-        for (plane = 0; plane < 5; ++plane)
-        {
-            getRenderQueue()->addRenderable(
-                mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
-        }
-    }
+	if (mSkyDomeEnabled)
+	{
+		for (uint plane = 0; plane < 5; ++plane)
+		{
+			if (mSkyDomeEntity[plane] && mSkyDomeEntity[plane]->isVisible()
+				&& mSkyDomeEntity[plane]->getSubEntity(0) && mSkyDomeEntity[plane]->getSubEntity(0)->isVisible())
+			{
+				getRenderQueue()->addRenderable(
+					mSkyDomeEntity[plane]->getSubEntity(0), mSkyDomeRenderQueue, OGRE_RENDERABLE_DEFAULT_PRIORITY);
+			}
+		}
+	}
 }
 //---------------------------------------------------------------------
 void SceneManager::addRenderQueueListener(RenderQueueListener* newListener)
@@ -5796,12 +5801,13 @@ void SceneManager::setShadowIndexBufferSize(size_t size)
 }
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-	unsigned short height, PixelFormat format, uint16 depthBufferPoolId )
+	unsigned short height, PixelFormat format, unsigned short fsaa, uint16 depthBufferPoolId )
 {
 	ShadowTextureConfig conf;
 	conf.width = width;
 	conf.height = height;
 	conf.format = format;
+    conf.fsaa = fsaa;
 	conf.depthBufferPoolId = depthBufferPoolId;
 
 	setShadowTextureConfig(shadowIndex, conf);
@@ -5876,18 +5882,31 @@ void SceneManager::setShadowTexturePixelFormat(PixelFormat fmt)
 		}
 	}
 }
+void SceneManager::setShadowTextureFSAA(unsigned short fsaa)
+{
+    for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
+                i != mShadowTextureConfigList.end(); ++i)
+    {
+        if (i->fsaa != fsaa)
+        {
+            i->fsaa = fsaa;
+            mShadowTextureConfigDirty = true;
+        }
+    }
+}
 //---------------------------------------------------------------------
 void SceneManager::setShadowTextureSettings(unsigned short size, 
-	unsigned short count, PixelFormat fmt, uint16 depthBufferPoolId)
+	unsigned short count, PixelFormat fmt, unsigned short fsaa, uint16 depthBufferPoolId)
 {
 	setShadowTextureCount(count);
 	for (ShadowTextureConfigList::iterator i = mShadowTextureConfigList.begin();
 		i != mShadowTextureConfigList.end(); ++i)
 	{
-		if (i->width != size || i->height != size || i->format != fmt)
+		if (i->width != size || i->height != size || i->format != fmt || i->fsaa != fsaa)
 		{
 			i->width = i->height = size;
 			i->format = fmt;
+            i->fsaa = fsaa;
 			i->depthBufferPoolId = depthBufferPoolId;
 			mShadowTextureConfigDirty = true;
 		}
@@ -6516,6 +6535,10 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
+	//The manager we're trying to destroy might have been scheduled for updating
+	//while we haven't yet rendered a frame. Update now to avoid a dangling ptr
+	updateDirtyInstanceManagers();
+
 	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
 	if (i != mInstanceManagerMap.end())
 	{
@@ -6541,6 +6564,7 @@ void SceneManager::destroyAllInstanceManagers(void)
 	}
 
 	mInstanceManagerMap.clear();
+	mDirtyInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,

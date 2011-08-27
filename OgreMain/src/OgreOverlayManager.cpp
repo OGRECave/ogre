@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -214,11 +214,9 @@ namespace Ogre {
 					if (line.substr(0,8) == "template")
 					{
 						isATemplate = true;
-
 					}
 					else
 					{
-			
 						// So first valid data should be overlay name
 						if (StringUtil::startsWith(line, "overlay "))
 						{
@@ -237,15 +235,12 @@ namespace Ogre {
 				    // Already in overlay
                     vector<String>::type params = StringUtil::split(line, "\t\n ()");
 
-
 				    if (line == "}")
 				    {
 					    // Finished overlay
 					    pOverlay = 0;
-						isATemplate = false;
 				    }
 				    else if (parseChildren(stream,line, pOverlay, isATemplate, NULL))
-						
 				    {
 
 				    }
@@ -257,12 +252,8 @@ namespace Ogre {
 							parseAttrib(line, pOverlay);
 						}
 				    }
-
 			    }
-
 		    }
-
-
 	    }
 
 		// record as parsed

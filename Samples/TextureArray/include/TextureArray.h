@@ -7,33 +7,6 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-//
-// fragment program to look up in texture array
-//
-static const char *fprog_code = 
-"!!NVfp4.0                                        \n"
-"TEMP texcoord;                                   \n"
-"MOV texcoord, fragment.texcoord[0];              \n"
-"FLR texcoord.z, texcoord;                        \n"
-"TEX result.color, texcoord, texture[0], ARRAY2D; \n"
-"END";
-
-//
-// interpolate between two nearest layers in array
-//
-static const char *lerp_fprog_code = 
-"!!NVfp4.0                                        \n"
-"TEMP texcoord, c0, c1, frac;                     \n"
-"MOV texcoord, fragment.texcoord[0];              \n"
-"FLR texcoord.z, texcoord;                        \n"
-"TEX c0, texcoord, texture[0], ARRAY2D;           \n"
-"ADD texcoord.z, texcoord, { 0, 0, 1, 0 };        \n"
-"TEX c1, texcoord, texture[0], ARRAY2D;           \n"
-"FRC frac.x, fragment.texcoord[0].z;              \n"
-"LRP result.color, frac.x, c1, c0;                \n"
-"END";
-
-
 class _OgreSampleClassExport Sample_TextureArray : public SdkSample
 {
 public:
@@ -102,28 +75,19 @@ protected:
 
         // create material and set the texture unit to our texture
         MaterialManager& matMgr = MaterialManager::getSingleton();
-		MaterialPtr newMat = matMgr.create("TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-		newMat->getTechnique(0)->getPass(0)->setLightingEnabled(false);
-        Pass * pass = newMat->getTechnique(0)->getPass(0);
+        MaterialPtr texArrayMat = matMgr.createOrRetrieve("Examples/TextureArray", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
+        texArrayMat->compile();
+        Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
+        pass->setLightingEnabled(false);
 		TextureUnitState* pState = pass->createTextureUnitState();
         pState->setTextureName(tex->getName());
-
-        // the the shader (you must use a shader with texture array - this doesn't work with the fixed func)
-        GpuProgramPtr fragProg = GpuProgramManager::getSingleton().createProgram("TexArrayFrag", 
-            ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            "",
-            GPT_FRAGMENT_PROGRAM,
-            "arbfp1");
-        fragProg->setSource(lerp_fprog_code);
-        fragProg->load();
-        pass->setFragmentProgram(fragProg->getName());
 
         // create a plain with float3 tex cord - the third value will be the texture index in our case
 	    ManualObject* textureArrayObject = mSceneMgr->createManualObject("TextureAtlasObject");
         
         // create a quad that uses our material 
         int quadSize = 100;
-	    textureArrayObject->begin(newMat->getName(), RenderOperation::OT_TRIANGLE_LIST);
+	    textureArrayObject->begin(texArrayMat->getName(), RenderOperation::OT_TRIANGLE_LIST);
 	    // triangle 0 of the quad
 	    textureArrayObject->position(0, 0, 0);
     	textureArrayObject->textureCoord(0, 0, 0);

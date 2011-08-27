@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -131,12 +131,10 @@ namespace Ogre  {
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
             case PF_X8B8G8R8:
             case PF_A8B8G8R8:
-                return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
                 return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_B8G8R8A8:
-                return GL_UNSIGNED_BYTE;
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
 #else
@@ -195,7 +193,6 @@ namespace Ogre  {
 #endif
                 
             case PF_B8G8R8A8:
-                return GL_BGRA;
             case PF_X8B8G8R8:
             case PF_X8R8G8B8:
             case PF_A8R8G8B8:
@@ -310,32 +307,25 @@ namespace Ogre  {
     size_t GLESPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth,
                                       PixelFormat format)
     {
-        size_t count = 0;
-
-        do {
-            if (width > 1)
-            {
-                width = width / 2;
-            }
-            if (height > 1)
-            {
-                height = height / 2;
-            }
-            if (depth > 1)
-            {
-                depth = depth / 2;
-            }
-            /*
-            NOT needed, compressed formats will have mipmaps up to 1x1
-            if(PixelUtil::isValidExtent(width, height, depth, format))
+		size_t count = 0;
+        if((width > 0) && (height > 0))
+        {
+            do {
+                if(width>1)		width = width/2;
+                if(height>1)	height = height/2;
+                if(depth>1)		depth = depth/2;
+                /*
+                 NOT needed, compressed formats will have mipmaps up to 1x1
+                 if(PixelUtil::isValidExtent(width, height, depth, format))
+                 count ++;
+                 else
+                 break;
+                 */
+                
                 count ++;
-            else
-                break;
-            */
-            count++;
-        } while (!(width == 1 && height == 1 && depth == 1));
-
-        return count;
+            } while(!(width == 1 && height == 1 && depth == 1));
+        }		
+		return count;
     }
 
     size_t GLESPixelUtil::optionalPO2(size_t value)

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -192,8 +192,12 @@ namespace Ogre {
 		*/
 		EntitySet* mSharedSkeletonEntities;
 
-		/// Private method to cache bone matrices from skeleton
-		void cacheBoneMatrices(void);
+		/** 
+		* Private method to cache bone matrices from skeleton
+		*
+		* @return True if the bone matrices cache has been updated. False if note
+		*/
+		bool cacheBoneMatrices(void);
 
 		/// Flag determines whether or not to display skeleton
 		bool mDisplaySkeleton;
@@ -338,7 +342,8 @@ namespace Ogre {
 			void rebindPositionBuffer(const VertexData* vertexData, bool force);
 			/// Overridden from ShadowRenderable
 			bool isVisible(void) const;
-
+			/// Overridden from ShadowRenderable
+			virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer);
 		};
 	public:
 		/** Default destructor.

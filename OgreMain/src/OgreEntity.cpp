@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -601,8 +601,15 @@ namespace Ogre {
 
 		if (getAlwaysUpdateMainSkeleton() && hasSkeleton() && (mMeshLodIndex > 0))
 		{
-			cacheBoneMatrices();
-			getSkeleton()->_updateTransforms();
+			//check if an update was made
+			if (cacheBoneMatrices())
+			{
+				getSkeleton()->_updateTransforms();
+				//We will mark the skeleton as dirty. Otherwise, if in the same frame the entity will 
+				//be rendered first with a low LOD and then with a high LOD the system wont know that
+				//the bone matrices has changed and there for will not update the vertex buffers
+				getSkeleton()->_notifyManualBonesDirty();
+			}
 		}
 
         // Since we know we're going to be rendered, take this opportunity to
@@ -1314,7 +1321,7 @@ namespace Ogre {
 		return &mTempVertexAnimInfo;
 	}
     //-----------------------------------------------------------------------
-    void Entity::cacheBoneMatrices(void)
+    bool Entity::cacheBoneMatrices(void)
     {
         Root& root = Root::getSingleton();
         unsigned long currentFrameNumber = root.getNextFrameNumber();
@@ -1325,7 +1332,10 @@ namespace Ogre {
 	            mSkeletonInstance->setAnimationState(*mAnimationState);
             mSkeletonInstance->_getBoneMatrices(mBoneMatrices);
             *mFrameBonesLastUpdated  = currentFrameNumber;
+
+			return true;
         }
+		return false;
     }
     //-----------------------------------------------------------------------
     void Entity::setDisplaySkeleton(bool display)
@@ -2158,6 +2168,13 @@ namespace Ogre {
             return ShadowRenderable::isVisible();
         }
     }
+	//-----------------------------------------------------------------------
+	void Entity::EntityShadowRenderable::rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer)
+	{
+		mRenderOp.indexData->indexBuffer = indexBuffer;
+		if (mLightCap) mLightCap->rebindIndexBuffer(indexBuffer);
+	}
+
     //-----------------------------------------------------------------------
     void Entity::setRenderQueueGroup(uint8 queueID)
     {

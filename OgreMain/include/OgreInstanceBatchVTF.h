@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -77,14 +77,22 @@ namespace Ogre
 		typedef vector<uint8>::type HWBoneIdxVec;
 		typedef vector<Matrix4>::type Matrix4Vec;
 
-		size_t					m_numWorldMatrices;	//Num bones * num instances
-		TexturePtr				m_matrixTexture;	//The VTF
+		size_t					mMatricesPerInstance; //number of bone matrices per instance
+		size_t					mNumWorldMatrices;	//Num bones * num instances
+		TexturePtr				mMatrixTexture;	//The VTF
 
 		//Used when all matrices from each instance must be in the same row (i.e. HW Instancing).
 		//A few pixels are wasted, but resizing the texture puts the danger of not sampling the
 		//right pixel... (in theory it should work, but in practice doesn't)
-		size_t					m_widthFloatsPadding;
-		size_t					m_maxFloatsPerLine;
+		size_t					mWidthFloatsPadding;
+		size_t					mMaxFloatsPerLine;
+
+		// The state of the usage of bone matrix lookup
+		bool mUseBoneMatrixLookup;
+		size_t mMaxLookupTableInstances;
+
+		//When true remove the memory of the VertexData & index we've created because no one else will
+		bool					mRemoveOwnVertexData;
 
 		/** Clones the base material so it can have it's own vertex texture, and also
 			clones it's shadow caster materials, if it has any
@@ -113,6 +121,12 @@ namespace Ogre
 		/** Affects VTF texture's width dimension */
 		virtual bool matricesToghetherPerRow() const = 0;
 
+		/** update the lookup numbers for entities with shared transforms */
+		virtual void updateSharedLookupIndexes();
+
+		/** @See InstanceBatch::generateInstancedEntity() */
+		virtual InstancedEntity* generateInstancedEntity(size_t num);
+
 	public:
 		BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
@@ -128,10 +142,38 @@ namespace Ogre
 
 		/** Overloaded to be able to updated the vertex texture */
 		void _updateRenderQueue(RenderQueue* queue);
+
+		/** Sets the state of the usage of bone matrix lookup
+		
+		Under default condition each instance entity is assigned a specific area in the vertex 
+		texture for bone matrix data. When turned on the amount of area in the vertex texture 
+		assigned for bone matrix data will be relative to the amount of unique animation states.
+		Instanced entities sharing the same animation state will share the same area in the matrix.
+		The specific position of each entity is placed in the vertex data and added in a second phase
+		in the shader.
+
+		Note this feature only works in VTF_HW for now.
+		This value needs to be set before adding any instanced entities
+		*/
+		void setBoneMatrixLookup(bool enable, size_t maxLookupTableInstances) { assert(mInstancedEntities.empty()); 
+			mUseBoneMatrixLookup = enable; }
+
+		/** Tells whether to use bone matrix lookup
+		@See setBoneMatrixLookup()
+		*/
+		bool useBoneMatrixLookup() const { return mUseBoneMatrixLookup; }
+
+		/** @See InstanceBatch::useBoneWorldMatrices()	*/
+		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
+
+		/** @Returns the maximum amount of shared transform entities when using lookup table*/
+		virtual size_t getMaxLookupTableInstances() const { return mMaxLookupTableInstances; }
+		
 	};
 
 	class _OgreExport InstanceBatchVTF : public BaseInstanceBatchVTF
 	{
+		
 		void setupVertices( const SubMesh* baseSubMesh );
 		void setupIndices( const SubMesh* baseSubMesh );
 
@@ -148,7 +190,6 @@ namespace Ogre
 
 		/** @See InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
-
 	};
 }
 

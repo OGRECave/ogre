@@ -31,6 +31,96 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.7.3 [Cthugha] (08 May 2011) - MAINTENANCE RELEASE</p>
+<ul>
+<li>iOS: Remove the animation timer.  Since DisplayLink is used by default now, this only hurts performance of things like input.</li>
+<li>Some small changes to ensure that the terrain and paging libs are added to linker flags for SDK sample builds.</li>
+<li>Consider weight when scaling in AnimationTracks</li>
+<li>Only allow to set custom render capabilities before RenderSystem is fully created</li>
+<li>iOS: Fix to prevent absolute paths from being inserted into resources.cfg for iOS to fix running the sample browser on devices.</li>
+<li>OS X: The Cocoa view has no use inside the main library.  Moving into the GL Rendersystem where it is actually used.</li>
+<li>OS X: Disabling CoreGraphics error checking by default</li>
+<li>OS X: 64 bit Cocoa support.  New dependencies are also available to download.  Fixed a few uninitialized variables along the way.  Also updated GLEW to the same version as in default, the older version had some Apple specific bugs that needed to be resolved.</li>
+<li>Several fixes for the Xcode templates such as: file permissions for the installer, iOS device orientation.</li>
+<li>Adding Cocoa window event handling.  Plus several other fixes for parameter parsing and other things.  Thanks to jdiogo for finding the bugs.</li>
+<li>OS X: Build fix when targeting 10.5 or earlier.</li>
+<li>OS X: A few fixes for Cocoa windowing.  Now plays nicer with externally created windows.</li>
+<li>Clean up several warnings(hidden local variables, unused functions)</li>
+<li>iOS: Fix orientation change support.  Use UISupportedInterfaceOrientations in your apps info property list to restrict which orientations are supported by your application.</li>
+<li>Fix a couple comment typos</li>
+<li>GLES: Disable ENABLE_GL_CHECK, again.</li>
+<li>GLES: Fix for images with custom mipmaps.  The dimensions were never being reduced for each mipmap level.  As a side effect, memory usage is also reduced.</li>
+<li>iOS: IOKit isn't needed at all and causes link errors with iOS 4.2.</li>
+<li>Separate out all the OS X and iOS specific code from SampleBrowser.cpp.  It was getting a bit unruly and difficult to maintain</li>
+<li>iOS: Improve orientation support.  Separate EAGLView into its own files.</li>
+<li>iOS: Several fixes to the Xcode templates regarding viewport orientation and some cleanup for readability.</li>
+<li>Patch 3116577: Plane equality operators.  Also cleaned up some documentation.</li>
+<li>Fix a catch-22 that prevented OGRE_BUILD_PLATFORM_IPHONE from showing up in CMake-Gui.</li>
+<li>Fixed an incorrect error message in the Terrain component.</li>
+<li>Do not offer the Carbon API option in 64-bit Mac builds and default to Cocoa</li>
+<li>Allow the retrieval of NSOpenGLContext and NSOpenGLPixelFormat easily in OSXCocoaWindow</li>
+<li>Specify the NSOpenGLFPAScreenMask to resolve ambiguity in the pixel format on multiple display systems</li>
+<li>In OSXCocoaWindow::createWindowFromExternal, don't force the window to be made key and ordered in front. As an external window, the calling application should have full control over window behaviour.</li>
+<li>When creating an external window in Cocoa, don't centre the window (app should be in charge of that)
+Also don't mess with the first responder.</li>
+<li>Fix using multiple Cocoa windows with Ogre.
+Previously the window delegate was incorrectly listening in on the events of *every* window, not just the one containing Ogre. This meant if the application had more than one window (Ogre or otherwise), the Ogre windows would get confused with all the events from different windows.
+Fix this by making sure each delegate only attaches to the NSNotifications of the specific window it's concerned with.</li>
+<li>Support getCustomAttribute() on Texture, only GL extracts anything interesting so far but more can be added
+This is pretty much essential if you want to get to internal API data for resource sharing without down-casting, which itself requires otherwise unnecessary linking to plugins. It's why we've offered this for RenderWindow etc in the past, I'm not sure why it's never been done for Texture.
+Also support retrieving the FBO ids directly from render targets on GL (already allowed retrieval of FBO struct but again that requires linking)</li>
+<li>Added support for spotlight_viewproj_matrix_array GPU parameter</li>
+<li>Changed DataStream::getAsString and MemoryDataStream constructors to deal with streams of unknown size</li>
+<li>[Papercut] Add destroyRenderTarget function to Ogre::Root</li>
+<li>Fix a problem with using some of the lower-level renderable callbacks such as RenderObjectListener to alter shader parameter state - mGpuParamsDirty would not be updated to reflect this and as such things like manual param variances within light iteration loops would not be propagated.
+Allow user to mark GPU params dirty themselves to resolve this.</li>
+<li>iOS: Rework some of the sample browser code to shut down properly on iOS</li>
+<li>GLES: Use the correct GL type for BGRA textures</li>
+<li>OS X: Use correct pixel format attribute name for specifying FSAA in Carbon windows.</li>
+<li>GL: Only bind up to the max supported number of render targets since not all implementations support 8.  This prevents a few OpenGL errors.</li>
+<li>iOS: Clean up the FSAA/framebuffer code in swapBuffers.  This should resolve issues on iOS 4.1 that have been reported. Bug #384</li>
+<li>iOS: Don't search for X11 if building for iOS.  I'm surprised that this hasn't been found until now.  Apparently most devs have the X11 package installed.</li>
+<li>iOS: 2 fixes.  The compiler should be g++ instead of gcc and switching the architecture to build for both armv6 and armv7.</li>
+<li>OS X: A few CMake fixes to ease building for universal libraries.  Upping the minimum OS to 10.5(it's required for x86_64).  Also updating the list of Boost versions to be current.</li>
+<li>Don't apply visibility settings to statically built samples. Fixes linking problems with Xcode 4 and iOS. (Backporting to 1.7)</li>
+<li>Remove a GL ES 2 reference in the 1.7 branch</li>
+<li>iOS: The meaning of ARCHS_UNIVERSAL_IPHONE_OS changed in Xcode at some point to just armv7.  Changing it to Standard will compile for both armv6 and armv7.</li>
+<li>OS X: A few small tweaks for Cocoa windows.  Clearing the framebuffer right away, fixing multisampling for example</li>
+<li>iOS: Let's pretend that the iOS simulator doesn't have SSE. (Works around a Xcode 4 bug)</li>
+<li>OS X: Add support for 8 FSAA samples</li>
+<li>Update the boost versions to look for.</li>
+<li>Patch 3153910 - Fix a typo in MovableObject::setRenderQueueGroupAndPriority.  Render queue priority should be set to the priority argument, not the queue ID.</li>
+<li>Patch 3221772 - iOS: Fixed bug in setting up the viewport if the lower-left corner is not 0,0.</li>
+<li>RTSS: Fix the "Disco" effect in the Shader Sample on OS X.  Thanks to Wolfmanfx!</li>
+<li>Fix a documentation spelling error in 2 places</li>
+<li>Patch 3046729 - Improvements on previous ProgressiveMesh patch.  "Sometimes it seems to be actually desired to list itself as neighbor, so instead of denying this, we rather make the loop in ProgressiveMesh::PMTriangle::notifyRemoved more robust to these edge conditions."</li>
+<li>GLES: Fix using PVR textures</li>
+<li>OS X: Fix a crash when switching between windowed and full screen when using the Cocoa interface.</li>
+<li>Bug #397: Fix the build with some versions of GCC.</li>
+<li>[Papercut] Image getColourAt parameters should be type size_t, not int</li>
+<li>373 - [Papercut] Image has getColourAt but not setColourAt</li>
+<li>Bug 409 - System freezes in GLPixelUtil::getMaxMipmaps when width or height is 0.  Bug was reported for GL but could affect GL ES as well.</li>
+<li>Reformat a little text in an exception so that it follows the format used elsewhere.</li>
+<li>Bug 374 - [Papercut] PixelBox should have getColourAt and setColourAt</li>
+<li>Bug 365 - [Papercut] void BillBoardSet::setMaterial (const MaterialPtr &material) is missing</li>
+<li>Bug 340 - Viewport::clear() saves and re-sets the previous Viewport, even if that Viewport has since been deleted</li>
+<li>Bug 344 - Add utility functions to enable/disable skybox/dome/planes instead of destroying and recreating.</li>
+<li>Bug 423 - Fix for looking up for texture definitions in very complex compositor setups in getSourceForTex and getTargetForTex</li>
+<li>iOS: Explicitly specify the release lib paths so that libraries are always installed to the correct places.  This fixes the problem of duplicate, single architecture libraries in SDK builds.</li>
+<li>iOS: Remove -fno-regmove flag to keep Clang from complaining about it.</li>
+<li>Update the SDK CMakeList template</li>
+<li>Several updates and fixes for the OS X and iOS SDK build scripts</li>
+<li>OS X: Fix a long standing issue that often prevented 3 situations: Building with Clang, 64 bit debug builds and linking with Xcode 4.
+<li>OS X: Add macAPI option to the config dialog</li>
+<li>Added Gentoo install location for Cg to the FindCg.cmake script</li>
+<li>Fixed a comment in OgrePixelFormat.h</li>
+<li>Modified FindTBB.cmake to cope with TBB 3 paths</li>
+<li>Fixed a build error with GCC 4.6</li>
+<li>Xcode 4 templates and installer files</li>
+<li>iOS: Normalize the case of the word Media in scripts.  Simplifies a little scripting.</li>
+</ul>
+
+<p class="mainheader">
     v1.7.2 [Cthugha] (03 November 2010) - MAINTENANCE RELEASE</p>
 <ul>
 <li>Fix bug 240: TextAreaOverlayElement incorrectly loads Font in background thread (OGRE_THREAD_SUPPORT == 2)</li>

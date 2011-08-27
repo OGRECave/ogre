@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,7 @@ namespace Ogre {
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
 					"to SubEntity of " + mParentEntity->getName() + ". Did "
 					"you forget to call MaterialManager::initialise()?",
-					"SubEntity.setMaterialName");
+					"SubEntity::setMaterialName");
 			}
 		}
 
@@ -122,7 +122,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
                     "to SubEntity of " + mParentEntity->getName() + ". Did "
                     "you forget to call MaterialManager::initialise()?",
-                    "SubEntity.setMaterialName");
+                    "SubEntity::setMaterial");
             }
         }
 		

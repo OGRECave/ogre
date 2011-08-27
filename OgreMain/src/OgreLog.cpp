@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,17 @@ THE SOFTWARE.
 #include "OgreLog.h"
 #include "OgreLogManager.h"
 #include "OgreString.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#   include "ppapi/cpp/var.h"
+#   include "ppapi/cpp/instance.h"
+#endif
 
 namespace Ogre
 {
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    pp::Instance* Log::mInstance = NULL;    
+#endif
+    
     //-----------------------------------------------------------------------
     Log::Log( const String& name, bool debuggerOuput, bool suppressFile ) : 
         mLogLevel(LL_NORMAL), mDebugOut(debuggerOuput),
@@ -59,29 +66,40 @@ namespace Ogre
 		OGRE_LOCK_AUTO_MUTEX
         if ((mLogLevel + lml) >= OGRE_LOG_THRESHOLD)
         {
+			bool skipThisMessage = false;
             for( mtLogListener::iterator i = mListeners.begin(); i != mListeners.end(); ++i )
-                (*i)->messageLogged( message, lml, maskDebug, mLogName );
-
-			if (mDebugOut && !maskDebug)
-                std::cerr << message << std::endl;
-
-            // Write time into log
-			if (!mSuppressFile)
+                (*i)->messageLogged( message, lml, maskDebug, mLogName, skipThisMessage);
+			
+			if (!skipThisMessage)
 			{
-				if (mTimeStamp)
-			    {
-                    struct tm *pTime;
-                    time_t ctTime; time(&ctTime);
-                    pTime = localtime( &ctTime );
-                    mfpLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
-                        << ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
-                        << ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
-                        << ": ";
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+                if(mInstance != NULL)
+                {
+                    mInstance->PostMessage(message.c_str());
                 }
-                mfpLog << message << std::endl;
+#else
+                if (mDebugOut && !maskDebug)
+                    std::cerr << message << std::endl;
+#endif
 
-				// Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
-				mfpLog.flush();
+				// Write time into log
+				if (!mSuppressFile)
+				{
+					if (mTimeStamp)
+					{
+						struct tm *pTime;
+						time_t ctTime; time(&ctTime);
+						pTime = localtime( &ctTime );
+						mfpLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
+							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
+							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
+							<< ": ";
+					}
+					mfpLog << message << std::endl;
+
+					// Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
+					mfpLog.flush();
+				}
 			}
         }
     }

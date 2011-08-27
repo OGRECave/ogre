@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@ THE SOFTWARE.s
 #include "OgreGLDepthBuffer.h"
 #include "OgreGLHardwarePixelBuffer.h"
 #include "OgreGLContext.h"
+#include "OgreGLSLProgramFactory.h"
 
 #include "OgreGLFBORenderTexture.h"
 #include "OgreGLPBRenderTexture.h"
@@ -110,6 +111,9 @@ namespace Ogre {
 		size_t i;
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
+
+        mRenderAttribsBound.reserve(100);
+        mRenderInstanceAttribsBound.reserve(100);
 
 		// Get our GLSupport
 		mGLSupport = getGLSupport();
@@ -215,6 +219,8 @@ namespace Ogre {
 		if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
 		else if (strstr(vendorName, "ATI"))
+			rsc->setVendor(GPU_ATI);
+		else if (strstr(vendorName, "AMD"))
 			rsc->setVendor(GPU_ATI);
 		else if (strstr(vendorName, "Intel"))
 			rsc->setVendor(GPU_INTEL);
@@ -431,6 +437,12 @@ namespace Ogre {
 			{
 				rsc->addShaderProfile("fp40");
 			}        
+
+			if (GLEW_NV_fragment_program4)
+			{
+				rsc->addShaderProfile("gp4fp");
+				rsc->addShaderProfile("gpu_fp");
+			}
 		}
 
 		// NFZ - Check if GLSL is supported
@@ -457,8 +469,8 @@ namespace Ogre {
 			rsc->setGeometryProgramConstantBoolCount(0);
 			rsc->setGeometryProgramConstantIntCount(0);
 
-			GLint floatConstantCount;
-			glGetProgramivARB(GL_GEOMETRY_PROGRAM_NV, GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB, &floatConstantCount);
+			GLint floatConstantCount = 0;
+            glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_EXT, &floatConstantCount);
 			rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
 
 			GLint maxOutputVertices;
@@ -794,6 +806,16 @@ namespace Ogre {
 				mGpuProgramManager->registerProgramFactory("fp30", createGLArbGpuProgram);
 			}
 
+			if(caps->isShaderProfileSupported("gp4fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gp4fp", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gpu_fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gpu_fp", createGLArbGpuProgram);
+			}
+
 		}
 
 		if(caps->isShaderProfileSupported("glsl"))
@@ -1080,7 +1102,7 @@ namespace Ogre {
 			//Unlike D3D9, OGL doesn't allow sharing the main depth buffer, so keep them separate.
 			//Only Copy does, but Copy means only one depth buffer...
 			GLContext *windowContext;
-			win->getCustomAttribute( "GLCONTEXT", &windowContext );
+			win->getCustomAttribute( GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
 
  			GLDepthBuffer *depthBuffer = new GLDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
 															windowContext, 0, 0,
@@ -1103,7 +1125,7 @@ namespace Ogre {
 		//else creates dummy (empty) containers
 		//retVal = mRTTManager->_createDepthBufferFor( renderTarget );
 		GLFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute("FBO", &fbo);
+        renderTarget->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbo);
 
 		if( fbo )
 		{
@@ -1141,7 +1163,7 @@ namespace Ogre {
 	{
 		// Set main and current context
 		mMainContext = 0;
-		primary->getCustomAttribute("GLCONTEXT", &mMainContext);
+		primary->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &mMainContext);
 		mCurrentContext = mMainContext;
 
 		// Set primary context as active
@@ -1182,7 +1204,7 @@ namespace Ogre {
 			if (i->second == pWin)
 			{
 				GLContext *windowContext;
-				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
+				pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
 
 				//1 Window <-> 1 Context, should be always true
 				assert( windowContext );
@@ -2404,7 +2426,9 @@ namespace Ogre {
 		}
 		else
 		{
-			glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+            if(!GLEW_VERSION_2_0)
+                glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
+
 			flip = false;
 			glStencilMask(mask);
 			glStencilFunc(convertCompareFunction(func), refValue, mask);
@@ -2878,8 +2902,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elemIter, elemEnd;
         elemEnd = decl.end();
-		vector<GLuint>::type attribsBound;
-		vector<GLuint>::type instanceAttribsBound;
         size_t maxSource = 0;
 
 		for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
@@ -2898,7 +2920,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				op.vertexData->vertexBufferBinding->getBuffer(source);
 
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart, 
-                                   attribsBound, instanceAttribsBound);
+                                   mRenderAttribsBound, mRenderInstanceAttribsBound);
         }
 
         if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
@@ -2908,7 +2930,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		    {
                 const VertexElement & elem = *elemIter;
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0, 
-                                       attribsBound, instanceAttribsBound);
+                                       mRenderAttribsBound, mRenderInstanceAttribsBound);
             
             }
         }
@@ -3031,19 +3053,22 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			glDisableClientState( GL_SECONDARY_COLOR_ARRAY );
 		}
  		// unbind any custom attributes
-		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArrayARB(*ai); 
  
   		}
 		
 		// unbind any instance attributes
-		for (vector<GLuint>::type::iterator ai = instanceAttribsBound.begin(); ai != instanceAttribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
 		{
 			glVertexAttribDivisor(*ai, 0); 
 
 		}
 		
+        mRenderAttribsBound.clear();
+        mRenderInstanceAttribsBound.clear();
+
 		glColor4f(1,1,1,1);
 		if (GLEW_EXT_secondary_color)
 		{
@@ -3528,7 +3553,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		{
 			// Switch context if different from current one
 			GLContext *newContext = 0;
-			target->getCustomAttribute("GLCONTEXT", &newContext);
+			target->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
 			if(newContext && mCurrentContext != newContext) 
 			{
 				_switchContext(newContext);

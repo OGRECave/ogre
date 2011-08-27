@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -132,7 +132,12 @@ namespace Ogre {
 		{			
 			glGetError(); //Clean up the error. Otherwise will flood log.
 			mGLHandle = glCreateProgramObjectARB();
-			checkForGLSLError( "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
+
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
+            }
 
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -149,13 +154,21 @@ namespace Ogre {
 		}
 		if (mLinked)
 		{
-			checkForGLSLError( "GLSLLinkProgram::Activate",
-				"Error prior to using GLSL Program Object : ", mGLHandle, false, false);
+            GLenum glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLLinkProgram::Activate",
+				    "Error prior to using GLSL Program Object : ", mGLHandle, false, false);
+            }
 
 			glUseProgramObjectARB( mGLHandle );
 
-			checkForGLSLError( "GLSLLinkProgram::Activate",
-				"Error using GLSL Program Object : ", mGLHandle, false, false);
+            glErr = glGetError();
+            if(glErr != GL_NO_ERROR)
+            {
+			    reportGLSLError( glErr, "GLSLLinkProgram::Activate",
+				    "Error using GLSL Program Object : ", mGLHandle, false, false);
+            }
         }
 	}
     //-----------------------------------------------------------------------
@@ -364,7 +377,11 @@ namespace Ogre {
 
 					} // end switch
 	#if OGRE_DEBUG_MODE
-					checkForGLSLError( "GLSLLinkProgram::updateUniforms", "Error updating uniform", 0 );
+                    GLenum glErr = glGetError();
+                    if(glErr != GL_NO_ERROR)
+                    {
+					    reportGLSLError( glErr, "GLSLLinkProgram::updateUniforms", "Error updating uniform", 0 );
+                    }
 	#endif
 				} // variability & mask
 			} // fromProgType == currentUniform->mSourceProgType
@@ -524,8 +541,12 @@ namespace Ogre {
 		mTriedToLinkAndFailed = !mLinked;
 
 		// force logging and raise exception if not linked
-		checkForGLSLError( "GLSLLinkProgram::compileAndLink",
-			"Error linking GLSL Program Object : ", mGLHandle, !mLinked, !mLinked );
+        GLenum glErr = glGetError();
+        if(glErr != GL_NO_ERROR)
+        {
+		    reportGLSLError( glErr, "GLSLLinkProgram::compileAndLink",
+			    "Error linking GLSL Program Object : ", mGLHandle, !mLinked, !mLinked );
+        }
 		
 		if(mLinked)
 		{

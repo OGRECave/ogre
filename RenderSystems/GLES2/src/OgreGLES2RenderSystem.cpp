@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,8 @@ THE SOFTWARE.
 #   include "OgreEAGL2Window.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #	include "OgreAndroidWindow.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#	include "OgreNaClWindow.h"
 #else
 #   include "OgreEGLWindow.h"
 #	ifndef GL_GLEXT_PROTOTYPES
@@ -81,6 +83,8 @@ namespace Ogre {
         size_t i;
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
+
+        mRenderAttribsBound.reserve(100);
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mEnableFixedPipeline = false;
@@ -1518,7 +1522,6 @@ namespace Ogre {
             op.vertexData->vertexDeclaration->getElements();
         VertexDeclaration::VertexElementList::const_iterator elem, elemEnd;
         elemEnd = decl.end();
-        vector<GLuint>::type attribsBound;
 
         for (elem = decl.begin(); elem != elemEnd; ++elem)
         {
@@ -1576,7 +1579,7 @@ namespace Ogre {
             glEnableVertexAttribArray(attrib);
             GL_CHECK_ERROR;
  			
-			attribsBound.push_back(attrib);
+			mRenderAttribsBound.push_back(attrib);
         }	
 
 		if (multitexturing)
@@ -1648,11 +1651,13 @@ namespace Ogre {
         }
 
  		// Unbind all attributes
-		for (vector<GLuint>::type::iterator ai = attribsBound.begin(); ai != attribsBound.end(); ++ai)
+		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArray(*ai);
             GL_CHECK_ERROR;
   		}
+
+        mRenderAttribsBound.clear();
     }
 
     void GLES2RenderSystem::setScissorTest(bool enabled, size_t left,
@@ -1894,7 +1899,7 @@ namespace Ogre {
     void GLES2RenderSystem::_setRenderTarget(RenderTarget *target)
     {
         // Unbind frame buffer object
-        if(mActiveRenderTarget)
+        if(mActiveRenderTarget && mRTTManager)
             mRTTManager->unbind(mActiveRenderTarget);
 
         mActiveRenderTarget = target;
@@ -2141,4 +2146,13 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_deleteGLBuffer(GLenum target, GLuint buffer)
+    {
+        BindBufferMap::iterator i = mActiveBufferMap.find(target);
+        if (i != mActiveBufferMap.end())
+        {
+            if((*i).second == buffer)
+                mActiveBufferMap.erase(i);
+        }
+    }
 }

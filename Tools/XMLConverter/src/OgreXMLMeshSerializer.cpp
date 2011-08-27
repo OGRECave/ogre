@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgreKeyFrame.h"
 #include "OgreLodStrategyManager.h"
+#include <cstddef>
 
 namespace Ogre {
 
@@ -1878,6 +1879,14 @@ namespace Ogre {
 
 			Animation* anim = pMesh->createAnimation(name, len);
 
+			TiXmlElement* baseInfoNode = animElem->FirstChildElement("baseinfo");
+			if (baseInfoNode)
+			{
+				String baseName = baseInfoNode->Attribute("baseanimationname");
+				Real baseTime = StringConverter::parseReal(baseInfoNode->Attribute("basekeyframetime"));
+				anim->setUseBaseKeyFrame(true, baseTime, baseName);
+			}
+			
 			TiXmlElement* tracksNode = animElem->FirstChildElement("tracks");
 			if (tracksNode)
 			{
@@ -2179,6 +2188,15 @@ namespace Ogre {
 			animNode->SetAttribute("length", 
 				StringConverter::toString(anim->getLength()));
 
+			// Optional base keyframe information
+			if (anim->getUseBaseKeyFrame())
+			{
+				TiXmlElement* baseInfoNode = 
+				animNode->InsertEndChild(TiXmlElement("baseinfo"))->ToElement();
+				baseInfoNode->SetAttribute("baseanimationname", anim->getBaseKeyFrameAnimationName());
+				baseInfoNode->SetAttribute("basekeyframetime", StringConverter::toString(anim->getBaseKeyFrameTime()));
+			}
+			
 			TiXmlElement* tracksNode = 
 				animNode->InsertEndChild(TiXmlElement("tracks"))->ToElement();
 			Animation::VertexTrackIterator iter = anim->getVertexTrackIterator();

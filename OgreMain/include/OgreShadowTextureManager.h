@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -54,10 +54,11 @@ namespace Ogre
 		unsigned int width;
 		unsigned int height;
 		PixelFormat format;
+        unsigned int fsaa;
 		uint16		depthBufferPoolId;
 
 		ShadowTextureConfig()
-			: width(512), height(512), format(PF_X8R8G8B8), depthBufferPoolId(1) {}
+			: width(512), height(512), format(PF_X8R8G8B8), fsaa(0), depthBufferPoolId(1) {}
 	};
 
 	typedef vector<ShadowTextureConfig>::type ShadowTextureConfigList;

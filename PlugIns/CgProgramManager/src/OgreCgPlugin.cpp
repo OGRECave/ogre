@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,17 +48,21 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void CgPlugin::install()
 	{
-		// Create new factory
-		mCgProgramFactory = OGRE_NEW CgProgramFactory();
-		// Register
-		HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
-
-		OGRE_NEW CgFxScriptLoader();
 	}
 	//---------------------------------------------------------------------
 	void CgPlugin::initialise()
 	{
-		// nothing to do
+        // check for gles2 by the glsles factory (this plugin is not supported on embedded systems for now)
+        if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported("glsles") == false)
+        {
+            // Create new factory
+            mCgProgramFactory = OGRE_NEW CgProgramFactory();
+
+            // Register
+            HighLevelGpuProgramManager::getSingleton().addFactory(mCgProgramFactory);
+
+            OGRE_NEW CgFxScriptLoader();
+        }
 	}
 	//---------------------------------------------------------------------
 	void CgPlugin::shutdown()
@@ -79,6 +83,4 @@ namespace Ogre
 		    mCgProgramFactory = 0;
         }
 	}
-
-
 }

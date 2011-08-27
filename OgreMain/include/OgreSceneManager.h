@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -1955,6 +1955,9 @@ namespace Ogre {
             int xsegments = 1, int ysegments = 1, 
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+		/** Enables / disables a 'sky plane' */
+		virtual void setSkyPlaneEnabled(bool enable) { mSkyPlaneEnabled = enable; }
+
 		/** Return whether a key plane is enabled */
 		virtual bool isSkyPlaneEnabled(void) const { return mSkyPlaneEnabled; }
 
@@ -2046,6 +2049,9 @@ namespace Ogre {
             bool enable, const String& materialName, Real distance = 5000,
             uint8 renderQueue = RENDER_QUEUE_SKIES_EARLY, const Quaternion& orientation = Quaternion::IDENTITY,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		/** Enables / disables a 'sky box' */
+		virtual void setSkyBoxEnabled(bool enable) { mSkyBoxEnabled = enable; }
 
 		/** Return whether a skybox is enabled */
 		virtual bool isSkyBoxEnabled(void) const { return mSkyBoxEnabled; }
@@ -2170,6 +2176,9 @@ namespace Ogre {
             const Quaternion& orientation = Quaternion::IDENTITY,
             int xsegments = 16, int ysegments = 16, int ysegments_keep = -1,
             const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+
+		/** Enables / disables a 'sky dome' */
+		virtual void setSkyDomeEnabled(bool enable) { mSkyDomeEnabled = enable; }
 
 		/** Return whether a skydome is enabled */
 		virtual bool isSkyDomeEnabled(void) const { return mSkyDomeEnabled; }
@@ -2781,10 +2790,11 @@ namespace Ogre {
 			number of shadow textures setting
 		@param width, height The dimensions of the texture
 		@param format The pixel format of the texture
+        @param fsaa The level of multisampling to use. Ignored if the device does not support it.
 		@param depthBufferPoolId The pool # it should query the depth buffers from
 		*/
 		virtual void setShadowTextureConfig(size_t shadowIndex, unsigned short width, 
-			unsigned short height, PixelFormat format, uint16 depthBufferPoolId=1);
+			unsigned short height, PixelFormat format, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
 		/** Set the detailed configuration for a shadow texture.
 		@param shadowIndex The index of the texture to configure, must be < the
 			number of shadow textures setting
@@ -2808,6 +2818,14 @@ namespace Ogre {
 			complex form.
         */
         virtual void setShadowTexturePixelFormat(PixelFormat fmt);
+        /** Set the level of multisample AA of the textures used for texture-based shadows.
+        @remarks
+            By default, the level of multisample AA is zero.
+        @note This is the simple form, see setShadowTextureConfig for the more 
+            complex form.
+        */
+        virtual void setShadowTextureFSAA(unsigned short fsaa);
+
         /** Set the number of textures allocated for texture-based shadows.
         @remarks
             The default number of textures assigned to deal with texture based
@@ -2843,7 +2861,7 @@ namespace Ogre {
 			complex form.
         */
         virtual void setShadowTextureSettings(unsigned short size, unsigned short count, 
-			PixelFormat fmt = PF_X8R8G8B8, uint16 depthBufferPoolId=1);
+			PixelFormat fmt = PF_X8R8G8B8, unsigned short fsaa = 0, uint16 depthBufferPoolId=1);
 
 		/** Get a reference to the shadow texture currently in use at the given index.
 		@note

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,13 +51,17 @@ namespace Ogre {
             OGRE_EXCEPT (Exception::ERR_INTERNAL_ERROR, "Could not load config dialog",
                          "ConfigDialog::initialise");
 
-        NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", nil];
+        NSArray *keys = [[NSArray alloc] initWithObjects:@"Full Screen", @"FSAA", @"Colour Depth", @"RTT Preferred Mode", @"Video Mode", @"macAPI", nil];
         NSArray *fullScreenOptions = [[NSArray alloc] initWithObjects:@"Yes", @"No", nil];
         NSArray *colourDepthOptions = [[NSArray alloc] initWithObjects:@"32", @"16", nil];
         NSArray *rttOptions = [[NSArray alloc] initWithObjects:@"FBO", @"PBuffer", @"Copy", nil];
         NSMutableArray *videoModeOptions = [[NSMutableArray alloc] initWithCapacity:1];
         NSMutableArray *fsaaOptions = [[NSMutableArray alloc] initWithCapacity:1];
-
+#ifdef __LP64__
+        NSArray *macAPIOptions = [[NSArray alloc] initWithObjects:@"cocoa", nil];
+#else
+        NSArray *macAPIOptions = [[NSArray alloc] initWithObjects:@"cocoa", @"carbon", nil];
+#endif
 		const RenderSystemList& renderers = Root::getSingleton().getAvailableRenderers();
 
         // Add renderers and options that are detected per RenderSystem
@@ -71,6 +75,11 @@ namespace Ogre {
 			rs->setConfigOption("FSAA", "0");
 			rs->setConfigOption("Full Screen", "No");
 			rs->setConfigOption("RTT Preferred Mode", "FBO");
+#ifdef __LP64__
+			rs->setConfigOption("macAPI", "cocoa");
+#else
+			rs->setConfigOption("macAPI", "carbon");
+#endif
             
             // Add to the drop down
             NSString *renderSystemName = [[NSString alloc] initWithCString:rs->getName().c_str() encoding:NSASCIIStringEncoding];
@@ -111,7 +120,7 @@ namespace Ogre {
         }
 
         NSArray *objects = [[NSArray alloc] initWithObjects:fullScreenOptions, fsaaOptions,
-                            colourDepthOptions, rttOptions, videoModeOptions, nil];
+                            colourDepthOptions, rttOptions, videoModeOptions, macAPIOptions, nil];
         [mWindowDelegate setOptions:[[NSDictionary alloc] initWithObjects:objects forKeys:keys]];
 
         // Clean up all those arrays
@@ -120,6 +129,7 @@ namespace Ogre {
         [colourDepthOptions release];
         [rttOptions release];
         [videoModeOptions release];
+        [macAPIOptions release];
         [keys release];
         [objects release];
 

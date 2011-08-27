@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSkeleton.h"
 #include "OgreBone.h"
-#include "OgreAnimation.h"
 #include "OgreAnimationState.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
@@ -302,6 +301,7 @@ namespace Ogre {
         }
 
         Animation* ret = OGRE_NEW Animation(name, length);
+		ret->_notifyContainer(this);
 
         // Add to list
         mAnimationsList[name] = ret;
@@ -323,7 +323,12 @@ namespace Ogre {
 		return ret;
 	}
 	//---------------------------------------------------------------------
-	bool Skeleton::hasAnimation(const String& name)
+	Animation* Skeleton::getAnimation(const String& name) const
+	{
+		return getAnimation(name, 0);
+	}
+	//---------------------------------------------------------------------
+	bool Skeleton::hasAnimation(const String& name) const
 	{
 		return _getAnimationImpl(name) != 0;
 	}

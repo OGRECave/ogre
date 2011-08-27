@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2130,6 +2130,26 @@ namespace Ogre {
 		// float length
 		float len = anim->getLength();
 		writeFloats(&len, 1);
+		
+		if (anim->getUseBaseKeyFrame())
+		{
+			size_t size = MSTREAM_OVERHEAD_SIZE;
+			// char* baseAnimationName (including terminator)
+			size += anim->getBaseKeyFrameAnimationName().length() + 1;
+			// float baseKeyFrameTime
+			size += sizeof(float);
+			
+			writeChunkHeader(M_ANIMATION_BASEINFO, size);
+			
+			// char* baseAnimationName (blank for self)
+			writeString(anim->getBaseKeyFrameAnimationName());
+			
+			// float baseKeyFrameTime
+			float t = (float)anim->getBaseKeyFrameTime();
+			writeFloats(&t, 1);
+		}
+
+		// tracks
 		Animation::VertexTrackIterator trackIt = anim->getVertexTrackIterator();
 		while (trackIt.hasMoreElements())
 		{
@@ -2362,6 +2382,25 @@ namespace Ogre {
 		if (!stream->eof())
 		{
 			streamID = readChunk(stream);
+			
+			// Optional base info is possible
+			if (streamID == M_ANIMATION_BASEINFO)
+			{
+				// char baseAnimationName
+				String baseAnimName = readString(stream);
+				// float baseKeyFrameTime
+				float baseKeyTime;
+				readFloats(stream, &baseKeyTime, 1);
+				
+				anim->setUseBaseKeyFrame(true, baseKeyTime, baseAnimName);
+				
+                if (!stream->eof())
+                {
+                    // Get next stream
+                    streamID = readChunk(stream);
+                }
+			}
+			
 			while(!stream->eof() &&
 				streamID == M_ANIMATION_TRACK)
 			{
@@ -3052,7 +3091,8 @@ namespace Ogre {
                 }
 
                 // Count number of triangles for this edge group
-                ++edgeGroup->triCount;
+                if(edgeGroup)
+                    ++edgeGroup->triCount;
             }
 
             //
