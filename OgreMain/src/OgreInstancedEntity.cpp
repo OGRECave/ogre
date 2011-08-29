@@ -173,7 +173,7 @@ namespace Ogre
 		else
 		{
 			if( mSkeletonInstance )
-				retVal = mSkeletonInstance->getNumBones();
+				retVal = mBatchOwner->_getIndexToBoneMap()->size();
 
 			std::fill_n( xform, retVal, Matrix4::ZERO );
 		}
@@ -207,7 +207,7 @@ namespace Ogre
 				const Mesh::IndexMap *indexMap = mBatchOwner->_getIndexToBoneMap();
 				Mesh::IndexMap::const_iterator itor = indexMap->begin();
 				Mesh::IndexMap::const_iterator end  = indexMap->end();
-
+				
 				while( itor != end )
 				{
 					const Matrix4 &mat = matrices[*itor++];
@@ -225,10 +225,10 @@ namespace Ogre
 		else
 		{
 			if( mSkeletonInstance )
-				retVal = mSkeletonInstance->getNumBones() * 3 * 4;
+				retVal = mBatchOwner->_getIndexToBoneMap()->size() * 3 * 4;
 			else
 				retVal = 12;
-
+			
 			std::fill_n( xform, retVal, 0.0f );
 		}
 
