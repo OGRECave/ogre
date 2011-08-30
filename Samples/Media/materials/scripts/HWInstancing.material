@@ -124,7 +124,7 @@ material Examples/Instancing/HWBasic/Robot : Examples/Instancing/HWBasic
 	set_texture_alias	DiffuseMap	r2skin.jpg
 }
 
-material Examples/Instancing/HWBasic/jaiqua : Examples/Instancing/HWBasic
+material Examples/Instancing/HWBasic/spine : Examples/Instancing/HWBasic
 {
-	set_texture_alias	DiffuseMap	blue_jaiqua.jpg
+	set_texture_alias	DiffuseMap	spine_strips.dds
 }

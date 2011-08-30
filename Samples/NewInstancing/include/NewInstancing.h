@@ -39,18 +39,18 @@ static const char *c_materialsTechniques_dq[] =
 
 static const char *c_materialsTechniques_dq_two_weights[] =
 {
-	"Examples/Instancing/ShaderBased/jaiqua_dq_two_weights",
-	"Examples/Instancing/VTF/jaiqua_dq_two_weights",
-	"Examples/Instancing/HWBasic/jaiqua",
-	"Examples/Instancing/VTF/HW/jaiqua_dq_two_weights",
-	"Examples/Instancing/VTF/HW/LUT/jaiqua_dq_two_weights",
-	"Examples/Instancing/ShaderBased/jaiqua_dq_two_weights"
+	"Examples/Instancing/ShaderBased/spine_dq_two_weights",
+	"Examples/Instancing/VTF/spine_dq_two_weights",
+	"Examples/Instancing/HWBasic/spine",
+	"Examples/Instancing/VTF/HW/spine_dq_two_weights",
+	"Examples/Instancing/VTF/HW/LUT/spine_dq_two_weights",
+	"Examples/Instancing/ShaderBased/spine_dq_two_weights"
 };
 
 static const char *c_meshNames[] =
 {
 	"robot.mesh",
-	"jaiqua.mesh"
+	"spine.mesh"
 };
 
 #define NUM_TECHNIQUES (((int)InstanceManager::InstancingTechniquesCount) + 1)

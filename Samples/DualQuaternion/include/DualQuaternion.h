@@ -13,7 +13,7 @@ using namespace OgreBites;
 class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 {
 public:
-	Sample_DualQuaternion() : ent(0), entDQ(0), accumulatedAngle(0), switchPodality(false)
+	Sample_DualQuaternion() : ent(0), entDQ(0)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		, mSrsHardwareSkinning(0)
 #endif
@@ -26,41 +26,9 @@ public:
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
-		Radian angle = Radian(2 * Math::PI * evt.timeSinceLastFrame);
+		ent->getAnimationState("Walk")->addTime(evt.timeSinceLastFrame);
+		entDQ->getAnimationState("Walk")->addTime(evt.timeSinceLastFrame);
 				
-		if(switchPodality)
-		{
-			angle = -angle;
-		}
-		
-		accumulatedAngle += angle;
-		Radian maxAngle = Radian(Math::PI - 0.2);
-		
-		if(accumulatedAngle > maxAngle)
-		{
-			switchPodality = true;
-			angle -= accumulatedAngle - maxAngle;
-			accumulatedAngle = maxAngle;
-		}
-		else if(accumulatedAngle < -maxAngle)
-		{
-			switchPodality = false;
-			angle -= accumulatedAngle + maxAngle;
-			accumulatedAngle = -maxAngle;
-		}		
-		
-		Ogre::Bone* bone = entDQ->getSkeleton()->getBone(0);
-		bone->rotate(Vector3::UNIT_X, angle / 2);
-
-		bone = entDQ->getSkeleton()->getBone(1);
-		bone->rotate(Vector3::UNIT_X, -angle);
-
-		bone = ent->getSkeleton()->getBone(0);
-		bone->rotate(Vector3::UNIT_X, angle / 2);
-
-		bone = ent->getSkeleton()->getBone(1);
-		bone->rotate(Vector3::UNIT_X, -angle);
-		
 		return SdkSample::frameRenderingQueued(evt);
 	}
 
@@ -147,9 +115,9 @@ protected:
 		//Create and attach a spine entity with standard skinning
 		ent = mSceneMgr->createEntity("Spine", "spine.mesh");
 		ent->setMaterialName("spine");
-		manuallyControlBones(ent);
+		ent->getAnimationState("Walk")->setEnabled(true);
 		sn->attachObject(ent);
-		sn->scale(Vector3(20,20,20));
+		sn->scale(Vector3(0.2,0.2,0.2));
 
 		sn = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		sn->translate(0, 0, -20, Node::TS_LOCAL);
@@ -157,9 +125,9 @@ protected:
 		//Create and attach a spine entity with dual quaternion skinning
 		entDQ = mSceneMgr->createEntity("SpineDQ", "spine.mesh");
 		entDQ->setMaterialName("spineDualQuat");
-		manuallyControlBones(entDQ);
+		entDQ->getAnimationState("Walk")->setEnabled(true);
 		sn->attachObject(entDQ);
-		sn->scale(Vector3(20,20,20));
+		sn->scale(Vector3(0.2,0.2,0.2));
 		
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		//To make glsles work the program will need to be provided with proper
@@ -211,14 +179,6 @@ protected:
 		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
 	}
 
-	void manuallyControlBones(Entity* entity)
-	{
-		for(Skeleton::BoneIterator it = entity->getSkeleton()->getBoneIterator(); it.hasMoreElements(); it.moveNext())
-		{
-			(*it.current())->setManuallyControlled(true);
-		}
-	}
-
 	void cleanupContent()
 	{
 		MeshManager::getSingleton().remove("floor");
@@ -236,8 +196,6 @@ protected:
 
 	Entity* ent;
 	Entity* entDQ;
-	Radian accumulatedAngle;
-	bool switchPodality;
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	RTShader::SubRenderState* mSrsHardwareSkinning;

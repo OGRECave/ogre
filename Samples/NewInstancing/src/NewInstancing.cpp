@@ -275,25 +275,12 @@ void Sample_NewInstancing::createEntities()
 		ent->setMaterialName( mCurrentMaterialSet[NUM_TECHNIQUES] );
 		mEntities.push_back( ent );
 
-		if(mCurrentMesh == 0)
+		//Get the animation
+		AnimationState *anim = ent->getAnimationState( "Walk" );
+		if (mAnimations.insert( anim ).second)
 		{
-			//Get the animation
-			AnimationState *anim = ent->getAnimationState( "Walk" );
-			if (mAnimations.insert( anim ).second)
-			{
-				anim->setEnabled( true );
-				anim->addTime( i * i * i * 0.001f ); //Random start offset
-			}
-		}
-		else if(mCurrentMesh == 1)
-		{
-			//Get the animation
-			AnimationState *anim = ent->getAnimationState( "Sneak" );
-			if (mAnimations.insert( anim ).second)
-			{
-				anim->setEnabled( true );
-				anim->addTime( i * i * i * 0.001f ); //Random start offset
-			}
+			anim->setEnabled( true );
+			anim->addTime( i * i * i * 0.001f ); //Random start offset
 		}
 	}
 }
@@ -309,20 +296,10 @@ void Sample_NewInstancing::createInstancedEntities()
 		//HWInstancingBasic is the only technique without animation support
 		if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
 		{
-			if(mCurrentMesh == 0)
-			{
-				AnimationState *anim = ent->getAnimationState( "Walk" );
-				anim->setEnabled( true );
-				anim->addTime( i * i * i * 0.001f  ); //Random start offset
-				mAnimations.insert( anim );
-			}
-			else if(mCurrentMesh == 1)
-			{
-				AnimationState *anim = ent->getAnimationState( "Sneak" );
-				anim->setEnabled( true );
-				anim->addTime( i * i * i * 0.001f  ); //Random start offset
-				mAnimations.insert( anim );
-			}
+			AnimationState *anim = ent->getAnimationState( "Walk" );
+			anim->setEnabled( true );
+			anim->addTime( i * i * i * 0.001f  ); //Random start offset
+			mAnimations.insert( anim );
 		}
 	}
 }

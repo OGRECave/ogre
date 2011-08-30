@@ -373,7 +373,7 @@ abstract material Examples/Instancing/ShaderBased_dq_two_weights
 	}
 }
 
-material Examples/Instancing/ShaderBased/jaiqua_dq_two_weights : Examples/Instancing/ShaderBased_dq_two_weights
+material Examples/Instancing/ShaderBased/spine_dq_two_weights : Examples/Instancing/ShaderBased_dq_two_weights
 {
-	set_texture_alias	DiffuseMap	blue_jaiqua.jpg
+	set_texture_alias	DiffuseMap	spine_strips.dds
 }
