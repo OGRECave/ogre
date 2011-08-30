@@ -175,7 +175,7 @@ namespace Ogre
 			if( mSkeletonInstance )
 				retVal = mBatchOwner->_getIndexToBoneMap()->size();
 
-			std::fill_n( xform, retVal, Matrix4::ZERO );
+			std::fill_n( xform, retVal, Matrix4::ZEROAFFINE );
 		}
 
 		return retVal;
