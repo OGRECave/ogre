@@ -87,12 +87,14 @@ namespace Ogre {
 			opt = miscParams->find("pp::Instance");
 			if(opt != end)
 			{
+                LogManager::getSingleton().logMessage("\tgetting pp::Instance - if stopped here - it means the parameter is null!");
 				mInstance = (pp::Instance*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
+                LogManager::getSingleton().logMessage("\tgot the pp::Instance.");
 			}
 			
 			if(mInstance != NULL)
 			{                
-				mContext = new NaClGLContext(mGLSupport, mInstance);
+				mContext = new NaClGLContext(this, mGLSupport, mInstance);
 			}
 			else
 			{
@@ -101,6 +103,7 @@ namespace Ogre {
 					"NaClWindow::initNativeCreatedWindow" );
 			}
 		}
+        LogManager::getSingleton().logMessage("\tinitNativeCreatedWindow ended");
 	}
 
 	void NaClWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
@@ -119,9 +122,8 @@ namespace Ogre {
 
         mWidth  = width;
         mHeight  = height;
-        mContext->invalidate();
-        
-        mContext->setCurrent();
+
+        mContext->resize();
 	}
 
 	void NaClWindow::windowMovedOrResized()

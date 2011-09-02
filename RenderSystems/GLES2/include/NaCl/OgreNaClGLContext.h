@@ -38,12 +38,14 @@ namespace Ogre {
     {
 		private:
 			const NaClGLSupport *mGLSupport;
+            const NaClWindow * mWindow;
             pp::Instance* mInstance;
-            pp::Context3D_Dev mContext;
-            pp::Surface3D_Dev mSurface;
+            pp::Graphics3D_Dev mContext;
             bool mFlushPending;
+            unsigned int mWidth;
+            unsigned int mHeight;
         public:
-            NaClGLContext(const NaClGLSupport *glsupport, pp::Instance* instance);
+            NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance);
             virtual ~NaClGLContext();
 
 			virtual void setCurrent();
@@ -51,9 +53,9 @@ namespace Ogre {
             GLES2Context* clone() const;
 
             void swapBuffers(bool waitForVSync);
-            void invalidate();
 
             void setFlushPending(const bool flag);
+            void resize();
 
             /// The Graphics3DClient interfcace - pp::Graphics3DClient_Dev
             virtual void Graphics3DContextLost();

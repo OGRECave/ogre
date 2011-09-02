@@ -67,12 +67,12 @@ THE SOFTWARE.
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
 #	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#		include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
 #       include "ppapi/c/dev/ppb_opengles_dev.h"
-#       include "ppapi/cpp/dev/context_3d_dev.h"
+#       include "ppapi/cpp/dev/graphics_3d_dev.h"
 #       include "ppapi/cpp/dev/graphics_3d_client_dev.h"
 #       include "ppapi/cpp/dev/graphics_3d_dev.h"
-#       include "ppapi/cpp/dev/surface_3d_dev.h"
 #		include "ppapi/gles2/gl2ext_ppapi.h"
 #       undef GL_OES_get_program_binary
 #       undef GL_OES_mapbuffer

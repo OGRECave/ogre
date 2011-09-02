@@ -42,6 +42,8 @@ THE SOFTWARE.
 #include "OgreNaClWindow.h"
 #include "OgreNaClGLContext.h"
 
+#include <stdint.h>
+
 namespace {
     // This is called by the browser when the 3D context has been flushed to the
     // browser window.
@@ -53,11 +55,14 @@ namespace {
 }  // namespace
 
 namespace Ogre {
-    NaClGLContext::NaClGLContext(const NaClGLSupport *glsupport, pp::Instance* instance)
+    NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance)
 		: pp::Graphics3DClient_Dev(instance)
+        , mWindow(window)
         , mGLSupport(glsupport)
         , mInstance(instance)
         , mFlushPending(false)
+        , mWidth(mWindow->getWidth())
+        , mHeight(mWindow->getHeight())
     {
     }
 
@@ -75,19 +80,26 @@ namespace Ogre {
         // Lazily create the Pepper context.
         if (mContext.is_null()) 
         {
-            mContext = pp::Context3D_Dev(*mInstance, 0, pp::Context3D_Dev(), NULL);
+            LogManager::getSingleton().logMessage("\tcreate context started");
+
+            int32_t attribs[] = {
+                PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_DEPTH_SIZE, 24,
+                PP_GRAPHICS3DATTRIB_STENCIL_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_SAMPLES, 0,
+                PP_GRAPHICS3DATTRIB_SAMPLE_BUFFERS, 0,
+                PP_GRAPHICS3DATTRIB_WIDTH, mWindow->getWidth(),
+                PP_GRAPHICS3DATTRIB_HEIGHT, mWindow->getHeight(),
+                PP_GRAPHICS3DATTRIB_NONE
+            };
+
+            mContext = pp::Graphics3D_Dev(*mInstance, pp::Graphics3D_Dev(), attribs);
             if (mContext.is_null()) 
             {
                 glSetCurrentContextPPAPI(0);
                 return;
             }
-        }
-
-        if (mSurface.is_null()) 
-        {
-            mSurface = pp::Surface3D_Dev(*mInstance, PP_GRAPHICS3DATTRIBVALUE_OPENGL_ES2_BIT, NULL);
-            mContext.BindSurfaces(mSurface, mSurface);
-            mInstance->BindGraphics(mSurface);
+            mInstance->BindGraphics(mContext);
         }
 
         glSetCurrentContextPPAPI(mContext.pp_resource());
@@ -101,9 +113,8 @@ namespace Ogre {
 
     GLES2Context* NaClGLContext::clone() const
     {
-        NaClGLContext* res = new NaClGLContext(mGLSupport, mInstance);
+        NaClGLContext* res = new NaClGLContext(mWindow, mGLSupport, mInstance);
         res->mInstance = this->mInstance;
-        res->mSurface = this->mSurface;
         res->mFlushPending = this->mFlushPending;
         return res;
     }
@@ -117,7 +128,7 @@ namespace Ogre {
         }
         mFlushPending = true;
 
-        mSurface.SwapBuffers(pp::CompletionCallback(&FlushCallback, this));
+        mContext.SwapBuffers(pp::CompletionCallback(&FlushCallback, this));
     }
 
     void NaClGLContext::setFlushPending( const bool flag )
@@ -133,14 +144,21 @@ namespace Ogre {
             "NaClGLContext::Graphics3DContextLost" );
     }
 
-    void NaClGLContext::invalidate()
+    void NaClGLContext::resize()
     {
-        // Unbind the existing surface and re-bind to null surfaces.
-        mInstance->BindGraphics(pp::Surface3D_Dev());
-        mContext.BindSurfaces(pp::Surface3D_Dev(), pp::Surface3D_Dev());
-        mSurface = pp::Surface3D_Dev();
-        glSetCurrentContextPPAPI(0);
+        if(mWidth != mWindow->getWidth() || mHeight != mWindow->getHeight() )
+        {
+            LogManager::getSingleton().logMessage("\tresizing in setFlushPending(false)");
+            mWidth = mWindow->getWidth();
+            mHeight = mWindow->getHeight();
+            glSetCurrentContextPPAPI(0);
+            mContext.ResizeBuffers( mWidth, mHeight );
+            glSetCurrentContextPPAPI(mContext.pp_resource());
+            LogManager::getSingleton().logMessage("\tdone resizing in setFlushPending(false)");
+        }            
+
     }
+
 
 
 
