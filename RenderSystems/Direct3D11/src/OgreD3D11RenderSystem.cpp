@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,6 +52,9 @@ THE SOFTWARE.
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
+
+// DXGetErrorDescription
+#include "DXErr.h"
 
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
@@ -543,7 +546,7 @@ namespace Ogre
 
 
 			UINT deviceFlags = 0;
-			if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+			if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
 			{
 				deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 			}
@@ -617,10 +620,15 @@ namespace Ogre
 				}
 			}
 
-			if(FAILED(D3D11CreateDevice(pSelectedAdapter, driverType , Software3d310Dll, deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0, 0)))         
+			HRESULT hr = D3D11CreateDevice(pSelectedAdapter, driverType , Software3d310Dll, deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0, 0);
+
+			if(FAILED(hr))         
 			{
+				std::stringstream error;
+				error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
+
 				OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-					"Failed to create Direct3D11 object", 
+					error.str(), 
 					"D3D11RenderSystem::D3D11RenderSystem" );
 			}
 
@@ -2821,7 +2829,7 @@ namespace Ogre
 		ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
 
 		UINT deviceFlags = 0;
-		if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+		if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
@@ -2831,12 +2839,18 @@ namespace Ogre
 		}
 
 		ID3D11Device * device;
-		if(FAILED(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0)))
+		hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE ,0,deviceFlags, NULL, 0, D3D11_SDK_VERSION, &device, 0 , 0);
+
+		if(FAILED(hr))
 		{
+			std::stringstream error;
+			error<<"Failed to create Direct3D11 object."<<std::endl<<DXGetErrorDescription(hr)<<std::endl;
+
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
 				"Failed to create Direct3D11 object", 
 				"D3D11RenderSystem::D3D11RenderSystem" );
 		}
+
 		mDevice = D3D11Device(device) ;
 
 

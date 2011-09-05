@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -219,6 +219,8 @@ namespace Ogre {
 		if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
 		else if (strstr(vendorName, "ATI"))
+			rsc->setVendor(GPU_ATI);
+		else if (strstr(vendorName, "AMD"))
 			rsc->setVendor(GPU_ATI);
 		else if (strstr(vendorName, "Intel"))
 			rsc->setVendor(GPU_INTEL);
@@ -435,6 +437,12 @@ namespace Ogre {
 			{
 				rsc->addShaderProfile("fp40");
 			}        
+
+			if (GLEW_NV_fragment_program4)
+			{
+				rsc->addShaderProfile("gp4fp");
+				rsc->addShaderProfile("gpu_fp");
+			}
 		}
 
 		// NFZ - Check if GLSL is supported
@@ -796,6 +804,16 @@ namespace Ogre {
 			if(caps->isShaderProfileSupported("fp30"))
 			{
 				mGpuProgramManager->registerProgramFactory("fp30", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gp4fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gp4fp", createGLArbGpuProgram);
+			}
+
+			if(caps->isShaderProfileSupported("gpu_fp"))
+			{
+				mGpuProgramManager->registerProgramFactory("gpu_fp", createGLArbGpuProgram);
 			}
 
 		}

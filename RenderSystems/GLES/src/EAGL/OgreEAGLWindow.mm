@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -114,19 +114,33 @@ namespace Ogre {
 	void EAGLWindow::resize(unsigned int width, unsigned int height)
 	{
         if(!mWindow) return;
-
+        
+        Real w = mContentScalingFactor, h = mContentScalingFactor;
+        
+        // Check the orientation of the view controller and adjust dimensions
+        if (UIInterfaceOrientationIsPortrait(mViewController.interfaceOrientation))
+        {
+            h *= std::max(width, height);
+            w *= std::min(width, height);
+        }
+        else
+        {
+            w *= std::max(width, height);
+            h *= std::min(width, height);
+        }
+        
         // Check if the window size really changed
-        if(mWidth == width && mHeight == height)
+        if(mWidth == w && mHeight == h)
             return;
-
+        
         // Destroy and recreate the framebuffer with new dimensions 
         mContext->destroyFramebuffer();
-
-        mWidth = width;
-        mHeight = height;
-
+        
+        mWidth = w;
+        mHeight = h;
+        
         mContext->createFramebuffer();
-
+        
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
             (*it).second->_updateDimensions();
@@ -303,21 +317,8 @@ namespace Ogre {
         
         mIsFullScreen = fullScreen;
         mName = name;
-        NSString *initialOrientation = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIInterfaceOrientation"];
-
-        if(mGLSupport->portraitIsSupported() && 
-           initialOrientation && 
-           ([initialOrientation isEqualToString:@"UIInterfaceOrientationPortrait"] || 
-            [initialOrientation isEqualToString:@"UIInterfaceOrientationPortraitUpsideDown" ]))
-        {
-            mWidth = width;
-            mHeight = height;
-        }
-        else
-        {
-            mWidth = height;
-            mHeight = width;
-        }
+        mWidth = width;
+        mHeight = height;
 
         if (miscParams)
         {
@@ -482,64 +483,73 @@ namespace Ogre {
 
     void EAGLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
+        if(dst.format != PF_A8R8G8B8)
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only PF_A8R8G8B8 is a supported format for OpenGL ES", __FUNCTION__);
+
         if ((dst.left < 0) || (dst.right > mWidth) ||
 			(dst.top < 0) || (dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Invalid box.",
-				__FUNCTION__ );
+                        "Invalid box.",
+                        __FUNCTION__ );
 		}
 
 		if (buffer == FB_AUTO)
 		{
-			buffer = mIsFullScreen? FB_FRONT : FB_BACK;
-		}
-
-		GLenum format = GLESPixelUtil::getGLOriginFormat(dst.format);
-		GLenum type = GLESPixelUtil::getGLOriginDataType(dst.format);
-
-		if ((format == 0) || (type == 0))
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Unsupported format.",
-				__FUNCTION__ );
+			buffer = mIsFullScreen ? FB_FRONT : FB_BACK;
 		}
 
 		// Switch context if different from current one
 		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
 		rsys->_setViewport(this->getViewport(0));
 
-        if((dst.getWidth() * Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
-        {
-            // Standard alignment of 4 is not right
-            glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        }
+        // The following code is adapted from Apple Technical Q & A QA1704
+        // http://developer.apple.com/library/ios/#qa/qa1704/_index.html
+        NSInteger width = dst.getWidth(), height = dst.getHeight();
+        NSInteger dataLength = width * height * 4;
+        GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
 
+        // Read pixel data from the framebuffer
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        GL_CHECK_ERROR
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
-			(GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-			format, type, dst.data);
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     GL_RGBA, GL_UNSIGNED_BYTE, data);
+        GL_CHECK_ERROR
 
-		// Restore default alignment
-		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        // Create a CGImage with the pixel data
+        // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
+        // otherwise, use kCGImageAlphaPremultipliedLast
+        CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, data, dataLength, NULL);
+        CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
+        CGImageRef iref = CGImageCreate(width, height, 8, 32, width * 4, colorspace,
+                                        kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                        ref, NULL, true, kCGRenderingIntentDefault);
 
-		// Vertical flip
-		{
-			size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
-			size_t height = dst.getHeight();
-			uchar *tmpData = OGRE_NEW uchar[rowSpan * height];
-			uchar *srcRow = (uchar *)dst.data, *tmpRow = tmpData + (height - 1) * rowSpan;
+        // OpenGL ES measures data in PIXELS
+        // Create a graphics context with the target size measured in POINTS
+        NSInteger widthInPoints = 0, heightInPoints = 0;
 
-			while (tmpRow >= tmpData)
-			{
-				memcpy(tmpRow, srcRow, rowSpan);
-				srcRow += rowSpan;
-				tmpRow -= rowSpan;
-			}
-			memcpy(dst.data, tmpData, rowSpan * height);
+        // Set the scale parameter to your OpenGL ES view's contentScaleFactor
+        // so that you get a high-resolution snapshot when its value is greater than 1.0
+        CGFloat scale = mView.contentScaleFactor;
+        widthInPoints = width / scale;
+        heightInPoints = height / scale;
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(widthInPoints, heightInPoints), NO, scale);
 
-			OGRE_DELETE [] tmpData;
-		}
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextDrawImage(context, CGRectMake(0.0, 0.0, widthInPoints, heightInPoints), iref);
 
+        // Retrieve the UIImage from the current context
+        size_t rowSpan = dst.getWidth() * PixelUtil::getNumElemBytes(dst.format);
+        memcpy(dst.data, CGBitmapContextGetData(context), rowSpan * dst.getHeight());
+        UIGraphicsEndImageContext();
+
+        // Clean up
+        free(data);
+        CFRelease(ref);
+        CFRelease(colorspace);
+        CGImageRelease(iref);
     }
 }

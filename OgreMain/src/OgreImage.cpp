@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -704,7 +704,8 @@ namespace Ogre {
     
     void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        PixelUtil::packColour(cv, m_eFormat, &m_pBuffer[m_ucPixelSize * (z * m_uWidth * m_uHeight + y * m_uWidth + x)]);
+        unsigned char pixelSize = PixelUtil::getNumElemBytes(getFormat());
+        PixelUtil::packColour(cv, getFormat(), &((unsigned char *)getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
     }
 
 	//-----------------------------------------------------------------------------    

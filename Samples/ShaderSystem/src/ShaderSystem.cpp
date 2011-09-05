@@ -14,6 +14,7 @@ const String INSTANCED_VIEWPORTS_NAME	= "InstancedViewports";
 const String ADD_LOTS_OF_MODELS_NAME	= "AddLotsOfModels";
 const String SPOT_LIGHT_NAME			= "SpotLight";
 const String PER_PIXEL_FOG_BOX			= "PerPixelFog";
+const String ATLAS_AUTO_BORDER_MODE		= "AutoBorderAtlasing";
 const String MAIN_ENTITY_MESH			= "ShaderSystem.mesh";
 const String SPECULAR_BOX				= "SpecularBox";
 const String REFLECTIONMAP_BOX			= "ReflectionMapBox";
@@ -135,6 +136,10 @@ void Sample_ShaderSystem::checkBoxToggled(CheckBox* box)
 	else if (cbName == PER_PIXEL_FOG_BOX)
 	{
 		setPerPixelFogEnable(box->isChecked());
+	}
+	else if (cbName == ATLAS_AUTO_BORDER_MODE)
+	{
+		setAtlasBorderMode(box->isChecked());
 	}
 }
 
@@ -491,6 +496,11 @@ void Sample_ShaderSystem::setupUI()
 	mTrayMgr->createCheckBox(TL_TOPLEFT, PER_PIXEL_FOG_BOX, "Per Pixel Fog", 220)->setChecked(mPerPixelFogEnable);
 #endif
 
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	mTrayMgr->createCheckBox(TL_TOPLEFT, ATLAS_AUTO_BORDER_MODE, "Atlas auto border", 220)->setChecked(true);
+	setAtlasBorderMode(true);
+#endif
+
 	// Create fog widgets.
 	mFogModeMenu = mTrayMgr->createLongSelectMenu(TL_TOPLEFT, "FogMode", "Fog Mode", 220, 120, 10);	
 	mFogModeMenu->addItem("None");
@@ -661,6 +671,16 @@ void Sample_ShaderSystem::setPerPixelFogEnable( bool enable )
 #endif
 
 }
+
+void Sample_ShaderSystem::setAtlasBorderMode( bool enable )
+{
+#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+	TextureAtlasSamplerFactory::getSingleton().setDefaultAtlasingAttributes(
+		TextureAtlasSamplerFactory::ipmRelative, 1, enable);
+	mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
+}
+
 
 //-----------------------------------------------------------------------
 void Sample_ShaderSystem::updateSystemShaders() 

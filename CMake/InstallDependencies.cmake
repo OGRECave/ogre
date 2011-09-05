@@ -114,9 +114,19 @@ if (OGRE_INSTALL_DEPENDENCIES)
     # copy the dependency DLLs to the right places
     install_debug(OIS_d.dll)
     install_release(OIS.dll)
+
     if (OGRE_BUILD_PLUGIN_CG)
-      install_debug(cg.dll)
-	  install_release(cg.dll)
+	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+	  if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+          install_debug(cg.dll)
+		else ()
+	      install_release(cg.dll)
+		endif ()
+	  else ()
+        install_debug(cg.dll)
+	    install_release(cg.dll)
+	  endif ()
     endif ()
 
     # install GLES dlls
@@ -227,8 +237,17 @@ if (OGRE_COPY_DEPENDENCIES)
     copy_release(OIS.dll)
 
     if (OGRE_BUILD_PLUGIN_CG)
-      copy_debug(cg.dll)
-      copy_release(cg.dll)
+	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
+	  if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+          copy_debug(cg.dll)
+		else ()
+	      copy_release(cg.dll)
+		endif ()
+	  else ()
+        copy_debug(cg.dll)
+	    copy_release(cg.dll)
+	  endif ()
     endif ()
 
     if (OGRE_BUILD_RENDERSYSTEM_GLES)

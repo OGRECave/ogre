@@ -1,0 +1,19 @@
+void main(float4 position : POSITION,
+			  float3 normal   : NORMAL,
+			  float2 uv		  : TEXCOORD0,
+			  out float4 oPosition : POSITION,
+			  out float2 oUv	   : TEXCOORD0,
+			  out float4 colour    : COLOR,
+			
+			  uniform float4x4 worldViewProjMatrix,
+			  uniform float size_value,
+			   uniform float time
+			)
+{
+
+   float4 mypos = position;
+   mypos.xyz += size_value * (1.0 + (sin(time * 5.0) + 1.0)  / 5.0 ) * normal; 
+   oPosition = mul(worldViewProjMatrix, mypos);
+	
+}
+

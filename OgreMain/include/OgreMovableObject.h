@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,8 @@ namespace Ogre {
 		/// Upper distance to still render
 		Real mUpperDistance;
 		Real mSquaredUpperDistance;
+		// Minimum pixel size to still render
+		Real mMinPixelSize;
 		/// Hidden because of distance?
 		bool mBeyondFarDistance;	
 		/// User objects binding.
@@ -289,6 +291,7 @@ namespace Ogre {
         virtual bool isVisible(void) const;
 
 		/** Sets the distance at which the object is no longer rendered.
+		@note Camera::setUseRenderingDistance() needs to be called for this parameter to be used.
 		@param dist Distance beyond which the object will not be rendered 
 			(the default is 0, which means objects are always rendered).
 		*/
@@ -299,6 +302,21 @@ namespace Ogre {
 
 		/** Gets the distance at which batches are no longer rendered. */
 		virtual Real getRenderingDistance(void) const { return mUpperDistance; }		
+
+		/** Sets the minimum pixel size an object needs to be in both screen axes in order to be rendered
+		@note Camera::setUseMinPixelSize() needs to be called for this parameter to be used.
+		@param pixelSize Number of minimum pixels
+			(the default is 0, which means objects are always rendered).
+		*/
+		virtual void setRenderingMinPixelSize(Real pixelSize) { 
+			mMinPixelSize = pixelSize; 
+		}
+
+		/** Returns the minimum pixel size an object needs to be in both screen axes in order to be rendered
+		*/
+		virtual Real getRenderingMinPixelSize() const { 
+			return mMinPixelSize; 
+		}
 
 		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
 			Sets any kind of user value on this object.

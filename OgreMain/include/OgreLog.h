@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,13 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreString.h"
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+namespace pp
+{
+    class Instance;
+}
+#endif
 
 namespace Ogre {
 
@@ -103,7 +110,6 @@ namespace Ogre {
 
         typedef vector<LogListener*>::type mtLogListener;
         mtLogListener mListeners;
-
     public:
 
 		class Stream;
@@ -242,6 +248,12 @@ namespace Ogre {
 
 
 		};
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    protected:
+        static pp::Instance* mInstance;
+    public:
+        static void setInstance(pp::Instance* instance) {mInstance = instance;};
+#endif
 
     };
 	/** @} */

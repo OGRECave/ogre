@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -175,6 +175,11 @@ namespace Ogre {
 		bool mUseRenderingDistance;
         /// Camera to use for LOD calculation
         const Camera* mLodCamera;
+		
+		/// Whether or not the minimum display size of objects should take effect for this camera
+		bool mUseMinPixelSize;
+		/// /See Camera::getPixelDisplayRatio()
+		Real mPixelDisplayRatio;
 
 		typedef vector<Listener*>::type ListenerList;
 		ListenerList mListeners;
@@ -643,6 +648,30 @@ namespace Ogre {
 		const Vector3& getPositionForViewUpdate(void) const;
 		/** Get the derived orientation of this frustum. */
 		const Quaternion& getOrientationForViewUpdate(void) const;
+
+		/** @brief 
+				Sets whether to use min display size calculations 
+			When active objects who's size on the screen is less then a given number will not
+			be rendered.
+		*/
+		void setUseMinPixelSize(bool enable) { mUseMinPixelSize = enable; }
+		/** Returns whether to use min display size calculations 
+			@see Camera::setUseMinDisplaySize()
+		*/
+		bool getUseMinPixelSize() const { return mUseMinPixelSize; }
+
+		/** Returns an estimated ratio between a pixel and the display area it represents.
+			For orthographic cameras this function returns the amount of meters covered by
+			a single pixel along the vertical axis. For perspective cameras the value
+			returned is the amount of meters covered by a single pixel per meter distance 
+			from the camera.
+		@note
+			This parameter is calculated just before the camera is rendered
+		@note
+			This parameter is used in min display size calculations.
+		*/
+		Real getPixelDisplayRatio() const { return mPixelDisplayRatio; }
+		
      };
 	 /** @} */
 	 /** @} */

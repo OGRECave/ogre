@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ namespace Ogre
 		friend class InstanceBatchHW;
 		friend class InstanceBatchHW_VTF;
 		friend class BaseInstanceBatchVTF;
-
+	protected:
 		uint16 mInstanceId; //Note it may change after defragmenting!
 		bool mInUse;
 		InstanceBatch *mBatchOwner;
@@ -188,7 +188,7 @@ namespace Ogre
 			@remarks Assumes it has a skeleton (m_skeletonInstance != 0)
 			@returns true if something was actually updated
 		*/
-		bool _updateAnimation(void);
+		virtual bool _updateAnimation(void);
 
 		/** Sets the transformation look up number */
 		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}

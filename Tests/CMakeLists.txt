@@ -10,6 +10,7 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
+
   if (CppUnit_FOUND)
 	# unit tests are go!
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include)
@@ -175,6 +176,9 @@ if (OGRE_BUILD_TESTS)
 
 	  # PlayPen gets included always
 	add_subdirectory(PlayPen)
+
+	# add VisualTests directory
+	add_subdirectory(VisualTests)
 
     endif (OIS_FOUND)
 

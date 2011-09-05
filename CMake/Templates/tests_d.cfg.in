@@ -1,0 +1,4 @@
+TestFolder=@OGRE_SAMPLES_DIR_DBG@
+[VTests]
+TestPlugin=PlayPenTests_d
+TestPlugin=VTests_d

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_APPLE_IOS 5
 #define OGRE_PLATFORM_ANDROID 6
 #define OGRE_PLATFORM_TEGRA2 7
+#define OGRE_PLATFORM_NACL 8
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -113,6 +114,20 @@ namespace Ogre {
 #   define OGRE_PLATFORM OGRE_PLATFORM_TEGRA2
 #elif defined(__ANDROID__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
+#elif defined( __native_client__ ) 
+#   define OGRE_PLATFORM OGRE_PLATFORM_NACL
+#   ifndef OGRE_STATIC_LIB
+#       error OGRE must be built as static for NaCl (OGRE_STATIC=true in cmake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
+#       error d3d9 is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_D3D9 false in cmake)
+#   endif
+#   ifdef OGRE_BUILD_RENDERSYSTEM_GL
+#       error gl is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_GL=false in cmake)
+#   endif
+#   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
+#       error GLES2 render system is needed for NaCl (OOGRE_BUILD_RENDERSYSTEM_GLES2=false in cmake)
+#   endif
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
 #endif
@@ -229,8 +244,9 @@ namespace Ogre {
 #endif
 */
 //----------------------------------------------------------------------------
-// Linux/Apple/Symbian/Tegra2 Settings
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
+// Linux/Apple/iOs/Android/Symbian/Tegra2/NaCl Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -267,8 +283,6 @@ namespace Ogre {
 #define OGRE_UNICODE_SUPPORT 1
 
 #endif
-
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // Endian Settings

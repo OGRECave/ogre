@@ -402,7 +402,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_boundsDirty(void)
 	{
-		if( !mBoundsDirty )
+		if( mCreator && !mBoundsDirty ) 
 			mCreator->_addDirtyBatch( this );
 		mBoundsDirty = true;
 	}

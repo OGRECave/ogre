@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -65,10 +65,11 @@ struct _OgreRTSSExport TextureAtlasRecord
 	size_t indexInAtlas;
 };
 
-
 typedef vector<TextureAtlasRecord>::type TextureAtlasTable;
 typedef SharedPtr<TextureAtlasTable> TextureAtlasTablePtr;
 typedef map<String, TextureAtlasTablePtr>::type TextureAtlasMap;
+
+
 
 /** Implements texture atlas sampling.
 
@@ -110,6 +111,20 @@ that all texture with in the atlas have power-of-2 dimensions. And also that
 the inserted textures will be padded with 1 pixel of their own border color.
 This will prevent visual artifacts caused when sampling textures at their borders.
 
+\par Border issues
+There is an inherit problem in texture atlases. This issue occurs because individual textures within 
+the atlas texture are adjacent to one another. when polling the color of a texture near the texture's
+edges, especially in lower mipmaps pixel color from other images may be mixed in with the result.
+There are 3 ways to handle this issue, each with it's own limitations:
+-# Ignore the problem - bad for repetitive images in which the border colour may be quite apparent.
+-# Auto adjust the polling position - This the default implementation of the TextureAtlasSampler SRS.
+	Auto adjust the polling position in the shader according the mipmap level in use. This means that 
+	a different (smaller) section of an image may be polled instead of the original section (especially 
+	with in mipmaps). Bad for non repetitive accurate images.
+-# Generate a texture atlas where each image will contain around it a wrapped version of itself. 
+	This solves all visual problems but is wasteful in gpu memory (up to 3 times the size of the original image)
+
+
 You can use the NVidia "Texture Atlas Tools" to create the texture. 
 */
 class _OgreRTSSExport TextureAtlasSampler : public SubRenderState
@@ -146,7 +161,7 @@ public:
 	@see SubRenderState::preAddToRenderState.
 	*/
 	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-	
+
 	static String Type;
 
 // Protected methods
@@ -179,6 +194,8 @@ protected:
 	bool mIsAtlasTextureUnits[TAS_MAX_TEXTURES];
 	//Tells if the data in mAtlasTableData has been uploaded to the corresponding mVSTextureTable parameter
 	bool mIsTableDataUpdated;
+	//Tells whether border issue handling uses auto adjust polling position.
+	bool mAutoAdjustPollPosition;
 };
 
 
@@ -195,10 +212,28 @@ public:
 		ipmRelative,
 		ipmAbsolute
 	};
+
+	struct TextureAtlasAttib
+	{
+		TextureAtlasAttib(IndexPositionMode _posMode = ipmRelative,	ushort _posOffset = 1,
+			bool _autoBorderAdjust = true) : positionMode(_posMode), positionOffset(_posOffset),
+			 autoBorderAdjust(_autoBorderAdjust) {}
+
+		IndexPositionMode positionMode;
+		ushort positionOffset;
+		bool autoBorderAdjust;
+	};
+
 public:
 
 	//TextureAtlasSamplerFactory c_tor
 	TextureAtlasSamplerFactory();
+
+	//Singleton implementation
+	static TextureAtlasSamplerFactory* getSingletonPtr(void);
+	static TextureAtlasSamplerFactory& getSingleton(void);
+	
+
 
 	/** 
 	@see SubRenderStateFactory::getType.
@@ -225,11 +260,15 @@ public:
 		in the texture atlas. Each line has the following format:
 		# <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
 	
+		@param filename The full path to the file containing a ".tai" format data.
 		@param stream A stream to a file containing ".tai" format data
 		@param textureAtlasTable A table into which the data in the stream will be filled. This
 			parameter will be filled only if it is not null. The system factory keeps a copy of this
 			information in any case.
+		@param autoBorderAdjust Sets whether to automatically adjust the image polling area for border 
+			issues.See the Border issues paragraph under the class documentation for more information.
 	*/
+	bool addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 	bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 
 	/**
@@ -237,8 +276,10 @@ public:
 		@param textureName Name of an atlas texture
 		@param atlasData a list of records containing the position and size of each 
 			texture in the atlas
+		@param autoBorderAdjust Sets whether to automatically adjust the image polling area for border 
+			issues.See the Border issues paragraph under the class documentation for more information.
 	*/
-	void setTextureAtlasTable(const String& textureName, const TextureAtlasTablePtr& atlasData);
+	void setTextureAtlasTable(const String& textureName, const TextureAtlasTablePtr& atlasData, bool autoBorderAdjust = true);
 	
 	/** 
 		Removes the texture atlas information from a given texture
@@ -252,31 +293,54 @@ public:
 	void removeAllTextureAtlasTables();
 
 	/** 
-		Retrieve the texture atlas information for a given texture
+		Retrieve the texture atlas table information for a given texture
 		@param textureName Name of an atlas texture
 	*/
 	const TextureAtlasTablePtr& getTextureAtlasTable(const String& textureName) const;
 
 	/**
-		Set the position of the atlas table indexes within the texcoords of the vertex data
+		Set the default attributes concerning atlas texture processing
+		@param mode The index positioning mode. Tells relative to where the the texture coordinates
+			containing the atlas image to use are positioned.
+		@param offset The index positioning offset. Tells the offset relative to the index positioning 
+			mode.
+		@param autoAdjustBorders Tells whether to automatically adjust the polled area in the texture
+			relative to the used mipmap level.
 		@see TextureAtlasSampler
 	*/
-	void setTableIndexPosition(IndexPositionMode mode, ushort offset);
+	void setDefaultAtlasingAttributes(IndexPositionMode mode, ushort offset, bool autoAdjustBorders);
 
 	/**
-		Get the positioning mode of the atlas table indexes within the texcoords of the vertex data
-		@see TextureAtlasSampler
-		*/
-	IndexPositionMode getTableIndexPositionMode() const;
+		Returns the default attributes of texture atlas processing
+		@see setDefaultAtlasingAttributes
+	*/
+	const TextureAtlasAttib& getDefaultAtlasingAttributes() const;
 
 	/**
-		Get the offset of the atlas table indexes within the texcoords of the vertex data
+		Set the default attributes concerning atlas texture processing for a specific material
+		@param material The material to which to add the information
+		@param mode The index positioning mode. Tells relative to where the the texture coordinates
+			containing the atlas image to use are positioned.
+		@param offset The index positioning offset. Tells the offset relative to the index positioning 
+			mode.
+		@param autoAdjustBorders Tells whether to automatically adjust the polled area in the texture
+			relative to the used mipmap level.
 		@see TextureAtlasSampler
-		*/
-	ushort getTableIndexPositionOffset() const;
+	*/
+	void setMaterialAtlasingAttributes(Ogre::Material* material, 
+		IndexPositionMode mode, ushort offset, bool autoAdjustBorders);
 
+
+	/**
+		Tells whether a specific material has atlas attributes associated with it. And returns the
+		attributes to be used.
+		@see setMaterialAtlasingAttributes
+	*/
+	bool hasMaterialAtlasingAttributes(Ogre::Material* material, TextureAtlasAttib* attrib = NULL) const;
 	
 protected:
+
+	
 
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
@@ -288,12 +352,10 @@ private:
 	//Holds a mapping of texture names and the atlas table information associated with them
 	TextureAtlasMap mAtlases;
 
-	//The positioning mode of the atlas table indexes within the texcoords of the vertex data
-	IndexPositionMode mIndexPositionMode;
-	
-	//The offset of the atlas table indexes within the texcoords of the vertex data
-	ushort mIndexPositionOffset;
+	TextureAtlasAttib mDefaultAtlasAttrib;
 };
+
+_OgreRTSSExport void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai);
 
 /** @} */
 /** @} */

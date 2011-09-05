@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,12 @@ namespace Ogre {
 	void ConfigFile::loadDirect(const String& filename, const String& separators, 
 		bool trimWhitespace)
 	{
-		/* Open the configuration file */
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "loadDirect is not supported on NaCl - tried to open: " + filename,
+            "ConfigFile::loadDirect");
+#endif
+
+        /* Open the configuration file */
 		std::ifstream fp;
         // Always open in binary mode
 		fp.open(filename.c_str(), std::ios::in | std::ios::binary);

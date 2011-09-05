@@ -466,7 +466,22 @@ set (SOURCE_FILES
 )
 
 # Add platform specific files
-if (WIN32)
+if (OGRE_BUILD_PLATFORM_NACL)
+  include_directories("include/Nacl")
+  set(PLATFORM_HEADER_FILES
+    include/Nacl/OgreConfigDialogImp.h
+    include/Nacl/OgreErrorDialogImp.h
+    include/Nacl/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/Nacl/OgreConfigDialog.cpp
+    src/Nacl/OgreErrorDialog.cpp
+    src/Nacl/OgreTimer.cpp
+    src/OgreSearchOps.cpp
+  )
+  set(PLATFORM_LIBS nosys)
+  set(PLATFORM_HEADER_INSTALL "NaCl")
+elseif (WIN32)
   include_directories("include/WIN32")
   set(PLATFORM_HEADER_FILES
     include/WIN32/OgreConfigDialogImp.h
@@ -612,7 +627,7 @@ elseif (SYMBIAN)
   )
   set(PLATFORM_HEADER_INSTALL "SYMBIAN")
 
-endif(WIN32)
+endif()
 
 
 # Configure threading files
