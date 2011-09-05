@@ -404,8 +404,9 @@ abstract material Examples/Instancing/HW_VTF_dq_two_weights
 
 		pass
 		{
-			specular	1 1 1 1 12.5
-
+			diffuse		0.3 0.3 0.3
+			specular	0.1 0.1 0.1 0.1 12.5
+			
 			vertex_program_ref Ogre/Instancing/HW_VTF_dq_two_weights_vs
 			{
 				param_named_auto	viewProjMatrix				viewproj_matrix
@@ -440,5 +441,5 @@ abstract material Examples/Instancing/HW_VTF_dq_two_weights
 
 material Examples/Instancing/VTF/HW/spine_dq_two_weights : Examples/Instancing/HW_VTF_dq_two_weights
 {
-	set_texture_alias	DiffuseMap	spine_strips.dds
+	set_texture_alias	DiffuseMap	circuit.dds
 }

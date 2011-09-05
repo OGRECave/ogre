@@ -94,7 +94,8 @@ abstract material Examples/Instancing/HWBasic
 
 		pass
 		{
-			specular	1 1 1 1 12.5
+			diffuse		0.3 0.3 0.3
+			specular	0.1 0.1 0.1 0.1 12.5
 			vertex_program_ref Ogre/Instancing/HWBasic_vs
 			{
 			}
@@ -126,5 +127,5 @@ material Examples/Instancing/HWBasic/Robot : Examples/Instancing/HWBasic
 
 material Examples/Instancing/HWBasic/spine : Examples/Instancing/HWBasic
 {
-	set_texture_alias	DiffuseMap	spine_strips.dds
+	set_texture_alias	DiffuseMap	circuit.dds
 }

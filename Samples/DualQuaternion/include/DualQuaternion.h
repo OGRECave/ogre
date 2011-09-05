@@ -13,7 +13,7 @@ using namespace OgreBites;
 class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 {
 public:
-	Sample_DualQuaternion() : ent(0), entDQ(0)
+	Sample_DualQuaternion() : ent(0), entDQ(0), totalTime(0)
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 		, mSrsHardwareSkinning(0)
 #endif
@@ -26,8 +26,14 @@ public:
 
 	bool frameRenderingQueued(const FrameEvent& evt)
 	{
-		ent->getAnimationState("Walk")->addTime(evt.timeSinceLastFrame);
-		entDQ->getAnimationState("Walk")->addTime(evt.timeSinceLastFrame);
+		const Real start = 30;
+		const Real range = 145;
+		const Real speed = 1;
+		const Vector3 vec = Vector3(1,0.3,0).normalisedCopy();
+		totalTime += evt.timeSinceLastFrame;
+		Quaternion orient = Quaternion(Degree(start + Ogre::Math::Sin(totalTime * speed) * range), vec);
+		ent->getSkeleton()->getBone("Bone02")->setOrientation(orient);
+		entDQ->getSkeleton()->getBone("Bone02")->setOrientation(orient);
 				
 		return SdkSample::frameRenderingQueued(evt);
 	}
@@ -115,7 +121,7 @@ protected:
 		//Create and attach a spine entity with standard skinning
 		ent = mSceneMgr->createEntity("Spine", "spine.mesh");
 		ent->setMaterialName("spine");
-		ent->getAnimationState("Walk")->setEnabled(true);
+		ent->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
 		sn->attachObject(ent);
 		sn->scale(Vector3(0.2,0.2,0.2));
 
@@ -125,7 +131,7 @@ protected:
 		//Create and attach a spine entity with dual quaternion skinning
 		entDQ = mSceneMgr->createEntity("SpineDQ", "spine.mesh");
 		entDQ->setMaterialName("spineDualQuat");
-		entDQ->getAnimationState("Walk")->setEnabled(true);
+		entDQ->getSkeleton()->getBone("Bone02")->setManuallyControlled(true);
 		sn->attachObject(entDQ);
 		sn->scale(Vector3(0.2,0.2,0.2));
 		
@@ -196,6 +202,8 @@ protected:
 
 	Entity* ent;
 	Entity* entDQ;
+
+	Real totalTime;
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 	RTShader::SubRenderState* mSrsHardwareSkinning;
