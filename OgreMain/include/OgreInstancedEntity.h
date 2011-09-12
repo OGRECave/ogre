@@ -251,7 +251,12 @@ namespace Ogre
 		}
 
 		/** @copydoc MovableObject::isInScene. */
-		virtual bool isInScene(void) const;
+		virtual bool isInScene(void) const
+		{
+			//We assume that the instanced entity is in the scene if it is in use
+			//It is in the scene whether it has a parent node or not
+			return mInUse;
+		}
 
 
 

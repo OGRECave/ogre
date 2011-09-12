@@ -158,7 +158,7 @@ namespace Ogre
 		size_t retVal = 1;
 
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( isVisible() )
+		if( isVisible() && isInScene() )
 		{
 			if( !mSkeletonInstance )
 			{
@@ -193,7 +193,7 @@ namespace Ogre
 	{
 		size_t retVal;
 		//When not attached, returns zero matrix to avoid rendering this one, not identity
-		if( isVisible() )
+		if( isVisible() && isInScene() )
 		{
 			if( !mSkeletonInstance )
 			{
@@ -500,13 +500,5 @@ namespace Ogre
 			}
 			mNeedTransformUpdate = false;
 		}
-	}
-
-	//---------------------------------------------------------------------------
-	bool InstancedEntity::isInScene(void) const
-	{
-		//We assume that the instanced entity is in the scene if it is in use
-		//It is in the scene whether it has a parent node or not
-		return mInUse;
 	}
 }
