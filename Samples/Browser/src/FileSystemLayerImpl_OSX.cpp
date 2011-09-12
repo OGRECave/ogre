@@ -89,6 +89,6 @@ namespace OgreBites
     //---------------------------------------------------------------------
 	bool FileSystemLayerImpl::createDirectory(const Ogre::String& path)
 	{
-		return !mkdir(path, 0755) || errno == EEXIST;
+		return !mkdir(path.c_str(), 0755) || errno == EEXIST;
 	}
 }
