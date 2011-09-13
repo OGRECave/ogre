@@ -245,6 +245,7 @@
 			<string>com.apple.product-type.application</string>
 			<key>Frameworks</key>
 			<array>
+				<string>CoreGraphics</string>
 				<string>Foundation</string>
 				<string>OpenGLES</string>
 				<string>QuartzCore</string>
