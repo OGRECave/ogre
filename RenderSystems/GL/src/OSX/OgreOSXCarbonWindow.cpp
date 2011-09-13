@@ -100,7 +100,14 @@ namespace Ogre
             if((opt = miscParams->find("Full Screen")) != end) 
                 fullScreen = StringConverter::parseBool( opt->second );
         }
-        
+
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+        mColourDepth = depth;
+        mFSAA = fsaa_samples;
+        mIsFullScreen = fullScreen;
+
         if(fullScreen)
         {
             setFullscreen(fullScreen, width, height);
@@ -137,20 +144,14 @@ namespace Ogre
             }
         }
 
-        // apply vsync settings. call setVSyncInterval first to avoid 
+        // Apply vsync settings. call setVSyncInterval first to avoid 
 		// setting vsync more than once.
         setVSyncEnabled(vsync);
-
         setHidden(hidden);
-        mName = name;
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
+
         mActive = true;
         mClosed = false;
         mCreated = true;
-        mIsFullScreen = fullScreen;
     }
 
     void OSXCarbonWindow::createAGLContext(size_t fsaa_samples, int depth)

@@ -212,7 +212,17 @@ namespace Ogre {
 
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");
-            
+
+            // Make active
+            mActive = true;
+            mClosed = false;
+            mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
+            mWidth = width;
+            mHeight = height;
+            mColourDepth = depth;
+            mFSAA = fsaa_samples;
+            mIsFullScreen = fullScreen;
+
             if(!miscParams || opt == miscParams->end())
             {
                 createNewWindow(width, height, [windowTitle cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -254,19 +264,11 @@ namespace Ogre {
             // Create register the context with the rendersystem and associate it with this window
             mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
         }
-		// make active
-        setHidden(hidden);
-		mActive = true;
-        mClosed = false;
-        mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
-        mIsFullScreen = fullScreen;
-		
+
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+
+        setHidden(hidden);
 
         [pool drain];
     }
