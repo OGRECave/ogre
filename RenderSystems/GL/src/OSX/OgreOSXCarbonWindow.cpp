@@ -98,6 +98,13 @@ namespace Ogre
                 fullScreen = StringConverter::parseBool( opt->second );
         }
         
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+        mColourDepth = depth;
+        mFSAA = fsaa_samples;
+        mIsFullScreen = fullScreen;
+
         if(fullScreen)
         {
             setFullscreen(fullScreen, width, height);
@@ -134,15 +141,9 @@ namespace Ogre
             }
         }
         
-        mName = name;
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
         mActive = true;
         mClosed = false;
         mCreated = true;
-        mIsFullScreen = fullScreen;
     }
 
     void OSXCarbonWindow::createAGLContext(size_t fsaa_samples, int depth)

@@ -208,6 +208,12 @@ namespace Ogre {
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");
             
+            mWidth = width;
+            mHeight = height;
+            mColourDepth = depth;
+            mFSAA = fsaa_samples;
+            mIsFullScreen = fullScreen;
+
             if(!miscParams || opt == miscParams->end())
             {
                 createNewWindow(width, height, [windowTitle cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -253,11 +259,6 @@ namespace Ogre {
 		mActive = true;
         mClosed = false;
         mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
-        mIsFullScreen = fullScreen;
 		
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
