@@ -107,7 +107,7 @@ namespace Ogre
 
 		///Object position
 		Vector3 mPosition;
-		Vector3 mDerivedPosition;
+		Vector3 mDerivedLocalPosition;
 		///Object orientation
 		Quaternion mOrientation;
 		///Object scale
@@ -115,11 +115,13 @@ namespace Ogre
 		///The maximum absolute scale for all dimension
 		Real mMaxScaleLocal;
 		///Full world transform
-		Matrix4 mFullTransform;
+		Matrix4 mFullLocalTransform;
 		///Tells if mFullTransform needs an updated
 		bool mNeedTransformUpdate;
 		/// Tells if the animation world transform needs an update
 		bool mNeedAnimTransformUpdate;
+		/// Tells whether to use the local transform parameters
+		bool mUseLocalTransform;
 
 
 		//Returns number of matrices written to xform, assumes xform has enough space
@@ -238,16 +240,23 @@ namespace Ogre
 		/** Update the world transform and derived values */
 		void updateTransforms();
 
+		/** Tells if the entity is in use. */
+		bool isInUse() const { return mInUse; }
+		/** Sets whether the entity is in use. */
+		void setInUse(bool used);
+
 		/** Returns the world transform of the instanced entity including local transform */
 		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
-			assert(!mNeedTransformUpdate && "Tranform data should be updated at this point");
-			return mFullTransform;
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			return mUseLocalTransform ? mFullLocalTransform :
+				mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
 		}
 
 		/** Returns the derived position of the instanced entity including local transform */
 		const Vector3& _getDerivedPosition() const {
-			assert(!mNeedTransformUpdate && "Tranform data should be updated at this point");
-			return mDerivedPosition;
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			return mUseLocalTransform ? mDerivedLocalPosition :
+				mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
 		}
 
 		/** @copydoc MovableObject::isInScene. */

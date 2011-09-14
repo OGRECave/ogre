@@ -306,7 +306,7 @@ void Sample_NewInstancing::createInstancedEntities()
 			mEntities.push_back( ent );
 
 			//HWInstancingBasic is the only technique without animation support
-			if( mInstancingTechnique != InstanceManager::HWInstancingBasic )
+			if( mInstancingTechnique != InstanceManager::HWInstancingBasic)
 			{
 				//Get the animation
 				AnimationState *anim = ent->getAnimationState( "Walk" );
@@ -318,7 +318,6 @@ void Sample_NewInstancing::createInstancedEntities()
 			if ((mInstancingTechnique < NUM_TECHNIQUES) && (!mUseSceneNodes->isChecked()))
 			{
 				mMovedInstances.push_back( ent );
-				ent->setScale( Vector3( 0.1f ) );
 				ent->setOrientation(Quaternion(Radian(randGenerator.nextFloat() * 10 * 3.14159265359f), Vector3::UNIT_Y));
 				ent->setPosition( Ogre::Vector3(mEntities[0]->getBoundingRadius() * (i - NUM_INST_ROW * 0.5f), 0,
 					mEntities[0]->getBoundingRadius() * (j - NUM_INST_COLUMN * 0.5f)) );
@@ -445,7 +444,7 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 			else if( (*itor)->getPosition().z < -5000.0f )
 			{
 				planeNormal = Vector3::UNIT_Z;
-			entityPos.z = -4999.0f;
+				entityPos.z = -4999.0f;
 			}
 			else if( (*itor)->getPosition().z > 5000.0f )
 			{
@@ -480,25 +479,25 @@ void Sample_NewInstancing::moveUnits( float timeSinceLast )
 			InstancedEntity* pEnt = *itor;
 			Vector3 entityPos = pEnt->getPosition();
 			Vector3 planeNormal = Vector3::ZERO;
-			if( pEnt->getPosition().x < -500.0f )
+			if( pEnt->getPosition().x < -5000.0f )
 			{
 				planeNormal = Vector3::UNIT_X;
-				entityPos.x = -499.0f;
+				entityPos.x = -4999.0f;
 			}
-			else if( pEnt->getPosition().x > 500.0f )
+			else if( pEnt->getPosition().x > 5000.0f )
 			{
 				planeNormal = Vector3::NEGATIVE_UNIT_X;
-				entityPos.x = 499.0f;
+				entityPos.x = 4999.0f;
 			}
-			else if( pEnt->getPosition().z < -500.0f )
+			else if( pEnt->getPosition().z < -5000.0f )
 			{
 				planeNormal = Vector3::UNIT_Z;
-				entityPos.z = -499.0f;
+				entityPos.z = -4999.0f;
 			}
-			else if( pEnt->getPosition().z > 500.0f )
+			else if( pEnt->getPosition().z > 5000.0f )
 			{
 				planeNormal = Vector3::NEGATIVE_UNIT_Z;
-				entityPos.z = 499.0f;
+				entityPos.z = 4999.0f;
 			}
 
 			if( planeNormal != Vector3::ZERO )
@@ -625,11 +624,12 @@ void Sample_NewInstancing::checkBoxToggled( CheckBox* box )
 	if( box == mEnableShadows )
 	{
 		mSceneMgr->setShadowTechnique( mEnableShadows->isChecked() ?
-SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
+			SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED : SHADOWTYPE_NONE );
 	}
 	else if( box == mSetStatic && mCurrentManager )
 	{
 		mCurrentManager->setBatchesAsStaticAndUpdate( mSetStatic->isChecked() );
+	}
 	else if (box == mUseSceneNodes)
 	{
 		clearScene();

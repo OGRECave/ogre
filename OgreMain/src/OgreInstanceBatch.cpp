@@ -259,7 +259,7 @@ namespace Ogre
 			retVal = mUnusedEntities.back();
 			mUnusedEntities.pop_back();
 
-			retVal->mInUse = true;
+			retVal->setInUse(true);
 		}
 
 		return retVal;
@@ -278,7 +278,7 @@ namespace Ogre
 		if( instancedEntity->getParentSceneNode() )
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
 
-		instancedEntity->mInUse = false;
+		instancedEntity->setInUse(false);
 		instancedEntity->stopSharingTransform();
 
 		//Put it back into the queue
@@ -292,7 +292,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			if( (*itor)->mInUse )
+			if( (*itor)->isInUse() )
 				outEntities.push_back( *itor );
 			++itor;
 		}

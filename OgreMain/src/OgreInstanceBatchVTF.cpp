@@ -57,7 +57,7 @@ namespace Ogre
 				mWeightCount(1),
 				mTempTransformsArray3x4(0),
 				mUseBoneMatrixLookup(false),
-				mMaxLookupTableInstances(16)
+				mMaxLookupTableInstances(16),
 				mUseBoneDualQuaternions(false),
 				mForceOneWeight(false),
 				mUseOneWeight(false),
@@ -523,6 +523,7 @@ namespace Ogre
 				retrieveBoneIdx( baseVertexData, hwBoneIdx );
 				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
 				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+
 				thisVertexData->vertexDeclaration->closeGapsInSource();
 			}
 

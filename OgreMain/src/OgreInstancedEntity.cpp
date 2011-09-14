@@ -53,12 +53,13 @@ namespace Ogre
 				mSharedTransformEntity( 0 ),
 				mTransformLookupNumber(instanceID),
 				mPosition(Vector3::ZERO),
-				mDerivedPosition(Vector3::ZERO),
+				mDerivedLocalPosition(Vector3::ZERO),
 				mOrientation(Quaternion::IDENTITY),
 				mScale(Vector3::UNIT_SCALE),
 				mMaxScaleLocal(1),
 				mNeedTransformUpdate(true),
-				mNeedAnimTransformUpdate(true)
+				mNeedAnimTransformUpdate(true),
+				mUseLocalTransform(false)
 
 	
 	{
@@ -442,7 +443,8 @@ namespace Ogre
 	void InstancedEntity::setPosition(const Vector3& position, bool doUpdate) 
 	{ 
 		mPosition = position; 
-		mDerivedPosition = position;
+		mDerivedLocalPosition = position;
+		mUseLocalTransform = true;
 		markTransformDirty();
 		if (doUpdate) updateTransforms();
 	} 
@@ -451,6 +453,7 @@ namespace Ogre
 	void InstancedEntity::setOrientation(const Quaternion& orientation, bool doUpdate) 
 	{ 
 		mOrientation = orientation;  
+		mUseLocalTransform = true;
 		markTransformDirty();
 		if (doUpdate) updateTransforms();
 	} 
@@ -461,6 +464,7 @@ namespace Ogre
 		mScale = scale; 
 		mMaxScaleLocal = std::max<Real>(std::max<Real>(
 			Math::Abs(mScale.x), Math::Abs(mScale.y)), Math::Abs(mScale.z)); 
+		mUseLocalTransform = true;
 		markTransformDirty();
 		if (doUpdate) updateTransforms();
 	} 
@@ -480,7 +484,7 @@ namespace Ogre
 	//---------------------------------------------------------------------------
 	void InstancedEntity::updateTransforms()
 	{
-		if (mNeedTransformUpdate)
+		if (mUseLocalTransform && mNeedTransformUpdate)
 		{
 			if (mParentNode)
 			{
@@ -490,15 +494,23 @@ namespace Ogre
 				
 				Quaternion derivedOrientation = parentOrientation * mOrientation;
 				Vector3 derivedScale = parentScale * mScale;
-				mDerivedPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
+				mDerivedLocalPosition = parentOrientation * (parentScale * mPosition) + parentPosition;
 			
-				mFullTransform.makeTransform(mDerivedPosition, derivedScale, derivedOrientation);
+				mFullLocalTransform.makeTransform(mDerivedLocalPosition, derivedScale, derivedOrientation);
 			}
 			else
 			{
-				mFullTransform.makeTransform(mPosition,mScale,mOrientation);
+				mFullLocalTransform.makeTransform(mPosition,mScale,mOrientation);
 			}
 			mNeedTransformUpdate = false;
 		}
+	}
+
+	//---------------------------------------------------------------------------
+	void InstancedEntity::setInUse( bool used )
+	{
+		mInUse = used;
+		//Remove the use of local transform if the object is deleted
+		mUseLocalTransform &= used;
 	}
 }
