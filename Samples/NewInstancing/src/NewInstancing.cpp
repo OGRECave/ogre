@@ -635,7 +635,6 @@ void Sample_NewInstancing::checkBoxToggled( CheckBox* box )
 		clearScene();
 		switchInstancingTechnique();
 	}
-	}
 }
 
 //------------------------------------------------------------------------------

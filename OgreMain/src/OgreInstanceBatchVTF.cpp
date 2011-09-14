@@ -60,8 +60,7 @@ namespace Ogre
 				mMaxLookupTableInstances(16),
 				mUseBoneDualQuaternions(false),
 				mForceOneWeight(false),
-				mUseOneWeight(false),
-				mRemoveOwnVertexData( false )
+				mUseOneWeight(false)
 	{
 		cloneMaterial( mMaterial );
 	}
