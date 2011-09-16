@@ -71,6 +71,8 @@ namespace Ogre {
     static const String kInitOgreId = "initOgre";
     static const String kRenderOneFrameId = "renderOneFrame";
     static const String kMessageArgumentSeparator = ":";
+    static const String kGetDownloadProgressId = "getDownloadProgress";
+    
 
     bool IsError(int32_t result) {
         return ((PP_OK != result) && (PP_OK_COMPLETIONPENDING != result));
@@ -92,6 +94,7 @@ namespace Ogre {
         const pp::FileSystem& mFileSystem;
         bool mStoreLocally;
         bool mNeedToStore;
+        bool mDownloadActive;
     public:
         explicit FileDownload(pp::Instance* instance, const pp::FileSystem& fileSystem)
             : mCcFactory(this)
@@ -103,6 +106,7 @@ namespace Ogre {
             , mFileSystem(fileSystem)
             , mStoreLocally(false)
             , mNeedToStore(false)
+            , mDownloadActive(false)
         {
 
         }
@@ -117,6 +121,23 @@ namespace Ogre {
             return mUrlFileInfo.size;
         }
 
+        void getDownloadProgress()
+        {
+            if(!mDownloadActive)
+            {
+                return;
+            }
+            int64_t bytes_received = -1;
+            int64_t total_bytes_to_be_received = -1;
+            mUrlLoader->GetDownloadProgress(&bytes_received, &total_bytes_to_be_received);
+            std::stringstream st;
+            st << "GetDownloadProgressId:";
+            st << "bytes_received:"<< bytes_received;
+            st << ":total_bytes_to_be_received:"<< total_bytes_to_be_received;
+            mInstance->PostMessage(st.str());
+
+
+        }
         void download(const String & url, pp::CompletionCallback& cc, const bool storeLocally)
         {
             mNeedToStore = false;
@@ -155,18 +176,18 @@ namespace Ogre {
         {
             mInstance->PostMessage("onTryToOpenLocalFile");
             
-            if(IsError(result))
+            //if(IsError(result))
             {
                 mInstance->PostMessage("file not found - will download.");
-                mInstance->PostMessage(String(String("downloading resource zip file: ") + mUrl).c_str());
+                mInstance->PostMessage(String(String("downloading resource zip file started: ") + mUrl).c_str());
                 mNeedToStore = true;
                 downloadFile();
             }
-            else
+            /*else
             {
                 mInstance->PostMessage("file found!");
                 onOpenFile(PP_OK);
-            }
+            }*/
         }
 
         void downloadFile()
@@ -174,6 +195,7 @@ namespace Ogre {
             mUrlRequest.SetURL(mUrl);
             mUrlRequest.SetMethod("GET");
             mUrlRequest.SetStreamToFile(true);
+            mUrlRequest.SetRecordDownloadProgress(true);
 
             pp::CompletionCallback cc1 = mCcFactory.NewCallback(&FileDownload::onOpen);
 
@@ -204,6 +226,7 @@ namespace Ogre {
             mInstance->PostMessage("readBody");
 
             pp::CompletionCallback cc = mCcFactory.NewCallback(&FileDownload::onDownloadedFile);
+            mDownloadActive = true;
             int32_t res = mUrlLoader->FinishStreamingToFile(cc);
             if (PP_OK_COMPLETIONPENDING != res)
                 cc.Run(res);
@@ -218,6 +241,11 @@ namespace Ogre {
         void onDownloadedFile(int32_t result) 
         {
             mInstance->PostMessage("onDownloadedFile");
+
+            mDownloadActive = false;
+
+            mInstance->PostMessage(String(String("downloading resource zip file finished: ") + mUrl).c_str());
+
 
             mInstance->PostMessage("mUrlLoader.GetResponseInfo()");
             pp::URLResponseInfo respInfo = mUrlLoader->GetResponseInfo();
@@ -394,17 +422,8 @@ namespace Ogre {
                     mWidth = position.size().width();
                     mHeight = position.size().height();
 
-                    std::stringstream s;
-                    s << "resize:";
-                    s << position.size().width();
-                    s << "x";
-                    s << position.size().height();
+                    resize();
 
-                    PostMessage(pp::Var(s.str().c_str()));
-
-                    sb.getRenderWindow()->resize(mWidth, mHeight);
-                    sb.getRenderWindow()->getViewport(0)->_updateDimensions();
-                    sb.windowResized(sb.getRenderWindow());
                 } 
                 catch( Exception& e ) 
                 {
@@ -412,6 +431,22 @@ namespace Ogre {
                 }
             }
         }
+
+        void resize() 
+        {
+            std::stringstream s;
+            s << "resize:";
+            s << mWidth;
+            s << "x";
+            s << mHeight;
+
+            PostMessage(pp::Var(s.str().c_str()));
+
+            sb.getRenderWindow()->resize(mWidth, mHeight);
+            sb.getRenderWindow()->getViewport(0)->_updateDimensions();
+            sb.windowResized(sb.getRenderWindow());
+        }
+
 
         virtual void DidChangeFocus(bool has_focus)
         {
@@ -445,12 +480,21 @@ namespace Ogre {
                 }
                 if(messageType == kInitOgreId)
                 {
-                    initOgre(mWidth, mWidth);
+                    PostMessage(messagesParts[1].c_str());
+                    PostMessage(messagesParts[2].c_str());
+                    mWidth = atoi(messagesParts[1].c_str());
+                    mHeight = atoi(messagesParts[2].c_str());
+                    initOgre(mWidth, mHeight);
                 }    
                 if(messageType == kRenderOneFrameId)
                 {
                     renderOneFrame();
-                }    
+                }
+
+                if(messageType == kGetDownloadProgressId)
+                {
+                    mFileDownload.getDownloadProgress();
+                }
 
             }
 
@@ -554,11 +598,13 @@ namespace Ogre {
         
             try 
             {
-                  sb.initAppForNaCl(this, &mIosInputNaCl, 480, 480);
+                  sb.initAppForNaCl(this, &mIosInputNaCl, width, height);
                   sb.initApp();
                   mWasOgreInit = true;
                   RequestInputEvents(PP_INPUTEVENT_CLASS_MOUSE | PP_INPUTEVENT_CLASS_WHEEL | PP_INPUTEVENT_CLASS_KEYBOARD);
                   LogManager::getSingleton().logMessage("done ogre init!!!");
+                  resize();
+
                   PostMessage("renderedOneFrame");
             } 
             catch( Exception& e ) 
