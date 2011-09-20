@@ -56,7 +56,7 @@ namespace {
 
 namespace Ogre {
     NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance)
-		: pp::Graphics3DClient_Dev(instance)
+		: pp::Graphics3DClient(instance)
         , mWindow(window)
         , mGLSupport(glsupport)
         , mInstance(instance)
@@ -93,7 +93,7 @@ namespace Ogre {
                 PP_GRAPHICS3DATTRIB_NONE
             };
 
-            mContext = pp::Graphics3D_Dev(*mInstance, pp::Graphics3D_Dev(), attribs);
+            mContext = pp::Graphics3D(mInstance, pp::Graphics3D(), attribs);
             if (mContext.is_null()) 
             {
                 glSetCurrentContextPPAPI(0);
@@ -136,7 +136,7 @@ namespace Ogre {
         mFlushPending = flag;
     }
 
-    // overrides pp::Graphics3DClient_Dev
+    // overrides pp::Graphics3DClient
     void NaClGLContext::Graphics3DContextLost()
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

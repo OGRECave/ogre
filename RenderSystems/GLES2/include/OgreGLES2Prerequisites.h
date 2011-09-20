@@ -69,10 +69,9 @@ THE SOFTWARE.
 #	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #		include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
-#       include "ppapi/c/dev/ppb_opengles_dev.h"
-#       include "ppapi/cpp/dev/graphics_3d_dev.h"
-#       include "ppapi/cpp/dev/graphics_3d_client_dev.h"
-#       include "ppapi/cpp/dev/graphics_3d_dev.h"
+#       include "ppapi/c/ppb_opengles2.h"
+#       include "ppapi/cpp/graphics_3d.h"
+#       include "ppapi/cpp/graphics_3d_client.h"
 #		include "ppapi/gles2/gl2ext_ppapi.h"
 #       undef GL_OES_get_program_binary
 #       undef GL_OES_mapbuffer

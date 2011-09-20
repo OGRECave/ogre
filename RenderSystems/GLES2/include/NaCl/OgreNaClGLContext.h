@@ -34,13 +34,13 @@ THE SOFTWARE.
 namespace Ogre {
     class NaClGLSupport;
 
-    class _OgrePrivate NaClGLContext : public GLES2Context, public pp::Graphics3DClient_Dev
+    class _OgrePrivate NaClGLContext : public GLES2Context, public pp::Graphics3DClient
     {
 		private:
 			const NaClGLSupport *mGLSupport;
             const NaClWindow * mWindow;
             pp::Instance* mInstance;
-            pp::Graphics3D_Dev mContext;
+            pp::Graphics3D mContext;
             bool mFlushPending;
             unsigned int mWidth;
             unsigned int mHeight;

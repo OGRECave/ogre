@@ -50,8 +50,8 @@ namespace Ogre {
                 "NaClGLSupport::NaClGLSupport" );
 
         }
-        const PPB_OpenGLES2_Dev* gles2Interface = static_cast<const struct PPB_OpenGLES2_Dev*>(
-            module->GetBrowserInterface(PPB_OPENGLES2_DEV_INTERFACE));
+        const PPB_OpenGLES2* gles2Interface = static_cast<const struct PPB_OpenGLES2*>(
+            module->GetBrowserInterface(PPB_OPENGLES2_INTERFACE));
         if(!gles2Interface)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
