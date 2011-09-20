@@ -1226,7 +1226,6 @@ protected:
             sampleList.push_back("Sample_DynTex");      
             sampleList.push_back("Sample_FacialAnimation");
             sampleList.push_back("Sample_Fresnel");
-            sampleList.push_back("Sample_Grass");
             sampleList.push_back("Sample_ParticleFX");
 #   ifdef USE_RTSHADER_SYSTEM
             sampleList.push_back("Sample_ShaderSystem");
@@ -1235,7 +1234,10 @@ protected:
             sampleList.push_back("Sample_SkyBox"); 
             sampleList.push_back("Sample_SkyDome"); 
             sampleList.push_back("Sample_SkyPlane"); 
-            sampleList.push_back("Sample_Smoke");      		
+            sampleList.push_back("Sample_Smoke");
+            sampleList.push_back("Sample_Water");
+            sampleList.push_back("Sample_Transparency");
+            sampleList.push_back("Sample_TextureFX");
 #else
 			Ogre::ConfigFile cfg;
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
