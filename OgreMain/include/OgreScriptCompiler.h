@@ -839,6 +839,9 @@ namespace Ogre
 			ID_DEPTH_FAIL_OP,
 			ID_PASS_OP,
 			ID_TWO_SIDED,
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+        ID_RT_SHADER_SYSTEM,
+#endif
 		ID_END_BUILTIN_IDS
 	};
 	/** @} */
