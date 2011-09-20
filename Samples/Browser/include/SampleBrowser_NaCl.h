@@ -176,18 +176,18 @@ namespace Ogre {
         {
             mInstance->PostMessage("onTryToOpenLocalFile");
             
-            //if(IsError(result))
+            if(IsError(result))
             {
                 mInstance->PostMessage("file not found - will download.");
                 mInstance->PostMessage(String(String("downloading resource zip file started: ") + mUrl).c_str());
                 mNeedToStore = true;
                 downloadFile();
             }
-            /*else
+            else
             {
                 mInstance->PostMessage("file found!");
                 onOpenFile(PP_OK);
-            }*/
+            }
         }
 
         void downloadFile()
