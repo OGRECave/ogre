@@ -49,7 +49,7 @@ namespace Ogre
 				mSkeletonInstance( 0 ),
 				mBoneMatrices(0),
 				mBoneWorldMatrices(0),
-				mFrameAnimationLastUpdated(std::numeric_limits<unsigned long>::max()),
+				mFrameAnimationLastUpdated(std::numeric_limits<unsigned long>::max() - 1),
 				mSharedTransformEntity( 0 ),
 				mTransformLookupNumber(instanceID),
 				mPosition(Vector3::ZERO),
