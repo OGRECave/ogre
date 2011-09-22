@@ -379,12 +379,11 @@ namespace Ogre {
             , mFileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
             , mFileDownload(this,mFileSystem)
             , mWasOgreInit(false)
-            ,  mWidth(1), mHeight(1)
+            , mWidth(1), mHeight(1)
+            , mSwapFinished(false)
+            , mFrameRenderFinished(false)
         {
-            //SDL_NACL_SetInstance(instance, 1, 1);
-
-            mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
-            
+            //SDL_NACL_SetInstance(instance, 1, 1);            
         }
 
         virtual ~AppDelegate()
@@ -396,8 +395,11 @@ namespace Ogre {
         {            
             if(mWasOgreInit)
             {            
-                mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
-                renderOneFrame();
+                mSwapFinished = true;
+                if(mFrameRenderFinished)
+                {
+                    renderOneFrame();
+                }
             }
         }
 
@@ -517,6 +519,8 @@ namespace Ogre {
         bool mWasOgreInit;
         int mWidth, mHeight;
         pp::CompletionCallback mNaClSwapCallback;
+        bool mSwapFinished;
+        bool mFrameRenderFinished;
         
         void loadResourcesFromUrl(String url)
         {
@@ -628,7 +632,16 @@ namespace Ogre {
             {
                 try
                 {
+                    mSwapFinished = false;
+                    mFrameRenderFinished = false;
+                    mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
                     Root::getSingleton().renderOneFrame();
+                    mFrameRenderFinished = true;
+                    if(mSwapFinished)
+                    {
+                        mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
+                        mNaClSwapCallback.Run(0);
+                    }
                 } 
                 catch( Exception& e ) 
                 {
