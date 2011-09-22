@@ -147,6 +147,13 @@ protected:
         mSceneMgr->getRootSceneNode()->attachObject(mWater);
 	}
 
+    void windowUpdate()
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        mWindow->update();
+#endif
+    }
+
 	void setupProps()
 	{
         Entity* ent;
@@ -156,21 +163,21 @@ protected:
 		mTrayMgr->showBackdrop("SdkTrays/Shade");
 
 		pb->setComment("Upper Bath");
-		mWindow->update();
+		windowUpdate();
         ent = mSceneMgr->createEntity("UpperBath", "RomanBathUpper.mesh" );
 		mSceneMgr->getRootSceneNode()->attachObject(ent);        
         mSurfaceEnts.push_back(ent);
 		pb->setProgress(0.4);
 
 		pb->setComment("Columns");
-		mWindow->update();
+		windowUpdate();
         ent = mSceneMgr->createEntity("Columns", "columns.mesh");
 		mSceneMgr->getRootSceneNode()->attachObject(ent);        
         mSurfaceEnts.push_back(ent);
 		pb->setProgress(0.5);
 
 		pb->setComment("Ogre Head");
-		mWindow->update();
+		windowUpdate();
 		ent = mSceneMgr->createEntity("Head", "ogrehead.mesh");
 		ent->setMaterialName("RomanBath/OgreStone");
         mSurfaceEnts.push_back(ent);
@@ -182,12 +189,12 @@ protected:
         headNode->attachObject(ent);
 
 		pb->setComment("Lower Bath");
-		mWindow->update();
+		windowUpdate();
 		ent = mSceneMgr->createEntity("LowerBath", "RomanBathLower.mesh");
         mSceneMgr->getRootSceneNode()->attachObject(ent);
         mSubmergedEnts.push_back(ent);
 		pb->setProgress(1);
-		mWindow->update();
+		windowUpdate();
 
 		mTrayMgr->destroyWidget(pb);
 		mTrayMgr->hideBackdrop();

@@ -2810,29 +2810,30 @@ namespace OgreBites
 			return true;
 		}
 
+        void windowUpdate()
+        {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            mWindow->update();
+#endif
+        }
+
 		void resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount)
 		{
 			mLoadInc = mGroupInitProportion / scriptCount;
 			mLoadBar->setCaption("Parsing...");
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void scriptParseStarted(const Ogre::String& scriptName, bool& skipThisScript)
 		{
 			mLoadBar->setComment(scriptName);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void scriptParseEnded(const Ogre::String& scriptName, bool skipped)
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceGroupScriptingEnded(const Ogre::String& groupName) {}
@@ -2841,41 +2842,31 @@ namespace OgreBites
 		{
 			mLoadInc = mGroupLoadProportion / resourceCount;
 			mLoadBar->setCaption("Loading...");
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceLoadStarted(const Ogre::ResourcePtr& resource)
 		{
 			mLoadBar->setComment(resource->getName());
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceLoadEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void worldGeometryStageStarted(const Ogre::String& description)
 		{
 			mLoadBar->setComment(description);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void worldGeometryStageEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceGroupLoadEnded(const Ogre::String& groupName) {}
