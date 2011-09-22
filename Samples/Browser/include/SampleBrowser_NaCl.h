@@ -69,7 +69,6 @@ namespace Ogre {
     // These are the method names as JavaScript sees them.
     static const String kLoadUrlMethodId = "loadResourcesFromUrl";
     static const String kInitOgreId = "initOgre";
-    static const String kRenderOneFrameId = "renderOneFrame";
     static const String kMessageArgumentSeparator = ":";
     static const String kGetDownloadProgressId = "getDownloadProgress";
     
@@ -380,16 +379,28 @@ namespace Ogre {
             , mFileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
             , mFileDownload(this,mFileSystem)
             , mWasOgreInit(false)
-            , mHasFocus(true)
             ,  mWidth(1), mHeight(1)
         {
             //SDL_NACL_SetInstance(instance, 1, 1);
+
+            mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
+            
         }
 
         virtual ~AppDelegate()
         {
 
         }
+
+        void onSwapCallback(int32_t result) 
+        {            
+            if(mWasOgreInit)
+            {            
+                mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
+                renderOneFrame();
+            }
+        }
+
 
         bool HandleInputEvent(const pp::InputEvent& event)
         {
@@ -451,8 +462,6 @@ namespace Ogre {
         virtual void DidChangeFocus(bool has_focus)
         {
             pp::Instance::DidChangeFocus(has_focus);
-            mHasFocus = has_focus;
-            renderOneFrame();
         }
 
         // Called by the browser to handle the postMessage() call in Javascript.
@@ -486,10 +495,6 @@ namespace Ogre {
                     mHeight = atoi(messagesParts[2].c_str());
                     initOgre(mWidth, mHeight);
                 }    
-                if(messageType == kRenderOneFrameId)
-                {
-                    renderOneFrame();
-                }
 
                 if(messageType == kGetDownloadProgressId)
                 {
@@ -511,7 +516,7 @@ namespace Ogre {
         vector<MemoryDataStreamPtr>::type mResourcefilesToDeleteInTheEnd;
         bool mWasOgreInit;
         int mWidth, mHeight;
-        bool mHasFocus;
+        pp::CompletionCallback mNaClSwapCallback;
         
         void loadResourcesFromUrl(String url)
         {
@@ -598,14 +603,14 @@ namespace Ogre {
         
             try 
             {
-                  sb.initAppForNaCl(this, &mIosInputNaCl, width, height);
+                  sb.initAppForNaCl(this, &mNaClSwapCallback, &mIosInputNaCl, width, height);
                   sb.initApp();
                   mWasOgreInit = true;
                   RequestInputEvents(PP_INPUTEVENT_CLASS_MOUSE | PP_INPUTEVENT_CLASS_WHEEL | PP_INPUTEVENT_CLASS_KEYBOARD);
                   LogManager::getSingleton().logMessage("done ogre init!!!");
                   resize();
-
-                  PostMessage("renderedOneFrame");
+                  renderOneFrame();
+                    
             } 
             catch( Exception& e ) 
             {
@@ -619,10 +624,7 @@ namespace Ogre {
 
         void renderOneFrame()
         {
-            if(mWasOgreInit 
-                && 
-                (mHasFocus == true || sb.getRenderWindow()->isDeactivatedOnFocusChange() == false ) 
-                )
+            if(mWasOgreInit)
             {
                 try
                 {
@@ -635,7 +637,6 @@ namespace Ogre {
                     // handle js messages here
                     PostMessage(pp::Var(error.c_str()));
                 }
-                PostMessage("renderedOneFrame");
             }
         }
 
@@ -684,17 +685,36 @@ namespace Ogre {
             {
                 return true;
             }
-        
+
             class NaClMouse : public OIS::Mouse
             {
             public:
-                NaClMouse(OIS::InputManager* creator) : OIS::Mouse("", false, 0, creator) {};
+                NaClMouse(OIS::InputManager* creator) : 
+                    OIS::Mouse("", false, 0, creator)                    
+                {};
                 void setBuffered(bool){};
                 void capture(){};
                 OIS::Interface* queryInterface(OIS::Interface::IType) {return NULL;};
                 void _initialize(){};
+
                 bool HandleInputEvent(const pp::InputEvent& event)
-                {
+                {   
+                    if(event.GetType() == PP_INPUTEVENT_TYPE_WHEEL)
+                    {
+                        const pp::WheelInputEvent * wheelEvent =
+                            reinterpret_cast<const pp::WheelInputEvent*>(&event);
+
+			            mState.Z.rel = wheelEvent->GetDelta().y();
+		                if( mListener )
+			                mListener->mouseMoved( OIS::MouseEvent( this, mState ) );
+
+                        return false;
+                    }
+                    else
+                    {
+                        mState.Z.rel = 0;
+                    }
+
                     const pp::MouseInputEvent * mouseEvent =
                       reinterpret_cast<const pp::MouseInputEvent*>(&event);
                     

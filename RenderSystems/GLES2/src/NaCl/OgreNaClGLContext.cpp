@@ -44,23 +44,13 @@ THE SOFTWARE.
 
 #include <stdint.h>
 
-namespace {
-    // This is called by the browser when the 3D context has been flushed to the
-    // browser window.
-    void FlushCallback(void* data, int32_t result) 
-    {
-        static_cast<Ogre::NaClGLContext*>(data)->setFlushPending(false);
-    }
-
-}  // namespace
-
 namespace Ogre {
-    NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance)
+    NaClGLContext::NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback)
 		: pp::Graphics3DClient(instance)
         , mWindow(window)
         , mGLSupport(glsupport)
         , mInstance(instance)
-        , mFlushPending(false)
+        , mSwapCallback(swapCallback)
         , mWidth(mWindow->getWidth())
         , mHeight(mWindow->getHeight())
     {
@@ -113,27 +103,14 @@ namespace Ogre {
 
     GLES2Context* NaClGLContext::clone() const
     {
-        NaClGLContext* res = new NaClGLContext(mWindow, mGLSupport, mInstance);
+        NaClGLContext* res = new NaClGLContext(mWindow, mGLSupport, mInstance, mSwapCallback);
         res->mInstance = this->mInstance;
-        res->mFlushPending = this->mFlushPending;
         return res;
     }
 
     void NaClGLContext::swapBuffers( bool waitForVSync )
     {
-        if (mFlushPending) 
-        {
-            // A flush is pending so do nothing; just drop this flush on the floor.
-            return;
-        }
-        mFlushPending = true;
-
-        mContext.SwapBuffers(pp::CompletionCallback(&FlushCallback, this));
-    }
-
-    void NaClGLContext::setFlushPending( const bool flag )
-    {
-        mFlushPending = flag;
+        mContext.SwapBuffers(*mSwapCallback);
     }
 
     // overrides pp::Graphics3DClient
@@ -148,13 +125,13 @@ namespace Ogre {
     {
         if(mWidth != mWindow->getWidth() || mHeight != mWindow->getHeight() )
         {
-            LogManager::getSingleton().logMessage("\tresizing in setFlushPending(false)");
+            LogManager::getSingleton().logMessage("\tresizing");
             mWidth = mWindow->getWidth();
             mHeight = mWindow->getHeight();
             glSetCurrentContextPPAPI(0);
             mContext.ResizeBuffers( mWidth, mHeight );
             glSetCurrentContextPPAPI(mContext.pp_resource());
-            LogManager::getSingleton().logMessage("\tdone resizing in setFlushPending(false)");
+            LogManager::getSingleton().logMessage("\tdone resizing");
         }            
 
     }

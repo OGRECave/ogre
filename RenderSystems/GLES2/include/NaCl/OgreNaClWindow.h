@@ -41,6 +41,7 @@ namespace Ogre {
 		NaClGLSupport* mGLSupport;
 		NaClGLContext* mContext;
         pp::Instance* mInstance;
+        pp::CompletionCallback* mSwapCallback;
 		bool mClosed;
 
 		void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);

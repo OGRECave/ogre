@@ -45,7 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	NaClWindow::NaClWindow(NaClGLSupport *glsupport)
-		: mGLSupport(glsupport), mClosed(false), mContext(0), mInstance(0)
+		: mGLSupport(glsupport), mClosed(false), mContext(0), mInstance(0), mSwapCallback(0)
 	{
 	}
 
@@ -91,10 +91,17 @@ namespace Ogre {
 				mInstance = (pp::Instance*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
                 LogManager::getSingleton().logMessage("\tgot the pp::Instance.");
 			}
+            opt = miscParams->find("SwapCallback");
+            if(opt != end)
+            {
+                LogManager::getSingleton().logMessage("\tgetting SwapCallback - if stopped here - it means the parameter is null!");
+                mSwapCallback = (pp::CompletionCallback*)(Ogre::StringConverter::parseUnsignedLong(opt->second));
+                LogManager::getSingleton().logMessage("\tgot the SwapCallback.");
+            }
 			
 			if(mInstance != NULL)
 			{                
-				mContext = new NaClGLContext(this, mGLSupport, mInstance);
+				mContext = new NaClGLContext(this, mGLSupport, mInstance, mSwapCallback);
 			}
 			else
 			{

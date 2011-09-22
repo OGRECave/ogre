@@ -40,12 +40,12 @@ namespace Ogre {
 			const NaClGLSupport *mGLSupport;
             const NaClWindow * mWindow;
             pp::Instance* mInstance;
+            pp::CompletionCallback* mSwapCallback;
             pp::Graphics3D mContext;
-            bool mFlushPending;
             unsigned int mWidth;
             unsigned int mHeight;
         public:
-            NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance);
+            NaClGLContext(const NaClWindow * window, const NaClGLSupport *glsupport, pp::Instance* instance, pp::CompletionCallback* swapCallback);
             virtual ~NaClGLContext();
 
 			virtual void setCurrent();
@@ -54,10 +54,9 @@ namespace Ogre {
 
             void swapBuffers(bool waitForVSync);
 
-            void setFlushPending(const bool flag);
             void resize();
 
-            /// The Graphics3DClient interfcace - pp::Graphics3DClient_Dev
+            /// The Graphics3DClient interface - pp::Graphics3DClient_Dev
             virtual void Graphics3DContextLost();
 
     };

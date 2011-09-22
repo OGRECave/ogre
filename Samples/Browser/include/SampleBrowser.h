@@ -207,6 +207,7 @@ protected:
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             mNaClInstance = 0;
+            mNaClSwapCallback = 0;
             mOisFactory = 0;
             mInitWidth = 0;
             mInitHeight = 0;
@@ -235,9 +236,10 @@ protected:
 		| init data members needed only by NaCl
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-		void initAppForNaCl( pp::Instance* NaClInstance, OIS::FactoryCreator * oisFactory, Ogre::uint32 initWidth, Ogre::uint32 initHeight )
+		void initAppForNaCl( pp::Instance* naClInstance, pp::CompletionCallback* naClSwapCallback, OIS::FactoryCreator * oisFactory, Ogre::uint32 initWidth, Ogre::uint32 initHeight )
 		{
-            mNaClInstance = NaClInstance;
+            mNaClInstance = naClInstance;
+            mNaClSwapCallback = naClSwapCallback;
             mOisFactory = oisFactory;
             mInitWidth = initWidth;
             mInitHeight = initHeight;
@@ -1096,6 +1098,7 @@ protected:
             res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Size().iWidth, mNativeWindow->Size().iHeight, false, &miscParams);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
             miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
+            miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
             // create 1x1 window - we will resize later
             res = mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 #endif
@@ -1123,9 +1126,13 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void loadResources()
 		{
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 			mTrayMgr->showLoadingBar(1, 0);
+#endif
 			Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Popular");
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 			mTrayMgr->hideLoadingBar();
+#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -1416,7 +1423,7 @@ protected:
 			// create main navigation tray
 			mTrayMgr->showLogo(TL_RIGHT);
 			mTrayMgr->createSeparator(TL_RIGHT, "LogoSep");
-			mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample");
+			mTrayMgr->createButton(TL_RIGHT, "StartStop", "Start Sample", 120);
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 			mTrayMgr->createButton(TL_RIGHT, "UnloadReload", mLoadedSamples.empty() ? "Reload Samples" : "Unload Samples");
             mTrayMgr->createButton(TL_RIGHT, "Configure", "Configure");
@@ -1749,6 +1756,7 @@ protected:
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
+        pp::CompletionCallback* mNaClSwapCallback;
         OIS::FactoryCreator * mOisFactory;
         Ogre::uint32 mInitWidth;
         Ogre::uint32 mInitHeight;
