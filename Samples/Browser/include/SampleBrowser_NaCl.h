@@ -65,6 +65,35 @@
 #include "OgreZip.h"
 #include <GLES2\gl2.h>
 
+namespace 
+{
+
+// A small helper RAII class that implements a scoped pthread_mutex lock.
+class ScopedMutexLock 
+{
+public:
+    explicit ScopedMutexLock(pthread_mutex_t* mutex) : mutex_(mutex) 
+    {
+        if (pthread_mutex_lock(mutex_) != 0) 
+        {
+            mutex_ = NULL;
+        }
+    }
+    ~ScopedMutexLock() 
+    {
+        if (mutex_)
+            pthread_mutex_unlock(mutex_);
+    }
+    bool is_valid() const 
+    {
+        return mutex_ != NULL;
+    }
+private:
+    pthread_mutex_t* mutex_;  // Weak reference.
+};
+
+}  // namespace
+
 namespace Ogre {
     // These are the method names as JavaScript sees them.
     static const String kLoadUrlMethodId = "loadResourcesFromUrl";
@@ -383,11 +412,12 @@ namespace Ogre {
             , mSwapFinished(false)
             , mFrameRenderFinished(false)
         {
-            //SDL_NACL_SetInstance(instance, 1, 1);            
+            pthread_mutex_init(&input_mutex_, NULL);
         }
 
         virtual ~AppDelegate()
         {
+            pthread_mutex_destroy(&input_mutex_);
 
         }
 
@@ -406,7 +436,7 @@ namespace Ogre {
 
         bool HandleInputEvent(const pp::InputEvent& event)
         {
-            //SDL_NACL_PushEvent(event);
+            ScopedMutexLock scoped_mutex(&input_mutex_);
              return mIosInputNaCl.HandleInputEvent(event);
         }
 
@@ -521,6 +551,8 @@ namespace Ogre {
         pp::CompletionCallback mNaClSwapCallback;
         bool mSwapFinished;
         bool mFrameRenderFinished;
+        pthread_mutex_t input_mutex_;
+
         
         void loadResourcesFromUrl(String url)
         {
@@ -632,6 +664,8 @@ namespace Ogre {
             {
                 try
                 {
+                    ScopedMutexLock scoped_mutex(&input_mutex_);
+
                     mSwapFinished = false;
                     mFrameRenderFinished = false;
                     mNaClSwapCallback = mCcFactory.NewCallback(&AppDelegate::onSwapCallback);
