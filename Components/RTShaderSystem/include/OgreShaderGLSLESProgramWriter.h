@@ -89,11 +89,12 @@ protected:
 	/** Initialize string maps. */
 	void				initializeStringMaps		();
 
-    /** Cache function libraries. */
-	void				cacheFunctionLibraries		();
+    /** Cache functions of a dependency */
+    virtual void        cacheDependencyFunctions(const String & libName);
+
 
     /** Create a FunctionInvocation object from a string taken out of a shader library. */
-	FunctionInvocation	*createInvocationFromString	(String input);
+	FunctionInvocation	*createInvocationFromString	(const String & input);
 
     /** Write the program dependencies. */
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -148,6 +149,7 @@ protected:
 	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes
 	int							mGLSLVersion;					// Holds the current glsl es version
 	StringVector				mFragInputParams;				// Holds the fragment input params 
+    StringMap                   mCachedFunctionLibraries;       // Holds the cached function libraries
 };
 
 /** GLSL ES program writer factory implementation.
