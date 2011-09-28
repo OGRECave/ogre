@@ -201,7 +201,7 @@ namespace Ogre {
 	
 		mTriedToLinkAndFailed = !mLinked;
 
-		logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLHandle );
+		logObjectInfo( getCombinedName() + String(" GLSL link result : "), mGLHandle );
 		if(mLinked)
 		{
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
