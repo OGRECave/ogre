@@ -146,7 +146,7 @@ bool LayeredBlending::resolveDependencies(ProgramSet* programSet)
 	FFPTexturing::resolveDependencies(programSet);
 	Program* psProgram = programSet->getCpuFragmentProgram();
 
-	psProgram->addDependency("SGXLib_LayeredBlending");
+	psProgram->addDependency(SGX_LIB_LAYEREDBLENDING);
 
 	return true;
 }
