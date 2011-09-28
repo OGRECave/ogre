@@ -238,7 +238,7 @@ namespace Ogre {
 
                             // Try to identify a function definition
                             // First, look for a return type
-                            if(isBasicType(tokens[0]))
+                            if(isBasicType(tokens[0]) && ((tokens.size() < 3) || (tokens[2] != "=")) )
                             {
                                 String functionSig;
                                 String functionBody;
