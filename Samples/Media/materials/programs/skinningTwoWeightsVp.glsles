@@ -21,6 +21,8 @@ uniform vec4 lightPos[2];
 uniform vec4 lightDiffuseColour[2];
 uniform vec4 ambient;
 uniform sampler2D skinTex;
+uniform vec4 diffuse;
+
 
 void main()
 {
@@ -55,7 +57,7 @@ void main()
 		lightPos[1].xyz -  (blendPos.xyz * lightPos[1].w));
 
 	vec4 texColour = texture2D(skinTex, uv0.xy);
-	colour = texColour
+	colour = diffuse * (texColour
 		+ clamp(dot(lightDir0, blendNorm), 0.0, 1.0) * lightDiffuseColour[0]
-		+ clamp(dot(lightDir1, blendNorm), 0.0, 1.0) * lightDiffuseColour[1];
+		+ clamp(dot(lightDir1, blendNorm), 0.0, 1.0) * lightDiffuseColour[1]);
 }

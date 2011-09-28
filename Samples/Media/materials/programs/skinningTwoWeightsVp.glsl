@@ -14,6 +14,7 @@ uniform mat4 viewProjectionMatrix;
 uniform vec4 lightPos[2];
 uniform vec4 lightDiffuseColour[2];
 uniform vec4 ambient;
+uniform vec4 diffuse;
 
 void main()
 {
@@ -52,7 +53,7 @@ void main()
 	vec3 lightDir1 = normalize(
 		lightPos[1].xyz -  (blendPos * lightPos[1].w));
 		
-	gl_FrontColor = gl_FrontMaterial.diffuse * (ambient + (clamp(dot(lightDir0, blendNorm), 0.0, 1.0) * lightDiffuseColour[0]) + 
+	gl_FrontColor = diffuse * (ambient + (clamp(dot(lightDir0, blendNorm), 0.0, 1.0) * lightDiffuseColour[0]) + 
 		(clamp(dot(lightDir1, blendNorm), 0.0, 1.0) * lightDiffuseColour[1]));	
 
 	gl_TexCoord[0] = uv0;
