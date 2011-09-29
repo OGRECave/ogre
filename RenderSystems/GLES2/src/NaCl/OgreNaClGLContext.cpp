@@ -73,7 +73,10 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("\tcreate context started");
 
             int32_t attribs[] = {
-                PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 0,
+                PP_GRAPHICS3DATTRIB_BLUE_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_GREEN_SIZE, 8,
+                PP_GRAPHICS3DATTRIB_RED_SIZE, 8,
                 PP_GRAPHICS3DATTRIB_DEPTH_SIZE, 24,
                 PP_GRAPHICS3DATTRIB_STENCIL_SIZE, 8,
                 PP_GRAPHICS3DATTRIB_SAMPLES, 0,
