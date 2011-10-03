@@ -83,7 +83,21 @@ endif (OGRE_CG_SUPPORT_FOR_GLES2)
 	
 
 # Add system specific settings
-if (WIN32)
+if (OGRE_BUILD_PLATFORM_NACL)
+  set(PLATFORM_HEADERS 
+    include/NaCl/OgreGLES2Util.h
+    include/NaCl/OgreNaClGLContext.h
+    include/NaCl/OgreNaClGLSupport.h
+    include/NaCl/OgreNaClWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/NaCl/OgreNaClGLContext.cpp
+    src/NaCl/OgreNaClGLSupport.cpp
+    src/NaCl/OgreNaClWindow.cpp
+  )
+  include_directories(src/NaCl include/NaCl)
+  set(PLATFORM_HEADER_INSTALL "NaCl")
+elseif (WIN32)
   set(PLATFORM_HEADERS 
     include/EGL/WIN32/OgreWin32EGLContext.h
     include/EGL/WIN32/OgreWin32EGLSupport.h

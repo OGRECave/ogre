@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ THE SOFTWARE.
 #		endif
 #	endif
 #	define OGRE_NEW_FIX_FOR_WIN32 new 
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2) || (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	define OGRE_NEW_FIX_FOR_WIN32 new
 #else
 #	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
@@ -59,13 +59,23 @@ THE SOFTWARE.
 #   ifdef __OBJC__
 #       include <OpenGLES/EAGL.h>
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #	ifndef GL_GLEXT_PROTOTYPES
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
 #	include <GLES2/gl2platform.h>
 #	include <GLES2/gl2.h>
 #	include <GLES2/gl2ext.h>
+#	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#		include "ppapi/cpp/completion_callback.h"
+#       include "ppapi/cpp/instance.h"
+#       include "ppapi/c/ppb_opengles2.h"
+#       include "ppapi/cpp/graphics_3d.h"
+#       include "ppapi/cpp/graphics_3d_client.h"
+#		include "ppapi/gles2/gl2ext_ppapi.h"
+#       undef GL_OES_get_program_binary
+#       undef GL_OES_mapbuffer
+#	endif
 #else
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
@@ -133,7 +143,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \

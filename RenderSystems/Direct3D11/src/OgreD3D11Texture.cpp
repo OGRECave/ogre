@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -385,9 +385,9 @@ namespace Ogre
 			desc.SampleDesc.Quality = 0;
 		}
 
-		desc.Usage			= D3D11_USAGE_DEFAULT;//D3D11Mappings::_getUsage(mUsage);
+		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
 		desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-		desc.CPUAccessFlags = 0;//D3D11_CPU_ACCESS_WRITE;//D3D11Mappings::_getAccessFlags(mUsage);
+		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
 		desc.MiscFlags		= 0;//D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		//if (mMipmapsHardwareGenerated)
 		{
@@ -424,7 +424,6 @@ namespace Ogre
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
 		}
-
 
 		// create the texture
 		hr = mDevice->CreateTexture2D(	
@@ -504,6 +503,16 @@ namespace Ogre
 			}
 			break;
 		}
+
+		if (this->getTextureType() == TEX_TYPE_2D_ARRAY)
+		{
+			mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+			mSRVDesc.Texture2DArray.MipLevels = desc.MipLevels;
+			mSRVDesc.Texture2DArray.MostDetailedMip = 0;
+			mSRVDesc.Texture2DArray.ArraySize = desc.ArraySize;
+			mSRVDesc.Texture2DArray.FirstArraySlice = 0;
+
+		}
 		
 		hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
@@ -514,7 +523,7 @@ namespace Ogre
 				"D3D11Texture::_create2DTex");
 		}
 
-		this->_setFinalAttributes(desc.Width, desc.Height, 1, D3D11Mappings::_getPF(desc.Format));
+		this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize, D3D11Mappings::_getPF(desc.Format));
 	}
 	//---------------------------------------------------------------------
 	void D3D11Texture::_create3DTex()

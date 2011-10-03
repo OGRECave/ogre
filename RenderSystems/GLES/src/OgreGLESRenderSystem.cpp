@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2001,21 +2001,14 @@ namespace Ogre {
                                                 StencilOperation passOp,
                                                 bool twoSidedOperation)
     {
-		bool flip;
 		mStencilMask = mask;
 
-        // NB: We should always treat CCW as front face for consistent with default
-        // culling mode. Therefore, we must take care with two-sided stencil settings.
-        flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
-            (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-
-        flip = false;
         glStencilMask(mask);
         glStencilFunc(convertCompareFunction(func), refValue, mask);
         glStencilOp(
-            convertStencilOp(stencilFailOp, flip),
-            convertStencilOp(depthFailOp, flip), 
-            convertStencilOp(passOp, flip));
+            convertStencilOp(stencilFailOp, false),
+            convertStencilOp(depthFailOp, false), 
+            convertStencilOp(passOp, false));
     }
 
     GLuint GLESRenderSystem::getCombinedMinMipFilter(void) const

@@ -9,6 +9,7 @@ SamplePlugin=Sample_CubeMapping_d
 SamplePlugin=Sample_DeferredShading_d
 SamplePlugin=Sample_Dot3Bump_d
 SamplePlugin=Sample_DynTex_d
+SamplePlugin=Sample_DualQuaternion_d
 SamplePlugin=Sample_FacialAnimation_d
 SamplePlugin=Sample_Fresnel_d
 SamplePlugin=Sample_Grass_d

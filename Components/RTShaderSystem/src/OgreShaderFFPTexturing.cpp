@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -805,14 +805,27 @@ void FFPTexturing::copyFrom(const SubRenderState& rhs)
 //-----------------------------------------------------------------------
 bool FFPTexturing::preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass)
 {
-	setTextureUnitCount(srcPass->getNumTextureUnitStates());
+	//count the number of texture units we need to process
+	size_t validTexUnits = 0;
+	for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
+	{		
+		if (isProcessingNeeded(srcPass->getTextureUnitState(i)))
+		{
+			++validTexUnits;
+		}
+	}
+
+	setTextureUnitCount(validTexUnits);
 
 	// Build texture stage sub states.
 	for (unsigned short i=0; i < srcPass->getNumTextureUnitStates(); ++i)
 	{		
 		TextureUnitState* texUnitState = srcPass->getTextureUnitState(i);								
 
-		setTextureUnit(i, texUnitState);			
+		if (isProcessingNeeded(texUnitState))
+		{
+			setTextureUnit(i, texUnitState);	
+		}
 	}	
 
 	return true;
@@ -907,6 +920,12 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 
 	 if (curParams.mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
 		 curParams.mVSOutTextureCoordinateType = GCT_FLOAT3;	
+}
+
+//-----------------------------------------------------------------------
+bool FFPTexturing::isProcessingNeeded(TextureUnitState* texUnitState)
+{
+	return texUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT;
 }
 
 

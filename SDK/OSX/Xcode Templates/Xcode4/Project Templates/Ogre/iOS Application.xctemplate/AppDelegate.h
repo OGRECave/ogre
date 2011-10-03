@@ -3,8 +3,8 @@
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
-#error This header is for use with iOS only
+#if !defined(OGRE_IS_IOS)
+#  error This header is for use with iOS only
 #endif
 
 #ifdef __OBJC__

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
+#include "OgreDualQuaternion.h"
 #include "OgreAutoParamDataSource.h"
 #include "OgreLight.h"
 #include "OgreRoot.h"
@@ -52,7 +53,8 @@ namespace Ogre
 
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY_3x4,        "world_matrix_array_3x4",      12, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_WORLD_MATRIX_ARRAY,            "world_matrix_array",          16, ET_REAL, ACDT_NONE),
-
+		AutoConstantDefinition(ACT_WORLD_DUALQUATERNION_ARRAY_2x4, "world_dualquaternion_array_2x4",      8, ET_REAL, ACDT_NONE),
+		AutoConstantDefinition(ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4, "world_scale_shear_matrix_array_3x4", 9, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_VIEW_MATRIX,                   "view_matrix",                 16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_INVERSE_VIEW_MATRIX,           "inverse_view_matrix",         16, ET_REAL, ACDT_NONE),
 		AutoConstantDefinition(ACT_TRANSPOSE_VIEW_MATRIX,              "transpose_view_matrix",             16, ET_REAL, ACDT_NONE),
@@ -1053,6 +1055,8 @@ namespace Ogre
 		case ACT_INVERSE_TRANSPOSE_WORLD_MATRIX:
 		case ACT_WORLD_MATRIX_ARRAY_3x4:
 		case ACT_WORLD_MATRIX_ARRAY:
+		case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+		case ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
 		case ACT_WORLDVIEW_MATRIX:
 		case ACT_INVERSE_WORLDVIEW_MATRIX:
 		case ACT_TRANSPOSE_WORLDVIEW_MATRIX:
@@ -1625,6 +1629,8 @@ namespace Ogre
 		Vector3 vec3;
 		Vector4 vec4;
 		Matrix3 m3;
+		Matrix4 scaleM;
+		DualQuaternion dQuat;
 
 		mActivePassIterationIndex = std::numeric_limits<size_t>::max();
 
@@ -1975,6 +1981,58 @@ namespace Ogre
 				case ACT_WORLD_MATRIX_ARRAY:
 					_writeRawConstant(i->physicalIndex, source->getWorldMatrixArray(), 
 						source->getWorldMatrixCount());
+					break;
+				case ACT_WORLD_DUALQUATERNION_ARRAY_2x4:
+					// Loop over matrices
+					pMatrix = source->getWorldMatrixArray();
+					numMatrices = source->getWorldMatrixCount();
+					index = i->physicalIndex;
+					for (m = 0; m < numMatrices; ++m)
+					{
+						dQuat.fromTransformationMatrix(*pMatrix);
+						_writeRawConstants(index, dQuat.ptr(), 8);
+						index += 8;
+						++pMatrix;
+					}
+					break;
+				case ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4:
+					// Loop over matrices
+					pMatrix = source->getWorldMatrixArray();
+					numMatrices = source->getWorldMatrixCount();
+					index = i->physicalIndex;
+					
+					scaleM = Matrix4::IDENTITY;
+					
+					for (m = 0; m < numMatrices; ++m)
+					{
+						//Based on Matrix4::decompostion, but we don't need the rotation or position components
+						//but do need the scaling and shearing. Shearing isn't available from Matrix4::decomposition
+						assert((*pMatrix).isAffine());
+						
+						(*pMatrix).extract3x3Matrix(m3);
+
+						Matrix3 matQ;
+						Vector3 scale;
+						
+						//vecU is the scaling component with vecU[0] = u01, vecU[1] = u02, vecU[2] = u12
+						//vecU[0] is shearing (x,y), vecU[1] is shearing (x,z), and vecU[2] is shearing (y,z)
+						//The first component represents the coordinate that is being sheared,
+						//while the second component represents the coordinate which performs the shearing.
+						Vector3 vecU;
+						m3.QDUDecomposition( matQ, scale, vecU );
+						
+						scaleM[0][0] = scale.x;
+						scaleM[1][1] = scale.y;
+						scaleM[2][2] = scale.z;
+
+						scaleM[0][1] = vecU[0];
+						scaleM[0][2] = vecU[1];
+						scaleM[1][2] = vecU[2];
+						
+						_writeRawConstants(index, scaleM[0], 12);
+						index += 12;
+						++pMatrix;
+					}
 					break;
 				case ACT_WORLDVIEW_MATRIX:
 					_writeRawConstant(i->physicalIndex, source->getWorldViewMatrix(),i->elementCount);

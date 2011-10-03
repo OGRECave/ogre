@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,24 +79,50 @@ namespace Ogre
 		friend class InstanceBatchHW;
 		friend class InstanceBatchHW_VTF;
 		friend class BaseInstanceBatchVTF;
+	protected:
+		uint16 mInstanceId; //Note it may change after defragmenting!
+		bool mInUse;
+		InstanceBatch *mBatchOwner;
 
-		uint16				m_instanceID;			//Note it may change after defragmenting!
-		bool				m_inUse;
-		InstanceBatch		*m_batchOwner;
+		AnimationStateSet *mAnimationState;
+		SkeletonInstance *mSkeletonInstance;
+		Matrix4 *mBoneMatrices;	 //Local space
+		Matrix4 *mBoneWorldMatrices; //World space
+		unsigned long mFrameAnimationLastUpdated;
 
-		AnimationStateSet	*mAnimationState;
-		SkeletonInstance	*m_skeletonInstance;
-		Matrix4				*mBoneMatrices;			//Local space
-		Matrix4				*mBoneWorldMatrices;	//World space
-		Matrix4				mLastParentXform;
-		unsigned long		mFrameAnimationLastUpdated;
-
-		bool				mSharedTransform;		//When true, another InstancedEntity controls
-													//the skeleton
+		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
+												
+		//Used in conjunction with bone matrix lookup. Tells the number of the transform for
+		//as arranged in the vertex texture
+		uint16 mTransformLookupNumber;
 
 		//Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
-		InstancedEntityVec m_sharingPartners;
+		InstancedEntityVec mSharingPartners;
+
+		//////////////////////////////////////////////////////////////////////////
+		// Parameters used for local transformation offset information
+		// The 
+		//////////////////////////////////////////////////////////////////////////
+
+		///Object position
+		Vector3 mPosition;
+		Vector3 mDerivedLocalPosition;
+		///Object orientation
+		Quaternion mOrientation;
+		///Object scale
+		Vector3 mScale;
+		///The maximum absolute scale for all dimension
+		Real mMaxScaleLocal;
+		///Full world transform
+		Matrix4 mFullLocalTransform;
+		///Tells if mFullTransform needs an updated
+		bool mNeedTransformUpdate;
+		/// Tells if the animation world transform needs an update
+		bool mNeedAnimTransformUpdate;
+		/// Tells whether to use the local transform parameters
+		bool mUseLocalTransform;
+
 
 		//Returns number of matrices written to xform, assumes xform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
@@ -104,7 +130,7 @@ namespace Ogre
 		size_t getTransforms3x4( float *xform ) const;
 
 		//Returns true if this InstancedObject is visible to the current camera
-		bool findVisible( Camera *camera );
+		bool findVisible( Camera *camera ) const;
 
 		//Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
 		void createSkeletonInstance();
@@ -116,11 +142,14 @@ namespace Ogre
 		//Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
 
+		//Mark the transformation matrixes as dirty
+		inline void markTransformDirty();
+
 		/// Incremented count for next name extension
         static NameGenerator msNameGenerator;
 
 	public:
-		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID );
+		InstancedEntity( InstanceBatch *batchOwner, uint32 instanceID, InstancedEntity* sharedTransformEntity = NULL);
 		virtual ~InstancedEntity();
 
 		/** Shares the entire transformation with another InstancedEntity. This is useful when a mesh
@@ -151,7 +180,7 @@ namespace Ogre
 		*/
 		void stopSharingTransform();
 
-		InstanceBatch* _getOwner() const { return m_batchOwner; }
+		InstanceBatch* _getOwner() const { return mBatchOwner; }
 
 		const String& getMovableType(void) const;
 
@@ -171,9 +200,9 @@ namespace Ogre
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
 		/** @see Entity::hasSkeleton */
-		bool hasSkeleton(void) const { return m_skeletonInstance != 0; }
+		bool hasSkeleton(void) const { return mSkeletonInstance != 0; }
 		/** @see Entity::getSkeleton */
-		SkeletonInstance* getSkeleton(void) const { return m_skeletonInstance; }
+		SkeletonInstance* getSkeleton(void) const { return mSkeletonInstance; }
 
 		/** @see Entity::getAnimationState */
 		AnimationState* getAnimationState(const String& name) const;
@@ -185,7 +214,61 @@ namespace Ogre
 			@remarks Assumes it has a skeleton (m_skeletonInstance != 0)
 			@returns true if something was actually updated
 		*/
-		bool _updateAnimation(void);
+		virtual bool _updateAnimation(void);
+
+		/** Sets the transformation look up number */
+		void setTransformLookupNumber(uint16 num) { mTransformLookupNumber = num;}
+
+		/** Retrieve the position */
+		const Vector3& getPosition() const { return mPosition; }
+		/** Set the position or the offset from the parent node if a parent node exists */ 
+		void setPosition(const Vector3& position, bool doUpdate = true);
+
+		/** Retrieve the orientation */
+		const Quaternion& getOrientation() const { return mOrientation; }
+		/** Set the orientation or the offset from the parent node if a parent node exists */
+		void setOrientation(const Quaternion& orientation, bool doUpdate = true);
+
+		/** Retrieve the local scale */ 
+		const Vector3& getScale() const { return mScale; }
+		/** Set the  scale or the offset from the parent node if a parent node exists  */ 
+		void setScale(const Vector3& scale, bool doUpdate = true);
+
+		/** Returns the maximum derived scale coefficient among the xyz values */
+		Real getMaxScaleCoef() const;
+
+		/** Update the world transform and derived values */
+		void updateTransforms();
+
+		/** Tells if the entity is in use. */
+		bool isInUse() const { return mInUse; }
+		/** Sets whether the entity is in use. */
+		void setInUse(bool used);
+
+		/** Returns the world transform of the instanced entity including local transform */
+		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			return mUseLocalTransform ? mFullLocalTransform :
+				mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
+		}
+
+		/** Returns the derived position of the instanced entity including local transform */
+		const Vector3& _getDerivedPosition() const {
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			return mUseLocalTransform ? mDerivedLocalPosition :
+				mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
+		}
+
+		/** @copydoc MovableObject::isInScene. */
+		virtual bool isInScene(void) const
+		{
+			//We assume that the instanced entity is in the scene if it is in use
+			//It is in the scene whether it has a parent node or not
+			return mInUse;
+		}
+
+
+
 	};
 }
 

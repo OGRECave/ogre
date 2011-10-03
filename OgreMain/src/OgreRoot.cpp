@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -112,8 +112,10 @@ namespace Ogre {
         assert( ms_Singleton );  return ( *ms_Singleton );
     }
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
     typedef void (*DLL_START_PLUGIN)(void);
     typedef void (*DLL_STOP_PLUGIN)(void);
+#endif
 
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
@@ -123,6 +125,7 @@ namespace Ogre {
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
 	  , mRemoveQueueStructuresOnClear(false)
+	  , mDefaultMinPixelSize(0)
 	  , mNextMovableObjectTypeFlag(1)
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
@@ -366,6 +369,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Root::saveConfig(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "saveConfig is not supported on NaCl",
+            "Root::saveConfig");
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Check the Documents directory within the application sandbox
         Ogre::String outBaseName, extension, configFileName;
@@ -413,6 +420,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::restoreConfig(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "restoreConfig is not supported on NaCl",
+            "Root::restoreConfig");
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // Read the config from Documents first(user config) if it exists on iPhone.
         // If it doesn't exist or is invalid then use mConfigFileName
@@ -525,6 +537,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool Root::showConfigDialog(void)
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+        OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE, "showConfigDialog is not supported on NaCl",
+            "Root::showConfigDialog");
+#endif
+
         // Displays the standard config dialog
         // Will use stored defaults if available
         ConfigDialog* dlg;
@@ -1069,6 +1086,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void Root::unloadPlugins(void)
     {
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		// unload dynamic libs first
         for (PluginLibList::reverse_iterator i = mPluginLibs.rbegin(); i != mPluginLibs.rend(); ++i)
         {
@@ -1090,7 +1108,7 @@ namespace Ogre {
 			(*i)->uninstall();
 		}
 		mPlugins.clear();
-
+#endif
     }
     //-----------------------------------------------------------------------
     void Root::addResourceLocation(const String& name, const String& locType,
@@ -1309,6 +1327,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	void Root::loadPlugin(const String& pluginName)
 	{
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		// Load plugin library
         DynLib* lib = DynLibManager::getSingleton().load( pluginName );
 		// Store for later unload
@@ -1327,11 +1346,12 @@ namespace Ogre {
 			// This must call installPlugin
 			pFunc();
 		}
-
+#endif
 	}
     //-----------------------------------------------------------------------
 	void Root::unloadPlugin(const String& pluginName)
 	{
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         PluginLibList::iterator i;
 
         for (i = mPluginLibs.begin(); i != mPluginLibs.end(); ++i)
@@ -1349,7 +1369,8 @@ namespace Ogre {
 			}
 
         }
-	}
+#endif
+    }
     //-----------------------------------------------------------------------
     Timer* Root::getTimer(void)
     {

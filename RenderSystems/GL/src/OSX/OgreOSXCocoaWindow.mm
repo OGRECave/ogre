@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -212,7 +212,17 @@ namespace Ogre {
 
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");
-            
+
+            // Make active
+            mActive = true;
+            mClosed = false;
+            mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
+            mWidth = width;
+            mHeight = height;
+            mColourDepth = depth;
+            mFSAA = fsaa_samples;
+            mIsFullScreen = fullScreen;
+
             if(!miscParams || opt == miscParams->end())
             {
                 createNewWindow(width, height, [windowTitle cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -254,19 +264,11 @@ namespace Ogre {
             // Create register the context with the rendersystem and associate it with this window
             mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
         }
-		// make active
-        setHidden(hidden);
-		mActive = true;
-        mClosed = false;
-        mName = [windowTitle cStringUsingEncoding:NSUTF8StringEncoding];
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
-        mIsFullScreen = fullScreen;
-		
+
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+
+        setHidden(hidden);
 
         [pool drain];
     }
@@ -518,7 +520,7 @@ namespace Ogre {
     void OSXCocoaWindow::createNewWindow(unsigned int width, unsigned int height, String title)
     {
         mWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, width, height)
-                                              styleMask:NSResizableWindowMask
+                                              styleMask:NSResizableWindowMask|NSTitledWindowMask
                                                 backing:NSBackingStoreBuffered
                                                   defer:NO];
         [mWindow setTitle:[NSString stringWithCString:title.c_str() encoding:NSUTF8StringEncoding]];

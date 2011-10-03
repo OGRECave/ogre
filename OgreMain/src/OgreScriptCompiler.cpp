@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1266,6 +1266,9 @@ namespace Ogre
 		mIds["depth_fail_op"] = ID_DEPTH_FAIL_OP;
 		mIds["pass_op"] = ID_PASS_OP;
 		mIds["two_sided"] = ID_TWO_SIDED;
+#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
+		mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
+#endif
 	}
 
 	// AbstractTreeeBuilder

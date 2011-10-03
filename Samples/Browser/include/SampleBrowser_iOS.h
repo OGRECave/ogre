@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2009 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -58,6 +58,7 @@
     NSDate* mDate;
     NSTimeInterval mLastFrameTime;
     BOOL mDisplayLinkSupported;
+    BOOL mIsAtLeastiOS4;
 }
 
 - (void)go;
@@ -138,6 +139,10 @@
     mLastFrameTime = 1;
     mDisplayLink = nil;
     mTimer = nil;
+    mIsAtLeastiOS4 = NO;
+
+    if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
+        mIsAtLeastiOS4 = YES;
 
     // A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
     // class is used as fallback when it isn't available.
@@ -190,7 +195,15 @@
         NSTimeInterval differenceInSeconds = currentFrameTime - mLastFrameTime;
         mLastFrameTime = currentFrameTime;
 
-        Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
+#if __IPHONE_4_0
+        if(mIsAtLeastiOS4)
+            dispatch_async(dispatch_get_main_queue(), ^(void)
+            {
+                Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
+            });
+        else
+#endif
+            Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
     }
     else
     {

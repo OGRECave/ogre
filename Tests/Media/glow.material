@@ -1,0 +1,244 @@
+
+
+vertex_program glow_vs_glsl glsl
+{
+	source vs_glow.glsl
+}
+
+fragment_program glow_ps_glsl glsl
+{
+	source ps_glow.glsl
+
+}
+
+material glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+			fragment_program_ref glow_ps_glsl 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.4
+			}
+			vertex_program_ref glow_vs_glsl 
+			{
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+		}
+		
+	}
+}
+
+
+material alpha_glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+			fragment_program_ref glow_ps_glsl 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.0
+			}
+			vertex_program_ref glow_vs_glsl 
+			{
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+		}
+
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+			fragment_program_ref glow_ps_glsl 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.0
+			}
+			
+		}
+		
+	}
+}
+
+material no_depth_check_glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check off
+			lighting off
+			
+			fragment_program_ref glow_ps_glsl 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.4
+			}
+			vertex_program_ref glow_vs_glsl 
+			{
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+		}
+	
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+vertex_program glow_vs_cg cg
+{
+	source vs_glow.cg
+	entry_point main
+	profiles vs_1_1 arbvp1
+
+}
+
+fragment_program glow_ps_cg cg
+{
+	source ps_glow.cg
+	entry_point main
+	profiles ps_2_0 arbfp1	
+	
+
+
+}
+
+
+
+
+material cg/glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+
+			vertex_program_ref glow_vs_cg
+			{
+				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+			
+			fragment_program_ref glow_ps_cg 
+			{
+				param_named alpha_value float 0.4
+				param_named_auto time time_0_x 100
+			}
+		}
+		
+	}
+}
+
+
+
+material cg/alpha_glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+			fragment_program_ref glow_ps_cg 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.0
+			}
+			vertex_program_ref glow_vs_cg 
+			{
+				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+		}
+		
+	pass
+		{
+			scene_blend alpha_blend
+			depth_check on
+			lighting off
+			
+			fragment_program_ref glow_ps_cg 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.0
+			}
+		}		
+		
+	}
+}
+
+material cg/no_depth_check_glow
+{
+	technique
+	{
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check off
+			lighting off
+			
+			fragment_program_ref glow_ps_cg 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.4
+			}
+		}
+		
+		pass
+		{
+			scene_blend alpha_blend
+			depth_check off
+			lighting off
+			
+			fragment_program_ref glow_ps_cg 
+			{
+				param_named_auto time time_0_x 100
+				param_named alpha_value float 0.4
+			}
+			vertex_program_ref glow_vs_cg 
+			{
+				param_named_auto worldViewProjMatrix worldviewproj_matrix
+				param_named size_value float 1.1
+				param_named_auto time time_0_x 100
+			}
+		}
+	
+	}
+}
+
+

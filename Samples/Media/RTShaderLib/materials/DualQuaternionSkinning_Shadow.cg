@@ -1,0 +1,292 @@
+float2x4 blendTwoWeights(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+{
+	float2x4 blendDQ = blendWgt.x*dualQuaternions[blendIdx.x];
+	blendDQ += blendWgt.y*dualQuaternions[blendIdx.y];
+
+	return blendDQ;
+}
+
+float2x4 blendTwoWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+{
+	float2x4 dq0 = dualQuaternions[blendIdx.x];
+	float2x4 dq1 = dualQuaternions[blendIdx.y];
+
+	//Accurate antipodality handling. For speed increase, remove the following line, 
+	//though, the results will only be valid for rotations less than 180 degrees.
+	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	
+	float2x4 blendDQ = blendWgt.x*dq0;
+	blendDQ += blendWgt.y*dq1;
+
+	return blendDQ;
+}
+
+float2x4 blendThreeWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+{
+	float2x4 dq0 = dualQuaternions[blendIdx.x];
+	float2x4 dq1 = dualQuaternions[blendIdx.y];
+	float2x4 dq2 = dualQuaternions[blendIdx.z];
+
+	//Accurate antipodality handling. For speed increase, remove the following line, 
+	//though, the results will only be valid for rotations less than 180 degrees.
+	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	if (dot(dq0[0], dq2[0]) < 0.0) dq2 *= -1.0;
+	
+	float2x4 blendDQ = blendWgt.x*dq0;
+	blendDQ += blendWgt.y*dq1;
+	blendDQ += blendWgt.z*dq2;
+	
+	return blendDQ;
+}
+
+float2x4 blendFourWeightsAntipod(float4 blendWgt, float4 blendIdx, float2x4 dualQuaternions[24])
+{
+	float2x4 dq0 = dualQuaternions[blendIdx.x];
+	float2x4 dq1 = dualQuaternions[blendIdx.y];
+	float2x4 dq2 = dualQuaternions[blendIdx.z];
+	float2x4 dq3 = dualQuaternions[blendIdx.w];
+
+	//Accurate antipodality handling. For speed increase, remove the following line, 
+	//though, the results will only be valid for rotations less than 180 degrees.
+	if (dot(dq0[0], dq1[0]) < 0.0) dq1 *= -1.0;
+	if (dot(dq0[0], dq2[0]) < 0.0) dq2 *= -1.0;
+	if (dot(dq0[0], dq3[0]) < 0.0) dq3 *= -1.0;
+	
+	float2x4 blendDQ = blendWgt.x*dq0;
+	blendDQ += blendWgt.y*dq1;
+	blendDQ += blendWgt.z*dq2;
+	blendDQ += blendWgt.w*dq3;
+
+	return blendDQ;
+}
+
+float3 calculateBlendPosition(float4 position, float2x4 blendDQ)
+{
+	float3 blendPosition = position.xyz + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, position.xyz) + blendDQ[0].x*position.xyz);
+	float3 trans = 2.0*(blendDQ[0].x*blendDQ[1].yzw - blendDQ[1].x*blendDQ[0].yzw + cross(blendDQ[0].yzw, blendDQ[1].yzw));
+	blendPosition += trans;
+
+	return blendPosition;
+}
+
+float3 calculateBlendNormal(float3 normal, float2x4 blendDQ)
+{
+	return normal + 2.0*cross(blendDQ[0].yzw, cross(blendDQ[0].yzw, normal) + blendDQ[0].x*normal);
+}
+
+float3x3 adjointTransposeMatrix(float3x3 M)
+{
+	float3x3 atM;
+	atM._m00 = M._m22 * M._m11 - M._m12 * M._m21;
+	atM._m01 = M._m12 * M._m20 - M._m10 * M._m22;
+	atM._m02 = M._m10 * M._m21 - M._m20 * M._m11;
+
+	atM._m10 = M._m02 * M._m21 - M._m22 * M._m01;
+	atM._m11 = M._m22 * M._m00 - M._m02 * M._m20;
+	atM._m12 = M._m20 * M._m01 - M._m00 * M._m21;
+
+	atM._m20 = M._m12 * M._m01 - M._m02 * M._m11;
+	atM._m21 = M._m10 * M._m02 - M._m12 * M._m00;
+	atM._m22 = M._m00 * M._m11 - M._m10 * M._m01;
+
+	return atM;
+}
+
+void shadow_caster_dq_vs(
+	float4 position : POSITION,
+	out float4 oPosition : POSITION,
+	out float2 oDepthInfo : TEXCOORD0,
+	
+	uniform float4x4 wvpMatrix)
+{
+	// output position.
+	oPosition = mul(wvpMatrix, position);
+
+	// depth info for the fragment.
+	oDepthInfo.x = oPosition.z;
+	oDepthInfo.y = oPosition.w;
+}
+
+void shadow_caster_dq_ps(
+	in float4 colour : COLOR,
+	out float4 oColour : COLOR)
+{	
+	oColour = colour;
+}
+
+//Shadow caster pass
+void shadow_caster_dq_skinning_1weight_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
+
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+void shadow_caster_dq_skinning_2weight_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	float2x4 blendDQ = blendTwoWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
+
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+void shadow_caster_dq_skinning_3weight_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	float2x4 blendDQ = blendThreeWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
+
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+void shadow_caster_dq_skinning_4weight_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	float2x4 blendDQ = blendFourWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
+
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+
+//Two-phase skinning shadow caster pass
+void shadow_caster_dq_skinning_1weight_twophase_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float3x4 scaleM[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	//First phase - applies scaling and shearing:
+	float3x4 blendS = blendWgt.x*scaleM[blendIdx.x];
+		
+	float3 pass1_position = mul(blendS, position);
+
+	//Second phase
+	float2x4 blendDQ = blendWgt.x * worldDualQuaternion2x4Array[blendIdx.x];
+	
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+//Two-phase skinning shadow caster pass
+void shadow_caster_dq_skinning_2weight_twophase_vs(
+	float4 position : POSITION,
+	float4 blendIdx : BLENDINDICES,
+	float4 blendWgt : BLENDWEIGHT,
+	
+	out float4 oPosition : POSITION,
+	out float4 colour    : COLOR,
+	// Support up to 24 bones of float3x4
+	// vs_1_1 only supports 96 params so more than this is not feasible
+	uniform float2x4 worldDualQuaternion2x4Array[24],
+	uniform float3x4 scaleM[24],
+	uniform float4x4 viewProjectionMatrix,
+	uniform float4   ambient)
+{
+	//First phase - applies scaling and shearing:
+	float3x4 blendS = blendWgt.x*scaleM[blendIdx.x];
+	blendS += blendWgt.y*scaleM[blendIdx.y];	
+		
+	float3 pass1_position = mul(blendS, position);
+
+	//Second phase
+	float2x4 blendDQ = blendTwoWeightsAntipod(blendWgt, blendIdx, worldDualQuaternion2x4Array);
+	
+	float len = length(blendDQ[0]);
+	blendDQ /= len;
+
+	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
+
+	// view / projection
+	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
+	
+	colour = ambient;
+}
+
+

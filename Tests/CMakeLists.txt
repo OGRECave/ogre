@@ -10,12 +10,14 @@
 # Configure Tests build
 if (OGRE_BUILD_TESTS)
 
+
   if (CppUnit_FOUND)
 	# unit tests are go!
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/OgreMain/include)
 	
 	set(HEADER_FILES 
 		OgreMain/include/BitwiseTests.h
+		OgreMain/include/DualQuaternionTests.h
 		OgreMain/include/EdgeBuilderTests.h
 		OgreMain/include/FileSystemArchiveTests.h
 		OgreMain/include/MeshWithoutIndexDataTests.h
@@ -30,6 +32,7 @@ if (OGRE_BUILD_TESTS)
 	)
 	set(SOURCE_FILES 
 		OgreMain/src/BitwiseTests.cpp
+		OgreMain/src/DualQuaternionTests.cpp
 		OgreMain/src/EdgeBuilderTests.cpp
 		OgreMain/src/FileSystemArchiveTests.cpp
 		OgreMain/src/MeshWithoutIndexDataTests.cpp
@@ -173,6 +176,9 @@ if (OGRE_BUILD_TESTS)
 
 	  # PlayPen gets included always
 	add_subdirectory(PlayPen)
+
+	# add VisualTests directory
+	add_subdirectory(VisualTests)
 
     endif (OIS_FOUND)
 

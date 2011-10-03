@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -204,8 +204,10 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_WORLD_MATRIX,           		"inverse_world_matrix",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_TRANSPOSE_WORLD_MATRIX,         		"transpose_world_matrix",           	GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 		"inverse_transpose_world_matrix",		GCT_MATRIX_4X4),
-		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4,					"world_matrix_array_3x4",				GCT_MATRIX_3X4),
-		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY,						"world_matrix_array",					GCT_MATRIX_4X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4,				"world_matrix_array_3x4",				GCT_MATRIX_3X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY,					"world_matrix_array",					GCT_MATRIX_4X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4,		"world_dualquaternion_array_2x4",		GCT_MATRIX_2X4),
+		AutoShaderParameter(GpuProgramParameters::ACT_WORLD_SCALE_SHEAR_MATRIX_ARRAY_3x4,	"world_scale_shear_matrix_array_3x4",		GCT_MATRIX_3X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_VIEW_MATRIX,							"view_matrix",							GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX,					"inverse_view_matrix",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_TRANSPOSE_VIEW_MATRIX,          		"transpose_view_matrix",				GCT_MATRIX_4X4),
@@ -420,6 +422,32 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 }
 
 //-----------------------------------------------------------------------
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type)
+{
+	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
+
+	mName				= parameterDef->name;
+	if (fAutoConstantData != 0.0)
+	{
+		mName += StringConverter::toString(fAutoConstantData);
+		//replace possible illegal point character in name
+		std::replace(mName.begin(), mName.end(), '.', '_'); 
+	}
+	mType				= type;
+	mSemantic			= SPS_UNKNOWN;
+	mIndex				= -1;
+	mContent			= SPC_UNKNOWN;
+	mIsAutoConstantReal	= true;	
+	mIsAutoConstantInt	= false;
+	mAutoConstantType	= autoType;
+	mAutoConstantRealData = fAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
+	mParamsPtr			 = NULL;
+	mPhysicalIndex		 = -1;
+	mSize				 = size;
+}
+
+//-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
 	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
@@ -428,6 +456,28 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 	if (nAutoConstantData != 0)
 		mName += StringConverter::toString(nAutoConstantData);
 	mType				= parameterDef->type;
+	mSemantic			= SPS_UNKNOWN;
+	mIndex				= -1;
+	mContent			= SPC_UNKNOWN;
+	mIsAutoConstantReal	= false;	
+	mIsAutoConstantInt	= true;
+	mAutoConstantType	= autoType;
+	mAutoConstantIntData = nAutoConstantData;
+	mVariability		= (uint16)GPV_GLOBAL;
+	mParamsPtr			 = NULL;
+	mPhysicalIndex		 = -1;
+	mSize				 = size;
+}
+
+//-----------------------------------------------------------------------
+UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
+{
+	AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
+
+	mName				= parameterDef->name;
+	if (nAutoConstantData != 0)
+		mName += StringConverter::toString(nAutoConstantData);
+	mType				= type;
 	mSemantic			= SPS_UNKNOWN;
 	mIndex				= -1;
 	mContent			= SPC_UNKNOWN;

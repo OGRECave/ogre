@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -479,7 +479,6 @@ namespace Ogre {
 				fiBitmap = newBitmap;
 				// get new formats
 				bpp = FreeImage_GetBPP(fiBitmap);
-				colourType = FreeImage_GetColorType(fiBitmap);
 			}
 			// Perform any colour conversions for RGB
 			else if (bpp < 8 || colourType == FIC_PALETTE || colourType == FIC_CMYK)
@@ -502,7 +501,6 @@ namespace Ogre {
 				fiBitmap = newBitmap;
 				// get new formats
 				bpp = FreeImage_GetBPP(fiBitmap);
-				colourType = FreeImage_GetColorType(fiBitmap);
 			}
 
 			// by this stage, 8-bit is greyscale, 16/24/32 bit are RGB[A]

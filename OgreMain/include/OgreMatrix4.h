@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -506,8 +506,9 @@ namespace Ogre
           return Quaternion(m3x3);
         }
 
-        static const Matrix4 ZERO;
-        static const Matrix4 IDENTITY;
+	static const Matrix4 ZERO;
+	static const Matrix4 ZEROAFFINE;
+	static const Matrix4 IDENTITY;
         /** Useful little matrix which takes 2D clipspace {-1, 1} to {0,1}
             and inverts the Y. */
         static const Matrix4 CLIPSPACE2DTOIMAGESPACE;

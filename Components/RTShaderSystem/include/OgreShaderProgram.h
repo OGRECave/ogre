@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -62,6 +62,15 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
 	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, Real data, size_t size = 0);
+	
+	/** Resolve uniform auto constant parameter with associated real data of this program.
+	@param autoType The auto type of the desired parameter.	
+	@param type The desired data type of the auto parameter.
+	@param data The data to associate with the auto parameter.
+	@param size number of elements in the parameter.	
+	Return parameter instance in case of that resolve operation succeeded.	
+	*/
+	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
 
 	/** Resolve uniform auto constant parameter with associated int data of this program.
 	@param autoType The auto type of the desired parameter.	
@@ -70,6 +79,15 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
 	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, size_t data, size_t size = 0);
+	
+	/** Resolve uniform auto constant parameter with associated int data of this program.
+	@param autoType The auto type of the desired parameter.
+	@param type The desired data type of the auto parameter.
+	@param data The data to associate with the auto parameter.
+	@param size number of elements in the parameter.
+	Return parameter instance in case of that resolve operation succeeded.	
+	*/
+	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, size_t data, size_t size = 0);
 
 	/** Resolve uniform parameter of this program.
 	@param type The type of the desired parameter.

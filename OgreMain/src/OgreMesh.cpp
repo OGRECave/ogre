@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1351,7 +1351,6 @@ namespace Ogre {
                     {
                         // This is a 3D set, might be tangents
                         foundExisting = true;
-						foundSemantic = VES_TEXTURE_COORDINATES;
                     }
 
                 }
@@ -1368,7 +1367,6 @@ namespace Ogre {
 				if (testElem)
 				{
 					foundExisting = true;
-					foundSemantic = targetSemantic;
 				}
 
 			}
@@ -1813,10 +1811,6 @@ namespace Ogre {
 			posElem->getSource());
 
 		size_t elemsPerVertex = destBuf->getVertexSize()/sizeof(float);
-		size_t dstSkip = elemsPerVertex - 3;
-		if (normals)
-			dstSkip -= 3;
-			
 
 		// Have to lock in normal mode since this is incremental
 		float* pBase = static_cast<float*>(

@@ -1,6 +1,8 @@
 # Configure NewInstancing demo build
 
-set(HEADER_FILES include/NewInstancing.h)
+set(HEADER_FILES 
+  include/NewInstancing.h
+  include/MersenneTwister.h)
 set(SOURCE_FILES src/NewInstancing.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)

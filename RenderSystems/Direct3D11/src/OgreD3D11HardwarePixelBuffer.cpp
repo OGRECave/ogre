@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -99,6 +99,9 @@ namespace Ogre {
 		if(mUsage & TU_RENDERTARGET)
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "DirectX does not allow locking of or directly writing to RenderTargets. Use blitFromMemory if you need the contents.",
 			"D3D11HardwarePixelBuffer::lockImpl");	
+
+		mLockBox = lockBox;
+
 		// Set extents and format
 		// Note that we do not carry over the left/top/front here, since the returned
 		// PixelBox will be re-based from the locking point onwards
@@ -148,7 +151,6 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
-			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->Map(
 							mParentTexture->GetTex2D(), 
@@ -156,6 +158,24 @@ namespace Ogre {
 							flags, 
 							0, 
 							&pMappedResource);
+					rval.data = pMappedResource.pData;
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
+							"D3D11HardwarePixelBuffer::lockImpl");
+					}
+				}
+				break;
+			case TEX_TYPE_2D_ARRAY:
+				{
+					mDevice.GetImmediateContext()->Map(
+						mParentTexture->GetTex2D(), 
+						D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), lockBox.front, mParentTexture->getNumMipmaps()), 
+						flags, 
+						0, 
+						&pMappedResource);
 					rval.data = pMappedResource.pData;
 					if (mDevice.isError())
 					{
@@ -190,6 +210,8 @@ namespace Ogre {
 			rval.data = mDataForStaticUsageLock;
 		}
 
+		mCurrentLock = rval;
+
 		return rval;
 	}
 	//-----------------------------------------------------------------------------  
@@ -205,10 +227,15 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
+				{							  
+					mDevice.GetImmediateContext()->Unmap(mParentTexture->GetTex2D(), 
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()));
+				}
+				break;
 			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->Unmap(mParentTexture->GetTex2D(), 
-					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()));
+						D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()));
 				}
 				break;
 			case TEX_TYPE_3D:
@@ -220,8 +247,31 @@ namespace Ogre {
 		}
 		else
 		{
-			const Image::Box dstBox;
-			D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(dstBox);
+			D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
+			dstBoxDx11.front = 0;
+			dstBoxDx11.back = mLockBox.getDepth();
+
+			// copied from dx9
+			size_t rowWidth;
+			if (PixelUtil::isCompressed(mCurrentLock.format))
+			{
+				// D3D wants the width of one row of cells in bytes
+				if (mCurrentLock.format == PF_DXT1)
+				{
+					// 64 bits (8 bytes) per 4x4 block
+					rowWidth = (mCurrentLock.rowPitch / 4) * 8;
+				}
+				else
+				{
+					// 128 bits (16 bytes) per 4x4 block
+					rowWidth = (mCurrentLock.rowPitch / 4) * 16;
+				}
+
+			}
+			else
+			{
+				rowWidth = mCurrentLock.rowPitch * PixelUtil::getNumElemBytes(mCurrentLock.format);
+			}
 
 			switch(mParentTexture->getTextureType()) {
 			case TEX_TYPE_1D:
@@ -231,7 +281,7 @@ namespace Ogre {
 						mParentTexture->GetTex1D(), 
 						static_cast<UINT>(mSubresourceIndex),
 						&dstBoxDx11, 
-						mDataForStaticUsageLock, 0, 0);
+						mDataForStaticUsageLock, rowWidth, 0);
 					if (mDevice.isError())
 					{
 						String errorDescription = mDevice.getErrorDescription();
@@ -243,35 +293,72 @@ namespace Ogre {
 				break;
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
-			case TEX_TYPE_2D_ARRAY:
 				{
 					mDevice.GetImmediateContext()->UpdateSubresource(
 						mParentTexture->GetTex2D(), 
 						D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()),
 						&dstBoxDx11, 
-						mDataForStaticUsageLock, 0, 0);
+						mDataForStaticUsageLock, rowWidth, 0);
 
 					if (mDevice.isError())
 					{
 						String errorDescription = mDevice.getErrorDescription();
 						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
+							"D3D11 device cannot map 2D texture\nError Description:" + errorDescription,
+							"D3D11HardwarePixelBuffer::lockImpl");
+					}
+				}
+				break;
+			case TEX_TYPE_2D_ARRAY:
+				{
+					mDevice.GetImmediateContext()->UpdateSubresource(
+						mParentTexture->GetTex2D(), 
+						D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()),
+						&dstBoxDx11, 
+						mDataForStaticUsageLock, rowWidth, 0);
+
+					if (mDevice.isError())
+					{
+						String errorDescription = mDevice.getErrorDescription();
+						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+							"D3D11 device cannot map 2D texture array\nError Description:" + errorDescription,
 							"D3D11HardwarePixelBuffer::lockImpl");
 					}
 				}
 				break;
 			case TEX_TYPE_3D:
 				{
+					size_t sliceWidth;
+					if (PixelUtil::isCompressed(mCurrentLock.format))
+					{
+						// D3D wants the width of one slice of cells in bytes
+						if (mCurrentLock.format == PF_DXT1)
+						{
+							// 64 bits (8 bytes) per 4x4 block
+							sliceWidth = (mCurrentLock.slicePitch / 16) * 8;
+						}
+						else
+						{
+							// 128 bits (16 bytes) per 4x4 block
+							sliceWidth = (mCurrentLock.slicePitch / 16) * 16;
+						}
+
+					}
+					else
+					{
+						sliceWidth = mCurrentLock.slicePitch * PixelUtil::getNumElemBytes(mCurrentLock.format);
+					}
+
 					mDevice.GetImmediateContext()->UpdateSubresource(
 						mParentTexture->GetTex3D(), 
 						static_cast<UINT>(mSubresourceIndex),
 						&dstBoxDx11, 
-						mDataForStaticUsageLock, 0, 0);
+						mDataForStaticUsageLock, rowWidth, sliceWidth);
 					if (mDevice.isError())
 					{
 						String errorDescription = mDevice.getErrorDescription();
 						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
+							"D3D11 device cannot map 3D texture\nError Description:" + errorDescription,
 							"D3D11HardwarePixelBuffer::lockImpl");
 					}
 				}
@@ -341,7 +428,6 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
-		case TEX_TYPE_2D_ARRAY:
 			{
 				mDevice.GetImmediateContext()->CopySubresourceRegion(
 					mParentTexture->GetTex2D(), 
@@ -349,6 +435,26 @@ namespace Ogre {
 					static_cast<UINT>(dstBox.left),
 					static_cast<UINT>(dstBox.top),
 					mFace,
+					rsrcDx11->mParentTexture->GetTex2D(),
+					static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+					&srcBoxDx11);
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot copy 2d subresource Region\nError Description:" + errorDescription,
+						"D3D11HardwarePixelBuffer::blit");
+				}
+			}
+			break;
+		case TEX_TYPE_2D_ARRAY:
+			{
+				mDevice.GetImmediateContext()->CopySubresourceRegion(
+					mParentTexture->GetTex2D(), 
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), srcBox.front, mParentTexture->getNumMipmaps()),
+					static_cast<UINT>(dstBox.left),
+					static_cast<UINT>(dstBox.top),
+					srcBox.front,
 					rsrcDx11->mParentTexture->GetTex2D(),
 					static_cast<UINT>(rsrcDx11->mSubresourceIndex),
 					&srcBoxDx11);
@@ -416,6 +522,8 @@ namespace Ogre {
 		PixelBox converted = src;
 
 		D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(dstBox);
+		dstBoxDx11.front = 0;
+		dstBoxDx11.back = converted.getDepth();
 
 		// convert to pixelbuffer's native format if necessary
 		if (src.format != mFormat)
@@ -427,10 +535,27 @@ namespace Ogre {
 			PixelUtil::bulkPixelConversion(src, converted);
 		}
 
-		// In d3d11 the Row Pitch is defined as: "The size of one row of the source data" and not 
-		// the same as the OGRE row pitch - meaning that we need to multiple the OGRE row pitch 
-		// with the size in bytes of the element to get the d3d11 row pitch. 
-		UINT d3dRowPitch = static_cast<UINT>(converted.rowPitch) * static_cast<UINT>(PixelUtil::getNumElemBytes(mFormat));
+		// copied from dx9
+		size_t rowWidth;
+		if (PixelUtil::isCompressed(converted.format))
+		{
+			// D3D wants the width of one row of cells in bytes
+			if (converted.format == PF_DXT1)
+			{
+				// 64 bits (8 bytes) per 4x4 block
+				rowWidth = (converted.rowPitch / 4) * 8;
+			}
+			else
+			{
+				// 128 bits (16 bytes) per 4x4 block
+				rowWidth = (converted.rowPitch / 4) * 16;
+			}
+
+		}
+		else
+		{
+			rowWidth = converted.rowPitch * PixelUtil::getNumElemBytes(converted.format);
+		}
 
 
 		switch(mParentTexture->getTextureType()) {
@@ -442,7 +567,7 @@ namespace Ogre {
 					0,
 					&dstBoxDx11,
 					converted.data,
-					0,
+					rowWidth,
 					0 );
 				if (mDevice.isError())
 				{
@@ -455,14 +580,13 @@ namespace Ogre {
 			break;
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D:
-		case TEX_TYPE_2D_ARRAY:
 			{
 				mDevice.GetImmediateContext()->UpdateSubresource( 
 					mParentTexture->GetTex2D(), 
 					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()),
 					&dstBoxDx11,
 					converted.data,
-					d3dRowPitch,
+					rowWidth,
 					0 );
 				if (mDevice.isError())
 				{
@@ -473,15 +597,55 @@ namespace Ogre {
 				}
 			}
 			break;
+		case TEX_TYPE_2D_ARRAY:
+			{
+				mDevice.GetImmediateContext()->UpdateSubresource( 
+					mParentTexture->GetTex2D(), 
+					D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), src.front, mParentTexture->getNumMipmaps()),
+					&dstBoxDx11,
+					converted.data,
+					rowWidth,
+					0 );
+				if (mDevice.isError())
+				{
+					String errorDescription = mDevice.getErrorDescription();
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+						"D3D11 device cannot update 2d array subresource\nError Description:" + errorDescription,
+						"D3D11HardwarePixelBuffer::blitFromMemory");
+				}
+			}
+			break;
 		case TEX_TYPE_3D:
 			{
+				// copied from dx9
+				size_t sliceWidth;
+				if (PixelUtil::isCompressed(converted.format))
+				{
+					// D3D wants the width of one slice of cells in bytes
+					if (converted.format == PF_DXT1)
+					{
+						// 64 bits (8 bytes) per 4x4 block
+						sliceWidth = (converted.slicePitch / 16) * 8;
+					}
+					else
+					{
+						// 128 bits (16 bytes) per 4x4 block
+						sliceWidth = (converted.slicePitch / 16) * 16;
+					}
+
+				}
+				else
+				{
+					sliceWidth = converted.slicePitch * PixelUtil::getNumElemBytes(converted.format);
+				}
+
 				mDevice.GetImmediateContext()->UpdateSubresource( 
 					mParentTexture->GetTex3D(), 
 					static_cast<UINT>(mSubresourceIndex),
 					&dstBoxDx11,
 					converted.data,
-					d3dRowPitch,
-					static_cast<UINT>(converted.slicePitch)
+					rowWidth,
+					sliceWidth
 					);
 				if (mDevice.isError())
 				{

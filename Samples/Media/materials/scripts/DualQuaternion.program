@@ -1,0 +1,148 @@
+///////////////////////////////////////////////////////////////////////////
+/// Declare CG shaders for skinning
+///////////////////////////////////////////////////////////////////////////
+// Dual quaternion hardware skinning using two indexed weights per vertex
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
+{
+	source DualQuaternion.cg
+	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
+	profiles vp40 vs_4_0 vs_3_0 vs_2_0
+	includes_skeletal_animation true
+}
+
+// Dual quaternion two phase hardware skinning using two indexed weights per vertex, supports scaling and shearing
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg cg
+{
+	source DualQuaternion.cg
+	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp
+	profiles vp40 vs_4_0 vs_3_0 vs_2_0
+	includes_skeletal_animation true
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Declare CG shaders for shadow casters
+///////////////////////////////////////////////////////////////////////////
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg cg
+{
+	source DualQuaternion.cg
+	entry_point dualQuaternionHardwareSkinningTwoWeightsCaster_vp
+	profiles vp40 vs_4_0 vs_3_0 vs_1_1 arbvp1
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg cg
+{
+	source DualQuaternion.cg
+	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp
+	profiles vp40 vs_4_0 vs_3_0 vs_1_1 arbvp1
+	includes_skeletal_animation true
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Declare GLSL shaders for skinning
+///////////////////////////////////////////////////////////////////////////
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon glsl
+{
+	source DualQuaternion_Common.glsl
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL glsl
+{
+	source DualQuaternion.glsl
+	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+}
+
+// Dual quaternion two phase hardware skinning using two indexed weights per vertex, supports scaling and shearing
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL glsl
+{
+	source DualQuaternion_TwoPhase.glsl
+	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Declare GLSL shaders for shadow casters
+///////////////////////////////////////////////////////////////////////////
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL glsl
+{
+	source DualQuaternion_ShadowCaster.glsl
+	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL glsl
+{
+	source DualQuaternion_TwoPhaseShadowCaster.glsl
+	attach Ogre/DualQuaternionHardwareSkinningTwoWeightsCommon
+	includes_skeletal_animation true
+}
+
+///////////////////////////////////////////////////////////////////////////
+/// Declare unified shaders 
+///////////////////////////////////////////////////////////////////////////
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
+{	
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL
+	
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto lightPos[0] light_position 0
+		param_named_auto lightPos[1] light_position 1
+		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+		param_named_auto ambient ambient_light_colour
+		//This property isn't relevant for GLSL, uses the GLSL material state instead
+		param_named_auto diffuse surface_diffuse_colour 
+	}
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
+{	
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL
+	
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
+{
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL
+	
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto lightPos[0] light_position 0
+		param_named_auto lightPos[1] light_position 1
+		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+		param_named_auto ambient ambient_light_colour
+		//This property isn't relevant for GLSL, uses the GLSL material state instead
+		param_named_auto diffuse surface_diffuse_colour
+	}
+}
+
+vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster unified
+{
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
+	
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}

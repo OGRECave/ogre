@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2009 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -163,7 +163,7 @@ namespace OgreBites
 				Ogre::TextureFilterOptions tfo;
 				unsigned int aniso;
 
-				switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
+				switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
 				{
 				case 'B':
 					newVal = "Trilinear";

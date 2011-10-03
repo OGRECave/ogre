@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2009 Torus Knot Software Ltd
+ Copyright (c) 2000-2011 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,11 @@
 #   pragma warning (disable : 4244)
 #endif
 
+#if OGRE_UNICODE_SUPPORT
+	#define DISPLAY_STRING_TO_STRING(DS) (DS.asUTF8())
+#else
+	#define DISPLAY_STRING_TO_STRING(DS) (DS)
+#endif
 namespace OgreBites
 {
 	enum TrayLocation   // enumerator values for widget tray anchoring locations
@@ -176,7 +181,7 @@ namespace OgreBites
 		static Ogre::Real getCaptionWidth(const Ogre::DisplayString& caption, Ogre::TextAreaOverlayElement* area)
 		{
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
-			Ogre::String current = caption.asUTF8();
+			Ogre::String current = DISPLAY_STRING_TO_STRING(caption);
 			Ogre::Real lineWidth = 0;
 
 			for (unsigned int i = 0; i < current.length(); i++)
@@ -201,7 +206,7 @@ namespace OgreBites
 		static void fitCaptionToArea(const Ogre::DisplayString& caption, Ogre::TextAreaOverlayElement* area, Ogre::Real maxWidth)
 		{
 			Ogre::Font* f = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(area->getFontName()).getPointer();
-			Ogre::String s = caption.asUTF8();
+			Ogre::String s = DISPLAY_STRING_TO_STRING(caption);
 
 			int nl = s.find('\n');
 			if (nl != -1) s = s.substr(0, nl);
@@ -448,7 +453,7 @@ namespace OgreBites
 
 			Ogre::Font* font = (Ogre::Font*)Ogre::FontManager::getSingleton().getByName(mTextArea->getFontName()).getPointer();
             
-			Ogre::String current = text.asUTF8();
+			Ogre::String current = DISPLAY_STRING_TO_STRING(text);
 			bool firstWord = true;
 			unsigned int lastSpace = 0;
 			unsigned int lineBegin = 0;
@@ -1425,15 +1430,15 @@ namespace OgreBites
 		{
 			for (unsigned int i = 0; i < mNames.size(); i++)
 			{
-				if (mNames[i] == paramName.asUTF8())
+				if (mNames[i] == DISPLAY_STRING_TO_STRING(paramName))
 				{
-					mValues[i] = paramValue.asUTF8();
+					mValues[i] = DISPLAY_STRING_TO_STRING(paramValue);
 					updateText();
 					return;
 				}
 			}
 
-			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + DISPLAY_STRING_TO_STRING(paramName) + "\".";
 			OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
 		}
 
@@ -1446,7 +1451,7 @@ namespace OgreBites
 				OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::setParamValue");
 			}
 
-			mValues[index] = paramValue.asUTF8();
+			mValues[index] = DISPLAY_STRING_TO_STRING(paramValue);
 			updateText();
 		}
 
@@ -1454,10 +1459,10 @@ namespace OgreBites
 		{
 			for (unsigned int i = 0; i < mNames.size(); i++)
 			{
-				if (mNames[i] == paramName.asUTF8()) return mValues[i];
+				if (mNames[i] == DISPLAY_STRING_TO_STRING(paramName)) return mValues[i];
 			}
 			
-			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + paramName.asUTF8() + "\".";
+			Ogre::String desc = "ParamsPanel \"" + getName() + "\" has no parameter \"" + DISPLAY_STRING_TO_STRING(paramName) + "\".";
 			OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, desc, "ParamsPanel::getParamValue");
 			return "";
 		}
@@ -2776,13 +2781,13 @@ namespace OgreBites
 					oss << std::fixed << std::setprecision(1) << stats.avgFPS;
 					Ogre::String str = oss.str();
 					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
-					values.push_back(s);
+					values.push_back(str);
 
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.bestFPS;
 					str = oss.str();
 					for (int i = str.length() - 5; i > 0; i -= 3) { str.insert(i, 1, ','); }
-					values.push_back(s);
+					values.push_back(str);
 
 					oss.str("");
 					oss << std::fixed << std::setprecision(1) << stats.worstFPS;
@@ -2805,29 +2810,30 @@ namespace OgreBites
 			return true;
 		}
 
+        void windowUpdate()
+        {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+            mWindow->update();
+#endif
+        }
+
 		void resourceGroupScriptingStarted(const Ogre::String& groupName, size_t scriptCount)
 		{
 			mLoadInc = mGroupInitProportion / scriptCount;
 			mLoadBar->setCaption("Parsing...");
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void scriptParseStarted(const Ogre::String& scriptName, bool& skipThisScript)
 		{
 			mLoadBar->setComment(scriptName);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void scriptParseEnded(const Ogre::String& scriptName, bool skipped)
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceGroupScriptingEnded(const Ogre::String& groupName) {}
@@ -2836,41 +2842,31 @@ namespace OgreBites
 		{
 			mLoadInc = mGroupLoadProportion / resourceCount;
 			mLoadBar->setCaption("Loading...");
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceLoadStarted(const Ogre::ResourcePtr& resource)
 		{
 			mLoadBar->setComment(resource->getName());
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceLoadEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void worldGeometryStageStarted(const Ogre::String& description)
 		{
 			mLoadBar->setComment(description);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void worldGeometryStageEnded()
 		{
 			mLoadBar->setProgress(mLoadBar->getProgress() + mLoadInc);
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-			mWindow->update();
-#endif
+			windowUpdate();
 		}
 
 		void resourceGroupLoadEnded(const Ogre::String& groupName) {}

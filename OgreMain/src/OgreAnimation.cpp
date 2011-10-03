@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -400,18 +400,12 @@ namespace Ogre {
 
 			VertexData* swVertexData;
 			VertexData* hwVertexData;
-			VertexData* origVertexData;
-			bool firstAnim = false;
-			bool normals = false;
 			if (handle == 0)
 			{
 				// shared vertex data
-				firstAnim = !entity->_getBuffersMarkedForAnimation();
 				swVertexData = entity->_getSoftwareVertexAnimVertexData();
 				hwVertexData = entity->_getHardwareVertexAnimVertexData();
-				origVertexData = entity->getMesh()->sharedVertexData;
 				entity->_markBuffersUsedForAnimation();
-				normals = entity->getMesh()->getSharedVertexDataAnimationIncludesNormals();
 			}
 			else
 			{
@@ -420,12 +414,9 @@ namespace Ogre {
 				// Skip this track if subentity is not visible
 				if (!s->isVisible())
 					continue;
-				firstAnim = !s->_getBuffersMarkedForAnimation();
 				swVertexData = s->_getSoftwareVertexAnimVertexData();
 				hwVertexData = s->_getHardwareVertexAnimVertexData();
-				origVertexData = s->getSubMesh()->vertexData;
 				s->_markBuffersUsedForAnimation();
-				normals = s->getSubMesh()->getVertexAnimationIncludesNormals();
 			}
 			// Apply to both hardware and software, if requested
 			if (software)

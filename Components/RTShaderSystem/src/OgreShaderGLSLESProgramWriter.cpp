@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -60,7 +60,7 @@ namespace Ogre {
         {
             mGLSLVersion = 100;
             initializeStringMaps();
-            cacheFunctionLibraries();
+            mFunctionCacheMap.clear();
         }
 
         //-----------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace Ogre {
 
         }
 
-        FunctionInvocation * GLSLESProgramWriter::createInvocationFromString(String input)
+        FunctionInvocation * GLSLESProgramWriter::createInvocationFromString(const String & input)
         {
             String functionName, returnType;
             FunctionInvocation *invoc = NULL;
@@ -159,182 +159,6 @@ namespace Ogre {
             return invoc;
         }
         
-        //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::cacheFunctionLibraries()
-        {
-            mFunctionCacheMap.clear();
-
-            StringVectorPtr libNames(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
-            libNames->push_back( FFP_LIB_COMMON );
-            libNames->push_back( FFP_LIB_FOG );
-            libNames->push_back( FFP_LIB_LIGHTING );
-            libNames->push_back( FFP_LIB_TEXTURING );
-            libNames->push_back( FFP_LIB_TRANSFORM );
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-            libNames->push_back( SGX_LIB_INTEGRATEDPSSM );
-            libNames->push_back( SGX_LIB_LAYEREDBLENDING );
-            libNames->push_back( SGX_LIB_NORMALMAPLIGHTING );
-            libNames->push_back( SGX_LIB_PERPIXELLIGHTING );
-//            libNames->push_back( "SGX_HardwareSkinning" );
-#endif
-            Ogre::StringVector::const_iterator libraryIterator = libNames->begin();
-
-            // Iterate over all shader libraries
-            while ( libraryIterator != libNames->end() )
-            {
-                DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(*libraryIterator + ".glsles");
-                
-                StringMap functionCache;
-                functionCache.clear();
-
-                String line;
-                while(!stream->eof())
-                {
-                    // Grab a line
-                    line = stream->getLine();
-
-                    // Ignore empty lines and comments
-                    if(line.length() > 0)
-                    {
-                        // Strip whitespace
-                        StringUtil::trim(line);
-
-                        // If we find a multiline comment, run through till we get to the end 
-                        if(line.at(0) == '/' && line.at(1) == '*')
-                        {
-                            bool endFound = false;
-                            
-                            while(!endFound)
-                            {
-                                // Get the next line
-                                line = stream->getLine();
-
-                                // Skip empties
-                                if(line.length() > 0)
-                                {
-                                    // Look for the ending sequence.
-                                    String::size_type comment_pos = line.find("*/", 0);
-                                    if(comment_pos != String::npos)
-                                    {
-                                        endFound = true;
-                                    }
-                                }
-                            }
-                        }
-                        else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
-                        {
-                            // Break up the line.
-                            StringVector tokens = StringUtil::tokenise(line, " (\n\r");
-
-                            // Cache #defines
-                            if(tokens[0] == "#define")
-                            {
-                                // Add the line in
-                                mDefinesMap[line] = *libraryIterator;
-
-                                // Move on to the next line in the shader
-                                continue;
-                            }
-
-                            // Try to identify a function definition
-                            // First, look for a return type
-                            if(isBasicType(tokens[0]))
-                            {
-                                String functionSig;
-                                String functionBody;
-                                FunctionInvocation *functionInvoc = NULL;
-
-                                // Return type
-                                functionSig += tokens[0];
-                                functionSig += " ";
-                                
-                                // Function name
-                                functionSig += tokens[1];
-                                functionSig += "(";
-
-                                bool foundEndOfSignature = false;
-                                // Now look for all the parameters, they may span multiple lines
-                                while(!foundEndOfSignature)
-                                {
-                                    // Trim whitespace from both sides of the line
-                                    StringUtil::trim(line);
-
-                                    // First we want to get everything right of the paren
-                                    StringVector paramTokens;
-                                    String::size_type lparen_pos = line.find('(', 0);
-                                    if(lparen_pos != String::npos)
-                                    {
-                                        StringVector lineTokens = StringUtil::split(line, "(");
-                                        paramTokens = StringUtil::split(lineTokens[1], ",");
-                                    }
-                                    else
-                                    {
-                                        paramTokens = StringUtil::split(line, ",");
-                                    }
-
-                                    StringVector::const_iterator itParam;
-                                    for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
-                                    {
-                                        functionSig += *itParam;
-
-                                        String::size_type rparen_pos = itParam->find(')', 0);
-                                        if(rparen_pos == String::npos)
-                                            functionSig += ",";
-                                    }
-
-                                    String::size_type space_pos = line.find(')', 0);
-                                    if(space_pos != String::npos)
-                                    {
-                                        foundEndOfSignature = true;
-                                    }
-                                    line = stream->getLine();
-                                }
-
-                                functionInvoc = createInvocationFromString(functionSig);
-
-                                // Ok, now if we have found the signature, iterate through the file until we find the end
-                                // of the function.
-                                bool foundEndOfBody = false;
-                                size_t braceCount = 0;
-                                while(!foundEndOfBody)
-                                {
-                                    functionBody += line;
-
-                                    String::size_type brace_pos = line.find('{', 0);
-                                    if(brace_pos != String::npos)
-                                    {
-                                        braceCount++;
-                                    }
-
-                                    brace_pos = line.find('}', 0);
-                                    if(brace_pos != String::npos)
-                                        braceCount--;
-
-                                    if(braceCount == 0)
-                                    {
-                                        foundEndOfBody = true;
-
-                                        // Remove first and last braces
-                                        size_t pos = functionBody.find("{");
-                                        functionBody.erase(pos, 1);
-                                        pos = functionBody.rfind("}");
-                                        functionBody.erase(pos, 1);
-                                        mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
-                                    }
-                                    functionBody += "\n";
-                                    line = stream->getLine();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                stream->close();
-
-                ++libraryIterator;
-            }
-        }
-
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector)
         {
@@ -848,6 +672,13 @@ namespace Ogre {
 #endif 
 			Program* program)
         {
+            for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
+            {
+                const String& curDependency = program->getDependency(i);
+                cacheDependencyFunctions(curDependency);
+            }
+
+
             os << "//-----------------------------------------------------------------------------" << ENDL;
             os << "//                         PROGRAM DEPENDENCIES"                                 << ENDL;
             os << "//-----------------------------------------------------------------------------" << ENDL;
@@ -1025,7 +856,169 @@ namespace Ogre {
 			{
 				os << "[" << parameter->getSize() << "]";	
 			}
-		}
+        }
+        //-----------------------------------------------------------------------
+        void GLSLESProgramWriter::cacheDependencyFunctions(const String & libName)
+        {
+            if(mCachedFunctionLibraries.find(libName) != mCachedFunctionLibraries.end())
+            {
+                // this mean that the lib is in the cache
+                return;
+            }
+
+            mCachedFunctionLibraries[libName] = "";
+
+            String libFileName =  libName + ".glsles";
+
+            DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(libFileName);
+
+            StringMap functionCache;
+            functionCache.clear();
+
+            String line;
+            while(!stream->eof())
+            {
+                // Grab a line
+                line = stream->getLine();
+
+                // Ignore empty lines and comments
+                if(line.length() > 0)
+                {
+                    // Strip whitespace
+                    StringUtil::trim(line);
+
+                    // If we find a multiline comment, run through till we get to the end 
+                    if(line.at(0) == '/' && line.at(1) == '*')
+                    {
+                        bool endFound = false;
+
+                        while(!endFound)
+                        {
+                            // Get the next line
+                            line = stream->getLine();
+
+                            // Skip empties
+                            if(line.length() > 0)
+                            {
+                                // Look for the ending sequence.
+                                String::size_type comment_pos = line.find("*/", 0);
+                                if(comment_pos != String::npos)
+                                {
+                                    endFound = true;
+                                }
+                            }
+                        }
+                    }
+                    else if(line.length() > 1 && line.at(0) != '/' && line.at(1) != '/')
+                    {
+                        // Break up the line.
+                        StringVector tokens = StringUtil::tokenise(line, " (\n\r");
+
+                        // Cache #defines
+                        if(tokens[0] == "#define")
+                        {
+                            // Add the line in
+                            mDefinesMap[line] = libName;
+
+                            // Move on to the next line in the shader
+                            continue;
+                        }
+
+                        // Try to identify a function definition
+                        // First, look for a return type
+                        if(isBasicType(tokens[0]) && ((tokens.size() < 3) || (tokens[2] != "=")) )
+                        {
+                            String functionSig;
+                            String functionBody;
+                            FunctionInvocation *functionInvoc = NULL;
+
+                            // Return type
+                            functionSig += tokens[0];
+                            functionSig += " ";
+
+                            // Function name
+                            functionSig += tokens[1];
+                            functionSig += "(";
+
+                            bool foundEndOfSignature = false;
+                            // Now look for all the parameters, they may span multiple lines
+                            while(!foundEndOfSignature)
+                            {
+                                // Trim whitespace from both sides of the line
+                                StringUtil::trim(line);
+
+                                // First we want to get everything right of the paren
+                                StringVector paramTokens;
+                                String::size_type lparen_pos = line.find('(', 0);
+                                if(lparen_pos != String::npos)
+                                {
+                                    StringVector lineTokens = StringUtil::split(line, "(");
+                                    paramTokens = StringUtil::split(lineTokens[1], ",");
+                                }
+                                else
+                                {
+                                    paramTokens = StringUtil::split(line, ",");
+                                }
+
+                                StringVector::const_iterator itParam;
+                                for(itParam = paramTokens.begin(); itParam != paramTokens.end(); ++itParam)
+                                {
+                                    functionSig += *itParam;
+
+                                    String::size_type rparen_pos = itParam->find(')', 0);
+                                    if(rparen_pos == String::npos)
+                                        functionSig += ",";
+                                }
+
+                                String::size_type space_pos = line.find(')', 0);
+                                if(space_pos != String::npos)
+                                {
+                                    foundEndOfSignature = true;
+                                }
+                                line = stream->getLine();
+                            }
+
+                            functionInvoc = createInvocationFromString(functionSig);
+
+                            // Ok, now if we have found the signature, iterate through the file until we find the end
+                            // of the function.
+                            bool foundEndOfBody = false;
+                            size_t braceCount = 0;
+                            while(!foundEndOfBody)
+                            {
+                                functionBody += line;
+
+                                String::size_type brace_pos = line.find('{', 0);
+                                if(brace_pos != String::npos)
+                                {
+                                    braceCount++;
+                                }
+
+                                brace_pos = line.find('}', 0);
+                                if(brace_pos != String::npos)
+                                    braceCount--;
+
+                                if(braceCount == 0)
+                                {
+                                    foundEndOfBody = true;
+
+                                    // Remove first and last braces
+                                    size_t pos = functionBody.find("{");
+                                    functionBody.erase(pos, 1);
+                                    pos = functionBody.rfind("}");
+                                    functionBody.erase(pos, 1);
+                                    mFunctionCacheMap.insert(FunctionMap::value_type(*functionInvoc, functionBody));
+                                }
+                                functionBody += "\n";
+                                line = stream->getLine();
+                            }
+                        }
+                    }
+                }
+            }
+
+            stream->close();
+        }
 
     }
 }

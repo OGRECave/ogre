@@ -584,16 +584,18 @@ void SGX_blend_overlay(in float s1, in float s2, out float oColor)
 
 void SGX_blend_softLight(in vec4 s1, in vec4 s2, out vec4 oColor)
 {
-	oColor = vec4(BlendSoftLightf(s1.r, s2.r), 
-		BlendSoftLightf(s1.g, s2.g), 
-		BlendSoftLightf(s1.b, s2.b), 
-		BlendSoftLightf(s1.a, s2.a));
+	float r = BlendSoftLightf(s1.r, s2.r);
+	float g = BlendSoftLightf(s1.g, s2.g);
+	float b = BlendSoftLightf(s1.b, s2.b);
+	float a = BlendSoftLightf(s1.a, s2.a);
+	oColor = vec4(r,g,b,a);
 }
 void SGX_blend_softLight(in vec3 s1, in vec3 s2, out vec3 oColor)
 {
-	oColor = vec3(BlendSoftLightf(s1.r, s2.r), 
-		BlendSoftLightf(s1.g, s2.g), 
-		BlendSoftLightf(s1.b, s2.b));
+	float r = BlendSoftLightf(s1.r, s2.r);
+	float g = BlendSoftLightf(s1.g, s2.g);
+	float b = BlendSoftLightf(s1.b, s2.b);
+	oColor = vec4(r,g,b);
 }
 void SGX_blend_softLight(in float s1, in float s2, out float oColor)
 {

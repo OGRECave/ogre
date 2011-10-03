@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,10 +43,10 @@ namespace Ogre {
     {
         /// Unknown pixel format.
         PF_UNKNOWN = 0,
-        /// 8-bit pixel format, all bits luminace.
+        /// 8-bit pixel format, all bits luminance.
         PF_L8 = 1,
 		PF_BYTE_L = PF_L8,
-        /// 16-bit pixel format, all bits luminace.
+        /// 16-bit pixel format, all bits luminance.
         PF_L16 = 2,
 		PF_SHORT_L = PF_L16,
         /// 8-bit pixel format, all bits alpha.

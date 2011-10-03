@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3332,7 +3332,6 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 						if (pass->getStartLight() > 0 &&
 							pass->getStartLight() >= rendLightList.size())
 						{
-							lightsLeft = 0;
 							break;
 						}
 						else
@@ -6536,6 +6535,10 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
+	//The manager we're trying to destroy might have been scheduled for updating
+	//while we haven't yet rendered a frame. Update now to avoid a dangling ptr
+	updateDirtyInstanceManagers();
+
 	InstanceManagerMap::iterator i = mInstanceManagerMap.find(name);
 	if (i != mInstanceManagerMap.end())
 	{
@@ -6561,6 +6564,7 @@ void SceneManager::destroyAllInstanceManagers(void)
 	}
 
 	mInstanceManagerMap.clear();
+	mDirtyInstanceManagers.clear();
 }
 //---------------------------------------------------------------------
 size_t SceneManager::getNumInstancesPerBatch( const String &meshName, const String &groupName,

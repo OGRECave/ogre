@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -288,7 +288,7 @@ namespace Ogre
 				
 				if (mode == optVideoMode->second.currentValue)
 				{
-					String frequency = StringConverter::toString(value->second) + " MHz";
+					String frequency = StringConverter::toString(value->second) + " Hz";
 					
 					optDisplayFrequency->second.possibleValues.push_back(frequency);
 				}
@@ -301,7 +301,7 @@ namespace Ogre
 			else
 			{
 				optVideoMode->second.currentValue = StringConverter::toString(mVideoModes[0].first.first,4) + " x " + StringConverter::toString(mVideoModes[0].first.second,4);
-				optDisplayFrequency->second.currentValue = StringConverter::toString(mVideoModes[0].second) + " MHz";
+				optDisplayFrequency->second.currentValue = StringConverter::toString(mVideoModes[0].second) + " Hz";
 			}
 		}
 	}
@@ -952,7 +952,7 @@ namespace Ogre
 				
 				mCurrentMode = *newMode;
 				
-				LogManager::getSingleton().logMessage("Entered video mode " + StringConverter::toString(mCurrentMode.first.first) + "x" + StringConverter::toString(mCurrentMode.first.second) + " @ " + StringConverter::toString(mCurrentMode.second) + "MHz");
+				LogManager::getSingleton().logMessage("Entered video mode " + StringConverter::toString(mCurrentMode.first.first) + "x" + StringConverter::toString(mCurrentMode.first.second) + " @ " + StringConverter::toString(mCurrentMode.second) + "Hz");
 			}
 		}
 	}

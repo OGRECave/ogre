@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ namespace Ogre
 										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
-				m_numWorldMatrices( instancesPerBatch )
+				mNumWorldMatrices( instancesPerBatch )
 	{
 	}
 
@@ -54,8 +54,8 @@ namespace Ogre
 	{
 		const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
-		m_material->load();
-		Technique *technique = m_material->getBestTechnique();
+		mMaterial->load();
+		Technique *technique = mMaterial->getBestTechnique();
 		if( technique )
 		{
 			GpuProgramParametersSharedPtr vertexParam = technique->getPass(0)->getVertexProgramParameters();
@@ -65,19 +65,22 @@ namespace Ogre
 				const GpuConstantDefinition &constDef = itor.getNext();
 				if( constDef.constType == GCT_MATRIX_3X4 ||
 					constDef.constType == GCT_MATRIX_4X3 ||		//OGL GLSL bitches without this
+					constDef.constType == GCT_MATRIX_2X4 ||
 					constDef.constType == GCT_FLOAT4			//OGL GLSL bitches without this
 					&& constDef.isFloat() )
 				{
 					const GpuProgramParameters::AutoConstantEntry *entry =
 									vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );
-					if( entry && entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 )
+					if( entry && (entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 || entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4))
 					{
 						//Material is correctly done!
 						size_t arraySize = constDef.arraySize;
 
 						//Deal with GL "hacky" way of doing 4x3 matrices
-						if( constDef.constType == GCT_FLOAT4 )
+						if(entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 && constDef.constType == GCT_FLOAT4)
 							arraySize /= 3;
+						else if(entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4 && constDef.constType == GCT_FLOAT4)
+							arraySize /= 2;
 
 						//Check the num of arrays
 						size_t retVal = arraySize / numBones;
@@ -88,11 +91,12 @@ namespace Ogre
 								retVal = 0xFFFF / baseSubMesh->vertexData->vertexCount;
 						}
 
-						if( retVal < 3 )
+						if((retVal < 3 && entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4) ||
+							(retVal < 2 && entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4))
 						{
 							LogManager::getSingleton().logMessage( "InstanceBatchShader: Mesh " +
-										m_meshReference->getName() + " using material " +
-										m_material->getName() + " contains many bones. The amount of "
+										mMeshReference->getName() + " using material " +
+										mMaterial->getName() + " contains many bones. The amount of "
 										"instances per batch is very low. Performance benefits will "
 										"be minimal, if any. It might be even slower!",
 										LML_NORMAL );
@@ -105,7 +109,7 @@ namespace Ogre
 
 			//Reaching here means material is supported, but malformed
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-			"Material '" + m_material->getName() + "' is malformed for this instancing technique",
+			"Material '" + mMaterial->getName() + "' is malformed for this instancing technique",
 			"InstanceBatchShader::calculateMaxNumInstances");
 		}
 
@@ -116,25 +120,26 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchShader::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
 	{
-		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
-			m_numWorldMatrices = m_instancesPerBatch * baseSubMesh->blendIndexToBoneIndexMap.size();
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+			mNumWorldMatrices = mInstancesPerBatch * baseSubMesh->blendIndexToBoneIndexMap.size();
 		InstanceBatch::buildFrom( baseSubMesh, renderOperation );
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchShader::setupVertices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.vertexData = OGRE_NEW VertexData();
+		mRenderOperation.vertexData = OGRE_NEW VertexData();
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
-		VertexData *thisVertexData = m_renderOperation.vertexData;
+		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
 
 		thisVertexData->vertexStart = 0;
-		thisVertexData->vertexCount = baseVertexData->vertexCount * m_instancesPerBatch;
+		thisVertexData->vertexCount = baseVertexData->vertexCount * mInstancesPerBatch;
 
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration( thisVertexData->vertexDeclaration );
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
 
-		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 		{
 			//Building hw skinned batches follow a different path
 			setupHardwareSkinned( baseSubMesh, thisVertexData, baseVertexData );
@@ -165,7 +170,7 @@ namespace Ogre
 			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
 
 			//Copy and repeat
-			for( size_t j=0; j<m_instancesPerBatch; ++j )
+			for( size_t j=0; j<mInstancesPerBatch; ++j )
 			{
 				const size_t sizeOfBuffer = baseVertexData->vertexCount *
 											baseVertexData->vertexDeclaration->getVertexSize(i);
@@ -187,7 +192,7 @@ namespace Ogre
 			thisVertexData->vertexBufferBinding->setBinding( lastSource, vertexBuffer );
 
 			char* thisBuf = static_cast<char*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-			for( size_t j=0; j<m_instancesPerBatch; ++j )
+			for( size_t j=0; j<mInstancesPerBatch; ++j )
 			{
 				for( size_t k=0; k<baseVertexData->vertexCount; ++k )
 				{
@@ -204,17 +209,18 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchShader::setupIndices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.indexData = OGRE_NEW IndexData();
+		mRenderOperation.indexData = OGRE_NEW IndexData();
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 
-		IndexData *thisIndexData = m_renderOperation.indexData;
+		IndexData *thisIndexData = mRenderOperation.indexData;
 		IndexData *baseIndexData = baseSubMesh->indexData;
 
 		thisIndexData->indexStart = 0;
-		thisIndexData->indexCount = baseIndexData->indexCount * m_instancesPerBatch;
+		thisIndexData->indexCount = baseIndexData->indexCount * mInstancesPerBatch;
 
 		//TODO: Check numVertices is below max supported by GPU
 		HardwareIndexBuffer::IndexType indexType = HardwareIndexBuffer::IT_16BIT;
-		if( m_renderOperation.vertexData->vertexCount > 65535 )
+		if( mRenderOperation.vertexData->vertexCount > 65535 )
 			indexType = HardwareIndexBuffer::IT_32BIT;
 		thisIndexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 													indexType, thisIndexData->indexCount,
@@ -226,9 +232,9 @@ namespace Ogre
 		uint16 *thisBuf16 = static_cast<uint16*>(buf);
 		uint32 *thisBuf32 = static_cast<uint32*>(buf);
 
-		for( size_t i=0; i<m_instancesPerBatch; ++i )
+		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
-			const size_t vertexOffset = i * m_renderOperation.vertexData->vertexCount / m_instancesPerBatch;
+			const size_t vertexOffset = i * mRenderOperation.vertexData->vertexCount / mInstancesPerBatch;
 
 			uint16 const *initBuf16 = static_cast<uint16 const *>(baseBuf);
 			uint32 const *initBuf32 = static_cast<uint32 const *>(baseBuf);
@@ -256,7 +262,7 @@ namespace Ogre
 													VertexData *baseVertexData )
 	{
 		const size_t numBones = baseSubMesh->blendIndexToBoneIndexMap.size();
-		m_numWorldMatrices = m_instancesPerBatch * numBones;
+		mNumWorldMatrices = mInstancesPerBatch * numBones;
 
 		for( size_t i=0; i<=thisVertexData->vertexDeclaration->getMaxSource(); ++i )
 		{
@@ -280,7 +286,7 @@ namespace Ogre
 			char *startBuf = baseBuf;
 
 			//Copy and repeat
-			for( size_t j=0; j<m_instancesPerBatch; ++j )
+			for( size_t j=0; j<mInstancesPerBatch; ++j )
 			{
 				//Repeat source
 				baseBuf = startBuf;
@@ -318,8 +324,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatchShader::getWorldTransforms( Matrix4* xform ) const
 	{
-		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
 		while( itor != end )
 		{
@@ -330,6 +336,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	unsigned short InstanceBatchShader::getNumWorldTransforms(void) const
 	{
-		return m_numWorldMatrices;
+		return mNumWorldMatrices;
 	}
 }

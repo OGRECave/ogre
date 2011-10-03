@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
+#include "OgreDualQuaternion.h"
 
 namespace Ogre
 {
@@ -46,20 +47,28 @@ namespace Ogre
 
 	BaseInstanceBatchVTF::BaseInstanceBatchVTF( InstanceManager *creator, MeshPtr &meshReference,
 										const MaterialPtr &material, size_t instancesPerBatch,
-										const Mesh::IndexMap *indexToBoneMap, const String &batchName ) :
+										const Mesh::IndexMap *indexToBoneMap, const String &batchName) :
 				InstanceBatch( creator, meshReference, material, instancesPerBatch,
 								indexToBoneMap, batchName ),
-				m_numWorldMatrices( instancesPerBatch ),
-				m_widthFloatsPadding( 0 ),
-				m_maxFloatsPerLine( std::numeric_limits<size_t>::max() )
+				mNumWorldMatrices( instancesPerBatch ),
+				mWidthFloatsPadding( 0 ),
+				mMaxFloatsPerLine( std::numeric_limits<size_t>::max() ),
+				mRowLength(3),
+				mWeightCount(1),
+				mTempTransformsArray3x4(0),
+				mUseBoneMatrixLookup(false),
+				mMaxLookupTableInstances(16),
+				mUseBoneDualQuaternions(false),
+				mForceOneWeight(false),
+				mUseOneWeight(false)
 	{
-		cloneMaterial( m_material );
+		cloneMaterial( mMaterial );
 	}
 
 	BaseInstanceBatchVTF::~BaseInstanceBatchVTF()
 	{
 		//Remove cloned caster materials (if any)
-		Material::TechniqueIterator techItor = m_material->getTechniqueIterator();
+		Material::TechniqueIterator techItor = mMaterial->getTechniqueIterator();
 		while( techItor.hasMoreElements() )
 		{
 			Technique *technique = techItor.getNext();
@@ -69,18 +78,32 @@ namespace Ogre
 		}
 
 		//Remove cloned material
-		MaterialManager::getSingleton().remove( m_material->getName() );
+		MaterialManager::getSingleton().remove( mMaterial->getName() );
 
 		//Remove the VTF texture
-		if( !m_matrixTexture.isNull() )
-			TextureManager::getSingleton().remove( m_matrixTexture->getName() );
+		if( !mMatrixTexture.isNull() )
+			TextureManager::getSingleton().remove( mMatrixTexture->getName() );
+
+		OGRE_FREE(mTempTransformsArray3x4, MEMCATEGORY_GENERAL);
 	}
 
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation )
 	{
-		createVertexTexture( baseSubMesh );
-		InstanceBatch::buildFrom( baseSubMesh, renderOperation );
+		if (useBoneMatrixLookup())
+		{
+			//when using bone matrix lookup resource are not shared
+			//
+			//Future implementation: while the instance vertex buffer can't be shared
+			//The texture can be.
+			//
+			build(baseSubMesh);
+		}
+		else
+		{
+			createVertexTexture( baseSubMesh );
+			InstanceBatch::buildFrom( baseSubMesh, renderOperation );
+		}
 	}
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::cloneMaterial( const MaterialPtr &material )
@@ -90,7 +113,7 @@ namespace Ogre
 		MatMap clonedMaterials;
 
 		//We need to clone the material so we can have different textures for each batch.
-		m_material = material->clone( mName + "/VTFMaterial" );
+		mMaterial = material->clone( mName + "/VTFMaterial" );
 
 		//Now do the same with the techniques which have a material shadow caster
 		Material::TechniqueIterator techItor = material->getTechniqueIterator();
@@ -124,9 +147,8 @@ namespace Ogre
 	{
 		const VertexElement *ve = baseVertexData->vertexDeclaration->
 															findElementBySemantic( VES_BLEND_INDICES );
-		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
-															findElementBySemantic( VES_BLEND_WEIGHTS );
-
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		
 		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
 		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
 
@@ -135,8 +157,10 @@ namespace Ogre
 			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 
 			uint8 biggestWeightIdx = 0;
-			for( size_t j=1; j<veWeights->getSize() / 4; ++j )
+			for( size_t j=1; j< mWeightCount; ++j )
+			{
 				biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
+			}
 
 			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
 			outBoneIdx[i] = pIndex[biggestWeightIdx];
@@ -146,6 +170,41 @@ namespace Ogre
 
 		buff->unlock();
 	}
+
+	//-----------------------------------------------------------------------
+	void BaseInstanceBatchVTF::retrieveBoneIdxWithWeights(VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx, HWBoneWgtVec &outBoneWgt)
+	{
+		const VertexElement *ve = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_INDICES );
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		
+		HardwareVertexBufferSharedPtr buff = baseVertexData->vertexBufferBinding->getBuffer(ve->getSource());
+		char const *baseBuffer = static_cast<char const*>(buff->lock( HardwareBuffer::HBL_READ_ONLY ));
+
+		for( size_t i=0; i<baseVertexData->vertexCount * mWeightCount; i += mWeightCount)
+		{
+			float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
+			uint8 const *pIndex = reinterpret_cast<uint8 const*>(baseBuffer + ve->getOffset());
+
+			float weightMagnitude = 0.0f;
+			for( size_t j=0; j < mWeightCount; ++j )
+			{
+				outBoneWgt[i+j] = pWeights[j];
+				weightMagnitude += pWeights[j];
+				outBoneIdx[i+j] = pIndex[j];
+			}
+
+			//Normalize the bone weights so they add to one
+			for(size_t j=0; j < mWeightCount; ++j)
+			{
+				outBoneWgt[i+j] /= weightMagnitude;
+			}
+
+			baseBuffer += baseVertexData->vertexDeclaration->getVertexSize(ve->getSource());
+		}
+
+		buff->unlock();
+	}
+	
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::setupMaterialToUseVTF( TextureType textureType, MaterialPtr &material )
 	{
@@ -168,7 +227,7 @@ namespace Ogre
 
 					if( texUnit->getName() == "InstancingVTF" )
 					{
-						texUnit->setTextureName( m_matrixTexture->getName(), textureType );
+						texUnit->setTextureName( mMatrixTexture->getName(), textureType );
 						texUnit->setTextureFiltering( TFO_NONE );
 						texUnit->setBindingType( TextureUnitState::BT_VERTEX );
 					}
@@ -190,73 +249,207 @@ namespace Ogre
 		http://www.ogre3d.org/forums/viewtopic.php?t=38305
 
 		Currently assuming it's 4096x4096, which is a safe bet for any hardware with decent VTF*/
+		
+		size_t uniqueAnimations = mInstancesPerBatch;
+		if (useBoneMatrixLookup())
+		{
+			uniqueAnimations = std::min<size_t>(getMaxLookupTableInstances(), uniqueAnimations);
+		}
+		mMatricesPerInstance = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
 
-		const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
-		m_numWorldMatrices = m_instancesPerBatch * numBones;
+		if(mUseBoneDualQuaternions && !mTempTransformsArray3x4)
+		{
+			mTempTransformsArray3x4 = OGRE_ALLOC_T(float, mMatricesPerInstance * 3 * 4, MEMCATEGORY_GENERAL);
+		}
+		
+		mNumWorldMatrices = uniqueAnimations * mMatricesPerInstance;
 
 		//Calculate the width & height required to hold all the matrices. Start by filling the width
 		//first (i.e. 4096x1 4096x2 4096x3, etc)
-		size_t texWidth			= std::min<size_t>( m_numWorldMatrices * 3, c_maxTexWidth );
+		
+		size_t texWidth			= std::min<size_t>( mNumWorldMatrices * mRowLength, c_maxTexWidth );
 		size_t maxUsableWidth	= texWidth;
 		if( matricesToghetherPerRow() )
 		{
 			//The technique requires all matrices from the same instance in the same row
 			//i.e. 4094 -> 4095 -> skip 4096 -> 0 (next row) contains data from a new instance 
-			m_widthFloatsPadding = texWidth % (numBones * 3);
+			mWidthFloatsPadding = texWidth % (mMatricesPerInstance * mRowLength);
 
-			if( m_widthFloatsPadding )
+			if( mWidthFloatsPadding )
 			{
-				m_maxFloatsPerLine = texWidth - m_widthFloatsPadding;
+				mMaxFloatsPerLine = texWidth - mWidthFloatsPadding;
 
-				maxUsableWidth = m_maxFloatsPerLine;
+				maxUsableWidth = mMaxFloatsPerLine;
 
 				//Values are in pixels, convert them to floats (1 pixel = 4 floats)
-				m_widthFloatsPadding	*= 4;
-				m_maxFloatsPerLine		*= 4;
+				mWidthFloatsPadding	*= 4;
+				mMaxFloatsPerLine		*= 4;
 			}
 		}
 
-		size_t texHeight = m_numWorldMatrices * 3 / maxUsableWidth;
+		size_t texHeight = mNumWorldMatrices * mRowLength / maxUsableWidth;
 
-		if( (m_numWorldMatrices * 3) % maxUsableWidth )
+		if( (mNumWorldMatrices * mRowLength) % maxUsableWidth )
 			texHeight += 1;
 
-		TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
+		//Don't use 1D textures, as OGL goes crazy because the shader should be calling texture1D()...
+		//TextureType texType = texHeight == 1 ? TEX_TYPE_1D : TEX_TYPE_2D;
+		TextureType texType = TEX_TYPE_2D;
 
-		m_matrixTexture = TextureManager::getSingleton().createManual(
-										mName + "/VTF", m_meshReference->getGroup(), texType,
+		mMatrixTexture = TextureManager::getSingleton().createManual(
+										mName + "/VTF", mMeshReference->getGroup(), texType,
 										(uint)texWidth, (uint)texHeight,
 										0, PF_FLOAT32_RGBA, TU_DYNAMIC_WRITE_ONLY_DISCARDABLE );
 
 		//Set our cloned material to use this custom texture!
-		setupMaterialToUseVTF( texType, m_material );
+		setupMaterialToUseVTF( texType, mMaterial );
 	}
+
+	//-----------------------------------------------------------------------
+	size_t BaseInstanceBatchVTF::convert3x4MatricesToDualQuaternions(float* matrices, size_t numOfMatrices, float* outDualQuaternions)
+	{
+		DualQuaternion dQuat;
+		Matrix4 matrix;
+		size_t floatsWritten = 0;
+
+		for (int m = 0; m < numOfMatrices; ++m)
+		{
+			for(int i = 0; i < 3; ++i)
+			{
+				for(int b = 0; b < 4; ++b)
+				{
+					matrix[i][b] = *matrices++;
+				}
+			}
+
+			matrix[3][0] = 0;
+			matrix[3][1] = 0;
+			matrix[3][2] = 0;
+			matrix[3][3] = 1;
+			
+			dQuat.fromTransformationMatrix(matrix);
+			
+			//Copy the 2x4 matrix
+			for(int i = 0; i < 8; ++i)
+			{
+				*outDualQuaternions++ = dQuat[i];
+				++floatsWritten;
+			}
+		}
+
+		return floatsWritten;
+	}
+	
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::updateVertexTexture(void)
 	{
 		//Now lock the texture and copy the 4x3 matrices!
-		m_matrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
-		const PixelBox &pixelBox = m_matrixTexture->getBuffer()->getCurrentLock();
+		mMatrixTexture->getBuffer()->lock( HardwareBuffer::HBL_DISCARD );
+		const PixelBox &pixelBox = mMatrixTexture->getBuffer()->getCurrentLock();
 
 		float *pDest = static_cast<float*>(pixelBox.data);
 
-		InstancedEntityVec::const_iterator itor = m_instancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = m_instancedEntities.end();
+		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
+		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
+		float* transforms;
+
+		//If using dual quaternion skinning, write the transforms to a temporary buffer,
+		//then convert to dual quaternions, then later write to the pixel buffer
+		//Otherwise simply write the transforms to the pixel buffer directly
+		if(mUseBoneDualQuaternions)
 		{
-			const size_t floatsWritten = (*itor)->getTransforms3x4( pDest );
-
-			if( mManager->getCameraRelativeRendering() )
-				makeMatrixCameraRelative3x4( pDest, floatsWritten );
-
-			pDest += floatsWritten;
-
-			++itor;
+			transforms = mTempTransformsArray3x4;
+		}
+		else
+		{
+			transforms = pDest;
 		}
 
-		m_matrixTexture->getBuffer()->unlock();
+		
+		while( itor != end )
+		{
+			size_t floatsWritten = (*itor)->getTransforms3x4( transforms );
+
+			if( mManager->getCameraRelativeRendering() )
+				makeMatrixCameraRelative3x4( transforms, floatsWritten );
+
+			if(mUseBoneDualQuaternions)
+			{
+				floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+				pDest += floatsWritten;
+			}
+			else
+			{
+				transforms += floatsWritten;
+			}
+			
+			++itor;
+		}
+		
+		mMatrixTexture->getBuffer()->unlock();
 	}
+	/** update the lookup numbers for entities with shared transforms */
+	void BaseInstanceBatchVTF::updateSharedLookupIndexes()
+	{
+		if (mTransformSharingDirty)
+		{
+			if (useBoneMatrixLookup())
+			{
+				//In each entity update the "transform lookup number" so that:
+				// 1. All entities sharing the same transformation will share the same unique number
+				// 2. "transform lookup number" will be numbered from 0 up to getMaxLookupTableInstances
+				size_t lookupCounter = 0;
+				typedef map<Matrix4*,size_t>::type MapTransformId;
+				MapTransformId transformToId;
+				InstancedEntityVec::const_iterator itEnt = mInstancedEntities.begin(),
+					itEntEnd = mInstancedEntities.end();
+				for(;itEnt != itEntEnd ; ++itEnt)
+				{
+					if ((*itEnt)->isInScene())
+					{
+						Matrix4* transformUniqueId = (*itEnt)->mBoneMatrices;
+						MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
+						if (itLu == transformToId.end())
+						{
+							itLu = transformToId.insert(MapTransformId::value_type(transformUniqueId,lookupCounter)).first;
+							++lookupCounter;
+						}
+						(*itEnt)->setTransformLookupNumber(itLu->second);
+					}
+					else 
+					{
+						(*itEnt)->setTransformLookupNumber(0);
+					}
+				}
+
+				if (lookupCounter > getMaxLookupTableInstances())
+				{
+					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,"Number of unique bone matrix states exceeds current limitation.","BaseInstanceBatchVTF::updateSharedLookupIndexes()");
+				}
+			}
+
+			mTransformSharingDirty = false;
+		}
+	}
+
+	//-----------------------------------------------------------------------
+	InstancedEntity* BaseInstanceBatchVTF::generateInstancedEntity(size_t num)
+	{
+		InstancedEntity* sharedTransformEntity = NULL;
+		if ((useBoneMatrixLookup()) && (num >= getMaxLookupTableInstances()))
+		{
+			sharedTransformEntity = mInstancedEntities[num % getMaxLookupTableInstances()];
+			if (sharedTransformEntity->mSharedTransformEntity)
+			{
+				sharedTransformEntity = sharedTransformEntity->mSharedTransformEntity;
+			}
+		}
+
+		return OGRE_NEW InstancedEntity( this, num, sharedTransformEntity);
+	}
+
+
 	//-----------------------------------------------------------------------
 	void BaseInstanceBatchVTF::getWorldTransforms( Matrix4* xform ) const
 	{
@@ -272,10 +465,10 @@ namespace Ogre
 	{
 		InstanceBatch::_updateRenderQueue( queue );
 
-		if( m_boundsUpdated || m_dirtyAnimation || mManager->getCameraRelativeRendering() )
+		if( mBoundsUpdated || mDirtyAnimation || mManager->getCameraRelativeRendering() )
 			updateVertexTexture();
 
-		m_boundsUpdated = false;
+		mBoundsUpdated = false;
 	}
 	//-----------------------------------------------------------------------
 	// InstanceBatchVTF
@@ -292,31 +485,47 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	InstanceBatchVTF::~InstanceBatchVTF()
 	{
-
 	}	
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupVertices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.vertexData = OGRE_NEW VertexData();
+		mRenderOperation.vertexData = OGRE_NEW VertexData();
+		mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
-		VertexData *thisVertexData = m_renderOperation.vertexData;
+		VertexData *thisVertexData = mRenderOperation.vertexData;
 		VertexData *baseVertexData = baseSubMesh->vertexData;
 
 		thisVertexData->vertexStart = 0;
-		thisVertexData->vertexCount = baseVertexData->vertexCount * m_instancesPerBatch;
+		thisVertexData->vertexCount = baseVertexData->vertexCount * mInstancesPerBatch;
 
 		HardwareBufferManager::getSingleton().destroyVertexDeclaration( thisVertexData->vertexDeclaration );
 		thisVertexData->vertexDeclaration = baseVertexData->vertexDeclaration->clone();
 
 		HWBoneIdxVec hwBoneIdx;
-		hwBoneIdx.resize( baseVertexData->vertexCount, 0 );
-		if( m_meshReference->hasSkeleton() && !m_meshReference->getSkeleton().isNull() )
-		{
-			retrieveBoneIdx( baseVertexData, hwBoneIdx );
+		HWBoneWgtVec hwBoneWgt;
 
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
-			thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
-			thisVertexData->vertexDeclaration->closeGapsInSource();
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );
+		//One weight is recommended for VTF
+		mWeightCount = (forceOneWeight() || useOneWeight()) ? 1 : veWeights->getSize() / sizeof(float);
+
+		hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
+
+		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
+		{
+			if(mWeightCount > 1)
+			{
+				hwBoneWgt.resize( baseVertexData->vertexCount * mWeightCount, 0 );
+				retrieveBoneIdxWithWeights(baseVertexData, hwBoneIdx, hwBoneWgt);
+			}
+			else
+			{
+				retrieveBoneIdx( baseVertexData, hwBoneIdx );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_INDICES );
+				thisVertexData->vertexDeclaration->removeElement( VES_BLEND_WEIGHTS );
+
+				thisVertexData->vertexDeclaration->closeGapsInSource();
+			}
+
 		}
 
 		for( unsigned short i=0; i<thisVertexData->vertexDeclaration->getMaxSource()+1; ++i )
@@ -337,7 +546,7 @@ namespace Ogre
 			char* baseBuf = static_cast<char*>(baseVertexBuffer->lock(HardwareBuffer::HBL_READ_ONLY));
 
 			//Copy and repeat
-			for( size_t j=0; j<m_instancesPerBatch; ++j )
+			for( size_t j=0; j<mInstancesPerBatch; ++j )
 			{
 				const size_t sizeOfBuffer = baseVertexData->vertexCount *
 					baseVertexData->vertexDeclaration->getVertexSize(i);
@@ -349,22 +558,23 @@ namespace Ogre
 		}
 
 		createVertexTexture( baseSubMesh );
-		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx );
+		createVertexSemantics( thisVertexData, baseVertexData, hwBoneIdx, hwBoneWgt);
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::setupIndices( const SubMesh* baseSubMesh )
 	{
-		m_renderOperation.indexData = OGRE_NEW IndexData();
+		mRenderOperation.indexData = OGRE_NEW IndexData();
+		mRemoveOwnIndexData = true;	//Raise flag to remove our own index data in the end (not always needed)
 
-		IndexData *thisIndexData = m_renderOperation.indexData;
+		IndexData *thisIndexData = mRenderOperation.indexData;
 		IndexData *baseIndexData = baseSubMesh->indexData;
 
 		thisIndexData->indexStart = 0;
-		thisIndexData->indexCount = baseIndexData->indexCount * m_instancesPerBatch;
+		thisIndexData->indexCount = baseIndexData->indexCount * mInstancesPerBatch;
 
 		//TODO: Check numVertices is below max supported by GPU
 		HardwareIndexBuffer::IndexType indexType = HardwareIndexBuffer::IT_16BIT;
-		if( m_renderOperation.vertexData->vertexCount > 65535 )
+		if( mRenderOperation.vertexData->vertexCount > 65535 )
 			indexType = HardwareIndexBuffer::IT_32BIT;
 		thisIndexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
 			indexType, thisIndexData->indexCount,
@@ -376,9 +586,9 @@ namespace Ogre
 		uint16 *thisBuf16 = static_cast<uint16*>(buf);
 		uint32 *thisBuf32 = static_cast<uint32*>(buf);
 
-		for( size_t i=0; i<m_instancesPerBatch; ++i )
+		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
-			const size_t vertexOffset = i * m_renderOperation.vertexData->vertexCount / m_instancesPerBatch;
+			const size_t vertexOffset = i * mRenderOperation.vertexData->vertexCount / mInstancesPerBatch;
 
 			uint16 const *initBuf16 = static_cast<uint16 const *>(baseBuf);
 			uint32 const *initBuf32 = static_cast<uint32 const *>(baseBuf);
@@ -403,12 +613,10 @@ namespace Ogre
 	}
 	//-----------------------------------------------------------------------
 	void InstanceBatchVTF::createVertexSemantics( 
-		VertexData *thisVertexData, VertexData *baseVertexData, const HWBoneIdxVec &hwBoneIdx )
+		VertexData *thisVertexData, VertexData *baseVertexData, const HWBoneIdxVec &hwBoneIdx, const HWBoneWgtVec &hwBoneWgt)
 	{
-		const size_t numBones = m_numWorldMatrices / m_instancesPerBatch;
-
-		const size_t texWidth  = m_matrixTexture->getWidth();
-		const size_t texHeight = m_matrixTexture->getHeight();
+		const size_t texWidth  = mMatrixTexture->getWidth();
+		const size_t texHeight = mMatrixTexture->getHeight();
 
 		//Calculate the texel offsets to correct them offline
 		//Akwardly enough, the offset is needed in OpenGL too
@@ -420,12 +628,25 @@ namespace Ogre
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 32 bytes aligned :-)
 		const unsigned short newSource = thisVertexData->vertexDeclaration->getMaxSource() + 1;
-		thisVertexData->vertexDeclaration->addElement( newSource, 0, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() );
-		thisVertexData->vertexDeclaration->addElement( newSource, 16, VET_FLOAT4, VES_TEXTURE_COORDINATES,
-			thisVertexData->vertexDeclaration->
-			getNextFreeTextureCoordinate() );
+		size_t maxFloatsPerVector = 4;
+		size_t offset = 0;
+
+		for(size_t i = 0; i < mWeightCount; i += maxFloatsPerVector / mRowLength)
+		{
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->
+				getNextFreeTextureCoordinate() ).getSize();
+			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+				thisVertexData->vertexDeclaration->
+				getNextFreeTextureCoordinate() ).getSize();
+		}
+
+		//Add the weights (supports up to four, which is Ogre's limit)
+		if(mWeightCount > 1)
+		{
+			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+		}
 
 		//Create our own vertex buffer
 		HardwareVertexBufferSharedPtr vertexBuffer =
@@ -435,20 +656,56 @@ namespace Ogre
 			HardwareBuffer::HBU_STATIC_WRITE_ONLY );
 		thisVertexData->vertexBufferBinding->setBinding( newSource, vertexBuffer );
 
-		Vector2 *thisVec = static_cast<Vector2*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
-
+		float *thisFloat = static_cast<float*>(vertexBuffer->lock(HardwareBuffer::HBL_DISCARD));
+		
 		//Copy and repeat
-		for( size_t i=0; i<m_instancesPerBatch; ++i )
+		for( size_t i=0; i<mInstancesPerBatch; ++i )
 		{
-			for( size_t j=0; j<baseVertexData->vertexCount; ++j )
+			for( size_t j=0; j<baseVertexData->vertexCount * mWeightCount; j += mWeightCount )
 			{
-				for( size_t k=0; k<4; ++k )
+				size_t numberOfMatricesInLine = 0;
+
+				for(size_t wgtIdx = 0; wgtIdx < mWeightCount; ++wgtIdx)
 				{
-					size_t instanceIdx = (hwBoneIdx[j] + i * numBones) * 3 + k;
-					thisVec->x = (instanceIdx % texWidth) / (float)texWidth;
-					thisVec->y = (instanceIdx / texWidth) / (float)texHeight;
-					*thisVec = *thisVec - texelOffsets;
-					++thisVec;
+					for( size_t k=0; k < mRowLength; ++k)
+					{
+						size_t instanceIdx = (hwBoneIdx[j+wgtIdx] + i * mMatricesPerInstance) * mRowLength + k;
+						//x
+						*thisFloat++ = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
+						//y
+						*thisFloat++ = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
+					}
+
+					++numberOfMatricesInLine;
+
+					//If another matrix can't be fit, we're on another line, or if this is the last weight
+					if((numberOfMatricesInLine + 1) * mRowLength > maxFloatsPerVector || (wgtIdx+1) == mWeightCount)
+					{
+						//Place zeroes in the remaining coordinates
+						for ( size_t k=mRowLength * numberOfMatricesInLine; k < maxFloatsPerVector; ++k)
+						{
+							*thisFloat++ = 0.0f;
+							*thisFloat++ = 0.0f;
+						}
+
+						numberOfMatricesInLine = 0;
+					}
+				}
+
+				//Don't need to write weights if there is only one
+				if(mWeightCount > 1)
+				{
+					//Write the weights
+					for(size_t wgtIdx = 0; wgtIdx < mWeightCount; ++wgtIdx)
+					{
+						*thisFloat++ = hwBoneWgt[j+wgtIdx];
+					}
+
+					//Fill the rest of the line with zeros
+					for(size_t wgtIdx = mWeightCount; wgtIdx < maxFloatsPerVector; ++wgtIdx)
+					{
+						*thisFloat++ = 0.0f;
+					}
 				}
 			}
 		}
@@ -470,7 +727,7 @@ namespace Ogre
 		{
 			//TODO: Check PF_FLOAT32_RGBA is supported (should be, since it was the 1st one)
 			const size_t numBones = std::max<size_t>( 1, baseSubMesh->blendIndexToBoneIndexMap.size() );
-			retVal = c_maxTexWidth * c_maxTexHeight / 3 / numBones;
+			retVal = c_maxTexWidth * c_maxTexHeight / mRowLength / numBones;
 
 			if( flags & IM_USE16BIT )
 			{
@@ -480,17 +737,17 @@ namespace Ogre
 
 			if( flags & IM_VTFBESTFIT )
 			{
-				const size_t instancesPerBatch = std::min( retVal, m_instancesPerBatch );
+				const size_t instancesPerBatch = std::min( retVal, mInstancesPerBatch );
 				//Do the same as in createVertexTexture()
 				const size_t numWorldMatrices = instancesPerBatch * numBones;
 
-				size_t texWidth  = std::min<size_t>( numWorldMatrices * 3, c_maxTexWidth );
-				size_t texHeight = numWorldMatrices * 3 / c_maxTexWidth;
+				size_t texWidth  = std::min<size_t>( numWorldMatrices * mRowLength, c_maxTexWidth );
+				size_t texHeight = numWorldMatrices * mRowLength / c_maxTexWidth;
 
-				const size_t remainder = (numWorldMatrices * 3) % c_maxTexWidth;
+				const size_t remainder = (numWorldMatrices * mRowLength) % c_maxTexWidth;
 
 				if( remainder && texHeight > 0 )
-					retVal = static_cast<size_t>(texWidth * texHeight / 3.0f / (float)(numBones));
+					retVal = static_cast<size_t>(texWidth * texHeight / (float)mRowLength / (float)(numBones));
 			}
 		}
 

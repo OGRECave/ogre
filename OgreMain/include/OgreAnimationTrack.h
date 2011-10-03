@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -513,11 +513,9 @@ namespace Ogre
 		*/
 		virtual VertexPoseKeyFrame* createVertexPoseKeyFrame(Real timePos);
 
-		/** This method in fact does nothing, since interpolation is not performed
-			inside the keyframes for this type of track. 
+		/** @copydoc AnimationTrack::getInterpolatedKeyFrame
 		*/
-        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const
-        { (void)timeIndex; (void)kf; }
+        virtual void getInterpolatedKeyFrame(const TimeIndex& timeIndex, KeyFrame* kf) const;
 
 		/// @copydoc AnimationTrack::apply
 		virtual void apply(const TimeIndex& timeIndex, Real weight = 1.0, Real scale = 1.0f);

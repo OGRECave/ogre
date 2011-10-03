@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ namespace Ogre {
 			mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
 		}
         
-        if (!mVertexProgram && !mFragmentProgram)
+        if (!mVertexProgram || !mFragmentProgram)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Attempted to create a shader program without both a vertex and fragment program.",
@@ -201,7 +201,7 @@ namespace Ogre {
 	
 		mTriedToLinkAndFailed = !mLinked;
 
-		logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLHandle );
+		logObjectInfo( getCombinedName() + String(" GLSL link result : "), mGLHandle );
 		if(mLinked)
 		{
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )

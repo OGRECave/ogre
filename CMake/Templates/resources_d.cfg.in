@@ -29,3 +29,7 @@ Zip=@OGRE_MEDIA_DIR_DBG@/packs/skybox.zip
 
 [General]
 FileSystem=@OGRE_MEDIA_DIR_DBG@
+
+# Materials for visual tests
+[Tests]
+FileSystem=@OGRE_MEDIA_DIR_REL@/../../Tests/Media

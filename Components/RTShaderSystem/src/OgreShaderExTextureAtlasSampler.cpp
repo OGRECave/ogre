@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -31,10 +31,12 @@ THE SOFTWARE.
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderProgramSet.h"
+#include "OgreTechnique.h"
 
 #define SGX_LIB_TEXTURE_ATLAS "SGXLib_TextureAtlas"
 
-#define SGX_FUNC_ATLAS_SAMPLE "SGX_Atlas_Sample"
+#define SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST "SGX_Atlas_Sample_Auto_Adjust"
+#define SGX_FUNC_ATLAS_SAMPLE_NORMAL "SGX_Atlas_Sample_Normal"
 
 #define SGX_FUNC_ATLAS_WRAP "SGX_Atlas_Wrap"
 #define SGX_FUNC_ATLAS_MIRROR "SGX_Atlas_Mirror"
@@ -48,15 +50,21 @@ template<> RTShader::TextureAtlasSamplerFactory* Singleton<RTShader::TextureAtla
 namespace RTShader {
 
 
+void operator<<(std::ostream& o, const TextureAtlasSamplerFactory::TextureAtlasAttib& tai)
+{
+	o << tai.autoBorderAdjust << tai.positionMode << tai.positionOffset;
+}
 
 const TextureAtlasTablePtr c_BlankAtlasTable;
 const String c_ParamTexel("texel_");
 String TextureAtlasSampler::Type = "SGX_TextureAtlasSampler";
+String c_RTAtlasKey = "RTAtlas";
 
 //-----------------------------------------------------------------------
 TextureAtlasSampler::TextureAtlasSampler() :
 	mAtlasTexcoordPos(0),
-	mIsTableDataUpdated(false)
+	mIsTableDataUpdated(false),
+	mAutoAdjustPollPosition(true)
 {
 	memset(mIsAtlasTextureUnits, 0, sizeof(bool) * TAS_MAX_TEXTURES);
 }
@@ -203,7 +211,8 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 				psMain->addAtomInstance(curFuncInvocation);
 
 				//sample the texel color
-				curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ATLAS_SAMPLE, groupOrder, internalCounter++);
+				curFuncInvocation = OGRE_NEW FunctionInvocation(
+					mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder, internalCounter++);
 				curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
 				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y);
 				curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_IN);
@@ -211,6 +220,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 				curFuncInvocation->pushOperand(mPSTextureSizes[j], Operand::OPS_IN);
 				curFuncInvocation->pushOperand(texel, Operand::OPS_OUT);
 				psMain->addAtomInstance(curFuncInvocation);
+
 			}
 		}
 	}
@@ -323,9 +333,14 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
 		}
 	}
 	
-	//calculate the postiion of the indexes 
-	mAtlasTexcoordPos = factory.getTableIndexPositionOffset();
-	if (factory.getTableIndexPositionMode() == TextureAtlasSamplerFactory::ipmRelative)
+	//gather the materials atlas processing attributes 
+	//and calculate the position of the indexes 
+	TextureAtlasSamplerFactory::TextureAtlasAttib attrib;
+	factory.hasMaterialAtlasingAttributes(srcPass->getParent()->getParent(), &attrib);
+
+	mAutoAdjustPollPosition = attrib.autoBorderAdjust;
+	mAtlasTexcoordPos = attrib.positionOffset;
+	if (attrib.positionMode == TextureAtlasSamplerFactory::ipmRelative)
 	{
 		mAtlasTexcoordPos += texCount - 1;
 	}
@@ -333,12 +348,22 @@ bool TextureAtlasSampler::preAddToRenderState(const RenderState* renderState, Pa
 	return hasAtlas;
 }
 
-TextureAtlasSamplerFactory::TextureAtlasSamplerFactory() :
-	mIndexPositionMode(ipmRelative),
-	mIndexPositionOffset(1)
+TextureAtlasSamplerFactory::TextureAtlasSamplerFactory()
 {
 
 }
+
+
+TextureAtlasSamplerFactory* TextureAtlasSamplerFactory::getSingletonPtr(void)
+{
+	return ms_Singleton;
+}
+TextureAtlasSamplerFactory& TextureAtlasSamplerFactory::getSingleton(void)
+{  
+	assert( ms_Singleton );  return ( *ms_Singleton );  
+}
+
+
 
 //-----------------------------------------------------------------------
 const String& TextureAtlasSamplerFactory::getType() const
@@ -359,6 +384,20 @@ void TextureAtlasSamplerFactory::writeInstance(MaterialSerializer* ser, SubRende
 {
 }
 
+//-----------------------------------------------------------------------
+bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable )
+{
+	std::ifstream inp;
+	inp.open(filename.c_str(), std::ios::in | std::ios::binary);
+	if(!inp)
+	{
+		OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND, "'" + filename + "' file not found!", 
+			"TextureAtlasSamplerFactory::addTexutreAtlasDefinition" );
+	}
+	DataStreamPtr stream(OGRE_NEW FileStreamDataStream(filename, &inp, false));
+	return addTexutreAtlasDefinition(stream, textureAtlasTable);
+
+}
 //-----------------------------------------------------------------------
 bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable )
 {
@@ -418,7 +457,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 		TextureAtlasMap::const_iterator itEnd = tmpMap.end();
 		for(;it != itEnd; ++it)
 		{
-			mAtlases[it->first] = it->second;
+			setTextureAtlasTable(it->first, it->second);
 			maxTextureCount = std::max<size_t>(maxTextureCount, it->second->size());
 		}
 
@@ -433,7 +472,7 @@ bool TextureAtlasSamplerFactory::addTexutreAtlasDefinition( DataStreamPtr stream
 }
 
 //-----------------------------------------------------------------------
-void TextureAtlasSamplerFactory::setTextureAtlasTable(const String& textureName, const TextureAtlasTablePtr& atlasData)
+void TextureAtlasSamplerFactory::setTextureAtlasTable(const String& textureName, const TextureAtlasTablePtr& atlasData, bool autoBorderAdjust)
 {
 	if ((atlasData.isNull() == true) || (atlasData->empty()))
 		removeTextureAtlasTable(textureName);
@@ -463,26 +502,51 @@ const TextureAtlasTablePtr& TextureAtlasSamplerFactory::getTextureAtlasTable(con
 	else return c_BlankAtlasTable;
 }
 
-
-///Set the position of the atlas table indexes within the texcoords of the vertex data
-void TextureAtlasSamplerFactory::setTableIndexPosition(IndexPositionMode mode, ushort offset)
+//-----------------------------------------------------------------------
+void TextureAtlasSamplerFactory::setDefaultAtlasingAttributes(IndexPositionMode mode, ushort offset, bool autoAdjustBorders)
 {
-	//It is illogical for offset to be 0. Go read the explanation in the h file.
-	assert(offset > 0);
-	mIndexPositionMode = mode;
-	mIndexPositionOffset = offset;
+	mDefaultAtlasAttrib = TextureAtlasAttib(mode, offset, autoAdjustBorders);
 }
 
-///Get the positioning mode of the atlas table indexes within the texcoords of the vertex data
-TextureAtlasSamplerFactory::IndexPositionMode TextureAtlasSamplerFactory::getTableIndexPositionMode() const
+//-----------------------------------------------------------------------
+const TextureAtlasSamplerFactory::TextureAtlasAttib& TextureAtlasSamplerFactory::getDefaultAtlasingAttributes() const
 {
-	return mIndexPositionMode;
+	return mDefaultAtlasAttrib;
 }
 
-///Get the offset of the atlas table indexes within the texcoords of the vertex data
-ushort TextureAtlasSamplerFactory::getTableIndexPositionOffset() const
+//-----------------------------------------------------------------------
+void TextureAtlasSamplerFactory::setMaterialAtlasingAttributes(Ogre::Material* material, 
+		IndexPositionMode mode, ushort offset, bool autoAdjustBorders)
 {
-	return mIndexPositionOffset;
+	if ((material) && (material->getNumTechniques()))
+	{
+		material->getTechnique(0)->getUserObjectBindings().setUserAny(c_RTAtlasKey, 
+			Ogre::Any(TextureAtlasAttib(mode, offset, autoAdjustBorders)));
+	}
+}
+
+
+//-----------------------------------------------------------------------
+bool TextureAtlasSamplerFactory::hasMaterialAtlasingAttributes(Ogre::Material* material, 
+																 TextureAtlasAttib* attrib) const
+{
+	bool isMaterialSpecific = false;
+	if ((material) && (material->getNumTechniques()))
+	{
+		const Ogre::Any& anyAttrib = 
+			//find if the "IsTerrain" flag exists in the first technique
+			material->getTechnique(0)->getUserObjectBindings().getUserAny(c_RTAtlasKey);
+		isMaterialSpecific = (anyAttrib.isEmpty() == false);
+		if ((isMaterialSpecific) && (attrib))
+		{
+			*attrib = Ogre::any_cast<TextureAtlasAttib>(anyAttrib);
+		}
+	}
+	if ((!isMaterialSpecific) && (attrib))
+	{
+		*attrib = mDefaultAtlasAttrib;
+	}
+	return isMaterialSpecific;	
 }
 
 //-----------------------------------------------------------------------
