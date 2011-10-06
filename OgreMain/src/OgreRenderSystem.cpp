@@ -634,7 +634,8 @@ namespace Ogre {
         else
             val = op.vertexData->vertexCount;
 
-		 val *= op.numberOfInstances;
+		if (op.numberOfInstances)
+			val *= op.numberOfInstances;
 
         // account for a pass having multiple iterations
         if (mCurrentPassIterationCount > 1)
