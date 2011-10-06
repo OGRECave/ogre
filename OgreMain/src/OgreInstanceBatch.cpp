@@ -144,7 +144,7 @@ namespace Ogre
 		mBoundingRadius = Math::boundingRadiusFromAABB( mFullBoundingBox );
 
 		//Tell the SceneManager our bounds have changed
-		getParentSceneNode()->needUpdate();
+		getParentSceneNode()->needUpdate(true);
 
 		mBoundsDirty	= false;
 		mBoundsUpdated	= true;
