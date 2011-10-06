@@ -988,13 +988,13 @@ vertex_program Examples/GrassWaverTexVpGLSLES glsles
 }
 vertex_program Examples/GrassWaverAmbientVpGLSLES glsles
 {
-	source GrassAmbientVp.glsles
-	profiles glsles
+    source GrassAmbientVp.glsles
+    profiles glsles
     
     default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
         param_named_auto offset custom 999
     }
 }
@@ -1004,6 +1004,7 @@ fragment_program Examples/GrassWaverAmbientFpGLSLES glsles
 	profiles glsles
     default_params
     {
+        param_named diffuseMap int 0
     }
 }
 
@@ -1025,6 +1026,7 @@ fragment_program Examples/GrassWaverCasterFpGLSLES glsles
 	profiles glsles
     default_params
     {
+        param_named diffuseMap int 0
     }
 }
 
@@ -1036,15 +1038,15 @@ vertex_program Examples/GrassWaverReceiverVpGLSLES glsles
     default_params
     {
         param_named_auto world world_matrix
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto texViewProj texture_viewproj_matrix
-        
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto texViewProj texture_viewproj_matrix
+
         param_named_auto camObjPos camera_position_object_space
-        
-  				param_named_auto objSpaceLight light_position_object_space 0
-  				param_named_auto lightColour light_diffuse_colour 0
-        
-  				param_named_auto offset custom 999
+
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+
+        param_named_auto offset custom 999
 	}
 }
 
@@ -1053,13 +1055,14 @@ fragment_program Examples/GrassWaverReceiverFpGLSLES glsles
 {
 	source GrassReceiverFp.glsles
 	profiles glsles
-   
+
 	default_params
     {
-        //param_named inverseShadowmapSize float 0.0009765625
-		param_named fixedDepthBias float 0.0005
-		param_named gradientClamp float 0.0098
-		param_named gradientScaleBias float 0
+        param_named shadowMap int 0
+        param_named diffuseMap int 1
+        param_named fixedDepthBias float 0.0005
+        param_named gradientClamp float 0.0098
+        param_named gradientScaleBias float 0
     }
 }
 
@@ -1069,6 +1072,7 @@ fragment_program Examples/GrassWaverFpGLSLES glsles
 	profiles glsles
     default_params
     {
+        param_named diffuseMap int 0
     }
 }
 
@@ -1576,7 +1580,7 @@ material Examples/GrassBlades
             
 			alpha_rejection greater 150 
 			scene_blend alpha_blend
-            
+
 		    cull_hardware none
             cull_software none
             
