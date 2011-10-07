@@ -72,15 +72,13 @@ set(GLSLES_FILES
   src/GLSLES/src/OgreGLSLESProgramFactory.cpp
 )
 
-if (OGRE_CG_SUPPORT_FOR_GLES2)
-set(GLSLES_FILES 
-  src/GLSLES/src/OgreGLSLESCgProgram.cpp
-  src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
-  ${GLSLES_FILES}
-)
-endif (OGRE_CG_SUPPORT_FOR_GLES2)
-	
-	
+if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
+  set(GLSLES_FILES 
+    src/GLSLES/src/OgreGLSLESCgProgram.cpp
+    src/GLSLES/src/OgreGLSLESCgProgramFactory.cpp
+    ${GLSLES_FILES}
+  )
+endif (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
 
 # Add system specific settings
 if (OGRE_BUILD_PLATFORM_NACL)
