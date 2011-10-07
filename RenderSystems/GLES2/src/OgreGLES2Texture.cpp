@@ -136,7 +136,8 @@ namespace Ogre {
             Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
 
         if ((mUsage & TU_AUTOMIPMAP) &&
-            mNumRequestedMipmaps && mMipmapsHardwareGenerated)
+            mNumRequestedMipmaps && mMipmapsHardwareGenerated &&
+            (mTextureType != TEX_TYPE_CUBE_MAP))
         {
             glGenerateMipmap(getGLES2TextureTarget());
             GL_CHECK_ERROR;
