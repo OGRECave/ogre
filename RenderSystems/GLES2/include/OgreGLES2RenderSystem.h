@@ -41,7 +41,7 @@ namespace Ogre {
     class GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramFactory;
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
     class GLSLESCgProgramFactory;
 #endif
     class GLSLESGpuProgram;
@@ -103,7 +103,7 @@ namespace Ogre {
             GLES2Context *mCurrentContext;
             GLES2GpuProgramManager *mGpuProgramManager;
             GLSLESProgramFactory* mGLSLESProgramFactory;
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
             GLSLESCgProgramFactory* mGLSLESCgProgramFactory;
 #endif
             HardwareBufferManager* mHardwareBufferManager;

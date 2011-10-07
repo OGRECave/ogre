@@ -68,7 +68,7 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
         
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         mGLSLOptimiserContext = glslopt_initialize(true);
 #endif
 	}
@@ -82,7 +82,7 @@ namespace Ogre {
 		{
 			OGRE_DELETE currentProgram->second;
 		}
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         if(mGLSLOptimiserContext)
         {
             glslopt_cleanup(mGLSLOptimiserContext);
@@ -247,7 +247,7 @@ namespace Ogre {
 		return false;
 	}
 
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
     void GLSLESLinkProgramManager::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
     {
         if(!gpuProgram->getGLSLProgram()->getIsOptimised())

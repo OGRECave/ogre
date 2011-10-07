@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESLinkProgram.h"
 
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
 #   include "glsl_optimizer.h"
 #endif
 
@@ -71,7 +71,7 @@ namespace Ogre {
 
 		typedef map<String, GLenum>::type StringToEnumMap;
 		StringToEnumMap mTypeEnumMap;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         struct glslopt_ctx *mGLSLOptimiserContext;
 #endif
 		/// Use type to complete other information
@@ -105,7 +105,7 @@ namespace Ogre {
 		*/
 		void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
 
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /**
          
         */

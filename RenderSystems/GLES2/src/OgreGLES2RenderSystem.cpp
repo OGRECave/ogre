@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLSLESProgramFactory.h"
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
 #include "OgreGLSLESCgProgramFactory.h"
 #endif
 #include "OgreGLSLESLinkProgram.h"
@@ -271,7 +271,7 @@ namespace Ogre {
         rsc->addShaderProfile("glsles");
         LogManager::getSingleton().logMessage("GLSL ES support detected");
 
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
         rsc->addShaderProfile("cg");
         rsc->addShaderProfile("ps_2_0");
         rsc->addShaderProfile("vs_2_0");
@@ -338,7 +338,7 @@ namespace Ogre {
         mGLSLESProgramFactory = OGRE_NEW GLSLESProgramFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESProgramFactory);
 
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
         mGLSLESCgProgramFactory = OGRE_NEW GLSLESCgProgramFactory();
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLESCgProgramFactory);
 #endif
@@ -438,7 +438,7 @@ namespace Ogre {
 			mGLSLESProgramFactory = 0;
 		}
 
-#ifdef OGRE_CG_SUPPORT_FOR_GLES2
+#if !OGRE_NO_GLES2_CG_SUPPORT
         // Deleting the GLSL program factory
         if (mGLSLESCgProgramFactory)
         {

@@ -42,7 +42,7 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
 	GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
     GLSLESProgram::CmdOptimisation GLSLESProgram::msCmdOptimisation;
 #endif
     //-----------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace Ogre {
 		, mGLHandle(0)
         , mCompiled(0)
         , mIsOptimised(false)
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mOptimiserEnabled(true)
 #endif
     {
@@ -66,7 +66,7 @@ namespace Ogre {
 			dict->addParameter(ParameterDef("preprocessor_defines", 
                                             "Preprocessor defines use to compile the program.",
                                             PT_STRING),&msCmdPreprocessorDefines);
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
 			dict->addParameter(ParameterDef("use_optimiser", 
                                             "Should the GLSL optimiser be used. Default is true.",
                                             PT_BOOL),&msCmdOptimisation);
@@ -277,7 +277,7 @@ namespace Ogre {
 		return true;
 	}
 	//-----------------------------------------------------------------------
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
 	String GLSLESProgram::CmdOptimisation::doGet(const void *target) const
 	{
         return StringConverter::toString(static_cast<const GLSLESProgram*>(target)->getOptimiserEnabled());

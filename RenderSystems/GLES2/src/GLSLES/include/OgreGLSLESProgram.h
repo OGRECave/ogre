@@ -56,7 +56,7 @@ namespace Ogre {
     class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram
     {
     public:
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Command object for running the GLSL optimiser 
         class CmdOptimisation : public ParamCommand
         {
@@ -92,7 +92,7 @@ namespace Ogre {
 		/// Sets the preprocessor defines use to compile the program.
 		const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Sets if the GLSL optimiser is enabled.
 		void setOptimiserEnabled(bool enabled) { mOptimiserEnabled = enabled; }
 		/// Gets if the GLSL optimiser is enabled.
@@ -114,7 +114,7 @@ namespace Ogre {
 
 	protected:
 		static CmdPreprocessorDefines msCmdPreprocessorDefines;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
 		static CmdOptimisation msCmdOptimisation;
 #endif
 
@@ -151,7 +151,7 @@ namespace Ogre {
         bool mIsOptimised;
 		/// Preprocessor options
 		String mPreprocessorDefines;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         bool mOptimiserEnabled;
 #endif
     };
