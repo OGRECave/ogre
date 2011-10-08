@@ -23,7 +23,7 @@
 from ogre_mesh_exporter.global_properties import loadStaticConfig
 from ogre_mesh_exporter.global_properties import saveStaticConfig
 
-import bpy, pprint
+import bpy
 
 class MainExporterPanel(bpy.types.Panel):
 	bl_idname = "ogre3d_exporter_panel"
@@ -158,6 +158,12 @@ class OperatorExport(bpy.types.Operator):
 	bl_description = "Export selected meshes"
 
 	def invoke(self, context, event):
+		# make sure the global data is loaded first if it hasn't already.
+		panel = bpy.types.ogre3d_exporter_panel
+		if (panel.mFirstLoad):
+			loadStaticConfig()
+			panel.mFirstLoad = False
+
 		return('FINISHED')
 
 class OperatorPreferences(bpy.types.Operator):

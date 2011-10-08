@@ -40,12 +40,14 @@ if "bpy" in locals():
 	imp.reload(mesh_properties)
 	imp.reload(main_exporter_panel)
 	imp.reload(mesh_panel)
+	imp.reload(mesh_exporter)
 else:
 	from . import global_properties
 	from . import material_properties
 	from . import mesh_properties
 	from . import main_exporter_panel
 	from . import mesh_panel
+	from . import mesh_exporter
 
 import bpy, pprint
 from bpy.props import PointerProperty

@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 # ##### END MIT LICENSE BLOCK #####
 
-import bpy, pprint
+import bpy
 
 class MeshExporterPanel(bpy.types.Panel):
 	bl_idname = "ogre3d_mesh_panel"
