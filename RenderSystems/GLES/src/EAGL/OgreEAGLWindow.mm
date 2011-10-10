@@ -403,8 +403,8 @@ namespace Ogre {
 
         unsigned int attachmentCount = 0;
         GLenum attachments[3];
-        GLES2RenderSystem *rs =
-        static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLESRenderSystem *rs =
+            static_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem());
         unsigned int buffers = rs->getDiscardBuffers();
         
         if(buffers & FBT_COLOUR)
