@@ -1776,6 +1776,8 @@ namespace Ogre {
             GL_CHECK_ERROR;
         }
 
+        _setDiscardBuffers(buffers);
+
 		// Clear buffers
         glClear(flags);
         GL_CHECK_ERROR;

@@ -148,7 +148,10 @@ namespace Ogre {
 
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
-        
+
+            /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
+            unsigned int mDiscardBuffers;
+
             /** OpenGL ES doesn't support setting the PolygonMode like desktop GL
                 So we will cache the value and set it manually
              */
@@ -459,7 +462,9 @@ namespace Ogre {
              */
             void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
         
-        
+            void _setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
+            unsigned int getDiscardBuffers(void) { return mDiscardBuffers; }
+
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
                 Real depth = 1.0f, unsigned short stencil = 0);

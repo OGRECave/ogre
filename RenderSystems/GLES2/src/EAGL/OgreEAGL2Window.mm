@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
-
+#include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 
 namespace Ogre {
@@ -405,6 +405,25 @@ namespace Ogre {
             return;
         }
 
+        unsigned int attachmentCount = 0;
+        GLenum attachments[3];
+        GLES2RenderSystem *rs =
+            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        unsigned int buffers = rs->getDiscardBuffers();
+        
+        if(buffers & FBT_COLOUR)
+        {
+            attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0;
+        }
+        if(buffers & FBT_DEPTH)
+        {
+            attachments[attachmentCount++] = GL_DEPTH_ATTACHMENT;
+        }
+        if(buffers & FBT_STENCIL)
+        {
+            attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT;
+        }
+        
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             glDisable(GL_SCISSOR_TEST);     
@@ -414,21 +433,20 @@ namespace Ogre {
             GL_CHECK_ERROR
             glResolveMultisampleFramebufferAPPLE();
             GL_CHECK_ERROR
+            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
+            GL_CHECK_ERROR
             
-            GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
         }
         else
         {
-            GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
             GL_CHECK_ERROR
         }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-        GL_CHECK_ERROR
-
+        
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)

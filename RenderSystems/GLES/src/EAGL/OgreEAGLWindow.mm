@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 
 #include "OgreGLESPixelFormat.h"
+#include "OgreGLESRenderSystem.h"
 
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
@@ -400,37 +401,50 @@ namespace Ogre {
             return;
         }
 
+        unsigned int attachmentCount = 0;
+        GLenum attachments[3];
+        GLES2RenderSystem *rs =
+        static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        unsigned int buffers = rs->getDiscardBuffers();
+        
+        if(buffers & FBT_COLOUR)
+        {
+            attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0;
+        }
+        if(buffers & FBT_DEPTH)
+        {
+            attachments[attachmentCount++] = GL_DEPTH_ATTACHMENT;
+        }
+        if(buffers & FBT_STENCIL)
+        {
+            attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT;
+        }
+        
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             glDisable(GL_SCISSOR_TEST);     
-            glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
             GL_CHECK_ERROR
-            glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
             glResolveMultisampleFramebufferAPPLE();
             GL_CHECK_ERROR
-        }
-
-        // Framebuffer discard is only supported on devices running iOS 4+
-        if(mCurrentOSVersion >= 4.0)
-        {
-            GLenum attachments[] = { GL_COLOR_ATTACHMENT0_OES, GL_DEPTH_ATTACHMENT_OES, GL_STENCIL_ATTACHMENT_OES };
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
+            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
+            GL_CHECK_ERROR
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
         }
-
-        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
-        GL_CHECK_ERROR
-
-        glBindRenderbufferOES(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
-        GL_CHECK_ERROR
-        if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER_OES] == NO)
+        else
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Failed to swap buffers in ",
-                        __FUNCTION__);
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
+            GL_CHECK_ERROR
         }
+        
+        glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
+        GL_CHECK_ERROR
     }
 
     void EAGLWindow::getCustomAttribute( const String& name, void* pData )
