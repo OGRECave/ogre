@@ -89,12 +89,7 @@ namespace Ogre {
         optContentScalingFactor.possibleValues.push_back( "1.33" );
         optContentScalingFactor.possibleValues.push_back( "1.5" );
         optContentScalingFactor.possibleValues.push_back( "2.0" );
-#if __IPHONE_4_0
-        if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
-            optContentScalingFactor.currentValue = StringConverter::toString([UIScreen mainScreen].scale);
-        else
-#endif
-        optContentScalingFactor.currentValue = "1.0";
+        optContentScalingFactor.currentValue = StringConverter::toString([UIScreen mainScreen].scale);
         optContentScalingFactor.immutable = false;
         
         optFSAA.name = "FSAA";

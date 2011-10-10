@@ -166,17 +166,12 @@ namespace Ogre {
         // Call the base class method first
         RenderTarget::_beginUpdate();
 
-#if __IPHONE_4_0
-        if(mCurrentOSVersion >= 4.0)
+        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
-            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-            {
-                // Bind the FSAA buffer if we're doing multisampling
-                glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mFSAAFramebuffer);
-                GL_CHECK_ERROR
-            }
+            // Bind the FSAA buffer if we're doing multisampling
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mFSAAFramebuffer);
+            GL_CHECK_ERROR
         }
-#endif
     }
 
     void EAGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
@@ -221,10 +216,7 @@ namespace Ogre {
 
             // Use the default scale factor of the screen
             // See Apple's documentation on supporting high resolution devices for more info
-#if __IPHONE_4_0
-            if(mIsContentScalingSupported)
-                mView.contentScaleFactor = mContentScalingFactor;
-#endif
+            mView.contentScaleFactor = mContentScalingFactor;
         }
 
         OgreAssert(mView != nil, "EAGLWindow: Failed to create view");
@@ -265,14 +257,8 @@ namespace Ogre {
 
             mContext = mGLSupport->createNewContext(dict, eaglLayer, group);
 
-#if __IPHONE_4_0
-            // MSAA is only supported on devices running iOS 4+
-            if(mCurrentOSVersion >= 4.0)
-            {
-                mContext->mIsMultiSampleSupported = true;
-                mContext->mNumSamples = mFSAA;
-            }
-#endif
+            mContext->mIsMultiSampleSupported = true;
+            mContext->mNumSamples = mFSAA;
         }
         
         OgreAssert(mContext != nil, "EAGLWindow: Failed to create OpenGL ES context");
@@ -414,7 +400,6 @@ namespace Ogre {
             return;
         }
 
-#if __IPHONE_4_0
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             glDisable(GL_SCISSOR_TEST);     
@@ -433,7 +418,7 @@ namespace Ogre {
             glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
             GL_CHECK_ERROR
         }
-#endif
+
         glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
         GL_CHECK_ERROR
 

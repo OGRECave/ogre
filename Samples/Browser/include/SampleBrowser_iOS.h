@@ -38,16 +38,10 @@
 #import <UIKit/UIKit.h> 
 #import <QuartzCore/QuartzCore.h>
 
-// To use CADisplayLink for smoother animation on iPhone comment out
-// the following line or define it to 1.  Use with caution, it can
-// sometimes cause input lag.
-#define USE_CADISPLAYLINK 1
-
 #ifdef __OBJC__
 
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {
-    NSTimer *mTimer;
     OgreBites::SampleBrowser sb;
 
     // Use of the CADisplayLink class is the preferred method for controlling your animation timing.
@@ -57,21 +51,17 @@
     id mDisplayLink;
     NSDate* mDate;
     NSTimeInterval mLastFrameTime;
-    BOOL mDisplayLinkSupported;
-    BOOL mIsAtLeastiOS4;
 }
 
 - (void)go;
 - (void)renderOneFrame:(id)sender;
 
-@property (retain) NSTimer *mTimer;
 @property (nonatomic) NSTimeInterval mLastFrameTime;
 
 @end
 
 @implementation AppDelegate
 
-@synthesize mTimer;
 @dynamic mLastFrameTime;
 
 - (NSTimeInterval)mLastFrameTime
@@ -109,50 +99,24 @@
         e.getFullDescription().c_str() << std::endl;
     }
 
-    if (mDisplayLinkSupported)
-    {
-        // CADisplayLink is API new to iPhone SDK 3.1. Compiling against earlier versions will result in a warning, but can be dismissed
-        // if the system version runtime check for CADisplayLink exists in -initWithCoder:. The runtime check ensures this code will
-        // not be called in system versions earlier than 3.1.
-        mDate = [[NSDate alloc] init];
-        mLastFrameTime = -[mDate timeIntervalSinceNow];
-        
-        mDisplayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
-        [mDisplayLink setFrameInterval:mLastFrameTime];
-        [mDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    }
-    else
-    {
-        mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
-                                                  target:self
-                                                selector:@selector(renderOneFrame:)
-                                                userInfo:nil
-                                                 repeats:YES];
-    }
+    // CADisplayLink is API new to iPhone SDK 3.1. Compiling against earlier versions will result in a warning, but can be dismissed
+    // if the system version runtime check for CADisplayLink exists in -initWithCoder:. The runtime check ensures this code will
+    // not be called in system versions earlier than 3.1.
+    mDate = [[NSDate alloc] init];
+    mLastFrameTime = -[mDate timeIntervalSinceNow];
+    
+    mDisplayLink = [NSClassFromString(@"CADisplayLink") displayLinkWithTarget:self selector:@selector(renderOneFrame:)];
+    [mDisplayLink setFrameInterval:mLastFrameTime];
+    [mDisplayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 
     [pool release];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    mDisplayLinkSupported = NO;
     mLastFrameTime = 1;
     mDisplayLink = nil;
-    mTimer = nil;
-    mIsAtLeastiOS4 = NO;
 
-    if([[[UIDevice currentDevice] systemVersion] floatValue] >= 4.0)
-        mIsAtLeastiOS4 = YES;
-
-    // A system version of 3.1 or greater is required to use CADisplayLink. The NSTimer
-    // class is used as fallback when it isn't available.
-#if USE_CADISPLAYLINK
-    NSString *reqSysVer = @"3.1";
-    NSString *currSysVer = [[UIDevice currentDevice] systemVersion];
-    if ([currSysVer compare:reqSysVer options:NSNumericSearch] != NSOrderedAscending)
-        mDisplayLinkSupported = YES;
-#endif
-    
     [self go];
 
     return YES;
@@ -162,20 +126,12 @@
 {
     Ogre::Root::getSingleton().queueEndRendering();
 
-    if (mDisplayLinkSupported)
-    {
-        [mDate release];
-        mDate = nil;
-        
-        [mDisplayLink invalidate];
-        mDisplayLink = nil;
-    }
-    else
-    {
-        [mTimer invalidate];
-        mTimer = nil;
-    }
+    [mDate release];
+    mDate = nil;
     
+    [mDisplayLink invalidate];
+    mDisplayLink = nil;
+
     sb.shutdown();
 }
 
@@ -188,27 +144,15 @@
 {
     [sb.mGestureView becomeFirstResponder];
 
-    if (mDisplayLinkSupported)
-    {
-        // NSTimerInterval is a simple typedef for double
-        NSTimeInterval currentFrameTime = -[mDate timeIntervalSinceNow];
-        NSTimeInterval differenceInSeconds = currentFrameTime - mLastFrameTime;
-        mLastFrameTime = currentFrameTime;
+    // NSTimeInterval is a simple typedef for double
+    NSTimeInterval currentFrameTime = -[mDate timeIntervalSinceNow];
+    NSTimeInterval differenceInSeconds = currentFrameTime - mLastFrameTime;
+    mLastFrameTime = currentFrameTime;
 
-#if __IPHONE_4_0
-        if(mIsAtLeastiOS4)
-            dispatch_async(dispatch_get_main_queue(), ^(void)
-            {
-                Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
-            });
-        else
-#endif
-            Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
-    }
-    else
+    dispatch_async(dispatch_get_main_queue(), ^(void)
     {
-        Root::getSingleton().renderOneFrame((Real)[mTimer timeInterval]);
-    }
+        Root::getSingleton().renderOneFrame((Real)differenceInSeconds);
+    });
 }
 
 @end
