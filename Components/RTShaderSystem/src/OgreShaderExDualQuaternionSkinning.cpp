@@ -378,8 +378,6 @@ void DualQuaternionSkinning::adjustForCorrectAntipodality(Function* vsMain,
 	//Antipodality doesn't need to be adjusted for dq0 on itself (used as the basis of antipodality calculations)
 	if(index > 0)
 	{
-		Operand::OpMask indexMask = indexToMask(index);
-
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_ANTIPODALITY_ADJUSTMENT, FFP_VS_TRANSFORM, funcCounter++);
 		//This is the base dual quaternion dq0, which the antipodality calculations are based on
 		curFuncInvocation->pushOperand(mParamInitialDQ, Operand::OPS_IN);
