@@ -323,7 +323,7 @@ namespace Ogre
 		size_t data_width = finalWidth * pixel_bytes;
 		size_t data_size = finalWidth * finalHeight * pixel_bytes;
 
-		LogManager::getSingleton().logMessage("Font " + mName + "using texture size " +
+		LogManager::getSingleton().logMessage("Font " + mName + " using texture size " +
 			StringConverter::toString(finalWidth) + "x" + StringConverter::toString(finalHeight));
 
         uchar* imageData = OGRE_ALLOC_T(uchar, data_size, MEMCATEGORY_GENERAL);
