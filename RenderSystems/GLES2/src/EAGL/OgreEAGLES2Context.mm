@@ -212,7 +212,7 @@ namespace Ogre {
 
     void EAGLES2Context::setCurrent()
     {
-        GLboolean ret = [EAGLContext setCurrentContext:mContext];
+        BOOL ret = [EAGLContext setCurrentContext:mContext];
         if (!ret)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

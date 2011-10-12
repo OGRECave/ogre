@@ -232,7 +232,7 @@ namespace Ogre {
 
             CGSize screenSize = [[UIScreen mainScreen] applicationFrame].size;
             bool fullscreen = false;
-            uint w = screenSize.width, h = screenSize.height;
+            uint w = (uint)screenSize.width, h = (uint)screenSize.height;
 
             if ((opt = mOptions.find("Full Screen")) != end)
             {

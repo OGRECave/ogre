@@ -75,8 +75,8 @@ using namespace Ogre;
     {
         // Get the window size and initialize temp variables
         unsigned int w = 0, h = 0;
-        unsigned int width = self.bounds.size.width;
-        unsigned int height = self.bounds.size.height;
+        unsigned int width = (uint)self.bounds.size.width;
+        unsigned int height = (uint)self.bounds.size.height;
 
         Ogre::Viewport *viewPort = window->getViewport(0);
 
