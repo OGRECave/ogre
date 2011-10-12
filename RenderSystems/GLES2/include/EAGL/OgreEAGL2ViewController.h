@@ -39,7 +39,7 @@ using namespace Ogre;
     EAGL2Support *mGLSupport;
 }
 
-@property (assign) EAGL2Support *mGLSupport;
+@property (atomic, assign) EAGL2Support *mGLSupport;
 
 @end
 
