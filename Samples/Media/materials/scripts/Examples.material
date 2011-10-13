@@ -1917,6 +1917,7 @@ fragment_program Examples/ShowUV_pCg cg
 fragment_program Examples/ShowUV_pGLSLES glsles
 {
 	source ShowUV.glsles
+	profiles glsles
 }
 
 fragment_program Examples/ShowUV_p unified
@@ -1935,6 +1936,7 @@ fragment_program Examples/ShowUVdir3DCg cg
 fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 {
 	source ShowUVdir3D.glsles
+	profiles glsles
 }
 
 fragment_program Examples/ShowUVdir3D_p unified
@@ -1957,6 +1959,7 @@ vertex_program Examples/ShowTangents_vCg cg
 vertex_program Examples/ShowTangents_vGLSLES glsles
 {
 	source ShowTangents.glsles
+	profiles glsles
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -1983,6 +1986,7 @@ vertex_program Examples/ShowNormals_vCg cg
 vertex_program Examples/ShowNormals_vGLSLES glsles
 {
 	source ShowNormals.glsles
+	profiles glsles
 	default_params
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
@@ -1997,6 +2001,20 @@ vertex_program Examples/ShowNormals_v unified
 
 material Examples/ShowUV
 {
+	technique
+	{
+		pass
+		{
+			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureWithUV
+			{
+				param_named_auto worldViewProj worldviewproj_matrix
+			}
+			fragment_program_ref Examples/ShowUV_p
+			{
+			}
+		}
+	}
+
 	technique
 	{
 		pass

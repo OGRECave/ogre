@@ -69,6 +69,17 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 	}
 }
 
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV glsles
+{
+	source AmbientOneTextureWithUV.glsles
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
