@@ -149,8 +149,12 @@ namespace Ogre {
         PF_PVRTC_RGB4 = 40,
         /// PVRTC (PowerVR) RGBA 4 bpp
         PF_PVRTC_RGBA4 = 41,
+        /// 8-bit pixel format, all bits red.
+        PF_R8 = 42,
+        /// 16-bit pixel format, 8 bits red, 8 bits green.
+        PF_RG8 = 43,
 		// Number of pixel formats currently defined
-        PF_COUNT = 42
+        PF_COUNT = 44
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 

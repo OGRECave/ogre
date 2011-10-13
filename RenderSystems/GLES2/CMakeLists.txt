@@ -20,6 +20,7 @@ set(HEADER_FILES
   include/OgreGLES2GpuProgramManager.h
   include/OgreGLES2HardwareBufferManager.h
   include/OgreGLES2HardwareIndexBuffer.h
+  include/OgreGLES2HardwareOcclusionQuery.h
   include/OgreGLES2HardwarePixelBuffer.h
   include/OgreGLES2HardwareVertexBuffer.h
   include/OgreGLES2PixelFormat.h
@@ -44,6 +45,7 @@ set(SOURCE_FILES
   src/OgreGLES2GpuProgramManager.cpp
   src/OgreGLES2HardwareBufferManager.cpp
   src/OgreGLES2HardwareIndexBuffer.cpp
+  src/OgreGLES2HardwareOcclusionQuery.cpp
   src/OgreGLES2HardwarePixelBuffer.cpp
   src/OgreGLES2HardwareVertexBuffer.cpp
   src/OgreGLES2PixelFormat.cpp
@@ -61,15 +63,23 @@ set(GLSLES_FILES
   src/GLSLES/include/OgreGLSLESLinkProgram.h
   src/GLSLES/include/OgreGLSLESLinkProgramManager.h
   src/GLSLES/include/OgreGLSLESPreprocessor.h
-  src/GLSLES/include/OgreGLSLESProgramFactory.h
   src/GLSLES/include/OgreGLSLESProgram.h
+  src/GLSLES/include/OgreGLSLESProgramCommon.h
+  src/GLSLES/include/OgreGLSLESProgramFactory.h
+  src/GLSLES/include/OgreGLSLESProgramManagerCommon.h
+  src/GLSLES/include/OgreGLSLESProgramPipeline.h
+  src/GLSLES/include/OgreGLSLESProgramPipelineManager.h
   src/GLSLES/src/OgreGLSLESExtSupport.cpp
   src/GLSLES/src/OgreGLSLESGpuProgram.cpp
   src/GLSLES/src/OgreGLSLESLinkProgram.cpp
   src/GLSLES/src/OgreGLSLESLinkProgramManager.cpp
   src/GLSLES/src/OgreGLSLESPreprocessor.cpp
   src/GLSLES/src/OgreGLSLESProgram.cpp
+  src/GLSLES/src/OgreGLSLESProgramCommon.cpp
   src/GLSLES/src/OgreGLSLESProgramFactory.cpp
+  src/GLSLES/src/OgreGLSLESProgramManagerCommon.cpp
+  src/GLSLES/src/OgreGLSLESProgramPipeline.cpp
+  src/GLSLES/src/OgreGLSLESProgramPipelineManager.cpp
 )
 
 if (OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT)
@@ -197,8 +207,6 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 ogre_config_plugin(RenderSystem_GLES2)
-if (OGRE_INSTALL_PLUGINS_HEADERS)
-  install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GLES2)
-  install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include/ DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})
-endif ()
+install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GLES2)
+install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include/ DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})

@@ -44,6 +44,7 @@ namespace Ogre
 	class GLSLESGpuProgram;
 	class GLSLESLinkProgram;
 	class GLSLESLinkProgramManager;
+	class GLSLESProgramPipelineManager;
 	class GLSLESProgramFactory;
 
 	/** If there is a message in GL info log then post it in the Ogre Log

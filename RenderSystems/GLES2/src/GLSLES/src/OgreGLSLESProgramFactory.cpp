@@ -28,10 +28,13 @@ THE SOFTWARE.
 
 #include "OgreGLSLESProgramFactory.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgram.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     GLSLESLinkProgramManager* GLSLESProgramFactory::mLinkProgramManager = NULL;
+    GLSLESProgramPipelineManager* GLSLESProgramFactory::mProgramPipelineManager = NULL;
     //-----------------------------------------------------------------------
     String GLSLESProgramFactory::sLanguageName = "glsles";
     //-----------------------------------------------------------------------
@@ -39,7 +42,15 @@ namespace Ogre {
     {
         if (mLinkProgramManager == NULL)
         {
-		    mLinkProgramManager = new GLSLESLinkProgramManager();
+		    mLinkProgramManager = OGRE_NEW GLSLESLinkProgramManager();
+        }
+
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            if (mProgramPipelineManager == NULL)
+            {
+                mProgramPipelineManager = OGRE_NEW GLSLESProgramPipelineManager();
+            }
         }
     }
     //-----------------------------------------------------------------------
@@ -47,8 +58,17 @@ namespace Ogre {
     {
 		if (mLinkProgramManager)
         {
-			delete mLinkProgramManager;
+			OGRE_DELETE mLinkProgramManager;
             mLinkProgramManager = NULL;
+        }
+
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            if (mProgramPipelineManager)
+            {
+                OGRE_DELETE mProgramPipelineManager;
+                mProgramPipelineManager = NULL;
+            }
         }
     }
     //-----------------------------------------------------------------------
@@ -68,6 +88,4 @@ namespace Ogre {
     {
         OGRE_DELETE prog;
     }
-    //-----------------------------------------------------------------------
-
 }

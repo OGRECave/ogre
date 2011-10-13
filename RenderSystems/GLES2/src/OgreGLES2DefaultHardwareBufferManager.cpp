@@ -101,12 +101,14 @@ namespace Ogre {
         : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false)
           // always software, never shadowed
     {
-		if (idxType == HardwareIndexBuffer::IT_32BIT)
+#ifndef GL_OES_element_index_uint
+		if (!mGLSupport->checkExtension("GL_OES_element_index_uint")) && idxType == HardwareIndexBuffer::IT_32BIT)
 		{
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2DefaultHardwareIndexBuffer");
 		}
+#endif
         mpData = OGRE_NEW_FIX_FOR_WIN32 unsigned char[mSizeInBytes];
     }
 

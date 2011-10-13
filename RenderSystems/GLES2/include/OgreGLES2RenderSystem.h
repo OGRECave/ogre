@@ -434,7 +434,7 @@ namespace Ogre {
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
                 Real depth = 1.0f, unsigned short stencil = 0);
-            HardwareOcclusionQuery* createHardwareOcclusionQuery(void) { return NULL; }   // Not supported
+            HardwareOcclusionQuery* createHardwareOcclusionQuery(void);
             Real getHorizontalTexelOffset(void) { return 0.0; }               // No offset in GL
             Real getVerticalTexelOffset(void) { return 0.0; }                 // No offset in GL
             Real getMinimumDepthInputValue(void) { return -1.0f; }            // Range [-1.0f, 1.0f]

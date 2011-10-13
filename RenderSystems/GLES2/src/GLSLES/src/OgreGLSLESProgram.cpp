@@ -28,11 +28,13 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
 #include "OgreStringConverter.h"
 
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESPreprocessor.h"
 
 namespace Ogre {
@@ -51,7 +53,8 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
-		, mGLHandle(0)
+		, mGLShaderHandle(0)
+        , mGLProgramHandle(0)
         , mCompiled(0)
         , mIsOptimised(false)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
@@ -181,36 +184,42 @@ namespace Ogre {
             {
 				shaderType = GL_FRAGMENT_SHADER;
 			}
-			mGLHandle = glCreateShader(shaderType);
+			mGLShaderHandle = glCreateShader(shaderType);
             GL_CHECK_ERROR
+
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                mGLProgramHandle = glCreateProgram();
+                GL_CHECK_ERROR
+            }
 		}
 
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
 		{
 			const char *source = mSource.c_str();
-			glShaderSource(mGLHandle, 1, &source, NULL);
+			glShaderSource(mGLShaderHandle, 1, &source, NULL);
 			// Check for load errors
             GL_CHECK_ERROR
 		}
 
         if (checkErrors)
-            logObjectInfo("GLSL ES compiling: " + mName, mGLHandle);
+            logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
 
-		glCompileShader(mGLHandle);
+		glCompileShader(mGLShaderHandle);
         GL_CHECK_ERROR
 
 		// Check for compile errors
-		glGetShaderiv(mGLHandle, GL_COMPILE_STATUS, &mCompiled);
+		glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled);
         if(!mCompiled && checkErrors)
 		{
-            String message = logObjectInfo("GLSL ES compile log: " + mName, mGLHandle);
+            String message = logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
 			checkAndFixInvalidDefaultPrecisionError(message);
 		}
 
 		// Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
-            logObjectInfo("GLSL ES compiled: " + mName, mGLHandle);
+            logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
 
 		return (mCompiled == 1);
 	}
@@ -235,7 +244,16 @@ namespace Ogre {
 	{
 		if (isSupported())
 		{
-			glDeleteProgram(mGLHandle);
+//            LogManager::getSingleton().logMessage("Deleting shader " + StringConverter::toString(mGLShaderHandle) +
+//                                                  " and program " + StringConverter::toString(mGLProgramHandle));
+			glDeleteShader(mGLShaderHandle);
+            GL_CHECK_ERROR;
+
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                glDeleteProgram(mGLProgramHandle);
+                GL_CHECK_ERROR;
+            }
 		}
 	}
 
@@ -254,8 +272,14 @@ namespace Ogre {
 
 		// Therefore instead, parse the source code manually and extract the uniforms
 		createParameterMappingStructures(true);
-		GLSLESLinkProgramManager::getSingleton().extractConstantDefs(
-			mSource, *mConstantDefs.get(), mName);
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        {
+            GLSLESProgramPipelineManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+        }
+        else
+        {
+            GLSLESLinkProgramManager::getSingleton().extractConstantDefs(mSource, *mConstantDefs.get(), mName);
+        }
 	}
 
 	//---------------------------------------------------------------------
@@ -300,13 +324,17 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::attachToProgramObject( const GLuint programObject )
 	{
-		glAttachShader(programObject, mGLHandle);
+//        LogManager::getSingleton().logMessage("Attaching shader " + StringConverter::toString(mGLShaderHandle) +
+//                                              " to program " + StringConverter::toString(programObject));
+        glAttachShader(programObject, mGLShaderHandle);
         GL_CHECK_ERROR
-	}
+    }
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::detachFromProgramObject( const GLuint programObject )
 	{
-		glDetachShader(programObject, mGLHandle);
+//        LogManager::getSingleton().logMessage("Detaching shader " + StringConverter::toString(mGLShaderHandle) +
+//                                              " to program " + StringConverter::toString(programObject));
+        glDetachShader(programObject, mGLShaderHandle);
         GL_CHECK_ERROR
 	}
 
@@ -327,7 +355,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::checkAndFixInvalidDefaultPrecisionError( String &message )
 	{
-		String precisionQualifierErrorString = ": 'Default Precision Qualifier' :  invalid type Type for default precision qualifier can be only float or int";
+		String precisionQualifierErrorString = ": 'Default Precision Qualifier' : invalid type Type for default precision qualifier can be only float or int";
 		vector< String >::type linesOfSource = StringUtil::split(mSource, "\n");
 		if( message.find(precisionQualifierErrorString) != String::npos )
 		{
@@ -365,17 +393,17 @@ namespace Ogre {
 			mSource = newSource.str();
 
 			const char *source = mSource.c_str();
-			glShaderSource(mGLHandle, 1, &source, NULL);
+			glShaderSource(mGLShaderHandle, 1, &source, NULL);
 			// Check for load errors
 			GL_CHECK_ERROR
-				if (compile())
-				{
-					LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
-				}
-				else
-				{
-					LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
-				}
+            if (compile())
+            {
+                LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");
+            }
+            else
+            {
+                LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
+            }
 		}
 	}
 	//-----------------------------------------------------------------------

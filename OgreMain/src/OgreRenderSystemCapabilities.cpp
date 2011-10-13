@@ -260,6 +260,9 @@ namespace Ogre {
 			pLog->logMessage(
 				" * GL 1.5 without HW-occlusion workaround: "
 				+ StringConverter::toString(hasCapability(RSC_GL1_5_NOHWOCCLUSION), true));
+			pLog->logMessage(
+                " * Separate shader objects: "
+                + StringConverter::toString(hasCapability(RSC_SEPARATE_SHADER_OBJECTS), true));
 		}
 
 		if (mCategoryRelevant[CAPS_CATEGORY_D3D9])

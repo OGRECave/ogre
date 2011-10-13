@@ -36,12 +36,16 @@ THE SOFTWARE.
 #include "OgreGLES2GpuProgramManager.h"
 #include "OgreGLES2Util.h"
 #include "OgreGLES2FBORenderTexture.h"
+#include "OgreGLES2HardwareOcclusionQuery.h"
 #include "OgreGLSLESProgramFactory.h"
+#include "OgreRoot.h"
 #if !OGRE_NO_GLES2_CG_SUPPORT
 #include "OgreGLSLESCgProgramFactory.h"
 #endif
 #include "OgreGLSLESLinkProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLSLESProgramPipelineManager.h"
+#include "OgreGLSLESProgramPipeline.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGL2Window.h"
@@ -199,6 +203,7 @@ namespace Ogre {
 
         // Check for hardware stencil support and set bit depth
         GLint stencil;
+
         glGetIntegerv(GL_STENCIL_BITS, &stencil);
         GL_CHECK_ERROR;
 
@@ -214,6 +219,12 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
+
+		// Check for hardware occlusion support
+		if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean"))
+		{
+			rsc->setCapability(RSC_HWOCCLUSION);
+		}
 
         // OpenGL ES - Check for these extensions too
         // For 2.0, http://www.khronos.org/registry/gles/api/2.0/gl2ext.h
@@ -287,6 +298,10 @@ namespace Ogre {
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
+        // Separate shader objects
+        if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+
         GLfloat floatConstantCount = 0;
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_VECTORS, &floatConstantCount);
         rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
@@ -306,7 +321,9 @@ namespace Ogre {
         rsc->setGeometryProgramConstantIntCount(0);
         
         // Check for Float textures
-//        rsc->setCapability(RSC_TEXTURE_FLOAT);
+#if GL_OES_texture_float || GL_OES_texture_half_float
+        rsc->setCapability(RSC_TEXTURE_FLOAT);
+#endif
 
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
@@ -348,64 +365,11 @@ namespace Ogre {
 
         // Use VBO's by default
         mHardwareBufferManager = OGRE_NEW GLES2HardwareBufferManager();
-#if GL_OES_packed_depth_stencil
 
-        ConfigOptionMap::iterator cfi = getConfigOptions().find("RTT Preferred Mode");
-		// RTT Mode: 0 use whatever available, 1 use PBuffers, 2 force use copying
-		int rttMode = 0;
-		if (cfi != getConfigOptions().end())
-		{
-			if (cfi->second.currentValue == "PBuffer")
-			{
-				rttMode = 1;
-			}
-			else if (cfi->second.currentValue == "Copy")
-			{
-				rttMode = 2;
-			}
-		}
-
-		// Check for framebuffer object extension
-		if(caps->hasCapability(RSC_FBO) && rttMode < 1)
-		{
-            // Create FBO manager
-            LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
-            mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
-            caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
-        }
-		else
-		{
-			// Check GLSupport for PBuffer support
-			if(caps->hasCapability(RSC_PBUFFER) && rttMode < 2)
-			{
-				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
-				{
-					// Use PBuffers
-//					mRTTManager = new GLES2PBRTTManager(mGLSupport, primary);
-					LogManager::getSingleton().logMessage("GL ES 2: Using PBuffers for rendering to textures");
-
-					// TODO: Depth buffer sharing in pbuffer is left unsupported
-				}
-			}
-			else
-#else
-		{
-
-#endif
-			{
-				// No pbuffer support either -- fallback to simplest copying from framebuffer
-				mRTTManager = new GLES2CopyingRTTManager();
-				LogManager::getSingleton().logMessage("GL ES 2: Using framebuffer copy for rendering to textures (worst)");
-				LogManager::getSingleton().logMessage("GL ES 2: Warning: RenderTexture size is restricted to size of framebuffer. If you are on Linux, consider using GLX instead of SDL.");
-
-				//Copy method uses the main depth buffer but no other depth buffer
-                caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
-				caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
-			}
-
-			// Downgrade number of simultaneous targets
-			caps->setNumMultiRenderTargets(1);
-		}
+        // Create FBO manager
+        LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
+        mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
+        caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
 		if (defaultLog)
@@ -565,9 +529,7 @@ namespace Ogre {
 		// else creates dummy (empty) containers
 		// retVal = mRTTManager->_createDepthBufferFor( renderTarget );
 		GLES2FrameBufferObject *fbo = 0;
-#if GL_OES_packed_depth_stencil
         renderTarget->getCustomAttribute("FBO", &fbo);
-#endif
 
 		if( fbo )
 		{
@@ -1257,6 +1219,14 @@ namespace Ogre {
         dest[3][3] = 1;
     }
 
+	//---------------------------------------------------------------------
+	HardwareOcclusionQuery* GLES2RenderSystem::createHardwareOcclusionQuery(void)
+	{
+		GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
+		mHwOcclusionQueries.push_back(ret);
+		return ret;
+	}
+
     void GLES2RenderSystem::_applyObliqueDepthProjection(Matrix4& matrix,
                                                       const Plane& plane,
                                                       bool forGpuProgram)
@@ -1533,7 +1503,7 @@ namespace Ogre {
         {
             if (!op.vertexData->vertexBufferBinding->isBufferBound(elem->getSource()))
                 continue; // skip unbound elements
-        GL_CHECK_ERROR;
+            GL_CHECK_ERROR;
 
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elem->getSource());
@@ -1552,13 +1522,29 @@ namespace Ogre {
             unsigned short typeCount = VertexElement::getTypeCount(elem->getType());
             GLboolean normalised = GL_FALSE;
 
-			GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-			if ( ! linkProgram->isAttributeValid(sem, elem->getIndex()) )
-			{
-				continue;
-			}
+            GLuint attrib = 0;
 
-			GLint attrib = linkProgram->getAttributeIndex(sem, elem->getIndex());
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                GLSLESProgramPipeline* programPipeline = 
+                    GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                if (!programPipeline->isAttributeValid(sem, elem->getIndex()))
+                {
+                    continue;
+                }
+                
+                attrib = (GLuint)programPipeline->getAttributeIndex(sem, elem->getIndex());
+            }
+            else
+            {
+                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+                if (!linkProgram->isAttributeValid(sem, elem->getIndex()))
+                {
+                    continue;
+                }
+                
+                attrib = (GLuint)linkProgram->getAttributeIndex(sem, elem->getIndex());
+            }
 
             switch(elem->getType())
             {
@@ -1624,7 +1610,7 @@ namespace Ogre {
             pBufferData = VBO_BUFFER_OFFSET(op.indexData->indexStart *
                                             op.indexData->indexBuffer->getIndexSize());
 
-            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_BYTE;
+            GLenum indexType = (op.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT) ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
             do
             {

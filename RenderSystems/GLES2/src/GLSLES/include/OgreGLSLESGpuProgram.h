@@ -42,8 +42,8 @@ namespace Ogre {
 		GLSL ES uses a program object to represent the active vertex and fragment programs used
 		but Ogre materials maintain separate instances of the active vertex and fragment programs
 		which creates a small problem for GLSL integration.  The GLSLESGpuProgram class provides the
-		interface between the GLSLESLinkProgramManager , GLES2RenderSystem, and the active GLSLESProgram
-		instances.
+		interface between the GLSLESLinkProgramManager, GLSLESProgramPipelineManager , GLES2RenderSystem,
+        and the active GLSLESProgram instances.
 	*/
     class _OgreGLES2Export GLSLESGpuProgram : public GLES2GpuProgram
     {
@@ -56,10 +56,14 @@ namespace Ogre {
 		/// Keep track of the number of fragment shaders created
 		static GLuint mFragmentShaderCount;
 
+        /** Flag indicating that the program object has been successfully linked.
+            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
+         */
+		GLint mLinked;
+
 	public:
         GLSLESGpuProgram(GLSLESProgram* parent);
 		~GLSLESGpuProgram();
-
 
 		/// Execute the binding functions for this program
 		void bindProgram(void);
@@ -70,11 +74,18 @@ namespace Ogre {
 		/// Execute the pass iteration param binding functions for this program
 		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
-		/// Get the assigned GL program id
-		const GLuint getProgramID(void) const { return mProgramID; }
-
 		/// Get the GLSLESProgram for the shader object
 		GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }		
+
+        /** Return the programs link status
+            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
+         */
+        GLint isLinked(void) { return mLinked; }
+
+        /** Set the programs link status
+            Only used when programs are linked separately with GL_EXT_separate_shader_objects.
+         */
+        void setLinked(GLint flag) { mLinked = flag; }
 
     protected:
         /// Overridden from GpuProgram

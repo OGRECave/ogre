@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESLinkProgram.h"
+#include "OgreGLSLESProgramPipelineManager.h"
+#include "OgreGLSLESProgramPipeline.h"
 
 static int computeLog(GLuint value)
 {
@@ -641,26 +643,39 @@ namespace Ogre {
                 u1, v2, w
             };
 
-			GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+            GLuint posAttrIndex = 0;
+            GLuint texAttrIndex = 0;
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                posAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_POSITION, 0);
+                texAttrIndex = (GLuint)programPipeline->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
+            }
+            else
+            {
+                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+                posAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_POSITION, 0);
+                texAttrIndex = (GLuint)linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0);
+            }
 
             // Draw the textured quad
-            glVertexAttribPointer(linkProgram->getAttributeIndex(VES_POSITION, 0),
+            glVertexAttribPointer(posAttrIndex,
                                   2,
                                   GL_FLOAT,
                                   0,
                                   0,
                                   squareVertices);
             GL_CHECK_ERROR;
-            glEnableVertexAttribArray(linkProgram->getAttributeIndex(VES_POSITION, 0));
+            glEnableVertexAttribArray(posAttrIndex);
             GL_CHECK_ERROR;
-            glVertexAttribPointer(linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0),
+            glVertexAttribPointer(texAttrIndex,
                                   3,
                                   GL_FLOAT,
                                   0,
                                   0,
                                   texCoords);
             GL_CHECK_ERROR;
-            glEnableVertexAttribArray(linkProgram->getAttributeIndex(VES_TEXTURE_COORDINATES, 0));
+            glEnableVertexAttribArray(texAttrIndex);
             GL_CHECK_ERROR;
 
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

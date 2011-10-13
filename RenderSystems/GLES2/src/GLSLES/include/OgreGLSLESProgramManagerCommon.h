@@ -25,15 +25,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLSLESLinkProgramManager_H__
-#define __GLSLESLinkProgramManager_H__
+#ifndef __GLSLESProgramManagerCommon_H__
+#define __GLSLESProgramManagerCommon_H__
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreSingleton.h"
-
+#include "OgreGLSLESProgramCommon.h"
 #include "OgreGLSLESExtSupport.h"
-#include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESProgramManagerCommon.h"
+
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+#   include "glsl_optimizer.h"
+#endif
 
 namespace Ogre {
 
@@ -49,51 +51,63 @@ namespace Ogre {
 		key in a hash_map for quick retrieval the next time the program object is required.
 	*/
 
-	class _OgreGLES2Export GLSLESLinkProgramManager : public GLSLESProgramManagerCommon, public Singleton<GLSLESLinkProgramManager>
+	class _OgreGLES2Export GLSLESProgramManagerCommon
 	{
-
-	private:
-	
-		typedef map<uint64, GLSLESLinkProgram*>::type LinkProgramMap;
-		typedef LinkProgramMap::iterator LinkProgramIterator;
-
-		/// Container holding previously created program objects 
-		LinkProgramMap mLinkPrograms; 
-
+	protected:
 		/// Active objects defining the active rendering gpu state
-		GLSLESLinkProgram* mActiveLinkProgram;
+		GLSLESGpuProgram* mActiveVertexGpuProgram;
+		GLSLESGpuProgram* mActiveFragmentGpuProgram;
 
 		typedef map<String, GLenum>::type StringToEnumMap;
 		StringToEnumMap mTypeEnumMap;
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        struct glslopt_ctx *mGLSLOptimiserContext;
+#endif
+		/// Use type to complete other information
+		void completeDefInfo(GLenum gltype, GpuConstantDefinition& defToUpdate);
+		/// Find where the data for a specific uniform should come from, populate
+		bool completeParamSource(const String& paramName,
+			const GpuConstantDefinitionMap* vertexConstantDefs, 
+			const GpuConstantDefinitionMap* fragmentConstantDefs,
+			GLUniformReference& refToUpdate);
 
 	public:
 
-		GLSLESLinkProgramManager(void);
+		GLSLESProgramManagerCommon(void);
+		~GLSLESProgramManagerCommon(void);
 
-		~GLSLESLinkProgramManager(void);
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        /**
+         
+        */
+        void optimiseShaderSource(GLSLESGpuProgram* gpuProgram);
+#endif
 
-		/**
-			Get the program object that links the two active shader objects together
-			if a program object was not already created and linked a new one is created and linked
+		/** Populate a list of uniforms based on a program object.
+		@param programObject Handle to the program object to query
+		@param vertexConstantDefs Definition of the constants extracted from the
+			vertex program, used to match up physical buffer indexes with program
+			uniforms. May be null if there is no vertex program.
+		@param fragmentConstantDefs Definition of the constants extracted from the
+			fragment program, used to match up physical buffer indexes with program
+			uniforms. May be null if there is no fragment program.
+		@param list The list to populate (will not be cleared before adding, clear
+		it yourself before calling this if that's what you want).
 		*/
-		GLSLESLinkProgram* getActiveLinkProgram(void);
-
-		/** Set the active fragment shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
+		void extractUniforms(GLuint programObject, 
+			const GpuConstantDefinitionMap* vertexConstantDefs, 
+			const GpuConstantDefinitionMap* fragmentConstantDefs,
+			GLUniformReferenceList& list);
+		/** Populate a list of uniforms based on GLSL ES source.
+		@param src Reference to the source code
+		@param list The defs to populate (will not be cleared before adding, clear
+		it yourself before calling this if that's what you want).
+		@param filename The file name this came from, for logging errors.
 		*/
-		void setActiveFragmentShader(GLSLESGpuProgram* fragmentGpuProgram);
-		/** Set the active vertex shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
-
-		static GLSLESLinkProgramManager& getSingleton(void);
-        static GLSLESLinkProgramManager* getSingletonPtr(void);
-
+		void extractConstantDefs(const String& src, GpuNamedConstants& constantDefs, 
+			const String& filename);
 	};
 
 }
 
-#endif // __GLSLESLinkProgramManager_H__
+#endif // __GLSLESProgramManagerCommon_H__

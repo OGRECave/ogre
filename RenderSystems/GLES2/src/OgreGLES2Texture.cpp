@@ -135,6 +135,8 @@ namespace Ogre {
         mMipmapsHardwareGenerated =
             Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
 
+        // FIXME: For some reason this is crashing on iOS 5
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         if ((mUsage & TU_AUTOMIPMAP) &&
             mNumRequestedMipmaps && mMipmapsHardwareGenerated &&
             (mTextureType != TEX_TYPE_CUBE_MAP))
@@ -142,6 +144,7 @@ namespace Ogre {
             glGenerateMipmap(getGLES2TextureTarget());
             GL_CHECK_ERROR;
         }
+#endif
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
