@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
     GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
@@ -39,14 +40,12 @@ namespace Ogre {
                                                      bool useShadowBuffer)
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
     {
-#ifndef GL_OES_element_index_uint
-		if (!mGLSupport->checkExtension("GL_OES_element_index_uint")) && idxType == HardwareIndexBuffer::IT_32BIT)
+		if (!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT)
 		{
 			OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2HardwareIndexBuffer");
 		}
-#endif
 
 		if (!useShadowBuffer)
         {
