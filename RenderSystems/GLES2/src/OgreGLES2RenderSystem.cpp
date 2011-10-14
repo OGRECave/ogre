@@ -1222,9 +1222,16 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	HardwareOcclusionQuery* GLES2RenderSystem::createHardwareOcclusionQuery(void)
 	{
-		GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
-		mHwOcclusionQueries.push_back(ret);
-		return ret;
+		if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean"))
+        {
+            GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
+            mHwOcclusionQueries.push_back(ret);
+            return ret;
+        }
+        else
+        {
+            return NULL;
+        }
 	}
 
     void GLES2RenderSystem::_applyObliqueDepthProjection(Matrix4& matrix,
