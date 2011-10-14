@@ -471,6 +471,7 @@ namespace Ogre {
              */
             void _setRenderTarget(RenderTarget *target);
 
+            GLES2Support* getGLES2Support() { return mGLSupport; }
             GLint convertCompareFunction(CompareFunction func) const;
             GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
