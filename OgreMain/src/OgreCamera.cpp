@@ -589,7 +589,7 @@ namespace Ogre {
         return msMovableType;
     }
     //-----------------------------------------------------------------------
-    void Camera::setAutoTracking(bool enabled, SceneNode* target, 
+    void Camera::setAutoTracking(bool enabled, SceneNode* const target, 
         const Vector3& offset)
     {
         if (enabled)

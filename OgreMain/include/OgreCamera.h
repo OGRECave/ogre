@@ -432,7 +432,7 @@ namespace Ogre {
         @param offset If supplied, the camera targets this point in local space of the target node
             instead of the origin of the target node. Good for fine tuning the look at point.
         */
-        void setAutoTracking(bool enabled, SceneNode* target = 0, 
+        void setAutoTracking(bool enabled, SceneNode* const target = 0, 
             const Vector3& offset = Vector3::ZERO);
 
 

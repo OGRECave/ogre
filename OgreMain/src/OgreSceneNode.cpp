@@ -464,7 +464,7 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void SceneNode::setAutoTracking(bool enabled, SceneNode* target, 
+    void SceneNode::setAutoTracking(bool enabled, SceneNode* const target, 
         const Vector3& localDirectionVector,
         const Vector3& offset)
     {
