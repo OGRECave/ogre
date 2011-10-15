@@ -209,11 +209,6 @@ SceneManager::~SceneManager()
 	}
 
 	OGRE_DELETE mSkyBoxObj;
-	OGRE_DELETE mSkyPlaneEntity;
-	for (int i=0;i<5;i++)
-	{
-		OGRE_DELETE mSkyDomeEntity[i];
-	}
 
 	OGRE_DELETE mShadowCasterQueryListener;
     OGRE_DELETE mSceneRoot;
@@ -1667,6 +1662,7 @@ void SceneManager::_setSkyPlane(
         {
             // destroy old one, do it by name for speed
             destroyEntity(meshName);
+            mSkyPlaneEntity = 0;
         }
         // Create, use the same name for mesh and entity
 		// manually construct as we don't want this to be destroyed on destroyAllMovableObjects
@@ -1677,6 +1673,9 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, this, &params));
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
+
+        MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+        objectMap->map[meshName] = mSkyPlaneEntity;
 
         // Create node and attach
         if (!mSkyPlaneNode)
@@ -1989,15 +1988,20 @@ void SceneManager::_setSkyDome(
             {
                 // destroy old one, do it by name for speed
                 destroyEntity(entName);
+                mSkyDomeEntity[i] = 0;
             }
 			// construct manually so we don't have problems if destroyAllMovableObjects called
 			MovableObjectFactory* factory = 
 				Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
+
 			NameValuePairList params;
 			params["mesh"] = planeMesh->getName();
 			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, this, &params));
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
+
+            MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+            objectMap->map[entName] = mSkyDomeEntity[i];
 
             // Attach to node
             mSkyDomeNode->attachObject(mSkyDomeEntity[i]);
