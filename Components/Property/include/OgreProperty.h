@@ -300,6 +300,9 @@ namespace Ogre
 		/** Reports whether this property set contains a named property. */
 		bool hasProperty(const String& name) const;
 
+        /** Removes the named property from the property set. */
+        void removeProperty(const String& name);
+
 		typedef map<String, PropertyBase*>::type PropertyMap;
 		typedef Ogre::MapIterator<PropertyMap> PropertyIterator;
 		/// Get an iterator over the available properties
