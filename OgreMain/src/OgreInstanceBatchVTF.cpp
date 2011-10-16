@@ -312,7 +312,7 @@ namespace Ogre
 		Matrix4 matrix;
 		size_t floatsWritten = 0;
 
-		for (int m = 0; m < numOfMatrices; ++m)
+		for (size_t m = 0; m < numOfMatrices; ++m)
 		{
 			for(int i = 0; i < 3; ++i)
 			{
