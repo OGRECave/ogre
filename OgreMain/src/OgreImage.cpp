@@ -40,22 +40,22 @@ namespace Ogre {
 
 	//-----------------------------------------------------------------------------
 	Image::Image()
-		: m_uWidth(0),
-		m_uHeight(0),
-		m_uDepth(0),
-		m_uSize(0),
-		m_uNumMipmaps(0),
-		m_uFlags(0),
-		m_eFormat(PF_UNKNOWN),
-		m_pBuffer( NULL ),
-		m_bAutoDelete( true )
+		: mWidth(0),
+		mHeight(0),
+		mDepth(0),
+		mBufSize(0),
+		mNumMipmaps(0),
+		mFlags(0),
+		mFormat(PF_UNKNOWN),
+		mBuffer( NULL ),
+		mAutoDelete( true )
 	{
 	}
 
 	//-----------------------------------------------------------------------------
 	Image::Image( const Image &img )
-		: m_pBuffer( NULL ),
-		m_bAutoDelete( true )
+		: mBuffer( NULL ),
+		mAutoDelete( true )
 	{
 		// call assignment operator
 		*this = img;
@@ -70,10 +70,10 @@ namespace Ogre {
 	void Image::freeMemory()
 	{
 		//Only delete if this was not a dynamic image (meaning app holds & destroys buffer)
-		if( m_pBuffer && m_bAutoDelete )
+		if( mBuffer && mAutoDelete )
 		{
-			OGRE_FREE(m_pBuffer, MEMCATEGORY_GENERAL);
-			m_pBuffer = NULL;
+			OGRE_FREE(mBuffer, MEMCATEGORY_GENERAL);
+			mBuffer = NULL;
 		}
 
 	}
@@ -82,24 +82,24 @@ namespace Ogre {
 	Image & Image::operator = ( const Image &img )
 	{
 		freeMemory();
-		m_uWidth = img.m_uWidth;
-		m_uHeight = img.m_uHeight;
-		m_uDepth = img.m_uDepth;
-		m_eFormat = img.m_eFormat;
-		m_uSize = img.m_uSize;
-		m_uFlags = img.m_uFlags;
-		m_ucPixelSize = img.m_ucPixelSize;
-		m_uNumMipmaps = img.m_uNumMipmaps;
-		m_bAutoDelete = img.m_bAutoDelete;
+		mWidth = img.mWidth;
+		mHeight = img.mHeight;
+		mDepth = img.mDepth;
+		mFormat = img.mFormat;
+		mBufSize = img.mBufSize;
+		mFlags = img.mFlags;
+		mPixelSize = img.mPixelSize;
+		mNumMipmaps = img.mNumMipmaps;
+		mAutoDelete = img.mAutoDelete;
 		//Only create/copy when previous data was not dynamic data
-		if( m_bAutoDelete )
+		if( mAutoDelete )
 		{
-			m_pBuffer = OGRE_ALLOC_T(uchar, m_uSize, MEMCATEGORY_GENERAL);
-			memcpy( m_pBuffer, img.m_pBuffer, m_uSize );
+			mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
+			memcpy( mBuffer, img.mBuffer, mBufSize );
 		}
 		else
 		{
-			m_pBuffer = img.m_pBuffer;
+			mBuffer = img.mBuffer;
 		}
 
 		return *this;
@@ -108,7 +108,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Image & Image::flipAroundY()
 	{
-		if( !m_pBuffer )
+		if( !mBuffer )
 		{
 			OGRE_EXCEPT( 
 				Exception::ERR_INTERNAL_ERROR,
@@ -116,75 +116,75 @@ namespace Ogre {
 				"Image::flipAroundY" );
 		}
         
-         m_uNumMipmaps = 0; // Image operations lose precomputed mipmaps
+         mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
 		uchar	*pTempBuffer1 = NULL;
 		ushort	*pTempBuffer2 = NULL;
 		uchar	*pTempBuffer3 = NULL;
 		uint	*pTempBuffer4 = NULL;
 
-		uchar	*src1 = m_pBuffer, *dst1 = NULL;
-		ushort	*src2 = (ushort *)m_pBuffer, *dst2 = NULL;
-		uchar	*src3 = m_pBuffer, *dst3 = NULL;
-		uint	*src4 = (uint *)m_pBuffer, *dst4 = NULL;
+		uchar	*src1 = mBuffer, *dst1 = NULL;
+		ushort	*src2 = (ushort *)mBuffer, *dst2 = NULL;
+		uchar	*src3 = mBuffer, *dst3 = NULL;
+		uint	*src4 = (uint *)mBuffer, *dst4 = NULL;
 
 		ushort y;
-		switch (m_ucPixelSize)
+		switch (mPixelSize)
 		{
 		case 1:
-			pTempBuffer1 = OGRE_ALLOC_T(uchar, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
-			for (y = 0; y < m_uHeight; y++)
+			pTempBuffer1 = OGRE_ALLOC_T(uchar, mWidth * mHeight, MEMCATEGORY_GENERAL);
+			for (y = 0; y < mHeight; y++)
 			{
-				dst1 = (pTempBuffer1 + ((y * m_uWidth) + m_uWidth - 1));
-				for (ushort x = 0; x < m_uWidth; x++)
+				dst1 = (pTempBuffer1 + ((y * mWidth) + mWidth - 1));
+				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst1--, src1++, sizeof(uchar));
 			}
 
-			memcpy(m_pBuffer, pTempBuffer1, m_uWidth * m_uHeight * sizeof(uchar));
+			memcpy(mBuffer, pTempBuffer1, mWidth * mHeight * sizeof(uchar));
 			OGRE_FREE(pTempBuffer1, MEMCATEGORY_GENERAL);
 			break;
 
 		case 2:
-			pTempBuffer2 = OGRE_ALLOC_T(ushort, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
-			for (y = 0; y < m_uHeight; y++)
+			pTempBuffer2 = OGRE_ALLOC_T(ushort, mWidth * mHeight, MEMCATEGORY_GENERAL);
+			for (y = 0; y < mHeight; y++)
 			{
-				dst2 = (pTempBuffer2 + ((y * m_uWidth) + m_uWidth - 1));
-				for (ushort x = 0; x < m_uWidth; x++)
+				dst2 = (pTempBuffer2 + ((y * mWidth) + mWidth - 1));
+				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst2--, src2++, sizeof(ushort));
 			}
 
-			memcpy(m_pBuffer, pTempBuffer2, m_uWidth * m_uHeight * sizeof(ushort));
+			memcpy(mBuffer, pTempBuffer2, mWidth * mHeight * sizeof(ushort));
 			OGRE_FREE(pTempBuffer2, MEMCATEGORY_GENERAL);
 			break;
 
 		case 3:
-			pTempBuffer3 = OGRE_ALLOC_T(uchar, m_uWidth * m_uHeight * 3, MEMCATEGORY_GENERAL);
-			for (y = 0; y < m_uHeight; y++)
+			pTempBuffer3 = OGRE_ALLOC_T(uchar, mWidth * mHeight * 3, MEMCATEGORY_GENERAL);
+			for (y = 0; y < mHeight; y++)
 			{
-				size_t offset = ((y * m_uWidth) + (m_uWidth - 1)) * 3;
+				size_t offset = ((y * mWidth) + (mWidth - 1)) * 3;
 				dst3 = pTempBuffer3;
 				dst3 += offset;
-				for (size_t x = 0; x < m_uWidth; x++)
+				for (size_t x = 0; x < mWidth; x++)
 				{
 					memcpy(dst3, src3, sizeof(uchar) * 3);
 					dst3 -= 3; src3 += 3;
 				}
 			}
 
-			memcpy(m_pBuffer, pTempBuffer3, m_uWidth * m_uHeight * sizeof(uchar) * 3);
+			memcpy(mBuffer, pTempBuffer3, mWidth * mHeight * sizeof(uchar) * 3);
 			OGRE_FREE(pTempBuffer3, MEMCATEGORY_GENERAL);
 			break;
 
 		case 4:
-			pTempBuffer4 = OGRE_ALLOC_T(uint, m_uWidth * m_uHeight, MEMCATEGORY_GENERAL);
-			for (y = 0; y < m_uHeight; y++)
+			pTempBuffer4 = OGRE_ALLOC_T(uint, mWidth * mHeight, MEMCATEGORY_GENERAL);
+			for (y = 0; y < mHeight; y++)
 			{
-				dst4 = (pTempBuffer4 + ((y * m_uWidth) + m_uWidth - 1));
-				for (ushort x = 0; x < m_uWidth; x++)
+				dst4 = (pTempBuffer4 + ((y * mWidth) + mWidth - 1));
+				for (ushort x = 0; x < mWidth; x++)
 					memcpy(dst4--, src4++, sizeof(uint));
 			}
 
-			memcpy(m_pBuffer, pTempBuffer4, m_uWidth * m_uHeight * sizeof(uint));
+			memcpy(mBuffer, pTempBuffer4, mWidth * mHeight * sizeof(uint));
 			OGRE_FREE(pTempBuffer4, MEMCATEGORY_GENERAL);
 			break;
 
@@ -203,7 +203,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	Image & Image::flipAroundX()
 	{
-		if( !m_pBuffer )
+		if( !mBuffer )
 		{
 			OGRE_EXCEPT( 
 				Exception::ERR_INTERNAL_ERROR,
@@ -211,20 +211,20 @@ namespace Ogre {
 				"Image::flipAroundX" );
 		}
         
-        m_uNumMipmaps = 0; // Image operations lose precomputed mipmaps
+        mNumMipmaps = 0; // Image operations lose precomputed mipmaps
 
-		size_t rowSpan = m_uWidth * m_ucPixelSize;
+		size_t rowSpan = mWidth * mPixelSize;
 
-		uchar *pTempBuffer = OGRE_ALLOC_T(uchar, rowSpan * m_uHeight, MEMCATEGORY_GENERAL);
-		uchar *ptr1 = m_pBuffer, *ptr2 = pTempBuffer + ( ( m_uHeight - 1 ) * rowSpan );
+		uchar *pTempBuffer = OGRE_ALLOC_T(uchar, rowSpan * mHeight, MEMCATEGORY_GENERAL);
+		uchar *ptr1 = mBuffer, *ptr2 = pTempBuffer + ( ( mHeight - 1 ) * rowSpan );
 
-		for( ushort i = 0; i < m_uHeight; i++ )
+		for( ushort i = 0; i < mHeight; i++ )
 		{
 			memcpy( ptr2, ptr1, rowSpan );
 			ptr1 += rowSpan; ptr2 -= rowSpan;
 		}
 
-		memcpy( m_pBuffer, pTempBuffer, rowSpan * m_uHeight);
+		memcpy( mBuffer, pTempBuffer, rowSpan * mHeight);
 
 		OGRE_FREE(pTempBuffer, MEMCATEGORY_GENERAL);
 
@@ -240,28 +240,28 @@ namespace Ogre {
 
 		freeMemory();
 		// Set image metadata
-		m_uWidth = uWidth;
-		m_uHeight = uHeight;
-		m_uDepth = depth;
-		m_eFormat = eFormat;
-		m_ucPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( m_eFormat ));
-		m_uNumMipmaps = numMipMaps;
-		m_uFlags = 0;
+		mWidth = uWidth;
+		mHeight = uHeight;
+		mDepth = depth;
+		mFormat = eFormat;
+		mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
+		mNumMipmaps = numMipMaps;
+		mFlags = 0;
 		// Set flags
 		if (PixelUtil::isCompressed(eFormat))
-			m_uFlags |= IF_COMPRESSED;
-		if (m_uDepth != 1)
-			m_uFlags |= IF_3D_TEXTURE;
+			mFlags |= IF_COMPRESSED;
+		if (mDepth != 1)
+			mFlags |= IF_3D_TEXTURE;
 		if(numFaces == 6)
-			m_uFlags |= IF_CUBEMAP;
+			mFlags |= IF_CUBEMAP;
 		if(numFaces != 6 && numFaces != 1)
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 			"Number of faces currently must be 6 or 1.", 
 			"Image::loadDynamicImage");
 
-		m_uSize = calculateSize(numMipMaps, numFaces, uWidth, uHeight, depth, eFormat);
-		m_pBuffer = pData;
-		m_bAutoDelete = autoDelete;
+		mBufSize = calculateSize(numMipMaps, numFaces, uWidth, uHeight, depth, eFormat);
+		mBuffer = pData;
+		mAutoDelete = autoDelete;
 
 		return *this;
 
@@ -310,7 +310,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void Image::save(const String& filename)
 	{
-		if( !m_pBuffer )
+		if( !mBuffer )
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
 				"Image::save");
@@ -335,22 +335,22 @@ namespace Ogre {
 			"Image::save" );
 
 		ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
-		imgData->format = m_eFormat;
-		imgData->height = m_uHeight;
-		imgData->width = m_uWidth;
-		imgData->depth = m_uDepth;
-		imgData->size = m_uSize;
+		imgData->format = mFormat;
+		imgData->height = mHeight;
+		imgData->width = mWidth;
+		imgData->depth = mDepth;
+		imgData->size = mBufSize;
 		// Wrap in CodecDataPtr, this will delete
 		Codec::CodecDataPtr codeDataPtr(imgData);
 		// Wrap memory, be sure not to delete when stream destroyed
-		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(m_pBuffer, m_uSize, false));
+		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
 		pCodec->codeToFile(wrapper, filename, codeDataPtr);
 	}
 	//---------------------------------------------------------------------
 	DataStreamPtr Image::encode(const String& formatextension)
 	{
-		if( !m_pBuffer )
+		if( !mBuffer )
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "No image data loaded", 
 				"Image::encode");
@@ -364,14 +364,14 @@ namespace Ogre {
 			"Image::encode" );
 
 		ImageCodec::ImageData* imgData = OGRE_NEW ImageCodec::ImageData();
-		imgData->format = m_eFormat;
-		imgData->height = m_uHeight;
-		imgData->width = m_uWidth;
-		imgData->depth = m_uDepth;
+		imgData->format = mFormat;
+		imgData->height = mHeight;
+		imgData->width = mWidth;
+		imgData->depth = mDepth;
 		// Wrap in CodecDataPtr, this will delete
 		Codec::CodecDataPtr codeDataPtr(imgData);
 		// Wrap memory, be sure not to delete when stream destroyed
-		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(m_pBuffer, m_uSize, false));
+		MemoryDataStreamPtr wrapper(OGRE_NEW MemoryDataStream(mBuffer, mBufSize, false));
 
 		return pCodec->code(wrapper, codeDataPtr);
 	}
@@ -410,22 +410,22 @@ namespace Ogre {
 		ImageCodec::ImageData* pData = 
 			static_cast<ImageCodec::ImageData*>(res.second.getPointer());
 
-		m_uWidth = pData->width;
-		m_uHeight = pData->height;
-		m_uDepth = pData->depth;
-		m_uSize = pData->size;
-		m_uNumMipmaps = pData->num_mipmaps;
-		m_uFlags = pData->flags;
+		mWidth = pData->width;
+		mHeight = pData->height;
+		mDepth = pData->depth;
+		mBufSize = pData->size;
+		mNumMipmaps = pData->num_mipmaps;
+		mFlags = pData->flags;
 
 		// Get the format and compute the pixel size
-		m_eFormat = pData->format;
-		m_ucPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( m_eFormat ));
+		mFormat = pData->format;
+		mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
 		// Just use internal buffer of returned memory stream
-		m_pBuffer = res.first->getPtr();
+		mBuffer = res.first->getPtr();
 		// Make sure stream does not delete
 		res.first->setFreeOnClose(false);
 		// make sure we delete
-		m_bAutoDelete = true;
+		mAutoDelete = true;
 
 		return *this;
 	}
@@ -449,32 +449,32 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	uchar* Image::getData()
 	{
-		return m_pBuffer;
+		return mBuffer;
 	}
 
 	//-----------------------------------------------------------------------------
 	const uchar* Image::getData() const
 	{
-		assert( m_pBuffer );
-		return m_pBuffer;
+		assert( mBuffer );
+		return mBuffer;
 	}
 
 	//-----------------------------------------------------------------------------
 	size_t Image::getSize() const
 	{
-		return m_uSize;
+		return mBufSize;
 	}
 
 	//-----------------------------------------------------------------------------
 	size_t Image::getNumMipmaps() const
 	{
-		return m_uNumMipmaps;
+		return mNumMipmaps;
 	}
 
 	//-----------------------------------------------------------------------------
 	bool Image::hasFlag(const ImageFlags imgFlag) const
 	{
-		if(m_uFlags & imgFlag)
+		if(mFlags & imgFlag)
 		{
 			return true;
 		}
@@ -487,18 +487,18 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	size_t Image::getDepth() const
 	{
-		return m_uDepth;
+		return mDepth;
 	}
 	//-----------------------------------------------------------------------------
 	size_t Image::getWidth() const
 	{
-		return m_uWidth;
+		return mWidth;
 	}
 
 	//-----------------------------------------------------------------------------
 	size_t Image::getHeight() const
 	{
-		return m_uHeight;
+		return mHeight;
 	}
 	//-----------------------------------------------------------------------------
 	size_t Image::getNumFaces(void) const
@@ -510,25 +510,25 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	size_t Image::getRowSpan() const
 	{
-		return m_uWidth * m_ucPixelSize;
+		return mWidth * mPixelSize;
 	}
 
 	//-----------------------------------------------------------------------------
 	PixelFormat Image::getFormat() const
 	{
-		return m_eFormat;
+		return mFormat;
 	}
 
 	//-----------------------------------------------------------------------------
 	uchar Image::getBPP() const
 	{
-		return m_ucPixelSize * 8;
+		return mPixelSize * 8;
 	}
 
 	//-----------------------------------------------------------------------------
 	bool Image::getHasAlpha(void) const
 	{
-		return PixelUtil::getFlags(m_eFormat) & PFF_HASALPHA;
+		return PixelUtil::getFlags(mFormat) & PFF_HASALPHA;
 	}
 	//-----------------------------------------------------------------------------
 	void Image::applyGamma( unsigned char *buffer, Real gamma, size_t size, uchar bpp )
@@ -573,20 +573,20 @@ namespace Ogre {
 	void Image::resize(ushort width, ushort height, Filter filter)
 	{
 		// resizing dynamic images is not supported
-		assert(m_bAutoDelete);
-		assert(m_uDepth == 1);
+		assert(mAutoDelete);
+		assert(mDepth == 1);
 
 		// reassign buffer to temp image, make sure auto-delete is true
 		Image temp;
-		temp.loadDynamicImage(m_pBuffer, m_uWidth, m_uHeight, 1, m_eFormat, true);
-		// do not delete[] m_pBuffer!  temp will destroy it
+		temp.loadDynamicImage(mBuffer, mWidth, mHeight, 1, mFormat, true);
+		// do not delete[] mBuffer!  temp will destroy it
 
 		// set new dimensions, allocate new buffer
-		m_uWidth = width;
-		m_uHeight = height;
-		m_uSize = PixelUtil::getMemorySize(m_uWidth, m_uHeight, 1, m_eFormat);
-		m_pBuffer = OGRE_ALLOC_T(uchar, m_uSize, MEMCATEGORY_GENERAL);
-        m_uNumMipmaps = 0; // Loses precomputed mipmaps
+		mWidth = width;
+		mHeight = height;
+		mBufSize = PixelUtil::getMemorySize(mWidth, mHeight, 1, mFormat);
+		mBuffer = OGRE_ALLOC_T(uchar, mBufSize, MEMCATEGORY_GENERAL);
+        mNumMipmaps = 0; // Loses precomputed mipmaps
 
 		// scale the image from temp into our resized buffer
 		Image::scale(temp.getPixelBox(), getPixelBox(), filter);
@@ -696,7 +696,7 @@ namespace Ogre {
 	ColourValue Image::getColourAt(size_t x, size_t y, size_t z) const
 	{
 		ColourValue rval;
-		PixelUtil::unpackColour(&rval, m_eFormat, &m_pBuffer[m_ucPixelSize * (z * m_uWidth * m_uHeight + m_uWidth * y + x)]);
+		PixelUtil::unpackColour(&rval, mFormat, &mBuffer[mPixelSize * (z * mWidth * mHeight + mWidth * y + x)]);
 		return rval;
 	}
 
@@ -833,33 +833,33 @@ namespace Ogre {
 
 		freeMemory();
 
-		m_uWidth = rgb.getWidth();
-		m_uHeight = rgb.getHeight();
-		m_uDepth = rgb.getDepth();
-		m_eFormat = fmt;
-		m_uNumMipmaps = rgb.getNumMipmaps();
+		mWidth = rgb.getWidth();
+		mHeight = rgb.getHeight();
+		mDepth = rgb.getDepth();
+		mFormat = fmt;
+		mNumMipmaps = rgb.getNumMipmaps();
 		size_t numFaces = rgb.getNumFaces();
 
 		// Set flags
-		m_uFlags = 0;
-		if (m_uDepth != 1)
-			m_uFlags |= IF_3D_TEXTURE;
+		mFlags = 0;
+		if (mDepth != 1)
+			mFlags |= IF_3D_TEXTURE;
 		if(numFaces == 6)
-			m_uFlags |= IF_CUBEMAP;
+			mFlags |= IF_CUBEMAP;
 
-		m_uSize = calculateSize(m_uNumMipmaps, numFaces, m_uWidth, m_uHeight, m_uDepth, m_eFormat);
+		mBufSize = calculateSize(mNumMipmaps, numFaces, mWidth, mHeight, mDepth, mFormat);
 
-		m_ucPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( m_eFormat ));
+		mPixelSize = static_cast<uchar>(PixelUtil::getNumElemBytes( mFormat ));
 
-		m_pBuffer = static_cast<uchar*>(OGRE_MALLOC(m_uSize, MEMCATEGORY_GENERAL));
+		mBuffer = static_cast<uchar*>(OGRE_MALLOC(mBufSize, MEMCATEGORY_GENERAL));
 
 		// make sure we delete
-		m_bAutoDelete = true;
+		mAutoDelete = true;
 
 
 		for (size_t face = 0; face < numFaces; ++face)
 		{
-			for (size_t mip = 0; mip <= m_uNumMipmaps; ++mip)
+			for (size_t mip = 0; mip <= mNumMipmaps; ++mip)
 			{
 				// convert the RGB first
 				PixelBox srcRGB = rgb.getPixelBox(face, mip);
@@ -870,24 +870,24 @@ namespace Ogre {
 				PixelBox srcAlpha = alpha.getPixelBox(face, mip);
 				uchar* psrcAlpha = static_cast<uchar*>(srcAlpha.data);
 				uchar* pdst = static_cast<uchar*>(dst.data);
-				for (size_t d = 0; d < m_uDepth; ++d)
+				for (size_t d = 0; d < mDepth; ++d)
 				{
-					for (size_t y = 0; y < m_uHeight; ++y)
+					for (size_t y = 0; y < mHeight; ++y)
 					{
-						for (size_t x = 0; x < m_uWidth; ++x)
+						for (size_t x = 0; x < mWidth; ++x)
 						{
 							ColourValue colRGBA, colA;
 							// read RGB back from dest to save having another pointer
-							PixelUtil::unpackColour(&colRGBA, m_eFormat, pdst);
+							PixelUtil::unpackColour(&colRGBA, mFormat, pdst);
 							PixelUtil::unpackColour(&colA, alpha.getFormat(), psrcAlpha);
 
 							// combine RGB from alpha source texture
 							colRGBA.a = (colA.r + colA.g + colA.b) / 3.0f;
 
-							PixelUtil::packColour(colRGBA, m_eFormat, pdst);
+							PixelUtil::packColour(colRGBA, mFormat, pdst);
 							
 							psrcAlpha += PixelUtil::getNumElemBytes(alpha.getFormat());
-							pdst += PixelUtil::getNumElemBytes(m_eFormat);
+							pdst += PixelUtil::getNumElemBytes(mFormat);
 
 						}
 					}
