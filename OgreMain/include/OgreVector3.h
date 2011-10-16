@@ -626,7 +626,7 @@ namespace Ogre
 		@remarks
 			Vectors do not have to be unit-length but must represent directions.
 		*/
-		inline Radian angleBetween(const Vector3& dest)
+		inline Radian angleBetween(const Vector3& dest) const
 		{
 			Real lenProduct = length() * dest.length();
 
