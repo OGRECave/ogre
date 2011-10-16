@@ -49,13 +49,16 @@ set(TBB_INC_SEARCH_PATH ${TBB_INC_SEARCH_PATH} ${TBB_PREFIX_PATH})
 # to detect the "best" version to use. The user will have to manually
 # select the right files. (Chances are the distributions are shipping their
 # custom version of tbb, anyway, so the problem is probably nonexistant.)
-if (WIN32)
+if (WIN32 AND MSVC)
   set(COMPILER_PREFIX "vc7.1")
-  if (MSVC80)
+  if (MSVC_VERSION EQUAL 1400)
     set(COMPILER_PREFIX "vc8")
   endif ()
-  if (MSVC90)
+  if (MSVC_VERSION EQUAL 1500)
     set(COMPILER_PREFIX "vc9")
+  endif ()
+  if (MSVC_VERSION EQUAL 1600)
+    set(COMPILER_PREFIX "vc10")
   endif ()
   
   # for each prefix path, add ia32/64\${COMPILER_PREFIX}\lib to the lib search path
