@@ -333,47 +333,51 @@ if (NOT OGRE_STATIC)
 endif()
 
 
+#########################################################
+# Find Ogre components
+#########################################################
+
+set(OGRE_COMPONENT_SEARCH_PATH_REL 
+  ${OGRE_LIBRARY_DIR_REL}/..
+  ${OGRE_LIBRARY_DIR_REL}/../..
+  ${OGRE_BIN_SEARCH_PATH}
+)
+set(OGRE_COMPONENT_SEARCH_PATH_DBG
+  ${OGRE_LIBRARY_DIR_DBG}/..
+  ${OGRE_LIBRARY_DIR_DBG}/../..
+  ${OGRE_BIN_SEARCH_PATH}
+)
+
+macro(ogre_find_component COMPONENT HEADER)
+  findpkg_begin(OGRE_${COMPONENT})
+  find_path(OGRE_${COMPONENT}_INCLUDE_DIR NAMES ${HEADER} HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES ${COMPONENT} OGRE/${COMPONENT} Components/${COMPONENT}/include)
+  set(OGRE_${COMPONENT}_LIBRARY_NAMES "Ogre${COMPONENT}${OGRE_LIB_SUFFIX}")
+  get_debug_names(OGRE_${COMPONENT}_LIBRARY_NAMES)
+  find_library(OGRE_${COMPONENT}_LIBRARY_REL NAMES ${OGRE_${COMPONENT}_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel")
+  find_library(OGRE_${COMPONENT}_LIBRARY_DBG NAMES ${OGRE_${COMPONENT}_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIR_DBG} PATH_SUFFIXES "" "debug")
+  make_library_set(OGRE_${COMPONENT}_LIBRARY)
+  findpkg_finish(OGRE_${COMPONENT})
+  if (OGRE_${COMPONENT}_FOUND)
+    # find binaries
+    if (NOT OGRE_STATIC)
+	  if (WIN32)
+	    find_file(OGRE_${COMPONENT}_BINARY_REL NAMES "Ogre${COMPONENT}.dll" HINTS ${OGRE_COMPONENT_SEARCH_PATH_REL} PATH_SUFFIXES "" bin bin/release bin/relwithdebinfo bin/minsizerel release)
+	    find_file(OGRE_${COMPONENT}_BINARY_DBG NAMES "Ogre${COMPONENT}_d.dll" HINTS ${OGRE_COMPONENT_SEARCH_PATH_DBG} PATH_SUFFIXES "" bin bin/debug debug)
+	  endif()
+	  mark_as_advanced(OGRE_${COMPONENT}_BINARY_REL OGRE_${COMPONENT}_BINARY_DBG)
+    endif()
+  endif()
+endmacro()
 
 # look for Paging component
-findpkg_begin(OGRE_Paging)
-find_path(OGRE_Paging_INCLUDE_DIR NAMES OgrePaging.h HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES Paging OGRE/Paging Components/Paging/include)
-set(OGRE_Paging_LIBRARY_NAMES "OgrePaging${OGRE_LIB_SUFFIX}")
-get_debug_names(OGRE_Paging_LIBRARY_NAMES)
-find_library(OGRE_Paging_LIBRARY_REL NAMES ${OGRE_Paging_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel")
-find_library(OGRE_Paging_LIBRARY_DBG NAMES ${OGRE_Paging_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIR_DBG} PATH_SUFFIXES "" "debug")
-set(OGRE_Paging_LIBRARY_FWK ${OGRE_LIBRARY_FWK})
-make_library_set(OGRE_Paging_LIBRARY)
-findpkg_finish(OGRE_Paging)
-
+ogre_find_component(Paging OgrePaging.h)
 # look for Terrain component
-findpkg_begin(OGRE_Terrain)
-find_path(OGRE_Terrain_INCLUDE_DIR NAMES OgreTerrain.h HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES Terrain OGRE/Terrain Components/Terrain/include)
-set(OGRE_Terrain_LIBRARY_NAMES "OgreTerrain${OGRE_LIB_SUFFIX}")
-get_debug_names(OGRE_Terrain_LIBRARY_NAMES)
-find_library(OGRE_Terrain_LIBRARY_REL NAMES ${OGRE_Terrain_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel")
-find_library(OGRE_Terrain_LIBRARY_DBG NAMES ${OGRE_Terrain_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIR_DBG} PATH_SUFFIXES "" "debug")
-make_library_set(OGRE_Terrain_LIBRARY)
-findpkg_finish(OGRE_Terrain)
-
+ogre_find_component(Terrain OgreTerrain.h)
 # look for Property component
-findpkg_begin(OGRE_Property)
-find_path(OGRE_Property_INCLUDE_DIR NAMES OgreProperty.h HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES Property OGRE/Property Components/Property/include)
-set(OGRE_Property_LIBRARY_NAMES "OgreProperty${OGRE_LIB_SUFFIX}")
-get_debug_names(OGRE_Property_LIBRARY_NAMES)
-find_library(OGRE_Property_LIBRARY_REL NAMES ${OGRE_Property_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel")
-find_library(OGRE_Property_LIBRARY_DBG NAMES ${OGRE_Property_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIR_DBG} PATH_SUFFIXES "" "debug")
-make_library_set(OGRE_Property_LIBRARY)
-findpkg_finish(OGRE_Property)
-
+ogre_find_component(Property OgreProperty.h)
 # look for RTShaderSystem component
-findpkg_begin(OGRE_RTShaderSystem)
-find_path(OGRE_RTShaderSystem_INCLUDE_DIR NAMES OgreRTShaderSystem.h HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES RTShaderSystem OGRE/RTShaderSystem Components/RTShaderSystem/include)
-set(OGRE_RTShaderSystem_LIBRARY_NAMES "OgreRTShaderSystem${OGRE_LIB_SUFFIX}")
-get_debug_names(OGRE_RTShaderSystem_LIBRARY_NAMES)
-find_library(OGRE_RTShaderSystem_LIBRARY_REL NAMES ${OGRE_RTShaderSystem_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} PATH_SUFFIXES "" "release" "relwithdebinfo" "minsizerel")
-find_library(OGRE_RTShaderSystem_LIBRARY_DBG NAMES ${OGRE_RTShaderSystem_LIBRARY_NAMES_DBG} HINTS ${OGRE_LIBRARY_DIR_DBG} PATH_SUFFIXES "" "debug")
-make_library_set(OGRE_RTShaderSystem_LIBRARY)
-findpkg_finish(OGRE_RTShaderSystem)
+ogre_find_component(RTShaderSystem OgreRTShaderSystem.h)
+
 
 #########################################################
 # Find Ogre plugins
