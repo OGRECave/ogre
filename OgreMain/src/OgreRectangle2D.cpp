@@ -37,7 +37,19 @@ namespace Ogre {
 #define NORMAL_BINDING 1
 #define TEXCOORD_BINDING 2
 
-	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
+	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
+	: SimpleRenderable()
+	{
+		_initRectangle2D(includeTextureCoords, vBufUsage);
+	}
+
+	Rectangle2D::Rectangle2D(const String& name, bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
+	: SimpleRenderable(name)
+	{
+		_initRectangle2D(includeTextureCoords, vBufUsage);
+	}
+
+	void Rectangle2D::_initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
     {
         // use identity projection and view matrices
         mUseIdentityProjection = true;

@@ -53,9 +53,12 @@ namespace Ogre {
         */
         void getWorldTransforms( Matrix4* xform ) const;
 
+        void _initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage);
+
     public:
 
         Rectangle2D(bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        Rectangle2D(const String& name, bool includeTextureCoordinates = false, HardwareBuffer::Usage vBufUsage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
         ~Rectangle2D();
 
         /** Sets the corners of the rectangle, in relative coordinates.

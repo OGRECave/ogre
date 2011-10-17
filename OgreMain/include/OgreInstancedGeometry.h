@@ -216,10 +216,17 @@ namespace Ogre {
 					}
 				}
 			}
+
+			void _initGeometryBucket(const VertexData* vData, const IndexData* iData);
+			void _initGeometryBucket(GeometryBucket* bucket);
+
 		public:
 			GeometryBucket(MaterialBucket* parent, const String& formatString, 
 				const VertexData* vData, const IndexData* iData);
+			GeometryBucket(const String& name, MaterialBucket* parent, const String& formatString, 
+				const VertexData* vData, const IndexData* iData);
 			GeometryBucket(MaterialBucket* parent,const String& formatString,GeometryBucket*bucket);
+			GeometryBucket(const String& name, MaterialBucket* parent,const String& formatString,GeometryBucket*bucket);
 			virtual ~GeometryBucket();
 			MaterialBucket* getParent(void) { return mParent; }
 			Real getBoundingRadius(void) const;

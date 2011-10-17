@@ -67,7 +67,11 @@ namespace Ogre {
         static uint msGenNameCount;
 
     public:
+        /// Constructor
         SimpleRenderable();
+
+        /// Named constructor
+        SimpleRenderable(const String& name);
 
         void setMaterial( const String& matName );
         virtual const MaterialPtr& getMaterial(void) const;
