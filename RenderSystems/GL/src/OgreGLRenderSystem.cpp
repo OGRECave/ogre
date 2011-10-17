@@ -2887,9 +2887,9 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
-                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+        bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
+                                !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL) ||
+                                op.vertexData->vertexBufferBinding->getHasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 

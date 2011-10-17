@@ -433,8 +433,8 @@ namespace Ogre {
     /// A static pointer to file io alternative implementation for the embedded files
     zzip_plugin_io_handlers* EmbeddedZipArchiveFactory::mPluginIo = NULL;
     _zzip_plugin_io sEmbeddedZipArchiveFactory_PluginIo;
-    #define EMBBED_IO__BAD_FILE_HANDLE (-1)
-    #define EMBBED_IO__SUCCESS (0)
+    #define EMBED_IO_BAD_FILE_HANDLE (-1)
+    #define EMBED_IO_SUCCESS (0)
     //-----------------------------------------------------------------------
     /// functions for embedded zzip_plugin_io_handlers implementation 
     /// The functions are here and not as static members because they 
@@ -459,7 +459,7 @@ namespace Ogre {
             if(curEmbeddedFileData.isFileOpened)
             {
                // file is opened - return an error handle
-               return EMBBED_IO__BAD_FILE_HANDLE;
+               return EMBED_IO_BAD_FILE_HANDLE;
             }
             
             curEmbeddedFileData.isFileOpened = true;
@@ -468,7 +468,7 @@ namespace Ogre {
         else
         {
            // not found - return an error handle
-           return EMBBED_IO__BAD_FILE_HANDLE;
+           return EMBED_IO_BAD_FILE_HANDLE;
         }
     }
     //-----------------------------------------------------------------------
@@ -476,7 +476,7 @@ namespace Ogre {
     // Return Value - On success, close returns 0. 
     int EmbeddedZipArchiveFactory_close(int fd)
     {
-        if (fd == EMBBED_IO__BAD_FILE_HANDLE)
+        if (fd == EMBED_IO_BAD_FILE_HANDLE)
         {
             // bad index - return an error
             return -1;
@@ -503,7 +503,7 @@ namespace Ogre {
     // reads data from the file
     zzip_ssize_t EmbeddedZipArchiveFactory_read(int fd, void* buf, zzip_size_t len)
     {
-        if (fd == EMBBED_IO__BAD_FILE_HANDLE)
+        if (fd == EMBED_IO_BAD_FILE_HANDLE)
         {
             // bad index - return an error size - negative
             return -1;
@@ -538,7 +538,7 @@ namespace Ogre {
     // Moves file pointer.
     zzip_off_t EmbeddedZipArchiveFactory_seeks(int fd, zzip_off_t offset, int whence)
     {
-        if (fd == EMBBED_IO__BAD_FILE_HANDLE)
+        if (fd == EMBED_IO_BAD_FILE_HANDLE)
         {
             // bad index - return an error - nonzero value.
             return -1;
@@ -577,7 +577,7 @@ namespace Ogre {
     // returns the file size
     zzip_off_t EmbeddedZipArchiveFactory_filesize(int fd)
     {
-        if (fd == EMBBED_IO__BAD_FILE_HANDLE)
+        if (fd == EMBED_IO_BAD_FILE_HANDLE)
         {
             // bad index - return an error - nonzero value.
             return -1;

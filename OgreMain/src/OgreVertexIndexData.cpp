@@ -764,22 +764,22 @@ namespace Ogre {
 
 		inline bool sharesEdge(const Triangle& t) const
 		{
-			return(	a == t.a && b == t.c ||
-					a == t.b && b == t.a ||
-					a == t.c && b == t.b ||
-					b == t.a && c == t.c ||
-					b == t.b && c == t.a ||
-					b == t.c && c == t.b ||
-					c == t.a && a == t.c ||
-					c == t.b && a == t.a ||
-					c == t.c && a == t.b );
+			return(	(a == t.a && b == t.c) ||
+					(a == t.b && b == t.a) ||
+					(a == t.c && b == t.b) ||
+					(b == t.a && c == t.c) ||
+					(b == t.b && c == t.a) ||
+					(b == t.c && c == t.b) ||
+					(c == t.a && a == t.c) ||
+					(c == t.b && a == t.a) ||
+					(c == t.c && a == t.b) );
 		}
 
 		inline bool sharesEdge(const uint32 ea, const uint32 eb, const Triangle& t) const
 		{
-			return(	ea == t.a && eb == t.c ||
-					ea == t.b && eb == t.a ||
-					ea == t.c && eb == t.b );	
+			return(	(ea == t.a && eb == t.c) ||
+					(ea == t.b && eb == t.a) ||
+					(ea == t.c && eb == t.b) );	
 		}
 
 		inline bool sharesEdge(const EdgeMatchType edge, const Triangle& t) const

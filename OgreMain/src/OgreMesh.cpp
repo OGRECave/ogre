@@ -1302,7 +1302,6 @@ namespace Ogre {
         // Go through all the vertex data and locate source and dest (must agree)
         bool sharedGeometryDone = false;
         bool foundExisting = false;
-		VertexElementSemantic foundSemantic = VES_TEXTURE_COORDINATES;
         bool firstOne = true;
         SubMeshList::iterator i, iend;
         iend = mSubMeshList.end();

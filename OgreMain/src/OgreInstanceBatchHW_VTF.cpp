@@ -141,7 +141,6 @@ namespace Ogre
 														 const HWBoneWgtVec& hwBoneWgt)
 	{
 		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
-		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
 
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 16 bytes aligned :-)
