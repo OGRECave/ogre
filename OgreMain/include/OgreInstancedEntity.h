@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __InstancedEntity_H__
 
 #include "OgreMovableObject.h"
+#include "OgreNode.h"
 
 namespace Ogre
 {
