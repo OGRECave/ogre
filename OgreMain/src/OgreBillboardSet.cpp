@@ -1225,7 +1225,7 @@ namespace Ogre {
             Vector3 axis = (offsets[3] - offsets[0]).crossProduct(offsets[2] - offsets[1]).normalisedCopy();
 
             Matrix3 rotation;
-			rotation.FromAxisAngle(axis, bb.mRotation);
+			rotation.FromAngleAxis(axis, bb.mRotation);
 
             Vector3 pt;
 

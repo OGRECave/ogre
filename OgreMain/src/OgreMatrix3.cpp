@@ -882,7 +882,7 @@ namespace Ogre
         return fNorm;
     }
     //-----------------------------------------------------------------------
-    void Matrix3::ToAxisAngle (Vector3& rkAxis, Radian& rfRadians) const
+    void Matrix3::ToAngleAxis (Vector3& rkAxis, Radian& rfRadians) const
     {
         // Let (x,y,z) be the unit-length axis and let A be an angle of rotation.
         // The rotation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
@@ -979,7 +979,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromAxisAngle (const Vector3& rkAxis, const Radian& fRadians)
+    void Matrix3::FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians)
     {
         Real fCos = Math::Cos(fRadians);
         Real fSin = Math::Sin(fRadians);
