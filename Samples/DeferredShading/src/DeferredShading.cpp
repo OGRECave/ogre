@@ -41,7 +41,7 @@ same license as the rest of the engine.
 
 namespace Ogre
 {
-    template<> SharedData* Singleton<SharedData>::ms_Singleton = 0;
+    template<> SharedData* Singleton<SharedData>::msSingleton = 0;
 }
 
 using namespace Ogre;

@@ -32,20 +32,20 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------
 template<> 
-RTShader::ProgramWriterManager* Singleton<RTShader::ProgramWriterManager>::ms_Singleton = 0;
+RTShader::ProgramWriterManager* Singleton<RTShader::ProgramWriterManager>::msSingleton = 0;
 
 namespace RTShader {
 //-----------------------------------------------------------------------
 ProgramWriterManager* ProgramWriterManager::getSingletonPtr(void)
 {
-	assert( ms_Singleton );  
-	return ms_Singleton;
+	assert( msSingleton );  
+	return msSingleton;
 }
 //-----------------------------------------------------------------------
 ProgramWriterManager& ProgramWriterManager::getSingleton(void)
 {  
-	assert( ms_Singleton );  
-	return ( *ms_Singleton );  
+	assert( msSingleton );  
+	return ( *msSingleton );  
 }
 //-----------------------------------------------------------------------
 ProgramWriterManager::ProgramWriterManager()

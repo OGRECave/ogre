@@ -52,7 +52,7 @@ namespace Ogre {
     DynLib::DynLib( const String& name )
     {
         mName = name;
-        m_hInst = NULL;
+        mInst = NULL;
     }
 
     //-----------------------------------------------------------------------
@@ -81,9 +81,9 @@ namespace Ogre {
 		if (name.substr(name.length() - 4, 4) != ".dll")
 			name += ".dll";
 #endif
-        m_hInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );
+        mInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );
 
-        if( !m_hInst )
+        if( !mInst )
             OGRE_EXCEPT(
                 Exception::ERR_INTERNAL_ERROR, 
                 "Could not load dynamic library " + mName + 
@@ -97,7 +97,7 @@ namespace Ogre {
         // Log library unload
         LogManager::getSingleton().logMessage("Unloading library " + mName);
 
-        if( DYNLIB_UNLOAD( m_hInst ) )
+        if( DYNLIB_UNLOAD( mInst ) )
 		{
             OGRE_EXCEPT(
                 Exception::ERR_INTERNAL_ERROR, 
@@ -111,7 +111,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void* DynLib::getSymbol( const String& strName ) const throw()
     {
-        return (void*)DYNLIB_GETSYM( m_hInst, strName.c_str() );
+        return (void*)DYNLIB_GETSYM( mInst, strName.c_str() );
     }
     //-----------------------------------------------------------------------
     String DynLib::dynlibError( void ) 

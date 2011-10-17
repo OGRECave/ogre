@@ -35,18 +35,18 @@ THE SOFTWARE.
 namespace Ogre {
 
 	//-----------------------------------------------------------------------
-	template<> GLSLLinkProgramManager* Singleton<GLSLLinkProgramManager>::ms_Singleton = 0;
+	template<> GLSLLinkProgramManager* Singleton<GLSLLinkProgramManager>::msSingleton = 0;
 
 	//-----------------------------------------------------------------------
     GLSLLinkProgramManager* GLSLLinkProgramManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
 
 	//-----------------------------------------------------------------------
     GLSLLinkProgramManager& GLSLLinkProgramManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 
 	//-----------------------------------------------------------------------

@@ -34,41 +34,41 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    uint SimpleRenderable::ms_uGenNameCount = 0;
+    uint SimpleRenderable::msGenNameCount = 0;
 
     SimpleRenderable::SimpleRenderable()
     {
-        m_matWorldTransform = Matrix4::IDENTITY;
+        mWorldTransform = Matrix4::IDENTITY;
 
-        m_strMatName = "BaseWhite"; 
-        m_pMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+        mMatName = "BaseWhite"; 
+        mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
 
-        m_pParentSceneManager = NULL;
+        mParentSceneManager = NULL;
 
         mParentNode = NULL;
-        m_pCamera = NULL;
+        mCamera = NULL;
 
         // Generate name
 		StringUtil::StrStreamType name;
-		name << "SimpleRenderable" << ms_uGenNameCount++;
+		name << "SimpleRenderable" << msGenNameCount++;
 		mName = name.str();
     }
 
     void SimpleRenderable::setMaterial( const String& matName )
     {
-        m_strMatName = matName;
-        m_pMaterial = MaterialManager::getSingleton().getByName(m_strMatName);
-		if (m_pMaterial.isNull())
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + m_strMatName,
+        mMatName = matName;
+        mMaterial = MaterialManager::getSingleton().getByName(mMatName);
+		if (mMaterial.isNull())
+			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
 				"SimpleRenderable::setMaterial" );
     
         // Won't load twice anyway
-        m_pMaterial->load();
+        mMaterial->load();
     }
 
     const MaterialPtr& SimpleRenderable::getMaterial(void) const
     {
-        return m_pMaterial;
+        return mMaterial;
     }
 
     void SimpleRenderable::getRenderOperation(RenderOperation& op)
@@ -83,19 +83,19 @@ namespace Ogre {
 
     void SimpleRenderable::setWorldTransform( const Matrix4& xform )
     {
-        m_matWorldTransform = xform;
+        mWorldTransform = xform;
     }
 
     void SimpleRenderable::getWorldTransforms( Matrix4* xform ) const
     {
-        *xform = m_matWorldTransform * mParentNode->_getFullTransform();
+        *xform = mWorldTransform * mParentNode->_getFullTransform();
     }
 
     void SimpleRenderable::_notifyCurrentCamera(Camera* cam)
     {
 		MovableObject::_notifyCurrentCamera(cam);
 
-        m_pCamera = cam;
+        mCamera = cam;
     }
 
     void SimpleRenderable::setBoundingBox( const AxisAlignedBox& box )

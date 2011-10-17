@@ -56,7 +56,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------
 template<> 
-RTShader::ProgramManager* Singleton<RTShader::ProgramManager>::ms_Singleton = 0;
+RTShader::ProgramManager* Singleton<RTShader::ProgramManager>::msSingleton = 0;
 
 namespace RTShader {
 
@@ -64,15 +64,15 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 ProgramManager* ProgramManager::getSingletonPtr()
 {
-	assert( ms_Singleton );  
-	return ms_Singleton;
+	assert( msSingleton );  
+	return msSingleton;
 }
 
 //-----------------------------------------------------------------------
 ProgramManager& ProgramManager::getSingleton()
 {
-	assert( ms_Singleton );  
-	return ( *ms_Singleton );
+	assert( msSingleton );  
+	return ( *msSingleton );
 }
 
 //-----------------------------------------------------------------------------

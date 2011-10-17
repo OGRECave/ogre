@@ -44,14 +44,14 @@ THE SOFTWARE.
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-    template<> MeshManager* Singleton<MeshManager>::ms_Singleton = 0;
+    template<> MeshManager* Singleton<MeshManager>::msSingleton = 0;
     MeshManager* MeshManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     MeshManager& MeshManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
     MeshManager::MeshManager():

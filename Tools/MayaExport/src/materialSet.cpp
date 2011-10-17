@@ -20,5 +20,5 @@
 
 namespace OgreMayaExporter
 {
-	template<> MaterialSet* Singleton<MaterialSet>::ms_Singleton = 0;
+	template<> MaterialSet* Singleton<MaterialSet>::msSingleton = 0;
 };	//end namespace

@@ -38,14 +38,14 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    template<> Quake3ShaderManager *Singleton<Quake3ShaderManager>::ms_Singleton = 0;
+    template<> Quake3ShaderManager *Singleton<Quake3ShaderManager>::msSingleton = 0;
     Quake3ShaderManager* Quake3ShaderManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     Quake3ShaderManager& Quake3ShaderManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
 

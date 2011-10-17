@@ -222,7 +222,7 @@ void VolumeRenderable::initialise()
 	textureUnit->setTextureFiltering(TFO_TRILINEAR);
 	
 	mUnit = textureUnit;
-	m_pMaterial = material;
+	mMaterial = material;
 }
 
 Ogre::Real VolumeRenderable::getBoundingRadius() const

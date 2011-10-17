@@ -29,16 +29,16 @@ THE SOFTWARE.
 
 #include "SelectionEventArgs.h"
 
-template<> SelectionService* Ogre::Singleton<SelectionService>::ms_Singleton = 0;
+template<> SelectionService* Ogre::Singleton<SelectionService>::msSingleton = 0;
 
 SelectionService& SelectionService::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }
 
 SelectionService* SelectionService::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 
 SelectionService::SelectionService()

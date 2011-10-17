@@ -303,7 +303,7 @@ namespace Ogre
 		const size_t maxInstancesToCopy = std::min( mInstancesPerBatch, usedEntities.size() );
 		InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
 
-		//Copy from the back to front, into m_instancedEntities
+		//Copy from the back to front, into mInstancedEntities
 		mInstancedEntities.insert( mInstancedEntities.begin(), first, usedEntities.end() );
 		//Remove them from the array
 		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
@@ -445,7 +445,7 @@ namespace Ogre
         Real lodValue = squaredDepth * cam->_getLodBiasInverse();
 
 		//Now calculate Material LOD
-        /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
+        /*const LodStrategy *materialStrategy = mMaterial->getLodStrategy();
         
         //Calculate lod value for given strategy
         Real lodValue = materialStrategy->getValue( this, cam );*/
@@ -459,7 +459,7 @@ namespace Ogre
         subEntEvt.subEntity = this;
         subEntEvt.camera = cam;
         subEntEvt.lodValue = lodValue;
-        subEntEvt.previousLodIndex = m_materialLodIndex;
+        subEntEvt.previousLodIndex = mMaterialLodIndex;
         subEntEvt.newLodIndex = idx;
 
         //Notify lod event listeners
@@ -514,7 +514,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceBatch::_updateRenderQueue( RenderQueue* queue )
 	{
-		/*if( m_boundsDirty )
+		/*if( mBoundsDirty )
 			_updateBounds();*/
 
 		mDirtyAnimation = false;

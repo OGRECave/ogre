@@ -40,7 +40,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------------
 
-template<> GLRTTManager* Singleton<GLRTTManager>::ms_Singleton = 0;
+template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
     GLRTTManager::~GLRTTManager()
     {
     }

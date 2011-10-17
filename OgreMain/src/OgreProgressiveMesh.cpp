@@ -267,14 +267,14 @@ namespace Ogre {
 	
     //---------------------------------------------------------------------
 	ProgressiveMesh::ProgressiveMesh(SubMesh* pSubMesh)
-		: m_pSubMesh(pSubMesh)
+		: mSubMesh(pSubMesh)
 		, mCurrNumIndexes(0)
 		, mVertexComponentFlags(0)
     {
 		// ignore un-indexed submeshes
 		if(pSubMesh->indexData->indexCount == 0)
 		{
-			m_pSubMesh = NULL;
+			mSubMesh = NULL;
 			return;
 		}
 		
@@ -286,11 +286,11 @@ namespace Ogre {
 		mInvalidCostCount = 0;
 		mRemovedVertexDuplicatesCount = 0;
 		
-		mpVertexData	= pSubMesh->useSharedVertices ? pMesh->sharedVertexData : pSubMesh->vertexData;
-		mpIndexData		= pSubMesh->indexData;
+		mVertexData	= pSubMesh->useSharedVertices ? pMesh->sharedVertexData : pSubMesh->vertexData;
+		mIndexData		= pSubMesh->indexData;
 		
-		mInvalidCostMask.resize(mpVertexData->vertexCount);
-        addWorkingData(mpVertexData, mpIndexData);
+		mInvalidCostMask.resize(mVertexData->vertexCount);
+        addWorkingData(mVertexData, mIndexData);
     }
     //---------------------------------------------------------------------
     ProgressiveMesh::~ProgressiveMesh()
@@ -299,7 +299,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void ProgressiveMesh::addExtraVertexPositionBuffer(const VertexData* vertexData)
     {
-        addWorkingData(vertexData, mpIndexData);
+        addWorkingData(vertexData, mIndexData);
     }
     //---------------------------------------------------------------------
 	void ProgressiveMesh::initializeProgressiveMeshList(ProgressiveMeshList& pmList, Mesh* pMesh)
@@ -406,14 +406,14 @@ namespace Ogre {
 		for(ProgressiveMeshList::iterator i = pmInList.begin(); i != pmInList.end(); ++i)
 		{
 			ProgressiveMesh* p = *i;
-			if(NULL == p->m_pSubMesh)
+			if(NULL == p->mSubMesh)
 				continue; // dummy, skip it
 			
 			p->computeAllCosts();
 			
 			// Init
-			p->mCurrNumIndexes = (Ogre::RenderOperation::OT_TRIANGLE_LIST == p->m_pSubMesh->operationType) ?
-				p->mpIndexData->indexCount : (p->mpIndexData->indexCount - 2) * 3;
+			p->mCurrNumIndexes = (Ogre::RenderOperation::OT_TRIANGLE_LIST == p->mSubMesh->operationType) ?
+				p->mIndexData->indexCount : (p->mIndexData->indexCount - 2) * 3;
 			
 #if LOG_PROGRESSIVE_MESH_GENERATION			
 			StringUtil::StrStreamType logname;
@@ -544,7 +544,7 @@ namespace Ogre {
 			for(ProgressiveMeshList::iterator i = pmBuildList.begin(); i != pmBuildList.end(); ++i)
 			{
 				ProgressiveMesh* p = *i;
-				assert(NULL != p->m_pSubMesh); //dummy can't happen here
+				assert(NULL != p->mSubMesh); //dummy can't happen here
 				
 #if LOG_PROGRESSIVE_MESH_GENERATION
 				StringUtil::StrStreamType logname;
@@ -555,7 +555,7 @@ namespace Ogre {
 #endif								
 				IndexData* lodData = NULL;
 				
-				if(p->mCurrNumIndexes != p->mpIndexData->indexCount)
+				if(p->mCurrNumIndexes != p->mIndexData->indexCount)
 				{
 					assert(p->mCurrNumIndexes > 0);
 					
@@ -566,7 +566,7 @@ namespace Ogre {
 				else
 				{
 					p->mRemovedVertexDuplicatesCount = 0;
-					lodData = p->m_pSubMesh->indexData->clone();
+					lodData = p->mSubMesh->indexData->clone();
 				}
 				
 				assert(NULL != lodData);
@@ -649,13 +649,13 @@ namespace Ogre {
         }
 		
         // Build tri list
-        size_t numTris = (Ogre::RenderOperation::OT_TRIANGLE_LIST == m_pSubMesh->operationType) ?
-			mpIndexData->indexCount / 3 : mpIndexData->indexCount - 2;
+        size_t numTris = (Ogre::RenderOperation::OT_TRIANGLE_LIST == mSubMesh->operationType) ?
+			mIndexData->indexCount / 3 : mIndexData->indexCount - 2;
 		
         work.mTriList.reserve(numTris); // reserved tri list
 		
 		PMFaceVertex* fvBase = &work.mFaceVertList.front();
-		if(Ogre::RenderOperation::OT_TRIANGLE_LIST == m_pSubMesh->operationType)
+		if(Ogre::RenderOperation::OT_TRIANGLE_LIST == mSubMesh->operationType)
 		{
 			for (size_t i = 0, vi = 0; i < numTris; ++i)
 			{
@@ -688,7 +688,7 @@ namespace Ogre {
 				}
 			}
 		}
-		else if(Ogre::RenderOperation::OT_TRIANGLE_STRIP == m_pSubMesh->operationType)
+		else if(Ogre::RenderOperation::OT_TRIANGLE_STRIP == mSubMesh->operationType)
 		{
 			bool tSign = true;
 			for (size_t i = 0, vi = 0; i < numTris; ++i)
@@ -804,7 +804,7 @@ namespace Ogre {
 	
     void ProgressiveMesh::mergeWorkingDataBorders()
 	{
-		IndexDataVariantSharedPtr indexDataVar(IndexDataVariant::create(mpIndexData));
+		IndexDataVariantSharedPtr indexDataVar(IndexDataVariant::create(mIndexData));
 		
 		if(indexDataVar.isNull())
 			return;
@@ -868,14 +868,14 @@ namespace Ogre {
         }
 		
         // Rebuild tri list by mapped indexes
-        size_t numTris = (Ogre::RenderOperation::OT_TRIANGLE_LIST == m_pSubMesh->operationType) ?
-			mpIndexData->indexCount / 3 : mpIndexData->indexCount - 2;
+        size_t numTris = (Ogre::RenderOperation::OT_TRIANGLE_LIST == mSubMesh->operationType) ?
+			mIndexData->indexCount / 3 : mIndexData->indexCount - 2;
 		
 		work.mTriList.clear();
         work.mTriList.reserve(numTris); // reserved tri list
 		
 		PMFaceVertex* fvBase = &work.mFaceVertList.front();
-		if(Ogre::RenderOperation::OT_TRIANGLE_LIST == m_pSubMesh->operationType)
+		if(Ogre::RenderOperation::OT_TRIANGLE_LIST == mSubMesh->operationType)
 		{
 			for (size_t i = 0, vi = 0; i < numTris; ++i)
 			{
@@ -911,7 +911,7 @@ namespace Ogre {
 				}
 			}
 		}
-		else if(Ogre::RenderOperation::OT_TRIANGLE_STRIP == m_pSubMesh->operationType)
+		else if(Ogre::RenderOperation::OT_TRIANGLE_STRIP == mSubMesh->operationType)
 		{
 			bool tSign = true;
 			for (size_t i = 0, vi = 0; i < numTris; ++i)
@@ -1540,7 +1540,7 @@ namespace Ogre {
 		pData->indexStart = 0;
 		// Base size of indexes on original 
 		bool use32bitindexes = 
-			(mpIndexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+			(mIndexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 
 		// Create index buffer, we don't need to read it back or modify it a lot
 		pData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
@@ -1741,7 +1741,7 @@ namespace Ogre {
 				continue;
 			
 			ProgressiveMesh* pm = pmList[i];
-			if(NULL == pm->m_pSubMesh)
+			if(NULL == pm->mSubMesh)
 				continue; // dummy, skip it
 			
 			IndexDataVariantSharedPtr inSubMeshIndexDataVar(IndexDataVariant::create(dropFirstLodLevel ? pm->mLodFaceList.front() : inSubMesh->indexData));
@@ -1777,7 +1777,7 @@ namespace Ogre {
 			outSubMesh->useSharedVertices = inSubMesh->useSharedVertices;
 			
 			ProgressiveMesh* pm = pmList[i];
-			if(NULL == pm->m_pSubMesh)
+			if(NULL == pm->mSubMesh)
 				continue; // dummy, skip it
 			
 			IndexDataVariantSharedPtr inSubMeshIndexDataVar(IndexDataVariant::create(dropFirstLodLevel ? pm->mLodFaceList.front() : inSubMesh->indexData));

@@ -1,6 +1,6 @@
 #include "IconManager.h"
 
-template<> IconManager* Ogre::Singleton<IconManager>::ms_Singleton = 0;
+template<> IconManager* Ogre::Singleton<IconManager>::msSingleton = 0;
 
 IconManager::IconManager()
 {
@@ -42,10 +42,10 @@ const wxBitmap& IconManager::getIcon(IconType type) const
 
 IconManager* IconManager::getSingletonPtr(void)
 {
-    return ms_Singleton;
+    return msSingleton;
 }
 
 IconManager& IconManager::getSingleton(void)
 {
-    assert( ms_Singleton );  return (*ms_Singleton);
+    assert( msSingleton );  return (*msSingleton);
 }

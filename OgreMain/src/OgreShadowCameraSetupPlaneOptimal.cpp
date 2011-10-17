@@ -289,7 +289,7 @@ namespace Ogre
 	/// Construct object to consider a specified plane of interest
 	PlaneOptimalShadowCameraSetup::PlaneOptimalShadowCameraSetup(MovablePlane* plane)
 	{
-		m_plane = plane;
+		mPlane = plane;
 	}
 
 	/// Destructor
@@ -301,7 +301,7 @@ namespace Ogre
 	{
 		// get the plane transformed by the parent node(s)
 		// Also, make sure the plane is normalized
-		Plane worldPlane = m_plane->_getDerivedPlane();
+		Plane worldPlane = mPlane->_getDerivedPlane();
 		worldPlane.normalise();
 
 		// get camera's projection matrix

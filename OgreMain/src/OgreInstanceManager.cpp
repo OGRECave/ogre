@@ -238,7 +238,7 @@ namespace Ogre
 
 		if( !firstTime )
 		{
-			//TODO: Check different materials have the same m_instancesPerBatch upper limit
+			//TODO: Check different materials have the same mInstancesPerBatch upper limit
 			//otherwise we can't share
 			batch->buildFrom( mMeshReference->getSubMesh(mSubMeshIdx), mSharedRenderOperation );
 		}
@@ -272,7 +272,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::cleanupEmptyBatches(void)
 	{
-		//Do this now to avoid any dangling pointer inside m_dirtyBatches
+		//Do this now to avoid any dangling pointer inside mDirtyBatches
 		_updateDirtyBatches();
 
 		InstanceBatchMap::iterator itor = mInstanceBatches.begin();
@@ -304,8 +304,8 @@ namespace Ogre
 			++itor;
 		}
 
-		//By this point it may happen that all m_instanceBatches' objects are also empty
-		//however if we call m_instanceBatches.clear(), next time we'll create an InstancedObject
+		//By this point it may happen that all mInstanceBatches' objects are also empty
+		//however if we call mInstanceBatches.clear(), next time we'll create an InstancedObject
 		//we'll end up calling buildFirstTime() instead of buildNewBatch(), which is not the idea
 		//(takes more time and will leak the shared render operation)
 	}
@@ -353,7 +353,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::defragmentBatches( bool optimizeCulling )
 	{
-		//Do this now to avoid any dangling pointer inside m_dirtyBatches
+		//Do this now to avoid any dangling pointer inside mDirtyBatches
 		_updateDirtyBatches();
 
 		//Do this for every material

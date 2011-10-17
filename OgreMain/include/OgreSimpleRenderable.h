@@ -51,20 +51,20 @@ namespace Ogre {
     protected:
         RenderOperation mRenderOp;
 
-        Matrix4 m_matWorldTransform;
+        Matrix4 mWorldTransform;
         AxisAlignedBox mBox;
 
-        String m_strMatName;
-        MaterialPtr m_pMaterial;
+        String mMatName;
+        MaterialPtr mMaterial;
 
         /// The scene manager for the current frame.
-        SceneManager *m_pParentSceneManager;
+        SceneManager *mParentSceneManager;
 
         /// The camera for the current frame.
-        Camera *m_pCamera;
+        Camera *mCamera;
 
         /// Static member used to automatically generate names for SimpleRendaerable objects.
-        static uint ms_uGenNameCount;
+        static uint msGenNameCount;
 
     public:
         SimpleRenderable();

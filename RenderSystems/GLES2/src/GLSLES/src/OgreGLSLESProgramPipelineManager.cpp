@@ -33,18 +33,18 @@
 namespace Ogre
 {
     //-----------------------------------------------------------------------
-	template<> GLSLESProgramPipelineManager* Singleton<GLSLESProgramPipelineManager>::ms_Singleton = 0;
+	template<> GLSLESProgramPipelineManager* Singleton<GLSLESProgramPipelineManager>::msSingleton = 0;
     
 	//-----------------------------------------------------------------------
     GLSLESProgramPipelineManager* GLSLESProgramPipelineManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     
 	//-----------------------------------------------------------------------
     GLSLESProgramPipelineManager& GLSLESProgramPipelineManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 
     GLSLESProgramPipelineManager::GLSLESProgramPipelineManager(void) :

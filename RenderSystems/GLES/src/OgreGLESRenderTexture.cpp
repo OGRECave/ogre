@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreGLESHardwarePixelBuffer.h"
 
 namespace Ogre {
-    template<> GLESRTTManager* Singleton<GLESRTTManager>::ms_Singleton = 0;
+    template<> GLESRTTManager* Singleton<GLESRTTManager>::msSingleton = 0;
 
     GLESRTTManager::~GLESRTTManager()
     {

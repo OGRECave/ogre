@@ -102,14 +102,14 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    template<> Root* Singleton<Root>::ms_Singleton = 0;
+    template<> Root* Singleton<Root>::msSingleton = 0;
     Root* Root::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     Root& Root::getSingleton(void)
     {
-        assert( ms_Singleton );  return ( *ms_Singleton );
+        assert( msSingleton );  return ( *msSingleton );
     }
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL

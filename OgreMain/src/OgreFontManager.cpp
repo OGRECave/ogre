@@ -35,14 +35,14 @@ THE SOFTWARE
 namespace Ogre
 {
     //---------------------------------------------------------------------
-    template<> FontManager * Singleton< FontManager >::ms_Singleton = 0;
+    template<> FontManager * Singleton< FontManager >::msSingleton = 0;
     FontManager* FontManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     FontManager& FontManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //---------------------------------------------------------------------
 	FontManager::FontManager() : ResourceManager()

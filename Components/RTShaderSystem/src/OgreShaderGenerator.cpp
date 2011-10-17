@@ -49,7 +49,7 @@ const String cBlankString;
 
 //-----------------------------------------------------------------------
 template<> 
-RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::ms_Singleton = 0;
+RTShader::ShaderGenerator* Singleton<RTShader::ShaderGenerator>::msSingleton = 0;
 
 namespace RTShader {
 
@@ -61,15 +61,15 @@ String ShaderGenerator::SGTechnique::UserKey	= "SGTechnique";
 //-----------------------------------------------------------------------
 ShaderGenerator* ShaderGenerator::getSingletonPtr()
 {
-	assert( ms_Singleton );  
-	return ms_Singleton;
+	assert( msSingleton );  
+	return msSingleton;
 }
 
 //-----------------------------------------------------------------------
 ShaderGenerator& ShaderGenerator::getSingleton()
 {
-	assert( ms_Singleton );  
-	return ( *ms_Singleton );
+	assert( msSingleton );  
+	return ( *msSingleton );
 }
 
 //-----------------------------------------------------------------------------
@@ -138,13 +138,13 @@ ShaderGenerator::~ShaderGenerator()
 //-----------------------------------------------------------------------------
 bool ShaderGenerator::initialize()
 {
-	if (ms_Singleton == NULL)
+	if (msSingleton == NULL)
 	{
-		ms_Singleton = OGRE_NEW ShaderGenerator;
-		if (false == ms_Singleton->_initialize())
+		msSingleton = OGRE_NEW ShaderGenerator;
+		if (false == msSingleton->_initialize())
 		{
-			OGRE_DELETE ms_Singleton;
-			ms_Singleton = NULL;
+			OGRE_DELETE msSingleton;
+			msSingleton = NULL;
 			return false;
 		}
 	}
@@ -224,12 +224,12 @@ void ShaderGenerator::createSubRenderStateExFactories()
 //-----------------------------------------------------------------------------
 void ShaderGenerator::finalize()
 {
-	if (ms_Singleton != NULL)
+	if (msSingleton != NULL)
 	{
-		ms_Singleton->_finalize();
+		msSingleton->_finalize();
 
-		OGRE_DELETE ms_Singleton;
-		ms_Singleton = NULL;
+		OGRE_DELETE msSingleton;
+		msSingleton = NULL;
 	}
 }
 

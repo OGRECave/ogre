@@ -35,14 +35,14 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    template<> DistanceLodStrategy* Singleton<DistanceLodStrategy>::ms_Singleton = 0;
+    template<> DistanceLodStrategy* Singleton<DistanceLodStrategy>::msSingleton = 0;
     DistanceLodStrategy* DistanceLodStrategy::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     DistanceLodStrategy& DistanceLodStrategy::getSingleton(void)
     {
-        assert( ms_Singleton );  return ( *ms_Singleton );
+        assert( msSingleton );  return ( *msSingleton );
     }
     //-----------------------------------------------------------------------
     DistanceLodStrategy::DistanceLodStrategy()

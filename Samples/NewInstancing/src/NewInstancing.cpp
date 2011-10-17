@@ -26,7 +26,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 
 #endif
 //------------------------------------------------------------------------------
-Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mSkinningTechniques(NULL), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0)
+Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0), mSkinningTechniques(NULL)
 {
 	mInfo["Title"] = "New Instancing";
 	mInfo["Description"] = "Demonstrates how to use the new InstancedManager to setup many dynamic"

@@ -120,7 +120,7 @@ namespace Ogre {
     protected:
 
         /// Handle to the loaded library.
-        DYNLIB_HANDLE m_hInst;
+        DYNLIB_HANDLE mInst;
     };
 	/** @} */
 	/** @} */

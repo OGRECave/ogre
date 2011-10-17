@@ -33,14 +33,14 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    template<> BspResourceManager* Singleton<BspResourceManager>::ms_Singleton = 0;
+    template<> BspResourceManager* Singleton<BspResourceManager>::msSingleton = 0;
     BspResourceManager* BspResourceManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     BspResourceManager& BspResourceManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
 

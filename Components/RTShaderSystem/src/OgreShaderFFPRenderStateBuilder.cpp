@@ -42,7 +42,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------
 template<> 
-RTShader::FFPRenderStateBuilder* Singleton<RTShader::FFPRenderStateBuilder>::ms_Singleton = 0;
+RTShader::FFPRenderStateBuilder* Singleton<RTShader::FFPRenderStateBuilder>::msSingleton = 0;
 
 namespace RTShader {
 
@@ -50,15 +50,15 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 FFPRenderStateBuilder* FFPRenderStateBuilder::getSingletonPtr()
 {
-	assert( ms_Singleton );  
-	return ms_Singleton;
+	assert( msSingleton );  
+	return msSingleton;
 }
 
 //-----------------------------------------------------------------------
 FFPRenderStateBuilder& FFPRenderStateBuilder::getSingleton()
 {
-	assert( ms_Singleton );  
-	return ( *ms_Singleton );
+	assert( msSingleton );  
+	return ( *msSingleton );
 }
 
 //-----------------------------------------------------------------------------

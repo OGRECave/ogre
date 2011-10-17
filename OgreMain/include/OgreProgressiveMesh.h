@@ -215,10 +215,10 @@ namespace Ogre {
 						
     protected:
 		/// Can be NULL for non-indexed subMeshes, such PM would be skipped
-		SubMesh* m_pSubMesh;
+		SubMesh* mSubMesh;
 		
-        VertexData *mpVertexData;
-        IndexData *mpIndexData;
+        VertexData *mVertexData;
+        IndexData *mIndexData;
 
 		vector<IndexData*>::type mLodFaceList;
 		

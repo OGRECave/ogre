@@ -34,9 +34,9 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 Function::Function(const String& name, const String& desc, const FunctionType functionType)
 {
-	m_name			= name;
-	m_description	= desc;
-	m_functionType	= functionType;
+	mName			= name;
+	mDescription	= desc;
+	mFunctionType	= functionType;
 }
 
 //-----------------------------------------------------------------------------
@@ -504,7 +504,7 @@ int Function::sAtomInstanceCompare(const void* p0, const void* p1)
 //-----------------------------------------------------------------------------
 Ogre::RTShader::Function::FunctionType Function::getFunctionType() const
 {
-	return m_functionType;
+	return mFunctionType;
 }
 
 }

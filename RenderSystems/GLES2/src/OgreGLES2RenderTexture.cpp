@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 
 namespace Ogre {
-    template<> GLES2RTTManager* Singleton<GLES2RTTManager>::ms_Singleton = 0;
+    template<> GLES2RTTManager* Singleton<GLES2RTTManager>::msSingleton = 0;
 
     GLES2RTTManager::~GLES2RTTManager()
     {

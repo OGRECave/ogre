@@ -36,23 +36,23 @@ namespace OgreMayaExporter
     template <typename T> class Singleton
     {
     protected:
-        static T* ms_Singleton;
+        static T* msSingleton;
 
     public:
         Singleton(){
-            assert( !ms_Singleton );
-		    ms_Singleton = static_cast< T* >( this );
+            assert( !msSingleton );
+		    msSingleton = static_cast< T* >( this );
         }
         ~Singleton(){
-			assert( ms_Singleton );
-			ms_Singleton = 0;  
+			assert( msSingleton );
+			msSingleton = 0;  
 		}
 		static T& getSingleton(){
-			assert( ms_Singleton );  
-			return ( *ms_Singleton ); 
+			assert( msSingleton );  
+			return ( *msSingleton ); 
 		}
         static T* getSingletonPtr(){ 
-			return ms_Singleton; 
+			return msSingleton; 
 		}
     };
 

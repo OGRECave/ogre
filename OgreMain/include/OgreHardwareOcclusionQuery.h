@@ -72,17 +72,17 @@ public:
 	/**
 	  * Starts the hardware occlusion query
 	  * @Remarks	Simple usage: Create one or more OcclusionQuery object one per outstanding query or one per tested object 
-	  *				OcclusionQuery* m_pOcclusionQuery;
-	  *				createOcclusionQuery( &m_pOcclusionQuery );
+	  *				OcclusionQuery* mOcclusionQuery;
+	  *				createOcclusionQuery( &mOcclusionQuery );
 	  *				In the rendering loop:
 	  *				Draw all occluders
-	  *				m_pOcclusionQuery->startOcclusionQuery();
+	  *				mOcclusionQuery->startOcclusionQuery();
 	  *				Draw the polygons to be tested
-	  *				m_pOcclusionQuery->endOcclusionQuery();
+	  *				mOcclusionQuery->endOcclusionQuery();
 	  *
 	  *				Results must be pulled using:
-	  *				UINT	m_uintNumberOfPixelsVisable;
-	  *				pullOcclusionQuery( &m_dwNumberOfPixelsVisable );
+	  *				UINT	mNumberOfPixelsVisable;
+	  *				pullOcclusionQuery( &mNumberOfPixelsVisable );
 	  *			
 	  */
 	virtual void beginOcclusionQuery() = 0;

@@ -46,14 +46,14 @@ namespace Ogre {
     // Shortcut to set up billboard particle renderer
     BillboardParticleRendererFactory* mBillboardRendererFactory = 0;
     //-----------------------------------------------------------------------
-    template<> ParticleSystemManager* Singleton<ParticleSystemManager>::ms_Singleton = 0;
+    template<> ParticleSystemManager* Singleton<ParticleSystemManager>::msSingleton = 0;
     ParticleSystemManager* ParticleSystemManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     ParticleSystemManager& ParticleSystemManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
     ParticleSystemManager::ParticleSystemManager()

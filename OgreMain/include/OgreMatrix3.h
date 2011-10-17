@@ -251,8 +251,8 @@ namespace Ogre
         bool QLAlgorithm (Real afDiag[3], Real afSubDiag[3]);
 
         // support for singular value decomposition
-        static const Real ms_fSvdEpsilon;
-        static const unsigned int ms_iSvdMaxIterations;
+        static const Real msSvdEpsilon;
+        static const unsigned int msSvdMaxIterations;
         static void Bidiagonalize (Matrix3& kA, Matrix3& kL,
             Matrix3& kR);
         static void GolubKahanStep (Matrix3& kA, Matrix3& kL,

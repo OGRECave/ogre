@@ -4570,11 +4570,11 @@ namespace Ogre
 			float scrollAnimU = 0;
 			float scrollAnimV = 0;
 
-            EffectMap m_ef = pTex->getEffects();
-            if (!m_ef.empty())
+            EffectMap effMap = pTex->getEffects();
+            if (!effMap.empty())
             {
                 EffectMap::const_iterator it;
-                for (it = m_ef.begin(); it != m_ef.end(); ++it)
+                for (it = effMap.begin(); it != effMap.end(); ++it)
                 {
                     const TextureUnitState::TextureEffect& ef = it->second;
                     switch (ef.type)

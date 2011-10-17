@@ -30,7 +30,7 @@ namespace Ogre {
 
 //-----------------------------------------------------------------------
 template<> 
-RTShader::RTShaderSystem* Singleton<RTShader::RTShaderSystem>::ms_Singleton = 0;
+RTShader::RTShaderSystem* Singleton<RTShader::RTShaderSystem>::msSingleton = 0;
 
 namespace RTShader {
 
@@ -194,15 +194,15 @@ void RTShaderSystem::finalizeRTShaderSystem()
 //-----------------------------------------------------------------------
 RTShaderSystem& RTShaderSystem::getSingleton()
 {
-	assert( ms_Singleton );  
-	return ( *ms_Singleton );
+	assert( msSingleton );  
+	return ( *msSingleton );
 }
 
 //-----------------------------------------------------------------------
 RTShaderSystem* RTShaderSystem::getSingletonPtr()
 {
-	assert( ms_Singleton );  
-	return ms_Singleton;
+	assert( msSingleton );  
+	return msSingleton;
 }
 
 }

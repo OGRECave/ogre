@@ -61,14 +61,14 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
-	template<> ProgressManager* Singleton<ProgressManager>::ms_Singleton = 0;
+	template<> ProgressManager* Singleton<ProgressManager>::msSingleton = 0;
 	ProgressManager* ProgressManager::getSingletonPtr(void)
 	{
-		return ms_Singleton;
+		return msSingleton;
 	}
 	ProgressManager& ProgressManager::getSingleton(void)
 	{  
-		assert( ms_Singleton );  return ( *ms_Singleton );  
+		assert( msSingleton );  return ( *msSingleton );  
 	}
 	//-----------------------------------------------------------------------------
 	ProgressManager::ProgressManager(size_t numberOfStages)

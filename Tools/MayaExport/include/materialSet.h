@@ -80,11 +80,11 @@ namespace OgreMayaExporter
 		};
 		//get material set
 		static MaterialSet& getSingleton(){
-			assert(ms_Singleton);  
-			return (*ms_Singleton);
+			assert(msSingleton);  
+			return (*msSingleton);
 		};
 		static MaterialSet* getSingletonPtr(){
-			return ms_Singleton;
+			return msSingleton;
 		};
 		//write materials to Ogre XML
 		MStatus writeOgreScript(ParamList &params){

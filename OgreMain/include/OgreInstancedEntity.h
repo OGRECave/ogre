@@ -211,7 +211,7 @@ namespace Ogre
 
 		/** Called by InstanceBatch in <i>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.
-			@remarks Assumes it has a skeleton (m_skeletonInstance != 0)
+			@remarks Assumes it has a skeleton (mSkeletonInstance != 0)
 			@returns true if something was actually updated
 		*/
 		virtual bool _updateAnimation(void);
