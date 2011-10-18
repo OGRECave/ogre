@@ -5,7 +5,7 @@ using namespace Ogre;
 
 namespace Ogre
 {
-    template<> OgreFramework* Ogre::Singleton<OgreFramework>::ms_Singleton = 0;
+    template<> OgreFramework* Ogre::Singleton<OgreFramework>::msSingleton = 0;
 };
 
 OgreFramework::OgreFramework()
