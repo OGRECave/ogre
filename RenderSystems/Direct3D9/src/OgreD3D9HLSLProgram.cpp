@@ -108,8 +108,8 @@ namespace Ogre {
 		cacheMicrocode->read(&microcodeSize, sizeof(size_t));
 
 		// get microcode
-		HRESULT hr=D3DXCreateBuffer(microcodeSize, &mpMicroCode); 
-		cacheMicrocode->read(mpMicroCode->GetBufferPointer(), microcodeSize);
+		HRESULT hr=D3DXCreateBuffer(microcodeSize, &mMicroCode); 
+		cacheMicrocode->read(mMicroCode->GetBufferPointer(), microcodeSize);
 		
 		// get size of param map
 		size_t parametersMapSize = 0;
@@ -263,7 +263,7 @@ namespace Ogre {
             mEntryPoint.c_str(),
             mTarget.c_str(),
             compileFlags,
-            &mpMicroCode,
+            &mMicroCode,
             &errors,
             &pConstTable);
 
@@ -317,18 +317,18 @@ namespace Ogre {
 		// add to the microcode to the cache
 		String name = String("D3D9_HLSL_") + mName;
 
-		size_t sizeOfBuffer = sizeof(size_t) + mpMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
+		size_t sizeOfBuffer = sizeof(size_t) + mMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
 		
         // create microcode
         GpuProgramManager::Microcode newMicrocode = 
             GpuProgramManager::getSingleton().createMicrocode(sizeOfBuffer);
 
 		// save size of microcode
-		size_t microcodeSize = mpMicroCode->GetBufferSize();
+		size_t microcodeSize = mMicroCode->GetBufferSize();
 		newMicrocode->write(&microcodeSize, sizeof(size_t));
 
 		// save microcode
-		newMicrocode->write(mpMicroCode->GetBufferPointer(), microcodeSize);
+		newMicrocode->write(mMicroCode->GetBufferPointer(), microcodeSize);
 
 
 		// save size of param map
@@ -371,14 +371,14 @@ namespace Ogre {
 					"",// dummy source, since we'll be using microcode
 					mType, 
 					mTarget);
-			static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mpMicroCode);
+			static_cast<D3D9GpuProgram*>(mAssemblerProgram.get())->setExternalMicrocode(mMicroCode);
 		}
 
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::unloadHighLevelImpl(void)
     {
-        SAFE_RELEASE(mpMicroCode);
+        SAFE_RELEASE(mMicroCode);
 
     }
     //-----------------------------------------------------------------------
@@ -631,7 +631,7 @@ namespace Ogre {
 
 	LPD3DXBUFFER D3D9HLSLProgram::getMicroCode()
 	{
-		return mpMicroCode;
+		return mMicroCode;
 	}
 
     //-----------------------------------------------------------------------
@@ -643,7 +643,7 @@ namespace Ogre {
         , mEntryPoint()
         , mPreprocessorDefines()
         , mColumnMajorMatrices(true)
-        , mpMicroCode(NULL)
+        , mMicroCode(NULL)
 		, mOptimisationLevel(OPT_DEFAULT)
 		, mParametersMapSizeAsBuffer(0)
     {

@@ -66,7 +66,7 @@ namespace Ogre {
         // State for export
         TiXmlDocument* mXMLDoc;
         // State for import
-        Mesh* mpMesh;
+        Mesh* mMesh;
 		VertexElementType mColourElementType;
 
         // Internal methods

@@ -90,7 +90,7 @@ namespace Ogre
 	protected:
 		HINSTANCE mInstance;			// Process instance
 		D3D11Device & mDevice;			// D3D11 driver
-		IDXGIFactory1*	mpDXGIFactory;
+		IDXGIFactory1*	mDXGIFactory;
 		HWND	mHWnd;					// Win32 Window handle
 		bool	mIsExternal;			// window not created by Ogre
 		bool	mSizing;
@@ -104,7 +104,7 @@ namespace Ogre
 		// -------------------------------------------------------
 
 		// Pointer to swap chain, only valid if mIsSwapChain
-		IDXGISwapChain * mpSwapChain;
+		IDXGISwapChain * mSwapChain;
 		DXGI_SWAP_CHAIN_DESC md3dpp;
 		DXGI_SAMPLE_DESC mFSAAType;
 		//DWORD mFSAAQuality;
@@ -114,7 +114,7 @@ namespace Ogre
 		bool mUseNVPerfHUD;
 		ID3D11RenderTargetView*		mRenderTargetView;
 		ID3D11DepthStencilView*		mDepthStencilView;
-		ID3D11Texture2D*			mpBackBuffer;
+		ID3D11Texture2D*			mBackBuffer;
 
 		// just check if the multisampling requested is supported by the device
 		bool _checkMultiSampleQuality(UINT SampleCount, UINT *outQuality, DXGI_FORMAT format);

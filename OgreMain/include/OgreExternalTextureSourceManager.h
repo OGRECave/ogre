@@ -64,7 +64,7 @@ namespace Ogre
 		void setCurrentPlugIn( const String& sTexturePlugInType );
 
 		/** Returns currently selected plugin, may be null if none selected */
-		ExternalTextureSource* getCurrentPlugIn( void ) const { return mpCurrExternalTextureSource; }
+		ExternalTextureSource* getCurrentPlugIn( void ) const { return mCurrExternalTextureSource; }
 	
 		/** Calls the destroy method of all registered plugins... 
 		Only the owner plugin should perform the destroy action. */
@@ -112,7 +112,7 @@ namespace Ogre
         static ExternalTextureSourceManager* getSingletonPtr(void);
 	protected:
 		//The current texture controller selected
-		ExternalTextureSource* mpCurrExternalTextureSource;
+		ExternalTextureSource* mCurrExternalTextureSource;
 		
         // Collection of loaded texture System PlugIns, keyed by registered type
         typedef map< String, ExternalTextureSource*>::type TextureSystemList;

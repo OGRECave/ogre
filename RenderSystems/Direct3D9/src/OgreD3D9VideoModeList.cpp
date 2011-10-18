@@ -36,13 +36,13 @@ namespace Ogre
 		if( NULL == pDriver )
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "pDriver parameter is NULL", "D3D9VideoModeList::D3D9VideoModeList" );
 
-		mpDriver = pDriver;
+		mDriver = pDriver;
 		enumerate();
 	}
 
 	D3D9VideoModeList::~D3D9VideoModeList()
 	{
-		mpDriver = NULL;
+		mDriver = NULL;
 		mModeList.clear();
 	}
 
@@ -50,7 +50,7 @@ namespace Ogre
 	{
 		UINT iMode;
 		IDirect3D9* pD3D = D3D9RenderSystem::getDirect3D9();
-		UINT adapter = mpDriver->getAdapterNumber();
+		UINT adapter = mDriver->getAdapterNumber();
 
 		for( iMode=0; iMode < pD3D->GetAdapterModeCount( adapter, D3DFMT_R5G6B5 ); iMode++ )
 		{

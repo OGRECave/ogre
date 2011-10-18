@@ -45,8 +45,8 @@ namespace Ogre
 		D3DDEVTYPE devType, 
 		DWORD behaviorFlags)
 	{
-		mpDeviceManager				= deviceManager;
-		mpDevice					= NULL;		
+		mDeviceManager				= deviceManager;
+		mDevice					= NULL;		
 		mAdapterNumber				= adapterNumber;
 		mMonitor					= hMonitor;
 		mDeviceType					= devType;
@@ -136,7 +136,7 @@ namespace Ogre
 		bool resetDevice = false;
 			
 		// Create device if need to.
-		if (mpDevice == NULL)
+		if (mDevice == NULL)
 		{			
 			createD3D9Device();
 		}
@@ -172,7 +172,7 @@ namespace Ogre
 			// grabbed by the primary window using the GetDepthStencilSurface method.
 			if (resetDevice == false)
 			{
-				mpDevice->SetDepthStencilSurface(itPrimary->second->depthBuffer);
+				mDevice->SetDepthStencilSurface(itPrimary->second->depthBuffer);
 			}
 			
 		}
@@ -202,7 +202,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::release()
 	{
-		if (mpDevice != NULL)
+		if (mDevice != NULL)
 		{
 			D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
 
@@ -309,7 +309,7 @@ namespace Ogre
 
 		//Remove _all_ depth buffers created by this device
 		D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
-		renderSystem->_cleanupDepthBuffers( mpDevice );
+		renderSystem->_cleanupDepthBuffers( mDevice );
 
 		release();
 		
@@ -337,7 +337,7 @@ namespace Ogre
 		mPresentationParamsCount = 0;
 
 		// Notify the device manager on this instance destruction.	
-		mpDeviceManager->notifyOnDeviceDestroy(this);
+		mDeviceManager->notifyOnDeviceDestroy(this);
 
 		// UnLock access to rendering device.
 		D3D9RenderSystem::getResourceManager()->unlockDeviceAccess();
@@ -348,7 +348,7 @@ namespace Ogre
 	{		
 		HRESULT hr;
 
-		hr = mpDevice->TestCooperativeLevel();
+		hr = mDevice->TestCooperativeLevel();
 
 		if (hr == D3DERR_DEVICELOST ||
 			hr == D3DERR_DEVICENOTRESET)
@@ -365,7 +365,7 @@ namespace Ogre
 		HRESULT hr;
 
 		// Check that device is in valid state for reset.
-		hr = mpDevice->TestCooperativeLevel();
+		hr = mDevice->TestCooperativeLevel();
 		if (hr == D3DERR_DEVICELOST ||
 			hr == D3DERR_DRIVERINTERNALERROR)
 		{
@@ -378,7 +378,7 @@ namespace Ogre
 		D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
 
 		// Inform all resources that device lost.
-		D3D9RenderSystem::getResourceManager()->notifyOnDeviceLost(mpDevice);
+		D3D9RenderSystem::getResourceManager()->notifyOnDeviceLost(mDevice);
 
 		// Notify all listener before device is rested
 		renderSystem->notifyOnDeviceLost(this);
@@ -410,7 +410,7 @@ namespace Ogre
 
 
 		// Reset the device using the presentation parameters.
-		hr = mpDevice->Reset(mPresentationParams);
+		hr = mDevice->Reset(mPresentationParams);
 	
 		if (hr == D3DERR_DEVICELOST)
 		{
@@ -441,14 +441,14 @@ namespace Ogre
 			++it;
 		}		
 
-		D3D9Device* pCurActiveDevice = mpDeviceManager->getActiveDevice();
+		D3D9Device* pCurActiveDevice = mDeviceManager->getActiveDevice();
 
-		mpDeviceManager->setActiveDevice(this);
+		mDeviceManager->setActiveDevice(this);
 
 		// Inform all resources that device has been reset.
-		D3D9RenderSystem::getResourceManager()->notifyOnDeviceReset(mpDevice);
+		D3D9RenderSystem::getResourceManager()->notifyOnDeviceReset(mDevice);
 
-		mpDeviceManager->setActiveDevice(pCurActiveDevice);
+		mDeviceManager->setActiveDevice(pCurActiveDevice);
 		
 		renderSystem->notifyOnDeviceReset(this);
 
@@ -519,7 +519,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	IDirect3DDevice9* D3D9Device::getD3D9Device()
 	{
-		return mpDevice;
+		return mDevice;
 	}
 
 	//---------------------------------------------------------------------
@@ -620,18 +620,18 @@ namespace Ogre
 			DWORD   dwCurValue = D3DTOP_FORCE_DWORD;
 			HRESULT hr;
 
-			hr = mpDevice->SetTexture(stage, NULL);
+			hr = mDevice->SetTexture(stage, NULL);
 			if( hr != S_OK )
 			{
 				String str = "Unable to disable texture '" + StringConverter::toString((unsigned int)stage) + "' in D3D9";
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, str, "D3D9Device::clearDeviceStreams" );
 			}
 		
-			mpDevice->GetTextureStageState(static_cast<DWORD>(stage), D3DTSS_COLOROP, &dwCurValue);
+			mDevice->GetTextureStageState(static_cast<DWORD>(stage), D3DTSS_COLOROP, &dwCurValue);
 
 			if (dwCurValue != D3DTOP_DISABLE)
 			{
-				hr = mpDevice->SetTextureStageState(static_cast<DWORD>(stage), D3DTSS_COLOROP, D3DTOP_DISABLE);
+				hr = mDevice->SetTextureStageState(static_cast<DWORD>(stage), D3DTSS_COLOROP, D3DTOP_DISABLE);
 				if( hr != S_OK )
 				{
 					String str = "Unable to disable texture '" + StringConverter::toString((unsigned)stage) + "' in D3D9";
@@ -650,7 +650,7 @@ namespace Ogre
 		// Unbind any vertex streams to avoid memory leaks				
 		for (unsigned int i = 0; i < mD3D9DeviceCaps.MaxStreams; ++i)
 		{
-			mpDevice->SetStreamSource(i, NULL, 0, 0);
+			mDevice->SetStreamSource(i, NULL, 0, 0);
 		}
 	}
 
@@ -682,14 +682,14 @@ namespace Ogre
 		// Try to create the device with hardware vertex processing. 
 		mBehaviorFlags |= D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-			mBehaviorFlags, mPresentationParams, &mpDevice);
+			mBehaviorFlags, mPresentationParams, &mDevice);
 
 		if (FAILED(hr))
 		{
 			// Try a second time, may fail the first time due to back buffer count,
 			// which will be corrected down to 1 by the runtime
 			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-				mBehaviorFlags, mPresentationParams, &mpDevice);
+				mBehaviorFlags, mPresentationParams, &mDevice);
 		}
 
 		// Case hardware vertex processing failed.
@@ -700,7 +700,7 @@ namespace Ogre
 			mBehaviorFlags |= D3DCREATE_MIXED_VERTEXPROCESSING;
 
 			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-				mBehaviorFlags, mPresentationParams, &mpDevice);
+				mBehaviorFlags, mPresentationParams, &mDevice);
 		}
 
 		if( FAILED( hr ) )
@@ -709,7 +709,7 @@ namespace Ogre
 			mBehaviorFlags &= ~D3DCREATE_MIXED_VERTEXPROCESSING;
 			mBehaviorFlags |= D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-				mBehaviorFlags, mPresentationParams, &mpDevice);
+				mBehaviorFlags, mPresentationParams, &mDevice);
 		}
 
 		if ( FAILED( hr ) )
@@ -717,7 +717,7 @@ namespace Ogre
 			// try reference device
 			mDeviceType = D3DDEVTYPE_REF;
 			hr = pD3D9->CreateDevice(mAdapterNumber, mDeviceType, mFocusWindow,
-				mBehaviorFlags, mPresentationParams, &mpDevice);
+				mBehaviorFlags, mPresentationParams, &mDevice);
 
 			if ( FAILED( hr ) )
 			{
@@ -728,7 +728,7 @@ namespace Ogre
 		}
 
 		// Get current device caps.
-		hr = mpDevice->GetDeviceCaps(&mD3D9DeviceCaps);
+		hr = mDevice->GetDeviceCaps(&mD3D9DeviceCaps);
 		if( FAILED( hr ) )
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
@@ -737,7 +737,7 @@ namespace Ogre
 		}
 
 		// Get current creation parameters caps.
-		hr = mpDevice->GetCreationParameters(&mCreationParams);
+		hr = mDevice->GetCreationParameters(&mCreationParams);
 		if ( FAILED(hr) )
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
@@ -753,14 +753,14 @@ namespace Ogre
 		// Lock access to rendering device.
 		D3D9RenderSystem::getResourceManager()->lockDeviceAccess();
 
-		D3D9Device* pCurActiveDevice = mpDeviceManager->getActiveDevice();
+		D3D9Device* pCurActiveDevice = mDeviceManager->getActiveDevice();
 
-		mpDeviceManager->setActiveDevice(this);
+		mDeviceManager->setActiveDevice(this);
 
 		// Inform all resources that new device created.
-		D3D9RenderSystem::getResourceManager()->notifyOnDeviceCreate(mpDevice);
+		D3D9RenderSystem::getResourceManager()->notifyOnDeviceCreate(mDevice);
 
-		mpDeviceManager->setActiveDevice(pCurActiveDevice);
+		mDeviceManager->setActiveDevice(pCurActiveDevice);
 
 		// UnLock access to rendering device.
 		D3D9RenderSystem::getResourceManager()->unlockDeviceAccess();
@@ -769,24 +769,24 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::releaseD3D9Device()
 	{
-		if (mpDevice != NULL)
+		if (mDevice != NULL)
 		{
 			// Lock access to rendering device.
 			D3D9RenderSystem::getResourceManager()->lockDeviceAccess();
 
-			D3D9Device* pCurActiveDevice = mpDeviceManager->getActiveDevice();
+			D3D9Device* pCurActiveDevice = mDeviceManager->getActiveDevice();
 
-			mpDeviceManager->setActiveDevice(this);
+			mDeviceManager->setActiveDevice(this);
 
 			// Inform all resources that device is going to be destroyed.
-			D3D9RenderSystem::getResourceManager()->notifyOnDeviceDestroy(mpDevice);
+			D3D9RenderSystem::getResourceManager()->notifyOnDeviceDestroy(mDevice);
 
-			mpDeviceManager->setActiveDevice(pCurActiveDevice);
+			mDeviceManager->setActiveDevice(pCurActiveDevice);
 			
 			clearDeviceStreams();		
 
 			// Release device.
-			SAFE_RELEASE(mpDevice);	
+			SAFE_RELEASE(mDevice);	
 			
 			// UnLock access to rendering device.
 			D3D9RenderSystem::getResourceManager()->unlockDeviceAccess();
@@ -862,7 +862,7 @@ namespace Ogre
 		RenderWindowResources* renderWindowResources =  it->second;
 		HRESULT hr;
 
-		hr = mpDevice->TestCooperativeLevel();	
+		hr = mDevice->TestCooperativeLevel();	
 
 		// Case device is not valid for rendering. 
 		if (FAILED(hr))
@@ -965,7 +965,7 @@ namespace Ogre
 			// Lock access to rendering device.
 			D3D9RenderSystem::getResourceManager()->lockDeviceAccess();
 
-			mpDeviceManager->linkRenderWindow(renderWindow);
+			mDeviceManager->linkRenderWindow(renderWindow);
 
 			// UnLock access to rendering device.
 			D3D9RenderSystem::getResourceManager()->unlockDeviceAccess();
@@ -997,7 +997,7 @@ namespace Ogre
 			// Only the master will call present method results in synchronized
 			// buffer swap for the rest of the implicit swap chain.
 			if (getPrimaryWindow() == renderWindow)
-				hr = mpDevice->Present( NULL, NULL, NULL, NULL );
+				hr = mDevice->Present( NULL, NULL, NULL, NULL );
 			else
 				hr = S_OK;
 		}
@@ -1034,14 +1034,14 @@ namespace Ogre
 		if (isSwapChainWindow(renderWindow) && !isMultihead())
 		{
 			// Create swap chain
-			HRESULT hr = mpDevice->CreateAdditionalSwapChain(&renderWindowResources->presentParameters, 
+			HRESULT hr = mDevice->CreateAdditionalSwapChain(&renderWindowResources->presentParameters, 
 				&renderWindowResources->swapChain);
 
 			if (FAILED(hr))
 			{
 				// Try a second time, may fail the first time due to back buffer count,
 				// which will be corrected by the runtime
-				hr = mpDevice->CreateAdditionalSwapChain(&renderWindowResources->presentParameters, 
+				hr = mDevice->CreateAdditionalSwapChain(&renderWindowResources->presentParameters, 
 					&renderWindowResources->swapChain);
 			}
 
@@ -1055,7 +1055,7 @@ namespace Ogre
 		else
 		{
 			// The swap chain is already created by the device
-			HRESULT hr = mpDevice->GetSwapChain(renderWindowResources->presentParametersIndex, 
+			HRESULT hr = mDevice->GetSwapChain(renderWindowResources->presentParametersIndex, 
 				&renderWindowResources->swapChain);
 			if (FAILED(hr)) 
 			{
@@ -1079,7 +1079,7 @@ namespace Ogre
 			if (isMultihead() && isAutoDepthStencil() || 
 			    isMultihead() == false && isSwapChainWindow(renderWindow) == false)
 			{
-				mpDevice->GetDepthStencilSurface(&renderWindowResources->depthBuffer);
+				mDevice->GetDepthStencilSurface(&renderWindowResources->depthBuffer);
 			}
 			else
 			{
@@ -1092,7 +1092,7 @@ namespace Ogre
 				if (targetHeight == 0)
 					targetHeight = 1;
 
-				HRESULT hr = mpDevice->CreateDepthStencilSurface(
+				HRESULT hr = mDevice->CreateDepthStencilSurface(
 					targetWidth, targetHeight,
 					renderWindowResources->presentParameters.AutoDepthStencilFormat,
 					renderWindowResources->presentParameters.MultiSampleType,
@@ -1110,7 +1110,7 @@ namespace Ogre
 
 				if (isSwapChainWindow(renderWindow) == false)
 				{
-					mpDevice->SetDepthStencilSurface(renderWindowResources->depthBuffer);
+					mDevice->SetDepthStencilSurface(renderWindowResources->depthBuffer);
 				}
 			}
 
@@ -1118,7 +1118,7 @@ namespace Ogre
 			{
 				//Tell the RS we have a depth buffer we created it needs to add to the default pool
 				D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
-				DepthBuffer *depthBuf = renderSystem->_addManualDepthBuffer( mpDevice, renderWindowResources->depthBuffer );
+				DepthBuffer *depthBuf = renderSystem->_addManualDepthBuffer( mDevice, renderWindowResources->depthBuffer );
 
 				//Don't forget we want this window to use _this_ depth buffer
 				renderWindow->attachDepthBuffer( depthBuf );
@@ -1135,7 +1135,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Device::setupDeviceStates()
 	{
-		HRESULT hr = mpDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
+		HRESULT hr = mDevice->SetRenderState(D3DRS_SPECULARENABLE, TRUE);
 		
 		if (FAILED(hr)) 
 		{
@@ -1208,7 +1208,7 @@ namespace Ogre
 			// In case a d3d9 device exists - try to keep the present parameters order
 			// so that the window that the device is focused on will stay the same and we
 			// will avoid device re-creation.
-			if (mpDevice != NULL)
+			if (mDevice != NULL)
 			{
 				it = mMapRenderWindowToResources.begin();
 				while (it != mMapRenderWindowToResources.end())			
@@ -1281,7 +1281,7 @@ namespace Ogre
 		{
 			D3DDISPLAYMODE dm;
 
-			if (FAILED(hr = mpDevice->GetDisplayMode(0, &dm)))
+			if (FAILED(hr = mDevice->GetDisplayMode(0, &dm)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 					"Can't get display mode: " + Root::getSingleton().getErrorDescription(hr),
@@ -1291,7 +1291,7 @@ namespace Ogre
 			desc.Width = dm.Width;
 			desc.Height = dm.Height;
 			desc.Format = D3DFMT_A8R8G8B8;
-			if (FAILED(hr = mpDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+			if (FAILED(hr = mDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
 				desc.Format,
 				D3DPOOL_SYSTEMMEM,
 				&pTempSurf,
@@ -1303,7 +1303,7 @@ namespace Ogre
 			}
 
 			if (FAILED(hr = swapChain ? resources->swapChain->GetFrontBufferData(pTempSurf) :
-				mpDevice->GetFrontBufferData(0, pTempSurf)))
+				mDevice->GetFrontBufferData(0, pTempSurf)))
 			{
 				SAFE_RELEASE(pTempSurf);
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -1369,7 +1369,7 @@ namespace Ogre
 		{
 			SAFE_RELEASE(pSurf);
 			if(FAILED(hr = swapChain? resources->swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pSurf) :
-				mpDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
+				mDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pSurf)))
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 					"Can't get back buffer: " + Root::getSingleton().getErrorDescription(hr),
@@ -1383,7 +1383,7 @@ namespace Ogre
 					"D3D9Device::copyContentsToMemory");
 			}
 
-			if (FAILED(hr = mpDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
+			if (FAILED(hr = mDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height,
 				desc.Format,
 				D3DPOOL_SYSTEMMEM,
 				&pTempSurf,
@@ -1396,7 +1396,7 @@ namespace Ogre
 
 			if (desc.MultiSampleType == D3DMULTISAMPLE_NONE)
 			{
-				if (FAILED(hr = mpDevice->GetRenderTargetData(pSurf, pTempSurf)))
+				if (FAILED(hr = mDevice->GetRenderTargetData(pSurf, pTempSurf)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
@@ -1408,7 +1408,7 @@ namespace Ogre
 			{
 				IDirect3DSurface9* pStretchSurf = 0;
 
-				if (FAILED(hr = mpDevice->CreateRenderTarget(desc.Width, desc.Height,
+				if (FAILED(hr = mDevice->CreateRenderTarget(desc.Width, desc.Height,
 					desc.Format,
 					D3DMULTISAMPLE_NONE,
 					0,
@@ -1422,7 +1422,7 @@ namespace Ogre
 						"D3D9Device::copyContentsToMemory");
 				}
 
-				if (FAILED(hr = mpDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
+				if (FAILED(hr = mDevice->StretchRect(pSurf, 0, pStretchSurf, 0, D3DTEXF_NONE)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);
@@ -1430,7 +1430,7 @@ namespace Ogre
 						"Can't stretch rect: " + Root::getSingleton().getErrorDescription(hr),
 						"D3D9Device::copyContentsToMemory");
 				}
-				if (FAILED(hr = mpDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
+				if (FAILED(hr = mDevice->GetRenderTargetData(pStretchSurf, pTempSurf)))
 				{
 					SAFE_RELEASE(pTempSurf);
 					SAFE_RELEASE(pStretchSurf);

@@ -57,7 +57,7 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mpShadowBuffer = OGRE_NEW DefaultHardwareIndexBuffer(mIndexType, 
+            mShadowBuffer = OGRE_NEW DefaultHardwareIndexBuffer(mIndexType, 
                 mNumIndexes, HardwareBuffer::HBU_DYNAMIC);
         }
 
@@ -71,9 +71,9 @@ namespace Ogre {
 			mMgr->_notifyIndexBufferDestroyed(this);
 		}
 
-        if (mpShadowBuffer)
+        if (mShadowBuffer)
         {
-            OGRE_DELETE mpShadowBuffer;
+            OGRE_DELETE mShadowBuffer;
         }
     }
     //-----------------------------------------------------------------------------

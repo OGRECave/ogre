@@ -271,7 +271,7 @@ namespace Ogre {
         ushort mPixelBottomBorderSize;
 
         String mBorderMaterialName;
-        MaterialPtr mpBorderMaterial;
+        MaterialPtr mBorderMaterial;
 
         // Render operation for the border area
         RenderOperation mRenderOp2;
@@ -328,7 +328,7 @@ namespace Ogre {
             mUseIdentityProjection = true;
             mUseIdentityView = true;
         }
-        const MaterialPtr& getMaterial(void) const { return mParent->mpBorderMaterial; }
+        const MaterialPtr& getMaterial(void) const { return mParent->mBorderMaterial; }
         void getRenderOperation(RenderOperation& op) { op = mParent->mRenderOp2; }
         void getWorldTransforms(Matrix4* xform) const { mParent->getWorldTransforms(xform); }
         unsigned short getNumWorldTransforms(void) const { return 1; }

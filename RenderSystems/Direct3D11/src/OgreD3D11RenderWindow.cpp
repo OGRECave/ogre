@@ -39,7 +39,7 @@ namespace Ogre
 	D3D11RenderWindow::D3D11RenderWindow(HINSTANCE instance, D3D11Device & device, IDXGIFactory1*	pDXGIFactory)
 		: mInstance(instance)
 		, mDevice(device)
-		, mpDXGIFactory(pDXGIFactory)
+		, mDXGIFactory(pDXGIFactory)
 {
 		mIsFullScreen = false;
 		mIsSwapChain = true;//(deviceIfSwapChain != NULL);
@@ -53,7 +53,7 @@ namespace Ogre
 		mDisplayFrequency = 0;
 		mRenderTargetView = 0;
 		mDepthStencilView = 0;
-		mpBackBuffer = 0;
+		mBackBuffer = 0;
 	}
 	//---------------------------------------------------------------------
 	D3D11RenderWindow::~D3D11RenderWindow()
@@ -61,7 +61,7 @@ namespace Ogre
 		SAFE_RELEASE( mRenderTargetView );
 		SAFE_RELEASE( mDepthStencilView );
 
-		SAFE_RELEASE(mpBackBuffer);
+		SAFE_RELEASE(mBackBuffer);
 
 		destroy();
 	}
@@ -392,7 +392,7 @@ namespace Ogre
 				SWP_DRAWFRAME | SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
 		}
-		mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
+		mSwapChain->SetFullscreenState(mIsFullScreen, NULL);
 		mSwitchingFullscreen = false;
 	}
 	//---------------------------------------------------------------------
@@ -464,14 +464,14 @@ namespace Ogre
 			}
 
 			// Create swap chain			
-			hr = mpDXGIFactory->CreateSwapChain( 
-				pDXGIDevice,&md3dpp,&mpSwapChain);
+			hr = mDXGIFactory->CreateSwapChain( 
+				pDXGIDevice,&md3dpp,&mSwapChain);
         
 			if (FAILED(hr))
 			{
 				// Try a second time, may fail the first time due to back buffer count,
 				// which will be corrected by the runtime
-				hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice,&md3dpp,&mpSwapChain);
+				hr = mDXGIFactory->CreateSwapChain(pDXGIDevice,&md3dpp,&mSwapChain);
 			}
 
             SAFE_RELEASE(pDXGIDevice);
@@ -486,7 +486,7 @@ namespace Ogre
 			// Additional swap chains need their own depth buffer
 			// to support resizing them
 
-			hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
+			hr = mSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mBackBuffer  );
 			if( FAILED(hr) )
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
@@ -496,7 +496,7 @@ namespace Ogre
 
 			// get the backbuffer desc
 			D3D11_TEXTURE2D_DESC BBDesc;
-			mpBackBuffer->GetDesc( &BBDesc );
+			mBackBuffer->GetDesc( &BBDesc );
 
 			// create the render target view
 			D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
@@ -505,7 +505,7 @@ namespace Ogre
 			RTVDesc.Format = BBDesc.Format;
 			RTVDesc.ViewDimension = mFSAA ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
 			RTVDesc.Texture2D.MipSlice = 0;
-			hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
+			hr = mDevice->CreateRenderTargetView( mBackBuffer, &RTVDesc, &mRenderTargetView );
 
 			if( FAILED(hr) )
 			{
@@ -572,7 +572,7 @@ namespace Ogre
 			} 
 			else 
 			{
-				//				mpRenderZBuffer = 0;
+				//				mRenderZBuffer = 0;
 			}
 		}
 		/*else
@@ -645,9 +645,9 @@ namespace Ogre
 		// update device in driver
 		mDriver->setD3DDevice( mDevice );
 		// Store references to buffers for convenience
-		mDevice->GetDepthStencilSurface( &mpRenderZBuffer );
+		mDevice->GetDepthStencilSurface( &mRenderZBuffer );
 		// release immediately so we don't hog them
-		mpRenderZBuffer->Release();
+		mRenderZBuffer->Release();
 		}
 		*/
 	}
@@ -656,13 +656,13 @@ namespace Ogre
 	{
 		if (mIsSwapChain)
 		{
-			//	SAFE_RELEASE(mpRenderZBuffer);
-			SAFE_RELEASE(mpSwapChain);
+			//	SAFE_RELEASE(mRenderZBuffer);
+			SAFE_RELEASE(mSwapChain);
 		}
 		else
 		{
 			// ignore depth buffer, access device through driver
-			//	mpRenderZBuffer = 0;
+			//	mRenderZBuffer = 0;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -755,7 +755,7 @@ namespace Ogre
 		UINT Flags = 0;
 		if( mIsFullScreen )
 			Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		mpSwapChain->ResizeBuffers(md3dpp.BufferCount, width, height, md3dpp.BufferDesc.Format, Flags);
+		mSwapChain->ResizeBuffers(md3dpp.BufferCount, width, height, md3dpp.BufferDesc.Format, Flags);
 		/*
 
 		if (mIsSwapChain) 
@@ -766,12 +766,12 @@ namespace Ogre
 		pp.BufferDesc.Height = width;
 		pp.BufferDesc.Height = height;
 
-		//SAFE_RELEASE( mpRenderZBuffer );
-		SAFE_RELEASE( mpSwapChain );
+		//SAFE_RELEASE( mRenderZBuffer );
+		SAFE_RELEASE( mSwapChain );
 
 		HRESULT hr = mDriver->mDevice->CreateAdditionalSwapChain(
 		&pp,
-		&mpSwapChain);
+		&mSwapChain);
 
 		if (FAILED(hr)) 
 		{
@@ -782,7 +782,7 @@ namespace Ogre
 		// try to recover
 		hr = mDriver->mDevice->CreateAdditionalSwapChain(
 		&md3dpp,
-		&mpSwapChain);
+		&mSwapChain);
 
 		if (FAILED(hr))
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Reset window to last size failed", "D3D11RenderWindow::resize" );
@@ -795,14 +795,14 @@ namespace Ogre
 		mWidth = width;
 		mHeight = height;
 
-		hr = mpSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mpRenderSurface);
+		hr = mSwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &mRenderSurface);
 		hr = mDriver->mDevice->CreateDepthStencilSurface(
 		mWidth, mHeight,
 		md3dpp.AutoDepthStencilFormat,
 		md3dpp.MultiSampleType,
 		md3dpp.MultiSampleQuality, 
 		(md3dpp.Flags & D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL),
-		&mpRenderZBuffer, NULL
+		&mRenderZBuffer, NULL
 		);
 
 		if (FAILED(hr)) 
@@ -835,7 +835,7 @@ namespace Ogre
 			HRESULT hr;
 			if (mIsSwapChain)
 			{
-				hr = mpSwapChain->Present(waitForVSync ? mVSyncInterval : 0, 0);
+				hr = mSwapChain->Present(waitForVSync ? mVSyncInterval : 0, 0);
 			}
 			else
 			{
@@ -881,7 +881,7 @@ namespace Ogre
 		else if( name == "ID3D11Texture2D" )
 		{
 			ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
-			*pBackBuffer = mpBackBuffer;
+			*pBackBuffer = mBackBuffer;
 		}
 
 	}
@@ -892,7 +892,7 @@ namespace Ogre
 
 		// get the backbuffer desc
 		D3D11_TEXTURE2D_DESC BBDesc;
-		mpBackBuffer->GetDesc( &BBDesc );
+		mBackBuffer->GetDesc( &BBDesc );
 
 		// change the parameters of the texture so we can read it
 		BBDesc.Usage = D3D11_USAGE_STAGING;
@@ -907,7 +907,7 @@ namespace Ogre
 			&pTempTexture2D);
 
 		// copy the back buffer
-		mDevice.GetImmediateContext()->CopyResource(pTempTexture2D, mpBackBuffer);
+		mDevice.GetImmediateContext()->CopyResource(pTempTexture2D, mBackBuffer);
 
 
 		// map the copied texture

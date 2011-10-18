@@ -227,7 +227,7 @@ namespace Ogre
         static CmdAlignment msCmdAlignment;
 
 
-        FontPtr mpFont;
+        FontPtr mFont;
         Real mCharHeight;
         ushort mPixelCharHeight;
         Real mSpaceWidth;

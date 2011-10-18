@@ -37,7 +37,7 @@ namespace Ogre {
                                                                  HardwareBuffer::Usage usage)
         : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false)
     {
-        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
     }
 
     GLES2DefaultHardwareVertexBuffer::GLES2DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr,
@@ -46,19 +46,19 @@ namespace Ogre {
                                                                        HardwareBuffer::Usage usage)
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false)
     {
-        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
     }
     
     GLES2DefaultHardwareVertexBuffer::~GLES2DefaultHardwareVertexBuffer()
     {
-        OGRE_FREE_SIMD(mpData, MEMCATEGORY_GEOMETRY);
+        OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
     }
 
     void* GLES2DefaultHardwareVertexBuffer::lockImpl(size_t offset,
                                                   size_t length,
                                                   LockOptions options)
     {
-        return mpData + offset;
+        return mData + offset;
     }
 
     void GLES2DefaultHardwareVertexBuffer::unlockImpl(void)
@@ -71,7 +71,7 @@ namespace Ogre {
                                               LockOptions options)
     {
         mIsLocked = true;
-        return mpData + offset;
+        return mData + offset;
     }
 
     void GLES2DefaultHardwareVertexBuffer::unlock(void)
@@ -85,7 +85,7 @@ namespace Ogre {
                                                  void* pDest)
     {
         assert((offset + length) <= mSizeInBytes);
-        memcpy(pDest, mpData + offset, length);
+        memcpy(pDest, mData + offset, length);
     }
 
     void GLES2DefaultHardwareVertexBuffer::writeData(size_t offset,
@@ -95,7 +95,7 @@ namespace Ogre {
     {
         assert((offset + length) <= mSizeInBytes);
         // ignore discard, memory is not guaranteed to be zeroised
-        memcpy(mpData + offset, pSource, length);
+        memcpy(mData + offset, pSource, length);
     }
 
     GLES2DefaultHardwareIndexBuffer::GLES2DefaultHardwareIndexBuffer(IndexType idxType,
@@ -110,18 +110,18 @@ namespace Ogre {
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2DefaultHardwareIndexBuffer");
 		}
-        mpData = OGRE_NEW_FIX_FOR_WIN32 unsigned char[mSizeInBytes];
+        mData = OGRE_NEW_FIX_FOR_WIN32 unsigned char[mSizeInBytes];
     }
 
     GLES2DefaultHardwareIndexBuffer::~GLES2DefaultHardwareIndexBuffer()
     {
-        OGRE_DELETE [] mpData;
+        OGRE_DELETE [] mData;
     }
 
     void* GLES2DefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
     {
         // Only for use internally, no 'locking' as such
-        return mpData + offset;
+        return mData + offset;
     }
 
     void GLES2DefaultHardwareIndexBuffer::unlockImpl(void)
@@ -132,7 +132,7 @@ namespace Ogre {
     void* GLES2DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
     {
         mIsLocked = true;
-        return mpData + offset;
+        return mData + offset;
     }
 
     void GLES2DefaultHardwareIndexBuffer::unlock(void)
@@ -144,7 +144,7 @@ namespace Ogre {
     void GLES2DefaultHardwareIndexBuffer::readData(size_t offset, size_t length, void* pDest)
     {
         assert((offset + length) <= mSizeInBytes);
-        memcpy(pDest, mpData + offset, length);
+        memcpy(pDest, mData + offset, length);
     }
 
     void GLES2DefaultHardwareIndexBuffer::writeData(size_t offset, size_t length, const void* pSource,
@@ -152,7 +152,7 @@ namespace Ogre {
     {
         assert((offset + length) <= mSizeInBytes);
         // ignore discard, memory is not guaranteed to be zeroised
-        memcpy(mpData + offset, pSource, length);
+        memcpy(mData + offset, pSource, length);
     }
 
     GLES2DefaultHardwareBufferManagerBase::GLES2DefaultHardwareBufferManagerBase()

@@ -75,7 +75,7 @@ namespace Ogre
                 mShadowUpdated = true;
             }
 
-            mCurrentLock = static_cast<HardwarePixelBuffer*>(mpShadowBuffer)->lock(lockBox, options);
+            mCurrentLock = static_cast<HardwarePixelBuffer*>(mShadowBuffer)->lock(lockBox, options);
         }
         else
         {

@@ -46,7 +46,7 @@ namespace Ogre {
     class _OgreExport DefaultHardwareVertexBuffer : public HardwareVertexBuffer 
     {
 	protected:
-		unsigned char* mpData;
+		unsigned char* mData;
         /** See HardwareBuffer. */
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /** See HardwareBuffer. */
@@ -73,7 +73,7 @@ namespace Ogre {
     class _OgreExport DefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
 	protected:
-		unsigned char* mpData;
+		unsigned char* mData;
         /** See HardwareBuffer. */
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /** See HardwareBuffer. */

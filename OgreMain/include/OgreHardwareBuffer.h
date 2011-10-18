@@ -145,7 +145,7 @@ namespace Ogre {
 			size_t mLockSize;
 			bool mSystemMemory;
             bool mUseShadowBuffer;
-            HardwareBuffer* mpShadowBuffer;
+            HardwareBuffer* mShadowBuffer;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
     		
@@ -158,7 +158,7 @@ namespace Ogre {
 		    /// Constructor, to be called by HardwareBufferManager only
             HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer) 
 				: mUsage(usage), mIsLocked(false), mSystemMemory(systemMemory), 
-                mUseShadowBuffer(useShadowBuffer), mpShadowBuffer(NULL), mShadowUpdated(false), 
+                mUseShadowBuffer(useShadowBuffer), mShadowBuffer(NULL), mShadowUpdated(false), 
                 mSuppressHardwareUpdate(false) 
             {
                 // If use shadow buffer, upgrade to WRITE_ONLY on hardware side
@@ -198,7 +198,7 @@ namespace Ogre {
                         mShadowUpdated = true;
                     }
 
-                    ret = mpShadowBuffer->lock(offset, length, options);
+                    ret = mShadowBuffer->lock(offset, length, options);
                 }
                 else
                 {
@@ -236,9 +236,9 @@ namespace Ogre {
                 assert(isLocked() && "Cannot unlock this buffer, it is not locked!");
 
 				// If we used the shadow buffer this time...
-                if (mUseShadowBuffer && mpShadowBuffer->isLocked())
+                if (mUseShadowBuffer && mShadowBuffer->isLocked())
                 {
-                    mpShadowBuffer->unlock();
+                    mShadowBuffer->unlock();
                     // Potentially update the 'real' buffer from the shadow buffer
                     _updateFromShadow();
                 }
@@ -305,7 +305,7 @@ namespace Ogre {
                 if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
                 {
                     // Do this manually to avoid locking problems
-                    const void *srcData = mpShadowBuffer->lockImpl(
+                    const void *srcData = mShadowBuffer->lockImpl(
     					mLockStart, mLockSize, HBL_READ_ONLY);
 					// Lock with discard if the whole buffer was locked, otherwise normal
 					LockOptions lockOpt;
@@ -319,7 +319,7 @@ namespace Ogre {
 					// Copy shadow to real
                     memcpy(destData, srcData, mLockSize);
                     this->unlockImpl();
-                    mpShadowBuffer->unlockImpl();
+                    mShadowBuffer->unlockImpl();
                     mShadowUpdated = false;
                 }
             }
@@ -334,7 +334,7 @@ namespace Ogre {
 			bool hasShadowBuffer(void) const { return mUseShadowBuffer; }
             /// Returns whether or not this buffer is currently locked.
             bool isLocked(void) const { 
-                return mIsLocked || (mUseShadowBuffer && mpShadowBuffer->isLocked()); 
+                return mIsLocked || (mUseShadowBuffer && mShadowBuffer->isLocked()); 
             }
             /// Pass true to suppress hardware upload of shadow buffer changes
             void suppressHardwareUpdate(bool suppress) {

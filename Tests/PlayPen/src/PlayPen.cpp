@@ -157,7 +157,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //Animation* mAnim = 0;
 //vector<AnimationState*>::type mAnimStateList;
 //AnimationState* mAnimState = 0;
-//Overlay* mpOverlay;
+//Overlay* mOverlay;
 //Entity* pPlaneEnt;
 //Camera* testCam = 0;
 //SceneNode* camPlaneNode[6];

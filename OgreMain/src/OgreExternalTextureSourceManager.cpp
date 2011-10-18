@@ -57,7 +57,7 @@ namespace Ogre
 	//****************************************************************************************
 	ExternalTextureSourceManager::ExternalTextureSourceManager()
 	{
-		mpCurrExternalTextureSource = 0;
+		mCurrExternalTextureSource = 0;
 	}
 
 	//****************************************************************************************
@@ -76,12 +76,12 @@ namespace Ogre
 		{
 			if( i->first == sTexturePlugInType )
 			{
-				mpCurrExternalTextureSource = i->second;
-				mpCurrExternalTextureSource->initialise();	//Now call overridden Init function
+				mCurrExternalTextureSource = i->second;
+				mCurrExternalTextureSource->initialise();	//Now call overridden Init function
 				return;
 			}
 		}
-		mpCurrExternalTextureSource = 0;
+		mCurrExternalTextureSource = 0;
 		LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ");
 	}
 

@@ -110,20 +110,20 @@ namespace Ogre {
 		{
 		public:
 			/** Attribute storage ctor. */
-			Attributes() : mpUserObjectsMap(NULL) {}
+			Attributes() : mUserObjectsMap(NULL) {}
 
 			/** Attribute storage dtor. */
 			~Attributes()
 			{
-				if (mpUserObjectsMap != NULL)
+				if (mUserObjectsMap != NULL)
 				{
-					OGRE_DELETE mpUserObjectsMap;
-					mpUserObjectsMap = NULL;
+					OGRE_DELETE mUserObjectsMap;
+					mUserObjectsMap = NULL;
 				}				
 			}
 
 			Any					mKeylessAny;		// Will hold key less associated user object for fast access. 	
-			UserObjectsMap*		mpUserObjectsMap;	// Will hold a map between user keys to user objects.
+			UserObjectsMap*		mUserObjectsMap;	// Will hold a map between user keys to user objects.
 		};
 
 	// Attributes.

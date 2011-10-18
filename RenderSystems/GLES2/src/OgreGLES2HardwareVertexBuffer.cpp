@@ -193,9 +193,9 @@ namespace Ogre {
     {
         if (mUseShadowBuffer)
         {
-            void* srcData = mpShadowBuffer->lock(offset, length, HBL_READ_ONLY);
+            void* srcData = mShadowBuffer->lock(offset, length, HBL_READ_ONLY);
             memcpy(pDest, srcData, length);
-            mpShadowBuffer->unlock();
+            mShadowBuffer->unlock();
         }
         else
         {
@@ -215,10 +215,10 @@ namespace Ogre {
         // Update the shadow buffer
         if(mUseShadowBuffer)
         {
-            void* destData = mpShadowBuffer->lock(offset, length,
+            void* destData = mShadowBuffer->lock(offset, length,
                                                   discardWholeBuffer ? HBL_DISCARD : HBL_NORMAL);
             memcpy(destData, pSource, length);
-            mpShadowBuffer->unlock();
+            mShadowBuffer->unlock();
         }
 
         if (offset == 0 && length == mSizeInBytes)
@@ -245,7 +245,7 @@ namespace Ogre {
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
-            const void *srcData = mpShadowBuffer->lock(mLockStart,
+            const void *srcData = mShadowBuffer->lock(mLockStart,
                                                        mLockSize,
                                                        HBL_READ_ONLY);
 
@@ -265,7 +265,7 @@ namespace Ogre {
                 GL_CHECK_ERROR;
             }
 
-            mpShadowBuffer->unlock();
+            mShadowBuffer->unlock();
             mShadowUpdated = false;
         }
     }

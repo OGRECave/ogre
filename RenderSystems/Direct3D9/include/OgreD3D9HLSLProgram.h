@@ -124,7 +124,7 @@ namespace Ogre {
         String mPreprocessorDefines;
         bool mColumnMajorMatrices;
 
-        LPD3DXBUFFER mpMicroCode;
+        LPD3DXBUFFER mMicroCode;
 
 		GpuConstantDefinitionMap mParametersMap;
 		size_t mParametersMapSizeAsBuffer;

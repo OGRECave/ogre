@@ -44,17 +44,17 @@ namespace Ogre {
 
 
 		/// D3D11 pointer
-		//LPDIRECT3D11				*mpD3D;
+		//LPDIRECT3D11				*mD3D;
 		// 1D texture pointer
-		ID3D11Texture1D *mp1DTex;
+		ID3D11Texture1D *m1DTex;
 		// 2D texture pointer
-		ID3D11Texture2D *mp2DTex;
+		ID3D11Texture2D *m2DTex;
 		/// cubic texture pointer
-		ID3D11Texture3D	*mp3DTex;	
+		ID3D11Texture3D	*m3DTex;	
 		/// actual texture pointer
-		ID3D11Resource 	*mpTex;		
+		ID3D11Resource 	*mTex;		
 
-		ID3D11ShaderResourceView* mpShaderResourceView;
+		ID3D11ShaderResourceView* mShaderResourceView;
 
 		// is dynamic
 		bool mIsDynamic; 
@@ -144,16 +144,16 @@ namespace Ogre {
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
 		ID3D11Resource *getTextureResource() 
-		{ assert(mpTex); return mpTex; }
+		{ assert(mTex); return mTex; }
 		/// retrieves a pointer to the actual texture
 		ID3D11ShaderResourceView *getTexture() 
-		{ assert(mpShaderResourceView); return mpShaderResourceView; }
+		{ assert(mShaderResourceView); return mShaderResourceView; }
 		/*/// retrieves a pointer to the normal 1D/2D texture
 		IDirect3DTexture9 *getNormTexture()
-		{ assert(mpNormTex); return mpNormTex; }
+		{ assert(mNormTex); return mNormTex; }
 		/// retrieves a pointer to the cube texture
 		IDirect3DCubeTexture9 *getCubeTexture()
-		{ assert(mpCubeTex); return mpCubeTex; }
+		{ assert(mCubeTex); return mCubeTex; }
 		*/
 
 
@@ -162,9 +162,9 @@ namespace Ogre {
 		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
 		bool recreateIfDefaultPool(D3D11Device & device);
 
-		ID3D11Texture1D * GetTex1D() {return mp1DTex;};
-		ID3D11Texture2D * GetTex2D() {return mp2DTex;};
-		ID3D11Texture3D	* GetTex3D() {return mp3DTex;};
+		ID3D11Texture1D * GetTex1D() {return m1DTex;};
+		ID3D11Texture2D * GetTex2D() {return m2DTex;};
+		ID3D11Texture3D	* GetTex3D() {return m3DTex;};
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
 

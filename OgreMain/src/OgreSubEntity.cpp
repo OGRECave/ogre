@@ -45,7 +45,7 @@ namespace Ogre {
         : Renderable(), mParentEntity(parent), mMaterialName("BaseWhite"),
 		mSubMesh(subMeshBasis), mCachedCamera(0)
     {
-        mpMaterial = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
+        mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mVisible = true;
         mSkelAnimVertexData = 0;
@@ -106,18 +106,18 @@ namespace Ogre {
 
 	void SubEntity::setMaterial( const MaterialPtr& material )
 	{
-		mpMaterial = material;
+		mMaterial = material;
 		
-        if (mpMaterial.isNull())
+        if (mMaterial.isNull())
         {
 			LogManager::getSingleton().logMessage("Can't assign material "  
                 " to SubEntity of " + mParentEntity->getName() + " because this "
                 "Material does not exist. Have you forgotten to define it in a "
                 ".material script?");
 			
-            mpMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
 			
-            if (mpMaterial.isNull())
+            if (mMaterial.isNull())
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
                     "to SubEntity of " + mParentEntity->getName() + ". Did "
@@ -126,10 +126,10 @@ namespace Ogre {
             }
         }
 		
-		mMaterialName = mpMaterial->getName();
+		mMaterialName = mMaterial->getName();
 
         // Ensure new material loaded (will not load again if already loaded)
-        mpMaterial->load();
+        mMaterial->load();
 
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
@@ -139,12 +139,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const MaterialPtr& SubEntity::getMaterial(void) const
     {
-        return mpMaterial;
+        return mMaterial;
     }
     //-----------------------------------------------------------------------
     Technique* SubEntity::getTechnique(void) const
     {
-        return mpMaterial->getBestTechnique(mMaterialLodIndex, this);
+        return mMaterial->getBestTechnique(mMaterialLodIndex, this);
     }
     //-----------------------------------------------------------------------
     void SubEntity::getRenderOperation(RenderOperation& op)

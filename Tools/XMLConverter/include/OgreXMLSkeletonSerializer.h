@@ -66,7 +66,7 @@ namespace Ogre {
         // State for export
         TiXmlDocument* mXMLDoc;
         // State for import
-        Skeleton* mpSkel;
+        Skeleton* mSkel;
 
         void writeSkeleton(const Skeleton* pSkel);
         void writeBone(TiXmlElement* bonesElement, const Bone* pBone);

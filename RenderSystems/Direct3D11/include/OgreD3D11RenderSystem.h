@@ -62,7 +62,7 @@ namespace Ogre
 
 
 		/// Direct3D
-		//int			mpD3D;
+		//int			mD3D;
 		/// Direct3D rendering device
 		D3D11Device 	mDevice;
 		
@@ -190,7 +190,7 @@ namespace Ogre
 		
 		bool mRenderSystemWasInited;
 
-		IDXGIFactory1*	mpDXGIFactory;
+		IDXGIFactory1*	mDXGIFactory;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 	public:

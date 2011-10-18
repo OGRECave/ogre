@@ -35,7 +35,7 @@ namespace Ogre {
 	: HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         // Allocate aligned memory for better SIMD processing friendly.
-        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
 	//-----------------------------------------------------------------------
 	DefaultHardwareVertexBuffer::DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
@@ -43,18 +43,18 @@ namespace Ogre {
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false) // always software, never shadowed
 	{
         // Allocate aligned memory for better SIMD processing friendly.
-        mpData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
 	}
 	//-----------------------------------------------------------------------
     DefaultHardwareVertexBuffer::~DefaultHardwareVertexBuffer()
 	{
-		OGRE_FREE_SIMD(mpData, MEMCATEGORY_GEOMETRY);
+		OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     void* DefaultHardwareVertexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
 	{
         // Only for use internally, no 'locking' as such
-		return mpData + offset;
+		return mData + offset;
 	}
 	//-----------------------------------------------------------------------
 	void DefaultHardwareVertexBuffer::unlockImpl(void)
@@ -65,7 +65,7 @@ namespace Ogre {
     void* DefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
 	{
         mIsLocked = true;
-		return mpData + offset;
+		return mData + offset;
 	}
 	//-----------------------------------------------------------------------
 	void DefaultHardwareVertexBuffer::unlock(void)
@@ -77,7 +77,7 @@ namespace Ogre {
     void DefaultHardwareVertexBuffer::readData(size_t offset, size_t length, void* pDest)
 	{
 		assert((offset + length) <= mSizeInBytes);
-		memcpy(pDest, mpData + offset, length);
+		memcpy(pDest, mData + offset, length);
 	}
 	//-----------------------------------------------------------------------
     void DefaultHardwareVertexBuffer::writeData(size_t offset, size_t length, const void* pSource,
@@ -85,7 +85,7 @@ namespace Ogre {
 	{
 		assert((offset + length) <= mSizeInBytes);
 		// ignore discard, memory is not guaranteed to be zeroised
-		memcpy(mpData + offset, pSource, length);
+		memcpy(mData + offset, pSource, length);
 
 	}
 	//-----------------------------------------------------------------------
@@ -94,18 +94,18 @@ namespace Ogre {
 		size_t numIndexes, HardwareBuffer::Usage usage) 
 		: HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
 	{
-		mpData = OGRE_ALLOC_T(unsigned char, mSizeInBytes, MEMCATEGORY_GEOMETRY);
+		mData = OGRE_ALLOC_T(unsigned char, mSizeInBytes, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     DefaultHardwareIndexBuffer::~DefaultHardwareIndexBuffer()
 	{
-		OGRE_FREE(mpData, MEMCATEGORY_GEOMETRY);
+		OGRE_FREE(mData, MEMCATEGORY_GEOMETRY);
 	}
 	//-----------------------------------------------------------------------
     void* DefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
 	{
         // Only for use internally, no 'locking' as such
-		return mpData + offset;
+		return mData + offset;
 	}
 	//-----------------------------------------------------------------------
 	void DefaultHardwareIndexBuffer::unlockImpl(void)
@@ -116,7 +116,7 @@ namespace Ogre {
     void* DefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
 	{
         mIsLocked = true;
-		return mpData + offset;
+		return mData + offset;
 	}
 	//-----------------------------------------------------------------------
 	void DefaultHardwareIndexBuffer::unlock(void)
@@ -128,7 +128,7 @@ namespace Ogre {
     void DefaultHardwareIndexBuffer::readData(size_t offset, size_t length, void* pDest)
 	{
 		assert((offset + length) <= mSizeInBytes);
-		memcpy(pDest, mpData + offset, length);
+		memcpy(pDest, mData + offset, length);
 	}
 	//-----------------------------------------------------------------------
     void DefaultHardwareIndexBuffer::writeData(size_t offset, size_t length, const void* pSource,
@@ -136,7 +136,7 @@ namespace Ogre {
 	{
 		assert((offset + length) <= mSizeInBytes);
 		// ignore discard, memory is not guaranteed to be zeroised
-		memcpy(mpData + offset, pSource, length);
+		memcpy(mData + offset, pSource, length);
 
 	}
 	//-----------------------------------------------------------------------

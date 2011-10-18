@@ -38,7 +38,7 @@ namespace Ogre {
 		bool useSystemMemory, bool useShadowBuffer, bool streamOut)
 		: HardwareBuffer(usage, useSystemMemory,  false /* TODO: useShadowBuffer*/),
 		mlpD3DBuffer(0),
-		mpTempStagingBuffer(0),
+		mTempStagingBuffer(0),
 		mUseTempStagingBuffer(false),
 		mBufferType(btype),
 		mDevice(device)
@@ -99,13 +99,13 @@ namespace Ogre {
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
 		SAFE_RELEASE(mlpD3DBuffer);
-		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
+		SAFE_DELETE(mTempStagingBuffer); // should never be nonzero unless destroyed while locked
 
 	}
    	void D3D11HardwareBuffer::reinterpretForStreamOutput(void)
 	{
 		SAFE_RELEASE(mlpD3DBuffer);
-		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
+		SAFE_DELETE(mTempStagingBuffer); // should never be nonzero unless destroyed while locked
 
 		assert(mDesc.Usage!=D3D11_USAGE_STAGING);
 
@@ -218,21 +218,21 @@ namespace Ogre {
 		else
 		{
 			mUseTempStagingBuffer = true;
-			if (!mpTempStagingBuffer)
+			if (!mTempStagingBuffer)
 			{
 				// create another buffer instance but use system memory
-				mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
+				mTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
 					mSizeInBytes, mUsage, mDevice, true, false, false);
 			}
 
 			// schedule a copy to the staging
 			if (options != HBL_DISCARD)
-				mpTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
+				mTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
 
 			// register whether we'll need to upload on unlock
 			mStagingUploadNeeded = (options != HBL_READ_ONLY);
 
-			return mpTempStagingBuffer->lock(offset, length, options);
+			return mTempStagingBuffer->lock(offset, length, options);
 
 
 		}
@@ -246,16 +246,16 @@ namespace Ogre {
 			mUseTempStagingBuffer = false;
 
 			// ok, we locked the staging buffer
-			mpTempStagingBuffer->unlock();
+			mTempStagingBuffer->unlock();
 
 			// copy data if needed
 			// this is async but driver should keep reference
 			if (mStagingUploadNeeded)
-				copyData(*mpTempStagingBuffer, 0, 0, mSizeInBytes, true);
+				copyData(*mTempStagingBuffer, 0, 0, mSizeInBytes, true);
 
 			// delete
 			// not that efficient, but we should not be locking often
-			SAFE_DELETE(mpTempStagingBuffer);
+			SAFE_DELETE(mTempStagingBuffer);
 		}
 		else
 		{

@@ -80,7 +80,7 @@ namespace Ogre {
         String mMaterialName;
 
         /// Cached pointer to material.
-        MaterialPtr mpMaterial;
+        MaterialPtr mMaterial;
 
         // Pointer to the SubMesh defining geometry.
         SubMesh* mSubMesh;

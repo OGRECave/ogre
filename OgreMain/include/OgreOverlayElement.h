@@ -132,7 +132,7 @@ namespace Ogre {
         Real mWidth;
         Real mHeight;
         String mMaterialName;
-        MaterialPtr mpMaterial;
+        MaterialPtr mMaterial;
         DisplayString mCaption;
         ColourValue mColour;
         Rectangle mClippingRegion;

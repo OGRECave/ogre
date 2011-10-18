@@ -52,7 +52,7 @@ namespace Ogre
 	{
 	private:
 		/// Direct3D
-		IDirect3D9*	 mpD3D;		
+		IDirect3D9*	 mD3D;		
 		// Stored options
 		ConfigOptionMap mOptions;
 		size_t mFSAASamples;

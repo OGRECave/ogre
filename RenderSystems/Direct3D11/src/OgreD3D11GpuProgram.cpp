@@ -70,7 +70,7 @@ namespace Ogre {
 		const String& name, ResourceHandle handle, const String& group, 
 		bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
 		: D3D11GpuProgram(creator, name, handle, group, isManual, loader, device)
-		, mpVertexShader(NULL)
+		, mVertexShader(NULL)
 	{
 		mType = GPT_VERTEX_PROGRAM;
 	}
@@ -91,7 +91,7 @@ namespace Ogre {
 				static_cast<DWORD*>(microcode->GetBufferPointer()), 
 				microcode->GetBufferSize(),
 				NULL,
-				&mpVertexShader);
+				&mVertexShader);
 
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -111,19 +111,19 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D11GpuVertexProgram::unloadImpl(void)
 	{
-		SAFE_RELEASE(mpVertexShader);
+		SAFE_RELEASE(mVertexShader);
 	}
 	//-----------------------------------------------------------------------------
 	ID3D11VertexShader * D3D11GpuVertexProgram::getVertexShader( void ) const
 	{
-		return mpVertexShader;
+		return mVertexShader;
 	}
 	//-----------------------------------------------------------------------------
 	D3D11GpuFragmentProgram::D3D11GpuFragmentProgram(ResourceManager* creator, 
 		const String& name, ResourceHandle handle, const String& group, 
 		bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
 		: D3D11GpuProgram(creator, name, handle, group, isManual, loader, device)
-		, mpPixelShader(NULL)
+		, mPixelShader(NULL)
 	{
 		mType = GPT_FRAGMENT_PROGRAM;
 	}
@@ -144,7 +144,7 @@ namespace Ogre {
 				static_cast<DWORD*>(microcode->GetBufferPointer()), 
 				microcode->GetBufferSize(),
 				NULL,
-				&mpPixelShader);
+				&mPixelShader);
 
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -163,12 +163,12 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D11GpuFragmentProgram::unloadImpl(void)
 	{
-		SAFE_RELEASE(mpPixelShader);
+		SAFE_RELEASE(mPixelShader);
 	}
 	//-----------------------------------------------------------------------------
 	ID3D11PixelShader * D3D11GpuFragmentProgram::getPixelShader( void ) const
 	{
-		return mpPixelShader;
+		return mPixelShader;
 	}
 	//-----------------------------------------------------------------------------
 

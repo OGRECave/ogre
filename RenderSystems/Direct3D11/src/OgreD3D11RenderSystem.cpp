@@ -99,7 +99,7 @@ namespace Ogre
             mHLSLProgramFactory = 0;
         }
 
-		//SAFE_RELEASE( mpD3D );
+		//SAFE_RELEASE( mD3D );
 
 		LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " destroyed." );
 	}
@@ -113,7 +113,7 @@ namespace Ogre
 	D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers()
 	{
 		if( !mDriverList )
-			mDriverList = new D3D11DriverList( mpDXGIFactory );
+			mDriverList = new D3D11DriverList( mDXGIFactory );
 
 		return mDriverList;
 	}
@@ -563,7 +563,7 @@ namespace Ogre
 			if ( mUseNVPerfHUD )
 			{
 				// Search for a PerfHUD adapter
-				while( mpDXGIFactory->EnumAdapters1( nAdapter, &pAdapter ) != DXGI_ERROR_NOT_FOUND )
+				while( mDXGIFactory->EnumAdapters1( nAdapter, &pAdapter ) != DXGI_ERROR_NOT_FOUND )
 				{
 					if ( pAdapter )
 					{
@@ -640,7 +640,7 @@ namespace Ogre
 				// D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
 				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
 				// the device - else CreateSwapChain fails later.
-				SAFE_RELEASE(mpDXGIFactory);
+				SAFE_RELEASE(mDXGIFactory);
 
 				IDXGIDevice1 * pDXGIDevice;
 				device->QueryInterface(__uuidof(IDXGIDevice1), (void **)&pDXGIDevice);
@@ -648,7 +648,7 @@ namespace Ogre
 				IDXGIAdapter1 * pDXGIAdapter;
 				pDXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void **)&pDXGIAdapter);
 
-				pDXGIAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)&mpDXGIFactory);
+				pDXGIAdapter->GetParent(__uuidof(IDXGIFactory1), (void **)&mDXGIFactory);
 
 				SAFE_RELEASE(pDXGIAdapter);
 				SAFE_RELEASE(pDXGIDevice);
@@ -784,7 +784,7 @@ namespace Ogre
 		mPrimaryWindow = NULL; // primary window deleted by base class.
 		freeDevice();
 		SAFE_DELETE( mDriverList );
-		SAFE_RELEASE( mpDXGIFactory );
+		SAFE_RELEASE( mDXGIFactory );
 		mActiveD3DDriver = NULL;
 		mDevice = NULL;
 		mBasicStatesInitialised = false;
@@ -845,7 +845,7 @@ namespace Ogre
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, msg, "D3D11RenderSystem::_createRenderWindow" );
 		}
 
-		RenderWindow* win = new D3D11RenderWindow(mhInstance, mDevice, mpDXGIFactory);
+		RenderWindow* win = new D3D11RenderWindow(mhInstance, mDevice, mDXGIFactory);
 
 		win->create( name, width, height, fullScreen, miscParams);
 
@@ -2783,9 +2783,9 @@ namespace Ogre
 
         mRenderSystemWasInited = true;
 		// set pointers to NULL
-		mpDXGIFactory = NULL;
+		mDXGIFactory = NULL;
 		HRESULT hr;
-		hr = CreateDXGIFactory1( __uuidof(IDXGIFactory1), (void**)&mpDXGIFactory );
+		hr = CreateDXGIFactory1( __uuidof(IDXGIFactory1), (void**)&mDXGIFactory );
 		if( FAILED(hr) )
 		{
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 

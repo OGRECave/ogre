@@ -54,7 +54,7 @@ namespace Ogre {
         // Create a shadow buffer if required
         if (mUseShadowBuffer)
         {
-            mpShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mMgr, mVertexSize, 
+            mShadowBuffer = OGRE_NEW DefaultHardwareVertexBuffer(mMgr, mVertexSize, 
                     mNumVertices, HardwareBuffer::HBU_DYNAMIC);
         }
 
@@ -66,9 +66,9 @@ namespace Ogre {
 		{
 			mMgr->_notifyVertexBufferDestroyed(this);
 		}
-        if (mpShadowBuffer)
+        if (mShadowBuffer)
         {
-            OGRE_DELETE mpShadowBuffer;
+            OGRE_DELETE mShadowBuffer;
         }
     }
     //-----------------------------------------------------------------------------

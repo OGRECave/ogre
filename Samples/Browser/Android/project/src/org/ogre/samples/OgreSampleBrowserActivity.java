@@ -36,9 +36,9 @@ public class OgreSampleBrowserActivity extends NvGLES2Activity {
 		// Set up asset manager
 		ACPManager.getInstance().setAssets(getAssets(), "packs/");
 		
-		addResourceLocation("SdkTrays.mp3", "Essential");
-		addResourceLocation("thumbnails.mp3", "Essential");
-		addResourceLocation("RTShaderLib.mp3", "Popular");
+		addResourceLocation("SdkTrays.m3", "Essential");
+		addResourceLocation("thumbnails.m3", "Essential");
+		addResourceLocation("RTShaderLib.m3", "Popular");
 			
 		// Call parent
 		super.onCreate(savedInstanceState);

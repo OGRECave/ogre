@@ -53,8 +53,8 @@ THE SOFTWARE.
 // Horrible hack to align the stack to a 16-bytes boundary for gcc.
 //
 // We assume a gcc version >= 2.95 so that
-// -mpreferred-stack-boundary works.  Otherwise, all bets are
-// off.  However, -mpreferred-stack-boundary does not create a
+// -mreferred-stack-boundary works.  Otherwise, all bets are
+// off.  However, -mreferred-stack-boundary does not create a
 // stack alignment, but it only preserves it.  Unfortunately,
 // since Ogre are designed as a flexibility library, user might
 // compile their application with wrong stack alignment, even

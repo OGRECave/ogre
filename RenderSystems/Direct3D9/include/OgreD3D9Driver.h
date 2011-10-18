@@ -74,7 +74,7 @@ namespace Ogre
 		D3DDISPLAYMODE			mDesktopDisplayMode;
 
 		// Video modes list.
-		D3D9VideoModeList*		mpVideoModeList;	
+		D3D9VideoModeList*		mVideoModeList;	
 	};
 }
 #endif

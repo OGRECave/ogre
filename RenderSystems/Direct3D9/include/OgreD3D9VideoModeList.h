@@ -37,7 +37,7 @@ namespace Ogre
 	class _OgreD3D9Export D3D9VideoModeList : public RenderSysAlloc
 	{
 	private:
-		D3D9Driver* mpDriver;
+		D3D9Driver* mDriver;
 		vector<D3D9VideoMode>::type mModeList;
 
 	public:

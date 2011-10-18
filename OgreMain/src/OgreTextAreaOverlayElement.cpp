@@ -154,7 +154,7 @@ namespace Ogre {
     {
 		float *pVert;
 
-		if (mpFont.isNull())
+		if (mFont.isNull())
 		{
 			// not initialised yet, probably due to the order of creation in a template
 			return;
@@ -177,7 +177,7 @@ namespace Ogre {
 		// Derive space with from a number 0
 		if (mSpaceWidth == 0)
 		{
-			mSpaceWidth = mpFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight * 2.0f * mViewportAspectCoef;
+			mSpaceWidth = mFont->getGlyphAspectRatio(UNICODE_ZERO) * mCharHeight * 2.0f * mViewportAspectCoef;
 		}
 
 		// Use iterator
@@ -204,7 +204,7 @@ namespace Ogre {
 					}
 					else 
 					{
-						len += mpFont->getGlyphAspectRatio(character) * mCharHeight * 2.0f * mViewportAspectCoef;
+						len += mFont->getGlyphAspectRatio(character) * mCharHeight * 2.0f * mViewportAspectCoef;
 					}
 				}
 
@@ -251,8 +251,8 @@ namespace Ogre {
 				continue;
 			}
 
-			Real horiz_height = mpFont->getGlyphAspectRatio(character) * mViewportAspectCoef ;
-			const Font::UVRect& uvRect = mpFont->getGlyphTexCoords(character);
+			Real horiz_height = mFont->getGlyphAspectRatio(character) * mViewportAspectCoef ;
+			const Font::UVRect& uvRect = mFont->getGlyphTexCoords(character);
 
 			// each vert is (x, y, z, u, v)
 			//-------------------------------------------------------------------------------------
@@ -355,8 +355,8 @@ namespace Ogre {
 
     void TextAreaOverlayElement::setFontName( const String& font )
     {
-        mpFont = FontManager::getSingleton().getByName( font );
-        if (mpFont.isNull())
+        mFont = FontManager::getSingleton().getByName( font );
+        if (mFont.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find font " + font,
 				"TextAreaOverlayElement::setFontName" );
 		
@@ -365,7 +365,7 @@ namespace Ogre {
     }
     const String& TextAreaOverlayElement::getFontName() const
     {
-        return mpFont->getName();
+        return mFont->getName();
     }
 
     void TextAreaOverlayElement::setCharHeight( Real height )
@@ -432,15 +432,15 @@ namespace Ogre {
     {
 		// On-demand load
 		// Moved from setFontName to avoid issues with background parsing of scripts
-		if (mpMaterial.isNull() && !mpFont.isNull())
+		if (mMaterial.isNull() && !mFont.isNull())
 		{
-			mpFont->load();
+			mFont->load();
 			// Ugly hack, but we need to override for lazy-load
-			*const_cast<MaterialPtr*>(&mpMaterial) = mpFont->getMaterial();
-			mpMaterial->setDepthCheckEnabled(false);
-			mpMaterial->setLightingEnabled(false);
+			*const_cast<MaterialPtr*>(&mMaterial) = mFont->getMaterial();
+			mMaterial->setDepthCheckEnabled(false);
+			mMaterial->setLightingEnabled(false);
 		}
-        return mpMaterial;
+        return mMaterial;
     }
     //---------------------------------------------------------------------
     void TextAreaOverlayElement::getRenderOperation(RenderOperation& op)

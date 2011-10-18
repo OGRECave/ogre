@@ -58,14 +58,14 @@ namespace Ogre
 		DataStreamPtr mCompressedStream;
 		DataStreamPtr mTmpWriteStream;
 		String mTempFileName;
-		z_stream* mpZStream;
+		z_stream* mZStream;
 		size_t mCurrentPos;
 		
 		// Cache for read data in case skipping around
 		StaticCache<16 * OGRE_STREAM_TEMP_SIZE> mReadCache;
 		
 		// Intermediate buffer for read / write
-		unsigned char *mpTmp;
+		unsigned char *mTmp;
 		
 		// Whether the underlying stream is valid compressed data
 		bool mIsCompressedValid;

@@ -45,7 +45,7 @@ namespace Ogre {
 		: mDevice(device)
         ,  mFrontBufferIndex(-1)
         , mBufManager(bufManager)
-        , mpGeometryShader(0)
+        , mGeometryShader(0)
 	{
 		mVertexBuffers[0].setNull();
 		mVertexBuffers[1].setNull();
