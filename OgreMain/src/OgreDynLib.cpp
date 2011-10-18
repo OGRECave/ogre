@@ -69,7 +69,7 @@ namespace Ogre {
 		String name = mName;
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
         // dlopen() does not add .so to the filename, like windows does for .dll
-        if (name.substr(name.length() - 3, 3) != ".so")
+	if (name.find(".so") == String::npos)
            name += ".so";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // dlopen() does not add .dylib to the filename, like windows does for .dll
