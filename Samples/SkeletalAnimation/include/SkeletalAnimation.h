@@ -154,7 +154,10 @@ protected:
 
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-			ent->setMaterialName("jaiquaDualQuatTest");
+			if (mShaderGenerator->getTargetLanguage() != "glsles")
+                ent->setMaterialName("jaiquaDualQuatTest");
+            else
+                ent->setMaterialName("jaiqua");
 			sn->attachObject(ent);
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
