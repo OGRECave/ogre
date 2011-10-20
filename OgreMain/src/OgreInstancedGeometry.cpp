@@ -1745,6 +1745,9 @@ namespace Ogre {
 		mRenderOp.vertexData = OGRE_NEW VertexData();
 		mRenderOp.vertexData->vertexCount = 0;
 
+        // VertexData constructor creates vertexDeclaration; must release to avoid 
+        // memory leak
+        HardwareBufferManager::getSingleton().destroyVertexDeclaration(mRenderOp.vertexData->vertexDeclaration);
 		mRenderOp.vertexData->vertexDeclaration = vData->vertexDeclaration->clone();
 		mIndexType = iData->indexBuffer->getType();
 		// Derive the max vertices
