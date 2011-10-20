@@ -6537,6 +6537,12 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 	return itor->second;
 }
 //---------------------------------------------------------------------
+bool SceneManager::hasInstanceManager( const String &managerName ) const
+{
+    InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+    return itor != mInstanceManagerMap.end();
+}
+//---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )
 {
 	//The manager we're trying to destroy might have been scheduled for updating

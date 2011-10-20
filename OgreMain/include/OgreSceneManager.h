@@ -3162,6 +3162,9 @@ namespace Ogre {
 		*/
 		virtual InstanceManager* getInstanceManager( const String &managerName ) const;
 
+    /** Returns whether an InstanceManager with the given name exists. */
+    virtual bool hasInstanceManager( const String &managerName ) const;
+
 		/** Destroys an InstanceManager <b>if</b> it was created with createInstanceManager()
 		@remarks
 			Be sure you don't have any InstancedEntity referenced somewhere which was created with
