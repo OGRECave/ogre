@@ -168,7 +168,7 @@
 	poseindex	CDATA	#REQUIRED
 	influence	CDATA	"1.0">
 <!-- Optional extremity points on submeshes for sub-object transparency sorting -->
-<!ELEMENT extremes (submesh+)>
+<!ELEMENT extremes (submesh_extremes+)>
 <!ELEMENT submesh_extremes (position+)>
 <!ATTLIST submesh_extremes
 	index	CDATA	#REQUIRED>
