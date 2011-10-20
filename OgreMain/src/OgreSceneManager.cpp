@@ -547,11 +547,22 @@ Entity* SceneManager::createEntity(
 
 }
 //---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const String& entityName, const MeshPtr& pMesh)
+{
+    return createEntity(entityName, pMesh->getName(), pMesh->getGroup());
+}
+//---------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& meshName)
 {
 	String name = mMovableNameGenerator.generate();
 	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
 	return createEntity(name, meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+}
+//---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const MeshPtr& pMesh)
+{
+    String name = mMovableNameGenerator.generate();
+    return createEntity(name, pMesh);
 }
 //-----------------------------------------------------------------------
 Entity* SceneManager::getEntity(const String& name) const
