@@ -194,7 +194,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		PATTERN "xpressive" EXCLUDE
 	  )
 	  # License
-	  install(FILES "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt" DESTINATION "boost_${Boost_LIB_VERSION}")
+	  install(FILES "${Boost_INCLUDE_DIR}/../LICENSE_1_0.txt" DESTINATION "boost_${Boost_LIB_VERSION}")
 	  # libraries
 	  if (Boost_THREAD_FOUND)
 	    install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
