@@ -686,6 +686,11 @@ namespace Ogre {
 		return mAnimationState->getAnimationState(name);
     }
     //-----------------------------------------------------------------------
+    bool Entity::hasAnimationState(const String& name) const
+    {
+        return mAnimationState && mAnimationState->hasAnimationState(name);
+    }
+    //-----------------------------------------------------------------------
     AnimationStateSet* Entity::getAllAnimationStates(void) const
     {
         return mAnimationState;
