@@ -567,7 +567,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLESRenderBuffer *stencilBuffer = depthBuffer;
-			if( stencilBuffer != GL_NONE )
+			if( stencilBuffer )
 			{
 				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
