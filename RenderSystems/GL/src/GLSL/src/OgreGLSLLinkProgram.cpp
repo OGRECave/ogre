@@ -468,7 +468,8 @@ namespace Ogre {
 				// The latter is recommended in GLSL 1.3 onwards 
 				// be slightly flexible about formatting
 				String::size_type pos = vpSource.find(a.name);
-				if (pos != String::npos)
+                bool foundAttr = false;
+				while (pos != String::npos && !foundAttr)
 				{
 					String::size_type startpos = vpSource.find("attribute", pos < 20 ? 0 : pos-20);
 					if (startpos == String::npos)
@@ -479,9 +480,13 @@ namespace Ogre {
 						String expr = vpSource.substr(startpos, pos + a.name.length() - startpos);
 						StringVector vec = StringUtil::split(expr);
 						if ((vec[0] == "in" || vec[0] == "attribute") && vec[2] == a.name)
+                        {
 							glBindAttribLocationARB(mGLHandle, a.attrib, a.name.c_str());
+                            foundAttr = true;
+                        }
 					}
-
+                    // Find the position of the next occurance if needed
+                    pos = vpSource.find(a.name, pos + a.name.length());
 				}
 			}
 		}
