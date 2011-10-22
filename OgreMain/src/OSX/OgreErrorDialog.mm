@@ -45,8 +45,8 @@ void ErrorDialog::display(const String& errorMessage, String logName)
 
     [alert setMessageText:@"An error has occurred!"];
     [alert setAlertStyle:NSCriticalAlertStyle];
-    [alert setInformativeText:[[NSString alloc] initWithCString:errorMessage.c_str()
-                                                       encoding:NSASCIIStringEncoding]];
+    [alert setInformativeText:[NSString stringWithCString:errorMessage.c_str()
+                                                 encoding:NSASCIIStringEncoding]];
     [alert runModal];
     [alert release];
     [pool release];

@@ -123,7 +123,7 @@ namespace Ogre {
 
         NSArray *objects = [[NSArray alloc] initWithObjects:fullScreenOptions, fsaaOptions,
                             colourDepthOptions, rttOptions, videoModeOptions, sRGBOptions, macAPIOptions, nil];
-        [mWindowDelegate setOptions:[[NSDictionary alloc] initWithObjects:objects forKeys:keys]];
+        [mWindowDelegate setOptions:[NSDictionary dictionaryWithObjects:objects forKeys:keys]];
 
         // Clean up all those arrays
         [fullScreenOptions release];
