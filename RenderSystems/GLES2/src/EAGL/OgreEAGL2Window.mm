@@ -300,7 +300,6 @@ namespace Ogre {
     void EAGL2Window::create(const String& name, uint width, uint height,
                                 bool fullScreen, const NameValuePairList *miscParams)
     {
-        String orientation = "Landscape Right";
         short frequency = 0;
         bool vsync = false;
 		int left = 0;
@@ -350,11 +349,6 @@ namespace Ogre {
             if ((opt = miscParams->find("title")) != end)
             {
                 mName = opt->second;
-            }
-
-            if ((opt = miscParams->find("orientation")) != end)
-            {
-                orientation = opt->second;
             }
 
             if ((opt = miscParams->find("externalWindowHandle")) != end)

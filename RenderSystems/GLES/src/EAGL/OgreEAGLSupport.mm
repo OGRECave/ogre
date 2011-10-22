@@ -48,7 +48,6 @@ namespace Ogre {
     void EAGLSupport::addConfig(void)
     {
         ConfigOption optFullScreen;
-        ConfigOption optOrientation;
         ConfigOption optVideoMode;
         ConfigOption optDisplayFrequency;
         ConfigOption optContentScalingFactor;
@@ -72,13 +71,6 @@ namespace Ogre {
                                     StringConverter::toString(screenSize.height);
         optVideoMode.immutable = false;
 
-        optOrientation.name = "Orientation";
-        optOrientation.possibleValues.push_back("Landscape Left");
-        optOrientation.possibleValues.push_back("Landscape Right");
-        optOrientation.possibleValues.push_back("Portrait");
-        optOrientation.currentValue = "Landscape Right";
-        optOrientation.immutable = false;
-        
         optDisplayFrequency.name = "Display Frequency";
         optDisplayFrequency.possibleValues.push_back("0 Hz");
         optDisplayFrequency.currentValue = "0 Hz";
@@ -111,7 +103,6 @@ namespace Ogre {
         mOptions[optContentScalingFactor.name] = optContentScalingFactor;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optRTTMode.name] = optRTTMode;
-        mOptions[optOrientation.name] = optOrientation;
     }
 
     String EAGLSupport::validateConfig(void)
@@ -238,11 +229,6 @@ namespace Ogre {
             if ((opt = mOptions.find("Display Frequency")) != end)
             {
                 miscParams["displayFrequency"] = opt->second.currentValue;
-            }
-
-            if ((opt = mOptions.find("Orientation")) != end)
-            {
-                miscParams["orientation"] = opt->second.currentValue;
             }
 
             if ((opt = mOptions.find("Content Scaling Factor")) != end)
