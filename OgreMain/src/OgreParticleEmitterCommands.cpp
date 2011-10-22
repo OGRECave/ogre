@@ -86,6 +86,16 @@ namespace Ogre {
             static_cast<ParticleEmitter*>(target)->setDirection(StringConverter::parseVector3(val));
         }
         //-----------------------------------------------------------------------
+        String CmdUp::doGet(const void* target) const
+        {
+            return StringConverter::toString(
+                static_cast<const ParticleEmitter*>(target)->getUp() );
+        }
+        void CmdUp::doSet(void* target, const String& val)
+        {
+            static_cast<ParticleEmitter*>(target)->setUp(StringConverter::parseVector3(val));
+        }
+        //-----------------------------------------------------------------------
         String CmdEmissionRate::doGet(const void* target) const
         {
             return StringConverter::toString(
