@@ -4983,7 +4983,7 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 
     if (isShadowTechniqueTextureBased())
     {
-		Pass* retPass;
+		Pass* retPass = NULL;
 		if (!pass->getParent()->getShadowReceiverMaterial().isNull())
 		{
 			return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0); 
@@ -5150,7 +5150,11 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 
 		// handle the case where there is no fixed pipeline support
 		retPass->getParent()->getParent()->compile();
-		retPass = retPass->getParent()->getParent()->getBestTechnique()->getPass(0);
+        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
+        if( btech )
+        {
+		    retPass = btech->getPass(0);
+        }
 
 		return retPass;
 	}

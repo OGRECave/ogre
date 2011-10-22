@@ -3088,6 +3088,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgram(GpuProgram* prg)
 	{
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Null program bound.",
+				"GLRenderSystem::bindGpuProgram");
+		}
+
 		GLGpuProgram* glprg = static_cast<GLGpuProgram*>(prg);
 
 		// Unbind previous gpu program first.

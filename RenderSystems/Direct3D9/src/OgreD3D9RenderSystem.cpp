@@ -3453,6 +3453,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::bindGpuProgram(GpuProgram* prg)
 	{
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Null program bound.",
+				"D3D9RenderSystem::bindGpuProgram");
+		}
+
 		HRESULT hr;
 		switch (prg->getType())
 		{

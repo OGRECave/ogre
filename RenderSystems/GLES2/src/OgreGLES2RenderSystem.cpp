@@ -1983,6 +1983,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void GLES2RenderSystem::bindGpuProgram(GpuProgram* prg)
     {
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                        "Null program bound.",
+                        "GLES2RenderSystem::bindGpuProgram");
+		}
+        
 		GLES2GpuProgram* glprg = static_cast<GLES2GpuProgram*>(prg);
         
 		// Unbind previous gpu program first.
