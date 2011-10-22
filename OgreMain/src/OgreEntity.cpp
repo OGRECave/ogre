@@ -583,7 +583,19 @@ namespace Ogre {
         {
             if((*i)->isVisible())
             {
-				if (mRenderQueuePrioritySet)
+                // Order: first use subentity queue settings, if available
+                //        if not then use entity queue settings, if available
+                //        finally fall back on default queue settings
+                if((*i)->isRenderQueuePrioritySet())
+                {
+					assert((*i)->isRenderQueueGroupSet() == true);
+                    queue->addRenderable(*i, (*i)->getRenderQueueGroup(), (*i)->getRenderQueuePriority());
+                }
+                else if((*i)->isRenderQueueGroupSet())
+                {
+                    queue->addRenderable(*i, (*i)->getRenderQueueGroup());
+                }
+				else if (mRenderQueuePrioritySet)
 				{
 					assert(mRenderQueueIDSet == true);
 					queue->addRenderable(*i, mRenderQueueID, mRenderQueuePriority);
@@ -591,7 +603,7 @@ namespace Ogre {
                 else if(mRenderQueueIDSet)
                 {
                     queue->addRenderable(*i, mRenderQueueID);
-                }
+				}
                 else
                 {
                     queue->addRenderable(*i);

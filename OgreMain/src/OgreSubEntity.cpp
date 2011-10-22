@@ -48,6 +48,8 @@ namespace Ogre {
         mMaterial = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
         mVisible = true;
+        mRenderQueueIDSet = false;
+        mRenderQueuePrioritySet = false;
         mSkelAnimVertexData = 0;
 		mSoftwareVertexAnimVertexData = 0;
 		mHardwareVertexAnimVertexData = 0;
@@ -449,5 +451,38 @@ namespace Ogre {
 		}
 
 	}
+
+    void SubEntity::setRenderQueueGroup(uint8 queueID)
+    {
+        mRenderQueueIDSet = true;
+        mRenderQueueID = queueID;
+    }
+
+    void SubEntity::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    {
+        setRenderQueueGroup(queueID);
+        mRenderQueuePrioritySet = true;
+        mRenderQueuePriority = priority;
+    }
+
+    uint8 SubEntity::getRenderQueueGroup(void) const
+    {
+        return mRenderQueueID;
+    }
+
+    ushort SubEntity::getRenderQueuePriority(void) const
+    {
+        return mRenderQueuePriority;
+    }
+
+    bool SubEntity::isRenderQueueGroupSet(void) const
+    {
+        return mRenderQueueIDSet;
+    }
+
+    bool SubEntity::isRenderQueuePrioritySet(void) const
+    {
+        return mRenderQueuePrioritySet;
+    }
 
 }
