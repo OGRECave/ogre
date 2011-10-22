@@ -891,9 +891,12 @@ namespace Ogre {
 			for (i = 0; i < nTriangles; ++i)
 			{
 				Triangle *t = &triangles[destlist[i]];
-				source[j++] = (uint16)t->a;
-				source[j++] = (uint16)t->b;
-				source[j++] = (uint16)t->c;
+                if(source)
+                {
+                    source[j++] = (uint16)t->a;
+                    source[j++] = (uint16)t->b;
+                    source[j++] = (uint16)t->c;
+                }
 			}
 			OGRE_FREE(triangles, MEMCATEGORY_GEOMETRY);
 		}
