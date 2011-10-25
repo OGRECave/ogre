@@ -83,7 +83,7 @@ namespace Ogre {
                 PP_GRAPHICS3DATTRIB_NONE
             };
 
-            mContext = pp::Graphics3D(mInstance, pp::Graphics3D(), attribs);
+            mContext = pp::Graphics3D(*mInstance, pp::Graphics3D(), attribs);
             if (mContext.is_null()) 
             {
                 glSetCurrentContextPPAPI(0);

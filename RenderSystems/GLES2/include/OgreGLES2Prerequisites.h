@@ -69,7 +69,7 @@ THE SOFTWARE.
 #	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #		include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
-#       include "ppapi/c/ppb_opengles2.h"
+#       include "ppapi/c/ppp_graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d_client.h"
 #		include "ppapi/gles2/gl2ext_ppapi.h"
