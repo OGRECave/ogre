@@ -439,6 +439,13 @@ namespace Ogre {
         
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
+        if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
+        {
+            GL_CHECK_ERROR
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Failed to swap buffers in ",
+                        __FUNCTION__);
+        }
     }
 
     void EAGLWindow::getCustomAttribute( const String& name, void* pData )
