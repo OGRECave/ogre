@@ -62,8 +62,8 @@ String HardwareSkinning::Type = "SGX_HardwareSkinning";
 /*                                                                      */
 /************************************************************************/
 HardwareSkinning::HardwareSkinning() :
-	mSkinningType(ST_LINEAR),
-	mCreator(NULL)
+	mCreator(NULL),
+	mSkinningType(ST_LINEAR)
 {
 }
 
