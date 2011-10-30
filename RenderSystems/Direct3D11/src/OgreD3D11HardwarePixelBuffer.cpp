@@ -716,6 +716,7 @@ namespace Ogre {
 
 		//Release the staging texture
 		mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
+        pStagingTexture->Release();
 	}
 
 	//-----------------------------------------------------------------------------  
