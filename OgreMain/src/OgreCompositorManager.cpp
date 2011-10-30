@@ -38,14 +38,14 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-template<> CompositorManager* Singleton<CompositorManager>::ms_Singleton = 0;
+template<> CompositorManager* Singleton<CompositorManager>::msSingleton = 0;
 CompositorManager* CompositorManager::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 CompositorManager& CompositorManager::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }//-----------------------------------------------------------------------
 CompositorManager::CompositorManager():
 	mRectangle(0)

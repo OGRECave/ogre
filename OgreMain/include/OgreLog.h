@@ -101,7 +101,7 @@ namespace Ogre {
 	class _OgreExport Log : public LogAlloc
     {
     protected:
-        std::ofstream	mfpLog;
+        std::ofstream	mLog;
         LoggingLevel	mLogLevel;
         bool			mDebugOut;
         bool			mSuppressFile;

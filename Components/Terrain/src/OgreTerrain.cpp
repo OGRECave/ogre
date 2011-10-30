@@ -79,14 +79,14 @@ namespace Ogre
 	// This MUST match the bitwise OR of all the types above with no extra bits!
 	const uint8 Terrain::DERIVED_DATA_ALL = 7;
 	//-----------------------------------------------------------------------
-	template<> TerrainGlobalOptions* Singleton<TerrainGlobalOptions>::ms_Singleton = 0;
+	template<> TerrainGlobalOptions* Singleton<TerrainGlobalOptions>::msSingleton = 0;
 	TerrainGlobalOptions* TerrainGlobalOptions::getSingletonPtr(void)
 	{
-		return ms_Singleton;
+		return msSingleton;
 	}
 	TerrainGlobalOptions& TerrainGlobalOptions::getSingleton(void)
 	{  
-		assert( ms_Singleton );  return ( *ms_Singleton );  
+		assert( msSingleton );  return ( *msSingleton );  
 	}
 	//---------------------------------------------------------------------
 	TerrainGlobalOptions::TerrainGlobalOptions()

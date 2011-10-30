@@ -35,7 +35,19 @@ THE SOFTWARE.
 namespace Ogre {
     #define POSITION_BINDING 0
 
-	WireBoundingBox::WireBoundingBox() 
+	WireBoundingBox::WireBoundingBox()
+	: SimpleRenderable()
+	{
+		_initWireBoundingBox();
+	}
+
+	WireBoundingBox::WireBoundingBox(const String& name) 
+	: SimpleRenderable(name)
+	{
+		_initWireBoundingBox();
+	}
+
+	void WireBoundingBox::_initWireBoundingBox()
     {
         mRenderOp.vertexData = OGRE_NEW VertexData();
 

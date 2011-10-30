@@ -42,14 +42,25 @@ namespace Ogre  {
 
             case PF_L8:
             case PF_L16:
-            case PF_FLOAT16_R:
-            case PF_FLOAT32_R:
                 return GL_LUMINANCE;
+#if GL_OES_texture_half_float
+            case PF_FLOAT16_RGB:
+                return GL_RGB;
+            case PF_FLOAT16_RGBA:
+                return GL_RGBA;
+#endif
 
+#if GL_EXT_texture_rg
+            case PF_FLOAT16_R:
+            case PF_R8:
+                return GL_RED_EXT;
+
+            case PF_FLOAT16_GR:
+            case PF_RG8:
+                return GL_RG_EXT;
+#endif
             case PF_BYTE_LA:
             case PF_SHORT_GR:
-            case PF_FLOAT16_GR:
-            case PF_FLOAT32_GR:
                 return GL_LUMINANCE_ALPHA;
 
             // PVRTC compressed formats
@@ -91,6 +102,9 @@ namespace Ogre  {
 #if GL_EXT_texture_compression_s3tc
                 return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
+            case PF_FLOAT32_GR:
+            case PF_FLOAT32_R:
+
             default:
                 return 0;
         }
@@ -136,18 +150,31 @@ namespace Ogre  {
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
 #endif
+            case PF_FLOAT16_R:
+            case PF_FLOAT16_GR:
+            case PF_FLOAT16_RGB:
+            case PF_FLOAT16_RGBA:
+#if GL_OES_texture_half_float
+                return GL_HALF_FLOAT_OES;
+#else
+                return 0;
+#endif
+#if GL_EXT_texture_rg
+            case PF_R8:
+            case PF_RG8:
+                return GL_UNSIGNED_BYTE;
+#endif
+            case PF_FLOAT32_R:
+            case PF_FLOAT32_GR:
+            case PF_FLOAT32_RGB:
+            case PF_FLOAT32_RGBA:
+                return GL_FLOAT;
             case PF_DXT1:
             case PF_DXT3:
             case PF_DXT5:
             case PF_R3G3B2:
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_R:
-            case PF_FLOAT32_GR:
-            case PF_FLOAT32_RGB:
-            case PF_FLOAT32_RGBA:
             case PF_SHORT_RGBA:
             case PF_SHORT_RGB:
             case PF_SHORT_GR:
@@ -199,12 +226,7 @@ namespace Ogre  {
             case PF_R3G3B2:
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
-            case PF_FLOAT16_R:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT16_GR:
             case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_R:
-            case PF_FLOAT32_GR:
             case PF_FLOAT32_RGB:
             case PF_FLOAT32_RGBA:
             case PF_SHORT_RGBA:
@@ -224,6 +246,16 @@ namespace Ogre  {
 #if GL_EXT_texture_compression_s3tc
 				if (!hwGamma)
 	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
+#if GL_EXT_texture_rg
+            case PF_FLOAT16_R:
+            case PF_FLOAT32_R:
+            case PF_R8:
+                return GL_RED_EXT;
+            case PF_FLOAT16_GR:
+            case PF_FLOAT32_GR:
+            case PF_RG8:
+                return GL_RG_EXT;
 #endif
             default:
                 return 0;
@@ -310,6 +342,13 @@ namespace Ogre  {
                 return PF_DXT3;
             case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
                 return PF_DXT5;
+#endif
+      
+#if GL_EXT_texture_rg
+            case GL_R8_EXT:
+                return PF_R8;
+            case GL_RG8_EXT:
+                return PF_RG8;
 #endif
             default:
                 //TODO: not supported

@@ -32,46 +32,32 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreGLSLESProgram.h"
 
+// Apple doesn't define this in their extension.  We'll do it just for convenience.
+// Using the value from desktop GL
+#if GL_EXT_shadow_samplers
+#define GL_SAMPLER_2D_SHADOW_EXT 0x8B62
+#endif
+
 namespace Ogre {
 
 	//-----------------------------------------------------------------------
-	template<> GLSLESLinkProgramManager* Singleton<GLSLESLinkProgramManager>::ms_Singleton = 0;
+	template<> GLSLESLinkProgramManager* Singleton<GLSLESLinkProgramManager>::msSingleton = 0;
 
 	//-----------------------------------------------------------------------
     GLSLESLinkProgramManager* GLSLESLinkProgramManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
 
 	//-----------------------------------------------------------------------
     GLSLESLinkProgramManager& GLSLESLinkProgramManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 
 	//-----------------------------------------------------------------------
-	GLSLESLinkProgramManager::GLSLESLinkProgramManager(void) : mActiveVertexGpuProgram(NULL),
-		mActiveFragmentGpuProgram(NULL), mActiveLinkProgram(NULL)
-	{
-		// Fill in the relationship between type names and enums
-		mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("vec2", GL_FLOAT_VEC2));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("vec3", GL_FLOAT_VEC3));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("vec4", GL_FLOAT_VEC4));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2D", GL_SAMPLER_2D));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCube", GL_SAMPLER_CUBE));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("int", GL_INT));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec2", GL_INT_VEC2));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec3", GL_INT_VEC3));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("ivec4", GL_INT_VEC4));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("mat2", GL_FLOAT_MAT2));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
-		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
-        
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
-        mGLSLOptimiserContext = glslopt_initialize(true);
-#endif
-	}
+	GLSLESLinkProgramManager::GLSLESLinkProgramManager(void) :
+        GLSLESProgramManagerCommon(), mActiveLinkProgram(NULL) { }
 
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgramManager::~GLSLESLinkProgramManager(void)
@@ -82,24 +68,17 @@ namespace Ogre {
 		{
 			OGRE_DELETE currentProgram->second;
 		}
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
-        if(mGLSLOptimiserContext)
-        {
-            glslopt_cleanup(mGLSLOptimiserContext);
-            mGLSLOptimiserContext = NULL;
-        }
-#endif
 	}
 
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram* GLSLESLinkProgramManager::getActiveLinkProgram(void)
 	{
-		// if there is an active link program then return it
+		// If there is an active link program then return it
 		if (mActiveLinkProgram)
 			return mActiveLinkProgram;
 
-		// no active link program so find one or make a new one
-		// is there an active key?
+		// No active link program so find one or make a new one
+		// Is there an active key?
 		uint64 activeKey = 0;
 
 		if (mActiveVertexGpuProgram)
@@ -111,12 +90,12 @@ namespace Ogre {
 			activeKey += static_cast<uint64>(mActiveFragmentGpuProgram->getProgramID());
 		}
 
-		// only return a link program object if a vertex or fragment program exist
+		// Only return a link program object if a vertex or fragment program exist
 		if (activeKey > 0)
 		{
-			// find the key in the hash map
+			// Find the key in the hash map
 			LinkProgramIterator programFound = mLinkPrograms.find(activeKey);
-			// program object not found for key so need to create it
+			// Program object not found for key so need to create it
 			if (programFound == mLinkPrograms.end())
 			{
 				mActiveLinkProgram = new GLSLESLinkProgram(mActiveVertexGpuProgram,mActiveFragmentGpuProgram);
@@ -124,16 +103,15 @@ namespace Ogre {
 			}
 			else
 			{
-				// found a link program in map container so make it active
+				// Found a link program in map container so make it active
 				mActiveLinkProgram = programFound->second;
 			}
 
 		}
-		// make the program object active
+		// Make the program object active
 		if (mActiveLinkProgram) mActiveLinkProgram->activate();
 
 		return mActiveLinkProgram;
-
 	}
 
 	//-----------------------------------------------------------------------
@@ -157,340 +135,4 @@ namespace Ogre {
 			mActiveLinkProgram = NULL;
 		}
 	}
-	//---------------------------------------------------------------------
-	void GLSLESLinkProgramManager::completeDefInfo(GLenum gltype, 
-		GpuConstantDefinition& defToUpdate)
-	{
-		// Decode uniform size and type
-		// Note GLSL ES never packs rows into float4's(from an API perspective anyway)
-		// therefore all values are tight in the buffer
-		switch (gltype)
-		{
-		case GL_FLOAT:
-			defToUpdate.constType = GCT_FLOAT1;
-			break;
-		case GL_FLOAT_VEC2:
-			defToUpdate.constType = GCT_FLOAT2;
-			break;
-		case GL_FLOAT_VEC3:
-			defToUpdate.constType = GCT_FLOAT3;
-			break;
-		case GL_FLOAT_VEC4:
-			defToUpdate.constType = GCT_FLOAT4;
-			break;
-		case GL_SAMPLER_2D:
-			defToUpdate.constType = GCT_SAMPLER2D;
-			break;
-		case GL_SAMPLER_CUBE:
-			defToUpdate.constType = GCT_SAMPLERCUBE;
-			break;
-		case GL_INT:
-			defToUpdate.constType = GCT_INT1;
-			break;
-		case GL_INT_VEC2:
-			defToUpdate.constType = GCT_INT2;
-			break;
-		case GL_INT_VEC3:
-			defToUpdate.constType = GCT_INT3;
-			break;
-		case GL_INT_VEC4:
-			defToUpdate.constType = GCT_INT4;
-			break;
-		case GL_FLOAT_MAT2:
-			defToUpdate.constType = GCT_MATRIX_2X2;
-			break;
-		case GL_FLOAT_MAT3:
-			defToUpdate.constType = GCT_MATRIX_3X3;
-			break;
-		case GL_FLOAT_MAT4:
-			defToUpdate.constType = GCT_MATRIX_4X4;
-			break;
-		default:
-			defToUpdate.constType = GCT_UNKNOWN;
-			break;
-		}
-
-		// GL doesn't pad
-		defToUpdate.elementSize = GpuConstantDefinition::getElementSize(defToUpdate.constType, false);
-	}
-
-	//---------------------------------------------------------------------
-	bool GLSLESLinkProgramManager::completeParamSource(
-		const String& paramName,
-		const GpuConstantDefinitionMap* vertexConstantDefs, 
-		const GpuConstantDefinitionMap* fragmentConstantDefs,
-		GLUniformReference& refToUpdate)
-	{
-		if (vertexConstantDefs)
-		{
-			GpuConstantDefinitionMap::const_iterator parami = 
-				vertexConstantDefs->find(paramName);
-			if (parami != vertexConstantDefs->end())
-			{
-				refToUpdate.mSourceProgType = GPT_VERTEX_PROGRAM;
-				refToUpdate.mConstantDef = &(parami->second);
-				return true;
-			}
-
-		}
-		if (fragmentConstantDefs)
-		{
-			GpuConstantDefinitionMap::const_iterator parami = 
-				fragmentConstantDefs->find(paramName);
-			if (parami != fragmentConstantDefs->end())
-			{
-				refToUpdate.mSourceProgType = GPT_FRAGMENT_PROGRAM;
-				refToUpdate.mConstantDef = &(parami->second);
-				return true;
-			}
-		}
-		return false;
-	}
-
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
-    void GLSLESLinkProgramManager::optimiseShaderSource(GLSLESGpuProgram* gpuProgram)
-    {
-        if(!gpuProgram->getGLSLProgram()->getIsOptimised())
-        {
-            GpuProgramType gpuType = gpuProgram->getType();
-            const glslopt_shader_type shaderType = (gpuType == GPT_VERTEX_PROGRAM) ? kGlslOptShaderVertex : kGlslOptShaderFragment;
-            String shaderSource = gpuProgram->getGLSLProgram()->getSource();
-            glslopt_shader* shader = glslopt_optimize(mGLSLOptimiserContext, shaderType, shaderSource.c_str(), 0);
-
-            std::stringstream os;
-            if(glslopt_get_status(shader))
-            {
-                // Write the current version (this forces the driver to fulfill the glsl es standard)
-                // TODO: Need to insert the current or compatibility version.  This is not future-proof
-                os << "#version 100" << std::endl;
-                
-                // Default precision declaration is required in fragment and vertex shaders.
-                os << "precision mediump float;" << std::endl;
-                os << "precision highp int;" << std::endl;
-                os << glslopt_get_output(shader);
-                gpuProgram->getGLSLProgram()->setSource(os.str());
-                gpuProgram->getGLSLProgram()->setIsOptimised(true);
-            }
-            else
-            {
-                LogManager::getSingleton().logMessage("Error from GLSL Optimiser, disabling optimisation for program: " + gpuProgram->getName());
-                gpuProgram->getGLSLProgram()->setParameter("use_optimiser", "false");
-//                LogManager::getSingleton().logMessage(String(glslopt_get_log(shader)));
-//                LogManager::getSingleton().logMessage("Original Shader");
-//                LogManager::getSingleton().logMessage(gpuProgram->getGLSLProgram()->getSource());
-//                LogManager::getSingleton().logMessage("Optimized Shader");
-//                LogManager::getSingleton().logMessage(os.str());
-            }
-            glslopt_shader_delete(shader);
-        }
-    }
-#endif
-
-	//---------------------------------------------------------------------
-	void GLSLESLinkProgramManager::extractUniforms(GLuint programObject, 
-		const GpuConstantDefinitionMap* vertexConstantDefs, 
-		const GpuConstantDefinitionMap* fragmentConstantDefs,
-		GLUniformReferenceList& list)
-	{
-		// scan through the active uniforms and add them to the reference list
-		GLint uniformCount;
-
-		#define BUFFERSIZE 200
-		char   uniformName[BUFFERSIZE];
-		//GLint location;
-		GLUniformReference newGLUniformReference;
-
-		// get the number of active uniforms
-		glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount);
-        GL_CHECK_ERROR;
-
-		// Loop over each of the active uniforms, and add them to the reference container
-		// only do this for user defined uniforms, ignore built in gl state uniforms
-		for (int index = 0; index < uniformCount; index++)
-		{
-			GLint arraySize;
-			GLenum glType;
-			glGetActiveUniform(programObject, index, BUFFERSIZE, NULL, 
-				&arraySize, &glType, uniformName);
-            GL_CHECK_ERROR;
-			// Don't add built in uniforms
-			newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
-			if (newGLUniformReference.mLocation >= 0)
-			{
-				// user defined uniform found, add it to the reference list
-				String paramName = String( uniformName );
-
-				// currant ATI drivers (Catalyst 7.2 and earlier) and older NVidia drivers will include all array elements as uniforms but we only want the root array name and location
-				// Also note that ATI Catalyst 6.8 to 7.2 there is a bug with glUniform that does not allow you to update a uniform array past the first uniform array element
-				// ie you can't start updating an array starting at element 1, must always be element 0.
-
-				// if the uniform name has a "[" in it then its an array element uniform.
-				String::size_type arrayStart = paramName.find("[");
-				if (arrayStart != String::npos)
-				{
-					// if not the first array element then skip it and continue to the next uniform
-					if (paramName.compare(arrayStart, paramName.size() - 1, "[0]") != 0) continue;
-					paramName = paramName.substr(0, arrayStart);
-				}
-
-				// find out which params object this comes from
-				bool foundSource = completeParamSource(paramName,
-						vertexConstantDefs,	fragmentConstantDefs, newGLUniformReference);
-
-				// only add this parameter if we found the source
-				if (foundSource)
-				{
-					assert(size_t (arraySize) == newGLUniformReference.mConstantDef->arraySize
-							&& "GL doesn't agree with our array size!");
-					list.push_back(newGLUniformReference);
-				}
-
-				// Don't bother adding individual array params, they will be
-				// picked up in the 'parent' parameter can copied all at once
-				// anyway, individual indexes are only needed for lookup from
-				// user params
-			} // end if
-		} // end for
-
-	}
-	//---------------------------------------------------------------------
-	void GLSLESLinkProgramManager::extractConstantDefs(const String& src,
-		GpuNamedConstants& defs, const String& filename)
-	{
-		// Parse the output string and collect all uniforms
-		// NOTE this relies on the source already having been preprocessed
-		// which is done in GLSLESProgram::loadFromSource
-		String line;
-		String::size_type currPos = src.find("uniform");
-		while (currPos != String::npos)
-		{
-			GpuConstantDefinition def;
-			String paramName;
-
-			// Now check for using the word 'uniform' in a larger string & ignore
-			bool inLargerString = false;
-			if (currPos != 0)
-			{
-				char prev = src.at(currPos - 1);
-				if (prev != ' ' && prev != '\t' && prev != '\r' && prev != '\n'
-					&& prev != ';')
-					inLargerString = true;
-			}
-			if (!inLargerString && currPos + 7 < src.size())
-			{
-				char next = src.at(currPos + 7);
-				if (next != ' ' && next != '\t' && next != '\r' && next != '\n')
-					inLargerString = true;
-			}
-
-			// skip 'uniform'
-			currPos += 7;
-
-			if (!inLargerString)
-			{
-				// find terminating semicolon
-				String::size_type endPos = src.find(";", currPos);
-				if (endPos == String::npos)
-				{
-					// problem, missing semicolon, abort
-					break;
-				}
-				line = src.substr(currPos, endPos - currPos);
-
-				// Remove spaces before opening square braces, otherwise
-				// the following split() can split the line at inappropriate
-				// places (e.g. "vec3 something [3]" won't work).
-				for (String::size_type sqp = line.find (" ["); sqp != String::npos;
-					 sqp = line.find (" ["))
-					line.erase (sqp, 1);
-				// Split into tokens
-				StringVector parts = StringUtil::split(line, ", \t\r\n");
-
-				for (StringVector::iterator i = parts.begin(); i != parts.end(); ++i)
-				{
-					// Is this a type?
-					StringToEnumMap::iterator typei = mTypeEnumMap.find(*i);
-					if (typei != mTypeEnumMap.end())
-					{
-						completeDefInfo(typei->second, def);
-					}
-					else
-					{
-						// if this is not a type, and not empty, it should be a name
-						StringUtil::trim(*i);
-						if (i->empty()) continue;
-
-                        // Skip over precision keywords
-                        if(StringUtil::match((*i), "lowp") ||
-                           StringUtil::match((*i), "mediump") ||
-                           StringUtil::match((*i), "highp"))
-                            continue;
-
-						String::size_type arrayStart = i->find("[", 0);
-						if (arrayStart != String::npos)
-						{
-							// potential name (if butted up to array)
-							String name = i->substr(0, arrayStart);
-							StringUtil::trim(name);
-							if (!name.empty())
-								paramName = name;
-
-							String::size_type arrayEnd = i->find("]", arrayStart);
-							String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
-							StringUtil::trim(arrayDimTerm);
-							// the array term might be a simple number or it might be
-							// an expression (e.g. 24*3) or refer to a constant expression
-							// we'd have to evaluate the expression which could get nasty
-							// TODO
-							def.arraySize = StringConverter::parseInt(arrayDimTerm);
-
-						}
-						else
-						{
-							paramName = *i;
-							def.arraySize = 1;
-						}
-
-						// Name should be after the type, so complete def and add
-						// We do this now so that comma-separated params will do
-						// this part once for each name mentioned 
-						if (def.constType == GCT_UNKNOWN)
-						{
-							LogManager::getSingleton().logMessage(
-								"Problem parsing the following GLSL Uniform: '"
-								+ line + "' in file " + filename);
-							// next uniform
-							break;
-						}
-
-						// Complete def and add
-						// increment physical buffer location
-						def.logicalIndex = 0; // not valid in GLSL
-						if (def.isFloat())
-						{
-							def.physicalIndex = defs.floatBufferSize;
-							defs.floatBufferSize += def.arraySize * def.elementSize;
-						}
-						else
-						{
-							def.physicalIndex = defs.intBufferSize;
-							defs.intBufferSize += def.arraySize * def.elementSize;
-						}
-						defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
-
-						// Generate array accessors
-						defs.generateConstantDefinitionArrayEntries(paramName, def);
-					}
-
-				}
-
-			} // not commented or a larger symbol
-
-			// Find next one
-			currPos = src.find("uniform", currPos);
-
-		}
-		
-	}
-
 }

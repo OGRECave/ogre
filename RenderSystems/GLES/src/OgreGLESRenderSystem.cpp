@@ -567,7 +567,12 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLESRenderBuffer *stencilBuffer = depthBuffer;
-			if( stencilBuffer != GL_NONE )
+			if( 
+               // not supported on AMD emulation for now...
+#ifdef GL_DEPTH24_STENCIL8_OES
+               depthFormat != GL_DEPTH24_STENCIL8_OES && 
+#endif
+               stencilBuffer )
 			{
 				stencilBuffer = OGRE_NEW GLESRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -2469,6 +2474,8 @@ namespace Ogre {
             glScissor(viewport[0], viewport[1], viewport[2], viewport[3]);
             GL_CHECK_ERROR;
         }
+
+        _setDiscardBuffers(buffers);
 
 		// Clear buffers
         glClear(flags);

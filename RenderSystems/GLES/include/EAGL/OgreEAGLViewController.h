@@ -39,7 +39,7 @@ using namespace Ogre;
     EAGLSupport *mGLSupport;
 }
 
-@property (assign) EAGLSupport *mGLSupport;
+@property (atomic, assign) EAGLSupport *mGLSupport;
 
 @end
 

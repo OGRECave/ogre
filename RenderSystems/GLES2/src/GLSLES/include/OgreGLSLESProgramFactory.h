@@ -53,7 +53,7 @@ namespace Ogre
 
 	private:
 		static GLSLESLinkProgramManager* mLinkProgramManager;
-
+		static GLSLESProgramPipelineManager* mProgramPipelineManager;
     };
 }
 

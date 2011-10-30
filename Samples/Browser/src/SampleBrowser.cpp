@@ -35,6 +35,7 @@
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
+#include "OgreString.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include "SampleBrowser_OSX.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -46,7 +47,7 @@
 #if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN  && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, INT)
 #else
 int main(int argc, char *argv[])
 #endif
@@ -73,6 +74,10 @@ int main(int argc, char *argv[])
         bool nograb = false;
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
         if (argc >= 2 && Ogre::String(argv[1]) == "nograb")
+            nograb = true;
+#else
+        // somewhat hacky, but much simpler than other solutions
+        if (Ogre::String(cmdLine).find("nograb") != Ogre::String::npos)
             nograb = true;
 #endif
 		OgreBites::SampleBrowser sb (nograb);

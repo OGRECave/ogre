@@ -630,7 +630,35 @@ namespace Ogre {
         /* Masks and shifts */
         0, 0, 0, 0, 0, 0, 0, 0
         },
-        
+    //-----------------------------------------------------------------------
+        {"PF_R8",
+        /* Bytes per element */
+        1,
+        /* Flags */
+        PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_BYTE, 1,
+        /* rbits, gbits, bbits, abits */
+        8, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_RG8",
+        /* Bytes per element */
+        2,
+        /* Flags */
+        PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_BYTE, 2,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0x00FF00, 0, 0,
+        8, 0, 0, 0
+        },
+
     };
     //-----------------------------------------------------------------------
 	size_t PixelBox::getConsecutiveSize() const

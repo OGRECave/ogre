@@ -61,7 +61,7 @@ namespace Ogre {
 	class _OgreExport PlaneOptimalShadowCameraSetup : public ShadowCameraSetup
 	{
 	private:
-		MovablePlane* m_plane;	///< pointer to plane of interest
+		MovablePlane* mPlane;	///< pointer to plane of interest
 	private:
 		PlaneOptimalShadowCameraSetup() {}	///< Default constructor is private
 

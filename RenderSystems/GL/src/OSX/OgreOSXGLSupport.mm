@@ -63,6 +63,7 @@ void OSXGLSupport::addConfig( void )
     ConfigOption optMacAPI;
 	ConfigOption optHiddenWindow;
 	ConfigOption optVsync;
+	ConfigOption optSRGB;
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 	ConfigOption optEnableFixedPipeline;
 #endif
@@ -100,6 +101,13 @@ void OSXGLSupport::addConfig( void )
 	optRTTMode.possibleValues.push_back( "Copy" );
 	optRTTMode.currentValue = "FBO";
 	optRTTMode.immutable = false;
+
+	// SRGB on auto window
+	optSRGB.name = "sRGB Gamma Conversion";
+	optSRGB.possibleValues.push_back("Yes");
+	optSRGB.possibleValues.push_back("No");
+	optSRGB.currentValue = "No";
+	optSRGB.immutable = false;
 
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
@@ -293,6 +301,7 @@ void OSXGLSupport::addConfig( void )
 	mOptions[optRTTMode.name] = optRTTMode;
 	mOptions[optHiddenWindow.name] = optHiddenWindow;
 	mOptions[optVsync.name] = optVsync;
+	mOptions[optSRGB.name] = optSRGB;
 }
 
 String OSXGLSupport::validateConfig( void )

@@ -2643,14 +2643,14 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
 	//---------------------------------------------------------------------
-	template<> CgFxScriptLoader *Singleton<CgFxScriptLoader>::ms_Singleton = 0;
+	template<> CgFxScriptLoader *Singleton<CgFxScriptLoader>::msSingleton = 0;
     CgFxScriptLoader* CgFxScriptLoader::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     CgFxScriptLoader& CgFxScriptLoader::getSingleton(void)
     {
-        assert( ms_Singleton );  return ( *ms_Singleton );
+        assert( msSingleton );  return ( *msSingleton );
     }
 	//---------------------------------------------------------------------
     CgFxScriptLoader::CgFxScriptLoader()

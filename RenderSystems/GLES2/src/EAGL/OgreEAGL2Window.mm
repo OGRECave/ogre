@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
-
+#include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2PixelFormat.h"
 
 namespace Ogre {
@@ -166,17 +166,12 @@ namespace Ogre {
         // Call the base class method first
         RenderTarget::_beginUpdate();
         
-#if __IPHONE_4_0
-        if(mCurrentOSVersion >= 4.0)
+        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
-            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-            {
-                // Bind the FSAA buffer if we're doing multisampling
-                glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
-                GL_CHECK_ERROR
-            }
+            // Bind the FSAA buffer if we're doing multisampling
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
+            GL_CHECK_ERROR
         }
-#endif
     }
 
     void EAGL2Window::initNativeCreatedWindow(const NameValuePairList *miscParams)
@@ -226,10 +221,7 @@ namespace Ogre {
 
             // Use the default scale factor of the screen
             // See Apple's documentation on supporting high resolution devices for more info
-#if __IPHONE_4_0
-            if(mIsContentScalingSupported)
-                mView.contentScaleFactor = mContentScalingFactor;
-#endif
+            mView.contentScaleFactor = mContentScalingFactor;
         }
     
         OgreAssert(mView != nil, "EAGL2Window: Failed to create view");
@@ -270,14 +262,8 @@ namespace Ogre {
             
             mContext = mGLSupport->createNewContext(dict, eaglLayer, group);
 
-#if __IPHONE_4_0
-            // MSAA is only supported on devices running iOS 4+
-            if(mCurrentOSVersion >= 4.0)
-            {
-                mContext->mIsMultiSampleSupported = true;
-                mContext->mNumSamples = mFSAA;
-            }
-#endif
+            mContext->mIsMultiSampleSupported = true;
+            mContext->mNumSamples = mFSAA;
         }
         
         OgreAssert(mContext != nil, "EAGL2Window: Failed to create OpenGL ES context");
@@ -314,7 +300,6 @@ namespace Ogre {
     void EAGL2Window::create(const String& name, uint width, uint height,
                                 bool fullScreen, const NameValuePairList *miscParams)
     {
-        String orientation = "Landscape Right";
         short frequency = 0;
         bool vsync = false;
 		int left = 0;
@@ -366,11 +351,6 @@ namespace Ogre {
                 mName = opt->second;
             }
 
-            if ((opt = miscParams->find("orientation")) != end)
-            {
-                orientation = opt->second;
-            }
-
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mWindow = (UIWindow *)StringConverter::parseUnsignedLong(opt->second);
@@ -419,34 +399,48 @@ namespace Ogre {
             return;
         }
 
-#if __IPHONE_4_0
-        if(mCurrentOSVersion >= 4.0)
+        unsigned int attachmentCount = 0;
+        GLenum attachments[3];
+        GLES2RenderSystem *rs =
+            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        unsigned int buffers = rs->getDiscardBuffers();
+        
+        if(buffers & FBT_COLOUR)
         {
-            if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
-            {
-                glDisable(GL_SCISSOR_TEST);     
-                glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
-                GL_CHECK_ERROR
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
-                GL_CHECK_ERROR
-                glResolveMultisampleFramebufferAPPLE();
-                GL_CHECK_ERROR
-                
-                GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT };
-                glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 3, attachments);
-                GL_CHECK_ERROR
-            }
-            else
-            {
-                GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT };
-                glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 2, attachments);
-                GL_CHECK_ERROR
-            }
+            attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0;
         }
-#endif
-        glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-        GL_CHECK_ERROR
-
+        if(buffers & FBT_DEPTH)
+        {
+            attachments[attachmentCount++] = GL_DEPTH_ATTACHMENT;
+        }
+        if(buffers & FBT_STENCIL)
+        {
+            attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT;
+        }
+        
+        if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
+        {
+            glDisable(GL_SCISSOR_TEST);     
+            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
+            GL_CHECK_ERROR
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+            glResolveMultisampleFramebufferAPPLE();
+            GL_CHECK_ERROR
+            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
+            GL_CHECK_ERROR
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+            GL_CHECK_ERROR
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
+            GL_CHECK_ERROR
+        }
+        
         glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)

@@ -34,14 +34,14 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    template<> ControllerManager* Singleton<ControllerManager>::ms_Singleton = 0;
+    template<> ControllerManager* Singleton<ControllerManager>::msSingleton = 0;
     ControllerManager* ControllerManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     ControllerManager& ControllerManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
     ControllerManager::ControllerManager()

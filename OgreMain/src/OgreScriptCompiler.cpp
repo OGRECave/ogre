@@ -1542,16 +1542,16 @@ namespace Ogre
 	
 
 	// ScriptCompilerManager
-	template<> ScriptCompilerManager *Singleton<ScriptCompilerManager>::ms_Singleton = 0;
+	template<> ScriptCompilerManager *Singleton<ScriptCompilerManager>::msSingleton = 0;
 	
 	ScriptCompilerManager* ScriptCompilerManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
 	//-----------------------------------------------------------------------
     ScriptCompilerManager& ScriptCompilerManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 	//-----------------------------------------------------------------------
 	ScriptCompilerManager::ScriptCompilerManager()

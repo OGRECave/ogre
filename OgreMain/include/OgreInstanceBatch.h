@@ -231,7 +231,7 @@ namespace Ogre
 		const Ogre::MeshPtr& _getMeshReference(void) const { return mMeshReference; }
 
 		/** Returns true if it can not create more InstancedEntities
-			(Num InstancedEntities == m_instancesPerBatch)
+			(Num InstancedEntities == mInstancesPerBatch)
 		*/
 		bool isBatchFull(void) const { return mUnusedEntities.empty(); }
 

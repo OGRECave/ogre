@@ -48,7 +48,7 @@ namespace Ogre
     {
 		if (!mSuppressFile)
 		{
-			mfpLog.open(name.c_str());
+			mLog.open(name.c_str());
 		}
     }
     //-----------------------------------------------------------------------
@@ -57,7 +57,7 @@ namespace Ogre
 		OGRE_LOCK_AUTO_MUTEX
 		if (!mSuppressFile)
 		{
-	        mfpLog.close();
+	        mLog.close();
 		}
     }
     //-----------------------------------------------------------------------
@@ -90,15 +90,15 @@ namespace Ogre
 						struct tm *pTime;
 						time_t ctTime; time(&ctTime);
 						pTime = localtime( &ctTime );
-						mfpLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
+						mLog << std::setw(2) << std::setfill('0') << pTime->tm_hour
 							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_min
 							<< ":" << std::setw(2) << std::setfill('0') << pTime->tm_sec
 							<< ": ";
 					}
-					mfpLog << message << std::endl;
+					mLog << message << std::endl;
 
 					// Flush stcmdream to ensure it is written (incase of a crash, we need log to be up to date)
-					mfpLog.flush();
+					mLog.flush();
 				}
 			}
         }

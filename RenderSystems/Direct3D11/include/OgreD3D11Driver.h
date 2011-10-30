@@ -44,10 +44,10 @@ namespace Ogre
 		unsigned int mAdapterNumber;
 		DXGI_ADAPTER_DESC1 mAdapterIdentifier;
 		DXGI_MODE_DESC mDesktopDisplayMode;
-		D3D11VideoModeList* mpVideoModeList;
+		D3D11VideoModeList* mVideoModeList;
 		unsigned int tempNo;
 		static unsigned int driverCount;
-		IDXGIAdapter1*	mpDXGIAdapter;
+		IDXGIAdapter1*	mDXGIAdapter;
 
 
 	public:

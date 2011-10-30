@@ -91,6 +91,9 @@ namespace Ogre
             if((opt = miscParams->find("hidden")) != end) 
                 hidden = StringConverter::parseBool(opt->second);
 
+            if((opt = miscParams->find("gamma")) != end) 
+				mHwGamma = StringConverter::parseBool(opt->second);
+
             if((opt = miscParams->find("depthBuffer")) != end) 
                 hasDepthBuffer = StringConverter::parseBool( opt->second );
             

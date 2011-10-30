@@ -670,7 +670,7 @@ namespace Ogre {
         /// Have we set the material etc on the renderer?
         bool mIsRendererConfigured;
         /// Pointer to the material to use
-        MaterialPtr mpMaterial;
+        MaterialPtr mMaterial;
         /// Default width of each particle
         Real mDefaultWidth;
         /// Default height of each particle

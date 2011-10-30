@@ -40,8 +40,8 @@ namespace Ogre
 		tempNo = ++driverCount;
 		ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
 		ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );
-		mpVideoModeList = NULL;
-		mpDXGIAdapter=NULL;
+		mVideoModeList = NULL;
+		mDXGIAdapter=NULL;
 	}
 	//---------------------------------------------------------------------
 	D3D11Driver::D3D11Driver( const D3D11Driver &ob ) 
@@ -50,8 +50,8 @@ namespace Ogre
 		mAdapterNumber = ob.mAdapterNumber;
 		mAdapterIdentifier = ob.mAdapterIdentifier;
 		mDesktopDisplayMode = ob.mDesktopDisplayMode;
-		mpVideoModeList = NULL;
-		mpDXGIAdapter=ob.mpDXGIAdapter;
+		mVideoModeList = NULL;
+		mDXGIAdapter=ob.mDXGIAdapter;
 
 	}
 	//---------------------------------------------------------------------
@@ -59,8 +59,8 @@ namespace Ogre
 	{
 		tempNo = ++driverCount;
 		mAdapterNumber = adapterNumber;
-		mpVideoModeList = NULL;
-		mpDXGIAdapter=pDXGIAdapter;
+		mVideoModeList = NULL;
+		mDXGIAdapter=pDXGIAdapter;
 
 		// get the description of the adapter
 		pDXGIAdapter->GetDesc1( &mAdapterIdentifier );
@@ -69,7 +69,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11Driver::~D3D11Driver()
 	{
-		SAFE_DELETE( mpVideoModeList );
+		SAFE_DELETE( mVideoModeList );
 		driverCount--;
 	}
 	//---------------------------------------------------------------------
@@ -101,10 +101,10 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11VideoModeList* D3D11Driver::getVideoModeList()
 	{
-		if( !mpVideoModeList )
-			mpVideoModeList = new D3D11VideoModeList( this );
+		if( !mVideoModeList )
+			mVideoModeList = new D3D11VideoModeList( this );
 
-		return mpVideoModeList;
+		return mVideoModeList;
 	}
 	//---------------------------------------------------------------------
 	unsigned int D3D11Driver::getAdapterNumber() const
@@ -124,7 +124,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	IDXGIAdapter1* D3D11Driver::getDeviceAdapter() const
 	{
-		return mpDXGIAdapter;
+		return mDXGIAdapter;
 	}
 	//---------------------------------------------------------------------
 }

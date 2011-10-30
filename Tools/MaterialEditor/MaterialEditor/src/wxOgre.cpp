@@ -245,13 +245,13 @@ void wxOgre::update()
 	Ogre::Root::getSingletonPtr()->renderOneFrame();
 }
 
-template<> wxOgre* Ogre::Singleton<wxOgre>::ms_Singleton = 0;
+template<> wxOgre* Ogre::Singleton<wxOgre>::msSingleton = 0;
 wxOgre& wxOgre::getSingleton()
 {
-	return ( *ms_Singleton );
+	return ( *msSingleton );
 }
 
 wxOgre* wxOgre::getSingletonPtr()
 {
-	return ms_Singleton;
+	return msSingleton;
 }

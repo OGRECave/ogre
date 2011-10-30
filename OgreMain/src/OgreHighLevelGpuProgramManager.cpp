@@ -99,14 +99,14 @@ namespace Ogre {
 	};
 	//-----------------------------------------------------------------------
 	template<> HighLevelGpuProgramManager* 
-	Singleton<HighLevelGpuProgramManager>::ms_Singleton = 0;
+	Singleton<HighLevelGpuProgramManager>::msSingleton = 0;
     HighLevelGpuProgramManager* HighLevelGpuProgramManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     HighLevelGpuProgramManager& HighLevelGpuProgramManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 	//-----------------------------------------------------------------------
 	HighLevelGpuProgramManager::HighLevelGpuProgramManager()

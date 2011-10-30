@@ -183,7 +183,7 @@ namespace Ogre {
         if (mVisible)
         {
 
-            if (!mTransparent && !mpMaterial.isNull())
+            if (!mTransparent && !mMaterial.isNull())
             {
                 OverlayElement::_updateRenderQueue(queue);
             }
@@ -251,10 +251,10 @@ namespace Ogre {
     void PanelOverlayElement::updateTextureGeometry(void)
     {
         // Generate for as many texture layers as there are in material
-        if (!mpMaterial.isNull() && mInitialised)
+        if (!mMaterial.isNull() && mInitialised)
         {
             // Assume one technique and pass for the moment
-            size_t numLayers = mpMaterial->getTechnique(0)->getPass(0)->getNumTextureUnitStates();
+            size_t numLayers = mMaterial->getTechnique(0)->getPass(0)->getNumTextureUnitStates();
 
             VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
             // Check the number of texcoords we have in our buffer now

@@ -31,16 +31,16 @@ THE SOFTWARE.
 #include "Project.h"
 #include "WorkspaceEventArgs.h"
 
-template<> Workspace* Ogre::Singleton<Workspace>::ms_Singleton = 0;
+template<> Workspace* Ogre::Singleton<Workspace>::msSingleton = 0;
 
 Workspace& Workspace::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }
 
 Workspace* Workspace::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 
 Workspace::Workspace()

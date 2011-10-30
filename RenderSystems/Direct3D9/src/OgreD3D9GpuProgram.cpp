@@ -66,7 +66,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     D3D9GpuProgram::D3D9GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
-        : GpuProgram(creator, name, handle, group, isManual, loader), mpExternalMicrocode(NULL), mColumnMajorMatrices(false)
+        : GpuProgram(creator, name, handle, group, isManual, loader), mExternalMicrocode(NULL), mColumnMajorMatrices(false)
     {			
         if (createParamDictionary("D3D9GpuProgram"))
         {
@@ -103,17 +103,17 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D9GpuProgram::setExternalMicrocode(ID3DXBuffer* pMicrocode)
 	{ 
-		SAFE_RELEASE(mpExternalMicrocode);
-		mpExternalMicrocode = pMicrocode;
-		if(mpExternalMicrocode)
+		SAFE_RELEASE(mExternalMicrocode);
+		mExternalMicrocode = pMicrocode;
+		if(mExternalMicrocode)
 		{
-			mpExternalMicrocode->AddRef();	
+			mExternalMicrocode->AddRef();	
 		}
 	}
     //-----------------------------------------------------------------------------
 	LPD3DXBUFFER D3D9GpuProgram::getExternalMicrocode(void)
 	{
-		return mpExternalMicrocode;
+		return mExternalMicrocode;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -134,9 +134,9 @@ namespace Ogre {
 	{
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
-		if (mpExternalMicrocode)
+		if (mExternalMicrocode)
 		{
-			loadFromMicrocode(d3d9Device, mpExternalMicrocode);
+			loadFromMicrocode(d3d9Device, mExternalMicrocode);
 		}
 		else
 		{
@@ -157,7 +157,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------
 	void D3D9GpuProgram::unloadImpl(void)
 	{
-		SAFE_RELEASE(mpExternalMicrocode);
+		SAFE_RELEASE(mExternalMicrocode);
 	}
 	//-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadFromSource(void)

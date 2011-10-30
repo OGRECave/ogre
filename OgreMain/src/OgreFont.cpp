@@ -151,10 +151,10 @@ namespace Ogre
     void Font::loadImpl()
     {
         // Create a new material
-        mpMaterial =  MaterialManager::getSingleton().create(
+        mMaterial =  MaterialManager::getSingleton().create(
 			"Fonts/" + mName,  mGroup);
 
-		if (mpMaterial.isNull())
+		if (mMaterial.isNull())
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                 "Error creating new material!", "Font::load" );
@@ -165,7 +165,7 @@ namespace Ogre
         if (mType == FT_TRUETYPE)
         {
             createTextureFromFont();
-            texLayer = mpMaterial->getTechnique(0)->getPass(0)->getTextureUnitState(0);
+            texLayer = mMaterial->getTechnique(0)->getPass(0)->getTextureUnitState(0);
             // Always blend by alpha
             blendByAlpha = true;
         }
@@ -174,11 +174,11 @@ namespace Ogre
 			// Manually load since we need to load to get alpha
 			mTexture = TextureManager::getSingleton().load(mSource, mGroup, TEX_TYPE_2D, 0);
             blendByAlpha = mTexture->hasAlpha();
-            texLayer = mpMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
+            texLayer = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(mSource);
         }
 
 		// Make sure material is aware of colour per vertex.
-		mpMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
+		mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
         // Clamp to avoid fuzzy edges
         texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
 		// Allow min/mag filter, but no mip
@@ -188,21 +188,21 @@ namespace Ogre
         // Set up blending
         if (blendByAlpha)
         {
-            mpMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
+            mMaterial->setSceneBlending( SBT_TRANSPARENT_ALPHA );
         }
         else
         {
             // Use add if no alpha (assume black background)
-            mpMaterial->setSceneBlending(SBT_ADD);
+            mMaterial->setSceneBlending(SBT_ADD);
         }
     }
     //---------------------------------------------------------------------
     void Font::unloadImpl()
     {
-		if (!mpMaterial.isNull())
+		if (!mMaterial.isNull())
 		{
-			MaterialManager::getSingleton().remove(mpMaterial->getHandle());
-			mpMaterial.setNull();
+			MaterialManager::getSingleton().remove(mMaterial->getHandle());
+			mMaterial.setNull();
 		}
 
 		if (!mTexture.isNull())
@@ -225,7 +225,7 @@ namespace Ogre
 		mTexture->setNumMipmaps(0);
 		mTexture->load();
 
-		TextureUnitState* t = mpMaterial->getTechnique(0)->getPass(0)->createTextureUnitState( texName );
+		TextureUnitState* t = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState( texName );
 		// Allow min/mag filter, but no mip
 		t->setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_NONE);
 
@@ -323,7 +323,7 @@ namespace Ogre
 		size_t data_width = finalWidth * pixel_bytes;
 		size_t data_size = finalWidth * finalHeight * pixel_bytes;
 
-		LogManager::getSingleton().logMessage("Font " + mName + "using texture size " +
+		LogManager::getSingleton().logMessage("Font " + mName + " using texture size " +
 			StringConverter::toString(finalWidth) + "x" + StringConverter::toString(finalHeight));
 
         uchar* imageData = OGRE_ALLOC_T(uchar, data_size, MEMCATEGORY_GENERAL);

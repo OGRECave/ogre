@@ -37,14 +37,14 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-template<> GTKGLSupport* Singleton<GTKGLSupport>::ms_Singleton = 0;
+template<> GTKGLSupport* Singleton<GTKGLSupport>::msSingleton = 0;
 GTKGLSupport* GTKGLSupport::getSingletonPtr(void)
 {
-    return ms_Singleton;
+    return msSingleton;
 }
 GTKGLSupport& GTKGLSupport::getSingleton(void)
 {  
-    assert( ms_Singleton );  return ( *ms_Singleton );  
+    assert( msSingleton );  return ( *msSingleton );  
 }
 
 GTKGLSupport::GTKGLSupport() : 

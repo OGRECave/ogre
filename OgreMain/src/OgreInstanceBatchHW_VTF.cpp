@@ -91,8 +91,13 @@ namespace Ogre
 		HWBoneIdxVec hwBoneIdx;
 		HWBoneWgtVec hwBoneWgt;
 
-		const VertexElement *veWeights = baseVertexData->vertexDeclaration->findElementBySemantic( VES_BLEND_WEIGHTS );	
-		mWeightCount = forceOneWeight() ? 1 : veWeights->getSize() / sizeof(float);
+		//Blend weights may not be present because HW_VTF does not require to be skeletally animated
+		const VertexElement *veWeights = baseVertexData->vertexDeclaration->
+														findElementBySemantic( VES_BLEND_WEIGHTS );	
+		if( veWeights )
+			mWeightCount = forceOneWeight() ? 1 : veWeights->getSize() / sizeof(float);
+		else
+			mWeightCount = 1;
 
 		hwBoneIdx.resize( baseVertexData->vertexCount * mWeightCount, 0 );
 
@@ -141,7 +146,6 @@ namespace Ogre
 														 const HWBoneWgtVec& hwBoneWgt)
 	{
 		const float texWidth  = static_cast<float>(mMatrixTexture->getWidth());
-		const float texHeight = static_cast<float>(mMatrixTexture->getHeight());
 
 		//Only one weight per vertex is supported. It would not only be complex, but prohibitively slow.
 		//Put them in a new buffer, since it's 16 bytes aligned :-)

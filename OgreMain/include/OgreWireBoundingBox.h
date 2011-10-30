@@ -58,9 +58,12 @@ namespace Ogre {
 
         Real mRadius;
 
+		void _initWireBoundingBox();
+
 	public:
 			
 		WireBoundingBox();
+		WireBoundingBox(const String& name);
 		~WireBoundingBox();
 
         /** Builds the wireframe line list.

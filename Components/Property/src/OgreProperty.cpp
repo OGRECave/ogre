@@ -98,8 +98,12 @@ namespace Ogre
 		else
 			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Property not found!", 
 				"PropertySet::getProperty");
-
 	}
+    //---------------------------------------------------------------------
+    void PropertySet::removeProperty(const String& name)
+    {
+        mPropertyMap.erase(name);
+    }
 	//---------------------------------------------------------------------
 	PropertySet::PropertyIterator PropertySet::getPropertyIterator()
 	{

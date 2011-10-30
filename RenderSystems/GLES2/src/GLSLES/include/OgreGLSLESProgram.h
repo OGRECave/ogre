@@ -45,18 +45,11 @@ namespace Ogre {
 		The GLES2Program class will create a shader object and compile the source but will
 		not create a program object.  It's up to GLES2GpuProgram class to request a program object
 		to link the shader object to.
-
-	@note
-		GLSL ES supports multiple modular shader objects that can be attached to one program
-		object to form a single shader.  This is supported through the "attach" material script
-		command.  All the modules to be attached are listed on the same line as the attach command
-		separated by white space.
-        
     */
     class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram
     {
     public:
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Command object for running the GLSL optimiser 
         class CmdOptimisation : public ParamCommand
         {
@@ -78,9 +71,12 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLESProgram();
 
-		const GLuint getGLHandle() const { return mGLHandle; }
+        /// GL Shader Handle
+		const GLuint getGLShaderHandle() const { return mGLShaderHandle; }
 		void attachToProgramObject( const GLuint programObject );
 		void detachFromProgramObject( const GLuint programObject );
+
+		const GLuint getGLProgramHandle() const { return mGLProgramHandle; }
 
 		/// Overridden
 		bool getPassTransformStates(void) const;
@@ -92,7 +88,7 @@ namespace Ogre {
 		/// Sets the preprocessor defines use to compile the program.
 		const String& getPreprocessorDefines(void) const { return mPreprocessorDefines; }
 
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Sets if the GLSL optimiser is enabled.
 		void setOptimiserEnabled(bool enabled) { mOptimiserEnabled = enabled; }
 		/// Gets if the GLSL optimiser is enabled.
@@ -114,7 +110,7 @@ namespace Ogre {
 
 	protected:
 		static CmdPreprocessorDefines msCmdPreprocessorDefines;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
 		static CmdOptimisation msCmdOptimisation;
 #endif
 
@@ -144,14 +140,15 @@ namespace Ogre {
 		void checkAndFixInvalidDefaultPrecisionError( String &message );
 	private:
 		/// GL handle for shader object
-		GLuint mGLHandle;
+		GLuint mGLShaderHandle;
+        GLuint mGLProgramHandle;
 		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
         /// Flag indicating if shader has been successfully optimised
         bool mIsOptimised;
 		/// Preprocessor options
 		String mPreprocessorDefines;
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         bool mOptimiserEnabled;
 #endif
     };

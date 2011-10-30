@@ -38,14 +38,14 @@ namespace Ogre {
     typedef void (*createFunc)( Archive**, const String& );
 
     //-----------------------------------------------------------------------
-    template<> ArchiveManager* Singleton<ArchiveManager>::ms_Singleton = 0;
+    template<> ArchiveManager* Singleton<ArchiveManager>::msSingleton = 0;
     ArchiveManager* ArchiveManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     ArchiveManager& ArchiveManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
 	ArchiveManager::ArchiveManager()

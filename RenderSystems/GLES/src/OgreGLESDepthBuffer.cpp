@@ -53,6 +53,9 @@ namespace Ogre
 				break;
 #endif
 
+#if GL_OES_packed_depth_stencil
+            case GL_DEPTH24_STENCIL8_OES:  // Packed depth / stencil
+#endif
 #if GL_OES_depth24
 			case GL_DEPTH_COMPONENT24_OES:
 				mBitDepth = 32;

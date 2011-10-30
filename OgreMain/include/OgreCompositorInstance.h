@@ -250,7 +250,7 @@ namespace Ogre {
 		void setScheme(const String& schemeName, bool reuseTextures = true);
 
 		/// Returns the name of the scheme this compositor is using
-		const String& getScheme() const { return mActiveScheme; }
+		const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : StringUtil::BLANK; }
 
 		/** Notify this instance that the primary surface has been resized. 
 		@remarks
@@ -316,9 +316,6 @@ namespace Ogre {
         
         /// Previous instance (set by chain)
         CompositorInstance *mPreviousInstance;
-
-		/// The scheme which is being used in this instance
-		String mActiveScheme;
 		
 		/** Collect rendering passes. Here, passes are converted into render target operations
 			and queued with queueRenderSystemOp.

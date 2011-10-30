@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    map< String, Codec * >::type Codec::ms_mapCodecs;
+    map< String, Codec * >::type Codec::msMapCodecs;
 
     Codec::~Codec() {
     }
@@ -41,9 +41,9 @@ namespace Ogre {
     StringVector Codec::getExtensions(void)
     {
         StringVector result;
-        result.reserve(ms_mapCodecs.size());
+        result.reserve(msMapCodecs.size());
         CodecList::const_iterator i;
-        for (i = ms_mapCodecs.begin(); i != ms_mapCodecs.end(); ++i)
+        for (i = msMapCodecs.begin(); i != msMapCodecs.end(); ++i)
         {
             result.push_back(i->first);
         }
@@ -54,11 +54,11 @@ namespace Ogre {
     {
         String lwrcase = extension;
 		StringUtil::toLowerCase(lwrcase);
-        CodecList::const_iterator i = ms_mapCodecs.find(lwrcase);
-        if (i == ms_mapCodecs.end())
+        CodecList::const_iterator i = msMapCodecs.find(lwrcase);
+        if (i == msMapCodecs.end())
         {
             String formats_str;
-            if(ms_mapCodecs.empty())
+            if(msMapCodecs.empty())
                 formats_str = "There are no formats supported (no codecs registered).";
             else
                 formats_str = "Supported formats are: " + StringConverter::toString(getExtensions()) + ".";
@@ -75,8 +75,8 @@ namespace Ogre {
 
 	Codec* Codec::getCodec(char *magicNumberPtr, size_t maxbytes)
 	{
-		for (CodecList::const_iterator i = ms_mapCodecs. begin(); 
-			i != ms_mapCodecs.end(); ++i)
+		for (CodecList::const_iterator i = msMapCodecs. begin(); 
+			i != msMapCodecs.end(); ++i)
 		{
 			String ext = i->second->magicNumberToFileExt(magicNumberPtr, maxbytes);
 			if (!ext.empty())

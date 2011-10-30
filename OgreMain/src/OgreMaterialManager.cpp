@@ -48,14 +48,14 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    template<> MaterialManager* Singleton<MaterialManager>::ms_Singleton = 0;
+    template<> MaterialManager* Singleton<MaterialManager>::msSingleton = 0;
     MaterialManager* MaterialManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     MaterialManager& MaterialManager::getSingleton(void)
     {
-        assert( ms_Singleton );  return ( *ms_Singleton );
+        assert( msSingleton );  return ( *msSingleton );
     }
 	String MaterialManager::DEFAULT_SCHEME_NAME = "Default";
     //-----------------------------------------------------------------------

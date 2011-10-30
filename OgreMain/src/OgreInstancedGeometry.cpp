@@ -1724,11 +1724,50 @@ namespace Ogre {
 	InstancedGeometry::GeometryBucket::GeometryBucket(MaterialBucket* parent,
 		const String& formatString, const VertexData* vData,
 		const IndexData* iData)
-		: SimpleRenderable(),
-		 mParent(parent), 
-		 mFormatString(formatString),
-		 mVertexData(0),
-		 mIndexData(0)
+	: SimpleRenderable()
+	, mParent(parent)
+	, mFormatString(formatString)
+	, mVertexData(0)
+	, mIndexData(0)
+	{
+		_initGeometryBucket(vData, iData);
+	}
+	//--------------------------------------------------------------------------
+	InstancedGeometry::GeometryBucket::GeometryBucket(const String& name, MaterialBucket* parent,
+		const String& formatString, const VertexData* vData,
+		const IndexData* iData)
+	: SimpleRenderable(name)
+	, mParent(parent)
+	, mFormatString(formatString)
+	, mVertexData(0)
+	, mIndexData(0)
+	{
+		_initGeometryBucket(vData, iData);
+	}
+	//--------------------------------------------------------------------------
+	InstancedGeometry::GeometryBucket::GeometryBucket(MaterialBucket* parent,
+		const String& formatString,GeometryBucket* bucket)
+	: SimpleRenderable()
+	, mParent(parent)
+	, mFormatString(formatString)
+	, mVertexData(0)
+	, mIndexData(0)
+	{
+		_initGeometryBucket(bucket);
+	}
+	//--------------------------------------------------------------------------
+	InstancedGeometry::GeometryBucket::GeometryBucket(const String& name, MaterialBucket* parent,
+		const String& formatString,GeometryBucket* bucket)
+	: SimpleRenderable(name)
+	, mParent(parent)
+	, mFormatString(formatString)
+	, mVertexData(0)
+	, mIndexData(0)
+	{
+		_initGeometryBucket(bucket);
+	}
+	//--------------------------------------------------------------------------
+	void InstancedGeometry::GeometryBucket::_initGeometryBucket(const VertexData* vData, const IndexData* iData)
 	{
 	   	mBatch=mParent->getParent()->getParent()->getParent();
 		if(!mBatch->getBaseSkeleton().isNull())
@@ -1786,13 +1825,7 @@ namespace Ogre {
 
 	}
 	//--------------------------------------------------------------------------
-	InstancedGeometry::GeometryBucket::GeometryBucket(MaterialBucket* parent,
-		const String& formatString,GeometryBucket* bucket)
-		: SimpleRenderable(),
-		 mParent(parent),
-		  mFormatString(formatString),
-		  mVertexData(0),
-		  mIndexData(0)
+	void InstancedGeometry::GeometryBucket::_initGeometryBucket(GeometryBucket* bucket)
 	{
 
 	   	mBatch=mParent->getParent()->getParent()->getParent();

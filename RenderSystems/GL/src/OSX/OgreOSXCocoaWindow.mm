@@ -129,6 +129,10 @@ namespace Ogre {
 			if(opt != miscParams->end())
 				fsaa_samples = StringConverter::parseUnsignedInt(opt->second);
 			
+            opt = miscParams->find("gamma");
+			if(opt != miscParams->end())
+				mHwGamma = StringConverter::parseBool(opt->second);
+
 			opt = miscParams->find("colourDepth");
 			if(opt != miscParams->end())
 				depth = StringConverter::parseUnsignedInt(opt->second);
@@ -173,7 +177,6 @@ namespace Ogre {
 			attribs[i++] = NSOpenGLPFAScreenMask;
 			attribs[i++] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(CGMainDisplayID());
 
-            
             // Specifying "NoRecovery" gives us a context that cannot fall back to the software renderer.
             // This makes the View-based context a compatible with the fullscreen context, enabling us to use
             // the "shareContext" feature to share textures, display lists, and other OpenGL objects between the two.

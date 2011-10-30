@@ -102,14 +102,14 @@ THE SOFTWARE.
 
 namespace Ogre {
     //-----------------------------------------------------------------------
-    template<> Root* Singleton<Root>::ms_Singleton = 0;
+    template<> Root* Singleton<Root>::msSingleton = 0;
     Root* Root::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     Root& Root::getSingleton(void)
     {
-        assert( ms_Singleton );  return ( *ms_Singleton );
+        assert( msSingleton );  return ( *msSingleton );
     }
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
@@ -1245,7 +1245,7 @@ namespace Ogre {
 		return success;
 	}	
     //-----------------------------------------------------------------------
-    void Root::detachRenderTarget(RenderTarget* target)
+    RenderTarget* Root::detachRenderTarget(RenderTarget* target)
     {
         if (!mActiveRenderer)
         {
@@ -1254,10 +1254,10 @@ namespace Ogre {
             "system has been selected.", "Root::detachRenderTarget");
         }
 
-        mActiveRenderer->detachRenderTarget( target->getName() );
+        return mActiveRenderer->detachRenderTarget( target->getName() );
     }
     //-----------------------------------------------------------------------
-    void Root::detachRenderTarget(const String &name)
+    RenderTarget* Root::detachRenderTarget(const String &name)
     {
         if (!mActiveRenderer)
         {
@@ -1266,7 +1266,7 @@ namespace Ogre {
             "system has been selected.", "Root::detachRenderTarget");
         }
 
-        mActiveRenderer->detachRenderTarget( name );
+        return mActiveRenderer->detachRenderTarget( name );
     }
     //-----------------------------------------------------------------------
     void Root::destroyRenderTarget(RenderTarget* target)

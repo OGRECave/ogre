@@ -36,7 +36,7 @@ namespace Ogre
 	class D3D11VideoModeList
 	{
 	private:
-		D3D11Driver* mpDriver;
+		D3D11Driver* mDriver;
 		vector<D3D11VideoMode>::type mModeList;
 
 	public:

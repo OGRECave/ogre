@@ -220,6 +220,7 @@ endfunction(ogre_config_component)
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)
   ogre_config_common(${PLUGINNAME})
+  set_target_properties(${PLUGINNAME} PROPERTIES VERSION ${OGRE_SOVERSION})
   if (OGRE_STATIC)
     # add static prefix, if compiling static version
     set_target_properties(${PLUGINNAME} PROPERTIES OUTPUT_NAME ${PLUGINNAME}Static)

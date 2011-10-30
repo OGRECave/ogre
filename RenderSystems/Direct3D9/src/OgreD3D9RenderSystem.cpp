@@ -71,7 +71,7 @@ namespace Ogre
 		mhInstance = hInstance;
 
 		// set pointers to NULL
-		mpD3D = NULL;		
+		mD3D = NULL;		
 		mDriverList = NULL;
 		mActiveD3DDriver = NULL;
 		mTextureManager = NULL;
@@ -91,7 +91,7 @@ namespace Ogre
 			mLights[i] = 0;
 
 		// Create our Direct3D object
-		if( NULL == (mpD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
+		if( NULL == (mD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
 			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Failed to create Direct3D9 object", "D3D9RenderSystem::D3D9RenderSystem" );
 
 		// set config options defaults
@@ -134,7 +134,7 @@ namespace Ogre
 			mHLSLProgramFactory = 0;
 		}
 		
-		SAFE_RELEASE( mpD3D );
+		SAFE_RELEASE( mD3D );
 		
 		if (mResourceManager != NULL)
 		{
@@ -164,7 +164,7 @@ namespace Ogre
 	bool D3D9RenderSystem::_checkMultiSampleQuality(D3DMULTISAMPLE_TYPE type, DWORD *outQuality, D3DFORMAT format, UINT adapterNum, D3DDEVTYPE deviceType, BOOL fullScreen)
 	{
 		HRESULT hr;
-		hr = mpD3D->CheckDeviceMultiSampleType( 
+		hr = mD3D->CheckDeviceMultiSampleType( 
 			adapterNum, 
 			deviceType, 
 			format, 
@@ -1082,7 +1082,7 @@ namespace Ogre
 
 		for (int i = 0; i < 6; ++i)
 		{
-			if (SUCCEEDED(mpD3D->CheckDeviceFormat(mActiveD3DDriver->getAdapterNumber(), 
+			if (SUCCEEDED(mD3D->CheckDeviceFormat(mActiveD3DDriver->getAdapterNumber(), 
 				D3DDEVTYPE_HAL, bbSurfDesc.Format, 
 				0, D3DRTYPE_TEXTURE, floatFormats[i])))
 			{
@@ -1124,7 +1124,7 @@ namespace Ogre
 			// NVIDIA needs a separate check
 			if (rsc->getVendor() == GPU_NVIDIA)
 			{
-				if (mpD3D->CheckDeviceFormat(
+				if (mD3D->CheckDeviceFormat(
 						D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, 0,D3DRTYPE_SURFACE, 
 						(D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C')) == S_OK)
 				{
@@ -1401,7 +1401,7 @@ namespace Ogre
 			D3DFORMAT fmt = 
 				D3D9Mappings::_getPF(D3D9Mappings::_getClosestSupportedPF(pf));
 
-			if (SUCCEEDED(mpD3D->CheckDeviceFormat(
+			if (SUCCEEDED(mD3D->CheckDeviceFormat(
 				mActiveD3DDriver->getAdapterNumber(), D3DDEVTYPE_HAL, bbSurfDesc.Format, 
 				D3DUSAGE_QUERY_VERTEXTEXTURE, D3DRTYPE_TEXTURE, fmt)))
 			{
@@ -1479,7 +1479,7 @@ namespace Ogre
 				return false;
 			}
 
-			HRESULT hr = mpD3D->CheckDeviceFormat(
+			HRESULT hr = mD3D->CheckDeviceFormat(
 				currDevice->getAdapterNumber(),
 				currDevice->getDeviceType(),
 				srfDesc.Format,
@@ -3453,6 +3453,13 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::bindGpuProgram(GpuProgram* prg)
 	{
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Null program bound.",
+				"D3D9RenderSystem::bindGpuProgram");
+		}
+
 		HRESULT hr;
 		switch (prg->getType())
 		{
@@ -3949,7 +3956,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	IDirect3D9*	D3D9RenderSystem::getDirect3D9()
 	{
-		IDirect3D9* pDirect3D9 = msD3D9RenderSystem->mpD3D;
+		IDirect3D9* pDirect3D9 = msD3D9RenderSystem->mD3D;
 
 		if (pDirect3D9 == NULL)
 		{
@@ -4058,7 +4065,7 @@ namespace Ogre
 			for(size_t x=0; x<NDSFORMATS; ++x)
 			{
 				// Verify that the depth format exists
-				if (mpD3D->CheckDeviceFormat(
+				if (mD3D->CheckDeviceFormat(
 					activeDevice->getAdapterNumber(),
 					activeDevice->getDeviceType(),
 					srfDesc.Format,
@@ -4069,7 +4076,7 @@ namespace Ogre
 					continue;
 				}
 				// Verify that the depth format is compatible
-				if(mpD3D->CheckDepthStencilMatch(
+				if(mD3D->CheckDepthStencilMatch(
 					activeDevice->getAdapterNumber(),
 					activeDevice->getDeviceType(), 
 					srfDesc.Format,
@@ -4125,7 +4132,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	unsigned int D3D9RenderSystem::getDisplayMonitorCount() const
 	{
-		return mpD3D->GetAdapterCount();
+		return mD3D->GetAdapterCount();
 	}
 
 	//---------------------------------------------------------------------
@@ -4257,7 +4264,7 @@ namespace Ogre
 
 			HRESULT hr;
 			DWORD outQuality;
-			hr = mpD3D->CheckDeviceMultiSampleType( 
+			hr = mD3D->CheckDeviceMultiSampleType( 
 				deviceDriver->getAdapterNumber(), 
 				D3DDEVTYPE_HAL, 
 				d3dPixelFormat, 

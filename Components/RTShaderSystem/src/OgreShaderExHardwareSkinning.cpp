@@ -43,17 +43,17 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-template<> RTShader::HardwareSkinningFactory* Singleton<RTShader::HardwareSkinningFactory>::ms_Singleton = 0;
+template<> RTShader::HardwareSkinningFactory* Singleton<RTShader::HardwareSkinningFactory>::msSingleton = 0;
 
 namespace RTShader {
 
 HardwareSkinningFactory* HardwareSkinningFactory::getSingletonPtr(void)
 {
-    return ms_Singleton;
+    return msSingleton;
 }
 HardwareSkinningFactory& HardwareSkinningFactory::getSingleton(void)
 {  
-    assert( ms_Singleton );  return ( *ms_Singleton );
+    assert( msSingleton );  return ( *msSingleton );
 }
 
 String HardwareSkinning::Type = "SGX_HardwareSkinning";
@@ -62,8 +62,8 @@ String HardwareSkinning::Type = "SGX_HardwareSkinning";
 /*                                                                      */
 /************************************************************************/
 HardwareSkinning::HardwareSkinning() :
-	mSkinningType(ST_LINEAR),
-	mCreator(NULL)
+	mCreator(NULL),
+	mSkinningType(ST_LINEAR)
 {
 }
 

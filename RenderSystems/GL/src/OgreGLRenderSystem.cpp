@@ -1139,7 +1139,7 @@ namespace Ogre {
 																fbo->getHeight(), fbo->getFSAA() );
 
 			GLRenderBuffer *stencilBuffer = depthBuffer;
-			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilBuffer != GL_NONE )
+			if( depthFormat != GL_DEPTH24_STENCIL8_EXT && stencilBuffer )
 			{
 				stencilBuffer = new GLRenderBuffer( stencilFormat, fbo->getWidth(),
 													fbo->getHeight(), fbo->getFSAA() );
@@ -2887,9 +2887,9 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
         HardwareVertexBufferSharedPtr globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
         VertexDeclaration* globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
-        bool hasInstanceData = op.useGlobalInstancingVertexBufferIsAvailable &&
-                    !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL 
-                || op.vertexData->vertexBufferBinding->getHasInstanceData();
+        bool hasInstanceData = (op.useGlobalInstancingVertexBufferIsAvailable &&
+                                !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL) ||
+                                op.vertexData->vertexBufferBinding->getHasInstanceData();
 
 		size_t numberOfInstances = op.numberOfInstances;
 
@@ -3088,6 +3088,13 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	//---------------------------------------------------------------------
 	void GLRenderSystem::bindGpuProgram(GpuProgram* prg)
 	{
+		if (!prg)
+		{
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Null program bound.",
+				"GLRenderSystem::bindGpuProgram");
+		}
+
 		GLGpuProgram* glprg = static_cast<GLGpuProgram*>(prg);
 
 		// Unbind previous gpu program first.

@@ -464,7 +464,7 @@ namespace
             alphaComp = GL_ALPHA;
 			map = GL_SIGNED_IDENTITY_NV;
 
-			unsigned int offset;
+			string::size_type offset;
 			if(
                 (offset = s.find(".a")) != string::npos ||
                 (offset = s.find(".w")) != string::npos
@@ -571,7 +571,7 @@ namespace
               instr_base = 1;
             }
 			op = instr[instr_base];
-			unsigned int offset;
+			string::size_type offset;
 			if((offset = op.find("_x2")) != string::npos)
 			{
 				scale = GL_SCALE_BY_TWO_NV;

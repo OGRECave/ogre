@@ -58,6 +58,8 @@
 #include "DynTex.h"
 #include "FacialAnimation.h"
 #include "Grass.h"
+#include "Instancing.h"
+#include "NewInstancing.h"
 #include "Lighting.h"
 #include "ParticleFX.h"
 #include "Shadows.h"
@@ -77,8 +79,6 @@
 
 #ifdef USE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
-#include "Instancing.h"
-#include "NewInstancing.h"
 
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.

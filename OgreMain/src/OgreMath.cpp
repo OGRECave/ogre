@@ -61,7 +61,6 @@ namespace Ogre
     Math::Math( unsigned int trigTableSize )
     {
         msAngleUnit = AU_DEGREE;
-
         mTrigTableSize = trigTableSize;
         mTrigTableFactor = mTrigTableSize / Math::TWO_PI;
 

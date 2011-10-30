@@ -40,14 +40,14 @@ namespace Ogre {
 	// is now contained in WorkQueue - this class is entirely single-threaded
 	//------------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    template<> ResourceBackgroundQueue* Singleton<ResourceBackgroundQueue>::ms_Singleton = 0;
+    template<> ResourceBackgroundQueue* Singleton<ResourceBackgroundQueue>::msSingleton = 0;
     ResourceBackgroundQueue* ResourceBackgroundQueue::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     ResourceBackgroundQueue& ResourceBackgroundQueue::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------	
 	//------------------------------------------------------------------------

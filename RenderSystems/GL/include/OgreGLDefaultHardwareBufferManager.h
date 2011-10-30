@@ -40,7 +40,7 @@ namespace Ogre {
     class _OgreGLExport GLDefaultHardwareVertexBuffer : public HardwareVertexBuffer 
     {
 	protected:
-		unsigned char* mpData;
+		unsigned char* mData;
         /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /// @copydoc HardwareBuffer::unlock
@@ -62,15 +62,15 @@ namespace Ogre {
         /** Override HardwareBuffer to turn off all shadowing. */
 		void unlock(void);
 
-        //void* getDataPtr(void) const { return (void*)mpData; }
-        void* getDataPtr(size_t offset) const { return (void*)(mpData + offset); }
+        //void* getDataPtr(void) const { return (void*)mData; }
+        void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
 	/// Specialisation of HardwareIndexBuffer for emulation
     class _OgreGLExport GLDefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
 	protected:
-		unsigned char* mpData;
+		unsigned char* mData;
         /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /// @copydoc HardwareBuffer::unlock
@@ -88,7 +88,7 @@ namespace Ogre {
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
-        void* getDataPtr(size_t offset) const { return (void*)(mpData + offset); }
+        void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
 	/** Specialisation of HardwareBufferManager to emulate hardware buffers.

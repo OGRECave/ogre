@@ -34,16 +34,16 @@ THE SOFTWARE.
 #include "Editor.h"
 #include "EditorEventArgs.h"
 
-template<> EditorManager* Ogre::Singleton<EditorManager>::ms_Singleton = 0;
+template<> EditorManager* Ogre::Singleton<EditorManager>::msSingleton = 0;
 
 EditorManager& EditorManager::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }
 
 EditorManager* EditorManager::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 
 EditorManager::EditorManager(wxAuiNotebook* notebook)

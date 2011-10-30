@@ -59,7 +59,7 @@ protected:
 	void setupContent()
 	{
 
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
@@ -154,10 +154,15 @@ protected:
 
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-			ent->setMaterialName("jaiquaDualQuatTest");
+#ifdef USE_RTSHADER_SYSTEM
+			if (mShaderGenerator->getTargetLanguage() == "glsles")
+                ent->setMaterialName("jaiqua");
+            else
+#endif
+                ent->setMaterialName("jaiquaDualQuatTest");
 			sn->attachObject(ent);
 
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
 			if (mShaderGenerator->getTargetLanguage() != "glsles")
@@ -264,7 +269,7 @@ protected:
 		mAnimSpeeds.clear();
 		MeshManager::getSingleton().remove("floor");
 
-#ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
+#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
 		if (mShaderGenerator->getTargetLanguage() != "glsles")

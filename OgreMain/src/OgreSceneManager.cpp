@@ -209,11 +209,6 @@ SceneManager::~SceneManager()
 	}
 
 	OGRE_DELETE mSkyBoxObj;
-	OGRE_DELETE mSkyPlaneEntity;
-	for (int i=0;i<5;i++)
-	{
-		OGRE_DELETE mSkyDomeEntity[i];
-	}
 
 	OGRE_DELETE mShadowCasterQueryListener;
     OGRE_DELETE mSceneRoot;
@@ -552,11 +547,22 @@ Entity* SceneManager::createEntity(
 
 }
 //---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const String& entityName, const MeshPtr& pMesh)
+{
+    return createEntity(entityName, pMesh->getName(), pMesh->getGroup());
+}
+//---------------------------------------------------------------------
 Entity* SceneManager::createEntity(const String& meshName)
 {
 	String name = mMovableNameGenerator.generate();
 	// note, we can't allow groupName to be passes, it would be ambiguous (2 string params)
 	return createEntity(name, meshName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME);
+}
+//---------------------------------------------------------------------
+Entity* SceneManager::createEntity(const MeshPtr& pMesh)
+{
+    String name = mMovableNameGenerator.generate();
+    return createEntity(name, pMesh);
 }
 //-----------------------------------------------------------------------
 Entity* SceneManager::getEntity(const String& name) const
@@ -1667,6 +1673,7 @@ void SceneManager::_setSkyPlane(
         {
             // destroy old one, do it by name for speed
             destroyEntity(meshName);
+            mSkyPlaneEntity = 0;
         }
         // Create, use the same name for mesh and entity
 		// manually construct as we don't want this to be destroyed on destroyAllMovableObjects
@@ -1677,6 +1684,9 @@ void SceneManager::_setSkyPlane(
         mSkyPlaneEntity = static_cast<Entity*>(factory->createInstance(meshName, this, &params));
         mSkyPlaneEntity->setMaterialName(materialName, groupName);
         mSkyPlaneEntity->setCastShadows(false);
+
+        MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+        objectMap->map[meshName] = mSkyPlaneEntity;
 
         // Create node and attach
         if (!mSkyPlaneNode)
@@ -1989,15 +1999,20 @@ void SceneManager::_setSkyDome(
             {
                 // destroy old one, do it by name for speed
                 destroyEntity(entName);
+                mSkyDomeEntity[i] = 0;
             }
 			// construct manually so we don't have problems if destroyAllMovableObjects called
 			MovableObjectFactory* factory = 
 				Root::getSingleton().getMovableObjectFactory(EntityFactory::FACTORY_TYPE_NAME);
+
 			NameValuePairList params;
 			params["mesh"] = planeMesh->getName();
 			mSkyDomeEntity[i] = static_cast<Entity*>(factory->createInstance(entName, this, &params));
             mSkyDomeEntity[i]->setMaterialName(m->getName(), groupName);
             mSkyDomeEntity[i]->setCastShadows(false);
+
+            MovableObjectCollection* objectMap = getMovableObjectCollection(EntityFactory::FACTORY_TYPE_NAME);
+            objectMap->map[entName] = mSkyDomeEntity[i];
 
             // Attach to node
             mSkyDomeNode->attachObject(mSkyDomeEntity[i]);
@@ -4456,7 +4471,7 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
 		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
 		// objects need an edge list to cast shadows (shadow volumes only)
 		((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
-		 (mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList()
+		 ((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList())
 		)
 	   )
     {
@@ -4968,7 +4983,7 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 
     if (isShadowTechniqueTextureBased())
     {
-		Pass* retPass;
+		Pass* retPass = NULL;
 		if (!pass->getParent()->getShadowReceiverMaterial().isNull())
 		{
 			return retPass = pass->getParent()->getShadowReceiverMaterial()->getBestTechnique()->getPass(0); 
@@ -5135,7 +5150,11 @@ const Pass* SceneManager::deriveShadowReceiverPass(const Pass* pass)
 
 		// handle the case where there is no fixed pipeline support
 		retPass->getParent()->getParent()->compile();
-		retPass = retPass->getParent()->getParent()->getBestTechnique()->getPass(0);
+        Technique* btech = retPass->getParent()->getParent()->getBestTechnique();
+        if( btech )
+        {
+		    retPass = btech->getPass(0);
+        }
 
 		return retPass;
 	}
@@ -6531,6 +6550,12 @@ InstanceManager* SceneManager::getInstanceManager( const String &managerName ) c
 	}
 
 	return itor->second;
+}
+//---------------------------------------------------------------------
+bool SceneManager::hasInstanceManager( const String &managerName ) const
+{
+    InstanceManagerMap::const_iterator itor = mInstanceManagerMap.find(managerName);
+    return itor != mInstanceManagerMap.end();
 }
 //---------------------------------------------------------------------
 void SceneManager::destroyInstanceManager( const String &name )

@@ -107,16 +107,16 @@ namespace Ogre {
 		/// resource locations. The default is true (ignore hidden files).
 		static void setIgnoreHidden(bool ignore)
 		{
-			ms_IgnoreHidden = ignore;
+			msIgnoreHidden = ignore;
 		}
 
 		/// Get whether hidden files are ignored during filesystem enumeration.
 		static bool getIgnoreHidden()
 		{
-			return ms_IgnoreHidden;
+			return msIgnoreHidden;
 		}
 
-		static bool ms_IgnoreHidden;
+		static bool msIgnoreHidden;
     };
 
     /** Specialisation of ArchiveFactory for FileSystem files. */

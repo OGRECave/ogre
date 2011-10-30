@@ -37,8 +37,8 @@ namespace Ogre
     const Real Matrix3::EPSILON = 1e-06;
     const Matrix3 Matrix3::ZERO(0,0,0,0,0,0,0,0,0);
     const Matrix3 Matrix3::IDENTITY(1,0,0,0,1,0,0,0,1);
-    const Real Matrix3::ms_fSvdEpsilon = 1e-04;
-    const unsigned int Matrix3::ms_iSvdMaxIterations = 32;
+    const Real Matrix3::msSvdEpsilon = 1e-04;
+    const unsigned int Matrix3::msSvdMaxIterations = 32;
 
     //-----------------------------------------------------------------------
     Vector3 Matrix3::GetColumn (size_t iCol) const
@@ -490,16 +490,16 @@ namespace Ogre
         Matrix3 kA = *this;
         Bidiagonalize(kA,kL,kR);
 
-        for (unsigned int i = 0; i < ms_iSvdMaxIterations; i++)
+        for (unsigned int i = 0; i < msSvdMaxIterations; i++)
         {
             Real fTmp, fTmp0, fTmp1;
             Real fSin0, fCos0, fTan0;
             Real fSin1, fCos1, fTan1;
 
             bool bTest1 = (Math::Abs(kA[0][1]) <=
-                ms_fSvdEpsilon*(Math::Abs(kA[0][0])+Math::Abs(kA[1][1])));
+                msSvdEpsilon*(Math::Abs(kA[0][0])+Math::Abs(kA[1][1])));
             bool bTest2 = (Math::Abs(kA[1][2]) <=
-                ms_fSvdEpsilon*(Math::Abs(kA[1][1])+Math::Abs(kA[2][2])));
+                msSvdEpsilon*(Math::Abs(kA[1][1])+Math::Abs(kA[2][2])));
             if ( bTest1 )
             {
                 if ( bTest2 )
@@ -882,7 +882,7 @@ namespace Ogre
         return fNorm;
     }
     //-----------------------------------------------------------------------
-    void Matrix3::ToAxisAngle (Vector3& rkAxis, Radian& rfRadians) const
+    void Matrix3::ToAngleAxis (Vector3& rkAxis, Radian& rfRadians) const
     {
         // Let (x,y,z) be the unit-length axis and let A be an angle of rotation.
         // The rotation matrix is R = I + sin(A)*P + (1-cos(A))*P^2 where
@@ -979,7 +979,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
-    void Matrix3::FromAxisAngle (const Vector3& rkAxis, const Radian& fRadians)
+    void Matrix3::FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians)
     {
         Real fCos = Math::Cos(fRadians);
         Real fSin = Math::Sin(fRadians);

@@ -40,14 +40,14 @@ THE SOFTWARE.
 namespace Ogre {
 
     //-----------------------------------------------------------------------
-    template<> SceneManagerEnumerator* Singleton<SceneManagerEnumerator>::ms_Singleton = 0;
+    template<> SceneManagerEnumerator* Singleton<SceneManagerEnumerator>::msSingleton = 0;
     SceneManagerEnumerator* SceneManagerEnumerator::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     SceneManagerEnumerator& SceneManagerEnumerator::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 
     //-----------------------------------------------------------------------

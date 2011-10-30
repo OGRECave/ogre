@@ -993,8 +993,8 @@ namespace Ogre {
 		void _load_buffer_WStr() const;
 		void _load_buffer_UTF32() const;
 
-		mutable BufferType m_bufferType; // identifies the data type held in m_buffer
-		mutable size_t m_bufferSize; // size of the CString buffer
+		mutable BufferType mBufferType; // identifies the data type held in mBuffer
+		mutable size_t mBufferSize; // size of the CString buffer
 
 		// multi-purpose buffer used everywhere we need a throw-away buffer
 		union {
@@ -1003,7 +1003,7 @@ namespace Ogre {
 			mutable std::wstring* mWStrBuffer;
 			mutable utf32string* mUTF32StrBuffer;
 		}
-		m_buffer;
+		mBuffer;
 	};
 
 	//! string addition operator \relates UTFString

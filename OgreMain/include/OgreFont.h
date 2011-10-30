@@ -149,7 +149,7 @@ namespace Ogre
 		CodePointMap mCodePointMap;
 
         /// The material which is generated for this font
-        MaterialPtr mpMaterial;
+        MaterialPtr mMaterial;
 
 		/// Texture pointer
 		TexturePtr mTexture;
@@ -352,7 +352,7 @@ namespace Ogre
         */
         inline const MaterialPtr& getMaterial() const
         {
-            return mpMaterial;
+            return mMaterial;
         }
         /** Gets the material generated for this font, as a weak reference. 
         @remarks
@@ -360,7 +360,7 @@ namespace Ogre
         */
         inline const MaterialPtr& getMaterial()
         {
-            return mpMaterial;
+            return mMaterial;
         }
         /** Sets whether or not the colour of this font is antialiased as it is generated
             from a true type font.

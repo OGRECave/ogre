@@ -43,21 +43,21 @@ email                : pjcast@yahoo.com
 namespace Ogre 
 {
 	//****************************************************************************************
-    template<> ExternalTextureSourceManager* Singleton<ExternalTextureSourceManager>::ms_Singleton = 0;
+    template<> ExternalTextureSourceManager* Singleton<ExternalTextureSourceManager>::msSingleton = 0;
     ExternalTextureSourceManager* ExternalTextureSourceManager::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     ExternalTextureSourceManager& ExternalTextureSourceManager::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
 	//****************************************************************************************
 
 	//****************************************************************************************
 	ExternalTextureSourceManager::ExternalTextureSourceManager()
 	{
-		mpCurrExternalTextureSource = 0;
+		mCurrExternalTextureSource = 0;
 	}
 
 	//****************************************************************************************
@@ -76,12 +76,12 @@ namespace Ogre
 		{
 			if( i->first == sTexturePlugInType )
 			{
-				mpCurrExternalTextureSource = i->second;
-				mpCurrExternalTextureSource->initialise();	//Now call overridden Init function
+				mCurrExternalTextureSource = i->second;
+				mCurrExternalTextureSource->initialise();	//Now call overridden Init function
 				return;
 			}
 		}
-		mpCurrExternalTextureSource = 0;
+		mCurrExternalTextureSource = 0;
 		LogManager::getSingleton().logMessage( "ExternalTextureSourceManager::SetCurrentPlugIn(ENUM) failed setting texture plugin ");
 	}
 

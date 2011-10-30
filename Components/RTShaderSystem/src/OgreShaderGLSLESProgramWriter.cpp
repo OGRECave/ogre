@@ -201,7 +201,7 @@ namespace Ogre {
             }
             else
             {
-            LogManager::getSingleton().logMessage("ERROR: Cached function not found " + invoc.getFunctionName());
+                LogManager::getSingleton().logMessage("ERROR: Cached function not found " + invoc.getFunctionName());
             }
         }
         
@@ -732,9 +732,8 @@ namespace Ogre {
                 }
             }
 
-            endIt = forwardDecl.end();
             // Parse the source shader and write out only the needed functions
-            for (FunctionVector::const_iterator it = forwardDecl.begin(); it != endIt; ++it)
+            for (FunctionVector::const_iterator it = forwardDecl.begin(); it != forwardDecl.end(); ++it)
             {
                 FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
                 FunctionInvocation invoc = FunctionInvocation("", 0, 0);
@@ -928,12 +927,12 @@ namespace Ogre {
                         // First, look for a return type
                         if(isBasicType(tokens[0]) && ((tokens.size() < 3) || (tokens[2] != "=")) )
                         {
-                            String functionSig;
-                            String functionBody;
+                            String functionSig = "";
+                            String functionBody = "";
                             FunctionInvocation *functionInvoc = NULL;
 
                             // Return type
-                            functionSig += tokens[0];
+                            functionSig = tokens[0];
                             functionSig += " ";
 
                             // Function name

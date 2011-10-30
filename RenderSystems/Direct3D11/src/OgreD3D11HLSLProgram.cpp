@@ -195,8 +195,8 @@ namespace Ogre {
 		GpuProgramManager::Microcode cacheMicrocode = 
 			GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 		
-		mpMicroCode.resize(cacheMicrocode->size());
-		cacheMicrocode->read(&mpMicroCode[0], cacheMicrocode->size());
+		mMicroCode.resize(cacheMicrocode->size());
+		cacheMicrocode->read(&mMicroCode[0], cacheMicrocode->size());
 		
 		analizeMicrocode();
 	}
@@ -260,7 +260,7 @@ namespace Ogre {
 		char* pDisassembly = NULL;
 		if( pMicroCode )
 		{
-			D3D11DisassembleShader( (UINT*) &mpMicroCode[0], 
+			D3D11DisassembleShader( (UINT*) &mMicroCode[0], 
 				pMicroCode->GetBufferSize(), TRUE, commentString, &pIDisassembly );
 		}
 
@@ -277,18 +277,18 @@ namespace Ogre {
 		}
 		else
 		{
-			mpMicroCode.resize(pMicroCode->GetBufferSize());
-			memcpy(&mpMicroCode[0], pMicroCode->GetBufferPointer(), pMicroCode->GetBufferSize());
+			mMicroCode.resize(pMicroCode->GetBufferSize());
+			memcpy(&mMicroCode[0], pMicroCode->GetBufferPointer(), pMicroCode->GetBufferSize());
 			SAFE_RELEASE(pMicroCode);
 
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
 		        // create microcode
 		        GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(mpMicroCode.size());
+                    GpuProgramManager::getSingleton().createMicrocode(mMicroCode.size());
 
         		// save microcode
-				newMicrocode->write(&mpMicroCode[0], mpMicroCode.size());
+				newMicrocode->write(&mMicroCode[0], mMicroCode.size());
 
         		// add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
@@ -300,16 +300,16 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::analizeMicrocode()
 	{
-		SIZE_T BytecodeLength = mpMicroCode.size();
+		SIZE_T BytecodeLength = mMicroCode.size();
 
-		HRESULT hr = D3DReflect( (void*) &mpMicroCode[0], BytecodeLength,
+		HRESULT hr = D3DReflect( (void*) &mMicroCode[0], BytecodeLength,
 			IID_ID3D11ShaderReflection, // can't do __uuidof(ID3D11ShaderReflection) here...
-			(void**) &mpIShaderReflection );
+			(void**) &mIShaderReflection );
 
 
 		if (!FAILED(hr))
 		{
-			hr = mpIShaderReflection->GetDesc( &mShaderDesc );
+			hr = mIShaderReflection->GetDesc( &mShaderDesc );
 
 			if (!FAILED(hr))
 			{
@@ -321,7 +321,7 @@ namespace Ogre {
 
 					for (UINT k=0; k<mShaderDesc.InputParameters; k++)
 					{
-						mpIShaderReflection->GetInputParameterDesc( k, &paramDesc);
+						mIShaderReflection->GetInputParameterDesc( k, &paramDesc);
 						mInputVertexDeclaration.addElement(
 							paramDesc.Register, 
 							-1, // we don't need the offset
@@ -341,7 +341,7 @@ namespace Ogre {
 
 				if (mShaderDesc.ConstantBuffers == 1)
 				{
-					mShaderReflectionConstantBuffer = mpIShaderReflection->GetConstantBufferByIndex(0);
+					mShaderReflectionConstantBuffer = mIShaderReflection->GetConstantBufferByIndex(0);
 
 
 					hr = mShaderReflectionConstantBuffer->GetDesc(&mConstantBufferDesc);
@@ -420,10 +420,10 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void D3D11HLSLProgram::unloadHighLevelImpl(void)
 	{
-        SAFE_RELEASE(mpVertexShader);
-        SAFE_RELEASE(mpPixelShader);
-        SAFE_RELEASE(mpGeometryShader);
-        SAFE_RELEASE(mpIShaderReflection);
+        SAFE_RELEASE(mVertexShader);
+        SAFE_RELEASE(mPixelShader);
+        SAFE_RELEASE(mGeometryShader);
+        SAFE_RELEASE(mIShaderReflection);
         SAFE_RELEASE(mConstantBuffer);
 	}
 
@@ -651,8 +651,8 @@ namespace Ogre {
 		ManualResourceLoader* loader, D3D11Device & device)
 		: HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
 		, mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device), 
-		mpIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mpVertexShader(NULL)//, mpConstTable(NULL)
-		,mpPixelShader(NULL),mpGeometryShader(NULL),mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mInputVertexDeclaration(device)
+		mIShaderReflection(NULL), mShaderReflectionConstantBuffer(NULL), mVertexShader(NULL)//, mConstTable(NULL)
+		,mPixelShader(NULL),mGeometryShader(NULL),mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), mInputVertexDeclaration(device)
 	{
 		ZeroMemory(&mConstantBufferDesc, sizeof(mConstantBufferDesc)) ;
 		ZeroMemory(&mShaderDesc, sizeof(mShaderDesc)) ;
@@ -791,12 +791,12 @@ namespace Ogre {
 		{
 			// Create the shader
 			HRESULT hr = mDevice->CreateVertexShader( 
-				&mpMicroCode[0],
-				mpMicroCode.size(),
+				&mMicroCode[0],
+				mMicroCode.size(),
 				NULL,
-				&mpVertexShader);
+				&mVertexShader);
 
-			assert(mpVertexShader);
+			assert(mVertexShader);
 
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -821,10 +821,10 @@ namespace Ogre {
 		{
 			// Create the shader
 			HRESULT hr = mDevice->CreatePixelShader( 
-				&mpMicroCode[0], 
-				mpMicroCode.size(),
+				&mMicroCode[0], 
+				mMicroCode.size(),
 				NULL,
-				&mpPixelShader);
+				&mPixelShader);
 
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -843,7 +843,7 @@ namespace Ogre {
 
     void D3D11HLSLProgram::reinterpretGSForStreamOut(void)
 	{
-		assert(mpGeometryShader);
+		assert(mGeometryShader);
 		unloadHighLevel();
 		mReinterpretingGS = true;
 		loadHighLevel();
@@ -854,14 +854,14 @@ namespace Ogre {
 	{
 		assert(index<mShaderDesc.InputParameters);
 		D3D11_SIGNATURE_PARAMETER_DESC desc;
-		mpIShaderReflection->GetInputParameterDesc(index, &desc);
+		mIShaderReflection->GetInputParameterDesc(index, &desc);
 		return desc;
 	}
 	D3D11_SIGNATURE_PARAMETER_DESC D3D11HLSLProgram::getOutputParamDesc(unsigned int index) const
 	{
 		assert(index<mShaderDesc.OutputParameters);
 		D3D11_SIGNATURE_PARAMETER_DESC desc;
-		mpIShaderReflection->GetOutputParameterDesc(index, &desc);
+		mIShaderReflection->GetOutputParameterDesc(index, &desc);
 		return desc;
 	}
 
@@ -909,8 +909,8 @@ namespace Ogre {
 				UINT bufferStrides[1];
 				bufferStrides[0] = totalComp*sizeof(float);
 				hr = mDevice->CreateGeometryShaderWithStreamOutput( 
-					&mpMicroCode[0], 
-					mpMicroCode.size(),
+					&mMicroCode[0], 
+					mMicroCode.size(),
 					soDeclarations,
 					mShaderDesc.OutputParameters,
 
@@ -919,7 +919,7 @@ namespace Ogre {
 
 					0,
 					NULL,
-					&mpGeometryShader);
+					&mGeometryShader);
 
 			//	delete [] soDeclarations;
 
@@ -928,14 +928,14 @@ namespace Ogre {
 			{
 				// Create the shader
 				hr = mDevice->CreateGeometryShader( 
-                    &mpMicroCode[0], 
-                    mpMicroCode.size(),
+                    &mMicroCode[0], 
+                    mMicroCode.size(),
 					NULL,
-					&mpGeometryShader);
+					&mGeometryShader);
 			}
 
 
-			assert(mpGeometryShader);
+			assert(mGeometryShader);
 
 			if (FAILED(hr) || mDevice.isError())
 			{
@@ -1014,29 +1014,29 @@ namespace Ogre {
 	ID3D11VertexShader* D3D11HLSLProgram::getVertexShader(void) const 
 	{ 
 		assert(mType == GPT_VERTEX_PROGRAM);
-		assert(mpVertexShader);
-		return mpVertexShader; 
+		assert(mVertexShader);
+		return mVertexShader; 
 	}
 	//-----------------------------------------------------------------------------
 	ID3D11PixelShader* D3D11HLSLProgram::getPixelShader(void) const 
 	{ 
 		assert(mType == GPT_FRAGMENT_PROGRAM);
-		assert(mpPixelShader);
-		return mpPixelShader; 
+		assert(mPixelShader);
+		return mPixelShader; 
 	}
 	//-----------------------------------------------------------------------------
 	ID3D11GeometryShader* D3D11HLSLProgram::getGeometryShader(void) const 
 	{ 
 		assert(mType == GPT_GEOMETRY_PROGRAM);
-		assert(mpGeometryShader);
-		return mpGeometryShader; 
+		assert(mGeometryShader);
+		return mGeometryShader; 
 	}
 
 	//-----------------------------------------------------------------------------
 	const MicroCode & D3D11HLSLProgram::getMicroCode(void) const 
 	{ 
-		assert(mpMicroCode.size() > 0);
-		return mpMicroCode; 
+		assert(mMicroCode.size() > 0);
+		return mMicroCode; 
 	}
 
 }

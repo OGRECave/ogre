@@ -12,11 +12,6 @@ varying vec2 oDepth;
 void main()
 {	
 	float alpha = texture2D(diffuseMap, oUv0.xy).a;
-    // Do manual alpha rejection because it is not built into OpenGL ES 2
-    if (alpha < 0.588)
-    {
-        discard;
-    }
 
 	if (alpha > 0.001)
     {

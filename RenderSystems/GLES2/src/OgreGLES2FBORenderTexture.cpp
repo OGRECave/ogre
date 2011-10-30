@@ -266,18 +266,19 @@ namespace Ogre {
             mProps[x].valid = false;
 
 			// Fetch GL format token
-			GLenum fmt = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
-            if(fmt == GL_NONE && x!=0)
+			GLint fmt = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
+
+            if((fmt == GL_NONE) && (x != 0))
                 continue;
 
 			// No test for compressed formats
-			if(PixelUtil::isCompressed((PixelFormat)x))
-				continue;
+            if(PixelUtil::isCompressed((PixelFormat)x))
+                continue;
 
             // Create and attach framebuffer
             glGenFramebuffers(1, &fb);
             glBindFramebuffer(GL_FRAMEBUFFER, fb);
-            if (fmt!=GL_NONE)
+            if (fmt != GL_NONE)
             {
 				// Create and attach texture
 				glGenTextures(1, &tid);
@@ -292,7 +293,7 @@ namespace Ogre {
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                             
-				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GL_UNSIGNED_BYTE, 0);
+				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GLES2PixelUtil::getGLOriginDataType((PixelFormat)x), 0);
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                 target, tid, 0);
             }
@@ -320,11 +321,11 @@ namespace Ogre {
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
-                            //StringUtil::StrStreamType l;
-                            //l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-                            //	<< " D" << depthBits[depth] 
-                            //	<< "S" << stencilBits[stencil];
-                            //LogManager::getSingleton().logMessage(l.str());
+//                            StringUtil::StrStreamType l;
+//                            l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
+//                            	<< " D" << depthBits[depth] 
+//                            	<< "S" << stencilBits[stencil];
+//                            LogManager::getSingleton().logMessage(l.str());
 
                             if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
                             {
@@ -362,6 +363,9 @@ namespace Ogre {
             if (fmt!=GL_NONE)
                 glDeleteTextures(1, &tid);
         }
+
+        // Clear any errors
+        GL_CHECK_ERROR;
 
 		String fmtstring;
         for(size_t x=0; x<PF_COUNT; ++x)
@@ -458,7 +462,7 @@ namespace Ogre {
             else
             {
                 // New one
-                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, fsaa);
+                GLES2RenderBuffer *rb = OGRE_NEW GLES2RenderBuffer(format, width, height, (GLint)fsaa);
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;

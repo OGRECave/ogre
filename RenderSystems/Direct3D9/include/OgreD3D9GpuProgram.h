@@ -102,7 +102,7 @@ namespace Ogre {
         virtual GpuProgramParametersSharedPtr createParameters(void);
 	protected:    
 		bool mColumnMajorMatrices;
-		ID3DXBuffer* mpExternalMicrocode;
+		ID3DXBuffer* mExternalMicrocode;
 
 		void getMicrocodeFromCache( IDirect3DDevice9* d3d9Device );
 		void compileMicrocode( IDirect3DDevice9* d3d9Device );

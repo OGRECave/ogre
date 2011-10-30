@@ -911,7 +911,7 @@ namespace Ogre {
 				// Scale by animation weight
 				influence = weight * influence;
 				// Get pose
-				assert (p1->poseIndex <= poseList->size());
+				assert (p1->poseIndex < poseList->size());
 				Pose* pose = (*poseList)[p1->poseIndex];
 				// apply
 				applyPoseToVertexData(pose, data, influence);

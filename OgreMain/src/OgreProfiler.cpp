@@ -51,14 +51,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     // PROFILE DEFINITIONS
     //-----------------------------------------------------------------------
-    template<> Profiler* Singleton<Profiler>::ms_Singleton = 0;
+    template<> Profiler* Singleton<Profiler>::msSingleton = 0;
     Profiler* Profiler::getSingletonPtr(void)
     {
-        return ms_Singleton;
+        return msSingleton;
     }
     Profiler& Profiler::getSingleton(void)
     {  
-        assert( ms_Singleton );  return ( *ms_Singleton );  
+        assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
     Profile::Profile(const String& profileName, uint32 groupID) 

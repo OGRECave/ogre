@@ -540,7 +540,6 @@ void CompositorInstance::setScheme(const String& schemeName, bool reuseTextures)
 	if (tech)
 	{
 		setTechnique(tech, reuseTextures);
-		mActiveScheme = tech->getSchemeName();
 	}
 }
 //-----------------------------------------------------------------------

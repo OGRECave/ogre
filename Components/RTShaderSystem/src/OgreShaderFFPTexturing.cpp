@@ -678,7 +678,7 @@ void FFPTexturing::addPSBlendInvocations(Function* psMain,
 	case LBX_BLEND_CURRENT_ALPHA:
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_LERP, groupOrder, internalCounter++);
 		curFuncInvocation->pushOperand(arg2, Operand::OPS_IN, targetChannels);
-		curFuncInvocation->pushOperand(arg1, Operand::OPS_OUT, targetChannels);
+		curFuncInvocation->pushOperand(arg1, Operand::OPS_IN, targetChannels);
 
 		if (samplerIndex == 0)
 			curFuncInvocation->pushOperand(mPSDiffuse, Operand::OPS_IN, Operand::OPM_W);

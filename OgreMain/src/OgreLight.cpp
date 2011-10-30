@@ -157,13 +157,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Light::setSpotlightRange(const Radian& innerAngle, const Radian& outerAngle, Real falloff)
     {
-
-        if (mLightType != LT_SPOTLIGHT)
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "setSpotlightRange is only valid for spotlights.",
-                "Light::setSpotlightRange");
-
-        mSpotInner =innerAngle;
+        mSpotInner = innerAngle;
         mSpotOuter = outerAngle;
         mSpotFalloff = falloff;
     }

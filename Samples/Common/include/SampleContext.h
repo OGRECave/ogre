@@ -638,6 +638,10 @@ namespace OgreBites
             {
                 pl.insert(std::make_pair("x11_keyboard_grab", "false"));
                 pl.insert(std::make_pair("x11_mouse_grab", "false"));
+                pl.insert(std::make_pair("w32_mouse", "DISCL_FOREGROUND"));
+                pl.insert(std::make_pair("w32_mouse", "DISCL_NONEXCLUSIVE"));
+                pl.insert(std::make_pair("w32_keyboard", "DISCL_FOREGROUND"));
+                pl.insert(std::make_pair("w32_keyboard", "DISCL_NONEXCLUSIVE"));
             }
 
 			mInputMgr = OIS::InputManager::createInputSystem(pl);

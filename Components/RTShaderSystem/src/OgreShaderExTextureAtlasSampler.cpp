@@ -45,7 +45,7 @@ THE SOFTWARE.
 #define TAS_MAX_SAFE_ATLASED_TEXTURES 250
 
 namespace Ogre {
-template<> RTShader::TextureAtlasSamplerFactory* Singleton<RTShader::TextureAtlasSamplerFactory>::ms_Singleton = 0;
+template<> RTShader::TextureAtlasSamplerFactory* Singleton<RTShader::TextureAtlasSamplerFactory>::msSingleton = 0;
 
 namespace RTShader {
 
@@ -356,11 +356,11 @@ TextureAtlasSamplerFactory::TextureAtlasSamplerFactory()
 
 TextureAtlasSamplerFactory* TextureAtlasSamplerFactory::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 TextureAtlasSamplerFactory& TextureAtlasSamplerFactory::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }
 
 

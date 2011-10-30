@@ -342,7 +342,10 @@ namespace Ogre
 		<tr>
 			<td>externalWindowHandle</td>
 			<td>Win32: HWND as integer<br/>
-			    GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)</td>
+			    GLX: poslong:posint:poslong (display*:screen:windowHandle) or poslong:posint:poslong:poslong (display*:screen:windowHandle:XVisualInfo*)<br/>
+                OS X: WindowRef for Carbon or NSWindow for Cocoa address as an integer
+                iOS: UIWindow address as an integer
+            </td>
 			<td>0 (none)</td>
 			<td>External window handle, for embedding the OGRE render in an existing window</td>
 			<td>&nbsp;</td>
@@ -379,6 +382,7 @@ namespace Ogre
 			<td>String: "cocoa" or "carbon"</td>
 			<td>"carbon"</td>
 			<td>Specifies the type of rendering window on the Mac Platform.</td>
+            <td>Mac OS X Specific</td>
 			<td>&nbsp;</td>
 		 </tr>
 		 <tr>
@@ -393,6 +397,7 @@ namespace Ogre
 				In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSView*
 				instead of an OgreView*. See OgreOSXCocoaView.h/mm.
 			</td>
+            <td>Mac OS X Specific</td>
 			<td>&nbsp;</td>
 		 </tr>
          <tr>
@@ -404,8 +409,25 @@ namespace Ogre
                  native resolution is 960 x 640.  Windows are always 320 x 480, if you would like to limit the display
                  to 720 x 480, specify 1.5 as the scaling factor.
              </td>
+             <td>iOS Specific</td>
              <td>&nbsp;</td>
 		 </tr>
+         <tr>
+             <td>externalViewHandle</td>
+             <td>UIView pointer as an integer</td>
+             <td>0</td>
+             <td>External view handle, for rendering OGRE render in an existing view</td>
+             <td>iOS Specific</td>
+             <td>&nbsp;</td>
+         </tr>
+         <tr>
+             <td>externalViewControllerHandle</td>
+             <td>UIViewController pointer as an integer</td>
+             <td>0</td>
+             <td>External view controller handle, for embedding OGRE in an existing view controller</td>
+             <td>iOS Specific</td>
+             <td>&nbsp;</td>
+         </tr>
          <tr>
 			<td>FSAA</td>
 			<td>Positive integer (usually 0, 2, 4, 8, 16)</td>

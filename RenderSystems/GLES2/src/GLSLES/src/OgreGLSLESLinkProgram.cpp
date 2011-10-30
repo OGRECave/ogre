@@ -27,12 +27,9 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLESLinkProgram.h"
-#include "OgreGLSLESExtSupport.h"
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
-#include "OgreGLES2RenderSystem.h"
-#include "OgreStringVector.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
@@ -41,20 +38,9 @@ namespace Ogre {
 
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram::GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram)
-        : mVertexProgram(vertexProgram)
-		, mFragmentProgram(fragmentProgram)
-		, mUniformRefsBuilt(false)
-        , mLinked(false)
-		, mTriedToLinkAndFailed(false)
+    : GLSLESProgramCommon(vertexProgram, fragmentProgram)
 	{
-		// init CustomAttributesIndexs
-		for(size_t i = 0 ; i < VES_COUNT; i++)
-			for(size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
-		{
-			mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
-		}
-        
-        if (!mVertexProgram || !mFragmentProgram)
+        if ((!mVertexProgram || !mFragmentProgram))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Attempted to create a shader program without both a vertex and fragment program.",
@@ -65,34 +51,29 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram::~GLSLESLinkProgram(void)
 	{
-		glDeleteProgram(mGLHandle);
+		glDeleteProgram(mGLProgramHandle);
         GL_CHECK_ERROR;
 	}
 
-	//-----------------------------------------------------------------------
-	Ogre::String GLSLESLinkProgram::getCombinedName()
-	{
-		String name;
-		if (mVertexProgram)
+    void GLSLESLinkProgram::_useProgram(void)
+    {
+		if (mLinked)
 		{
-			name += "Vertex Program:" ;
-			name += mVertexProgram->getName();
+            GL_CHECK_ERROR
+            glUseProgram( mGLProgramHandle );
+            GL_CHECK_ERROR
 		}
-		if (mFragmentProgram)
-		{
-			name += " Fragment Program:" ;
-			name += mFragmentProgram->getName();
-		}
-		return name;
-	}
+    }
+
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::activate(void)
 	{
 		if (!mLinked && !mTriedToLinkAndFailed)
 		{
 			glGetError(); // Clean up the error. Otherwise will flood log.
-			mGLHandle = glCreateProgram();
-			GL_CHECK_ERROR
+
+			mGLProgramHandle = glCreateProgram();
+ 			GL_CHECK_ERROR
 
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -101,202 +82,99 @@ namespace Ogre {
 			}
 			else
 			{
-#ifdef OGRE_USE_GLES2_GLSL_OPTIMISER
-                // check CmdParams for each shader type to see if we should optimize
-                String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
-                if((paramStr == "true") || paramStr.empty())
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+                // Check CmdParams for each shader type to see if we should optimize
+                if(mVertexProgram)
                 {
-                    GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mVertexProgram);
+                    String paramStr = mVertexProgram->getGLSLProgram()->getParameter("use_optimiser");
+                    if((paramStr == "true") || paramStr.empty())
+                    {
+                        GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mVertexProgram);
+                    }
                 }
-                paramStr = mFragmentProgram->getGLSLProgram()->getParameter("use_optimiser");
-                if((paramStr == "true") || paramStr.empty())
+
+                if(mFragmentProgram)
                 {
-                    GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mFragmentProgram);
+                    String paramStr = mFragmentProgram->getGLSLProgram()->getParameter("use_optimiser");
+                    if((paramStr == "true") || paramStr.empty())
+                    {
+                        GLSLESLinkProgramManager::getSingleton().optimiseShaderSource(mFragmentProgram);
+                    }
                 }
 #endif
 				compileAndLink();
 			}
 
+            extractLayoutQualifiers();
 			buildGLUniformReferences();
 		}
 
-		if (mLinked)
-		{
-            GL_CHECK_ERROR
-            glUseProgram( mGLHandle );
-            GL_CHECK_ERROR
-		}
-	}
-	//-----------------------------------------------------------------------
-	void GLSLESLinkProgram::getMicrocodeFromCache(void)
-	{
-		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
-
-		// add to the microcode to the cache
-		String name;
-		name = getCombinedName();
-
-		// turns out we need this param when loading
-		GLenum binaryFormat = 0;
-
-		cacheMicrocode->seek(0);
-
-		// get size of binary
-		cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
-
-#if GL_OES_get_program_binary
-        GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
-
-        // load binary
-		glProgramBinaryOES( mGLHandle, 
-							binaryFormat, 
-							cacheMicrocode->getPtr(),
-							binaryLength
-			);
-        GL_CHECK_ERROR;
-#endif
-		GLint   success = 0;
-		glGetProgramiv(mGLHandle, GL_LINK_STATUS, &success);
-    GL_CHECK_ERROR;
-		if (!success)
-		{
-			//
-			// Something must have changed since the program binaries
-			// were cached away.  Fallback to source shader loading path,
-			// and then retrieve and cache new program binaries once again.
-			//
-			compileAndLink();
-		}
-
+        _useProgram();
 	}
 
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::compileAndLink()
 	{
-		// compile and attach Vertex Program
+		// Compile and attach Vertex Program
 		if (!mVertexProgram->getGLSLProgram()->compile(true))
 		{
-			// todo error
+			// TODO error
             mTriedToLinkAndFailed = true;
 			return;
 		}
-        mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+        mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
         setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
         
-		// compile and attach Fragment Program
+		// Compile and attach Fragment Program
 		if (!mFragmentProgram->getGLSLProgram()->compile(true))
 		{
-			// todo error
+			// TODO error
             mTriedToLinkAndFailed = true;
 			return;
-		}		
-        mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLHandle);
+		}
+        mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
+        
+        // The link
+        glLinkProgram( mGLProgramHandle );
+        GL_CHECK_ERROR
+        glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked );
+        GL_CHECK_ERROR
+        mTriedToLinkAndFailed = !mLinked;
 
-		// the link
-		glLinkProgram( mGLHandle );
-		GL_CHECK_ERROR
-        glGetProgramiv( mGLHandle, GL_LINK_STATUS, &mLinked );
-		GL_CHECK_ERROR
-	
-		mTriedToLinkAndFailed = !mLinked;
+        logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
-		logObjectInfo( getCombinedName() + String(" GLSL link result : "), mGLHandle );
 		if(mLinked)
 		{
 			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
 			{
-				// add to the microcode to the cache
+				// Add to the microcode to the cache
 				String name;
 				name = getCombinedName();
 
-				// get buffer size
+				// Get buffer size
 				GLint binaryLength = 0;
 #if GL_OES_get_program_binary
-				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
+				glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
                 GL_CHECK_ERROR;
 #endif
 
-                // create microcode
+                // Create microcode
                 GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
+                    GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
 
 #if GL_OES_get_program_binary
-				// get binary
-				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
+				// Get binary
+				glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
+                                      newMicrocode->getPtr() + sizeof(GLenum));
                 GL_CHECK_ERROR;
 #endif
 
-        		// add to the microcode to the cache
+        		// Add to the microcode to the cache
 				GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 			}
 		}
 	}
-	//-----------------------------------------------------------------------
-	const char * getAttributeSemanticString(VertexElementSemantic semantic)
-	{
-		switch(semantic)
-		{
-			case VES_POSITION:
-				return "vertex";
-			case VES_BLEND_WEIGHTS:
-				return "blendWeights";
-			case VES_NORMAL:
-				return "normal";
-			case VES_DIFFUSE:
-				return "colour";
-			case VES_SPECULAR:
-				return "secondary_colour";
-			case VES_BLEND_INDICES:
-				return "blendIndices";
-			case VES_TANGENT:
-				return "tangent";
-			case VES_BINORMAL:
-				return "binormal";
-			case VES_TEXTURE_COORDINATES:
-				return "uv";
-			default:
-				assert(false && "Missing attribute!");
-				return 0;
-		};
 
-	}
-	//-----------------------------------------------------------------------
-	GLuint GLSLESLinkProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
-	{
-		GLint res = mCustomAttributesIndexes[semantic-1][index];
-		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
-		{
-			const char * attString = getAttributeSemanticString(semantic);
-			GLint attrib = glGetAttribLocation(mGLHandle, attString);
-            GL_CHECK_ERROR;
-
-			// sadly position is a special case 
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
-			{
-				attrib = glGetAttribLocation(mGLHandle, "position");
-            GL_CHECK_ERROR;
-			}
-
-			// for uv and other case the index is a part of the name
-			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
-			{
-				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-				attrib = glGetAttribLocation(mGLHandle, attStringWithSemantic.c_str());
-            GL_CHECK_ERROR;
-			}
-
-			// update mCustomAttributesIndexes with the index we found (or didn't find) 
-			mCustomAttributesIndexes[semantic-1][index] = attrib;
-			res = attrib;
-		}
-		return (GLuint)res;
-	}
-	//-----------------------------------------------------------------------
-	bool GLSLESLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
-	{
-		return (GLint)(getAttributeIndex(semantic, index)) != NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX;
-	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::buildGLUniformReferences(void)
 	{
@@ -314,7 +192,7 @@ namespace Ogre {
 			}
 
 			GLSLESLinkProgramManager::getSingleton().extractUniforms(
-				mGLHandle, vertParams, fragParams, mGLUniformReferences);
+				mGLProgramHandle, vertParams, fragParams, mGLUniformReferences);
 
 			mUniformRefsBuilt = true;
 		}

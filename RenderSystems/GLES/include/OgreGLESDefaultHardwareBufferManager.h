@@ -40,7 +40,7 @@ namespace Ogre {
     class _OgreGLESExport GLESDefaultHardwareVertexBuffer : public HardwareVertexBuffer
     {
         protected:
-            unsigned char* mpData;
+            unsigned char* mData;
             /** See HardwareBuffer. */
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
@@ -62,14 +62,14 @@ namespace Ogre {
             /** Override HardwareBuffer to turn off all shadowing. */
             void unlock(void);
 
-            void* getDataPtr(size_t offset) const { return (void*)(mpData + offset); }
+            void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
     /// Specialisation of HardwareIndexBuffer for emulation
     class _OgreGLESExport GLESDefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
         protected:
-            unsigned char* mpData;
+            unsigned char* mData;
             /** See HardwareBuffer. */
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
@@ -88,7 +88,7 @@ namespace Ogre {
             /** Override HardwareBuffer to turn off all shadowing. */
             void unlock(void);
 
-            void* getDataPtr(size_t offset) const { return (void*)(mpData + offset); }
+            void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
     /** Specialisation of HardwareBufferManager to emulate hardware buffers.

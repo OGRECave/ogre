@@ -430,6 +430,8 @@ namespace Ogre {
 		initialised from the Mesh object.
 		*/
 		AnimationState* getAnimationState(const String& name) const;
+        /** Returns whether the AnimationState with the given name exists. */
+        bool hasAnimationState(const String& name) const;
 		/** For entities based on animated meshes, gets the AnimationState objects for all animations.
 		@returns
 		In case the entity is animated, this functions returns the pointer to a AnimationStateSet

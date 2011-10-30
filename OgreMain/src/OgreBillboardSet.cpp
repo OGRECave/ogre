@@ -305,16 +305,16 @@ namespace Ogre {
     {
         mMaterialName = name;
 
-        mpMaterial = MaterialManager::getSingleton().getByName(name, groupName);
+        mMaterial = MaterialManager::getSingleton().getByName(name, groupName);
 
-		if (mpMaterial.isNull())
+		if (mMaterial.isNull())
 			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + name,
 				"BillboardSet::setMaterialName" );
 
         /* Ensure that the new material was loaded (will not load again if
            already loaded anyway)
         */
-        mpMaterial->load();
+        mMaterial->load();
     }
 
     //-----------------------------------------------------------------------
@@ -640,23 +640,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const MaterialPtr& BillboardSet::getMaterial(void) const
     {
-        return mpMaterial;
+        return mMaterial;
     }
 
     void BillboardSet::setMaterial( const MaterialPtr& material )
 	{
-		mpMaterial = material;
+		mMaterial = material;
 		
-        if (mpMaterial.isNull())
+        if (mMaterial.isNull())
         {
 			LogManager::getSingleton().logMessage("Can't assign material "  
                                                   " to BillboardSet of " + getName() + " because this "
                                                   "Material does not exist. Have you forgotten to define it in a "
                                                   ".material script?");
 			
-            mpMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
+            mMaterial = MaterialManager::getSingleton().getByName("BaseWhite");
 			
-            if (mpMaterial.isNull())
+            if (mMaterial.isNull())
             {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
                             "to BillboardSet " + getName() + ". Did "
@@ -665,10 +665,10 @@ namespace Ogre {
             }
         }
 		
-		mMaterialName = mpMaterial->getName();
+		mMaterialName = mMaterial->getName();
         
         // Ensure new material loaded (will not load again if already loaded)
-        mpMaterial->load();
+        mMaterial->load();
 	}
 
     //-----------------------------------------------------------------------
@@ -1225,7 +1225,7 @@ namespace Ogre {
             Vector3 axis = (offsets[3] - offsets[0]).crossProduct(offsets[2] - offsets[1]).normalisedCopy();
 
             Matrix3 rotation;
-			rotation.FromAxisAngle(axis, bb.mRotation);
+			rotation.FromAngleAxis(axis, bb.mRotation);
 
             Vector3 pt;
 

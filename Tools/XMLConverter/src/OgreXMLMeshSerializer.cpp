@@ -55,7 +55,7 @@ namespace Ogre {
 		VertexElementType colourElementType, Mesh* pMesh)
     {
         LogManager::getSingleton().logMessage("XMLMeshSerializer reading mesh data from " + filename + "...");
-        mpMesh = pMesh;
+        mMesh = pMesh;
 		mColourElementType = colourElementType;
         mXMLDoc = new TiXmlDocument(filename);
         mXMLDoc->LoadFile();
@@ -71,8 +71,8 @@ namespace Ogre {
             const char *claimedVertexCount_ = elem->Attribute("vertexcount");
             if(!claimedVertexCount_ || StringConverter::parseInt(claimedVertexCount_) > 0)
             {
-                mpMesh->sharedVertexData = new VertexData();
-                readGeometry(elem, mpMesh->sharedVertexData);
+                mMesh->sharedVertexData = new VertexData();
+                readGeometry(elem, mMesh->sharedVertexData);
             }
         }
 
@@ -99,22 +99,22 @@ namespace Ogre {
 		// submesh names
 		elem = rootElem->FirstChildElement("submeshnames");
 		if (elem)
-			readSubMeshNames(elem, mpMesh);
+			readSubMeshNames(elem, mMesh);
 
 		// submesh extremes
 		elem = rootElem->FirstChildElement("extremes");
 		if (elem)
-			readExtremes(elem, mpMesh);
+			readExtremes(elem, mMesh);
 
 		// poses
 		elem = rootElem->FirstChildElement("poses");
 		if (elem)
-			readPoses(elem, mpMesh);
+			readPoses(elem, mMesh);
 
 		// animations
 		elem = rootElem->FirstChildElement("animations");
 		if (elem)
-			readAnimations(elem, mpMesh);
+			readAnimations(elem, mMesh);
 
 		delete mXMLDoc;
 
@@ -126,7 +126,7 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("XMLMeshSerializer writing mesh data to " + filename + "...");
         
-        mpMesh = const_cast<Mesh*>(pMesh);
+        mMesh = const_cast<Mesh*>(pMesh);
 
         mXMLDoc = new TiXmlDocument();
         mXMLDoc->InsertEndChild(TiXmlElement("mesh"));
@@ -349,7 +349,7 @@ namespace Ogre {
         writeTextureAliases(subMeshNode, s);
 
         // Bone assignments
-        if (mpMesh->hasSkeleton())
+        if (mMesh->hasSkeleton())
         {
             SubMesh::BoneAssignmentIterator bi = const_cast<SubMesh*>(s)->getBoneAssignmentIterator();
             LogManager::getSingleton().logMessage("Exporting dedicated geometry bone assignments...");
@@ -697,7 +697,7 @@ namespace Ogre {
             smElem != 0; smElem = smElem->NextSiblingElement())
         {
             // All children should be submeshes 
-            SubMesh* sm = mpMesh->createSubMesh();
+            SubMesh* sm = mMesh->createSubMesh();
 
             const char* mat = smElem->Attribute("material");
             if (mat)
@@ -1327,21 +1327,21 @@ namespace Ogre {
         } // vertexbuffer
 
         // Set bounds
-        const AxisAlignedBox& currBox = mpMesh->getBounds();
-        Real currRadius = mpMesh->getBoundingSphereRadius();
+        const AxisAlignedBox& currBox = mMesh->getBounds();
+        Real currRadius = mMesh->getBoundingSphereRadius();
         if (currBox.isNull())
         {
 	    //do not pad the bounding box
-            mpMesh->_setBounds(AxisAlignedBox(min, max), false);
-            mpMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredRadius));
+            mMesh->_setBounds(AxisAlignedBox(min, max), false);
+            mMesh->_setBoundingSphereRadius(Math::Sqrt(maxSquaredRadius));
         }
         else
         {
             AxisAlignedBox newBox(min, max);
             newBox.merge(currBox);
 	    //do not pad the bounding box
-            mpMesh->_setBounds(newBox, false);
-            mpMesh->_setBoundingSphereRadius(std::max(Math::Sqrt(maxSquaredRadius), currRadius));
+            mMesh->_setBounds(newBox, false);
+            mMesh->_setBoundingSphereRadius(std::max(Math::Sqrt(maxSquaredRadius), currRadius));
         }
         
 
@@ -1350,7 +1350,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readSkeletonLink(TiXmlElement* mSkelNode)
     {
-        mpMesh->setSkeletonName(mSkelNode->Attribute("name"));
+        mMesh->setSkeletonName(mSkelNode->Attribute("name"));
     }
     //---------------------------------------------------------------------
     void XMLMeshSerializer::readBoneAssignments(TiXmlElement* mBoneAssignmentsNode)
@@ -1369,7 +1369,7 @@ namespace Ogre {
             vba.weight= StringConverter::parseReal(
                 elem->Attribute("weight"));
 
-            mpMesh->addBoneAssignment(vba);
+            mMesh->addBoneAssignment(vba);
         }
 
         LogManager::getSingleton().logMessage("Bone assignments done.");
@@ -1602,7 +1602,7 @@ namespace Ogre {
         {
             String strategyName = val;
             LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-            mpMesh->setLodStrategy(strategy);
+            mMesh->setLodStrategy(strategy);
         }
 
 		val = lodNode->Attribute("numlevels");
@@ -1613,7 +1613,7 @@ namespace Ogre {
 		bool manual = StringConverter::parseBool(val);
 
 		// Set up the basic structures
-		mpMesh->_setLodInfo(numLevels, manual);
+		mMesh->_setLodInfo(numLevels, manual);
 
 		// Parse the detail, start from 1 (the first sub-level of detail)
 		unsigned short i = 1;
@@ -1663,11 +1663,11 @@ namespace Ogre {
 		{
 			usage.userValue = StringConverter::parseReal(val);
 		}
-		usage.value = mpMesh->getLodStrategy()->transformUserValue(usage.userValue);
+		usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
 		usage.manualName = manualNode->Attribute("meshname");
         usage.edgeData = NULL;
 
-		mpMesh->_setLodUsage(index, usage);
+		mMesh->_setLodUsage(index, usage);
 	}
     //---------------------------------------------------------------------
 	void XMLMeshSerializer::readLodUsageGenerated(TiXmlElement* genNode, unsigned short index)
@@ -1688,12 +1688,12 @@ namespace Ogre {
 		{
 			usage.userValue = StringConverter::parseReal(val);
 		}
-		usage.value = mpMesh->getLodStrategy()->transformUserValue(usage.userValue);
+		usage.value = mMesh->getLodStrategy()->transformUserValue(usage.userValue);
 		usage.manualMesh.setNull();
 		usage.manualName = "";
         usage.edgeData = NULL;
 
-		mpMesh->_setLodUsage(index, usage);
+		mMesh->_setLodUsage(index, usage);
 
 		// Read submesh face lists
 		TiXmlElement* faceListElem = genNode->FirstChildElement("lodfacelist");
@@ -1708,7 +1708,7 @@ namespace Ogre {
 			{
 				// use of 32bit indexes depends on submesh
 				HardwareIndexBuffer::IndexType itype = 
-					mpMesh->getSubMesh(subidx)->indexData->indexBuffer->getType();
+					mMesh->getSubMesh(subidx)->indexData->indexBuffer->getType();
 				bool use32bitindexes = (itype == HardwareIndexBuffer::IT_32BIT);
 
 				// Assign memory: this will be deleted by the submesh 
@@ -1758,7 +1758,7 @@ namespace Ogre {
 			facedata->indexCount = numFaces * 3;
             facedata->indexStart = 0;
             facedata->indexBuffer = ibuf;
-			mpMesh->_setSubMeshLodFaceList(subidx, index, facedata);
+			mMesh->_setSubMeshLodFaceList(subidx, index, facedata);
 
 			faceListElem = faceListElem->NextSiblingElement();
 		}

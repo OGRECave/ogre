@@ -29,16 +29,16 @@ THE SOFTWARE.
 
 #include "RootEventArgs.h"
 
-template<> RootEventPlugin* Ogre::Singleton<RootEventPlugin>::ms_Singleton = 0;
+template<> RootEventPlugin* Ogre::Singleton<RootEventPlugin>::msSingleton = 0;
 
 RootEventPlugin& RootEventPlugin::getSingleton(void)
 {  
-	assert( ms_Singleton );  return ( *ms_Singleton );  
+	assert( msSingleton );  return ( *msSingleton );  
 }
 
 RootEventPlugin* RootEventPlugin::getSingletonPtr(void)
 {
-	return ms_Singleton;
+	return msSingleton;
 }
 
 RootEventPlugin::RootEventPlugin()

@@ -489,11 +489,11 @@ namespace Ogre {
 	{
 	protected:
 		/// Reference to source stream (read)
-		std::istream* mpInStream;
+		std::istream* mInStream;
 		/// Reference to source file stream (read-only)
-		std::ifstream* mpFStreamRO;
+		std::ifstream* mFStreamRO;
 		/// Reference to source file stream (read-write)
-		std::fstream* mpFStream;
+		std::fstream* mFStream;
         bool mFreeOnClose;	
 
 		void determineAccess();

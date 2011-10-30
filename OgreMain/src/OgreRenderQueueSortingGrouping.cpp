@@ -102,7 +102,7 @@ namespace Ogre {
             if (mSplitNoShadowPasses &&
                 mParent->getShadowsEnabled() &&
 				(!pTech->getParent()->getReceiveShadows() ||
-				rend->getCastsShadows() && mShadowCastersNotReceivers))
+				(rend->getCastsShadows() && mShadowCastersNotReceivers)))
             {
                 // Add solid renderable and add passes to no-shadow group
                 addSolidRenderable(pTech, rend, true);

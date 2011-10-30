@@ -382,7 +382,7 @@ namespace Ogre {
             vertex declaration. <b>Please read the information in VertexDeclaration about
 	    the importance of ordering and structure for compatibility with older D3D drivers</b>.
 	    @param source The binding index of HardwareVertexBuffer which will provide the source for this element.
-			See VertexBufferBindingState for full information.
+			See VertexBufferBinding for full information.
         @param offset The offset in bytes where this element is located in the buffer
         @param theType The data format of the element (3 floats, a colour etc)
         @param semantic The meaning of the data (position, normal, diffuse colour etc)
@@ -397,7 +397,7 @@ namespace Ogre {
         vertex declaration. <b>Please read the information in VertexDeclaration about
         the importance of ordering and structure for compatibility with older D3D drivers</b>.
         @param source The binding index of HardwareVertexBuffer which will provide the source for this element.
-        See VertexBufferBindingState for full information.
+        See VertexBufferBinding for full information.
         @param offset The offset in bytes where this element is located in the buffer
         @param theType The data format of the element (3 floats, a colour etc)
         @param semantic The meaning of the data (position, normal, diffuse colour etc)

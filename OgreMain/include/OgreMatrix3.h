@@ -177,13 +177,13 @@ namespace Ogre
         Real SpectralNorm () const;
 
         // matrix must be orthonormal
-        void ToAxisAngle (Vector3& rkAxis, Radian& rfAngle) const;
-		inline void ToAxisAngle (Vector3& rkAxis, Degree& rfAngle) const {
+        void ToAngleAxis (Vector3& rkAxis, Radian& rfAngle) const;
+		inline void ToAngleAxis (Vector3& rkAxis, Degree& rfAngle) const {
 			Radian r;
-			ToAxisAngle ( rkAxis, r );
+			ToAngleAxis ( rkAxis, r );
 			rfAngle = r;
 		}
-        void FromAxisAngle (const Vector3& rkAxis, const Radian& fRadians);
+        void FromAngleAxis (const Vector3& rkAxis, const Radian& fRadians);
 
         // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
         // where yaw is rotation about the Up vector, pitch is rotation about the
@@ -251,8 +251,8 @@ namespace Ogre
         bool QLAlgorithm (Real afDiag[3], Real afSubDiag[3]);
 
         // support for singular value decomposition
-        static const Real ms_fSvdEpsilon;
-        static const unsigned int ms_iSvdMaxIterations;
+        static const Real msSvdEpsilon;
+        static const unsigned int msSvdMaxIterations;
         static void Bidiagonalize (Matrix3& kA, Matrix3& kL,
             Matrix3& kR);
         static void GolubKahanStep (Matrix3& kA, Matrix3& kL,

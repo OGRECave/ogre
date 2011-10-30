@@ -104,6 +104,7 @@ namespace Ogre
         file << "\t" << "pbuffer " << StringConverter::toString(caps->hasCapability(RSC_PBUFFER)) << endl;
         file << "\t" << "gl1_5_nohwocclusion " << StringConverter::toString(caps->hasCapability(RSC_GL1_5_NOHWOCCLUSION)) << endl;
         file << "\t" << "perstageconstant " << StringConverter::toString(caps->hasCapability(RSC_PERSTAGECONSTANT)) << endl;
+        file << "\t" << "separate_shader_objects " << StringConverter::toString(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS)) << endl;
         file << endl;
 
         RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
@@ -416,6 +417,7 @@ namespace Ogre
         addKeywordType("pbuffer", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("gl1_5_nohwocclusion", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("perstageconstant", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("separate_shader_objects", SET_CAPABILITY_ENUM_BOOL);
 
 		addCapabilitiesMapping("fixed_function", RSC_FIXED_FUNCTION);
         addCapabilitiesMapping("automipmap", RSC_AUTOMIPMAP);
