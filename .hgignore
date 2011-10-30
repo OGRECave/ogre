@@ -1,2 +1,11 @@
 syntax: glob
 testTerrain*.dat
+*.dll
+*.filters
+Dependencies/include/FreeImage.h
+*.vcxproj
+*.pdb
+*.ilk
+*.tlog
+*.obj
+*.rule

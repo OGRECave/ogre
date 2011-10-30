@@ -38,7 +38,7 @@ namespace Ogre {
 		bool useSystemMemory, bool useShadowBuffer, bool streamOut)
 		: HardwareBuffer(usage, useSystemMemory,  false /* TODO: useShadowBuffer*/),
 		mlpD3DBuffer(0),
-		mTempStagingBuffer(0),
+		mpTempStagingBuffer(0),
 		mUseTempStagingBuffer(false),
 		mBufferType(btype),
 		mDevice(device)
@@ -99,27 +99,9 @@ namespace Ogre {
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
 		SAFE_RELEASE(mlpD3DBuffer);
-		SAFE_DELETE(mTempStagingBuffer); // should never be nonzero unless destroyed while locked
+		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
 
 	}
-   	void D3D11HardwareBuffer::reinterpretForStreamOutput(void)
-	{
-		SAFE_RELEASE(mlpD3DBuffer);
-		SAFE_DELETE(mTempStagingBuffer); // should never be nonzero unless destroyed while locked
-
-		assert(mDesc.Usage!=D3D11_USAGE_STAGING);
-
-		mDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
-
-		HRESULT hr = mDevice->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
-		if (FAILED(hr) || mDevice.isError())
-		{
-			String msg = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Cannot create D3D11 buffer: " + msg, 
-				"D3D11HardwareBuffer::reinterpretForStreamOutput");
-		}
- 	}
 	//---------------------------------------------------------------------
 	void* D3D11HardwareBuffer::lockImpl(size_t offset, 
 		size_t length, LockOptions options)
@@ -218,21 +200,21 @@ namespace Ogre {
 		else
 		{
 			mUseTempStagingBuffer = true;
-			if (!mTempStagingBuffer)
+			if (!mpTempStagingBuffer)
 			{
 				// create another buffer instance but use system memory
-				mTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
+				mpTempStagingBuffer = new D3D11HardwareBuffer(mBufferType, 
 					mSizeInBytes, mUsage, mDevice, true, false, false);
 			}
 
 			// schedule a copy to the staging
 			if (options != HBL_DISCARD)
-				mTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
+				mpTempStagingBuffer->copyData(*this, 0, 0, mSizeInBytes, true);
 
 			// register whether we'll need to upload on unlock
 			mStagingUploadNeeded = (options != HBL_READ_ONLY);
 
-			return mTempStagingBuffer->lock(offset, length, options);
+			return mpTempStagingBuffer->lock(offset, length, options);
 
 
 		}
@@ -246,16 +228,16 @@ namespace Ogre {
 			mUseTempStagingBuffer = false;
 
 			// ok, we locked the staging buffer
-			mTempStagingBuffer->unlock();
+			mpTempStagingBuffer->unlock();
 
 			// copy data if needed
 			// this is async but driver should keep reference
 			if (mStagingUploadNeeded)
-				copyData(*mTempStagingBuffer, 0, 0, mSizeInBytes, true);
+				copyData(*mpTempStagingBuffer, 0, 0, mSizeInBytes, true);
 
 			// delete
 			// not that efficient, but we should not be locking often
-			SAFE_DELETE(mTempStagingBuffer);
+			SAFE_DELETE(mpTempStagingBuffer);
 		}
 		else
 		{
@@ -325,6 +307,9 @@ namespace Ogre {
 			discardWholeBuffer ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
 		memcpy(pDst, pSource, length);
 		this->unlock();
+
+
+		//mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer, 0, NULL, pSource, offset, length);
 	}
 	//---------------------------------------------------------------------
 

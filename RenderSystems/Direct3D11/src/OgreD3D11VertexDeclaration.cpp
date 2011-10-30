@@ -206,10 +206,7 @@ namespace Ogre {
 
 			DWORD dwShaderFlags = 0;
 			const MicroCode &  vSBuf = boundVertexProgram->getMicroCode();
-            if (boundVertexProgram->getName() == "595364079_VS")
-            {
-                int u = 1;
-            }
+
 			D3D11_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration(boundVertexProgram, binding);
 			HRESULT hr = mlpD3DDevice->CreateInputLayout( 
 				pVertexDecl, 

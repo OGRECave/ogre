@@ -58,11 +58,8 @@ namespace Ogre
 
 		OGRE_D3D11_DRIVER_TYPE mDriverType; // d3d11 driver type
 
-
-
-
 		/// Direct3D
-		//int			mD3D;
+		//int			mpD3D;
 		/// Direct3D rendering device
 		D3D11Device 	mDevice;
 		
@@ -82,7 +79,6 @@ namespace Ogre
 		bool mPerStageConstantSupport;
 
 		/// structure holding texture unit settings for every stage
-
 
 
 		D3D11DriverList* getDirect3DDrivers(void);
@@ -190,7 +186,7 @@ namespace Ogre
 		
 		bool mRenderSystemWasInited;
 
-		IDXGIFactory1*	mDXGIFactory;
+		IDXGIFactory1*	mpDXGIFactory;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 	public:

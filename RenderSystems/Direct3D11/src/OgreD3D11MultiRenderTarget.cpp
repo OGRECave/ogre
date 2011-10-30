@@ -42,6 +42,7 @@ namespace Ogre
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			targets[x] = 0;
+			mRenderTargetViews[x] = 0;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -78,6 +79,14 @@ namespace Ogre
 		}
 
 		targets[attachment] = buffer;
+
+		ID3D11RenderTargetView** v;
+		target->getCustomAttribute( "ID3D11RenderTargetView", &v );
+		mRenderTargetViews[attachment] = *v;
+
+		if(mNumberOfViews >= OGRE_MAX_MULTIPLE_RENDER_TARGETS)
+			mNumberOfViews++;
+
 		checkAndUpdate();
 	}
 	//---------------------------------------------------------------------
@@ -85,13 +94,17 @@ namespace Ogre
 	{
 		assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
 		targets[attachment] = 0;
+		mRenderTargetViews[attachment] = 0;
+
+		if(mNumberOfViews <= 0)
+			mNumberOfViews--;
+
 		checkAndUpdate();
 	}
 	//---------------------------------------------------------------------
 	void D3D11MultiRenderTarget::update(void)
 	{
-		D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(
-			Root::getSingleton().getRenderSystem());
+		//D3D11RenderSystem* rs = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 
 		MultiRenderTarget::update();
 	}
@@ -108,6 +121,16 @@ namespace Ogre
 					pSurf[x] = targets[x]->getParentTexture()->GetTex2D();
 			}
 			return;
+		}
+		else if(name == "ID3D11RenderTargetView")
+		{
+			*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
+			return;
+		}
+		else if( name == "numberOfViews" )
+		{
+			uint* n = reinterpret_cast<unsigned int*>(pData);
+			*n = mNumberOfViews;
 		}
 	}
 	//---------------------------------------------------------------------

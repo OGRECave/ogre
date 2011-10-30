@@ -39,12 +39,11 @@ namespace Ogre
 		ManualResourceLoader* loader, D3D11Device & device)
 		:Texture(creator, name, handle, group, isManual, loader),
 		mDevice(device), 
-		// mD3D(NULL), 
-		mTex(NULL),
-		mShaderResourceView(NULL),
-		m1DTex(NULL),
-		m2DTex(NULL),
-		m3DTex(NULL),
+		mpTex(NULL),
+		mpShaderResourceView(NULL),
+		mp1DTex(NULL),
+		mp2DTex(NULL),
+		mp3DTex(NULL),
 		mDynamicTextures(false)
 	{
 	}
@@ -80,7 +79,7 @@ namespace Ogre
 		// get the target
 		other = reinterpret_cast< D3D11Texture * >( target.get() );
 
-		mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mTex);
+		mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex);
 		if (mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription();
@@ -135,11 +134,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Texture::freeInternalResourcesImpl()
 	{
-		SAFE_RELEASE(mTex);
-        SAFE_RELEASE(mShaderResourceView);
-		SAFE_RELEASE(m1DTex);
-		SAFE_RELEASE(m2DTex);
-		SAFE_RELEASE(m3DTex);
+		SAFE_RELEASE(mpTex);
+        SAFE_RELEASE(mpShaderResourceView);
+		SAFE_RELEASE(mp1DTex);
+		SAFE_RELEASE(mp2DTex);
+		SAFE_RELEASE(mp3DTex);
 	}
 	//---------------------------------------------------------------------
 	void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -155,7 +154,7 @@ namespace Ogre
 			//	size_t pos = mName.find_last_of(".");
 			
 			//	if ( pos != String::npos )
-		//		ext = mName.substr(pos+1);
+			//		ext = mName.substr(pos+1);
 			vector<Image>::type images(6);
 			ConstImagePtrList imagePtrs;
 			static const String suffixes[6] = {"_rt", "_lf", "_up", "_dn", "_fr", "_bk"};
@@ -204,14 +203,14 @@ namespace Ogre
 										memoryptr->size(),
 										NULL,
 										NULL, 
-										&mShaderResourceView, 
+										&mpShaderResourceView, 
 										NULL );
 				if( FAILED( hr ) )
 				{
 					LogManager::getSingleton().logMessage("D3D11 : "+mName+" Could not be loaded");
 				}
 				D3D11_SHADER_RESOURCE_VIEW_DESC pDesc;
-				mShaderResourceView->GetDesc(&pDesc);
+				mpShaderResourceView->GetDesc(&pDesc);
 				int a=0;
 			}
 			else
@@ -221,6 +220,12 @@ namespace Ogre
 			}
 		}
 	}
+
+	void D3D11Texture::createInternalResources(void)
+	{
+		createInternalResourcesImpl();
+	}
+
 	//---------------------------------------------------------------------
 	void D3D11Texture::createInternalResourcesImpl(void)
 	{
@@ -275,9 +280,6 @@ namespace Ogre
 		// Use D3DX to help us create the texture, this way it can adjust any relevant sizes
 		UINT numMips = static_cast<UINT>(mNumRequestedMipmaps );
 
-
-
-
 		D3D11_TEXTURE1D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
 		desc.MipLevels		= numMips;
@@ -300,7 +302,7 @@ namespace Ogre
 		hr = mDevice->CreateTexture1D(	
 			&desc,
 			NULL,
-			&m1DTex);						// data pointer
+			&mp1DTex);						// data pointer
 		// check result and except if failed
 		if (FAILED(hr) || mDevice.isError())
 		{
@@ -311,7 +313,7 @@ namespace Ogre
 		}
 
 		// set the base texture we'll use in the render system
-		hr = m1DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mTex);
+		hr = mp1DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
@@ -322,14 +324,13 @@ namespace Ogre
 
 		// set final tex. attributes from tex. description
 		// they may differ from the source image !!!
-
-		m1DTex->GetDesc(&desc);
+		mp1DTex->GetDesc(&desc);
 
 		ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 		mSRVDesc.Format = desc.Format;
 		mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
 		mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-		hr = mDevice->CreateShaderResourceView( m1DTex, &mSRVDesc, &mShaderResourceView );
+		hr = mDevice->CreateShaderResourceView( mp1DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
@@ -360,10 +361,10 @@ namespace Ogre
 			numMips = 0;
 			mNumMipmaps = 0; // Will get this value from the created texture
 		}
-		else
-		{
-			numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
-		}
+		//else
+		//{
+		//	numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+		//}
 
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -371,15 +372,21 @@ namespace Ogre
 		desc.MipLevels		= numMips;
 		desc.ArraySize		= mDepth == 0 ? 1 : mDepth;
 		desc.Format			= d3dPF;
-		DXGI_SAMPLE_DESC sampleDesc;
-		sampleDesc.Count = 1;
-		sampleDesc.Quality = 0;
-		desc.SampleDesc		= sampleDesc;
+
+		// Handle multisampled render target
+		if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
+		{
+			desc.SampleDesc.Count = mFSAA;
+			desc.SampleDesc.Quality = atoi(mFSAAHint.c_str());
+		}
+		else
+		{
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+		}
+
 		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
-
 		desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-
-
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
 		desc.MiscFlags		= 0;//D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		//if (mMipmapsHardwareGenerated)
@@ -392,7 +399,9 @@ namespace Ogre
 			desc.Usage			= D3D11_USAGE_DYNAMIC;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			desc.MiscFlags = 0;
-			desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE ;
+			desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
 		}
 
 		if (this->getTextureType() == TEX_TYPE_CUBE_MAP)
@@ -412,13 +421,15 @@ namespace Ogre
 			desc.MiscFlags = 0;
 			mNumRequestedMipmaps -= 2;
 			desc.MipLevels -= 2;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
 		}
 
 		// create the texture
 		hr = mDevice->CreateTexture2D(	
 			&desc,
 			NULL,// data pointer
-			&m2DTex);						
+			&mp2DTex);						
 		// check result and except if failed
 		if (FAILED(hr) || mDevice.isError())
 		{
@@ -432,12 +443,12 @@ namespace Ogre
 		if(mNumMipmaps == 0)
 		{
 			D3D11_TEXTURE2D_DESC texDesc;
-			m2DTex->GetDesc(&texDesc);
+			mp2DTex->GetDesc(&texDesc);
 			mNumMipmaps = texDesc.MipLevels; 		
 		}
 
 		// set the base texture we'll use in the render system
-		hr = m2DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mTex);
+		hr = mp2DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
@@ -449,19 +460,48 @@ namespace Ogre
 
 		// set final tex. attributes from tex. description
 		// they may differ from the source image !!!
-		m2DTex->GetDesc(&desc);
+		mp2DTex->GetDesc(&desc);
 		
 		ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 		mSRVDesc.Format = desc.Format;
-		mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		mSRVDesc.Texture2D.MipLevels = desc.MipLevels;
-
-		if (this->getTextureType() == TEX_TYPE_CUBE_MAP)
+		
+		switch(this->getTextureType())
 		{
+		case TEX_TYPE_CUBE_MAP:
 			mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 			mSRVDesc.TextureCube.MipLevels = desc.MipLevels;
 			mSRVDesc.TextureCube.MostDetailedMip = 0;
+			break;
 
+		case TEX_TYPE_2D_ARRAY:
+			if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
+			{
+				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+				mSRVDesc.Texture2DMSArray.FirstArraySlice = 0;
+				mSRVDesc.Texture2DMSArray.ArraySize = mDepth;
+			}
+			else
+			{
+				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				mSRVDesc.Texture2DArray.FirstArraySlice = 0;
+				mSRVDesc.Texture2DArray.ArraySize = mDepth;
+				mSRVDesc.Texture2DArray.MostDetailedMip = 0;
+				mSRVDesc.Texture2DArray.MipLevels = mNumMipmaps;
+			}
+			break;
+
+		case TEX_TYPE_2D:
+			if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
+			{
+				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			}
+			else
+			{
+				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				mSRVDesc.Texture2D.MostDetailedMip = 0;
+				mSRVDesc.Texture2D.MipLevels = mNumMipmaps;
+			}
+			break;
 		}
 
 		if (this->getTextureType() == TEX_TYPE_2D_ARRAY)
@@ -474,7 +514,7 @@ namespace Ogre
 
 		}
 		
-		hr = mDevice->CreateShaderResourceView( m2DTex, &mSRVDesc, &mShaderResourceView );
+		hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
@@ -519,7 +559,7 @@ namespace Ogre
 		hr = mDevice->CreateTexture3D(	
 			&desc,
 			NULL,
-			&m3DTex);						// data pointer
+			&mp3DTex);						// data pointer
 		// check result and except if failed
 		if (FAILED(hr) || mDevice.isError())
 		{
@@ -531,7 +571,7 @@ namespace Ogre
 		}
 
 		// set the base texture we'll use in the render system
-		hr = m3DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mTex);
+		hr = mp3DTex->QueryInterface(__uuidof(ID3D11Resource), (void **)&mpTex);
 		if (FAILED(hr) || mDevice.isError())
 		{
 			this->freeInternalResources();
@@ -543,14 +583,15 @@ namespace Ogre
 
 		// set final tex. attributes from tex. description
 		// they may differ from the source image !!!
-		m3DTex->GetDesc(&desc);
+		mp3DTex->GetDesc(&desc);
 
 	
 		ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 		mSRVDesc.Format = desc.Format;
 		mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+		mSRVDesc.Texture3D.MostDetailedMip = 0;
 		mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-		hr = mDevice->CreateShaderResourceView( m3DTex, &mSRVDesc, &mShaderResourceView );
+		hr = mDevice->CreateShaderResourceView( mp3DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String errorDescription = mDevice.getErrorDescription(hr);
@@ -788,7 +829,7 @@ namespace Ogre
 			return;
 		}
 
-		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		//D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 		
         LoadedStreams loadedStreams;
 
@@ -895,7 +936,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Texture::postLoadImpl()
 	{
-		D3D11_DEVICE_ACCESS_CRITICAL_SECTION
+		//D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 		mLoadedStreams.setNull();	
 	}
 	//---------------------------------------------------------------------
@@ -980,15 +1021,20 @@ namespace Ogre
 		}
 		else if(name == "ID3D11RenderTargetView")
 		{
-			*static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView;
+			//*static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView;
+			*static_cast<ID3D11RenderTargetView***>(pData) = &mRenderTargetView;
 			return;
+		}
+		else if( name == "numberOfViews" )
+		{
+			unsigned int* n = reinterpret_cast<unsigned int*>(pData);
+			*n = 1;
 		}
 	}
 	//---------------------------------------------------------------------
 	D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
 	RenderTexture(buffer, 0)
 	{
-
 		mName = name;
 
 		rebind(buffer);

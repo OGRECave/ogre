@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __D3D8TEXTURE_H__
-#define __D3D8TEXTURE_H__
+#ifndef __D3D11TEXTURE_H__
+#define __D3D11TEXTURE_H__
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreTexture.h"
@@ -42,19 +42,18 @@ namespace Ogre {
 		/// D3DDevice pointer
 		D3D11Device	&	mDevice;	
 
-
 		/// D3D11 pointer
-		//LPDIRECT3D11				*mD3D;
+		//LPDIRECT3D11				*mpD3D;
 		// 1D texture pointer
-		ID3D11Texture1D *m1DTex;
+		ID3D11Texture1D *mp1DTex;
 		// 2D texture pointer
-		ID3D11Texture2D *m2DTex;
+		ID3D11Texture2D *mp2DTex;
 		/// cubic texture pointer
-		ID3D11Texture3D	*m3DTex;	
+		ID3D11Texture3D	*mp3DTex;	
 		/// actual texture pointer
-		ID3D11Resource 	*mTex;		
+		ID3D11Resource 	*mpTex;		
 
-		ID3D11ShaderResourceView* mShaderResourceView;
+		ID3D11ShaderResourceView* mpShaderResourceView;
 
 		// is dynamic
 		bool mIsDynamic; 
@@ -89,6 +88,8 @@ namespace Ogre {
 		/// internal method, return a D3D pixel format for texture creation
 		DXGI_FORMAT _chooseD3DFormat();
 
+		/// @copydoc Texture::createInternalResources
+		void createInternalResources(void);
 		/// @copydoc Texture::createInternalResourcesImpl
 		void createInternalResourcesImpl(void);
 		/// @copydoc Texture::freeInternalResources
@@ -144,16 +145,16 @@ namespace Ogre {
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
 		ID3D11Resource *getTextureResource() 
-		{ assert(mTex); return mTex; }
+		{ assert(mpTex); return mpTex; }
 		/// retrieves a pointer to the actual texture
 		ID3D11ShaderResourceView *getTexture() 
-		{ assert(mShaderResourceView); return mShaderResourceView; }
+		{ assert(mpShaderResourceView); return mpShaderResourceView; }
 		/*/// retrieves a pointer to the normal 1D/2D texture
 		IDirect3DTexture9 *getNormTexture()
-		{ assert(mNormTex); return mNormTex; }
+		{ assert(mpNormTex); return mpNormTex; }
 		/// retrieves a pointer to the cube texture
 		IDirect3DCubeTexture9 *getCubeTexture()
-		{ assert(mCubeTex); return mCubeTex; }
+		{ assert(mpCubeTex); return mpCubeTex; }
 		*/
 
 
@@ -162,9 +163,9 @@ namespace Ogre {
 		/// For dealing with lost devices - recreate the resource if in the default pool (and return true)
 		bool recreateIfDefaultPool(D3D11Device & device);
 
-		ID3D11Texture1D * GetTex1D() {return m1DTex;};
-		ID3D11Texture2D * GetTex2D() {return m2DTex;};
-		ID3D11Texture3D	* GetTex3D() {return m3DTex;};
+		ID3D11Texture1D * GetTex1D() {return mp1DTex;};
+		ID3D11Texture2D * GetTex2D() {return mp2DTex;};
+		ID3D11Texture3D	* GetTex3D() {return mp3DTex;};
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
 

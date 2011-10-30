@@ -30,7 +30,6 @@ THE SOFTWARE.
 #define __GLES2Prerequisites_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreLogManager.h"
 #include "OgreMath.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
@@ -70,7 +69,7 @@ THE SOFTWARE.
 #	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #		include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
-#       include "ppapi/c/ppb_opengles2.h"
+#       include "ppapi/c/ppp_graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d.h"
 #       include "ppapi/cpp/graphics_3d_client.h"
 #		include "ppapi/gles2/gl2ext_ppapi.h"
@@ -148,7 +147,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
-        GLenum e = glGetError(); \
+        int e = glGetError(); \
         if (e != 0) \
         { \
             const char * errorString = ""; \
@@ -161,7 +160,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
             default:                                                            break; \
             } \
             char msgBuf[10000]; \
-            sprintf(msgBuf, "OpenGL ES 2 error 0x%04X %s in %s at line %i\n", e, errorString, __PRETTY_FUNCTION__, __LINE__); \
+            sprintf(msgBuf, "OpenGL ES2 error 0x%04X %s in %s at line %i\n", e, errorString, __PRETTY_FUNCTION__, __LINE__); \
             LogManager::getSingleton().logMessage(msgBuf); \
         } \
     }

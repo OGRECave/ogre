@@ -40,6 +40,27 @@ namespace Ogre
 		ID3D11DeviceContext * mImmediateContext;
         ID3D11InfoQueue * mInfoQueue; 
 
+		struct ThreadInfo
+		{
+			ID3D11DeviceContext* mContext;
+			void* mEventHandle;
+
+			ThreadInfo(ID3D11DeviceContext* context)
+				: mContext(context)
+				, mEventHandle(0)
+			{
+				mEventHandle = CreateEvent(0, false, false, "ThreadContextEvent");
+			}
+
+			~ThreadInfo()
+			{
+				mContext->Release();
+				mContext = 0;
+
+				CloseHandle(mEventHandle);
+			}
+		};
+
 		D3D11Device();
     public:
 

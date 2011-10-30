@@ -45,22 +45,10 @@ namespace Ogre {
 		: mDevice(device)
         ,  mFrontBufferIndex(-1)
         , mBufManager(bufManager)
-        , mGeometryShader(0)
+        , mpGeometryShader(0)
 	{
 		mVertexBuffers[0].setNull();
 		mVertexBuffers[1].setNull();
-
-		D3D11_QUERY_DESC queryDesc;
-		queryDesc.Query = D3D11_QUERY_PIPELINE_STATISTICS;
-		queryDesc.MiscFlags = 0;
-
-		mDeviceStatsQuery = NULL;
-		HRESULT hr = mDevice->CreateQuery( &queryDesc, &mDeviceStatsQuery);
-		if (FAILED(hr) || mDevice.isError())
-		{
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to create query", 
-			"D3D11RenderToVertexBuffer::D3D11RenderToVertexBuffer");
-		}
 	}
 
 	D3D11RenderToVertexBuffer::~D3D11RenderToVertexBuffer(void)
@@ -101,7 +89,6 @@ namespace Ogre {
 	}
 	void D3D11RenderToVertexBuffer::update(SceneManager* sceneMgr)
 	{
-
 		//Single pass only for now
 		Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
 
@@ -141,6 +128,7 @@ namespace Ogre {
 		}
 
 		RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
+
 		//Draw the object
 		targetRenderSystem->_setWorldMatrix(Matrix4::IDENTITY);
 		targetRenderSystem->_setViewMatrix(Matrix4::IDENTITY);
@@ -164,7 +152,8 @@ namespace Ogre {
 				r2vbPass->getGeometryProgramParameters(), GPV_ALL);
 		}
 
-		mDevice.GetImmediateContext()->Begin(mDeviceStatsQuery);
+		// Remove fragment program
+		mDevice.GetImmediateContext()->PSSetShader(NULL, NULL, 0);
 
 		targetRenderSystem->_render(renderOp);	
 
@@ -176,16 +165,14 @@ namespace Ogre {
 			mFrontBufferIndex = targetBufferIndex;
 		}
 
-		ID3D11Buffer* nullBuffer[1];
-		nullBuffer[0]=NULL;
-		mDevice.GetImmediateContext()->SOSetTargets( 1, nullBuffer, offset );
+		// Remove stream output buffer 
+		iBuffer[0]=NULL;
+		mDevice.GetImmediateContext()->SOSetTargets( 1, iBuffer, offset );
 		//Clear the reset flag
 		mResetRequested = false;
 
-		mDevice.GetImmediateContext()->End(mDeviceStatsQuery);
-
-		D3D11_QUERY_DATA_PIPELINE_STATISTICS stats;
-		while( S_OK != mDevice.GetImmediateContext()->GetData(mDeviceStatsQuery, &stats, mDeviceStatsQuery->GetDataSize(), 0 ) ){}
+		// Enable DrawAuto
+		mVertexData->vertexCount = -1;
 	}
 	//-----------------------------------------------------------------------------
     void D3D11RenderToVertexBuffer::reallocateBuffer(size_t index)
@@ -196,11 +183,9 @@ namespace Ogre {
             mVertexBuffers[index].setNull();
         }
 
-        mVertexBuffers[index] = HardwareBufferManager::getSingleton().createVertexBuffer(
-            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, HardwareBuffer::HBU_STATIC
+		mVertexBuffers[index] = mBufManager->createStreamOutputVertexBuffer(
+            mVertexData->vertexDeclaration->getVertexSize(0), mMaxVertexCount, 
+			HardwareBuffer::HBU_STATIC_WRITE_ONLY
             );
-
-        D3D11HardwareVertexBuffer* vbuf = static_cast<D3D11HardwareVertexBuffer*>(mVertexBuffers[index].getPointer());
-        vbuf->reinterpretForStreamOutput();
     }
 }
