@@ -835,7 +835,6 @@ namespace OgreBites
 
 		FileSystemLayer* mFSLayer; 		// File system abstraction layer
 		Ogre::Root* mRoot;              // OGRE root
-		Ogre::RenderWindow* mWindow;    // render window
 		OIS::InputManager* mInputMgr;   // OIS input manager
 #ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
@@ -857,6 +856,8 @@ namespace OgreBites
 		Ogre::String mNextRenderer;     // name of renderer used for next run
 		Sample* mLastSample;            // last sample run before reconfiguration
 		Ogre::NameValuePairList mLastSampleState;     // state of last sample
+    public:
+        Ogre::RenderWindow* mWindow;    // render window
 	};
 }
 

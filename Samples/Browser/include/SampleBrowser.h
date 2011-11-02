@@ -189,6 +189,7 @@ protected:
 
 		SampleBrowser(bool nograb = false) : SampleContext()
 		{
+            mIsShuttingDown = false;
             mNoGrabInput = nograb;
 			mTrayMgr = 0;
 			mLastViewCategory = 0;
@@ -511,6 +512,15 @@ protected:
                 mRoot->queueEndRendering();   // exit browser
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+                // Set the shutting down flag and sleep a bit so the displaylink thread can shut itself down
+                // Note: It is essential that you yield to the CVDisplayLink thread. Otherwise it will 
+                // continue to run which will result in either a crash or kernel panic.
+                mIsShuttingDown = true;
+                struct timespec ts;
+                ts.tv_sec = 0;
+                ts.tv_nsec = 1000;
+                nanosleep(&ts, NULL);
+
 				mRoot->saveConfig();
 				shutdown();
 				if (mRoot) OGRE_DELETE mRoot;
@@ -1548,7 +1558,6 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void shutdown()
 		{
-
 #ifdef	ENABLE_SHADERS_CACHE
             FILE * outFile = fopen("cache.bin", "wb");
             if (outFile)
@@ -1761,15 +1770,15 @@ protected:
         Ogre::uint32 mInitWidth;
         Ogre::uint32 mInitHeight;
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-    public:
-        SampleBrowserGestureView *mGestureView;
-#endif
 #ifdef USE_RTSHADER_SYSTEM
 		Ogre::RTShader::ShaderGenerator*			mShaderGenerator;			// The Shader generator instance.
 		ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Shader generator material manager listener.	
 #endif // USE_RTSHADER_SYSTEM
-
+    public:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        SampleBrowserGestureView *mGestureView;
+#endif
+        bool mIsShuttingDown;
 	};
 }
 
