@@ -212,6 +212,8 @@ namespace Ogre {
 			OSXCocoaContext *mainContext = (OSXCocoaContext*)rs->_getMainContext();
 			NSOpenGLContext *shareContext = mainContext == 0? nil : mainContext->getContext();
             mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
+            GLint swapInterval = 1;
+            [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
 
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");

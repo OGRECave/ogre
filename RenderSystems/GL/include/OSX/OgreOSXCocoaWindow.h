@@ -66,6 +66,7 @@ namespace Ogre {
 		NSView* ogreView() const { return mView; };
 		NSWindow* ogreWindow() const { return mWindow; };
 		NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
+		NSOpenGLPixelFormat* nsopenGLPixelFormat() const { return mGLPixelFormat; };
 		void createWithView(OgreView *view);
 
 		void create(const String& name, unsigned int width, unsigned int height,
