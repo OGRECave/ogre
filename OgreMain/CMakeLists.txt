@@ -467,16 +467,16 @@ set (SOURCE_FILES
 
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
-  include_directories("include/Nacl")
+  include_directories("include/NaCl")
   set(PLATFORM_HEADER_FILES
-    include/Nacl/OgreConfigDialogImp.h
-    include/Nacl/OgreErrorDialogImp.h
-    include/Nacl/OgreTimerImp.h
+    include/NaCl/OgreConfigDialogImp.h
+    include/NaCl/OgreErrorDialogImp.h
+    include/NaCl/OgreTimerImp.h
   )
   set(PLATFORM_SOURCE_FILES
-    src/Nacl/OgreConfigDialog.cpp
-    src/Nacl/OgreErrorDialog.cpp
-    src/Nacl/OgreTimer.cpp
+    src/NaCl/OgreConfigDialog.cpp
+    src/NaCl/OgreErrorDialog.cpp
+    src/NaCl/OgreTimer.cpp
     src/OgreSearchOps.cpp
   )
   set(PLATFORM_LIBS nosys)
