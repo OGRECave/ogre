@@ -36,8 +36,8 @@ use_pkgconfig(GLSL_Optimizer_PKGC GLSL_Optimizer)
 
 findpkg_framework(GLSL_Optimizer)
 find_path(GLSL_Optimizer_INCLUDE_DIR NAMES glsl_optimizer.h HINTS ${GLSL_Optimizer_INC_SEARCH_PATH} ${GLSL_Optimizer_PKGC_INCLUDE_DIRS} PATH_SUFFIXES GLSL_Optimizer)
-find_library(GLSL_Optimizer_LIBRARY_REL NAMES ${GLSL_Optimizer_LIBRARY_NAMES} HINTS ${GLSL_Optimizer_LIB_SEARCH_PATH} ${GLSL_Optimizer_PKGC_LIBRARY_DIRS})
-find_library(GLSL_Optimizer_LIBRARY_DBG NAMES ${GLSL_Optimizer_LIBRARY_NAMES_DBG} HINTS ${GLSL_Optimizer_LIB_SEARCH_PATH} ${GLSL_Optimizer_PKGC_LIBRARY_DIRS})
+find_library(GLSL_Optimizer_LIBRARY_REL NAMES ${GLSL_Optimizer_LIBRARY_NAMES} HINTS ${GLSL_Optimizer_LIB_SEARCH_PATH} ${GLSL_Optimizer_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" release relwithdebinfo minsizerel)
+find_library(GLSL_Optimizer_LIBRARY_DBG NAMES ${GLSL_Optimizer_LIBRARY_NAMES_DBG} HINTS ${GLSL_Optimizer_LIB_SEARCH_PATH} ${GLSL_Optimizer_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" debug)
 make_library_set(GLSL_Optimizer_LIBRARY)
 
 findpkg_finish(GLSL_Optimizer)

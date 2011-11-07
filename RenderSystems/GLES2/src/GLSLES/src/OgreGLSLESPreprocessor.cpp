@@ -1042,7 +1042,7 @@ CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
 {
     // Analyze preprocessor directive
     const char *directive = iToken.String + 1;
-    int dirlen = iToken.Length - 1;
+    size_t dirlen = iToken.Length - 1;
     while (dirlen && isspace (*directive))
         dirlen--, directive++;
 
@@ -1097,12 +1097,14 @@ CPreprocessor::Token CPreprocessor::HandleDirective (Token &iToken, int iLine)
     }
 Done:
 
-#define IS_DIRECTIVE(s) ((dirlen == sizeof (s) - 1) && (strncmp (directive, s, sizeof (s) - 1) == 0))
+#define IS_DIRECTIVE(s) \
+    (dirlen == strlen(s) && (strncmp (directive, s, strlen(s)) == 0))
 
+    bool outputEnabled = ((EnableOutput & (EnableOutput + 1)) == 0);
     bool rc;
-    if (IS_DIRECTIVE ("define"))
+    if (IS_DIRECTIVE ("define") && outputEnabled)
         rc = HandleDefine (t, iLine);
-    else if (IS_DIRECTIVE ("undef"))
+    else if (IS_DIRECTIVE ("undef") && outputEnabled)
         rc = HandleUnDef (t, iLine);
     else if (IS_DIRECTIVE ("ifdef"))
         rc = HandleIfDef (t, iLine);
