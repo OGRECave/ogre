@@ -192,11 +192,16 @@ if (APPLE)
     endif(OGRE_SDK_BUILD)
   else()
 
+    include_directories(
+        ${OGRE_SOURCE_DIR}/RenderSystems/GL/include
+        ${OGRE_SOURCE_DIR}/RenderSystems/GL/include/OSX
+        )
+
     # Add the path where the Ogre framework was found, if it has been found somewhere
     if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "" AND OGRE_SDK_BUILD)
       set_target_properties(SampleBrowser PROPERTIES
         COMPILE_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
-        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH} -framework IOKit -framework Cocoa -framework Carbon"
+        LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH} -framework IOKit -framework Cocoa -framework Carbon -framework OpenGL -framework CoreVideo"
       )
     endif()
 	# also, symlink frameworks so .app is standalone
@@ -314,7 +319,7 @@ if (APPLE)
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/PlayPen.dylib 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
-	ENDIF()
+	endif()
   endif()
 endif (APPLE)
 
