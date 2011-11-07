@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __GLES2Prerequisites_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreLogManager.h"
 #include "OgreMath.h"
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
