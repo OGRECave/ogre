@@ -918,10 +918,6 @@ namespace Ogre
 			if ((rkCurCaps.TextureOpCaps & D3DTEXOPCAPS_DOTPRODUCT3) == 0)
 				rsc->unsetCapability(RSC_DOT3);
 
-			// Check cube map support.
-			if ((rkCurCaps.TextureOpCaps & D3DPTEXTURECAPS_CUBEMAP) == 0)
-				rsc->unsetCapability(RSC_CUBEMAPPING);
-			
 			// Scissor test
 			if ((rkCurCaps.RasterCaps & D3DPRASTERCAPS_SCISSORTEST) == 0)
 				rsc->unsetCapability(RSC_SCISSOR_TEST);
@@ -944,6 +940,10 @@ namespace Ogre
 			if ((rkCurCaps.DeclTypes & D3DDTCAPS_UBYTE4) == 0)			
 				rsc->unsetCapability(RSC_VERTEX_FORMAT_UBYTE4);	
 
+			// Check cube map support.
+			if ((rkCurCaps.TextureCaps & D3DPTEXTURECAPS_CUBEMAP) == 0)
+				rsc->unsetCapability(RSC_CUBEMAPPING);
+			
 			// 3D textures?
 			if ((rkCurCaps.TextureCaps & D3DPTEXTURECAPS_VOLUMEMAP) == 0)			
 				rsc->unsetCapability(RSC_TEXTURE_3D);			

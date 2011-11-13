@@ -38,7 +38,7 @@ endif ()
 # to find the PCZSceneManager library
 if (UNIX)
   set_property(TARGET Plugin_OctreeZone APPEND PROPERTY
-    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib/OGRE
+    INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY}/OGRE
   )
 endif ()
 

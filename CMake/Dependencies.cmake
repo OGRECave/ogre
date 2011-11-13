@@ -50,6 +50,8 @@ message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
 # Set hardcoded path guesses for various platforms
 if (UNIX AND NOT OGRE_BUILD_PLATFORM_TEGRA2)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
+  # Ubuntu 11.10 has an inconvenient path to OpenGL libraries
+  set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
 endif ()
 
 if(OGRE_BUILD_PLATFORM_TEGRA2)

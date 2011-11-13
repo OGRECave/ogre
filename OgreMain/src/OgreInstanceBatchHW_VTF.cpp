@@ -111,7 +111,10 @@ namespace Ogre
 			else
 			{
 				retrieveBoneIdx( baseVertexData, hwBoneIdx );
-			const VertexElement* pElement = thisVertexData->vertexDeclaration->findElementBySemantic(VES_BLEND_INDICES);
+			}
+
+			const VertexElement* pElement = thisVertexData->vertexDeclaration->findElementBySemantic
+																					(VES_BLEND_INDICES);
 			if (pElement) 
 			{
 				unsigned short skelDataSource = pElement->getSource();
@@ -124,7 +127,6 @@ namespace Ogre
 					VertexBufferBinding::BindingIndexMap tmpMap;
 					thisVertexData->vertexBufferBinding->closeGaps(tmpMap);
 				}
-			}
 			}
 		}
 
@@ -166,7 +168,7 @@ namespace Ogre
 		if(mWeightCount > 1)
 		{
 			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
-										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
+										0 ).getSize();
 		}
 		
 		//Create our own vertex buffer

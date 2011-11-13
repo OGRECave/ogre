@@ -169,8 +169,9 @@ namespace Ogre
 			sharing the transform. If the instanced entity was the master one, all it's slaves stop
 			sharing and start having their own transform too.
 			@param slave The InstancedEntity that should share with us and become our slave
+			@returns true if successfully shared (may fail if they aren't skeletally animated)
 		*/
-		void shareTransformWith( InstancedEntity *slave );
+		bool shareTransformWith( InstancedEntity *slave );
 
 		/** @See shareTransformWith
 			Stops sharing the transform if this is a slave, and notifies the master we're no longer

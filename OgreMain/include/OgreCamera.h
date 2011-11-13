@@ -178,7 +178,7 @@ namespace Ogre {
 		
 		/// Whether or not the minimum display size of objects should take effect for this camera
 		bool mUseMinPixelSize;
-		/// /See Camera::getPixelDisplayRatio()
+		/// @see Camera::getPixelDisplayRatio
 		Real mPixelDisplayRatio;
 
 		typedef vector<Listener*>::type ListenerList;
@@ -656,7 +656,7 @@ namespace Ogre {
 		*/
 		void setUseMinPixelSize(bool enable) { mUseMinPixelSize = enable; }
 		/** Returns whether to use min display size calculations 
-			@see Camera::setUseMinDisplaySize()
+			@see Camera::setUseMinDisplaySize
 		*/
 		bool getUseMinPixelSize() const { return mUseMinPixelSize; }
 
