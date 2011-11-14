@@ -42,17 +42,14 @@ ELSE (WIN32)
 
   ELSE(APPLE)
 
-
-
     FIND_PATH(OPENGLES_INCLUDE_DIR GLES/gl.h
       /usr/openwin/share/include
       /opt/graphics/OpenGL/include /usr/X11R6/include
       /usr/include
     )
 
-
     FIND_LIBRARY(OPENGLES_gl_LIBRARY
-      NAMES GLES_CM
+      NAMES GLES_CM GLESv1_CM
       PATHS /opt/graphics/OpenGL/lib
             /usr/openwin/lib
             /usr/shlib /usr/X11R6/lib
@@ -62,16 +59,13 @@ ELSE (WIN32)
     # On Unix OpenGL most certainly always requires X11.
     # Feel free to tighten up these conditions if you don't 
     # think this is always true.
-    # It's not true on OSX.
 
     IF (OPENGLES_gl_LIBRARY)
       IF(NOT X11_FOUND)
         INCLUDE(FindX11)
       ENDIF(NOT X11_FOUND)
       IF (X11_FOUND)
-        IF (NOT APPLE)
-          SET (OPENGLES_LIBRARIES ${X11_LIBRARIES})
-        ENDIF (NOT APPLE)
+        SET (OPENGLES_LIBRARIES ${X11_LIBRARIES})
       ENDIF (X11_FOUND)
     ENDIF (OPENGLES_gl_LIBRARY)
 
