@@ -390,6 +390,15 @@ namespace Ogre {
         void setSelfIllumination(Real red, Real green, Real blue);
 
         /** Sets the amount of self-illumination an object has.
+        @see
+            setSelfIllumination
+        */
+        void setEmissive(Real red, Real green, Real blue)
+        {
+            setSelfIllumination(red, green, blue);
+        }
+
+        /** Sets the amount of self-illumination an object has.
         @remarks
         If an object is self-illuminating, it does not need external sources to light it, ambient or
         otherwise. It's like the object has it's own personal ambient light. This property is rarely useful since
@@ -399,6 +408,15 @@ namespace Ogre {
         or if this is a programmable pass.
         */
         void setSelfIllumination(const ColourValue& selfIllum);
+
+        /** Sets the amount of self-illumination an object has.
+        @see
+            setSelfIllumination
+        */
+        void setEmissive(const ColourValue& emissive)
+        {
+            setSelfIllumination(emissive);
+        }
 
         /** Sets which material properties follow the vertex colour
          */
@@ -497,6 +515,15 @@ namespace Ogre {
         /** Gets the self illumination colour of the pass.
         */
         const ColourValue& getSelfIllumination(void) const;
+
+        /** Gets the self illumination colour of the pass.
+        @see
+                getSelfIllumination
+        */
+        const ColourValue& getEmissive(void) const
+        {
+            return getSelfIllumination();
+        }
 
         /** Gets the 'shininess' property of the pass (affects specular highlights).
         */
