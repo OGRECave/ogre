@@ -25,15 +25,6 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS)
     "${OGRE_BINARY_DIR}/../iPhoneDependencies"
     "${OGRE_SOURCE_DIR}/../iPhoneDependencies"
   )
-elseif(OGRE_BUILD_PLATFORM_TEGRA2)
-  set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${OGRE_BINARY_DIR}/Tegra2Dependencies"
-    "${OGRE_SOURCE_DIR}/Tegra2Dependencies"
-    "${OGRE_BINARY_DIR}/../Tegra2Dependencies"
-    "${OGRE_SOURCE_DIR}/../Tegra2Dependencies"
-  )
 else()
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
@@ -48,21 +39,11 @@ endif()
 message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
 
 # Set hardcoded path guesses for various platforms
-if (UNIX AND NOT OGRE_BUILD_PLATFORM_TEGRA2)
+if (UNIX)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
   # Ubuntu 11.10 has an inconvenient path to OpenGL libraries
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
 endif ()
-
-if(OGRE_BUILD_PLATFORM_TEGRA2)
-  getenv_path(L4TROOT)
-  set(OGRE_DEP_SEARCH_PATH
-    ${OGRE_DEP_SEARCH_PATH}
-    ${ENV_L4TROOT}/_out/3rdparty/xorg/arm-none-linux-gnueabi
-    ${ENV_L4TROOT}/_out/targetfs/usr
-    ${ENV_L4TROOT}/_out/targetfs
-  )
-endif()
 
 # give guesses as hints to the find_package calls
 set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
@@ -94,12 +75,10 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 if (UNIX AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
-  if (NOT OGRE_BUILD_PLATFORM_TEGRA2)
-     macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
-     find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
-     macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
-     mark_as_advanced(XAW_LIBRARY)
-  endif (NOT OGRE_BUILD_PLATFORM_TEGRA2)
+  macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
+  find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
+  macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
+  mark_as_advanced(XAW_LIBRARY)
 endif ()
 
 

@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include "OgreX11EGLContext.h"
 
 
-#if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX) && (OGRE_PLATFORM != OGRE_PLATFORM_TEGRA2)
+#if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX)
 	void XStringListToTextProperty(char ** prop, int num, XTextProperty * textProp){};
 	Window DefaultRootWindow(Display* nativeDisplayType){return Window();};
 	bool XQueryExtension(Display* nativeDisplayType, char * name, int * dummy0, int * dummy2, int * dummy3){return 0;}
