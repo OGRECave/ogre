@@ -403,15 +403,15 @@ namespace Ogre {
         
         if(buffers & FBT_COLOUR)
         {
-            attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0;
+            attachments[attachmentCount++] = GL_COLOR_ATTACHMENT0_OES;
         }
         if(buffers & FBT_DEPTH)
         {
-            attachments[attachmentCount++] = GL_DEPTH_ATTACHMENT;
+            attachments[attachmentCount++] = GL_DEPTH_ATTACHMENT_OES;
         }
         if(buffers & FBT_STENCIL)
         {
-            attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT;
+            attachments[attachmentCount++] = GL_STENCIL_ATTACHMENT_OES;
         }
         
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
@@ -426,20 +426,20 @@ namespace Ogre {
             glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
             GL_CHECK_ERROR
             
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+            glBindFramebuffer(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
+            glBindFramebuffer(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
+            glDiscardFramebufferEXT(GL_FRAMEBUFFER_OES, attachmentCount, attachments);
             GL_CHECK_ERROR
         }
         
-        glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
-        if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
+        if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER_OES] == NO)
         {
             GL_CHECK_ERROR
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
