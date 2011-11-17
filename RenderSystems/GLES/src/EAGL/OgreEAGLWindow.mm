@@ -417,27 +417,27 @@ namespace Ogre {
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             glDisable(GL_SCISSOR_TEST);     
-            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
+            glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
             GL_CHECK_ERROR
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
+            glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
             glResolveMultisampleFramebufferAPPLE();
             GL_CHECK_ERROR
             glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
             GL_CHECK_ERROR
             
-            glBindFramebuffer(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
+            glBindFramebufferOES(GL_FRAMEBUFFER_OES, mContext->mViewFramebuffer);
             GL_CHECK_ERROR
             glDiscardFramebufferEXT(GL_FRAMEBUFFER_OES, attachmentCount, attachments);
             GL_CHECK_ERROR
         }
         
-        glBindRenderbuffer(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
+        glBindRenderbufferOES(GL_RENDERBUFFER_OES, mContext->mViewRenderbuffer);
         GL_CHECK_ERROR
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER_OES] == NO)
         {
