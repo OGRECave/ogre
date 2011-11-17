@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include <stdio.h>
 #include "Ogre.h"
+#include "OgreProgressiveMesh.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
@@ -459,7 +460,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
 
     Mesh::LodValueList lodDistanceList;
     lodDistanceList.push_back(600.0);
-    mesh->generateLodLevels(lodDistanceList, ProgressiveMesh::VRQ_CONSTANT, 2);
+    ProgressiveMesh::generateLodLevels(mesh.get(), lodDistanceList, ProgressiveMesh::VRQ_CONSTANT, 2);
 
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
