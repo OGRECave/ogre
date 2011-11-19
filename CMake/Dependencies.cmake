@@ -205,6 +205,9 @@ if (APPLE)
 
     find_package(IOKit)
     macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
+
+    find_package(CoreVideo)
+    macro_log_feature(CoreVideo_FOUND "CoreVideo" "CoreVideo" "http://developer.apple.com/mac" TRUE "" "")
   endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 endif(APPLE)
 
@@ -240,6 +243,7 @@ include_directories(
   ${CppUnit_INCLUDE_DIRS}
   ${Carbon_INCLUDE_DIRS}
   ${Cocoa_INCLUDE_DIRS}
+  ${CoreVideo_INCLUDE_DIRS}
   ${GLSL_Optimizer_INCLUDE_DIRS}
   ${HLSL2GLSL_INCLUDE_DIRS}
 )

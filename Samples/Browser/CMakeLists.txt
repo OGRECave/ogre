@@ -197,6 +197,8 @@ if (APPLE)
         ${OGRE_SOURCE_DIR}/RenderSystems/GL/include/OSX
         )
 
+	target_link_libraries(SampleBrowser ${OPENGL_LIBRARIES} ${CoreVideo_LIBRARIES})
+
     # Add the path where the Ogre framework was found, if it has been found somewhere
     if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "" AND OGRE_SDK_BUILD)
       set_target_properties(SampleBrowser PROPERTIES
