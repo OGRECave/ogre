@@ -32,18 +32,6 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
-# Assign compiler for Mac OS X-based systems
-# NOTE: This logic is order-dependent and must occur here because the
-# configuration phase of CMake projects will fall into an infinite loop
-# if compiler assignments are modified after issuing a project(...) command.
-#
-if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  # Force gcc <= 4.2 on iPhone
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(g++-4.2 GNU)
-  CMAKE_FORCE_CXX_COMPILER(g++-4.2 GNU)
-endif ()
-
 project(OGRE)
 
 # Include necessary submodules

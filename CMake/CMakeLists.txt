@@ -25,6 +25,8 @@ set(INST_FILES
   Utils/FindPkgMacros.cmake
   Utils/MacroLogFeature.cmake
   Utils/PreprocessorUtils.cmake
+  Utils/PrecompiledHeader.cmake
+  Utils/OgreAddTargets.cmake
   Utils/OgreConfigTargets.cmake
   Utils/OgreGetVersion.cmake
   Utils/OgreFindFrameworks.cmake
@@ -52,12 +54,14 @@ endif ()
 if (APPLE)
   set(INST_FILES ${INST_FILES}
     Packages/FindIOKit.cmake
-  )
-  set(STATIC_INST_FILES ${STATIC_INST_FILES}
     Packages/FindCarbon.cmake
     Packages/FindCocoa.cmake
     Packages/FindCoreVideo.cmake
+  )
+  set(STATIC_INST_FILES ${STATIC_INST_FILES}
     Packages/FindiPhoneSDK.cmake
+    Packages/FindGLSLOptimizer.cmake
+    Packages/FindHLSL2GLSL.cmake
   )
 endif ()
 
