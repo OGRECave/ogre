@@ -379,7 +379,7 @@ TexturePtr Compositor::getTextureInstance(const String& name, size_t mrtIndex)
 	}
 	//Try MRT
 	String mrtName = getMRTTexLocalName(name, mrtIndex);
-	i = mGlobalTextures.find(name);
+	i = mGlobalTextures.find(mrtName);
 	if(i != mGlobalTextures.end())
 	{
 		return i->second;
