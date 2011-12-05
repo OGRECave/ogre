@@ -171,7 +171,7 @@ namespace Ogre {
                     OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Badly formed #include directive (expected \" or <) in file "
                         + fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
-                        "GLSLESCgProgram::preprocessor");
+                        "GLSLESCgProgram::resolveCgIncludes");
                 }
                 else
                 {
@@ -184,7 +184,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                     "Badly formed #include directive (expected " + endDelimeter + ") in file "
                     + fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
-                    "GLSLESCgProgram::preprocessor");
+                    "GLSLESCgProgram::resolveCgIncludes");
             }
 
             // extract filename
@@ -287,7 +287,7 @@ namespace Ogre {
                     OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Badly formed register directive (expected () in file "
                         + mFilename + ": " + inSource.substr(registerPos, newLineAfter-registerPos),
-                        "GLSLESCgProgram::preprocessor");
+                        "GLSLESCgProgram::deleteRegisterFromCg");
                 }
                 else
                 {
@@ -300,15 +300,12 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                     "Badly formed register directive (expected " + endDelimeter + ") in file "
                     + mFilename + ": " + inSource.substr(registerPos, newLineAfter-registerPos),
-                    "GLSLESCgProgram::preprocessor");
+                    "GLSLESCgProgram::deleteRegisterFromCg");
             }
 
             // delete the register
             if (newLineBefore != String::npos && registerPos >= startMarker)
                 outSource.append(inSource.substr(startMarker, registerPos-startMarker));
-
-            size_t lineCount = 0;
-            size_t lineCountPos = 0;
 
             startMarker = endIt + 1;
 

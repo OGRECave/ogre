@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLSLESCgProgramFactory.h"
-#include "ogreglslescgprogram.h"
+#include "OgreGLSLESCgProgram.h"
 #include "hlsl2glsl.h" // use the code from here: http://code.google.com/p/hlsl2glslfork/
 
 namespace Ogre {
