@@ -218,7 +218,7 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}Ogre.framework 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Dependencies/Cg.framework 
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Dependencies/lib/Cg.framework 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 		)
 	# now cfg files
