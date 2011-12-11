@@ -3169,12 +3169,12 @@ namespace Ogre
 	void D3D9RenderSystem::setVertexBufferBinding(
         VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable, bool indexesUsed)
 	{
-		if (!prg)
+		/*if (!prg)
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Null program bound.",
 				"D3D9RenderSystem::bindGpuProgram");
-		}
+		}*/
 
 		HRESULT hr;
 
@@ -3501,12 +3501,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::unbindGpuProgram(GpuProgramType gptype)
 	{
-		if (!prg)
+		/*if (!prg)
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"Null program bound.",
 				"D3D9RenderSystem::bindGpuProgram");
-		}
+		}*/
 
 		HRESULT hr;
 		switch(gptype)

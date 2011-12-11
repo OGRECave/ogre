@@ -494,7 +494,6 @@ elseif (WIN32)
     src/WIN32/OgreErrorDialog.cpp
     src/WIN32/OgreTimer.cpp
     src/WIN32/resource.h
-    src/WIN32/OgreWin32Resources.rc
     src/WIN32/winres.h
   )  
   set(RESOURCE_FILES
@@ -506,7 +505,8 @@ elseif (WIN32)
   set(PLATFORM_HEADER_INSTALL "WIN32")
  
   if (MINGW) 
-    # There's a bug in CMake which makes it ignore resource files with Mingw
+    # Older CMake versions do not know how to deal with resource files on MinGW.
+	# Newer ones do, but pass along invalid command options to windres.
     # This is a manual fix for the moment.
     get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
     #set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
@@ -521,7 +521,9 @@ elseif (WIN32)
 	                           -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
 							   -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
       DEPENDS ${RESOURCE_FILES})
-	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)		
+	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
+  else ()
+    list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
   endif ()
 
 elseif (APPLE)
