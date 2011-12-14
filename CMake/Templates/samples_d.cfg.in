@@ -28,6 +28,7 @@ SamplePlugin=Sample_SkyDome_d
 SamplePlugin=Sample_SkyPlane_d
 SamplePlugin=Sample_Smoke_d
 SamplePlugin=Sample_SphereMapping_d
+SamplePlugin=Sample_SSAO_d
 SamplePlugin=Sample_Terrain_d
 SamplePlugin=Sample_TextureFX_d
 SamplePlugin=Sample_TextureArray_d

@@ -1,0 +1,44 @@
+// courtesy of the ogre wiki and the defered shading sample
+// http://www.ogre3d.org/wiki/index.php/Deferred_Shading
+//------------------------------------------------------------------------------
+
+void GBuffer_vp(
+        float4 iPosition : POSITION,
+        float3 iNormal   : NORMAL,
+        float2 iUV0 : TEXCOORD0,
+
+        out float4 oPosition : POSITION,
+        out float3 oViewPos : TEXCOORD0,
+        out float3 oNormal : TEXCOORD1,
+
+        uniform float4x4 cWorldViewProj,
+        uniform float4x4 cWorldView
+        )
+{
+        oPosition = mul(cWorldViewProj, iPosition);         // transform the vertex position to the projection space
+        oViewPos = mul(cWorldView, iPosition).xyz;          // transform the vertex position to the view space
+        oNormal = mul(cWorldView, float4(iNormal,0)).xyz;   // transform the vertex normal to view space
+}
+
+void GBuffer_fp(
+        float3 iViewPos : TEXCOORD0,
+        float3 iNormal  : TEXCOORD1,
+
+        out float4 oColor0 : COLOR0,        // rgb color
+        out float4 oNormalDepth : COLOR1,   // normal + linear depth [0, 1]
+        out float4 oViewPos : COLOR2,       // view space position
+        
+        uniform float cNearClipDistance,
+        uniform float cFarClipDistance // !!! might be 0 for infinite view projection.
+        )
+{
+        oColor0.rgb = 1; //...and a least little touch of the titanium white...
+        oColor0.a = 0; // not used
+        
+        oNormalDepth.xyz = normalize(iNormal);
+        
+        float clipDistance = cFarClipDistance - cNearClipDistance;
+        oNormalDepth.w = (length(iViewPos.z) - cNearClipDistance) / clipDistance; // norm to [0, 1]
+        oViewPos.xyz = float4(iViewPos, 0);
+}
+

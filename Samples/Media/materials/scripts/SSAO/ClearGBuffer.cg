@@ -1,0 +1,11 @@
+void ClearGBuffer_fp
+(
+    out float4 oColor0 : COLOR0,
+    out float4 oColor1 : COLOR1,
+    out float4 oColor2 : COLOR2
+)
+{
+    oColor0 = float4(0, 0, 0, 0);    // rgba
+    oColor1 = float4(0.5, 0.5, 0.5, 1);    // normal + liear depth [0..1]
+    oColor2 = float4(0, 0, 0, 0);    // position in view space + unused
+}

@@ -51,7 +51,6 @@
 #include "OceanDemo.h"
 #include "Terrain.h"
 #include "Water.h"
-//#endif
 #include "BezierPatch.h"
 #include "CameraTrack.h"
 #include "CharacterSample.h"
@@ -69,6 +68,7 @@
 #include "SkyPlane.h"
 #include "Smoke.h"
 #include "SphereMapping.h"
+#include "SSAO.h"
 #include "TextureFX.h"
 #include "TextureArray.h"
 #include "Transparency.h"
@@ -1019,6 +1019,7 @@ protected:
 				mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
 				mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
 				mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+				mPluginNameMap["Sample_SSAO"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_SSAO();
                 mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
             }
 #endif

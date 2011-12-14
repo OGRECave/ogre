@@ -1,0 +1,46 @@
+fragment_program SSAO/HemisphereMC_fp cg
+{
+    source HemisphereMC.cg
+    entry_point HemisphereMC_fp
+    profiles ps_3_0 arbfp1
+}
+
+// Monte Carlo Integration of the hemisphere definded by the fragment normal
+// lossely based on Ritschel et al. SSDO.
+material SSAO/HemisphereMC
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/HemisphereMC_fp
+            {
+                param_named_auto cViewportSize viewport_size
+                param_named_auto cFov fov
+            }
+
+            texture_unit // normals
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // view space position
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit
+            {
+                texture importance4InterleavedSphereHemisphere8x4.png
+                tex_address_mode wrap
+                filtering none
+            }
+        }
+    }
+}

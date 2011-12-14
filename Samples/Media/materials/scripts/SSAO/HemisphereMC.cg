@@ -1,0 +1,86 @@
+void HemisphereMC_fp
+(
+    in const float2 uv : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler sMRT1 : register(s0), // fragment normals
+    uniform sampler sMRT2 : register(s1), // view space position, remember that we are looking down the negative Z axis!!!
+    uniform sampler sRand : register(s2), // MxN random texture, M sets of N precomputed low-discrepancy samples
+    
+    uniform const float4 cViewportSize, // (viewport_width, viewport_height, inverse_viewport_width, inverse_viewport_height)
+    uniform const float cFov, // vertical field of view in radians
+    uniform const float cSampleInScreenspace, // whether to sample in screen or world space
+    uniform const float cSampleLengthScreenSpace, // The sample length in screen space [0, 1]
+    uniform const float cSampleLengthWorldSpace, // the sample length in world space in units
+    uniform const float cSampleLengthExponent // The exponent of the sample length
+)
+{
+    const int interleaved = 4;
+    const int m = 8;
+    const int n = 4;
+    const int numSamples = m * n;
+    const float2 interleaveOffset = uv * cViewportSize.xy / interleaved;
+    const float3 fragmentPosition = tex2D(sMRT2, uv).xyz; // the current fragment in view space
+    const float3 fragmentNormal = tex2D(sMRT1, uv).xyz; // the fragment normal
+    float rUV = 0; // radius of influence in screen space
+    float r = 0; // radius of influence in world space
+
+    if (cSampleInScreenspace == 1)
+    {
+        rUV = cSampleLengthScreenSpace;
+        r = tan(rUV * cFov) * -fragmentPosition.z;
+    }
+    else
+    {
+        rUV = atan(cSampleLengthWorldSpace / -fragmentPosition.z) / cFov; // the radius of influence projected into screen space
+        r = cSampleLengthWorldSpace;
+    }
+
+    if (rUV < (cViewportSize.z)) // abort if the projected radius of influence is smaller than 1 fragment
+    {
+        oColor0 = 1;
+        return;
+    }
+    
+
+    float accessibility = 0; // accessibility of the fragment
+
+    const float3 viewVector = float3(0, 0, 1); // the constant view vector in view space
+
+    // the reflection vector to align the hemisphere with the fragment normal
+    // somehow the x component must be flipped...???
+    const float3 reflector = normalize(fragmentNormal + viewVector) * float3(-1, 1, 1); 
+
+    float count = 0;
+    float sampleLength;
+
+    for (float i = 0.0f; i < m; i++)
+    for (float j = 0.0f; j < n; j++)
+    {
+        count ++;
+
+        const float2 randomTC = interleaveOffset + float2(i/(interleaved * m), j/(interleaved * n)); 
+        float3 randomVector = (tex2D(sRand, randomTC) * 2 - 1); // unpack to [-1, 1]x[-1, 1]x[1, 1]
+
+        sampleLength = pow(count/(float)numSamples, cSampleLengthExponent);
+
+        const float3 sampleVector = reflect(randomVector, reflector) * sampleLength;
+
+        const float2 sampleTC = uv + sampleVector.xy * rUV;
+
+        const float3 samplePosition = tex2D(sMRT2, sampleTC);
+
+        if (samplePosition.z < (fragmentPosition.z - sampleVector.z * r)) // thin air
+            accessibility++;
+        else // solid geometry
+            accessibility += length(fragmentPosition - samplePosition) > r; // out of reach, i.e. false occluder
+    }
+
+    accessibility /= numSamples;
+    oColor0 = float4(accessibility.xxx, 1);
+
+    float3 direction = 0;
+    direction += reflect(float3(0, 0, -1), reflector);
+    direction = normalize(direction);
+}

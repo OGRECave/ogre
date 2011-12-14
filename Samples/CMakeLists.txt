@@ -145,6 +145,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(Fresnel)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)
+  add_subdirectory(SSAO)
 endif ()
 
   # Add browser last

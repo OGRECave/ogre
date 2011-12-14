@@ -1,0 +1,225 @@
+compositor SSAO/GBuffer
+{
+    technique
+    {
+        // GBuffer enconding: --------------------------------------------------
+        // mrt0: rgba --> unused in this sample (plain white, (1, 1, 1, 1))
+        // mrt1: xyz --> normals, w --> normalized linear depth [0, 1]
+        // mrt2: xyz --> position in view space
+        // 
+        // use a better packing of variables in the mrt to (possibly) increase
+        // performance!
+        // ---------------------------------------------------------------------
+        
+        texture mrt target_width target_height PF_FLOAT32_RGBA PF_FLOAT32_RGBA PF_FLOAT32_RGBA chain_scope
+        texture occlusion target_width target_height PF_FLOAT32_RGBA chain_scope
+
+        target mrt
+        {
+            input none
+            shadows off
+            
+            pass clear {}
+            
+            pass render_quad
+            {
+                material SSAO/ClearGBuffer
+            }            
+
+            pass render_scene {}
+        }
+    }
+}
+
+compositor SSAO/Volumetric // Szirmay-Kalos et al 2010
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/Volumetric
+            }
+        }
+    }
+}
+
+
+compositor SSAO/HemisphereMC // Ritschel et al. inspired hemisphere mc integration
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/HemisphereMC
+            }
+        }
+    }
+}
+
+compositor SSAO/HorizonBased // Bavoil and Sainz in ShaderX7
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/HorizonBased
+            }
+        }
+    }
+}
+
+
+compositor SSAO/Crytek // Crytek style ssao as found in shaderX7
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/Crytek
+            }
+        }
+    }
+}
+
+
+compositor SSAO/CreaseShading // Megan Fox's crease shading http://www.shalinor.com/research.html
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/CreaseShading
+            }
+        }
+    }
+}
+
+compositor SSAO/UnsharpMask //Unsharp mask the depth buffer [LCD2006]
+{
+    technique
+    {
+        texture blurred target_width target_height PF_FLOAT32_RGBA
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target blurred
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/UnsharpMask/GaussianBlurX
+            }
+        }
+
+        target blurred
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/UnsharpMask/GaussianBlurY
+                input 0 blurred
+            }
+        }
+
+        target occlusion
+        {
+            input none
+            pass clear {}
+            
+            pass render_quad
+            {
+                material SSAO/UnsharpMask
+                input 0 blurred
+            }
+        }
+    }
+}
+
+compositor SSAO/ShowNormals
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                // Renders a fullscreen quad with a material
+                material SSAO/ShowNormals
+            }
+        }
+    }
+}
+
+compositor SSAO/ShowDepth
+{
+    technique 
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                // Renders a fullscreen quad with a material
+                material SSAO/ShowDepth
+            }
+        }
+    }
+}
+
+compositor SSAO/ShowViewPos
+{
+    technique
+    {
+        texture_ref occlusion SSAO/GBuffer occlusion
+
+        target occlusion
+        {
+            input none
+            
+            pass render_quad
+            {
+                // Renders a fullscreen quad with a material
+                material SSAO/ShowViewPos
+            }
+        }
+    }
+}
+

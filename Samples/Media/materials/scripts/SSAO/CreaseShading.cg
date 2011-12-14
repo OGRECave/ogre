@@ -1,0 +1,65 @@
+// original sources found at Game Developer Magazine March 2008
+
+void CreaseShading_fp
+(
+    in float2 uv : TEXCOORD0,
+
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler sNormal : register(s0),    // xyz normal + depth [0, 1]
+    uniform sampler sPosition : register(s1),  // view space position
+    uniform sampler sRandom : register(s2),    // random texture sampler
+    uniform const float cRange, // the three(four) artistic parameters
+    uniform const float cBias,
+    uniform const float cAverager,
+    uniform const float cMinimumCrease,
+    uniform const float cKernelSize, // Bias for the kernel size, Hack for the fixed size 11x11 stipple kernel
+    uniform const float4 cViewportSize // (width, height, 1/width, 1/height)
+)
+{
+    // get the view space position and normal of the fragment
+    const float3 fragmentPosition = tex2D(sPosition, uv).xyz;
+    const float3 fragmentNormal = tex2D(sNormal, uv).xyz;
+
+    float totalGI = 0.0f;
+    
+    // a diamond shaped (45deg rotated square) stipple pattern around (0, 0) this will be used as offset for the samples
+    //        O
+    //       O O
+    //      O O O
+    //     O O O O
+    //    O O X O O
+    //     O O O O
+    //      O O O
+    //       O O
+    //        O
+    // the algorith starts with the leftmost element and walks the diagonal to the topmost element
+    // a stippleSize of n yields (((n - 1) / 2)^2) - 1 samples
+    // the 'image' above has a stipple size of 11 'cuz it has 5 samples (minus
+    // the current fragment position and 4 gaps = 11.
+
+    const int stippleSize = 11; // must be odd
+    for (int i = 0; i < (stippleSize + 1) / 2; i++)
+    {
+        float2 diagonalStart = float2(-(stippleSize - 1) / 2, 0) + i;
+        for(int j = 0; j < (stippleSize + 1) / 2; j++)
+        {
+            float2 sampleOffset = diagonalStart + float2(j, -j);
+
+            float2 sampleUV = uv + (sampleOffset * cViewportSize.zw * cKernelSize);
+            float3 samplePos = tex2D(sPosition, sampleUV).xyz;
+
+            float3 toCenter = samplePos - fragmentPosition;
+            float distance = length(toCenter);
+
+            toCenter = normalize(toCenter);
+            float centerContrib = saturate((dot(toCenter, fragmentNormal) - cMinimumCrease) * cBias);
+            float rangeAttenuation = 1.0f - saturate(distance / cRange);
+
+            totalGI += centerContrib * rangeAttenuation;
+        }
+    }
+    
+    totalGI /= cAverager;
+    oColor0 = 1 - float4(totalGI.xxx, 1);
+}

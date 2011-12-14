@@ -1,0 +1,44 @@
+fragment_program SSAO/HorizonBased_fp cg
+{
+    source HorizonBased.cg
+    entry_point HorizonBased_fp
+    profiles ps_3_0 arbfp1
+}
+
+material SSAO/HorizonBased
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/HorizonBased_fp
+            {
+                param_named_auto cViewportSize viewport_size
+                param_named_auto cFov fov
+            }
+
+            texture_unit // fragment normal
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // view position
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit
+            {
+                texture randCosSinJitter4x4.png
+                tex_address_mode wrap
+                filtering none
+            }
+        }
+    }
+}

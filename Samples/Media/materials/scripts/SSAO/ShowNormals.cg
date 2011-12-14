@@ -1,0 +1,11 @@
+void ShowNormals_fp
+(
+    in float2 iTexCoord : TEXCOORD0,
+    
+    out float4 oColor0: COLOR0,
+    
+    uniform sampler mrt1: register(s0)
+)
+{
+    oColor0 = float4(tex2D(mrt1, iTexCoord).xyz / 2 + 0.5, 1);
+}
