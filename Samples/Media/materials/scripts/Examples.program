@@ -94,6 +94,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
 	delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
+	delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
 	delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
 }
 
@@ -103,6 +104,18 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 	entry_point main
 	source PassthroughFP.cg
 	profiles ps_4_0
+}
+
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
+{
+	entry_point mainCg
+	source PassthroughFP.cg
+	profiles vs_4_0 vs_1_1 arbvp1
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
