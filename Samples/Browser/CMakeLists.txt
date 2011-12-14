@@ -94,6 +94,7 @@ if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
 else ()
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_OSX.h
+	${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
 endif (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
 
@@ -158,6 +159,7 @@ if (APPLE)
 
 	# On OS X, create .app bundle
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE TRUE)
+	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Samples/Common/misc/Info.plist)
 
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
@@ -232,6 +234,8 @@ if (APPLE)
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+        COMMAND /Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp 
+		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
 
 	# now plugins
