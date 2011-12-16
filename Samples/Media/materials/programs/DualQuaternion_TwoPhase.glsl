@@ -4,27 +4,27 @@ mat2x4 blendTwoWeightsAntipod(vec4 blendWgt, vec4 blendIdx, vec4 dualQuaternions
 vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 vec3 calculateBlendNormal(vec3 normal, mat2x4 blendDQ);
 
-mat3x3 adjointTransposeMatrix(mat3x3 M)
+mat3 adjointTransposeMatrix(mat3 M)
 {
-	mat3x3 atM;
-	atM._m00 = M._m22 * M._m11 - M._m12 * M._m21;
-	atM._m01 = M._m12 * M._m20 - M._m10 * M._m22;
-	atM._m02 = M._m10 * M._m21 - M._m20 * M._m11;
+	mat3 atM;
+	atM[0][0] = M[2][2] * M[1][1] - M[2][1] * M[1][2];
+	atM[1][0] = M[2][1] * M[0][2] - M[0][1] * M[2][2];
+	atM[2][0] = M[0][1] * M[1][2] - M[0][2] * M[1][1];
 
-	atM._m10 = M._m02 * M._m21 - M._m22 * M._m01;
-	atM._m11 = M._m22 * M._m00 - M._m02 * M._m20;
-	atM._m12 = M._m20 * M._m01 - M._m00 * M._m21;
+	atM[0][1] = M[2][0] * M[1][2] - M[2][2] * M[1][0];
+	atM[1][1] = M[2][2] * M[0][0] - M[2][0] * M[0][2];
+	atM[2][1] = M[0][2] * M[1][0] - M[0][0] * M[1][2];
 
-	atM._m20 = M._m12 * M._m01 - M._m02 * M._m11;
-	atM._m21 = M._m10 * M._m02 - M._m12 * M._m00;
-	atM._m22 = M._m00 * M._m11 - M._m10 * M._m01;
+	atM[0][2] = M[2][1] * M[1][0] - M[2][0] * M[1][1];
+	atM[1][2] = M[0][1] * M[2][0] - M[2][1] * M[0][0];
+	atM[2][2] = M[0][0] * M[1][1] - M[0][1] * M[1][0];
 
 	return atM;
 }
 
 uniform vec4 worldDualQuaternion2x4Array[48];
-uniform mat4x3 scaleM[24];
-uniform mat4x4 viewProjectionMatrix;
+uniform vec4 scaleM[72];
+uniform mat4 viewProjectionMatrix;
 uniform vec4   lightPos[2];
 uniform vec4   lightDiffuseColour[2];
 uniform vec4   ambient;
@@ -38,11 +38,17 @@ attribute vec4 uv0;
 void main()
 {	
 	//First phase - applies scaling and shearing:
-	mat4x3 blendS = blendWeights.x*scaleM[int(blendIndices.x)];
-	blendS += blendWeights.y*scaleM[int(blendIndices.y)];	
-	mat3x4 blendF = transpose(blendS);
+	int blendIndicesX = int(blendIndices.x) * 3;
+	int blendIndicesY = int(blendIndices.y) * 3;
+	
+	mat3x4 blendS = blendWeights.x*mat3x4(scaleM[blendIndicesX], 
+		scaleM[blendIndicesX + 1], scaleM[blendIndicesX + 2]);
+	
+	blendS += blendWeights.y*mat3x4(scaleM[blendIndicesY], 						scaleM[blendIndicesY + 1], scaleM[blendIndicesY + 2]);
 
-	vec3 pass1_position = vertex * blendF;
+	mat4x3 blendF = transpose(blendS);
+
+	vec3 pass1_position = blendF * vertex;
 
 	mat3x3 blendSrotAT = adjointTransposeMatrix(mat3x3(blendF));
 	vec3 pass1_normal = normalize(blendSrotAT * normal);
@@ -50,8 +56,7 @@ void main()
 	//Second phase
 	mat2x4 blendDQ = blendTwoWeightsAntipod(blendWeights, blendIndices, worldDualQuaternion2x4Array);
 
-	float len = length(blendDQ[0]);
-	blendDQ /= len;
+	blendDQ /= length(blendDQ[0]);
 
 	vec3 blendPosition = calculateBlendPosition(pass1_position, blendDQ);
 

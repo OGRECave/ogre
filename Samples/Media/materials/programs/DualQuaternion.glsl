@@ -5,7 +5,7 @@ vec3 calculateBlendPosition(vec3 position, mat2x4 blendDQ);
 vec3 calculateBlendNormal(vec3 normal, mat2x4 blendDQ);
 
 uniform vec4 worldDualQuaternion2x4Array[48];
-uniform mat4x4 viewProjectionMatrix;
+uniform mat4 viewProjectionMatrix;
 uniform vec4   lightPos[2];
 uniform vec4   lightDiffuseColour[2];
 uniform vec4   ambient;
