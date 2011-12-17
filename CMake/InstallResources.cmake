@@ -61,7 +61,6 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_D3D11)
   set(OGRE_COMMENT_RENDERSYSTEM_D3D11 "#")
 endif ()
 if (CMAKE_SYSTEM_VERSION VERSION_LESS "6.0")
-  set(OGRE_COMMENT_RENDERSYSTEM_D3D10 "#")
   set(OGRE_COMMENT_RENDERSYSTEM_D3D11 "#")
 endif ()
 if (NOT OGRE_BUILD_RENDERSYSTEM_GL)
@@ -115,8 +114,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 	${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
 	${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
-    DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_DEBUG_PATH}"
-    CONFIGURATIONS Debug
+    DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
   )
   install(FILES 
     ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
@@ -142,13 +140,30 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
 	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
   )
-endif ()
+
+  # Need a special case here for the iOS SDK, configuration is not being matched, could be a CMake bug.
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    install(FILES 
+      ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+      ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+      ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
+      ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
+      ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
+      DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}"
+    )
+  endif()
+
+endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
 if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
+else ()
+  # iPhone needs to use relative paths in the config files
+  set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
+  set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
 endif ()
 
 if (WIN32)
@@ -157,12 +172,6 @@ if (WIN32)
   set(OGRE_SAMPLES_DIR_REL ".")
   set(OGRE_SAMPLES_DIR_DBG ".")
 elseif (APPLE)
-  # iPhone needs to use relative paths in the config files
-  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
-    set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
-    set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
-  endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
-
   # not used on OS X, uses Resources
   set(OGRE_PLUGIN_DIR_REL "")
   set(OGRE_PLUGIN_DIR_DBG "")

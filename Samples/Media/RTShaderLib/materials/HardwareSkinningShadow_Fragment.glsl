@@ -1,8 +1,6 @@
 #version 120
 
-attribute vec4 colour;
-
 void main()
 {	
-	gl_FrontColor = colour;
+	gl_FragColor = gl_Color;
 }

@@ -75,7 +75,6 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/PlugIns/ParticleFX/include)
   	include_directories(${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D10/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES2/include)
@@ -146,6 +145,7 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(Fresnel)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)
+  add_subdirectory(SSAO)
 endif ()
 
   # Add browser last
@@ -167,7 +167,7 @@ if (OGRE_INSTALL_SAMPLES_SOURCE)
     PATTERN "Media" EXCLUDE
     PATTERN "bin" EXCLUDE
     PATTERN "setup" EXCLUDE
-    PATTERN ".svn" EXCLUDE
+    PATTERN ".hg" EXCLUDE
 	PATTERN "obj" EXCLUDE
 	PATTERN "scripts" EXCLUDE
   )

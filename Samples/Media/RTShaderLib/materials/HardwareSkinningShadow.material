@@ -81,11 +81,6 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_4weight_vs cg
 fragment_program Ogre/RTShader/shadow_caster_ps_glsl glsl
 {
 	source HardwareSkinningShadow_Fragment.glsl
-
- 	default_params
-	{
-		
-	}
 }
 
 vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl glsl

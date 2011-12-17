@@ -32,18 +32,6 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
-# Assign compiler for Mac OS X-based systems
-# NOTE: This logic is order-dependent and must occur here because the
-# configuration phase of CMake projects will fall into an infinite loop
-# if compiler assignments are modified after issuing a project(...) command.
-#
-if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  # Force gcc <= 4.2 on iPhone
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(g++-4.2 GNU)
-  CMAKE_FORCE_CXX_COMPILER(g++-4.2 GNU)
-endif ()
-
 project(OGRE)
 
 # Include necessary submodules
@@ -62,6 +50,21 @@ include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 
+
+if (APPLE)
+  include(CMakeForceCompiler)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    CMAKE_FORCE_C_COMPILER(clang GNU)
+    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+  else ()
+    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
+    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
+    SET(CMAKE_SIZEOF_VOID_P 4)
+	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
+  endif ()
+endif ()
 
 #####################################################################
 # Set up the basic build environment
@@ -218,9 +221,6 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
 
   remove_definitions(-msse)
-elseif (UNIX AND OGRE_BUILD_PLATFORM_TEGRA2)
-  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2.x RenderSystem for NVIDIA Tegra 2" FORCE)
-  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/Tegra2")
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.5 as the base SDK by default
@@ -253,11 +253,10 @@ endif()
 cmake_dependent_option(OGRE_STATIC "Static build" FALSE "NOT SYMBIAN" TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" FALSE "WIN32;DirectX_D3D11_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT OGRE_BUILD_PLATFORM_TEGRA2;NOT SYMBIAN" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLATFORM_TEGRA2 "Build Ogre for NVIDIA Tegra 2 with Linux" FALSE "OGRE_BUILD_PLATFORM_TEGRA2;OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_NACL "Build Ogre for Google's Native Client (NaCl)" FALSE "OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)

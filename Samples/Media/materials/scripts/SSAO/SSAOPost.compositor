@@ -1,0 +1,77 @@
+compositor SSAO/Post/NoFilter
+{
+    technique 
+    {
+        target_output
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/Post/NoFilter
+            }
+        }
+    }
+}
+
+compositor SSAO/Post/BoxFilter
+{
+    technique 
+    {
+        target_output
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/Post/BoxFilter
+            }
+        }
+    }
+}
+
+compositor SSAO/Post/SmartBoxFilter
+{
+    technique 
+    {
+        target_output
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/Post/SmartBoxFilter
+            }
+        }
+    }
+}
+
+
+compositor SSAO/Post/CrossBilateralFilter
+{
+    technique
+    {
+        texture accessibility target_width target_height PF_R8G8B8A8
+
+        target accessibility
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/HorizonBased/CrossBilateralFilter/X
+            }
+        }
+
+        target_output
+        {
+            input none
+            
+            pass render_quad
+            {
+                material SSAO/HorizonBased/CrossBilateralFilter/Y
+                input 0 accessibility
+            }
+        }
+    }
+}

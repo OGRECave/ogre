@@ -1,0 +1,43 @@
+fragment_program SSAO/CreaseShading_fp cg
+{
+    source CreaseShading.cg
+    entry_point CreaseShading_fp
+    profiles ps_2_x arbfp1
+}
+
+material SSAO/CreaseShading
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/CreaseShading_fp
+            {
+                param_named_auto cViewportSize viewport_size
+            }
+
+            texture_unit // normals
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // view space position
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // random texture will be replace by 11x11 stipple
+            {
+                texture rand1x32.png
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}

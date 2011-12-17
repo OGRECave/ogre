@@ -173,12 +173,7 @@ elseif (UNIX)
   )
   include_directories(src/EGL/X11 include/EGL/X11)
   set(PLATFORM_HEADER_INSTALL "X11")
-  if(OGRE_BUILD_PLATFORM_TEGRA2)
-    link_directories(${OPENGLES2_LIBRARY_PATH})
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES}) 
-  else()
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
-  endif()
+  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
 # Add support for the RT Shader System

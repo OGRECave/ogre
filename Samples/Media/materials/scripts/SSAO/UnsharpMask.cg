@@ -1,0 +1,79 @@
+void UnsharpMask_fp
+(
+    in float2 iTexCoord : TEXCOORD0, 
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler blurred: register(s0),
+    uniform sampler mrt0: register(s1),
+    uniform sampler mrt1: register(s2),
+    uniform float cLambda
+)
+{
+    float spacialImportance = tex2D(blurred, iTexCoord).w - tex2D(mrt1, iTexCoord).w;
+    float4 color = tex2D(mrt0, iTexCoord);
+    if (spacialImportance < 0) // darkening only
+    {
+        oColor0 = float4(color.rgb + (cLambda * spacialImportance), 1);
+    } else 
+    {
+        oColor0 = color;
+    }
+}
+
+void GaussianBlurX_fp
+(
+    in float2 uv : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler mrt1 : register(s0),
+    uniform float stepX,
+    uniform const float cKernelWidthBias
+)
+{
+    const int kernelWidth = 19;
+    float sigma = (kernelWidth - 1) / 6; // make the kernel span 6 sigma
+
+    float weights = 0;
+    float blurredDepth = 0;
+    
+    for (float i = -(kernelWidth - 1) / 2; i < (kernelWidth - 1) / 2; i++)
+    {
+        float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
+        weights += geometricWeight;
+        blurredDepth += tex2D(mrt1, float2(uv.x - i * stepX * cKernelWidthBias, uv.y)).w * geometricWeight;
+    }
+
+    blurredDepth /= weights;
+    oColor0 = float4(tex2D(mrt1, uv).xyz, blurredDepth);
+}
+
+void GaussianBlurY_fp
+(
+    in float2 uv : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler mrt1 : register(s0),
+    uniform const float stepY,
+    uniform const float cKernelWidthBias
+)
+{
+    const int kernelWidth = 19;
+    float sigma = (kernelWidth - 1) / 6; // make the kernel span 6 sigma
+
+    float weights = 0;
+    float blurredDepth = 0;
+    
+    for (float i = -(kernelWidth - 1) / 2; i < (kernelWidth - 1) / 2; i++)
+    {
+        float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
+        weights += geometricWeight;
+        blurredDepth += tex2D(mrt1, float2(uv.x, uv.y - i * stepY * cKernelWidthBias)).w * geometricWeight;
+    }
+
+    blurredDepth /= weights;
+    oColor0 = float4(tex2D(mrt1, uv).xyz, blurredDepth);
+}
+    

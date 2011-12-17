@@ -25,15 +25,6 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS)
     "${OGRE_BINARY_DIR}/../iPhoneDependencies"
     "${OGRE_SOURCE_DIR}/../iPhoneDependencies"
   )
-elseif(OGRE_BUILD_PLATFORM_TEGRA2)
-  set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${OGRE_BINARY_DIR}/Tegra2Dependencies"
-    "${OGRE_SOURCE_DIR}/Tegra2Dependencies"
-    "${OGRE_BINARY_DIR}/../Tegra2Dependencies"
-    "${OGRE_SOURCE_DIR}/../Tegra2Dependencies"
-  )
 else()
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
@@ -48,21 +39,11 @@ endif()
 message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
 
 # Set hardcoded path guesses for various platforms
-if (UNIX AND NOT OGRE_BUILD_PLATFORM_TEGRA2)
+if (UNIX)
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/local)
   # Ubuntu 11.10 has an inconvenient path to OpenGL libraries
   set(OGRE_DEP_SEARCH_PATH ${OGRE_DEP_SEARCH_PATH} /usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
 endif ()
-
-if(OGRE_BUILD_PLATFORM_TEGRA2)
-  getenv_path(L4TROOT)
-  set(OGRE_DEP_SEARCH_PATH
-    ${OGRE_DEP_SEARCH_PATH}
-    ${ENV_L4TROOT}/_out/3rdparty/xorg/arm-none-linux-gnueabi
-    ${ENV_L4TROOT}/_out/targetfs/usr
-    ${ENV_L4TROOT}/_out/targetfs
-  )
-endif()
 
 # give guesses as hints to the find_package calls
 set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
@@ -94,12 +75,10 @@ macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.f
 if (UNIX AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
-  if (NOT OGRE_BUILD_PLATFORM_TEGRA2)
-     macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
-     find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
-     macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
-     mark_as_advanced(XAW_LIBRARY)
-  endif (NOT OGRE_BUILD_PLATFORM_TEGRA2)
+  macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
+  find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${OGRE_DEP_SEARCH_PATH} ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
+  macro_log_feature(XAW_LIBRARY "Xaw" "X11 Athena widget set" "http://www.x.org" TRUE "" "")
+  mark_as_advanced(XAW_LIBRARY)
 endif ()
 
 
@@ -143,12 +122,10 @@ else ()
 	# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
 	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 endif ()
-if (APPLE)
-	if(OGRE_BUILD_PLATFORM_APPLE_IOS)
-		set(Boost_COMPILER "-xgcc42")
-	endif()
+if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+	set(Boost_COMPILER "-xgcc42")
 endif()
-set(Boost_ADDITIONAL_VERSIONS "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
+set(Boost_ADDITIONAL_VERSIONS "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40" "1.39.0" "1.39" "1.38.0" "1.38" "1.37.0" "1.37" )
 # Components that need linking (NB does not include header-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
@@ -226,6 +203,9 @@ if (APPLE)
 
     find_package(IOKit)
     macro_log_feature(IOKit_FOUND "IOKit" "IOKit HID framework needed by the samples" "http://developer.apple.com/mac" FALSE "" "")
+
+    find_package(CoreVideo)
+    macro_log_feature(CoreVideo_FOUND "CoreVideo" "CoreVideo" "http://developer.apple.com/mac" TRUE "" "")
   endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 endif(APPLE)
 
@@ -261,6 +241,7 @@ include_directories(
   ${CppUnit_INCLUDE_DIRS}
   ${Carbon_INCLUDE_DIRS}
   ${Cocoa_INCLUDE_DIRS}
+  ${CoreVideo_INCLUDE_DIRS}
   ${GLSL_Optimizer_INCLUDE_DIRS}
   ${HLSL2GLSL_INCLUDE_DIRS}
 )

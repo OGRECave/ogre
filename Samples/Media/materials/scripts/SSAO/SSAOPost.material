@@ -1,0 +1,166 @@
+fragment_program SSAO/Post/NoFilter_fp cg
+{
+    source SSAOPost.cg
+    entry_point noFilter_fp
+    profiles ps_3_0 arbfp1
+}
+
+fragment_program SSAO/Post/BoxFilter_fp cg
+{
+    source SSAOPost.cg
+    entry_point boxFilter_fp
+    profiles ps_3_0 arbfp1
+}
+
+fragment_program SSAO/Post/SmartBoxFilter_fp cg
+{
+    source SSAOPost.cg
+    entry_point smartBoxFilter_fp
+    profiles ps_3_0 arbfp1
+}
+
+fragment_program SSAO/HorizonBased/CrossBilateralFilter/X_fp cg
+{
+    source SSAOPost.cg
+    entry_point crossBilateralFilterX_fp
+    profiles ps_3_0 arbfp1 
+}
+
+fragment_program SSAO/HorizonBased/CrossBilateralFilter/Y_fp cg
+{
+    source SSAOPost.cg
+    entry_point crossBilateralFilterY_fp
+    profiles ps_3_0 arbfp1 
+}
+
+material SSAO/Post/NoFilter
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+            fragment_program_ref SSAO/Post/NoFilter_fp {}
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer occlusion
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/Post/BoxFilter
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/Post/BoxFilter_fp
+            {
+                param_named_auto screenSize viewport_size
+            }
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer occlusion
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/Post/SmartBoxFilter
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/Post/SmartBoxFilter_fp
+            {
+                param_named_auto screenSize viewport_size
+                param_named_auto farClipDistance far_clip_distance
+            }
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer occlusion
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/HorizonBased/CrossBilateralFilter/X
+{
+    technique
+    {
+        pass // two pass in x and y direction
+        {
+            depth_check off
+            
+            fragment_program_ref SSAO/HorizonBased/CrossBilateralFilter/X_fp
+            {
+                param_named_auto stepX inverse_viewport_width
+            }
+            
+            texture_unit // the accessability texture
+            {
+                content_type compositor SSAO/GBuffer occlusion
+                tex_address_mode clamp
+                filtering none
+            }
+            
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/HorizonBased/CrossBilateralFilter/Y
+{
+    technique
+    {
+        pass // two pass in x and y direction
+        {
+            depth_check off
+            
+            fragment_program_ref SSAO/HorizonBased/CrossBilateralFilter/Y_fp
+            {
+                param_named_auto stepY inverse_viewport_height
+            }
+            
+            texture_unit // the accessability texture, injected by the compositor
+            {
+                tex_address_mode clamp
+                filtering none
+            }
+            
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}

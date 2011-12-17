@@ -37,7 +37,7 @@
 
 #ifdef __OBJC__
 
-#define USE_DISPLAYLINK 1
+#define USE_DISPLAYLINK 0
 
 #import "OgreOSXCocoaWindow.h"
 #import <Cocoa/Cocoa.h>

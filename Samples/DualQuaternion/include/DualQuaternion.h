@@ -44,29 +44,24 @@ protected:
 	void setupContent()
 	{
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-		//To make glsles work the program will need to be provided with proper
-		//shadow caster materials
-		if (mShaderGenerator->getTargetLanguage() != "glsles")
-		{
-			//Add the hardware skinning to the shader generator default render state
-			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
-			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
+        //Add the hardware skinning to the shader generator default render state
+        mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        renderState->addTemplateSubRenderState(mSrsHardwareSkinning);
 
-			Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase");
-			Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase");
-			Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase");
-			Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase");
+        Ogre::MaterialPtr pCast1 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase");
+        Ogre::MaterialPtr pCast2 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase");
+        Ogre::MaterialPtr pCast3 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight_twophase");
+        Ogre::MaterialPtr pCast4 = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase");
 
-			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
+        Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 
-			Ogre::MaterialPtr pCast1l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
-			Ogre::MaterialPtr pCast2l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
-			Ogre::MaterialPtr pCast3l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
-			Ogre::MaterialPtr pCast4l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
+        Ogre::MaterialPtr pCast1l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_1weight");
+        Ogre::MaterialPtr pCast2l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_2weight");
+        Ogre::MaterialPtr pCast3l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_3weight");
+        Ogre::MaterialPtr pCast4l = Ogre::MaterialManager::getSingleton().getByName("Ogre/RTShader/shadow_caster_skinning_4weight");
 
-			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_LINEAR, pCast1l, pCast2l, pCast3l, pCast4l);
-		}
+        Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(RTShader::ST_LINEAR, pCast1l, pCast2l, pCast3l, pCast4l);
 #endif
 		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
@@ -136,29 +131,24 @@ protected:
 		sn->scale(Vector3(0.2,0.2,0.2));
 		
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-		//To make glsles work the program will need to be provided with proper
-		//shadow caster materials
-		if (mShaderGenerator->getTargetLanguage() != "glsles")
-		{
-			//In case the system uses the RTSS, the following line will ensure
-			//that the entity is using hardware animation in RTSS as well.
-			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
-			RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
+        //In case the system uses the RTSS, the following line will ensure
+        //that the entity is using hardware animation in RTSS as well.
+        RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(ent);
+        RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(entDQ, RTShader::ST_DUAL_QUATERNION, false, true);
 
-			//The following line is needed only because the spine models' materials have shaders and
-			//as such is not automatically reflected in the RTSS system		
-			RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-				ent->getSubEntity(0)->getMaterialName(),
-				Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-				Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-				true);
-			
-			RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
-				entDQ->getSubEntity(0)->getMaterialName(),
-				Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-				Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-				true);
-		}
+        //The following line is needed only because the spine models' materials have shaders and
+        //as such is not automatically reflected in the RTSS system		
+        RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+            ent->getSubEntity(0)->getMaterialName(),
+            Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+            Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+            true);
+        
+        RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+            entDQ->getSubEntity(0)->getMaterialName(),
+            Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+            Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+            true);
 #endif
 
 		// create name and value for skinning mode
@@ -190,13 +180,8 @@ protected:
 		MeshManager::getSingleton().remove("floor");
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
-		//To make glsles work the program will need to be provided with proper
-		//shadow caster materials
-		if (mShaderGenerator->getTargetLanguage() != "glsles")
-		{
-			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-			renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
-		}
+        Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+        renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
 #endif
 	}
 

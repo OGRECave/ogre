@@ -42,7 +42,7 @@ using namespace Ogre;
     String mWindowName;
 }
 
-@property (atomic, assign) String mWindowName;
+@property (assign) String mWindowName;
 
 @end
 

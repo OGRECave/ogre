@@ -39,8 +39,7 @@ namespace Ogre {
 #define OGRE_PLATFORM_SYMBIAN 4
 #define OGRE_PLATFORM_APPLE_IOS 5
 #define OGRE_PLATFORM_ANDROID 6
-#define OGRE_PLATFORM_TEGRA2 7
-#define OGRE_PLATFORM_NACL 8
+#define OGRE_PLATFORM_NACL 7
 
 #define OGRE_COMPILER_MSVC 1
 #define OGRE_COMPILER_GNUC 2
@@ -108,25 +107,21 @@ namespace Ogre {
 #   else
 #       define OGRE_PLATFORM OGRE_PLATFORM_APPLE
 #   endif
-#elif defined(linux) && defined(__arm__)
-// TODO: This is NOT the correct way to detect the Tegra 2 platform but it works for now.
-// It doesn't appear that GCC defines any platform specific macros.
-#   define OGRE_PLATFORM OGRE_PLATFORM_TEGRA2
 #elif defined(__ANDROID__)
 #	define OGRE_PLATFORM OGRE_PLATFORM_ANDROID
 #elif defined( __native_client__ ) 
 #   define OGRE_PLATFORM OGRE_PLATFORM_NACL
 #   ifndef OGRE_STATIC_LIB
-#       error OGRE must be built as static for NaCl (OGRE_STATIC=true in cmake)
+#       error OGRE must be built as static for NaCl (OGRE_STATIC=true in CMake)
 #   endif
 #   ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
-#       error d3d9 is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_D3D9 false in cmake)
+#       error D3D9 is not supported on NaCl (OGRE_BUILD_RENDERSYSTEM_D3D9 false in CMake)
 #   endif
 #   ifdef OGRE_BUILD_RENDERSYSTEM_GL
-#       error gl is nor supported on NaCl (OOGRE_BUILD_RENDERSYSTEM_GL=false in cmake)
+#       error OpenGL is not supported on NaCl (OGRE_BUILD_RENDERSYSTEM_GL=false in CMake)
 #   endif
 #   ifndef OGRE_BUILD_RENDERSYSTEM_GLES2
-#       error GLES2 render system is needed for NaCl (OOGRE_BUILD_RENDERSYSTEM_GLES2=false in cmake)
+#       error GLES2 render system is required for NaCl (OGRE_BUILD_RENDERSYSTEM_GLES2=false in CMake)
 #   endif
 #else
 #   define OGRE_PLATFORM OGRE_PLATFORM_LINUX
@@ -244,9 +239,9 @@ namespace Ogre {
 #endif
 */
 //----------------------------------------------------------------------------
-// Linux/Apple/iOs/Android/Symbian/Tegra2/NaCl Settings
+// Linux/Apple/iOs/Android/Symbian/NaCl Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2 || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )

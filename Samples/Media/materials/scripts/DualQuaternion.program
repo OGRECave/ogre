@@ -8,6 +8,11 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
 	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
 	profiles vp40 vs_4_0 vs_3_0 vs_2_0
 	includes_skeletal_animation true
+	
+	default_params
+	{
+	    param_named_auto diffuse surface_diffuse_colour
+	}
 }
 
 // Dual quaternion two phase hardware skinning using two indexed weights per vertex, supports scaling and shearing
@@ -17,6 +22,11 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp
 	profiles vp40 vs_4_0 vs_3_0 vs_2_0
 	includes_skeletal_animation true
+
+	default_params
+	{
+	    param_named_auto diffuse surface_diffuse_colour
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -95,8 +105,6 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
 		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
 		param_named_auto ambient ambient_light_colour
-		//This property isn't relevant for GLSL, uses the GLSL material state instead
-		param_named_auto diffuse surface_diffuse_colour 
 	}
 }
 
@@ -128,15 +136,13 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
 		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
 		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
 		param_named_auto ambient ambient_light_colour
-		//This property isn't relevant for GLSL, uses the GLSL material state instead
-		param_named_auto diffuse surface_diffuse_colour
 	}
 }
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster unified
 {
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL
 	
 	default_params
 	{

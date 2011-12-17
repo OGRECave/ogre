@@ -1,0 +1,26 @@
+fragment_program SSAO/ShowViewPos_fp cg
+{
+    source ShowViewPos.cg
+    entry_point ShowViewPos_fp
+    profiles ps_2_0 arbfp1
+}
+
+material SSAO/ShowViewPos
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/ShowViewPos_fp {}
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 2
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}

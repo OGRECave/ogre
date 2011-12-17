@@ -1,0 +1,33 @@
+fragment_program SSAO/ShowDepth_fp cg
+{
+    source ShowDepth.cg
+    entry_point ShowDepth_fp
+    profiles ps_2_x arbfp1
+}
+
+material SSAO/ShowDepth
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/ShowDepth_fp {}
+
+            texture_unit 
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit
+            {
+                texture gray256.png
+                tex_address_mode wrap
+                filtering none
+            }
+        }
+    }
+}

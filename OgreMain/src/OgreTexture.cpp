@@ -251,24 +251,27 @@ namespace Ogre {
             str << "Texture: " << mName << ": Loading " << faces << " faces"
                 << "(" << PixelUtil::getFormatName(images[0]->getFormat()) << "," <<
                 images[0]->getWidth() << "x" << images[0]->getHeight() << "x" << images[0]->getDepth() <<
-                ") with ";
+                ")";
             if (!(mMipmapsHardwareGenerated && mNumMipmaps == 0))
-                str << mNumMipmaps;
-            if(mUsage & TU_AUTOMIPMAP)
             {
-                if (mMipmapsHardwareGenerated)
-                    str << " hardware";
+                str << " with " << mNumMipmaps;
+                if(mUsage & TU_AUTOMIPMAP)
+                {
+                    if (mMipmapsHardwareGenerated)
+                        str << " hardware";
 
-                str << " generated mipmaps";
+                    str << " generated mipmaps";
+                }
+                else
+                {
+                    str << " custom mipmaps";
+                }
+                if(multiImage)
+                    str << " from multiple Images.";
+                else
+                    str << " from Image.";
             }
-            else
-            {
-                str << " custom mipmaps";
-            }
-            if(multiImage)
-                str << " from multiple Images.";
-            else
-                str << " from Image.";
+
             // Scoped
             {
                 // Print data about first destination surface

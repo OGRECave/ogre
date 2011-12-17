@@ -1,0 +1,153 @@
+void noFilter_fp (
+    in float2 uv : TEXCOORD0,
+    out float4 oColor0 : COLOR0,
+
+    uniform sampler sOcclusion : register(s0)
+)
+{
+    oColor0 = float4(tex2D(sOcclusion, uv).xyz, 1);
+} 
+
+
+// a very simple 4x4 box filter
+// the kernel has the following form
+//   o o o o
+//   o o o o
+//   o o x o
+//   o o o o 
+// where x marks the fragment position and the o marks a sampling point
+void boxFilter_fp
+(
+    in float2 screenTC : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+
+    uniform sampler sOcclusion : register(s0),
+    uniform float4 screenSize,
+    uniform float farClipDistance
+)
+{
+    float color = 0;
+    for (int x = -2; x < 2; x++)
+    for (int y = -2; y < 2; y++)
+    {
+        color += tex2D(sOcclusion, float2(screenTC.x + x * screenSize.z, screenTC.y + y * screenSize.w)).x;
+    }
+    color /= 16;
+        
+    oColor0 = float4(color.xxx, 1);
+}
+
+
+// a very simple and slightly dumb depth aware 4x4 box filter
+// the kernel has the following form
+//   o o o o
+//   o o o o
+//   o o x o
+//   o o o o 
+// where x marks the fragment position and the o marks a sampling point
+void smartBoxFilter_fp
+(
+    in float2 screenTC : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+
+    uniform sampler sMrt1 : register(s0), // normals + depth
+    uniform sampler sOcclusion : register(s1),
+    uniform float4 screenSize,
+    uniform float farClipDistance
+)
+{
+    float fragmentDepth = tex2D(sMrt1, screenTC).x;
+
+    float color = 0;
+    float weight = 0;
+    for (int x = -2; x < 2; x++)
+    for (int y = -2; y < 2; y++)
+    {
+        float sampleDepth = tex2D(sMrt1, float2(screenTC.x + x * screenSize.z, screenTC.y + y * screenSize.w)).x;
+        float dist = abs(fragmentDepth - sampleDepth) * farClipDistance + 0.5;
+        float sampleWeight = 1 / (pow(dist, 1) + 1);
+        color += sampleWeight * tex2D(sOcclusion, float2(screenTC.x + x * screenSize.z, screenTC.y + y * screenSize.w)).x;
+        weight += sampleWeight;
+    }
+    color /= weight;
+        
+    oColor0 = float4(color.xxx, 1);
+//    oColor0 = float4(tex2D(sOcclusion, screenTC).www, 1);
+}
+
+
+// cross bilateral filter
+// gaussian blur with photometric weighting
+// note: encode the viewspace z component in the accessibility texture to reduce
+// the texture fetch count
+void crossBilateralFilterX_fp
+(
+    in float2 uv : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler sAccessibility : register(s0),
+    uniform sampler sMRT2 : register(s1), // the view space position, xyz
+    
+    uniform float stepX, // inverse viewport width
+    uniform float cPhotometricExponent
+)
+{
+    const int kernelWidth = 13;
+    float sigma = (kernelWidth - 1) / 6; // make the kernel span 6 sigma
+    
+    float fragmentDepth = tex2D(sMRT2, uv).z;
+
+    float weights = 0;
+    float blurred = 0;
+    
+    for (float i = -(kernelWidth - 1) / 2; i < (kernelWidth - 1) / 2; i++)
+    {
+        float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
+        float sampleDepth = tex2D(sMRT2, float2(uv.x - i * stepX, uv.y)).z;
+        float photometricWeight = 1 / pow((1 + abs(fragmentDepth - sampleDepth)), cPhotometricExponent);
+
+        weights += (geometricWeight * photometricWeight);
+        blurred += tex2D(sAccessibility, float2(uv.x - i * stepX, uv.y)).r * geometricWeight * photometricWeight;
+    }
+
+    blurred /= weights;
+    oColor0 = float4(blurred.xxx, 1);
+}
+
+void crossBilateralFilterY_fp
+(
+    in float2 uv : TEXCOORD0,
+    
+    out float4 oColor0 : COLOR0,
+    
+    uniform sampler sAccessibility : register(s0),
+    uniform sampler sMRT2 : register(s1), // the view space position, xyz
+    
+    uniform float stepY, // inverse viewport width
+    uniform float cPhotometricExponent
+)
+{
+    const int kernelWidth = 13;
+    float sigma = (kernelWidth - 1) / 6; // make the kernel span 6 sigma
+    
+    float fragmentDepth = tex2D(sMRT2, uv).z;
+
+    float weights = 0;
+    float blurred = 0;
+    
+    for (float i = -(kernelWidth - 1) / 2; i < (kernelWidth - 1) / 2; i++)
+    {
+        float geometricWeight = exp(-pow(i, 2) / (2 * pow(sigma, 2)));
+        float sampleDepth = tex2D(sMRT2, float2(uv.x, uv.y - i * stepY)).z;
+        float photometricWeight = 1 / pow((1 + abs(fragmentDepth - sampleDepth)), cPhotometricExponent);
+        
+        weights += (geometricWeight * photometricWeight);
+        blurred += tex2D(sAccessibility, float2(uv.x, uv.y - i * stepY)).r * geometricWeight * photometricWeight;
+    }
+
+    blurred /= weights;
+    oColor0 = float4(blurred.xxx, 1);
+}

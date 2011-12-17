@@ -1,0 +1,99 @@
+fragment_program SSAO/UnsharpMask_fp cg
+{
+    source UnsharpMask.cg
+    entry_point UnsharpMask_fp
+    profiles ps_2_0 arbfp1
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurX_fp cg
+{
+    source UnsharpMask.cg
+    entry_point GaussianBlurX_fp
+    profiles ps_2_0 arbfp1
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurY_fp cg
+{
+    source UnsharpMask.cg
+    entry_point GaussianBlurY_fp
+    profiles ps_2_0 arbfp1
+}
+
+material SSAO/UnsharpMask/GaussianBlurX
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+            
+            fragment_program_ref SSAO/UnsharpMask/GaussianBlurX_fp
+            {
+                param_named_auto stepX inverse_viewport_width
+            }
+            
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/UnsharpMask/GaussianBlurY
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+        
+            fragment_program_ref SSAO/UnsharpMask/GaussianBlurY_fp
+            {
+                param_named_auto stepY inverse_viewport_height
+            }
+            
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}
+
+material SSAO/UnsharpMask
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            fragment_program_ref SSAO/UnsharpMask_fp {}
+            
+            texture_unit // blurred depth buffer
+            {
+                tex_address_mode clamp
+                filtering none
+            }
+            
+            texture_unit // color component of the GBuffer
+            {
+                content_type compositor SSAO/GBuffer mrt 0
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // original depth buffer
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}

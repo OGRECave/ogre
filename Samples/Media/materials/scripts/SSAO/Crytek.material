@@ -1,0 +1,43 @@
+fragment_program SSAO/Crytek_fp cg
+{
+    source Crytek.cg
+    entry_point Crytek_fp
+    profiles ps_3_0 arbfp1
+}
+
+material SSAO/Crytek
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+            
+            fragment_program_ref SSAO/Crytek_fp
+            {
+                param_named_auto cViewportSize viewport_size
+                param_named_auto farClipDistance far_clip_distance
+                param_named_auto nearClipDistance near_clip_distance
+                param_named_auto cFov fov
+            }
+
+            texture_unit
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+            
+            texture_unit
+            {
+                // texture regularSphere4.png
+                texture regularSphereJittered4.png
+                // texture regularSphereOctant4.png
+                // texture regularSphereJitteredOctant4.png
+                // texture rand4x4.png
+                tex_address_mode wrap
+                filtering none
+            }
+        }
+    }
+}

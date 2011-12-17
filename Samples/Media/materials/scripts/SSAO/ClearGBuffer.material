@@ -1,0 +1,19 @@
+fragment_program SSAO/ClearGBuffer_fp cg
+{
+    source ClearGBuffer.cg
+    entry_point ClearGBuffer_fp
+    profiles ps_2_x arbfp1
+}
+
+material SSAO/ClearGBuffer
+{
+    technique
+    {
+        pass
+        {
+            depth_write off
+
+            fragment_program_ref SSAO/ClearGBuffer_fp {}
+        }
+    }
+}

@@ -1,0 +1,11 @@
+void ShowViewPos_fp
+(
+    in float2 iTexCoord : TEXCOORD0,
+    
+    out float4 oColor0: COLOR0,
+    
+    uniform sampler mrt2: register(s0)
+)
+{
+    oColor0 = float4(tex2D(mrt2, iTexCoord).xyz * float3(0.1, 0.1, -0.01), 1);
+}

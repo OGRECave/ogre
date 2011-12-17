@@ -42,8 +42,6 @@ THE SOFTWARE.
 # include "WIN32/OgreErrorDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 # include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_TEGRA2
-# include "Tegra2/OgreErrorDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
 # include "NaCl/OgreErrorDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE

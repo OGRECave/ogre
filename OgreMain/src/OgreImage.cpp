@@ -531,7 +531,7 @@ namespace Ogre {
 		return PixelUtil::getFlags(mFormat) & PFF_HASALPHA;
 	}
 	//-----------------------------------------------------------------------------
-	void Image::applyGamma( unsigned char *buffer, Real gamma, size_t size, uchar bpp )
+	void Image::applyGamma( uchar *buffer, Real gamma, size_t size, uchar bpp )
 	{
 		if( gamma == 1.0f )
 			return;
@@ -543,30 +543,23 @@ namespace Ogre {
 
 		for( size_t i = 0, j = size / stride; i < j; i++, buffer += stride )
 		{
-			float r, g, b;
+			Real r, g, b;
 
-			r = (float)buffer[0];
-			g = (float)buffer[1];
-			b = (float)buffer[2];
+			const Real rangeMult = 255.0f;
+			const Real rangeMultInv = 1.0f / rangeMult;
+			const Real gammaValue = 1.0f / gamma;
 
-			r = r * gamma;
-			g = g * gamma;
-			b = b * gamma;
+			r = rangeMultInv * buffer[0];
+			g = rangeMultInv * buffer[1];
+			b = rangeMultInv * buffer[2];
 
-			float scale = 1.0f, tmp;
+			Math::Pow(r, gammaValue);
+			Math::Pow(g, gammaValue);
+			Math::Pow(b, gammaValue);
 
-			if( r > 255.0f && (tmp=(255.0f/r)) < scale )
-				scale = tmp;
-			if( g > 255.0f && (tmp=(255.0f/g)) < scale )
-				scale = tmp;
-			if( b > 255.0f && (tmp=(255.0f/b)) < scale )
-				scale = tmp;
-
-			r *= scale; g *= scale; b *= scale;
-
-			buffer[0] = (uchar)r;
-			buffer[1] = (uchar)g;
-			buffer[2] = (uchar)b;
+			buffer[0] = (uchar)(r * rangeMult);
+			buffer[1] = (uchar)(g * rangeMult);
+			buffer[2] = (uchar)(b * rangeMult);
 		}
 	}
 	//-----------------------------------------------------------------------------

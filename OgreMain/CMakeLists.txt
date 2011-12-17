@@ -494,7 +494,6 @@ elseif (WIN32)
     src/WIN32/OgreErrorDialog.cpp
     src/WIN32/OgreTimer.cpp
     src/WIN32/resource.h
-    src/WIN32/OgreWin32Resources.rc
     src/WIN32/winres.h
   )  
   set(RESOURCE_FILES
@@ -506,7 +505,8 @@ elseif (WIN32)
   set(PLATFORM_HEADER_INSTALL "WIN32")
  
   if (MINGW) 
-    # There's a bug in CMake which makes it ignore resource files with Mingw
+    # Older CMake versions do not know how to deal with resource files on MinGW.
+	# Newer ones do, but pass along invalid command options to windres.
     # This is a manual fix for the moment.
     get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
     #set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
@@ -521,7 +521,9 @@ elseif (WIN32)
 	                           -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
 							   -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
       DEPENDS ${RESOURCE_FILES})
-	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)		
+	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
+  else ()
+    list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
   endif ()
 
 elseif (APPLE)
@@ -573,45 +575,27 @@ elseif (APPLE)
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
 elseif (UNIX)
-  if (OGRE_BUILD_PLATFORM_TEGRA2)
-    include_directories("include/Tegra2")
-    set(PLATFORM_HEADER_FILES
-      include/Tegra2/OgreConfigDialogImp.h
-      include/Tegra2/OgreErrorDialogImp.h
-      include/Tegra2/OgreTimerImp.h
-    )
-    set(PLATFORM_SOURCE_FILES
-      src/Tegra2/OgreConfigDialog.cpp
-      src/Tegra2/OgreErrorDialog.cpp
-      src/Tegra2/OgreTimer.cpp
-      src/OgreSearchOps.cpp
-    )
-
-    set(PLATFORM_LIBS ${X11_LIBRARIES} pthread dl)
-    set(PLATFORM_HEADER_INSTALL "Tegra2")
-  else ()
-    include_directories(include/GLX ${X11_INCLUDE_DIR})
-    set(PLATFORM_HEADER_FILES
-      include/GLX/OgreConfigDialogImp.h
-      include/GLX/OgreErrorDialogImp.h
-      include/GLX/OgreTimerImp.h
-    )
-    set(PLATFORM_SOURCE_FILES
-      src/GLX/GLX_backdrop.h
-      src/GLX/OgreConfigDialog.cpp
-      src/GLX/OgreErrorDialog.cpp
-      src/GLX/OgreTimer.cpp
-      src/OgreSearchOps.cpp
-    )
-    set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
-    set(PLATFORM_HEADER_INSTALL "GLX")
-    # some platforms require explicit linking to libdl, see if it's available
-    find_library(DL_LIBRARY NAMES dl dlsym)
-    mark_as_advanced(DL_LIBRARY)
-    if (DL_LIBRARY)
-      list(APPEND PLATFORM_LIBS dl)
-    endif ()
-  endif(OGRE_BUILD_PLATFORM_TEGRA2)
+  include_directories(include/GLX ${X11_INCLUDE_DIR})
+  set(PLATFORM_HEADER_FILES
+    include/GLX/OgreConfigDialogImp.h
+    include/GLX/OgreErrorDialogImp.h
+    include/GLX/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/GLX/GLX_backdrop.h
+    src/GLX/OgreConfigDialog.cpp
+    src/GLX/OgreErrorDialog.cpp
+    src/GLX/OgreTimer.cpp
+    src/OgreSearchOps.cpp
+  )
+  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xt_LIB} ${XAW_LIBRARY} pthread)
+  set(PLATFORM_HEADER_INSTALL "GLX")
+  # some platforms require explicit linking to libdl, see if it's available
+  find_library(DL_LIBRARY NAMES dl dlsym)
+  mark_as_advanced(DL_LIBRARY)
+  if (DL_LIBRARY)
+    list(APPEND PLATFORM_LIBS dl)
+  endif ()
 elseif (SYMBIAN)
   include_directories(include/symbian)
   set(PLATFORM_HEADER_FILES

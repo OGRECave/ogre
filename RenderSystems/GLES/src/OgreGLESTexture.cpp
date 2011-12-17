@@ -49,6 +49,14 @@ namespace Ogre {
                 name, group, true, r);
 
         images[imgIdx].load(dstream, ext);
+
+        size_t w = 0, h = 0;
+        
+        // Scale to nearest power of 2
+        w = GLESPixelUtil::optionalPO2(images[imgIdx].getWidth());
+        h = GLESPixelUtil::optionalPO2(images[imgIdx].getHeight());
+        if((images[imgIdx].getWidth() != w) || (images[imgIdx].getHeight() != h))
+            images[imgIdx].resize(w, h);
     }
 
     GLESTexture::GLESTexture(ResourceManager* creator, const String& name,

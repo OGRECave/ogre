@@ -22,7 +22,7 @@ OGRE_VERSION=`cat version.txt`
 echo Building API docs...
 
 # Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx10.6 ARCHS=i386 GCC_VERSION=4.2 MACOSX_DEPLOYMENT_TARGET=10.5
+xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx ARCHS=i386 DEFAULT_COMPILER=com.apple.compilers.llvmgcc42 MACOSX_DEPLOYMENT_TARGET=10.5
 
 pushd api/html
 
@@ -41,7 +41,7 @@ popd
 echo API generation done.
 
 # Invoke Xcode build
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx10.6 ARCHS="i386 x86_64" GCC_VERSION=4.2 MACOSX_DEPLOYMENT_TARGET=10.5
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx ARCHS="i386 x86_64" DEFAULT_COMPILER=com.apple.compilers.llvmgcc42 MACOSX_DEPLOYMENT_TARGET=10.5
 # Just release mode, debug is too big
 #xcodebuild -project OGRE.xcodeproj -target install -configuration Debug -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 
@@ -105,6 +105,8 @@ ditto sdk $SDKBUILDDIR/sdk_contents
 popd
 
 echo End Copying SDK
+
+find sdk_contents -iname .DS_Store -exec rm -rf \{\} \;
 
 # Also remove build directories.
 find sdk_contents -iname *.build -exec rm -rf \{\} \;

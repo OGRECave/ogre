@@ -28,7 +28,7 @@
 #  Plugin_BSPSceneManager, Plugin_CgProgramManager,
 #  Plugin_OctreeSceneManager, Plugin_OctreeZone,
 #  Plugin_ParticleFX, Plugin_PCZSceneManager,
-#  RenderSystem_GL, RenderSystem_Direct3D9, RenderSystem_Direct3D10,
+#  RenderSystem_GL, RenderSystem_Direct3D9,
 #  Paging, Terrain
 #
 # For each of these components, the following variables are defined:
@@ -127,7 +127,7 @@ endif ()
 set(OGRE_COMPONENTS Paging Terrain 
   Plugin_BSPSceneManager Plugin_CgProgramManager Plugin_OctreeSceneManager
   Plugin_OctreeZone Plugin_PCZSceneManager Plugin_ParticleFX
-  RenderSystem_Direct3D10 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GLES RenderSystem_GLES2)
+  RenderSystem_Direct3D11 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GLES RenderSystem_GLES2)
 set(OGRE_RESET_VARS 
   OGRE_CONFIG_INCLUDE_DIR OGRE_INCLUDE_DIR 
   OGRE_LIBRARY_FWK OGRE_LIBRARY_REL OGRE_LIBRARY_DBG
@@ -248,7 +248,8 @@ if (OGRE_STATIC)
   if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     find_package(Cocoa QUIET)
     find_package(Carbon QUIET)
-    if (NOT Cocoa_FOUND OR NOT Carbon_FOUND)
+    find_package(CoreVideo QUIET)
+    if (NOT Cocoa_FOUND OR NOT Carbon_FOUND OR NOT CoreVideo_FOUND)
       set(OGRE_DEPS_FOUND FALSE)
     endif ()
   endif ()

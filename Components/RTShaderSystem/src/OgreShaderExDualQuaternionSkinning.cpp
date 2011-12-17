@@ -221,7 +221,7 @@ void DualQuaternionSkinning::addPositionCalculations(Function* vsMain, int& func
 			//Transform the position based by the scaling and shearing matrix
 			curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_TRANSFORM, FFP_VS_TRANSFORM, funcCounter++);
 			curFuncInvocation->pushOperand(mParamBlendS, Operand::OPS_IN);
-			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN);
+			curFuncInvocation->pushOperand(mParamInPosition, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z);
 			curFuncInvocation->pushOperand(mParamLocalBlendPosition, Operand::OPS_OUT);
 			vsMain->addAtomInstance(curFuncInvocation);
 		}
