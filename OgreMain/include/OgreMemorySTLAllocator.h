@@ -156,6 +156,12 @@ namespace Ogre
 			return AllocPolicy::getMaxAllocationSize();
 		}
 
+		void construct(pointer p)
+		{
+			// call placement new
+			new(static_cast<void*>(p)) T();
+		}
+
 		void construct(pointer p, const T& val)
 		{
 			// call placement new
