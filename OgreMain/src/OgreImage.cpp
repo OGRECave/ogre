@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreImageCodec.h"
 #include "OgreColourValue.h"
-
+#include "OgreMath.h"
 #include "OgreImageResampler.h"
 
 namespace Ogre {
