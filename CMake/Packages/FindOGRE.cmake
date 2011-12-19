@@ -69,7 +69,11 @@ else ()
 endif ()
 
 
-set(OGRE_LIBRARY_NAMES "OgreMain${OGRE_LIB_SUFFIX}")
+if(APPLE)
+	set(OGRE_LIBRARY_NAMES "Ogre${OGRE_LIB_SUFFIX}")
+else()
+    set(OGRE_LIBRARY_NAMES "OgreMain${OGRE_LIB_SUFFIX}")
+endif()
 get_debug_names(OGRE_LIBRARY_NAMES)
 
 # construct search paths from environmental hints and
