@@ -6528,15 +6528,15 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 													  size_t numInstancesPerBatch, uint16 flags,
 													  unsigned short subMeshIdx )
 {
-	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
-													flags, numInstancesPerBatch, subMeshIdx );
-	
 	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
 	{
 		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
 			"InstancedManager with name '" + customName + "' already exists!", 
 			"SceneManager::createInstanceManager");
 	}
+
+	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
+													flags, numInstancesPerBatch, subMeshIdx );
 
 	mInstanceManagerMap[customName] = retVal;
 	return retVal;

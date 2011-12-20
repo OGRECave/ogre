@@ -153,6 +153,8 @@ namespace Ogre
 
 		const String& getName() const { return mName; }
 
+		SceneManager* getSceneManager() const { return mSceneManager; }
+
 		/** Raises an exception if trying to change it after creating the first InstancedEntity
 			@remarks The actual value may be less if the technique doesn't support having so much
 			@see getMaxOrBestNumInstancesPerBatches for the usefulness of this function
