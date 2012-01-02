@@ -6,7 +6,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeights_vp
-	profiles vp40 vs_4_0 vs_3_0 vs_2_0
+	profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 	
 	default_params
@@ -36,7 +36,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg cg
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsCaster_vp
-	profiles vp40 vs_4_0 vs_3_0 vs_1_1 arbvp1
+	profiles vp40 vs_4_0 vs_3_0 vs_2_0 vs_1_1 arbvp1
 	includes_skeletal_animation true
 }
 
@@ -44,7 +44,7 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 {
 	source DualQuaternion.cg
 	entry_point dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp
-	profiles vp40 vs_4_0 vs_3_0 vs_1_1 arbvp1
+	profiles vp40 vs_4_0 vs_3_0 vs_2_0
 	includes_skeletal_animation true
 }
 

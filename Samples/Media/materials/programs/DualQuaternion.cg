@@ -25,7 +25,7 @@ void dualQuaternionHardwareSkinningTwoWeights_vp(
 	float len = length(blendDQ[0]);
 	blendDQ /= len;
 
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+	float3 blendPosition = calculateBlendPosition(position.xyz, blendDQ);
 
 	//No need to normalize, the magnitude of the normal is preserved because only rotation is performed
 	float3 blendNormal = calculateBlendNormal(normal, blendDQ);
@@ -62,7 +62,7 @@ void dualQuaternionHardwareSkinningTwoWeightsCaster_vp(
 	float len = length(blendDQ[0]);
 	blendDQ /= len;
 
-	float3 blendPosition = calculateBlendPosition(position, blendDQ);
+	float3 blendPosition = calculateBlendPosition(position.xyz, blendDQ);
 
 	// view / projection
 	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
@@ -106,7 +106,7 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhase_vp(
 	float len = length(blendDQ[0]);
 	blendDQ /= len;
 
-	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
+	float3 blendPosition = calculateBlendPosition(pass1_position, blendDQ);
 
 	//No need to normalize, the magnitude of the normal is preserved because only rotation is performed
 	float3 blendNormal = calculateBlendNormal(pass1_normal, blendDQ);
@@ -149,7 +149,7 @@ void dualQuaternionHardwareSkinningTwoWeightsTwoPhaseCaster_vp(
 	float len = length(blendDQ[0]);
 	blendDQ /= len;
 
-	float3 blendPosition = calculateBlendPosition(float4(pass1_position, 1.0), blendDQ);
+	float3 blendPosition = calculateBlendPosition(pass1_position, blendDQ);
 
 	// view / projection
 	oPosition = mul(viewProjectionMatrix, float4(blendPosition, 1.0));
