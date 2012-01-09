@@ -3668,14 +3668,16 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		OGRE_LOCK_MUTEX(mThreadInitMutex)
 		// free context, we'll need this to share lists
-		mCurrentContext->endCurrent();
+        if(mCurrentContext)
+            mCurrentContext->endCurrent();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::postExtraThreadsStarted()
 	{
 		OGRE_LOCK_MUTEX(mThreadInitMutex)
 		// reacquire context
-		mCurrentContext->setCurrent();
+        if(mCurrentContext)
+            mCurrentContext->setCurrent();
 	}
 	//---------------------------------------------------------------------
 	bool GLRenderSystem::activateGLTextureUnit(size_t unit)
