@@ -81,6 +81,7 @@ static OgreBites::SampleBrowser sb = 0;
 static id mAppDelegate;
 
 // DisplayLink callback
+#if USE_DISPLAYLINK
 static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp* now, const CVTimeStamp* outputTime,
                                       CVOptionFlags flagsIn, CVOptionFlags* flagsOut, void* displayLinkContext)
 {
@@ -104,6 +105,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
     }
     return kCVReturnSuccess;
 }
+#endif
 #endif
 
 @implementation AppDelegate
