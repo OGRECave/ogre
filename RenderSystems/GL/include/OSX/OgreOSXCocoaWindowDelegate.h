@@ -30,15 +30,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-using namespace Ogre;
-
-_OgreGLExport @interface OSXCocoaWindowDelegate : NSObject
+@interface OSXCocoaWindowDelegate : NSObject
 {
 @private
-    RenderWindow *ogreWindow;
+    Ogre::RenderWindow *ogreWindow;
 	NSWindow *window;
 }
 
--(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(RenderWindow*)ogrewin;
+-(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(Ogre::RenderWindow*)ogrewin;
 
 @end

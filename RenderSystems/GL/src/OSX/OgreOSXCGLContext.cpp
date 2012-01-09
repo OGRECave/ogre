@@ -38,6 +38,8 @@ namespace Ogre
     
 	OSXCGLContext::~OSXCGLContext()
 	{
+		_unregisterContext();
+		
         if(mPixelFormat != NULL)
         {
             CGLDestroyPixelFormat(mPixelFormat);

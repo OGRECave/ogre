@@ -63,6 +63,10 @@ namespace Ogre
 		 @note Return value will be "AGL", "CGL", or "NSOpenGL" accordingly.
 		 */
 		virtual String getContextType() = 0;
+		
+	protected:
+		/** Must be called from destructor of final descendant. */
+		void _unregisterContext();
     };
 }
 

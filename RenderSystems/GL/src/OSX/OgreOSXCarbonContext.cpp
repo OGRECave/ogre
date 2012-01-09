@@ -37,6 +37,8 @@ namespace Ogre
 	
 	OSXCarbonContext::~OSXCarbonContext()
 	{
+		_unregisterContext();
+		
         if(mPixelFormat != NULL)
             aglDestroyPixelFormat(mPixelFormat);
     }

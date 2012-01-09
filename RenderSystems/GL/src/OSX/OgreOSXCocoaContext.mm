@@ -39,6 +39,8 @@ namespace Ogre
 	    
 	OSXCocoaContext::~OSXCocoaContext()
 	{
+		_unregisterContext();
+		
 		[mNSGLPixelFormat release];
     }
 

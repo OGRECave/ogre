@@ -29,11 +29,10 @@ THE SOFTWARE.
 #ifndef __OSXCocoaView_H__
 #define __OSXCocoaView_H__
 
-#include "OgreGLPrerequisites.h"
 #include "OgreRenderWindow.h"
 #include <Cocoa/Cocoa.h>
 
-_OgreGLExport @interface OgreView : NSView
+@interface OgreView : NSView
 {
 	Ogre::RenderWindow *window;
 }
