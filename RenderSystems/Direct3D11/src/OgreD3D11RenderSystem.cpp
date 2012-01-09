@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -649,7 +649,7 @@ namespace Ogre
 				// D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
 				// If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
 				// the device - else CreateSwapChain fails later.
-				//  Update (Jun 12, 2011)
+				//  Update (Jun 12, 2012)
 				// If using WARP driver, get factory from created device
 				SAFE_RELEASE(mpDXGIFactory);
 
