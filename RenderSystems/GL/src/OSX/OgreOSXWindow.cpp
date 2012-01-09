@@ -43,7 +43,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
     uint32 OSXWindow::bitDepthFromDisplayMode(CGDisplayModeRef mode)
     {
         uint32 depth = 0;
@@ -136,7 +136,7 @@ namespace Ogre
         CGLError cglErr = kCGLNoError;
         CGError cgErr = kCGErrorSuccess;
         
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         // Get a copy of the current display mode
         CGDisplayModeRef displayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
         
@@ -241,7 +241,7 @@ namespace Ogre
         CG_CHECK_ERROR(cgErr)
         
         // Switch to the correct resolution
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         mOriginalDisplayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
         cgErr = CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
 #else
@@ -403,7 +403,7 @@ namespace Ogre
         }
 
         // Switch back to the original screen resolution
-#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         CGDisplaySetDisplayMode(kCGDirectMainDisplay, mOriginalDisplayMode, NULL);
 #else
         CGDisplaySwitchToMode(kCGDirectMainDisplay, mOriginalDisplayMode);
