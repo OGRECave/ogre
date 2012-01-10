@@ -321,6 +321,13 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << ENDL;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+                if (gpuType == GPT_FRAGMENT_PROGRAM) {
+                  // TMP var
+                  os << "\t" << "vec4" << "\t" <<"tmpFragColor = vec4(0.0, 0.0, 0.0, 0.0);" << ENDL;
+                }
+#endif
+
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
                 ShaderParameterConstIterator itParam = localParams.begin();
@@ -523,6 +530,12 @@ namespace Ogre {
                     localOs << ENDL;
                     os << localOs.str();
                 }
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+                if (gpuType == GPT_FRAGMENT_PROGRAM) {
+                  os << "\t" << "gl_FragColor = tmpFragColor;" << ENDL;
+                }
+#endif
+
                 os << "}" << ENDL;
             }
             os << ENDL;
@@ -649,7 +662,11 @@ namespace Ogre {
                         pParam->getSemantic() == Parameter::SPS_COLOR)
                 {					
                     // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";						
+  #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
+  #else   // OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+                    mInputToGLStatesMap[pParam->getName()] = "tmpFragColor";
+  #endif  // OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                 }
             }
         }
