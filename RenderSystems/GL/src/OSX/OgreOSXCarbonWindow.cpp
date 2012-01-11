@@ -104,13 +104,6 @@ namespace Ogre
                 fullScreen = StringConverter::parseBool( opt->second );
         }
 
-        mName = name;
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
-        mIsFullScreen = fullScreen;
-
         if(fullScreen)
         {
             setFullscreen(fullScreen, width, height);
@@ -152,6 +145,12 @@ namespace Ogre
         setVSyncEnabled(vsync);
         setHidden(hidden);
 
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+        mColourDepth = depth;
+        mFSAA = fsaa_samples;
+        mIsFullScreen = fullScreen;
         mActive = true;
         mClosed = false;
         mCreated = true;
