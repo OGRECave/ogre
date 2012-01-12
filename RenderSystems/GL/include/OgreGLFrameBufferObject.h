@@ -40,7 +40,7 @@ namespace Ogre {
     public:
         GLFrameBufferObject(GLFBOManager *manager, uint fsaa);
         ~GLFrameBufferObject();
-        //void bindSurface(size_t attachment, RenderTarget *target);
+
         /** Bind a surface to a certain attachment point.
             attachment: 0..OGRE_MAX_MULTIPLE_RENDER_TARGETS-1
         */

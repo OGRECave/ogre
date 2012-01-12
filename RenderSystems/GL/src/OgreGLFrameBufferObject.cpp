@@ -41,7 +41,7 @@ namespace Ogre {
     GLFrameBufferObject::GLFrameBufferObject(GLFBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         glGenFramebuffersEXT(1, &mFB);
 		// check multisampling
 		if (GLEW_EXT_framebuffer_blit && GLEW_EXT_framebuffer_multisample)
@@ -66,7 +66,7 @@ namespace Ogre {
 		{
 			mMultisampleFB = 0;
 		}
-        /// Initialise state
+        // Initialise state
         mDepth.buffer=0;
         mStencil.buffer=0;
         for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
@@ -79,7 +79,7 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
 		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        /// Delete framebuffer object
+        // Delete framebuffer object
         glDeleteFramebuffersEXT(1, &mFB);        
 		if (mMultisampleFB)
 			glDeleteFramebuffersEXT(1, &mMultisampleFB);
@@ -109,7 +109,7 @@ namespace Ogre {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
 		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
-        /// First buffer must be bound
+        // First buffer must be bound
         if(!mColour[0].buffer)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
@@ -122,7 +122,7 @@ namespace Ogre {
 		// FBO afterwards to perform the multisample resolve. In that case, the 
 		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
-        /// Store basic stats
+        // Store basic stats
         size_t width = mColour[0].buffer->getWidth();
         size_t height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
@@ -131,7 +131,7 @@ namespace Ogre {
 		// Bind simple buffer to add colour attachments
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFB);
 
-        /// Bind all attachment points to frame buffer
+        // Bind all attachment points to frame buffer
         for(size_t x=0; x<maxSupportedMRTs; ++x)
         {
             if(mColour[x].buffer)
@@ -182,10 +182,10 @@ namespace Ogre {
 
 		}
 
-        /// Depth buffer is not handled here anymore.
-		/// See GLFrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
+        // Depth buffer is not handled here anymore.
+		// See GLFrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
-		/// Do glDrawBuffer calls
+		// Do glDrawBuffer calls
 		GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
@@ -204,12 +204,12 @@ namespace Ogre {
 		}
 		if(glDrawBuffers)
 		{
-			/// Drawbuffer extension supported, use it
+			// Drawbuffer extension supported, use it
 			glDrawBuffers(n, bufs);
 		}
 		else
 		{
-			/// In this case, the capabilities will not show more than 1 simultaneaous render target.
+			// In this case, the capabilities will not show more than 1 simultaneaous render target.
 			glDrawBuffer(bufs[0]);
 		}
 		if (mMultisampleFB)
@@ -219,15 +219,15 @@ namespace Ogre {
 		}
 		else
 		{
-			/// No read buffer, by default, if we want to read anyway we must not forget to set this.
+			// No read buffer, by default, if we want to read anyway we must not forget to set this.
 			glReadBuffer(GL_NONE);
 		}
         
-        /// Check status
+        // Check status
         GLuint status;
         status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
         
-        /// Bind main buffer
+        // Bind main buffer
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         
         switch(status)
@@ -248,7 +248,7 @@ namespace Ogre {
     }
     void GLFrameBufferObject::bind()
     {
-        /// Bind it to FBO
+        // Bind it to FBO
 		const GLuint fb = mMultisampleFB ? mMultisampleFB : mFB;
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
     }
@@ -257,13 +257,15 @@ namespace Ogre {
 	{
 		if (mMultisampleFB)
 		{
-			// blit from multisample buffer to final buffer, triggers resolve
+			// Blit from multisample buffer to final buffer, triggers resolve
 			size_t width = mColour[0].buffer->getWidth();
 			size_t height = mColour[0].buffer->getHeight();
 			glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, mMultisampleFB);
 			glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, mFB);
 			glBlitFramebufferEXT(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+            // Unbind
+            glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 		}
 	}
 
@@ -278,11 +280,11 @@ namespace Ogre {
 			GLRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GLRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-			//Attach depth buffer, if it has one.
+			// Attach depth buffer, if it has one.
 			if( depthBuf )
 				depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT_EXT, 0 );
 
-			//Attach stencil buffer, if it has one.
+			// Attach stencil buffer, if it has one.
 			if( stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT_EXT, 0 );
 		}
