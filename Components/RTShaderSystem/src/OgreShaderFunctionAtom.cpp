@@ -319,13 +319,42 @@ bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocat
         if (itLHSOps->getSemantic() > itRHSOps->getSemantic())
             return false;
 
-        if (itLHSOps->getParameter()->getType() < itRHSOps->getParameter()->getType())
+        GpuConstantType leftType    = itLHSOps->getParameter()->getType();
+        GpuConstantType rightType   = itRHSOps->getParameter()->getType();
+        
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            if (leftType == GCT_SAMPLER1D)
+                leftType = GCT_SAMPLER2D;
+
+            if (rightType == GCT_SAMPLER1D)
+                rightType = GCT_SAMPLER2D;
+        }
+
+        // If a swizzle mask is being applied to the parameter, generate the GpuConstantType to
+        // perform the parameter type comparison the way that the compiler will see it.
+        if ((itLHSOps->getFloatCount(itLHSOps->getMask()) > 0) ||
+           (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0))
+        {
+            if (itLHSOps->getFloatCount(itLHSOps->getMask()) > 0)
+            {
+                leftType = (GpuConstantType)((itLHSOps->getParameter()->getType() - itLHSOps->getParameter()->getType()) +
+                                             itLHSOps->getFloatCount(itLHSOps->getMask()));
+            }
+            if (itRHSOps->getFloatCount(itRHSOps->getMask()) > 0)
+            {
+                rightType = (GpuConstantType)((itRHSOps->getParameter()->getType() - itRHSOps->getParameter()->getType()) +
+                                             itRHSOps->getFloatCount(itRHSOps->getMask()));
+            }
+        }
+
+        if (leftType < rightType)
             return true;
-        if (itLHSOps->getParameter()->getType() > itRHSOps->getParameter()->getType())
+        if (leftType > rightType)
             return false;
     }
 
-    return true;
+    return false;
 }
 
 bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const
