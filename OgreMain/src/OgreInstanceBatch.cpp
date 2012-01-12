@@ -67,7 +67,9 @@ namespace Ogre
 		mVisibilityFlags = std::numeric_limits<Ogre::uint32>::max();
 
 		if( indexToBoneMap )
+		{
 			assert( !(meshReference->hasSkeleton() && indexToBoneMap->empty()) );
+		}
 
 		mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
