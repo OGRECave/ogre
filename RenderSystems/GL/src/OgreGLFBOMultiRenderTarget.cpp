@@ -40,45 +40,30 @@ namespace Ogre {
 		fbo(manager, 0 /* TODO: multisampling on MRTs? */)
 	{
 	}
+
 	GLFBOMultiRenderTarget::~GLFBOMultiRenderTarget()
 	{
 	}
 
-
 	void GLFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
-
 	{
-
 		/// Check if the render target is in the rendertarget->FBO map
         GLFrameBufferObject *fbobj = 0;
         target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbobj);
 		assert(fbobj);
 		fbo.bindSurface(attachment, fbobj->getSurface(0));
 
-
-
-		// Initialise?
-
-		
-
 		// Set width and height
-
 		mWidth = fbo.getWidth();
-
 		mHeight = fbo.getHeight();
-
 	}
-
-
 
 	void GLFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
 	{
 		fbo.unbindSurface(attachment);
 
 		// Set width and height
-
 		mWidth = fbo.getWidth();
-
 		mHeight = fbo.getHeight();
 	}
 
