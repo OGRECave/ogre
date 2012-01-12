@@ -78,8 +78,6 @@ using namespace Ogre;
         unsigned int width = (uint)self.bounds.size.width;
         unsigned int height = (uint)self.bounds.size.height;
 
-        Ogre::Viewport *viewPort = window->getViewport(0);
-
         if (UIDeviceOrientationIsLandscape(deviceOrientation))
         {
             w = std::max(width, height);
@@ -96,9 +94,13 @@ using namespace Ogre;
 
         // Resize the window
         window->resize(width, height);
-
+        
         // After rotation the aspect ratio of the viewport has changed, update that as well.
-        viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
+        if(window->getNumViewports())
+        {
+            Ogre::Viewport *viewPort = window->getViewport(0);
+            viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
+        }
     }
 }
 
