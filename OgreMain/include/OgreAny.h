@@ -382,7 +382,7 @@ namespace Ogre
     template<typename ValueType>
     ValueType * any_cast(Any * operand)
     {
-        return operand && operand->getType() == typeid(ValueType)
+        return operand && (std::strcmp(operand->getType().name(), typeid(ValueType).name()) == 0)
                     ? &static_cast<Any::holder<ValueType> *>(operand->mContent)->held
                     : 0;
     }
