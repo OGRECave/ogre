@@ -257,6 +257,9 @@ namespace Ogre {
 	{
 		if (mMultisampleFB)
 		{
+            GLint oldfb = 0;
+            glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &oldfb);
+
 			// Blit from multisample buffer to final buffer, triggers resolve
 			size_t width = mColour[0].buffer->getWidth();
 			size_t height = mColour[0].buffer->getHeight();
@@ -265,7 +268,7 @@ namespace Ogre {
 			glBlitFramebufferEXT(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
             // Unbind
-            glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, oldfb);
 		}
 	}
 
