@@ -31,6 +31,35 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 <p class="mainheader">
+    v1.7.4 [Cthugha] (14 January 2012) - MAINTENANCE RELEASE</p>
+<ul>
+<li>iOS: Fix the fix I did for libraries that are included in SDK builds. Use iOS 3.2 when building SDKs</li>
+<li>OS X: Add visibility attributes to Cocoa classes so the symbols are exported. Apparently symbol visibility only has an effect for Objective-C on x86_64 targets.</li>
+<li>OS X: Fix the OS X build</li>
+<li>Bug 443: Small fix for Image::setColourAt</li>
+<li>GL: Fix for a couple old bugs that could cause lots of GL errors.  One is an assumption about 2 sided stencil support always being there.  The other related to the wrong enumerations being used for the extension that we are checking.  See <a href="http://www.ogre3d.org/forums/viewtopic.php?f=2&t=44132">relevant forum topic</a>.</li>
+<li>Missing D3D9 Software vertex processing fix</li>
+<li>Xcode templates update</li>
+<li>Adding RTShaderLib files to Xcode templates</li>
+<li>OS X: Fix for input issues on Lion.  NSTitledWindowMask is no longer implied when creating a NSWindow.  To fix, we just add it to the style mask that we use.</li>
+<li>iOS: The Dynamic Texture sample works.  It should be enabled.</li>
+<li>Add a forward slash to the beginning of paths in the Xcode 4 templates to workaround a weird bug in the template wizard that eats up any leading slashes in text fields</li>
+<li>GLES: A little cleanup and fixed GL errors when using BGRA textures.</li>
+<li>Fix the incorrect average and max FPS entries in SDK trays.</li>
+<li>The Xcode 4 templates will need to link to the CoreGraphics framework now.</li>
+<li>OS X: FSAA was not being applied to the both Carbon and Cocoa contexts at all.</li>
+<li>Updated FindOGRE.cmake to properly set OGRE_${COMPONENT}_BINARY variables with paths to the corresponding DLLs</li>
+<li>Updated FindTBB.cmake to correctly identify the version of Visual Studio used</li>
+<li>Consider OGRE_LIB_DIRECTORY when setting RPATH for SampleBrowser and OctreeZone plugin</li>
+<li>Fix D3D9 capabilities check for cubemaps</li>
+<li>Fixed a memory leak in InstancedGeometry</li>
+<li>Fix Boost license file location in CMake</li>
+<li>Fix definition of element extremes in ogremeshxml.dtd</li>
+<li>Have D3D9 rendersystem clean up properly when creating a renderwindow fails</li>
+</ul>
+
+
+<p class="mainheader">
     v1.7.3 [Cthugha] (08 May 2011) - MAINTENANCE RELEASE</p>
 <ul>
 <li>iOS: Remove the animation timer.  Since DisplayLink is used by default now, this only hurts performance of things like input.</li>
