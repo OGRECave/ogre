@@ -700,7 +700,19 @@ namespace Ogre
 
 		mResourceManager->lockDeviceAccess();
 
-		mDeviceManager->linkRenderWindow(renderWindow);
+        try
+        {
+		    mDeviceManager->linkRenderWindow(renderWindow);
+        }
+        catch (const Ogre::RenderingAPIException&)
+        {
+            // after catching the exception, clean up
+            mResourceManager->unlockDeviceAccess();
+            renderWindow->destroy();
+
+            // re-throw
+            throw;
+        }
 
 		mResourceManager->unlockDeviceAccess();
 	
