@@ -877,6 +877,13 @@ namespace Ogre {
             scaled.data = OGRE_NEW_FIX_FOR_WIN32 uint8[sizeInBytes];
             Image::scale(data, scaled, Image::FILTER_LINEAR);
         }
+
+        // Delete the scaled data for the last level
+        if (level > 0)
+        {
+            OGRE_DELETE[] (uint8*) scaled.data;
+            scaled.data = 0;
+        }
     }
     
     //********* GLES2RenderBuffer
