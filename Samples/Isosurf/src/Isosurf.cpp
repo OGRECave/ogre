@@ -52,7 +52,7 @@ public:
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
-				"so cannot run this demo. Sorry!", 
+				"so you cannot run this sample. Sorry!", 
                 "Sample_Isosurf::setupContent");
         }
 		
