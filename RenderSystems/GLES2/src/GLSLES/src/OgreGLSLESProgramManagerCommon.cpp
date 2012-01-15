@@ -221,6 +221,7 @@ namespace Ogre {
 		// Scan through the active uniforms and add them to the reference list
 		GLint uniformCount = 0;
         GLint maxLength = 0;
+		char* uniformName = NULL;
 
 		glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
         GL_CHECK_ERROR;
@@ -230,7 +231,7 @@ namespace Ogre {
         if(maxLength == 0)
             return;
 
-		char uniformName[maxLength];
+		uniformName = OGRE_NEW char[maxLength + 1];
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
@@ -280,6 +281,11 @@ namespace Ogre {
 				// user params
 			} // end if
 		} // end for
+		
+		if( uniformName != NULL ) 
+		{
+			OGRE_DELETE uniformName;
+		}
 	}
 	//---------------------------------------------------------------------
 	void GLSLESProgramManagerCommon::extractConstantDefs(const String& src,
