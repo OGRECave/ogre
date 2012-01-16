@@ -95,6 +95,10 @@ namespace Ogre
                         "OSXWindow::copyContentsToMemory" );
         }
         
+        // Switch context if different from current one
+		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+		rsys->_setViewport(this->getViewport(0));
+
         if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
         {
             // Standard alignment of 4 is not right
