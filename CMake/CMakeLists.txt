@@ -59,7 +59,7 @@ if (APPLE)
     Packages/FindCoreVideo.cmake
   )
   set(STATIC_INST_FILES ${STATIC_INST_FILES}
-    Packages/FindiPhoneSDK.cmake
+    Packages/FindiOSSDK.cmake
     Packages/FindGLSLOptimizer.cmake
     Packages/FindHLSL2GLSL.cmake
   )

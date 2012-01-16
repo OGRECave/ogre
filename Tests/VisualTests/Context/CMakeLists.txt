@@ -25,7 +25,7 @@ set(SOURCE_FILES
 if (WIN32)
   list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_WIN32.cpp)
 elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_iPhone.mm)
+  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_iOS.mm)
 elseif (APPLE)
   list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_OSX.cpp)
 elseif (UNIX)

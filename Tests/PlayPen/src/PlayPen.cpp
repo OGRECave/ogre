@@ -336,8 +336,8 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //
 //		}
 //
-//        // Neither Terrain nor keyboard input works on iPhone
-//#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+//        // Neither Terrain nor keyboard input works on iOS
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 //		if (mTerrain)
 //		{
 //			if (mKeyboard->isKeyDown(OIS::KC_PERIOD))
@@ -451,7 +451,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //            timeUntilNextToggle -= evt.timeSinceLastFrame;
 //
 //		static bool mWireframe = false;
-//#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 //		if (mKeyboard->isKeyDown(OIS::KC_G) && timeUntilNextToggle <= 0)
 //        {
 //			mWireframe = !mWireframe;
@@ -519,7 +519,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //			(*animi)->addTime(evt.timeSinceLastFrame);
 //		}
 //
-//#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 //        if (mKeyboard->isKeyDown(OIS::KC_R) && timeUntilNextToggle <= 0)
 //        {
 //            rotate = !rotate;
@@ -617,7 +617,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //        }
 //        */
 //
-//#if OGRE_PLATFORM != OGRE_PLATFORM_IPHONE
+//#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 //		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 //		{
 //			if (testremoveNode)
@@ -8634,7 +8634,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //		String pluginsPath = mResourcePath + "plugins.cfg";
 //		// only use plugins.cfg if not static
 //#ifdef OGRE_STATIC_LIB
-//    #if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+//    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 //        Ogre::String workDir = Ogre::StringUtil::BLANK;
 //        workDir = Ogre::macBundlePath() + "/";
 //
@@ -8879,7 +8879,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //int main(int argc, char **argv)
 //#endif
 //{
-//#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+//#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 //    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 //    int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
 //    [pool release];
@@ -8905,7 +8905,7 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 //#endif
 //}
 //
-//#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+//#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 //#   ifdef __OBJC__
 //@interface AppDelegate : NSObject <UIApplicationDelegate>
 //{

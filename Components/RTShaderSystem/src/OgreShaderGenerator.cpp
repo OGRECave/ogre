@@ -114,7 +114,7 @@ ShaderGenerator::ShaderGenerator()
 	}
 	else
 	{
-		// ASSAF: This is disabled for now - to stop an exception on the iPhone
+		// ASSAF: This is disabled for now - to stop an exception on the iOS
 		// when running with the OpenGL ES 1.x that doesn't support shaders...
 		/*
 		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 

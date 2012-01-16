@@ -1,4 +1,4 @@
-/* iPhone/Xcode specific configuration file */
+/* iOS/Xcode specific configuration file */
 
 /* Big endian machine */
 #if defined(__BIG_ENDIAN__)

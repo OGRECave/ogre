@@ -73,7 +73,7 @@ namespace Ogre {
             FilterOptions mMipFilter;
 
             /** Used to store the number of mipmaps in the currently bound texture.  This is then
-             used to modify the texture unit filtering.  Some GL ES implementations e.g. iPhone, 
+             used to modify the texture unit filtering.  Some GL ES implementations e.g. iOS, 
              have a more strict implementation, if the current texture has no mipmaps and a filter that 
              requires them is requested, it is as if the texture is unbound.
              */

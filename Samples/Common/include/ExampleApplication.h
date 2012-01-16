@@ -44,7 +44,7 @@ Description: Base class for all the OGRE examples
 #  else
 #    define OGRE_STATIC_OctreeSceneManager
 #  endif
-#  if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#  if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #     undef OGRE_STATIC_CgProgramManager
 #     undef OGRE_STATIC_GL
 #     define OGRE_STATIC_GLES 1
@@ -55,7 +55,7 @@ Description: Base class for all the OGRE examples
 #  include "OgreStaticPluginLoader.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "macUtils.h"
 #endif
 
@@ -129,7 +129,7 @@ public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 		mResourcePath = macBundlePath() + "/Contents/Resources/";
         mConfigPath = mResourcePath;
-#elif OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         mResourcePath = macBundlePath() + "/";
         mConfigPath = mResourcePath;
 #else
@@ -349,7 +349,7 @@ protected:
     }
     virtual void createFrameListener(void)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         mFrameListener= new ExampleFrameListener(mWindow, mCamera, true, true, true);
 #else
         mFrameListener= new ExampleFrameListener(mWindow, mCamera);
@@ -397,7 +397,7 @@ protected:
             {
                 typeName = i->first;
                 archName = i->second;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 // OS X does not set the working directory relative to the app,
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location

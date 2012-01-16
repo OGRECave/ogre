@@ -317,7 +317,7 @@ namespace Ogre {
 			msGPUVendorStrings[GPU_MATROX] = "matrox";
 			msGPUVendorStrings[GPU_SIS] = "sis";
 			msGPUVendorStrings[GPU_IMAGINATION_TECHNOLOGIES] = "imagination technologies";
-			msGPUVendorStrings[GPU_APPLE] = "apple";    // iPhone Simulator
+			msGPUVendorStrings[GPU_APPLE] = "apple";    // iOS Simulator
 		}
 	}
 

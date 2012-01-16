@@ -528,22 +528,22 @@ elseif (WIN32)
 
 elseif (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    include_directories("include/iPhone")
+    include_directories("include/iOS")
     set(PLATFORM_HEADER_FILES
-      include/iPhone/OgreConfigDialogImp.h
-      include/iPhone/OgreErrorDialogImp.h
-      include/iPhone/OgreTimerImp.h
-      include/iPhone/macUtils.h
+      include/iOS/OgreConfigDialogImp.h
+      include/iOS/OgreErrorDialogImp.h
+      include/iOS/OgreTimerImp.h
+      include/iOS/macUtils.h
     )
     set(PLATFORM_SOURCE_FILES
-      src/iPhone/OgreConfigDialog.cpp
-      src/iPhone/OgreErrorDialog.cpp
-      src/iPhone/OgreTimer.cpp
-      src/iPhone/macUtils.mm
+      src/iOS/OgreConfigDialog.cpp
+      src/iOS/OgreErrorDialog.cpp
+      src/iOS/OgreTimer.cpp
+      src/iOS/macUtils.mm
       src/OgreSearchOps.cpp
     )
     set(PLATFORM_LIBS "")
-    set(PLATFORM_HEADER_INSTALL "iPhone")
+    set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
     include_directories("include/OSX")
     set(PLATFORM_HEADER_FILES

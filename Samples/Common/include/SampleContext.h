@@ -760,7 +760,7 @@ namespace OgreBites
 			}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            // Need to save the config on iPhone to make sure that changes are kept on disk
+            // Need to save the config on iOS to make sure that changes are kept on disk
             mRoot->saveConfig();
 #endif
 			mLastRun = false;             // we want to go again with the new settings

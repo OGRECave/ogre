@@ -215,7 +215,7 @@ namespace Ogre {
 		if (strstr(vendorName, "Imagination Technologies"))
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
-			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
+			rsc->setVendor(GPU_APPLE);  // iOS Simulator
 		else if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
 		else if (strstr(vendorName, "Nokia"))
@@ -1358,7 +1358,7 @@ namespace Ogre {
     {
         if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
         {
-#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
+#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iOS OS, block it out to fix Linux build
             if (activateGLTextureUnit(unit))
             {
                 glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);

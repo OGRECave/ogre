@@ -426,7 +426,7 @@ namespace Ogre {
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // Read the config from Documents first(user config) if it exists on iPhone.
+        // Read the config from Documents first(user config) if it exists on iOS.
         // If it doesn't exist or is invalid then use mConfigFileName
 
         Ogre::String outBaseName, extension, configFileName;

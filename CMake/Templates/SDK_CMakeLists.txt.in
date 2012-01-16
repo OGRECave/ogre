@@ -87,7 +87,7 @@ if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
-  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iPhone" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
 
@@ -158,7 +158,7 @@ include_directories(
 )
 if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/iPhone")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/iOS")
   else ()
     # Set 10.5 as the base SDK by default
     set(XCODE_ATTRIBUTE_SDKROOT macosx)

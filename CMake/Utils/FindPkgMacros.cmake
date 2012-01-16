@@ -133,7 +133,7 @@ MACRO(findpkg_framework fwk)
       /Library/Frameworks
       /System/Library/Frameworks
       /Network/Library/Frameworks
-      /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS3.0.sdk/System/Library/Frameworks/
+      /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Release
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug
     )

@@ -287,7 +287,7 @@ namespace Ogre  {
                         return PF_A4R4G4B4;
                     default:
 #if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-                        // seems that in iPhone we need this value to get the right color
+                        // seems that in iOS we need this value to get the right color
                         return PF_A8R8G8B8;
 #else
                         return PF_X8B8G8R8;

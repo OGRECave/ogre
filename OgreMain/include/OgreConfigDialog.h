@@ -47,7 +47,7 @@ THE SOFTWARE.
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 # include "OSX/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iPhone/OgreConfigDialogImp.h"
+# include "iOS/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
 # include "Symbian/OgreConfigDialogImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID

@@ -6,7 +6,7 @@ System Path
 You need the following available on your system path:
 - CMake 2.8+
 - Xcode 4.0
-- iPhone SDK 4.1 or later
+- iOS SDK 4.1 or later
 - Doxygen
 - Graphviz 'dot' command
 
@@ -19,4 +19,4 @@ The following environment variables must be defined:
 Building the SDK
 ----------------
 
-Open a Terminal window and navigate to the OGRESDK/SDK/iPhone directory.  Then run ./make_iphone.sh . You can optionally supply the parameter "clean" to remove any previous build results.
+Open a Terminal window and navigate to the OGRESDK/SDK/iOS directory.  Then run ./make_ios.sh . You can optionally supply the parameter "clean" to remove any previous build results.

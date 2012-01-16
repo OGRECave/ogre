@@ -51,7 +51,7 @@ THE SOFTWARE.
 #endif
 #endif
 
-// Color order is actually RGB on iPhone
+// Color order is actually RGB on iOS
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
 #endif

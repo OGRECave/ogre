@@ -20,10 +20,10 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
     ${ENV_OGRE_DEPENDENCIES_DIR}
-    "${OGRE_BINARY_DIR}/iPhoneDependencies"
-    "${OGRE_SOURCE_DIR}/iPhoneDependencies"
-    "${OGRE_BINARY_DIR}/../iPhoneDependencies"
-    "${OGRE_SOURCE_DIR}/../iPhoneDependencies"
+    "${OGRE_BINARY_DIR}/iOSDependencies"
+    "${OGRE_SOURCE_DIR}/iOSDependencies"
+    "${OGRE_BINARY_DIR}/../iOSDependencies"
+    "${OGRE_SOURCE_DIR}/../iOSDependencies"
   )
 else()
   set(OGRE_DEP_SEARCH_PATH 
@@ -191,8 +191,8 @@ macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "h
 # Apple-specific
 #######################################################################
 if (APPLE)
-  find_package(iPhoneSDK)
-  macro_log_feature(iPhoneSDK_FOUND "iOS SDK" "iOS SDK" "http://developer.apple.com/ios" FALSE "" "")
+  find_package(iOSSDK)
+  macro_log_feature(iOSSDK_FOUND "iOS SDK" "iOS SDK" "http://developer.apple.com/ios" FALSE "" "")
   
   if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     find_package(Carbon)

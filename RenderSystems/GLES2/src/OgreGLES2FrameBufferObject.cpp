@@ -208,7 +208,7 @@ namespace Ogre {
 
         /// Bind main buffer
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // The screen buffer is 1 on iPhone
+        // The screen buffer is 1 on iOS
         glBindFramebuffer(GL_FRAMEBUFFER, 1);
 #else
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

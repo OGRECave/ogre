@@ -157,7 +157,7 @@ namespace Ogre {
                                     GL_RENDERBUFFER_OES, depthRB);
         }
 
-        // Stencil buffers aren't available on iPhone
+        // Stencil buffers aren't available on iOS
         if(stencilFormat != GL_NONE)
         {
             /// Generate stencil renderbuffer
@@ -400,7 +400,7 @@ namespace Ogre {
         else
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            // The screen buffer is 1 on iPhone
+            // The screen buffer is 1 on iOS
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, 1);
 #else
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);

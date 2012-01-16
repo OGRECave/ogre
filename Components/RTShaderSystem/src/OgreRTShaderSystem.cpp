@@ -156,7 +156,7 @@ bool RTShaderSystem::initializeRTShaderSystem( Ogre::SceneManager* sceneMgr )
 
 #ifdef _RTSS_WRITE_SHADERS_TO_DISK
     // Set shader cache path.
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     shaderCachePath = Ogre::macCachePath();
 #endif
     mShaderGenerator->setShaderCachePath(shaderCachePath);		

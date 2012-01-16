@@ -652,14 +652,14 @@ namespace Ogre
         /** Set the orientation mode of the frustum. Default is OR_DEGREE_0
              @remarks
                 Setting the orientation of a frustum is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
+                iOS at this time.  An exception is thrown on other platforms.
         */
         void setOrientationMode(OrientationMode orientationMode);
 
         /** Get the orientation mode of the frustum.
              @remarks
                 Getting the orientation of a frustum is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
+                iOS at this time.  An exception is thrown on other platforms.
         */
         OrientationMode getOrientationMode() const;
 

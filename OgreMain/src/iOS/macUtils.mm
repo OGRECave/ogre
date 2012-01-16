@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    // Basically a dummy function.  Dynamic libraries aren't supported on iPhone
+    // Basically a dummy function.  Dynamic libraries aren't supported on iOS
     void* mac_loadDylib(const char* name)
     {
         return NULL;
@@ -60,7 +60,7 @@ namespace Ogre {
         return std::string(path);
     }
     
-    std::string iPhoneDocumentsDirectory()
+    std::string iOSDocumentsDirectory()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
