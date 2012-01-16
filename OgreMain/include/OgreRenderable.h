@@ -132,7 +132,7 @@ namespace Ogre {
                 If the object has any derived transforms, these are expected to be up to date as long as
                 all the SceneNode structures have been updated before this is called.
             @par
-                This method will populate xform with 1 matrix if it does not use vertex blending. If it
+                This method will populate transform with 1 matrix if it does not use vertex blending. If it
                 does use vertex blending it will fill the passed in pointer with an array of matrices,
                 the length being the value returned from getNumWorldTransforms.
             @note

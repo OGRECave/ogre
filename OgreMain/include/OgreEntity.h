@@ -258,7 +258,7 @@ namespace Ogre {
 		/// Has this entity been initialised yet?
 		bool mInitialised;
 
-		/// Last parent xform
+		/// Last parent transform
 		Matrix4 mLastParentXform;
 
 		/// Mesh state count, used to detect differences

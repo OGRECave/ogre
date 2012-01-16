@@ -93,11 +93,11 @@ namespace Ogre
 
 		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
 												
-		//Used in conjunction with bone matrix lookup. Tells the number of the transform for
-		//as arranged in the vertex texture
+		/** Used in conjunction with bone matrix lookup. Tells the number of the transform for
+            as arranged in the vertex texture */
 		uint16 mTransformLookupNumber;
 
-		//Stores the master when we're the slave, store our slaves when we're the master
+		/// Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 		InstancedEntityVec mSharingPartners;
 
@@ -106,18 +106,18 @@ namespace Ogre
 		// The 
 		//////////////////////////////////////////////////////////////////////////
 
-		///Object position
+		/// Object position
 		Vector3 mPosition;
 		Vector3 mDerivedLocalPosition;
-		///Object orientation
+		/// Object orientation
 		Quaternion mOrientation;
-		///Object scale
+		/// Object scale
 		Vector3 mScale;
-		///The maximum absolute scale for all dimension
+		/// The maximum absolute scale for all dimension
 		Real mMaxScaleLocal;
-		///Full world transform
+		/// Full world transform
 		Matrix4 mFullLocalTransform;
-		///Tells if mFullTransform needs an updated
+		/// Tells if mFullTransform needs an updated
 		bool mNeedTransformUpdate;
 		/// Tells if the animation world transform needs an update
 		bool mNeedAnimTransformUpdate;
@@ -125,25 +125,25 @@ namespace Ogre
 		bool mUseLocalTransform;
 
 
-		//Returns number of matrices written to xform, assumes xform has enough space
+		/// Returns number of matrices written to transform, assumes transform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
-		//Returns number of 32-bit values written
+		/// Returns number of 32-bit values written
 		size_t getTransforms3x4( float *xform ) const;
 
-		//Returns true if this InstancedObject is visible to the current camera
+		/// Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera ) const;
 
-		//Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
+		/// Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
 		void createSkeletonInstance();
 		void destroySkeletonInstance();
 
-		//Just unlinks, and tells our master we're no longer sharing
+		/// Just unlinks, and tells our master we're no longer sharing
 		void unlinkTransform();
 
-		//Called when a slave has unlinked from us
+		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
 
-		//Mark the transformation matrixes as dirty
+		/// Mark the transformation matrixes as dirty
 		inline void markTransformDirty();
 
 		/// Incremented count for next name extension
@@ -189,15 +189,15 @@ namespace Ogre
 		const AxisAlignedBox& getBoundingBox(void) const;
 		Real getBoundingRadius(void) const;
 
-		//This is used by our batch owner to get the closest entity's depth, returns infinity
-		//when not attached to a scene node
+		/** This is used by our batch owner to get the closest entity's depth, returns infinity
+            when not attached to a scene node */
 		Real getSquaredViewDepth( const Camera* cam ) const;
 
-		//Overriden so we can tell the InstanceBatch it needs to update it's bounds
+		/// Overriden so we can tell the InstanceBatch it needs to update it's bounds
 		void _notifyMoved(void);
 		void _notifyAttached( Node* parent, bool isTagPoint = false );
 
-		//Do nothing, InstanceBatch takes care of this.
+		/// Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
