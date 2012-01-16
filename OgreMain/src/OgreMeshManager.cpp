@@ -488,7 +488,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate
@@ -635,7 +635,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate
@@ -798,7 +798,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate
