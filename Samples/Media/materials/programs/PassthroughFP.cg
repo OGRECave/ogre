@@ -3,16 +3,9 @@ float4 main (float4 pos : POSITION, uniform float4 colour) : COLOR
 	return colour;
 }
 
-float4 mainCg
-(
-    in float4 inPos : POSITION,
-    out float4 pos : POSITION,
-    uniform float4 colour,
-    uniform float4x4 worldViewProj) : COLOR
+float4 mainCg (float4 colour0 : COLOR) : COLOR
 {
-    pos = mul(worldViewProj, inPos);
-
-    return colour;
+    return colour0;
 }
 
 float4 mainForAmbientOneTexture (float4 pos : POSITION, float2 oUv : TEXCOORD0, float4 colour0 : COLOR, uniform float4 colour) : COLOR
