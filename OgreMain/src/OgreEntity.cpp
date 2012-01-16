@@ -1549,14 +1549,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real Entity::getBoundingRadius(void) const
     {
-        Real rad = mMesh->getBoundingSphereRadius();
-        // Scale by largest scale factor
-        if (mParentNode)
-        {
-            const Vector3& s = mParentNode->_getDerivedScale();
-			rad *=  std::max(Ogre::Math::Abs(s.x), std::max(Ogre::Math::Abs(s.y), Ogre::Math::Abs(s.z)));
-        }
-        return rad;
+        return mMesh->getBoundingSphereRadius();
     }
     //-----------------------------------------------------------------------
     void Entity::prepareTempBlendBuffers(void)
