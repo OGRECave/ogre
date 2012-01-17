@@ -611,11 +611,13 @@ void CompositorInstance::createResources(bool forResizeOnly)
     while(it.hasMoreElements())
     {
         CompositionTechnique::TextureDefinition *def = it.getNext();
-
+        
 		if (!def->refCompName.empty()) {
 			//This is a reference, isn't created in this compositor
 			continue;
 		}
+        
+        RenderTarget* rendTarget;
 		if (def->scope == CompositionTechnique::TS_GLOBAL) {
 			//This is a global texture, just link the created resources from the parent
 			Compositor* parentComp = mTechnique->getParent();
@@ -623,136 +625,138 @@ void CompositorInstance::createResources(bool forResizeOnly)
 			{
 				size_t atch = 0;
 				for (PixelFormatList::iterator p = def->formatList.begin(); 
-					p != def->formatList.end(); ++p, ++atch)
+                     p != def->formatList.end(); ++p, ++atch)
 				{
 					Ogre::TexturePtr tex = parentComp->getTextureInstance(def->name, atch);
 					mLocalTextures[getMRTTexLocalName(def->name, atch)] = tex;
 				}
 				MultiRenderTarget* mrt = static_cast<MultiRenderTarget*>
-					(parentComp->getRenderTarget(def->name));
+                (parentComp->getRenderTarget(def->name));
 				mLocalMRTs[def->name] = mrt;
-			}
-			else
-			{
+                
+                rendTarget = mrt;
+            } else {
 				Ogre::TexturePtr tex = parentComp->getTextureInstance(def->name, 0);
 				mLocalTextures[def->name] = tex;
-			}
-			continue;
-		}
-        /// Determine width and height
-        size_t width = def->width;
-        size_t height = def->height;
-		uint fsaa = 0;
-		String fsaaHint;
-		bool hwGamma = false;
-
-		// Skip this one if we're only (re)creating for a resize & it's not derived
-		// from the target size
-		if (forResizeOnly && width != 0 && height != 0)
-			continue;
-
-		deriveTextureRenderTargetOptions(def->name, &hwGamma, &fsaa, &fsaaHint);
-
-        if(width == 0)
-            width = static_cast<size_t>(
-				static_cast<float>(mChain->getViewport()->getActualWidth()) * def->widthFactor);
-        if(height == 0)
-			height = static_cast<size_t>(
-				static_cast<float>(mChain->getViewport()->getActualHeight()) * def->heightFactor);
-
-		// determine options as a combination of selected options and possible options
-		if (!def->fsaa)
-		{
-			fsaa = 0;
-			fsaaHint = StringUtil::BLANK;
-		}
-		hwGamma = hwGamma || def->hwGammaWrite;
-
-        /// Make the tetxure
-		RenderTarget* rendTarget;
-		if (def->formatList.size() > 1)
-		{
-			String MRTbaseName = "c" + StringConverter::toString(dummyCounter++) + 
+                
+                rendTarget = tex->getBuffer()->getRenderTarget();
+            }
+            
+        } else {
+            /// Determine width and height
+            size_t width = def->width;
+            size_t height = def->height;
+            uint fsaa = 0;
+            String fsaaHint;
+            bool hwGamma = false;
+            
+            // Skip this one if we're only (re)creating for a resize & it's not derived
+            // from the target size
+            if (forResizeOnly && width != 0 && height != 0)
+                continue;
+            
+            deriveTextureRenderTargetOptions(def->name, &hwGamma, &fsaa, &fsaaHint);
+            
+            if(width == 0)
+                width = static_cast<size_t>(
+                                            static_cast<float>(mChain->getViewport()->getActualWidth()) * def->widthFactor);
+            if(height == 0)
+                height = static_cast<size_t>(
+                                             static_cast<float>(mChain->getViewport()->getActualHeight()) * def->heightFactor);
+            
+            // determine options as a combination of selected options and possible options
+            if (!def->fsaa)
+            {
+                fsaa = 0;
+                fsaaHint = StringUtil::BLANK;
+            }
+            hwGamma = hwGamma || def->hwGammaWrite;
+            
+            /// Make the tetxure
+            if (def->formatList.size() > 1)
+            {
+                String MRTbaseName = "c" + StringConverter::toString(dummyCounter++) + 
 				"/" + def->name + "/" + mChain->getViewport()->getTarget()->getName();
-			MultiRenderTarget* mrt = 
+                MultiRenderTarget* mrt = 
 				Root::getSingleton().getRenderSystem()->createMultiRenderTarget(MRTbaseName);
-			mLocalMRTs[def->name] = mrt;
-
-			// create and bind individual surfaces
-			size_t atch = 0;
-			for (PixelFormatList::iterator p = def->formatList.begin(); 
-				p != def->formatList.end(); ++p, ++atch)
-			{
-
-				String texname = MRTbaseName + "/" + StringConverter::toString(atch);
-				String mrtLocalName = getMRTTexLocalName(def->name, atch);
-				TexturePtr tex;
-				if (def->pooled)
-				{
-					// get / create pooled texture
-					tex = CompositorManager::getSingleton().getPooledTexture(texname,
-						mrtLocalName, 
-						width, height, *p, fsaa, fsaaHint,  
-						hwGamma && !PixelUtil::isFloatingPoint(*p), 
-						assignedTextures, this, def->scope);
-				}
-				else
-				{
-					tex = TextureManager::getSingleton().createManual(
-						texname, 
-						ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-						(uint)width, (uint)height, 0, *p, TU_RENDERTARGET, 0, 
-						hwGamma && !PixelUtil::isFloatingPoint(*p), fsaa, fsaaHint ); 
-				}
-				
-				RenderTexture* rt = tex->getBuffer()->getRenderTarget();
-				rt->setAutoUpdated(false);
-				mrt->bindSurface(atch, rt);
-
-				// Also add to local textures so we can look up
-				mLocalTextures[mrtLocalName] = tex;
-				
-			}
-
-			rendTarget = mrt;
-		}
-		else
-		{
-			String texName =  "c" + StringConverter::toString(dummyCounter++) + 
+                mLocalMRTs[def->name] = mrt;
+                
+                // create and bind individual surfaces
+                size_t atch = 0;
+                for (PixelFormatList::iterator p = def->formatList.begin(); 
+                     p != def->formatList.end(); ++p, ++atch)
+                {
+                    
+                    String texname = MRTbaseName + "/" + StringConverter::toString(atch);
+                    String mrtLocalName = getMRTTexLocalName(def->name, atch);
+                    TexturePtr tex;
+                    if (def->pooled)
+                    {
+                        // get / create pooled texture
+                        tex = CompositorManager::getSingleton().getPooledTexture(texname,
+                                                                                 mrtLocalName, 
+                                                                                 width, height, *p, fsaa, fsaaHint,  
+                                                                                 hwGamma && !PixelUtil::isFloatingPoint(*p), 
+                                                                                 assignedTextures, this, def->scope);
+                    }
+                    else
+                    {
+                        tex = TextureManager::getSingleton().createManual(
+                                                                          texname, 
+                                                                          ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+                                                                          (uint)width, (uint)height, 0, *p, TU_RENDERTARGET, 0, 
+                                                                          hwGamma && !PixelUtil::isFloatingPoint(*p), fsaa, fsaaHint ); 
+                    }
+                    
+                    RenderTexture* rt = tex->getBuffer()->getRenderTarget();
+                    rt->setAutoUpdated(false);
+                    mrt->bindSurface(atch, rt);
+                    
+                    // Also add to local textures so we can look up
+                    mLocalTextures[mrtLocalName] = tex;
+                    
+                }
+                
+                rendTarget = mrt;
+            }
+            else
+            {
+                String texName =  "c" + StringConverter::toString(dummyCounter++) + 
 				"/" + def->name + "/" + mChain->getViewport()->getTarget()->getName();
-			
-			// space in the name mixup the cegui in the compositor demo
-			// this is an auto generated name - so no spaces can't hart us.
-			std::replace( texName.begin(), texName.end(), ' ', '_' ); 
-
-			TexturePtr tex;
-			if (def->pooled)
-			{
-				// get / create pooled texture
-				tex = CompositorManager::getSingleton().getPooledTexture(texName, 
-					def->name, width, height, def->formatList[0], fsaa, fsaaHint,
-					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), assignedTextures, 
-					this, def->scope);
-			}
-			else
-			{
-				tex = TextureManager::getSingleton().createManual(
-					texName, 
-					ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
-					(uint)width, (uint)height, 0, def->formatList[0], TU_RENDERTARGET, 0,
-					hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), fsaa, fsaaHint); 
-			}
-
-			rendTarget = tex->getBuffer()->getRenderTarget();
-			mLocalTextures[def->name] = tex;
-		}
-
+                
+                // space in the name mixup the cegui in the compositor demo
+                // this is an auto generated name - so no spaces can't hart us.
+                std::replace( texName.begin(), texName.end(), ' ', '_' ); 
+                
+                TexturePtr tex;
+                if (def->pooled)
+                {
+                    // get / create pooled texture
+                    tex = CompositorManager::getSingleton().getPooledTexture(texName, 
+                                                                             def->name, width, height, def->formatList[0], fsaa, fsaaHint,
+                                                                             hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), assignedTextures, 
+                                                                             this, def->scope);
+                }
+                else
+                {
+                    tex = TextureManager::getSingleton().createManual(
+                                                                      texName, 
+                                                                      ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, TEX_TYPE_2D, 
+                                                                      (uint)width, (uint)height, 0, def->formatList[0], TU_RENDERTARGET, 0,
+                                                                      hwGamma && !PixelUtil::isFloatingPoint(def->formatList[0]), fsaa, fsaaHint); 
+                }
+                
+                rendTarget = tex->getBuffer()->getRenderTarget();
+                mLocalTextures[def->name] = tex;
+            }
+        }
+        
 		//Set DepthBuffer pool for sharing
 		rendTarget->setDepthBufferPool( def->depthBufferId );
         
         /// Set up viewport over entire texture
         rendTarget->setAutoUpdated( false );
-
+        
 		// We may be sharing / reusing this texture, so test before adding viewport
 		if (rendTarget->getNumViewports() == 0)
 		{
@@ -767,9 +771,9 @@ void CompositorInstance::createResources(bool forResizeOnly)
 				// Save last viewport and current aspect ratio
 				Viewport* oldViewport = camera->getViewport();
 				Real aspectRatio = camera->getAspectRatio();
-
+                
 				v = rendTarget->addViewport( camera );
-
+                
 				// Should restore aspect ratio, in case of auto aspect ratio
 				// enabled, it'll changed when add new viewport.
 				camera->setAspectRatio(aspectRatio);
@@ -777,13 +781,13 @@ void CompositorInstance::createResources(bool forResizeOnly)
 				// which might based on that.
 				camera->_notifyViewport(oldViewport);
 			}
-
+            
 			v->setClearEveryFrame( false );
 			v->setOverlaysEnabled( false );
 			v->setBackgroundColour( ColourValue( 0, 0, 0, 0 ) );
 		}
     }
-
+    
 	_fireNotifyResourcesCreated(forResizeOnly);
 }
 //---------------------------------------------------------------------
