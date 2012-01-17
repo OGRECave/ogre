@@ -979,27 +979,50 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 	CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
 	if (texDef != 0 && !texDef->refCompName.empty()) 
 	{
-		//This is a reference - find the compositor and referenced texture definition
-		Ogre::CompositorInstance *refCompInst = mChain->getCompositor(texDef->refCompName);
-		if(refCompInst == 0)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
-				"CompositorInstance::getTargetForTex");
-		}
-		Ogre::Compositor *refComp = refCompInst->getCompositor();
-		CompositionTechnique::TextureDefinition* refTexDef = refComp->getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
-		if (refTexDef == 0)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor texture",
-				"CompositorInstance::getTargetForTex");
-		}
-
-		switch (refTexDef->scope) 
-		{
-			case CompositionTechnique::TS_CHAIN: 
+ 		//This TextureDefinition is reference.
+ 		//Since referenced TD's have no info except name we have to find original TD
+        
+ 		CompositionTechnique::TextureDefinition* refTexDef = 0;
+        
+ 		//Try chain first
+ 		if(mChain)
+  		{
+ 			CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
+ 			if(refCompInst)
+ 			{
+ 				refTexDef = refCompInst->getCompositor()->
+                getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(name);
+ 			}
+			else
 			{
-				//Find the instance and check if it is before us
-				CompositorInstance* refCompInst = 0;
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
+                            "CompositorInstance::getTargetForTex");
+			}
+  		}
+        
+ 		if(refTexDef == 0)
+  		{
+ 			//Still NULL. Try global search.
+ 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+ 			if(!refComp.isNull())
+ 			{
+ 				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(name);
+ 			}
+ 		}
+        
+ 		if(refTexDef == 0)
+ 		{
+ 			//Still NULL
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor texture",
+                        "CompositorInstance::getTargetForTex");
+  		}
+        
+ 		switch(refTexDef->scope) 
+  		{
+ 			case CompositionTechnique::TS_CHAIN:
+  			{
+  				//Find the instance and check if it is before us
+  				CompositorInstance* refCompInst = 0;
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1031,8 +1054,16 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 				return refCompInst->getRenderTarget(texDef->refTexName);
 			}
 			case CompositionTechnique::TS_GLOBAL:
+			{
 				//Chain and global case - the referenced compositor will know how to handle
+				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+				if(refComp.isNull())
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
+						"CompositorInstance::getTargetForTex");
+				}
 				return refComp->getRenderTarget(texDef->refTexName);
+			}
 			case CompositionTechnique::TS_LOCAL:
 			default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Referencing local compositor texture",
@@ -1047,30 +1078,60 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
 //-----------------------------------------------------------------------
 const String &CompositorInstance::getSourceForTex(const String &name, size_t mrtIndex)
 {
-	CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
-
-	if (!texDef->refCompName.empty()) 
-	{
-		Ogre::CompositorInstance *refCompInst = mChain->getCompositor(texDef->refCompName);
-		if(refCompInst == 0)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
-			"CompositorInstance::getSourceForTex");
-		}
-		Ogre::Compositor *refComp = refCompInst->getCompositor();
-		CompositionTechnique::TextureDefinition* refTexDef = refComp->getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
-		if (refTexDef == 0)
-		{
-			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor texture",
-				"CompositorInstance::getSourceForTex");
-		}
-
-		switch (refTexDef->scope) 
-		{
-			case CompositionTechnique::TS_CHAIN: 
+  	CompositionTechnique::TextureDefinition* texDef = mTechnique->getTextureDefinition(name);
+ 	if(texDef == 0)
+ 	{
+ 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent TextureDefinition",
+                    "CompositorInstance::getSourceForTex");
+ 	}
+    
+ 	//Check if texture definition is reference
+ 	if(!texDef->refCompName.empty())
+  	{
+ 		//This TextureDefinition is reference.
+ 		//Since referenced TD's have no info except name we have to find original TD
+ 		
+ 		CompositionTechnique::TextureDefinition* refTexDef = 0;
+        
+ 		//Try chain first
+ 		if(mChain)
+  		{
+ 			CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
+ 			if(refCompInst)
+ 			{
+ 				refTexDef = refCompInst->getCompositor()->
+                    getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(name);
+ 			}
+			else
 			{
-				//Find the instance and check if it is before us
-				CompositorInstance* refCompInst = 0;
+				OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
+                            "CompositorInstance::getSourceForTex");
+			}
+ 		}
+        
+ 		if(refTexDef == 0)
+ 		{
+ 			//Still NULL. Try global search.
+ 			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+ 			if(!refComp.isNull())
+ 			{
+ 				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(name);
+ 			}
+ 		}
+        
+ 		if(refTexDef == 0)
+ 		{
+ 			//Still NULL
+			OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor texture",
+                        "CompositorInstance::getSourceForTex");
+  		}
+        
+ 		switch(refTexDef->scope)
+  		{
+ 			case CompositionTechnique::TS_CHAIN:
+  			{
+  				//Find the instance and check if it is before us
+  				CompositorInstance* refCompInst = 0;
 				CompositorChain::InstanceIterator it = mChain->getCompositors();
 				bool beforeMe = true;
 				while (it.hasMoreElements())
@@ -1102,8 +1163,16 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
 				return refCompInst->getTextureInstanceName(texDef->refTexName, mrtIndex);
 			}
 			case CompositionTechnique::TS_GLOBAL:
+			{
 				//Chain and global case - the referenced compositor will know how to handle
+				const CompositorPtr& refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
+				if(refComp.isNull())
+				{
+					OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Referencing non-existent compositor",
+						"CompositorInstance::getSourceForTex");
+				}
 				return refComp->getTextureInstanceName(texDef->refTexName, mrtIndex);
+			}
 			case CompositionTechnique::TS_LOCAL:
 			default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Referencing local compositor texture",
