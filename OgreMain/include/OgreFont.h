@@ -81,7 +81,13 @@ namespace Ogre
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
-		/// Command object for Font - see ParamCommand 
+ 		class _OgreExport CmdCharSpacer : public ParamCommand
+ 		{
+ 		public:
+ 			String doGet(const void* target) const;
+ 			void doSet(void* target, const String& val);
+ 		};
+        /// Command object for Font - see ParamCommand 
 		class _OgreExport CmdSize : public ParamCommand
 		{
 		public:
@@ -106,6 +112,7 @@ namespace Ogre
 		// Command object for setting / getting parameters
 		static CmdType msTypeCmd;
 		static CmdSource msSourceCmd;
+ 		static CmdCharSpacer msCharacterSpacerCmd;
 		static CmdSize msSizeCmd;
 		static CmdResolution msResolutionCmd;
 		static CmdCodePoints msCodePointsCmd;
@@ -115,6 +122,10 @@ namespace Ogre
 
         /// Source of the font (either an image name or a truetype font)
         String mSource;
+
+        /** Add a gap between letters vertically and horizonally
+            prevents nasty artifacts caused by fonts atypically wide or tall characters. */
+        uint mCharacterSpacer;
 
         /// Size of the truetype font, in points
         Real mTtfSize;
@@ -204,6 +215,20 @@ namespace Ogre
         /** Gets the source this font (either an image or a truetype font).
         */
         const String& getSource(void) const;
+
+        /** Sets the spacing to allocate for font characters to overlap each other.
+        @param charSpacer The size of the character spacer, in points.  Increasing it
+            allows for more stretched-out fonts; decreasing it reduces memory and processing
+            time.  The default is "5".
+        */
+        void setCharacterSpacer(uint charSpacer);
+ 
+        /** Gets the spacing to allocate for font characters to overlap each other.
+        @remarks Returns the size of the character spacer, in points.  A higher value
+            allows for more stretched-out fonts.  A low value reduces memory and processing
+            time.  The default is "5".
+        */
+        uint getCharacterSpacer(void) const;
 
         /** Sets the size of a truetype font (only required for FT_TRUETYPE). 
         @param ttfSize The size of the font in points. Note that the

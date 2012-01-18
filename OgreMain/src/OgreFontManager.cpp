@@ -201,7 +201,19 @@ namespace Ogre
             }
             // Set
             pFont->setTrueTypeSize(
-                StringConverter::parseReal(params[1]) );
+                StringConverter::parseReal(params[1]));
+        }
+        else if (attrib == "character_spacer")
+        {
+            // Check params
+            if (params.size() != 2)
+            {
+                logBadAttrib(line, pFont);
+                return;
+            }
+            // Set
+            pFont->setCharacterSpacer(
+                StringConverter::parseUnsignedInt(params[1]));
         }
         else if (attrib == "resolution")
         {
