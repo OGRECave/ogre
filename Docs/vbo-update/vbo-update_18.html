@@ -11,10 +11,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <head>
-<title>OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation</title>
+<title>Geometry Changes In OGRE 0.12: 2.8.1 Textures</title>
 
-<meta name="description" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
-<meta name="keywords" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
+<meta name="description" content="Geometry Changes In OGRE 0.12: 2.8.1 Textures">
+<meta name="keywords" content="Geometry Changes In OGRE 0.12: 2.8.1 Textures">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.70">
@@ -198,52 +198,102 @@ HR { height: 1px; }
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<a name="NOD87"></a>
-<a name="SEC353"></a>
+<a name="NOD18"></a>
+<a name="SEC23"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_19.html#SEC27" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <hr size="1">
-<h3 class="subsection"> 8.3.2 Pose Animation </h3>
-<p>Pose animation allows you to blend together potentially multiple vertex poses at different influence levels into final vertex state. A common use for this is facial animation, where each facial expression is placed in a separate animation, and influences used to either blend from one expression to another, or to combine full expressions if each pose only affects part of the face.<br><br>
+<h3 class="subsection"> 2.8.1 Textures </h3>
 
-</p><p>In order to do this, pose animation uses a set of reference poses defined in the mesh, expressed as offsets to the original vertex data. It does not require that every vertex has an offset - those that don't are left alone. When blending in software these vertices are completely skipped - when blending in hardware (which requires a vertex entry for every vertex), zero offsets for vertices which are not mentioned are automatically created for you.<br><br>
+<p>A texture is an image that can be applied onto the surface of a three dimensional model. In Ogre, textures are represented by the Texture resource class.
 
-</p><p>Once you've defined the poses, you can refer to them in animations. Each pose animation track refers to a single set of geometry (either the shared geometry of the mesh, or dedicated geometry on a submesh), and each keyframe in the track can refer to one or more poses, each with its own influence level. The weight applied to the entire animation scales these influence levels too. You can define many keyframes which cause the blend of poses to change over time. The absence of a pose reference in a keyframe when it is present in a neighbouring one causes it to be treated as an influence of 0 for interpolation. <br><br>
+</p><a name="SEC24"></a>
+<h3 class="subheading"> Creating a texture </h3>
 
-</p><p>You should be careful how many poses you apply at once. When performing pose animation in hardware (See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>), every active pose requires another vertex buffer to be added to the shader, and in when animating in software it will also take longer the more active poses you have. Bear in mind that if you have 2 poses in one keyframe, and a different 2 in the next, that actually means there are 4 active keyframes when interpolating between them. <br><br>  
+<p>Textures are created through the TextureManager. In most cases they are created from image files directly by the
+Ogre resource system. If you are reading this, you most probably want to create a texture manually so that you can provide it with image data yourself. This is done through TextureManager::createManual:
 
-</p><p>You can combine pose animation with skeletal animation, See section <a href="manual_81.html#SEC354">Combining Skeletal and Vertex Animation</a>, and you can also hardware accelerate the application of the blend with a vertex shader, See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>.
+</p><table><tr><td>&nbsp;</td><td><pre class="example">ptex = TextureManager::getSingleton().createManual(
+    &quot;MyManualTexture&quot;, // Name of texture
+    &quot;General&quot;, // Name of resource group in which the texture should be created
+    TEX_TYPE_2D, // Texture type
+    256, // Width
+    256, // Height
+    1, // Depth (Must be 1 for two dimensional textures)
+    0, // Number of mipmaps
+    PF_A8R8G8B8, // Pixel format
+    TU_DYNAMIC_WRITE_ONLY // usage
+);
+</pre></td></tr></table>
+<p>This example creates a texture named <em>MyManualTexture</em> in resource group <em>General</em>. It is a
+square <em>two dimensional</em> texture, with width 256 and height 256. It has <em>no mipmaps</em>, internal
+format <em>PF_A8R8G8B8</em> and usage <em>TU_DYNAMIC_WRITE_ONLY</em>.
 
-</p><hr size="1">
+</p><p>The different texture types will be discussed in <a href="vbo-update_20.html#SEC30">Texture Types</a>. Pixel formats are summarised in
+<a href="vbo-update_21.html#SEC32">Pixel Formats</a>.
+
+</p><a name="SEC25"></a>
+<h3 class="subheading"> Texture usages </h3>
+
+<p>In addition to the hardware buffer usages as described in See section <a href="vbo-update_5.html#SEC5">Buffer Usage</a> there are some usage flags specific to textures:
+</p><dl compact="compact">
+<dt> TU_AUTOMIPMAP</dt>
+<dd><p>Mipmaps for this texture will be automatically generated by the graphics hardware. The exact algorithm used is not
+defined, but you can assume it to be a 2x2 box filter.
+</p></dd>
+<dt> TU_RENDERTARGET</dt>
+<dd><p>This texture will be a render target, i.e. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU_AUTOMIPMAP.
+</p></dd>
+<dt> TU_DEFAULT</dt>
+<dd><p>This is actually a combination of usage flags, and is equivalent to TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY. The resource
+system uses these flags for textures that are loaded from images.
+
+</p></dd>
+</dl>
+
+<a name="SEC26"></a>
+<h3 class="subheading"> Getting a PixelBuffer </h3>
+
+<p>A Texture can consist of multiple PixelBuffers, one for each combo if mipmap level and face number. To get a PixelBuffer from a Texture object the method Texture::getBuffer(face, mipmap) is used:
+
+</p><p><em>face</em> should be zero for non-cubemap textures. For cubemap textures it identifies the face to use, which is one of the cube faces described in See section <a href="vbo-update_20.html#SEC30">Texture Types</a>.
+
+</p><p><em>mipmap</em> is zero for the zeroth mipmap level, one for the first mipmap level, and so on. On textures that have automatic mipmap generation (TU_AUTOMIPMAP) only level 0 should be accessed, the rest will be taken care of by the rendering API.
+
+</p><p>A simple example of using getBuffer is
+</p><table><tr><td>&nbsp;</td><td><pre class="example">// Get the PixelBuffer for face 0, mipmap 0.
+HardwarePixelBufferSharedPtr ptr = tex-&gt;getBuffer(0,0);
+</pre></td></tr></table>
+<hr size="1">
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_19.html#SEC27" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <p>
  <font size="-1">

@@ -47,28 +47,28 @@ The manager also provides a method for deleting a texture source material: Advan
 As mentioned earlier, the process of defining/creating texture sources can be done within material script file. Here is an example of a material script definition - Note: This example is based off the ffmpegVideoSystem plugin parameters.
 @example
 material Example/MyVideoExample
-{
+@{
 	technique
-	{
+	@{
 		pass
-		{
+		@{
 			texture_unit
-			{
+			@{
 				texture_source video
-				{
+				@{
 					filename mymovie.mpeg
 					play_mode play
 					sound_mode on
-				}
-			}
-		}
-	}		
-}
+				@}
+			@}
+		@}
+	@}
+@}
 @end example
 Notice that the first two param/value pairs are defined in the ExternalTextureSource base class and that the third parameter/value pair is not defined in the base class... That parameter is added to the param dictionary by the ffmpegVideoPlugin... This shows that extending the functionality with the plugins is extremely easy. Also, pay particular attention to the line: texture_source video. This line identifies that this texture unit will come from a texture source plugin. It requires one parameter that determines which texture plugin will be used. In the example shown, the plugin requested is one that registered with "video" name.
 
 @heading Simplified Diagram of Process
 
-This diagram uses ffmpegVideoPlugin as example, but all plug ins will work the same in how they are registered/used here. Also note that TextureSource Plugins are loaded/registered before scripts are parsed. This does not mean that they are initialized... Plugins are not initialized until they are set active! This is to ensure that a rendersystem is setup before the plugins might make a call the rendersystem.
+This diagram uses ffmpegVideoPlugin as example, but all plug ins will work the same in how they are registered/used here. Also note that TextureSource Plugins are loaded/registered before scripts are parsed. This does not mean that they are initialized... Plugins are not initialized until they are set active! This is to ensure that a rendersystem is set up before the plugins might make a call the rendersystem.
 
 @image{images/TextureSource}

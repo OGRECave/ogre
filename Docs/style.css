@@ -6,10 +6,9 @@ li {  color: #003300; list-style-type: diamond; position: relative; left: -15px;
 td {  font-size: 10pt}
 th {  font-size: 10pt}
 
-.header { font-weight: bold; font-size: 12pt; }
-.MainHeader {  font-weight: bold; color: white; background-color: #6b7d6b; font-size: 10pt}
+.MainHeader {  font-weight: bold; color: #F5BC52; background-color: #006600; font-size: 10pt}
 .BorderHeader {  background-color: #999900; font-size: 8pt; font-weight: bold; color: #F5BC52; text-align: center} 	  
-.MainContent { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt } 	 
+.MainContent { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #CCFFCC } 	 
 .BorderContent {  font-size: 8pt; color: #66CC33; border-color: black #666600 #666600; 
                   padding-top: 2px; padding-right: 2px; padding-bottom: 10px; padding-left: 2px;
                   margin-bottom: 2px; border-style: solid; 

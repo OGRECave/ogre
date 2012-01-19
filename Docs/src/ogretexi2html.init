@@ -670,16 +670,24 @@ sub T2H_DEFAULT_print_section
 # author and overview is printed
 # T2H_HREF of Next, Prev, Up, Forward, Back are not defined
 # if $T2H_SPLIT then Top page is in its own html file
-sub T2H_DEFAULT_print_Top_header
+sub T2H_DEFAULT_print_Top_header($$)
 {
-  &$T2H_print_page_head(@_) if $T2H_SPLIT;
-  t2h_print_label(@_); # this needs to be called, otherwise no label set
-  &$T2H_print_head_navigation(@_);
+    my $fh = shift;
+    my $do_page_head = shift;
+    &$print_page_head($fh) if ($do_page_head);
 }
-sub T2H_DEFAULT_print_Top_footer
+sub T2H_DEFAULT_print_Top_footer($$)
 {
-  &$T2H_print_foot_navigation(@_);
-  &$T2H_print_page_foot(@_) if $T2H_SPLIT; 
+    my $fh = shift;
+    my $end_page = shift;
+    my $buttons = \@MISC_BUTTONS;
+    &$print_foot_navigation($fh);
+    print $fh "$SMALL_RULE\n";
+    if ($end_page)
+    {
+        &$print_navigation($fh, $buttons);
+        &$print_page_foot($fh);
+    }
 }
 sub T2H_DEFAULT_print_Top
 {
@@ -828,45 +836,57 @@ $T2H_ADDRESS .= "on <I>$T2H_TODAY</I>";
 # can be used for <style> <script>, <meta> tags
 $T2H_EXTRA_HEAD = '<LINK TYPE="text/css" rel="stylesheet" href="../style.css"> ';
 
-sub T2H_DEFAULT_print_page_head
+sub T2H_DEFAULT_print_page_head($)
 {
-  my $fh = shift; 
-  my $longtitle = "$T2H_THISDOC{title}: $T2H_NAME{This}";
-  print $fh <<EOT;
-<HTML>
-$T2H_DOCTYPE
-<!-- Created on $T2H_TODAY by $THISPROG -->
-<!-- 
-$T2H_AUTHORS 
+    my $fh = shift;
+    my $longtitle = "$Texi2HTML::THISDOC{'title_no_texi'}";
+    $longtitle .= ": $Texi2HTML::NO_TEXI{'This'}" if exists $Texi2HTML::NO_TEXI{'This'};
+    my $description = $DOCUMENT_DESCRIPTION;
+    $description = $longtitle if (!defined($description));
+    $description = "<meta name=\"description\" content=\"$description\">" if
+         ($description ne '');
+    $description = $Texi2HTML::THISDOC{'documentdescription'} if (defined($Texi2HTML::THISDOC{'documentdescription'}));
+    my $encoding = '';
+    $encoding = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$ENCODING\">" if (defined($ENCODING) and ($ENCODING ne ''));
+    print $fh <<EOT;
+$DOCTYPE
+<html>
+$Texi2HTML::THISDOC{'copying'}<!-- Created on $Texi2HTML::THISDOC{today} by $Texi2HTML::THISDOC{program} -->
+<!--
+$Texi2HTML::THISDOC{program_authors}
 -->
-<HEAD>
-<TITLE>$longtitle</TITLE>
+<head>
+<title>$longtitle</title>
 
-<META NAME="description" CONTENT="$longtitle">
-<META NAME="keywords" CONTENT="$longtitle">
-<META NAME="resource-type" CONTENT="document">
-<META NAME="distribution" CONTENT="global">
-<META NAME="Generator" CONTENT="$THISPROG">
-$T2H_EXTRA_HEAD
-</HEAD>
+$description
+<meta name="keywords" content="$longtitle">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="$Texi2HTML::THISDOC{program}">
+$encoding
+$CSS_LINES
+$EXTRA_HEAD
+</head>
 
-<BODY $T2H_BODYTEXT>
-$T2H_AFTER_BODY_OPEN
+<body $BODYTEXT>
+$AFTER_BODY_OPEN
 EOT
 }
 
-sub T2H_DEFAULT_print_page_foot
+sub T2H_DEFAULT_print_page_foot($)
 {
-  my $fh = shift;
-  print $fh <<EOT;
-<BR>  
-<FONT SIZE="-1">
-This document was generated
-$T2H_ADDRESS
-using <A HREF="$T2H_HOMEPAGE"><I>texi2html</I></A>
-$T2H_PRE_BODY_CLOSE
-</BODY>
-</HTML>
+    my $fh = shift;
+    my $program_string = program_string();
+    print $fh <<EOT;
+<p>
+ <font size="-1">
+  $program_string
+ </font>
+ <br>
+$PRE_BODY_CLOSE
+</p>
+</body>
+</html>
 EOT
 }
 
@@ -875,29 +895,45 @@ EOT
 
 # if this is set, then a vertical navigation panel is used
 $T2H_VERTICAL_HEAD_NAVIGATION = 0;
-sub T2H_DEFAULT_print_head_navigation
+sub T2H_DEFAULT_print_head_navigation($$)
 {
-  my $fh = shift;
-  if ($T2H_VERTICAL_HEAD_NAVIGATION)
-  {
-    print $fh <<EOT;
-<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
-<TR VALIGN="TOP">
-<TD ALIGN="LEFT">
+    my $fh = shift;
+    my $buttons = shift;
+    if ($VERTICAL_HEAD_NAVIGATION)
+    {
+        print $fh <<EOT;
+<table border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td align="left">
 EOT
-  }
-  &$T2H_print_navigation($fh, $T2H_VERTICAL_HEAD_NAVIGATION);
-  if ($T2H_VERTICAL_HEAD_NAVIGATION)
-  {
-    print $fh <<EOT;
-</TD>
-<TD ALIGN="LEFT">
+    }
+    main::print_lines($fh, $Texi2HTML::THIS_HEADER);
+    &$print_navigation($fh, $buttons, $VERTICAL_HEAD_NAVIGATION);
+    if ($VERTICAL_HEAD_NAVIGATION)
+    {
+        print $fh <<EOT;
+</td>
+<td align="left">
 EOT
-  }
-  elsif ($T2H_SPLIT eq 'section')
-  {
-    print $fh "<HR SIZE=1>\n";
-  }
+    }
+    elsif (defined $SPLIT
+           and ($SPLIT eq 'node'))
+    {
+        print $fh "$SMALL_RULE\n";
+    }
+}
+
+sub T2H_DEFAULT_print_foot_navigation
+{
+    my $fh = shift;
+    if ($VERTICAL_HEAD_NAVIGATION)
+    {
+        print $fh <<EOT;
+</td>
+</tr>
+</table>
+EOT
+    }
 }
 
 # Specifies the minimum page length required before a navigation panel

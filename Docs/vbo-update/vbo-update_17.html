@@ -11,10 +11,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <head>
-<title>OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation</title>
+<title>Geometry Changes In OGRE 0.12: 2.8 Hardware Pixel Buffers</title>
 
-<meta name="description" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
-<meta name="keywords" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
+<meta name="description" content="Geometry Changes In OGRE 0.12: 2.8 Hardware Pixel Buffers">
+<meta name="keywords" content="Geometry Changes In OGRE 0.12: 2.8 Hardware Pixel Buffers">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.70">
@@ -198,53 +198,33 @@ HR { height: 1px; }
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<a name="NOD87"></a>
-<a name="SEC353"></a>
+<a name="NOD17"></a>
+<a name="SEC22"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_16.html#SEC21" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_18.html#SEC23" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <hr size="1">
-<h3 class="subsection"> 8.3.2 Pose Animation </h3>
-<p>Pose animation allows you to blend together potentially multiple vertex poses at different influence levels into final vertex state. A common use for this is facial animation, where each facial expression is placed in a separate animation, and influences used to either blend from one expression to another, or to combine full expressions if each pose only affects part of the face.<br><br>
+<h2 class="section"> 2.8 Hardware Pixel Buffers </h2>
 
-</p><p>In order to do this, pose animation uses a set of reference poses defined in the mesh, expressed as offsets to the original vertex data. It does not require that every vertex has an offset - those that don't are left alone. When blending in software these vertices are completely skipped - when blending in hardware (which requires a vertex entry for every vertex), zero offsets for vertices which are not mentioned are automatically created for you.<br><br>
+<p>Hardware Pixel Buffers are a special kind of buffer that stores graphical data in graphics card memory, generally
+for use as textures. Pixel buffers can represent a one dimensional, two dimensional or three dimensional image. A texture can consist of a multiple of these buffers.
 
-</p><p>Once you've defined the poses, you can refer to them in animations. Each pose animation track refers to a single set of geometry (either the shared geometry of the mesh, or dedicated geometry on a submesh), and each keyframe in the track can refer to one or more poses, each with its own influence level. The weight applied to the entire animation scales these influence levels too. You can define many keyframes which cause the blend of poses to change over time. The absence of a pose reference in a keyframe when it is present in a neighbouring one causes it to be treated as an influence of 0 for interpolation. <br><br>
-
-</p><p>You should be careful how many poses you apply at once. When performing pose animation in hardware (See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>), every active pose requires another vertex buffer to be added to the shader, and in when animating in software it will also take longer the more active poses you have. Bear in mind that if you have 2 poses in one keyframe, and a different 2 in the next, that actually means there are 4 active keyframes when interpolating between them. <br><br>  
-
-</p><p>You can combine pose animation with skeletal animation, See section <a href="manual_81.html#SEC354">Combining Skeletal and Vertex Animation</a>, and you can also hardware accelerate the application of the blend with a vertex shader, See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>.
+</p><p>In contrary to vertex and index buffers, pixel buffers are not constructed directly. When creating a texture, the necessary pixel buffers to hold its data are constructed automatically.
 
 </p><hr size="1">
-<table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
-<td valign="middle" align="left">[ &gt;&gt; ]</td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
-<td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
-</tr></table>
 <p>
  <font size="-1">
   This document was generated by <em>David Rogers</em> on <em>January, 18 2012</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.70</em></a>.

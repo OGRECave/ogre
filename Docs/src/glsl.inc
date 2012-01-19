@@ -3,9 +3,9 @@
 OpenGL GLSL has a similar language syntax to HLSL but is tied to the OpenGL API. The are a few benefits over Cg in that it only requires the OpenGL render system plugin, not any additional plugins. Declaring a OpenGL GLSL program is similar to Cg but simpler. Here's an example:
 @example
 vertex_program myGLSLVertexProgram glsl
-{
+@{
     source myGLSLVertexProgram.txt
-}
+@}
 @end example
 In GLSL, no entry point needs to be defined since it is always 'main()' and there is no target definition since GLSL source is compiled into native GPU code and not intermediate assembly. @*@*
 
@@ -13,26 +13,26 @@ GLSL supports the use of modular shaders.  This means you can write GLSL externa
 
 @example
 vertex_program myExternalGLSLFunction1 glsl
-{
+@{
     source myExternalGLSLfunction1.txt
-}
+@}
 
 vertex_program myExternalGLSLFunction2 glsl
-{
+@{
     source myExternalGLSLfunction2.txt
-}
+@}
 
 vertex_program myGLSLVertexProgram1 glsl
-{
+@{
     source myGLSLfunction.txt
     attach myExternalGLSLFunction1 myExternalGLSLFunction2
-}
+@}
 
 vertex_program myGLSLVertexProgram2 glsl
-{
+@{
     source myGLSLfunction.txt
     attach myExternalGLSLFunction1
-}
+@}
 @end example
 
 External GLSL functions are attached to the program that needs them by using 'attach' and including the names of all external programs required on the same line separated by spaces.  This can be done for both vertex and fragment programs.
@@ -46,36 +46,36 @@ varying vec2 UV;
 uniform sampler2D diffuseMap;
 
 void main(void)
-{
+@{
 	gl_FragColor = texture2D(diffuseMap, UV);
-}
+@}
 @end example
 
 In material script:
 @example
 fragment_program myFragmentShader glsl
-{
+@{
   source example.frag
-}
+@}
 
 material exampleGLSLTexturing
-{
+@{
   technique
-  {
+  @{
     pass
-    {
+    @{
       fragment_program_ref myFragmentShader
-      { 
+      @{
         param_named diffuseMap int 0
-      }
+      @}
 
       texture_unit 
-      {
+      @{
         texture myTexture.jpg 2d
-      }
-    }
-  }
-}
+      @}
+    @}
+  @}
+@}
 @end example
 
 An index value of 0 refers to the first texture unit in the pass, an index value of 1 refers to the second unit in the pass and so on.@*@*
@@ -86,13 +86,13 @@ Here are some examples of passing matrices to GLSL mat2, mat3, mat4 uniforms:
 
 @example
 material exampleGLSLmatrixUniforms
-{
+@{
   technique matrix_passing
-  {
+  @{
     pass examples
-    {
+    @{
       vertex_program_ref myVertexShader
-      { 
+      @{
         // mat4 uniform
         param_named OcclusionMatrix matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 0 
         // or
@@ -100,17 +100,16 @@ material exampleGLSLmatrixUniforms
         
         // mat3
         param_named TextRotMatrix float9 1 0 0  0 1 0  0 0 1  
-      }
+      @}
       
       fragment_program_ref myFragmentShader
-      { 
+      @{ 
         // mat2 uniform
         param_named skewMatrix float4 0.5 0 -0.5 1.0
-      }
-
-    }
-  }
-}
+      @}
+    @}
+  @}
+@}
 @end example
 
 @subheading Accessing OpenGL states in GLSL
@@ -175,10 +174,10 @@ The maximum number of vertices that the shader can emit. There is an upper limit
 For example:
 @example
 geometry_program Ogre/GPTest/Swizzle_GP_GLSL glsl
-{
+@{
 	source SwizzleGP.glsl
 	input_operation_type triangle_list
 	output_operation_type line_strip
 	max_output_vertices 6
-}
+@}
 @end example

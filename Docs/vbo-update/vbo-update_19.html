@@ -11,10 +11,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <head>
-<title>OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation</title>
+<title>Geometry Changes In OGRE 0.12: 2.8.2 Updating Pixel Buffers</title>
 
-<meta name="description" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
-<meta name="keywords" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
+<meta name="description" content="Geometry Changes In OGRE 0.12: 2.8.2 Updating Pixel Buffers">
+<meta name="keywords" content="Geometry Changes In OGRE 0.12: 2.8.2 Updating Pixel Buffers">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.70">
@@ -198,53 +198,78 @@ HR { height: 1px; }
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<a name="NOD87"></a>
-<a name="SEC353"></a>
+<a name="NOD19"></a>
+<a name="SEC27"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_18.html#SEC23" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_20.html#SEC30" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <hr size="1">
-<h3 class="subsection"> 8.3.2 Pose Animation </h3>
-<p>Pose animation allows you to blend together potentially multiple vertex poses at different influence levels into final vertex state. A common use for this is facial animation, where each facial expression is placed in a separate animation, and influences used to either blend from one expression to another, or to combine full expressions if each pose only affects part of the face.<br><br>
+<h3 class="subsection"> 2.8.2 Updating Pixel Buffers </h3>
 
-</p><p>In order to do this, pose animation uses a set of reference poses defined in the mesh, expressed as offsets to the original vertex data. It does not require that every vertex has an offset - those that don't are left alone. When blending in software these vertices are completely skipped - when blending in hardware (which requires a vertex entry for every vertex), zero offsets for vertices which are not mentioned are automatically created for you.<br><br>
+<p>Pixel Buffers can be updated in two different ways; a simple, convenient way and a more difficult (but in some cases faster) method. Both methods make use of PixelBox objects (See section <a href="vbo-update_22.html#SEC35">Pixel boxes</a>) to represent image data in memory.
 
-</p><p>Once you've defined the poses, you can refer to them in animations. Each pose animation track refers to a single set of geometry (either the shared geometry of the mesh, or dedicated geometry on a submesh), and each keyframe in the track can refer to one or more poses, each with its own influence level. The weight applied to the entire animation scales these influence levels too. You can define many keyframes which cause the blend of poses to change over time. The absence of a pose reference in a keyframe when it is present in a neighbouring one causes it to be treated as an influence of 0 for interpolation. <br><br>
+</p><a name="SEC28"></a>
+<h3 class="subheading"> blitFromMemory </h3>
 
-</p><p>You should be careful how many poses you apply at once. When performing pose animation in hardware (See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>), every active pose requires another vertex buffer to be added to the shader, and in when animating in software it will also take longer the more active poses you have. Bear in mind that if you have 2 poses in one keyframe, and a different 2 in the next, that actually means there are 4 active keyframes when interpolating between them. <br><br>  
+<p>The easy method to get an image into a PixelBuffer is by using HardwarePixelBuffer::blitFromMemory. This takes a PixelBox object and does all necessary pixel format conversion and scaling for you. For example, to create a manual texture and load an image into it, all you have to do is
 
-</p><p>You can combine pose animation with skeletal animation, See section <a href="manual_81.html#SEC354">Combining Skeletal and Vertex Animation</a>, and you can also hardware accelerate the application of the blend with a vertex shader, See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>.
+</p><table><tr><td>&nbsp;</td><td><pre class="example">// Manually loads an image and puts the contents in a manually created texture
+Image img;
+img.load(&quot;elephant.png&quot;, &quot;General&quot;);
+// Create RGB texture with 5 mipmaps
+TexturePtr tex = TextureManager::getSingleton().createManual(
+    &quot;elephant&quot;,
+    &quot;General&quot;,
+    TEX_TYPE_2D,
+    img.getWidth(), img.getHeight(),
+    5, PF_X8R8G8B8);
+// Copy face 0 mipmap 0 of the image to face 0 mipmap 0 of the texture.
+tex-&gt;getBuffer(0,0)-&gt;blitFromMemory(img.getPixelBox(0,0));
+</pre></td></tr></table>
+<a name="SEC29"></a>
+<h3 class="subheading"> Direct memory locking </h3>
 
-</p><hr size="1">
-<table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
-<td valign="middle" align="left">[ &gt;&gt; ]</td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
-<td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
-</tr></table>
+<p>A more advanced method to transfer image data from and to a PixelBuffer is to use locking. By locking a PixelBuffer
+you can directly access its contents in whatever the internal format of the buffer inside the GPU is.
+
+</p><table><tr><td>&nbsp;</td><td><pre class="example">/// Lock the buffer so we can write to it
+buffer-&gt;lock(HardwareBuffer::HBL_DISCARD);
+const PixelBox &amp;pb = buffer-&gt;getCurrentLock();
+
+/// Update the contents of pb here
+/// Image data starts at pb.data and has format pb.format
+/// Here we assume data.format is PF_X8R8G8B8 so we can address pixels as uint32.
+uint32 *data = static_cast&lt;uint32*&gt;(pb.data);
+size_t height = pb.getHeight();
+size_t width = pb.getWidth();
+size_t pitch = pb.rowPitch; // Skip between rows of image
+for(size_t y=0; y&lt;height; ++y)
+{
+    for(size_t x=0; x&lt;width; ++x)
+    {
+        // 0xRRGGBB -&gt; fill the buffer with yellow pixels
+        data[pitch*y + x] = 0x00FFFF00;
+    }
+}
+
+/// Unlock the buffer again (frees it for use by the GPU)
+buffer-&gt;unlock();
+</pre></td></tr></table>
+
+<hr size="1">
 <p>
  <font size="-1">
   This document was generated by <em>David Rogers</em> on <em>January, 18 2012</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.70</em></a>.

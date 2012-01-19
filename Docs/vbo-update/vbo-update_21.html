@@ -11,10 +11,10 @@ Send bugs and suggestions to <users@texi2html.cvshome.org>
 
 -->
 <head>
-<title>OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation</title>
+<title>Geometry Changes In OGRE 0.12: 2.8.4 Pixel Formats</title>
 
-<meta name="description" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
-<meta name="keywords" content="OGRE Manual v1.8 ('Byatis'): 8.3.2 Pose Animation">
+<meta name="description" content="Geometry Changes In OGRE 0.12: 2.8.4 Pixel Formats">
+<meta name="keywords" content="Geometry Changes In OGRE 0.12: 2.8.4 Pixel Formats">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="texi2html 1.70">
@@ -198,52 +198,145 @@ HR { height: 1px; }
 
 <body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<a name="NOD87"></a>
-<a name="SEC353"></a>
+<a name="NOD21"></a>
+<a name="SEC32"></a>
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_20.html#SEC30" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_22.html#SEC35" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <hr size="1">
-<h3 class="subsection"> 8.3.2 Pose Animation </h3>
-<p>Pose animation allows you to blend together potentially multiple vertex poses at different influence levels into final vertex state. A common use for this is facial animation, where each facial expression is placed in a separate animation, and influences used to either blend from one expression to another, or to combine full expressions if each pose only affects part of the face.<br><br>
+<h3 class="subsection"> 2.8.4 Pixel Formats </h3>
 
-</p><p>In order to do this, pose animation uses a set of reference poses defined in the mesh, expressed as offsets to the original vertex data. It does not require that every vertex has an offset - those that don't are left alone. When blending in software these vertices are completely skipped - when blending in hardware (which requires a vertex entry for every vertex), zero offsets for vertices which are not mentioned are automatically created for you.<br><br>
+<p>A pixel format described the storage format of pixel data. It defines the way pixels are encoded in memory. The following classes of pixel formats (PF_*) are defined:
 
-</p><p>Once you've defined the poses, you can refer to them in animations. Each pose animation track refers to a single set of geometry (either the shared geometry of the mesh, or dedicated geometry on a submesh), and each keyframe in the track can refer to one or more poses, each with its own influence level. The weight applied to the entire animation scales these influence levels too. You can define many keyframes which cause the blend of poses to change over time. The absence of a pose reference in a keyframe when it is present in a neighbouring one causes it to be treated as an influence of 0 for interpolation. <br><br>
+</p><dl compact="compact">
+<dt> Native endian formats (PF_A8R8G8B8 and other formats with bit counts)</dt>
+<dd><p>These are native endian (16, 24 and 32 bit) integers in memory. This means that an image with format PF_A8R8G8B8 can be seen as an array of 32 bit integers, defined as 0xAARRGGBB in hexadecimal. The meaning of the letters is described below.
 
-</p><p>You should be careful how many poses you apply at once. When performing pose animation in hardware (See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>), every active pose requires another vertex buffer to be added to the shader, and in when animating in software it will also take longer the more active poses you have. Bear in mind that if you have 2 poses in one keyframe, and a different 2 in the next, that actually means there are 4 active keyframes when interpolating between them. <br><br>  
+</p></dd>
+<dt> Byte formats (PF_BYTE_*)</dt>
+<dd><p>These formats have one byte per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_BYTE_RGBA consists of blocks of four bytes, one for red, one for green, one for blue, one for alpha.
 
-</p><p>You can combine pose animation with skeletal animation, See section <a href="manual_81.html#SEC354">Combining Skeletal and Vertex Animation</a>, and you can also hardware accelerate the application of the blend with a vertex shader, See <a href="manual_18.html#NOD24">Pose Animation in Vertex Programs</a>.
+</p></dd>
+<dt> Short formats (PF_SHORT_*)</dt>
+<dd><p>These formats have one unsigned short (16 bit integer) per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_SHORT_RGBA consists of blocks of four 16 bit integers, one for red, one for green, one for blue, one for alpha.
 
-</p><hr size="1">
+</p></dd>
+<dt> Float16 formats (PF_FLOAT16_*)</dt>
+<dd><p>These formats have one 16 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT16_RGBA consists of blocks of four 16 bit floats, one for red, one for green, one for blue, one for alpha. The 16 bit floats, also called half float) are very similar to the IEEE single-precision floating-point standard of the 32 bits floats, except that they have only 5 exponent bits and 10 mantissa. Note that there is no standard C++ data type or CPU support to work with these efficiently, but GPUs can
+calculate with these much more efficiently than with 32 bit floats.
+
+</p></dd>
+<dt> Float32 formats (PF_FLOAT32_*)</dt>
+<dd><p>These formats have one 32 bit floating point number per channel, and their channels in memory are organized in the order they are specified in the format name. For example, PF_FLOAT32_RGBA consists of blocks of four 32 bit floats, one for red, one for green, one for blue, one for alpha. The C++ data type for these 32 bits floats is just &quot;float&quot;.
+
+</p></dd>
+<dt> Compressed formats (PF_DXT[1-5])</dt>
+<dd><p>S3TC compressed texture formats, a good description can be found at | Wikipedia (http://en.wikipedia.org/wiki/S3TC)
+
+</p></dd>
+</dl>
+
+<a name="SEC33"></a>
+<h3 class="subheading"> Colour channels </h3>
+
+<p>The meaning of the channels R,G,B,A,L and X is defined as
+
+</p><dl compact="compact">
+<dt> R</dt>
+<dd><p>Red colour component, usually ranging from 0.0 (no red) to 1.0 (full red).
+</p></dd>
+<dt> G</dt>
+<dd><p>Green colour component, usually ranging from 0.0 (no green) to 1.0 (full green).
+</p></dd>
+<dt> B</dt>
+<dd><p>Blue colour component, usually ranging from 0.0 (no blue) to 1.0 (full blue).
+</p></dd>
+<dt> A</dt>
+<dd><p>Alpha component, usually ranging from 0.0 (entire transparent) to 1.0 (opaque).
+</p></dd>
+<dt> L</dt>
+<dd><p>Luminance component, usually ranging from 0.0 (black) to 1.0 (white). The luminance component is duplicated in the R, G, and B channels to achieve a greyscale image.
+</p></dd>
+<dt> X</dt>
+<dd><p>This component is completely ignored.
+</p></dd>
+</dl>
+
+<p>If none of red, green and blue components, or luminance is defined in a format, these default to 0. For the alpha channel this is different; if no alpha is defined, it defaults to 1. 
+
+</p><a name="SEC34"></a>
+<h3 class="subheading"> Complete list of pixel formats </h3>
+
+<p>This pixel formats supported by the current version of Ogre are
+
+</p><dl compact="compact">
+<dt> Byte formats</dt>
+<dd><p>PF_BYTE_RGB, PF_BYTE_BGR, PF_BYTE_BGRA, PF_BYTE_RGBA, PF_BYTE_L, PF_BYTE_LA, PF_BYTE_A
+
+</p></dd>
+<dt> Short formats</dt>
+<dd><p>PF_SHORT_RGBA
+
+</p></dd>
+<dt> Float16 formats</dt>
+<dd><p>PF_FLOAT16_R, PF_FLOAT16_RGB, PF_FLOAT16_RGBA
+
+</p></dd>
+<dt> Float32 formats</dt>
+<dd><p>PF_FLOAT32_R, PF_FLOAT32_RGB, PF_FLOAT32_RGBA
+
+</p></dd>
+<dt> 8 bit native endian formats</dt>
+<dd><p>PF_L8, PF_A8, PF_A4L4, PF_R3G3B2
+
+</p></dd>
+<dt> 16 bit native endian formats</dt>
+<dd><p>PF_L16, PF_R5G6B5, PF_B5G6R5, PF_A4R4G4B4, PF_A1R5G5B5
+
+</p></dd>
+<dt> 24 bit native endian formats</dt>
+<dd><p>PF_R8G8B8, PF_B8G8R8
+
+</p></dd>
+<dt> 32 bit native endian formats</dt>
+<dd><p>PF_A8R8G8B8, PF_A8B8G8R8, PF_B8G8R8A8, PF_R8G8B8A8, PF_X8R8G8B8, PF_X8B8G8R8, PF_A2R10G10B10 PF_A2B10G10R10
+
+</p></dd>
+<dt> Compressed formats</dt>
+<dd><p>PF_DXT1, PF_DXT2, PF_DXT3, PF_DXT4, PF_DXT5
+
+</p></dd>
+</dl>
+
+<hr size="1">
 <table cellpadding="1" cellspacing="1" border="0">
-<tr><td valign="middle" align="left">[<a href="manual_79.html#SEC352" title="Previous section in reading order"> &lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_81.html#SEC354" title="Next section in reading order"> &gt; </a>]</td>
+<tr><td valign="middle" align="left">[<a href="vbo-update_20.html#SEC30" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_22.html#SEC35" title="Next section in reading order"> &gt; </a>]</td>
 <td valign="middle" align="left"> &nbsp; </td>
-<td valign="middle" align="left">[<a href="manual_75.html#SEC345" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
-<td valign="middle" align="left">[<a href="manual_78.html#SEC348" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_17.html#SEC22" title="Up section"> Up </a>]</td>
 <td valign="middle" align="left">[ &gt;&gt; ]</td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left"> &nbsp; </td>
 <td valign="middle" align="left">[<a href="index.html#SEC_Top" title="Cover (top) of document">Top</a>]</td>
-<td valign="middle" align="left">[<a href="manual_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Contents]</td>
 <td valign="middle" align="left">[Index]</td>
-<td valign="middle" align="left">[<a href="manual_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+<td valign="middle" align="left">[<a href="vbo-update_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
 </tr></table>
 <p>
  <font size="-1">
