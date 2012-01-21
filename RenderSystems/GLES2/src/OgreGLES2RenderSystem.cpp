@@ -114,7 +114,6 @@ namespace Ogre {
         mCurrentContext = 0;
         mMainContext = 0;
         mGLInitialised = false;
-        mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mCurrentVertexProgram = 0;
@@ -680,9 +679,6 @@ namespace Ogre {
 				// Note used
 				tex->touch();
 				mTextureTypes[stage] = tex->getGLES2TextureTarget();
-
-                // Store the number of mipmaps
-                mTextureMipmapCount = tex->getNumMipmaps();
 			}
 			else
 				// Assume 2D
@@ -1405,15 +1401,7 @@ namespace Ogre {
         switch (ftype)
         {
             case FT_MIN:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMinFilter = FO_NONE;
-                }
-                else
-                {
-                    mMinFilter = fo;
-                }
-
+                mMinFilter = fo;
                 // Combine with existing mip filter
                 glTexParameteri(mTextureTypes[unit],
                                 GL_TEXTURE_MIN_FILTER,
@@ -1441,14 +1429,8 @@ namespace Ogre {
                 }
                 break;
             case FT_MIP:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMipFilter = FO_NONE;
-                }
-                else
-                {
-                    mMipFilter = fo;
-                }
+                mMipFilter = fo;
+//                }
 
                 // Combine with existing min filter
                 glTexParameteri(mTextureTypes[unit],

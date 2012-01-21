@@ -64,13 +64,6 @@ namespace Ogre {
             FilterOptions mMinFilter;
             FilterOptions mMipFilter;
 
-            /** Used to store the number of mipmaps in the currently bound texture.  This is then
-             used to modify the texture unit filtering.  Some GL ES implementations e.g. iOS, 
-             have a more strict implementation, if the current texture has no mipmaps and a filter that 
-             requires them is requested, it is as if the texture is unbound.
-             */
-            size_t mTextureMipmapCount;
-
             /// What texture coord set each texture unit is using
             size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];
 
