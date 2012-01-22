@@ -110,7 +110,7 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
 {
 	entry_point mainCg
 	source PassthroughFP.cg
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_1_1 arbfp1
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
