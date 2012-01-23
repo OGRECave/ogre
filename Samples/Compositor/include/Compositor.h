@@ -146,10 +146,13 @@ void Sample_Compositor::registerCompositors(void)
         Ogre::ResourcePtr resource = resourceIterator.getNext();
         const Ogre::String& compositorName = resource->getName();
         // Don't add base Ogre/Scene compositor to view
-        if (compositorName == "Ogre/Scene")
+        if (Ogre::StringUtil::startsWith(compositorName, "Ogre/Scene/", false))
             continue;
 		// Don't add the deferred shading compositors, thats a different demo.
 		if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
+			continue;
+		// Don't add the SSAO compositors, thats a different demo.
+		if (Ogre::StringUtil::startsWith(compositorName, "SSAO", false))
 			continue;
 
 		mCompositorNames.push_back(compositorName);
