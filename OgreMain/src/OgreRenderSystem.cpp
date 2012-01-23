@@ -634,8 +634,8 @@ namespace Ogre {
         else
             val = op.vertexData->vertexCount;
 
-		if (op.numberOfInstances)
-			val *= op.numberOfInstances;
+		int trueInstanceNum = std::max<size_t>(op.numberOfInstances,1);
+		val *= trueInstanceNum;
 
         // account for a pass having multiple iterations
         if (mCurrentPassIterationCount > 1)
@@ -657,7 +657,7 @@ namespace Ogre {
 	        break;
 	    }
 
-        mVertexCount += op.vertexData->vertexCount * op.numberOfInstances;
+		mVertexCount += op.vertexData->vertexCount * trueInstanceNum;
         mBatchCount += mCurrentPassIterationCount;
 
 		// sort out clip planes
