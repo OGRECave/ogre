@@ -7,11 +7,13 @@
 
 float mipmapLevel(vec2 coords, vec2 texSize)
 {
-	float2 coordInPix = coords * texSize;
-	float2 dx = ddx(coordInPix);
-	float2 dy = ddy(coordInPix);
-	float d = max(dot(dx, dx), dot(dy, dy));
-	return 0.4 * log2(d);
+	coords = coords.xy * texSize;
+	vec2 dx = ddx(coords.xy);
+	vec2 dy = ddy(coords.xy);
+	float Px = length(dx);
+	float Py = length(dy);
+	float Pmax = max(Px, Py);
+	return log2(max(Pmax,1));
 }
 	
 
@@ -36,34 +38,35 @@ void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample,
 	// imageSize - size of the image in pixels
 	// texel - [Output] The color of the pixel at the requested position
 	
-	float2 startPos = textureData.xy;
+	vec2 startPos = textureData.xy;
 	
 	
 	// calculate the tileSize by using the power of 2 value
-	float2 pwrs = textureData.zw;
+	vec2 pwrs = textureData.zw;
 
 	//Calculate the power of 2 size of the maximum avialable Mipmap
 	//Note: We limit the amount of available LODs to [actual number] - 2
 	//as some atlas packaging tools do not include the last 2 LODs
 	//when packeging DXT format atlas textures.
-	float pwr = min(pwrs.x,pwrs.y) - 2;	
-	float2 tileSize = pow(float2(2.0,2.0),pwrs);
+	float availableLODCount = min(pwrs.x,pwrs.y) - 2;	
+	vec2 tileSize = pow(vec2(2.0,2.0),pwrs);
 	
 	// retrieve the mipmap level for this pixel clamped by the power of 2 value
-	float lod = clamp(mipmapLevel(origTexcoord, tileSize), 0, pwr);
+	float lod = clamp(mipmapLevel(origTexcoord, tileSize), 0, availableLODCount);
 	
+	vec2 relativeTileSize = tileSize / imageSize;
 	// get the width/height of the mip surface we've decided on
-	float mipSize = pow(2.0, pwr - lod);
+	vec2 mipSize = pow(vec2(2.0,2.0), pwrs.xy - ceil(lod));
 	
 	// compute the inverse fraction size for the tile 
-	//float2 lodSize = mipSize * imageSize / tileSize;
-	float2 lodSizeInv = tileSize / (mipSize * imageSize);
+	//vec2 lodSize = mipSize * imageSize / tileSize;
+	vec2 lodSizeInv = (relativeTileSize / mipSize);
 	//compute the new coordinates
 	//atlasTexcoord = atlasTexcoord * ((lodSize * (tileSize / imageSize) - 1.0) / lodSize) + (0.5 / lodSize) + startPos;
-	atlasTexcoord = atlasTexcoord * ((tileSize / imageSize) - lodSizeInv) + (0.5 * lodSizeInv) + startPos;
+	atlasTexcoord = atlasTexcoord * (relativeTileSize - lodSizeInv) + (0.5 * lodSizeInv) + startPos;
 	
 	//return the pixel from the correct mip surface of the atlas
-	texel = texture2DLod(sample, float4(atlasTexcoord, 0, lod));
+	texel = texture2DLod(sample, vec4(atlasTexcoord, 0, lod));
 }
 //-----------------------------------------------------------------------------
 void SGX_Atlas_Sample_Normal(in sampler2D sample, 
@@ -78,8 +81,8 @@ void SGX_Atlas_Sample_Normal(in sampler2D sample,
 	// y = texture atlas v
 	// z = derivative of original u
 	// w = derivative of original v
-	atlasTexcoord = textureData.xy + (atlasTexcoord * pow(float2(2.0,2.0),textureData.zw) / imageSize);
-	//texel = texture2DLod(sample, float4(atlasTexcoord, 0,0));
+	atlasTexcoord = textureData.xy + (atlasTexcoord * pow(vec2(2.0,2.0),textureData.zw) / imageSize);
+	//texel = texture2DLod(sample, vec4(atlasTexcoord, 0,0));
 	texel = texture2D(sample, atlasTexcoord);
 }
 
