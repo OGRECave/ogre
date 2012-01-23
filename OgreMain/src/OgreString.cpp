@@ -302,7 +302,7 @@ namespace Ogre {
 						do {
 							--indexDst;
 						}
-						while ((indexDst > metaPathArea) && (bufferDst[indexDst - 1] != '\\'));
+						while ((indexDst > metaPathArea) && (bufferDst[indexDst - 1] != '/'));
 						indexSrc += 3;
 						continue;
 					}
@@ -320,7 +320,7 @@ namespace Ogre {
 			{
 				char curChar = bufferSrc[indexSrc];
 				if (makeLowerCase) curChar = tolower(curChar);
-				if (curChar == '\\') curChar = '/';
+				if ((curChar == '\\') || (curChar == '/')) curChar = '/';
 				bufferDst[indexDst] = curChar;
 				++indexDst;
 				++indexSrc;
