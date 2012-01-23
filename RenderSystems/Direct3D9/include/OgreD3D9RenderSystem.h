@@ -50,6 +50,14 @@ namespace Ogre
 	*/
 	class _OgreD3D9Export D3D9RenderSystem : public RenderSystem
 	{
+	public:
+		enum MultiheadUseType
+		{
+			mutAuto,
+			mutYes,
+			mutNo
+		};
+		
 	private:
 		/// Direct3D
 		IDirect3D9*	 mD3D;		
@@ -153,6 +161,8 @@ namespace Ogre
 		*/
 		typedef HashMap<unsigned int, D3DFORMAT> DepthStencilHash;
 		DepthStencilHash mDepthStencilHash;
+
+		MultiheadUseType mMultiheadUse;
 
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);		
@@ -344,6 +354,11 @@ namespace Ogre
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const;
 		
+		/// fires a device releated event
+		void fireDeviceEvent( D3D9Device* device, const String & name );
+
+		/// Returns how multihead should be activated
+		MultiheadUseType getMultiheadUse() const { return mMultiheadUse; }
 	protected:	
 		///returns the sampler id for a given unit texture number
 		DWORD getSamplerId(size_t unit);
