@@ -69,7 +69,7 @@ namespace Ogre
 		@par
 		Each InstanceBatch preallocates a fixed amount of mInstancesPerBatch instances once it's been
 		built (@see build, @see buildFrom).
-		@See createInstancedEntity and @see removeInstancedEntity on how to retrieve those instances
+		@see createInstancedEntity and @see removeInstancedEntity on how to retrieve those instances
 		remove them from scene.
 		Note that, on GPU side, removing an instance from scene doesn't save GPU cycles on what
 		respects vertex shaders, but saves a little fillrate and pixel shaders; unless all instances
@@ -152,10 +152,10 @@ namespace Ogre
 
 		void updateVisibility(void);
 
-		/** @See _defragmentBatch */
+		/** @see _defragmentBatch */
 		void defragmentBatchNoCull( InstancedEntityVec &usedEntities );
 
-		/** @See _defragmentBatch
+		/** @see _defragmentBatch
 			This one takes the entity closest to the minimum corner of the bbox, then starts
 			gathering entities closest to this entity. There might be much better algorithms (i.e.
 			involving space partition), but this one is simple and works well enough
@@ -184,7 +184,7 @@ namespace Ogre
 		*/
 		bool _supportsSkeletalAnimation() const { return mTechnSupportsSkeletal; }
 
-		/** @See InstanceManager::updateDirtyBatches */
+		/** @see InstanceManager::updateDirtyBatches */
 		void _updateBounds(void);
 
 		/** Some techniques have a limit on how many instances can be done.
@@ -194,8 +194,8 @@ namespace Ogre
 			the parameters, instead of using the object's own. This allows
 			querying for a technique without requiering to actually build it.
 			@param baseSubMesh The base submesh that will be using to build it.
-			@param flags @See InstanceManagerFlags
-			@returns The max instances limit
+			@param flags @see InstanceManagerFlags
+			@return The max instances limit
 		*/
 		virtual size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const = 0;
 
@@ -207,7 +207,7 @@ namespace Ogre
 				Call this only ONCE. This is done automatically by Ogre::InstanceManager
 				Caller is responsable for freeing buffers in this RenderOperation
 				Buffers inside the RenderOp may be null if the built failed.
-			@returns
+			@return
 				A render operation which is very useful to pass to other InstanceBatches
 				(@see buildFrom) so that they share the same vertex buffers and indices,
 				when possible
@@ -230,7 +230,7 @@ namespace Ogre
 
 		const Ogre::MeshPtr& _getMeshReference(void) const { return mMeshReference; }
 
-		/** Returns true if it can not create more InstancedEntities
+		/** @return true if it can not create more InstancedEntities
 			(Num InstancedEntities == mInstancesPerBatch)
 		*/
 		bool isBatchFull(void) const { return mUnusedEntities.empty(); }
@@ -244,7 +244,7 @@ namespace Ogre
 		*/
 		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities );
 
-		/** @See InstanceManager::defragmentBatches
+		/** @see InstanceManager::defragmentBatches
 			This function takes InstancedEntities and pushes back all entities it can fit here
 			Extra entities in mUnusedEntities are destroyed
 			(so that used + unused = mInstancedEntities.size())
@@ -257,7 +257,7 @@ namespace Ogre
 		*/
 		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
 
-		/** @See InstanceManager::_defragmentBatchDiscard
+		/** @see InstanceManager::_defragmentBatchDiscard
 			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
 			dangling pointers from reparented InstancedEntities
 			Usually called before deleting this pointer. Don't call directly!
@@ -280,11 +280,11 @@ namespace Ogre
 				Call this function again (with bStatic=true) if you've made a change to an
 				InstancedEntity and wish this change to take effect.
 				Be sure to call this after you've set all your instances
-				@See InstanceBatchHW::setStaticAndUpdate
+				@see InstanceBatchHW::setStaticAndUpdate
 		*/
 		virtual void setStaticAndUpdate( bool bStatic )		{}
 
-		/** Returns true if this batch was set as static. @See setStaticAndUpdate
+		/** Returns true if this batch was set as static. @see setStaticAndUpdate
 		*/
 		virtual bool isStatic() const						{ return false; }
 

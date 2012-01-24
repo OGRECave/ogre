@@ -383,7 +383,7 @@ namespace Ogre
             @param
                 vec Vector with which to calculate the dot product (together
                 with this one).
-            @returns
+            @return
                 A float representing the dot product value.
         */
         inline Real dotProduct(const Vector4& vec) const

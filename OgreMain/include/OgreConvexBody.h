@@ -245,7 +245,7 @@ namespace Ogre
 		@param intersectionEdges A list of edges, which is updated if a match is found
 		@param vNext A reference to a vector which will be filled with the other
 			vertex at the matching edge, if found.
-		@returns True if a match was found
+		@return True if a match was found
 		*/
 		bool findAndEraseEdgePair(const Vector3& vec, 
 			Polygon::EdgeMap& intersectionEdges, Vector3& vNext ) const;

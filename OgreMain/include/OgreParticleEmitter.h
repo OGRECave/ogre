@@ -65,7 +65,7 @@ namespace Ogre {
     @par
         This same approach is used for ParticleAffectors (which modify existing particles per frame).
         This means that OGRE is particularly flexible when it comes to creating particle system effects,
-        with literally infinite combinations of emitter and affector types, and paramters within those
+        with literally infinite combinations of emitter and affector types, and parameters within those
         types.
     */
     class _OgreExport ParticleEmitter : public StringInterface, public Particle

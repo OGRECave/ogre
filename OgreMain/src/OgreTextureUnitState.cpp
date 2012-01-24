@@ -418,7 +418,7 @@ namespace Ogre {
         }
         else // raise exception for frameNumber out of bounds
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber paramter value exceeds number of stored frames.",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::setFrameTextureName");
         }
     }
@@ -466,7 +466,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber paramter value exceeds number of stored frames.",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::deleteFrameTextureName");
         }
     }
@@ -566,7 +566,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber paramter value exceeds number of stored frames.",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::setCurrentFrame");
         }
 
@@ -586,7 +586,7 @@ namespace Ogre {
     {
         if (frameNumber >= mFrames.size())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber paramter value exceeds number of stored frames.",
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::getFrameTextureName");
         }
 

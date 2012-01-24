@@ -153,14 +153,14 @@ namespace Ogre
 		size_t getCurrentChunkDepth() const { return mChunkStack.size(); }
 
 		/** Get the ID of the chunk that's currently being read/written, if any.
-		@returns The id of the current chunk being read / written (at the tightest
+		@return The id of the current chunk being read / written (at the tightest
 			level of nesting), or zero if no chunk is being processed.
 		*/
 		uint32 getCurrentChunkID() const;
 
 		/** Get the current byte position relative to the start of the data section
 			of the last chunk that was read or written. 
-		@returns the offset. Note that a return value of 0 means that either the
+		@return the offset. Note that a return value of 0 means that either the
 			position is at the start of the chunk data section (ie right after the
 			header), or that no chunk is currently active. Use getCurrentChunkID
 			or getCurrentChunkDepth to determine if a chunk is active.
@@ -176,7 +176,7 @@ namespace Ogre
 			When you have finished with this chunk, you should call readChunkEnd. 
 			This will perform a bit of validation and clear the chunk from 
 			the stack. 
-		@returns The Chunk that comes next
+		@return The Chunk that comes next
 		*/
 		virtual const Chunk* readChunkBegin();
 
@@ -190,7 +190,7 @@ namespace Ogre
 			but the version	exceeds what is passed in here, the chunk is skipped over,
 			the problem logged and null is returned. 
 		@param msg Descriptive text added to the log if versions are not compatible
-		@returns The chunk if it passes the validation.
+		@return The chunk if it passes the validation.
 		*/
 		virtual const Chunk* readChunkBegin(uint32 id, uint16 maxVersion, const String& msg = StringUtil::BLANK);
 

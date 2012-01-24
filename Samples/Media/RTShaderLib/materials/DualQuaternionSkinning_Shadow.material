@@ -137,7 +137,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_glsl glsl
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_1weight_vs
 
@@ -152,7 +152,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_2weight_vs
 	includes_skeletal_animation true
@@ -168,7 +168,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_3weight_vs
 
@@ -184,7 +184,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_4weight_vs
 
@@ -199,7 +199,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_1weight_twophase_vs
 
@@ -215,7 +215,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg cg
 {
 	source DualQuaternionSkinning_Shadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_dq_skinning_2weight_twophase_vs
 	includes_skeletal_animation true

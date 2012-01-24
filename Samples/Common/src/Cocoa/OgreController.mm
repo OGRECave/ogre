@@ -23,7 +23,7 @@ Ogre::SceneManager *mSceneMgr;
 	// Initialise, we do not want an auto created window, as that will create a carbon window
 	mRoot->initialise(false);
 	
-	// Build the param list for a embeded cocoa window...
+	// Build the param list for a embedded cocoa window...
 	NameValuePairList misc;
 	misc["macAPI"] = "cocoa";
 	misc["externalWindowHandle"] = StringConverter::toString((size_t)ogreView);

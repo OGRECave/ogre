@@ -166,7 +166,7 @@ namespace Ogre {
 			Note that this may be more than needed - each codec may be looking for 
 			a different size magic number.
 		@param maxbytes The number of bytes passed
-		@returns A blank string if the magic number was unknown, or a file extension.
+		@return A blank string if the magic number was unknown, or a file extension.
 		*/
 		virtual String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const = 0;
     };

@@ -433,7 +433,7 @@ namespace Ogre {
         /** Returns whether the AnimationState with the given name exists. */
         bool hasAnimationState(const String& name) const;
 		/** For entities based on animated meshes, gets the AnimationState objects for all animations.
-		@returns
+		@return
 		In case the entity is animated, this functions returns the pointer to a AnimationStateSet
 		containing all animations of the entries. If the entity is not animated, it returns 0.
 		@remarks
@@ -542,7 +542,7 @@ namespace Ogre {
 		@param pMovable Pointer to the object to attach
 		@param offsetOrientation An adjustment to the orientation of the attached object, relative to the bone.
 		@param offsetPosition An adjustment to the position of the attached object, relative to the bone.
-		@returns The TagPoint to which the object has been attached
+		@return The TagPoint to which the object has been attached
 		*/
 		TagPoint* attachObjectToBone(const String &boneName,
 			MovableObject *pMovable,

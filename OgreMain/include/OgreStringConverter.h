@@ -169,34 +169,34 @@ namespace Ogre {
         static String toString(const StringVector& val);
 
         /** Converts a String to a Real. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the Real version of the String.
         */
         static Real parseReal(const String& val, Real defaultValue = 0);
         /** Converts a String to a Angle. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the Angle version of the String.
         */
         static inline Radian parseAngle(const String& val, Radian defaultValue = Radian(0)) {
 			return Angle(parseReal(val, defaultValue.valueRadians()));
 		}
         /** Converts a String to a whole number. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static int parseInt(const String& val, int defaultValue = 0);
         /** Converts a String to a whole number. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static unsigned int parseUnsignedInt(const String& val, unsigned int defaultValue = 0);
         /** Converts a String to a whole number. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static long parseLong(const String& val, long defaultValue = 0);
         /** Converts a String to a whole number. 
-        @returns
+        @return
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0);

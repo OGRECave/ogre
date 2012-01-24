@@ -261,7 +261,7 @@ namespace Ogre
 			if it fails.
 		@param forceSynchronous Forces the request to be processed immediately
 			even if threading is enabled.
-		@returns The ID of the request that has been added
+		@return The ID of the request that has been added
 		*/
 		virtual RequestID addRequest(uint16 channel, uint16 requestType, const Any& rData, uint8 retryCount = 0, 
 			bool forceSynchronous = false) = 0;

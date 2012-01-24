@@ -1389,13 +1389,13 @@ namespace Ogre {
 		/** Retrieves the logical index relating to a physical index in the float
 		buffer, for programs which support that (low-level programs and 
 		high-level programs which use logical parameter indexes).
-		@returns std::numeric_limits<size_t>::max() if not found
+		@return std::numeric_limits<size_t>::max() if not found
 		*/
 		size_t getFloatLogicalIndexForPhysicalIndex(size_t physicalIndex);
 		/** Retrieves the logical index relating to a physical index in the int
 		buffer, for programs which support that (low-level programs and 
 		high-level programs which use logical parameter indexes).
-		@returns std::numeric_limits<size_t>::max() if not found
+		@return std::numeric_limits<size_t>::max() if not found
 		*/
 		size_t getIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
 

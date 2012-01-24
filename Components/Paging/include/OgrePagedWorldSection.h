@@ -198,7 +198,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _loadProceduralPage
 		for that
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _prepareProceduralPage(Page* page);
 		/** Give a section the opportunity to prepare page content procedurally. 
@@ -206,7 +206,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _prepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _loadProceduralPage(Page* page);
 		/** Give a section  the opportunity to unload page content procedurally. 
@@ -214,7 +214,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _unloadProceduralPage(Page* page);
 		/** Give a section  the opportunity to unprepare page content procedurally. 
@@ -222,7 +222,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _unloadProceduralPage
 		for that
-		@returns true if the page was unpopulated, false otherwise
+		@return true if the page was unpopulated, false otherwise
 		*/
 		virtual bool _unprepareProceduralPage(Page* page);
 

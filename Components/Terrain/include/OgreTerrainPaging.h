@@ -98,7 +98,7 @@ namespace Ogre
 			in each direction or 20x20 pages.
 		@param sectionName An optional name to give the section (if none is
 			provided, one will be generated)
-		@returns The world section which is already attached to and owned by the world you passed in. 
+		@return The world section which is already attached to and owned by the world you passed in. 
 			There is no 'destroy' method because you destroy via the PagedWorld, this is just a
 			helper function. 
 		*/

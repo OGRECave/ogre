@@ -94,7 +94,7 @@ namespace Ogre {
 			@param vp			Viewport to modify
 			@param compositor	The name of the compositor to apply
 			@param addPosition	At which position to add, defaults to the end (-1).
-			@returns pointer to instance, or 0 if it failed.
+			@return pointer to instance, or 0 if it failed.
 		*/
 		CompositorInstance *addCompositor(Viewport *vp, const String &compositor, int addPosition=-1);
 

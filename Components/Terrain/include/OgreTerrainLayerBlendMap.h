@@ -119,7 +119,7 @@ namespace Ogre
 
 		/** Get a single value of blend information, in image space.
 		@param x,y Coordinates of the point of data to get, in image space (top down)
-		@returns The blend data
+		@return The blend data
 		*/
 		float getBlendValue(size_t x, size_t y);
 

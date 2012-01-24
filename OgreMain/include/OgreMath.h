@@ -236,13 +236,56 @@ namespace Ogre
 		static inline int IFloor (float fValue) { return int(floor(fValue)); }
         static int ISign (int iValue);
 
+        /** Absolute value function
+            @param
+                fValue The value whose absolute value will be returned.
+        */
 		static inline Real Abs (Real fValue) { return Real(fabs(fValue)); }
+
+        /** Absolute value function
+            @param
+                fValue The value, in degrees, whose absolute value will be returned.
+         */
 		static inline Degree Abs (const Degree& dValue) { return Degree(fabs(dValue.valueDegrees())); }
-		static inline Radian Abs (const Radian& rValue) { return Radian(fabs(rValue.valueRadians())); }
+
+        /** Absolute value function
+            @param
+                fValue The value, in radians, whose absolute value will be returned.
+         */
+        static inline Radian Abs (const Radian& rValue) { return Radian(fabs(rValue.valueRadians())); }
+
+        /** Arc cosine function
+            @param
+                fValue The value whose arc cosine will be returned.
+         */
 		static Radian ACos (Real fValue);
+
+        /** Arc sine function
+            @param
+                fValue The value whose arc sine will be returned.
+         */
 		static Radian ASin (Real fValue);
+
+        /** Arc tangent function
+            @param
+                fValue The value whose arc tangent will be returned.
+         */
 		static inline Radian ATan (Real fValue) { return Radian(atan(fValue)); }
+
+        /** Arc tangent between two values function
+            @param
+                fY The first value to calculate the arc tangent with.
+            @param
+                fX The second value to calculate the arc tangent with.
+         */
 		static inline Radian ATan2 (Real fY, Real fX) { return Radian(atan2(fY,fX)); }
+
+        /** Ceiling function
+            Returns the smallest following integer. (example: Ceil(1.1) = 2)
+
+            @param
+                fValue The value to round up to the nearest integer.
+         */
 		static inline Real Ceil (Real fValue) { return Real(ceil(fValue)); }
 		static inline bool isNaN(Real f)
 		{
@@ -274,6 +317,12 @@ namespace Ogre
 
 		static inline Real Exp (Real fValue) { return Real(exp(fValue)); }
 
+        /** Floor function
+            Returns the largest previous integer. (example: Floor(1.9) = 1)
+         
+            @param
+                fValue The value to round down to the nearest integer.
+         */
 		static inline Real Floor (Real fValue) { return Real(floor(fValue)); }
 
 		static inline Real Log (Real fValue) { return Real(log(fValue)); }
@@ -318,24 +367,62 @@ namespace Ogre
 			return (!useTables) ? Real(sin(fValue)) : SinTable(fValue);
 		}
 
+        /** Squared function.
+            @param
+                fValue The value to be squared (fValue^2)
+        */
 		static inline Real Sqr (Real fValue) { return fValue*fValue; }
 
+        /** Square root function.
+            @param
+                fValue The value whose square root will be calculated.
+         */
 		static inline Real Sqrt (Real fValue) { return Real(sqrt(fValue)); }
 
+        /** Square root function.
+            @param
+                fValue The value, in radians, whose square root will be calculated.
+            @return
+                The square root of the angle in radians.
+         */
         static inline Radian Sqrt (const Radian& fValue) { return Radian(sqrt(fValue.valueRadians())); }
 
+        /** Square root function.
+            @param
+                fValue The value, in degrees, whose square root will be calculated.
+            @return
+                The square root of the angle in degrees.
+         */
         static inline Degree Sqrt (const Degree& fValue) { return Degree(sqrt(fValue.valueDegrees())); }
 
         /** Inverse square root i.e. 1 / Sqrt(x), good for vector
             normalisation.
+            @param
+                fValue The value whose inverse square root will be calculated.
         */
-		static Real InvSqrt(Real fValue);
+		static Real InvSqrt (Real fValue);
 
-        static Real UnitRandom ();  // in [0,1]
+        /** Generate a random number of unit length.
+            @return
+                A random number in the range from [0,1].
+        */
+        static Real UnitRandom ();
 
-        static Real RangeRandom (Real fLow, Real fHigh);  // in [fLow,fHigh]
+        /** Generate a random number within the range provided.
+            @param
+                fLow The lower bound of the range.
+            @param
+                fHigh The upper bound of the range.
+            @return
+                A random number in the range from [fLow,fHigh].
+         */
+        static Real RangeRandom (Real fLow, Real fHigh);
 
-        static Real SymmetricRandom ();  // in [-1,1]
+        /** Generate a random number in the range [-1,1].
+            @return
+                A random number in the range from [-1,1].
+         */
+        static Real SymmetricRandom ();
 
         /** Tangent function.
             @param
@@ -394,7 +481,7 @@ namespace Ogre
                 b The triangle's second vertex.
             @param
                 c The triangle's third vertex.
-            @returns
+            @return
                 If the point resides in the triangle, <b>true</b> is
                 returned.
             @par
@@ -421,7 +508,7 @@ namespace Ogre
 		@param 
 			normal The triangle plane's normal (passed in rather than calculated
 				on demand since the caller may already have it)
-        @returns
+        @return
             If the point resides in the triangle, <b>true</b> is
             returned.
         @par
@@ -453,7 +540,7 @@ namespace Ogre
             d2 A real pointer to retrieve the far intersection distance
                 from the ray origin, maybe <b>null</b> which means don't care
                 about the far intersection distance.
-        @returns
+        @return
             If the ray is intersects the box, <b>true</b> is returned, and
             the near intersection distance is return by <i>d1</i>, the
             far intersection distance is return by <i>d2</i>. Guarantee
@@ -482,7 +569,7 @@ namespace Ogre
             positiveSide Intersect with "positive side" of the triangle
         @param
             negativeSide Intersect with "negative side" of the triangle
-        @returns
+        @return
             If the ray is intersects the triangle, a pair of <b>true</b> and the
             distance between intersection point and ray origin returned.
         @par
@@ -506,7 +593,7 @@ namespace Ogre
             positiveSide Intersect with "positive side" of the triangle
         @param
             negativeSide Intersect with "negative side" of the triangle
-        @returns
+        @return
             If the ray is intersects the triangle, a pair of <b>true</b> and the
             distance between intersection point and ray origin returned.
         @par

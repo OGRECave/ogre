@@ -391,17 +391,17 @@ namespace Ogre {
 				Any* pAny = 0) = 0;
 		};
 
-		/** Sets render system private data
+		/** Gets RenderSystem private data
 		@remarks
-		This should only be used by a render system
+		This should only be used by a RenderSystem
 		*/
 		virtual RenderSystemData * getRenderSystemData() const 
 		{ 
 			return mRenderSystemData; 
 		}
-		/** gets render system private data
+		/** Sets RenderSystem private data
 		@remarks
-		This should only be used by a render system
+		This should only be used by a RenderSystem
 		*/
 		virtual void setRenderSystemData(RenderSystemData * val) const
 		{ 
@@ -415,8 +415,8 @@ namespace Ogre {
 		bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;
-		UserObjectBindings mUserObjectBindings;		 // User objects binding.
-		mutable RenderSystemData * mRenderSystemData;// this should be used only by a render system for internal use
+		UserObjectBindings mUserObjectBindings;		 /// User objects binding.
+		mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
 	};
 
 	/** @} */

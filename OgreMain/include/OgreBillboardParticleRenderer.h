@@ -141,7 +141,7 @@ namespace Ogre {
         void setBillboardOrigin(BillboardOrigin origin) { mBillboardSet->setBillboardOrigin(origin); }
 
         /** Gets the point which acts as the origin point for all billboards in this set.
-        @returns
+        @return
         A member of the BillboardOrigin enum specifying the origin for all the billboards in this set.
         */
         BillboardOrigin getBillboardOrigin(void) const { return mBillboardSet->getBillboardOrigin(); }
@@ -158,7 +158,7 @@ namespace Ogre {
         void setBillboardRotationType(BillboardRotationType rotationType);
 
         /** Sets billboard rotation type.
-            @returns
+            @return
                 A member of the BillboardRotationType enum specifying the rotation type for all the billboards in this set.
         */
         BillboardRotationType getBillboardRotationType(void) const;

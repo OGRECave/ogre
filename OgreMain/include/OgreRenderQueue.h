@@ -331,7 +331,7 @@ namespace Ogre {
 			@param pQueue Pointer to the render queue that this object is being
 				added to. You can for example call this back to duplicate the 
 				object with a different technique
-			@returns true to allow the Renderable to be added to the queue, 
+			@return true to allow the Renderable to be added to the queue, 
 				false if you want to prevent it being added
 			*/
 			virtual bool renderableQueued(Renderable* rend, uint8 groupID, 

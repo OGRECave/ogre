@@ -20,7 +20,7 @@ fragment_program Ogre/RTShader/shadow_caster_ps_cg cg
 vertex_program Ogre/RTShader/shadow_caster_skinning_1weight_vs cg
 {
 	source HardwareSkinningShadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_skinning_1weight_vs
 
@@ -34,7 +34,7 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_1weight_vs cg
 vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg cg
 {
 	source HardwareSkinningShadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_skinning_2weight_vs
 
@@ -48,7 +48,7 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg cg
 vertex_program Ogre/RTShader/shadow_caster_skinning_3weight_vs cg
 {
 	source HardwareSkinningShadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_skinning_3weight_vs
 
@@ -63,7 +63,7 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_3weight_vs cg
 vertex_program Ogre/RTShader/shadow_caster_skinning_4weight_vs cg
 {
 	source HardwareSkinningShadow.cg
-	//will run on 3 to accomodate the amount of registers
+	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
 	entry_point shadow_caster_skinning_4weight_vs
 

@@ -40,7 +40,7 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** @See InstanceBatch to understand how instancing works.
+	/** @see InstanceBatch to understand how instancing works.
 
 		Instanced entities work in a very similar way as how an Entity works, as this interface
 		tries to mimic it as most as possible to make the transition between Entity and InstancedEntity
@@ -165,15 +165,15 @@ namespace Ogre
 				* An InstancedEntity can't be both "master" and "slave" at the same time
 			@remarks
 			Sharing does nothing if the original mesh doesn't have a skeleton
-			When an InstancedEntity is removed (@See InstanceBatch::removeInstancedEntity), it stops
+			When an InstancedEntity is removed (@see InstanceBatch::removeInstancedEntity), it stops
 			sharing the transform. If the instanced entity was the master one, all it's slaves stop
 			sharing and start having their own transform too.
 			@param slave The InstancedEntity that should share with us and become our slave
-			@returns true if successfully shared (may fail if they aren't skeletally animated)
+			@return true if successfully shared (may fail if they aren't skeletally animated)
 		*/
 		bool shareTransformWith( InstancedEntity *slave );
 
-		/** @See shareTransformWith
+		/** @see shareTransformWith
 			Stops sharing the transform if this is a slave, and notifies the master we're no longer
 			a slave.
 			If this is a master, tells all it's slave to stop sharing
@@ -214,7 +214,7 @@ namespace Ogre
 		/** Called by InstanceBatch in <i>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.
 			@remarks Assumes it has a skeleton (mSkeletonInstance != 0)
-			@returns true if something was actually updated
+			@return true if something was actually updated
 		*/
 		virtual bool _updateAnimation(void);
 
@@ -249,14 +249,14 @@ namespace Ogre
 
 		/** Returns the world transform of the instanced entity including local transform */
 		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
 			return mUseLocalTransform ? mFullLocalTransform :
 				mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
 		}
 
 		/** Returns the derived position of the instanced entity including local transform */
 		const Vector3& _getDerivedPosition() const {
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
 			return mUseLocalTransform ? mDerivedLocalPosition :
 				mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
 		}

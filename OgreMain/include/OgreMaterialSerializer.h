@@ -206,7 +206,7 @@ namespace Ogre {
         MaterialScriptContext mScriptContext;
 
         /** internal method for parsing a material
-        @returns true if it expects the next line to be a {
+        @return true if it expects the next line to be a {
         */
         bool parseScriptLine(String& line);
         /** internal method for finding & invoking an attribute parser. */

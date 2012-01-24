@@ -76,10 +76,10 @@ namespace Ogre
 							const String &batchName );
 		virtual ~InstanceBatchHW();
 
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
-		/** @See InstanceBatch::buildFrom */
+		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		/** Overloaded so that we don't perform needless updates when in static mode. Also doing that
@@ -88,7 +88,7 @@ namespace Ogre
         */
 		void _boundsDirty(void);
 
-		/** @See InstanceBatch::setStaticAndUpdate. While this flag is true, no individual per-entity
+		/** @see InstanceBatch::setStaticAndUpdate. While this flag is true, no individual per-entity
 			cull check is made. This means if the camera is looking at only one instance, all instances
 			are sent to the vertex shader (unlike when this flag is false). This saves a lot of CPU
 			power and a bit of bus bandwidth.

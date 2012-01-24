@@ -111,7 +111,7 @@ namespace Ogre
 		void destroyLog(Log* log);
 
 		/** Sets the passed in log as the default log.
-        @returns The previous default log.
+        @return The previous default log.
         */
         Log* setDefaultLog(Log* newLog);
 

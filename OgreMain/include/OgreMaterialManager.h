@@ -97,7 +97,7 @@ namespace Ogre {
 			@param rend Pointer to the Renderable that is requesting this technique
 				to be used, so this may influence your choice of Technique. May be
 				null if the technique isn't being requested in that context.
-			@returns A pointer to the technique to be used, or NULL if you wish to
+			@return A pointer to the technique to be used, or NULL if you wish to
 				use the default technique for this material
 			*/
 			virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 

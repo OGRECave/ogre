@@ -244,7 +244,7 @@ namespace Ogre {
 			bool getCastsShadows(void) const;
 			String getFormatString(void) const;
 			/** Try to assign geometry to this bucket.
-			@returns false if there is no room left in this bucket
+			@return false if there is no room left in this bucket
 			*/
 			bool assign(QueuedGeometry* qsm);
 			/// Build

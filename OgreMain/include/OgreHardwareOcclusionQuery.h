@@ -71,7 +71,7 @@ public:
 
 	/**
 	  * Starts the hardware occlusion query
-	  * @Remarks	Simple usage: Create one or more OcclusionQuery object one per outstanding query or one per tested object 
+	  * @remarks	Simple usage: Create one or more OcclusionQuery object one per outstanding query or one per tested object 
 	  *				OcclusionQuery* mOcclusionQuery;
 	  *				createOcclusionQuery( &mOcclusionQuery );
 	  *				In the rendering loop:

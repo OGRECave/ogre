@@ -39,14 +39,14 @@ namespace Ogre {
 	{
 	public:
 		/** Takes the OGRE pixel format and returns the appropriate GL one
-			@returns a GLenum describing the format, or 0 if there is no exactly matching 
+			@return a GLenum describing the format, or 0 if there is no exactly matching 
 			one (and conversion is needed)
 		*/
 		static GLenum getGLOriginFormat(PixelFormat mFormat);
 	
 		/** Takes the OGRE pixel format and returns type that must be provided
 			to GL as data type for reading it into the GPU
-			@returns a GLenum describing the data type, or 0 if there is no exactly matching 
+			@return a GLenum describing the data type, or 0 if there is no exactly matching 
 			one (and conversion is needed)
 		*/
 		static GLenum getGLOriginDataType(PixelFormat mFormat);

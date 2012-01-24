@@ -235,7 +235,7 @@ namespace Ogre
 		/** Calculate appropriate LOD for this node and children
 		@param cam The camera to be used (this should already be the LOD camera)
 		@param cFactor The cFactor which incorporates the viewport size, max pixel error and lod bias
-		@returns true if this node or any of its children were selected for rendering
+		@return true if this node or any of its children were selected for rendering
 		*/
 		bool calculateCurrentLod(const Camera* cam, Real cFactor);
 

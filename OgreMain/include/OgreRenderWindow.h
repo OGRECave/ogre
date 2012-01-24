@@ -150,7 +150,7 @@ namespace Ogre
 		virtual void setVSyncEnabled(bool vsync)
 		{ (void)vsync; }
 
-		/** Indicates whether vertical sync is actived for the window.
+		/** Indicates whether vertical sync is activated for the window.
 		*/
 		virtual bool isVSyncEnabled() const { return false; }
 

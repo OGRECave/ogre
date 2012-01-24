@@ -69,7 +69,7 @@ namespace Ogre {
                 The filename that will be opened
             @param refLibrary
                 The library that contains the data-handling code
-            @returns
+            @return
                 If the function succeeds, a valid pointer to an Archive
                 object is returned.
             @par

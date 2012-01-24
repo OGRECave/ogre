@@ -114,7 +114,7 @@ namespace Ogre {
         }
 
         /** Intersection test with a Ray
-        @returns std::pair of hit (bool) and distance
+        @return std::pair of hit (bool) and distance
         @remarks May return false positives but will never miss an intersection.
         */
         inline std::pair<bool, Real> intersects(const Ray& ray)

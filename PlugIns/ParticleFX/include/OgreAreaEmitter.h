@@ -120,7 +120,7 @@ namespace Ogre {
         /// Internal method for generating the area axes
         void genAreaAxes(void);
         /** Internal for initializing some defaults and parameters
-        @returns True if custom parameters need initialising
+        @return True if custom parameters need initialising
         */
         bool initDefaults(const String& mType);
 

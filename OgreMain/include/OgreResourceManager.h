@@ -111,7 +111,7 @@ namespace Ogre {
 			fail because another thread created a resource in between.
 		@see ResourceManager::create
 		@see ResourceManager::getByName
-		@returns A pair, the first element being the pointer, and the second being 
+		@return A pair, the first element being the pointer, and the second being 
 			an indicator specifying whether the resource was newly created.
 		*/
 		virtual ResourceCreateOrRetrieveResult createOrRetrieve(const String& name, 
@@ -381,7 +381,7 @@ namespace Ogre {
 		@par
 			This method lets you determine the file pattern which will be used
 			to identify scripts intended for this manager.
-		@returns
+		@return
 			A list of file patterns, in the order they should be searched in.
 		@see isScriptingSupported, parseScript
 		*/

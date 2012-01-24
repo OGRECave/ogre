@@ -1455,7 +1455,7 @@ namespace Ogre {
 			split, it's up to the author to ensure that there is a fallback Technique
 			for less capable cards.
 		@param numUnits The target number of texture units
-		@returns A new Pass which contains the remaining units, and a scene_blend
+		@return A new Pass which contains the remaining units, and a scene_blend
 				setting appropriate to approximate the multitexture. This Pass will be
 				attached to the parent Technique of this Pass.
 		*/

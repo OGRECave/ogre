@@ -69,7 +69,7 @@ namespace Ogre {
             @param
                 alignment The alignment of result pointer, must be power of two
                 and in range [1, 128].
-            @returns
+            @return
                 The allocated memory pointer.
             @par
                 On failure, exception will be throw.
@@ -83,7 +83,7 @@ namespace Ogre {
                 cache boundary friendly.
             @param
                 size The size of memory need to allocate.
-            @returns
+            @return
                 The allocated memory pointer.
             @par
                 On failure, exception will be throw.

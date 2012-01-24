@@ -187,7 +187,7 @@ namespace Ogre {
 		@param source Source string
 		@param replaceWhat Sub-string to find and replace
 		@param replaceWithWhat Sub-string to replace with (the new sub-string)
-		@returns An updated string with the sub-string replaced
+		@return An updated string with the sub-string replaced
 		*/
 		static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
 

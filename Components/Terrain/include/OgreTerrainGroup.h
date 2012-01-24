@@ -336,7 +336,7 @@ namespace Ogre
 		@remarks
 			Definitions exist before the actual instances to allow background loading.
 		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-		@returns The definition, or null if nothing is in this slot. While this return value is
+		@return The definition, or null if nothing is in this slot. While this return value is
 			not const, you should be careful about modifying it; it will have no effect unless you load
 			the terrain afterwards, and can cause a race condition if you modify it while a background
 			load is in progress.
@@ -345,7 +345,7 @@ namespace Ogre
 		
 		/** Get the terrain instance at a given slot, if loaded. 
 		@param x, y The coordinates of the terrain slot relative to the centre slot (signed).
-		@returns The terrain, or null if no terrain is loaded in this slot (call getTerrainDefinition if
+		@return The terrain, or null if no terrain is loaded in this slot (call getTerrainDefinition if
 			you want to access the definition before it is loaded).
 		*/
 		virtual Terrain* getTerrain(long x, long y) const;

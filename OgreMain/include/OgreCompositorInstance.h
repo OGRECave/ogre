@@ -186,7 +186,7 @@ namespace Ogre {
 			same if you disable and re-enable the compositor instance.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@returns The instance name for the texture, corresponds to a real texture
+		@return The instance name for the texture, corresponds to a real texture
 		*/
 		const String& getTextureInstanceName(const String& name, size_t mrtIndex);
 
@@ -198,7 +198,7 @@ namespace Ogre {
 			same if you disable and re-enable the compositor instance.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@returns The texture pointer, corresponds to a real texture
+		@return The texture pointer, corresponds to a real texture
 		*/
 		TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
 
@@ -347,7 +347,7 @@ namespace Ogre {
         const String &getSourceForTex(const String &name, size_t mrtIndex = 0);
 
 		/** Queue a render system operation.
-			@returns destination pass
+			@return destination pass
 		 */
 		void queueRenderSystemOp(TargetOperation &finalState, RenderSystemOperation *op);
 

@@ -176,7 +176,7 @@ namespace Ogre {
 		    @param offset The byte offset from the start of the buffer to lock
 		    @param length The size of the area to lock, in bytes
 		    @param options Locking options
-		    @returns Pointer to the locked memory
+		    @return Pointer to the locked memory
 		    */
 		    virtual void* lock(size_t offset, size_t length, LockOptions options)
             {
@@ -213,7 +213,7 @@ namespace Ogre {
 
             /** Lock the entire buffer for (potentially) reading / writing.
 		    @param options Locking options
-		    @returns Pointer to the locked memory
+		    @return Pointer to the locked memory
             */
             void* lock(LockOptions options)
             {

@@ -51,7 +51,7 @@ namespace Ogre {
 		    then this prefab will be created as a submesh of the given mesh.
 
 			@param mesh The mesh that the potential prefab will be created in.
-			@returns true if a prefab has been created, otherwise false.
+			@return true if a prefab has been created, otherwise false.
 		*/
 		static bool createPrefab(Mesh* mesh);
 

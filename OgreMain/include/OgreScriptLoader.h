@@ -64,7 +64,7 @@ namespace Ogre {
 		@remarks
 			This method is called when a resource group is loaded if you use 
 			ResourceGroupManager::_registerScriptLoader.
-		@returns
+		@return
 			A list of file patterns, in the order they should be searched in.
 		*/
 		virtual const StringVector& getScriptPatterns(void) const = 0;
@@ -80,7 +80,7 @@ namespace Ogre {
 		@remarks
 			There are dependencies between some kinds of scripts, and to enforce
 			this all implementors of this interface must define a loading order. 
-		@returns A value representing the relative loading order of these scripts
+		@return A value representing the relative loading order of these scripts
 			compared to other script users, where higher values load later.
 		*/
 		virtual Real getLoadingOrder(void) const  = 0;

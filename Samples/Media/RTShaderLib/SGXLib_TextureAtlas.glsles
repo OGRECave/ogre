@@ -28,9 +28,9 @@ void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample,
 	// http://www.gamedev.net/topic/534149-solved-texture-seams-using-atlas-with-screenshots/ 
 
 
-	// origTexcoord - original texture coordintates as recived from the vertex buffer.
-	// atlasTexcoord - texture coordinates that have gone through on which diffrent mathematical 
-	//			functions to simulate diffrent texture addressing modes (wrap, mirror, clamp)
+	// origTexcoord - original texture coordintates as received from the vertex buffer.
+	// atlasTexcoord - texture coordinates that have gone through on which different mathematical 
+	//			functions to simulate different texture addressing modes (wrap, mirror, clamp)
 	// textureData.xy - top left corner (in 0-1 units) where the needed texture in the texture atlas begins
 	// textureData.zw - width and height in power of 2 for the needed texture in the texture atlas
 	// imageSize - size of the image in pixels

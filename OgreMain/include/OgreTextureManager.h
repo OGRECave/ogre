@@ -389,7 +389,7 @@ namespace Ogre {
 		@param format The pixel format requested
 		@param usage The kind of usage this texture is intended for, a combination of 
 			the TextureUsage flags.
-		@returns true if the format is natively supported, false if a fallback would be used.
+		@return true if the format is natively supported, false if a fallback would be used.
 		*/
 		virtual bool isFormatSupported(TextureType ttype, PixelFormat format, int usage);
 
@@ -440,7 +440,7 @@ namespace Ogre {
             In case the pixel format doesn't supported by device, false will be returned
             if in precise mode, and natively used pixel format will be actually use to
             check if in fallback mode.
-		@returns true if the texture filtering is supported.
+		@return true if the texture filtering is supported.
         */
         virtual bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly = false) = 0;

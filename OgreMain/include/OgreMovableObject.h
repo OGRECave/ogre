@@ -75,7 +75,7 @@ namespace Ogre {
             /** MovableObject has been moved */
             virtual void objectMoved(MovableObject*) {}
             /** Called when the movable object of the camera to be used for rendering.
-            @returns
+            @return
                 true if allows queue for rendering, false otherwise.
             */
             virtual bool objectRendering(const MovableObject*, const Camera*) { return true; }
@@ -97,7 +97,7 @@ namespace Ogre {
 			@note
 				This method will not be called for additive stencil shadows since the
 				light list cannot be varied per object with this technique.
-            @returns
+            @return
                 A pointer to a light list if you populated the light list yourself, or
                 NULL to fall back on the default finding process.
             */
@@ -464,7 +464,7 @@ namespace Ogre {
         @par
             This method can be useful when implementing Renderable::getLights in case
             the renderable is a part of the movable.
-        @returns The list of lights use to lighting this object.
+        @return The list of lights use to lighting this object.
         */
         virtual const LightList& queryLights(void) const;
 

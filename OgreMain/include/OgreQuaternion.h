@@ -146,11 +146,11 @@ namespace Ogre {
             dAngle = rAngle;
         }
 		/** Constructs the quaternion using 3 axes, the axes are assumed to be orthonormal
-			@See FromAxes
+			@see FromAxes
 		*/
         void FromAxes (const Vector3* akAxis);
         void FromAxes (const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis);
-		/** Gets the 3 orthonormal axes defining the quaternion. @See FromAxes */
+		/** Gets the 3 orthonormal axes defining the quaternion. @see FromAxes */
         void ToAxes (Vector3* akAxis) const;
         void ToAxes (Vector3& xAxis, Vector3& yAxis, Vector3& zAxis) const;
 
@@ -194,8 +194,12 @@ namespace Ogre {
 			return !operator==(rhs);
 		}
         // functions of a quaternion
-        Real Dot (const Quaternion& rkQ) const;  // dot product
-        Real Norm () const;  // squared-length
+        /// Returns the dot product of the quaternion
+        Real Dot (const Quaternion& rkQ) const;
+        /* Returns the normal length of this quaternion.
+            @note This does <b>not</b> alter any values.
+        */
+        Real Norm () const;
         /// Normalises this quaternion, and returns the previous length
         Real normalise(void); 
         Quaternion Inverse () const;  // apply to non-zero quaternion
@@ -203,7 +207,7 @@ namespace Ogre {
         Quaternion Exp () const;
         Quaternion Log () const;
 
-        // rotation of a vector by a quaternion
+        /// Rotation of a vector by a quaternion
         Vector3 operator* (const Vector3& rkVector) const;
 
    		/** Calculate the local roll element of this quaternion.
@@ -212,7 +216,8 @@ namespace Ogre {
 			Y axes, the angle between them is returned. If set to false though, the
 			result is the actual yaw that will be used to implement the quaternion,
 			which is the shortest possible path to get to the same orientation and 
-			may involve less axial rotation. 
+             may involve less axial rotation.  The co-domain of the returned value is 
+             from -180 to 180 degrees.
 		*/
 		Radian getRoll(bool reprojectAxis = true) const;
    		/** Calculate the local pitch element of this quaternion
@@ -221,16 +226,18 @@ namespace Ogre {
 			Y axes, the angle between them is returned. If set to true though, the
 			result is the actual yaw that will be used to implement the quaternion,
 			which is the shortest possible path to get to the same orientation and 
-			may involve less axial rotation. 
+            may involve less axial rotation.  The co-domain of the returned value is 
+            from -180 to 180 degrees.
 		*/
 		Radian getPitch(bool reprojectAxis = true) const;
    		/** Calculate the local yaw element of this quaternion
 		@param reprojectAxis By default the method returns the 'intuitive' result
-			that is, if you projected the local Z of the quaternion onto the X and
+			that is, if you projected the local Y of the quaternion onto the X and
 			Z axes, the angle between them is returned. If set to true though, the
 			result is the actual yaw that will be used to implement the quaternion,
 			which is the shortest possible path to get to the same orientation and 
-			may involve less axial rotation. 
+			may involve less axial rotation. The co-domain of the returned value is 
+            from -180 to 180 degrees.
 		*/
 		Radian getYaw(bool reprojectAxis = true) const;		
 		/// Equality with tolerance (tolerance is max angle difference)
@@ -239,7 +246,7 @@ namespace Ogre {
 	    /** Performs Spherical linear interpolation between two quaternions, and returns the result.
 			Slerp ( 0.0f, A, B ) = A
 			Slerp ( 1.0f, A, B ) = B
-			@returns Interpolated quaternion
+			@return Interpolated quaternion
 			@remarks
 			Slerp has the proprieties of performing the interpolation at constant
 			velocity, and being torque-minimal (unless shortestPath=false).
@@ -251,7 +258,7 @@ namespace Ogre {
         static Quaternion Slerp (Real fT, const Quaternion& rkP,
             const Quaternion& rkQ, bool shortestPath = false);
 
-		/** @See Slerp. It adds extra "spins" (i.e. rotates several times) specified
+		/** @see Slerp. It adds extra "spins" (i.e. rotates several times) specified
 			by parameter 'iExtraSpins' while interpolating before arriving to the
 			final values
 		*/
@@ -274,7 +281,7 @@ namespace Ogre {
 			nlerp ( 1.0f, A, B ) = B
 			@remarks
 			Nlerp is faster than Slerp.
-			Nlerp has the proprieties of being commutative (@See Slerp;
+			Nlerp has the proprieties of being commutative (@see Slerp;
 			commutativity is desired in certain places, like IK animation), and
 			being torque-minimal (unless shortestPath=false). However, it's performing
 			the interpolation at non-constant velocity; sometimes this is desired,
@@ -286,7 +293,7 @@ namespace Ogre {
         static Quaternion nlerp(Real fT, const Quaternion& rkP, 
             const Quaternion& rkQ, bool shortestPath = false);
 
-        // cutoff for sine near zero
+        /// Cutoff for sine near zero
         static const Real msEpsilon;
 
         // special values

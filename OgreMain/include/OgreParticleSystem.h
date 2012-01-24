@@ -355,7 +355,7 @@ namespace Ogre {
         virtual void setMaterialName( const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
         /** Sets the name of the material to be used for this billboard set.
-            @returns The name of the material that is used for this set.
+            @return The name of the material that is used for this set.
         */
         virtual const String& getMaterialName(void) const;
 

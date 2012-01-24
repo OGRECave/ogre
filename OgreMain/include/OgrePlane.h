@@ -97,7 +97,7 @@ namespace Ogre {
             The box is defined as centre/half-size pairs for effectively.
         @param centre The centre of the box.
         @param halfSize The half-size of the box.
-        @returns
+        @return
             POSITIVE_SIDE if the box complete lies on the "positive side" of the plane,
             NEGATIVE_SIDE if the box complete lies on the "negative side" of the plane,
             and BOTH_SIDE if the box intersects the plane.
@@ -137,7 +137,7 @@ namespace Ogre {
             @note
                 This function will not crash for zero-sized vectors, but there
                 will be no changes made to their components.
-            @returns The previous length of the plane's normal.
+            @return The previous length of the plane's normal.
         */
         Real normalise(void);
 

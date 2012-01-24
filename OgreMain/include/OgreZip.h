@@ -144,7 +144,7 @@ namespace Ogre {
         @param pos pos in file
         @param buf current buffer to decrypt
         @param len - length of buffer
-        @returns success
+        @return success
         */  
         typedef bool (*DecryptEmbeddedZipFileFunc)(size_t pos, void* buf, size_t len);
 

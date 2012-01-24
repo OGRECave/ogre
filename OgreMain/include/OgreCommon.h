@@ -827,7 +827,7 @@ namespace Ogre {
 		virtual ~Pool() {}
 
 		/** Get the next item from the pool.
-		@returns pair indicating whether there was a free item, and the item if so
+		@return pair indicating whether there was a free item, and the item if so
 		*/
 		virtual std::pair<bool, T> removeItem()
 		{

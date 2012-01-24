@@ -42,7 +42,7 @@ namespace Ogre
 
 	/** Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and
 		hardware instancing.
-		@See BaseInstanceBatchVTF and @See InstanceBatchHW
+		@see BaseInstanceBatchVTF and @see InstanceBatchHW
 
 		The advantage over TextureVTF technique, is that this implements a basic culling algorithm
 		to avoid useless processing in vertex shader and uses a lot less VRAM and memory bandwidth
@@ -93,7 +93,7 @@ namespace Ogre
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName );
 		virtual ~InstanceBatchHW_VTF();
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
 		/** @copydoc InstanceBatchHW::_boundsDirty */

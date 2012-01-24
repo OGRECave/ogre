@@ -84,10 +84,10 @@ namespace Ogre
 							const String &batchName );
 		virtual ~InstanceBatchShader();
 
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
-		/** @See InstanceBatch::buildFrom */
+		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		//Renderable overloads

@@ -434,7 +434,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the box was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -447,7 +447,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the sphere was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -460,7 +460,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the box was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -574,7 +574,7 @@ namespace Ogre
         @param left, top, right, bottom Pointers to destination values, these
             will be completed with the normalised device coordinates (in the 
             range {-1,1})
-        @returns true if the sphere was projected to a subset of the near plane,
+        @return true if the sphere was projected to a subset of the near plane,
             false if the entire near plane was contained
         */
         virtual bool projectSphere(const Sphere& sphere, 

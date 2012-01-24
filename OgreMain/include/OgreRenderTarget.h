@@ -354,7 +354,7 @@ namespace Ogre {
         void writeContentsToFile(const String& filename);
 
 		/** Writes the current contents of the render target to the (PREFIX)(time-stamp)(SUFFIX) file.
-			@returns the name of the file used.*/
+			@return the name of the file used.*/
 		virtual String writeContentsToTimestampedFile(const String& filenamePrefix, const String& filenameSuffix);
 
 		virtual bool requiresTextureFlipping() const = 0;

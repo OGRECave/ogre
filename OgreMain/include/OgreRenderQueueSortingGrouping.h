@@ -87,7 +87,7 @@ namespace Ogre {
 			method will not be called for this collection. The 
 			Renderable visit method will be called for each item
 			underneath the pass grouping level.
-		@returns True to continue, false to skip the Renderables underneath
+		@return True to continue, false to skip the Renderables underneath
 		*/
 		virtual bool visit(const Pass* p) = 0;
 		/** Visit method called once per Renderable on a grouped 

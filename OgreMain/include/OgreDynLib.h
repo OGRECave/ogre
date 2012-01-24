@@ -108,7 +108,7 @@ namespace Ogre {
             Returns the address of the given symbol from the loaded library.
             @param
                 strName The name of the symbol to search for
-            @returns
+            @return
                 If the function succeeds, the returned value is a handle to
                 the symbol.
             @par

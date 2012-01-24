@@ -65,14 +65,14 @@ namespace Ogre
 		@remarks
 		This call may well happen in a separate thread so it should not access 
 		GPU resources, use loadProceduralPage for that
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool prepareProceduralPage(Page* page, PagedWorldSection* section) { return false; }
 		/** Give a provider the opportunity to load page content procedurally. 
 		@remarks
 		This call will happen in the main render thread so it can access GPU resources. 
 		Use prepareProceduralPage for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool loadProceduralPage(Page* page, PagedWorldSection* section) { return false; }
 		/** Give a provider the opportunity to unload page content procedurally. 
@@ -80,7 +80,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool unloadProceduralPage(Page* page, PagedWorldSection* section) { return false; }
 		/** Give a provider the opportunity to unprepare page content procedurally. 
@@ -88,7 +88,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _unloadProceduralPage
 		for that
-		@returns true if the page was unpopulated, false otherwise
+		@return true if the page was unpopulated, false otherwise
 		*/
 		virtual bool unprepareProceduralPage(Page* page, PagedWorldSection* section) { return false; }
 
@@ -175,7 +175,7 @@ namespace Ogre
 		void saveWorld(PagedWorld* world, const DataStreamPtr& stream);
 		/** Get a named world.
 		@params name The name of the world (not a filename, the identifying name)
-		@returns The world, or null if the world doesn't exist.
+		@return The world, or null if the world doesn't exist.
 		*/
 		PagedWorld* getWorld(const String& name);
 		typedef map<String, PagedWorld*>::type WorldMap;
@@ -196,7 +196,7 @@ namespace Ogre
 
 		/** Get a PageStrategy.
 		@param name The name of the strategy to retrieve
-		@returns Pointer to a PageStrategy, or null if the strategy was not found.
+		@return Pointer to a PageStrategy, or null if the strategy was not found.
 		*/
 		PageStrategy* getStrategy(const String& name);
 
@@ -218,7 +218,7 @@ namespace Ogre
 
 		/** Get a PageContentCollectionFactory.
 		@param name The name of the factory to retrieve
-		@returns Pointer to a PageContentCollectionFactory, or null if the ContentCollection was not found.
+		@return Pointer to a PageContentCollectionFactory, or null if the ContentCollection was not found.
 		*/
 		PageContentCollectionFactory* getContentCollectionFactory(const String& name);
 
@@ -248,7 +248,7 @@ namespace Ogre
 
 		/** Get a PageContentFactory.
 		@param name The name of the factory to retrieve
-		@returns Pointer to a PageContentFactory, or null if the Content was not found.
+		@return Pointer to a PageContentFactory, or null if the Content was not found.
 		*/
 		PageContentFactory* getContentFactory(const String& name);
 
@@ -279,7 +279,7 @@ namespace Ogre
 
 		/** Get a PagedWorldSectionFactory.
 		@param name The name of the factory to retrieve
-		@returns Pointer to a PagedWorldSectionFactory, or null if the WorldSection was not found.
+		@return Pointer to a PagedWorldSectionFactory, or null if the WorldSection was not found.
 		*/
 		PagedWorldSectionFactory* getWorldSectionFactory(const String& name);
 
@@ -322,7 +322,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _loadProceduralPage
 		for that
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _prepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a provider the opportunity to prepare page content procedurally. 
@@ -330,7 +330,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _prepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _loadProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a manager  the opportunity to unload page content procedurally. 
@@ -338,7 +338,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _unloadProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a manager  the opportunity to unprepare page content procedurally. 
@@ -346,7 +346,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _unloadProceduralPage
 		for that
-		@returns true if the page was unpopulated, false otherwise
+		@return true if the page was unpopulated, false otherwise
 		*/
 		virtual bool _unprepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 

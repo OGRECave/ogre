@@ -142,7 +142,7 @@ static const size_t depthBits[] =
 	}
 
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
-        @returns true    if this combo is supported
+        @return true    if this combo is supported
                  false   if this combo is not supported
     */
     GLuint GLFBOManager::_tryFormat(GLenum depthFormat, GLenum stencilFormat)
@@ -199,7 +199,7 @@ static const size_t depthBits[] =
     }
     
     /** Try a certain packed depth/stencil format, and return the status.
-        @returns true    if this combo is supported
+        @return true    if this combo is supported
                  false   if this combo is not supported
     */
     bool GLFBOManager::_tryPackedFormat(GLenum packedFormat)

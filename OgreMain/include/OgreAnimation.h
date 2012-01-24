@@ -452,7 +452,7 @@ namespace Ogre {
             the animation object, if the animation object altered (e.g. create/remove
             keyframe or track), all related time index will invalidated.
         @param timePos The time position.
-        @returns The time index object which contains wrapped time position (in
+        @return The time index object which contains wrapped time position (in
             relation to the whole animation sequence) and lower bound index of
             global keyframe time list.
         */

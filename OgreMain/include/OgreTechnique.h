@@ -157,7 +157,7 @@ namespace Ogre {
         */
         bool isSupported(void) const;
         /** Internal compilation method; see Material::compile. 
-		@returns Any information explaining problems with the compile.
+		@return Any information explaining problems with the compile.
 		*/
         String _compile(bool autoManageTextureUnits);
 		/// Internal method for checking GPU vendor / device rules
