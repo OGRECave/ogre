@@ -4470,8 +4470,8 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
     if (object->getCastShadows() && object->isVisible() && 
 		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
 		// objects need an edge list to cast shadows (shadow volumes only)
-		((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
-		 ((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList())
+		(((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
+		 (mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL)) && object->hasEdgeList()
 		)
 	   )
     {
