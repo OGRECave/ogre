@@ -489,12 +489,20 @@ protected:
 			TL_TOPLEFT, "TechniqueSelectMenu", "Technique", 300, 200, 5);
 		mTechniqueMenu->addItem("Stencil");
 		mTechniqueMenu->addItem("Texture");
+        if(mCurrentShadowTechnique & SHADOWDETAILTYPE_STENCIL)
+            mTechniqueMenu->selectItem("Stencil", false);
+        else
+            mTechniqueMenu->selectItem("Texture", false);
 
 		mLightingMenu = mTrayMgr->createLongSelectMenu(
 			TL_TOPLEFT, "LightingSelectMenu", "Lighting", 300, 200, 5);
 		mLightingMenu->addItem("Additive");
 		mLightingMenu->addItem("Modulative");
-
+        if(mCurrentShadowTechnique & SHADOWTYPE_STENCIL_ADDITIVE)
+            mLightingMenu->selectItem("Additive", false);
+        else
+            mLightingMenu->selectItem("Modulative", false);
+        
 		//These values are synchronized with ShadowProjection enum
 		mProjectionMenu = mTrayMgr->createLongSelectMenu(
 			TL_TOPLEFT, "ProjectionSelectMenu", "Projection", 300, 200, 5);
