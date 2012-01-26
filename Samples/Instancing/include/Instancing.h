@@ -457,6 +457,7 @@ protected:
 
 	void cleanupContent()
 	{
+        MeshManager::getSingleton().remove("Myplane");
 		destroyCurrentGeomOpt();
 		delete mTimer;
 	}

@@ -302,11 +302,8 @@ void Sample_ShaderSystem::setupContent()
 	// Setup the sky box,
 	mSceneMgr->setSkyBox(true, "Examples/SceneCubeMap2");
 
-	Plane plane;
-	plane.normal = Vector3::UNIT_Y;
-	plane.d = 0;
 	MeshManager::getSingleton().createPlane("Myplane",
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
 		1500,1500,25,25,true,1,60,60,Vector3::UNIT_Z);
 
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
@@ -577,6 +574,8 @@ void Sample_ShaderSystem::cleanupContent()
 	
 	MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
 	mTargetEntities.clear();
+
+    MeshManager::getSingleton().remove("Myplane");
 
 	mSceneMgr->destroyQuery(mRayQuery);
 }

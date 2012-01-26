@@ -140,6 +140,8 @@ Sample_Ocean::Sample_Ocean()
 *************************************************************************/
 void Sample_Ocean::cleanupContent()
 {
+    MeshManager::getSingleton().remove("OceanSurface");
+
 	// get rid of the shared pointers before shutting down ogre or exceptions occur
     mActiveFragmentProgram.setNull();
     mActiveFragmentParameters.setNull();

@@ -397,6 +397,8 @@ protected:
 	virtual void cleanupContent()
 	{
 		ControllerManager::getSingleton().destroyController(mController);
+
+        MeshManager::getSingleton().remove("Myplane");
 	}
 
 	/// Change basic shadow technique 

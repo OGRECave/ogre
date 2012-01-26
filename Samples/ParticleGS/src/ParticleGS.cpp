@@ -159,6 +159,11 @@ protected:
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,95,0))->attachObject(pPlaneEnt);
     }
 
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("Myplane");
+    }
+
 	bool frameStarted(const FrameEvent& evt) 
 	{ 
 		//Set shader parameters

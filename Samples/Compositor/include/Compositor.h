@@ -234,6 +234,7 @@ void Sample_Compositor::cleanupContent(void)
 		++itor;
 	}
 	mCompositorLogics.clear();
+    MeshManager::getSingleton().remove("Myplane");
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupControls(void) 
