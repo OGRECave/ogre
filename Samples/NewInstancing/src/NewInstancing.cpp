@@ -660,8 +660,8 @@ void Sample_NewInstancing::testCapabilities( const RenderSystemCapabilities* cap
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") )
 	{
-		OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample needs at least Shader Model 2.0+ or "
-			"GLSL to work. Your GPU is too old. Sorry!", "NewInstancing::testCapabilities");
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
+                    "so you cannot run this sample. Sorry!", "NewInstancing::testCapabilities");
 	}
 }
 //------------------------------------------------------------------------------
