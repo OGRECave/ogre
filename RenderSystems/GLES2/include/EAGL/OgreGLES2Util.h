@@ -34,7 +34,7 @@
 namespace Ogre {
     inline GLES2Support* getGLSupport()
     {
-        return OGRE_NEW EAGL2Support();
+        return new EAGL2Support();
     }
 };
 

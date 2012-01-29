@@ -367,7 +367,7 @@ namespace Ogre {
 
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
-        mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
+        mRTTManager = new GLES2FBOManager();
         caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
@@ -419,7 +419,7 @@ namespace Ogre {
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        OGRE_DELETE mRTTManager;
+        delete mRTTManager;
         mRTTManager = 0;
 
         OGRE_DELETE mTextureManager;

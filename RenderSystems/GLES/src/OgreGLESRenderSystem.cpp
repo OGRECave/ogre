@@ -363,7 +363,7 @@ namespace Ogre {
 			{
 				// Create FBO manager
 				LogManager::getSingleton().logMessage("GL ES: Using GL_OES_framebuffer_object for rendering to textures (best)");
-				mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESFBOManager();
+				mRTTManager = new GLESFBOManager();
 				caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 			}
 		}
@@ -375,7 +375,7 @@ namespace Ogre {
 				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 				{
 					// Use PBuffers
-					mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESPBRTTManager(mGLSupport, primary);
+					mRTTManager = new GLESPBRTTManager(mGLSupport, primary);
 					LogManager::getSingleton().logMessage("GL ES: Using PBuffers for rendering to textures");
 				}
 			}
@@ -412,7 +412,7 @@ namespace Ogre {
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        OGRE_DELETE mRTTManager;
+        delete mRTTManager;
         mRTTManager = 0;
 
         mGLSupport->stop();

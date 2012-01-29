@@ -69,7 +69,7 @@ namespace Ogre {
     GLESHardwarePixelBuffer::~GLESHardwarePixelBuffer()
     {
         // Force free buffer
-        OGRE_DELETE [] (uint8*)mBuffer.data;
+        delete [] (uint8*)mBuffer.data;
     }
 
     void GLESHardwarePixelBuffer::allocateBuffer()
@@ -78,7 +78,7 @@ namespace Ogre {
             // Already allocated
             return;
 
-        mBuffer.data = OGRE_NEW_FIX_FOR_WIN32 uint8[mSizeInBytes];
+        mBuffer.data = new uint8[mSizeInBytes];
         // TODO use PBO if we're HBU_DYNAMIC
     }
 
@@ -87,7 +87,7 @@ namespace Ogre {
         // Free buffer if we're STATIC to save memory
         if (mUsage & HBU_STATIC)
         {
-            OGRE_DELETE [] (uint8*)mBuffer.data;
+            delete [] (uint8*)mBuffer.data;
             mBuffer.data = 0;
         }
     }
@@ -773,7 +773,7 @@ namespace Ogre {
 
             if (mip != 0)
             {
-                OGRE_DELETE[] (uint8*) scaled.data;
+                delete[] (uint8*) scaled.data;
                 scaled.data = 0;
             }
 
@@ -790,7 +790,7 @@ namespace Ogre {
             int sizeInBytes = PixelUtil::getMemorySize(width, height, 1,
                                                        data.format);
             scaled = PixelBox(width, height, 1, data.format);
-            scaled.data = OGRE_NEW_FIX_FOR_WIN32 uint8[sizeInBytes];
+            scaled.data = new uint8[sizeInBytes];
             Image::scale(data, scaled, Image::FILTER_LINEAR);
         }
     }

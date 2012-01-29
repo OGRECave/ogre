@@ -68,7 +68,7 @@ namespace Ogre {
         size_t height = 8;
 
         // TODO convert to 5_6_5
-        uint32* data = OGRE_NEW_FIX_FOR_WIN32 uint32[width * height]; // 0xXXRRGGBB
+        uint32* data = new uint32[width * height]; // 0xXXRRGGBB
 
         // Yellow/black stripes
         for(size_t y = 0; y < height; ++y)
@@ -91,7 +91,7 @@ namespace Ogre {
                      GL_UNSIGNED_SHORT_5_6_5, (void*)data);
         GL_CHECK_ERROR;
         // Free memory
-        OGRE_DELETE [] data;
+        delete [] data;
     }
 
     PixelFormat GLES2TextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)

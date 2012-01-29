@@ -231,7 +231,7 @@ namespace Ogre {
         if(maxLength == 0)
             return;
 
-		uniformName = OGRE_NEW char[maxLength + 1];
+		uniformName = new char[maxLength + 1];
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
@@ -284,7 +284,7 @@ namespace Ogre {
 		
 		if( uniformName != NULL ) 
 		{
-			OGRE_DELETE uniformName;
+			delete uniformName;
 		}
 	}
 	//---------------------------------------------------------------------

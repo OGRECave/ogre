@@ -43,11 +43,6 @@ THE SOFTWARE.
 #			define NOMINMAX // required to stop windows.h messing up std::min
 #		endif
 #	endif
-#	define OGRE_NEW_FIX_FOR_WIN32 new 
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_LINUX) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
-#	define OGRE_NEW_FIX_FOR_WIN32 new
-#else
-#	define OGRE_NEW_FIX_FOR_WIN32 OGRE_NEW
 #endif
 
 #ifndef GL_GLEXT_PROTOTYPES

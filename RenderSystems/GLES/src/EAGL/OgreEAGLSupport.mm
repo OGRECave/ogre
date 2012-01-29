@@ -201,7 +201,7 @@ namespace Ogre {
 
     GLESPBuffer * EAGLSupport::createPBuffer( PixelComponentType format, size_t width, size_t height )
 	{
-		return OGRE_NEW EAGLPBuffer(this, format, width, height);
+		return new EAGLPBuffer(this, format, width, height);
 	}
     
     
@@ -272,7 +272,7 @@ namespace Ogre {
 
     EAGLESContext * EAGLSupport::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
-        EAGLESContext *context = OGRE_NEW EAGLESContext(drawable, group);
+        EAGLESContext *context = new EAGLESContext(drawable, group);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

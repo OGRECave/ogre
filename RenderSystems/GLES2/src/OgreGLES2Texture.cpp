@@ -171,7 +171,7 @@ namespace Ogre {
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
 
-            uint8* tmpdata = OGRE_NEW_FIX_FOR_WIN32 uint8[size];
+            uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -221,7 +221,7 @@ namespace Ogre {
                     depth = depth / 2;
                 }
             }
-            OGRE_DELETE [] tmpdata;
+            delete [] tmpdata;
         }
         else
         {
@@ -296,7 +296,7 @@ namespace Ogre {
             ext = mName.substr(pos+1);
         }
 
-        LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 vector<Image>::type());
+        LoadedImages loadedImages = LoadedImages(new vector<Image>::type());
 
         if (mTextureType == TEX_TYPE_1D || mTextureType == TEX_TYPE_2D)
         {

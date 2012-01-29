@@ -276,7 +276,7 @@ namespace Ogre {
 
     EAGLES2Context * EAGL2Support::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
-        EAGLES2Context *context = OGRE_NEW EAGLES2Context(drawable, group);
+        EAGLES2Context *context = new EAGLES2Context(drawable, group);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

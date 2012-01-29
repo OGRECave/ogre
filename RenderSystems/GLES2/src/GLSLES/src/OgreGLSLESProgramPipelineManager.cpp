@@ -56,7 +56,7 @@ namespace Ogre
 		for (ProgramPipelineIterator currentProgram = mProgramPipelines.begin();
              currentProgram != mProgramPipelines.end(); ++currentProgram)
 		{
-			OGRE_DELETE currentProgram->second;
+			delete currentProgram->second;
 		}
     }
 
@@ -110,7 +110,7 @@ namespace Ogre
 			// Program object not found for key so need to create it
 			if (programFound == mProgramPipelines.end())
 			{
-				mActiveProgramPipeline = OGRE_NEW GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
+				mActiveProgramPipeline = new GLSLESProgramPipeline(mActiveVertexGpuProgram, mActiveFragmentGpuProgram);
 				mProgramPipelines[activeKey] = mActiveProgramPipeline;
 			}
 			else

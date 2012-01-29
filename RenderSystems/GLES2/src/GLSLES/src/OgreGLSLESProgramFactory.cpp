@@ -42,14 +42,14 @@ namespace Ogre {
     {
         if (mLinkProgramManager == NULL)
         {
-		    mLinkProgramManager = OGRE_NEW GLSLESLinkProgramManager();
+		    mLinkProgramManager = new GLSLESLinkProgramManager();
         }
 
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             if (mProgramPipelineManager == NULL)
             {
-                mProgramPipelineManager = OGRE_NEW GLSLESProgramPipelineManager();
+                mProgramPipelineManager = new GLSLESProgramPipelineManager();
             }
         }
     }
@@ -58,7 +58,7 @@ namespace Ogre {
     {
 		if (mLinkProgramManager)
         {
-			OGRE_DELETE mLinkProgramManager;
+			delete mLinkProgramManager;
             mLinkProgramManager = NULL;
         }
 
@@ -66,7 +66,7 @@ namespace Ogre {
         {
             if (mProgramPipelineManager)
             {
-                OGRE_DELETE mProgramPipelineManager;
+                delete mProgramPipelineManager;
                 mProgramPipelineManager = NULL;
             }
         }

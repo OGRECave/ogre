@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre {
     inline GLESSupport* getGLSupport()
     {
-        return OGRE_NEW EAGLSupport();
+        return new EAGLSupport();
     }
 };
 
