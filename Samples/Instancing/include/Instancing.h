@@ -396,7 +396,9 @@ protected:
 
 		mCamera->setPosition(500,500, 1500);
 		mCamera->lookAt(0,0,0);
-		setDragLook(true);
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        setDragLook(true);
+#endif
 
 		   Plane plane;
         plane.normal = Vector3::UNIT_Y;
