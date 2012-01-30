@@ -1080,7 +1080,15 @@ namespace Ogre {
                         {
 							if (mLoadingListener)
 								mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
-                            su->parseScript(stream, grp->name);
+
+							if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
+							{
+								DataStreamPtr cachedCopy;
+								cachedCopy.bind(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+								su->parseScript(cachedCopy, grp->name);
+							}
+							else
+                            	su->parseScript(stream, grp->name);
                         }
                     }
 					fireScriptEnded(fii->filename, skipScript);
