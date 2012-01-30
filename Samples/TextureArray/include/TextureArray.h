@@ -31,7 +31,9 @@ protected:
                         "TextureArray::testCapabilities");
         }
 
-        if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") || 
+            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") || 
+            !GpuProgramManager::getSingleton().isSyntaxSupported("gp4fp"))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
                         "so you cannot run this sample. Sorry!", "TextureArray::testCapabilities");
