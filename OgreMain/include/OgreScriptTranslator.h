@@ -248,6 +248,22 @@ namespace Ogre{
 		CompositionPassTranslator();
 		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
 	};
+	class _OgreExport CompositionPassClearTranslator : public ScriptTranslator
+	{
+	protected:
+		CompositionPass *mPass;
+	public:
+		CompositionPassClearTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
+	class _OgreExport CompositionPassStencilTranslator : public ScriptTranslator
+	{
+	protected:
+		CompositionPass *mPass;
+	public:
+		CompositionPassStencilTranslator();
+		void translate(ScriptCompiler *compiler, const AbstractNodePtr &node);
+	};
 
 	/**************************************************************************
 	 * BuiltinScriptTranslatorManager
@@ -270,6 +286,8 @@ namespace Ogre{
 		CompositionTechniqueTranslator mCompositionTechniqueTranslator;
 		CompositionTargetPassTranslator mCompositionTargetPassTranslator;
 		CompositionPassTranslator mCompositionPassTranslator;
+		CompositionPassClearTranslator mCompositionPassClearTranslator;
+		CompositionPassStencilTranslator mCompositionPassStencilTranslator;
 	public:
 		BuiltinScriptTranslatorManager();
 		/// Returns the number of translators being managed
