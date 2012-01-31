@@ -5782,188 +5782,6 @@ namespace Ogre{
 				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
 				switch(prop->id)
 				{
-				case ID_CHECK:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						bool val;
-						if(getBoolean(prop->values.front(), &val))
-							mPass->setStencilCheck(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_COMP_FUNC:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						CompareFunction func;
-						if(getCompareFunction(prop->values.front(), &func))
-							mPass->setStencilFunc(func);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_REF_VALUE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						uint32 val;
-						if(getUInt(prop->values.front(), &val))
-							mPass->setStencilRefValue(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_MASK:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						uint32 val;
-						if(getUInt(prop->values.front(), &val))
-							mPass->setStencilMask(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_FAIL_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilFailOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_DEPTH_FAIL_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilDepthFailOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_PASS_OP:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						StencilOperation val;
-						if(getStencilOp(prop->values.front(), &val))
-							mPass->setStencilPassOp(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_TWO_SIDED:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-							return;
-						}
-						bool val;
-						if(getBoolean(prop->values.front(), &val))
-							mPass->setStencilTwoSidedOperation(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_BUFFERS:
-					{
-						uint32 buffers = 0;
-						for(AbstractNodeList::iterator k = prop->values.begin(); k != prop->values.end(); ++k)
-						{
-							if((*k)->type == ANT_ATOM)
-							{
-								switch(((AtomAbstractNode*)(*k).get())->id)
-								{
-								case ID_COLOUR:
-									buffers |= FBT_COLOUR;
-									break;
-								case ID_DEPTH:
-									buffers |= FBT_DEPTH;
-									break;
-								case ID_STENCIL:
-									buffers |= FBT_STENCIL;
-									break;
-								default:
-									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-								}
-							}
-							else
-								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-						}
-						mPass->setClearBuffers(buffers);
-					}
-					break;
-				case ID_COLOUR_VALUE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						ColourValue val;
-						if(getColour(prop->values.begin(), prop->values.end(), &val))
-							mPass->setClearColour(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_DEPTH_VALUE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						Real val;
-						if(getReal(prop->values.front(), &val))
-							mPass->setClearDepth(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
-				case ID_STENCIL_VALUE:
-					{
-						if(prop->values.empty())
-						{
-							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-							return;
-						}
-						uint32 val;
-						if(getUInt(prop->values.front(), &val))
-							mPass->setClearStencil(val);
-						else
-							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-					}
-					break;
 				case ID_MATERIAL:
 					if(prop->values.empty())
 					{
@@ -6160,6 +5978,266 @@ namespace Ogre{
 	}
 
 	/**************************************************************************
+	* CompositionPassClearTranslator
+	*************************************************************************/
+	CompositionPassClearTranslator::CompositionPassClearTranslator()
+		:mPass(0)
+	{
+	}
+
+	void CompositionPassClearTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		mPass = any_cast<CompositionPass*>(obj->parent->context);
+
+		// Should be no parameters, just children
+		if(!obj->values.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line);
+		}
+
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
+				case ID_BUFFERS:
+					{
+						uint32 buffers = 0;
+						for(AbstractNodeList::iterator k = prop->values.begin(); k != prop->values.end(); ++k)
+						{
+							if((*k)->type == ANT_ATOM)
+							{
+								switch(((AtomAbstractNode*)(*k).get())->id)
+								{
+								case ID_COLOUR:
+									buffers |= FBT_COLOUR;
+									break;
+								case ID_DEPTH:
+									buffers |= FBT_DEPTH;
+									break;
+								case ID_STENCIL:
+									buffers |= FBT_STENCIL;
+									break;
+								default:
+									compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+								}
+							}
+							else
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+						}
+						mPass->setClearBuffers(buffers);
+					}
+					break;
+				case ID_COLOUR_VALUE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+						ColourValue val;
+						if(getColour(prop->values.begin(), prop->values.end(), &val))
+							mPass->setClearColour(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_DEPTH_VALUE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+						Real val;
+						if(getReal(prop->values.front(), &val))
+							mPass->setClearDepth(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_STENCIL_VALUE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+						uint32 val;
+						if(getUInt(prop->values.front(), &val))
+							mPass->setClearStencil(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+		}
+	}
+
+	/**************************************************************************
+	* CompositionPassStencilTranslator
+	*************************************************************************/
+	CompositionPassStencilTranslator::CompositionPassStencilTranslator()
+		:mPass(0)
+	{
+	}
+
+	void CompositionPassStencilTranslator::translate(ScriptCompiler *compiler, const AbstractNodePtr &node)
+	{
+		ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+		mPass = any_cast<CompositionPass*>(obj->parent->context);
+
+		// Should be no parameters, just children
+		if(!obj->values.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, obj->file, obj->line);
+		}
+
+		for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+		{
+			if((*i)->type == ANT_OBJECT)
+			{
+				processNode(compiler, *i);
+			}
+			else if((*i)->type == ANT_PROPERTY)
+			{
+				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+				switch(prop->id)
+				{
+				case ID_CHECK:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						bool val;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setStencilCheck(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_COMP_FUNC:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						CompareFunction func;
+						if(getCompareFunction(prop->values.front(), &func))
+							mPass->setStencilFunc(func);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_REF_VALUE:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+						uint32 val;
+						if(getUInt(prop->values.front(), &val))
+							mPass->setStencilRefValue(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_MASK:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+							return;
+						}
+						uint32 val;
+						if(getUInt(prop->values.front(), &val))
+							mPass->setStencilMask(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_FAIL_OP:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						StencilOperation val;
+						if(getStencilOp(prop->values.front(), &val))
+							mPass->setStencilFailOp(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_DEPTH_FAIL_OP:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						StencilOperation val;
+						if(getStencilOp(prop->values.front(), &val))
+							mPass->setStencilDepthFailOp(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_PASS_OP:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						StencilOperation val;
+						if(getStencilOp(prop->values.front(), &val))
+							mPass->setStencilPassOp(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				case ID_TWO_SIDED:
+					{
+						if(prop->values.empty())
+						{
+							compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+							return;
+						}
+						bool val;
+						if(getBoolean(prop->values.front(), &val))
+							mPass->setStencilTwoSidedOperation(val);
+						else
+							compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+					}
+					break;
+				default:
+					compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+						"token \"" + prop->name + "\" is not recognized");
+				}
+			}
+		}
+	}
+
+	/**************************************************************************
 	 * BuiltinScriptTranslatorManager
 	 *************************************************************************/
 	BuiltinScriptTranslatorManager::BuiltinScriptTranslatorManager()
@@ -6207,6 +6285,10 @@ namespace Ogre{
 				translator = &mCompositionTargetPassTranslator;
 			else if(obj->id == ID_PASS && parent && (parent->id == ID_TARGET || parent->id == ID_TARGET_OUTPUT))
 				translator = &mCompositionPassTranslator;
+			else if(obj->id == ID_CLEAR && parent && parent->id == ID_PASS)
+				translator = &mCompositionPassClearTranslator;
+			else if(obj->id == ID_STENCIL && parent && parent->id == ID_PASS)
+				translator = &mCompositionPassStencilTranslator;
 		}
 
 		return translator;
