@@ -156,6 +156,9 @@ namespace Ogre
                 glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLSLProgram()->getGLProgramHandle());
                 GL_CHECK_ERROR
             }
+
+            // Validate pipeline
+            logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 		}
 #endif
 	}
@@ -335,19 +338,19 @@ namespace Ogre
                             break;
                         case GCT_INT1:
                             glProgramUniform1ivEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                   (GLint*)params->getIntPointer(def->physicalIndex));
+                                                   params->getIntPointer(def->physicalIndex));
                             break;
                         case GCT_INT2:
                             glProgramUniform2ivEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                   (GLint*)params->getIntPointer(def->physicalIndex));
+                                                   params->getIntPointer(def->physicalIndex));
                             break;
                         case GCT_INT3:
                             glProgramUniform3ivEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                   (GLint*)params->getIntPointer(def->physicalIndex));
+                                                   params->getIntPointer(def->physicalIndex));
                             break;
                         case GCT_INT4:
                             glProgramUniform4ivEXT(progID, currentUniform->mLocation, glArraySize, 
-                                                   (GLint*)params->getIntPointer(def->physicalIndex));
+                                                   params->getIntPointer(def->physicalIndex));
                             break;
                         case GCT_SAMPLER1D:
                         case GCT_SAMPLER1DSHADOW:
@@ -357,7 +360,7 @@ namespace Ogre
                         case GCT_SAMPLERCUBE:
                             // Samplers handled like 1-element ints
                             glProgramUniform1ivEXT(progID, currentUniform->mLocation, 1, 
-                                                   (GLint*)params->getIntPointer(def->physicalIndex));
+                                                   params->getIntPointer(def->physicalIndex));
                             break;
                         case GCT_MATRIX_2X3:
                         case GCT_MATRIX_2X4:
