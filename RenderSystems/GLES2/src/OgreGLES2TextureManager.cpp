@@ -67,8 +67,7 @@ namespace Ogre {
         size_t width = 8;
         size_t height = 8;
 
-        // TODO convert to 5_6_5
-        uint32* data = new uint32[width * height]; // 0xXXRRGGBB
+        uint16* data = new uint16[width * height];
 
         // Yellow/black stripes
         for(size_t y = 0; y < height; ++y)
