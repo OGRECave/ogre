@@ -1396,7 +1396,10 @@ namespace Ogre {
         // On iOS cube maps are especially sensitive to texture parameter changes.
         // So, for performance (and it's a large difference) we will skip updating them.
         if(mTextureTypes[unit] == GL_TEXTURE_CUBE_MAP)
+        {
+            activateGLTextureUnit(0);
             return;
+        }
 
         switch (ftype)
         {
@@ -1430,7 +1433,6 @@ namespace Ogre {
                 break;
             case FT_MIP:
                 mMipFilter = fo;
-//                }
 
                 // Combine with existing min filter
                 glTexParameteri(mTextureTypes[unit],
@@ -1562,9 +1564,6 @@ namespace Ogre {
  			
 			mRenderAttribsBound.push_back(attrib);
         }	
-
-		if (multitexturing)
-            activateGLTextureUnit(GL_TEXTURE0);
 
         // Find the correct type to render
         GLint primType;
