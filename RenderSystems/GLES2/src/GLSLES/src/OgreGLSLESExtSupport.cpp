@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLESExtSupport.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -46,7 +47,8 @@ namespace Ogre
                 GL_CHECK_ERROR
             }
 #if GL_EXT_separate_shader_objects
-            else if(glIsProgramPipelineEXT(obj))
+            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                    glIsProgramPipelineEXT(obj))
             {
                 glValidateProgramPipelineEXT(obj);
                 glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength);
@@ -73,7 +75,8 @@ namespace Ogre
                     GL_CHECK_ERROR
                 }
 #if GL_EXT_separate_shader_objects
-                else if(glIsProgramPipelineEXT(obj))
+                else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                        glIsProgramPipelineEXT(obj))
                 {
                     glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog);
                     GL_CHECK_ERROR
