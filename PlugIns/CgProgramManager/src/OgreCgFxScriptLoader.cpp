@@ -3781,8 +3781,8 @@ namespace Ogre {
 			break;
 		case CG_FLOAT3x2:
 			paramSize = 3*2;
+            break;
 		case CG_FLOAT3x3:
-			break;
 			paramSize = 3*3;
 			break;
 		case CG_FLOAT3x4:
@@ -3860,8 +3860,8 @@ namespace Ogre {
 			break;
 		case CG_INT3x2:
 			paramSize = 3*2;
+            break;
 		case CG_INT3x3:
-			break;
 			paramSize = 3*3;
 			break;
 		case CG_INT3x4:
