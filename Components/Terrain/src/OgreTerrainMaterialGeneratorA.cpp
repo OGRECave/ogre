@@ -1150,7 +1150,7 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
 	{
 		uint uvIdx = layer / 2;
-		String uvChannels = layer % 2 ? ".zw" : ".xy";
+		String uvChannels = (layer % 2) ? ".zw" : ".xy";
 		uint blendIdx = (layer-1) / 4;
 		String blendChannel = getChannel(layer-1);
 		String blendWeightStr = String("blendTexVal") + StringConverter::toString(blendIdx) + 

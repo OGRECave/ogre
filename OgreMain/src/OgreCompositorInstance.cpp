@@ -173,6 +173,8 @@ public:
 	RSQuadOperation(CompositorInstance *inInstance, uint32 inPass_id, MaterialPtr inMat):
 	  mat(inMat), instance(inInstance), pass_id(inPass_id),
       mQuadCornerModified(false),
+      mQuadFarCorners(false),
+      mQuadFarCornersViewSpace(false),
       mQuadLeft(-1),
       mQuadTop(1),
       mQuadRight(1),
@@ -257,7 +259,7 @@ public:
 class RSSetSchemeOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-	RSSetSchemeOperation(const String& schemeName) : mSchemeName(schemeName) {}
+	RSSetSchemeOperation(const String& schemeName) : mPreviousLateResolving(false), mSchemeName(schemeName) {}
 	
 	String mPreviousScheme;
 	bool mPreviousLateResolving;

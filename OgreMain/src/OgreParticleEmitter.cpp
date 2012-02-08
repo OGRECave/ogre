@@ -257,13 +257,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     unsigned short ParticleEmitter::genConstantEmissionCount(Real timeElapsed)
     {
-        unsigned short intRequest;
-        
         if (mEnabled)
         {
             // Keep fractions, otherwise a high frame rate will result in zero emissions!
             mRemainder += mEmissionRate * timeElapsed;
-            intRequest = (unsigned short)mRemainder;
+            unsigned short intRequest = (unsigned short)mRemainder;
             mRemainder -= intRequest;
 
             // Check duration

@@ -2180,7 +2180,6 @@ namespace Ogre {
                 pBufferData = static_cast<char*>(pBufferData) + op.vertexData->vertexStart * vertexBuffer->getVertexSize();
             }
 
-            unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
 
             {
@@ -2218,7 +2217,7 @@ namespace Ogre {
                     case VES_TEXTURE_COORDINATES:
                         {
                             // fixed function matching to units based on tex_coord_set
-                            for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                            for (unsigned int i = 0; i < mDisabledTexUnitsFrom; i++)
                             {
                                 // Only set this texture unit's texcoord pointer if it
                                 // is supposed to be using this element's index

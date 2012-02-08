@@ -1483,7 +1483,6 @@ namespace Ogre {
         RenderSystem::_render(op);
 
         void* pBufferData = 0;
-		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
         const VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();

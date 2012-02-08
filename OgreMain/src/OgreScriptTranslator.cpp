@@ -4557,10 +4557,10 @@ namespace Ogre{
 					{
 						bool named = (prop->id == ID_PARAM_NAMED_AUTO);
 						String name;
-						size_t index = 0;
 
 						if(prop->values.size() >= 2)
 						{
+                            size_t index = 0;
 							AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
 								i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2), i3 = getNodeAt(prop->values, 3);
 							if((*i0)->type != ANT_ATOM || (*i1)->type != ANT_ATOM)

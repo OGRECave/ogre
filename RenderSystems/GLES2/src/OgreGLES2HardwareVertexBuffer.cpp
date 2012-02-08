@@ -75,8 +75,6 @@ namespace Ogre {
                                            size_t length,
                                            LockOptions options)
     {
-        GLenum access = 0;
-
         if (mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -119,6 +117,7 @@ namespace Ogre {
 #if GL_OES_mapbuffer
         if (!retPtr)
 		{
+            GLenum access = 0;
 			// Use glMapBuffer
             dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 

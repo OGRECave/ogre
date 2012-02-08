@@ -63,8 +63,6 @@ namespace Ogre {
     void* GLHardwareVertexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        GLenum access = 0;
-
         if(mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -101,6 +99,7 @@ namespace Ogre {
 		
 		if (!retPtr)
 		{
+            GLenum access = 0;
 			// Use glMapBuffer
 			glBindBufferARB( GL_ARRAY_BUFFER_ARB, mBufferId );
 			// Use glMapBuffer

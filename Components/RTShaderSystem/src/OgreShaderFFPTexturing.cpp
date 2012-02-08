@@ -408,7 +408,6 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
 		break;
-		break;
 
 	case TEXCALC_PROJECTIVE_TEXTURE:
 

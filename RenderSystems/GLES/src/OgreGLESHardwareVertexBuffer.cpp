@@ -74,8 +74,6 @@ namespace Ogre {
                                            size_t length,
                                            LockOptions options)
     {
-        GLenum access = 0;
-
         if (mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
@@ -118,6 +116,7 @@ namespace Ogre {
 #if defined(GL_GLEXT_PROTOTYPES)
         if (!retPtr)
 		{
+            GLenum access = 0;
 			// Use glMapBuffer
 			glBindBuffer( GL_ARRAY_BUFFER, mBufferId );
 			// Use glMapBuffer

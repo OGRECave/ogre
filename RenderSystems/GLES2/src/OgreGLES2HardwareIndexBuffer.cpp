@@ -128,7 +128,6 @@ namespace Ogre {
         }
 
         void* retPtr = 0;
-        GLenum access = 0;
 		GLES2HardwareBufferManager* glBufManager = static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
         if(length < glBufManager->getGLMapBufferThreshold())
@@ -158,6 +157,7 @@ namespace Ogre {
 #if GL_OES_mapbuffer
 		if (!retPtr)
 		{
+            GLenum access = 0;
             dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)

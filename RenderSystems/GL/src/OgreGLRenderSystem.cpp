@@ -3736,7 +3736,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();
         }
 
-        unsigned int i = 0;
         VertexElementSemantic sem = elem.getSemantic();
         bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
@@ -3841,7 +3840,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
                 else
                 {
                     // fixed function matching to units based on tex_coord_set
-                    for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                    for (unsigned int i = 0; i < mDisabledTexUnitsFrom; i++)
                     {
                         // Only set this texture unit's texcoord pointer if it
                         // is supposed to be using this element's index

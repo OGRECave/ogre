@@ -125,7 +125,6 @@ namespace Ogre {
         }
 
         void* retPtr = 0;
-        GLenum access = 0;
 		GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
         if(length < glBufManager->getGLMapBufferThreshold())
@@ -155,6 +154,7 @@ namespace Ogre {
 #if defined(GL_GLEXT_PROTOTYPES)
         if (!retPtr)
 		{
+            GLenum access = 0;
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)
