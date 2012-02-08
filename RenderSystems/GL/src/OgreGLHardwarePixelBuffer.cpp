@@ -110,8 +110,7 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box
 		src.getHeight() != dstBox.getHeight() ||
 		src.getDepth() != dstBox.getDepth())
 	{
-		// Scale to destination size. Use DevIL and not iluScale because ILU screws up for 
-		// floating point textures and cannot cope with 3D images.
+		// Scale to destination size.
 		// This also does pixel format conversion if needed
 		allocateBuffer();
 		scaled = mBuffer.getSubVolume(dstBox);

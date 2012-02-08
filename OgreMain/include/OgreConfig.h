@@ -166,14 +166,6 @@ WARNING: Use only when you want to provide your own image loading code via codec
 #define OGRE_NO_FREEIMAGE 0
 #endif
 
-/** Disables use of the DevIL image library for loading images.
-By default DevIL is disabled in Eihort in favour of FreeImage, but you may re-enable
-it if you choose
-*/
-#ifndef OGRE_NO_DEVIL
-#define OGRE_NO_DEVIL 1
-#endif
-
 /** Disables use of the internal image codec for loading DDS files.
 WARNING: Use only when you want to provide your own image loading code via codecs.
 */
