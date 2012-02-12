@@ -126,7 +126,7 @@ bool GLHardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments 
 //------------------------------------------------------------------
 bool GLHardwareOcclusionQuery::isStillOutstanding(void)
 {    
-      GLuint available;
+    GLuint available = GL_FALSE;
 
     if(GLEW_VERSION_1_5 || GLEW_ARB_occlusion_query)
 	{

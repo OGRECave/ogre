@@ -262,7 +262,7 @@ SubRenderState*	HardwareSkinningFactory::createInstance(ScriptCompiler* compiler
 		uint32 boneCount = 0;
 		uint32 weightCount = 0;
 		String skinningType = "";
-		SkinningType skinType;
+		SkinningType skinType = ST_LINEAR;
 		bool correctAntipodalityHandling = false;
 		bool scalingShearingSupport = false;
 		

@@ -237,6 +237,7 @@ namespace Ogre
             // Set the title of our window
             CFStringRef titleRef = CFStringCreateWithCString( kCFAllocatorDefault, title.c_str(), kCFStringEncodingASCII );
             SetWindowTitleWithCFString( mWindow, titleRef );
+            CFRelease(titleRef);
             mWindowTitle = title;
             
             // Center our window on the screen
