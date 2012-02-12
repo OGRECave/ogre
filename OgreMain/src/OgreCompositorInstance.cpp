@@ -1106,7 +1106,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
  			if(refCompInst)
  			{
  				refTexDef = refCompInst->getCompositor()->
-                    getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(name);
+                    getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
  			}
 			else
 			{
@@ -1121,7 +1121,7 @@ const String &CompositorInstance::getSourceForTex(const String &name, size_t mrt
  			const CompositorPtr &refComp = CompositorManager::getSingleton().getByName(texDef->refCompName);
  			if(!refComp.isNull())
  			{
- 				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(name);
+ 				refTexDef = refComp->getSupportedTechnique()->getTextureDefinition(texDef->refTexName);
  			}
  		}
         
