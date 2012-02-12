@@ -1198,7 +1198,8 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 Ogre::StringVector Sample_ShaderSystem::getRequiredPlugins()
 {
 	StringVector names;
-    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
         names.push_back("Cg Program Manager");
 	return names;
 }
@@ -1218,8 +1219,9 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 		return;
 	}
 
-	// Check if GLSL ES shaders are supported - is so - then we are OK.
-	if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+	// Check if GLSL type shaders are supported - is so - then we are OK.
+	if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
+        GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
 	{
 		return;
 	}
