@@ -2919,6 +2919,8 @@ It is also possible to 'emit emitters' - that is, have new emitters spawned base
 @item
 @ref{direction}
 @item
+@ref{direction_position_reference}
+@item
 @ref{emission_rate}
 @item
 @ref{position}
@@ -2992,6 +2994,17 @@ Sets the direction of the emitter. This is relative to the SceneNode which the p
 format: direction <x> <y> <z>@*
 example: direction 0 1 0@*
 default: 1 0 0@*
+
+@anchor{direction_position_reference}
+@subheading direction_position_reference
+
+Sets the position reference of the emitter. This supersedes direction when present. The last parameter must be 1 to enable it, 0 to disable. You may still want to set the direction to setup orientation of the emitter's dimensions.
+When present, particles direction is calculated at the time of emission by doing (particlePosition - referencePosition); therefore particles will travel in a particular direction or in every direction depending on where the particles are originated, and the location of the reference position. Note angle still works to apply some randomness after the direction vector is generated. This parameter is specially useful to create explosions and implosions (when velocity is negative) best paired with HollowEllipsoid and Ring emitters.
+This is relative to the SceneNode which the particle system is attached to, meaning that as with other movable objects changing the orientation of the node will also move the emitter.@*@*
+
+format: direction_position_reference <x> <y> <z> <enable>@*
+example: direction_position_reference 0 -10 0 1@*
+default: direction_position_reference 0 0 0 0@*
 
 @anchor{emission_rate}
 @subheading emission_rate
