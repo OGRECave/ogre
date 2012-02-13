@@ -50,14 +50,16 @@ namespace Ogre {
 	{
 	}
 	//-----------------------------------------------------------------------
-	BillboardChain::Element::Element(Vector3 _position,
+	BillboardChain::Element::Element(const Vector3 &_position,
 		Real _width,
 		Real _texCoord,
-		ColourValue _colour) :
+		const ColourValue &_colour,
+		const Quaternion &_orientation) :
 	position(_position),
 		width(_width),
 		texCoord(_texCoord),
-		colour(_colour)
+		colour(_colour),
+		orientation(_orientation)
 	{
 	}
 	//-----------------------------------------------------------------------
@@ -74,7 +76,9 @@ namespace Ogre {
 		mBoundsDirty(true),
 		mIndexContentDirty(true),
 		mRadius(0.0f),
-		mTexCoordDir(TCD_U)
+		mTexCoordDir(TCD_U),
+		mFaceCamera(true),
+		mNormalBase(Vector3::UNIT_X)
 	{
 		mVertexData = OGRE_NEW VertexData();
 		mIndexData = OGRE_NEW IndexData();
@@ -344,6 +348,12 @@ namespace Ogre {
 
 	}
 	//-----------------------------------------------------------------------
+	void BillboardChain::setFaceCamera( bool faceCamera, const Vector3 &normalVector )
+	{
+		mFaceCamera = faceCamera;
+		mNormalBase = normalVector.normalisedCopy();
+	}
+	//-----------------------------------------------------------------------
 	void BillboardChain::updateChainElement(size_t chainIndex, size_t elementIndex,
 		const BillboardChain::Element& dtls)
 	{
@@ -522,7 +532,13 @@ namespace Ogre {
 
 					}
 
-					Vector3 vP1ToEye = eyePos - elem.position;
+					Vector3 vP1ToEye;
+
+					if( mFaceCamera )
+						vP1ToEye = eyePos - elem.position;
+					else
+						vP1ToEye = elem.orientation * mNormalBase;
+
 					Vector3 vPerpendicular = chainTangent.crossProduct(vP1ToEye);
 					vPerpendicular.normalise();
 					vPerpendicular *= (elem.width * 0.5f);

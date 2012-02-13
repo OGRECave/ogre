@@ -408,10 +408,13 @@ namespace Ogre
 
 		clearDeviceStreams();
 
+		renderSystem->fireDeviceEvent(this, "BeforeDeviceReset");
 
 		// Reset the device using the presentation parameters.
 		hr = mDevice->Reset(mPresentationParams);
 	
+		renderSystem->fireDeviceEvent(this, "AfterDeviceReset");
+
 		if (hr == D3DERR_DEVICELOST)
 		{
 			// UnLock access to rendering device.
@@ -762,6 +765,9 @@ namespace Ogre
 
 		mDeviceManager->setActiveDevice(pCurActiveDevice);
 
+		D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+		renderSystem->fireDeviceEvent(this, "DeviceCreated");
+
 		// UnLock access to rendering device.
 		D3D9RenderSystem::getResourceManager()->unlockDeviceAccess();
 	}
@@ -771,6 +777,9 @@ namespace Ogre
 	{
 		if (mDevice != NULL)
 		{
+			D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+			renderSystem->fireDeviceEvent(this, "DeviceReleased");
+
 			// Lock access to rendering device.
 			D3D9RenderSystem::getResourceManager()->lockDeviceAccess();
 
@@ -991,6 +1000,9 @@ namespace Ogre
 
 
 		HRESULT hr;
+
+		D3D9RenderSystem* renderSystem = static_cast<D3D9RenderSystem*>(Root::getSingleton().getRenderSystem());
+		renderSystem->fireDeviceEvent(this, "BeforeDevicePresent");
 
 		if (isMultihead())
 		{

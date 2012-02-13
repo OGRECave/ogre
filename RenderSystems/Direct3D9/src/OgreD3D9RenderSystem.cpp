@@ -60,7 +60,8 @@ namespace Ogre
 	D3D9RenderSystem* D3D9RenderSystem::msD3D9RenderSystem = NULL;
 
 	//---------------------------------------------------------------------
-	D3D9RenderSystem::D3D9RenderSystem( HINSTANCE hInstance )
+	D3D9RenderSystem::D3D9RenderSystem( HINSTANCE hInstance ) :
+		mMultiheadUse(mutAuto)
 	{
 		LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " created." );
 
@@ -186,6 +187,7 @@ namespace Ogre
 		ConfigOption optDevice;
 		ConfigOption optVideoMode;
 		ConfigOption optFullScreen;
+		ConfigOption optMultihead;
 		ConfigOption optVSync;
 		ConfigOption optVSyncInterval;
 		ConfigOption optAA;
@@ -214,6 +216,13 @@ namespace Ogre
 		optFullScreen.possibleValues.push_back( "No" );
 		optFullScreen.currentValue = "Yes";
 		optFullScreen.immutable = false;
+
+		optMultihead.name = "Use Multihead";
+		optMultihead.possibleValues.push_back( "Auto" );
+		optMultihead.possibleValues.push_back( "Yes" );
+		optMultihead.possibleValues.push_back( "No" );
+		optMultihead.currentValue = "Auto";
+		optMultihead.immutable = false;
 
 		optResourceCeationPolicy.name = "Resource Creation Policy";		
 		optResourceCeationPolicy.possibleValues.push_back( "Create on all devices" );
@@ -298,6 +307,7 @@ namespace Ogre
 		mOptions[optDevice.name] = optDevice;
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
+		mOptions[optMultihead.name] = optMultihead;
 		mOptions[optVSync.name] = optVSync;
 		mOptions[optVSyncInterval.name] = optVSyncInterval;
 		mOptions[optAA.name] = optAA;
@@ -396,6 +406,15 @@ namespace Ogre
 				it->second.currentValue = "800 x 600 @ 32-bit colour";
 				viewModeChanged = true;
 			}
+		}
+
+		if( name == "Use Multihead" )
+		{
+			if (value == "Yes")
+				mMultiheadUse = mutYes;
+			else if (value == "No")
+				mMultiheadUse = mutNo;
+			else mMultiheadUse = mutAuto;
 		}
 
 		if( name == "FSAA" )
@@ -4164,9 +4183,8 @@ namespace Ogre
 		ss << "D3D9 Device 0x[" << device->getD3D9Device() << "] entered lost state";
 		LogManager::getSingleton().logMessage(ss.str());
 
+		fireDeviceEvent(device, "DeviceLost");
 
-		// you need to stop the physics or game engines after this event
-		fireEvent("DeviceLost");
 	}
 
 	//---------------------------------------------------------------------
@@ -4198,7 +4216,8 @@ namespace Ogre
 		ss << "D3D9 device: 0x[" << device->getD3D9Device() << "] was reset";
 		LogManager::getSingleton().logMessage(ss.str());
 
-		fireEvent("DeviceRestored");
+		fireDeviceEvent(device, "DeviceRestored");
+
 	}
 
 	//---------------------------------------------------------------------
@@ -4328,5 +4347,13 @@ namespace Ogre
 		} // while !ok
 	}
 
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::fireDeviceEvent( D3D9Device* device, const String & name )
+	{
+		NameValuePairList params;
+		params["D3DDEVICE"] =  StringConverter::toString((size_t)device->getD3D9Device());
+		params["DEVICE_ADAPTER_NUMBER"] =  StringConverter::toString(device->getAdapterNumber());
 
+		fireEvent(name, &params);
+	}
 }

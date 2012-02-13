@@ -195,38 +195,44 @@ namespace Ogre
 			renderSystem->mActiveD3DDriver = findDriver(renderWindow);
 			nAdapterOrdinal = renderSystem->mActiveD3DDriver->getAdapterNumber();
 
-			BOOL bTryUsingMultiheadDevice = FALSE;
+			bool bTryUsingMultiheadDevice = false;
 
 			if (renderWindow->isFullScreen())
 			{
-				bTryUsingMultiheadDevice = TRUE;
-
-				OSVERSIONINFO osVersionInfo;
-				
-				osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-				
-				// Case version info failed -> assume we run on XP.
-				if (FALSE == GetVersionEx(&osVersionInfo))
+				bTryUsingMultiheadDevice = true;
+				if (renderSystem->getMultiheadUse() == D3D9RenderSystem::mutAuto)
 				{
-					osVersionInfo.dwMajorVersion = 5;
+					OSVERSIONINFO osVersionInfo;
+					
+					osVersionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+					
+					// Case version info failed -> assume we run on XP.
+					if (FALSE == GetVersionEx(&osVersionInfo))
+					{
+						osVersionInfo.dwMajorVersion = 5;
+					}
+
+					// XP and below - multi-head will cause artifacts when vsync is on.
+					if (osVersionInfo.dwMajorVersion <= 5 && renderWindow->isVSync())
+					{
+						bTryUsingMultiheadDevice = false;
+						LogManager::getSingleton().logMessage("D3D9 : Multi head disabled. It causes horizontal line when used in XP + VSync combination");
+					}		
+
+					// Vista and SP1 or SP2 - multi-head device can not be reset - it causes memory corruption.
+					if (osVersionInfo.dwMajorVersion == 6 &&
+						(_stricmp(osVersionInfo.szCSDVersion, "Service Pack 1") == 0 ||
+						 _stricmp(osVersionInfo.szCSDVersion, "Service Pack 2") == 0))
+
+					{
+						bTryUsingMultiheadDevice = false;
+						LogManager::getSingleton().logMessage("D3D9 : Multi head disabled. It causes application run time crashes when used in Vista + SP 1 or 2 combination");
+					}	
 				}
-
-				// XP and below - multi-head will cause artifacts when vsync is on.
-				if (osVersionInfo.dwMajorVersion <= 5 && renderWindow->isVSync())
+				else
 				{
-					bTryUsingMultiheadDevice = FALSE;
-					LogManager::getSingleton().logMessage("D3D9 : Multi head disabled. It causes horizontal line when used in XP + VSync combination");
-				}		
-
-				// Vista and SP1 or SP2 - multi-head device can not be reset - it causes memory corruption.
-				if (osVersionInfo.dwMajorVersion == 6 &&
-					(_stricmp(osVersionInfo.szCSDVersion, "Service Pack 1") == 0 ||
-					 _stricmp(osVersionInfo.szCSDVersion, "Service Pack 2") == 0))
-
-				{
-					bTryUsingMultiheadDevice = FALSE;
-					LogManager::getSingleton().logMessage("D3D9 : Multi head disabled. It causes application run time crashes when used in Vista + SP 1 or 2 combination");
-				}				
+					bTryUsingMultiheadDevice = renderSystem->getMultiheadUse() == D3D9RenderSystem::mutYes ? true : false;
+				}
 			}
 			
 			

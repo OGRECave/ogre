@@ -387,7 +387,8 @@ namespace Ogre
 				Vector3 scaledDiff = diff * (mElemLength / Math::Sqrt(sqlen));
 				headElem.position = nextElem.position + scaledDiff;
 				// Add a new element to be the new head
-				Element newElem(newPos, mInitialWidth[index], 0.0f, mInitialColour[index]);
+				Element newElem( newPos, mInitialWidth[index], 0.0f,
+								 mInitialColour[index], node->_getDerivedOrientation() );
 				addChainElement(index, newElem);
 				// alter diff to represent new head size
 				diff = newPos - headElem.position;
@@ -486,7 +487,7 @@ namespace Ogre
 				/ mParentNode->_getDerivedScale();
 		}
         Element e(position,
-            mInitialWidth[index], 0.0f, mInitialColour[index]);
+			mInitialWidth[index], 0.0f, mInitialColour[index], node->_getDerivedOrientation());
         // Add the start position
         addChainElement(index, e);
         // Add another on the same spot, this will extend
