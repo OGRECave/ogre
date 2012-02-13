@@ -31,40 +31,40 @@ Compositor scripts are loaded when resource groups are initialised: OGRE looks i
 
 @heading Format
 
-Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('{', '}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below:@*@*
+Several compositors may be defined in a single script. The script format is pseudo-C++, with sections delimited by curly braces ('@{', '@}'), and comments indicated by starting a line with '//' (note, no nested form comments allowed). The general format is shown below in the example below:@*@*
 @example
 // This is a comment
 // Black and white effect
 compositor B&W
-{
+@{
     technique
-    {
+    @{
         // Temporary textures
         texture rt0 target_width target_height PF_A8R8G8B8
 
         target rt0
-        {
+        @{
             // Render output from previous compositor (or original scene)
             input previous
-        }
+        @}
 
         target_output
-        {
+        @{
             // Start with clear output
             input none
             // Draw a fullscreen quad with the black and white image
             pass render_quad
-            {
+            @{
                 // Renders a fullscreen quad with a material
                 material Ogre/Compositor/BlackAndWhite
                 input 0 rt0
-            }
-        }
-    }
-}
+            @}
+        @}
+    @}
+@}
 @end example
 
-Every compositor in the script must be given a name, which is the line 'compositor <name>' before the first opening '{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.  Names can include spaces but must be surrounded by double quotes ie compositor "My Name".@*@*
+Every compositor in the script must be given a name, which is the line 'compositor <name>' before the first opening '@{'. This name must be globally unique. It can include path characters (as in the example) to logically divide up your compositors, and also to avoid duplicate names, but the engine does not treat the name as hierarchical, just as a string.  Names can include spaces but must be surrounded by double quotes i.e. compositor "My Name".@*@*
 
 The major components of a compositor are the @ref{Compositor Techniques,techniques}, the @ref{Compositor Target Passes,target passes} and the @ref{Compositor Passes,passes}, which are covered in detail in the following sections.@*@*
 
@@ -81,7 +81,7 @@ This one is slightly more complicated. When you request a @ref{compositor_textur
 
 As with material techniques, compositor techniques are evaluated in the order you define them in the script, so techniques declared first are preferred over those declared later.
 
-Format: technique { }@*@*
+Format: technique @{ @}@*@*
 
 Techniques can have the following nested elements:
 @itemize @bullet
@@ -174,9 +174,9 @@ Registration of compositor logics is done by name through CompositorManager::reg
 A target pass is the action of rendering to a given target, either a render texture or the final output. You can update the same render texture multiple times by adding more than one target pass to your compositor script - this is very useful for 'ping pong' renders between a couple of render textures to perform complex convolutions that cannot be done in a single render, such as blurring.@*@*
 
 There are two types of target pass, the sort that updates a render texture:@*@*
-Format: target <Name> { }@*@*
+Format: target <Name> @{ @}@*@*
 ... and the sort that defines the final output render:@*@*
-Format: target_output { }@*@*
+Format: target_output @{ @}@*@*
 
 The contents of both are identical, the only real difference is that you can only have a single target_output entry, whilst you can have many target entries. Here are the attributes you can use in a 'target' or 'target_output' section of a .compositor script:
 
@@ -245,7 +245,7 @@ Default: None@*@*
 @subsection Compositor Passes
 
 A pass is a single rendering action to be performed in a target pass. @*@*
-Format: 'pass' (render_quad | clear | stencil | render_scene | render_custom) [custom name] { }@*@*
+Format: 'pass' (render_quad | clear | stencil | render_scene | render_custom) [custom name] @{ @}@*@*
 
 There are four types of pass:
 @table @asis
@@ -331,7 +331,7 @@ Default: None@*@*
 @anchor{compositor_clear}
 @heading Clear Section
 For passes of type 'clear', this section defines the buffer clearing parameters. @*@*
-Format: clear { }@*@*
+Format: clear @{ @}@*@*
 
 Here are the attributes you can use in a 'clear' section of a .compositor script:
 @itemize @bullet
@@ -374,7 +374,7 @@ Default: stencil_value 0.0@*@*
 @heading Stencil Section
 For passes of type 'stencil', this section defines the stencil operation parameters. @*@*
 
-Format: stencil { }@*@*
+Format: stencil @{ @}@*@*
 
 Here are the attributes you can use in a 'stencil' section of a .compositor script:
 
@@ -393,6 +393,7 @@ Here are the attributes you can use in a 'stencil' section of a .compositor scri
 @ref{compositor_stencil_depth_fail_op,depth_fail_op}
 @item
 @ref{compositor_stencil_pass_op,pass_op}
+
 @item
 @ref{compositor_stencil_two_sided,two_sided}
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -131,7 +131,7 @@ namespace Ogre
 			virtual ~Listener() {}
 
 			/** Get an interpolated keyframe for this track at the given time.
-			@returns true if the KeyFrame was populated, false if not.
+			@return true if the KeyFrame was populated, false if not.
 			*/
 			virtual bool getInterpolatedKeyFrame(const AnimationTrack* t, const TimeIndex& timeIndex, KeyFrame* kf) = 0;
 		};
@@ -167,7 +167,7 @@ namespace Ogre
             keyframe just after this time index. 
         @param firstKeyIndex Pointer to an unsigned short which, if supplied, will receive the 
             index of the 'from' keyframe in case the caller needs it.
-        @returns Parametric value indicating how far along the gap between the 2 keyframes the timeIndex
+        @return Parametric value indicating how far along the gap between the 2 keyframes the timeIndex
             value is, e.g. 0.0 for exactly at 1, 0.25 for a quarter etc. By definition the range of this 
             value is:  0.0 <= returnValue < 1.0 .
         */

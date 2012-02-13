@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -157,7 +157,7 @@ namespace Ogre {
         */
         bool isSupported(void) const;
         /** Internal compilation method; see Material::compile. 
-		@returns Any information explaining problems with the compile.
+		@return Any information explaining problems with the compile.
 		*/
         String _compile(bool autoManageTextureUnits);
 		/// Internal method for checking GPU vendor / device rules

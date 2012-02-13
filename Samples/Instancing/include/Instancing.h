@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2011 Torus Knot Software Ltd
+ Copyright (c) 2000-2012 Torus Knot Software Ltd
  Also see acknowledgements in Readme.html
  
  You may use this sample code for anything you like, it is not covered by the
@@ -396,7 +396,9 @@ protected:
 
 		mCamera->setPosition(500,500, 1500);
 		mCamera->lookAt(0,0,0);
-		setDragLook(true);
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        setDragLook(true);
+#endif
 
 		   Plane plane;
         plane.normal = Vector3::UNIT_Y;
@@ -457,6 +459,7 @@ protected:
 
 	void cleanupContent()
 	{
+        MeshManager::getSingleton().remove("Myplane");
 		destroyCurrentGeomOpt();
 		delete mTimer;
 	}

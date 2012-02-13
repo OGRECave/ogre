@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,14 +39,14 @@ namespace Ogre {
 	{
 	public:
 		/** Takes the OGRE pixel format and returns the appropriate GL one
-			@returns a GLenum describing the format, or 0 if there is no exactly matching 
+			@return a GLenum describing the format, or 0 if there is no exactly matching 
 			one (and conversion is needed)
 		*/
 		static GLenum getGLOriginFormat(PixelFormat mFormat);
 	
 		/** Takes the OGRE pixel format and returns type that must be provided
 			to GL as data type for reading it into the GPU
-			@returns a GLenum describing the data type, or 0 if there is no exactly matching 
+			@return a GLenum describing the data type, or 0 if there is no exactly matching 
 			one (and conversion is needed)
 		*/
 		static GLenum getGLOriginDataType(PixelFormat mFormat);

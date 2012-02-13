@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build and package the SDK for iOS
-# Assumes that you are in the SDK/iPhone directory
+# Assumes that you are in the SDK/iOS directory
 
 LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
 SDKBUILDDIR=`pwd`

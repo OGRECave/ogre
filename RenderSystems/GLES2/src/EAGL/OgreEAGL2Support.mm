@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -276,7 +276,7 @@ namespace Ogre {
 
     EAGLES2Context * EAGL2Support::createNewContext(CFDictionaryRef &glconfig, CAEAGLLayer *drawable, EAGLSharegroup *group) const
     {
-        EAGLES2Context *context = OGRE_NEW EAGLES2Context(drawable, group);
+        EAGLES2Context *context = new EAGLES2Context(drawable, group);
         if (context == NULL)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

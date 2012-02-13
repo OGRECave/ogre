@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -141,7 +141,6 @@ namespace Ogre {
         mMainContext = 0;
         mGLInitialised = false;
         mCurrentLights = 0;
-        mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mPolygonMode = GL_FILL;
@@ -215,7 +214,7 @@ namespace Ogre {
 		if (strstr(vendorName, "Imagination Technologies"))
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
-			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
+			rsc->setVendor(GPU_APPLE);  // iOS Simulator
 		else if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
 		else if (strstr(vendorName, "Nokia"))
@@ -364,7 +363,7 @@ namespace Ogre {
 			{
 				// Create FBO manager
 				LogManager::getSingleton().logMessage("GL ES: Using GL_OES_framebuffer_object for rendering to textures (best)");
-				mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESFBOManager();
+				mRTTManager = new GLESFBOManager();
 				caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 			}
 		}
@@ -376,7 +375,7 @@ namespace Ogre {
 				if(caps->hasCapability(RSC_HWRENDER_TO_TEXTURE))
 				{
 					// Use PBuffers
-					mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLESPBRTTManager(mGLSupport, primary);
+					mRTTManager = new GLESPBRTTManager(mGLSupport, primary);
 					LogManager::getSingleton().logMessage("GL ES: Using PBuffers for rendering to textures");
 				}
 			}
@@ -413,7 +412,7 @@ namespace Ogre {
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        OGRE_DELETE mRTTManager;
+        delete mRTTManager;
         mRTTManager = 0;
 
         mGLSupport->stop();
@@ -952,9 +951,6 @@ namespace Ogre {
             {
                 // Note used
                 tex->touch();
-
-                // Store the number of mipmaps
-                mTextureMipmapCount = tex->getNumMipmaps();
             }
 
             glEnable(GL_TEXTURE_2D);
@@ -1358,7 +1354,7 @@ namespace Ogre {
     {
         if (mCurrentCapabilities->hasCapability(RSC_MIPMAP_LOD_BIAS))
         {
-#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iPhone OS, block it out to fix Linux build
+#if GL_EXT_texture_lod_bias	// This extension only seems to be supported on iOS OS, block it out to fix Linux build
             if (activateGLTextureUnit(unit))
             {
                 glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, bias);
@@ -2066,14 +2062,7 @@ namespace Ogre {
         switch (ftype)
         {
             case FT_MIN:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMinFilter = FO_NONE;
-                }
-                else
-                {
-                    mMinFilter = fo;
-                }
+                mMinFilter = fo;
 
                 // Combine with existing mip filter
                 glTexParameteri(GL_TEXTURE_2D,
@@ -2102,14 +2091,7 @@ namespace Ogre {
                 }
                 break;
             case FT_MIP:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMipFilter = FO_NONE;
-                }
-                else
-                {
-                    mMipFilter = fo;
-                }
+                mMipFilter = fo;
 
                 // Combine with existing min filter
                 glTexParameteri(GL_TEXTURE_2D,
@@ -2198,7 +2180,6 @@ namespace Ogre {
                 pBufferData = static_cast<char*>(pBufferData) + op.vertexData->vertexStart * vertexBuffer->getVertexSize();
             }
 
-            unsigned int i = 0;
             VertexElementSemantic sem = elem->getSemantic();
 
             {
@@ -2236,7 +2217,7 @@ namespace Ogre {
                     case VES_TEXTURE_COORDINATES:
                         {
                             // fixed function matching to units based on tex_coord_set
-                            for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                            for (unsigned int i = 0; i < mDisabledTexUnitsFrom; i++)
                             {
                                 // Only set this texture unit's texcoord pointer if it
                                 // is supposed to be using this element's index

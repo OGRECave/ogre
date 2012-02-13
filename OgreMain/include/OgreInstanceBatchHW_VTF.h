@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ namespace Ogre
 
 	/** Instancing implementation using vertex texture through Vertex Texture Fetch (VTF) and
 		hardware instancing.
-		@See BaseInstanceBatchVTF and @See InstanceBatchHW
+		@see BaseInstanceBatchVTF and @see InstanceBatchHW
 
 		The advantage over TextureVTF technique, is that this implements a basic culling algorithm
 		to avoid useless processing in vertex shader and uses a lot less VRAM and memory bandwidth
@@ -93,7 +93,7 @@ namespace Ogre
 							size_t instancesPerBatch, const Mesh::IndexMap *indexToBoneMap,
 							const String &batchName );
 		virtual ~InstanceBatchHW_VTF();
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
 		/** @copydoc InstanceBatchHW::_boundsDirty */

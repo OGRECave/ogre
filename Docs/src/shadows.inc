@@ -59,7 +59,7 @@ There are a number of issues to consider which are specific to stencil shadows:
 
 @anchor{CPU Overhead}
 @subheading CPU Overhead
-Calculating the shadow volume for a mesh can be expensive, and it has to be done on the CPU, it is not a hardware accelerated feature. Therefore, you can find that if you overuse this feature, you can create a CPU bottleneck for your application. Ogre quite aggressively eliminates objects which cannot be casting shadows on the frustum, but there are limits to how much it can do, and large, elongated shadows (e.g. representing a very low sun position) are very difficult to cull efficiently. Try to avoid having too many shadow casters around at once, and avoid long shadows if you can. Also, make use of the 'shadow far distance' parameter on the SceneManager, this can eliminate distant shadow casters from the shadow volume construction and save you some time, at the expense of only having shadows for closer objects. Lastly, make use of Ogre's Level-Of-Detail (LOD) features; you can generate automatically calculated LODs for your meshes in code (see the Mesh API docs) or when using the mesh tools such as OgreXmlConverter and OgreMeshUpgrader. Alternatively, you can assign your own manual LODs by providing alternative mesh files at lower detail levels. Both methods will cause the shadow volume complexity to decrease as the object gets further away, which saves you valuable volume calculation time. 
+Calculating the shadow volume for a mesh can be expensive, and it has to be done on the CPU, it is not a hardware accelerated feature. Therefore, you can find that if you overuse this feature, you can create a CPU bottleneck for your application. Ogre quite aggressively eliminates objects which cannot be casting shadows on the frustum, but there are limits to how much it can do, and large, elongated shadows (e.g. representing a very low sun position) are very difficult to cull efficiently. Try to avoid having too many shadow casters around at once, and avoid long shadows if you can. Also, make use of the 'shadow far distance' parameter on the SceneManager, this can eliminate distant shadow casters from the shadow volume construction and save you some time, at the expense of only having shadows for closer objects. Lastly, make use of Ogre's Level-Of-Detail (LOD) features; you can generate automatically calculated LODs for your meshes in code (see the Mesh API docs) or when using the mesh tools such as OgreXMLConverter and OgreMeshUpgrader. Alternatively, you can assign your own manual LODs by providing alternative mesh files at lower detail levels. Both methods will cause the shadow volume complexity to decrease as the object gets further away, which saves you valuable volume calculation time. 
 
 @anchor{Extrusion distance}
 @subheading Extrusion distance
@@ -100,8 +100,8 @@ As previously mentioned, Ogre performs the extrusion of shadow volumes in hardwa
 Ogre uses a scissor rectangle to limit the effect of point / spot lights when their range does not cover the entire viewport; that means we save fillrate when rendering stencil volumes, especially with distant lights
 @item Z-Pass and Z-Fail algorithms
 The Z-Fail algorithm, often attributed to John Carmack, is used in Ogre to make sure shadows are robust when the camera passes through the shadow volume. However, the Z-Fail algorithm is more expensive than the traditional Z-Pass; so Ogre detects when Z-Fail is required and only uses it then, Z-Pass is used at all other times.
-@item 2-Sided stencilling and stencil wrapping
-Ogre supports the 2-Sided stencilling / stencil wrapping extensions, which when supported allow volumes to be rendered in a single pass instead of having to do one pass for back facing tris and another for front-facing tris. This doesn't save fillrate, since the same number of stencil updates are done, but it does save primitive setup and the overhead incurred in the driver every time a render call is made.
+@item 2-Sided stenciling and stencil wrapping
+Ogre supports the 2-Sided stenciling / stencil wrapping extensions, which when supported allow volumes to be rendered in a single pass instead of having to do one pass for back facing tris and another for front-facing tris. This doesn't save fillrate, since the same number of stencil updates are done, but it does save primitive setup and the overhead incurred in the driver every time a render call is made.
 @item Aggressive shadow volume culling
 Ogre is pretty good at detecting which lights could be affecting the frustum, and from that, which objects could be casting a shadow on the frustum. This means we don't waste time constructing shadow geometry we don't need. Setting the shadow far distance is another important way you can reduce stencil shadow overhead since it culls far away shadow volumes even if they are visible, which is beneficial in practice since you're most interested in shadows for close-up objects.
 @end table
@@ -142,7 +142,7 @@ If you're not using depth shadow mapping, OGRE divides shadow casters and receiv
 @heading Configuring Texture Shadows 
 There are a number of settings which will help you configure your texture-based shadows so that they match your requirements.
 
-@itemize bullet
+@itemize @bullet
 @item @ref{Maximum number of shadow textures}
 @item @ref{Shadow texture size}
 @item @ref{Shadow far distance}
@@ -193,9 +193,9 @@ As previously mentioned, one of the downsides of texture shadows is that the tex
 
 @anchor{Shadow texture Depth Buffer sharing}
 @subheading Shadow texture Depth Buffer sharing
-Shadow textures need a depth buffer like many other RTs (Render Textures). Prior to Ogre 1.8, the depth buffer behavior was left undefined leaving a very small posibility of causing inconsistencies across different window resolutions and render systems. Depending on the render window's resolutions and/or rendersystem being used, the depth buffer might been shared with the render window or a new one could get created to suite the shadow textures. If the application was depending on the depth buffer contents from the previous scene render (that is, no clear was performed) where a shadow texture render pass was in the middle; then the depth buffer would've contained garbage (but not consistent on all machines) causing graphical glitches hard to spot.
+Shadow textures need a depth buffer like many other RTs (Render Textures). Prior to Ogre 1.8, the depth buffer behavior was left undefined leaving a very small possibility of causing inconsistencies across different window resolutions and render systems. Depending on the render window's resolutions and/or rendersystem being used, the depth buffer might been shared with the render window or a new one could get created to suite the shadow textures. If the application was depending on the depth buffer contents from the previous scene render (that is, no clear was performed) where a shadow texture render pass was in the middle; then the depth buffer would've contained garbage (but not consistent on all machines) causing graphical glitches hard to spot.
 
-From Ogre 1.8 onwards the depth buffer usage & sharing can be flexible controlled through the use of depth pool IDs. These pool IDs are not specifically part of shadow textures, but rather anything involving RTs. All RTs with the same pool ID share the same depth buffers when possible (following RenderSystem API rules, check RenderSystemCapabilities flags to find out what the behavior will be). The default ID for shadow textures is 1; which is the same default value for render windows, and RTTs; thus mantaining the same behavior with older applications while achieving maximum memory saving and performance efficiency because the number of created depth buffers is as lowest as possible.
+From Ogre 1.8 onwards the depth buffer usage & sharing can be flexible controlled through the use of depth pool IDs. These pool IDs are not specifically part of shadow textures, but rather anything involving RTs. All RTs with the same pool ID share the same depth buffers when possible (following RenderSystem API rules, check RenderSystemCapabilities flags to find out what the behavior will be). The default ID for shadow textures is 1; which is the same default value for render windows, and RTTs; thus maintaining the same behavior with older applications while achieving maximum memory saving and performance efficiency because the number of created depth buffers is as lowest as possible.
 
 However there are some reasons to put shadow textures in a separate pool. This holds specially true if the application depends on the previous contents from the depth buffer before the shadow pass, instead of doing a clear:
 @itemize @bullet 
@@ -218,7 +218,7 @@ Texture shadows have one major advantage over stencil shadows - the data used to
 
 Here is where 'integrated' texture shadows step in. Both of the texture shadow types above have alternative versions called SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED and SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED, where instead of rendering the shadows for you, it just creates the texture shadow and then expects you to use that shadow texture as you see fit when rendering receiver objects in the scene. The downside is that you have to take into account shadow receipt in every one of your materials if you use this option - the upside is that you have total control over how the shadow textures are used. The big advantage here is that you can can perform more complex shading, taking into account shadowing, than is possible using the generalised bolt-on approaches, AND you can probably write them in a smaller number of passes, since you know precisely what you need and can combine passes where possible. When you use one of these shadowing approaches, the only difference between additive and modulative is the colour of the casters in the shadow texture (the shadow colour for modulative, black for additive) - the actual calculation of how the texture affects the receivers is of course up to you. No separate modulative pass will be performed, and no splitting of your materials into ambient / per-light / decal etc will occur - absolutely everything is determined by your original material (which may have modulative passes or per-light iteration if you want of course, but it's not required).@*@*
 
-You reference a shadow texture in a material which implements this approach by using the '@ref{content_type} shadow' directive in your @{texture_unit}. It implicitly references a shadow texture based on the number of times you've used this directive in the same pass, and the light_start option or light-based pass iteration, which might start the light index higher than 0.
+You reference a shadow texture in a material which implements this approach by using the '@ref{content_type} shadow' directive in your @ref{Texture Units,texture_unit}. It implicitly references a shadow texture based on the number of times you've used this directive in the same pass, and the light_start option or light-based pass iteration, which might start the light index higher than 0.
 
 @node Modulative Shadows
 @section Modulative Shadows
@@ -249,58 +249,58 @@ Passes categorised as 'decal' add the final texture colour to the scene, which i
 In practice, @ref{Passes} rarely fall nicely into just one of these categories. For each Technique, Ogre compiles a list of 'Illumination Passes', which are derived from the user defined passes, but can be split, to ensure that the divisions between illumination pass categories can be maintained. For example, if we take a very simple material definition:
 @example
 material TestIllumination
-{
+@{
 	technique
-	{
+	@{
 		pass
-		{
+		@{
 			ambient 0.5 0.2 0.2 
 			diffuse 1 0 0  
 			specular 1 0.8 0.8 15
 			texture_unit
-			{
+			@{
 				texture grass.png
-			}
-		}
-	}
-}
+			@}
+		@}
+	@}
+@}
 @end example
 
 Ogre will split this into 3 illumination passes, which will be the equivalent of this:
 @example
 material TestIlluminationSplitIllumination
-{
+@{
 	technique
-	{
+	@{
 		// Ambient pass
 		pass
-		{
+		@{
 			ambient 0.5 0.2 0.2 
 			diffuse 0 0 0
 			specular 0 0 0
-		}
+		@}
 
 		// Diffuse / specular pass
 		pass
-		{
+		@{
 			scene_blend add
 			iteration once_per_light
 			diffuse 1 0 0  
 			specular 1 0.8 0.8 15
-		}
+		@}
 
 		// Decal pass
 		pass
-		{
+		@{
 			scene_blend modulate
 			lighting off
 			texture_unit
-			{
+			@{
 				texture grass.png
-			}
-		}
-	}
-}
+			@}
+		@}
+	@}
+@}
 @end example
 So as you can see, even a simple material requires a minimum of 3 passes when using this shadow technique, and in fact it requires (num_lights + 2) passes in the general sense. You can use more passes in your original material and Ogre will cope with that too, but be aware that each pass may turn into multiple ones if it uses more than one type of light contribution (ambient vs diffuse/specular) and / or has texture units. The main nice thing is that you get the full multipass lighting behaviour even if you don't define your materials in terms of it, meaning that your material definitions can remain the same no matter what lighting approach you decide to use.@*@*
 
@@ -320,13 +320,12 @@ So clearly, when you use additive light masking as a shadow technique, you need 
 @example
 // Per-pixel normal mapping Any number of lights, diffuse and specular
 material Examples/BumpMapping/MultiLightSpecular
-{
-
+@{
 	technique
-	{
+	@{
 		// Base ambient pass
 		pass
-		{
+		@{
 			// ambient only, not needed for rendering, but as information
 			// to lighting pass categorisation routine
 			ambient 1 1 1
@@ -334,86 +333,80 @@ material Examples/BumpMapping/MultiLightSpecular
 			specular 0 0 0 0
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-			{
+			@{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named_auto ambient ambient_light_colour
-			}
-			
-		}
+			@}
+		@}
 		// Now do the lighting pass
 		// NB we don't do decal texture here because this is repeated per light
 		pass
-		{
+		@{
 			// set ambient off, not needed for rendering, but as information
 			// to lighting pass categorisation routine
 			ambient 0 0 0 
 			// do this for each light
 			iteration once_per_light
-
-		
 			scene_blend add
 
 			// Vertex program reference
 			vertex_program_ref Examples/BumpMapVPSpecular
-			{
+			@{
 				param_named_auto lightPosition light_position_object_space 0
 				param_named_auto eyePosition camera_position_object_space
 				param_named_auto worldViewProj worldviewproj_matrix
-			}
+			@}
 
 			// Fragment program
 			fragment_program_ref Examples/BumpMapFPSpecular
-			{
+			@{
 				param_named_auto lightDiffuse light_diffuse_colour 0 
 				param_named_auto lightSpecular light_specular_colour 0
-			}
+			@}
 			
 			// Base bump map
 			texture_unit
-			{
+			@{
 				texture NMBumpsOut.png
 				colour_op replace
-			}
+			@}
 			// Normalisation cube map
 			texture_unit
-			{
+			@{
 				cubic_texture nm.png combinedUVW
 				tex_coord_set 1
 				tex_address_mode clamp
-			}
+			@}
 			// Normalisation cube map #2
 			texture_unit
-			{
+			@{
 				cubic_texture nm.png combinedUVW
 				tex_coord_set 1
 				tex_address_mode clamp
-			}
-		}
+			@}
+		@}
 		
 		// Decal pass
 		pass
-		{
+		@{
 			lighting off
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTexture
-			{
+			@{
 				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
-			}
+			@}
 			scene_blend dest_colour zero
 			texture_unit
-			{
+			@{
 				texture RustedMetal.jpg 
-			}
-			
-		}
-	}
-}
+			@}
+		@}
+	@}
+@}
 @end example
 
 Note that if you're using texture shadows you have the additional option of using @ref{Integrated Texture Shadows} rather than being forced to use this explicit sequence - allowing you to compress the number of passes into a much smaller number at the expense of defining an upper number of shadow casting lights. In this case the 'additive' aspect of the shadow technique just affects the colour of the shadow texture and it's up to you to combine the shadow textures in your receivers however you like. @*@*
 
 @subheading Static Lighting
 Despite their power, additive lighting techniques have an additional limitation; they do not combine well with pre-calculated static lighting in the scene. This is because they are based on the principle that shadow is an absence of light, but since static lighting in the scene already includes areas of light and shadow, additive lighting cannot remove light to create new shadows. Therefore, if you use the additive lighting technique you must either use it exclusively as your lighting solution (and you can combine it with per-pixel lighting to create a very impressive dynamic lighting solution), or you must use @ref{Integrated Texture Shadows} to combine the static lighting according to your chosen approach. 
-
-

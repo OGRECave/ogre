@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -50,8 +50,8 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 public:
     Sample_ParticleGS() 
 	{
-		mInfo["Title"] = "Particle Effects (GPU)";
-		mInfo["Description"] = "A demo of GPU-accelerated particle systems using geometry shaders and 'render to vertex buffer's.";
+		mInfo["Title"] = "Geometry Shader Particle System";
+		mInfo["Description"] = "A demo of particle systems using geometry shaders and render to vertex buffers.";
 		mInfo["Thumbnail"] = "thumb_particlegs.png";
 		mInfo["Category"] = "Effects";
     }
@@ -116,13 +116,13 @@ protected:
         if (!caps->hasCapability(RSC_GEOMETRY_PROGRAM))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support geometry programs, "
-				"so cannot run this demo. Sorry!", 
+				"so you cannot run this sample. Sorry!", 
                 "Sample_ParticleGS::createScene");
         }
 		if (!caps->hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your render system / hardware does not support render to vertex buffers, "
-				"so cannot run this demo. Sorry!", 
+				"so you cannot run this sample. Sorry!", 
                 "Sample_ParticleGS::createScene");
         }
 
@@ -157,6 +157,11 @@ protected:
 		pPlaneEnt->setMaterialName("Examples/Rockwall");
 		pPlaneEnt->setCastShadows(false);
 		mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0,95,0))->attachObject(pPlaneEnt);
+    }
+
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("Myplane");
     }
 
 	bool frameStarted(const FrameEvent& evt) 

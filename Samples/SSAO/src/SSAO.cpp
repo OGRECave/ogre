@@ -1,16 +1,3 @@
-/*
- -----------------------------------------------------------------------------
- This source file is part of OGRE
- (Object-oriented Graphics Rendering Engine)
- For the latest info, see http://www.ogre3d.org/
- 
- Copyright (c) 2000-2011 Torus Knot Software Ltd
- Also see acknowledgements in Readme.html
- 
- You may use this sample code for anything you like, it is not covered by the
- same license as the rest of the engine.
- -----------------------------------------------------------------------------
-*/
 #include "SamplePlugin.h"
 #include "SSAO.h"
 
@@ -19,7 +6,7 @@ Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
-	s = new Sample_SSAO();
+	s = new Sample_SSAO;
 	sp = OGRE_NEW SamplePlugin(s->getInfo()["Title"] + " Sample");
 	sp->addSample(s);
 	Root::getSingleton().installPlugin(sp);

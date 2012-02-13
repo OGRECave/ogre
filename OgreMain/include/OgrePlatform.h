@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -255,10 +255,6 @@ namespace Ogre {
 // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 
-// Unlike the Win32 compilers, Linux compilers seem to use DEBUG for when
-// specifying a debug build.
-// (??? this is wrong, on Linux debug builds aren't marked in any way unless
-// you mark it yourself any way you like it -- zap ???)
 #   ifdef DEBUG
 #       define OGRE_DEBUG_MODE 1
 #   else

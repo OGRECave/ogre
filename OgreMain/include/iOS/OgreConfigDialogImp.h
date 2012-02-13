@@ -1,5 +1,5 @@
-#ifndef __iPhoneConfigDialog_H__
-#define __iPhoneConfigDialog_H__
+#ifndef __iOSConfigDialog_H__
+#define __iOSConfigDialog_H__
 
 #include "OgrePrerequisites.h"
 #include "OgreRoot.h"
@@ -26,4 +26,4 @@ namespace Ogre
 	};
 }
 
-#endif // __IPHONE_CONFIG_DIALOG_H__
+#endif // __iOS_CONFIG_DIALOG_H__

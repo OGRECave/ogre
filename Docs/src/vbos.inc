@@ -87,7 +87,7 @@ If you need to update a buffer regularly, you will have to compromise. Use HBU_D
 @item
 If you really need to read data from the buffer, create it with a shadow buffer. Make sure you use HBL_READ_ONLY when locking for reading because it will avoid the upload normally associated with unlocking the buffer. You can also combine this with either of the 2 previous points, obviously try for static if you can - remember that the _WRITE_ONLY' part refers to the hardware buffer so can be safely used with a shadow buffer you read from. 
 @item
-Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updateable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it's own buffer and make the rest HBU_STATIC_WRITE_ONLY.
+Split your vertex buffers up if you find that your usage patterns for different elements of the vertex are different. No point having one huge updatable buffer with all the vertex data in it, if all you need to update is the texture coordinates. Split that part out into it's own buffer and make the rest HBU_STATIC_WRITE_ONLY.
 @end enumerate
 
 
@@ -114,7 +114,7 @@ A pointer to a VertexBufferBinding object which defines which vertex buffers are
 
 @node Vertex Declarations
 @subsection Vertex Declarations
-Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeling, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It's your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should.@*@*
+Vertex declarations define the vertex inputs used to render the geometry you want to appear on the screen. Basically this means that for each vertex, you want to feed a certain set of data into the graphics pipeline, which (you hope) will affect how it all looks when the triangles are drawn. Vertex declarations let you pull items of data (which we call vertex elements, represented by the VertexElement class) from any number of buffers, both shared and dedicated to that particular element. It's your job to ensure that the contents of the buffers make sense when interpreted in the way that your VertexDeclaration indicates that they should.@*@*
 To add an element to a VertexDeclaration, you call it's addElement method. The parameters to this method are:
 @table @asis
 @item source
@@ -122,7 +122,7 @@ This tells the declaration which buffer the element is to be pulled from. Note t
 @item offset
 Tells the declaration how far in bytes the element is offset from the start of each whole vertex in this buffer. This will be 0 if this is the only element being sourced from this buffer, but if other elements are there then it may be higher. A good way of thinking of this is the size of all vertex elements which precede this element in the buffer.
 @item type
-This defines the data type of the vertex input, including it's size. This is an important element because as GPUs become more advanced, we can no longer assume that position input will always require 3 floating point numbers, because programmable vertex pipelines allow full control over the inputs and outuputs. This part of the element definition covers the basic type and size, e.g. VET_FLOAT3 is 3 floating point numbers - the meaning of the data is dealt with in the next paramter.
+This defines the data type of the vertex input, including it's size. This is an important element because as GPUs become more advanced, we can no longer assume that position input will always require 3 floating point numbers, because programmable vertex pipelines allow full control over the inputs and outputs. This part of the element definition covers the basic type and size, e.g. VET_FLOAT3 is 3 floating point numbers - the meaning of the data is dealt with in the next parameter.
 @item semantic
 This defines the meaning of the element - the GPU will use this to determine what to use this input for, and programmable vertex pipelines will use this to identify which semantic to map the input to. This can identify the element as positional data, normal data, texture coordinate data, etc. See the API reference for full details of all the options.
 @item index
@@ -201,26 +201,26 @@ Firstly, you lock the buffer but assign the result to a unsigned char* rather th
 unsigned char* pVert = static_cast<unsigned char*>(vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 Real* pReal;
 for (size_t v = 0; v < vertexCount; ++v)
-{
+@{
 	// Get elements
 	VertexDeclaration::VertexElementList elems = decl->findElementsBySource(bufferIdx);
 	VertexDeclaration::VertexElementList::iterator i, iend;
 	for (i = elems.begin(); i != elems.end(); ++i)
-	{
+	@{
 		VertexElement& elem = *i;
 		if (elem.getSemantic() == VES_POSITION)
-		{
+		@{
 			elem.baseVertexPointerToElement(pVert, &pReal);
 			// write position using pReal
 
-		}
+		@}
 		
 		...
 		
 		
-	}
+	@}
 	pVert += vbuf->getVertexSize();
-}
+@}
 vbuf->unlock();
 @end example
 
@@ -228,7 +228,7 @@ See the API docs for full details of all the helper methods on VertexDeclaration
 
 @node Hardware Index Buffers
 @section Hardware Index Buffers
-Index buffers are used to render geometry by building triangles out of vertices indirectly by reference to their position in the buffer, rather than just building triangles by sequentially reading vertices. Index buffers are simpler than vertex buffers, since they are just a list of indexes at the end of the day, howeverthey can be held on the hardware and shared between multiple pieces of geometry in the same way vertex buffers can, so the rules on creation and locking are the same. @xref{Hardware Buffers} for information.
+Index buffers are used to render geometry by building triangles out of vertices indirectly by reference to their position in the buffer, rather than just building triangles by sequentially reading vertices. Index buffers are simpler than vertex buffers, since they are just a list of indexes at the end of the day, however they can be held on the hardware and shared between multiple pieces of geometry in the same way vertex buffers can, so the rules on creation and locking are the same. @xref{Hardware Buffers} for information.
 
 @node The IndexData class
 @subsection The IndexData class
@@ -319,7 +319,7 @@ In addition to the hardware buffer usages as described in @xref{Buffer Usage} th
 Mipmaps for this texture will be automatically generated by the graphics hardware. The exact algorithm used is not
 defined, but you can assume it to be a 2x2 box filter.
 @item TU_RENDERTARGET
-This texture will be a render target, ie. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU_AUTOMIPMAP.
+This texture will be a render target, i.e. used as a target for render to texture. Setting this flag will ignore all other texture usages except TU_AUTOMIPMAP.
 @item TU_DEFAULT
 This is actually a combination of usage flags, and is equivalent to TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY. The resource
 system uses these flags for textures that are loaded from images.
@@ -343,7 +343,7 @@ HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
 @node Updating Pixel Buffers
 @subsection Updating Pixel Buffers
 
-Pixel Buffers can be updated in two different ways; a simple, convient way and a more difficult (but in some cases faster) method. Both methods make use of PixelBox objects (@xref{Pixel boxes}) to represent image data in memory.
+Pixel Buffers can be updated in two different ways; a simple, convenient way and a more difficult (but in some cases faster) method. Both methods make use of PixelBox objects (@xref{Pixel boxes}) to represent image data in memory.
 
 @subheading blitFromMemory
 
@@ -382,13 +382,13 @@ size_t height = pb.getHeight();
 size_t width = pb.getWidth();
 size_t pitch = pb.rowPitch; // Skip between rows of image
 for(size_t y=0; y<height; ++y)
-{
+@{
     for(size_t x=0; x<width; ++x)
-{
+    @{
         // 0xRRGGBB -> fill the buffer with yellow pixels
         data[pitch*y + x] = 0x00FFFF00;
-}
-}
+    @}
+@}
 
 /// Unlock the buffer again (frees it for use by the GPU)
 buffer->unlock();
@@ -557,7 +557,7 @@ Get the number of elements between one past the rightmost pixel of one row and t
 @item getSliceSkip()
 Get the number of elements between one past the right bottom pixel of one slice and the left top pixel of the next slice. This is zero if slices are consecutive.
 @item isConsecutive()
-Return whether this buffer is laid out consecutive in memory (ie the pitches are equal to the dimensions)
+Return whether this buffer is laid out consecutive in memory (i.e. the pitches are equal to the dimensions)
 @item getConsecutiveSize()
 Return the size (in bytes) this image would take if it was laid out consecutive in memory
 @item getSubVolume(const Box &def)

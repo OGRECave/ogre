@@ -53,17 +53,10 @@ set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 
 if (APPLE)
   include(CMakeForceCompiler)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    CMAKE_FORCE_C_COMPILER(clang GNU)
-    CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  else ()
-    CMAKE_FORCE_C_COMPILER(llvm-gcc-4.2 GNU)
-    CMAKE_FORCE_CXX_COMPILER(llvm-g++-4.2 GNU)
-    SET(CMAKE_SIZEOF_VOID_P 4)
-	set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvmgcc42")
-  endif ()
+  CMAKE_FORCE_C_COMPILER(clang GNU)
+  CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
+  SET(CMAKE_SIZEOF_VOID_P 4)
+  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
 endif ()
 
 #####################################################################
@@ -171,7 +164,7 @@ include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
 if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
+    include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
 
     # Set static early for proper dependency detection
     set(OGRE_STATIC TRUE)
@@ -202,9 +195,9 @@ if (WIN32 OR APPLE)
   endif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif(WIN32 OR APPLE)
 
-# Set up iPhone overrides.
+# Set up iOS overrides.
 if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iPhone")
+  include_directories("${OGRE_SOURCE_DIR}/OgreMain/include/iOS")
 
   # Set build variables
   set(CMAKE_OSX_SYSROOT iphoneos)
@@ -232,7 +225,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
   endif()
 
-  # Make sure that the OpenGL render system is selected for non-iPhone Apple builds
+  # Make sure that the OpenGL render system is selected for non-iOS Apple builds
   set(OGRE_BUILD_RENDERSYSTEM_GL TRUE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 FALSE)
@@ -256,7 +249,7 @@ cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSys
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT SYMBIAN" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND" FALSE)
-cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iPhoneSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
+cmake_dependent_option(OGRE_BUILD_PLATFORM_APPLE_IOS "Build Ogre for iOS" FALSE "iOSSDK_FOUND;OPENGLES_FOUND;OPENGLES2_FOUND" FALSE)
 cmake_dependent_option(OGRE_BUILD_PLATFORM_NACL "Build Ogre for Google's Native Client (NaCl)" FALSE "OPENGLES2_FOUND" FALSE)
 option(OGRE_BUILD_PLUGIN_BSP "Build BSP SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)

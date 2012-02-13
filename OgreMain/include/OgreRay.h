@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ namespace Ogre {
 		}
 
 		/** Tests whether this ray intersects the given plane. 
-		@returns A pair structure where the first element indicates whether
+		@return A pair structure where the first element indicates whether
 			an intersection occurs, and if true, the second element will
 			indicate the distance along the ray at which it intersects. 
 			This can be converted to a point in space by calling getPoint().
@@ -84,7 +84,7 @@ namespace Ogre {
 			return Math::intersects(*this, p);
 		}
         /** Tests whether this ray intersects the given plane bounded volume. 
-        @returns A pair structure where the first element indicates whether
+        @return A pair structure where the first element indicates whether
         an intersection occurs, and if true, the second element will
         indicate the distance along the ray at which it intersects. 
         This can be converted to a point in space by calling getPoint().
@@ -94,7 +94,7 @@ namespace Ogre {
             return Math::intersects(*this, p.planes, p.outside == Plane::POSITIVE_SIDE);
         }
 		/** Tests whether this ray intersects the given sphere. 
-		@returns A pair structure where the first element indicates whether
+		@return A pair structure where the first element indicates whether
 			an intersection occurs, and if true, the second element will
 			indicate the distance along the ray at which it intersects. 
 			This can be converted to a point in space by calling getPoint().
@@ -104,7 +104,7 @@ namespace Ogre {
 			return Math::intersects(*this, s);
 		}
 		/** Tests whether this ray intersects the given box. 
-		@returns A pair structure where the first element indicates whether
+		@return A pair structure where the first element indicates whether
 			an intersection occurs, and if true, the second element will
 			indicate the distance along the ray at which it intersects. 
 			This can be converted to a point in space by calling getPoint().

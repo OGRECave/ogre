@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -110,12 +110,12 @@ namespace Ogre {
 				"32 bit hardware buffers are not allowed in OpenGL ES.",
 				"GLES2DefaultHardwareIndexBuffer");
 		}
-        mData = OGRE_NEW_FIX_FOR_WIN32 unsigned char[mSizeInBytes];
+        mData = new unsigned char[mSizeInBytes];
     }
 
     GLES2DefaultHardwareIndexBuffer::~GLES2DefaultHardwareIndexBuffer()
     {
-        OGRE_DELETE [] mData;
+        delete [] mData;
     }
 
     void* GLES2DefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)

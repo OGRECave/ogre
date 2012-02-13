@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -132,7 +132,7 @@ namespace Ogre {
                 If the object has any derived transforms, these are expected to be up to date as long as
                 all the SceneNode structures have been updated before this is called.
             @par
-                This method will populate xform with 1 matrix if it does not use vertex blending. If it
+                This method will populate transform with 1 matrix if it does not use vertex blending. If it
                 does use vertex blending it will fill the passed in pointer with an array of matrices,
                 the length being the value returned from getNumWorldTransforms.
             @note
@@ -391,17 +391,17 @@ namespace Ogre {
 				Any* pAny = 0) = 0;
 		};
 
-		/** Sets render system private data
+		/** Gets RenderSystem private data
 		@remarks
-		This should only be used by a render system
+		This should only be used by a RenderSystem
 		*/
 		virtual RenderSystemData * getRenderSystemData() const 
 		{ 
 			return mRenderSystemData; 
 		}
-		/** gets render system private data
+		/** Sets RenderSystem private data
 		@remarks
-		This should only be used by a render system
+		This should only be used by a RenderSystem
 		*/
 		virtual void setRenderSystemData(RenderSystemData * val) const
 		{ 
@@ -415,8 +415,8 @@ namespace Ogre {
 		bool mPolygonModeOverrideable;
         bool mUseIdentityProjection;
         bool mUseIdentityView;
-		UserObjectBindings mUserObjectBindings;		 // User objects binding.
-		mutable RenderSystemData * mRenderSystemData;// this should be used only by a render system for internal use
+		UserObjectBindings mUserObjectBindings;		 /// User objects binding.
+		mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
 	};
 
 	/** @} */

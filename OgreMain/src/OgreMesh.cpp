@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -642,7 +642,7 @@ namespace Ogre {
         for (size_t v = 0; v < vertexCount; ++v)
         {
             // Get number of entries for this vertex
-            unsigned short currBones = static_cast<unsigned short>(assignments.count(v));
+            short currBones = static_cast<unsigned short>(assignments.count(v));
 			if (currBones <= 0)
 				existsNonSkinnedVertices = true;
 

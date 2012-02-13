@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Ogre {
 	*  @{
 	*/
 
-    /** Represents the state of an animation and the weight of it's influence. 
+    /** Represents the state of an animation and the weight of its influence. 
     @remarks
         Other classes can hold instances of this class to store the state of any animations
         they are using.
@@ -53,17 +53,27 @@ namespace Ogre {
     {
     public:
 
-      /// typedef for an array of float values used as a bone blend mask
-      typedef vector<float>::type BoneBlendMask;
+        /// Typedef for an array of float values used as a bone blend mask
+        typedef vector<float>::type BoneBlendMask;
 
-        /// Normal constructor with all params supplied
+        /** Normal constructor with all params supplied
+            @param
+                animName The name of this state.
+            @param
+                parent The parent AnimationStateSet that this state will belong to.
+            @param
+                timePos The position, in seconds, where this state will begin.
+            @param
+                length The length, in seconds, of this animation state.
+            @param
+                weight Weight to apply the animation state with.
+            @param
+                enabled Whether the animation state is enabled.
+        */
         AnimationState(const String& animName, AnimationStateSet *parent, 
 			Real timePos, Real length, Real weight = 1.0, bool enabled = false);
-		/// constructor to copy from an existing state with new parent
+		/// Constructor to copy from an existing state with new parent
 		AnimationState(AnimationStateSet* parent, const AnimationState &rhs);
-		/** Destructor - is here because class has virtual functions and some compilers 
-			would whine if it won't exist.
-		*/
 		virtual ~AnimationState();
         
         /// Gets the name of the animation to which this state applies
@@ -81,6 +91,7 @@ namespace Ogre {
         /// Sets the weight (influence) of this animation
         void setWeight(Real weight);
         /** Modifies the time position, adjusting for animation length
+        @param offset The amount of time, in seconds, to extend the animation.
         @remarks
             This method loops at the edges if animation looping is enabled.
         */
@@ -96,7 +107,7 @@ namespace Ogre {
 
         /// Equality operator
         bool operator==(const AnimationState& rhs) const;
-        // Inequality operator
+        /// Inequality operator
         bool operator!=(const AnimationState& rhs) const;
 
         /** Sets whether or not an animation loops at the start and end of
@@ -115,7 +126,7 @@ namespace Ogre {
 		/// Get the parent animation state set
 		AnimationStateSet* getParent(void) const { return mParent; }
 
-      /** @brief create a new blend mask with the given number of entries
+      /** @brief Create a new blend mask with the given number of entries
        *
        * In addition to assigning a single weight value to a skeletal animation,
        * it may be desirable to assign animation weights per bone using a 'blend mask'.
@@ -126,9 +137,9 @@ namespace Ogre {
 	   *   The value all the blend mask entries will be initialised with (negative to skip initialisation)
        */
       void createBlendMask(size_t blendMaskSizeHint, float initialWeight = 1.0f);
-      /// destroy the currently set blend mask
+      /// Destroy the currently set blend mask
       void destroyBlendMask();
-      /** @brief set the blend mask data (might be dangerous)
+      /** @brief Set the blend mask data (might be dangerous)
        *
        * @par The size of the array should match the number of entries the
        *      blend mask was created with.
@@ -136,7 +147,7 @@ namespace Ogre {
        * @par Stick to the setBlendMaskEntry method if you don't know exactly what you're doing.
        */
       void _setBlendMaskData(const float* blendMaskData);
-      /** @brief set the blend mask
+      /** @brief Set the blend mask
        *
        * @par The size of the array should match the number of entries the
        *      blend mask was created with.
@@ -144,21 +155,21 @@ namespace Ogre {
        * @par Stick to the setBlendMaskEntry method if you don't know exactly what you're doing.
        */
       void _setBlendMask(const BoneBlendMask* blendMask);
-      /// get the current blend mask (const version, may be 0) 
+      /// Get the current blend mask (const version, may be 0) 
       const BoneBlendMask* getBlendMask() const {return mBlendMask;}
-      /// return whether there is currently a valid blend mask set
+      /// Return whether there is currently a valid blend mask set
       bool hasBlendMask() const {return mBlendMask != 0;}
-      /// set the weight for the bone identified by the given handle
+      /// Set the weight for the bone identified by the given handle
       void setBlendMaskEntry(size_t boneHandle, float weight);
-      /// get the weight for the bone identified by the given handle
+      /// Get the weight for the bone identified by the given handle
       inline float getBlendMaskEntry(size_t boneHandle) const
       {
-        assert(mBlendMask && mBlendMask->size() > boneHandle);
-        return (*mBlendMask)[boneHandle];
+          assert(mBlendMask && mBlendMask->size() > boneHandle);
+          return (*mBlendMask)[boneHandle];
       }
     protected:
-      /// the blend mask (containing per bone weights)
-      BoneBlendMask* mBlendMask;
+        /// The blend mask (containing per bone weights)
+        BoneBlendMask* mBlendMask;
 
         String mAnimationName;
 		AnimationStateSet* mParent;

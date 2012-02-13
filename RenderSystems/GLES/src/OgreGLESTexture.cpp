@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -157,7 +157,7 @@ namespace Ogre {
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
 
-            uint8* tmpdata = OGRE_NEW_FIX_FOR_WIN32 uint8[size];
+            uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -191,7 +191,7 @@ namespace Ogre {
                     depth = depth / 2;
                 }
             }
-            OGRE_DELETE [] tmpdata;
+            delete [] tmpdata;
         }
         else
         {
@@ -244,7 +244,7 @@ namespace Ogre {
             ext = mName.substr(pos+1);
         }
 
-        LoadedImages loadedImages = LoadedImages(OGRE_NEW_FIX_FOR_WIN32 std::vector<Image>());
+        LoadedImages loadedImages = LoadedImages(new std::vector<Image>());
 
         if (mTextureType == TEX_TYPE_2D)
         {

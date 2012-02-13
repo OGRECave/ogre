@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1389,13 +1389,13 @@ namespace Ogre {
 		/** Retrieves the logical index relating to a physical index in the float
 		buffer, for programs which support that (low-level programs and 
 		high-level programs which use logical parameter indexes).
-		@returns std::numeric_limits<size_t>::max() if not found
+		@return std::numeric_limits<size_t>::max() if not found
 		*/
 		size_t getFloatLogicalIndexForPhysicalIndex(size_t physicalIndex);
 		/** Retrieves the logical index relating to a physical index in the int
 		buffer, for programs which support that (low-level programs and 
 		high-level programs which use logical parameter indexes).
-		@returns std::numeric_limits<size_t>::max() if not found
+		@return std::numeric_limits<size_t>::max() if not found
 		*/
 		size_t getIntLogicalIndexForPhysicalIndex(size_t physicalIndex);
 

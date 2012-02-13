@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ namespace Ogre {
         /** Lock the buffer for (potentially) reading / writing.
 		    @param lockBox Region of the buffer to lock
 		    @param options Locking options
-		    @returns PixelBox containing the locked region, the pitches and
+		    @return PixelBox containing the locked region, the pitches and
 		    	the pixel format
 		*/
 		virtual const PixelBox& lock(const Image::Box& lockBox, LockOptions options);
@@ -103,7 +103,7 @@ namespace Ogre {
 
 		/** Get the current locked region. This is the same value as returned
 		    by lock(const Image::Box, LockOptions)
-		    @returns PixelBox containing the locked region
+		    @return PixelBox containing the locked region
 		*/        
         const PixelBox& getCurrentLock();
 		
@@ -176,7 +176,7 @@ namespace Ogre {
             was acquired from must have TU_RENDERTARGET set, otherwise it is possible to
             render to it and this method will throw an ERR_RENDERSYSTEM exception.
             @param slice    Which slice
-            @returns A pointer to the render target. This pointer has the lifespan of this
+            @return A pointer to the render target. This pointer has the lifespan of this
             PixelBuffer.
         */
         virtual RenderTexture *getRenderTarget(size_t slice=0);

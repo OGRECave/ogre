@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -235,10 +235,10 @@ namespace Ogre{
 	void ScriptLexer::setToken(const Ogre::String &lexeme, Ogre::uint32 line, const String &source, Ogre::ScriptTokenList *tokens)
 	{
 #if OGRE_WCHAR_T_STRINGS
-		const wchar_t newline = L'\n', openBracket = L'{', closeBracket = L'}', colon = L':', 
+		const wchar_t openBracket = L'{', closeBracket = L'}', colon = L':', 
 			quote = L'\"', var = L'$';
 #else
-		const char newline = '\n', openBracket = '{', closeBracket = '}', colon = ':', 
+		const char openBracket = '{', closeBracket = '}', colon = ':', 
 			quote = '\"', var = '$';
 #endif
 
@@ -249,7 +249,7 @@ namespace Ogre{
 		bool ignore = false;
 
 		// Check the user token map first
-		if(lexeme.size() == 1 && lexeme[0] == newline)
+		if(lexeme.size() == 1 && isNewline(lexeme[0]))
 		{
 			token->type = TID_NEWLINE;
 			if(!tokens->empty() && tokens->back()->type == TID_NEWLINE)
@@ -292,9 +292,9 @@ namespace Ogre{
 	bool ScriptLexer::isNewline(Ogre::String::value_type c) const
 	{
 #ifdef OGRE_WCHAR_T_STRINGS
-		return c == L'\n';
+		return c == L'\n' || c == L'\r';
 #else
-		return c == '\n';
+		return c == '\n' || c == '\r';
 #endif
 	}
 

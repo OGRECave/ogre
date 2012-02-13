@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,8 +68,7 @@ namespace Ogre {
         size_t width = 8;
         size_t height = 8;
 
-        // TODO convert to 5_6_5
-        uint32* data = OGRE_NEW_FIX_FOR_WIN32 uint32[width * height]; // 0xXXRRGGBB
+        uint16* data = new uint16[width * height];
 
         // Yellow/black stripes
         for(size_t y = 0; y < height; ++y)
@@ -89,7 +88,7 @@ namespace Ogre {
                      GL_UNSIGNED_SHORT_5_6_5, (void*)data);
         GL_CHECK_ERROR;
         // Free memory
-        OGRE_DELETE [] data;
+        delete [] data;
     }
 
     PixelFormat GLESTextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)

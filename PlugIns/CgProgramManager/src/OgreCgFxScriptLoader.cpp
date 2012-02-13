@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3781,8 +3781,8 @@ namespace Ogre {
 			break;
 		case CG_FLOAT3x2:
 			paramSize = 3*2;
+            break;
 		case CG_FLOAT3x3:
-			break;
 			paramSize = 3*3;
 			break;
 		case CG_FLOAT3x4:
@@ -3860,8 +3860,8 @@ namespace Ogre {
 			break;
 		case CG_INT3x2:
 			paramSize = 3*2;
+            break;
 		case CG_INT3x3:
-			break;
 			paramSize = 3*3;
 			break;
 		case CG_INT3x4:

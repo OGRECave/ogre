@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,8 +62,6 @@ namespace Ogre {
     void* GLHardwareIndexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
-        GLenum access = 0;
-
         if(mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
@@ -98,6 +96,7 @@ namespace Ogre {
 
 		if (!retPtr)
 		{
+            GLenum access = 0;
 			glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, mBufferId );
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)

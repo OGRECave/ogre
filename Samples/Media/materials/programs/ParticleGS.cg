@@ -174,7 +174,7 @@ void GSEmber2Handler( float3 Pos, float3 Vel, float Timer, float Type,
 
 struct FireworkData
 {
-	float3 	Pos 	: POSITION;
+	float4 	Pos 	: POSITION;
 	float 	Timer 	: TEXCOORD0;
     float 	Type 	: TEXCOORD1;
 	float3	Velocity : TEXCOORD2;
@@ -182,7 +182,7 @@ struct FireworkData
 
 //The vertex shader that prepares the fireworks for display
 FireworkData GenerateParticles_VS(
-    in float3 		inPos : POSITION,	
+    in float4 		inPos : POSITION,	
 	in float 		inTimer : TEXCOORD0,
 	in float 		inType : TEXCOORD1,
 	in float3 		inVelocity : TEXCOORD2

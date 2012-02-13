@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ namespace Ogre
 		void destroyLog(Log* log);
 
 		/** Sets the passed in log as the default log.
-        @returns The previous default log.
+        @return The previous default log.
         */
         Log* setDefaultLog(Log* newLog);
 

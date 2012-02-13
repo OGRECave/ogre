@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1080,7 +1080,15 @@ namespace Ogre {
                         {
 							if (mLoadingListener)
 								mLoadingListener->resourceStreamOpened(fii->filename, grp->name, 0, stream);
-                            su->parseScript(stream, grp->name);
+
+							if(fii->archive->getType() == "FileSystem" && stream->size() <= 1024 * 1024)
+							{
+								DataStreamPtr cachedCopy;
+								cachedCopy.bind(OGRE_NEW MemoryDataStream(stream->getName(), stream));
+								su->parseScript(cachedCopy, grp->name);
+							}
+							else
+                            	su->parseScript(stream, grp->name);
                         }
                     }
 					fireScriptEnded(fii->filename, skipScript);

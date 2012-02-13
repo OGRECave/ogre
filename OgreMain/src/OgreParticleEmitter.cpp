@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -257,13 +257,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     unsigned short ParticleEmitter::genConstantEmissionCount(Real timeElapsed)
     {
-        unsigned short intRequest;
-        
         if (mEnabled)
         {
             // Keep fractions, otherwise a high frame rate will result in zero emissions!
             mRemainder += mEmissionRate * timeElapsed;
-            intRequest = (unsigned short)mRemainder;
+            unsigned short intRequest = (unsigned short)mRemainder;
             mRemainder -= intRequest;
 
             // Check duration

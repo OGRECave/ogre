@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ namespace Ogre
 	*  @{
 	*/
 
-	/** @See InstanceBatch to understand how instancing works.
+	/** @see InstanceBatch to understand how instancing works.
 
 		Instanced entities work in a very similar way as how an Entity works, as this interface
 		tries to mimic it as most as possible to make the transition between Entity and InstancedEntity
@@ -93,11 +93,11 @@ namespace Ogre
 
 		InstancedEntity* mSharedTransformEntity;	//When not null, another InstancedEntity controls the skeleton
 												
-		//Used in conjunction with bone matrix lookup. Tells the number of the transform for
-		//as arranged in the vertex texture
+		/** Used in conjunction with bone matrix lookup. Tells the number of the transform for
+            as arranged in the vertex texture */
 		uint16 mTransformLookupNumber;
 
-		//Stores the master when we're the slave, store our slaves when we're the master
+		/// Stores the master when we're the slave, store our slaves when we're the master
 		typedef vector<InstancedEntity*>::type InstancedEntityVec;
 		InstancedEntityVec mSharingPartners;
 
@@ -106,18 +106,18 @@ namespace Ogre
 		// The 
 		//////////////////////////////////////////////////////////////////////////
 
-		///Object position
+		/// Object position
 		Vector3 mPosition;
 		Vector3 mDerivedLocalPosition;
-		///Object orientation
+		/// Object orientation
 		Quaternion mOrientation;
-		///Object scale
+		/// Object scale
 		Vector3 mScale;
-		///The maximum absolute scale for all dimension
+		/// The maximum absolute scale for all dimension
 		Real mMaxScaleLocal;
-		///Full world transform
+		/// Full world transform
 		Matrix4 mFullLocalTransform;
-		///Tells if mFullTransform needs an updated
+		/// Tells if mFullTransform needs an updated
 		bool mNeedTransformUpdate;
 		/// Tells if the animation world transform needs an update
 		bool mNeedAnimTransformUpdate;
@@ -125,25 +125,25 @@ namespace Ogre
 		bool mUseLocalTransform;
 
 
-		//Returns number of matrices written to xform, assumes xform has enough space
+		/// Returns number of matrices written to transform, assumes transform has enough space
 		size_t getTransforms( Matrix4 *xform ) const;
-		//Returns number of 32-bit values written
+		/// Returns number of 32-bit values written
 		size_t getTransforms3x4( float *xform ) const;
 
-		//Returns true if this InstancedObject is visible to the current camera
+		/// Returns true if this InstancedObject is visible to the current camera
 		bool findVisible( Camera *camera ) const;
 
-		//Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
+		/// Creates/destroys our own skeleton, also tells slaves to unlink if we're destroying
 		void createSkeletonInstance();
 		void destroySkeletonInstance();
 
-		//Just unlinks, and tells our master we're no longer sharing
+		/// Just unlinks, and tells our master we're no longer sharing
 		void unlinkTransform();
 
-		//Called when a slave has unlinked from us
+		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
 
-		//Mark the transformation matrixes as dirty
+		/// Mark the transformation matrixes as dirty
 		inline void markTransformDirty();
 
 		/// Incremented count for next name extension
@@ -165,15 +165,15 @@ namespace Ogre
 				* An InstancedEntity can't be both "master" and "slave" at the same time
 			@remarks
 			Sharing does nothing if the original mesh doesn't have a skeleton
-			When an InstancedEntity is removed (@See InstanceBatch::removeInstancedEntity), it stops
+			When an InstancedEntity is removed (@see InstanceBatch::removeInstancedEntity), it stops
 			sharing the transform. If the instanced entity was the master one, all it's slaves stop
 			sharing and start having their own transform too.
 			@param slave The InstancedEntity that should share with us and become our slave
-			@returns true if successfully shared (may fail if they aren't skeletally animated)
+			@return true if successfully shared (may fail if they aren't skeletally animated)
 		*/
 		bool shareTransformWith( InstancedEntity *slave );
 
-		/** @See shareTransformWith
+		/** @see shareTransformWith
 			Stops sharing the transform if this is a slave, and notifies the master we're no longer
 			a slave.
 			If this is a master, tells all it's slave to stop sharing
@@ -189,15 +189,15 @@ namespace Ogre
 		const AxisAlignedBox& getBoundingBox(void) const;
 		Real getBoundingRadius(void) const;
 
-		//This is used by our batch owner to get the closest entity's depth, returns infinity
-		//when not attached to a scene node
+		/** This is used by our batch owner to get the closest entity's depth, returns infinity
+            when not attached to a scene node */
 		Real getSquaredViewDepth( const Camera* cam ) const;
 
-		//Overriden so we can tell the InstanceBatch it needs to update it's bounds
+		/// Overriden so we can tell the InstanceBatch it needs to update it's bounds
 		void _notifyMoved(void);
 		void _notifyAttached( Node* parent, bool isTagPoint = false );
 
-		//Do nothing, InstanceBatch takes care of this.
+		/// Do nothing, InstanceBatch takes care of this.
 		void _updateRenderQueue( RenderQueue* queue )	{}
 		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
@@ -214,7 +214,7 @@ namespace Ogre
 		/** Called by InstanceBatch in <i>his</i> _updateRenderQueue to tell us we need
 			to calculate our bone matrices.
 			@remarks Assumes it has a skeleton (mSkeletonInstance != 0)
-			@returns true if something was actually updated
+			@return true if something was actually updated
 		*/
 		virtual bool _updateAnimation(void);
 
@@ -249,14 +249,14 @@ namespace Ogre
 
 		/** Returns the world transform of the instanced entity including local transform */
 		virtual const Matrix4& _getParentNodeFullTransform(void) const { 
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
 			return mUseLocalTransform ? mFullLocalTransform :
 				mParentNode ? mParentNode->_getFullTransform() : Matrix4::IDENTITY;
 		}
 
 		/** Returns the derived position of the instanced entity including local transform */
 		const Vector3& _getDerivedPosition() const {
-			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Tranform data should be updated at this point");
+			assert((!mNeedTransformUpdate || !mUseLocalTransform) && "Transform data should be updated at this point");
 			return mUseLocalTransform ? mDerivedLocalPosition :
 				mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
 		}

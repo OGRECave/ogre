@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -135,7 +135,7 @@ namespace Ogre {
             mParamCommands[paramDef.name] = paramCmd;
         }
         /** Retrieves a list of parameters valid for this object. 
-        @returns
+        @return
             A reference to a static list of ParameterDef objects.
 
         */
@@ -178,7 +178,7 @@ namespace Ogre {
             used or performance).
         @param
             className the name of the class using the dictionary
-        @returns
+        @return
             true if a new dictionary was created, false if it was already there
         */
         bool createParamDictionary(const String& className)
@@ -210,7 +210,7 @@ namespace Ogre {
         /** Retrieves the parameter dictionary for this class. 
         @remarks
             Only valid to call this after createParamDictionary.
-        @returns
+        @return
             Pointer to ParamDictionary shared by all instances of this class
             which you can add parameters to, retrieve parameters etc.
         */
@@ -225,7 +225,7 @@ namespace Ogre {
         }
 
         /** Retrieves a list of parameters valid for this object. 
-        @returns
+        @return
             A reference to a static list of ParameterDef objects.
 
         */
@@ -242,7 +242,7 @@ namespace Ogre {
         @param
             value String value. Must be in the right format for the type specified in the parameter definition.
             See the StringConverter class for more information.
-        @returns
+        @return
             true if set was successful, false otherwise (NB no exceptions thrown - tolerant method)
         */
         virtual bool setParameter(const String& name, const String& value);
@@ -264,7 +264,7 @@ namespace Ogre {
             like you can use StringConverter to convert this string back into a native type.
         @param
             name The name of the parameter to get
-        @returns
+        @return
             String value of parameter, blank if not found
         */
         virtual String getParameter(const String& name) const

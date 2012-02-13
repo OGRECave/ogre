@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -51,6 +51,7 @@ namespace Ogre
     //---------------------------------------------------------------------
 	Font::CmdType Font::msTypeCmd;
 	Font::CmdSource Font::msSourceCmd;
+	Font::CmdCharSpacer Font::msCharacterSpacerCmd;
 	Font::CmdSize Font::msSizeCmd;
 	Font::CmdResolution Font::msResolutionCmd;
 	Font::CmdCodePoints Font::msCodePointsCmd;
@@ -59,7 +60,7 @@ namespace Ogre
 	Font::Font(ResourceManager* creator, const String& name, ResourceHandle handle,
 		const String& group, bool isManual, ManualResourceLoader* loader)
 		:Resource (creator, name, handle, group, isManual, loader),
-		mType(FT_TRUETYPE), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
+		mType(FT_TRUETYPE), mCharacterSpacer(5), mTtfSize(0), mTtfResolution(0), mTtfMaxBearingY(0), mAntialiasColour(false)
     {
 
 		if (createParamDictionary("Font"))
@@ -71,6 +72,9 @@ namespace Ogre
 			dict->addParameter(
 				ParameterDef("source", "Filename of the source of the font.", PT_STRING),
 				&msSourceCmd);
+			dict->addParameter(
+				ParameterDef("character_spacer", "Spacing between characters to prevent overlap artifacts.", PT_STRING),
+				&msCharacterSpacerCmd);
 			dict->addParameter(
 				ParameterDef("size", "True type size", PT_REAL),
 				&msSizeCmd);
@@ -111,6 +115,11 @@ namespace Ogre
         mTtfSize = ttfSize;
     }
     //---------------------------------------------------------------------
+    void Font::setCharacterSpacer(uint charSpacer)
+    {
+        mCharacterSpacer = charSpacer;
+    }
+    //---------------------------------------------------------------------
     void Font::setTrueTypeResolution(uint ttfResolution)
     {
         mTtfResolution = ttfResolution;
@@ -119,6 +128,11 @@ namespace Ogre
     const String& Font::getSource(void) const
     {
         return mSource;
+    }
+    //---------------------------------------------------------------------
+    uint Font::getCharacterSpacer(void) const
+    {
+        return mCharacterSpacer;
     }
     //---------------------------------------------------------------------
     Real Font::getTrueTypeSize(void) const
@@ -241,9 +255,6 @@ namespace Ogre
             "Font::Font");
 
         FT_Face face;
-        // Add a gap between letters vert and horz
-        // prevents nasty artefacts when letters are too close together
-        uint char_spacer = 5;
 
         // Locate ttf file, load it pre-buffered into memory by wrapping the
 		// original DataStream in a MemoryDataStream
@@ -296,8 +307,8 @@ namespace Ogre
 		}
 
 		// Now work out how big our texture needs to be
-		size_t rawSize = (max_width + char_spacer) *
-							((max_height >> 6) + char_spacer) * glyphCount;
+		size_t rawSize = (max_width + mCharacterSpacer) *
+							((max_height >> 6) + mCharacterSpacer) * glyphCount;
 
 		uint32 tex_side = static_cast<uint32>(Math::Sqrt((Real)rawSize));
 		// just in case the size might chop a glyph in half, add another glyph width/height
@@ -365,12 +376,12 @@ namespace Ogre
 					continue;
 				}
 
-				int y_bearnig = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
+				int y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
 				int x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
 				for(int j = 0; j < face->glyph->bitmap.rows; j++ )
 				{
-					size_t row = j + m + y_bearnig;
+					size_t row = j + m + y_bearing;
 					uchar* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
 					for(int k = 0; k < face->glyph->bitmap.width; k++ )
 					{
@@ -399,12 +410,12 @@ namespace Ogre
 					);
 
 				// Advance a column
-				l += (advance + char_spacer);
+				l += (advance + mCharacterSpacer);
 
 				// If at end of row
 				if( finalWidth - 1 < l + ( advance ) )
 				{
-					m += ( max_height >> 6 ) + char_spacer;
+					m += ( max_height >> 6 ) + mCharacterSpacer;
 					l = 0;
 				}
 			}
@@ -462,6 +473,19 @@ namespace Ogre
 	{
 		Font* f = static_cast<Font*>(target);
 		f->setSource(val);
+	}
+	//-----------------------------------------------------------------------
+	String Font::CmdCharSpacer::doGet(const void* target) const
+	{
+		const Font* f = static_cast<const Font*>(target);
+		char buf[sizeof(uint)];
+		sprintf(buf, "%d", f->getCharacterSpacer());
+		return String(buf);
+	}
+	void Font::CmdCharSpacer::doSet(void* target, const String& val)
+	{
+		Font* f = static_cast<Font*>(target);
+		f->setCharacterSpacer(atoi(val.c_str()));
 	}
 	//-----------------------------------------------------------------------
 	String Font::CmdSize::doGet(const void* target) const

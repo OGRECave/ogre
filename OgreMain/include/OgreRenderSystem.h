@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -153,7 +153,7 @@ namespace Ogre
 		This routine is called automatically by the default
 		configuration dialogue produced by Root::showConfigDialog
 		or may be used by the caller for custom settings dialogs
-		@returns
+		@return
 		A 'map' of options, i.e. a list of options which is also
 		indexed by option name.
 		*/
@@ -207,7 +207,7 @@ namespace Ogre
 		If an application has more specific window requirements,
 		however (e.g. a level design app), it should specify false
 		for this parameter and do it manually.
-		@returns
+		@return
 		A pointer to the automatically created window, if requested, otherwise null.
 		*/
 		virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
@@ -520,7 +520,7 @@ namespace Ogre
 		See _createRenderWindow for details about each member.		
 		@param
 		createdWindows This array will hold the created render windows.
-		@returns
+		@return
 		true on success.		
 		*/
 		virtual bool _createRenderWindows(const RenderWindowDescriptionList& renderWindowDescriptions, 
@@ -1520,7 +1520,7 @@ namespace Ogre
 
 		/** updates pass iteration rendering state including bound gpu program parameter
 		pass iteration auto constant entry
-		@returns True if more iterations are required
+		@return True if more iterations are required
 		*/
 		bool updatePassIterationRenderState(void);
 

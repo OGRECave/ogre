@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -206,7 +206,7 @@ namespace Ogre {
         MaterialScriptContext mScriptContext;
 
         /** internal method for parsing a material
-        @returns true if it expects the next line to be a {
+        @return true if it expects the next line to be a {
         */
         bool parseScriptLine(String& line);
         /** internal method for finding & invoking an attribute parser. */

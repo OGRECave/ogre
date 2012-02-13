@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -229,10 +229,20 @@ namespace Ogre {
 						"SDLWindow::copyContentsToMemory" );
 		}
 	
+		// Switch context if different from current one
+		RenderSystem* rsys = Root::getSingleton().getRenderSystem();
+		rsys->_setViewport(this->getViewport(0));
+	
+		// Must change the packing to ensure no overruns!
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	
 		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
 					 (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
 					 format, type, dst.data);
+	
+		// restore default alignment
+		glPixelStorei(GL_PACK_ALIGNMENT, 4);
 	
 		//vertical flip
 		{

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -365,7 +365,7 @@ namespace Ogre {
 		bool hasVertexAnimation(void) const;
 		
 		/** Gets a pointer to any linked Skeleton. 
-        @returns Weak reference to the skeleton - copy this if you want to hold a strong pointer.
+        @return Weak reference to the skeleton - copy this if you want to hold a strong pointer.
         */
         const SkeletonPtr& getSkeleton(void) const;
 
@@ -544,7 +544,7 @@ namespace Ogre {
         @param vertexCount The number of vertices.
         @param assignments The bone assignment list to rationalise. This list will be modified and
             entries will be removed where the limits are exceeded.
-        @returns The maximum number of bone assignments per vertex found, clamped to [1-4]
+        @return The maximum number of bone assignments per vertex found, clamped to [1-4]
         */
         unsigned short _rationaliseBoneAssignments(size_t vertexCount, VertexBoneAssignmentList& assignments);
 
@@ -828,7 +828,7 @@ namespace Ogre {
   	    @param target The target geometry index; 0 is the shared Mesh geometry, 1+ is the
 			dedicated SubMesh geometry belonging to submesh index + 1.
 		@param name Name to give the pose, which is optional
-		@returns A new Pose ready for population
+		@return A new Pose ready for population
 		*/
 		Pose* createPose(ushort target, const String& name = StringUtil::BLANK);
 		/** Get the number of poses.*/

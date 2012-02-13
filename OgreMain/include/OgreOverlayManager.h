@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,7 @@ namespace Ogre {
         /** Create a new Overlay. */
         Overlay* create(const String& name);
         /** Retrieve an Overlay by name 
-        @returns A pointer to the Overlay, or 0 if not found
+        @return A pointer to the Overlay, or 0 if not found
         */
         Overlay* getByName(const String& name);
         /** Destroys an existing overlay by name */

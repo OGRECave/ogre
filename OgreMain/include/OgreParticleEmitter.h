@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ namespace Ogre {
     @par
         This same approach is used for ParticleAffectors (which modify existing particles per frame).
         This means that OGRE is particularly flexible when it comes to creating particle system effects,
-        with literally infinite combinations of emitter and affector types, and paramters within those
+        with literally infinite combinations of emitter and affector types, and parameters within those
         types.
     */
     class _OgreExport ParticleEmitter : public StringInterface, public Particle

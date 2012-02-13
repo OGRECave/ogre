@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -338,7 +338,7 @@ namespace Ogre {
 				within the range of the frustum will be in the list.
 			@param lightList The list of lights within range of the frustum which you
 				may sort.
-			@returns true if you sorted the list, false otherwise.
+			@return true if you sorted the list, false otherwise.
 			*/
 			virtual bool sortLightsAffectingFrustum(LightList& lightList)
                         { (void)lightList; return false; }
@@ -796,7 +796,7 @@ namespace Ogre {
 		InstanceManagerVec mDirtyInstanceManagers;
 		InstanceManagerVec mDirtyInstanceMgrsTmp;
 
-		/** Updates all instance managaers with dirty instance batches. @See _addDirtyInstanceManager */
+		/** Updates all instance managaers with dirty instance batches. @see _addDirtyInstanceManager */
 		void updateDirtyInstanceManagers(void);
         
 	public:
@@ -2524,7 +2524,7 @@ namespace Ogre {
 			current 'special case' render queue list and mode.
 		@see SceneManager::addSpecialCaseRenderQueue
 		@param qid The identifier of the queue which should be tested
-		@returns true if the queue will be rendered, false otherwise
+		@return true if the queue will be rendered, false otherwise
 		*/
 		virtual bool isRenderQueueToBeProcessed(uint8 qid);
 
@@ -3113,7 +3113,7 @@ namespace Ogre {
 			efficient form at the expense of being able to move it. Please 
 			read the StaticGeometry class documentation for full information.
 		@param name The name to give the new object
-		@returns The new StaticGeometry instance
+		@return The new StaticGeometry instance
 		*/
 		virtual StaticGeometry* createStaticGeometry(const String& name);
 		/** Retrieve a previously created StaticGeometry instance. 
@@ -3136,7 +3136,7 @@ namespace Ogre {
 			efficient form, and still be able to move it. Please 
 			read the InstancedGeometry class documentation for full information.
 		@param name The name to give the new object
-		@returns The new InstancedGeometry instance
+		@return The new InstancedGeometry instance
 		*/
 		virtual InstancedGeometry* createInstancedGeometry(const String& name);
 		/** Retrieve a previously created InstancedGeometry instance. */
@@ -3161,10 +3161,10 @@ namespace Ogre {
 		@param Technique to use, which may be shader based, or hardware based.
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
 		may end up being lower if the technique doesn't support having so many. It can't be zero
-		@param flags @See InstanceManagerFlags
+		@param flags @see InstanceManagerFlags
 		@param InstanceManager only supports using one submesh from the base mesh. This parameter
 		says which submesh to pick (must be <= Mesh::getNumSubMeshes())
-		@returns The new InstanceManager instance
+		@return The new InstanceManager instance
 		*/
 		virtual InstanceManager* createInstanceManager( const String &customName, const String &meshName,
 														const String &groupName,
@@ -3191,7 +3191,7 @@ namespace Ogre {
 
 		virtual void destroyAllInstanceManagers(void);
 
-		/** @See InstanceManager::getMaxOrBestNumInstancesPerBatch
+		/** @see InstanceManager::getMaxOrBestNumInstancesPerBatch
 		@remarks
 			If you've already created an InstanceManager, you can call it's
 			getMaxOrBestNumInstancesPerBatch() function directly.
@@ -3199,7 +3199,7 @@ namespace Ogre {
 			an InstanceManager and use createInstancedEntity, which will return null pointer.
 			The input parameter "numInstancesPerBatch" is a suggested value when using IM_VTFBESTFIT
 			flag (in that case it should be non-zero)
-		@returns
+		@return
 			The ideal (or maximum, depending on flags) number of instances per batch for
 			the given technique. Zero if technique is unsupported or errors were spotted
 		*/
@@ -3218,7 +3218,7 @@ namespace Ogre {
 			pointer from createInstanceManager
 		@param materialName Material name 
 		@param managerName Name of the instance manager
-		@returns An InstancedEntity ready to be attached to a SceneNode
+		@return An InstancedEntity ready to be attached to a SceneNode
 		*/
 		virtual InstancedEntity* createInstancedEntity( const String &materialName,
 														const String &managerName );
@@ -3423,7 +3423,7 @@ namespace Ogre {
 				true.
 			@param shadowDerivation If false, disables the derivation of shadow
 				passes from original passes
-            @returns
+            @return
                 A Pass object that was used instead of the one passed in, can
                 happen when rendering shadow passes
         */

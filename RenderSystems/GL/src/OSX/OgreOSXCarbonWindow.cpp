@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -104,13 +104,6 @@ namespace Ogre
                 fullScreen = StringConverter::parseBool( opt->second );
         }
 
-        mName = name;
-        mWidth = width;
-        mHeight = height;
-        mColourDepth = depth;
-        mFSAA = fsaa_samples;
-        mIsFullScreen = fullScreen;
-
         if(fullScreen)
         {
             setFullscreen(fullScreen, width, height);
@@ -152,6 +145,12 @@ namespace Ogre
         setVSyncEnabled(vsync);
         setHidden(hidden);
 
+        mName = name;
+        mWidth = width;
+        mHeight = height;
+        mColourDepth = depth;
+        mFSAA = fsaa_samples;
+        mIsFullScreen = fullScreen;
         mActive = true;
         mClosed = false;
         mCreated = true;
@@ -238,6 +237,7 @@ namespace Ogre
             // Set the title of our window
             CFStringRef titleRef = CFStringCreateWithCString( kCFAllocatorDefault, title.c_str(), kCFStringEncodingASCII );
             SetWindowTitleWithCFString( mWindow, titleRef );
+            CFRelease(titleRef);
             mWindowTitle = title;
             
             // Center our window on the screen

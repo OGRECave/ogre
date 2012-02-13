@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2011 Torus Knot Software Ltd
+ Copyright (c) 2000-2012 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ namespace OgreBites
 			SampleBrowser resides, or a special config path above that path.)
 			@param
 				The config file name (without path)
-			@returns
+			@return
 				The full path to the config file.
 		 */
 		virtual const Ogre::String getConfigFilePath(Ogre::String filename) const = 0;
@@ -64,7 +64,7 @@ namespace OgreBites
 			be used for any output like logs and graphics settings.
 			@param
 				Name of the file.
-			@returns
+			@return
 				The full path to a writable location for the given filename.
 		 */
 		virtual const Ogre::String getWritablePath(const Ogre::String& filename) const = 0;

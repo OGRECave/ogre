@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -179,14 +179,7 @@ namespace Ogre {
     void Node::_update(bool updateChildren, bool parentHasChanged)
     {
 		// always clear information about parent notification
-		mParentNotified = false ;
-
-        // Short circuit the off case
-        if (!updateChildren && !mNeedParentUpdate && !mNeedChildUpdate && !parentHasChanged )
-        {
-            return;
-        }
-
+		mParentNotified = false;
 
         // See if we should process everyone
         if (mNeedParentUpdate || parentHasChanged)
@@ -195,35 +188,34 @@ namespace Ogre {
             _updateFromParent();
 		}
 
-		if (mNeedChildUpdate || parentHasChanged)
-		{
-
-            ChildNodeMap::iterator it, itend;
-			itend = mChildren.end();
-            for (it = mChildren.begin(); it != itend; ++it)
-            {
-                Node* child = it->second;
-                child->_update(true, true);
-            }
-            mChildrenToUpdate.clear();
-        }
-        else
+        if(updateChildren)
         {
-            // Just update selected children
-
-            ChildUpdateSet::iterator it, itend;
-			itend = mChildrenToUpdate.end();
-            for(it = mChildrenToUpdate.begin(); it != itend; ++it)
+            if (mNeedChildUpdate || parentHasChanged)
             {
-                Node* child = *it;
-                child->_update(true, false);
+                ChildNodeMap::iterator it, itend;
+                itend = mChildren.end();
+                for (it = mChildren.begin(); it != itend; ++it)
+                {
+                    Node* child = it->second;
+                    child->_update(true, true);
+                }
+            }
+            else
+            {
+                // Just update selected children
+                ChildUpdateSet::iterator it, itend;
+                itend = mChildrenToUpdate.end();
+                for(it = mChildrenToUpdate.begin(); it != itend; ++it)
+                {
+                    Node* child = *it;
+                    child->_update(true, false);
+                }
+
             }
 
             mChildrenToUpdate.clear();
+            mNeedChildUpdate = false;
         }
-
-        mNeedChildUpdate = false;
-
     }
 	//-----------------------------------------------------------------------
 	void Node::_updateFromParent(void) const

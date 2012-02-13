@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -114,7 +114,6 @@ namespace Ogre {
         mCurrentContext = 0;
         mMainContext = 0;
         mGLInitialised = false;
-        mTextureMipmapCount = 0;
         mMinFilter = FO_LINEAR;
         mMipFilter = FO_POINT;
         mCurrentVertexProgram = 0;
@@ -190,7 +189,7 @@ namespace Ogre {
 		if (strstr(vendorName, "Imagination Technologies"))
 			rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
 		else if (strstr(vendorName, "Apple Computer, Inc."))
-			rsc->setVendor(GPU_APPLE);  // iPhone Simulator
+			rsc->setVendor(GPU_APPLE);  // iOS Simulator
 		else if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
         else
@@ -368,7 +367,7 @@ namespace Ogre {
 
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL ES 2: Using FBOs for rendering to textures");
-        mRTTManager = OGRE_NEW_FIX_FOR_WIN32 GLES2FBOManager();
+        mRTTManager = new GLES2FBOManager();
         caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
@@ -420,7 +419,7 @@ namespace Ogre {
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
-        OGRE_DELETE mRTTManager;
+        delete mRTTManager;
         mRTTManager = 0;
 
         OGRE_DELETE mTextureManager;
@@ -680,9 +679,6 @@ namespace Ogre {
 				// Note used
 				tex->touch();
 				mTextureTypes[stage] = tex->getGLES2TextureTarget();
-
-                // Store the number of mipmaps
-                mTextureMipmapCount = tex->getNumMipmaps();
 			}
 			else
 				// Assume 2D
@@ -1400,20 +1396,15 @@ namespace Ogre {
         // On iOS cube maps are especially sensitive to texture parameter changes.
         // So, for performance (and it's a large difference) we will skip updating them.
         if(mTextureTypes[unit] == GL_TEXTURE_CUBE_MAP)
+        {
+            activateGLTextureUnit(0);
             return;
+        }
 
         switch (ftype)
         {
             case FT_MIN:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMinFilter = FO_NONE;
-                }
-                else
-                {
-                    mMinFilter = fo;
-                }
-
+                mMinFilter = fo;
                 // Combine with existing mip filter
                 glTexParameteri(mTextureTypes[unit],
                                 GL_TEXTURE_MIN_FILTER,
@@ -1441,14 +1432,7 @@ namespace Ogre {
                 }
                 break;
             case FT_MIP:
-                if(mTextureMipmapCount == 0)
-                {
-                    mMipFilter = FO_NONE;
-                }
-                else
-                {
-                    mMipFilter = fo;
-                }
+                mMipFilter = fo;
 
                 // Combine with existing min filter
                 glTexParameteri(mTextureTypes[unit],
@@ -1499,7 +1483,6 @@ namespace Ogre {
         RenderSystem::_render(op);
 
         void* pBufferData = 0;
-		bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
         const VertexDeclaration::VertexElementList& decl =
             op.vertexData->vertexDeclaration->getElements();
@@ -1580,9 +1563,6 @@ namespace Ogre {
  			
 			mRenderAttribsBound.push_back(attrib);
         }	
-
-		if (multitexturing)
-            activateGLTextureUnit(GL_TEXTURE0);
 
         // Find the correct type to render
         GLint primType;

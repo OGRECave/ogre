@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ namespace Ogre
 	*  @{
 	*/
 	/**
-	@Remarks
+	@remarks
 		Callback class used to send out window events to client app
 	*/
 	class _OgreExport WindowEventListener
@@ -61,7 +61,7 @@ namespace Ogre
 		virtual ~WindowEventListener() {}
 
 		/**
-		@Remarks
+		@remarks
 			Window has moved position
 		@param rw
 			The RenderWindow which created this events
@@ -70,7 +70,7 @@ namespace Ogre
                 { (void)rw; }
 
 		/**
-		@Remarks
+		@remarks
 			Window has resized
 		@param rw
 			The RenderWindow which created this events
@@ -79,7 +79,7 @@ namespace Ogre
                 { (void)rw; }
 
 		/**
-		@Remarks
+		@remarks
 			Window is closing (Only triggered if user pressed the [X] button)
 		@param rw
 			The RenderWindow which created this events
@@ -89,7 +89,7 @@ namespace Ogre
 		{ (void)rw; return true; }
 
 		/**
-		@Remarks
+		@remarks
 			Window has been closed (Only triggered if user pressed the [X] button)
 		@param rw
 			The RenderWindow which created this events
@@ -102,7 +102,7 @@ namespace Ogre
                 { (void)rw; }
 
 		/**
-		@Remarks
+		@remarks
 			Window has lost/gained focus
 		@param rw
 			The RenderWindow which created this events
@@ -112,21 +112,21 @@ namespace Ogre
 	};
 
 	/**
-	@Remarks
+	@remarks
 		Utility class to handle Window Events/Pumping/Messages
 	*/
 	class _OgreExport WindowEventUtilities
 	{
 	public:
 		/**
-		@Remarks
+		@remarks
 			Call this once per frame if not using Root:startRendering(). This will update all registered
 			RenderWindows (If using external Windows, you can optionally register those yourself)
 		*/
 		static void messagePump();
 
 		/**
-		@Remarks
+		@remarks
 			Add a listener to listen to renderwindow events (multiple listener's per renderwindow is fine)
 			The same listener can listen to multiple windows, as the Window Pointer is sent along with
 			any messages.
@@ -138,7 +138,7 @@ namespace Ogre
 		static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
 		/**
-		@Remarks
+		@remarks
 			Remove previously added listener
 		@param window
 			The RenderWindow you registered with
@@ -148,7 +148,7 @@ namespace Ogre
 		static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );
 
 		/**
-		@Remarks
+		@remarks
 			Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
 			external windows here too if needed.
 		@param window
@@ -157,7 +157,7 @@ namespace Ogre
 		static void _addRenderWindow(RenderWindow* window);
 
 		/**
-		@Remarks
+		@remarks
 			Called by RenderWindows upon creation for Ogre generated windows. You are free to add your
 			external windows here too if needed.
 		@param window

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -275,7 +275,7 @@ namespace Ogre {
       	size_t getConsecutiveSize() const;
       	/** Return a subvolume of this PixelBox.
       		@param def	Defines the bounds of the subregion to return
-      		@returns	A pixel box describing the region and the data in it
+      		@return	A pixel box describing the region and the data in it
       		@remarks	This function does not copy any data, it just returns
       			a PixelBox object with a data pointer pointing somewhere inside 
       			the data of object.
@@ -305,7 +305,7 @@ namespace Ogre {
     class _OgreExport PixelUtil {
     public:
         /** Returns the size in bytes of an element of the given pixel format.
-         @returns
+         @return
                The size in bytes of an element. See Remarks.
          @remarks
                Passing PF_UNKNOWN will result in returning a size of 0 bytes.
@@ -313,7 +313,7 @@ namespace Ogre {
         static size_t getNumElemBytes( PixelFormat format );
 
         /** Returns the size in bits of an element of the given pixel format.
-          @returns
+          @return
                The size in bits of an element. See Remarks.
            @remarks
                Passing PF_UNKNOWN will result in returning a size of 0 bits.
@@ -330,7 +330,7 @@ namespace Ogre {
 				The depth of the area
 			@param format
 				The format of the area
-		  	@returns
+		  	@return
 		  		The size in bytes
 			@remarks
 				In case that the format is non-compressed, this simply returns
@@ -340,7 +340,7 @@ namespace Ogre {
 		static size_t getMemorySize(size_t width, size_t height, size_t depth, PixelFormat format);
 		
         /** Returns the property flags for this pixel format
-          @returns
+          @return
                A bitfield combination of PFF_HASALPHA, PFF_ISCOMPRESSED,
                PFF_FLOAT, PFF_DEPTH, PFF_NATIVEENDIAN, PFF_LUMINANCE
           @remarks
@@ -398,7 +398,7 @@ namespace Ogre {
         and unpackColour() functions. This is generally not true for compressed and
         depth formats as they are special. It can only be true for formats with a
         fixed element size.
-          @returns 
+          @return 
                true if yes, otherwise false
         */
         static bool isAccessible(PixelFormat srcformat);
@@ -419,7 +419,7 @@ namespace Ogre {
             @param  accessibleOnly  If true, non-accessible format will treat as invalid format,
                                     otherwise, all supported format are valid.
             @param  caseSensitive   Should be set true if string match should use case sensitivity.
-            @returns                The format match the format name, or PF_UNKNOWN if is invalid name.
+            @return                The format match the format name, or PF_UNKNOWN if is invalid name.
         */
         static PixelFormat getFormatFromName(const String& name, bool accessibleOnly = false, bool caseSensitive = false);
 
@@ -428,7 +428,7 @@ namespace Ogre {
                                     to work with Compiler2Pass.
             @param  accessibleOnly  If true, only accessible pixel format will take into account, otherwise all
                                     pixel formats list in PixelFormat enumeration will being returned.
-            @returns                A string contains the BNF expression.
+            @return                A string contains the BNF expression.
         */
         static String getBNFExpressionOfPixelFormats(bool accessibleOnly = false);
 
@@ -438,7 +438,7 @@ namespace Ogre {
                             Available values: 0, 16 and 32, where 0 (the default) means as it is.
             @param floatBits Preferred bit depth (channel bits) for float pixel format.
                             Available values: 0, 16 and 32, where 0 (the default) means as it is.
-            @returns        The format that similar original format with bit depth according
+            @return        The format that similar original format with bit depth according
                             with preferred bit depth, or original format if no conversion occurring.
         */
         static PixelFormat getFormatForBitDepths(PixelFormat fmt, ushort integerBits, ushort floatBits);

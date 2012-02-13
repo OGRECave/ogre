@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -4470,8 +4470,8 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
     if (object->getCastShadows() && object->isVisible() && 
 		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
 		// objects need an edge list to cast shadows (shadow volumes only)
-		((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
-		 ((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList())
+		(((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
+		 (mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL)) && object->hasEdgeList()
 		)
 	   )
     {
@@ -6528,15 +6528,15 @@ InstanceManager* SceneManager::createInstanceManager( const String &customName, 
 													  size_t numInstancesPerBatch, uint16 flags,
 													  unsigned short subMeshIdx )
 {
-	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
-													flags, numInstancesPerBatch, subMeshIdx );
-	
 	if (mInstanceManagerMap.find(customName) != mInstanceManagerMap.end())
 	{
 		OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, 
 			"InstancedManager with name '" + customName + "' already exists!", 
 			"SceneManager::createInstanceManager");
 	}
+
+	InstanceManager *retVal = new InstanceManager( customName, this, meshName, groupName, technique,
+													flags, numInstancesPerBatch, subMeshIdx );
 
 	mInstanceManagerMap[customName] = retVal;
 	return retVal;

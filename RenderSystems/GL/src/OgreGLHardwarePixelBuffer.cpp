@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -110,8 +110,7 @@ void GLHardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box
 		src.getHeight() != dstBox.getHeight() ||
 		src.getDepth() != dstBox.getDepth())
 	{
-		// Scale to destination size. Use DevIL and not iluScale because ILU screws up for 
-		// floating point textures and cannot cope with 3D images.
+		// Scale to destination size.
 		// This also does pixel format conversion if needed
 		allocateBuffer();
 		scaled = mBuffer.getSubVolume(dstBox);

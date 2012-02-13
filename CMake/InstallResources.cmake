@@ -161,7 +161,7 @@ if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
 else ()
-  # iPhone needs to use relative paths in the config files
+  # iOS needs to use relative paths in the config files
   set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
 endif ()

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ namespace Ogre {
 		    then this prefab will be created as a submesh of the given mesh.
 
 			@param mesh The mesh that the potential prefab will be created in.
-			@returns true if a prefab has been created, otherwise false.
+			@return true if a prefab has been created, otherwise false.
 		*/
 		static bool createPrefab(Mesh* mesh);
 

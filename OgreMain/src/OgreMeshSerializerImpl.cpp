@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -833,8 +833,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener)
     {
-        unsigned short streamID;
-
         // Never automatically build edge lists for this version
         // expect them in the file or not at all
         pMesh->mAutoBuildEdgeLists = false;
@@ -846,7 +844,7 @@ namespace Ogre {
         // Find all substreams
         if (!stream->eof())
         {
-            streamID = readChunk(stream);
+            unsigned short streamID = readChunk(stream);
             while(!stream->eof() &&
                 (streamID == M_GEOMETRY ||
 				 streamID == M_SUBMESH ||
@@ -1755,11 +1753,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
 	void MeshSerializerImpl::readEdgeList(DataStreamPtr& stream, Mesh* pMesh)
 	{
-        unsigned short streamID;
-
         if (!stream->eof())
         {
-            streamID = readChunk(stream);
+            unsigned short streamID = readChunk(stream);
             while(!stream->eof() &&
                 streamID == M_EDGE_LIST_LOD)
             {
@@ -2236,12 +2232,10 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void MeshSerializerImpl::readPoses(DataStreamPtr& stream, Mesh* pMesh)
 	{
-		unsigned short streamID;
-
 		// Find all substreams
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				(streamID == M_POSE))
 			{
@@ -2282,10 +2276,9 @@ namespace Ogre {
 		Pose* pose = pMesh->createPose(target, name);
 
 		// Find all substreams
-		unsigned short streamID;
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				(streamID == M_POSE_VERTEX))
 			{
@@ -2332,12 +2325,10 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void MeshSerializerImpl::readAnimations(DataStreamPtr& stream, Mesh* pMesh)
 	{
-		unsigned short streamID;
-
 		// Find all substreams
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				(streamID == M_ANIMATION))
 			{
@@ -2377,11 +2368,9 @@ namespace Ogre {
 		Animation* anim = pMesh->createAnimation(name, len);
 
 		// tracks
-		unsigned short streamID;
-
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			
 			// Optional base info is possible
 			if (streamID == M_ANIMATION_BASEINFO)
@@ -2440,11 +2429,9 @@ namespace Ogre {
 			pMesh->getVertexDataByTrackHandle(target), animType);
 
 		// keyframes
-		unsigned short streamID;
-
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				(streamID == M_ANIMATION_MORPH_KEYFRAME ||
 				 streamID == M_ANIMATION_POSE_KEYFRAME))
@@ -2510,11 +2497,9 @@ namespace Ogre {
 		// Create keyframe
 		VertexPoseKeyFrame* kf = track->createVertexPoseKeyFrame(timePos);
 
-		unsigned short streamID;
-
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				streamID == M_ANIMATION_POSE_REF)
 			{
@@ -2651,10 +2636,9 @@ namespace Ogre {
 		Pose* pose = pMesh->createPose(target, name);
 
 		// Find all substreams
-		unsigned short streamID;
 		if (!stream->eof())
 		{
-			streamID = readChunk(stream);
+			unsigned short streamID = readChunk(stream);
 			while(!stream->eof() &&
 				(streamID == M_POSE_VERTEX))
 			{
@@ -3285,8 +3269,6 @@ namespace Ogre {
     void MeshSerializerImpl_v1_2::readGeometry(DataStreamPtr& stream, Mesh* pMesh,
         VertexData* dest)
     {
-        unsigned short texCoordSet = 0;
-
         unsigned short bindIdx = 0;
 
         dest->vertexStart = 0;
@@ -3304,6 +3286,8 @@ namespace Ogre {
         if (!stream->eof())
         {
             unsigned short streamID = readChunk(stream);
+            unsigned short texCoordSet = 0;
+            
             while(!stream->eof() &&
                 (streamID == M_GEOMETRY_NORMALS ||
                  streamID == M_GEOMETRY_COLOURS ||

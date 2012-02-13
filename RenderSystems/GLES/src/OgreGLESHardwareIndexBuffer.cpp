@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -125,7 +125,6 @@ namespace Ogre {
         }
 
         void* retPtr = 0;
-        GLenum access = 0;
 		GLESHardwareBufferManager* glBufManager = static_cast<GLESHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
         if(length < glBufManager->getGLMapBufferThreshold())
@@ -155,6 +154,7 @@ namespace Ogre {
 #if defined(GL_GLEXT_PROTOTYPES)
         if (!retPtr)
 		{
+            GLenum access = 0;
 			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, mBufferId );
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)

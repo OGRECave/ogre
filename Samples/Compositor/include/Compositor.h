@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -146,10 +146,13 @@ void Sample_Compositor::registerCompositors(void)
         Ogre::ResourcePtr resource = resourceIterator.getNext();
         const Ogre::String& compositorName = resource->getName();
         // Don't add base Ogre/Scene compositor to view
-        if (compositorName == "Ogre/Scene")
+        if (Ogre::StringUtil::startsWith(compositorName, "Ogre/Scene/", false))
             continue;
 		// Don't add the deferred shading compositors, thats a different demo.
 		if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
+			continue;
+		// Don't add the SSAO compositors, thats a different demo.
+		if (Ogre::StringUtil::startsWith(compositorName, "SSAO", false))
 			continue;
 
 		mCompositorNames.push_back(compositorName);
@@ -231,6 +234,7 @@ void Sample_Compositor::cleanupContent(void)
 		++itor;
 	}
 	mCompositorLogics.clear();
+    MeshManager::getSingleton().remove("Myplane");
 }
 //-----------------------------------------------------------------------------------
 void Sample_Compositor::setupControls(void) 

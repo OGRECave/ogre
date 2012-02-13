@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -187,7 +187,7 @@ namespace Ogre {
 		@param source Source string
 		@param replaceWhat Sub-string to find and replace
 		@param replaceWithWhat Sub-string to replace with (the new sub-string)
-		@returns An updated string with the sub-string replaced
+		@return An updated string with the sub-string replaced
 		*/
 		static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
 

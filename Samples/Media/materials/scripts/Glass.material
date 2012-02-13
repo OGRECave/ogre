@@ -8,6 +8,11 @@ fragment_program Ogre/Compositor/GlassFP_cg cg
 fragment_program Ogre/Compositor/GlassFP_glsles glsles
 {
 	source GlassFP.glsles
+	default_params
+	{
+		param_named RT int 0
+		param_named NormalMap int 1
+	}
 }
 
 fragment_program Ogre/Compositor/GlassFP unified

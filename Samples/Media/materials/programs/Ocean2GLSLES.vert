@@ -85,7 +85,9 @@ void main(void)
     vec3 B = normalize(vec3(0.0, ddx, 1.0)) * BumpScale; // Binormal
     vec3 N = normalize(vec3(ddx, 1.0, ddy));             // Normal
 
-	rotMatrix = mat3(T, B, N);
+	rotMatrix = mat3(vec3(T[0], B[0], N[0]),
+						vec3(T[1], B[1], N[1]),
+						vec3(T[2], B[2], N[2]));
 
 	gl_Position = worldViewProj * P;
 

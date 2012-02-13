@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -387,7 +387,7 @@ namespace Ogre {
         @param theType The data format of the element (3 floats, a colour etc)
         @param semantic The meaning of the data (position, normal, diffuse colour etc)
         @param index Optional index for multi-input elements like texture coordinates
-		@returns A reference to the VertexElement added.
+		@return A reference to the VertexElement added.
         */
         virtual const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
             VertexElementSemantic semantic, unsigned short index = 0);
@@ -402,7 +402,7 @@ namespace Ogre {
         @param theType The data format of the element (3 floats, a colour etc)
         @param semantic The meaning of the data (position, normal, diffuse colour etc)
         @param index Optional index for multi-input elements like texture coordinates
-        @returns A reference to the VertexElement added.
+        @return A reference to the VertexElement added.
         */
         virtual const VertexElement& insertElement(unsigned short atPosition,
             unsigned short source, size_t offset, VertexElementType theType,

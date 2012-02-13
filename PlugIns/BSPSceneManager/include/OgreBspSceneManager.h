@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ namespace Ogre {
             is in, and tags any geometry which is in a visible leaf for
             later processing.
             @param camera Pointer to the viewpoint.
-            @returns The BSP node the camera was found in, for info.
+            @return The BSP node the camera was found in, for info.
         */
         BspNode* walkTree(Camera* camera, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
         /** Tags geometry in the leaf specified for later rendering. */
@@ -250,12 +250,12 @@ namespace Ogre {
 
         void clearTemporaries(void);
         /** Internal processing of a single node.
-        @returns true if we should continue tracing, false otherwise
+        @return true if we should continue tracing, false otherwise
         */
         bool processNode(const BspNode* node, const Ray& tracingRay, RaySceneQueryListener* listener,
             Real maxDistance = Math::POS_INFINITY, Real traceDistance = 0.0f);
         /** Internal processing of a single leaf.
-        @returns true if we should continue tracing, false otherwise
+        @return true if we should continue tracing, false otherwise
         */
         bool processLeaf(const BspNode* node, const Ray& tracingRay, RaySceneQueryListener* listener,
             Real maxDistance = Math::POS_INFINITY, Real traceDistance = 0.0f);

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -389,7 +389,7 @@ namespace Ogre {
 		@param format The pixel format requested
 		@param usage The kind of usage this texture is intended for, a combination of 
 			the TextureUsage flags.
-		@returns true if the format is natively supported, false if a fallback would be used.
+		@return true if the format is natively supported, false if a fallback would be used.
 		*/
 		virtual bool isFormatSupported(TextureType ttype, PixelFormat format, int usage);
 
@@ -440,7 +440,7 @@ namespace Ogre {
             In case the pixel format doesn't supported by device, false will be returned
             if in precise mode, and natively used pixel format will be actually use to
             check if in fallback mode.
-		@returns true if the texture filtering is supported.
+		@return true if the texture filtering is supported.
         */
         virtual bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly = false) = 0;

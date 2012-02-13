@@ -28,7 +28,7 @@ getenv_path(OGRE_DEPENDENCIES_DIR)
 # construct search paths
 set(OIS_PREFIX_PATH ${OIS_HOME} ${ENV_OIS_HOME} 
   ${OGRE_DEPENDENCIES_DIR} ${ENV_OGRE_DEPENDENCIES_DIR}
-  ${OGRE_SOURCE}/iPhoneDependencies ${ENV_OGRE_SOURCE}/iPhoneDependencies
+  ${OGRE_SOURCE}/iOSDependencies ${ENV_OGRE_SOURCE}/iOSDependencies
   ${OGRE_SOURCE}/Dependencies ${ENV_OGRE_SOURCE}/Dependencies
   ${OGRE_SDK} ${ENV_OGRE_SDK}
   ${OGRE_HOME} ${ENV_OGRE_HOME})

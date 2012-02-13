@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -71,13 +71,6 @@ namespace Ogre {
             /// Last min & mip filtering options, so we can combine them
             FilterOptions mMinFilter;
             FilterOptions mMipFilter;
-
-            /** Used to store the number of mipmaps in the currently bound texture.  This is then
-             used to modify the texture unit filtering.  Some GL ES implementations e.g. iPhone, 
-             have a more strict implementation, if the current texture has no mipmaps and a filter that 
-             requires them is requested, it is as if the texture is unbound.
-             */
-            size_t mTextureMipmapCount;
 
             /// What texture coord set each texture unit is using
             size_t mTextureCoordIndex[OGRE_MAX_TEXTURE_LAYERS];

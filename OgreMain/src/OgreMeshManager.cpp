@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -488,7 +488,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate
@@ -635,7 +635,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate
@@ -798,7 +798,7 @@ namespace Ogre
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
 
-        // Set up standard xform from origin
+        // Set up standard transform from origin
         xlate.setTrans(params.plane.normal * -params.plane.d);
 
         // concatenate

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -221,6 +221,7 @@ namespace Ogre {
 		// Scan through the active uniforms and add them to the reference list
 		GLint uniformCount = 0;
         GLint maxLength = 0;
+		char* uniformName = NULL;
 
 		glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
         GL_CHECK_ERROR;
@@ -230,7 +231,7 @@ namespace Ogre {
         if(maxLength == 0)
             return;
 
-		char uniformName[maxLength];
+		uniformName = new char[maxLength + 1];
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
@@ -280,6 +281,11 @@ namespace Ogre {
 				// user params
 			} // end if
 		} // end for
+		
+		if( uniformName != NULL ) 
+		{
+			delete uniformName;
+		}
 	}
 	//---------------------------------------------------------------------
 	void GLSLESProgramManagerCommon::extractConstantDefs(const String& src,

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ namespace Ogre {
 		@remarks
 			This method is called when a resource group is loaded if you use 
 			ResourceGroupManager::_registerScriptLoader.
-		@returns
+		@return
 			A list of file patterns, in the order they should be searched in.
 		*/
 		virtual const StringVector& getScriptPatterns(void) const = 0;
@@ -80,7 +80,7 @@ namespace Ogre {
 		@remarks
 			There are dependencies between some kinds of scripts, and to enforce
 			this all implementors of this interface must define a loading order. 
-		@returns A value representing the relative loading order of these scripts
+		@return A value representing the relative loading order of these scripts
 			compared to other script users, where higher values load later.
 		*/
 		virtual Real getLoadingOrder(void) const  = 0;

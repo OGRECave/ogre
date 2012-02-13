@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,10 +84,10 @@ namespace Ogre
 							const String &batchName );
 		virtual ~InstanceBatchShader();
 
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 
-		/** @See InstanceBatch::buildFrom */
+		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		//Renderable overloads

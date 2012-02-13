@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -177,8 +177,8 @@ namespace Ogre {
                 updateChildren If true, the update cascades down to all children. Specify false if you wish to
                 update children separately, e.g. because of a more selective SceneManager implementation.
             @param
-                parentHasChanged This flag indicates that the parent xform has changed,
-                    so the child should retrieve the parent's xform and combine it with its own
+                parentHasChanged This flag indicates that the parent transform has changed,
+                    so the child should retrieve the parent's transform and combine it with its own
                     even if it hasn't changed itself.
         */
         virtual void _update(bool updateChildren, bool parentHasChanged);

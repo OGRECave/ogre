@@ -164,17 +164,17 @@ the install location by changing the variable CMAKE_INSTALL_PREFIX in
 CMake.
 
 
-8. Building Ogre on Mac OS X for iPhone OS
+8. Building Ogre on Mac OS X for iOS OS
 --------------------------------------------
 
-To build Ogre for the iPhone, you need to check the option
+To build Ogre for the iOS, you need to check the option
 OGRE_BUILD_PLATFORM_APPLE_IOS in cmake-gui before you generate the Xcode
 project. Unfortunately, you will now have to do a few manual steps to
 make the generated build system work properly.
 
 A Xcode project has now been generated in the build directory, so
 to start the Ogre build, open OGRE.xcodeproj and build as usual.
-To run samples on your device you will need to have a valid iPhone Developer
+To run samples on your device you will need to have a valid iOS Developer
 certificate installed.  For each sample, double click on target in the Groups &
 Files list.  Ensure that a valid identity is selected in the Code Signing Identity
 drop menu.
@@ -187,4 +187,4 @@ the Info.plist file to match the App ID of the chosen code signing identity.
 This can be done from the Target Properties panel.  It must match the bundle
 identifier of a valid developer certificate if you are building for devices.
 See the following PDF for information under Generating an App ID:
-http://adcdownload.apple.com/iphone/iphone_developer_program_user_guide/iphone_developer_program_user_guide__standard_program_v2.4.pdf
+http://developer.apple.com/library/ios/documentation/Xcode/Conceptual/iphone_development/index.html

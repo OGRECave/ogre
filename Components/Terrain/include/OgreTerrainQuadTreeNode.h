@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -235,7 +235,7 @@ namespace Ogre
 		/** Calculate appropriate LOD for this node and children
 		@param cam The camera to be used (this should already be the LOD camera)
 		@param cFactor The cFactor which incorporates the viewport size, max pixel error and lod bias
-		@returns true if this node or any of its children were selected for rendering
+		@return true if this node or any of its children were selected for rendering
 		*/
 		bool calculateCurrentLod(const Camera* cam, Real cFactor);
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLSLESExtSupport.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -45,8 +46,18 @@ namespace Ogre
                 glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
                 GL_CHECK_ERROR
             }
+#if GL_EXT_separate_shader_objects
+            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                    glIsProgramPipelineEXT(obj))
+            {
+                glValidateProgramPipelineEXT(obj);
+                glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength);
+                GL_CHECK_ERROR
+            }
+#endif
             else if(glIsProgram(obj))
             {
+                glValidateProgram(obj);
                 glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
                 GL_CHECK_ERROR
             }
@@ -55,7 +66,6 @@ namespace Ogre
 			{
 				GLint charsWritten  = 0;
 
-				//GLchar * infoLog = OGRE_NEW GLchar[infologLength];
 				char * infoLog = new char [infologLength];
 				infoLog[0] = 0;
 
@@ -64,11 +74,20 @@ namespace Ogre
                     glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
                     GL_CHECK_ERROR
                 }
+#if GL_EXT_separate_shader_objects
+                else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                        glIsProgramPipelineEXT(obj))
+                {
+                    glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog);
+                    GL_CHECK_ERROR
+                }
+#endif
                 else if(glIsProgram(obj))
                 {
                     glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
                     GL_CHECK_ERROR
                 }
+
 				if (strlen(infoLog) > 0)
 				{
 					logMessage += "\n" + String(infoLog);

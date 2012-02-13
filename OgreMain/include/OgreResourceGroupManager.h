@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -740,7 +740,7 @@ namespace Ogre {
 			group membership to be changed
 		@param resourceBeingLoaded Optional pointer to the resource being 
 			loaded, which you should supply if you want
-		@returns Shared pointer to data stream containing the data, will be
+		@return Shared pointer to data stream containing the data, will be
 			destroyed automatically when no longer referenced
 		*/
 		DataStreamPtr openResource(const String& resourceName, 
@@ -755,7 +755,7 @@ namespace Ogre {
 			does not need to be fully qualified.
 		@param groupName The resource group; this determines which locations
 			are searched.
-		@returns Shared pointer to a data stream list , will be
+		@return Shared pointer to a data stream list , will be
 			destroyed automatically when no longer referenced
 		*/
 		DataStreamListPtr openResources(const String& pattern, 
@@ -767,14 +767,14 @@ namespace Ogre {
         information using listFileInfo.
         @param groupName The name of the group
         @param dirs If true, directory names will be returned instead of file names
-        @returns A list of filenames matching the criteria, all are fully qualified
+        @return A list of filenames matching the criteria, all are fully qualified
         */
         StringVectorPtr listResourceNames(const String& groupName, bool dirs = false);
 
         /** List all files in a resource group with accompanying information.
         @param groupName The name of the group
         @param dirs If true, directory names will be returned instead of file names
-        @returns A list of structures detailing quite a lot of information about
+        @return A list of structures detailing quite a lot of information about
         all the files in the archive.
         */
         FileInfoListPtr listResourceFileInfo(const String& groupName, bool dirs = false);
@@ -788,7 +788,7 @@ namespace Ogre {
         @param pattern The pattern to search for; wildcards (*) are allowed
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of filenames matching the criteria, all are fully qualified
+        @return A list of filenames matching the criteria, all are fully qualified
         */
         StringVectorPtr findResourceNames(const String& groupName, const String& pattern,
             bool dirs = false);
@@ -813,7 +813,7 @@ namespace Ogre {
 		/** Find the group in which a resource exists.
 		@param filename Fully qualified name of the file the resource should be
 			found as
-		@returns Name of the resource group the resource was found in. An
+		@return Name of the resource group the resource was found in. An
 			exception is thrown if the group could not be determined.
 		*/
 		const String& findGroupContainingResource(const String& filename);
@@ -824,7 +824,7 @@ namespace Ogre {
         @param pattern The pattern to search for; wildcards (*) are allowed
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of file information structures for all files matching 
+        @return A list of file information structures for all files matching 
         the criteria.
         */
         FileInfoListPtr findResourceFileInfo(const String& group, const String& pattern,
@@ -834,7 +834,7 @@ namespace Ogre {
 		time_t resourceModifiedTime(const String& group, const String& filename); 
         /** List all resource locations in a resource group.
         @param groupName The name of the group
-        @returns A list of resource locations matching the criteria
+        @return A list of resource locations matching the criteria
         */
         StringVectorPtr listResourceLocations(const String& groupName);
 
@@ -842,7 +842,7 @@ namespace Ogre {
             resource group.
         @param groupName The name of the group
         @param pattern The pattern to search for; wildcards (*) are allowed
-        @returns A list of resource locations matching the criteria
+        @return A list of resource locations matching the criteria
         */
         StringVectorPtr findResourceLocation(const String& groupName, const String& pattern);
 
@@ -1029,20 +1029,20 @@ namespace Ogre {
 		/** Get a list of the currently defined resource groups. 
 		@note This method intentionally returns a copy rather than a reference in
 			order to avoid any contention issues in multithreaded applications.
-		@returns A copy of list of currently defined groups.
+		@return A copy of list of currently defined groups.
 		*/
 		StringVector getResourceGroups(void);
 		/** Get the list of resource declarations for the specified group name. 
 		@note This method intentionally returns a copy rather than a reference in
 			order to avoid any contention issues in multithreaded applications.
 		@param groupName The name of the group
-		@returns A copy of list of currently defined resources.
+		@return A copy of list of currently defined resources.
 		*/
 		ResourceDeclarationList getResourceDeclarationList(const String& groupName);
 
 		/** Get the list of resource locations for the specified group name.
 		@param groupName The name of the group
-		@returns The list of resource locations associated with the given group.
+		@return The list of resource locations associated with the given group.
 		*/		
 		const LocationList& getResourceLocationList(const String& groupName);
 

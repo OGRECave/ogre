@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -407,7 +407,6 @@ bool FFPTexturing::addVSFunctionInvocations(TextureUnitParams* textureUnitParams
 			texCoordCalcFunc->pushOperand(mVSInputNormal, Operand::OPS_IN);	
 			texCoordCalcFunc->pushOperand(textureUnitParams->mVSOutputTexCoord, Operand::OPS_OUT);
 		}			
-		break;
 		break;
 
 	case TEXCALC_PROJECTIVE_TEXTURE:
@@ -905,6 +904,7 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 		curParams.mTextureSamplerType = GCT_SAMPLER2D;
 		curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
 		break;
+    case TEX_TYPE_2D_ARRAY:
 	case TEX_TYPE_3D:
 		curParams.mTextureSamplerType = GCT_SAMPLER3D;
 		curParams.mVSInTextureCoordinateType = GCT_FLOAT3;

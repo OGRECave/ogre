@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -128,7 +128,6 @@ namespace Ogre {
         }
 
         void* retPtr = 0;
-        GLenum access = 0;
 		GLES2HardwareBufferManager* glBufManager = static_cast<GLES2HardwareBufferManager*>(HardwareBufferManager::getSingletonPtr());
 
         if(length < glBufManager->getGLMapBufferThreshold())
@@ -158,6 +157,7 @@ namespace Ogre {
 #if GL_OES_mapbuffer
 		if (!retPtr)
 		{
+            GLenum access = 0;
             dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
 			// Use glMapBuffer
 			if(options == HBL_DISCARD)

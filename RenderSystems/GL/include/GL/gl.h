@@ -9,7 +9,7 @@ extern "C" {
 ** The contents of this file are subject to the GLX Public License Version 1.0
 ** (the "License"). You may not use this file except in compliance with the
 ** License. You may obtain a copy of the License at Silicon Graphics, Inc.,
-** attn: Legal Services, 2011 N. Shoreline Blvd., Mountain View, CA 94043
+** attn: Legal Services, 2012 N. Shoreline Blvd., Mountain View, CA 94043
 ** or at http://www.sgi.com/software/opensource/glx/license.html.
 ** 
 ** Software distributed under the License is distributed on an "AS IS"

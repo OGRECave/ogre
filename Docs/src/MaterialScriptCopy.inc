@@ -5,7 +5,7 @@ When creating new script objects that are only slight variations of another obje
 
 For example, to make a new material that is based on one previously defined, add a @emph{colon} @strong{:} after the new material name followed by the name of the material that is to be copied.@*@*
 
-Format: material <NewUniqueChildName> : <ReferanceParentMaterial>@*@*
+Format: material <NewUniqueChildName> : <ReferenceParentMaterial>@*@*
 
 The only caveat is that a parent material must have been defined/parsed prior to the child material script being parsed.  The easiest way to achieve this is to either place parents at the beginning of the material script file, or to use the 'import' directive (@xref{Script Import Directive}). Note that inheritance is actually a copy - after scripts are loaded into Ogre, objects no longer maintain their copy inheritance structure.  If a parent material is modified through code at runtime, the changes have no effect on child materials that were copied from it in the script.@*@*
 
@@ -16,31 +16,31 @@ Names become very useful in materials that copy from other materials.  In order 
 Here is an example:
 @example
 material test2 : test1
-{
+@{
   technique
-  {
+  @{
     pass
-    {
-    }
+    @{
+    @}
 
     pass
-    {
-    }
+    @{
+    @}
 
     pass
-    {
-    }
+    @{
+    @}
 
     pass
-    {
-    }
+    @{
+    @}
 
     pass
-    {
+    @{
 	  ambient 0.5 0.7 0.3 1.0
-    }
-  }
-}
+    @}
+  @}
+@}
 @end example
 
 This method is tedious for materials that only have slight variations to their parent.
@@ -48,15 +48,15 @@ An easier way is to name the pass directly without listing the previous passes:@
 
 @example
 material test2 : test1
-{
+@{
   technique 0
-  {
+  @{
     pass 4
-    {
+    @{
 	  ambient 0.5 0.7 0.3 1.0
-    }
-  }
-}
+    @}
+  @}
+@}
 @end example
 
 The parent pass name must be known and the pass must be in the correct technique in order for this to work correctly.  Specifying the technique name and the pass name is the best method.  If the parent technique/pass are not named then use their index values for their name as done in the example.@*@*
@@ -73,18 +73,18 @@ A specific texture unit state (TUS) can be given a unique name within a pass of 
 
 @example
 material BumpMap2 : BumpMap1
-{
+@{
   technique ati8500
-  {
+  @{
     pass 0
-    {
+    @{
       texture_unit NormalMap
-      {
+      @{
         texture BumpyMetalNM.png
-      }
-    }
-  }
-}
+      @}
+    @}
+  @}
+@}
 @end example
 
 @subheading Advanced Script Inheritance
@@ -92,14 +92,14 @@ Starting with Ogre 1.6, script objects can now inherit from each other more gene
 
 @example
 material Test
-{
+@{
     technique
-    {
+    @{
         pass : ParentPass
-        {
-        }
-    }
-}
+        @{
+        @}
+    @}
+@}
 @end example
 
 Notice that the pass inherits from ParentPass. This allows for the creation of more fine-grained inheritance hierarchies.@*@*
@@ -108,9 +108,9 @@ Along with the more generalized inheritance system comes an important new keywor
 
 @example
 abstract pass ParentPass
-{
+@{
     diffuse 1 0 0 1
-}
+@}
 @end example
 
 That declares the ParentPass object which was inherited from in the above example. Notice the abstract keyword which informs the compiler that it should not attempt to actually turn this object into any sort of Ogre resource. If it did attempt to do so, then it would obviously fail, since a pass all on its own like that is not valid.@*@*
@@ -119,12 +119,12 @@ The final matching option is based on wildcards. Using the '*' character, you ca
 
 @example
 abstract technique Overrider
-{
-   pass *color*
-   {
+@{
+   pass *colour*
+   @{
       diffuse 0 0 0 0
-   }
-} 
+   @}
+@}
 @end example
 
 This technique, when included in a material, will override all passes matching the wildcard "*color*" (color has to appear in the name somewhere) and turn their diffuse properties black. It does not matter their position or exact name in the inherited technique, this will match them. @*@*
@@ -142,114 +142,112 @@ texture_alias <name>@*@*
 Default: <name> will default to texture_unit <name> if set
 @example
 texture_unit DiffuseTex
-{
+@{
   texture diffuse.jpg
-}
+@}
 @end example
 texture_alias defaults to DiffuseTex.@*
 
 Example: The base material to be cloned:@*
 @example
 material TSNormalSpecMapping
-{ 
+@{
   technique GLSL
-  { 
+  @{
     pass 
-    { 
+    @{
       ambient 0.1 0.1 0.1
       diffuse 0.7 0.7 0.7
       specular 0.7 0.7 0.7 128
 		
       vertex_program_ref GLSLDemo/OffsetMappingVS
-      {
+      @{
         param_named_auto lightPosition light_position_object_space 0
         param_named_auto eyePosition camera_position_object_space
         param_named textureScale float 1.0
-      }
+      @}
 
       fragment_program_ref GLSLDemo/TSNormalSpecMappingFS 
-      { 
+      @{
         param_named normalMap int 0
         param_named diffuseMap int 1
         param_named fxMap int 2
-      } 
+      @}
 
       // Normal map
       texture_unit NormalMap
-      {
+      @{
         texture defaultNM.png
         tex_coord_set 0
         filtering trilinear
-      }
+      @}
 
       // Base diffuse texture map
       texture_unit DiffuseMap
-      {
+      @{
         texture defaultDiff.png
         filtering trilinear
         tex_coord_set 1
-      }
+      @}
 
       // spec map for shininess
       texture_unit SpecMap
-      {
+      @{
         texture defaultSpec.png
         filtering trilinear
         tex_coord_set 2
-      }
+      @}
 
-    } 
-
-  } 
+    @}
+  @}
 
   technique HLSL_DX9
-  { 
+  @{
     pass 
-    { 
+    @{
 			
       vertex_program_ref FxMap_HLSL_VS
-      {
+      @{
         param_named_auto worldViewProj_matrix worldviewproj_matrix 
         param_named_auto lightPosition light_position_object_space 0
         param_named_auto eyePosition camera_position_object_space
-      }
+      @}
 
       fragment_program_ref FxMap_HLSL_PS 
-      { 
+      @{
         param_named ambientColor float4 0.2 0.2 0.2 0.2
-      } 
+      @}
 
       // Normal map
       texture_unit 
-      {
+      @{
         texture_alias NormalMap
         texture defaultNM.png
         tex_coord_set 0
         filtering trilinear
-      }
+      @}
 
       // Base diffuse texture map
       texture_unit 
-      {
+      @{
         texture_alias DiffuseMap
         texture defaultDiff.png
         filtering trilinear
         tex_coord_set 1
-      }
+      @}
 
       // spec map for shininess
       texture_unit
-      {
+      @{
         texture_alias SpecMap
         texture defaultSpec.png
         filtering trilinear
         tex_coord_set 2
-      }
+      @}
 
-    } 
-
-  } 
-}
+    @}
+  @}
+@}
 @end example
 
 Note that the GLSL and HLSL techniques use the same textures.  For each texture usage type a texture alias is given that describes what the texture is used for.  So the first texture unit in the GLSL technique has the same alias as the TUS in the HLSL technique since its the same texture used. Same goes for the second and third texture units.@*
@@ -261,24 +259,24 @@ Format:@*
 set_texture_alias <alias name> <texture name>@*
 @example
 material fxTest : TSNormalSpecMapping
-{
+@{
   set_texture_alias NormalMap fxTestNMap.png
   set_texture_alias DiffuseMap fxTestDiff.png
   set_texture_alias SpecMap fxTestMap.png
-}
+@}
 @end example
 
 The textures in both techniques in the child material will automatically get replaced with the new ones we want to use.@*@*
 
-  The same process can be done in code as long you set up the texture alias names so then there is no need to traverse technique/pass/TUS to change a texture.  You just call myMaterialPtr->applyTextureAliases(myAliasTextureNameList) which will update all textures in all texture units that match the alias names in the map container reference you passed as a parameter.@*@*
+The same process can be done in code as long you set up the texture alias names so then there is no need to traverse technique/pass/TUS to change a texture.  You just call myMaterialPtr->applyTextureAliases(myAliasTextureNameList) which will update all textures in all texture units that match the alias names in the map container reference you passed as a parameter.@*@*
 
  You don't have to supply all the textures in the copied material.@*
 @example
 material fxTest2 : fxTest
-{
+@{
   set_texture_alias DiffuseMap fxTest2Diff.png
   set_texture_alias SpecMap fxTest2Map.png
-}
+@}
 @end example
 
 Material fxTest2 only changes the diffuse and spec maps of material fxTest and uses the same normal map.@*@*
@@ -286,9 +284,9 @@ Material fxTest2 only changes the diffuse and spec maps of material fxTest and u
 Another example:
 @example
 material fxTest3 : TSNormalSpecMapping
-{
+@{
   set_texture_alias DiffuseMap fxTest2Diff.png
-}
+@}
 @end example
 
 fxTest3 will end up with the default textures for the normal map and spec map setup in TSNormalSpecMapping material but will have a different diffuse map.  So your base material can define the default textures to use and then the child materials can override specific textures.@*@*
@@ -299,35 +297,35 @@ A very powerful new feature in Ogre 1.6 is variables. Variables allow you to par
 
 @example
 abstract pass ParentPass
-{
+@{
    diffuse $diffuse_colour
-}
+@}
 
 material Test
-{
+@{
    technique
-   {
+   @{
        pass : ParentPass
-       {
+       @{
            set $diffuse_colour "1 0 0 1"
-       }
-   }
-}
+       @}
+   @}
+@}
 @end example
 
 The ParentPass object declares a variable called "diffuse_colour" which is then overridden in the Test material's pass. The "set" keyword is used to set the value of that variable. The variable assignment follows lexical scoping rules, which means that the value of "1 0 0 1" is only valid inside that pass definition. Variable assignment in outer scopes carry over into inner scopes.@*@*
 
 @example
 material Test
-{
+@{
     set $diffuse_colour "1 0 0 1"
     technique
-    {
+    @{
         pass : ParentPass
-        {
-        }
-    }
-}
+        @{
+        @}
+    @}
+@}
 @end example
 
 The $diffuse_colour assignment carries down through the technique and into the pass. @*@*
@@ -342,8 +340,8 @@ Imports are a feature introduced to remove ambiguity from script dependencies. W
 @example
 import * from "parent.material"
 material Child : Parent
-{
-}
+@{
+@}
 @end example
 
 The material "Parent" is defined in parent.material and the import ensures that those definitions are found properly. You can also import specific targets from within a file.

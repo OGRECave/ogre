@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -130,29 +130,43 @@ namespace Ogre
 			memcpy(m,rkMatrix.m,9*sizeof(Real));
 			return *this;
 		}
+
+        /** Tests 2 matrices for equality.
+         */
         bool operator== (const Matrix3& rkMatrix) const;
+
+        /** Tests 2 matrices for inequality.
+         */
         inline bool operator!= (const Matrix3& rkMatrix) const
 		{
 			return !operator==(rkMatrix);
 		}
 
         // arithmetic operations
+        /** Matrix addition.
+         */
         Matrix3 operator+ (const Matrix3& rkMatrix) const;
+
+        /** Matrix subtraction.
+         */
         Matrix3 operator- (const Matrix3& rkMatrix) const;
+
+        /** Matrix concatenation using '*'.
+         */
         Matrix3 operator* (const Matrix3& rkMatrix) const;
         Matrix3 operator- () const;
 
-        // matrix * vector [3x3 * 3x1 = 3x1]
+        /// Matrix * vector [3x3 * 3x1 = 3x1]
         Vector3 operator* (const Vector3& rkVector) const;
 
-        // vector * matrix [1x3 * 3x3 = 1x3]
+        /// Vector * matrix [1x3 * 3x3 = 1x3]
         _OgreExport friend Vector3 operator* (const Vector3& rkVector,
             const Matrix3& rkMatrix);
 
-        // matrix * scalar
+        /// Matrix * scalar
         Matrix3 operator* (Real fScalar) const;
 
-        // scalar * matrix
+        /// Scalar * matrix
         _OgreExport friend Matrix3 operator* (Real fScalar, const Matrix3& rkMatrix);
 
         // utilities
@@ -167,10 +181,10 @@ namespace Ogre
         void SingularValueComposition (const Matrix3& rkL,
             const Vector3& rkS, const Matrix3& rkR);
 
-        // Gram-Schmidt orthonormalization (applied to columns of rotation matrix)
+        /// Gram-Schmidt orthonormalization (applied to columns of rotation matrix)
         void Orthonormalize ();
 
-        // orthogonal Q, diagonal D, upper triangular U stored as (u01,u02,u12)
+        /// Orthogonal Q, diagonal D, upper triangular U stored as (u01,u02,u12)
         void QDUDecomposition (Matrix3& rkQ, Vector3& rkD,
             Vector3& rkU) const;
 
@@ -206,7 +220,7 @@ namespace Ogre
         void FromEulerAnglesYZX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesZXY (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
         void FromEulerAnglesZYX (const Radian& fYAngle, const Radian& fPAngle, const Radian& fRAngle);
-        // eigensolver, matrix must be symmetric
+        /// Eigensolver, matrix must be symmetric
         void EigenSolveSymmetric (Real afEigenvalue[3],
             Vector3 akEigenvector[3]) const;
 

@@ -186,7 +186,7 @@ namespace Ogre {
 		@param renderQueueGroupID The ID of the render queue group
 		@param invocationName Optional name to identify the invocation, useful
 			for listeners if a single queue group is invoked more than once
-		@returns A new RenderQueueInvocatin instance which you may customise
+		@return A new RenderQueueInvocatin instance which you may customise
 		*/
 		RenderQueueInvocation* add(uint8 renderQueueGroupID, 
 			const String& invocationName);

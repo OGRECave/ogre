@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -164,14 +164,6 @@ WARNING: Use only when you want to provide your own image loading code via codec
 */
 #ifndef OGRE_NO_FREEIMAGE
 #define OGRE_NO_FREEIMAGE 0
-#endif
-
-/** Disables use of the DevIL image library for loading images.
-By default DevIL is disabled in Eihort in favour of FreeImage, but you may re-enable
-it if you choose
-*/
-#ifndef OGRE_NO_DEVIL
-#define OGRE_NO_DEVIL 1
 #endif
 
 /** Disables use of the internal image codec for loading DDS files.

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -3668,14 +3668,16 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		OGRE_LOCK_MUTEX(mThreadInitMutex)
 		// free context, we'll need this to share lists
-		mCurrentContext->endCurrent();
+        if(mCurrentContext)
+            mCurrentContext->endCurrent();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::postExtraThreadsStarted()
 	{
 		OGRE_LOCK_MUTEX(mThreadInitMutex)
 		// reacquire context
-		mCurrentContext->setCurrent();
+        if(mCurrentContext)
+            mCurrentContext->setCurrent();
 	}
 	//---------------------------------------------------------------------
 	bool GLRenderSystem::activateGLTextureUnit(size_t unit)
@@ -3734,7 +3736,6 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             pBufferData = static_cast<char*>(pBufferData) + vertexStart * vertexBuffer->getVertexSize();
         }
 
-        unsigned int i = 0;
         VertexElementSemantic sem = elem.getSemantic();
         bool multitexturing = (getCapabilities()->getNumTextureUnits() > 1);
 
@@ -3839,7 +3840,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
                 else
                 {
                     // fixed function matching to units based on tex_coord_set
-                    for (i = 0; i < mDisabledTexUnitsFrom; i++)
+                    for (unsigned int i = 0; i < mDisabledTexUnitsFrom; i++)
                     {
                         // Only set this texture unit's texcoord pointer if it
                         // is supposed to be using this element's index

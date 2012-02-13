@@ -1,10 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
+    (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,44 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ILImageCodec_H__
-#define _ILImageCodec_H__
 
-#include "OgreImageCodec.h"
+#include <CoreFoundation/CoreFoundation.h>
+#include "OgrePrerequisites.h"
 
 namespace Ogre {
-
-    /** Codec specialized in images loaded using DevIL.
-        @remarks
-            The users implementing subclasses of ImageCodec are required to return
-            a valid pointer to a ImageData class from the decode(...) function.
-    */
-    class _OgreExport ILImageCodec : public ImageCodec
-    {
-    private:
-		static bool _is_initialised;
-        String mType;
-        unsigned int mIlType;
-
-    public:
-        ILImageCodec(const String &type, unsigned int ilType);
-        virtual ~ILImageCodec() { }
-
-        /// @copydoc Codec::code
-        DataStreamPtr code(MemoryDataStreamPtr& input, CodecDataPtr& pData) const;
-        /// @copydoc Codec::codeToFile
-        void codeToFile(MemoryDataStreamPtr& input, const String& outFileName, CodecDataPtr& pData) const;
-        /// @copydoc Codec::decode
-        DecodeResult decode(DataStreamPtr& input) const;
-
-        /// Initialise DevIL
-        void initialiseIL(void);
-        
-        virtual String getType() const;        
-
-	String magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const;
-    };
-
-} // namespace
-
-#endif
+    void* mac_loadDylib(const char* name);
+    _OgreExport std::string macCachePath();
+    _OgreExport std::string macBundlePath(void);
+    _OgreExport std::string iOSDocumentsDirectory(void);
+}

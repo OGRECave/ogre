@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -112,7 +112,7 @@ namespace Ogre
 		*/
 		void retrieveBoneIdx( VertexData *baseVertexData, HWBoneIdxVec &outBoneIdx );
 
-		/** @see: retrieveBoneIdx()
+		/** @see retrieveBoneIdx()
 			Assumes outBoneIdx has enough space (twice the base submesh vertex count, one for each weight)
 			Assumes outBoneWgt has enough space (twice the base submesh vertex count, one for each weight)
 		*/
@@ -139,7 +139,7 @@ namespace Ogre
 		/** update the lookup numbers for entities with shared transforms */
 		virtual void updateSharedLookupIndexes();
 
-		/** @See InstanceBatch::generateInstancedEntity() */
+		/** @see InstanceBatch::generateInstancedEntity() */
 		virtual InstancedEntity* generateInstancedEntity(size_t num);
 
 	public:
@@ -148,7 +148,7 @@ namespace Ogre
 							const String &batchName);
 		virtual ~BaseInstanceBatchVTF();
 
-		/** @See InstanceBatch::buildFrom */
+		/** @see InstanceBatch::buildFrom */
 		void buildFrom( const SubMesh *baseSubMesh, const RenderOperation &renderOperation );
 
 		//Renderable overloads
@@ -174,7 +174,7 @@ namespace Ogre
 			mUseBoneMatrixLookup = enable; mMaxLookupTableInstances = maxLookupTableInstances; }
 
 		/** Tells whether to use bone matrix lookup
-		@See setBoneMatrixLookup()
+		@see setBoneMatrixLookup()
 		*/
 		bool useBoneMatrixLookup() const { return mUseBoneMatrixLookup; }
 
@@ -193,10 +193,10 @@ namespace Ogre
 
 		bool useOneWeight() const { return mUseOneWeight; }
 
-		/** @See InstanceBatch::useBoneWorldMatrices()	*/
+		/** @see InstanceBatch::useBoneWorldMatrices()	*/
 		virtual bool useBoneWorldMatrices() const { return !mUseBoneMatrixLookup; }
 
-		/** @Returns the maximum amount of shared transform entities when using lookup table*/
+		/** @return the maximum amount of shared transform entities when using lookup table*/
 		virtual size_t getMaxLookupTableInstances() const { return mMaxLookupTableInstances; }
 		
 	};
@@ -218,7 +218,7 @@ namespace Ogre
 							const String &batchName);
 		virtual ~InstanceBatchVTF();
 
-		/** @See InstanceBatch::calculateMaxNumInstances */
+		/** @see InstanceBatch::calculateMaxNumInstances */
 		size_t calculateMaxNumInstances( const SubMesh *baseSubMesh, uint16 flags ) const;
 	};
 }

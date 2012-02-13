@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -321,6 +321,15 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << ENDL;
 
+                if (gpuType == GPT_FRAGMENT_PROGRAM)
+                {
+                    os << "\tvec4 outputColor;" << ENDL;
+                }
+                else if (gpuType == GPT_VERTEX_PROGRAM)
+                {
+                    os << "\tvec4 outputPosition;" << ENDL;
+                }
+
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
                 ShaderParameterConstIterator itParam = localParams.begin();
@@ -523,6 +532,16 @@ namespace Ogre {
                     localOs << ENDL;
                     os << localOs.str();
                 }
+
+                if (gpuType == GPT_FRAGMENT_PROGRAM)
+                {
+                    os << "\tgl_FragColor = outputColor;" << ENDL;
+                }
+                else if (gpuType == GPT_VERTEX_PROGRAM)
+                {
+                    os << "\tgl_Position = outputPosition;" << ENDL;
+                }
+
                 os << "}" << ENDL;
             }
             os << ENDL;
@@ -630,7 +649,7 @@ namespace Ogre {
                     // GLSL vertex program has to write always gl_Position
                     if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
                     {
-                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
+                        mInputToGLStatesMap[pParam->getName()] = "outputPosition";
                     }
                     else
                     {
@@ -649,7 +668,7 @@ namespace Ogre {
                         pParam->getSemantic() == Parameter::SPS_COLOR)
                 {					
                     // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";						
+                    mInputToGLStatesMap[pParam->getName()] = "outputColor";
                 }
             }
         }
@@ -750,70 +769,73 @@ namespace Ogre {
                     break;
                 }
 
-                // Write out the function from the cached FunctionInvocation;
-                os << invoc.getReturnType();
-                os << " ";
-                os << invoc.getFunctionName();
-                os << "(";
+				if(invoc.getFunctionName().length())
+				{
+                    // Write out the function from the cached FunctionInvocation;
+                    os << invoc.getReturnType();
+                    os << " ";
+                    os << invoc.getFunctionName();
+                    os << "(";
 
-                FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
-                FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
-                for (; itOperand != itOperandEnd;)
-                {
-                    Operand op = *itOperand;
-                    Operand::OpSemantic opSemantic = op.getSemantic();
-                    String paramName = op.getParameter()->getName();
-                    int opMask = (*itOperand).getMask();
-                    GpuConstantType gpuType = GCT_UNKNOWN;
-
-                    switch(opSemantic)
+                    FunctionInvocation::OperandVector::iterator itOperand    = invoc.getOperandList().begin();
+                    FunctionInvocation::OperandVector::iterator itOperandEnd = invoc.getOperandList().end();
+                    for (; itOperand != itOperandEnd;)
                     {
-                    case Operand::OPS_IN:
-                        os << "in ";
-                        break;
+                        Operand op = *itOperand;
+                        Operand::OpSemantic opSemantic = op.getSemantic();
+                        String paramName = op.getParameter()->getName();
+                        int opMask = (*itOperand).getMask();
+                        GpuConstantType gpuType = GCT_UNKNOWN;
 
-                    case Operand::OPS_OUT:
-                        os << "out ";
-                        break;
+                        switch(opSemantic)
+                        {
+                        case Operand::OPS_IN:
+                            os << "in ";
+                            break;
 
-                    case Operand::OPS_INOUT:
-                        os << "inout ";
-                        break;
+                        case Operand::OPS_OUT:
+                            os << "out ";
+                            break;
 
-                    default:
-                        break;
+                        case Operand::OPS_INOUT:
+                            os << "inout ";
+                            break;
+
+                        default:
+                            break;
+                        }
+
+                        // Swizzle masks are only defined for types like vec2, vec3, vec4.
+                        if (opMask == Operand::OPM_ALL)
+                        {
+                            gpuType = op.getParameter()->getType();
+                        }
+                        else
+                        {
+                            // Now we have to convert the mask to operator
+                            gpuType = Operand::getGpuConstantType(opMask);
+                        }
+
+                        // We need a valid type otherwise glsl compilation will not work
+                        if (gpuType == GCT_UNKNOWN)
+                        {
+                            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+                                "Can not convert Operand::OpMask to GpuConstantType", 
+                                "GLSLESProgramWriter::writeProgramDependencies" );	
+                        }
+
+                        os << mGpuConstTypeMap[gpuType] << " " << paramName;
+
+                        ++itOperand;
+
+                        // Prepare for the next operand
+                        if (itOperand != itOperandEnd)
+                        {
+                            os << ", ";
+                        }
                     }
-
-                    // Swizzle masks are only defined for types like vec2, vec3, vec4.
-                    if (opMask == Operand::OPM_ALL)
-                    {
-                        gpuType = op.getParameter()->getType();
-                    }
-                    else
-                    {
-                        // Now we have to convert the mask to operator
-                        gpuType = Operand::getGpuConstantType(opMask);
-                    }
-
-                    // We need a valid type otherwise glsl compilation will not work
-                    if (gpuType == GCT_UNKNOWN)
-                    {
-                        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                            "Can not convert Operand::OpMask to GpuConstantType", 
-                            "GLSLESProgramWriter::writeProgramDependencies" );	
-                    }
-
-                    os << mGpuConstTypeMap[gpuType] << " " << paramName;
-
-                    ++itOperand;
-
-                    // Prepare for the next operand
-                    if (itOperand != itOperandEnd)
-                    {
-                        os << ", ";
-                    }
+                    os << ENDL << "{" << ENDL << body << ENDL << "}" << ENDL;
                 }
-                os << ENDL << "{" << ENDL << body << ENDL << "}" << ENDL;
             }
         }
 

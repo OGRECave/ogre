@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    // Basically a dummy function.  Dynamic libraries aren't supported on iPhone
+    // Basically a dummy function.  Dynamic libraries aren't supported on iOS
     void* mac_loadDylib(const char* name)
     {
         return NULL;
@@ -60,7 +60,7 @@ namespace Ogre {
         return std::string(path);
     }
     
-    std::string iPhoneDocumentsDirectory()
+    std::string iOSDocumentsDirectory()
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];

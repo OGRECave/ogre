@@ -22,7 +22,7 @@ endif ()
 if (OGRE_INSTALL_DOCS)
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${OGRE_DOCS_PATH}
-    PATTERN ".svn" EXCLUDE
+    PATTERN ".hg" EXCLUDE
     PATTERN "src" EXCLUDE
   )
 endif ()

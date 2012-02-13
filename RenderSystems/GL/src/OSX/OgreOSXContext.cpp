@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 
 #include "OgreOSXContext.h"
+#include "OgreGLRenderSystem.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
@@ -37,4 +39,12 @@ namespace Ogre
 	OSXContext::~OSXContext()
 	{        
     }
+	
+	void OSXContext::_unregisterContext()
+	{
+		// NB have to do this is subclass to ensure any methods called back
+		// are on this subclass and not half-destructed superclass
+		GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
+		rs->_unregisterContext(this);
+	}
 }

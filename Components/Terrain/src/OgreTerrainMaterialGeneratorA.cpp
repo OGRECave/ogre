@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1150,7 +1150,7 @@ namespace Ogre
 		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
 	{
 		uint uvIdx = layer / 2;
-		String uvChannels = layer % 2 ? ".zw" : ".xy";
+		String uvChannels = (layer % 2) ? ".zw" : ".xy";
 		uint blendIdx = (layer-1) / 4;
 		String blendChannel = getChannel(layer-1);
 		String blendWeightStr = String("blendTexVal") + StringConverter::toString(blendIdx) + 

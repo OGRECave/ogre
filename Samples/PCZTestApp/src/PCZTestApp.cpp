@@ -29,7 +29,7 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int main(int argc, char *argv[])
 #endif
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
         [pool release];
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_IPHONE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   ifdef __OBJC__
 @interface AppDelegate : NSObject <UIApplicationDelegate>
 {

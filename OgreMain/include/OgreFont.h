@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -81,7 +81,13 @@ namespace Ogre
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
-		/// Command object for Font - see ParamCommand 
+ 		class _OgreExport CmdCharSpacer : public ParamCommand
+ 		{
+ 		public:
+ 			String doGet(const void* target) const;
+ 			void doSet(void* target, const String& val);
+ 		};
+        /// Command object for Font - see ParamCommand 
 		class _OgreExport CmdSize : public ParamCommand
 		{
 		public:
@@ -106,6 +112,7 @@ namespace Ogre
 		// Command object for setting / getting parameters
 		static CmdType msTypeCmd;
 		static CmdSource msSourceCmd;
+ 		static CmdCharSpacer msCharacterSpacerCmd;
 		static CmdSize msSizeCmd;
 		static CmdResolution msResolutionCmd;
 		static CmdCodePoints msCodePointsCmd;
@@ -115,6 +122,10 @@ namespace Ogre
 
         /// Source of the font (either an image name or a truetype font)
         String mSource;
+
+        /** Add a gap between letters vertically and horizonally
+            prevents nasty artifacts caused by fonts atypically wide or tall characters. */
+        uint mCharacterSpacer;
 
         /// Size of the truetype font, in points
         Real mTtfSize;
@@ -205,6 +216,20 @@ namespace Ogre
         */
         const String& getSource(void) const;
 
+        /** Sets the spacing to allocate for font characters to overlap each other.
+        @param charSpacer The size of the character spacer, in points.  Increasing it
+            allows for more stretched-out fonts; decreasing it reduces memory and processing
+            time.  The default is "5".
+        */
+        void setCharacterSpacer(uint charSpacer);
+ 
+        /** Gets the spacing to allocate for font characters to overlap each other.
+        @remarks Returns the size of the character spacer, in points.  A higher value
+            allows for more stretched-out fonts.  A low value reduces memory and processing
+            time.  The default is "5".
+        */
+        uint getCharacterSpacer(void) const;
+
         /** Sets the size of a truetype font (only required for FT_TRUETYPE). 
         @param ttfSize The size of the font in points. Note that the
             size of the font does not affect how big it is on the screen, just how large it is in
@@ -244,7 +269,7 @@ namespace Ogre
         /** Returns the texture coordinates of the associated glyph. 
             @remarks Parameter is a short to allow both ASCII and wide chars.
             @param id The code point (unicode)
-            @returns A rectangle with the UV coordinates, or null UVs if the
+            @return A rectangle with the UV coordinates, or null UVs if the
 				code point was not present
         */
         inline const UVRect& getGlyphTexCoords(CodePoint id) const

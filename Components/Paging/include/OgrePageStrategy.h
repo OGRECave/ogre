@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +126,7 @@ namespace Ogre
 		virtual void updateDebugDisplay(Page* p, SceneNode* sn) = 0;
 
 		/** Get the page ID for a given world position. 
-		@returns The page ID
+		@return The page ID
 		*/
 		virtual PageID getPageID(const Vector3& worldPos, PagedWorldSection* section) = 0;
 	};

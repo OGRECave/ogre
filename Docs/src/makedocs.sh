@@ -6,16 +6,18 @@
 # To run this script, you require:
 #   1. Doxygen
 #   2. texi2html
+# Run from the Docs folder. For example:
+# ./src/makedocs.sh
 # ----------------------------------------------------------------------------
 
 # Generate API docs using doxygen
-doxygen html.cfg
+doxygen src/html.cfg
 
 # Generate manuals from texi
-for f in *.texi;
+for f in src/*.texi;
 do
-	texi2html -Verbose -init_file ogretexi2html.init -subdir=../`basename $f .texi` -split=section -top_file=index.html $f
+	texi2html -Verbose --css-include=style.css --output=`basename $f .texi` -split=node -top_file=index.html $f
 done
 # copy stylesheet to core docs folder
-cp style.css ../
+cp src/style.css .
 	

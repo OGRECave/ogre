@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -139,7 +139,7 @@ namespace Ogre {
         @param filename The fully qualified name of the file
 		@param readOnly Whether to open the file in read-only mode or not (note, 
 			if the archive is read-only then this cannot be set to false)
-        @returns A shared pointer to a DataStream which can be used to 
+        @return A shared pointer to a DataStream which can be used to 
             read / write the file. If the file is not present, returns a null
 			shared pointer.
         */
@@ -148,7 +148,7 @@ namespace Ogre {
 		/** Create a new file (or overwrite one already there). 
 		@note If the archive is read-only then this method will fail.
 		@param filename The fully qualified name of the file
-		@returns A shared pointer to a DataStream which can be used to 
+		@return A shared pointer to a DataStream which can be used to 
 		read / write the file. 
 		*/
 		virtual DataStreamPtr create(const String& filename) const
@@ -179,7 +179,7 @@ namespace Ogre {
             archive has a concept of that)
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of filenames matching the criteria, all are fully qualified
+        @return A list of filenames matching the criteria, all are fully qualified
         */
         virtual StringVectorPtr list(bool recursive = true, bool dirs = false) = 0;
         
@@ -188,7 +188,7 @@ namespace Ogre {
             archive has a concept of that)
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of structures detailing quite a lot of information about
+        @return A list of structures detailing quite a lot of information about
             all the files in the archive.
         */
         virtual FileInfoListPtr listFileInfo(bool recursive = true, bool dirs = false) = 0;
@@ -203,7 +203,7 @@ namespace Ogre {
             archive has a concept of that)
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of filenames matching the criteria, all are fully qualified
+        @return A list of filenames matching the criteria, all are fully qualified
         */
         virtual StringVectorPtr find(const String& pattern, bool recursive = true,
             bool dirs = false) = 0;
@@ -222,7 +222,7 @@ namespace Ogre {
         archive has a concept of that)
         @param dirs Set to true if you want the directories to be listed
             instead of files
-        @returns A list of file information structures for all files matching 
+        @return A list of file information structures for all files matching 
             the criteria.
         */
         virtual FileInfoListPtr findFileInfo(const String& pattern, 

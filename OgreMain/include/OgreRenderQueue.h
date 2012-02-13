@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -331,7 +331,7 @@ namespace Ogre {
 			@param pQueue Pointer to the render queue that this object is being
 				added to. You can for example call this back to duplicate the 
 				object with a different technique
-			@returns true to allow the Renderable to be added to the queue, 
+			@return true to allow the Renderable to be added to the queue, 
 				false if you want to prevent it being added
 			*/
 			virtual bool renderableQueued(Renderable* rend, uint8 groupID, 

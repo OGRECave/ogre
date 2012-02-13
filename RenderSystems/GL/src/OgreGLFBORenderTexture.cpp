@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -142,7 +142,7 @@ static const size_t depthBits[] =
 	}
 
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
-        @returns true    if this combo is supported
+        @return true    if this combo is supported
                  false   if this combo is not supported
     */
     GLuint GLFBOManager::_tryFormat(GLenum depthFormat, GLenum stencilFormat)
@@ -199,7 +199,7 @@ static const size_t depthBits[] =
     }
     
     /** Try a certain packed depth/stencil format, and return the status.
-        @returns true    if this combo is supported
+        @return true    if this combo is supported
                  false   if this combo is not supported
     */
     bool GLFBOManager::_tryPackedFormat(GLenum packedFormat)

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,28 +25,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __iPhoneErrorDialog_H__
-#define __iPhoneErrorDialog_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreErrorDialog.h"
+#include <CoreFoundation/CoreFoundation.h>
 
-namespace Ogre
+
+using namespace Ogre;
+
+ErrorDialog::ErrorDialog()
 {
-	/** Class for displaying the error dialog if Ogre fails badly. */
-	class _OgreExport ErrorDialog
-	{
-	public:
-		ErrorDialog();
-
-		/**
-		@remarks
-			Displays the error dialog.
-		@param
-			errorMessage The error message which has caused the failure.
-		@param
-			logName Optional name of the log to display in the detail pane.
-		*/
-		void display(const String& errorMessage, String logName = "");
-	};
 }
-#endif
+
+void ErrorDialog::display(const String& errorMessage, String logName)
+{
+// TODO: Implement with a UIAlertView perhaps
+}

@@ -30,7 +30,7 @@ fragment_program Ogre/ParticleGS/DisplayPScg cg
 {
 	source ParticleGS.cg
 	entry_point DisplayParticles_PS
-	profiles ps_1_1 arbfp1
+	profiles ps_2_0 arbfp1
 }
 
 vertex_program Ogre/ParticleGS/GenerateVShlsl4 hlsl

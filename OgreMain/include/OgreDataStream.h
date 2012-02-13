@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -210,14 +210,14 @@ namespace Ogre {
 			stopping at the end of the file.
 		@param buf Reference to a buffer pointer
 		@param count Number of bytes to read
-		@returns The number of bytes read
+		@return The number of bytes read
 		*/
 		virtual size_t read(void* buf, size_t count) = 0;
 		/** Write the requisite number of bytes from the stream (only applicable to 
 			streams that are not read-only)
 		@param buf Pointer to a buffer containing the bytes to write
 		@param count Number of bytes to write
-		@returns The number of bytes written
+		@return The number of bytes written
 		*/
 		virtual size_t write(const void* buf, size_t count)
 		{
@@ -239,7 +239,7 @@ namespace Ogre {
 		@param buf Reference to a buffer pointer
 		@param maxCount The maximum length of data to be read, excluding the terminating character
 		@param delim The delimiter to stop at
-		@returns The number of bytes read, excluding the terminating character
+		@return The number of bytes read, excluding the terminating character
 		*/
 		virtual size_t readLine(char* buf, size_t maxCount, const String& delim = "\n");
 		
@@ -271,7 +271,7 @@ namespace Ogre {
             If you used this function, you <b>must</b> open the stream in <b>binary mode</b>,
             otherwise, it'll produce unexpected results.
 		@param delim The delimiter(s) to stop at
-		@returns The number of bytes skipped
+		@return The number of bytes skipped
 		*/
 		virtual size_t skipLine(const String& delim = "\n");
 

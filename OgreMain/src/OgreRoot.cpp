@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,9 +69,6 @@ THE SOFTWARE.
 	
 #if OGRE_NO_FREEIMAGE == 0
 #include "OgreFreeImageCodec.h"
-#endif
-#if OGRE_NO_DEVIL == 0
-#include "OgreILCodecs.h"
 #endif
 #if OGRE_NO_DDS_CODEC == 0
 #include "OgreDDSCodec.h"
@@ -242,10 +239,6 @@ namespace Ogre {
 		// Register image codecs
 		FreeImageCodec::startup();
 #endif
-#if OGRE_NO_DEVIL == 0
-	    // Register image codecs
-	    ILCodecs::registerCodecs();
-#endif
 #if OGRE_NO_PVRTC_CODEC == 0
         PVRTCCodec::startup();
 #endif
@@ -302,9 +295,6 @@ namespace Ogre {
 		OGRE_DELETE mExternalTextureSourceManager;
 #if OGRE_NO_FREEIMAGE == 0
 		FreeImageCodec::shutdown();
-#endif
-#if OGRE_NO_DEVIL == 0
-        ILCodecs::deleteCodecs();
 #endif
 #if OGRE_NO_DDS_CODEC == 0
 		DDSCodec::shutdown();
@@ -426,7 +416,7 @@ namespace Ogre {
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        // Read the config from Documents first(user config) if it exists on iPhone.
+        // Read the config from Documents first(user config) if it exists on iOS.
         // If it doesn't exist or is invalid then use mConfigFileName
 
         Ogre::String outBaseName, extension, configFileName;

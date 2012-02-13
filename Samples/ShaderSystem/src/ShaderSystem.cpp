@@ -302,11 +302,8 @@ void Sample_ShaderSystem::setupContent()
 	// Setup the sky box,
 	mSceneMgr->setSkyBox(true, "Examples/SceneCubeMap2");
 
-	Plane plane;
-	plane.normal = Vector3::UNIT_Y;
-	plane.d = 0;
 	MeshManager::getSingleton().createPlane("Myplane",
-		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
 		1500,1500,25,25,true,1,60,60,Vector3::UNIT_Z);
 
 	Entity* pPlaneEnt = mSceneMgr->createEntity( "plane", "Myplane" );
@@ -577,6 +574,8 @@ void Sample_ShaderSystem::cleanupContent()
 	
 	MeshManager::getSingleton().remove(MAIN_ENTITY_MESH);
 	mTargetEntities.clear();
+
+    MeshManager::getSingleton().remove("Myplane");
 
 	mSceneMgr->destroyQuery(mRayQuery);
 }
@@ -1199,7 +1198,8 @@ void Sample_ShaderSystem::exportRTShaderSystemMaterial(const String& fileName, c
 Ogre::StringVector Sample_ShaderSystem::getRequiredPlugins()
 {
 	StringVector names;
-    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+    if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
+        !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
         names.push_back("Cg Program Manager");
 	return names;
 }
@@ -1219,8 +1219,9 @@ void Sample_ShaderSystem::testCapabilities( const RenderSystemCapabilities* caps
 		return;
 	}
 
-	// Check if GLSL ES shaders are supported - is so - then we are OK.
-	if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+	// Check if GLSL type shaders are supported - is so - then we are OK.
+	if (GpuProgramManager::getSingleton().isSyntaxSupported("glsles") ||
+        GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
 	{
 		return;
 	}

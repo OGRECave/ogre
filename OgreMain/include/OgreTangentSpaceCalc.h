@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -168,7 +168,7 @@ namespace Ogre
         @param index The element index, ie the texture coordinate set which should be used to store the 3D
             coordinates representing a tangent vector per vertex, if targetSemantic is 
 			VES_TEXTURE_COORDINATES. If this already exists, it will be overwritten.
-		@returns
+		@return
 			A structure containing the results of the tangent space build. Vertex data
 			will always be modified but it's also possible that the index data
 			could be adjusted. This happens when mirroring is used on a mesh, which

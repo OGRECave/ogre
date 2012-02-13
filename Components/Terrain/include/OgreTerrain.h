@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -636,7 +636,7 @@ namespace Ogre
 		@param inSpace The space that inPos is expressed as
 		@param inPos The incoming position
 		@param outSpace The space which outPos should be expressed as
-		@returns The output position 
+		@return The output position 
 		*/
 		Vector3 convertPosition(Space inSpace, const Vector3& inPos, Space outSpace) const;
 		/** Convert a direction from one space to another with respect to this terrain.
@@ -650,7 +650,7 @@ namespace Ogre
 		@param inSpace The space that inDir is expressed as
 		@param inDir The incoming direction
 		@param outSpace The space which outDir should be expressed as
-		@returns The output direction 
+		@return The output direction 
 		*/
 		Vector3 convertDirection(Space inSpace, const Vector3& inDir, Space outSpace) const;
 
@@ -696,7 +696,7 @@ namespace Ogre
 		@remarks
 			This is safe to do in a background thread as it creates no GPU resources.
 			It reads data from a native terrain data chunk. 
-		@returns true if the preparation was successful
+		@return true if the preparation was successful
 		*/
 		bool prepare(StreamSerialiser& stream);
 
@@ -1222,7 +1222,7 @@ namespace Ogre
 			in its recorded position, and the place it will end up in the LOD
 			in which it is removed. 
 		@param rect Rectangle describing the area in which heights have altered 
-		@returns A Rectangle describing the area which was updated (may be wider
+		@return A Rectangle describing the area which was updated (may be wider
 			than the input rectangle)
 		*/
 		Rect calculateHeightDeltas(const Rect& rect);
@@ -1239,7 +1239,7 @@ namespace Ogre
 		/** Calculate (or recalculate) the normals on the terrain
 		@param rect Rectangle describing the area of heights that were changed
 		@param outFinalRect Output rectangle describing the area updated
-		@returns Pointer to a PixelBox full of normals (caller responsible for deletion)
+		@return Pointer to a PixelBox full of normals (caller responsible for deletion)
 		*/
 		PixelBox* calculateNormals(const Rect& rect, Rect& outFinalRect);
 
@@ -1257,7 +1257,7 @@ namespace Ogre
 		@param extraTargetRect Rectangle describing a target area of the terrain that
 			needs to be calculated additionally (e.g. from a neighbour)
 		@param outFinalRect Output rectangle describing the area updated in the lightmap
-		@returns Pointer to a PixelBox full of lighting data (caller responsible for deletion)
+		@return Pointer to a PixelBox full of lighting data (caller responsible for deletion)
 		*/
 		PixelBox* calculateLightmap(const Rect& rect, const Rect& extraTargetRect, Rect& outFinalRect);
 
@@ -1354,7 +1354,7 @@ namespace Ogre
 			may only upload it in the main render thread.
 		@param layerIndex The layer index, which should be 1 or higher (since 
 			the bottom layer has no blending).
-		@returns Pointer to the TerrainLayerBlendMap requested. The caller must
+		@return Pointer to the TerrainLayerBlendMap requested. The caller must
 			not delete this instance, use freeTemporaryResources if you want
 			to save the memory after completing your editing.
 		*/
@@ -1363,7 +1363,7 @@ namespace Ogre
 		/** Get the index of the blend texture that a given layer uses.
 		@param layerIndex The layer index, must be >= 1 and less than the number
 			of layers
-		@returns The index of the shared blend texture
+		@return The index of the shared blend texture
 		*/
 		uint8 getBlendTextureIndex(uint8 layerIndex) const;
 
@@ -1436,7 +1436,7 @@ namespace Ogre
 		/** Get the texture index and colour channel of the blend information for 
 			a given layer. 
 		@param layerIndex The index of the layer (1 or higher, layer 0 has no blend data)
-		@returns A pair in which the first value is the texture index, and the 
+		@return A pair in which the first value is the texture index, and the 
 			second value is the colour channel (RGBA)
 		*/
 		std::pair<uint8,uint8> getLayerBlendTextureIndex(uint8 layerIndex);
@@ -1589,7 +1589,7 @@ namespace Ogre
 		/** Utility method to pick a neighbour based on a ray. 
 		@param ray The ray in world space
 		@param distanceLimit Limit beyond which we want to ignore neighbours (0 for infinite)
-		@returns The first neighbour along this ray, or null
+		@return The first neighbour along this ray, or null
 		*/
 		Terrain* raySelectNeighbour(const Ray& ray, Real distanceLimit = 0);
 

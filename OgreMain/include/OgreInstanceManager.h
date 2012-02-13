@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,13 @@ namespace Ogre
 	/** This is the main starting point for the new instancing system.
 		Each InstanceManager can control one technique and one mesh, but it can manage
 		multiple materials at the same time.
-		@See SceneManager::createInstanceManager, which creates this InstanceManager. Each one
+		@see SceneManager::createInstanceManager, which creates this InstanceManager. Each one
 		must have a unique name. It's wasteless to create two InstanceManagers with the same
 		mesh reference, instancing technique and instances per batch count.
 		This class takes care of managing batches automatically, so that more are created when
 		needed, and reuse existing ones as much as posible; thus the user doesn't have to worry
 		of managing all those low level issues.
-		@See InstanceBatch & @see InstanceEntity for more information.
+		@see InstanceBatch & @see InstanceEntity for more information.
 
         @remarks
 			Design discussion webpage: http://www.ogre3d.org/forums/viewtopic.php?f=4&t=59902
@@ -64,10 +64,10 @@ namespace Ogre
 	public:
 		enum InstancingTechnique
 		{
-			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
-			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
-			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support @See InstanceBatchHW
-			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @See InstanceBatchHW_VTF
+			ShaderBased,			//Any SM 2.0+ @see InstanceBatchShader
+			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @see InstanceBatchVTF
+			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support @see InstanceBatchHW
+			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @see InstanceBatchHW_VTF
 			InstancingTechniquesCount,
 		};
 
@@ -130,16 +130,16 @@ namespace Ogre
 			which decreases their build time, and prevents GPU RAM from skyrocketing.
 			@param materialName The material name, to know where to put this batch in the map
 			@param firstTime True if this is the first time it is called
-			@returns The created InstancedManager for convenience
+			@return The created InstancedManager for convenience
         */
 		InstanceBatch* buildNewBatch( const String &materialName, bool firstTime );
 
-		/** @See defragmentBatches overload, this takes care of an array of batches
+		/** @see defragmentBatches overload, this takes care of an array of batches
 			for a specific material */
 		void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
 								InstanceBatchVec &fragmentedBatches );
 
-		/** @See setSetting. This function helps it by setting the given parameter to all batches
+		/** @see setSetting. This function helps it by setting the given parameter to all batches
 			in container.
 		*/
 		void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
@@ -152,6 +152,8 @@ namespace Ogre
 		virtual ~InstanceManager();
 
 		const String& getName() const { return mName; }
+
+		SceneManager* getSceneManager() const { return mSceneManager; }
 
 		/** Raises an exception if trying to change it after creating the first InstancedEntity
 			@remarks The actual value may be less if the technique doesn't support having so much
@@ -178,8 +180,8 @@ namespace Ogre
 			per batch
 			@param materialName Name of the material to base on
 			@param suggestedSize Suggested amount of instances per batch
-			@param flags @See InstanceManagerFlags
-			@returns The max/best amount of instances per batch given the suggested size and flags
+			@param flags @see InstanceManagerFlags
+			@return The max/best amount of instances per batch given the suggested size and flags
 		*/
 		size_t getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize, uint16 flags );
 
@@ -223,7 +225,7 @@ namespace Ogre
 			those that will be created in the future.
 		@par
 			For example setSetting( BatchSetting::CAST_SHADOWS, false ) disables shadow
-			casting for all instanced entities (@See MovableObject::setCastShadow)
+			casting for all instanced entities (@see MovableObject::setCastShadow)
 		@par
 			For example setSetting( BatchSetting::SHOW_BOUNDINGBOX, true, "MyMat" )
 			will display the bounding box of the batch (not individual InstancedEntities)

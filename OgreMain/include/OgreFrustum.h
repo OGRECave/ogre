@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -434,7 +434,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the box was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -447,7 +447,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the sphere was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -460,7 +460,7 @@ namespace Ogre
             @param
                 culledBy Optional pointer to an int which will be filled by the plane number which culled
                 the box if the result was false;
-            @returns
+            @return
                 If the box was visible, true is returned.
             @par
                 Otherwise, false is returned.
@@ -574,7 +574,7 @@ namespace Ogre
         @param left, top, right, bottom Pointers to destination values, these
             will be completed with the normalised device coordinates (in the 
             range {-1,1})
-        @returns true if the sphere was projected to a subset of the near plane,
+        @return true if the sphere was projected to a subset of the near plane,
             false if the entire near plane was contained
         */
         virtual bool projectSphere(const Sphere& sphere, 
@@ -652,14 +652,14 @@ namespace Ogre
         /** Set the orientation mode of the frustum. Default is OR_DEGREE_0
              @remarks
                 Setting the orientation of a frustum is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
+                iOS at this time.  An exception is thrown on other platforms.
         */
         void setOrientationMode(OrientationMode orientationMode);
 
         /** Get the orientation mode of the frustum.
              @remarks
                 Getting the orientation of a frustum is only supported on
-                iPhone at this time.  An exception is thrown on other platforms.
+                iOS at this time.  An exception is thrown on other platforms.
         */
         OrientationMode getOrientationMode() const;
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>								
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -173,7 +173,7 @@ namespace Ogre
 			if (out_proj != NULL)
 			{
 				// set FOV slightly larger than spotlight range
-				mTempFrustum->setFOVy(light.getSpotlightOuterAngle() * 1.2);
+				mTempFrustum->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
 
 				mTempFrustum->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
 				mTempFrustum->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
@@ -187,7 +187,7 @@ namespace Ogre
 				out_cam->setProjectionType(PT_PERSPECTIVE);
 				out_cam->setDirection(light.getDerivedDirection());
 				out_cam->setPosition(light.getDerivedPosition());
-				out_cam->setFOVy(light.getSpotlightOuterAngle() * 1.2);
+				out_cam->setFOVy(Ogre::Math::Clamp<Radian>(light.getSpotlightOuterAngle() * 1.2, Radian(0), Radian(Math::PI/2.0f)));
 				out_cam->setNearClipDistance(light._deriveShadowNearClipDistance(&cam));
 				out_cam->setFarClipDistance(light._deriveShadowFarClipDistance(&cam));
 			}

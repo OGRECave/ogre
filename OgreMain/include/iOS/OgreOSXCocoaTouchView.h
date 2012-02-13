@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,27 +25,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ILCodecs_H__
-#define _ILCodecs_H__
 
-#include <list>
+#ifndef __OSXCocoaView_H__
+#define __OSXCocoaView_H__
 
-namespace Ogre 
+#include "OgreRenderWindow.h"
+#include <UIKit/UIKit.h>
+
+@interface OgreView : UIView
 {
-    class ILImageCodec;
-    
-    class _OgrePrivate ILCodecs {
-    protected:
-       static std::list<ILImageCodec*> codeclist;
-    public:
-    	// Register all codecs provided by this module
-	   static void registerCodecs(void);
-	   // Delete all codecs provided by this module
-	   static void deleteCodecs(void);
-    };
+	Ogre::RenderWindow *window;
+}
 
-} // namespace Ogre
+- (id)initWithFrame:(CGRect)f;
+- (id)initWithGLiPhoneWindow:(Ogre::RenderWindow*)w;
 
+- (void)setOgreWindow:(Ogre::RenderWindow*)w;
+- (Ogre::RenderWindow*)ogreWindow;
 
-#endif // #ifndef _DDSCodec_H__
+- (void)setFrameSize:(CGSize)s;
+
+@end
+
+@interface OgreWindow : UIWindow
+{}
+@end
+
+#endif
 

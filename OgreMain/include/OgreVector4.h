@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -383,7 +383,7 @@ namespace Ogre
             @param
                 vec Vector with which to calculate the dot product (together
                 with this one).
-            @returns
+            @return
                 A float representing the dot product value.
         */
         inline Real dotProduct(const Vector4& vec) const

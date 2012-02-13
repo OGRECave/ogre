@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -244,7 +244,7 @@ namespace Ogre {
 			bool getCastsShadows(void) const;
 			String getFormatString(void) const;
 			/** Try to assign geometry to this bucket.
-			@returns false if there is no room left in this bucket
+			@return false if there is no room left in this bucket
 			*/
 			bool assign(QueuedGeometry* qsm);
 			/// Build

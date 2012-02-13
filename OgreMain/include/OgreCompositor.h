@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,14 +116,14 @@ namespace Ogre {
 		/** Get the instance name for a global texture.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@returns The instance name for the texture, corresponds to a real texture
+		@return The instance name for the texture, corresponds to a real texture
 		*/
 		const String& getTextureInstanceName(const String& name, size_t mrtIndex);
 
 		/** Get the instance of a global texture.
 		@param name The name of the texture in the original compositor definition
 		@param mrtIndex If name identifies a MRT, which texture attachment to retrieve
-		@returns The texture pointer, corresponds to a real texture
+		@return The texture pointer, corresponds to a real texture
 		*/
 		TexturePtr getTextureInstance(const String& name, size_t mrtIndex);
 

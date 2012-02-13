@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -182,7 +182,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _loadProceduralPage
 		for that
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _prepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a world  the opportunity to prepare page content procedurally. 
@@ -190,7 +190,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _prepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _loadProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a world  the opportunity to unload page content procedurally. 
@@ -198,7 +198,7 @@ namespace Ogre
 		You should not call this method directly. This call will happen in 
 		the main render thread so it can access GPU resources. Use _unprepareProceduralPage
 		for background preparation.
-		@returns true if the page was populated, false otherwise
+		@return true if the page was populated, false otherwise
 		*/
 		virtual bool _unloadProceduralPage(Page* page, PagedWorldSection* section);
 		/** Give a world  the opportunity to unprepare page content procedurally. 
@@ -206,7 +206,7 @@ namespace Ogre
 		You should not call this method directly. This call may well happen in 
 		a separate thread so it should not access GPU resources, use _unloadProceduralPage
 		for that
-		@returns true if the page was unpopulated, false otherwise
+		@return true if the page was unpopulated, false otherwise
 		*/
 		virtual bool _unprepareProceduralPage(Page* page, PagedWorldSection* section);
 		/** Get a serialiser set up to read Page data for the given PageID. 

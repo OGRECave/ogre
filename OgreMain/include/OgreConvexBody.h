@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Copyright (c) 2006 Matthias Fink, netAllied GmbH <matthias.fink@web.de>								
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -245,7 +245,7 @@ namespace Ogre
 		@param intersectionEdges A list of edges, which is updated if a match is found
 		@param vNext A reference to a vector which will be filled with the other
 			vertex at the matching edge, if found.
-		@returns True if a match was found
+		@return True if a match was found
 		*/
 		bool findAndEraseEdgePair(const Vector3& vec, 
 			Polygon::EdgeMap& intersectionEdges, Vector3& vNext ) const;

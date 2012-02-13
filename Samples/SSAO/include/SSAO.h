@@ -4,13 +4,13 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2011 Torus Knot Software Ltd
+ Copyright (c) 2000-2012 Torus Knot Software Ltd
  Also see acknowledgements in Readme.html
  
  You may use this sample code for anything you like, it is not covered by the
  same license as the rest of the engine.
  -----------------------------------------------------------------------------
-*/
+ */
 
 #include "SdkSample.h"
 
@@ -24,36 +24,36 @@ using namespace OgreBites;
 #define SSAO_GUI_TRACK_WIDTH 100
 #define SSAO_GUI_VALUE_BOX_WIDTH 50
 
-const String SSAO_OBJECT_MENU_NAME = "ObjectType";
-const String SSAO_CAMERA_MENU_NAME = "Camera";
+#define SSAO_OBJECT_MENU_NAME "ObjectType"
+#define SSAO_CAMERA_MENU_NAME "Camera"
 
-const String SSAO_COMPOSITOR_MENU_NAME = "Compositor";
-const String SSAO_POST_MENU_NAME = "Post";
-const String SSAO_CREASE_MINIMUM_NAME = "CreaseMinimum";
-const String SSAO_CREASE_RANGE_NAME = "mCreaseRange";
-const String SSAO_CREASE_BIAS_NAME = "mCreaseBias";
-const String SSAO_CREASE_AVERAGER_NAME = "mCreaseAverager";
-const String SSAO_CREASE_KERNELSIZE_NAME = "mCreaseKernelsize";
+#define SSAO_COMPOSITOR_MENU_NAME "Compositor"
+#define SSAO_POST_MENU_NAME "Post"
+#define SSAO_CREASE_MINIMUM_NAME "CreaseMinimum"
+#define SSAO_CREASE_RANGE_NAME "mCreaseRange"
+#define SSAO_CREASE_BIAS_NAME "mCreaseBias"
+#define SSAO_CREASE_AVERAGER_NAME "mCreaseAverager"
+#define SSAO_CREASE_KERNELSIZE_NAME "mCreaseKernelsize"
 
-const String SSAO_SAMPLE_SPACE_NAME = "sampleSpace";
-const String SSAO_SAMPLE_LENGTH_SCREENSPACE = "sampleScreenSpace";
-const String SSAO_SAMPLE_LENGTH_WORLDSPACE = "sampleWorldSpace";
-const String SSAO_SAMPLE_LENGTH_EXPONENT_NAME = "sampleLengthExponent";
+#define SSAO_SAMPLE_SPACE_NAME "sampleSpace"
+#define SSAO_SAMPLE_LENGTH_SCREENSPACE "sampleScreenSpace"
+#define SSAO_SAMPLE_LENGTH_WORLDSPACE "sampleWorldSpace"
+#define SSAO_SAMPLE_LENGTH_EXPONENT_NAME "sampleLengthExponent"
 
-const String SSAO_ANGLE_BIAS_NAME = "angleBias";
+#define SSAO_ANGLE_BIAS_NAME "angleBias"
 
-const String SSAO_CRYTEK_OFFSET_SCALE_NAME = "offsetScale";
-const String SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME = "edgeHighlight";
-const String SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME = "defaultOcclusion";
+#define SSAO_CRYTEK_OFFSET_SCALE_NAME "offsetScale"
+#define SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME "edgeHighlight"
+#define SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME "defaultOcclusion"
 
-const String SSAO_UNSHARP_KERNEL_BIAS_NAME = "kernelBias";
-const String SSAO_UNSHARP_LAMBDA_NAME = "lambda";
+#define SSAO_UNSHARP_KERNEL_BIAS_NAME "kernelBias"
+#define SSAO_UNSHARP_LAMBDA_NAME "lambda"
 
-const String SSAO_BILATERAL_PHOTOMETRIC_EXPONENT = "photometricExponent";
+#define SSAO_BILATERAL_PHOTOMETRIC_EXPONENT "photometricExponent"
 
-const String SSAO_USER_CAMERA_ITEM = "User Camera";
-const String SSAO_CAMERA_SIBENIK = "Sibenik";
-const String SSAO_CAMERA_CORNELL = "Cornell Box";
+#define SSAO_USER_CAMERA_ITEM "User Camera"
+#define SSAO_CAMERA_SIBENIK "Sibenik"
+#define SSAO_CAMERA_CORNELL "Cornell Box"
 
 class _OgreSampleClassExport Sample_SSAO : public SdkSample
 {
@@ -61,74 +61,13 @@ private:
 	std::vector<String> mMeshNames;
 	std::vector<Entity*> mMeshes;
 	int mCurrentMeshIndex;
-
+    
 	std::vector<String> mCompositorNames;
 	String mCurrentCompositor;
 	
 	std::vector<String> mPostNames;
 	String mCurrentPost;
-
-	std::vector<Widget *> mCreasePanel;
-	std::vector<Widget *> mUnsharpPanel;
-	std::vector<Widget *> mBilateralPanel;
-	
-	CheckBox* mSamplingCheckbox;
-	Slider* mScreenSpaceSlider;
-	Slider* mWorldSpaceSlider;
-
-	Slider* mSampleLengthExponent;
-
-	Slider* mAngleBiasSlider;
-	Slider* mOffsetStepSlider;
-	Slider* mEdgeHighlight;
-	Slider* mDefaultAccessibility;
-
-	SelectMenu* mCameraMenu;
-
-	/**
-	 * Show all the widgets in the panel
-	 * @see Sample_SSAO::showWidget
-	 */
-    void showPanel(std::vector<Widget *> panel)
-    {
-        for (unsigned int i = 0; i < panel.size(); i++)
-        {
-            mTrayMgr->moveWidgetToTray(panel[i], TL_TOPLEFT);
-            panel[i]->show();
-        }
-    }
-
-	/**
-	 * Hide all the widgets in the panel
-	 * @see Sample_SSAO::hideWidget
-	 */
-    void hidePanel(std::vector<Widget *> panel)
-    {
-        for (unsigned int i = 0; i < panel.size(); i++)
-        {
-            mTrayMgr->removeWidgetFromTray(panel[i]);
-            panel[i]->hide();
-        }
-    }
-
-	/**
-	 * Show the given widget. This sets it visible and re-adds it to the panel
-	 */
-    void showWidget(Widget* widget)
-    {
-        mTrayMgr->moveWidgetToTray(widget, TL_TOPLEFT);
-        widget->show();
-    }
-
-	/**
-	 * Hide the given widget. This sets it to not visible and also removes it
-	 * from the panel.
-	 */
-    void hideWidget(Widget* widget)
-    {
-        mTrayMgr->removeWidgetFromTray(widget);
-        widget->hide();
-    }
+    
 public:
 	Sample_SSAO()
     {
@@ -158,14 +97,40 @@ public:
         mCurrentCompositor = mCompositorNames[0];
         mCurrentPost = mPostNames[0];
     }
-
+    
+    void cleanupContent()
+    {
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
+        
+        CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/GBuffer", false);
+        CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/GBuffer");
+        
+        for (unsigned int i = 0; i < mCompositorNames.size(); i++)
+        {
+            CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCompositorNames[i], false);
+            CompositorManager::getSingleton().removeCompositor(mViewport, mCompositorNames[i]);
+        }
+        
+        for (unsigned int i = 0; i < mPostNames.size(); i++)
+        {
+            CompositorManager::getSingleton().setCompositorEnabled(mViewport, mPostNames[i], false);
+            CompositorManager::getSingleton().removeCompositor(mViewport, mPostNames[i]);
+        }
+        
+        MeshManager::getSingleton().remove("sibenik");
+        MeshManager::getSingleton().remove("cornell");
+        
+        mMeshes.clear();
+    }
+    
     StringVector getRequiredPlugins()
     {
         StringVector names;
         names.push_back("Cg Program Manager");
         return names;
     }
-
+    
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !caps->hasCapability(RSC_FRAGMENT_PROGRAM))
@@ -174,7 +139,7 @@ public:
                         " programs, so you cannot run this sample. Sorry!", "Sample_SSAO::testCapabilities");
         }
     }
-
+    
 protected:
 	/**
 	 * Setup the compositors to be used.
@@ -207,7 +172,7 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, true);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
     }
-
+    
 	/**
 	 * Setup the controls, ie. the gui elements.
 	 */
@@ -219,10 +184,10 @@ protected:
             objectType->addItem(mMeshNames[i]);
         
         // --- select camera menu ---
-        mCameraMenu = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, SSAO_CAMERA_MENU_NAME, "Camera Position", SSAO_GUI_WIDTH, 16);
-        mCameraMenu->addItem(SSAO_USER_CAMERA_ITEM);
-        mCameraMenu->addItem(SSAO_CAMERA_CORNELL);
-        mCameraMenu->addItem(SSAO_CAMERA_SIBENIK);
+        SelectMenu* cameraMenu = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, SSAO_CAMERA_MENU_NAME, "Camera Position", SSAO_GUI_WIDTH, 16);
+        cameraMenu->addItem(SSAO_USER_CAMERA_ITEM);
+        cameraMenu->addItem(SSAO_CAMERA_CORNELL);
+        cameraMenu->addItem(SSAO_CAMERA_SIBENIK);
         
         // --- select compositor menu ---
         SelectMenu* compositor = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, SSAO_COMPOSITOR_MENU_NAME, "Compositor: ", SSAO_GUI_WIDTH, 16);
@@ -235,187 +200,174 @@ protected:
             post->addItem(mPostNames[i]);
         
         // --- hemisphere MC sample length exponent --- //
-        mSampleLengthExponent = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                            SSAO_SAMPLE_LENGTH_EXPONENT_NAME,
-                                                            "Sample Length Exponent",
-                                                            SSAO_GUI_WIDTH,
-                                                            SSAO_GUI_VALUE_BOX_WIDTH,
-                                                            0,
-                                                            5,
-                                                            501); // snaps ???
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_SAMPLE_LENGTH_EXPONENT_NAME,
+                                    "Sample Length Exponent",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    5,
+                                    501); // snaps ???
         
         
         // --- bilateral photometric exponent ---
-        Slider* photometricExponent = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                                  SSAO_BILATERAL_PHOTOMETRIC_EXPONENT,
-                                                                  "Photometric Exponent",
-                                                                  SSAO_GUI_WIDTH,
-                                                                  SSAO_GUI_VALUE_BOX_WIDTH,
-                                                                  0,
-                                                                  50,
-                                                                  501); // snaps ???
-        mBilateralPanel.push_back(photometricExponent);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_BILATERAL_PHOTOMETRIC_EXPONENT,
+                                    "Photometric Exponent",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    50,
+                                    501); // snaps ???
         
         // --- crease shading options ---
-        Slider* mCreaseMinimumSlider = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                                   SSAO_CREASE_MINIMUM_NAME,
-                                                                   "Minimum Crease",
-                                                                   SSAO_GUI_WIDTH,
-                                                                   SSAO_GUI_VALUE_BOX_WIDTH,
-                                                                   0,
-                                                                   1,
-                                                                   101); // snaps ???
-        mCreasePanel.push_back(mCreaseMinimumSlider);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CREASE_MINIMUM_NAME,
+                                    "Minimum Crease",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    1,
+                                    101); // snaps ???
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CREASE_RANGE_NAME,
+                                    "Crease Range",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    10,
+                                    101); // snaps ???
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CREASE_BIAS_NAME,
+                                    "Bias",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    2,
+                                    101); // snaps ???
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CREASE_AVERAGER_NAME,
+                                    "Averager",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    100,
+                                    101); // snaps ???
         
-        Slider* mCreaseRange = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                           SSAO_CREASE_RANGE_NAME,
-                                                           "Crease Range",
-                                                           SSAO_GUI_WIDTH,
-                                                           SSAO_GUI_VALUE_BOX_WIDTH,
-                                                           0,
-                                                           10,
-                                                           101); // snaps ???
-        mCreasePanel.push_back(mCreaseRange);
-        
-        Slider* mCreaseBias = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                          SSAO_CREASE_BIAS_NAME,
-                                                          "Bias",
-                                                          SSAO_GUI_WIDTH,
-                                                          SSAO_GUI_VALUE_BOX_WIDTH,
-                                                          0,
-                                                          2,
-                                                          101); // snaps ???
-        mCreasePanel.push_back(mCreaseBias);
-        
-        Slider* mCreaseAverager = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                              SSAO_CREASE_AVERAGER_NAME,
-                                                              "Averager",
-                                                              SSAO_GUI_WIDTH,
-                                                              SSAO_GUI_VALUE_BOX_WIDTH,
-                                                              0,
-                                                              100,
-                                                              101); // snaps ???
-        mCreasePanel.push_back(mCreaseAverager);
-        
-        Slider* mCreaseKernelsize = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                                SSAO_CREASE_KERNELSIZE_NAME,
-                                                                "Kernel Size Bias",
-                                                                SSAO_GUI_WIDTH,
-                                                                SSAO_GUI_VALUE_BOX_WIDTH,
-                                                                0,
-                                                                10,
-                                                                101); // snaps ???
-        mCreasePanel.push_back(mCreaseKernelsize);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CREASE_KERNELSIZE_NAME,
+                                    "Kernel Size Bias",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    10,
+                                    101); // snaps ???
         
         // --- sample length parameter ---
         mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
-        mSamplingCheckbox = mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_SAMPLE_SPACE_NAME, "Sample in Screen Space", SSAO_GUI_WIDTH);
-        mScreenSpaceSlider = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                         SSAO_SAMPLE_LENGTH_SCREENSPACE,
-                                                         "Screen space length (in %)",
-                                                         SSAO_GUI_WIDTH,
-                                                         SSAO_GUI_VALUE_BOX_WIDTH,
-                                                         0,
-                                                         100,
-                                                         10001);
+        mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_SAMPLE_SPACE_NAME, "Sample in Screen Space", SSAO_GUI_WIDTH);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_SAMPLE_LENGTH_SCREENSPACE,
+                                    "Screen space length (in %)",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    100,
+                                    10001);
         
-        mWorldSpaceSlider = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                        SSAO_SAMPLE_LENGTH_WORLDSPACE,
-                                                        "World Space Length (units)",
-                                                        SSAO_GUI_WIDTH,
-                                                        SSAO_GUI_VALUE_BOX_WIDTH,
-                                                        0,
-                                                        10,
-                                                        10001);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_SAMPLE_LENGTH_WORLDSPACE,
+                                    "World Space Length (units)",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    10,
+                                    10001);
         
         // --- angle bias ---
-        mAngleBiasSlider = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                       SSAO_ANGLE_BIAS_NAME,
-                                                       "Angle Bias (radians)",
-                                                       SSAO_GUI_WIDTH,
-                                                       SSAO_GUI_VALUE_BOX_WIDTH,
-                                                       0,
-                                                       Math::HALF_PI,
-                                                       1001);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_ANGLE_BIAS_NAME,
+                                    "Angle Bias (radians)",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    Math::HALF_PI,
+                                    1001);
         
         // --- offset length ---
-        mOffsetStepSlider = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                        SSAO_CRYTEK_OFFSET_SCALE_NAME,
-                                                        "Offset Scale (% of sample length)",
-                                                        SSAO_GUI_WIDTH,
-                                                        SSAO_GUI_VALUE_BOX_WIDTH,
-                                                        0,
-                                                        100,
-                                                        10001);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CRYTEK_OFFSET_SCALE_NAME,
+                                    "Offset Scale (% of sample length)",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    100,
+                                    10001);
         
         // --- crytek edge highlight ---
-        mEdgeHighlight = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                     SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME,
-                                                     "Edge Highlight Factor",
-                                                     SSAO_GUI_WIDTH,
-                                                     SSAO_GUI_VALUE_BOX_WIDTH,
-                                                     0,
-                                                     1,
-                                                     101);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME,
+                                    "Edge Highlight Factor",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    1,
+                                    101);
         
         // --- crytek default accesibility value for invalid samples ---
-        mDefaultAccessibility = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                            SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME,
-                                                            "Default Accessibility",
-                                                            SSAO_GUI_WIDTH,
-                                                            SSAO_GUI_VALUE_BOX_WIDTH,
-                                                            0,
-                                                            1,
-                                                            101);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME,
+                                    "Default Accessibility",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    1,
+                                    101);
         
         // --- unsharp mask kernel bias ---
-        Slider* mUnsharpKernelBias = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                                 SSAO_UNSHARP_KERNEL_BIAS_NAME,
-                                                                 "Kernel Size Bias",
-                                                                 SSAO_GUI_WIDTH,
-                                                                 SSAO_GUI_VALUE_BOX_WIDTH,
-                                                                 0,
-                                                                 10,
-                                                                 101); // snaps ???
-        mUnsharpPanel.push_back(mUnsharpKernelBias);
-        
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_UNSHARP_KERNEL_BIAS_NAME,
+                                    "Kernel Size Bias",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    10,
+                                    101); // snaps ???
         // --- unsharp mask lambda ---
-        Slider* mUnsharpLambda = mTrayMgr->createThickSlider(TL_TOPLEFT,
-                                                             SSAO_UNSHARP_LAMBDA_NAME,
-                                                             "Unsharp Lambda",
-                                                             SSAO_GUI_WIDTH,
-                                                             SSAO_GUI_VALUE_BOX_WIDTH,
-                                                             0,
-                                                             10,
-                                                             101); // snaps ???
-        mUnsharpPanel.push_back(mUnsharpLambda);
+        mTrayMgr->createThickSlider(TL_TOPLEFT,
+                                    SSAO_UNSHARP_LAMBDA_NAME,
+                                    "Unsharp Lambda",
+                                    SSAO_GUI_WIDTH,
+                                    SSAO_GUI_VALUE_BOX_WIDTH,
+                                    0,
+                                    10,
+                                    101); // snaps ???
         
         // setup values
-        mCreaseMinimumSlider->setValue(0.2);
-        mCreaseRange->setValue(1.0f);
-        mCreaseBias->setValue(1.0f);
-        mCreaseAverager->setValue(24);
-        mCreaseKernelsize->setValue(3.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CREASE_MINIMUM_NAME))->setValue(0.2f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CREASE_RANGE_NAME))->setValue(1.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CREASE_BIAS_NAME))->setValue(1.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CREASE_AVERAGER_NAME))->setValue(24);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CREASE_KERNELSIZE_NAME))->setValue(3.0f);
         
-        mSamplingCheckbox->setChecked(false);
-        mScreenSpaceSlider->setValue(6.0f);
-        mWorldSpaceSlider->setValue(2.0f);
-        mAngleBiasSlider->setValue(0.2f);
-        mOffsetStepSlider->setValue(1.0f);
-        mEdgeHighlight->setValue(0.0f);
-        mDefaultAccessibility->setValue(0.5f);
+        static_cast<CheckBox*>(mTrayMgr->getWidget(SSAO_SAMPLE_SPACE_NAME))->setChecked(false);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_SCREENSPACE))->setValue(6.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_WORLDSPACE))->setValue(2.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_ANGLE_BIAS_NAME))->setValue(0.2f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CRYTEK_OFFSET_SCALE_NAME))->setValue(1.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME))->setValue(0.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME))->setValue(0.5f);
         
-        mUnsharpKernelBias->setValue(1.0f);
-        mUnsharpLambda->setValue(5.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_UNSHARP_KERNEL_BIAS_NAME))->setValue(1.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_UNSHARP_LAMBDA_NAME))->setValue(5.0f);
         
-        photometricExponent->setValue(10.0f);
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT))->setValue(10.0f);
         
-        mSampleLengthExponent->setValue(1.0f);
-        
+        static_cast<Slider*>(mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_EXPONENT_NAME))->setValue(1.0f);
         
         mTrayMgr->showCursor();
     }
-
+    
 	/**
 	 * Create the scene and load the content.
 	 */
@@ -425,12 +377,13 @@ protected:
         
         // set our camera to orbit around the origin and show cursor
         mCameraMan->setStyle(CS_FREELOOK);
+		mCameraMan->setTopSpeed(20.0);
         mCamera->move(Vector3(0, 10, 0));
         mCamera->setFOVy(Radian(Degree(45).valueRadians())); // i.e. 60deg * 1.3.. maya and ogre use fovX and fovY
         mCamera->setFarClipDistance(400);
         mCamera->setNearClipDistance(0.1);
         mTrayMgr->showCursor();
-
+        
         // sibenik
         mCamera->setPosition(27, 9, -2);
         mCamera->lookAt(Vector3(-6, 2, 1));;
@@ -454,7 +407,7 @@ protected:
         changeCompositor(mCompositorNames[0]);
         changePost(mPostNames[0]);
     }
-
+    
 	/**
 	 * Change the current displayed mesh to the new mesh identified by its index.
 	 * @param index The index of the new mesh in the mesh vector.
@@ -465,7 +418,7 @@ protected:
         mMeshes[index]->setVisible(true);
         mCurrentMeshIndex = index;
     }
-
+    
 	/**
 	 * Change the compositor to be used.
 	 * @param compositor The name of the compositor
@@ -477,52 +430,106 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, true);
         
         if (compositor == "SSAO/CreaseShading")
-            showPanel(mCreasePanel);
+        {
+            mTrayMgr->getWidget(SSAO_CREASE_MINIMUM_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CREASE_MINIMUM_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CREASE_RANGE_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CREASE_RANGE_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CREASE_BIAS_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CREASE_BIAS_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CREASE_AVERAGER_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CREASE_AVERAGER_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CREASE_KERNELSIZE_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CREASE_KERNELSIZE_NAME, TL_TOPLEFT);
+        }
         else
-            hidePanel(mCreasePanel);
+        {
+            mTrayMgr->getWidget(SSAO_CREASE_MINIMUM_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CREASE_MINIMUM_NAME);
+            mTrayMgr->getWidget(SSAO_CREASE_RANGE_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CREASE_RANGE_NAME);
+            mTrayMgr->getWidget(SSAO_CREASE_BIAS_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CREASE_BIAS_NAME);
+            mTrayMgr->getWidget(SSAO_CREASE_AVERAGER_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CREASE_AVERAGER_NAME);
+            mTrayMgr->getWidget(SSAO_CREASE_KERNELSIZE_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CREASE_KERNELSIZE_NAME);
+        }
         
         if (compositor == "SSAO/UnsharpMask")
-            showPanel(mUnsharpPanel);
+        {
+            mTrayMgr->getWidget(SSAO_UNSHARP_KERNEL_BIAS_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_UNSHARP_KERNEL_BIAS_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_UNSHARP_LAMBDA_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_UNSHARP_LAMBDA_NAME, TL_TOPLEFT);
+        }
         else
-            hidePanel(mUnsharpPanel);
+        {
+            mTrayMgr->getWidget(SSAO_UNSHARP_KERNEL_BIAS_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_UNSHARP_KERNEL_BIAS_NAME);
+            mTrayMgr->getWidget(SSAO_UNSHARP_LAMBDA_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_UNSHARP_LAMBDA_NAME);
+        }
         
         if (compositor == "SSAO/Crytek" || compositor == "SSAO/HorizonBased" || compositor == "SSAO/HemisphereMC" || compositor == "SSAO/Volumetric")
         {
-            showWidget(mSamplingCheckbox);
-            mSamplingCheckbox->setChecked(mSamplingCheckbox->isChecked()); // easy way to update the sliders...
+            mTrayMgr->getWidget(SSAO_SAMPLE_SPACE_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_SAMPLE_SPACE_NAME, TL_TOPLEFT);
+            CheckBox *samplingCheckBox = (CheckBox *)mTrayMgr->getWidget(SSAO_SAMPLE_SPACE_NAME);
+            samplingCheckBox->setChecked(samplingCheckBox->isChecked()); // easy way to update the sliders...
         }
         else
         {
-            hideWidget(mSamplingCheckbox);
-            hideWidget(mScreenSpaceSlider);
-            hideWidget(mWorldSpaceSlider);
+            mTrayMgr->getWidget(SSAO_SAMPLE_SPACE_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_SPACE_NAME);
+            mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_SCREENSPACE)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_SCREENSPACE);
+            mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_WORLDSPACE)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_WORLDSPACE);
         }
         
         if (compositor == "SSAO/HemisphereMC")
-            showWidget(mSampleLengthExponent);
+        {
+            mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_EXPONENT_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_SAMPLE_LENGTH_EXPONENT_NAME, TL_TOPLEFT);
+        }
         else
-            hideWidget(mSampleLengthExponent);
+        {
+            mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_EXPONENT_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_EXPONENT_NAME);
+        }
         
         if (compositor == "SSAO/HorizonBased")
-            showWidget(mAngleBiasSlider);
+        {
+            mTrayMgr->getWidget(SSAO_ANGLE_BIAS_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_ANGLE_BIAS_NAME, TL_TOPLEFT);
+        }
         else
-            hideWidget(mAngleBiasSlider);
-        
+        {
+            mTrayMgr->getWidget(SSAO_ANGLE_BIAS_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_ANGLE_BIAS_NAME);
+        }
         
         if (compositor == "SSAO/Crytek")
         {
-            showWidget(mOffsetStepSlider);
-            showWidget(mEdgeHighlight);
-            showWidget(mDefaultAccessibility);
+            mTrayMgr->getWidget(SSAO_CRYTEK_OFFSET_SCALE_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CRYTEK_OFFSET_SCALE_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME, TL_TOPLEFT);
+            mTrayMgr->getWidget(SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME, TL_TOPLEFT);
         }
         else
         {
-            hideWidget(mOffsetStepSlider);
-            hideWidget(mEdgeHighlight);
-            hideWidget(mDefaultAccessibility);
+            mTrayMgr->getWidget(SSAO_CRYTEK_OFFSET_SCALE_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CRYTEK_OFFSET_SCALE_NAME);
+            mTrayMgr->getWidget(SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CRYTEK_EDGE_HIGHLIGHT_NAME);
+            mTrayMgr->getWidget(SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_CRYTEK_DEFAULT_ACCESSIBILITY_NAME);
         }
     }
-
+    
 	/**
 	 * Change the post filter to be used.
 	 * @param post The name of the new post processing filter.
@@ -534,11 +541,17 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
         
         if (post == "SSAO/Post/CrossBilateralFilter")
-            showPanel(mBilateralPanel);
+        {
+            mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)->show();
+            mTrayMgr->moveWidgetToTray(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT, TL_TOPLEFT);
+        }
         else
-            hidePanel(mBilateralPanel);
+        {
+            mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)->hide();
+            mTrayMgr->removeWidgetFromTray(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT);
+        }
     }
-
+    
 	// sdkTray listener callbacks
     void itemSelected(SelectMenu* menu)
     {
@@ -565,7 +578,7 @@ protected:
             }
         }
     }
-
+    
     void sliderMoved(Slider* slider)
     {
         if (slider->getName() == SSAO_CREASE_MINIMUM_NAME)
@@ -627,11 +640,11 @@ protected:
         
         else if(slider->getName() == SSAO_SAMPLE_LENGTH_EXPONENT_NAME)
             setUniform("SSAO/HemisphereMC", "SSAO/HemisphereMC", "cSampleLengthExponent", slider->getValue(), false, 1);
-
+        
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, true);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
     }
-
+    
     void checkBoxToggled(OgreBites::CheckBox *box) 
     {
         if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
@@ -644,25 +657,25 @@ protected:
             
             if (box->isChecked()) // we sample in screen space 
             {
-                mTrayMgr->removeWidgetFromTray(mWorldSpaceSlider);
-                mWorldSpaceSlider->hide();
-                mTrayMgr->moveWidgetToTray(mScreenSpaceSlider, TL_TOPLEFT);
-                mScreenSpaceSlider->show();
+                mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_WORLDSPACE);
+                mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_WORLDSPACE)->hide();
+                mTrayMgr->moveWidgetToTray(SSAO_SAMPLE_LENGTH_SCREENSPACE, TL_TOPLEFT);
+                mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_SCREENSPACE)->show();
             }
             else
             {
-                mTrayMgr->removeWidgetFromTray(mScreenSpaceSlider);
-                mScreenSpaceSlider->hide();
-                mTrayMgr->moveWidgetToTray(mWorldSpaceSlider, TL_TOPLEFT);
-                mWorldSpaceSlider->show();
+                mTrayMgr->removeWidgetFromTray(SSAO_SAMPLE_LENGTH_SCREENSPACE);
+                mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_SCREENSPACE)->hide();
+                mTrayMgr->moveWidgetToTray(SSAO_SAMPLE_LENGTH_WORLDSPACE, TL_TOPLEFT);
+                mTrayMgr->getWidget(SSAO_SAMPLE_LENGTH_WORLDSPACE)->show();
             }
         }
     }
-
+    
 	// The following three methods are for mouse input
 	/** @see Sample::mousePressed. */
 #if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-
+    
     bool mousePressed( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
     {
         if (mTrayMgr->injectMouseDown(evt, id)) 
@@ -672,7 +685,7 @@ protected:
         
         return true;
     }
-
+    
 	/** @see Sample::mouseReleased. */
     bool mouseReleased( const OIS::MouseEvent& evt, OIS::MouseButtonID id )
     {
@@ -683,7 +696,7 @@ protected:
         
         return true;
     }
-
+    
 	/** @see Sample::mouseMoved. */
     bool mouseMoved( const OIS::MouseEvent& evt )
     {
@@ -693,7 +706,7 @@ protected:
         else 
         {
             mCameraMan->injectMouseMove(evt);
-            mCameraMenu->selectItem(SSAO_USER_CAMERA_ITEM);
+            static_cast<SelectMenu*>(mTrayMgr->getWidget(SSAO_CAMERA_MENU_NAME))->selectItem(SSAO_USER_CAMERA_ITEM);
         }
         
         return true;
@@ -715,7 +728,7 @@ protected:
         CompositorManager::getSingleton().removeCompositor(mViewport, compositor);
         
         (static_cast<MaterialPtr>(MaterialManager::getSingleton().getByName(material)))->getTechnique(0)->
-            getPass(0)->getFragmentProgramParameters()->setNamedConstant(uniform, value);
+        getPass(0)->getFragmentProgramParameters()->setNamedConstant(uniform, value);
         
         // adding again
         CompositorManager::getSingleton().addCompositor(mViewport, compositor, position);

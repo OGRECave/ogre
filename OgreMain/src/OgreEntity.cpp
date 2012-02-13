@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1549,14 +1549,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Real Entity::getBoundingRadius(void) const
     {
-        Real rad = mMesh->getBoundingSphereRadius();
-        // Scale by largest scale factor
-        if (mParentNode)
-        {
-            const Vector3& s = mParentNode->_getDerivedScale();
-			rad *=  std::max(Ogre::Math::Abs(s.x), std::max(Ogre::Math::Abs(s.y), Ogre::Math::Abs(s.z)));
-        }
-        return rad;
+        return mMesh->getBoundingSphereRadius();
     }
     //-----------------------------------------------------------------------
     void Entity::prepareTempBlendBuffers(void)
