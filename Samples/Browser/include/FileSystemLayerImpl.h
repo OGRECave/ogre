@@ -53,7 +53,7 @@ namespace OgreBites
 
 		const Ogre::String getConfigFilePath(Ogre::String filename) const
 		{
-#if OGRE_DEBUG_MODE == 1
+#if OGRE_DEBUG_MODE == 1 && (OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS)
 			// add _d suffix to config files
 			Ogre::String::size_type pos = filename.rfind('.');
 			if (pos != Ogre::String::npos)
