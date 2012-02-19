@@ -19,12 +19,11 @@ compositor SSAO/GBuffer
             input none
             shadows off
             
-            pass clear {}
-            
-            pass render_quad
-            {
-                material SSAO/ClearGBuffer
-            }            
+            pass clear 
+			{
+			    buffers colour depth stencil
+				depth_value 1.0 
+			}      
 
             pass render_scene {}
         }

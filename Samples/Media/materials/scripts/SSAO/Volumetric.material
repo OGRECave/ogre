@@ -1,8 +1,21 @@
-fragment_program SSAO/Volumetric_fp cg
+fragment_program SSAO/Volumetric_fp_hlsl hlsl
+{
+    source Volumetric.cg
+    entry_point Volumetric_fp
+    target ps_3_0
+}
+
+fragment_program SSAO/Volumetric_fp_cg cg
 {
     source Volumetric.cg
     entry_point Volumetric_fp
     profiles arbfp1 ps_3_0
+}
+
+fragment_program SSAO/Volumetric_fp unified
+{
+	delegate SSAO/Volumetric_fp_hlsl 
+	delegate SSAO/Volumetric_fp_cg
 }
 
 
@@ -14,6 +27,7 @@ material SSAO/Volumetric
         {
             depth_check off
             
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/Volumetric_fp
             {
                 param_named_auto cViewportSize viewport_size

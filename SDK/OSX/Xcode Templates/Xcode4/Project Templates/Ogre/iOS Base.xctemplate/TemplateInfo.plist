@@ -6,7 +6,7 @@
 	<dict>
 		<key>*:*:importCocoa</key>
 		<string>#import &lt;UIKit/UIKit.h&gt;
-</string>
+		</string>
 		<key>*:shouldAutorotateToInterfaceOrientation</key>
 		<string>/*
  // Override to allow orientations other than the default portrait orientation.
@@ -15,21 +15,28 @@
 	return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
  */
+		</string>
+		<key>___PACKAGENAME___-Prefix.pch:Availability:iPhoneAvailability:*</key>
+		<string>#import &lt;Availability.h&gt;
+
+#ifndef __IPHONE____*____0
+#warning "This project uses features only available in iOS SDK ___*___.0 and later."
+#endif
 </string>
-		<key>___PACKAGENAME___-Info.plist:UISupportedInterfaceOrientations~iPad</key>
-		<string>&lt;key&gt;UISupportedInterfaceOrientations~ipad&lt;/key&gt;
+		<key>___PACKAGENAME___-Info.plist:iPhone</key>
+		<string>&lt;key&gt;CFBundleIconFiles&lt;/key&gt;
+&lt;array/&gt;
+&lt;key&gt;CFBundleDisplayName&lt;/key&gt;
+&lt;string&gt;${PRODUCT_NAME}&lt;/string&gt;
+&lt;key&gt;CFBundleVersion&lt;/key&gt;
+&lt;string&gt;1.0&lt;/string&gt;
+&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
+&lt;string&gt;1.0&lt;/string&gt;
+&lt;key&gt;LSRequiresIPhoneOS&lt;/key&gt;
+&lt;true/&gt;
+&lt;key&gt;UIRequiredDeviceCapabilities&lt;/key&gt;
 &lt;array&gt;
-	&lt;string&gt;UIInterfaceOrientationPortrait&lt;/string&gt;
-	&lt;string&gt;UIInterfaceOrientationPortraitUpsideDown&lt;/string&gt;
-	&lt;string&gt;UIInterfaceOrientationLandscapeLeft&lt;/string&gt;
-	&lt;string&gt;UIInterfaceOrientationLandscapeRight&lt;/string&gt;
-&lt;/array&gt;</string>
-		<key>___PACKAGENAME___-Info.plist:UISupportedInterfaceOrientations~iPhone</key>
-		<string>&lt;key&gt;UISupportedInterfaceOrientations&lt;/key&gt;
-&lt;array&gt;
-     &lt;string&gt;UIInterfaceOrientationPortrait&lt;/string&gt;
-     &lt;string&gt;UIInterfaceOrientationLandscapeLeft&lt;/string&gt;
-     &lt;string&gt;UIInterfaceOrientationLandscapeRight&lt;/string&gt;
+	&lt;string&gt;armv7&lt;/string&gt;
 &lt;/array&gt;</string>
 	</dict>
 	<key>Identifier</key>

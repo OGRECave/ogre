@@ -61,6 +61,13 @@
 	</array>
 	<key>Definitions</key>
 	<dict>
+		<key>en.lproj/InfoPlist.strings</key>
+		<dict>
+			<key>Group</key>
+			<string>Resources</string>
+		</dict>
+		<key>en.lproj/InfoPlist.strings:Instructions</key>
+		<string>/* Localized versions of Info.plist keys */</string>
 		<key>___PACKAGENAME___-Info.plist</key>
 		<dict>
 			<key>Beginning</key>
@@ -75,7 +82,7 @@
 			<key>Indent</key>
 			<integer>1</integer>
 			<key>Group</key>
-			<string>Resources</string>
+			<string>Supporting Files</string>
 			<key>TargetIndices</key>
 			<array/>
 			<key>SubstituteMacros</key>
@@ -88,7 +95,7 @@
 		<key>en.lproj/InfoPlist.strings</key>
 		<dict>
 			<key>Group</key>
-			<string>Resources</string>
+			<string>Supporting Files</string>
 		</dict>
 		<key>en.lproj/InfoPlist.strings:Instructions</key>
 		<string>/* Localized versions of Info.plist keys */

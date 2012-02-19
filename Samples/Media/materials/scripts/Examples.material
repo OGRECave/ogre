@@ -1926,7 +1926,7 @@ fragment_program Examples/ShowUV_p unified
 	delegate Examples/ShowUV_pCg
 }
 
-fragment_program Examples/ShowUVdir3DCg cg
+fragment_program Examples/ShowUVdir3D_pCg cg
 {
 	source Example_Basic.cg
 	entry_point showuvdir3d_p

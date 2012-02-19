@@ -21,7 +21,7 @@ void HorizonBased_fp
     const float numSteps = 7; // number of samples/steps along a direction
     const float numDirections = 4; // number of sampling directions in uv space
     
-    float3 point = tex2D(sMRT2, uv).xyz; // the current fragment in view space
+    float3 p = tex2D(sMRT2, uv).xyz; // the current fragment in view space
     float3 pointNormal = tex2D(sMRT1, uv).xyz; // the fragment normal
 
     float Ruv = 0; // radius of influence in screen space
@@ -29,11 +29,11 @@ void HorizonBased_fp
     if (cSampleInScreenspace == 1)
     {
         Ruv = cSampleLengthScreenSpace;
-        R = tan(Ruv * cFov) * -point.z;
+        R = tan(Ruv * cFov) * -p.z;
     }
     else
     {
-        Ruv = atan(cSampleLengthWorldSpace / -point.z) / cFov; // the radius of influence projected into screen space
+        Ruv = atan(cSampleLengthWorldSpace / -p.z) / cFov; // the radius of influence projected into screen space
         R = cSampleLengthWorldSpace;
     }
 
@@ -77,7 +77,7 @@ void HorizonBased_fp
             float2 sampleUV = uv + ((jitter + j) * sampleDirection); // jitter the step a little bit
             
             float3 sample = tex2D(sMRT2, sampleUV); // the sample in view space
-            float3 sampleVector = (sample - point);
+            float3 sampleVector = (sample - p);
             float gamma = (pi / 2) - acos(dot(pointNormal, normalize(sampleVector))); //the angle between the fragment tangent and the sample
 
             if (gamma > oldAngle) 

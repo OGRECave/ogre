@@ -264,6 +264,19 @@ public:
 		mInfo["Thumbnail"] = "thumb_water.png";
 		mInfo["Category"] = "Environment";
     }
+
+    virtual void _shutdown()
+    {
+        // cleanup all allocated circles
+		for(int i = 0 ; i < circles.size() ; i++)
+        {
+		    delete (circles[i]);
+		}
+
+        circles.clear();
+
+        SdkSample::_shutdown();
+    }
     
 protected:
 	WaterMesh *waterMesh ;

@@ -21,6 +21,11 @@ void main()
        vec4 diffuse = texture2D(diffuseMap, oUv0.xy);
        if (diffuse.a > 0.001)
        {
+            // Do manual alpha rejection because it is not built into OpenGL ES 2
+            if (diffuse.a < 0.588)
+            {
+                discard;
+            }
             gl_FragColor = vec4(0.0);
        }
        else

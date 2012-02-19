@@ -17,20 +17,6 @@
 	<true/>
 	<key>Definitions</key>
 	<dict>
-		<key>___PACKAGENAME___-Info.plist:ApplicationCategory</key>
-		<string>&lt;key&gt;LSApplicationCategoryType&lt;/key&gt;
-&lt;string&gt;___VARIABLE_applicationCategory___&lt;/string&gt;
-		</string>
-		<key>___PACKAGENAME___-Info.plist:iPhone</key>
-		<string>&lt;key&gt;CFBundleShortVersionString&lt;/key&gt;
-&lt;string&gt;1.0&lt;/string&gt;
-&lt;key&gt;CFBundleVersion&lt;/key&gt;
-&lt;string&gt;1.0&lt;/string&gt;
-&lt;key&gt;CFBundleDisplayName&lt;/key&gt;
-&lt;string&gt;${PRODUCT_NAME}&lt;/string&gt;
-&lt;key&gt;LSRequiresIPhoneOS&lt;/key&gt;
-&lt;true/&gt;
-		</string>
 		<key>main.mm</key>
 		<dict>
 			<key>Path</key>
@@ -106,11 +92,12 @@
 			<key>Group</key>
 			<string>Resources</string>
 		</dict>
+		<key>___PACKAGENAME___-Info.plist:UIStatusBarHidden</key>
+		<string>&lt;key&gt;UIStatusBarHidden&lt;/key&gt;
+&lt;true/&gt;</string>
 	</dict>
 	<key>Nodes</key>
 	<array>
-		<string>___PACKAGENAME___-Info.plist:Mac</string>
-		<string>___PACKAGENAME___-Info.plist:ApplicationCategory</string>
 		<string>main.mm</string>
 		<string>AppDelegate.h</string>
 		<string>OgreDemoApp.cpp</string>
@@ -122,6 +109,8 @@
 		<string>ogre.cfg</string>
 		<string>plugins.cfg</string>
 		<string>resources.cfg</string>
+		<string>___PACKAGENAME___-Info.plist:iPhone</string>
+		<string>___PACKAGENAME___-Info.plist:UIStatusBarHidden</string>
 	</array>
 	<key>Options</key>
 	<array>
@@ -161,7 +150,7 @@
 								<key>SharedSettings</key>
 								<dict>
 									<key>HEADER_SEARCH_PATHS</key>
-									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES" "___VARIABLE_ogrePathiOS___/include/OGRE/iOS" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iOSDependencies/include"</string>
 									<key>OTHER_LDFLAGS</key>
 									<string>-lOIS -lOgreMainStatic -lRenderSystem_GLESStatic -lboost_thread -lFreeType -lFreeImage -lzzip -lz</string>
 								</dict>
@@ -178,7 +167,7 @@
 								<key>SharedSettings</key>
 								<dict>
 									<key>HEADER_SEARCH_PATHS</key>
-									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES2" "___VARIABLE_ogrePathiOS___/include/OGRE/RTShaderSystem" "___VARIABLE_ogrePathiOS___/include/OGRE/iPhone" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/include"</string>
+									<string>"___VARIABLE_ogrePathiOS___/include/OGRE" "___VARIABLE_ogrePathiOS___/include/OGRE/RenderSystems/GLES2" "___VARIABLE_ogrePathiOS___/include/OGRE/RTShaderSystem" "___VARIABLE_ogrePathiOS___/include/OGRE/iOS" "___VARIABLE_ogrePathiOS___/include" "___VARIABLE_ogrePathiOS___/include/OIS" "___VARIABLE_ogrePathiOS___/iOSDependencies/include"</string>
 									<key>OTHER_CFLAGS</key>
 									<string>-DOGRE_USE_GLES2=1</string>
 									<key>OTHER_LDFLAGS</key>
@@ -186,35 +175,6 @@
 								</dict>
 							</dict>
 						</array>
-					</dict>
-				</array>
-			</dict>
-		</dict>
-		<dict>
-			<key>Description</key>
-			<string>The category for your application in the App Store.</string>
-			<key>Identifier</key>
-			<string>applicationCategory</string>
-			<key>Name</key>
-			<string>App Store Category</string>
-			<key>NotPersisted</key>
-			<true/>
-			<key>Placeholder</key>
-			<string>None</string>
-			<key>SpecialType</key>
-			<string>LSApplicationCategoryType</string>
-			<key>Type</key>
-			<string>popup</string>
-			<key>Units</key>
-			<dict>
-				<key></key>
-				<array>
-					<dict>
-						<key>Definitions</key>
-						<dict>
-							<key>___PACKAGENAME___-Info.plist:ApplicationCategory</key>
-							<string></string>
-						</dict>
 					</dict>
 				</array>
 			</dict>
@@ -227,7 +187,7 @@
 		<key>SharedSettings</key>
 		<dict>
 			<key>LIBRARY_SEARCH_PATHS</key>
-			<string>"___VARIABLE_ogrePathiOS___/lib/Release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib/release" "___VARIABLE_ogrePathiOS___/iPhoneDependencies/lib"</string>
+			<string>"___VARIABLE_ogrePathiOS___/lib/Release" "___VARIABLE_ogrePathiOS___/iOSDependencies/lib/release" "___VARIABLE_ogrePathiOS___/iOSDependencies/lib"</string>
 			<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
 			<string>iPhone Developer</string>
 			<key>GCC_THUMB_SUPPORT</key>
