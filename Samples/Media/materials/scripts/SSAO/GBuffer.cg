@@ -5,7 +5,6 @@
 void GBuffer_vp(
         float4 iPosition : POSITION,
         float3 iNormal   : NORMAL,
-        float2 iUV0 : TEXCOORD0,
 
         out float4 oPosition : POSITION,
         out float3 oViewPos : TEXCOORD0,
@@ -32,13 +31,10 @@ void GBuffer_fp(
         uniform float cFarClipDistance // !!! might be 0 for infinite view projection.
         )
 {
-        oColor0.rgb = 1; //...and a least little touch of the titanium white...
-        oColor0.a = 0; // not used
-        
-        oNormalDepth.xyz = normalize(iNormal);
-        
-        float clipDistance = cFarClipDistance - cNearClipDistance;
-        oNormalDepth.w = (length(iViewPos.z) - cNearClipDistance) / clipDistance; // norm to [0, 1]
-        oViewPos.xyz = float4(iViewPos, 0);
+
+        oColor0 = float4(1, 1, 1, 1); //...and a least little touch of the titanium white...
+    	float clipDistance = cFarClipDistance - cNearClipDistance;
+		oNormalDepth = float4(normalize(iNormal).xyz, (length(iViewPos) - cNearClipDistance) / clipDistance);
+		oViewPos = float4(iViewPos, 0);
 }
 

@@ -1,22 +1,61 @@
-fragment_program SSAO/UnsharpMask_fp cg
+fragment_program SSAO/UnsharpMask_fp_hlsl hlsl
+{
+    source UnsharpMask.cg
+    entry_point UnsharpMask_fp
+    target ps_3_0 
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurX_fp_hlsl hlsl
+{
+    source UnsharpMask.cg
+    entry_point GaussianBlurX_fp
+    target ps_3_0 
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_hlsl hlsl
+{
+    source UnsharpMask.cg
+    entry_point GaussianBlurY_fp
+    target ps_3_0 
+}
+
+fragment_program SSAO/UnsharpMask_fp_cg cg
 {
     source UnsharpMask.cg
     entry_point UnsharpMask_fp
     profiles ps_2_0 arbfp1
 }
 
-fragment_program SSAO/UnsharpMask/GaussianBlurX_fp cg
+fragment_program SSAO/UnsharpMask/GaussianBlurX_fp_cg cg
 {
     source UnsharpMask.cg
     entry_point GaussianBlurX_fp
     profiles ps_2_0 arbfp1
 }
 
-fragment_program SSAO/UnsharpMask/GaussianBlurY_fp cg
+fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_cg cg
 {
     source UnsharpMask.cg
     entry_point GaussianBlurY_fp
     profiles ps_2_0 arbfp1
+}
+
+fragment_program SSAO/UnsharpMask_fp unified
+{
+	delegate SSAO/UnsharpMask_fp_hlsl 
+	delegate SSAO/UnsharpMask_fp_cg
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurX_fp unified
+{
+	delegate SSAO/UnsharpMask/GaussianBlurX_fp_hlsl 
+	delegate SSAO/UnsharpMask/GaussianBlurX_fp_cg
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurY_fp unified
+{
+	delegate SSAO/UnsharpMask/GaussianBlurY_fp_hlsl 
+	delegate SSAO/UnsharpMask/GaussianBlurY_fp_cg
 }
 
 material SSAO/UnsharpMask/GaussianBlurX
@@ -27,6 +66,7 @@ material SSAO/UnsharpMask/GaussianBlurX
         {
             depth_check off
             
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/UnsharpMask/GaussianBlurX_fp
             {
                 param_named_auto stepX inverse_viewport_width
@@ -50,6 +90,7 @@ material SSAO/UnsharpMask/GaussianBlurY
         {
             depth_check off
         
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/UnsharpMask/GaussianBlurY_fp
             {
                 param_named_auto stepY inverse_viewport_height
@@ -73,6 +114,7 @@ material SSAO/UnsharpMask
         {
             depth_check off
 
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/UnsharpMask_fp {}
             
             texture_unit // blurred depth buffer

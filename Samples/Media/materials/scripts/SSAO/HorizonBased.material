@@ -1,8 +1,21 @@
-fragment_program SSAO/HorizonBased_fp cg
+fragment_program SSAO/HorizonBased_fp_hlsl hlsl
+{
+    source HorizonBased.cg
+    entry_point HorizonBased_fp
+    target ps_3_0 
+}
+
+fragment_program SSAO/HorizonBased_fp_cg cg
 {
     source HorizonBased.cg
     entry_point HorizonBased_fp
     profiles ps_3_0 arbfp1
+}
+
+fragment_program SSAO/HorizonBased_fp unified
+{
+	delegate SSAO/HorizonBased_fp_hlsl 
+	delegate SSAO/HorizonBased_fp_cg
 }
 
 material SSAO/HorizonBased
@@ -13,6 +26,7 @@ material SSAO/HorizonBased
         {
             depth_check off
 
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/HorizonBased_fp
             {
                 param_named_auto cViewportSize viewport_size

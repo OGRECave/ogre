@@ -1,8 +1,21 @@
-fragment_program SSAO/ShowNormals_fp cg
+fragment_program SSAO/ShowNormals_fp_hlsl hlsl
+{
+    source ShowNormals.cg
+    entry_point ShowNormals_fp
+    target ps_2_0 
+}
+
+fragment_program SSAO/ShowNormals_fp_cg cg
 {
     source ShowNormals.cg
     entry_point ShowNormals_fp
     profiles ps_2_0 arbfp1
+}
+
+fragment_program SSAO/ShowNormals_fp unified
+{
+	delegate SSAO/ShowNormals_fp_hlsl 
+	delegate SSAO/ShowNormals_fp_cg
 }
 
 material SSAO/ShowNormals
@@ -13,6 +26,7 @@ material SSAO/ShowNormals
         {
             depth_check off
 
+			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/ShowNormals_fp {}
 
             texture_unit

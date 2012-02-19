@@ -1,17 +1,42 @@
 // Gbuffer Material
 
-vertex_program SSAO/GBuffer_vp cg
+vertex_program SSAO/GBuffer_vp_hlsl hlsl
+{
+    source GBuffer.cg
+    entry_point GBuffer_vp
+    target vs_2_0
+}
+
+fragment_program SSAO/GBuffer_fp_hlsl hlsl
+{
+    source GBuffer.cg
+    entry_point GBuffer_fp
+    target ps_3_0 
+}
+
+vertex_program SSAO/GBuffer_vp_cg cg
 {
     source GBuffer.cg
     entry_point GBuffer_vp
     profiles vs_2_x arbvp1
 }
 
-fragment_program SSAO/GBuffer_fp cg
+fragment_program SSAO/GBuffer_fp_cg cg
 {
     source GBuffer.cg
     entry_point GBuffer_fp
     profiles ps_3_0 arbfp1
+}
+
+vertex_program SSAO/GBuffer_vp unified
+{
+	delegate SSAO/GBuffer_vp_hlsl 
+	delegate SSAO/GBuffer_vp_cg
+}
+fragment_program SSAO/GBuffer_fp unified
+{
+	delegate SSAO/GBuffer_fp_hlsl 
+	delegate SSAO/GBuffer_fp_cg
 }
 
 material SSAO/GBuffer
@@ -19,7 +44,7 @@ material SSAO/GBuffer
     technique
     {
         pass
-        {
+        {	 
             vertex_program_ref SSAO/GBuffer_vp
             {
                 param_named_auto cWorldViewProj worldviewproj_matrix
