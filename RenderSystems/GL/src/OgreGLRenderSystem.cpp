@@ -486,7 +486,7 @@ namespace Ogre {
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
-		if (GLEW_VERSION_3_3)
+		if (GLEW_VERSION_3_3 || GLEW_ARB_instanced_arrays)
 		{
 			// states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml
 			rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
@@ -3002,7 +3002,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				}
 				if(hasInstanceData)
 				{
-					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
+					glDrawElementsInstancedARB(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
 				}
 				else
 				{
@@ -3025,7 +3025,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 				if(hasInstanceData)
 				{
-					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, numberOfInstances);
+					glDrawArraysInstancedARB(primType, 0, op.vertexData->vertexCount, numberOfInstances);
 				}
 				else
 				{
@@ -3059,14 +3059,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArrayARB(*ai); 
- 
-  		}
+   		}
 		
 		// unbind any instance attributes
 		for (vector<GLuint>::type::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
 		{
-			glVertexAttribDivisor(*ai, 0); 
-
+			glVertexAttribDivisorARB(*ai, 0); 
 		}
 		
         mRenderAttribsBound.clear();
@@ -3750,7 +3748,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             if (hwGlBuffer->getIsInstanceData())
             {
                 GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
-                glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate() );
+                glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
                 instanceAttribsBound.push_back(attrib);
             }
         }
