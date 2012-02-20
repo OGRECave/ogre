@@ -93,7 +93,7 @@ namespace Ogre {
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
             case TEX_TYPE_2D_ARRAY:
-                return GL_TEXTURE_2D_ARRAY;
+                return GL_TEXTURE_2D_ARRAY_EXT;
             default:
                 return 0;
         };
@@ -201,9 +201,9 @@ namespace Ogre {
 							width, height, 0, 
 							size, tmpdata);
 						break;
-					case TEX_TYPE_2D_ARRAY: // todo - check this...
+					case TEX_TYPE_2D_ARRAY:
 					case TEX_TYPE_3D:
-						glCompressedTexImage3DARB(3, mip, format,
+						glCompressedTexImage3DARB(getGLTextureTarget(), mip, format,
 							width, height, depth, 0, 
 							size, tmpdata);
 						break;
@@ -240,8 +240,8 @@ namespace Ogre {
 							width, height, 0, 
 							GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						break;
-					case TEX_TYPE_3D:
 					case TEX_TYPE_2D_ARRAY:
+					case TEX_TYPE_3D:
 						glTexImage3D(getGLTextureTarget(), mip, format,
 							width, height, depth, 0, 
 							GL_RGBA, GL_UNSIGNED_BYTE, 0);
@@ -304,7 +304,6 @@ namespace Ogre {
         {
 
             do_image_io(mName, mGroup, ext, *loadedImages, this);
-
 
             // If this is a cube map, set the texture type flag accordingly.
             if ((*loadedImages)[0].hasFlag(IF_CUBEMAP))

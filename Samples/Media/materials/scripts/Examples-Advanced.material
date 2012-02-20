@@ -757,9 +757,29 @@ vertex_program Examples/TextureArrayVScg cg
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
-	
 }
 
+vertex_program Examples/TextureArrayVSglsl glsl
+{
+	source Example_TextureArrayVS.glsl
+	profiles glsl
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program Examples/TextureArrayPSglsl glsl
+{
+	source Example_TextureArrayPS.glsl
+	profiles glsl
+
+	default_params
+	{
+		param_named TextureArrayTex int 0
+	}
+}
 
 fragment_program Examples/TextureArrayPShlsl4 hlsl
 {
@@ -788,7 +808,7 @@ material Examples/TextureArray
 	}
 
 
-	technique
+	technique HLSL4
 	{
 		pass
 		{
@@ -798,6 +818,27 @@ material Examples/TextureArray
 
 			fragment_program_ref Examples/TextureArrayPShlsl4
 			{
+			}
+		}
+	}
+
+	technique GLSL
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVSglsl
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPSglsl
+			{
+			}
+
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture TextureArrayTex
+				tex_address_mode clamp
 			}
 		}
 	}

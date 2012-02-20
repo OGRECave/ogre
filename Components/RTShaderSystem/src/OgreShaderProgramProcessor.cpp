@@ -243,6 +243,7 @@ void ProgramProcessor::buildTexcoordTable(const ShaderParameterList& paramList, 
 				break;
             case GCT_SAMPLER1D:
             case GCT_SAMPLER2D:
+            case GCT_SAMPLER2DARRAY:
             case GCT_SAMPLER3D:
             case GCT_SAMPLERCUBE:
             case GCT_SAMPLER1DSHADOW:

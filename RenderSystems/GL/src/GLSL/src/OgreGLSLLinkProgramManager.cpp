@@ -61,6 +61,7 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler1D", GL_SAMPLER_1D));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2D", GL_SAMPLER_2D));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler3D", GL_SAMPLER_3D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArray", GL_SAMPLER_2D_ARRAY_EXT));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCube", GL_SAMPLER_CUBE));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler1DShadow", GL_SAMPLER_1D_SHADOW));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW));
@@ -213,6 +214,9 @@ namespace Ogre {
 		case GL_SAMPLER_2D_RECT_ARB:
 			defToUpdate.constType = GCT_SAMPLER2D;
 			break;
+        case GL_SAMPLER_2D_ARRAY_EXT:
+            defToUpdate.constType = GCT_SAMPLER2DARRAY;
+            break;
 		case GL_SAMPLER_3D:
 			defToUpdate.constType = GCT_SAMPLER3D;
 			break;
@@ -357,7 +361,7 @@ namespace Ogre {
 				// user defined uniform found, add it to the reference list
 				String paramName = String( uniformName );
 
-				// currant ATI drivers (Catalyst 7.2 and earlier) and older NVidia drivers will include all array elements as uniforms but we only want the root array name and location
+				// Current ATI drivers (Catalyst 7.2 and earlier) and older NVidia drivers will include all array elements as uniforms but we only want the root array name and location
 				// Also note that ATI Catalyst 6.8 to 7.2 there is a bug with glUniform that does not allow you to update a uniform array past the first uniform array element
 				// ie you can't start updating an array starting at element 1, must always be element 0.
 

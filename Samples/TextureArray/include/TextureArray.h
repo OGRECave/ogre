@@ -31,8 +31,9 @@ protected:
                         "TextureArray::testCapabilities");
         }
 
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") || 
-            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") || 
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") && 
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("gp4fp"))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
@@ -98,9 +99,9 @@ protected:
         Pass * pass = texArrayMat->getBestTechnique()->getPass(0);
         pass->setLightingEnabled(false);
 		TextureUnitState* pState = pass->createTextureUnitState();
-        pState->setTextureName(tex->getName());
+        pState->setTextureName(tex->getName(), TEX_TYPE_2D_ARRAY);
 
-        // create a plain with float3 tex cord - the third value will be the texture index in our case
+        // create a plane with float3 tex coord - the third value will be the texture index in our case
 	    ManualObject* textureArrayObject = mSceneMgr->createManualObject("TextureAtlasObject");
         
         // create a quad that uses our material 

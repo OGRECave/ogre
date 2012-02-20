@@ -1590,13 +1590,15 @@ namespace Ogre {
 			{
 				if (stage < mFixedFunctionTextureUnits)
 				{
-					glDisable( lastTextureType );
+                    if(lastTextureType != GL_TEXTURE_2D_ARRAY_EXT)
+                        glDisable( lastTextureType );
 				}
 			}
 
 			if (stage < mFixedFunctionTextureUnits)
 			{
-				glEnable( mTextureTypes[stage] );
+                if(mTextureTypes[stage] != GL_TEXTURE_2D_ARRAY_EXT)
+                    glEnable( mTextureTypes[stage] );
 			}
 
 			if(!tex.isNull())
@@ -1610,7 +1612,8 @@ namespace Ogre {
 			{
 				if (lastTextureType != 0)
 				{
-					glDisable( mTextureTypes[stage] );
+                    if(mTextureTypes[stage] != GL_TEXTURE_2D_ARRAY_EXT)
+                        glDisable( mTextureTypes[stage] );
 				}
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
@@ -3037,7 +3040,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         {
 			for (int i = 0; i < mFixedFunctionTextureUnits; i++)
 			{
-            glClientActiveTextureARB(GL_TEXTURE0 + i);
+                glClientActiveTextureARB(GL_TEXTURE0 + i);
 				glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 			}
 			glClientActiveTextureARB(GL_TEXTURE0);
@@ -3472,14 +3475,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		if (GLEW_VERSION_1_2)
 		{
-		// Set nicer lighting model -- d3d9 has this by default
-		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
+            // Set nicer lighting model -- d3d9 has this by default
+            glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+            glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
 		}
 		if (GLEW_VERSION_1_4)
 		{
-		glEnable(GL_COLOR_SUM);
-		glDisable(GL_DITHER);
+            glEnable(GL_COLOR_SUM);
+            glDisable(GL_DITHER);
 		}
 
 		// Check for FSAA
