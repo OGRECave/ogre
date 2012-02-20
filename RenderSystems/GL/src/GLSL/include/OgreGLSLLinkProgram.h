@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
-	/// structure used to keep track of named uniforms in the linked program object
+	/// Structure used to keep track of named uniforms in the linked program object
 	struct GLUniformReference
 	{
 		/// GL location handle
@@ -54,7 +54,7 @@ namespace Ogre {
 	class _OgreGLExport GLSLLinkProgram
 	{
 	private:
-		/// container of uniform references that are active in the program object
+		/// Container of uniform references that are active in the program object
 		GLUniformReferenceList mGLUniformReferences;
 
 		/// Linked vertex program
@@ -64,15 +64,15 @@ namespace Ogre {
 		/// Linked fragment program
 		GLSLGpuProgram* mFragmentProgram;
 
-		/// flag to indicate that uniform references have already been built
+		/// Flag to indicate that uniform references have already been built
 		bool		mUniformRefsBuilt;
 		/// GL handle for the program object
 		GLhandleARB mGLHandle;
-		/// flag indicating that the program object has been successfully linked
+		/// Flag indicating that the program object has been successfully linked
 		GLint		mLinked;
 		/// Flag indicating that the program object has tried to link and failed
 		bool		mTriedToLinkAndFailed;
-		/// flag indicating skeletal animation is being performed
+		/// Flag indicating skeletal animation is being performed
 		bool mSkeletalAnimation;
 
 		/// build uniform references from active named uniforms
@@ -81,7 +81,7 @@ namespace Ogre {
 		void extractAttributes(void);
 
 		typedef set<GLuint>::type AttributeSet;
-		// Custom attribute bindings
+		/// Custom attribute bindings
 		AttributeSet mValidAttributes;
 
 		/// Name / attribute list
@@ -101,7 +101,7 @@ namespace Ogre {
 		/// Get the the binary data of a program from the microcode cache
 		void getMicrocodeFromCache();
 	public:
-		/// constructor should only be used by GLSLLinkProgramManager
+		/// Constructor should only be used by GLSLLinkProgramManager
 		GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
 		~GLSLLinkProgram(void);
 
@@ -110,15 +110,15 @@ namespace Ogre {
 		*/
 		void activate(void);
 
-		/** updates program object uniforms using data from GpuProgramParamters.
+		/** Updates program object uniforms using data from GpuProgramParamters.
 		normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
 		*/
 		void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** updates program object uniforms using data from pass iteration GpuProgramParamters.
+		/** Updates program object uniforms using data from pass iteration GpuProgramParamters.
 		normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
 		*/
 		void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
-		/// get the GL Handle for the program object
+		/// Get the GL Handle for the program object
 		GLhandleARB getGLHandle(void) const { return mGLHandle; }
         /** Sets whether the linked program includes the required instructions
         to perform skeletal animation. 
