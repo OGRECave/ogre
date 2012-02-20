@@ -30,14 +30,14 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
 void SGX_InstancedViewportsTransform(
-                in vec4 i_position,
-                in mat4	i_worldViewMatrix,
-                in mat4	i_projectionMatrix,
-						    in  vec4 i_viewportOffsetMatrixR0,   
-						    in  vec4 i_viewportOffsetMatrixR1,   
-						    in  vec4 i_viewportOffsetMatrixR2,   
-						    in  vec4 i_viewportOffsetMatrixR3,   
-						    in  vec2 i_monitorsCount,   
+			                in vec4 i_position,
+			                in mat4	i_worldViewMatrix,
+			                in mat4	i_projectionMatrix,
+						    in vec4 i_viewportOffsetMatrixR0,   
+						    in vec4 i_viewportOffsetMatrixR1,   
+						    in vec4 i_viewportOffsetMatrixR2,   
+						    in vec4 i_viewportOffsetMatrixR3,   
+						    in vec2 i_monitorsCount,   
 						    in vec4 i_monitorIndex, 
 						    out vec4 o_position)
  {
@@ -53,14 +53,14 @@ void SGX_InstancedViewportsTransform(
     vec2 monitorIndexNorm = i_monitorIndex.xy - (i_monitorsCount - 1.0)/2.0;
     o_position.xy = 
     (o_position.xy + (o_position.w * monitorIndexNorm)*2.0) / i_monitorsCount;
- };
+ }
 
 //-----------------------------------------------------------------------------
 // Discard any pixel that is outside the bounds of the current "monitor"
 //-----------------------------------------------------------------------------
 
 void SGX_InstancedViewportsDiscardOutOfBounds(
-						    in  vec2 i_monitorsCount,   
+						    in vec2 i_monitorsCount,   
 						    in vec4 i_monitorIndex, 
 						    in vec4 i_positionProjectiveSpace)
 { 
@@ -71,8 +71,8 @@ void SGX_InstancedViewportsDiscardOutOfBounds(
     
    boxedXY = abs(boxedXY - middleMonitor);
    float maxM = max(boxedXY.x,boxedXY.y);
-   if (maxM >= 0.5)
-   {
-      discard;
-   }
+   // if (maxM >= 0.5)
+   // {
+   //    discard;
+   // }
 }

@@ -140,7 +140,7 @@ protected:
     void addModelToScene(const String &  modelName);
 
 	/** Toggle instanced viewports */
-	void updateInstancedViewports(bool ebabled);
+	void updateInstancedViewports(bool enabled);
 
 	/** Toggle light visibility. */
 	void updateLightState(const String& lightName, bool visible);
