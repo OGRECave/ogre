@@ -432,7 +432,7 @@ namespace Ogre {
 			SST_COMPAREMODE, // CompareMode
 			SST_COMPAREFUNC, // CompareFunc
 			SST_GENERATEMIPMAP, // GenerateMipmap
-			SST_COUNT,
+			SST_COUNT
 		};
 
 #define SST_FIRST (SamplerStateType) (SST_UNKNOWN + (SamplerStateType)1)
@@ -760,7 +760,7 @@ namespace Ogre {
 				BET_FUNCSUBTRACT,  // FuncSubtract
 				BET_MIN, // Min
 				BET_MAX,  // Max
-				BET_LOGICOP, // LogicOp
+				BET_LOGICOP // LogicOp
 			};
 			virtual void createState();
 		public:
@@ -780,7 +780,7 @@ namespace Ogre {
 				DFT_GREATER,  // Greater
 				DFT_NOTEQUAL, // NotEqual
 				DFT_GEQUAL,  // GEqual
-				DFT_ALWAYS, // Always
+				DFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -795,7 +795,7 @@ namespace Ogre {
 			{
 				FDMT_EYERADIAL, // EyeRadial
 				FDMT_EYEPLANE, // EyePlane
-				FDMT_EYEPLANEABSOLUTE, // EyePlaneAbsolute
+				FDMT_EYEPLANEABSOLUTE // EyePlaneAbsolute
 			};
 			virtual void createState();
 		public:
@@ -810,7 +810,7 @@ namespace Ogre {
 			{
 				FMT_LINEAR, // Linear
 				FMT_EXP,  // Exp
-				FMT_EXP2, // Exp2
+				FMT_EXP2 // Exp2
 			};
 			virtual void createState();
 		public:
@@ -825,7 +825,7 @@ namespace Ogre {
 			enum LightModelColorControlType
 			{
 				LMCCT_SINGLECOLOR, // SingleColor
-				LMCCT_SEPARATESPECULAR, // SeparateSpecular
+				LMCCT_SEPARATESPECULAR // SeparateSpecular
 			};
 			virtual void createState();
 		public:
@@ -852,7 +852,7 @@ namespace Ogre {
 				LOT_ORREVERSE, // OrReverse
 				LOT_COPYINVERTED, // CopyInverted
 				LOT_NAND,  // Nand
-				LOT_SET, // Set
+				LOT_SET // Set
 			};
 			virtual void createState();
 		public:
@@ -866,7 +866,7 @@ namespace Ogre {
 			enum PointSpriteCoordOriginType
 			{
 				PSCOT_LOWERLEFT, // LowerLeft
-				PSCOT_UPPERLEFT, // UpperLeft
+				PSCOT_UPPERLEFT // UpperLeft
 			};
 			virtual void createState();
 		public:
@@ -881,7 +881,7 @@ namespace Ogre {
 			{
 				PSRMT_ZERO,  // Zero
 				PSRMT_R,  // R
-				PSRMT_S, // S
+				PSRMT_S // S
 			};
 			virtual void createState();
 		public:
@@ -895,7 +895,7 @@ namespace Ogre {
 			enum ShadeModelType
 			{
 				SMT_FLAT,  // Flat
-				SMT_SMOOTH, // Smooth
+				SMT_SMOOTH // Smooth
 			};
 			virtual void createState();
 			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
@@ -912,7 +912,7 @@ namespace Ogre {
 				TGMT_EYELINEAR, // EyeLinear
 				TGMT_SPHEREMAP, // SphereMap
 				TGMT_REFLECTIONMAP, // ReflectionMap
-				TGMT_NORMALMAP, // NormalMap
+				TGMT_NORMALMAP // NormalMap
 			};
 			virtual void createState();
 		public:
@@ -929,7 +929,7 @@ namespace Ogre {
 				BET_DECAL, // Decal
 				BET_BLEND,  // Blend
 				BET_REPLACE, // Replace
-				BET_ADD, // Add
+				BET_ADD // Add
 			};
 			virtual void createState();
 		public:
@@ -947,7 +947,7 @@ namespace Ogre {
 				MFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
 				MFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
 				MFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MFT_LINEARMIPMAPLINEAR, // LinearMipMapLinear
+				MFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
 			};
 			virtual void createState();
 		public:
@@ -961,7 +961,7 @@ namespace Ogre {
 			enum MagFilterType
 			{
 				MFT_NEAREST,  // Nearest
-				MFT_LINEAR, // Linear
+				MFT_LINEAR // Linear
 			};
 			virtual void createState();
 		public:
@@ -975,7 +975,7 @@ namespace Ogre {
 			enum FrontFaceType
 			{
 				FFT_CW, // CW
-				FFT_CCW, // CCW
+				FFT_CCW // CCW
 			};
 			virtual void createState();
 		public:
@@ -990,7 +990,7 @@ namespace Ogre {
 			{
 				CFT_FRONT,  // Front
 				CFT_BACK, // Back
-				CFT_FRONTANDBACK, // FrontAndBack
+				CFT_FRONTANDBACK // FrontAndBack
 			};
 			virtual void createState();
 		public:
@@ -1004,7 +1004,7 @@ namespace Ogre {
 			enum FogCoordSrcType
 			{
 				FCST_FRAGMENTDEPTH, // FragmentDepth
-				FCST_FOGCOORD, // FogCoord
+				FCST_FOGCOORD // FogCoord
 			};
 			virtual void createState();
 		public:
@@ -1025,7 +1025,7 @@ namespace Ogre {
 				AFT_GREATER,  // Greater
 				AFT_NOTEQUAL, // NotEqual
 				AFT_GEQUAL,  // GEqual
-				AFT_ALWAYS, // Always
+				AFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1053,7 +1053,7 @@ namespace Ogre {
 				BF_CONSTANTCOLOR, // ConstantColor
 				BF_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
 				BF_CONSTANTALPHA, // ConstantAlpha
-				BF_ONEMINUSCONSTANTALPHA, // OneMinusConstantAlpha
+				BF_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
 			};
 			virtual void createState();
 		public:
@@ -1082,7 +1082,7 @@ namespace Ogre {
 				BFST_CONSTANTCOLOR, // ConstantColor
 				BFST_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
 				BFST_CONSTANTALPHA, // ConstantAlpha
-				BFST_ONEMINUSCONSTANTALPHA, // OneMinusConstantAlpha
+				BFST_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
 			};
 			virtual void createState();
 		public:
@@ -1100,7 +1100,7 @@ namespace Ogre {
 				BEST_FUNCSUBTRACT,  // FuncSubtract
 				BEST_MIN, // Min
 				BEST_MAX,  // Max
-				BEST_LOGICOP, // LogicOp
+				BEST_LOGICOP // LogicOp
 			};
 			virtual void createState();
 		public:
@@ -1122,7 +1122,7 @@ namespace Ogre {
 				CMT_AMBIENT, // Ambient
 				CMT_DIFFUSE, // Diffuse
 				CMT_SPECULAR, // Specular
-				CMT_AMBIENTANDDIFFUSE, // AmbientAndDiffuse
+				CMT_AMBIENTANDDIFFUSE // AmbientAndDiffuse
 			};
 			virtual void createState();
 		public:
@@ -1141,7 +1141,7 @@ namespace Ogre {
 				PMT_FRONTANDBACK, // FrontAndBack
 				PMT_POINT,  // Point
 				PMT_LINE,  // Line
-				PMT_FILL, // Fill
+				PMT_FILL // Fill
 			};
 			virtual void createState();
 		public:
@@ -1162,7 +1162,7 @@ namespace Ogre {
 				SFT_GREATER, // Greater
 				SFT_NOTEQUAL, // NotEqual
 				SFT_GEQUAL,  // GEqual
-				SFT_ALWAYS, // Always
+				SFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1183,7 +1183,7 @@ namespace Ogre {
 				SOT_DECR,  // Decr
 				SOT_INVERT, // Invert
 				SOT_INCRWRAP,  // IncrWrap
-				SOT_DECRWRAP, // DecrWrap
+				SOT_DECRWRAP // DecrWrap
 			};
 			virtual void createState();
 		public:
@@ -1207,7 +1207,7 @@ namespace Ogre {
 				SFST_GREATER,  // Greater
 				SFST_NOTEQUAL, // NotEqual
 				SFST_GEQUAL,  // GEqual
-				SFST_ALWAYS, // Always
+				SFST_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1223,7 +1223,7 @@ namespace Ogre {
 			{
 				BET_FRONT,  // Front
 				BET_BACK,  // Back
-				BET_FRONTANDBACK, // FrontAndBack
+				BET_FRONTANDBACK // FrontAndBack
 			};
 			virtual void createState();
 		public:
@@ -1244,7 +1244,7 @@ namespace Ogre {
 				BET_DECR, // Decr
 				BET_INVERT, // Invert
 				BET_INCRWRAP,  // IncrWrap
-				BET_DECRWRAP, // DecrWrap
+				BET_DECRWRAP // DecrWrap
 			};
 			virtual void createState();
 		public:
@@ -1319,7 +1319,7 @@ namespace Ogre {
 				WT_MIRROREDREPEAT, // MirroredRepeat
 				WT_MIRRORCLAMP, // MirrorClamp
 				WT_MIRRORCLAMPTOEDGE, // MirrorClampToEdge
-				WT_MIRRORCLAMPTOBORDER, // MirrorClampToBorder
+				WT_MIRRORCLAMPTOBORDER // MirrorClampToBorder
 			};
 			virtual void createState();
 			TextureUnitState::TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
@@ -1334,7 +1334,7 @@ namespace Ogre {
 			enum CompareModeType
 			{
 				CMT_NONE, // None
-				CMT_COMPARERTOTEXTURE, // CompareRToTexture
+				CMT_COMPARERTOTEXTURE // CompareRToTexture
 			};
 			virtual void createState();
 		public:
@@ -1352,7 +1352,7 @@ namespace Ogre {
 				CFT_LEQUAL, // LEqual
 				CFT_EQUAL,  // Equal
 				CFT_GREATER, // Greater
-				CFT_NOTEQUAL, // NotEqual
+				CFT_NOTEQUAL // NotEqual
 			};
 			virtual void createState();
 		public:
@@ -1367,7 +1367,7 @@ namespace Ogre {
 			{
 				DMT_ALPHA,   // Alpha
 				DMT_INTENSITY,  // Intensity
-				DMT_LUMINANCE,  // Luminance
+				DMT_LUMINANCE   // Luminance
 			};
 			virtual void createState();
 		public:
@@ -1385,7 +1385,7 @@ namespace Ogre {
 				MINFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
 				MINFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
 				MINFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MINFT_LINEARMIPMAPLINEAR, // LinearMipMapLinear
+				MINFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
 			};
 
 			virtual void createState();
@@ -1400,7 +1400,7 @@ namespace Ogre {
 			enum MagFilterType
 			{
 				MAGFT_NEAREST, // Nearest
-				MAGFT_LINEAR, // Linear
+				MAGFT_LINEAR // Linear
 
 			};
 
@@ -1420,7 +1420,7 @@ namespace Ogre {
 				MIPFT_LINEAR          = 2,    // linear interpolation
 				MIPFT_ANISOTROPIC     = 3,    // anisotropic
 				MIPFT_PYRAMIDALQUAD   = 6,    // 4-sample tent
-				MIPFT_GAUSSIANQUAD    = 7,    // 4-sample gaussian
+				MIPFT_GAUSSIANQUAD    = 7     // 4-sample gaussian
 
 			};
 
@@ -1439,7 +1439,7 @@ namespace Ogre {
 				TAT_MIRROR, // Mirror
 				TAT_CLAMP, // Clamp
 				TAT_BORDER, // Border
-				TAT_MIRRORONCE, // MirrorOnce
+				TAT_MIRRORONCE // MirrorOnce
 			};
 
 			virtual void createState();
@@ -1477,8 +1477,8 @@ namespace Ogre {
 		void parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		void parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		bool parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		const bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
-		const FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
+		bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
+		FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
 
 		void buildStateNameStringToTypeMap();
 

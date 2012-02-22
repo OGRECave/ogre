@@ -282,9 +282,6 @@ namespace Ogre
     */
     void Octree::_getChildIndexes( const AxisAlignedBox &box, int *x, int *y, int *z ) const
     {
-        Vector3 max = mBox.getMaximum();
-        Vector3 min = box.getMinimum();
-
         Vector3 center = mBox.getMaximum().midPoint( mBox.getMinimum() );
 
         Vector3 ncenter = box.getMaximum().midPoint( box.getMinimum() );

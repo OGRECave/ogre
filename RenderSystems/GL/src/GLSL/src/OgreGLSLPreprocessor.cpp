@@ -110,10 +110,12 @@ bool CPreprocessor::Token::GetValue (long &oValue) const
 
     long base = 10;
     if (String [i] == '0')
+    {
         if (Length > i + 1 && String [i + 1] == 'x')
             base = 16, i += 2;
         else
             base = 8;
+    }
 
     for (; i < Length; i++)
     {
@@ -490,6 +492,7 @@ CPreprocessor::Token CPreprocessor::GetExpression (
 
     // Handle unary operators here
     if (oResult.Type == Token::TK_PUNCTUATION && oResult.Length == 1)
+    {
         if (strchr ("+-!~", oResult.String [0]))
         {
             char uop = oResult.String [0];
@@ -525,6 +528,7 @@ CPreprocessor::Token CPreprocessor::GetExpression (
                     op.String [0] == ')');
             op = GetToken (true);
         }
+    }
 
     while (op.Type == Token::TK_WHITESPACE ||
            op.Type == Token::TK_NEWLINE ||
@@ -743,6 +747,7 @@ CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand)
              oArg.Type == Token::TK_LINECONT);
 
     if (!iExpand)
+    {
         if (oArg.Type == Token::TK_EOS)
             return oArg;
         else if (oArg.Type == Token::TK_PUNCTUATION &&
@@ -758,6 +763,7 @@ CPreprocessor::Token CPreprocessor::GetArgument (Token &oArg, bool iExpand)
             Error (Line, "Unexpected token", &oArg);
             return Token (Token::TK_ERROR);
         }
+    }
 
     uint len = oArg.Length;
     while (true)

@@ -82,7 +82,7 @@ namespace OgreBites
 		}
 	}
     //---------------------------------------------------------------------
-	const bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
+	bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
 	{
 		return access(path.c_str(), R_OK) == 0;
 	}

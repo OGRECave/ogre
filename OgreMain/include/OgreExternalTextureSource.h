@@ -117,7 +117,7 @@ namespace Ogre
 		//! Sets the frames per second - plugin may or may not use this
 		void setFPS( int iFPS ) { mFramesPerSecond = iFPS; }
 		//! Gets currently set frames per second
-		const int getFPS( ) const { return mFramesPerSecond; }
+		int getFPS( ) const { return mFramesPerSecond; }
 		//! Sets a play mode
 		void setPlayMode( eTexturePlayMode eMode )	{ mMode = eMode; }
 		//! Gets currently set play mode

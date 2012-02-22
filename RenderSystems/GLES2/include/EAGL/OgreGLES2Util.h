@@ -36,6 +36,6 @@ namespace Ogre {
     {
         return new EAGL2Support();
     }
-};
+}
 
 #endif

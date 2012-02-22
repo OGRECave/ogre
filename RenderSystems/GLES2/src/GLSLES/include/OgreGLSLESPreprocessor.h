@@ -90,7 +90,7 @@ class CPreprocessor
             TK_STRING,       // A string
             TK_COMMENT,      // A block comment
             TK_LINECOMMENT,  // A line comment
-            TK_TEXT,         // An unparsed text (cannot be returned from GetToken())
+            TK_TEXT          // An unparsed text (cannot be returned from GetToken())
         };
 
         /// Token type

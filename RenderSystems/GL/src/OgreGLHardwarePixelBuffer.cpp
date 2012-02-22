@@ -907,4 +907,4 @@ void GLRenderBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
                         GL_RENDERBUFFER_EXT, mRenderbufferID);
 }
 
-};
+}

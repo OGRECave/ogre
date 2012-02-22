@@ -2298,11 +2298,8 @@ YY_RULE_SETUP
 	MACROTEXT *tMacro;
 	char *macroParmEnd;
 	unsigned int startOffset;
-	bool bFoundEndParen;
 	unsigned int leftParenCount;
 	unsigned int rightParenCount;
-
-	bFoundEndParen = false;
 
 	// sheesh, we gotta count the parenthesis....
 	macroParmEnd = yytext;

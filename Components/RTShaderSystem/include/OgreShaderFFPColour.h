@@ -59,7 +59,7 @@ public:
 		SF_PS_INPUT_DIFFUSE		= 1 << 5,
 		SF_PS_INPUT_SPECULAR	= 1 << 6,
 		SF_PS_OUTPUT_DIFFUSE	= 1 << 7,
-		SF_PS_OUTPUT_SPECULAR	= 1 << 8,
+		SF_PS_OUTPUT_SPECULAR	= 1 << 8
 	};
 
 // Interface.

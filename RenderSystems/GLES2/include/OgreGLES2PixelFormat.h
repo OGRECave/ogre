@@ -97,6 +97,6 @@ namespace Ogre {
             static size_t optionalPO2(size_t value);
             static void convertToGLformat(const PixelBox &src, const PixelBox &dst);
     };
-};
+}
 
 #endif

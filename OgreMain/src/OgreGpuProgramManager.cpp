@@ -202,12 +202,12 @@ namespace Ogre {
 		return mSharedParametersMap;
 	}
 	//---------------------------------------------------------------------
-	const bool GpuProgramManager::getSaveMicrocodesToCache() const
+	bool GpuProgramManager::getSaveMicrocodesToCache() const
 	{
 		return mSaveMicrocodesToCache;
 	}
 	//---------------------------------------------------------------------
-	const bool GpuProgramManager::canGetCompiledShaderBuffer() const
+	bool GpuProgramManager::canGetCompiledShaderBuffer() const
 	{
 		// Use the current render system
 		RenderSystem* rs = Root::getSingleton().getRenderSystem();

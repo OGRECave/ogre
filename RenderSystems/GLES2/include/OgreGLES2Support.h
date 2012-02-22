@@ -130,7 +130,7 @@ namespace Ogre
             */
             virtual bool checkExtension(const String& ext) const;
 
-	/// @copydoc RenderSystem::getDisplayMonitorCount
+            /// @copydoc RenderSystem::getDisplayMonitorCount
             virtual unsigned int getDisplayMonitorCount() const
             {
                 return 1;
@@ -159,6 +159,6 @@ namespace Ogre
             set<String>::type extensionList;
     };
 
-};
+}
 
 #endif

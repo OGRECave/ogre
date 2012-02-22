@@ -105,7 +105,7 @@ namespace OgreBites
 		void prepareUserHome(const Ogre::String& subdir);
 
 		/** Test if the given file exists. */
-		const bool fileExists(const Ogre::String& path) const;
+		bool fileExists(const Ogre::String& path) const;
 	};
 }
 

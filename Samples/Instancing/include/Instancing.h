@@ -86,17 +86,11 @@ protected:
 		double mStartTime = mTimer->getMicroseconds()/1000000.0f; //convert into seconds
 		double mCurTime =  mStartTime;
 		double mStopTime = mLastTime + mBurnAmount;
-		double mCPUUsage;
 
 		while( mCurTime < mStopTime )
 		{
 			mCurTime = mTimer->getMicroseconds()/1000000.0f; //convert into seconds
 		}
-
-		if( mCurTime - mLastTime > 0.00001f )
-			mCPUUsage = (mCurTime - mStartTime) / (mCurTime - mLastTime) * 100.0f;
-		else
-			mCPUUsage = FLT_MAX;
 
 		mLastTime = mTimer->getMicroseconds()/1000000.0f; //convert into seconds
 	}

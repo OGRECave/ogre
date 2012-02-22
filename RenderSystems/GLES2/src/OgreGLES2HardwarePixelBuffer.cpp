@@ -929,4 +929,4 @@ namespace Ogre {
                                      GL_RENDERBUFFER, mRenderbufferID);
         GL_CHECK_ERROR;
     }
-};
+}

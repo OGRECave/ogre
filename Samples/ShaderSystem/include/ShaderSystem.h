@@ -16,7 +16,7 @@ enum ShaderSystemLightingModel
 	SSLM_PerVertexLighting,
 	SSLM_PerPixelLighting,
 	SSLM_NormalMapLightingTangentSpace,
-	SSLM_NormalMapLightingObjectSpace,		
+	SSLM_NormalMapLightingObjectSpace
 };
 
 // a hack class to get infinite frustum - needed by instanced viewports demo

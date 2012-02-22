@@ -69,7 +69,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLProgram();
 
-		const GLhandleARB getGLHandle() const { return mGLHandle; }
+		GLhandleARB getGLHandle() const { return mGLHandle; }
 		void attachToProgramObject( const GLhandleARB programObject );
 		void detachFromProgramObject( const GLhandleARB programObject );
 		String getAttachedShaderNames() const { return mAttachedShaderNames; }

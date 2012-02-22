@@ -1853,7 +1853,7 @@ namespace Ogre{
 					}
 					else
 					{
-						AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0), i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
+						AbstractNodeList::const_iterator i1 = getNodeAt(prop->values, 1), i2 = getNodeAt(prop->values, 2);
 						bool val = false;
 						if(getBoolean(prop->values.front(), &val))
 						{

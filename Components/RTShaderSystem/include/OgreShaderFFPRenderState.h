@@ -48,7 +48,7 @@ enum FFPVertexShaderStage
 	FFP_VS_LIGHTING						= 300,
 	FFP_VS_TEXTURING					= 400,		
 	FFP_VS_FOG							= 500,	
-	FFP_VS_POST_PROCESS					= 2000,
+	FFP_VS_POST_PROCESS					= 2000
 };
 
 // Fixed Function fragment shader stages.
@@ -60,7 +60,7 @@ enum FFPFragmentShaderStage
 	FFP_PS_TEXTURING					= 200,	
 	FFP_PS_COLOUR_END					= 300,
 	FFP_PS_FOG							= 400,
-	FFP_PS_POST_PROCESS					= 500,
+	FFP_PS_POST_PROCESS					= 500
 };
 
 // Fixed Function generic stages.
@@ -72,7 +72,7 @@ enum FFPShaderStage
 	FFP_LIGHTING						= 300,
 	FFP_TEXTURING						= 400,
 	FFP_FOG								= 500,
-	FFP_POST_PROCESS					= 600,
+	FFP_POST_PROCESS					= 600
 };
 
 // Fixed Function Library: Common functions

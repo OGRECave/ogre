@@ -64,11 +64,11 @@ namespace Ogre
 	public:
 		enum InstancingTechnique
 		{
-			ShaderBased,			//Any SM 2.0+ @see InstanceBatchShader
-			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @see InstanceBatchVTF
-			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support @see InstanceBatchHW
-			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @see InstanceBatchHW_VTF
-			InstancingTechniquesCount,
+			ShaderBased,			//Any SM 2.0+ @See InstanceBatchShader
+			TextureVTF,				//Needs Vertex Texture Fetch & SM 3.0+ @See InstanceBatchVTF
+			HWInstancingBasic,		//Needs SM 3.0+ and HW instancing support @See InstanceBatchHW
+			HWInstancingVTF,		//Needs SM 3.0+, HW instancing support & VTF @See InstanceBatchHW_VTF
+			InstancingTechniquesCount
 		};
 
 		/** Values to be used in setSetting() & BatchSettings::setting */
@@ -152,8 +152,6 @@ namespace Ogre
 		virtual ~InstanceManager();
 
 		const String& getName() const { return mName; }
-
-		SceneManager* getSceneManager() const { return mSceneManager; }
 
 		/** Raises an exception if trying to change it after creating the first InstancedEntity
 			@remarks The actual value may be less if the technique doesn't support having so much

@@ -430,7 +430,6 @@ namespace Ogre
 		float *pSource = static_cast<float*>(pixelBox.data);
 		
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 		
 		std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
 
@@ -440,7 +439,7 @@ namespace Ogre
 		size_t instanceCount = mInstancedEntities.size();
 		size_t updatedInstances = 0;
 
-		float* transforms;
+		float* transforms = NULL;
 		//If using dual quaternions, write 3x4 matrices to a temporary buffer, then convert to dual quaternions
 		if(mUseBoneDualQuaternions)
 		{

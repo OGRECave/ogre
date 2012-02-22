@@ -249,7 +249,7 @@ namespace Ogre {
         assert(false && "Memory deallocation error");
     }
 	//---------------------------------------------------------------------
-	const size_t GLES2HardwareBufferManagerBase::getGLMapBufferThreshold() const
+	size_t GLES2HardwareBufferManagerBase::getGLMapBufferThreshold() const
 	{
 		return mMapBufferThreshold;
 	}

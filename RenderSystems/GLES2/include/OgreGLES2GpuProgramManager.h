@@ -47,11 +47,11 @@ namespace Ogre {
             ProgramMap mProgramMap;
 
         protected:
-    /// @copydoc ResourceManager::createImpl
+            /// @copydoc ResourceManager::createImpl
             Resource* createImpl(const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader,
                 const NameValuePairList* params);
-    /// Specialised create method with specific parameters
+            /// Specialised create method with specific parameters
             Resource* createImpl(const String& name, ResourceHandle handle,
                 const String& group, bool isManual, ManualResourceLoader* loader,
                 GpuProgramType gptype, const String& syntaxCode);
@@ -62,6 +62,6 @@ namespace Ogre {
             bool registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
             bool unregisterProgramFactory(const String& syntaxCode);
     };
-};
+}
 
 #endif

@@ -503,7 +503,7 @@ namespace Ogre
 	void ScriptCompiler::processImports(Ogre::AbstractNodeListPtr &nodes)
 	{
 		// We only need to iterate over the top-level of nodes
-		AbstractNodeList::iterator i = nodes->begin(), last = nodes->end();
+		AbstractNodeList::iterator i = nodes->begin();
 		while(i != nodes->end())
 		{
 			// We move to the next node here and save the current one.

@@ -55,7 +55,7 @@ namespace Ogre {
 
 
         /// Get the assigned GL program id
-        const GLuint getProgramID(void) const
+        GLuint getProgramID(void) const
         { return mProgramID; }
 
     protected:

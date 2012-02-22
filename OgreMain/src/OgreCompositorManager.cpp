@@ -164,7 +164,6 @@ CompositorInstance *CompositorManager::addCompositor(Viewport *vp, const String 
 void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
 {
 	CompositorChain *chain = getCompositorChain(vp);
-	CompositorChain::InstanceIterator it = chain->getCompositors();
 	for(size_t pos=0; pos < chain->getNumCompositors(); ++pos)
 	{
 		CompositorInstance *instance = chain->getCompositor(pos);
@@ -179,7 +178,6 @@ void CompositorManager::removeCompositor(Viewport *vp, const String &compositor)
 void CompositorManager::setCompositorEnabled(Viewport *vp, const String &compositor, bool value)
 {
 	CompositorChain *chain = getCompositorChain(vp);
-	CompositorChain::InstanceIterator it = chain->getCompositors();
 	for(size_t pos=0; pos < chain->getNumCompositors(); ++pos)
 	{
 		CompositorInstance *instance = chain->getCompositor(pos);

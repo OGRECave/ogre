@@ -77,9 +77,9 @@ namespace Ogre {
 
     		/** Threshold after which glMapBuffer is used and not glBufferSubData
             */
-            const size_t getGLMapBufferThreshold() const;
+            size_t getGLMapBufferThreshold() const;
             void setGLMapBufferThreshold( const size_t value );
-};
+    };
 
 	/// GLES2HardwareBufferManagerBase as a Singleton
 	class _OgreGLES2Export GLES2HardwareBufferManager : public HardwareBufferManager

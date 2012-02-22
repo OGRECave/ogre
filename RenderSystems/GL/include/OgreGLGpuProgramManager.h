@@ -63,6 +63,6 @@ public:
     bool unregisterProgramFactory(const String& syntaxCode);
 };
 
-}; //namespace Ogre
+} //namespace Ogre
 
 #endif //__GLGpuProgramManager_H__

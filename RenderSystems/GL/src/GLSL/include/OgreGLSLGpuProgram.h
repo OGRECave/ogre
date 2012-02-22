@@ -73,7 +73,7 @@ namespace Ogre {
 		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
 		/// Get the assigned GL program id
-		const GLuint getProgramID(void) const
+		GLuint getProgramID(void) const
 		{ return mProgramID; }
 
 		/// get the GLSLProgram for the shader object
