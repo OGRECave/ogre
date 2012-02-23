@@ -3,7 +3,7 @@
 # Build and package the SDK for iOS
 # Assumes that you are in the SDK/iOS directory
 
-LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
+LIPO=lipo
 SDKBUILDDIR=`pwd`
 
 set IPHONEOS_DEPLOYMENT_TARGET 4.0
