@@ -101,7 +101,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
-        NameValuePairList::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt;
 		
 		if(miscParams)
 		{
@@ -237,7 +237,7 @@ namespace Ogre {
             }
             else
             {
-                NameValuePairList::const_iterator param_useNSView_pair(NULL);
+                NameValuePairList::const_iterator param_useNSView_pair;
                 param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
                 
                 if(param_useNSView_pair != miscParams->end())

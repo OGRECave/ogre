@@ -48,7 +48,7 @@ THE SOFTWARE.
 // thing. The size of the allocated block seems to be irrelevant.
 #define __OGRE_SIMD_ALIGN_STACK()   _alloca(16)
 
-#elif OGRE_CPU == OGRE_CPU_X86 && OGRE_COMPILER == OGRE_COMPILER_GNUC
+#elif OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
 //
 // Horrible hack to align the stack to a 16-bytes boundary for gcc.
 //

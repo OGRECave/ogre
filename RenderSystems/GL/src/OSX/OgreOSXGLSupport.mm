@@ -385,7 +385,7 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-        NameValuePairList::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt;
 
         // First we must determine if this is a Carbon or a Cocoa window
         // that we wish to create
