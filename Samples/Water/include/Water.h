@@ -268,7 +268,7 @@ public:
     virtual void _shutdown()
     {
         // cleanup all allocated circles
-		for(int i = 0 ; i < circles.size() ; i++)
+		for(unsigned i = 0 ; i < circles.size() ; i++)
         {
 		    delete (circles[i]);
 		}
