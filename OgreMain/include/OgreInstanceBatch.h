@@ -106,18 +106,20 @@ namespace Ogre
 		InstancedEntityVec	mInstancedEntities;
 		InstancedEntityVec	mUnusedEntities;
 
-		//This bbox contains all (visible) instanced entities
+		/// This bbox contains all (visible) instanced entities
 		AxisAlignedBox		mFullBoundingBox;
 		Real				mBoundingRadius;
 		bool				mBoundsDirty;
-		bool				mBoundsUpdated; //Set to false by derived classes that need it
+        /// Set to false by derived classes that need it
+		bool				mBoundsUpdated;
 		Camera				*mCurrentCamera;
 
 		unsigned short		mMaterialLodIndex;
 
-		bool				mDirtyAnimation; //Set to false at start of each _updateRenderQueue
+        /// Set to false at start of each _updateRenderQueue
+		bool				mDirtyAnimation;
 
-		//False if a technique doesn't support skeletal animation
+		/// False if a technique doesn't support skeletal animation
 		bool				mTechnSupportsSkeletal;
 
 		/// Cached distance to last camera for getSquaredViewDepth
@@ -128,9 +130,9 @@ namespace Ogre
 		/// Tells that the list of entity instances with shared transforms has changed
 		bool mTransformSharingDirty;
 
-		//When true remove the memory of the VertexData we've created because no one else will
+		/// When true remove the memory of the VertexData we've created because no one else will
 		bool mRemoveOwnVertexData;
-		//When true remove the memory of the IndexData we've created because no one else will
+		/// When true remove the memory of the IndexData we've created because no one else will
 		bool mRemoveOwnIndexData;
 
 		virtual void setupVertices( const SubMesh* baseSubMesh ) = 0;
@@ -147,7 +149,7 @@ namespace Ogre
 		*/
 		void makeMatrixCameraRelative3x4( float *mat3x4, size_t numFloats );
 
-		//Returns false on errors that would prevent building this batch from the given submesh
+		/// Returns false on errors that would prevent building this batch from the given submesh
 		virtual bool checkSubMeshCompatibility( const SubMesh* baseSubMesh );
 
 		void updateVisibility(void);
@@ -313,17 +315,25 @@ namespace Ogre
 		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
 		//Renderable overloads
+        /** @copydoc Renderable::getMaterial. */
 		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
+        /** @copydoc Renderable::getRenderOperation. */
 		void getRenderOperation( RenderOperation& op )	{ op = mRenderOperation; }
 
+        /** @copydoc Renderable::getSquaredViewDepth. */
 		Real getSquaredViewDepth( const Camera* cam ) const;
+        /** @copydoc Renderable::getLights. */
         const LightList& getLights( void ) const;
+        /** @copydoc Renderable::getTechnique. */
 		Technique* getTechnique(void) const;
 
-		//MovableObject overloads
+        /** @copydoc MovableObject::getMovableType. */
 		const String& getMovableType(void) const;
+        /** @copydoc MovableObject::_notifyCurrentCamera. */
 		void _notifyCurrentCamera( Camera* cam );
+        /** @copydoc MovableObject::getBoundingBox. */
 		const AxisAlignedBox& getBoundingBox(void) const;
+        /** @copydoc MovableObject::getBoundingRadius. */
 		Real getBoundingRadius(void) const;
 
 		virtual void _updateRenderQueue(RenderQueue* queue);
