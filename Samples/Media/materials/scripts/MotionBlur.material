@@ -16,6 +16,8 @@ fragment_program Ogre/Compositor/Combine_GLSLES_fp glsles
 	default_params
 	{
 		param_named blur float 0.8
+   		param_named RT int 0
+   		param_named Sum int 1
 	}
 }
 
