@@ -22,8 +22,10 @@
 
 from ogre_mesh_exporter.global_properties import loadStaticConfig
 from ogre_mesh_exporter.global_properties import saveStaticConfig
+from ogre_mesh_exporter.mesh_exporter import exportMesh
 
-import bpy
+import bpy, os
+from bpy.app.handlers import persistent
 
 class MainExporterPanel(bpy.types.Panel):
 	bl_idname = "ogre3d_exporter_panel"
@@ -34,6 +36,47 @@ class MainExporterPanel(bpy.types.Panel):
 	# flag to tell if we are in preference view or not.
 	mPreference_view = False
 	mFirstLoad = True
+	mSelectionRefreshState = 0
+
+	@persistent
+	def refreshSelection(context):
+		globalSettings = bpy.context.scene.ogre_mesh_exporter
+		collection = globalSettings.selectedObjectList.collection
+
+		# CollectionProperty stupidly has no clear function. So we have to remove one by one.
+		while (len(collection) > 0):
+			collection.remove(0)
+
+		for object in bpy.context.selected_objects:
+			if (object.type == 'MESH'):
+				item = collection.add()
+				item.name = object.name
+
+		# NOTE1: we need to remove the callback first before setting the frame.
+		# this is because calling frame_set() refreshes the whole scene again which will end up
+		# randomly(?) calling this callback function again if we don't stop listening first.
+		# NOTE2: we call frame_set() for a stupid hackish reason to refresh the UI to reflect the selection change.
+		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
+		context.frame_set(context.frame_current)
+		panel = bpy.types.ogre3d_exporter_panel
+		# flag selection refresh state to 2.
+		# this is because the poll() event will be triggered again due to scene refresh.
+		# this way, the poll event will correctly ignore registering callback for refreshing of selection.
+		panel.mSelectionRefreshState = 2
+
+	# take advantage of the poll event to refresh our selection.
+	@classmethod
+	def poll(self, context):
+		# due to context issue, we cannot modify RNA data during drawing stage which is what this poll stage is.
+		# hence we take advantage of the scene update handler callback to do the actual refresh.
+		# however, we do not want to keep refreshing every frame which is rediculous.
+		# this is why we have the mRefreshingSelection flag to make sure we only refresh when nessesary.
+		# once the selection is refreshed, we reset this flag and remove the callback so this polling path can continue again.
+		if (self.mSelectionRefreshState == 0) :
+			self.mSelectionRefreshState = 1
+			bpy.app.handlers.scene_update_pre.append(MainExporterPanel.refreshSelection)
+		elif (self.mSelectionRefreshState == 2): self.mSelectionRefreshState = 0
+		return True
 
 	def draw(self, context):
 		layout = self.layout
@@ -79,10 +122,8 @@ class MainExporterPanel(bpy.types.Panel):
 
 		# display selection list.
 		col = layout.column()
+		col.label("Selected:")
 		selectedObjectList = globalSettings.selectedObjectList
-		row = col.row()
-		row.label("Selected:")
-		row.operator("ogre3d.refresh_selection", "", 'FILE_REFRESH')
 		col.template_list(selectedObjectList, "collection", selectedObjectList, "collectionIndex")
 
 		# ####################################################
@@ -122,35 +163,21 @@ class MainExporterPanel(bpy.types.Panel):
 		row.prop(globalSettings, "skeletonNameFollowMesh", icon = 'NONE', toggle = True)
 		row.prop(globalSettings, "runOgreXMLConverter", icon = 'NONE', toggle = True)
 
+		exportPathValid = os.path.isdir(globalSettings.exportPath)
+
 		exportPathBox = layout.column(True)
 		exportPathBox.label("Export Path:")
-		exportPathBox.prop(globalSettings, "exportPath", "")
+		exportPathBox.prop(globalSettings, "exportPath", "",
+			icon = ('NONE' if (exportPathValid) else 'ERROR'))
 
 		row = layout.row(True)
 		row.scale_y = 1.5
-		row.operator("ogre3d.export", icon = 'SCRIPTWIN')
+		exportRow = row.row(True)
+		exportRow.scale_y = 1.5
+		if (not exportPathValid): exportRow.enabled = False
+		exportRow.operator("ogre3d.export", icon = 'SCRIPTWIN')
 		row.operator("ogre3d.preferences", icon = 'SETTINGS')
 		row.operator("ogre3d.help", icon = 'HELP')
-
-class OperatorRefreshSelection(bpy.types.Operator):
-	bl_idname = "ogre3d.refresh_selection"
-	bl_label = "Refresh selection"
-	bl_description = "Refresh object selection for export."
-
-	def invoke(self, context, event):
-		globalSettings = bpy.context.scene.ogre_mesh_exporter
-		collection = globalSettings.selectedObjectList.collection
-
-		# CollectionProperty stupidly has no clear function. So we have to remove one by one.
-		while (len(collection) > 0):
-			collection.remove(0)
-
-		for object in bpy.context.selected_objects:
-			if (object.type == 'MESH'):
-				item = collection.add()
-				item.name = object.name
-
-		return('FINISHED')
 
 class OperatorExport(bpy.types.Operator):
 	bl_idname = "ogre3d.export"
@@ -164,7 +191,13 @@ class OperatorExport(bpy.types.Operator):
 			loadStaticConfig()
 			panel.mFirstLoad = False
 
-		return('FINISHED')
+		globalSettings = bpy.context.scene.ogre_mesh_exporter
+		collection = globalSettings.selectedObjectList.collection
+		for item in collection:
+			object = bpy.data.objects[item.name]
+			exportMesh(object, "%s%s.mesh.xml" % (globalSettings.exportPath, item.name))
+
+		return {'FINISHED'}
 
 class OperatorPreferences(bpy.types.Operator):
 	bl_idname = "ogre3d.preferences"
@@ -177,7 +210,7 @@ class OperatorPreferences(bpy.types.Operator):
 		if (panel.mFirstLoad):
 			loadStaticConfig()
 			panel.mFirstLoad = False
-		return('FINISHED')
+		return {'FINISHED'}
 
 class OperatorHelp(bpy.types.Operator):
 	bl_idname = "ogre3d.help"
@@ -185,7 +218,7 @@ class OperatorHelp(bpy.types.Operator):
 	bl_description = "Open help document."
 
 	def invoke(self, context, event):
-		return('FINISHED')
+		return {'FINISHED'}
 
 class OperatorPrefApplyStaticConfig(bpy.types.Operator):
 	bl_idname = "ogre3d.preferences_apply_static_config"
@@ -195,7 +228,7 @@ class OperatorPrefApplyStaticConfig(bpy.types.Operator):
 	def invoke(self, context, event):
 		bpy.types.ogre3d_exporter_panel.mPreference_view = False
 		saveStaticConfig()
-		return('FINISHED')
+		return {'FINISHED'}
 
 class OperatorPrefBack(bpy.types.Operator):
 	bl_idname = "ogre3d.preferences_back"
@@ -205,15 +238,4 @@ class OperatorPrefBack(bpy.types.Operator):
 	def invoke(self, context, event):
 		bpy.types.ogre3d_exporter_panel.mPreference_view = False
 		loadStaticConfig()
-		return('FINISHED')
-
-# registering and menu integration
-def register():
-	bpy.utils.register_module(__name__)
-
-# unregistering and removing menus
-def unregister():
-	bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-	register()
+		return {'FINISHED'}
