@@ -165,12 +165,6 @@ public:
 
     }
 
-    ~Sample_Shadows() 
-    {
-		//mDescWindow = 0;
-		
-		delete mPlane;
-    }
 protected:
 
 	// Override this to ensure FPU mode

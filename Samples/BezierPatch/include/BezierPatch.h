@@ -70,14 +70,14 @@ protected:
 		};
 
 		// specify a vertex format declaration for our patch: 3 floats for position, 3 floats for normal, 2 floats for UV
-        VertexDeclaration* decl = HardwareBufferManager::getSingleton().createVertexDeclaration();
-        decl->addElement(0, 0, VET_FLOAT3, VES_POSITION);
-        decl->addElement(0, sizeof(float) * 3, VET_FLOAT3, VES_NORMAL);
-        decl->addElement(0, sizeof(float) * 6, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
+        mDecl = HardwareBufferManager::getSingleton().createVertexDeclaration();
+        mDecl->addElement(0, 0, VET_FLOAT3, VES_POSITION);
+        mDecl->addElement(0, sizeof(float) * 3, VET_FLOAT3, VES_NORMAL);
+        mDecl->addElement(0, sizeof(float) * 6, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
 
 		// create a patch mesh using vertices and declaration
         mPatch = MeshManager::getSingleton().createBezierPatch("patch",
-			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, (float*)verts, decl, 3, 3, 5, 5, PatchSurface::VS_BOTH);
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, (float*)verts, mDecl, 3, 3, 5, 5, PatchSurface::VS_BOTH);
 
         mPatch->setSubdivision(0);   // start at 0 detail
 
@@ -102,10 +102,12 @@ protected:
 
     void cleanupContent()
     {
+        HardwareBufferManager::getSingleton().destroyVertexDeclaration(mDecl);
 		mPatchPass->setPolygonMode(PM_SOLID);
 		MeshManager::getSingleton().remove(mPatch->getHandle());
     }
 
+    VertexDeclaration* mDecl;
 	PatchMeshPtr mPatch;
 	Pass* mPatchPass;
 };

@@ -224,6 +224,9 @@ void Sample_Compositor::cleanupContent(void)
 	CompositorManager::getSingleton().removeCompositorChain(mViewport);
 	mCompositorNames.clear();
 
+    TextureManager::getSingleton().remove("DitherTex");
+    TextureManager::getSingleton().remove("HalftoneVolume");
+
 	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
 	CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();
 	CompositorLogicMap::const_iterator end  = mCompositorLogics.end();

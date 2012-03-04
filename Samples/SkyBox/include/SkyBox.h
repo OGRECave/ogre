@@ -33,13 +33,13 @@ protected:
 
 		// create a particle system with 200 quota, then set its material and dimensions
         ParticleSystem* thrusters = mSceneMgr->createParticleSystem(25);
-        thrusters ->setMaterialName("Examples/Flare");
-        thrusters ->setDefaultDimensions(25, 25);
+        thrusters->setMaterialName("Examples/Flare");
+        thrusters->setDefaultDimensions(25, 25);
 
 		// create two emitters for our thruster particle system
 		for (unsigned int i = 0; i < 2; i++)
 		{
-			ParticleEmitter* emitter = thrusters ->addEmitter("Point");  // add a point emitter
+			ParticleEmitter* emitter = thrusters->addEmitter("Point");  // add a point emitter
 
 			// set the emitter properties
 			emitter->setAngle(Degree(3));

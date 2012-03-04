@@ -66,12 +66,7 @@ public:
 		mInfo["Category"] = "Lighting";
 		mInfo["Help"] = "See http://www.ogre3d.org/wiki/index.php/Deferred_Shading for more info";
 	}
-    
-	~Sample_DeferredShading()
-    {
-		
-	}
-    
+
 protected:
     
 	void cleanupContent(void)
@@ -250,16 +245,9 @@ protected:
         }
         
 	}
-    
-    // Just override the mandatory create scene method
-    void setupContent(void)
+
+    void testCapabilities(const RenderSystemCapabilities* caps)
     {
-		mCameraMan->setTopSpeed(20.0);
-		new SharedData();
-		mSystem = 0;
-        
-		RenderSystem *rs = Root::getSingleton().getRenderSystem();
-		const RenderSystemCapabilities* caps = rs->getCapabilities();
         if (!caps->hasCapability(RSC_VERTEX_PROGRAM) || !(caps->hasCapability(RSC_FRAGMENT_PROGRAM)))
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support vertex and fragment programs, so cannot "
@@ -272,9 +260,15 @@ protected:
                         "run this demo. Sorry!", 
                         "DeferredShading::createScene");
         }
-        
-		
-        
+    }
+
+    // Just override the mandatory create scene method
+    void setupContent(void)
+    {
+		mCameraMan->setTopSpeed(20.0);
+		new SharedData();
+		mSystem = 0;
+
         // Set ambient light
         mSceneMgr->setAmbientLight(ColourValue(0.15, 0.00, 0.00));
         // Skybox

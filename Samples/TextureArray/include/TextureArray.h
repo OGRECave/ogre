@@ -129,8 +129,12 @@ protected:
 		SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 		node->setPosition(-quadSize / 2, -quadSize / 2, 0);
 		node->attachObject(textureArrayObject);
-
 	}
+    
+    void cleanupContent()
+    {
+        TextureManager::getSingleton().remove("TextureArrayTex");
+    }
 };
 
 #endif
