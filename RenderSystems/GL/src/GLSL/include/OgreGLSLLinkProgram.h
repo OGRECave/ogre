@@ -75,9 +75,9 @@ namespace Ogre {
 		/// Flag indicating skeletal animation is being performed
 		bool mSkeletalAnimation;
 
-		/// build uniform references from active named uniforms
+		/// Build uniform references from active named uniforms
 		void buildGLUniformReferences(void);
-		/// extract attributes
+		/// Extract attributes
 		void extractAttributes(void);
 
 		typedef set<GLuint>::type AttributeSet;
@@ -110,11 +110,11 @@ namespace Ogre {
 		*/
 		void activate(void);
 
-		/** Updates program object uniforms using data from GpuProgramParamters.
+		/** Updates program object uniforms using data from GpuProgramParameters.
 		normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
 		*/
 		void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program object uniforms using data from pass iteration GpuProgramParamters.
+		/** Updates program object uniforms using data from pass iteration GpuProgramParameters.
 		normally called by GLSLGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
 		*/
 		void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);

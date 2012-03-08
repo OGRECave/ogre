@@ -51,9 +51,9 @@ namespace Ogre {
 		/// GL Handle for the shader object
 		GLSLProgram* mGLSLProgram;
 
-		/// keep track of the number of vertex shaders created
+		/// Keep track of the number of vertex shaders created
 		static GLuint mVertexShaderCount;
-		/// keep track of the number of fragment shaders created
+		/// Keep track of the number of fragment shaders created
 		static GLuint mFragmentShaderCount;
 		/// keep track of the number of geometry shaders created
 		static GLuint mGeometryShaderCount;
@@ -76,7 +76,7 @@ namespace Ogre {
 		GLuint getProgramID(void) const
 		{ return mProgramID; }
 
-		/// get the GLSLProgram for the shader object
+		/// Get the GLSLProgram for the shader object
 		GLSLProgram* getGLSLProgram(void) const { return mGLSLProgram; }
 
 		/// @copydoc GLGpuProgram::getAttributeIndex

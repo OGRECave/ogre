@@ -177,7 +177,7 @@ namespace Ogre {
 	private:
 		/// GL handle for shader object
 		GLhandleARB mGLHandle;
-		/// flag indicating if shader object successfully compiled
+		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
 		/// The input operation type for this (geometry) program
 		RenderOperation::OperationType mInputOperationType;

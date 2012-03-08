@@ -127,7 +127,7 @@ namespace Ogre {
         if (format == PF_UNKNOWN)
             return false;
 
-        // Check natively format
+        // Check native format
         PixelFormat nativeFormat = getNativeFormat(ttype, format, usage);
         if (preciseFormatOnly && format != nativeFormat)
             return false;

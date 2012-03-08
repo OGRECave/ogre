@@ -68,7 +68,7 @@ namespace Ogre {
 
     GLTexture::~GLTexture()
     {
-        // have to call this here reather than in Resource destructor
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
 		if (isLoaded())
 		{
@@ -223,7 +223,7 @@ namespace Ogre {
 		}
 		else
 		{
-			// Run through this process to pregenerate mipmap piramid
+			// Run through this process to pregenerate mipmap pyramid
 			for(size_t mip=0; mip<=mNumMipmaps; mip++)
 			{
 				// Normal formats
