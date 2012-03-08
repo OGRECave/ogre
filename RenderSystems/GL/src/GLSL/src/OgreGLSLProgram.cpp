@@ -143,22 +143,10 @@ namespace Ogre {
 			return true;
 		}
 
-		if (checkErrors)
-        {
-            logObjectInfo("GLSL compiling: " + mName, mGLHandle);
-        }
-
 		// only create a shader object if glsl is supported
 		if (isSupported())
 		{
-            GLenum glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "GL Errors before creating shader object", 0 );
-            }
-
 			// create shader object
-
 			GLenum shaderType = 0x0000;
 			switch (mType)
 			{
@@ -173,12 +161,6 @@ namespace Ogre {
 				break;
 			}
 			mGLHandle = glCreateShaderObjectARB(shaderType);
-
-            glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Error creating GLSL shader object", 0 );
-            }
 		}
 
 		// Add preprocessor extras and main source
@@ -186,34 +168,22 @@ namespace Ogre {
 		{
 			const char *source = mSource.c_str();
 			glShaderSourceARB(mGLHandle, 1, &source, NULL);
-			// check for load errors
-            GLenum glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::loadFromSource", "Cannot load GLSL high-level shader source : " + mName, 0 );
-            }
 		}
 
+		if (checkErrors)
+        {
+            logObjectInfo("GLSL compiling: " + mName, mGLHandle);
+        }
 
 		glCompileShaderARB(mGLHandle);
 		// check for compile errors
 		glGetObjectParameterivARB(mGLHandle, GL_OBJECT_COMPILE_STATUS_ARB, &mCompiled);
-		// force exception if not compiled
-		if (checkErrors)
+        if(checkErrors)
 		{
-            GLenum glErr = glGetError();
-            if(glErr != GL_NO_ERROR)
-            {
-			    reportGLSLError( glErr, "GLSLProgram::compile", "Cannot compile GLSL high-level shader : " + mName + " ", mGLHandle, !mCompiled, !mCompiled );
-            }
-			
-			if (mCompiled)
-			{
-				logObjectInfo("GLSL compiled : " + mName, mGLHandle);
-			}
+            logObjectInfo(mCompiled ? "GLSL compiled: " : "GLSL compile log: "  + mName, mGLHandle);
 		}
-		return (mCompiled == 1);
 
+		return (mCompiled == 1);
 	}
 
 	//-----------------------------------------------------------------------
