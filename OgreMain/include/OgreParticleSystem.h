@@ -307,7 +307,8 @@ namespace Ogre {
             under control should they be affected by complex parameters which alter their emission rates
             etc. If a particle system reaches it's particle quota, none of the emitters will be able to 
             emit any more particles. As existing particles die, the spare capacity will be allocated
-            equally across all emitters to be as consistent to the origina particle system style as possible.
+            equally across all emitters to be as consistent to the original particle system style as possible.
+            The quota can be increased but not decreased after the system has been created.
         @param quota The maximum number of particles this system is allowed to have.
         */
         void setParticleQuota(size_t quota);
