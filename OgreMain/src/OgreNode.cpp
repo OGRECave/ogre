@@ -589,7 +589,7 @@ namespace Ogre {
         {
             _updateFromParent();
         }
-		return (mDerivedOrientation * localPos * mDerivedScale) + mDerivedPosition;
+		return (mDerivedOrientation * (localPos * mDerivedScale)) + mDerivedPosition;
 	}
 	//-----------------------------------------------------------------------
 	Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )
