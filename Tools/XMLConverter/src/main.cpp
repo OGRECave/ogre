@@ -150,6 +150,7 @@ XmlOptions parseArgs(int numArgs, char **args)
 	unOpt["-q"] = false;
 	unOpt["-d3d"] = false;
 	unOpt["-gl"] = false;
+	unOpt["-h"] = false;
     binOpt["-l"] = "";
     binOpt["-v"] = "";
     binOpt["-s"] = "Distance";
@@ -164,6 +165,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
     UnaryOptionList::iterator ui;
     BinaryOptionList::iterator bi;
+
+    ui = unOpt.find("-h");
+	if (ui->second)
+	{
+		help();
+        exit(1);
+	}
 
 	ui = unOpt.find("-q");
 	if (ui->second)
