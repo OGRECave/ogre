@@ -34,30 +34,6 @@ fragment_program Ogre/Compositor/HDR/downscale2x2Luminence_fp unified
 
 material Ogre/Compositor/HDR/Downsample2x2Luminence
 {
-	technique GLSL
-	{
-		pass
-		{
-			cull_hardware none
-			cull_software none
-			depth_check off
-
-			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
-			{
-			}
-			fragment_program_ref Ogre/Compositor/HDR/downscale2x2Luminence_fp
-			{
-			}
-
-			texture_unit
-			{
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering none 
-			}
-		}
-	}
-	// Everything else
 	technique
 	{
 		pass
@@ -120,30 +96,6 @@ fragment_program Ogre/Compositor/HDR/downscale3x3_fp unified
 
 material Ogre/Compositor/HDR/Downsample3x3
 {
-	technique GLSL
-	{
-		pass
-		{
-			cull_hardware none
-			cull_software none
-			depth_check off
-
-			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
-			{
-			}
-			fragment_program_ref Ogre/Compositor/HDR/downscale3x3_fp
-			{
-			}
-
-			texture_unit
-			{
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering none 
-			}
-		}
-	}
-	// Everything else
 	technique
 	{
 		pass
@@ -214,37 +166,6 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpass_fp unified
 
 material Ogre/Compositor/HDR/Downsample3x3Brightpass
 {
-	technique GLSL
-	{
-		pass
-		{
-			cull_hardware none
-			cull_software none
-			depth_check off
-
-			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
-			{
-			}
-			fragment_program_ref Ogre/Compositor/HDR/downscale3x3brightpass_fp
-			{
-			}
-
-			// Scene 
-			texture_unit
-			{
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering none 
-			}
-			// Luminence 
-			texture_unit
-			{
-				tex_address_mode clamp
-				filtering none 
-			}
-		}
-	}
-	// Everything else
 	technique
 	{
 		pass
@@ -310,31 +231,6 @@ fragment_program Ogre/Compositor/HDR/bloom_fp unified
 
 material Ogre/Compositor/HDR/GaussianBloom
 {
-	technique GLSL
-	{
-		pass
-		{
-			cull_hardware none
-			cull_software none
-			depth_check off
-
-			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
-			{
-			}
-			fragment_program_ref Ogre/Compositor/HDR/bloom_fp
-			{
-			}
-
-			// Input 
-			texture_unit
-			{
-                tex_coord_set 0
-				tex_address_mode clamp
-				filtering none 
-			}
-		}
-	}
-	// Everything else
 	technique
 	{
 		pass
@@ -400,40 +296,6 @@ fragment_program Ogre/Compositor/HDR/finaltonemapping_fp unified
 
 material Ogre/Compositor/HDR/ToneMapping
 {
-	technique GLSL
-	{
-		pass
-		{
-			cull_hardware none
-			cull_software none
-			depth_check off
-
-			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
-			{
-			}
-			fragment_program_ref Ogre/Compositor/HDR/finaltonemapping_fp
-			{
-			}
-
-			// Scene 
-			texture_unit
-			{
-                tex_coord_set 0
-				tex_address_mode clamp
-			}
-			// Bloom
-			texture_unit
-			{
-				tex_address_mode clamp
-			}
-			// Luminence 
-			texture_unit
-			{
-				tex_address_mode clamp
-			}
-		}
-	}
-	// Everything else
 	technique
 	{
 		pass
