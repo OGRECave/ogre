@@ -796,6 +796,27 @@ fragment_program Examples/TextureArrayPSasm asm
 
 material Examples/TextureArray
 {
+	technique GLSL
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVSglsl
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPSglsl
+			{
+			}
+
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture TextureArrayTex
+				tex_address_mode clamp
+			}
+		}
+	}
+	
 	technique
 	{
 		pass
@@ -821,26 +842,4 @@ material Examples/TextureArray
 			}
 		}
 	}
-
-	technique GLSL
-	{
-		pass
-		{
-			vertex_program_ref Examples/TextureArrayVSglsl
-			{
-			}
-
-			fragment_program_ref Examples/TextureArrayPSglsl
-			{
-			}
-
-			texture_unit
-			{
-				// Will be filled in at runtime
-				texture TextureArrayTex
-				tex_address_mode clamp
-			}
-		}
-	}
-
 }

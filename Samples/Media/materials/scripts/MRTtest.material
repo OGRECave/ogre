@@ -94,6 +94,44 @@ fragment_program Ogre/MRTtest/quadfp unified
 // Quad material
 material Ogre/MRTtest/quad
 {
+    technique GLSL
+    {
+
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			vertex_program_ref Ogre/Compositor/StdQuad_GLSL_vp
+			{
+			}
+
+			fragment_program_ref Ogre/MRTtest/quadfp
+			{
+			}
+
+			texture_unit RT0
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT1
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT2
+			{
+				tex_address_mode clamp
+			}
+			texture_unit RT3
+			{
+				tex_address_mode clamp
+			}
+
+
+		}
+	}
+	// Everything else
     technique
     {
 
