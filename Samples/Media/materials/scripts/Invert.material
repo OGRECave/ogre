@@ -12,8 +12,8 @@ fragment_program Ogre/Compositor/Invert_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/InvertFP unified
 {
-	delegate Ogre/Compositor/Invert_Cg_FP
 	delegate Ogre/Compositor/Invert_GLSLES_FP
+	delegate Ogre/Compositor/Invert_Cg_FP
 }
 
 material Ogre/Compositor/Invert

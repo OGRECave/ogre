@@ -20,8 +20,8 @@ fragment_program Ogre/Compositor/SharpenEdgesFP_glsles glsles
 fragment_program Ogre/Compositor/SharpenEdgesFP unified
 {
 	delegate Ogre/Compositor/SharpenEdgesFP_ps_2_a
-	delegate Ogre/Compositor/SharpenEdgesFP_cg
 	delegate Ogre/Compositor/SharpenEdgesFP_glsles
+	delegate Ogre/Compositor/SharpenEdgesFP_cg
 
 	default_params
 	{

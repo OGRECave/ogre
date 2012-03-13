@@ -12,8 +12,8 @@ fragment_program Ogre/Compositor/Laplace_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/LaplaceFP unified
 {
-	delegate Ogre/Compositor/Laplace_Cg_FP
 	delegate Ogre/Compositor/Laplace_GLSLES_FP
+	delegate Ogre/Compositor/Laplace_Cg_FP
 }
 
 material Ogre/Compositor/Laplace

@@ -101,14 +101,14 @@ vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl glsl
 ///////////////////////////////////////////////////////////////////////////
 fragment_program Ogre/RTShader/shadow_caster_ps unified
 {
-	delegate Ogre/RTShader/shadow_caster_ps_cg
 	delegate Ogre/RTShader/shadow_caster_ps_glsl
+	delegate Ogre/RTShader/shadow_caster_ps_cg
 }
 
 vertex_program Ogre/RTShader/shadow_caster_skinning_2weight_vs unified
 {
-	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg
 	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_glsl
+	delegate Ogre/RTShader/shadow_caster_skinning_2weight_vs_cg
 }
 
 ///////////////////////////////////////////////////////////////////////////

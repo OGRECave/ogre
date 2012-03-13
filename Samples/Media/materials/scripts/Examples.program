@@ -82,20 +82,20 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV glsles
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
 	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
+	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
+	delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
 	delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
 	delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
-	delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
@@ -232,10 +232,10 @@ vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
 
 vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
-	delegate Ogre/HardwareSkinningTwoWeightsCg
 	delegate Ogre/HardwareSkinningTwoWeightsGLSL
 	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
 	delegate Ogre/HardwareSkinningTwoWeightsHLSL
+	delegate Ogre/HardwareSkinningTwoWeightsCg
 	
 	default_params
 	{
