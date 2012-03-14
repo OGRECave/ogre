@@ -159,7 +159,7 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
+		while( itor != end && !mVisible )
 		{
 			//Trick to force Ogre not to render us if none of our instances is visible
 			//Because we do Camera::isVisible(), it is better if the SceneNode from the
