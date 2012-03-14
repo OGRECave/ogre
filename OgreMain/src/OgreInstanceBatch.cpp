@@ -223,9 +223,9 @@ namespace Ogre
 										mat3x4[(i+2) * 4 + 3] );
 			const Vector3 newPos( worldTrans - cameraRelativePosition );
 
-			mat3x4[(i+0) * 4 + 3] = newPos.x;
-			mat3x4[(i+1) * 4 + 3] = newPos.y;
-			mat3x4[(i+2) * 4 + 3] = newPos.z;
+			mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
+			mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
+			mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
 		}
 	}
 	//-----------------------------------------------------------------------

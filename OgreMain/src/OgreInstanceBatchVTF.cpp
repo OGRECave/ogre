@@ -332,7 +332,7 @@ namespace Ogre
 			//Copy the 2x4 matrix
 			for(int i = 0; i < 8; ++i)
 			{
-				*outDualQuaternions++ = dQuat[i];
+				*outDualQuaternions++ = static_cast<float>( dQuat[i] );
 				++floatsWritten;
 			}
 		}
@@ -681,9 +681,9 @@ namespace Ogre
 					{
 						size_t instanceIdx = (hwBoneIdx[j+wgtIdx] + i * mMatricesPerInstance) * mRowLength + k;
 						//x
-						*thisFloat++ = ((instanceIdx % texWidth) / (float)texWidth) - texelOffsets.x;
+						*thisFloat++ = ((instanceIdx % texWidth) / (float)texWidth) - (float)texelOffsets.x;
 						//y
-						*thisFloat++ = ((instanceIdx / texWidth) / (float)texHeight) - texelOffsets.y;
+						*thisFloat++ = ((instanceIdx / texWidth) / (float)texHeight) - (float)texelOffsets.y;
 					}
 
 					++numberOfMatricesInLine;
