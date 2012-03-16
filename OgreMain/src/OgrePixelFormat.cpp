@@ -1155,7 +1155,7 @@ namespace Ogre {
             }
         } else {
             // Do the operation with the more generic floating point
-            float rr, gg, bb, aa;
+            float rr = 0, gg = 0, bb = 0, aa = 0;
             unpackColour(&rr,&gg,&bb,&aa, pf, src);
             *r = (uint8)Bitwise::floatToFixed(rr, 8);
             *g = (uint8)Bitwise::floatToFixed(gg, 8);
@@ -1384,7 +1384,7 @@ namespace Ogre {
         const size_t dstSliceSkipBytes = dst.getSliceSkip()*dstPixelSize;
 
         // The brute force fallback
-        float r,g,b,a;
+        float r = 0, g = 0, b = 0, a = 1;
         for(size_t z=src.front; z<src.back; z++)
         {
             for(size_t y=src.top; y<src.bottom; y++)

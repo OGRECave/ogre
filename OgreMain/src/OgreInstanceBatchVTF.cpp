@@ -654,7 +654,7 @@ namespace Ogre
 		//Add the weights (supports up to four, which is Ogre's limit)
 		if(mWeightCount > 1)
 		{
-			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
 										thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 		}
 

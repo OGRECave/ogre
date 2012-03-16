@@ -176,7 +176,7 @@ void Sample_NewInstancing::switchInstancingTechnique()
 		//Because we use IM_USEALL as flags, the actual num of instances per batch might be much lower
 		//If you're not bandwidth limited, you may want to lift IM_VTFBESTFIT flag away
 
-		InstanceManager::InstancingTechnique technique;
+		InstanceManager::InstancingTechnique technique = InstanceManager::ShaderBased;
 	
 		switch( mInstancingTechnique )
 		{

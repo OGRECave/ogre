@@ -167,7 +167,7 @@ namespace Ogre
 		//Add the weights (supports up to four, which is Ogre's limit)
 		if(mWeightCount > 1)
 		{
-			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
 										0 ).getSize();
 		}
 		
@@ -244,7 +244,7 @@ namespace Ogre
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
-			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+			thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			//Add two floats of padding here? or earlier?
 			//If not using bone matrix lookup, is it ok that it is 8 bytes since divides evenly into 16
@@ -479,7 +479,7 @@ namespace Ogre
 
 				if(mUseBoneDualQuaternions)
 				{
-					floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+					convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
 				}
 
 				if (useMatrixLookup)

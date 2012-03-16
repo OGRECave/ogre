@@ -287,57 +287,57 @@ namespace Ogre
 		return compile(nodes, group);
 	}
 
-	static void logAST(int tabs, const AbstractNodePtr &node)
-	{
-		String msg = "";
-		for(int i = 0; i < tabs; ++i)
-			msg += "\t";
-
-		switch(node->type)
-		{
-		case ANT_ATOM:
-			{
-				AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(node.get());
-				msg = msg + atom->value;
-			}
-			break;
-		case ANT_PROPERTY:
-			{
-				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>(node.get());
-				msg = msg + prop->name + " =";
-				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
-				{
-					if((*i)->type == ANT_ATOM)
-						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
-				}
-			}
-			break;
-		case ANT_OBJECT:
-			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-				msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
-				for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
-				{
-					if((*i)->type == ANT_ATOM)
-						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
-				}
-			}
-			break;
-		default:
-			msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
-		}
-
-		LogManager::getSingleton().logMessage(msg);
-
-		if(node->type == ANT_OBJECT)
-		{
-			ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
-			{
-				logAST(tabs + 1, *i);
-			}
-		}
-	}
+//	static void logAST(int tabs, const AbstractNodePtr &node)
+//	{
+//		String msg = "";
+//		for(int i = 0; i < tabs; ++i)
+//			msg += "\t";
+//
+//		switch(node->type)
+//		{
+//		case ANT_ATOM:
+//			{
+//				AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(node.get());
+//				msg = msg + atom->value;
+//			}
+//			break;
+//		case ANT_PROPERTY:
+//			{
+//				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>(node.get());
+//				msg = msg + prop->name + " =";
+//				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+//				{
+//					if((*i)->type == ANT_ATOM)
+//						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//				}
+//			}
+//			break;
+//		case ANT_OBJECT:
+//			{
+//				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//				msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
+//				for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
+//				{
+//					if((*i)->type == ANT_ATOM)
+//						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//				}
+//			}
+//			break;
+//		default:
+//			msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
+//		}
+//
+//		LogManager::getSingleton().logMessage(msg);
+//
+//		if(node->type == ANT_OBJECT)
+//		{
+//			ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+//			{
+//				logAST(tabs + 1, *i);
+//			}
+//		}
+//	}
 
 	bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
 	{

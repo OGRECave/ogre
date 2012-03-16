@@ -4834,7 +4834,7 @@ namespace Ogre{
 						AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get();
 
 						String pName = atom0->value;
-						GpuConstantType constType;
+						GpuConstantType constType = GCT_UNKNOWN;
 						size_t arraySz = 1;
 						if (!getConstantType(i1, &constType))
 						{

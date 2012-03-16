@@ -1801,7 +1801,14 @@ namespace Ogre {
 				indexMap = &localIndexMap;
 				createIndexMap(inSubMeshIndexes, inSubMesh->vertexData->vertexCount, localIndexMap);
 			}
-			
+
+			if(!outSubMesh->useSharedVertices && !outSubMesh->vertexData)
+            {
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                            String("Submesh does not have any vertex data"),
+                            "ProgressiveMesh::bakeSimplifiedMesh");
+            }
+
 			bool outUse16bitIndexes = (outSubMesh->useSharedVertices ? outMesh->sharedVertexData : outSubMesh->vertexData)->vertexCount <= 0xFFFF;
 			
 			inSubMeshIndexDataVar->createIndexData(outSubMesh->indexData, outUse16bitIndexes, indexMap);
