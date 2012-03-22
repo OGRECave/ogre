@@ -222,6 +222,16 @@ namespace Ogre  {
             case PF_R8G8B8:
             case PF_B8G8R8:
                 return GL_RGB;
+#if GL_EXT_texture_rg
+            case PF_FLOAT16_R:
+            case PF_FLOAT32_R:
+            case PF_R8:
+                return GL_RED_EXT;
+            case PF_FLOAT16_GR:
+            case PF_FLOAT32_GR:
+            case PF_RG8:
+                return GL_RG_EXT;
+#endif
             case PF_A4L4:
             case PF_R3G3B2:
             case PF_A2R10G10B10:
@@ -246,16 +256,6 @@ namespace Ogre  {
 #if GL_EXT_texture_compression_s3tc
 				if (!hwGamma)
 	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-#endif
-#if GL_EXT_texture_rg
-            case PF_FLOAT16_R:
-            case PF_FLOAT32_R:
-            case PF_R8:
-                return GL_RED_EXT;
-            case PF_FLOAT16_GR:
-            case PF_FLOAT32_GR:
-            case PF_RG8:
-                return GL_RG_EXT;
 #endif
             default:
                 return 0;
