@@ -93,11 +93,22 @@ public:
 	// Used field mask
 	enum OpMask
 	{
-		OPM_ALL = 1 << 0,
-		OPM_X	= 1 << 1,
-		OPM_Y	= 1 << 2,
-		OPM_Z	= 1 << 3,
-		OPM_W	= 1 << 4
+		OPM_ALL		= 0x0001,
+		OPM_X		= 0x0002,
+		OPM_Y		= 0x0004,
+		OPM_Z		= 0x0008,
+		OPM_W		= 0x0010,
+		OPM_XY		= OPM_X | OPM_Y,
+		OPM_XZ		= OPM_X | OPM_Z,
+		OPM_XW		= OPM_X | OPM_W,
+		OPM_YZ		= OPM_Y | OPM_Z,
+		OPM_YW		= OPM_Y | OPM_W,
+		OPM_ZW		= OPM_Z | OPM_W,
+		OPM_XYZ		= OPM_X | OPM_Y | OPM_Z,
+		OPM_XYW		= OPM_X | OPM_Y | OPM_W,
+		OPM_XZW		= OPM_X | OPM_Z | OPM_W,
+		OPM_YZW		= OPM_Y | OPM_Z | OPM_W,
+		OPM_XYZW	= OPM_X | OPM_Y | OPM_Z | OPM_W
 	};
 
 	/** Class constructor 

@@ -214,7 +214,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 				curFuncInvocation = OGRE_NEW FunctionInvocation(
 					mAutoAdjustPollPosition ? SGX_FUNC_ATLAS_SAMPLE_AUTO_ADJUST : SGX_FUNC_ATLAS_SAMPLE_NORMAL, groupOrder, internalCounter++);
 				curFuncInvocation->pushOperand(sampler, Operand::OPS_IN);
-				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_X | Operand::OPM_Y);
+				curFuncInvocation->pushOperand(texcoord, Operand::OPS_IN, Operand::OPM_XY);
 				curFuncInvocation->pushOperand(psAtlasTextureCoord, Operand::OPS_IN);
 				curFuncInvocation->pushOperand(mPSInpTextureDatas[j], Operand::OPS_IN);
 				curFuncInvocation->pushOperand(mPSTextureSizes[j], Operand::OPS_IN);

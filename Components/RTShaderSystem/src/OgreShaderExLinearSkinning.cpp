@@ -262,7 +262,7 @@ void LinearSkinning::addIndexedPositionWeight(Function* vsMain,
 
 	FunctionInvocation* curFuncInvocation;
 
-	int outputMask = Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z;
+	int outputMask = Operand::OPM_XYZ;
 	if (mParamInWorldMatrices->getType() == GCT_MATRIX_4X4)
 	{
 		outputMask = Operand::OPM_ALL;

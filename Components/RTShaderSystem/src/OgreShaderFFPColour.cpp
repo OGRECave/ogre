@@ -249,9 +249,9 @@ bool FFPColour::addFunctionInvocations(ProgramSet* programSet)
 	if (mPSOutputDiffuse.get() != NULL && psSpecular.get() != NULL)
 	{
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ADD, FFP_PS_COLOUR_END, internalCounter++);
-		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
-		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
-		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
+		curFuncInvocation->pushOperand(psSpecular, Operand::OPS_IN, Operand::OPM_XYZ);
+		curFuncInvocation->pushOperand(mPSOutputDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
 		psMain->addAtomInstance(curFuncInvocation);
 	}	
 

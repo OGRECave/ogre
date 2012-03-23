@@ -470,7 +470,7 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 	addPSBlendInvocations(psMain, source1, source2, texel, 
 		textureUnitParams->mTextureSamplerIndex,
 		colourBlend, groupOrder, internalCounter, 
-		needDifferentAlphaBlend ? (Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z )  : Operand::OPM_ALL);
+		needDifferentAlphaBlend ? Operand::OPM_XYZ : Operand::OPM_ALL);
 
 	// Case we need different alpha channel code.
 	if (needDifferentAlphaBlend)

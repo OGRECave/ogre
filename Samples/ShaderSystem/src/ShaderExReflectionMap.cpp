@@ -286,9 +286,9 @@ bool ShaderExReflectionMap::addPSInvocations( Function* psMain, const int groupO
 	funcInvocation->pushOperand(mPSInMaskTexcoord, Operand::OPS_IN);
 	funcInvocation->pushOperand(mReflectionMapSampler, Operand::OPS_IN);
 	funcInvocation->pushOperand(mPSInReflectionTexcoord, Operand::OPS_IN);	
-	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_IN, Operand::OPM_XYZ);
 	funcInvocation->pushOperand(mReflectionPower, Operand::OPS_IN);
-	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT,(Operand::OPM_X | Operand::OPM_Y | Operand::OPM_Z));
+	funcInvocation->pushOperand(mPSOutDiffuse, Operand::OPS_OUT, Operand::OPM_XYZ);
 	
 	psMain->addAtomInstance(funcInvocation);
 
