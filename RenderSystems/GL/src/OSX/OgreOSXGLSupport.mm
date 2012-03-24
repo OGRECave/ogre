@@ -251,7 +251,12 @@ void OSXGLSupport::addConfig( void )
 #endif
 		}
 	}
-	
+
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+        // Release memory
+        CFRelease(displayModes);
+#endif
+
 	// Sort the modes...
 	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 
 					  (CFComparatorFunction)_compareModes, NULL);
