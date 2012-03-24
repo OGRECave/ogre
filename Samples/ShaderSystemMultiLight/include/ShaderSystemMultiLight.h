@@ -4,6 +4,7 @@
 #include "SdkSample.h"
 #include "SegmentedDynamicLightManager.h"
 #include "RTShaderSRSSegmentedLights.h"
+#include "OgreControllerManager.h"
 
 /*
 Part of the original guidelines under which the RTSS was created was to emulate the fixed pipeline mechanism as close as possible.  
@@ -90,7 +91,7 @@ public:
 			if (mTwirlLights)
 			{
 				mLights[i].light->setDirection(
-					Quaternion(Degree(mLights[i].animState->getTimePosition() * 200 + i / (float)mLights.size()), Vector3::UNIT_Y) *
+					Quaternion(Degree(ControllerManager::getSingleton().getElapsedTime() * 150 + 360 * i / (float)mLights.size()), Vector3::UNIT_Y) *
 					Vector3(0,-1,-1).normalisedCopy());
 			}
 			else
