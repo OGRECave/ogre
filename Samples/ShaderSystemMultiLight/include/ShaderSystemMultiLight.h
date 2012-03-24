@@ -41,6 +41,7 @@ const uint8 cPriorityLights = 55;
 const unsigned int cInitialLightCount = 3;
 const String DEBUG_MODE_CHECKBOX = "DebugMode";
 const String NUM_OF_LIGHTS_SLIDER = "NumOfLights";
+const String TWIRL_LIGHTS_CHECKBOX = "TwirlLights";
 
 
 class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
@@ -49,7 +50,8 @@ public:
 
 	Sample_ShaderSystemMultiLight() :
 		mPathNameGen("RTPath"),
-		mSRSSegLightFactory(NULL)
+		mSRSSegLightFactory(NULL),
+		mTwirlLights(false)
 	{
 		mInfo["Title"] = "ShaderSystem - Multi Light";
 		mInfo["Description"] = "Shows a possible way to support a large varying amount of spot lights in the RTSS using a relatively simple system."
@@ -85,7 +87,18 @@ public:
 		for(size_t i = 0 ; i < mLights.size() ; ++i)
 		{
 			mLights[i].animState->addTime(evt.timeSinceLastFrame);
+			if (mTwirlLights)
+			{
+				mLights[i].light->setDirection(
+					Quaternion(Degree(mLights[i].animState->getTimePosition() * 200 + i / (float)mLights.size()), Vector3::UNIT_Y) *
+					Vector3(0,-1,-1).normalisedCopy());
+			}
+			else
+			{
+				mLights[i].light->setDirection(Vector3::NEGATIVE_UNIT_Y);
+			}
 		}
+		
 				
 		return SdkSample::frameRenderingQueued(evt);   // don't forget the parent class updates!
     }
@@ -103,8 +116,9 @@ protected:
 
 	void setupContent()
 	{
-		mTrayMgr->createCheckBox(TL_BOTTOM, DEBUG_MODE_CHECKBOX, "Show Grid", 240)->setChecked(false, false);
 		mTrayMgr->createThickSlider(TL_BOTTOM, NUM_OF_LIGHTS_SLIDER, "Num of lights", 240, 80, 0, 64, 65)->setValue(cInitialLightCount, false);
+		mTrayMgr->createCheckBox(TL_BOTTOM, TWIRL_LIGHTS_CHECKBOX, "Twirl Lights", 240)->setChecked(false, false);
+		mTrayMgr->createCheckBox(TL_BOTTOM, DEBUG_MODE_CHECKBOX, "Show Grid", 240)->setChecked(false, false);
 
 		// Set our camera to orbit around the origin at a suitable distance
 		mCamera->setPosition(0, 100, 600);
@@ -195,7 +209,7 @@ protected:
 		Vector3 firstFramePos;
 		for(int i = 0 ; i <= animPoints ; ++i)
 		{
-			Vector3 framePos(rand01() * 900 - 500, 20 + rand01() * 100, rand01() * 900 - 500);
+			Vector3 framePos(rand01() * 900 - 500, 10 + rand01() * 100, rand01() * 900 - 500);
 			if (i == 0)
 			{
 				firstFramePos = framePos;
@@ -297,6 +311,10 @@ protected:
 		{
 			setDebugModeState(box->isChecked());
 		}
+		if (cbName == TWIRL_LIGHTS_CHECKBOX)
+		{
+			mTwirlLights = box->isChecked();
+		}
 	}
 
 	#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
@@ -353,6 +371,7 @@ private:
 
 	typedef Ogre::vector<LightState>::type VecLights;
 	VecLights mLights;	
+	bool mTwirlLights;
 
 	RTShaderSRSSegmentedLightsFactory* mSRSSegLightFactory;
 
