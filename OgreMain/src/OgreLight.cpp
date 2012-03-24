@@ -865,6 +865,76 @@ namespace Ogre {
         }
 	}
 	//-----------------------------------------------------------------------
+	bool Light::isInLightRange(const Ogre::Sphere& container) const
+	{
+		bool isIntersect = true;
+		//directional light always intersects (check only spotlight and point)
+		if (mLightType != LT_DIRECTIONAL)
+		{
+			//Check that the sphere is within the sphere of the light
+			isIntersect = container.intersects(Sphere(mDerivedPosition, mRange));
+			//If this is a spotlight, check that the sphere is within the cone of the spot light
+			if ((isIntersect) && (mLightType == LT_SPOTLIGHT))
+			{
+				//check first check of the sphere surrounds the position of the light
+				//(this covers the case where the center of the sphere is behind the position of the light
+				// something which is not covered in the next test).
+				isIntersect = container.intersects(mDerivedPosition);
+				//if not test cones
+				if (!isIntersect)
+				{
+					//Calculate the cone that exists between the sphere and the center position of the light
+					Ogre::Vector3 lightSphereConeDirection = container.getCenter() - mDerivedPosition;
+					Ogre::Radian halfLightSphereConeAngle = Math::ASin(container.getRadius() / lightSphereConeDirection.length());
+
+					//Check that the light cone and the light-position-to-sphere cone intersect)
+					Radian angleBetweenConeDirections = lightSphereConeDirection.angleBetween(mDerivedDirection);
+					isIntersect = angleBetweenConeDirections <=  halfLightSphereConeAngle + mSpotOuter * 0.5;
+				}
+			}
+		}
+		return isIntersect;
+	}
+
+	//-----------------------------------------------------------------------
+	bool Light::isInLightRange(const Ogre::AxisAlignedBox& container) const
+	{
+		bool isIntersect = true;
+		//Check the 2 simple / obvious situations. Light is directional or light source is inside the container
+		if ((mLightType != LT_DIRECTIONAL) && (container.intersects(mDerivedPosition) == false))
+		{
+			//Check that the container is within the sphere of the light
+			isIntersect = Math::intersects(Sphere(mDerivedPosition, mRange),container);
+			//If this is a spotlight, do a more specific check
+			if ((isIntersect) && (mLightType == LT_SPOTLIGHT) && (mSpotOuter.valueRadians() <= Math::PI))
+			{
+				//Create a rough bounding box around the light and check if
+				Quaternion localToWorld = Vector3::NEGATIVE_UNIT_Z.getRotationTo(mDerivedDirection);
+
+				Real boxOffset = Math::Sin(mSpotOuter * 0.5) * mRange;
+				AxisAlignedBox lightBoxBound;
+				lightBoxBound.merge(Vector3::ZERO);
+				lightBoxBound.merge(localToWorld * Vector3(boxOffset, boxOffset, -mRange));
+				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, boxOffset, -mRange));
+				lightBoxBound.merge(localToWorld * Vector3(-boxOffset, -boxOffset, -mRange));
+				lightBoxBound.merge(localToWorld * Vector3(boxOffset, -boxOffset, -mRange));
+				lightBoxBound.setMaximum(lightBoxBound.getMaximum() + mDerivedPosition);
+				lightBoxBound.setMinimum(lightBoxBound.getMinimum() + mDerivedPosition);
+				isIntersect = lightBoxBound.intersects(container);
+				
+				//If the bounding box check succeeded do one more test
+				if (isIntersect)
+				{
+					//Check intersection again with the bounding sphere of the container
+					//Helpful for when the light is at an angle near one of the vertexes of the bounding box
+					isIntersect = isInLightRange(Sphere(container.getCenter(), 
+						container.getHalfSize().length()));
+				}
+			}
+		}
+		return isIntersect;
+	}
+	//-----------------------------------------------------------------------
 	//-----------------------------------------------------------------------
 	String LightFactory::FACTORY_TYPE_NAME = "Light";
 	//-----------------------------------------------------------------------

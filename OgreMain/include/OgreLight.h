@@ -518,7 +518,22 @@ namespace Ogre {
         virtual void _updateCustomGpuParameter(uint16 paramIndex, 
 			const GpuProgramParameters::AutoConstantEntry& constantEntry, 
 			GpuProgramParameters* params) const;
-    protected:
+				
+		/** Check whether a sphere is included in the lighted area of the light 
+		@note 
+			The function trades accuracy for efficiency. As a result you may get
+			false-positives (The function should not return any false-negatives).
+		*/
+		bool isInLightRange(const Ogre::Sphere& sphere) const;
+		
+		/** Check whether a bounding box is included in the lighted	area of the light
+		@note 
+			The function trades accuracy for efficiency. As a result you may get
+			false-positives (The function should not return any false-negatives).
+		*/
+		bool isInLightRange(const Ogre::AxisAlignedBox& container) const;
+    
+	protected:
         /// internal method for synchronising with parent node (if any)
         virtual void update(void) const;
 

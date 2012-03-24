@@ -463,9 +463,7 @@ void SceneManager::_populateLightList(const Vector3& position, Real radius,
         else
         {
             // only add in-range lights
-            Real range = lt->getAttenuationRange();
-            Real maxDist = range + radius;
-            if (lt->tempSquareDist <= Math::Sqr(maxDist))
+			if (lt->isInLightRange(Sphere(position,radius)))
             {
                 destList.push_back(lt);
             }
