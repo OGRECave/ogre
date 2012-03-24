@@ -423,7 +423,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 	{
 		if(data.getWidth() != data.rowPitch)
 			glPixelStorei(GL_UNPACK_ROW_LENGTH, data.rowPitch);
-		if(data.getHeight()*data.getWidth() != data.slicePitch)
+		if(data.getWidth() > 0 && data.getHeight()*data.getWidth() != data.slicePitch)
 			glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, (data.slicePitch/data.getWidth()));
 		if(data.left > 0 || data.top > 0 || data.front > 0)
 			glPixelStorei(GL_UNPACK_SKIP_PIXELS, data.left + data.rowPitch * data.top + data.slicePitch * data.front);
