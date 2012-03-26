@@ -96,6 +96,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   if (OGRE_GCC_HAS_SSE)
     add_definitions(-msse)
   endif ()
+  # This is a set of sensible warnings that provide meaningful output
+  add_definitions(-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -pedantic -Wshadow -Wno-unused-but-set-parameter -Wno-missing-field-initializers -Wno-long-long)
 endif ()
 if (MSVC)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
