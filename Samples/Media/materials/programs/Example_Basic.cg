@@ -17,6 +17,18 @@ void ambientOneTexture_vp(float4 position : POSITION,
 }
 
 /*
+  Basic fragment program using texture and diffuse colour.
+*/
+void diffuseOneTexture_fp(float4 position          : POSITION, 
+						  float2 uv                : TEXCOORD0,
+						  float4 diffuse           : COLOR,
+						  out float4 colour        : COLOR,
+						  uniform sampler2D texMap : register(s0))
+{
+	colour = tex2D(texMap,uv) * diffuse;
+}
+			  
+/*
   Single-weight-per-vertex hardware skinning, 2 lights
   The trouble with vertex programs is they're not general purpose, but
   fixed function hardware skinning is very poorly supported

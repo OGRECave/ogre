@@ -4,7 +4,7 @@ vertex_program SSAO/GBuffer_vp_hlsl hlsl
 {
     source GBuffer.cg
     entry_point GBuffer_vp
-    target vs_2_0
+    target vs_3_0
 }
 
 fragment_program SSAO/GBuffer_fp_hlsl hlsl

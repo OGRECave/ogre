@@ -762,7 +762,6 @@ vertex_program Examples/TextureArrayVScg cg
 vertex_program Examples/TextureArrayVSglsl glsl
 {
 	source Example_TextureArrayVS.glsl
-	profiles glsl
 
 	default_params
 	{
@@ -773,7 +772,6 @@ vertex_program Examples/TextureArrayVSglsl glsl
 fragment_program Examples/TextureArrayPSglsl glsl
 {
 	source Example_TextureArrayPS.glsl
-	profiles glsl
 
 	default_params
 	{

@@ -103,7 +103,7 @@ material Ogre/MRTtest/quad
 			cull_software none
 			depth_func always_pass
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 
