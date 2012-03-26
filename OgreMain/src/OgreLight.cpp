@@ -120,15 +120,12 @@ namespace Ogre {
         mPosition.y = y;
         mPosition.z = z;
         mDerivedTransformDirty = true;
-		mDerivedCamRelativeDirty = true;
-
     }
     //-----------------------------------------------------------------------
     void Light::setPosition(const Vector3& vec)
     {
         mPosition = vec;
         mDerivedTransformDirty = true;
-		mDerivedCamRelativeDirty = true;
     }
     //-----------------------------------------------------------------------
     const Vector3& Light::getPosition(void) const
@@ -284,6 +281,8 @@ namespace Ogre {
             }
 
             mDerivedTransformDirty = false;
+            //if the position has been updated we must update also the relative position
+            mDerivedCamRelativeDirty = true;
         }
 		if (mCameraToBeRelativeTo && mDerivedCamRelativeDirty)
 		{
