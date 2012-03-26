@@ -182,6 +182,7 @@ protected:
 		light->setType(Light::LT_DIRECTIONAL);
 		light->setDirection(Vector3(-1,-1,0).normalisedCopy());
 		light->setDiffuseColour(ColourValue(0.1, 0.1, 0.1));
+		light->setCastShadows(false);
 		
 		for(unsigned int i = 0 ; i < cInitialLightCount ; ++i)
 		{
@@ -235,7 +236,8 @@ protected:
 
 		// Attach a light with the same colour to the light node
 		state.light = mSceneMgr->createLight();
-		state.light->setType(Light::LT_SPOTLIGHT);
+		state.light->setCastShadows(false);
+		state.light->setType(mLights.size() % 10 ? Light::LT_SPOTLIGHT : Light::LT_POINT);
 		state.light->setDirection(Vector3::NEGATIVE_UNIT_Y);
 		state.light->setAttenuation(200,0,0,0);
 		state.light->setDiffuseColour(lightColor);

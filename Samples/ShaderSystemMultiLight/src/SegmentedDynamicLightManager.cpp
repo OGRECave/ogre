@@ -23,6 +23,12 @@ SegmentedDynamicLightManager::SegmentedDynamicLightManager() :
 	mIsDebugMode(false),
 	mSegmentedLightGrid(SDL_SEGMENT_GRID_SIZE)
 {
+	//calculate needed texture width
+	mTextureWidth = SDL_LIGHT_DATA_SIZE * SDL_SEGMENT_GRID_SIZE;
+	//round up to the nearest power of 2
+	unsigned int pow2Val = 1;
+	for( ; mTextureWidth > pow2Val; pow2Val = pow2Val << 1);
+	mTextureWidth = pow2Val;
 }
 
 //------------------------------------------------------------------------------
@@ -48,9 +54,13 @@ bool SegmentedDynamicLightManager::setDebugMode(bool i_IsDebugMode)
 }
 	
 //------------------------------------------------------------------------------
-void SegmentedDynamicLightManager::postUpdateSceneGraph(SceneManager* source, Camera* camera)
+void SegmentedDynamicLightManager::postFindVisibleObjects(SceneManager* source, 
+	SceneManager::IlluminationRenderStage irs, Viewport* v)
 {
-	updateLightList(camera, source->_getLightsAffectingFrustum());
+	if (irs == SceneManager::IRS_NONE)
+	{
+		updateLightList(v->getCamera(), source->_getLightsAffectingFrustum());
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -60,14 +70,18 @@ void SegmentedDynamicLightManager::setSceneManager(SceneManager* i_Manager)
 	{
 		if (mManager) mManager->removeListener(this);
 		mManager = i_Manager;
-		if (mManager) mManager->addListener(this);
+		if (mManager) 
+		{
+			mManager->addListener(this);
+			initTexture();
+		}
 	}
 }
 		
 //------------------------------------------------------------------------------
 void SegmentedDynamicLightManager::updateLightList(const Camera* i_pCamera, const LightList& i_LightList)
 {
-	if ((isActive()) && (initTexture()))
+	if (isActive())
 	{
 		arrangeLightsInSegmentedLists(i_pCamera, i_LightList);
 		updateTextureFromSegmentedLists(i_pCamera);
@@ -79,13 +93,6 @@ bool SegmentedDynamicLightManager::initTexture()
 {
 	if (mLightTexture.get() == NULL)
 	{
-		//calculate needed texture width
-		mTextureWidth = SDL_LIGHT_DATA_SIZE * SDL_SEGMENT_GRID_SIZE;
-		//round up to the nearest power of 2
-		unsigned int pow2Val = 1;
-		for( ; mTextureWidth > pow2Val; pow2Val = pow2Val << 1);
-		mTextureWidth = pow2Val;
-
 		const String& sdlTextureName = getSDLTextureName();
 		// create the render texture
 		mLightTexture = TextureManager::getSingleton().createManual(sdlTextureName, 
@@ -288,8 +295,8 @@ void SegmentedDynamicLightManager::updateTextureFromSegmentedLists(const Camera*
 				// Update spotlight parameters.
 				Vector3 spotParam;
 				float inverseRange = 1.0f / (float)pLight->getAttenuationRange();
-				float spotAngle = 0;
-				float spotInvAngleRange = 0;
+				float spotAngle = -1;
+				float spotInvAngleRange = std::numeric_limits<float>::max();
 				if (pLight->getType() == Light::LT_SPOTLIGHT)
 				{
 					Real phi   = Math::Cos(pLight->getSpotlightOuterAngle().valueRadians() * 0.5f);

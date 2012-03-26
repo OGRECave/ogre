@@ -73,7 +73,8 @@ public:
 	bool isDebugMode() const { return mIsDebugMode; }
 
 	//Implementation of SceneManager::Listener
-	virtual void postUpdateSceneGraph(SceneManager* source, Camera* camera);
+	virtual void postFindVisibleObjects(SceneManager* source, 
+		SceneManager::IlluminationRenderStage irs, Viewport* v);
 	
 private:
 		
