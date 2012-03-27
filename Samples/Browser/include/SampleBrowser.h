@@ -1707,9 +1707,11 @@ protected:
 				mShaderGenerator->setShaderCachePath(shaderCachePath);		
 #endif
 #endif
-				// Create and register the material manager listener.
-				mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
-				Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+				// Create and register the material manager listener if it doesn't exist yet.
+				if (mMaterialMgrListener == NULL) {
+					mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
+					Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+				}
 			}
 
 			return true;
