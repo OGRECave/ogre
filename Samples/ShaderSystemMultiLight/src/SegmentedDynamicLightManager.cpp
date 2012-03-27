@@ -264,7 +264,7 @@ void SegmentedDynamicLightManager::updateTextureFromSegmentedLists(const Camera*
 		
 	HardwarePixelBufferSharedPtr pBuf = mLightTexture->getBuffer();
 	void* pStartPos = pBuf->lock(HardwareBuffer::HBL_DISCARD);
-	__int16* pData = (__int16*)pStartPos;
+	uint16* pData = (uint16*)pStartPos;
 
 	size_t remainBufWidth = mTextureWidth;
 	for(size_t j = 0; j < SDL_SEGMENT_GRID_SIZE; ++j)

@@ -75,9 +75,13 @@ public:
 			RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
 		pMainRenderState->reset();
 		
-		RTShader::ShaderGenerator::getSingleton().removeAllShaderBasedTechniques();
-		RTShader::ShaderGenerator::getSingleton().removeSubRenderStateFactory(mSRSSegLightFactory);
-		delete mSRSSegLightFactory;
+		if (mSRSSegLightFactory)
+		{
+			RTShader::ShaderGenerator::getSingleton().removeAllShaderBasedTechniques();
+			RTShader::ShaderGenerator::getSingleton().removeSubRenderStateFactory(mSRSSegLightFactory);
+			delete mSRSSegLightFactory;
+			mSRSSegLightFactory = NULL;
+		}
 
 		SdkSample::_shutdown();
 	}
