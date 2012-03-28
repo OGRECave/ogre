@@ -59,4 +59,4 @@ namespace Ogre {
 		return true;
 	}
 
-};
+}

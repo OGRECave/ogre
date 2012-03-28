@@ -97,7 +97,7 @@ typedef std::map<std::string, OgreBites::SdkSample *> PluginMap;
 namespace OgreBites
 {
     class SampleBrowser;
-};
+}
 
 @interface SampleBrowserGestureView : UIView
 {

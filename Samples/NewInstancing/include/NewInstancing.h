@@ -8,52 +8,6 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-static const char *c_instancingTechniques[] =
-{
-	"Shader Based",
-	"Vertex Texture Fetch (VTF)",
-	"Hardware Instancing Basic",
-	"Hardware Instancing + VTF",
-	"Limited Animation - Hardware Instancing + VTF",
-	"No Instancing"
-};
-
-static const char *c_materialsTechniques[] =
-{
-	"Examples/Instancing/ShaderBased/Robot",
-	"Examples/Instancing/VTF/Robot",
-	"Examples/Instancing/HWBasic/Robot",
-	"Examples/Instancing/VTF/HW/Robot",
-	"Examples/Instancing/VTF/HW/LUT/Robot",
-	"Examples/Instancing/ShaderBased/Robot"
-};
-
-static const char *c_materialsTechniques_dq[] =
-{
-	"Examples/Instancing/ShaderBased/Robot_dq",
-	"Examples/Instancing/VTF/Robot_dq",
-	"Examples/Instancing/HWBasic/Robot",
-	"Examples/Instancing/VTF/HW/Robot_dq",
-	"Examples/Instancing/VTF/HW/LUT/Robot_dq",
-	"Examples/Instancing/ShaderBased/Robot_dq"
-};
-
-static const char *c_materialsTechniques_dq_two_weights[] =
-{
-	"Examples/Instancing/ShaderBased/spine_dq_two_weights",
-	"Examples/Instancing/VTF/spine_dq_two_weights",
-	"Examples/Instancing/HWBasic/spine",
-	"Examples/Instancing/VTF/HW/spine_dq_two_weights",
-	"Examples/Instancing/VTF/HW/LUT/spine_dq_two_weights",
-	"Examples/Instancing/ShaderBased/spine_dq_two_weights"
-};
-
-static const char *c_meshNames[] =
-{
-	"robot.mesh",
-	"spine.mesh"
-};
-
 #define NUM_TECHNIQUES (((int)InstanceManager::InstancingTechniquesCount) + 1)
 
 class _OgreSampleClassExport Sample_NewInstancing : public SdkSample

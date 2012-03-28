@@ -90,6 +90,6 @@ protected:
 	
 }; // class OSXGLSupport
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // OGRE_OSXGLSupport_H

@@ -25,6 +25,53 @@ extern "C" _OgreSampleExport void dllStopPlugin()
 }
 
 #endif
+
+static const char *c_instancingTechniques[] =
+{
+	"Shader Based",
+	"Vertex Texture Fetch (VTF)",
+	"Hardware Instancing Basic",
+	"Hardware Instancing + VTF",
+	"Limited Animation - Hardware Instancing + VTF",
+	"No Instancing"
+};
+
+static const char *c_materialsTechniques[] =
+{
+	"Examples/Instancing/ShaderBased/Robot",
+	"Examples/Instancing/VTF/Robot",
+	"Examples/Instancing/HWBasic/Robot",
+	"Examples/Instancing/VTF/HW/Robot",
+	"Examples/Instancing/VTF/HW/LUT/Robot",
+	"Examples/Instancing/ShaderBased/Robot"
+};
+
+static const char *c_materialsTechniques_dq[] =
+{
+	"Examples/Instancing/ShaderBased/Robot_dq",
+	"Examples/Instancing/VTF/Robot_dq",
+	"Examples/Instancing/HWBasic/Robot",
+	"Examples/Instancing/VTF/HW/Robot_dq",
+	"Examples/Instancing/VTF/HW/LUT/Robot_dq",
+	"Examples/Instancing/ShaderBased/Robot_dq"
+};
+
+static const char *c_materialsTechniques_dq_two_weights[] =
+{
+	"Examples/Instancing/ShaderBased/spine_dq_two_weights",
+	"Examples/Instancing/VTF/spine_dq_two_weights",
+	"Examples/Instancing/HWBasic/spine",
+	"Examples/Instancing/VTF/HW/spine_dq_two_weights",
+	"Examples/Instancing/VTF/HW/LUT/spine_dq_two_weights",
+	"Examples/Instancing/ShaderBased/spine_dq_two_weights"
+};
+
+static const char *c_meshNames[] =
+{
+	"robot.mesh",
+	"spine.mesh"
+};
+
 //------------------------------------------------------------------------------
 Sample_NewInstancing::Sample_NewInstancing() : NUM_INST_ROW(50), NUM_INST_COLUMN(50), mCurrentManager(0), mCurrentMaterialSet(c_materialsTechniques), mCurrentFlags(0), mSkinningTechniques(NULL)
 {

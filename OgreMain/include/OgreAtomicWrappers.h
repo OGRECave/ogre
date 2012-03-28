@@ -185,7 +185,7 @@ namespace Ogre {
 
 		T operator+=(const T &add)
 		{
-			__sync_fetch_and_add (&mField, add);
+			return __sync_add_and_fetch (&mField, add);
 		}
 
         volatile T mField;

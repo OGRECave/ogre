@@ -4470,7 +4470,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void Terrain::DefaultGpuBufferAllocator::warmStart(size_t numInstances, uint16 terrainSize, uint16 maxBatchSize, 
-		uint16 mMinBatchSize)
+		uint16 minBatchSize)
 	{
 		// TODO
 
