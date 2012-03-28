@@ -34,13 +34,6 @@ using namespace OgreBites;
 #define PLANE_SIZE 3000.0f
 #define CIRCLES_MATERIAL "Examples/Water/Circles"
 
-/* Some global variables */
-SceneNode *headNode ;
-Overlay* waterOverlay ;
-ParticleSystem *particleSystem ;
-ParticleEmitter *particleEmitter ;
-SceneManager *sceneMgr ;
-
 void prepareCircleMaterial()
 {
 	char *bmap = new char[256 * 256 * 4] ;
@@ -101,6 +94,7 @@ private:
 	SubMesh *subMesh ;
 	Entity *entity ;
 	Real tm ;
+    SceneManager *sceneMgr ;
 	static bool first ;
 	// some buffers shared by all circles
 	static HardwareVertexBufferSharedPtr posnormVertexBuffer ;
@@ -209,9 +203,10 @@ public:
 	{
 		subMesh->vertexData->vertexBufferBinding->setBinding(1, texcoordsVertexBuffers[lvl]);
 	}
-	WaterCircle(const String& inName, Real x, Real y)
+	WaterCircle(SceneManager *mgr, const String& inName, Real x, Real y)
 	{
-		this->name = inName ;
+        sceneMgr = mgr;
+		name = inName ;
 		_prepareMesh();
 		node = static_cast<SceneNode*> (sceneMgr->getRootSceneNode()->createChild(name));
 		node->translate(x*(PLANE_SIZE/COMPLEXITY), 10, y*(PLANE_SIZE/COMPLEXITY));
@@ -282,7 +277,12 @@ protected:
 	WaterMesh *waterMesh ;
 	Entity *waterEntity ;
 	AnimationState* mAnimState;
-    
+    SceneNode *headNode ;
+    Overlay* waterOverlay ;
+    ParticleSystem *particleSystem ;
+    ParticleEmitter *particleEmitter ;
+    SceneManager *sceneMgr ;
+
     // Just override the mandatory create scene method
     void setupContent(void)
     {
@@ -459,7 +459,7 @@ protected:
 				if (y<1) y=1 ;
 				if (y>COMPLEXITY-1) y=COMPLEXITY-1;
 				waterMesh->push(x,y,-h) ;
-				WaterCircle *circle = new WaterCircle(
+				WaterCircle *circle = new WaterCircle(mSceneMgr,
                                                       "Circle#"+StringConverter::toString(pindex++),
                                                       x, y);
 				circles.push_back(circle);
