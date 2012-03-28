@@ -68,6 +68,6 @@ namespace Ogre {
         GLenum mProgramType;
     };
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // __GLES2GpuProgram_H__

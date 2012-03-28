@@ -149,6 +149,6 @@ namespace Ogre {
             // In case this is a render buffer
             GLuint mRenderbufferID;
     };
-};
+}
 
 #endif
