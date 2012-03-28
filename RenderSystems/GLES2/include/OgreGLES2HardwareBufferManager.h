@@ -123,7 +123,7 @@ namespace Ogre {
 
         /** Threshold after which glMapBuffer is used and not glBufferSubData
 		*/
-		const size_t getGLMapBufferThreshold() const
+		size_t getGLMapBufferThreshold() const
 		{
 			return static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->getGLMapBufferThreshold();
 		}

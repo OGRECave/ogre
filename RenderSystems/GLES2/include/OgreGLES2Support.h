@@ -102,7 +102,7 @@ namespace Ogre
             /**
             * Set shader cache path
             */
-            const void setShaderCachePath(String path)
+            void setShaderCachePath(String path)
             {
                 mShaderCachePath = path;
             }
@@ -110,7 +110,7 @@ namespace Ogre
             /**
             * Set shader library path
             */
-            const void setShaderLibraryPath(String path)
+            void setShaderLibraryPath(String path)
             {
                 mShaderLibraryPath = path;
             }
