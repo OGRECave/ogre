@@ -368,6 +368,7 @@ namespace Ogre
                         case GCT_MATRIX_3X4:
                         case GCT_MATRIX_4X2:
                         case GCT_MATRIX_4X3:
+                        case GCT_SAMPLER2DARRAY:
                         case GCT_UNKNOWN:
                             break;
                             
