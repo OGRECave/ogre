@@ -710,7 +710,10 @@ namespace Ogre
 		Image image;
 		int width, height;
 		char* imageData;
-		
+                
+                if (! Ogre::ResourceGroupManager::getSingleton().resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, name)) 
+                    return false;
+                
 		try 
 		{
 			// Try to load image
