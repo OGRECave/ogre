@@ -91,7 +91,7 @@ if (NOT APPLE)
 endif ()
 
 # Set compiler specific build flags
-if (CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
   check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
   if (OGRE_GCC_HAS_SSE)
     add_definitions(-msse)
@@ -122,7 +122,7 @@ if (MINGW)
   add_definitions(-D_WIN32_WINNT=0x0500)
 endif ()
 
-if ((CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") AND NOT MINGW)
+if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
   # Test for GCC visibility
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
@@ -149,7 +149,7 @@ if ((CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") AND
   if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
   endif()  
-endif ((CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") AND NOT MINGW)
+endif ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
 
 # determine system endianess
 if (MSVC)
