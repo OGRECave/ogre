@@ -7,156 +7,156 @@
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 {
-	source Example_Basic.cg
-	entry_point ambientOneTexture_vp
-	profiles vs_1_1 arbvp1
+    source Example_Basic.cg
+    entry_point ambientOneTexture_vp
+    profiles vs_1_1 arbvp1
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
-	
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
+    
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
 {
-	source Example_Basic.cg
-	entry_point ambientOneTexture_vp
-	profiles vs_4_0
+    source Example_Basic.cg
+    entry_point ambientOneTexture_vp
+    profiles vs_4_0
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
-	
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
+    
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 {
-	source Example_Basic.hlsl
-	entry_point ambientOneTexture_vp
-	target vs_4_0 vs_1_1
+    source Example_Basic.hlsl
+    entry_point ambientOneTexture_vp
+    target vs_4_0 vs_1_1
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
 }
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 {
-	source AmbientOneTexture.glsl
+    source AmbientOneTexture.glsl
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
 {
-	source AmbientOneTexture.glsles
+    source AmbientOneTexture.glsles
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV glsles
 {
-	source AmbientOneTextureWithUV.glsles
+    source AmbientOneTextureWithUV.glsles
 
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto ambient ambient_light_colour
-	}
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
 {
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
-	delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSL
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureCg cg
 {
-	source Example_Basic.cg
-	entry_point diffuseOneTexture_fp
-	profiles ps_2_0 arbfp1
+    source Example_Basic.cg
+    entry_point diffuseOneTexture_fp
+    profiles ps_2_0 arbfp1
 }
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES glsles
 {
-	source DiffuseOneTexture.glsles
-	default_params
-	{
-		param_named texMap int 0
-	}
+    source DiffuseOneTexture.glsles
+    default_params
+    {
+        param_named texMap int 0
+    }
 }
 
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTexture unified
 {
-	delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES
-	delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureCg
+    delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES
+    delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureCg
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
-	delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
-	delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
-	delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
+    delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
+    delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
+    delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 {
-	entry_point main
-	source PassthroughFP.cg
-	profiles ps_4_0
+    entry_point main
+    source PassthroughFP.cg
+    profiles ps_4_0
 }
 
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
 {
-	entry_point mainCg
-	source PassthroughFP.cg
-	profiles ps_4_0 ps_2_0 arbfp1
+    entry_point mainCg
+    source PassthroughFP.cg
+    profiles ps_4_0 ps_2_0 arbfp1
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTexture cg
 {
-	entry_point mainForAmbientOneTexture
-	source PassthroughFP.cg
-	profiles ps_4_0
+    entry_point mainForAmbientOneTexture
+    source PassthroughFP.cg
+    profiles ps_4_0
 }
 
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles
 {
-	source PassthroughFP.glsles
+    source PassthroughFP.glsles
 }
 
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningOneWeightShadowCaster cg
 {
-	source Example_Basic.cg
-	entry_point hardwareSkinningOneWeightCaster_vp
-	profiles vs_1_1 arbvp1
-	includes_skeletal_animation true
+    source Example_Basic.cg
+    entry_point hardwareSkinningOneWeightCaster_vp
+    profiles vs_1_1 arbvp1
+    includes_skeletal_animation true
 }
 // Basic hardware skinning using one indexed weight per vertex
 vertex_program Ogre/HardwareSkinningOneWeight cg
@@ -169,74 +169,64 @@ vertex_program Ogre/HardwareSkinningOneWeight cg
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterCg cg
 {
-	source Example_Basic.cg
-	entry_point hardwareSkinningTwoWeightsCaster_vp
-	profiles vs_4_0 vs_1_1 arbvp1
-	includes_skeletal_animation true
+    source Example_Basic.cg
+    entry_point hardwareSkinningTwoWeightsCaster_vp
+    profiles vs_4_0 vs_1_1 arbvp1
+    includes_skeletal_animation true
 }
 
 // Same as below, but for use when rendering texture shadows
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL hlsl
 {
-	source Example_Basic.hlsl
-	entry_point hardwareSkinningTwoWeightsCaster_vp
-	target vs_1_1
-	includes_skeletal_animation true
-	column_major_matrices false
+    source Example_Basic.hlsl
+    entry_point hardwareSkinningTwoWeightsCaster_vp
+    target vs_1_1
+    includes_skeletal_animation true
+    column_major_matrices false
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL glsl
 {
-	source skinningTwoWeightsShadowCasterVp.glsl
-	includes_skeletal_animation true
+    source skinningTwoWeightsShadowCasterVp.glsl
+    includes_skeletal_animation true
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES glsles
 {
-	source skinningTwoWeightsShadowCasterVp.glsles
-	includes_skeletal_animation true
-	use_optimiser false
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named skinTex int 0
-	}
+    source skinningTwoWeightsShadowCasterVp.glsles
+    includes_skeletal_animation true
+    use_optimiser false
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsShadowCaster unified
 {
-	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES
-	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
-	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
-	delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
+    delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSLES
+    delegate Ogre/HardwareSkinningTwoWeightsShadowCasterHLSL
+    delegate Ogre/HardwareSkinningTwoWeightsShadowCasterGLSL
+    delegate Ogre/HardwareSkinningTwoWeightsShadowCasterCg
 }
 
 // Basic hardware skinning using two indexed weights per vertex
 vertex_program Ogre/HardwareSkinningTwoWeightsHLSL hlsl
 {
-   source Example_Basic.hlsl
-   entry_point hardwareSkinningTwoWeights_vp
-   target vs_1_1 
-   includes_skeletal_animation true
-   column_major_matrices false
+    source Example_Basic.hlsl
+    entry_point hardwareSkinningTwoWeights_vp
+    target vs_1_1 
+    includes_skeletal_animation true
+    column_major_matrices false
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsGLSL glsl
 {
-   source skinningTwoWeightsVp.glsl
-   includes_skeletal_animation true
+    source skinningTwoWeightsVp.glsl
+    includes_skeletal_animation true
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsGLSLES glsles
 {
-   source skinningTwoWeightsVp.glsles
-   includes_skeletal_animation true
-	use_optimiser false
-	default_params
-	{
-		// assign samplers as required by GLSL
-		param_named skinTex int 0
-	}
+    source skinningTwoWeightsVp.glsles
+    includes_skeletal_animation true
+    use_optimiser false
 }
 
 vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
@@ -249,23 +239,23 @@ vertex_program Ogre/HardwareSkinningTwoWeightsCg cg
 
 vertex_program Ogre/HardwareSkinningTwoWeights unified
 {
-	delegate Ogre/HardwareSkinningTwoWeightsGLSL
-	delegate Ogre/HardwareSkinningTwoWeightsGLSLES
-	delegate Ogre/HardwareSkinningTwoWeightsHLSL
-	delegate Ogre/HardwareSkinningTwoWeightsCg
-	
-	default_params
-	{
-		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto lightPos[0] light_position 0
-		param_named_auto lightPos[1] light_position 1
-		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
-		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
-		param_named_auto ambient ambient_light_colour
-		//This property isn't relevant for GLSL, uses the GLSL material state instead
-		param_named_auto diffuse surface_diffuse_colour
-	}
+    delegate Ogre/HardwareSkinningTwoWeightsGLSL
+    delegate Ogre/HardwareSkinningTwoWeightsGLSLES
+    delegate Ogre/HardwareSkinningTwoWeightsHLSL
+    delegate Ogre/HardwareSkinningTwoWeightsCg
+    
+    default_params
+    {
+        param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+        param_named_auto viewProjectionMatrix viewproj_matrix
+        param_named_auto lightPos[0] light_position 0
+        param_named_auto lightPos[1] light_position 1
+        param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+        param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+        param_named_auto ambient ambient_light_colour
+        //This property isn't relevant for GLSL, uses the GLSL material state instead
+        param_named_auto diffuse surface_diffuse_colour
+    }
 }
 
 // Basic hardware skinning using four indexed weights per vertex
@@ -278,74 +268,74 @@ vertex_program Ogre/HardwareSkinningFourWeights cg
 
    default_params
    {
-   		param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-		param_named_auto viewProjectionMatrix viewproj_matrix
-		param_named_auto lightPos[0] light_position 0
-		param_named_auto lightPos[1] light_position 1
-		param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
-		param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
-		param_named_auto ambient ambient_light_colour
+           param_named_auto worldMatrix3x4Array world_matrix_array_3x4
+        param_named_auto viewProjectionMatrix viewproj_matrix
+        param_named_auto lightPos[0] light_position 0
+        param_named_auto lightPos[1] light_position 1
+        param_named_auto lightDiffuseColour[0] light_diffuse_colour 0
+        param_named_auto lightDiffuseColour[1] light_diffuse_colour 1
+        param_named_auto ambient ambient_light_colour
    }
 }
 
 // Basic hardware morph animation (no normals)
 vertex_program Ogre/HardwareMorphAnimation cg
 {
-	source Example_Basic.cg
-	entry_point hardwareMorphAnimation
-	profiles vs_1_1 arbvp1
+    source Example_Basic.cg
+    entry_point hardwareMorphAnimation
+    profiles vs_1_1 arbvp1
 
-	includes_morph_animation true
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto anim_t animation_parametric
-	}
+    includes_morph_animation true
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto anim_t animation_parametric
+    }
 }
 // Basic hardware pose animation supporting 2 active poses (no normals)
 vertex_program Ogre/HardwarePoseAnimation cg
 {
-	source Example_Basic.cg
-	entry_point hardwarePoseAnimation
-	profiles vs_1_1 arbvp1
+    source Example_Basic.cg
+    entry_point hardwarePoseAnimation
+    profiles vs_1_1 arbvp1
 
-	includes_pose_animation 2
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto anim_t animation_parametric
-	}
+    includes_pose_animation 2
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto anim_t animation_parametric
+    }
 }
 
 // Basic hardware morph animation (with normals)
 vertex_program Ogre/HardwareMorphAnimationWithNormals cg
 {
-	source Example_Basic.cg
-	entry_point hardwareMorphAnimationWithNormals
-	profiles vs_1_1 arbvp1
+    source Example_Basic.cg
+    entry_point hardwareMorphAnimationWithNormals
+    profiles vs_1_1 arbvp1
 
-	includes_morph_animation true
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto anim_t animation_parametric
-		param_named_auto objSpaceLightPos light_position_object_space 0
-		param_named_auto ambient ambient_light_colour
-	}
+    includes_morph_animation true
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto anim_t animation_parametric
+        param_named_auto objSpaceLightPos light_position_object_space 0
+        param_named_auto ambient ambient_light_colour
+    }
 }
 // Basic hardware pose animation supporting 2 active poses (with normals)
 vertex_program Ogre/HardwarePoseAnimationWithNormals cg
 {
-	source Example_Basic.cg
-	entry_point hardwarePoseAnimationWithNormals
-	profiles vs_1_1 arbvp1
+    source Example_Basic.cg
+    entry_point hardwarePoseAnimationWithNormals
+    profiles vs_1_1 arbvp1
 
-	includes_pose_animation 2
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		param_named_auto anim_t animation_parametric
-		param_named_auto objSpaceLightPos light_position_object_space 0
-		param_named_auto ambient ambient_light_colour
-	}
+    includes_pose_animation 2
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto anim_t animation_parametric
+        param_named_auto objSpaceLightPos light_position_object_space 0
+        param_named_auto ambient ambient_light_colour
+    }
 }
