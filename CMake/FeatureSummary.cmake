@@ -153,7 +153,6 @@ var_to_string(OGRE_CONFIG_CONTAINERS_USE_CUSTOM_ALLOCATOR _containers)
 var_to_string(OGRE_CONFIG_DOUBLE _double)
 var_to_string(OGRE_CONFIG_MEMTRACK_DEBUG _memtrack_debug)
 var_to_string(OGRE_CONFIG_MEMTRACK_RELEASE _memtrack_release)
-var_to_string(OGRE_CONFIG_NEW_COMPILERS _compilers)
 var_to_string(OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR _string)
 var_to_string(OGRE_USE_BOOST _boost)
 # threading settings
