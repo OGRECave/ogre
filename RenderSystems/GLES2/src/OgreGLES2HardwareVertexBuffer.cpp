@@ -250,19 +250,21 @@ namespace Ogre {
 
             dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
+            // DJR - Always update the entire buffer. Much faster on mobiles.
+            // A better approach would be to double buffer or ring buffer
+
             // Update whole buffer if possible, otherwise normal
-            if (mLockStart == 0 && mLockSize == mSizeInBytes)
-            {
-                glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, srcData,
+//            if (mLockStart == 0 && mLockSize == mSizeInBytes)
+//            {
+                glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, srcData,
                              GLES2HardwareBufferManager::getGLUsage(mUsage));
                 GL_CHECK_ERROR;
-            }
-            else
-            {
-                // FIXME: GPU frequently stalls here - DJR
-                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
-                GL_CHECK_ERROR;
-            }
+//            }
+//            else
+//            {
+//                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
+//                GL_CHECK_ERROR;
+//            }
 
             mShadowBuffer->unlock();
             mShadowUpdated = false;
