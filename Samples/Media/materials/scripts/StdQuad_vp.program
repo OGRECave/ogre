@@ -2,7 +2,7 @@ vertex_program Ogre/Compositor/StdQuad_Cg_vp cg
 {
 	source StdQuad_vp.cg
 	entry_point StdQuad_vp
-	profiles vs_4_0 vs_3_0 vs_1_1 arbvp1
+    profiles vs_4_0 vs_2_0 vs_1_1 arbvp1
 
 	default_params
 	{
