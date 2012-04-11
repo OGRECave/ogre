@@ -66,8 +66,8 @@ struct _finddata_t
 #define _A_SUBDIR 0x10  /* Subdirectory */
 
 long _findfirst(const char *pattern, struct _finddata_t *data);
-int _findnext(long id, struct _finddata_t *data);
-int _findclose(long id);
+int _findnext(intptr_t id, struct _finddata_t *data);
+int _findclose(intptr_t id);
 
 #endif
 

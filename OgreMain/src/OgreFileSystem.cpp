@@ -99,7 +99,7 @@ namespace Ogre {
     void FileSystemArchive::findFiles(const String& pattern, bool recursive, 
         bool dirs, StringVector* simpleList, FileInfoList* detailList) const
     {
-        long lHandle, res;
+        intptr_t lHandle, res;
         struct _finddata_t tagData;
 
         // pattern can contain a directory name, separate it from mask
