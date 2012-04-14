@@ -40,7 +40,11 @@ namespace Ogre {
     D3D9HardwareIndexBuffer::D3D9HardwareIndexBuffer(HardwareBufferManagerBase* mgr, HardwareIndexBuffer::IndexType idxType, 
         size_t numIndexes, HardwareBuffer::Usage usage,
         bool useSystemMemory, bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, useSystemMemory, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, useSystemMemory, 
+		useShadowBuffer || 
+		// Allocate the system memory buffer for restoring after device lost.
+		(((usage & HardwareBuffer::HBU_WRITE_ONLY) != 0) && 
+			D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement()))
     {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
@@ -61,17 +65,6 @@ namespace Ogre {
 		// Set source buffer to NULL.
 		mSourceBuffer = NULL;
 		mSourceLockedBytes  = NULL;
-
-		// Allocate the system memory buffer.
-		if (mUsage & HardwareBuffer::HBU_WRITE_ONLY && D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement())
-		{			
-			mSystemMemoryBuffer = OGRE_ALLOC_T(char, getSizeInBytes(), MEMCATEGORY_RESOURCE);
-			memset(mSystemMemoryBuffer, 0, getSizeInBytes());
-		}
-		else
-		{			
-			mSystemMemoryBuffer = NULL;
-		}
 
 		// Create buffer resource(s).
 		for (uint i = 0; i < D3D9RenderSystem::getResourceCreationDeviceCount(); ++i)
@@ -99,8 +92,7 @@ namespace Ogre {
 			++it;
 		}	
 		mMapDeviceToBufferResources.clear();   
-		OGRE_FREE (mSystemMemoryBuffer, MEMCATEGORY_RESOURCE);
-    }
+	}
 	//---------------------------------------------------------------------
     void* D3D9HardwareIndexBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
@@ -139,20 +131,11 @@ namespace Ogre {
 			++it;
 		}		
 
-		// Case we use system memory buffer -> just return it
-		if (mSystemMemoryBuffer != NULL)
-		{
-			return mSystemMemoryBuffer + offset;
-		}
-		
-		else
-		{
-			// Lock the source buffer.
-			mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
+		// Lock the source buffer.
+		mSourceLockedBytes = _lockBuffer(mSourceBuffer, mSourceBuffer->mLockOffset, mSourceBuffer->mLockLength);
 
-			return mSourceLockedBytes;		
-		}		
-    }
+		return mSourceLockedBytes;		
+	}
 	//---------------------------------------------------------------------
 	void D3D9HardwareIndexBuffer::unlockImpl(void)
     {	
@@ -169,11 +152,7 @@ namespace Ogre {
 				bufferResources->mBuffer != NULL &&
 				nextFrameNumber - bufferResources->mLastUsedFrame <= 1)
 			{
-				if (mSystemMemoryBuffer != NULL)
-				{
-					updateBufferResources(mSystemMemoryBuffer + bufferResources->mLockOffset, bufferResources);
-				}
-				else if (mSourceBuffer != bufferResources)
+				if (mSourceBuffer != bufferResources)
 				{
 					updateBufferResources(mSourceLockedBytes, bufferResources);
 				}				
@@ -183,12 +162,9 @@ namespace Ogre {
 		}	
 
 		// Unlock the source buffer.
-		if (mSystemMemoryBuffer == NULL)
-		{
-			_unlockBuffer(mSourceBuffer);
-			mSourceLockedBytes = NULL;
-		}		
-    }
+		_unlockBuffer(mSourceBuffer);
+		mSourceLockedBytes = NULL;
+	 }
 	//---------------------------------------------------------------------
     void D3D9HardwareIndexBuffer::readData(size_t offset, size_t length, 
         void* pDest)
@@ -374,11 +350,12 @@ namespace Ogre {
 	{
 		if (bufferResources->mOutOfDate)
 		{
-			if (mSystemMemoryBuffer != NULL)
+			if (mShadowBuffer != NULL)
 			{
-				updateBufferResources(mSystemMemoryBuffer, bufferResources);
+				const char* shadowData = (const char*)mShadowBuffer->lock(HBL_NORMAL);
+				updateBufferResources(shadowData, bufferResources);
+				mShadowBuffer->unlock();
 			}
-
 			else if (mSourceBuffer != bufferResources && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
 			{				
 				mSourceBuffer->mLockOptions = HBL_READ_ONLY;
