@@ -45,7 +45,7 @@ namespace Ogre {
 		// Allocate the system memory buffer for restoring after device lost.
 		(((usage & HardwareBuffer::HBU_WRITE_ONLY) != 0) && 
 			D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement()))
-    {
+   {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
 		D3DPOOL eResourcePool;

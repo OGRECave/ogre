@@ -160,7 +160,6 @@ namespace Ogre {
 			++it;
 		}	
 
-		// Unlock the source buffer.
 		_unlockBuffer(mSourceBuffer);
 		mSourceLockedBytes = NULL;
 	}
@@ -349,11 +348,11 @@ namespace Ogre {
 		if (bufferResources->mOutOfDate)
 		{
 			if (mShadowBuffer != NULL)
-			{
+ 			{
 				const char* shadowData = (const char*)mShadowBuffer->lock(HBL_NORMAL);
 				updateBufferResources(shadowData, bufferResources);
 				mShadowBuffer->unlock();
-			}
+ 			}
 			else if (mSourceBuffer != bufferResources && (mUsage & HardwareBuffer::HBU_WRITE_ONLY) == 0)
 			{				
 				mSourceBuffer->mLockOptions = HBL_READ_ONLY;
