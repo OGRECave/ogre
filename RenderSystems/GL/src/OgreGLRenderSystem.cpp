@@ -197,6 +197,9 @@ namespace Ogre {
 	{
 		mGLSupport->start();
 
+        // Create the texture manager        
+		mTextureManager = new GLTextureManager(*mGLSupport); 
+
 		RenderWindow* autoWindow = mGLSupport->createWindow(autoCreateWindow, this, windowTitle);
 
 		RenderSystem::_initialise(autoCreateWindow, windowTitle);
@@ -920,9 +923,6 @@ namespace Ogre {
 		{
 			caps->log(defaultLog);
 		}
-
-		// Create the texture manager        
-		mTextureManager = new GLTextureManager(*mGLSupport); 
 
 		mGLInitialised = true;
 	}
