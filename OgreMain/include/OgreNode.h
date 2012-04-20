@@ -43,21 +43,21 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Class representing a general-purpose node an articulated scene graph.
-        @remarks
-            A node in the scene graph is a node in a structured tree. A node contains
-            information about the transformation which will apply to
-            it and all of it's children. Child nodes can have transforms of their own, which
-            are combined with their parent's transformations.
-        @par
-            This is an abstract class - concrete classes are based on this for specific purposes,
-            e.g. SceneNode, Bone
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Class representing a general-purpose node an articulated scene graph.
+    @remarks
+        A node in the scene graph is a node in a structured tree. A node contains
+        information about the transformation which will apply to
+        it and all of it's children. Child nodes can have transforms of their own, which
+        are combined with their parent's transformations.
+    @par
+        This is an abstract class - concrete classes are based on this for specific purposes,
+        e.g. SceneNode, Bone
     */
     class _OgreExport Node : public NodeAlloc
     {
@@ -75,50 +75,50 @@ namespace Ogre {
         };
         typedef HashMap<String, Node*> ChildNodeMap;
         typedef MapIterator<ChildNodeMap> ChildNodeIterator;
-		typedef ConstMapIterator<ChildNodeMap> ConstChildNodeIterator;
+        typedef ConstMapIterator<ChildNodeMap> ConstChildNodeIterator;
 
-		/** Listener which gets called back on Node events.
-		*/
-		class _OgreExport Listener
-		{
-		public:
-			Listener() {}
-			virtual ~Listener() {}
-			/** Called when a node gets updated.
-			@remarks
-				Note that this happens when the node's derived update happens,
-				not every time a method altering it's state occurs. There may 
-				be several state-changing calls but only one of these calls, 
-				when the node graph is fully updated.
-			*/
-			virtual void nodeUpdated(const Node*) {}
-			/** Node is being destroyed */
-			virtual void nodeDestroyed(const Node*) {}
-			/** Node has been attached to a parent */
-			virtual void nodeAttached(const Node*) {}
-			/** Node has been detached from a parent */
-			virtual void nodeDetached(const Node*) {}
-		};
+        /** Listener which gets called back on Node events.
+        */
+        class _OgreExport Listener
+        {
+        public:
+            Listener() {}
+            virtual ~Listener() {}
+            /** Called when a node gets updated.
+            @remarks
+                Note that this happens when the node's derived update happens,
+                not every time a method altering it's state occurs. There may 
+                be several state-changing calls but only one of these calls, 
+                when the node graph is fully updated.
+            */
+            virtual void nodeUpdated(const Node*) {}
+            /** Node is being destroyed */
+            virtual void nodeDestroyed(const Node*) {}
+            /** Node has been attached to a parent */
+            virtual void nodeAttached(const Node*) {}
+            /** Node has been detached from a parent */
+            virtual void nodeDetached(const Node*) {}
+        };
 
-		/** Inner class for displaying debug renderable for Node. */
-		class DebugRenderable : public Renderable, public NodeAlloc
-		{
-		protected:
-			Node* mParent;
-			MeshPtr mMeshPtr;
-			MaterialPtr mMat;
-			Real mScaling;
-		public:
-			DebugRenderable(Node* parent);
-			~DebugRenderable();
-			const MaterialPtr& getMaterial(void) const;
-			void getRenderOperation(RenderOperation& op);
-			void getWorldTransforms(Matrix4* xform) const;
-			Real getSquaredViewDepth(const Camera* cam) const;
-			const LightList& getLights(void) const;
-			void setScaling(Real s) { mScaling = s; }
+        /** Inner class for displaying debug renderable for Node. */
+        class DebugRenderable : public Renderable, public NodeAlloc
+        {
+        protected:
+            Node* mParent;
+            MeshPtr mMeshPtr;
+            MaterialPtr mMat;
+            Real mScaling;
+        public:
+            DebugRenderable(Node* parent);
+            ~DebugRenderable();
+            const MaterialPtr& getMaterial(void) const;
+            void getRenderOperation(RenderOperation& op);
+            void getWorldTransforms(Matrix4* xform) const;
+            Real getSquaredViewDepth(const Camera* cam) const;
+            const LightList& getLights(void) const;
+            void setScaling(Real s) { mScaling = s; }
 
-		};
+        };
 
     protected:
         /// Pointer to parent node
@@ -126,15 +126,15 @@ namespace Ogre {
         /// Collection of pointers to direct children; hashmap for efficiency
         ChildNodeMap mChildren;
 
-		typedef set<Node*>::type ChildUpdateSet;
+        typedef set<Node*>::type ChildUpdateSet;
         /// List of children which need updating, used if self is not out of date but children are
         mutable ChildUpdateSet mChildrenToUpdate;
         /// Flag to indicate own transform from parent is out of date
         mutable bool mNeedParentUpdate;
-		/// Flag indicating that all children need to be updated
-		mutable bool mNeedChildUpdate;
-		/// Flag indicating that parent has been notified about update request
-	    mutable bool mParentNotified ;
+        /// Flag indicating that all children need to be updated
+        mutable bool mNeedChildUpdate;
+        /// Flag indicating that parent has been notified about update request
+        mutable bool mParentNotified ;
         /// Flag indicating that the node has been queued for update
         mutable bool mQueuedForUpdate;
 
@@ -163,47 +163,47 @@ namespace Ogre {
         virtual void setParent(Node* parent);
 
         /** Cached combined orientation.
-            @par
-                This member is the orientation derived by combining the
-                local transformations and those of it's parents.
-                This is updated when _updateFromParent is called by the
-                SceneManager or the nodes parent.
+        @par
+            This member is the orientation derived by combining the
+            local transformations and those of it's parents.
+            This is updated when _updateFromParent is called by the
+            SceneManager or the nodes parent.
         */
         mutable Quaternion mDerivedOrientation;
 
         /** Cached combined position.
-            @par
-                This member is the position derived by combining the
-                local transformations and those of it's parents.
-                This is updated when _updateFromParent is called by the
-                SceneManager or the nodes parent.
+        @par
+            This member is the position derived by combining the
+            local transformations and those of it's parents.
+            This is updated when _updateFromParent is called by the
+            SceneManager or the nodes parent.
         */
         mutable Vector3 mDerivedPosition;
 
         /** Cached combined scale.
-            @par
-                This member is the position derived by combining the
-                local transformations and those of it's parents.
-                This is updated when _updateFromParent is called by the
-                SceneManager or the nodes parent.
+        @par
+            This member is the position derived by combining the
+            local transformations and those of it's parents.
+            This is updated when _updateFromParent is called by the
+            SceneManager or the nodes parent.
         */
         mutable Vector3 mDerivedScale;
 
         /** Triggers the node to update it's combined transforms.
-            @par
-                This method is called internally by Ogre to ask the node
-                to update it's complete transformation based on it's parents
-                derived transform.
+        @par
+            This method is called internally by Ogre to ask the node
+            to update it's complete transformation based on it's parents
+            derived transform.
         */
         virtual void _updateFromParent(void) const;
 
-		/** Class-specific implementation of _updateFromParent.
-		@remarks
-			Splitting the implementation of the update away from the update call
-			itself allows the detail to be overridden without disrupting the 
-			general sequence of updateFromParent (e.g. raising events)
-		*/
-		virtual void updateFromParentImpl(void) const;
+        /** Class-specific implementation of _updateFromParent.
+        @remarks
+            Splitting the implementation of the update away from the update call
+            itself allows the detail to be overridden without disrupting the 
+            general sequence of updateFromParent (e.g. raising events)
+        */
+        virtual void updateFromParentImpl(void) const;
 
 
         /** Internal method for creating a new child node - must be overridden per subclass. */
@@ -223,16 +223,16 @@ namespace Ogre {
         mutable Matrix4 mCachedTransform;
         mutable bool mCachedTransformOutOfDate;
 
-		/** Node listener - only one allowed (no list) for size & performance reasons. */
-		Listener* mListener;
+        /** Node listener - only one allowed (no list) for size & performance reasons. */
+        Listener* mListener;
 
-		typedef vector<Node*>::type QueuedUpdates;
-		static QueuedUpdates msQueuedUpdates;
+        typedef vector<Node*>::type QueuedUpdates;
+        static QueuedUpdates msQueuedUpdates;
 
-		DebugRenderable* mDebug;
+        DebugRenderable* mDebug;
 
-		/// User objects binding.
-		UserObjectBindings mUserObjectBindings;
+        /// User objects binding.
+        UserObjectBindings mUserObjectBindings;
 
     public:
         /** Constructor, should only be called by parent, not directly.
@@ -421,67 +421,71 @@ namespace Ogre {
         virtual void scale(Real x, Real y, Real z);
 
         /** Moves the node along the Cartesian axes.
-            @par
-                This method moves the node by the supplied vector along the
-                world Cartesian axes, i.e. along world x,y,z
-            @param 
-                d Vector with x,y,z values representing the translation.
-            @param
-                relativeTo The space which this transform is relative to.
+        @par
+            This method moves the node by the supplied vector along the
+            world Cartesian axes, i.e. along world x,y,z
+        @param d
+            Vector with x,y,z values representing the translation.
+        @param relativeTo
+            The space which this transform is relative to.
         */
         virtual void translate(const Vector3& d, TransformSpace relativeTo = TS_PARENT);
         /** Moves the node along the Cartesian axes.
-            @par
-                This method moves the node by the supplied vector along the
-                world Cartesian axes, i.e. along world x,y,z
-            @param 
-                x
-            @param
-                y
-            @param
-                z Real x, y and z values representing the translation.
-            @param
-            relativeTo The space which this transform is relative to.
+        @par
+            This method moves the node by the supplied vector along the
+            world Cartesian axes, i.e. along world x,y,z
+        @param x
+            Real @c x value representing the translation.
+        @param y
+            Real @c y value representing the translation.
+        @param z
+            Real @c z value representing the translation.
+        @param relativeTo
+            The space which this transform is relative to.
         */
         virtual void translate(Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
         /** Moves the node along arbitrary axes.
-            @remarks
-                This method translates the node by a vector which is relative to
-                a custom set of axes.
-            @param 
-                axes A 3x3 Matrix containg 3 column vectors each representing the
-                axes X, Y and Z respectively. In this format the standard cartesian
-                axes would be expressed as:
-                <pre>
-                1 0 0
-                0 1 0
-                0 0 1
-                </pre>
-                i.e. the identity matrix.
-            @param 
-                move Vector relative to the axes above.
-            @param
-            relativeTo The space which this transform is relative to.
+        @remarks
+            This method translates the node by a vector which is relative to
+            a custom set of axes.
+        @param axes
+            A 3x3 Matrix containg 3 column vectors each representing the
+            axes X, Y and Z respectively. In this format the standard cartesian
+            axes would be expressed as:
+            <pre>
+            1 0 0
+            0 1 0
+            0 0 1
+            </pre>
+            i.e. the identity matrix.
+        @param move
+            Vector relative to the axes above.
+        @param relativeTo
+            The space which this transform is relative to.
         */
         virtual void translate(const Matrix3& axes, const Vector3& move, TransformSpace relativeTo = TS_PARENT);
         /** Moves the node along arbitrary axes.
-            @remarks
+        @remarks
             This method translates the node by a vector which is relative to
             a custom set of axes.
-            @param 
-                axes A 3x3 Matrix containg 3 column vectors each representing the
-                axes X, Y and Z respectively. In this format the standard cartesian
-                axes would be expressed as
-                <pre>
-                1 0 0
-                0 1 0
-                0 0 1
-                </pre>
-                i.e. the identity matrix.
-            @param 
-                x,y,z Translation components relative to the axes above.
-            @param
-                relativeTo The space which this transform is relative to.
+        @param axes
+            A 3x3 Matrix containg 3 column vectors each representing the
+            axes X, Y and Z respectively. In this format the standard cartesian
+            axes would be expressed as
+            <pre>
+            1 0 0
+            0 1 0
+            0 0 1
+            </pre>
+            i.e. the identity matrix.
+        @param x
+            The @c x translation component relative to the axes above.
+        @param y
+            The @c y translation component relative to the axes above.
+        @param z
+            The @c z translation component relative to the axes above.
+        @param relativeTo
+            The space which this transform is relative to.
         */
         virtual void translate(const Matrix3& axes, Real x, Real y, Real z, TransformSpace relativeTo = TS_PARENT);
 
@@ -510,10 +514,10 @@ namespace Ogre {
         virtual Matrix3 getLocalAxes(void) const;
 
         /** Creates an unnamed new Node as a child of this node.
-        @param
-            translate Initial translation offset of child relative to parent
-        @param
-            rotate Initial rotation relative to parent
+        @param translate
+            Initial translation offset of child relative to parent
+        @param rotate
+            Initial rotation relative to parent
         */
         virtual Node* createChild(
             const Vector3& translate = Vector3::ZERO, 
@@ -523,10 +527,10 @@ namespace Ogre {
         @remarks
             This creates a child node with a given name, which allows you to look the node up from 
             the parent which holds this collection of nodes.
-            @param
-                translate Initial translation offset of child relative to parent
-            @param
-                rotate Initial rotation relative to parent
+        @param translate
+            Initial translation offset of child relative to parent
+        @param rotate
+            Initial rotation relative to parent
         */
         virtual Node* createChild(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
@@ -572,7 +576,7 @@ namespace Ogre {
             store up changes for later. Note that calling methods on returned items in 
             the iterator IS allowed and does not invalidate the iterator.
         */
-		virtual ConstChildNodeIterator getChildIterator(void) const;
+        virtual ConstChildNodeIterator getChildIterator(void) const;
 
         /** Drops the specified child from this node. 
         @remarks
@@ -584,10 +588,10 @@ namespace Ogre {
         virtual Node* removeChild(unsigned short index);
         /** Drops the specified child from this node. 
         @remarks
-        Does not delete the node, just detaches it from
-        this parent, potentially to be reattached elsewhere. 
-        There is also an alternate version which drops a named
-        child from this node.
+            Does not delete the node, just detaches it from
+            this parent, potentially to be reattached elsewhere. 
+            There is also an alternate version which drops a named
+            child from this node.
         */
         virtual Node* removeChild(Node* child);
 
@@ -601,21 +605,21 @@ namespace Ogre {
             this parent, potentially to be reattached elsewhere.
         */
         virtual void removeAllChildren(void);
-		
-		/** Sets the final world position of the node directly.
-		@remarks 
-			It's advisable to use the local setPosition if possible
-		*/
-		virtual void _setDerivedPosition(const Vector3& pos);
+        
+        /** Sets the final world position of the node directly.
+        @remarks 
+            It's advisable to use the local setPosition if possible
+        */
+        virtual void _setDerivedPosition(const Vector3& pos);
 
-		/** Sets the final world orientation of the node directly.
-		@remarks 
-		It's advisable to use the local setOrientation if possible, this simply does
-		the conversion for you.
-		*/
-		virtual void _setDerivedOrientation(const Quaternion& q);
+        /** Sets the final world orientation of the node directly.
+        @remarks 
+            It's advisable to use the local setOrientation if possible, this simply does
+            the conversion for you.
+        */
+        virtual void _setDerivedOrientation(const Quaternion& q);
 
-		/** Gets the orientation of the node as derived from all parents.
+        /** Gets the orientation of the node as derived from all parents.
         */
         virtual const Quaternion & _getDerivedOrientation(void) const;
 
@@ -628,41 +632,41 @@ namespace Ogre {
         virtual const Vector3 & _getDerivedScale(void) const;
 
         /** Gets the full transformation matrix for this node.
-            @remarks
-                This method returns the full transformation matrix
-                for this node, including the effect of any parent node
-                transformations, provided they have been updated using the Node::_update method.
-                This should only be called by a SceneManager which knows the
-                derived transforms have been updated before calling this method.
-                Applications using Ogre should just use the relative transforms.
+        @remarks
+            This method returns the full transformation matrix
+            for this node, including the effect of any parent node
+            transformations, provided they have been updated using the Node::_update method.
+            This should only be called by a SceneManager which knows the
+            derived transforms have been updated before calling this method.
+            Applications using Ogre should just use the relative transforms.
         */
         virtual const Matrix4& _getFullTransform(void) const;
 
         /** Internal method to update the Node.
-            @note
-                Updates this node and any relevant children to incorporate transforms etc.
-                Don't call this yourself unless you are writing a SceneManager implementation.
-            @param
-                updateChildren If true, the update cascades down to all children. Specify false if you wish to
-                update children separately, e.g. because of a more selective SceneManager implementation.
-            @param
-                parentHasChanged This flag indicates that the parent transform has changed,
-                    so the child should retrieve the parent's transform and combine it with its own
-                    even if it hasn't changed itself.
+        @note
+            Updates this node and any relevant children to incorporate transforms etc.
+            Don't call this yourself unless you are writing a SceneManager implementation.
+        @param updateChildren
+            If @c true, the update cascades down to all children. Specify false if you wish to
+            update children separately, e.g. because of a more selective SceneManager implementation.
+        @param parentHasChanged
+            This flag indicates that the parent transform has changed,
+            so the child should retrieve the parent's transform and combine
+            it with its own even if it hasn't changed itself.
         */
         virtual void _update(bool updateChildren, bool parentHasChanged);
 
         /** Sets a listener for this Node.
-		@remarks
-			Note for size and performance reasons only one listener per node is
-			allowed.
-		*/
-		virtual void setListener(Listener* listener) { mListener = listener; }
-		
-		/** Gets the current listener for this Node.
-		*/
-		virtual Listener* getListener(void) const { return mListener; }
-		
+        @remarks
+            Note for size and performance reasons only one listener per node is
+            allowed.
+        */
+        virtual void setListener(Listener* listener) { mListener = listener; }
+        
+        /** Gets the current listener for this Node.
+        */
+        virtual Listener* getListener(void) const { return mListener; }
+        
 
         /** Sets the current transform of this node to be the 'initial state' ie that
             position / orientation / scale to be used as a basis for delta values used
@@ -684,22 +688,22 @@ namespace Ogre {
             Also resets the cumulative animation weight used for blending.
         */
         virtual const Vector3& getInitialPosition(void) const;
-		
-		/** Gets the local position, relative to this node, of the given world-space position */
-		virtual Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
+        
+        /** Gets the local position, relative to this node, of the given world-space position */
+        virtual Vector3 convertWorldToLocalPosition( const Vector3 &worldPos );
 
-		/** Gets the world position of a point in the node local space
-			useful for simple transforms that don't require a child node.*/
-		virtual Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
+        /** Gets the world position of a point in the node local space
+            useful for simple transforms that don't require a child node.*/
+        virtual Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
 
-		/** Gets the local orientation, relative to this node, of the given world-space orientation */
-		virtual Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
+        /** Gets the local orientation, relative to this node, of the given world-space orientation */
+        virtual Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
 
-		/** Gets the world orientation of an orientation in the node local space
-			useful for simple transforms that don't require a child node.*/
-		virtual Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
+        /** Gets the world orientation of an orientation in the node local space
+            useful for simple transforms that don't require a child node.*/
+        virtual Quaternion convertLocalToWorldOrientation( const Quaternion &localOrientation );
 
-		/** Gets the initial orientation of this node, see setInitialState for more info. */
+        /** Gets the initial orientation of this node, see setInitialState for more info. */
         virtual const Quaternion& getInitialOrientation(void) const;
 
         /** Gets the initial position of this node, see setInitialState for more info. */
@@ -712,63 +716,63 @@ namespace Ogre {
         @remarks
             This not only tags the node state as being 'dirty', it also requests it's parent to 
             know about it's dirtiness so it will get an update next time.
-		@param forceParentUpdate Even if the node thinks it has already told it's
-			parent, tell it anyway
+        @param forceParentUpdate Even if the node thinks it has already told it's
+            parent, tell it anyway
         */
         virtual void needUpdate(bool forceParentUpdate = false);
         /** Called by children to notify their parent that they need an update. 
-		@param forceParentUpdate Even if the node thinks it has already told it's
-			parent, tell it anyway
-		*/
+        @param forceParentUpdate Even if the node thinks it has already told it's
+            parent, tell it anyway
+        */
         virtual void requestUpdate(Node* child, bool forceParentUpdate = false);
         /** Called by children to notify their parent that they no longer need an update. */
         virtual void cancelUpdate(Node* child);
 
-		/** Get a debug renderable for rendering the Node.  */
-		virtual DebugRenderable* getDebugRenderable(Real scaling);
+        /** Get a debug renderable for rendering the Node.  */
+        virtual DebugRenderable* getDebugRenderable(Real scaling);
 
-		/** Queue a 'needUpdate' call to a node safely.
-		@remarks
-			You can't call needUpdate() during the scene graph update, e.g. in
-			response to a Node::Listener hook, because the graph is already being 
-			updated, and update flag changes cannot be made reliably in that context. 
-			Call this method if you need to queue a needUpdate call in this case.
-		*/
-		static void queueNeedUpdate(Node* n);
-		/** Process queued 'needUpdate' calls. */
-		static void processQueuedUpdates(void);
+        /** Queue a 'needUpdate' call to a node safely.
+        @remarks
+            You can't call needUpdate() during the scene graph update, e.g. in
+            response to a Node::Listener hook, because the graph is already being 
+            updated, and update flag changes cannot be made reliably in that context. 
+            Call this method if you need to queue a needUpdate call in this case.
+        */
+        static void queueNeedUpdate(Node* n);
+        /** Process queued 'needUpdate' calls. */
+        static void processQueuedUpdates(void);
 
 
-		/** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
-		Sets any kind of user value on this object.
-		@remarks
-		This method allows you to associate any user value you like with 
-		this Node. This can be a pointer back to one of your own
-		classes for instance.
-		*/
-		virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
+        /** @deprecated use UserObjectBindings::setUserAny via getUserObjectBindings() instead.
+            Sets any kind of user value on this object.
+        @remarks
+            This method allows you to associate any user value you like with 
+            this Node. This can be a pointer back to one of your own
+            classes for instance.
+        */
+        virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
-		/** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
-		Retrieves the custom user value associated with this object.
-		*/
-		virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+        /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
+            Retrieves the custom user value associated with this object.
+        */
+        virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
-		/** Return an instance of user objects binding associated with this class.
-		You can use it to associate one or more custom objects with this class instance.
-		@see UserObjectBindings::setUserAny.
-		*/
-		UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+        /** Return an instance of user objects binding associated with this class.
+            You can use it to associate one or more custom objects with this class instance.
+        @see UserObjectBindings::setUserAny.
+        */
+        UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
 
-		/** Return an instance of user objects binding associated with this class.
-		You can use it to associate one or more custom objects with this class instance.
-		@see UserObjectBindings::setUserAny.		
-		*/
-		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
+        /** Return an instance of user objects binding associated with this class.
+            You can use it to associate one or more custom objects with this class instance.
+        @see UserObjectBindings::setUserAny.
+        */
+        const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
-} //namespace
+} // namespace Ogre
 
-#endif
+#endif // _Node_H__

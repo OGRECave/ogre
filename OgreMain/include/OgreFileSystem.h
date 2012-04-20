@@ -35,32 +35,34 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** Specialisation of the Archive class to allow reading of files from 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** Specialisation of the Archive class to allow reading of files from 
         filesystem folders / directories.
     */
     class _OgreExport FileSystemArchive : public Archive 
     {
     protected:
         /** Utility method to retrieve all files in a directory matching pattern.
-        @param pattern File pattern
-        @param recursive Whether to cascade down directories
-        @param dirs Set to true if you want the directories to be listed
-            instead of files
-        @param simpleList Populated if retrieving a simple list
-        @param detailList Populated if retrieving a detailed list
-        @param currentDir The current directory relative to the base of the 
-            archive, for file naming
+        @param pattern
+            File pattern.
+        @param recursive
+            Whether to cascade down directories.
+        @param dirs
+            Set to @c true if you want the directories to be listed instead of files.
+        @param simpleList
+            Populated if retrieving a simple list.
+        @param detailList
+            Populated if retrieving a detailed list.
         */
         void findFiles(const String& pattern, bool recursive, bool dirs,
             StringVector* simpleList, FileInfoList* detailList) const;
 
-		OGRE_AUTO_MUTEX
+        OGRE_AUTO_MUTEX
     public:
         FileSystemArchive(const String& name, const String& archType );
         ~FileSystemArchive();
@@ -76,13 +78,13 @@ namespace Ogre {
         /// @copydoc Archive::open
         DataStreamPtr open(const String& filename, bool readOnly = true) const;
 
-		/// @copydoc Archive::create
-		DataStreamPtr create(const String& filename) const;
+        /// @copydoc Archive::create
+        DataStreamPtr create(const String& filename) const;
 
-		/// @copydoc Archive::delete
-		void remove(const String& filename) const;
+        /// @copydoc Archive::remove
+        void remove(const String& filename) const;
 
-		/// @copydoc Archive::list
+        /// @copydoc Archive::list
         StringVectorPtr list(bool recursive = true, bool dirs = false);
 
         /// @copydoc Archive::listFileInfo
@@ -99,28 +101,27 @@ namespace Ogre {
         /// @copydoc Archive::exists
         bool exists(const String& filename);
 
-		/// @copydoc Archive::getModifiedTime
-		time_t getModifiedTime(const String& filename);
+        /// @copydoc Archive::getModifiedTime
+        time_t getModifiedTime(const String& filename);
 
-		/// Set whether filesystem enumeration will include hidden files or not.
-		/// This should be called prior to declaring and/or initializing filesystem
-		/// resource locations. The default is true (ignore hidden files).
-		static void setIgnoreHidden(bool ignore)
-		{
-			msIgnoreHidden = ignore;
-		}
+        /// Set whether filesystem enumeration will include hidden files or not.
+        /// This should be called prior to declaring and/or initializing filesystem
+        /// resource locations. The default is true (ignore hidden files).
+        static void setIgnoreHidden(bool ignore)
+        {
+            msIgnoreHidden = ignore;
+        }
 
-		/// Get whether hidden files are ignored during filesystem enumeration.
-		static bool getIgnoreHidden()
-		{
-			return msIgnoreHidden;
-		}
+        /// Get whether hidden files are ignored during filesystem enumeration.
+        static bool getIgnoreHidden()
+        {
+            return msIgnoreHidden;
+        }
 
-		static bool msIgnoreHidden;
+        static bool msIgnoreHidden;
     };
 
     /** Specialisation of ArchiveFactory for FileSystem files. */
-    //class _OgrePrivate FileSystemArchiveFactory : public ArchiveFactory
     class _OgreExport FileSystemArchiveFactory : public ArchiveFactory
     {
     public:
@@ -133,12 +134,12 @@ namespace Ogre {
             return OGRE_NEW FileSystemArchive(name, "FileSystem");
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* arch) { delete arch; }
+        void destroyInstance(Archive* ptr) { delete ptr; }
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
-}
+} // namespace Ogre
 
-#endif
+#endif // __FileSystem_H__

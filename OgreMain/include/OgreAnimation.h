@@ -37,45 +37,45 @@ THE SOFTWARE.
 #include "OgreAnimationState.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
 
-	/** \addtogroup Animation
-	*  @{
-	*/
+    /** \addtogroup Animation
+    *  @{
+    */
 
-	class Animation;
-	
-	/** An animation container interface, which allows generic access to sibling animations.
-	 @remarks
-		Because Animation instances can be held by different kinds of classes, and
-		there are sometimes instances when you need to reference other Animation 
-		instances within the same container, this class allows generic access to
-		named animations within that container, whatever it may be.
-	*/
-	class _OgreExport AnimationContainer
-	{
-	public:
-		/** Gets the number of animations in this container. */
+    class Animation;
+    
+    /** An animation container interface, which allows generic access to sibling animations.
+     @remarks
+        Because Animation instances can be held by different kinds of classes, and
+        there are sometimes instances when you need to reference other Animation 
+        instances within the same container, this class allows generic access to
+        named animations within that container, whatever it may be.
+    */
+    class _OgreExport AnimationContainer
+    {
+    public:
+        /** Gets the number of animations in this container. */
         virtual unsigned short getNumAnimations(void) const = 0;
-		
+        
         /** Retrieve an animation by index.  */
         virtual Animation* getAnimation(unsigned short index) const = 0;
-		
-		/** Retrieve an animation by name. */
-		virtual Animation* getAnimation(const String& name) const = 0;
-		
-		/** Create a new animation with a given length owned by this container. */
-		virtual Animation* createAnimation(const String& name, Real length) = 0;
-		
-		/** Returns whether this object contains the named animation. */
-		virtual bool hasAnimation(const String& name) const = 0;
-		
+        
+        /** Retrieve an animation by name. */
+        virtual Animation* getAnimation(const String& name) const = 0;
+        
+        /** Create a new animation with a given length owned by this container. */
+        virtual Animation* createAnimation(const String& name, Real length) = 0;
+        
+        /** Returns whether this object contains the named animation. */
+        virtual bool hasAnimation(const String& name) const = 0;
+        
         /** Removes an Animation from this container. */
         virtual void removeAnimation(const String& name) = 0;
-		
-	};
+        
+    };
     /** An animation sequence. 
     @remarks
         This class defines the interface for a sequence of animation, whether that
@@ -86,7 +86,7 @@ namespace Ogre {
         You should not create these animations directly. They will be created via a parent
         object which owns the animation, e.g. Skeleton.
     */
-	class _OgreExport Animation : public AnimationAlloc
+    class _OgreExport Animation : public AnimationAlloc
     {
 
     public:
@@ -124,11 +124,11 @@ namespace Ogre {
         /** Gets the total length of the animation. */
         Real getLength(void) const;
 
-		/** Sets the length of the animation. 
-		@note Changing the length of an animation may invalidate existing AnimationState
-		instances which will need to be recreated. 
-		*/
-		void setLength(Real len);
+        /** Sets the length of the animation. 
+        @note Changing the length of an animation may invalidate existing AnimationState
+            instances which will need to be recreated. 
+        */
+        void setLength(Real len);
 
         /** Creates a NodeAnimationTrack for animating a Node.
         @param handle Handle to give the track, used for accessing the track later. 
@@ -136,22 +136,22 @@ namespace Ogre {
         */
         NodeAnimationTrack* createNodeTrack(unsigned short handle);
 
-		/** Creates a NumericAnimationTrack for animating any numeric value.
-		@param handle Handle to give the track, used for accessing the track later. 
-		Must be unique within this Animation.
-		*/
-		NumericAnimationTrack* createNumericTrack(unsigned short handle);
+        /** Creates a NumericAnimationTrack for animating any numeric value.
+        @param handle Handle to give the track, used for accessing the track later. 
+            Must be unique within this Animation.
+        */
+        NumericAnimationTrack* createNumericTrack(unsigned short handle);
 
-		/** Creates a VertexAnimationTrack for animating vertex position data.
-		@param handle Handle to give the track, used for accessing the track later. 
-		Must be unique within this Animation, and is used to identify the target. For example
-		when applied to a Mesh, the handle must reference the index of the geometry being 
-		modified; 0 for the shared geometry, and 1+ for SubMesh geometry with the same index-1.
-		@param animType Either morph or pose animation, 
-		*/
-		VertexAnimationTrack* createVertexTrack(unsigned short handle, VertexAnimationType animType);
+        /** Creates a VertexAnimationTrack for animating vertex position data.
+        @param handle Handle to give the track, used for accessing the track later. 
+            Must be unique within this Animation, and is used to identify the target. For example
+            when applied to a Mesh, the handle must reference the index of the geometry being 
+            modified; 0 for the shared geometry, and 1+ for SubMesh geometry with the same index-1.
+        @param animType Either morph or pose animation, 
+        */
+        VertexAnimationTrack* createVertexTrack(unsigned short handle, VertexAnimationType animType);
 
-		/** Creates a new AnimationTrack automatically associated with a Node. 
+        /** Creates a new AnimationTrack automatically associated with a Node. 
         @remarks
             This method creates a standard AnimationTrack, but also associates it with a
             target Node which will receive all keyframe effects.
@@ -161,68 +161,68 @@ namespace Ogre {
         */
         NodeAnimationTrack* createNodeTrack(unsigned short handle, Node* node);
 
-		/** Creates a NumericAnimationTrack and associates it with an animable. 
-		@param handle Handle to give the track, used for accessing the track later. 
-		@param anim Animable object link
-		Must be unique within this Animation.
-		*/
-		NumericAnimationTrack* createNumericTrack(unsigned short handle, 
-			const AnimableValuePtr& anim);
+        /** Creates a NumericAnimationTrack and associates it with an animable. 
+        @param handle Handle to give the track, used for accessing the track later. 
+        @param anim Animable object link
+            Must be unique within this Animation.
+        */
+        NumericAnimationTrack* createNumericTrack(unsigned short handle, 
+            const AnimableValuePtr& anim);
 
-		/** Creates a VertexAnimationTrack and associates it with VertexData. 
-		@param handle Handle to give the track, used for accessing the track later. 
-		@param data VertexData object link
-		@param animType The animation type 
-		Must be unique within this Animation.
-		*/
-		VertexAnimationTrack* createVertexTrack(unsigned short handle, 
-			VertexData* data, VertexAnimationType animType);
+        /** Creates a VertexAnimationTrack and associates it with VertexData. 
+        @param handle Handle to give the track, used for accessing the track later. 
+        @param data VertexData object link
+        @param animType The animation type 
+            Must be unique within this Animation.
+        */
+        VertexAnimationTrack* createVertexTrack(unsigned short handle, 
+            VertexData* data, VertexAnimationType animType);
 
-		/** Gets the number of NodeAnimationTrack objects contained in this animation. */
+        /** Gets the number of NodeAnimationTrack objects contained in this animation. */
         unsigned short getNumNodeTracks(void) const;
 
         /** Gets a node track by it's handle. */
         NodeAnimationTrack* getNodeTrack(unsigned short handle) const;
 
-		/** Does a track exist with the given handle? */
-		bool hasNodeTrack(unsigned short handle) const;
+        /** Does a track exist with the given handle? */
+        bool hasNodeTrack(unsigned short handle) const;
 
-		/** Gets the number of NumericAnimationTrack objects contained in this animation. */
-		unsigned short getNumNumericTracks(void) const;
+        /** Gets the number of NumericAnimationTrack objects contained in this animation. */
+        unsigned short getNumNumericTracks(void) const;
 
-		/** Gets a numeric track by it's handle. */
-		NumericAnimationTrack* getNumericTrack(unsigned short handle) const;
+        /** Gets a numeric track by it's handle. */
+        NumericAnimationTrack* getNumericTrack(unsigned short handle) const;
 
-		/** Does a track exist with the given handle? */
-		bool hasNumericTrack(unsigned short handle) const;
+        /** Does a track exist with the given handle? */
+        bool hasNumericTrack(unsigned short handle) const;
 
-		/** Gets the number of VertexAnimationTrack objects contained in this animation. */
-		unsigned short getNumVertexTracks(void) const;
+        /** Gets the number of VertexAnimationTrack objects contained in this animation. */
+        unsigned short getNumVertexTracks(void) const;
 
-		/** Gets a Vertex track by it's handle. */
-		VertexAnimationTrack* getVertexTrack(unsigned short handle) const;
+        /** Gets a Vertex track by it's handle. */
+        VertexAnimationTrack* getVertexTrack(unsigned short handle) const;
 
-		/** Does a track exist with the given handle? */
-		bool hasVertexTrack(unsigned short handle) const;
-		
-		/** Destroys the node track with the given handle. */
+        /** Does a track exist with the given handle? */
+        bool hasVertexTrack(unsigned short handle) const;
+        
+        /** Destroys the node track with the given handle. */
         void destroyNodeTrack(unsigned short handle);
 
-		/** Destroys the numeric track with the given handle. */
-		void destroyNumericTrack(unsigned short handle);
+        /** Destroys the numeric track with the given handle. */
+        void destroyNumericTrack(unsigned short handle);
 
-		/** Destroys the Vertex track with the given handle. */
-		void destroyVertexTrack(unsigned short handle);
+        /** Destroys the Vertex track with the given handle. */
+        void destroyVertexTrack(unsigned short handle);
 
-		/** Removes and destroys all tracks making up this animation. */
+        /** Removes and destroys all tracks making up this animation. */
         void destroyAllTracks(void);
 
-		/** Removes and destroys all tracks making up this animation. */
-		void destroyAllNodeTracks(void);
-		/** Removes and destroys all tracks making up this animation. */
-		void destroyAllNumericTracks(void);
-		/** Removes and destroys all tracks making up this animation. */
-		void destroyAllVertexTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllNodeTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllNumericTracks(void);
+        /** Removes and destroys all tracks making up this animation. */
+        void destroyAllVertexTracks(void);
 
         /** Applies an animation given a specific time point and weight.
         @remarks
@@ -231,61 +231,61 @@ namespace Ogre {
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.
-	    @param scale The scale to apply to translations and scalings, useful for 
-			adapting an animation to a different size target.
+        @param scale The scale to apply to translations and scalings, useful for 
+            adapting an animation to a different size target.
         */
         void apply(Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
         /** Applies all node tracks given a specific time point and weight to the specified node.
         @remarks
             It does not consider the actual node tracks are attached to.
-			As such, it resembles the apply method for a given skeleton (see below).
+            As such, it resembles the apply method for a given skeleton (see below).
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.
-	    @param scale The scale to apply to translations and scalings, useful for 
-			adapting an animation to a different size target.
+        @param scale The scale to apply to translations and scalings, useful for 
+            adapting an animation to a different size target.
         */
-		void applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+        void applyToNode(Node* node, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
-       /** Applies all node tracks given a specific time point and weight to a given skeleton.
+        /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
-        Where you have associated animation tracks with Node objects, you can easily apply
-        an animation to those nodes by calling this method.
+            Where you have associated animation tracks with Node objects, you can easily apply
+            an animation to those nodes by calling this method.
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
-        other animations.
-	    @param scale The scale to apply to translations and scalings, useful for 
-			adapting an animation to a different size target.
+            other animations.
+        @param scale The scale to apply to translations and scalings, useful for 
+            adapting an animation to a different size target.
         */
         void apply(Skeleton* skeleton, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
         /** Applies all node tracks given a specific time point and weight to a given skeleton.
         @remarks
-        Where you have associated animation tracks with Node objects, you can easily apply
-        an animation to those nodes by calling this method.
+            Where you have associated animation tracks with Node objects, you can easily apply
+            an animation to those nodes by calling this method.
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
-        other animations.
+            other animations.
         @param blendMask The influence array defining additional per bone weights. These will
-        be modulated with the weight factor.
+            be modulated with the weight factor.
         @param scale The scale to apply to translations and scalings, useful for 
-        adapting an animation to a different size target.
+            adapting an animation to a different size target.
         */
         void apply(Skeleton* skeleton, Real timePos, float weight,
           const AnimationState::BoneBlendMask* blendMask, Real scale);
 
-		/** Applies all vertex tracks given a specific time point and weight to a given entity.
-		@remarks
-		@param entity The Entity to which this animation should be applied
-		@param timePos The time position in the animation to apply.
-		@param weight The weight at which the animation should be applied 
-			(only affects pose animation)
-		@param software Whether to populate the software morph vertex data
-		@param hardware Whether to populate the hardware morph vertex data
-		*/
-		void apply(Entity* entity, Real timePos, Real weight, bool software, 
-			bool hardware);
+        /** Applies all vertex tracks given a specific time point and weight to a given entity.
+        @remarks
+        @param entity The Entity to which this animation should be applied
+        @param timePos The time position in the animation to apply.
+        @param weight The weight at which the animation should be applied 
+            (only affects pose animation)
+        @param software Whether to populate the software morph vertex data
+        @param hardware Whether to populate the hardware morph vertex data
+        */
+        void apply(Entity* entity, Real timePos, Real weight, bool software, 
+            bool hardware);
 
         /** Applies all numeric tracks given a specific time point and weight to the specified animable value.
         @remarks
@@ -293,10 +293,10 @@ namespace Ogre {
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.
-	    @param scale The scale to apply to translations and scalings, useful for 
-			adapting an animation to a different size target.
+        @param scale The scale to apply to translations and scalings, useful for 
+            adapting an animation to a different size target.
         */
-		void applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight = 1.0, Real scale = 1.0f);
+        void applyToAnimable(const AnimableValuePtr& anim, Real timePos, Real weight = 1.0, Real scale = 1.0f);
 
         /** Applies all vertex tracks given a specific time point and weight to the specified vertex data.
         @remarks
@@ -307,7 +307,7 @@ namespace Ogre {
         */
         void applyToVertexData(VertexData* data, Real timePos, Real weight = 1.0);
 
-		/** Tells the animation how to interpolate between keyframes.
+        /** Tells the animation how to interpolate between keyframes.
         @remarks
             By default, animations normally interpolate linearly between keyframes. This is
             fast, but when animations include quick changes in direction it can look a little
@@ -370,41 +370,41 @@ namespace Ogre {
         typedef map<unsigned short, NodeAnimationTrack*>::type NodeTrackList;
         typedef ConstMapIterator<NodeTrackList> NodeTrackIterator;
 
-		typedef map<unsigned short, NumericAnimationTrack*>::type NumericTrackList;
-		typedef ConstMapIterator<NumericTrackList> NumericTrackIterator;
+        typedef map<unsigned short, NumericAnimationTrack*>::type NumericTrackList;
+        typedef ConstMapIterator<NumericTrackList> NumericTrackIterator;
 
-		typedef map<unsigned short, VertexAnimationTrack*>::type VertexTrackList;
-		typedef ConstMapIterator<VertexTrackList> VertexTrackIterator;
+        typedef map<unsigned short, VertexAnimationTrack*>::type VertexTrackList;
+        typedef ConstMapIterator<VertexTrackList> VertexTrackIterator;
 
-		/// Fast access to NON-UPDATEABLE node track list
+        /// Fast access to NON-UPDATEABLE node track list
         const NodeTrackList& _getNodeTrackList(void) const;
 
         /// Get non-updateable iterator over node tracks
         NodeTrackIterator getNodeTrackIterator(void) const
         { return NodeTrackIterator(mNodeTrackList.begin(), mNodeTrackList.end()); }
         
-		/// Fast access to NON-UPDATEABLE numeric track list
-		const NumericTrackList& _getNumericTrackList(void) const;
+        /// Fast access to NON-UPDATEABLE numeric track list
+        const NumericTrackList& _getNumericTrackList(void) const;
 
-		/// Get non-updateable iterator over node tracks
-		NumericTrackIterator getNumericTrackIterator(void) const
-		{ return NumericTrackIterator(mNumericTrackList.begin(), mNumericTrackList.end()); }
+        /// Get non-updateable iterator over node tracks
+        NumericTrackIterator getNumericTrackIterator(void) const
+        { return NumericTrackIterator(mNumericTrackList.begin(), mNumericTrackList.end()); }
 
-		/// Fast access to NON-UPDATEABLE Vertex track list
-		const VertexTrackList& _getVertexTrackList(void) const;
+        /// Fast access to NON-UPDATEABLE Vertex track list
+        const VertexTrackList& _getVertexTrackList(void) const;
 
-		/// Get non-updateable iterator over node tracks
-		VertexTrackIterator getVertexTrackIterator(void) const
-		{ return VertexTrackIterator(mVertexTrackList.begin(), mVertexTrackList.end()); }
+        /// Get non-updateable iterator over node tracks
+        VertexTrackIterator getVertexTrackIterator(void) const
+        { return VertexTrackIterator(mVertexTrackList.begin(), mVertexTrackList.end()); }
 
-		/** Optimise an animation by removing unnecessary tracks and keyframes.
-		@remarks
-			When you export an animation, it is possible that certain tracks
-			have been keyframed but actually don't include anything useful - the
-			keyframes include no transformation. These tracks can be completely
-			eliminated from the animation and thus speed up the animation. 
-			In addition, if several keyframes in a row have the same value, 
-			then they are just adding overhead and can be removed.
+        /** Optimise an animation by removing unnecessary tracks and keyframes.
+        @remarks
+            When you export an animation, it is possible that certain tracks
+            have been keyframed but actually don't include anything useful - the
+            keyframes include no transformation. These tracks can be completely
+            eliminated from the animation and thus speed up the animation. 
+            In addition, if several keyframes in a row have the same value, 
+            then they are just adding overhead and can be removed.
         @note
             Since track-less and identity track has difference behavior for
             accumulate animation blending if corresponding track presenting at
@@ -415,8 +415,8 @@ namespace Ogre {
             you should use Skeleton::optimiseAllAnimations instead.
         @param
             discardIdentityNodeTracks If true, discard identity node tracks.
-		*/
-		void optimise(bool discardIdentityNodeTracks = true);
+        */
+        void optimise(bool discardIdentityNodeTracks = true);
 
         /// A list of track handles
         typedef set<ushort>::type TrackHandleList;
@@ -434,14 +434,14 @@ namespace Ogre {
         */
         void _destroyNodeTracks(const TrackHandleList& tracks);
 
-		/** Clone this animation.
-		@note
-			The pointer returned from this method is the only one recorded, 
-			thus it is up to the caller to arrange for the deletion of this
-			object.
-		*/
-		Animation* clone(const String& newName) const;
-		
+        /** Clone this animation.
+        @note
+            The pointer returned from this method is the only one recorded, 
+            thus it is up to the caller to arrange for the deletion of this
+            object.
+        */
+        Animation* clone(const String& newName) const;
+        
         /** Internal method used to tell the animation that keyframe list has been
             changed, which may cause it to rebuild some internal data */
         void _keyFrameListChanged(void) { mKeyFrameTimesDirty = true; }
@@ -457,60 +457,60 @@ namespace Ogre {
             global keyframe time list.
         */
         TimeIndex _getTimeIndex(Real timePos) const;
-		
-		/** Sets a base keyframe which for the skeletal / pose keyframes 
-			in this animation. 
-		 @remarks
-			Skeletal and pose animation keyframes are expressed as deltas from a 
-			given base state. By default, that is the binding setup of the skeleton, 
-			or the object space mesh positions for pose animation. However, sometimes
-			it is useful for animators to create animations with a different starting
-			pose, because that's more convenient, and the animation is designed to
-			simply be added to the existing animation state and not globally averaged
-			with other animations (this is always the case with pose animations, but
-			is activated for skeletal animations via ANIMBLEND_CUMULATIVE).
-		 @par
-			In order for this to work, the keyframes need to be 're-based' against
-			this new starting state, for example by treating the first keyframe as
-			the reference point (and therefore representing no change). This can 
-			be achieved by applying the inverse of this reference keyframe against
-			all other keyframes. Since this fundamentally changes the animation, 
-			this method just marks the animation as requiring this rebase, which 
-			is performed at the next Animation 'apply' call. This is to allow the
-			Animation to be re-saved with this flag set, but without having altered
-			the keyframes yet, so no data is lost unintentionally. If you wish to
-			save the animation after the adjustment has taken place, you can
-			(@see _applyBaseKeyFrame)
-		 @param useBaseKeyFrame Whether a base keyframe should be used
-		 @param keyframeTime The time corresponding to the base keyframe, if any
-		 @param baseAnimName Optionally a different base animation (must contain the same tracks)
-		*/
-		void setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime = 0.0f, const String& baseAnimName = StringUtil::BLANK);
-		/** Whether a base keyframe is being used for this Animation. */
-		bool getUseBaseKeyFrame() const;
-		/** If a base keyframe is being used, the time of that keyframe. */
-		Real getBaseKeyFrameTime() const;
-		/** If a base keyframe is being used, the Animation that provides that keyframe. */
-		const String& getBaseKeyFrameAnimationName() const;
-		
-		/// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
-		void _applyBaseKeyFrame();
-		
-		void _notifyContainer(AnimationContainer* c);
-		/** Retrieve the container of this animation. */
-		AnimationContainer* getContainer();
-		
+        
+        /** Sets a base keyframe which for the skeletal / pose keyframes 
+            in this animation. 
+        @remarks
+            Skeletal and pose animation keyframes are expressed as deltas from a 
+            given base state. By default, that is the binding setup of the skeleton, 
+            or the object space mesh positions for pose animation. However, sometimes
+            it is useful for animators to create animations with a different starting
+            pose, because that's more convenient, and the animation is designed to
+            simply be added to the existing animation state and not globally averaged
+            with other animations (this is always the case with pose animations, but
+            is activated for skeletal animations via ANIMBLEND_CUMULATIVE).
+        @par
+            In order for this to work, the keyframes need to be 're-based' against
+            this new starting state, for example by treating the first keyframe as
+            the reference point (and therefore representing no change). This can 
+            be achieved by applying the inverse of this reference keyframe against
+            all other keyframes. Since this fundamentally changes the animation, 
+            this method just marks the animation as requiring this rebase, which 
+            is performed at the next Animation 'apply' call. This is to allow the
+            Animation to be re-saved with this flag set, but without having altered
+            the keyframes yet, so no data is lost unintentionally. If you wish to
+            save the animation after the adjustment has taken place, you can
+            (@see _applyBaseKeyFrame)
+        @param useBaseKeyFrame Whether a base keyframe should be used
+        @param keyframeTime The time corresponding to the base keyframe, if any
+        @param baseAnimName Optionally a different base animation (must contain the same tracks)
+        */
+        void setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime = 0.0f, const String& baseAnimName = StringUtil::BLANK);
+        /** Whether a base keyframe is being used for this Animation. */
+        bool getUseBaseKeyFrame() const;
+        /** If a base keyframe is being used, the time of that keyframe. */
+        Real getBaseKeyFrameTime() const;
+        /** If a base keyframe is being used, the Animation that provides that keyframe. */
+        const String& getBaseKeyFrameAnimationName() const;
+        
+        /// Internal method to adjust keyframes relative to a base keyframe (@see setUseBaseKeyFrame) */
+        void _applyBaseKeyFrame();
+        
+        void _notifyContainer(AnimationContainer* c);
+        /** Retrieve the container of this animation. */
+        AnimationContainer* getContainer();
+        
     protected:
         /// Node tracks, indexed by handle
         NodeTrackList mNodeTrackList;
-		/// Numeric tracks, indexed by handle
-		NumericTrackList mNumericTrackList;
-		/// Vertex tracks, indexed by handle
-		VertexTrackList mVertexTrackList;
+        /// Numeric tracks, indexed by handle
+        NumericTrackList mNumericTrackList;
+        /// Vertex tracks, indexed by handle
+        VertexTrackList mVertexTrackList;
         String mName;
 
         Real mLength;
-		
+        
         InterpolationMode mInterpolationMode;
         RotationInterpolationMode mRotationInterpolationMode;
 
@@ -523,22 +523,22 @@ namespace Ogre {
         /// Dirty flag indicate that keyframe time list need to rebuild
         mutable bool mKeyFrameTimesDirty;
 
-		bool mUseBaseKeyFrame;
-		Real mBaseKeyFrameTime;
-		String mBaseKeyFrameAnimationName;
-		AnimationContainer* mContainer;
+        bool mUseBaseKeyFrame;
+        Real mBaseKeyFrameTime;
+        String mBaseKeyFrameAnimationName;
+        AnimationContainer* mContainer;
 
-		void optimiseNodeTracks(bool discardIdentityTracks);
-		void optimiseVertexTracks(void);
+        void optimiseNodeTracks(bool discardIdentityTracks);
+        void optimiseVertexTracks(void);
 
         /// Internal method to build global keyframe time list
         void buildKeyFrameTimeList(void) const;
     };
 
-	/** @} */
-	/** @} */
-}
+    /** @} */
+    /** @} */
+} // namespace Ogre
 
 
-#endif
+#endif // __Animation_H__
 
