@@ -160,7 +160,7 @@ namespace Ogre {
 		/** Internal method for notifying the level that an object has been detached from a node */
 		void _notifyObjectDetached(const MovableObject* mov);
 
-        /** Creates an AxisAlignedBoxSceneQuery for this scene manager. 
+        /* Creates an AxisAlignedBoxSceneQuery for this scene manager. 
         @remarks
             This method creates a new instance of a query object for this scene manager, 
             for an axis aligned box region. See SceneQuery and AxisAlignedBoxSceneQuery 
@@ -176,7 +176,7 @@ namespace Ogre {
         virtual AxisAlignedBoxSceneQuery* 
             createAABBQuery(const AxisAlignedBox& box, unsigned long mask = 0xFFFFFFFF);
         */
-        /** Creates a SphereSceneQuery for this scene manager. 
+        /* Creates a SphereSceneQuery for this scene manager. 
         @remarks
             This method creates a new instance of a query object for this scene manager, 
             for a spherical region. See SceneQuery and SphereSceneQuery 

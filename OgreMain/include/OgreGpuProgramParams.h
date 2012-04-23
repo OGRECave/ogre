@@ -454,25 +454,25 @@ namespace Ogre {
 		*/
 		const GpuNamedConstants& getConstantDefinitions() const;
 	
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, Real val) */
 		void setNamedConstant(const String& name, Real val);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, int val) */
 		void setNamedConstant(const String& name, int val);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector4& vec) */
 		void setNamedConstant(const String& name, const Vector4& vec);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector3& vec) */
 		void setNamedConstant(const String& name, const Vector3& vec);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4& m) */
 		void setNamedConstant(const String& name, const Matrix4& m);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
 		void setNamedConstant(const String& name, const Matrix4* m, size_t numEntries);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const float *val, size_t count) */
 		void setNamedConstant(const String& name, const float *val, size_t count);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const double *val, size_t count) */
 		void setNamedConstant(const String& name, const double *val, size_t count);
-			/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const ColourValue& colour) */
 		void setNamedConstant(const String& name, const ColourValue& colour);
-		/** @copydoc GpuProgramParameters::setNamedConstant */
+		/** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const int *val, size_t count) */
 		void setNamedConstant(const String& name, const int *val, size_t count);
 
 		/// Get a pointer to the 'nth' item in the float buffer

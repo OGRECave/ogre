@@ -72,7 +72,7 @@ namespace Ogre {
         */
         Frustum* mTempFrustum;
 
-        /** Temporary preallocated camera to set up a light frustum for clipping in ::calculateB.
+        /** Temporary preallocated camera to set up a light frustum for clipping in FocusedShadowCameraSetup::calculateB.
         */
         Camera* mLightFrustumCamera;
         mutable bool mLightFrustumCameraCalculated;
@@ -190,7 +190,7 @@ namespace Ogre {
             Currently active light.
         @param sceneBB
             Scene bounding box for clipping operations.
-        @param receiverAABB
+        @param receiverBB
             Bounding information for just the receivers.
         @param out_bodyB
             Final intersection bodyB point list.
@@ -206,13 +206,13 @@ namespace Ogre {
             rotation matrix L_r. This matrix is applied after the projection matrix L_p to 
             avoid an accidental flip of the frustum orientation for views tilted with 
             respect to the shadow map.
-        @param scene
-            Holds all potential occluders / receivers as one single bounding box
-            of the currently active scene node.
         @param cam
             Current viewer camera.
         @param light
             Current light.
+        @param sceneBB
+            Holds all potential occluders / receivers as one single bounding box
+            of the currently active scene node.
         @param out_LVS
             Intersection body LVS (world coordinates).
         */

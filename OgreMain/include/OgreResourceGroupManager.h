@@ -140,7 +140,6 @@ namespace Ogre {
         /** This event is fired when a stage of preparing linked world geometry 
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
-        @param description Text description of what was just prepared
         */
         virtual void worldGeometryPrepareStageEnded(void) {}
         /** This event is fired when a resource group finished preparing. */
@@ -169,7 +168,6 @@ namespace Ogre {
         /** This event is fired when a stage of loading linked world geometry 
             has been completed. The number of stages required will have been 
             included in the resourceCount passed in resourceGroupLoadStarted.
-        @param description Text description of what was just loaded
         */
         virtual void worldGeometryStageEnded(void) = 0;
         /** This event is fired when a resource group finished loading. */

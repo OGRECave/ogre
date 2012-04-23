@@ -282,7 +282,7 @@ namespace Ogre {
         /** Set the near clip plane distance to be used by spotlights that use light
             clipping, allowing you to render spots as if they start from further
             down their frustum. 
-        @param near
+        @param nearClip
             The near distance.
         */
         void setSpotlightNearClipDistance(Real nearClip) { mSpotNearClip = nearClip; }
@@ -437,7 +437,7 @@ namespace Ogre {
 
         /** Set the near clip plane distance to be used by the shadow camera, if
             this light casts texture shadows.
-        @param near
+        @param nearClip
             The distance, or -1 to use the main camera setting.
         */
         void setShadowNearClipDistance(Real nearClip) { mShadowNearClipDist = nearClip; }
@@ -461,7 +461,7 @@ namespace Ogre {
             This is different from the 'shadow far distance', which is
             always measured from the main camera. This distance is the far clip plane
             of the light camera.
-        @param far
+        @param farClip
             The distance, or -1 to use the main camera setting.
         */
         void setShadowFarClipDistance(Real farClip) { mShadowFarClipDist = farClip; }

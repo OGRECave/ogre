@@ -88,7 +88,7 @@ namespace Ogre
 		/** Constructor.
 		@param terrain The ultimate parent terrain
 		@param parent Optional parent node (in which case xoff, yoff are 0 and size must be entire terrain)
-		@param xoff,off Offsets from the start of the terrain data in 2D
+		@param xoff, yoff Offsets from the start of the terrain data in 2D
 		@param size The size of the node in vertices at the highest LOD
 		@param lod The base LOD level
 		@param depth The depth that this node is at in the tree (or convenience)

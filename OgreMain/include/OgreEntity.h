@@ -335,7 +335,7 @@ namespace Ogre {
             
             /// Create the separate light cap if it doesn't already exists.
             void _createSeparateLightCap();
-            /// @copydoc OShadowRenderable::getWorldTransforms.
+            /// @copydoc ShadowRenderable::getWorldTransforms.
             void getWorldTransforms(Matrix4* xform) const;
             HardwareVertexBufferSharedPtr getPositionBuffer(void) { return mPositionBuffer; }
             HardwareVertexBufferSharedPtr getWBuffer(void) { return mWBuffer; }
@@ -815,7 +815,7 @@ namespace Ogre {
         */
         void backgroundLoadingComplete(Resource* res);
 
-        /// @copydocdoc MovableObject::visitRenderables
+        /// @copydoc MovableObject::visitRenderables
         void visitRenderables(Renderable::Visitor* visitor, 
             bool debugRenderables = false);
 

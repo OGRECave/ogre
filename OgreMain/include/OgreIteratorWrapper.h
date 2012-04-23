@@ -147,8 +147,8 @@ class VectorIteratorWrapper : public IteratorWrapper<T, IteratorType, typename  
 		 * 
 		 * Constructor that provide a start and end iterator to initialise.
 		 * 
-		 * @param start start iterator 
-		 * @param end end iterator 
+		 * @param start Start iterator 
+		 * @param last End iterator 
 		 */
 		VectorIteratorWrapper ( IteratorType start, IteratorType last )
 		: IteratorWrapper<T, IteratorType, typename T::value_type>( start, last ) 

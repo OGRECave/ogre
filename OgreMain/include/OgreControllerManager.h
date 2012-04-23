@@ -162,7 +162,7 @@ namespace Ogre {
             scrollers / stretchers / rotators.
         @param layer
             The texture layer to rotate.
-        @param vSpeed
+        @param speed
             Speed of rotation, in complete anticlockwise revolutions per second.
         */
         Controller<Real>* createTextureRotater(TextureUnitState* layer, Real speed);

@@ -3158,11 +3158,11 @@ namespace Ogre {
 		@param customName Custom name for referencing. Must be unique
 		@param meshName The mesh name the instances will be based upon
 		@param groupName The resource name where the mesh lives
-		@param Technique to use, which may be shader based, or hardware based.
+		@param technique Technique to use, which may be shader based, or hardware based.
 		@param numInstancesPerBatch Suggested number of instances per batch. The actual number
 		may end up being lower if the technique doesn't support having so many. It can't be zero
 		@param flags @see InstanceManagerFlags
-		@param InstanceManager only supports using one submesh from the base mesh. This parameter
+		@param subMeshIdx InstanceManager only supports using one submesh from the base mesh. This parameter
 		says which submesh to pick (must be <= Mesh::getNumSubMeshes())
 		@return The new InstanceManager instance
 		*/
@@ -3184,7 +3184,7 @@ namespace Ogre {
 		@remarks
 			Be sure you don't have any InstancedEntity referenced somewhere which was created with
 			this manager, since it will become a dangling pointer.
-		@param customName Name of the manager to remove
+		@param name Name of the manager to remove
 		*/
 		virtual void destroyInstanceManager( const String &name );
 		virtual void destroyInstanceManager( InstanceManager *instanceManager );

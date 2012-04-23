@@ -112,7 +112,7 @@ namespace Ogre {
             object containing the definition of the parameters this program understands.
         */
         GpuProgramParametersSharedPtr createParameters(void);
-        /** @copydoc GpuProgram::getBindingDelegate */
+        /** @copydoc GpuProgram::_getBindingDelegate */
         GpuProgram* _getBindingDelegate(void) { return mAssemblerProgram.getPointer(); }
 
 		/** Get the full list of GpuConstantDefinition instances.

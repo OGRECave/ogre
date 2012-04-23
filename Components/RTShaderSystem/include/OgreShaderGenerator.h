@@ -57,7 +57,6 @@ public:
 	/** 
 	Initialize the Shader Generator System.
 	Return true upon success.
-	@param sceneMgr The scene manager that the shader generator will be bound to. 
 	*/
 	static bool		initialize	();
 
@@ -134,7 +133,7 @@ public:
 
 	/** 
 	Set the output vertex shader target profiles.
-	@param vertexShaderProfile The target profiles for the vertex shader.	
+	@param vertexShaderProfiles The target profiles for the vertex shader.	
 	*/
 	void			setVertexShaderProfiles		(const String& vertexShaderProfiles);
 
@@ -151,7 +150,7 @@ public:
 
 	/** 
 	Set the output fragment shader target profiles.
-	@param fragmentShaderProfile The target profiles for the fragment shader.	
+	@param fragmentShaderProfiles The target profiles for the fragment shader.	
 	*/
 	void			setFragmentShaderProfiles	(const String& fragmentShaderProfiles);
 
@@ -215,10 +214,17 @@ public:
 	Using this method allows the user to customize the behavior of a specific pass.
 	@param schemeName The destination scheme name.
 	@param materialName The specific material name.
-	@param groupName The specific material name.
 	@param passIndex The pass index.
 	*/
 	RenderState*	getRenderState				(const String& schemeName, const String& materialName, unsigned short passIndex);
+    /** 
+	Get render state of specific pass.
+	Using this method allows the user to customize the behavior of a specific pass.
+	@param schemeName The destination scheme name.
+	@param materialName The specific material name.
+	@param groupName The specific material name.
+	@param passIndex The pass index.
+	*/
 	RenderState*	getRenderState				(const String& schemeName, const String& materialName, const String& groupName, unsigned short passIndex);
 
 	/** 
@@ -269,14 +275,31 @@ public:
 	Checks if a shader based technique has been created for a given technique. 
 	Return true if exist. False if not.
 	@param materialName The source material name.
-	@param groupName The source group name.	
 	@param srcTechniqueSchemeName The source technique scheme name.
 	@param dstTechniqueSchemeName The destination shader based technique scheme name.
 	*/
 	bool			hasShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
+    /** 
+	Checks if a shader based technique has been created for a given technique. 
+	Return true if exist. False if not.
+	@param materialName The source material name.
+	@param groupName The source group name.	
+	@param srcTechniqueSchemeName The source technique scheme name.
+	@param dstTechniqueSchemeName The destination shader based technique scheme name.
+	*/
 	bool			hasShaderBasedTechnique	(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
 
 	/** 
+	Create shader based technique from a given technique. 
+	Return true upon success. Failure may occur if the source technique is not FFP pure, or different
+	source technique is mapped to the requested destination scheme.
+	@param materialName The source material name.
+	@param srcTechniqueSchemeName The source technique scheme name.
+	@param dstTechniqueSchemeName The destination shader based technique scheme name.
+	@param overProgrammable If true a shader will be created even if the material has shaders
+	*/
+	bool			createShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
+    /** 
 	Create shader based technique from a given technique. 
 	Return true upon success. Failure may occur if the source technique is not FFP pure, or different
 	source technique is mapped to the requested destination scheme.
@@ -286,7 +309,6 @@ public:
 	@param dstTechniqueSchemeName The destination shader based technique scheme name.
 	@param overProgrammable If true a shader will be created even if the material has shaders
 	*/
-	bool			createShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 	bool			createShaderBasedTechnique	(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
 
@@ -295,11 +317,19 @@ public:
 	Return true upon success. Failure may occur if the given source technique was not previously
 	registered successfully using the createShaderBasedTechnique method.
 	@param materialName The source material name.
-	@param groupName The source group name.	
 	@param srcTechniqueSchemeName The source technique scheme name.
 	@param dstTechniqueSchemeName The destination shader based technique scheme name.
 	*/
 	bool			removeShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
+    /** 
+	Remove shader based technique from a given technique. 
+	Return true upon success. Failure may occur if the given source technique was not previously
+	registered successfully using the createShaderBasedTechnique method.
+	@param materialName The source material name.
+	@param groupName The source group name.	
+	@param srcTechniqueSchemeName The source technique scheme name.
+	@param dstTechniqueSchemeName The destination shader based technique scheme name.
+	*/
 	bool			removeShaderBasedTechnique	(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
 
 
@@ -820,7 +850,7 @@ protected:
 	@param compiler The compiler instance.
 	@param prop The abstract property node.
 	@param pass The pass that is the parent context of this node.
-	@param the translator for the specific SubRenderState
+	@param translator The translator for the specific SubRenderState
 	*/
 	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 	
@@ -830,7 +860,7 @@ protected:
 	@param compiler The compiler instance.
 	@param prop The abstract property node.
 	@param texState The texture unit state that is the parent context of this node.
-	@param the translator for the specific SubRenderState
+	@param translator The translator for the specific SubRenderState
 	*/
 	SubRenderState*		createSubRenderState				(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 

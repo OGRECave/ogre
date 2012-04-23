@@ -69,7 +69,7 @@ namespace Ogre {
         void _initParticle(Particle* pParticle);
 
         /** Sets the size of the clear space inside the area from where NO particles are emitted.
-        @param x,y,z
+        @param x, y
             Parametric values describing the proportion of the shape which is hollow in each direction.
             E.g. 0 is solid, 0.5 is half-hollow etc
         */

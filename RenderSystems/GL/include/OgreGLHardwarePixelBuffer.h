@@ -84,10 +84,10 @@ namespace Ogre {
 			GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
         ~GLTextureBuffer();
         
-        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
+        /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
         /// @copydoc HardwarePixelBuffer::getRenderTarget
-        RenderTexture* getRenderTarget(size_t);
+        RenderTexture* getRenderTarget(size_t slice);
         /// Upload a box of pixels to this buffer on the card
 		virtual void upload(const PixelBox &data, const Image::Box &dest);
 		// Download a box of pixels from the card

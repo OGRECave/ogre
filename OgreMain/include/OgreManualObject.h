@@ -260,7 +260,7 @@ namespace Ogre
 		@note
 			32-bit indexes are not supported on all cards and will only be used
             when required, if an index is > 65535.
-		@param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face. 
+		@param i1, i2, i3, i4 4 vertex indices from 0 to 4294967295 defining a quad. 
 		*/
 		virtual void quad(uint32 i1, uint32 i2, uint32 i3, uint32 i4);
 
@@ -285,7 +285,7 @@ namespace Ogre
 		@param subIndex The index of the subsection to alter
 		@param name The name of the new material to use
 		*/
-		virtual void setMaterialName(size_t subindex, const String& name, const String & group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+		virtual void setMaterialName(size_t subIndex, const String& name, const String & group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
 		/** Convert this object to a Mesh. 
 		@remarks

@@ -114,7 +114,7 @@ namespace Ogre {
 		object containing the definition of the parameters this program understands.
 		*/
 		GpuProgramParametersSharedPtr createParameters(void);
-		/** @copydoc GpuProgram::getBindingDelegate */
+		/** @copydoc GpuProgram::_getBindingDelegate */
 		GpuProgram* _getBindingDelegate(void);
 
 		// All the following methods must delegate to the implementation

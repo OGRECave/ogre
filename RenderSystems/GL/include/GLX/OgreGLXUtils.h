@@ -45,11 +45,11 @@ namespace Ogre
 		static PFNGLXGETVISUALFROMFBCONFIGPROC getVisualFromFBConfig;
 		
 		/**
-		 * Get the GLXFBConfig used to create a ::GLXContext
+		 * Get the GLXFBConfig used to create a GLXContext
 		 *
 		 * @param display	X Display
-		 * @param drawable   GLXContext 
-		 * @returns		  GLXFBConfig used to create the context
+		 * @param context   GLXContext 
+		 * @return		  GLXFBConfig used to create the context
 		 */
 		static GLXFBConfig getFBConfigFromContext (Display *display, ::GLXContext context);
 		
@@ -61,7 +61,7 @@ namespace Ogre
 		 * @param drawable   GLXDrawable 
 		 * @param width	  Receiver for the drawable width
 		 * @param height	 Receiver for the drawable height
-		 * @returns		  GLXFBConfig used to create the drawable
+		 * @return		  GLXFBConfig used to create the drawable
 		 */
 		static GLXFBConfig getFBConfigFromDrawable (Display *display, GLXDrawable drawable, 
 								unsigned int *width, unsigned int *height);
@@ -79,7 +79,7 @@ namespace Ogre
 		 * @param display	X Display
 		 * @param minAttribs FBConfig attributes that must be provided with minimum values
 		 * @param maxAttribs FBConfig attributes that are preferred with maximum values
-		 * @returns		  GLXFBConfig with attributes or 0 when unsupported. 
+		 * @return		  GLXFBConfig with attributes or 0 when unsupported. 
 		 */
 		static GLXFBConfig selectFBConfig(Display *display, const int *minAttribs, const int *maxAttribs);
 		
@@ -92,7 +92,7 @@ namespace Ogre
 		 * @param name	   Name of image to load
 		 * @param pix		Receiver for the output pixmap
 		 * @param mask	   Receiver for the output mask (alpha bitmap)
-		 * @returns true on success
+		 * @return true on success
 		 */		
 		static bool loadIcon(Display *display, const std::string &name, Pixmap *pix, Pixmap *mask);
 	};

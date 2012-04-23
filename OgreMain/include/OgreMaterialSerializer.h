@@ -125,7 +125,7 @@ namespace Ogre {
 			
 			/** Called when material section event raised.					
 			@param ser The MaterialSerializer instance that writes the given material.
-			@param stage The current section writing stage.
+			@param event The current section writing stage.
 			@param skip May set to true by sub-class instances in order to skip the following section write.
 			This parameter relevant only when stage equals MSE_PRE_WRITE. 
 			@param mat The material that is being written.			
@@ -136,7 +136,7 @@ namespace Ogre {
 			
 			/** Called when technique section event raised.				
 			@param ser The MaterialSerializer instance that writes the given material.
-			@param stage The current section writing stage.
+			@param event The current section writing stage.
 			@param skip May set to true by sub-class instances in order to skip the following section write.
 			This parameter relevant only when stage equals MSE_PRE_WRITE. 
 			@param tech The technique that is being written.		
@@ -147,7 +147,7 @@ namespace Ogre {
 		
 			/** Called when pass section event raised.					
 			@param ser The MaterialSerializer instance that writes the given material.
-			@param stage The current section writing stage.
+			@param event The current section writing stage.
 			@param skip May set to true by sub-class instances in order to skip the following section write.
 			This parameter relevant only when stage equals MSE_PRE_WRITE. 
 			@param pass The pass that is being written.		
@@ -158,7 +158,7 @@ namespace Ogre {
 
 			/** Called when GPU program reference section event raised.				
 			@param ser The MaterialSerializer instance that writes the given material.
-			@param stage The current section writing stage.
+			@param event The current section writing stage.
 			@param skip May set to true by sub-class instances in order to skip the following section write.
 			This parameter relevant only when stage equals MSE_PRE_WRITE. 
 			@param attrib The GPU program reference description (vertex_program_ref, fragment_program_ref, etc).		
@@ -184,7 +184,7 @@ namespace Ogre {
 
 			/** Called when texture unit state section event raised.					
 			@param ser The MaterialSerializer instance that writes the given material.
-			@param stage The current section writing stage.
+			@param event The current section writing stage.
 			@param skip May set to true by sub-class instances in order to skip the following section write.
 			This parameter relevant only when stage equals MSE_PRE_WRITE. 
 			@param textureUnit The texture unit state that is being written.		

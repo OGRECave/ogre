@@ -87,7 +87,7 @@ namespace Ogre
             @param
                 depthBuffer Specify true to include a depth-buffer.
             @param
-                miscParam A variable number of pointers to platform-specific arguments. The
+                miscParams A variable number of pointers to platform-specific arguments. The
                 actual requirements must be defined by the implementing subclasses.
         */
 		virtual void create(const String& name, unsigned int width, unsigned int height,

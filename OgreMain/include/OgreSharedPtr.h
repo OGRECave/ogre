@@ -76,7 +76,7 @@ namespace Ogre {
 
 		/** Constructor.
 		@param rep The pointer to take ownership of
-		@param freeMode The mechanism to use to free the pointer
+		@param inFreeMethod The mechanism to use to free the pointer
 		*/
         template< class Y>
 		explicit SharedPtr(Y* rep, SharedPtrFreeMethod inFreeMethod = SPFM_DELETE) 

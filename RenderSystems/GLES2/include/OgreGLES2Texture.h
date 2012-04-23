@@ -68,7 +68,7 @@ namespace Ogre {
             void unprepareImpl(void);
             /// @copydoc Resource::loadImpl
             void loadImpl(void);
-            /// @copydoc Resource::freeInternalResourcesImpl
+            /// @copydoc Texture::freeInternalResourcesImpl
             void freeInternalResourcesImpl(void);
 
             /** Internal method, create GLHardwarePixelBuffers for every face and

@@ -184,7 +184,7 @@ namespace Ogre {
         ~TextureUnitState();
 
         /** Name-based constructor.
-        @param name
+        @param texName
             The basic name of the texture e.g. brickwall.jpg, stonefloor.png.
         @param texCoordSet
             The index of the texture coordinate set to use.
@@ -248,7 +248,7 @@ namespace Ogre {
             Skyboxes are created by calling SceneManager::setSkyBox.
             </p>
             </li>
-            </ul>
+            </ol>
         @note
             Applies to both fixed-function and programmable pipeline.
         @param name
@@ -296,7 +296,7 @@ namespace Ogre {
             Skyboxes are created by calling SceneManager::setSkyBox.
             </p>
             </li>
-            </ul>
+            </ol>
         @note
             Applies to both fixed-function and programmable pipeline.
         @param names
@@ -342,15 +342,15 @@ namespace Ogre {
             Skyboxes are created by calling SceneManager::setSkyBox.
             </p>
             </li>
-            </ul>
+            </ol>
         @note
             Applies to both fixed-function and programmable pipeline.
-        @param pTextures
+        @param texPtrs
             The 6 pointers to the textures which make up the 6 sides of the box. The textures must all 
             be the same size and be powers of 2 in width & height.
             Must be an Ogre::TexturePtr array with a length of 6 unless forUVW is set to @c true.
-        @param
-            forUVW Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
+        @param forUVW
+            Set to @c true if you want a single 3D texture addressable with 3D texture coordinates rather than
             6 separate textures. Useful for cubic environment mapping.
         */
         void setCubicTexture( const TexturePtr* const texPtrs, bool forUVW = false );

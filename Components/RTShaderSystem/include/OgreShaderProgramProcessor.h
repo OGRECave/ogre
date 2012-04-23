@@ -53,7 +53,6 @@ class _OgreRTSSExport ProgramProcessor : public RTShaderSystemAlloc
 public:	
 
 	/** Class constructor.
-	@param type The type of this program.
 	*/
 	ProgramProcessor			();
 

@@ -80,7 +80,7 @@ namespace Ogre {
 			be true if you intend to use fading)
 		*/
 		RibbonTrail(const String& name, size_t maxElements = 20, size_t numberOfChains = 1, 
-			bool useTextureCoords = true, bool useColours = true);
+			bool useTextureCoords = true, bool useVertexColours = true);
 		/// destructor
 		virtual ~RibbonTrail();
 

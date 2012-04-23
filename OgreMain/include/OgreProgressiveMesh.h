@@ -196,7 +196,7 @@ namespace Ogre {
 			work. Pass only shadowed buffers, or better yet perform mesh reduction as
 			an offline process using DefaultHardwareBufferManager to manage vertex
 			buffers in system memory.
-        @param buffer Pointer to x/y/z buffer with vertex positions. The number of vertices
+        @param vertexData Pointer to x/y/z buffer with vertex positions. The number of vertices
             must be the same as in the original GeometryData passed to the constructor.
         */
         virtual void addExtraVertexPositionBuffer(const VertexData* vertexData);

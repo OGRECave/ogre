@@ -251,7 +251,6 @@ namespace Ogre {
             animations do not have to sum to 1.0, because some animations may affect only subsets
             of the skeleton. If the weights exceed 1.0 for the same area of the skeleton, the 
             movement will just be exaggerated.
-            @param 
         */
         virtual void setAnimationState(const AnimationStateSet& animSet);
 

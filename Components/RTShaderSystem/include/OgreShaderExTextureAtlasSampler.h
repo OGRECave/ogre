@@ -261,20 +261,32 @@ public:
 		# <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
 	
 		@param filename The full path to the file containing a ".tai" format data.
+		@param textureAtlasTable A table into which the data in the stream will be filled. This
+			parameter will be filled only if it is not null. The system factory keeps a copy of this
+			information in any case.
+	*/
+	bool addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
+    /**
+		Adds a texture atlas definition from a stream. 
+
+		This function loads a texture atlas definition file from a stream. The accepted format for
+		this file is the NVidia Texture Atlas Tools ".tai" file format. This file as
+	
+		The ".tai" format consist of lines, where each line corresponds to a specific texture
+		in the texture atlas. Each line has the following format:
+		# <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
+	
 		@param stream A stream to a file containing ".tai" format data
 		@param textureAtlasTable A table into which the data in the stream will be filled. This
 			parameter will be filled only if it is not null. The system factory keeps a copy of this
 			information in any case.
-		@param autoBorderAdjust Sets whether to automatically adjust the image polling area for border 
-			issues.See the Border issues paragraph under the class documentation for more information.
 	*/
-	bool addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 	bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 
 	/**
 		Set the texture atlas information for a given texture
 		@param textureName Name of an atlas texture
-		@param atlasData a list of records containing the position and size of each 
+		@param atlasData A list of records containing the position and size of each 
 			texture in the atlas
 		@param autoBorderAdjust Sets whether to automatically adjust the image polling area for border 
 			issues.See the Border issues paragraph under the class documentation for more information.

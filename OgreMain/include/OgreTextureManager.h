@@ -199,35 +199,35 @@ namespace Ogre {
         virtual TexturePtr loadImage( 
             const String &name, const String& group, const Image &img, 
             TextureType texType = TEX_TYPE_2D,
-            int iNumMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool isAlpha = false,
+            int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool isAlpha = false,
             PixelFormat desiredFormat = PF_UNKNOWN, bool hwGammaCorrection = false);
 			
         /** Loads a texture from a raw data stream.
             @note
                 The texture will create as manual texture without loader.
-            @param
-                name The name to give the resulting texture
-            @param
-                group The name of the resource group to assign the texture to
-            @param
-                stream Incoming data stream
-            @param
-                width, height The dimensions of the texture
-            @param
-                format The format of the data being passed in; the manager reserves
+            @param name
+                The name to give the resulting texture
+            @param group
+                The name of the resource group to assign the texture to
+            @param stream
+                Incoming data stream
+            @param width, height
+                The dimensions of the texture
+            @param format
+                The format of the data being passed in; the manager reserves
                 the right to create a different format for the texture if the 
                 original format is not available in this context.
-            @param
-                texType The type of texture to load/create, defaults to normal 2D textures
-            @param
-                numMipmaps The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
+            @param texType
+                The type of texture to load/create, defaults to normal 2D textures
+            @param numMipmaps
+                The number of pre-filtered mipmaps to generate. If left to MIP_DEFAULT then
                 the TextureManager's default number of mipmaps will be used (see setDefaultNumMipmaps())
 				If set to MIP_UNLIMITED mipmaps will be generated until the lowest possible
 				level, 1x1x1.
-            @param
-                gamma The gamma adjustment factor to apply to this texture (brightening/darkening)
-				 while loading
-			 @param hwGammaCorrection Pass 'true' to enable hardware gamma correction
+            @param gamma
+                The gamma adjustment factor to apply to this texture (brightening/darkening)
+				while loading
+			@param hwGammaCorrection Pass 'true' to enable hardware gamma correction
 				 (sRGB) on this texture. The hardware will convert from gamma space
 				 to linear space when reading from this texture. Only applicable for 
 				 8-bits per channel textures, will be ignored for other types. Has the advantage
@@ -235,9 +235,9 @@ namespace Ogre {
 
         */
         virtual TexturePtr loadRawData(const String &name, const String& group,
-            DataStreamPtr& stream, ushort uWidth, ushort uHeight, 
+            DataStreamPtr& stream, ushort width, ushort height, 
             PixelFormat format, TextureType texType = TEX_TYPE_2D, 
-            int iNumMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool hwGammaCorrection = false);
+            int numMipmaps = MIP_DEFAULT, Real gamma = 1.0f, bool hwGammaCorrection = false);
 
 		/** Create a manual texture with specified width, height and depth (not loaded from a file).
             @param
@@ -283,7 +283,7 @@ namespace Ogre {
         */
         virtual TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, uint depth, 
-			int num_mips, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
+			int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
 			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK);
 			
         /** Create a manual texture with a depth of 1 (not loaded from a file).
@@ -329,7 +329,7 @@ namespace Ogre {
 				not support it.
         */
         TexturePtr createManual(const String & name, const String& group,
-            TextureType texType, uint width, uint height, int num_mips,
+            TextureType texType, uint width, uint height, int numMipmaps,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
 			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK)
 		{

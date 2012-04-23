@@ -104,7 +104,7 @@ namespace Ogre
 			tangents using this method, and the 'w' co-ordinate will be populated
 			with the parity of the triangle (+1 or -1), which will allow you to generate
 			the bitangent properly.
-		@param enable true to enable 4-component tangents (default false). If you enable
+		@param enabled true to enable 4-component tangents (default false). If you enable
 			this, you will probably also want to enable mirror splitting (see setSplitMirrored), 
 			and your shader must understand how to deal with the parity.
 		*/

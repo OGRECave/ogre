@@ -18,13 +18,13 @@ namespace Ogre {
 		Atom mAtomFullScreen;
 		Atom mAtomState;
 		
-		/** @copydoc see GLSupport::addConfig */
+		/** @copydoc GLSupport::addConfig */
 		void addConfig(void);
 		
-		/** @copydoc see GLSupport::validateConfig */
+		/** @copydoc GLSupport::validateConfig */
 		String validateConfig(void);
 		
-		/** @copydoc see GLSupport::setConfigOption */
+		/** @copydoc GLSupport::setConfigOption */
 		void setConfigOption(const String &name, const String &value);
 		
 		/// @copydoc GLSupport::createWindow
@@ -37,16 +37,16 @@ namespace Ogre {
 		/// @copydoc GLSupport::createPBuffer
 		GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height);
 		
-		/** @copydoc see GLSupport::start */
+		/** @copydoc GLSupport::start */
 		void start();
 		
-		/** @copydoc see GLSupport::stop */
+		/** @copydoc GLSupport::stop */
 		void stop();
 		
-		/** @copydoc see GLSupport::initialiseExtensions */
+		/** @copydoc GLSupport::initialiseExtensions */
 		void initialiseExtensions();
 		
-		/** @copydoc see GLSupport::getProcAddress */
+		/** @copydoc GLSupport::getProcAddress */
 		void* getProcAddress(const String& procname);
 		
 		// The remaining functions are internal to the GLX Rendersystem:
@@ -62,7 +62,7 @@ namespace Ogre {
 		 * using the same connection as that GL context and direct all 
 		 * subsequent rendering to the screen targeted by that GL context.
 		 * 
-		 * @returns		 Display name.
+		 * @return		 Display name.
 		 */
 		String getDisplayName (void);
 		
@@ -71,14 +71,14 @@ namespace Ogre {
 		 *
 		 * This function establishes the initial connection when necessary.
 		 * 
-		 * @returns		 Display connection
+		 * @return		 Display connection
 		 */
 		Display* getGLDisplay(void);
 		
 		/**
 		 * Get the Display connection used for window management & events
 		 *
-		 * @returns		 Display connection
+		 * @return		 Display connection
 		 */
 		Display* getXDisplay(void);
 		
@@ -87,7 +87,7 @@ namespace Ogre {
 		 *
 		 * @param width	  Receiver for requested and final width
 		 * @param height	 Receiver for requested and final drawable height
-		 * @param height	 Receiver for requested and final drawable frequency
+		 * @param frequency	 Receiver for requested and final drawable frequency
 		 */
 		void switchMode (uint& width, uint& height, short& frequency);
 		
@@ -101,19 +101,18 @@ namespace Ogre {
 		 * works for 24 and 32 bit displays. The image must be findable by the Ogre
 		 * resource system, and of format PF_A8R8G8B8.
 		 *
-		 * @param display	X display
 		 * @param name	   Name of image to load
 		 * @param pix		Receiver for the output pixmap
 		 * @param mask	   Receiver for the output mask (alpha bitmap)
-		 * @returns		  true on success
+		 * @return		  true on success
 		 */		
 		bool loadIcon(const std::string &name, Pixmap *pix, Pixmap *mask);
 		
 		/**
-		 * Get the GLXFBConfig used to create a ::GLXContext
+		 * Get the GLXFBConfig used to create a GLXContext
 		 *
-		 * @param drawable   GLXContext 
-		 * @returns		  GLXFBConfig used to create the context
+		 * @param context   GLXContext 
+		 * @return		  GLXFBConfig used to create the context
 		 */
 		GLXFBConfig getFBConfigFromContext (::GLXContext context);
 		
@@ -124,17 +123,16 @@ namespace Ogre {
 		 * @param drawable   GLXDrawable 
 		 * @param width	  Receiver for the drawable width
 		 * @param height	 Receiver for the drawable height
-		 * @returns		  GLXFBConfig used to create the drawable
+		 * @return		  GLXFBConfig used to create the drawable
 		 */
 		GLXFBConfig getFBConfigFromDrawable (GLXDrawable drawable, unsigned int *width, unsigned int *height);
 		
 		/**
 		 * Select an FBConfig given a list of required and a list of desired properties
 		 *
-		 * @param display	X Display
 		 * @param minAttribs FBConfig attributes that must be provided with minimum values
 		 * @param maxAttribs FBConfig attributes that are desirable with maximum values
-		 * @returns		  GLXFBConfig with attributes or 0 when unsupported. 
+		 * @return		  GLXFBConfig with attributes or 0 when unsupported. 
 		 */
 		GLXFBConfig selectFBConfig(const int *minAttribs, const int *maxAttribs);
 		
@@ -146,7 +144,7 @@ namespace Ogre {
 		 * alternative suffices for the creation of compatible contexts.
 		 *
 		 * @param visualid   VisualID 
-		 * @returns		  FBConfig for VisualID
+		 * @return		  FBConfig for VisualID
 		 */
 		GLXFBConfig getFBConfigFromVisualID(VisualID visualid);
 		

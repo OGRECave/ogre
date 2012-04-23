@@ -1,4 +1,4 @@
-/**
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -56,7 +56,7 @@ namespace Ogre {
  * <li>#ifdef/#ifndef/#else/#endif: Conditional suppression of parts of code.
  * <li>#if: Supports numeric expression of any complexity, also supports the
  *     defined() pseudo-function.
- * <ul>
+ * </ul>
  */
 class CPreprocessor
 {

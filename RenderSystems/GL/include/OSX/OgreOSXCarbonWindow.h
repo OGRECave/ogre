@@ -53,13 +53,13 @@ namespace Ogre
 		virtual bool isActive( void ) const;
         /** Overridden - see RenderWindow */
 		virtual bool isClosed( void ) const;
-        /** @copydoc see RenderWindow::isHidden */
+        /** @copydoc RenderWindow::isHidden */
         bool isHidden(void) const { return mHidden; }
-        /** @copydoc see RenderWindow::setHidden */
+        /** @copydoc RenderWindow::setHidden */
         void setHidden(bool hidden);
-        /** @copydoc see RenderWindow::setVSyncEnabled */
+        /** @copydoc RenderWindow::setVSyncEnabled */
         void setVSyncEnabled(bool vsync);
-        /** @copydoc see RenderWindow::isVSyncEnabled */
+        /** @copydoc RenderWindow::isVSyncEnabled */
         bool isVSyncEnabled() const;
         /** Overridden - see RenderWindow */
 		virtual void reposition( int left, int top );

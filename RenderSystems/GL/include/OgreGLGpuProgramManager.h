@@ -50,7 +50,7 @@ protected:
     /// @copydoc ResourceManager::createImpl
     Resource* createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader,
-        const NameValuePairList* params);
+        const NameValuePairList* createParams);
     /// Specialised create method with specific parameters
     Resource* createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader,

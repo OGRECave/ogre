@@ -48,7 +48,6 @@ class GLSLESProgramWriter : public ProgramWriter
 public:
 
 	/** Class constructor. 
-	@param language The target shader language.
 	*/
 	GLSLESProgramWriter	();
 

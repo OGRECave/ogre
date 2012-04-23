@@ -136,11 +136,11 @@ public:
 
     /** 
     Returns the source modifier parameters for a given texture unit
-    @return True if a valid modifier exist for the given texture unit
     @param modType The source modification type to use
     @param customNum The custom parameter number used to control the modification
+    @return True if a valid modifier exist for the given texture unit
     */
-    bool getSourceModifier(unsigned short index, SourceModifier& , int& customNum) const;
+    bool getSourceModifier(unsigned short index, SourceModifier& modType, int& customNum) const;
 
     /** 
     @see SubRenderState::copyFrom.
@@ -239,9 +239,9 @@ protected:
     String sourceModifierToString(LayeredBlending::SourceModifier modifier);
 
     /** 
-    Returns the LayeredBlending sub-rener state previously created for this material/pass.
+    Returns the LayeredBlending sub-render state previously created for this material/pass.
     if no such sub-render state exists creates a new one
-    @param trscript compiler
+    @param translator Script compiler
     */
     LayeredBlending* createOrRetrieveSubRenderState(SGScriptTranslator* translator);
 };

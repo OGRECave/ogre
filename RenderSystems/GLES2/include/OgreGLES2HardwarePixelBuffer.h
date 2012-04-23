@@ -93,7 +93,7 @@ namespace Ogre {
             virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
 
             /// @copydoc HardwarePixelBuffer::getRenderTarget
-            RenderTexture* getRenderTarget(size_t);
+            RenderTexture* getRenderTarget(size_t slice);
 
             /// Upload a box of pixels to this buffer on the card
             virtual void upload(const PixelBox &data, const Image::Box &dest);
@@ -140,7 +140,7 @@ namespace Ogre {
             GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
             virtual ~GLES2RenderBuffer();
 
-            /// @copydoc GLHardwarePixelBuffer::bindToFramebuffer
+            /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
             virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
 
         protected:
