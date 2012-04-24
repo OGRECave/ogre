@@ -262,7 +262,6 @@ material Examples/MorningSkyBox
 
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Examples/MorningSkyBoxHDRfp
@@ -1461,7 +1460,6 @@ material Examples/GrassBladesAdditiveFloat
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
   			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
@@ -1996,7 +1994,6 @@ material Examples/ShowUV
 		{
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 			}
 			fragment_program_ref Examples/ShowUV_p
 			{

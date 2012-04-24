@@ -274,7 +274,6 @@ material Examples/BumpMapping/MultiLight
 			// be an issue
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named_auto ambient ambient_light_colour
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
@@ -343,7 +342,6 @@ material Examples/BumpMapping/MultiLight
 			// be an issue
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
