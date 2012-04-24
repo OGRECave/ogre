@@ -287,7 +287,8 @@ namespace Ogre
 		assert(ret == Z_STREAM_END);        /* stream will be complete */
 		
 		deflateEnd(mZStream);
-				
+
+        inFile.close();
 		remove(mTempFileName.c_str());
 						
 	}
