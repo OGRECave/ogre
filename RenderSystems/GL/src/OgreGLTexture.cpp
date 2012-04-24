@@ -215,9 +215,12 @@ namespace Ogre {
 						}
 						break;
 				};
-				if(width>1)		width = width/2;
-				if(height>1)	height = height/2;
-				if(depth>1)		depth = depth/2;
+				if(width>1)
+                    width = width/2;
+				if(height>1)
+                    height = height/2;
+				if(depth>1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth/2;
 			}
 			delete [] tmpdata;
 		}
@@ -254,9 +257,12 @@ namespace Ogre {
 						}
 						break;
 				};
-				if(width>1)		width = width/2;
-				if(height>1)	height = height/2;
-				if(depth>1)		depth = depth/2;
+				if(width>1)
+                    width = width/2;
+				if(height>1)
+                    height = height/2;
+				if(depth>1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                    depth = depth/2;
 			}
 		}
 		_createSurfaceList();
