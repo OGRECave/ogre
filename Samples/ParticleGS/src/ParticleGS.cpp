@@ -124,7 +124,9 @@ protected:
     {
         demoTime = 0;
 
-        mProceduralManualObjectFactory = new ProceduralManualObjectFactory;
+        mProceduralManualObjectFactory = OGRE_NEW ProceduralManualObjectFactory();
+        Root::getSingleton().addMovableObjectFactory(mProceduralManualObjectFactory);
+
 		createProceduralParticleSystem();
 
 		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(mParticleSystem);
@@ -155,6 +157,9 @@ protected:
     void cleanupContent()
     {
         Root::getSingleton().removeMovableObjectFactory(mProceduralManualObjectFactory);
+        OGRE_DELETE mProceduralManualObjectFactory;
+        mProceduralManualObjectFactory = 0;
+
         MeshManager::getSingleton().remove("Myplane");
     }
 
