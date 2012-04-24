@@ -247,9 +247,10 @@ namespace Ogre {
         [tableBox setBorderType:NSLineBorder];
 
         // Set up the tableview
-        mOptionsTable = [[NSTableView alloc] initWithFrame:NSMakeRect(0, 0, 437, 133)];
+        mOptionsTable = [[NSTableView alloc] init];
         [mOptionsTable setDelegate:self];
         [mOptionsTable setDataSource:self];
+        [mOptionsTable setHeaderView:nil];
         [mOptionsTable setUsesAlternatingRowBackgroundColors:YES];
         [mOptionsTable sizeToFit];
         
@@ -261,9 +262,10 @@ namespace Ogre {
         [column release];
 
         // Scroll view to hold the table in case the list grows some day
-        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(18, 42, 439, 135)];
+        NSScrollView *scrollView = [[NSScrollView alloc] initWithFrame:NSMakeRect(22, 42, 439, 135)];
         [scrollView setBorderType:NSBezelBorder];
         [scrollView setAutoresizesSubviews:YES];
+        [scrollView setAutohidesScrollers:YES];
         [scrollView setDocumentView:mOptionsTable];
         
         [[tableBox contentView] addSubview:scrollView];
