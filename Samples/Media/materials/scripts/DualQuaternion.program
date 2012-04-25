@@ -93,8 +93,8 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster
 ///////////////////////////////////////////////////////////////////////////
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 {	
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsCg
 	
 	default_params
 	{
@@ -110,8 +110,8 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeights unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
 {	
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCasterCg
 	
 	default_params
 	{
@@ -123,8 +123,8 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsShadowCaster unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
 {
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseCg
 	
 	default_params
 	{
@@ -141,8 +141,8 @@ vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhase unified
 
 vertex_program Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCaster unified
 {
-	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
 	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterGLSL
+	delegate Ogre/DualQuaternionHardwareSkinningTwoWeightsTwoPhaseShadowCasterCg
 	
 	default_params
 	{

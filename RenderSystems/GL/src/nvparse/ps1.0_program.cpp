@@ -563,7 +563,6 @@ namespace
 		{
 			string op;
 			GLenum scale = GL_NONE;
-			bool op_sat = false;
             bool paired_instr = false;
             int instr_base = 0;
             if (instr[0]=="+") {
@@ -590,8 +589,6 @@ namespace
 
 			if((offset = op.find("_sat")) != string::npos)
 			{
-				// need to actually use this...
-				op_sat = true;
 				op.erase(op.begin()+offset, op.begin()+offset+4);
 			}
 			

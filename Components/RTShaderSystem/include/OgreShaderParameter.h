@@ -633,6 +633,7 @@ public:
 	static UniformParameterPtr	createSampler			(GpuConstantType type, int index);
 	static UniformParameterPtr	createSampler1D			(int index);
 	static UniformParameterPtr	createSampler2D			(int index);
+	static UniformParameterPtr	createSampler2DArray	(int index);
 	static UniformParameterPtr	createSampler3D			(int index);
 	static UniformParameterPtr	createSamplerCUBE		(int index);	
 

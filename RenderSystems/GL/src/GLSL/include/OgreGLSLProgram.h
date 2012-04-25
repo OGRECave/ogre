@@ -69,7 +69,7 @@ namespace Ogre {
             const String& group, bool isManual, ManualResourceLoader* loader);
 		~GLSLProgram();
 
-		const GLhandleARB getGLHandle() const { return mGLHandle; }
+		GLhandleARB getGLHandle() const { return mGLHandle; }
 		void attachToProgramObject( const GLhandleARB programObject );
 		void detachFromProgramObject( const GLhandleARB programObject );
 		String getAttachedShaderNames() const { return mAttachedShaderNames; }
@@ -177,7 +177,7 @@ namespace Ogre {
 	private:
 		/// GL handle for shader object
 		GLhandleARB mGLHandle;
-		/// flag indicating if shader object successfully compiled
+		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
 		/// The input operation type for this (geometry) program
 		RenderOperation::OperationType mInputOperationType;

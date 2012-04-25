@@ -55,7 +55,7 @@ namespace Ogre {
 
 
         /// Get the assigned GL program id
-        const GLuint getProgramID(void) const
+        GLuint getProgramID(void) const
         { return mProgramID; }
 
 		/** Get the attribute index for a given semantic. 
@@ -103,7 +103,7 @@ namespace Ogre {
 		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
         /// Get the GL type for the program
-        const GLuint getProgramType(void) const
+        GLuint getProgramType(void) const
         { return mProgramType; }
 
     protected:
@@ -115,6 +115,6 @@ namespace Ogre {
 
 
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // __GLGpuProgram_H__

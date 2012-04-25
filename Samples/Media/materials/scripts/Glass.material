@@ -17,8 +17,8 @@ fragment_program Ogre/Compositor/GlassFP_glsles glsles
 
 fragment_program Ogre/Compositor/GlassFP unified
 {
-	delegate Ogre/Compositor/GlassFP_cg
 	delegate Ogre/Compositor/GlassFP_glsles
+	delegate Ogre/Compositor/GlassFP_cg
 }
 
 material Ogre/Compositor/GlassPass

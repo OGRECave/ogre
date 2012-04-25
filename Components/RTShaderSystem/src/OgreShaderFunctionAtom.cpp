@@ -312,7 +312,7 @@ bool FunctionInvocation::FunctionInvocationLessThan::operator ()(FunctionInvocat
     OperandVector::const_iterator itLHSOps = lhs.mOperands.begin();
     OperandVector::const_iterator itRHSOps = rhs.mOperands.begin();
 
-    for ( ; itLHSOps != lhs.mOperands.end(), itRHSOps != rhs.mOperands.end(); ++itLHSOps, ++itRHSOps)
+    for ( ; ((itLHSOps != lhs.mOperands.end()) && (itRHSOps != rhs.mOperands.end())); ++itLHSOps, ++itRHSOps)
     {
         if (itLHSOps->getSemantic() < itRHSOps->getSemantic())
             return true;
@@ -375,7 +375,7 @@ bool FunctionInvocation::FunctionInvocationCompare::operator ()(FunctionInvocati
     // Check the semantic and type.  The operands must be in the same order as well.
     OperandVector::const_iterator itLHSOps = lhs.mOperands.begin();
     OperandVector::const_iterator itRHSOps = rhs.mOperands.begin();
-    for ( ; itLHSOps != lhs.mOperands.end(), itRHSOps != rhs.mOperands.end(); ++itLHSOps, ++itRHSOps)
+    for ( ; ((itLHSOps != lhs.mOperands.end()) && (itRHSOps != rhs.mOperands.end())); ++itLHSOps, ++itRHSOps)
     {
         if (itLHSOps->getSemantic() != itRHSOps->getSemantic())
             return false;

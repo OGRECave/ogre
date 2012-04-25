@@ -16,7 +16,7 @@ same license as the rest of the engine.
 \file 
 Instancing.cpp
 \brief
-Shows OGRE's bezier instancing feature
+Shows OGRE's instancing feature
 */
 
 #include "Instancing.h"

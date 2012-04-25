@@ -15,7 +15,7 @@ public:
 	void reset();
 	void set(const char * e);
 	void set(const char * e, int line_number);
-	char * const * const get_errors();
+	char** get_errors();
     inline int  get_num_errors() { return num_errors; }
 private:
         char* elist [NVPARSE_MAX_ERRORS+1];

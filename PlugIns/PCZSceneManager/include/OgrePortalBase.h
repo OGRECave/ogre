@@ -50,7 +50,7 @@ namespace Ogre
 		{
 			PORTAL_TYPE_QUAD,
 			PORTAL_TYPE_AABB,
-			PORTAL_TYPE_SPHERE,
+			PORTAL_TYPE_SPHERE
 		};
 
 		/** Constructor. */
@@ -107,7 +107,7 @@ namespace Ogre
 		void calcDirectionAndRadius() const;
 
 		/** get the type of portal */
-		const PORTAL_TYPE getType() const {return mType;}
+		PORTAL_TYPE getType() const {return mType;}
 		/** Retrieve the radius of the portal (calculates if necessary for quad portals) */
 		Real getRadius() const;
 

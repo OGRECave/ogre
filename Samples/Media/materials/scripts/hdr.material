@@ -42,7 +42,7 @@ material Ogre/Compositor/HDR/Downsample2x2Luminence
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale2x2Luminence_fp
@@ -104,7 +104,7 @@ material Ogre/Compositor/HDR/Downsample3x3
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale3x3_fp
@@ -174,7 +174,7 @@ material Ogre/Compositor/HDR/Downsample3x3Brightpass
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale3x3brightpass_fp
@@ -239,7 +239,7 @@ material Ogre/Compositor/HDR/GaussianBloom
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/bloom_fp
@@ -289,9 +289,9 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingGLSLES_fp glsles
 }
 fragment_program Ogre/Compositor/HDR/finaltonemapping_fp unified
 {
-	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp
 	delegate Ogre/Compositor/HDR/finaltonemappingGLSL_fp
 	delegate Ogre/Compositor/HDR/finaltonemappingGLSLES_fp
+	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp
 }
 
 material Ogre/Compositor/HDR/ToneMapping
@@ -304,7 +304,7 @@ material Ogre/Compositor/HDR/ToneMapping
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/finaltonemapping_fp

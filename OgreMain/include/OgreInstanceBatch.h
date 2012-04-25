@@ -252,83 +252,91 @@ namespace Ogre
         @param usedEntities Array of InstancedEntities to parent with this batch. Those reparented
             are removed from this input vector
         @remarks
-            This function assumes caller holds data to mInstancedEntities! Otherwise
-            you can get memory leaks. Don't call this directly if you don't know what you're doing!
+			This function assumes caller holds data to mInstancedEntities! Otherwise
+			you can get memory leaks. Don't call this directly if you don't know what you're doing!
+		*/
+		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
+
+		/** @see InstanceManager::_defragmentBatchDiscard
+			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
+			dangling pointers from reparented InstancedEntities
+			Usually called before deleting this pointer. Don't call directly!
+		*/
+		void _defragmentBatchDiscard(void);
+
+		/** Called by InstancedEntity(s) to tell us we need to update the bounds
+			(we touch the SceneNode so the SceneManager aknowledges such change)
         */
-        void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
+		virtual void _boundsDirty(void);
 
-        /** @see InstanceManager::_defragmentBatchDiscard
-            Destroys unused entities and clears the mInstancedEntity container which avoids leaving
-            dangling pointers from reparented InstancedEntities
-            Usually called before deleting this pointer. Don't call directly!
+		/** Tells this batch to stop updating animations, positions, rotations, and display
+			all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
+			This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
+			memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
+			billboards of trees, repeating vegetation, etc.
+			@remarks
+				This function moves a lot of processing time from the CPU to the GPU. If the GPU
+				is already a bottleneck, you may see a decrease in performance instead!
+				Call this function again (with bStatic=true) if you've made a change to an
+				InstancedEntity and wish this change to take effect.
+				Be sure to call this after you've set all your instances
+				@see InstanceBatchHW::setStaticAndUpdate
+		*/
+		virtual void setStaticAndUpdate( bool bStatic )		{}
+
+		/** Returns true if this batch was set as static. @see setStaticAndUpdate
+		*/
+		virtual bool isStatic() const						{ return false; }
+
+		/** Returns a pointer to a new InstancedEntity ready to use
+			Note it's actually preallocated, so no memory allocation happens at
+			this point.
+			@remarks
+				Returns NULL if all instances are being used
         */
-        void _defragmentBatchDiscard(void);
+		InstancedEntity* createInstancedEntity();
 
-        /** Called by InstancedEntity(s) to tell us we need to update the bounds
-            (we touch the SceneNode so the SceneManager aknowledges such change)
+		/** Removes an InstancedEntity from the scene retrieved with
+			getNewInstancedEntity, putting back into a queue
+			@remarks
+				Throws an exception if the instanced entity wasn't created by this batch
+				Removed instanced entities save little CPU time, but _not_ GPU
         */
-        virtual void _boundsDirty(void);
+		void removeInstancedEntity( InstancedEntity *instancedEntity );
 
-        /** Tells this batch to stop updating animations, positions, rotations, and display
-            all it's active instances. Currently only InstanceBatchHW & InstanceBatchHW_VTF support it.
-            This option makes the batch behave pretty much like Static Geometry, but with the GPU RAM
-            memory advantages (less VRAM, less bandwidth) and not LOD support. Very useful for
-            billboards of trees, repeating vegetation, etc.
-        @remarks
-            This function moves a lot of processing time from the CPU to the GPU. If the GPU
-            is already a bottleneck, you may see a decrease in performance instead!
-            Call this function again (with bStatic=true) if you've made a change to an
-            InstancedEntity and wish this change to take effect.
-            Be sure to call this after you've set all your instances
-        @see InstanceBatchHW::setStaticAndUpdate
+		/** Tells whether world bone matrices need to be calculated.
+			This does not include bone matrices which are calculated regardless
         */
-        virtual void setStaticAndUpdate( bool bStatic ) {}
+		virtual bool useBoneWorldMatrices() const { return true; }
 
-        /** Returns true if this batch was set as static. @see setStaticAndUpdate
-        */
-        virtual bool isStatic() const { return false; }
+		/** Tells that the list of entity instances with shared transforms has changed */
+		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
-        /** Returns a pointer to a new InstancedEntity ready to use
-            Note it's actually preallocated, so no memory allocation happens at
-            this point.
-        @remarks
-            Returns NULL if all instances are being used
-        */
-        InstancedEntity* createInstancedEntity();
+		//Renderable overloads
+        /** @copydoc Renderable::getMaterial. */
+		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
+        /** @copydoc Renderable::getRenderOperation. */
+		void getRenderOperation( RenderOperation& op )	{ op = mRenderOperation; }
 
-        /** Removes an InstancedEntity from the scene retrieved with
-            getNewInstancedEntity, putting back into a queue
-        @remarks
-            Throws an exception if the instanced entity wasn't created by this batch
-            Removed instanced entities save little CPU time, but _not_ GPU
-        */
-        void removeInstancedEntity( InstancedEntity *instancedEntity );
-
-        /** Tells whether world bone matrices need to be calculated.
-            This does not include bone matrices which are calculated regardless
-        */
-        virtual bool useBoneWorldMatrices() const { return true; }
-
-        /** Tells that the list of entity instances with shared transforms has changed */
-        void _markTransformSharingDirty() { mTransformSharingDirty = true; }
-
-        //Renderable overloads
-        const MaterialPtr& getMaterial(void) const { return mMaterial; }
-        void getRenderOperation( RenderOperation& op ) { op = mRenderOperation; }
-
-        Real getSquaredViewDepth( const Camera* cam ) const;
+        /** @copydoc Renderable::getSquaredViewDepth. */
+		Real getSquaredViewDepth( const Camera* cam ) const;
+        /** @copydoc Renderable::getLights. */
         const LightList& getLights( void ) const;
-        Technique* getTechnique(void) const;
+        /** @copydoc Renderable::getTechnique. */
+		Technique* getTechnique(void) const;
 
-        //MovableObject overloads
-        const String& getMovableType(void) const;
-        void _notifyCurrentCamera( Camera* cam );
-        const AxisAlignedBox& getBoundingBox(void) const;
-        Real getBoundingRadius(void) const;
+        /** @copydoc MovableObject::getMovableType. */
+		const String& getMovableType(void) const;
+        /** @copydoc MovableObject::_notifyCurrentCamera. */
+		void _notifyCurrentCamera( Camera* cam );
+        /** @copydoc MovableObject::getBoundingBox. */
+		const AxisAlignedBox& getBoundingBox(void) const;
+        /** @copydoc MovableObject::getBoundingRadius. */
+		Real getBoundingRadius(void) const;
 
-        virtual void _updateRenderQueue(RenderQueue* queue);
-        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
-    };
+		virtual void _updateRenderQueue(RenderQueue* queue);
+		void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false );
+	};
 } // namespace Ogre
 
 #endif // __InstanceBatch_H__

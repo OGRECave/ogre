@@ -62,6 +62,6 @@ namespace Ogre {
             bool registerProgramFactory(const String& syntaxCode, CreateGpuProgramCallback createFn);
             bool unregisterProgramFactory(const String& syntaxCode);
     };
-};
+}
 
 #endif

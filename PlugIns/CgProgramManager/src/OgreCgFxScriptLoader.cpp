@@ -2988,7 +2988,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	const CgFxScriptLoader::FXSemanticID CgFxScriptLoader::cgSemanticStringToType( const char * cgParamSemantic )
+	CgFxScriptLoader::FXSemanticID CgFxScriptLoader::cgSemanticStringToType( const char * cgParamSemantic )
 	{
 		String sem = cgParamSemantic;
 		Ogre::StringUtil::toLowerCase(sem);
@@ -3381,7 +3381,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	const bool CgFxScriptLoader::cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo )
+	bool CgFxScriptLoader::cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo )
 	{
 		extraInfo = 0;
 

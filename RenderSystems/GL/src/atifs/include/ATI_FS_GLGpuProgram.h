@@ -56,7 +56,7 @@ namespace Ogre {
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
 		/// Get the assigned GL program id
-		const GLuint getProgramID(void) const
+		GLuint getProgramID(void) const
 		{ return mProgramID; }
 
 	protected:
@@ -68,6 +68,6 @@ namespace Ogre {
 
 
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // __ATI_FS_GLGpuProgram_H__

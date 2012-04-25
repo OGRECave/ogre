@@ -82,7 +82,7 @@ enum VSOutputCompactPolicy
 {	
 	VSOCP_LOW		= 0,		// VS Outputs will be compacted just in case the maximum slot count exceeded.
 	VSOCP_MEDIUM	= 1,		// VS Outputs will be compacted always without parameter splits.
-	VSOCP_HIGH		= 2,		// VS Outputs will be compacted always including parameter splits.
+	VSOCP_HIGH		= 2			// VS Outputs will be compacted always including parameter splits.
 };
 
 enum SkinningType

@@ -62,7 +62,7 @@ namespace Ogre {
     }
 #pragma warning(pop)
 
-#elif OGRE_COMPILER == OGRE_COMPILER_GNUC
+#elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
     typedef unsigned long long uint64;
     static FORCEINLINE uint64 getCpuTimestamp(void)
     {

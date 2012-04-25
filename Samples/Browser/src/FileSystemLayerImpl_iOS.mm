@@ -44,7 +44,7 @@ namespace OgreBites
         mHomePath = std::string([[paths objectAtIndex:0] cStringUsingEncoding:NSASCIIStringEncoding]) + "/";
 	}
     //---------------------------------------------------------------------
-	const bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
+    bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
 	{
 		return access(path.c_str(), R_OK) == 0;
 	}

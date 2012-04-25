@@ -72,11 +72,10 @@ namespace Ogre {
 		~GLSLESProgram();
 
         /// GL Shader Handle
-		const GLuint getGLShaderHandle() const { return mGLShaderHandle; }
+		GLuint getGLShaderHandle() const { return mGLShaderHandle; }
 		void attachToProgramObject( const GLuint programObject );
 		void detachFromProgramObject( const GLuint programObject );
-
-		const GLuint getGLProgramHandle() const { return mGLProgramHandle; }
+		GLuint getGLProgramHandle() const { return mGLProgramHandle; }
 
 		/// Overridden
 		bool getPassTransformStates(void) const;

@@ -78,7 +78,7 @@ namespace Ogre {
 
     		/** Threshold after which glMapBuffer is used and not glBufferSubData
             */
-            const size_t getGLMapBufferThreshold() const;
+            size_t getGLMapBufferThreshold() const;
             void setGLMapBufferThreshold( const size_t value );
     };
 
@@ -125,7 +125,7 @@ namespace Ogre {
 		}
         /** Threshold after which glMapBuffer is used and not glBufferSubData
 		*/
-		const size_t getGLMapBufferThreshold() const
+		size_t getGLMapBufferThreshold() const
 		{
 			return static_cast<GLESHardwareBufferManagerBase*>(mImpl)->getGLMapBufferThreshold();
 		}

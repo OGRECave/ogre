@@ -46,8 +46,8 @@ vertex_program Ogre/Instancing/HWBasic/shadow_caster_cg_vs cg
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/HWBasic_vs unified
 {
-	delegate Ogre/Instancing/HWBasic_cg_vs
 	delegate Ogre/Instancing/HWBasic_glsl_vs
+	delegate Ogre/Instancing/HWBasic_cg_vs
 
 	default_params
 	{
@@ -60,8 +60,8 @@ vertex_program Ogre/Instancing/HWBasic_vs unified
 
 vertex_program Ogre/Instancing/HWBasic/shadow_caster_vs unified
 {
-	delegate Ogre/Instancing/HWBasic/shadow_caster_cg_vs
 	delegate Ogre/Instancing/HWBasic/shadow_caster_glsl_vs
+	delegate Ogre/Instancing/HWBasic/shadow_caster_cg_vs
 
 	default_params
 	{

@@ -120,6 +120,7 @@ protected:
 
 	void cleanupContent()
 	{
+        mSceneMgr->destroyCamera(mCubeCamera);
 		MeshManager::getSingleton().remove("floor");
 		TextureManager::getSingleton().remove("dyncubemap");
 	}

@@ -46,6 +46,7 @@ namespace Ogre {
 #define OGRE_COMPILER_BORL 3
 #define OGRE_COMPILER_WINSCW 4
 #define OGRE_COMPILER_GCCE 5
+#define OGRE_COMPILER_CLANG 6
 
 #define OGRE_ENDIAN_LITTLE 1
 #define OGRE_ENDIAN_BIG 2
@@ -65,12 +66,16 @@ namespace Ogre {
 #elif defined( _MSC_VER )
 #   define OGRE_COMPILER OGRE_COMPILER_MSVC
 #   define OGRE_COMP_VER _MSC_VER
+#elif defined( __clang__ )
+#   define OGRE_COMPILER OGRE_COMPILER_CLANG
+#   define OGRE_COMP_VER (((__clang_major__)*100) + \
+        (__clang_minor__*10) + \
+        __clang_patchlevel__)
 #elif defined( __GNUC__ )
 #   define OGRE_COMPILER OGRE_COMPILER_GNUC
 #   define OGRE_COMP_VER (((__GNUC__)*100) + \
         (__GNUC_MINOR__*10) + \
         __GNUC_PATCHLEVEL__)
-
 #elif defined( __BORLANDC__ )
 #   define OGRE_COMPILER OGRE_COMPILER_BORL
 #   define OGRE_COMP_VER __BCPLUSPLUS__

@@ -45,13 +45,12 @@ namespace Ogre
 {
 	//-------------------------------------------------------------------------------------------------//
 	GLXPBuffer::GLXPBuffer(GLXGLSupport* glsupport, PixelComponentType format, size_t width, size_t height):
-		mGLSupport(glsupport), GLPBuffer(format, width, height), mContext(0)
+		GLPBuffer(format, width, height), mContext(0), mGLSupport(glsupport)
 	{
 		Display *glDisplay = mGLSupport->getGLDisplay();
 		::GLXDrawable glxDrawable = 0;
 		::GLXFBConfig fbConfig = 0;
 		
-		bool isFloat = false;
 		int bits = 0;
 		
 		switch (mFormat)
@@ -122,8 +121,8 @@ namespace Ogre
 		};
 		
 		int pBufferAttribs[] = {
-			GLX_PBUFFER_WIDTH,	  mWidth,
-			GLX_PBUFFER_HEIGHT,	 mHeight,
+			GLX_PBUFFER_WIDTH,	  (int)mWidth,
+			GLX_PBUFFER_HEIGHT,	 (int)mHeight,
 			GLX_PRESERVED_CONTENTS, GL_TRUE,
 			None
 		};

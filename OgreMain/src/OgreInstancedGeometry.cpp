@@ -620,11 +620,16 @@ namespace Ogre {
 		
 
 		BatchInstanceIterator regIt = getBatchInstanceIterator();
-		BatchInstance*lastBatchInstance=0 ;
+		BatchInstance* lastBatchInstance=0 ;
 		while(regIt.hasMoreElements())
 		{
 			lastBatchInstance= regIt.getNext();
 		}
+        
+        if(!lastBatchInstance)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No batch instance found",
+                        "InstancedGeometry::addBatchInstance");
+
 		uint32 index=(lastBatchInstance)?lastBatchInstance->getID()+1:0;
 		//create a new BatchInstance
 

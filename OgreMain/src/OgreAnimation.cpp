@@ -440,7 +440,7 @@ namespace Ogre {
 		_applyBaseKeyFrame();
 
         // Calculate time index for fast keyframe search
-        TimeIndex timeIndex = _getTimeIndex(timePos);
+        _getTimeIndex(timePos);
 
 		NumericTrackList::iterator j;
 		for (j = mNumericTrackList.begin(); j != mNumericTrackList.end(); ++j)

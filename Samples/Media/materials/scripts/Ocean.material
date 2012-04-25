@@ -376,7 +376,12 @@ vertex_program GLSLES/Ocean2VS glsles
 
 fragment_program GLSLES/Ocean2FS glsles
 {
-	source Ocean2GLSLES.frag
+   	source Ocean2GLSLES.frag
+   	default_params
+   	{
+   		param_named NormalMap int 0
+   		param_named EnvironmentMap int 1
+   	}
 }
 
 material Ocean2_HLSL_GLSL

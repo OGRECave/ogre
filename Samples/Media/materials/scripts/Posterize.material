@@ -12,8 +12,8 @@ fragment_program Ogre/Compositor/Posterize_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/PosterizeFP unified
 {
-	delegate Ogre/Compositor/Posterize_Cg_FP
 	delegate Ogre/Compositor/Posterize_GLSLES_FP
+	delegate Ogre/Compositor/Posterize_Cg_FP
 }
 
 material Ogre/Compositor/Posterize

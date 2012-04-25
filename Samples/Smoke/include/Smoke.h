@@ -16,7 +16,6 @@ public:
 		mInfo["Description"] = "Demonstrates depth-sorting of particles in particle systems.";
 		mInfo["Thumbnail"] = "thumb_smoke.png";
 		mInfo["Category"] = "Effects";
-		mInfo["Help"] = "Proof that OGRE is just the hottest thing. Bleh. So there. ^_^";
 	}
 
 	bool frameRenderingQueued(const FrameEvent& evt)

@@ -182,12 +182,12 @@ namespace Ogre {
 
         /** Get if the microcode of a shader should be saved to a cache
         */
-		const bool getSaveMicrocodesToCache() const;
+		bool getSaveMicrocodesToCache();
         /** Set if the microcode of a shader should be saved to a cache
         */
 		void setSaveMicrocodesToCache( const bool val );
 
-		const bool canGetCompiledShaderBuffer() const;
+		bool canGetCompiledShaderBuffer();
         /** Check if a microcode is available for a program in the microcode cache.
         @param name The name of the program.
         */

@@ -250,7 +250,7 @@ namespace Ogre {
         assert(false && "Memory deallocation error");
     }
 	//---------------------------------------------------------------------
-	const size_t GLESHardwareBufferManagerBase::getGLMapBufferThreshold() const
+	size_t GLESHardwareBufferManagerBase::getGLMapBufferThreshold() const
 	{
 		return mMapBufferThreshold;
 	}

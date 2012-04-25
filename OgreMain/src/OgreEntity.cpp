@@ -229,6 +229,7 @@ namespace Ogre {
 		{
 			// Delete SubEntity
 			OGRE_DELETE *i;
+            *i = 0;
 		}
 		mSubEntityList.clear();
 		
@@ -238,7 +239,8 @@ namespace Ogre {
 		for (li = mLodEntityList.begin(); li != liend; ++li)
 		{
 			// Delete
-			OGRE_DELETE (*li);
+			OGRE_DELETE *li;
+            *li = 0;
 		}
         mLodEntityList.clear();
         
@@ -248,6 +250,7 @@ namespace Ogre {
 		for (si = mShadowRenderables.begin(); si != siend; ++si)
 		{
 			OGRE_DELETE *si;
+            *si = 0;
 		}
         mShadowRenderables.clear();
         
@@ -257,6 +260,7 @@ namespace Ogre {
 
 		if (mSkeletonInstance) {
 			OGRE_FREE_SIMD(mBoneWorldMatrices, MEMCATEGORY_ANIMATION);
+            mBoneWorldMatrices = 0;
 
             if (mSharedSkeletonEntities) {
                 mSharedSkeletonEntities->erase(this);
@@ -267,29 +271,30 @@ namespace Ogre {
                 // Should never occur, just in case
                 else if (mSharedSkeletonEntities->empty())
                 {
-                    OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION);
+                    OGRE_DELETE_T(mSharedSkeletonEntities, EntitySet, MEMCATEGORY_ANIMATION); mSharedSkeletonEntities = 0;
 					// using OGRE_FREE since unsigned long is not a destructor
-                    OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
-                    OGRE_DELETE mSkeletonInstance;
-                    OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-                    OGRE_DELETE mAnimationState;
+                    OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION); mFrameBonesLastUpdated = 0;
+                    OGRE_DELETE mSkeletonInstance; mSkeletonInstance = 0;
+                    OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION); mBoneMatrices = 0;
+                    OGRE_DELETE mAnimationState; mAnimationState = 0;
                 }
             } else {
 				// using OGRE_FREE since unsigned long is not a destructor
-				OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION);
-                OGRE_DELETE mSkeletonInstance;
-                OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION);
-                OGRE_DELETE mAnimationState;
+				OGRE_FREE(mFrameBonesLastUpdated, MEMCATEGORY_ANIMATION); mFrameBonesLastUpdated = 0;
+                OGRE_DELETE mSkeletonInstance; mSkeletonInstance = 0;
+                OGRE_FREE_SIMD(mBoneMatrices, MEMCATEGORY_ANIMATION); mBoneMatrices = 0;
+                OGRE_DELETE mAnimationState; mAnimationState = 0;
             }
         }
 		else if (hasVertexAnimation())
 		{
 			OGRE_DELETE mAnimationState;
+            mAnimationState = 0;
 		}
 
-		OGRE_DELETE mSkelAnimVertexData;
-		OGRE_DELETE mSoftwareVertexAnimVertexData;
-		OGRE_DELETE mHardwareVertexAnimVertexData;
+		OGRE_DELETE mSkelAnimVertexData; mSkelAnimVertexData = 0;
+		OGRE_DELETE mSoftwareVertexAnimVertexData; mSoftwareVertexAnimVertexData = 0;
+		OGRE_DELETE mHardwareVertexAnimVertexData; mHardwareVertexAnimVertexData = 0;
 
 		mInitialised = false;
 	}

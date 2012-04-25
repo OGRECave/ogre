@@ -58,9 +58,9 @@ namespace Ogre
 	/** Enum for type of texture play mode */
 	enum eTexturePlayMode
 	{
-		TextureEffectPause = 0,			//! Video starts out paused
-		TextureEffectPlay_ASAP = 1,		//! Video starts playing as soon as possible
-		TextureEffectPlay_Looping = 2	//! Video Plays Instantly && Loops
+		TextureEffectPause = 0,			/// Video starts out paused
+		TextureEffectPlay_ASAP = 1,		/// Video starts playing as soon as possible
+		TextureEffectPlay_Looping = 2	/// Video Plays Instantly && Loops
 	};
 
 	/** IMPORTANT: **Plugins must override default dictionary name!** 
@@ -80,7 +80,7 @@ namespace Ogre
 
 		//------------------------------------------------------------------------------//
 		/* Command objects for specifying some base features							*/
-		/* Any PlugIns wishing to add more specific params to "ExternalTextureSourcePlugins"*/
+		/* Any Plugins wishing to add more specific params to "ExternalTextureSourcePlugins"*/
 		/* dictionary, feel free to do so, that's why this is here						*/
         class _OgrePrivate CmdInputFileName : public ParamCommand
         {
@@ -110,38 +110,38 @@ namespace Ogre
 		//Base Functions that work with Command String Interface... Or can be called
 		//manually to create video through code 
 
-		//! Sets an input file name - if needed by plugin
+		/// Sets an input file name - if needed by plugin
 		void setInputName( String sIN ) { mInputFileName = sIN; }
-		//! Gets currently set input file name
+		/// Gets currently set input file name
 		const String& getInputName( ) const	{ return mInputFileName; }
-		//! Sets the frames per second - plugin may or may not use this
+		/// Sets the frames per second - plugin may or may not use this
 		void setFPS( int iFPS ) { mFramesPerSecond = iFPS; }
-		//! Gets currently set frames per second
-		const int getFPS( ) const { return mFramesPerSecond; }
-		//! Sets a play mode
+		/// Gets currently set frames per second
+		int getFPS( ) const { return mFramesPerSecond; }
+		/// Sets a play mode
 		void setPlayMode( eTexturePlayMode eMode )	{ mMode = eMode; }
-		//! Gets currently set play mode
+		/// Gets currently set play mode
 		eTexturePlayMode getPlayMode() const { return mMode; }
 
-		//! Used for attaching texture to Technique, State, and texture unit layer
+		/// Used for attaching texture to Technique, State, and texture unit layer
 		void setTextureTecPassStateLevel( int t, int p, int s ) 
 				{ mTechniqueLevel = t;mPassLevel = p;mStateLevel = s; }
-		//! Get currently selected Textute attribs.
+		/// Get currently selected Texture attribs.
 		void getTextureTecPassStateLevel( int& t, int& p, int& s ) const
 				{t = mTechniqueLevel;	p = mPassLevel;	s = mStateLevel;}
 		
 		/** Call from derived classes to ensure the dictionary is setup */
 		void addBaseParams();
 
-		/** Returns the string name of this PlugIn (as set by the PlugIn)*/
-		const String& getPlugInStringName( void ) const { return mPlugInName; }
+		/** Returns the string name of this Plugin (as set by the Plugin)*/
+		const String& getPluginStringName( void ) const { return mPluginName; }
 		/** Returns dictionary name */
 		const String& getDictionaryStringName( void ) const { return mDictionaryName; }
 
 		//Pure virtual functions that plugins must Override
 		/** Call this function from manager to init system */
 		virtual bool initialise() = 0;
-		/** Shuts down PlugIn */
+		/** Shuts down Plugin */
 		virtual void shutDown() = 0;
 
 		/** Creates a texture into an already defined material or one that is created new
@@ -157,14 +157,14 @@ namespace Ogre
 			const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME) = 0;
 
 	protected:
-        static CmdInputFileName msCmdInputFile;		//! Command for setting input file name
-		static CmdFPS msCmdFramesPerSecond;			//! Command for setting frames per second
-		static CmdPlayMode msCmdPlayMode;			//! Command for setting play mode
-		static CmdTecPassState msCmdTecPassState;	//! Command for setting the technique, pass, & state level
+        static CmdInputFileName msCmdInputFile;		/// Command for setting input file name
+		static CmdFPS msCmdFramesPerSecond;			/// Command for setting frames per second
+		static CmdPlayMode msCmdPlayMode;			/// Command for setting play mode
+		static CmdTecPassState msCmdTecPassState;	/// Command for setting the technique, pass, & state level
 
 
-		//! String Name of this PlugIn
-		String mPlugInName;
+		/// String Name of this Plugin
+		String mPluginName;
 	
 		//------ Vars used for setting/getting dictionary stuff -----------//
 		eTexturePlayMode mMode;

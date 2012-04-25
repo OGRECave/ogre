@@ -529,7 +529,6 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-                param_named_auto worldViewProj worldviewproj_matrix
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
@@ -578,7 +577,6 @@ material Ogre/DepthShadowmap/Receiver/RockWall
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-                param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
@@ -617,7 +615,6 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-                param_named_auto worldViewProj worldviewproj_matrix
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
@@ -680,7 +677,6 @@ material Ogre/DepthShadowmap/Receiver/Athene
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-                param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP

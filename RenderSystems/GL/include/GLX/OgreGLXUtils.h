@@ -97,6 +97,6 @@ namespace Ogre
 		static bool loadIcon(Display *display, const std::string &name, Pixmap *pix, Pixmap *mask);
 	};
    
-};
+}
 
 #endif

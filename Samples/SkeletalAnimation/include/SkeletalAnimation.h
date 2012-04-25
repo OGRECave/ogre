@@ -59,7 +59,7 @@ protected:
 	void setupContent()
 	{
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+/*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
@@ -77,7 +77,7 @@ protected:
 			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
 				Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 		}
-#endif
+#endif*/
 		// set shadow properties
 		mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
 		mSceneMgr->setShadowTextureSize(512);
@@ -154,15 +154,21 @@ protected:
 
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
-#ifdef USE_RTSHADER_SYSTEM
-			if (mShaderGenerator->getTargetLanguage() == "glsles")
+
+/*#ifdef USE_RTSHADER_SYSTEM
+			if (mShaderGenerator->getTargetLanguage() == "glsles")*/
+            if (mShaderGenerator->getTargetLanguage() == "glsles")
+            {
+                MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
+                mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
+            }
                 ent->setMaterialName("jaiqua");
-            else
+/*            else
 #endif
-                ent->setMaterialName("jaiquaDualQuatTest");
+                ent->setMaterialName("jaiquaDualQuatTest");*/
 			sn->attachObject(ent);
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+/*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 			//To make glsles work the program will need to be provided with proper
 			//shadow caster materials
 			if (mShaderGenerator->getTargetLanguage() != "glsles")
@@ -179,7 +185,7 @@ protected:
 					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
 					true);
 			}
-#endif
+#endif*/
 		
 			// enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
 			as = ent->getAnimationState("Sneak");
@@ -210,7 +216,7 @@ protected:
 		}
 		
 		// create a params panel to display the skinning mode
-		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
+		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
 	}
 	
 	/*-----------------------------------------------------------------------------
@@ -269,7 +275,7 @@ protected:
 		mAnimSpeeds.clear();
 		MeshManager::getSingleton().remove("floor");
 
-#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+/*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
 		if (mShaderGenerator->getTargetLanguage() != "glsles")
@@ -277,7 +283,7 @@ protected:
 			Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 			renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
 		}
-#endif
+#endif*/
 	}
 
 	const unsigned int NUM_MODELS;

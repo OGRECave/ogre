@@ -70,7 +70,7 @@ $ bintoheader.py GLX_backdrop GLX_backdrop.png > GLX_backdrop.h
 */
 #include "GLX_backdrop.h"
 
-};
+}
 
 namespace Ogre {
 
@@ -257,7 +257,7 @@ bool GLXConfigurator::CreateWindow() {
 	/* Create renderer selection */
 	int cury = ystart + 0*rowh;
 
-	Widget lb1 = XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, "Select Renderer", XtNborderWidth, 0,
+    XtVaCreateManagedWidget("topLabel", labelWidgetClass, box, XtNlabel, "Select Renderer", XtNborderWidth, 0,
 		XtNwidth, col1w, 	// Fixed width
 		XtNheight, 18,
 		XtNleft, XawChainLeft,
@@ -268,6 +268,7 @@ bool GLXConfigurator::CreateWindow() {
 		XtNvertDistance, cury,
 		XtNjustify, XtJustifyLeft,
 		NULL);
+
 	const char *curRenderName = " Select One "; // Name of current renderer, or hint to select one
 	if(mRenderer)
 		curRenderName = mRenderer->getName().c_str();
@@ -511,5 +512,5 @@ bool ConfigDialog::display()
 
 	return true;
 }
-};
+}
 

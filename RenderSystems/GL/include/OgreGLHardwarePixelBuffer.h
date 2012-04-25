@@ -90,7 +90,7 @@ namespace Ogre {
         RenderTexture* getRenderTarget(size_t slice);
         /// Upload a box of pixels to this buffer on the card
 		virtual void upload(const PixelBox &data, const Image::Box &dest);
-		// Download a box of pixels from the card
+		/// Download a box of pixels from the card
 		virtual void download(const PixelBox &data);
   
         /// Hardware implementation of blitFromMemory
@@ -133,6 +133,6 @@ namespace Ogre {
         // In case this is a render buffer
         GLuint mRenderbufferID;
     };
-};
+}
 
 #endif

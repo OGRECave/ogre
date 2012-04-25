@@ -51,7 +51,7 @@ public:
 	void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
     /// Get the assigned GL program id
-    const GLuint getProgramID(void) const
+    GLuint getProgramID(void) const
     { return mProgramID; }
 
 protected:
@@ -64,6 +64,6 @@ private:
     GLenum mProgramType;
 };
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // __GLGpuNvparseProgram_H__

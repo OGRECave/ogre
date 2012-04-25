@@ -135,10 +135,10 @@ void OSXGLSupport::addConfig( void )
 #endif
 
 #if defined(MAC_OS_X_VERSION_10_4) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
-	long maxSamples;
+	long maxSamples = 0;
 	CGLDescribeRenderer(rend, 0, kCGLRPMaxSamples, &maxSamples);
 #else
-    GLint maxSamples;
+    GLint maxSamples = 0;
 	CGLDescribeRenderer(rend, 0, kCGLRPMaxSamples, &maxSamples);
 #endif
 
@@ -146,30 +146,9 @@ void OSXGLSupport::addConfig( void )
 
     // FSAA possibilities
     optFSAA.name = "FSAA";
-    optFSAA.possibleValues.push_back( "0" );
 
-	switch( maxSamples )
-	{
-		case 8:
-            optFSAA.possibleValues.push_back( "2" );
-            optFSAA.possibleValues.push_back( "4" );
-            optFSAA.possibleValues.push_back( "6" );
-            optFSAA.possibleValues.push_back( "8" );
-            break;
-		case 6:
-			optFSAA.possibleValues.push_back( "2" );
-			optFSAA.possibleValues.push_back( "4" );
-			optFSAA.possibleValues.push_back( "6" );
-			break;
-		case 4:
-			optFSAA.possibleValues.push_back( "2" );
-			optFSAA.possibleValues.push_back( "4" );
-			break;
-		case 2:
-			optFSAA.possibleValues.push_back( "2" );
-			break;
-		default: break;
-	}
+    for(int i = 0; i <= maxSamples; i += 2)
+        optFSAA.possibleValues.push_back( StringConverter::toString(i) );
 
     optFSAA.currentValue = "0";
     optFSAA.immutable = false;
@@ -251,7 +230,12 @@ void OSXGLSupport::addConfig( void )
 #endif
 		}
 	}
-	
+
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+        // Release memory
+        CFRelease(displayModes);
+#endif
+
 	// Sort the modes...
 	CFArraySortValues(goodModes, CFRangeMake(0, CFArrayGetCount(goodModes)), 
 					  (CFComparatorFunction)_compareModes, NULL);
@@ -385,7 +369,7 @@ RenderWindow* OSXGLSupport::newWindow( const String &name, unsigned int width, u
 	
 	if(miscParams)
 	{
-        NameValuePairList::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt;
 
         // First we must determine if this is a Carbon or a Cocoa window
         // that we wish to create

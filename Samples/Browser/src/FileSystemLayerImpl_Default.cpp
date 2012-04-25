@@ -41,7 +41,7 @@ namespace OgreBites
 		mHomePath = "";
 	}
     //---------------------------------------------------------------------
-	const bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
+	bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
 	{
 		// always assume true
 		return true;

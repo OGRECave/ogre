@@ -132,6 +132,6 @@ private:
 
 }; // class GLSupport
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // OGRE_GLSUPPORT_H

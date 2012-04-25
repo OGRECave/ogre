@@ -190,7 +190,7 @@ namespace Ogre {
             
             ++numSplits;
 
-        } while (pos != String::npos);
+        } while (start != String::npos);
 
         return ret;
     }

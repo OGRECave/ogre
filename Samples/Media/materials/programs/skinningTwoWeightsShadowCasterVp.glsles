@@ -1,7 +1,7 @@
 #version 100
 
-precision mediump int;
-precision mediump float;
+precision highp int;
+precision highp float;
 
 /*
   Two-weight-per-vertex hardware skinning, shadow caster pass
@@ -11,18 +11,18 @@ attribute vec4 vertex;
 attribute vec4 uv0;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
-varying vec4 colour;
 
 // 3x4 matrix, passed as vec4's for compatibility with GL ES 2.0
 // Support 24 bones ie 24*3, but use 72 since our parser can pick that out for sizing
 uniform vec4 worldMatrix3x4Array[72];
 uniform mat4 viewProjectionMatrix;
 uniform vec4 ambient;
-uniform sampler2D skinTex;
+
+varying vec4 colour;
 
 void main()
 {
-	vec3 blendPos = vec3(0.0, 0.0, 0.0);
+	vec3 blendPos = vec3(0.0);
 
 	for (int bone = 0; bone < 2; ++bone)
 	{
@@ -42,6 +42,5 @@ void main()
 	// Apply view / projection to position
 	gl_Position = viewProjectionMatrix * vec4(blendPos, 1.0);
 
-	vec4 texColour = texture2D(skinTex, uv0.xy);
-	colour = ambient + texColour;
+	colour = ambient;
 }

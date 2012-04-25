@@ -66,13 +66,17 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     OSXWindow::~OSXWindow()
     {
+#if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
+        if (mOriginalDisplayMode != NULL)
+            CGDisplayModeRelease(mOriginalDisplayMode);
+#endif
     }
     
     //-------------------------------------------------------------------------------------------------//
     void OSXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.left < 0) || (dst.right > mWidth) ||
-            (dst.top < 0) || (dst.bottom > mHeight) ||
+        if ((dst.right > mWidth) ||
+            (dst.bottom > mHeight) ||
             (dst.front != 0) || (dst.back != 1))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -163,7 +167,10 @@ namespace Ogre
             
             if((CGDisplayModeGetWidth(mode) == width) && (CGDisplayModeGetHeight(mode) == height))
             {
+                // Release memory
+                CGDisplayModeRelease(displayMode);
                 displayMode = mode;
+                CGDisplayModeRetain(displayMode);
                 exactMatch = 1;
                 break;
             }
@@ -180,13 +187,19 @@ namespace Ogre
                 
                 if((CGDisplayModeGetWidth(mode) >= width) && (CGDisplayModeGetHeight(mode) >= height))
                 {
+                    // Release memory
+                    CGDisplayModeRelease(displayMode);
                     displayMode = mode;
+                    CGDisplayModeRetain(displayMode);
                     exactMatch = 1;
                     break;
                 }
             }
         }
-        
+
+        // Release memory
+        CFRelease(allModes);
+
         reqWidth = CGDisplayModeGetWidth(displayMode);
         reqHeight = CGDisplayModeGetHeight(displayMode);
         reqDepth = bitDepthFromDisplayMode(displayMode);
@@ -248,6 +261,9 @@ namespace Ogre
 #if defined(MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         mOriginalDisplayMode = CGDisplayCopyDisplayMode(kCGDirectMainDisplay);
         cgErr = CGDisplaySetDisplayMode(kCGDirectMainDisplay, displayMode, NULL);
+
+        // Release memory
+        CFRelease(displayMode);
 #else
         mOriginalDisplayMode = CGDisplayCurrentMode(kCGDirectMainDisplay);
         cgErr = CGDisplaySwitchToMode(kCGDirectMainDisplay, displayMode);

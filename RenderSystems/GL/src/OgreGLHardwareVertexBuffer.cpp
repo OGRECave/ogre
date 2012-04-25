@@ -66,7 +66,7 @@ namespace Ogre {
         if(mIsLocked)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Invalid attempt to lock an index buffer that has already been locked",
+                "Invalid attempt to lock an vertex buffer that has already been locked",
                 "GLHardwareVertexBuffer::lock");
         }
 

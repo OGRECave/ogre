@@ -172,7 +172,7 @@ protected:
 		}
 
 		// create a params panel to display the skinning mode
-		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 150, names)->setParamValue(0, value);
+		mTrayMgr->createParamsPanel(TL_TOPLEFT, "Skinning", 170, names)->setParamValue(0, value);
 	}
 
 	void cleanupContent()

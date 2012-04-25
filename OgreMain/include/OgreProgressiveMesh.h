@@ -119,7 +119,7 @@ namespace Ogre {
 			VRQ_PROPORTIONAL,
 			/// All vertices with reduction error cost less than reductionValue * sqr(lodDistance[lodLevel] / lodDistance[0]) 
 			/// are removed at each reduction. Error cost is calculated as introduced error area divided by squared mesh diagonal
-			VRQ_ERROR_COST,
+			VRQ_ERROR_COST
 		};
 
 		

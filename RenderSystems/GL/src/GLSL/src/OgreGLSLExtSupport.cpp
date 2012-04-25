@@ -74,6 +74,9 @@ namespace Ogre
 		{
 			GLint infologLength = 0;
 
+            if(glIsProgram(obj))
+                glValidateProgram(obj);
+
 			glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
 
 			if (infologLength > 0)

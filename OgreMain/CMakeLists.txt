@@ -718,7 +718,9 @@ else()
 endif()
 
 if (APPLE)
-  if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
+  else ()
     set_target_properties(OgreMain PROPERTIES FRAMEWORK TRUE)
     # Set the INSTALL_PATH so that Frameworks can be local
     set_target_properties(OgreMain
@@ -737,12 +739,6 @@ if (APPLE)
       COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX
       COMMAND ditto ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX/	
 	)
-  else ()
-    set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   endif ()
 
   # Framework is called 'Ogre'

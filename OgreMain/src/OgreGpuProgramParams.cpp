@@ -650,6 +650,7 @@ namespace Ogre
 						assert(e.dstDefinition->elementSize % 4 == 0);
 						size_t iterations = e.dstDefinition->elementSize / 4 
 							* e.dstDefinition->arraySize;
+                        assert(iterations > 0);
 						size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
 						for (size_t l = 0; l < iterations; ++l)
 						{
@@ -676,6 +677,7 @@ namespace Ogre
 					assert(e.dstDefinition->elementSize % 4 == 0);
 					size_t iterations = (e.dstDefinition->elementSize / 4)
 						* e.dstDefinition->arraySize;
+					assert(iterations > 0);
 					size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
 					for (size_t l = 0; l < iterations; ++l)
 					{
@@ -1459,7 +1461,13 @@ namespace Ogre
 	{
 		// Get auto constant definition for sizing
 		const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);
-		// round up to nearest multiple of 4
+
+        if(!autoDef)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No constant definition found for type " + 
+                        StringConverter::toString(acType),
+                        "GpuProgramParameters::setAutoConstant");
+
+        // round up to nearest multiple of 4
 		size_t sz = autoDef->elementCount;
 		if (sz % 4 > 0)
 		{
@@ -1504,6 +1512,12 @@ namespace Ogre
 
 		// Get auto constant definition for sizing
 		const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);
+        
+        if(!autoDef)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No constant definition found for type " + 
+                        StringConverter::toString(acType),
+                        "GpuProgramParameters::setAutoConstant");
+
 		// round up to nearest multiple of 4
 		size_t sz = autoDef->elementCount;
 		if (sz % 4 > 0)
@@ -1600,6 +1614,12 @@ namespace Ogre
 	{
 		// Get auto constant definition for sizing
 		const AutoConstantDefinition* autoDef = getAutoConstantDefinition(acType);
+        
+        if(!autoDef)
+            OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "No constant definition found for type " + 
+                        StringConverter::toString(acType),
+                        "GpuProgramParameters::setAutoConstantReal");
+
 		// round up to nearest multiple of 4
 		size_t sz = autoDef->elementCount;
 		if (sz % 4 > 0)

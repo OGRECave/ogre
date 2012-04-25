@@ -171,14 +171,11 @@ namespace
 	{
 		GLint  errPos;
 		GLenum errCode;
-		const GLubyte *errString;
 		
 		int len = strlen(instring);
 		glLoadProgramNV( target, id, len, (const GLubyte *) instring );
 		if ( (errCode = glGetError()) != GL_NO_ERROR )
 		{
-			errString = gluErrorString( errCode );
-			
 			glGetIntegerv( GL_PROGRAM_ERROR_POSITION_NV, &errPos );
 			
 			int nlines = 1;

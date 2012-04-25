@@ -13,8 +13,8 @@ fragment_program Radial_Blur_GLSLES_ps glsles
 
 fragment_program Radial_Blur_ps unified
 {
-	delegate Radial_Blur_Cg_ps
 	delegate Radial_Blur_GLSLES_ps
+	delegate Radial_Blur_Cg_ps
 }
 
 //Effect: Radial Blur

@@ -80,8 +80,8 @@ namespace Ogre {
 		/// in only a part of the render systems.
 		size_t numberOfInstances;
 
-        /// a flag to indicate that it is possible for this operation to use a global
-        /// vertex instance buffer if available. 
+        /** A flag to indicate that it is possible for this operation to use a global
+            vertex instance buffer if available.*/
         bool useGlobalInstancingVertexBufferIsAvailable;
 
         RenderOperation() :

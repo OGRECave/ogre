@@ -44,9 +44,10 @@ namespace Ogre
 	}
 	#define OGRE_DEFLATE_TMP_SIZE 16384
     //---------------------------------------------------------------------
-	DeflateStream::DeflateStream(const DataStreamPtr& compressedStream)
+	DeflateStream::DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName)
 	: DataStream(compressedStream->getAccessMode())
 	, mCompressedStream(compressedStream)
+    , mTempFileName(tmpFileName)
 	, mZStream(0)
 	, mCurrentPos(0)
 	, mTmp(0)
@@ -55,9 +56,10 @@ namespace Ogre
 		init();
 	}
     //---------------------------------------------------------------------
-	DeflateStream::DeflateStream(const String& name, const DataStreamPtr& compressedStream)		
+	DeflateStream::DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName)		
 	: DataStream(name, compressedStream->getAccessMode())
 	, mCompressedStream(compressedStream)
+    , mTempFileName(tmpFileName)
 	, mZStream(0)
 	, mCurrentPos(0)
 	, mTmp(0)
@@ -114,12 +116,16 @@ namespace Ogre
 		}
 		else 
 		{
-			// Write to temp file
-			char tmpname[L_tmpnam];
-			tmpnam(tmpname);
-			mTempFileName = tmpname;
+            if(mTempFileName.empty())
+            {
+                // Write to temp file
+                char tmpname[L_tmpnam];
+                tmpnam(tmpname);
+                mTempFileName = tmpname;
+            }
+
 			std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
-			f->open(tmpname, std::ios::binary | std::ios::out);
+			f->open(mTempFileName.c_str(), std::ios::binary | std::ios::out);
 			mTmpWriteStream = DataStreamPtr(OGRE_NEW FileStreamDataStream(f));
 			
 		}
@@ -281,7 +287,8 @@ namespace Ogre
 		assert(ret == Z_STREAM_END);        /* stream will be complete */
 		
 		deflateEnd(mZStream);
-				
+
+        inFile.close();
 		remove(mTempFileName.c_str());
 						
 	}

@@ -41,7 +41,7 @@ using namespace Ogre;
     String mWindowName;
 }
 
-@property (assign) String mWindowName;
+@property (nonatomic,assign) String mWindowName;
 
 @end
 

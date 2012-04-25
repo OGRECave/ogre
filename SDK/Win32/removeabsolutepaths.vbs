@@ -9,7 +9,8 @@ FileContents = GetFile(FileName)
 
 
 'replace all string In the source file
-dFileContents = Replace(FileContents, OrigText, "../..", 1, -1, 1)
+cFileContents = Replace(FileContents, OrigText, "../..", 1, -1, 1)
+dFileContents = Replace(cFileContents, CurDir, "..\..", 1, -1, 1)
 
 ' Update if different
 if dFileContents <> FileContents Then WriteFile FileName, dFileContents

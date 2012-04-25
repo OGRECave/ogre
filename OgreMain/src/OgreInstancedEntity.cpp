@@ -208,7 +208,7 @@ namespace Ogre
 				{
 					Real const *row = mat[i];
 					for( int j=0; j<4; ++j )
-						*xform++ = *row++;
+						*xform++ = static_cast<float>( *row++ );
 				}
 
 				retVal = 12;
@@ -228,7 +228,7 @@ namespace Ogre
 					{
 						Real const *row = mat[i];
 						for( int j=0; j<4; ++j )
-							*xform++ = *row++;
+							*xform++ = static_cast<float>( *row++ );
 					}
 				}
 

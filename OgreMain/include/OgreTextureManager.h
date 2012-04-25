@@ -334,7 +334,7 @@ namespace Ogre {
 			bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = StringUtil::BLANK)
 		{
 			return createManual(name, group, texType, width, height, 1, 
-				num_mips, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint);
+				numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint);
 		}
 
         /** Sets preferred bit depth for integer pixel format textures.
@@ -346,7 +346,7 @@ namespace Ogre {
         */
         virtual void setPreferredIntegerBitDepth(ushort bits, bool reloadTextures = true);
 
-        /** gets preferred bit depth for integer pixel format textures.
+        /** Gets preferred bit depth for integer pixel format textures.
         */
         virtual ushort getPreferredIntegerBitDepth(void) const;
 
@@ -359,7 +359,7 @@ namespace Ogre {
         */
         virtual void setPreferredFloatBitDepth(ushort bits, bool reloadTextures = true);
 
-        /** gets preferred bit depth for float pixel format textures.
+        /** Gets preferred bit depth for float pixel format textures.
         */
         virtual ushort getPreferredFloatBitDepth(void) const;
 

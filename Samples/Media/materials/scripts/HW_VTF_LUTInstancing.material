@@ -164,8 +164,8 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs cg
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/HW_VTF_LUT_vs unified
 {
-	delegate Ogre/Instancing/HW_VTF_LUT_cg_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_cg_vs
 
 	default_params
 	{
@@ -178,8 +178,8 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_vs unified
 
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs unified
 {
-	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_cg_vs
 
 	default_params
 	{
@@ -190,8 +190,8 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_vs unified
 
 vertex_program Ogre/Instancing/HW_VTF_LUT_dq_vs unified
 {
-	delegate Ogre/Instancing/HW_VTF_LUT_dq_cg_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_dq_cg_vs
 
 	default_params
 	{
@@ -204,8 +204,8 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_vs unified
 
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_vs unified
 {
-	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_cg_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_cg_vs
 
 	default_params
 	{
@@ -216,8 +216,8 @@ vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_vs unified
 
 vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_vs unified
 {
-	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_cg_vs
 	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/HW_VTF_LUT_dq_two_weights_cg_vs
 
 	default_params
 	{
@@ -230,8 +230,8 @@ vertex_program Ogre/Instancing/HW_VTF_LUT_dq_two_weights_vs unified
 
 vertex_program Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_vs unified
 {
-	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs
 	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_glsl_vs
+	delegate Ogre/Instancing/VTF/HW/LUT/shadow_caster_dq_two_weights_cg_vs
 
 	default_params
 	{

@@ -4,26 +4,26 @@
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs unified
 {	
-	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_glsl
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_1weight_vs_cg
 }
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs unified
 {
-	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_glsl
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_vs_cg
 }
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs unified
 {	
-	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_glsl
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_3weight_vs_cg
 }
 
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs unified
 {
-	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_glsl
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs_cg
 }
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs unified
 {	
@@ -47,8 +47,8 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_4weight_twophase_vs unifi
 
 fragment_program Ogre/RTShader/shadow_caster_dq_ps unified
 {
-	delegate Ogre/RTShader/shadow_caster_dq_ps_cg
 	delegate Ogre/RTShader/shadow_caster_dq_ps_glsl
+	delegate Ogre/RTShader/shadow_caster_dq_ps_cg
 }
 
 // declare the fragment shader (GLSL for the language)

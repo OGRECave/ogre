@@ -265,7 +265,7 @@ namespace Ogre {
 
 	}
 	//---------------------------------------------------------------------
-	const size_t GLHardwareBufferManagerBase::getGLMapBufferThreshold() const
+	size_t GLHardwareBufferManagerBase::getGLMapBufferThreshold() const
 	{
 		return mMapBufferThreshold;
 	}

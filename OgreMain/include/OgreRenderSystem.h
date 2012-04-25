@@ -590,16 +590,16 @@ namespace Ogre
 		/** Sets the global instance vertex buffer.
 		*/
         void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr val);
-		/** gets vertex declaration for the global vertex buffer for the global instancing
+		/** Gets vertex declaration for the global vertex buffer for the global instancing
 		*/
         VertexDeclaration* getGlobalInstanceVertexBufferVertexDeclaration() const;
-		/** sets vertex declaration for the global vertex buffer for the global instancing
+		/** Sets vertex declaration for the global vertex buffer for the global instancing
 		*/
         void setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val);
-		/** gets the global number of instances.
+		/** Gets the global number of instances.
 		*/
         size_t getGlobalNumberOfInstances() const;
-		/** sets the global number of instances.
+		/** Sets the global number of instances.
 		*/
         void setGlobalNumberOfInstances(const size_t val);
 

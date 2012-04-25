@@ -61,13 +61,13 @@ namespace Ogre
 		z_stream* mZStream;
 		size_t mCurrentPos;
 		
-		// Cache for read data in case skipping around
+		/// Cache for read data in case skipping around
 		StaticCache<16 * OGRE_STREAM_TEMP_SIZE> mReadCache;
 		
-		// Intermediate buffer for read / write
+		/// Intermediate buffer for read / write
 		unsigned char *mTmp;
 		
-		// Whether the underlying stream is valid compressed data
+		/// Whether the underlying stream is valid compressed data
 		bool mIsCompressedValid;
 		
 		
@@ -78,14 +78,16 @@ namespace Ogre
 		/** Constructor for creating unnamed stream wrapping another stream.
 		 @param compressedStream The stream that this stream will use when reading / 
 			writing compressed data. The access mode from this stream will be matched.
+		 @param tmpFileName Path/Filename to be used for temporary storage of incoming data
 		*/
-        DeflateStream(const DataStreamPtr& compressedStream);
+        DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName = "");
 		/** Constructor for creating named stream wrapping another stream.
 		 @param name The name to give this stream
 		 @param compressedStream The stream that this stream will use when reading / 
 			writing compressed data. The access mode from this stream will be matched.
+		 @param tmpFileName Path/Filename to be used for temporary storage of incoming data
 		 */
-		DeflateStream(const String& name, const DataStreamPtr& compressedStream);	
+		DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName="");	
 		
 		~DeflateStream();
 		

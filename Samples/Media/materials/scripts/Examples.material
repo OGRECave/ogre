@@ -262,7 +262,6 @@ material Examples/MorningSkyBox
 
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Examples/MorningSkyBoxHDRfp
@@ -1461,7 +1460,6 @@ material Examples/GrassBladesAdditiveFloat
 			// Really basic vertex program
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
   			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
 			{
@@ -1813,7 +1811,7 @@ material Examples/TudorHouse
 
 material jaiqua
 {
-	// Hardware skinning technique - GLES2 passthrough fragment program
+	// Hardware skinning technique - no fragment program
 	technique
 	{
 		pass
@@ -1822,33 +1820,8 @@ material jaiqua
 			{
 			
 			}
-			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
-			shadow_caster_vertex_program_ref Ogre/HardwareSkinningTwoWeightsShadowCaster
-			{
-				param_named_auto worldMatrix3x4Array world_matrix_array_3x4
-				param_named_auto viewProjectionMatrix viewproj_matrix
-				param_named_auto ambient ambient_light_colour
-			}
-			shadow_caster_fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
-			{
-			}
-
-			texture_unit
-			{
-				texture blue_jaiqua.jpg
-				tex_address_mode clamp
-			}
-		}
-	}
-
-	// Hardware skinning technique - no fragment program
-	technique
-	{
-		pass
-		{
-			vertex_program_ref Ogre/HardwareSkinningTwoWeights
+			
+			fragment_program_ref Ogre/BasicFragmentPrograms/DiffuseOneTexture
 			{
 			
 			}
@@ -2021,7 +1994,6 @@ material Examples/ShowUV
 		{
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 			}
 			fragment_program_ref Examples/ShowUV_p
 			{

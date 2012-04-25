@@ -490,8 +490,8 @@ namespace Ogre {
         if(dst.format != PF_A8R8G8B8)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only PF_A8R8G8B8 is a supported format for OpenGL ES", __FUNCTION__);
 
-        if ((dst.left < 0) || (dst.right > mWidth) ||
-			(dst.top < 0) || (dst.bottom > mHeight) ||
+        if ((dst.right > mWidth) ||
+			(dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,

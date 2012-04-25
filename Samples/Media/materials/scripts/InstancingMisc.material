@@ -33,8 +33,8 @@ vertex_program Ogre/Instancing/Misc_cg_vs cg
 //--------------------------------------------------------------
 vertex_program Ogre/Instancing/Misc_vs unified
 {
-	delegate Ogre/Instancing/Misc_cg_vs
 	delegate Ogre/Instancing/Misc_glsl_vs
+	delegate Ogre/Instancing/Misc_cg_vs
 
 	default_params
 	{

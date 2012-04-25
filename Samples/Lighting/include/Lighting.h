@@ -41,15 +41,6 @@ public:
 		mInfo["Category"] = "Lighting";
 	}
 
-	~Sample_Lighting()
-	{
-		RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
-		if (mLight1QueryArea != NULL) renderSystem->destroyHardwareOcclusionQuery(mLight1QueryArea);
-		if (mLight1QueryVisible != NULL) renderSystem->destroyHardwareOcclusionQuery(mLight1QueryVisible);
-		if (mLight2QueryArea != NULL) renderSystem->destroyHardwareOcclusionQuery(mLight2QueryArea);
-		if (mLight2QueryVisible != NULL) renderSystem->destroyHardwareOcclusionQuery(mLight2QueryVisible);
-	}
-
     bool frameRenderingQueued(const FrameEvent& evt)
     {
 		// Move the lights along their paths
@@ -339,6 +330,19 @@ protected:
 			}
 		}
 	}
+
+    void cleanupContent()
+    {
+        RenderSystem* renderSystem = Ogre::Root::getSingleton().getRenderSystem();
+		if (mLight1QueryArea != NULL)
+            renderSystem->destroyHardwareOcclusionQuery(mLight1QueryArea);
+		if (mLight1QueryVisible != NULL)
+            renderSystem->destroyHardwareOcclusionQuery(mLight1QueryVisible);
+		if (mLight2QueryArea != NULL)
+            renderSystem->destroyHardwareOcclusionQuery(mLight2QueryArea);
+		if (mLight2QueryVisible != NULL)
+            renderSystem->destroyHardwareOcclusionQuery(mLight2QueryVisible);
+    }
 
 	AnimationState* mGreenLightAnimState;
 	AnimationState* mYellowLightAnimState;
