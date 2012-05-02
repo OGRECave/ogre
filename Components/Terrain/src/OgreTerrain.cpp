@@ -4351,8 +4351,13 @@ namespace Ogre
 
 			Image::scale(src, dst, Image::FILTER_BILINEAR);
 
-			freeCPUResources();
+            if (!mTerrainNormalMap.isNull())
+            {
+                TextureManager::getSingletonPtr()->remove(mTerrainNormalMap->getHandle());
+                mTerrainNormalMap.setNull();
+            }
 
+            freeCPUResources();
 			mSize = newSize;
 
 			determineLodLevels();
