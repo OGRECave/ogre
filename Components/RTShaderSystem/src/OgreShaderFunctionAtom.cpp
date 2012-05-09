@@ -202,7 +202,7 @@ FunctionInvocation::FunctionInvocation(const FunctionInvocation& other)
 }
 
 //-----------------------------------------------------------------------
-void FunctionInvocation::writeSourceCode(std::ostream& os, const String& targetLanguage) const
+void FunctionInvocation::writeSourceCode(outStream& os, const String& targetLanguage) const
 {
 	// Write function name.
 	os << mFunctionName << "(";

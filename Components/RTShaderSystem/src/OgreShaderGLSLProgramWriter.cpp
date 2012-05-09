@@ -106,7 +106,7 @@ void GLSLProgramWriter::initializeStringMaps()
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
+void GLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 {
 	GpuProgramType gpuType = program->getType();
 	if(gpuType == GPT_GEOMETRY_PROGRAM)
@@ -126,19 +126,19 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	UniformParameterConstIterator itUniformParam = parameterList.begin();
 	
 	// Write the current version (this force the driver to more fulfill the glsl standard)
-	os << "#version "<< mGLSLVersion << std::endl;
+	os << "#version "<< mGLSLVersion << ENDL;
 
 	// Generate source code header.
 	writeProgramTitle(os, program);
-	os<< std::endl;
+	os<< ENDL;
 
 	// Write forward declarations
 	writeForwardDeclarations(os, program);
-	os<< std::endl;
+	os<< ENDL;
 	
 	// Generate global variable code.
 	writeUniformParametersTitle(os, program);
-	os << std::endl;
+	os << ENDL;
 
 	// Write the uniforms 
 	for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
@@ -153,9 +153,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		{
 			os << "[" << pUniformParam->getSize() << "]";	
 		}
-		os << ";" << std::endl;		
+		os << ";" << ENDL;		
 	}
-	os << std::endl;			
+	os << ENDL;			
 
 	// Write program function(s).
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
@@ -173,7 +173,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		writeOutParameters(os, curFunction, gpuType);
 					
 		// The function name must always main.
-		os << "void main() {" << std::endl;
+		os << "void main() {" << ENDL;
 
 		// Write local parameters.
 		const ShaderParameterList& localParams = curFunction->getLocalParameters();
@@ -184,9 +184,9 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 		{
 			os << "\t";
 			writeLocalParameter(os, *itParam);			
-			os << ";" << std::endl;						
+			os << ";" << ENDL;						
 		}
-		os << std::endl;			
+		os << ENDL;			
 
 		// Sort function atoms.
 		curFunction->sortAtomInstances();
@@ -237,7 +237,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 							tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
 							// Declare the copy variable and assign the original
-							os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
+							os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << ENDL;	
 
 							// From now on we replace it automatic 
 							mInputToGLStatesMap[paramName] = newVar;
@@ -261,7 +261,7 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 							if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
 							{
 								// Declare the copy variable and assign the original
-								os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
+								os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << ENDL;	
 
 								// From now on we replace it automatic 
 								mInputToGLStatesMap[paramName] = newVar;
@@ -365,21 +365,21 @@ void GLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			}
 
 			// Write function call closer.
-			localOs << ");" << std::endl;
-			localOs << std::endl;
+			localOs << ");" << ENDL;
+			localOs << ENDL;
 			os << localOs.str();
 		}
-		os << "}" << std::endl;
+		os << "}" << ENDL;
 	}
-	os << std::endl;
+	os << ENDL;
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* program)
+void GLSLProgramWriter::writeForwardDeclarations(outStream& os, Program* program)
 {
-	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "//                         FORWARD DECLARATIONS" << std::endl;
-	os << "//-----------------------------------------------------------------------------" << std::endl;
+	os << "//-----------------------------------------------------------------------------" << ENDL;
+	os << "//                         FORWARD DECLARATIONS" << ENDL;
+	os << "//-----------------------------------------------------------------------------" << ENDL;
 
 	StringVector forwardDecl; // holds all generated function declarations 
 	const ShaderFunctionList& functionList = program->getFunctions();
@@ -490,7 +490,7 @@ void GLSLProgramWriter::writeForwardDeclarations(std::ostream& os, Program* prog
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+void GLSLProgramWriter::writeInputParameters(outStream& os, Function* function, GpuProgramType gpuType)
 {
 	const ShaderParameterList& inParams = function->getInputParameters();
 
@@ -528,7 +528,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 			os << mGpuConstTypeMap[pParam->getType()];
 			os << "\t";	
 			os << paramName;
-			os << ";" << std::endl;	
+			os << ";" << ENDL;	
 		}
 		else if (gpuType == GPT_VERTEX_PROGRAM && 
 				 mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -556,7 +556,7 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 			}
 			os << "\t";	
 			os << mContentToPerVertexAttributes[paramContent];
-			os << ";" << std::endl;	
+			os << ";" << ENDL;	
 		}
 		else if(paramContent == Parameter::SPC_COLOR_DIFFUSE)
 		{
@@ -572,13 +572,13 @@ void GLSLProgramWriter::writeInputParameters(std::ostream& os, Function* functio
 			os << mGpuConstTypeMap[pParam->getType()];
 			os << "\t";	
 			os << paramName;
-			os << ";" << std::endl;	
+			os << ";" << ENDL;	
 		}							
 	}
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType)
+void GLSLProgramWriter::writeOutParameters(outStream& os, Function* function, GpuProgramType gpuType)
 {
 	const ShaderParameterList& outParams = function->getOutputParameters();
 
@@ -615,7 +615,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 				{
 					os << "[" << pParam->getSize() << "]";	
 				}
-				os << ";" << std::endl;	
+				os << ";" << ENDL;	
 			}
 		}
 		else if(gpuType == GPT_FRAGMENT_PROGRAM &&
@@ -628,7 +628,7 @@ void GLSLProgramWriter::writeOutParameters(std::ostream& os, Function* function,
 }
 
 //-----------------------------------------------------------------------
-void GLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
+void GLSLProgramWriter::writeLocalParameter(outStream& os, ParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	

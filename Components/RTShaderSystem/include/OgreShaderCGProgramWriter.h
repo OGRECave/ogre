@@ -58,8 +58,8 @@ public:
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void			writeSourceCode			(std::ostream& os, Program* program);
+     */
+    virtual void writeSourceCode			(StringSerialiser& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
@@ -75,22 +75,22 @@ protected:
 	void		initializeStringMaps		();
 
 	/** Write the program dependencies. */
-	void		writeProgramDependencies	(std::ostream& os, Program* program);
+	void		writeProgramDependencies	(outStream& os, Program* program);
 	
 	/** Write a uniform parameter. */
-	void		writeUniformParameter		(std::ostream& os, UniformParameterPtr parameter);
+	void		writeUniformParameter		(outStream& os, UniformParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
+	void		writeFunctionParameter		(outStream& os, ParameterPtr parameter);
 
 	/** Write a local parameter. */
-	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+	void		writeLocalParameter			(outStream& os, ParameterPtr parameter);
 
 	/** Write a function declaration. */
-	void		writeFunctionDeclaration	(std::ostream& os, Function* function, ParameterPtr & colorParameter);
+	void		writeFunctionDeclaration	(outStream& os, Function* function, ParameterPtr & colorParameter);
 
 	/** Write function atom instance. */
-	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);
+	void		writeAtomInstance			(outStream& os, FunctionAtom* atom);
 
 
 protected:

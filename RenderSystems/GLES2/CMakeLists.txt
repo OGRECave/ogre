@@ -130,6 +130,30 @@ elseif (WIN32)
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
   link_directories(${OPENGLES2_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "WIN32")
+elseif (ANDROID)
+  set(PLATFORM_HEADERS 
+    include/Android/OgreAndroidGLContext.h
+    include/Android/OgreAndroidGLSupport.h
+    include/Android/OgreAndroidWindow.h
+    include/Android/OgreGLES2Util.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/Android/OgreAndroidGLContext.cpp
+    src/Android/OgreAndroidGLSupport.cpp
+    src/Android/OgreAndroidWindow.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
+  )
+
+  include_directories(src/Android include/Android)
+  link_directories(${OPENGLES2_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (APPLE)
   set(PLATFORM_HEADERS 
     include/EAGL/OgreEAGLES2Context.h

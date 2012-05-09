@@ -33,6 +33,15 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreStringVector.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#   include "OgreStringSerialiser.h"
+#	define ENDL "\n"
+#   define outStream StringSerialiser
+#else
+#   define outStream std::ostream
+#	define ENDL std::endl
+#endif
+
 namespace Ogre {
 namespace RTShader {
 
@@ -62,7 +71,7 @@ public:
 	int						getInternalExecutionOrder	() const;
 	
 	/** Abstract method that writes a source code to the given output stream in the target shader language. */
-	virtual void			writeSourceCode				(std::ostream& os, const String& targetLanguage) const = 0;
+	virtual void			writeSourceCode				(outStream& os, const String& targetLanguage) const = 0;
 	
 	/** Return the type of this atom instance implementation. */
 	virtual const String&	getFunctionAtomType			() = 0;
@@ -189,7 +198,7 @@ public:
 	/** 
 	@see FunctionAtom::writeSourceCode
 	*/
-	virtual void			writeSourceCode	(std::ostream& os, const String& targetLanguage) const;
+	virtual void			writeSourceCode	(outStream& os, const String& targetLanguage) const;
 
 	/** 
 	@see FunctionAtom::getFunctionAtomType

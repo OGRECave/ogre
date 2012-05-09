@@ -58,7 +58,7 @@ public:
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
-	virtual void			writeSourceCode			(std::ostream& os, Program* program);
+	virtual void			writeSourceCode			(outStream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
@@ -75,16 +75,16 @@ protected:
 	void				initializeStringMaps		();
 
 	/** Write a local parameter. */
-	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+	void				writeLocalParameter			(outStream& os, ParameterPtr parameter);
 
 	/** Write forward declarations. This is needed so that we can attach library shader at a later step. */
-	void				writeForwardDeclarations	(std::ostream& os, Program* program);
+	void				writeForwardDeclarations	(outStream& os, Program* program);
 
 	/** Write the input params of the function */
-	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
+	void				writeInputParameters		(outStream& os, Function* function, GpuProgramType gpuType);
 	
 	/** Write the output params of the function */
-	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
+	void				writeOutParameters			(outStream& os, Function* function, GpuProgramType gpuType);
 
 protected:
 	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;

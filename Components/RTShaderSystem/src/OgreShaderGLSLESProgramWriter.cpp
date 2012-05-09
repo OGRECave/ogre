@@ -35,12 +35,6 @@ THE SOFTWARE.
 #include "OgreShaderFunctionAtom.h"
 #include "OgreResourceGroupManager.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#	define ENDL "\n"
-#else
-#	define ENDL std::endl
-#endif
-
 namespace Ogre {
     namespace RTShader {
 
@@ -244,11 +238,7 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeSourceCode(
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser& os,
-#else
-			std::ostream& os, 
-#endif
+			outStream& os, 
 			Program* program)
         {
             GpuProgramType gpuType = program->getType();
@@ -549,11 +539,7 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeInputParameters(
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser& os,
-#else
-			std::ostream& os, 
-#endif
+			outStream& os, 
 			Function* function, 
 			GpuProgramType gpuType)
         {
@@ -627,11 +613,7 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeOutParameters(
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser& os,
-#else
-			std::ostream& os, 
-#endif
+			outStream& os,
 			Function* function, 
 			GpuProgramType gpuType)
         {
@@ -684,11 +666,7 @@ namespace Ogre {
         // 5. Go back to step 1 until we have found all the functions
         //
         void GLSLESProgramWriter::writeProgramDependencies(
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser& os,
-#else
-			std::ostream& os, 
-#endif 
+			outStream& os, 
 			Program* program)
         {
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
@@ -862,13 +840,7 @@ namespace Ogre {
         }
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeLocalParameter(
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			StringSerialiser& os,
-#else
-			std::ostream& os, 
-#endif
-			ParameterPtr parameter)
+        void GLSLESProgramWriter::writeLocalParameter(outStream& os, ParameterPtr parameter)
         {
             os << mGpuConstTypeMap[parameter->getType()];
             os << "\t";	

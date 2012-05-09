@@ -324,6 +324,12 @@ SET (CMAKE_SYMBIAN_UID_3 "0xA0007218" CACHE STRING
   "Application UID (or UID3) is used to uniquely identify the binary (EXE or DLL) within the system. The purpose of UID 3 is to prevent one executable from interfering the operation of another executable.")
 endif ()
 
+if (ANDROID)
+  SET(TargetPlatform "Android")
+  SET(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
+  SET(OGRE_PLATFORM OGRE_PLATFORM_ANDROID)
+endif()
+
 # hide advanced options
 mark_as_advanced(
   OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS 

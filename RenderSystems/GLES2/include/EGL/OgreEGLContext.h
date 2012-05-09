@@ -31,6 +31,7 @@ THE SOFTWARE.
 #define __EGLContext_H__
 
 #include "OgreGLES2Context.h"
+#include <EGL/egl.h>
 
 namespace Ogre {
     class EGLSupport;

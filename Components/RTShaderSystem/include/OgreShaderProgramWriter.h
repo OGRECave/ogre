@@ -34,10 +34,6 @@ THE SOFTWARE.
 #include "OgreShaderParameter.h"
 #include "OgreShaderFunction.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include "OgreStringSerialiser.h"
-#endif
-
 namespace Ogre {
 namespace RTShader {
 
@@ -66,37 +62,21 @@ public:
 	@param os The output stream to write to code into.
 	@param program The source CPU program for the GPU program code.
 	*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	virtual void				writeSourceCode			(StringSerialiser& os, Program* program) = 0;
-#else
-	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
-#endif
-
+	virtual void				writeSourceCode			(outStream& os, Program* program) = 0;
+    
 	/** Return the target language of this writer. */
 	virtual const String&		getTargetLanguage	() const = 0;
 
 // Protected methods.
 protected:
 	/** Write the program title. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeProgramTitle			(StringSerialiser& os, Program* program);
-#else
-	void				writeProgramTitle			(std::ostream& os, Program* program);
-#endif
+	void				writeProgramTitle			(outStream& os, Program* program);
 
 	/** Write the uniform parameters title. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeUniformParametersTitle	(StringSerialiser& os, Program* program);
-#else
-	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
-#endif
+	void				writeUniformParametersTitle	(outStream& os, Program* program);
 
 	/** Write a function title. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeFunctionTitle			(StringSerialiser& os, Function* function);
-#else
-	void				writeFunctionTitle			(std::ostream& os, Function* function);
-#endif
+	void				writeFunctionTitle			(outStream& os, Function* function);
 };
 
 /** @} */

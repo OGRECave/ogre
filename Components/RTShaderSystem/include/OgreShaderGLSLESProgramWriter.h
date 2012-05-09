@@ -58,11 +58,7 @@ public:
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	virtual void            writeSourceCode			(StringSerialiser& os, Program* program);
-#else
-	virtual void            writeSourceCode			(std::ostream& os, Program* program);
-#endif
+	virtual void            writeSourceCode			(outStream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
@@ -96,38 +92,16 @@ protected:
 	FunctionInvocation	*createInvocationFromString	(const String & input);
 
     /** Write the program dependencies. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void                writeProgramDependencies	(StringSerialiser& os, Program* program);
-#else
-	void                writeProgramDependencies	(std::ostream& os, Program* program);
-#endif
+	void                writeProgramDependencies	(outStream& os, Program* program);
 
 	/** Write a local parameter. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeLocalParameter			(StringSerialiser& os, ParameterPtr parameter);
-#else
-	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
-#endif
+	void				writeLocalParameter			(outStream& os, ParameterPtr parameter);
 
 	/** Write the input params of the function */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeInputParameters		(StringSerialiser& os, Function* function, GpuProgramType gpuType);
-#else
-	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
-#endif
+	void				writeInputParameters		(outStream& os, Function* function, GpuProgramType gpuType);
 	
 	/** Write the output params of the function */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void				writeOutParameters			(StringSerialiser& os, Function* function, GpuProgramType gpuType);
-#else
-	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeAssignFunction(StringSerialiser& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
-#else
-	void writeAssignFunction(std::stringstream& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
-#endif
+	void				writeOutParameters			(outStream& os, Function* function, GpuProgramType gpuType);
 
 	String processOperand(Operand op, GpuProgramType gpuType);
 	

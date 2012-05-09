@@ -574,6 +574,18 @@ elseif (APPLE)
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
+elseif(ANDROID)
+  set(PLATFORM_HEADER_FILES
+    include/Android/OgreConfigDialogImp.h
+    include/Android/OgreErrorDialogImp.h
+    include/Android/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/Android/OgreConfigDialog.cpp
+    src/Android/OgreErrorDialog.cpp
+    src/Android/OgreTimer.cpp
+  )
+  set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
   set(PLATFORM_HEADER_FILES
