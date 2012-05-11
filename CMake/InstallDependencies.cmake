@@ -174,7 +174,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
   if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # headers (try to exclude things we don't need)
-    install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost_${Boost_LIB_VERSION}"
+    install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost"
       PATTERN "accumulators" EXCLUDE
       PATTERN "archive" EXCLUDE
       PATTERN "asio" EXCLUDE
@@ -236,15 +236,19 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "xpressive" EXCLUDE
     )
     # License
-    install(FILES "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt" DESTINATION "boost_${Boost_LIB_VERSION}")
+    if (EXISTS "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt")
+        install(FILES "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt" DESTINATION "boost")
+    elseif (EXISTS "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt")
+        install(FILES "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt" DESTINATION "boost")
+    endif ()
     # libraries
     if (Boost_THREAD_FOUND)
-      install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
+      install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
+      install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
     endif()
     if (Boost_DATE_TIME_FOUND)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
+      install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
+      install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
     endif()
   endif()
 endif ()
