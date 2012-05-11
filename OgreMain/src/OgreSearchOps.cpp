@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 
 // Emulate _findfirst, _findnext on non-Windows platforms
-
-
 #include "OgreSearchOps.h"
 #include <stdio.h>
 #include <ctype.h>
@@ -65,8 +63,7 @@ bool fnmatch (Ogre::String pattern, Ogre::String name, int dummy)
 
 /* Win32 directory operations emulation */
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
-
-
+    
 struct _find_search_t
 {
     char *pattern;

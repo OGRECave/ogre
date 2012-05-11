@@ -262,10 +262,11 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Android Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#   define _OgreExport 
+#   ifdef OGRE_UNICODE_SUPPORT
+#       undef OGRE_UNICODE_SUPPORT
+#   endif
 #	define OGRE_UNICODE_SUPPORT 0
 #   define OGRE_DEBUG_MODE 0
-#   define _OgrePrivate
 #	  define CLOCKS_PER_SEC  1000
     // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
