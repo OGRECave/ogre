@@ -224,7 +224,7 @@ namespace Ogre {
 		Profiler::getSingleton().setTimer(mTimer);
 #endif
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+
         mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );        
 #   if OGRE_NO_ZIP_ARCHIVE == 0
@@ -233,7 +233,6 @@ namespace Ogre {
         mEmbeddedZipArchiveFactory = OGRE_NEW EmbeddedZipArchiveFactory();
         ArchiveManager::getSingleton().addArchiveFactory( mEmbeddedZipArchiveFactory );
 #   endif
-#endif
         
 #if OGRE_NO_DDS_CODEC == 0
 		// Register image codecs
@@ -314,13 +313,11 @@ namespace Ogre {
 		OGRE_DELETE mLodStrategyManager;
         OGRE_DELETE mArchiveManager;
         
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #   if OGRE_NO_ZIP_ARCHIVE == 0
         OGRE_DELETE mZipArchiveFactory;
         OGRE_DELETE mEmbeddedZipArchiveFactory;
 #   endif
         OGRE_DELETE mFileSystemArchiveFactory;
-#endif
         
         OGRE_DELETE mSkeletonManager;
         OGRE_DELETE mMeshManager;

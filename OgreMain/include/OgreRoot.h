@@ -96,11 +96,9 @@ namespace Ogre
         OverlayManager* mOverlayManager;
         FontManager* mFontManager;
         
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         ArchiveFactory *mZipArchiveFactory;
         ArchiveFactory *mEmbeddedZipArchiveFactory;
         ArchiveFactory *mFileSystemArchiveFactory;
-#endif
         
 		ResourceGroupManager* mResourceGroupManager;
 		ResourceBackgroundQueue* mResourceBackgroundQueue;

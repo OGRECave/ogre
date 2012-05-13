@@ -584,6 +584,7 @@ elseif(ANDROID)
     src/Android/OgreConfigDialog.cpp
     src/Android/OgreErrorDialog.cpp
     src/Android/OgreTimer.cpp
+    src/OgreSearchOps.cpp
   )
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
