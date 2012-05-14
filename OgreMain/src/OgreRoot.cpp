@@ -146,6 +146,11 @@ namespace Ogre {
 			mLogManager = OGRE_NEW LogManager();
 			mLogManager->createLog(logFileName, true, true);
 		}
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        mAndroidLogger = OGRE_NEW AndroidLogListener();
+        mLogManager->getDefaultLog()->addListener(mAndroidLogger);
+#endif
 
         // Dynamic library manager
         mDynLibManager = OGRE_NEW DynLibManager();
@@ -350,6 +355,12 @@ namespace Ogre {
 		OGRE_DELETE mTimer;
 
         OGRE_DELETE mDynLibManager;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        mLogManager->getDefaultLog()->removeListener(mAndroidLogger);
+        OGRE_DELETE mAndroidLogger;
+#endif
+        
         OGRE_DELETE mLogManager;
 
 		OGRE_DELETE mCompilerManager;

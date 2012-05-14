@@ -85,7 +85,7 @@ void HLSLProgramWriter::initializeStringMaps()
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
+void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
 	const ShaderFunctionList& functionList = program->getFunctions();
 	ShaderFunctionConstIterator itFunction;
@@ -95,22 +95,22 @@ void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 
 	// Generate source code header.
 	writeProgramTitle(os, program);
-	os << ENDL;
+	os << std::endl;
 
 	// Generate dependencies.
 	writeProgramDependencies(os, program);
-	os << ENDL;
+	os << std::endl;
 
 	// Generate global variable code.
 	writeUniformParametersTitle(os, program);
-	os << ENDL;
+	os << std::endl;
 
 	for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
 	{
 		writeUniformParameter(os, *itUniformParam);			
-		os << ";" << ENDL;				
+		os << ";" << std::endl;				
 	}
-	os << ENDL;
+	os << std::endl;
 
 	// Write program function(s).
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
@@ -123,7 +123,7 @@ void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 
 		writeFunctionDeclaration(os, curFunction, needToTranslateHlsl4Color, colorParameter);
 
-		os << "{" << ENDL;
+		os << "{" << std::endl;
 
 		// Write local parameters.
 		const ShaderParameterList& localParams = curFunction->getLocalParameters();
@@ -133,7 +133,7 @@ void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 		{
 			os << "\t";
 			writeLocalParameter(os, *itParam);			
-			os << ";" << ENDL;						
+			os << ";" << std::endl;						
 		}
 
 		//  translate hlsl 4 color parameter if needed
@@ -141,8 +141,8 @@ void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 		{
 			os << "\t";
 			writeLocalParameter(os, colorParameter);			
-			os << ";" << ENDL;						
-			os << ENDL <<"\tFFP_Assign(iHlsl4Color_0, " << colorParameter->getName() << ");" << ENDL;
+			os << ";" << std::endl;						
+			os << std::endl <<"\tFFP_Assign(iHlsl4Color_0, " << colorParameter->getName() << ");" << std::endl;
 		}
 
 		// Sort and write function atoms.
@@ -157,31 +157,31 @@ void HLSLProgramWriter::writeSourceCode(outStream& os, Program* program)
 		}
 
 
-		os << "}" << ENDL;
+		os << "}" << std::endl;
 	}
 
-	os << ENDL;
+	os << std::endl;
 }
 
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeProgramDependencies(outStream& os, Program* program)
+void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* program)
 {
-	os << "//-----------------------------------------------------------------------------" << ENDL;
-	os << "//                         PROGRAM DEPENDENCIES" << ENDL;
-	os << "//-----------------------------------------------------------------------------" << ENDL;
+	os << "//-----------------------------------------------------------------------------" << std::endl;
+	os << "//                         PROGRAM DEPENDENCIES" << std::endl;
+	os << "//-----------------------------------------------------------------------------" << std::endl;
 
 
 	for (unsigned int i=0; i < program->getDependencyCount(); ++i)
 	{
 		const String& curDependency = program->getDependency(i);
 
-		os << "#include " << '\"' << curDependency << "." << getTargetLanguage() << '\"' << ENDL;
+		os << "#include " << '\"' << curDependency << "." << getTargetLanguage() << '\"' << std::endl;
 	}
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeUniformParameter(outStream& os, UniformParameterPtr parameter)
+void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
@@ -198,7 +198,7 @@ void HLSLProgramWriter::writeUniformParameter(outStream& os, UniformParameterPtr
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(outStream& os, ParameterPtr parameter)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
 {
 
 	os << mGpuConstTypeMap[parameter->getType()];
@@ -229,7 +229,7 @@ void HLSLProgramWriter::writeFunctionParameter(outStream& os, ParameterPtr param
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeLocalParameter(outStream& os, ParameterPtr parameter)
+void HLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
 {
 	os << mGpuConstTypeMap[parameter->getType()];
 	os << "\t";	
@@ -241,7 +241,7 @@ void HLSLProgramWriter::writeLocalParameter(outStream& os, ParameterPtr paramete
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionDeclaration(outStream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter)
+void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();
@@ -251,7 +251,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(outStream& os, Function* functi
 	os << " ";
 
 	os << function->getName();
-	os << ENDL << "\t(" << ENDL;
+	os << std::endl << "\t(" << std::endl;
 
 	ShaderParameterConstIterator it;
 	size_t paramsCount = inParams.size() + outParams.size();
@@ -281,7 +281,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(outStream& os, Function* functi
 		
 
 		if (curParamIndex + 1 != paramsCount)		
-			os << ", " << ENDL;
+			os << ", " << std::endl;
 
 		curParamIndex++;
 	}
@@ -292,7 +292,7 @@ void HLSLProgramWriter::writeFunctionDeclaration(outStream& os, Function* functi
 		os << "\t out ";
 		if (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN)
 		{
-			os << mGpuConstTypeMap[(*it)->getType()] << " " << (*it)->getName() << " : SV_Target" << ENDL;
+			os << mGpuConstTypeMap[(*it)->getType()] << " " << (*it)->getName() << " : SV_Target" << std::endl;
 		}
 		else
 		{
@@ -300,20 +300,20 @@ void HLSLProgramWriter::writeFunctionDeclaration(outStream& os, Function* functi
 		}
 
 		if (curParamIndex + 1 != paramsCount)				
-			os << ", " << ENDL;
+			os << ", " << std::endl;
 
 		curParamIndex++;
 	}	
 	
-	os << ENDL << "\t)" << ENDL;
+	os << std::endl << "\t)" << std::endl;
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeAtomInstance(outStream& os, FunctionAtom* atom)
+void HLSLProgramWriter::writeAtomInstance(std::ostream& os, FunctionAtom* atom)
 {
-	os << ENDL << "\t";
+	os << std::endl << "\t";
 	atom->writeSourceCode(os, getTargetLanguage());
-	os << ENDL;
+	os << std::endl;
 }
 
 /** @} */

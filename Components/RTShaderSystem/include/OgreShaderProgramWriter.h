@@ -62,7 +62,7 @@ public:
 	@param os The output stream to write to code into.
 	@param program The source CPU program for the GPU program code.
 	*/
-	virtual void				writeSourceCode			(outStream& os, Program* program) = 0;
+	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
     
 	/** Return the target language of this writer. */
 	virtual const String&		getTargetLanguage	() const = 0;
@@ -70,13 +70,13 @@ public:
 // Protected methods.
 protected:
 	/** Write the program title. */
-	void				writeProgramTitle			(outStream& os, Program* program);
+	void				writeProgramTitle			(std::ostream& os, Program* program);
 
 	/** Write the uniform parameters title. */
-	void				writeUniformParametersTitle	(outStream& os, Program* program);
+	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
 
 	/** Write a function title. */
-	void				writeFunctionTitle			(outStream& os, Function* function);
+	void				writeFunctionTitle			(std::ostream& os, Function* function);
 };
 
 /** @} */

@@ -579,13 +579,18 @@ elseif(ANDROID)
     include/Android/OgreConfigDialogImp.h
     include/Android/OgreErrorDialogImp.h
     include/Android/OgreTimerImp.h
+    include/Android/OgreAndroidLogListener.h
+    include/Android/OgreAPKFileSystemArchive.h
   )
   set(PLATFORM_SOURCE_FILES
     src/Android/OgreConfigDialog.cpp
     src/Android/OgreErrorDialog.cpp
     src/Android/OgreTimer.cpp
     src/OgreSearchOps.cpp
+    src/Android/OgreAndroidLogListener.cpp
+    src/Android/OgreAPKFileSystemArchive.cpp
   )
+
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
@@ -703,6 +708,12 @@ endif ()
 if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)
+
+  if(ANDROID)
+    list(APPEND PLATFORM_HEADER_FILES include/Android/OgreAPKZipArchive.h)
+    list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
+  endif()
+
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
   list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
 endif ()

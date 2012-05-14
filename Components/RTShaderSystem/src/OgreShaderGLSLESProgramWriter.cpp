@@ -238,7 +238,7 @@ namespace Ogre {
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeSourceCode(
-			outStream& os, 
+			std::ostream& os, 
 			Program* program)
         {
             GpuProgramType gpuType = program->getType();
@@ -259,23 +259,23 @@ namespace Ogre {
             UniformParameterConstIterator itUniformParam = parameterList.begin();
             
             // Write the current version (this forces the driver to fulfill the glsl es standard)
-            os << "#version "<< mGLSLVersion << ENDL;
+            os << "#version "<< mGLSLVersion << std::endl;
 
             // Default precision declaration is required in fragment and vertex shaders.
-            os << "precision highp float;" << ENDL;
-            os << "precision highp int;" << ENDL;
+            os << "precision highp float;" << std::endl;
+            os << "precision highp int;" << std::endl;
 
             // Generate source code header.
             writeProgramTitle(os, program);
-            os<< ENDL;
+            os<< std::endl;
 
             // Embed dependencies.
             writeProgramDependencies(os, program);
-            os << ENDL;
+            os << std::endl;
 
             // Generate global variable code.
             writeUniformParametersTitle(os, program);
-            os << ENDL;
+            os << std::endl;
 
             // Write the uniforms 
             for (itUniformParam = parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
@@ -290,9 +290,9 @@ namespace Ogre {
 				{
 					os << "[" << pUniformParam->getSize() << "]";	
 				}
-                os << ";" << ENDL;
+                os << ";" << std::endl;
             }
-            os << ENDL;			
+            os << std::endl;			
 
             // Write program function(s).
             for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
@@ -309,15 +309,15 @@ namespace Ogre {
                 writeOutParameters(os, curFunction, gpuType);
                             
                 // The function name must always main.
-                os << "void main() {" << ENDL;
+                os << "void main() {" << std::endl;
 
                 if (gpuType == GPT_FRAGMENT_PROGRAM)
                 {
-                    os << "\tvec4 outputColor;" << ENDL;
+                    os << "\tvec4 outputColor;" << std::endl;
                 }
                 else if (gpuType == GPT_VERTEX_PROGRAM)
                 {
-                    os << "\tvec4 outputPosition;" << ENDL;
+                    os << "\tvec4 outputPosition;" << std::endl;
                 }
 
                 // Write local parameters.
@@ -329,9 +329,9 @@ namespace Ogre {
                 {
                     os << "\t";
                     writeLocalParameter(os, *itParam);			
-                    os << ";" << ENDL;						
+                    os << ";" << std::endl;						
                 }
-                os << ENDL;			
+                os << std::endl;			
 
                 // Sort function atoms.
                 curFunction->sortAtomInstances();
@@ -385,7 +385,7 @@ namespace Ogre {
                                     tempVar.replace(tempVar.begin(), tempVar.begin() + 1, "o");
 
                                     // Declare the copy variable and assign the original
-                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << ENDL;	
+                                    os << "\t" << mGpuConstTypeMap[op.getParameter()->getType()] << " " << newVar << " = " << tempVar << ";\n" << std::endl;	
 
                                     // From now on we replace it automatic 
                                     mInputToGLStatesMap[paramName] = newVar;
@@ -409,7 +409,7 @@ namespace Ogre {
                                     if(mInputToGLStatesMap.find(newVar) == mInputToGLStatesMap.end())
                                     {
                                         // Declare the copy variable and assign the original
-                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << ENDL;	
+                                        os << "\t" << mGpuConstTypeMap[itFound->get()->getType()] << " " << newVar << " = " << paramName << ";\n" << std::endl;	
 
                                         // From now on we replace it automatic 
                                         mInputToGLStatesMap[paramName] = newVar;
@@ -518,28 +518,28 @@ namespace Ogre {
                     }
 
                     // Write function call closer.
-                    localOs << ");" << ENDL;
-                    localOs << ENDL;
+                    localOs << ");" << std::endl;
+                    localOs << std::endl;
                     os << localOs.str();
                 }
 
                 if (gpuType == GPT_FRAGMENT_PROGRAM)
                 {
-                    os << "\tgl_FragColor = outputColor;" << ENDL;
+                    os << "\tgl_FragColor = outputColor;" << std::endl;
                 }
                 else if (gpuType == GPT_VERTEX_PROGRAM)
                 {
-                    os << "\tgl_Position = outputPosition;" << ENDL;
+                    os << "\tgl_Position = outputPosition;" << std::endl;
                 }
 
-                os << "}" << ENDL;
+                os << "}" << std::endl;
             }
-            os << ENDL;
+            os << std::endl;
         }
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeInputParameters(
-			outStream& os, 
+			std::ostream& os, 
 			Function* function, 
 			GpuProgramType gpuType)
         {
@@ -570,7 +570,7 @@ namespace Ogre {
                     os << mGpuConstTypeMap[pParam->getType()];
                     os << "\t";	
                     os << paramName;
-                    os << ";" << ENDL;	
+                    os << ";" << std::endl;	
                 }
                 else if (gpuType == GPT_VERTEX_PROGRAM && 
                          mContentToPerVertexAttributes.find(paramContent) != mContentToPerVertexAttributes.end())
@@ -598,7 +598,7 @@ namespace Ogre {
                     }
                     os << "\t";	
                     os << mContentToPerVertexAttributes[paramContent];
-                    os << ";" << ENDL;	
+                    os << ";" << std::endl;	
                 }
                 else
                 {
@@ -606,14 +606,14 @@ namespace Ogre {
                     os << mGpuConstTypeMap[pParam->getType()];
                     os << "\t";	
                     os << paramName;
-                    os << ";" << ENDL;	
+                    os << ";" << std::endl;	
                 }							
             }
         }
 
         //-----------------------------------------------------------------------
         void GLSLESProgramWriter::writeOutParameters(
-			outStream& os,
+			std::ostream& os,
 			Function* function, 
 			GpuProgramType gpuType)
         {
@@ -643,7 +643,7 @@ namespace Ogre {
 						{
 							os << "[" << pParam->getSize() << "]";	
 						}
-						os << ";" << ENDL;	
+						os << ";" << std::endl;	
                     }
                 }
                 else if(gpuType == GPT_FRAGMENT_PROGRAM &&
@@ -666,7 +666,7 @@ namespace Ogre {
         // 5. Go back to step 1 until we have found all the functions
         //
         void GLSLESProgramWriter::writeProgramDependencies(
-			outStream& os, 
+			std::ostream& os, 
 			Program* program)
         {
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
@@ -676,9 +676,9 @@ namespace Ogre {
             }
 
 
-            os << "//-----------------------------------------------------------------------------" << ENDL;
-            os << "//                         PROGRAM DEPENDENCIES"                                 << ENDL;
-            os << "//-----------------------------------------------------------------------------" << ENDL;
+            os << "//-----------------------------------------------------------------------------" << std::endl;
+            os << "//                         PROGRAM DEPENDENCIES"                                 << std::endl;
+            os << "//-----------------------------------------------------------------------------" << std::endl;
 
             FunctionVector forwardDecl; // Holds all function declarations
             const ShaderFunctionList& functionList = program->getFunctions();
@@ -812,7 +812,7 @@ namespace Ogre {
                             os << ", ";
                         }
                     }
-                    os << ENDL << "{" << ENDL << body << ENDL << "}" << ENDL;
+                    os << std::endl << "{" << std::endl << body << std::endl << "}" << std::endl;
                 }
             }
         }
@@ -840,7 +840,7 @@ namespace Ogre {
         }
 
         //-----------------------------------------------------------------------
-        void GLSLESProgramWriter::writeLocalParameter(outStream& os, ParameterPtr parameter)
+        void GLSLESProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
         {
             os << mGpuConstTypeMap[parameter->getType()];
             os << "\t";	

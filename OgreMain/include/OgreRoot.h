@@ -38,6 +38,10 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreWorkQueue.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include "Android/OgreAndroidLogListener.h"
+#endif
+
 #include <exception>
 
 namespace Ogre
@@ -99,6 +103,10 @@ namespace Ogre
         ArchiveFactory *mZipArchiveFactory;
         ArchiveFactory *mEmbeddedZipArchiveFactory;
         ArchiveFactory *mFileSystemArchiveFactory;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        AndroidLogListener* mAndroidLogger;
+#endif
         
 		ResourceGroupManager* mResourceGroupManager;
 		ResourceBackgroundQueue* mResourceBackgroundQueue;

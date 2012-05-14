@@ -58,7 +58,7 @@ public:
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
-	virtual void            writeSourceCode			(outStream& os, Program* program);
+	virtual void            writeSourceCode			(std::ostream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
@@ -92,16 +92,16 @@ protected:
 	FunctionInvocation	*createInvocationFromString	(const String & input);
 
     /** Write the program dependencies. */
-	void                writeProgramDependencies	(outStream& os, Program* program);
+	void                writeProgramDependencies	(std::ostream& os, Program* program);
 
 	/** Write a local parameter. */
-	void				writeLocalParameter			(outStream& os, ParameterPtr parameter);
+	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
 
 	/** Write the input params of the function */
-	void				writeInputParameters		(outStream& os, Function* function, GpuProgramType gpuType);
+	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
 	
 	/** Write the output params of the function */
-	void				writeOutParameters			(outStream& os, Function* function, GpuProgramType gpuType);
+	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 	String processOperand(Operand op, GpuProgramType gpuType);
 	
