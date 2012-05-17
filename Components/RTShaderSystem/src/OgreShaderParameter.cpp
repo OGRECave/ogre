@@ -328,6 +328,7 @@ namespace RTShader {
 		AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_MATRIX,							 "texture_matrix",					GCT_MATRIX_4X4),
 		AutoShaderParameter(GpuProgramParameters::ACT_LOD_CAMERA_POSITION,					"lod_camera_position",              GCT_FLOAT3),
 		AutoShaderParameter(GpuProgramParameters::ACT_LOD_CAMERA_POSITION_OBJECT_SPACE,		"lod_camera_position_object_space", GCT_FLOAT3),
+        AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CUSTOM,                     "light_custom",GCT_FLOAT1)
 	};
 
 //-----------------------------------------------------------------------
