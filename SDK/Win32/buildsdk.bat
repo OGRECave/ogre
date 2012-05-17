@@ -60,7 +60,7 @@ rem Build main binaries
 
 rem call CMake in sdk 
 pushd sdk
-cmake -G%GENERATOR% .\
+cmake -DBOOST_INCLUDEDIR:PATH=%cd%\boost -DBOOST_LIBRARYDIR=%cd%\boost\lib -DBoost_NO_SYSTEM_PATHS:BOOL=ON -G%GENERATOR% .\
 if errorlevel 1 goto cmakeerror
 rem delete cache (since it will include absolute paths)
 del CMakeCache.txt
