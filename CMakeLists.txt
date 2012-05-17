@@ -120,6 +120,11 @@ if (MSVC)
 endif ()
 if (MINGW)
   add_definitions(-D_WIN32_WINNT=0x0500)
+  # set architecture to i686, since otherwise some versions of MinGW can't link 
+  # the atomic primitives
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=i686")
+  # disable this optimisation because it breaks release builds (reason unknown)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-tree-slp-vectorize")
 endif ()
 
 if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
