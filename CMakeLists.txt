@@ -32,6 +32,15 @@ if(WIN32)
   set(CMAKE_SUPPRESS_REGENERATION true)
 endif()
 
+if (APPLE)
+  include(CMakeForceCompiler)
+  CMAKE_FORCE_C_COMPILER(clang GNU)
+  CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
+  SET(CMAKE_SIZEOF_VOID_P 4)
+  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+endif ()
+
+
 project(OGRE)
 
 # Include necessary submodules
@@ -50,14 +59,6 @@ include(PreprocessorUtils)
 set(OGRE_TEMPLATES_DIR "${OGRE_SOURCE_DIR}/CMake/Templates")
 set(OGRE_WORK_DIR ${OGRE_BINARY_DIR})
 
-
-if (APPLE)
-  include(CMakeForceCompiler)
-  CMAKE_FORCE_C_COMPILER(clang GNU)
-  CMAKE_FORCE_CXX_COMPILER(clang++ GNU)
-  SET(CMAKE_SIZEOF_VOID_P 4)
-  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-endif ()
 
 #####################################################################
 # Set up the basic build environment
@@ -97,7 +98,11 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     add_definitions(-msse)
   endif ()
   # This is a set of sensible warnings that provide meaningful output
-  add_definitions(-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -pedantic -Wshadow -Wno-unused-but-set-parameter -Wno-missing-field-initializers -Wno-long-long)
+  set(OGRE_WARNING_FLAGS "-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -pedantic -Wshadow -Wno-missing-field-initializers -Wno-long-long")
+  if (NOT APPLE)
+      set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-unused-but-set-parameter")
+  endif ()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OGRE_WARNING_FLAGS}")
 endif ()
 if (MSVC)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
@@ -219,9 +224,9 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 
-  set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_BIT))
+  set(CMAKE_OSX_ARCHITECTURES ${ARCHS_STANDARD_32_BIT})
   # armv7 only
-  #set(CMAKE_OSX_ARCHITECTURES $(ARCHS_UNIVERSAL_IPHONE_OS))
+  #set(CMAKE_OSX_ARCHITECTURES ${ARCHS_UNIVERSAL_IPHONE_OS})
 
   remove_definitions(-msse)
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
@@ -232,7 +237,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 
   if (NOT CMAKE_OSX_ARCHITECTURES)
-    set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
+    set(CMAKE_OSX_ARCHITECTURES ${ARCHS_STANDARD_32_64_BIT})
   endif()
 
   # Make sure that the OpenGL render system is selected for non-iOS Apple builds
