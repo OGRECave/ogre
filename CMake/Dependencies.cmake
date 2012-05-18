@@ -25,6 +25,15 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS)
     "${OGRE_BINARY_DIR}/../iOSDependencies"
     "${OGRE_SOURCE_DIR}/../iOSDependencies"
   )
+elif(OGRE_BUILD_PLATFORM_ANDROID)
+  set(OGRE_DEP_SEARCH_PATH 
+    ${OGRE_DEPENDENCIES_DIR}
+    ${ENV_OGRE_DEPENDENCIES_DIR}
+    "${OGRE_BINARY_DIR}/AndroidDependencies"
+    "${OGRE_SOURCE_DIR}/AndroidDependencies"
+    "${OGRE_BINARY_DIR}/../AndroidDependencies"
+    "${OGRE_SOURCE_DIR}/../AndroidDependencies"
+  )
 else()
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}

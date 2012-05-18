@@ -1,0 +1,32 @@
+# Resources required by the sample browser and most samples.
+[Essential]
+APKZip=/packs/SdkTrays.zip
+APKFileSystem=/thumbnails
+
+# Common sample resources needed by many of the samples.
+# Rarely used resources should be separately loaded by the
+# samples which require them.
+[Popular]
+APKFileSystem=/fonts
+APKFileSystem=/materials/programs
+APKFileSystem=/materials/scripts
+APKFileSystem=/materials/textures
+APKFileSystem=/materials/textures/nvidia
+APKFileSystem=/models
+APKFileSystem=/particle
+APKFileSystem=/RTShaderLib
+APKFileSystem=/RTShaderLib/materials
+APKFileSystem=/materials/scripts/SSAO
+APKFileSystem=/materials/textures/SSAO
+APKZip=/packs/cubemap.zip
+APKZip=/packs/cubemapsJS.zip
+APKZip=/packs/dragon.zip
+APKZip=/packs/fresneldemo.zip
+APKZip=/packs/ogretestmap.zip
+APKZip=/packs/ogredance.zip
+APKZip=/packs/Sinbad.zip
+APKZip=/packs/skybox.zip
+
+[General]
+APKFileSystem=/
+
