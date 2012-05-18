@@ -15,7 +15,6 @@ PROJECT(OgreMain)
 
 include(PrecompiledHeader)
 
-
 # define header and source files for the library
 set (HEADER_FILES
   include/asm_math.h
@@ -710,6 +709,7 @@ if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)
 
   if(ANDROID)
+    ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
     list(APPEND PLATFORM_HEADER_FILES include/Android/OgreAPKZipArchive.h)
     list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
