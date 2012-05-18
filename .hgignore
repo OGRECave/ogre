@@ -10,3 +10,5 @@ Dependencies/include/FreeImage.h
 *.obj
 *.rule
 build
+AndroidBuild
+AndroidDependencies
