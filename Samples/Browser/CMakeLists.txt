@@ -128,6 +128,7 @@ if(ANDROID)
 
     SET(ANDROID_EXECUTABLE "android")
     SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    SET(ANT_EXECUTABLE "ant")
     SET(ANDROID_TARGET "android-15")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
@@ -166,7 +167,7 @@ if(ANDROID)
 	add_custom_command(
 	                    TARGET SampleBrowserDummy
                         POST_BUILD
-	                    COMMAND ${ANDROID_EXECUTABLE} debug
+	                    COMMAND ${ANT_EXECUTABLE} debug
 	                    WORKING_DIRECTORY ${NDKOUT}
 	                  )
 
