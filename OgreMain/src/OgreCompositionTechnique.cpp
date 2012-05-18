@@ -221,7 +221,25 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
 				if (!texMgr.isEquivalentFormatSupported(TEX_TYPE_2D, *pfi, TU_RENDERTARGET))
 				{
 					return false;
-				}	
+				}
+			}
+		}
+
+		//Check all render targets have same number of bits
+		if( !Root::getSingleton().getRenderSystem()->getCapabilities()->
+			hasCapability( RSC_MRT_DIFFERENT_BIT_DEPTHS ) && !td->formatList.empty() )
+		{
+			PixelFormat nativeFormat = texMgr.getNativeFormat( TEX_TYPE_2D, td->formatList.front(),
+																TU_RENDERTARGET );
+			size_t nativeBits = PixelUtil::getNumElemBits( nativeFormat );
+			for( PixelFormatList::iterator pfi = td->formatList.begin()+1;
+					pfi != td->formatList.end(); ++pfi )
+			{
+				PixelFormat nativeTmp = texMgr.getNativeFormat( TEX_TYPE_2D, *pfi, TU_RENDERTARGET );
+				if( PixelUtil::getNumElemBits( nativeTmp ) != nativeBits )
+				{
+					return false;
+				}
 			}
 		}
 	}
