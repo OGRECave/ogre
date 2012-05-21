@@ -196,11 +196,9 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "graph" EXCLUDE
       PATTERN "interprocess" EXCLUDE
       PATTERN "intrusive" EXCLUDE
-      PATTERN "io" EXCLUDE
       PATTERN "iostreams" EXCLUDE
       PATTERN "lambda" EXCLUDE
       PATTERN "logic" EXCLUDE
-      PATTERN "move" EXCLUDE
       PATTERN "mpi" EXCLUDE
       PATTERN "multi_array" EXCLUDE
       PATTERN "multi_index" EXCLUDE
