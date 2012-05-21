@@ -178,7 +178,7 @@ namespace Ogre {
         */
         virtual void setDefaultTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
 
-		/// get the default texture filtering
+		/// Get the default texture filtering
         virtual FilterOptions getDefaultTextureFiltering(FilterType ftype) const;
 
         /** Sets the default anisotropy level to be used for loaded textures, for when textures are
@@ -188,7 +188,7 @@ namespace Ogre {
                 The default value is 1 (no anisotropy).
         */
 		void setDefaultAnisotropy(unsigned int maxAniso);
-		/// get the default maxAnisotropy
+		/// Get the default maxAnisotropy
 		unsigned int getDefaultAnisotropy() const;
 
         /** Returns a pointer to the default Material settings.

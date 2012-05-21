@@ -612,7 +612,7 @@ namespace Ogre {
         Has no effect in the programmable pipeline.
         */
         void setTextureUScroll(Real value);
-        // get texture uscroll value
+        // Get texture uscroll value
         Real getTextureUScroll(void) const;
 
         /** As setTextureScroll, but sets only V value.
@@ -620,7 +620,7 @@ namespace Ogre {
         Has no effect in the programmable pipeline.
         */
         void setTextureVScroll(Real value);
-        // get texture vscroll value
+        // Get texture vscroll value
         Real getTextureVScroll(void) const;
 
         /** As setTextureScale, but sets only U value.
@@ -628,7 +628,7 @@ namespace Ogre {
         Has no effect in the programmable pipeline.
         */
         void setTextureUScale(Real value);
-        // get texture uscale value
+        /// Get texture uscale value
         Real getTextureUScale(void) const;
 
         /** As setTextureScale, but sets only V value.
@@ -636,7 +636,7 @@ namespace Ogre {
         Has no effect in the programmable pipeline.
         */
         void setTextureVScale(Real value);
-        // get texture vscale value
+        /// Get texture vscale value
         Real getTextureVScale(void) const;
 
         /** Sets the scaling factor applied to texture coordinates.
@@ -664,7 +664,7 @@ namespace Ogre {
         angle The angle of rotation (anticlockwise).
         */
         void setTextureRotate(const Radian& angle);
-        // get texture rotation effects angle value
+        /// Get texture rotation effects angle value
         const Radian& getTextureRotate(void) const;
 
         /** Gets the texture addressing mode for a given coordinate, 
@@ -1018,9 +1018,9 @@ namespace Ogre {
 		*/
 		void retryTextureLoad() { mTextureLoadFailed = false; }
 
-        // get texture effects in a multimap paired array
+        /// Get texture effects in a multimap paired array
         const EffectMap& getEffects(void) const;
-        // get the animated-texture animation duration
+        /// Get the animated-texture animation duration
         Real getAnimationDuration(void) const;
 
         /** Set the texture filtering for this unit, using the simplified interface.
@@ -1047,7 +1047,7 @@ namespace Ogre {
             Can be FO_NONE (turns off mipmapping), FO_POINT or FO_LINEAR (trilinear filtering)
         */
         void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
-        // get the texture filtering for the given type
+        /// Get the texture filtering for the given type
         FilterOptions getTextureFiltering(FilterType ftpye) const;
 
         /** Sets the anisotropy level to be used for this texture level.
@@ -1056,7 +1056,7 @@ namespace Ogre {
         This option applies in both the fixed function and the programmable pipeline.
         */
         void setTextureAnisotropy(unsigned int maxAniso);
-        // get this layer texture anisotropy level
+        /// Get this layer texture anisotropy level
         unsigned int getTextureAnisotropy() const;
 
 		/** Sets the bias value applied to the mipmap calculation.
@@ -1107,7 +1107,7 @@ namespace Ogre {
         /// Returns whether this unit has texture coordinate generation that depends on the camera
         bool hasViewRelativeTextureCoordinateGeneration(void) const;
 
-        // Is this loaded?
+        /// Is this loaded?
         bool isLoaded(void) const;
         /** Tells the class that it needs recompilation. */
         void _notifyNeedsRecompile(void);
@@ -1118,14 +1118,14 @@ namespace Ogre {
             from another material and only want to modify a particalar Texture Unit State.
         */
         void setName(const String& name);
-        /// get the name of the Texture Unit State
+        /// Get the name of the Texture Unit State
         const String& getName(void) const { return mName; }
 
         /** Set the alias name used for texture frame names
         @param name can be any sequence of characters and does not have to be unique           
         */
         void setTextureNameAlias(const String& name);
-        /** gets the Texture Name Alias of the Texture Unit.
+        /** Gets the Texture Name Alias of the Texture Unit.
         */
         const String& getTextureNameAlias(void) const { return mTextureNameAlias;}
 
@@ -1137,9 +1137,9 @@ namespace Ogre {
             If matching texture aliases are found then true is returned.
 
         @param
-            aliasList is a map container of texture alias, texture name pairs
+            aliasList Is a map container of texture alias, texture name pairs
         @param
-            apply set true to apply the texture aliases else just test to see if texture alias matches are found.
+            apply Set true to apply the texture aliases else just test to see if texture alias matches are found.
         @return
             True if matching texture aliases were found in the Texture Unit State.
         */
@@ -1200,7 +1200,7 @@ protected:
         FilterOptions mMagFilter;
         /// Texture filtering - mipmapping
         FilterOptions mMipFilter;
-        ///Texture anisotropy
+        /// Texture anisotropy
         unsigned int mMaxAniso;
 		/// Mipmap bias (always float, not Real)
 		float mMipmapBias;
@@ -1223,7 +1223,7 @@ protected:
         String mName;               // optional name for the TUS
         String mTextureNameAlias;       // optional alias for texture frames
         EffectMap mEffects;
-		///The data that references the compositor
+		/// The data that references the compositor
 		String mCompositorRefName;
 		String mCompositorRefTexName;
         //-----------------------------------------------------------------------------
