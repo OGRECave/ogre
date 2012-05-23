@@ -29,26 +29,29 @@ THE SOFTWARE.
 #ifndef __OSXCocoaWindow_H__
 #define __OSXCocoaWindow_H__
 
-#include "OgreOSXWindow.h"
 #include "OgreOSXCocoaContext.h"
 
 #include <Cocoa/Cocoa.h>
 #include "OgreOSXCocoaView.h"
-#include "OgreOSXCGLContext.h"
 #include "OgreOSXCocoaWindowDelegate.h"
 
 @class OSXCocoaWindowDelegate;
 
+@interface OgreWindow : NSWindow
+
+@end
+
 namespace Ogre {
-    class _OgreGLExport OSXCocoaWindow : public OSXWindow
+    class _OgreGLExport OSXCocoaWindow : public RenderWindow
     {
     private:
         NSWindow *mWindow;
         NSView *mView;
         NSOpenGLContext *mGLContext;
         NSOpenGLPixelFormat *mGLPixelFormat;
-        OSXCGLContext* mCGLContext;
+        NSPoint mWindowOrigin;
         OSXCocoaWindowDelegate *mWindowDelegate;
+        OSXCocoaContext* mContext;
 
         bool mActive;
         bool mClosed;
@@ -59,6 +62,7 @@ namespace Ogre {
         String mWindowTitle;
         bool mUseNSView;
 
+        void _setWindowParameters(void);
     public:
         OSXCocoaWindow();
         ~OSXCocoaWindow();
@@ -91,6 +95,8 @@ namespace Ogre {
         void resize(unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
         void swapBuffers(bool waitForVSync);
+        /** Overridden - see RenderTarget */
+        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
         /** Overridden - see RenderWindow */
