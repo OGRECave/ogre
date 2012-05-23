@@ -453,7 +453,7 @@ namespace Ogre
 
 		/** Returns true if capability is render system specific
 		*/
-		bool isCapabilityRenderSystemSpecific(const Capabilities c)
+		bool isCapabilityRenderSystemSpecific(const Capabilities c) const
 		{
 			int cat = c >> OGRE_CAPS_BITSHIFT;
 			if(cat == CAPS_CATEGORY_GL || cat == CAPS_CATEGORY_D3D9)
