@@ -1360,7 +1360,7 @@ namespace Ogre {
                         return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
                         // linear min, point mip
-//                        return GL_LINEAR_MIPMAP_NEAREST;
+                        return GL_LINEAR_MIPMAP_NEAREST;
                     case FO_NONE:
                         // linear min, no mip
                         return GL_LINEAR;

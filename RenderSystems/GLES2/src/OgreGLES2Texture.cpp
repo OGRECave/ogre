@@ -121,8 +121,12 @@ namespace Ogre {
         glBindTexture(getGLES2TextureTarget(), mTextureID);
         GL_CHECK_ERROR;
 
+        // If we can do automip generation and the user desires this, do so
+        mMipmapsHardwareGenerated =
+            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+
 #if GL_APPLE_texture_max_level
-        glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps );
+        glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 #endif
 
         // Set some misc default parameters, these can of course be changed later
@@ -138,21 +142,6 @@ namespace Ogre {
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
-
-		// If we can do automip generation and the user desires this, do so
-        mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
-
-        // FIXME: For some reason this is crashing on iOS 5
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-        if ((mUsage & TU_AUTOMIPMAP) &&
-            mNumRequestedMipmaps && mMipmapsHardwareGenerated &&
-            (mTextureType != TEX_TYPE_CUBE_MAP))
-        {
-            glGenerateMipmap(getGLES2TextureTarget());
-            GL_CHECK_ERROR;
-        }
-#endif
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format

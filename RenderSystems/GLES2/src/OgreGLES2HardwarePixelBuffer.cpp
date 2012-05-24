@@ -409,6 +409,11 @@ namespace Ogre {
                             GLES2PixelUtil::getGLOriginFormat(data.format),
                             GLES2PixelUtil::getGLOriginDataType(data.format),
                             data.data);
+        }
+        
+        if ((mUsage & TU_AUTOMIPMAP) && !mSoftwareMipmap && (mLevel == 0))
+        {
+            glGenerateMipmap(mFaceTarget);
             GL_CHECK_ERROR;
         }
 
