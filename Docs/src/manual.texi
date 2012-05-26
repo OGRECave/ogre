@@ -3610,7 +3610,7 @@ The properties which can be included within the braces depend on the custom type
 @item 
 @ref{left}
 @item 
-@ref{top}
+@ref{overlaytopelement, top}
 @item 
 @ref{width}
 @item 
