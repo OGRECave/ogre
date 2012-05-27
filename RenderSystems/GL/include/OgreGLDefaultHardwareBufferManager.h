@@ -107,7 +107,7 @@ namespace Ogre {
 		HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, 
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a hardware vertex buffer
+		/// Create a hardware index buffer
 		HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);

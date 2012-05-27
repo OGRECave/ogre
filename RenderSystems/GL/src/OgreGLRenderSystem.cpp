@@ -22,7 +22,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.s
+THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
@@ -196,6 +196,9 @@ namespace Ogre {
 	RenderWindow* GLRenderSystem::_initialise(bool autoCreateWindow, const String& windowTitle)
 	{
 		mGLSupport->start();
+
+        // Create the texture manager        
+		mTextureManager = new GLTextureManager(*mGLSupport); 
 
 		RenderWindow* autoWindow = mGLSupport->createWindow(autoCreateWindow, this, windowTitle);
 
@@ -486,7 +489,7 @@ namespace Ogre {
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
 		}
 
-		if (GLEW_VERSION_3_3)
+		if (GLEW_VERSION_3_3 || GLEW_ARB_instanced_arrays)
 		{
 			// states 3.3 here: http://www.opengl.org/sdk/docs/man3/xhtml/glVertexAttribDivisor.xml
 			rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
@@ -920,9 +923,6 @@ namespace Ogre {
 		{
 			caps->log(defaultLog);
 		}
-
-		/// Create the texture manager        
-		mTextureManager = new GLTextureManager(*mGLSupport); 
 
 		mGLInitialised = true;
 	}
@@ -1590,13 +1590,15 @@ namespace Ogre {
 			{
 				if (stage < mFixedFunctionTextureUnits)
 				{
-					glDisable( lastTextureType );
+                    if(lastTextureType != GL_TEXTURE_2D_ARRAY_EXT)
+                        glDisable( lastTextureType );
 				}
 			}
 
 			if (stage < mFixedFunctionTextureUnits)
 			{
-				glEnable( mTextureTypes[stage] );
+                if(mTextureTypes[stage] != GL_TEXTURE_2D_ARRAY_EXT)
+                    glEnable( mTextureTypes[stage] );
 			}
 
 			if(!tex.isNull())
@@ -1610,7 +1612,8 @@ namespace Ogre {
 			{
 				if (lastTextureType != 0)
 				{
-					glDisable( mTextureTypes[stage] );
+                    if(mTextureTypes[stage] != GL_TEXTURE_2D_ARRAY_EXT)
+                        glDisable( mTextureTypes[stage] );
 				}
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			}
@@ -2999,7 +3002,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				}
 				if(hasInstanceData)
 				{
-					glDrawElementsInstancedEXT(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
+					glDrawElementsInstancedARB(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances);
 				}
 				else
 				{
@@ -3022,7 +3025,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 
 				if(hasInstanceData)
 				{
-					glDrawArraysInstancedEXT(primType, 0, op.vertexData->vertexCount, numberOfInstances);
+					glDrawArraysInstancedARB(primType, 0, op.vertexData->vertexCount, numberOfInstances);
 				}
 				else
 				{
@@ -3037,7 +3040,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
         {
 			for (int i = 0; i < mFixedFunctionTextureUnits; i++)
 			{
-            glClientActiveTextureARB(GL_TEXTURE0 + i);
+                glClientActiveTextureARB(GL_TEXTURE0 + i);
 				glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 			}
 			glClientActiveTextureARB(GL_TEXTURE0);
@@ -3056,14 +3059,12 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
  			glDisableVertexAttribArrayARB(*ai); 
- 
-  		}
+   		}
 		
 		// unbind any instance attributes
 		for (vector<GLuint>::type::iterator ai = mRenderInstanceAttribsBound.begin(); ai != mRenderInstanceAttribsBound.end(); ++ai)
 		{
-			glVertexAttribDivisor(*ai, 0); 
-
+			glVertexAttribDivisorARB(*ai, 0); 
 		}
 		
         mRenderAttribsBound.clear();
@@ -3472,14 +3473,14 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		if (GLEW_VERSION_1_2)
 		{
-		// Set nicer lighting model -- d3d9 has this by default
-		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
+            // Set nicer lighting model -- d3d9 has this by default
+            glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
+            glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);        
 		}
 		if (GLEW_VERSION_1_4)
 		{
-		glEnable(GL_COLOR_SUM);
-		glDisable(GL_DITHER);
+            glEnable(GL_COLOR_SUM);
+            glDisable(GL_DITHER);
 		}
 
 		// Check for FSAA
@@ -3747,7 +3748,7 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
             if (hwGlBuffer->getIsInstanceData())
             {
                 GLint attrib = mCurrentVertexProgram->getAttributeIndex(sem, elem.getIndex());
-                glVertexAttribDivisor(attrib, hwGlBuffer->getInstanceDataStepRate() );
+                glVertexAttribDivisorARB(attrib, hwGlBuffer->getInstanceDataStepRate() );
                 instanceAttribsBound.push_back(attrib);
             }
         }

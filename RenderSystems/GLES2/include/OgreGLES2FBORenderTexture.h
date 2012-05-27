@@ -131,8 +131,8 @@ namespace Ogre {
         */
         struct RBFormat
         {
-            RBFormat(GLenum format, size_t width, size_t height, uint fsaa):
-                format(format), width(width), height(height), samples(fsaa)
+            RBFormat(GLenum inFormat, size_t inWidth, size_t inHeight, uint fsaa):
+                format(inFormat), width(inWidth), height(inHeight), samples(fsaa)
             {}
             GLenum format;
             size_t width;
@@ -168,8 +168,8 @@ namespace Ogre {
         struct RBRef
         {
             RBRef(){}
-            RBRef(GLES2RenderBuffer *buffer):
-                buffer(buffer), refcount(1)
+            RBRef(GLES2RenderBuffer *inBuffer):
+                buffer(inBuffer), refcount(1)
             { }
             GLES2RenderBuffer *buffer;
             size_t refcount;

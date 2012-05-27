@@ -154,6 +154,9 @@ void Sample_Compositor::registerCompositors(void)
 		// Don't add the SSAO compositors, thats a different demo.
 		if (Ogre::StringUtil::startsWith(compositorName, "SSAO", false))
 			continue;
+		// Don't add the TestMRT compositor, it needs extra scene setup so doesn't currently work.
+		if (Ogre::StringUtil::startsWith(compositorName, "TestMRT", false))
+			continue;
 
 		mCompositorNames.push_back(compositorName);
 		int addPosition = -1;
@@ -223,6 +226,9 @@ void Sample_Compositor::cleanupContent(void)
 	mDebugTextureTUS->setContentType(TextureUnitState::CONTENT_NAMED);
 	CompositorManager::getSingleton().removeCompositorChain(mViewport);
 	mCompositorNames.clear();
+
+    TextureManager::getSingleton().remove("DitherTex");
+    TextureManager::getSingleton().remove("HalftoneVolume");
 
 	Ogre::CompositorManager& compMgr = Ogre::CompositorManager::getSingleton();
 	CompositorLogicMap::const_iterator itor = mCompositorLogics.begin();

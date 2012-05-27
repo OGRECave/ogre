@@ -32,13 +32,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
-	/** Abstract factory class. Does nothing by itself, but derived classes can add
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
+    /** Abstract factory class. Does nothing by itself, but derived classes can add
         functionality.
     */
     template< typename T > class FactoryObj
@@ -47,8 +47,8 @@ namespace Ogre {
         virtual ~FactoryObj() {}
 
         /** Returns the factory type.
-            @return
-                The factory type.
+        @return
+            The factory type.
         */
         virtual const String& getType() const = 0;
 
@@ -58,15 +58,15 @@ namespace Ogre {
             An object created by the factory. The type of the object depends on
             the factory.
         */
-        virtual T* createInstance( const String& name ) = 0;    
+        virtual T* createInstance(const String& name) = 0;
         /** Destroys an object which was created by this factory.
         @param ptr Pointer to the object to destroy
         */
-        virtual void destroyInstance( T* ) = 0;    
+        virtual void destroyInstance(T* ptr) = 0;
     };
 
-	/** @} */
-	/** @} */
-} // namespace
+    /** @} */
+    /** @} */
+} // namespace Ogre
 
-#endif
+#endif // _FactoryObj_H__

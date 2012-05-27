@@ -12,8 +12,8 @@ fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/B&W_FP unified
 {
-	delegate Ogre/Compositor/B&W_Cg_FP
 	delegate Ogre/Compositor/B&W_GLSLES_FP
+	delegate Ogre/Compositor/B&W_Cg_FP
 }
 
 material Ogre/Compositor/BlackAndWhite

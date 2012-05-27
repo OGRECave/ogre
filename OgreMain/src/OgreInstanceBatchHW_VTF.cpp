@@ -167,7 +167,7 @@ namespace Ogre
 		//Add the weights (supports up to four, which is Ogre's limit)
 		if(mWeightCount > 1)
 		{
-			offset += thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
+			thisVertexData->vertexDeclaration->addElement(newSource, offset, VET_FLOAT4, VES_BLEND_WEIGHTS,
 										0 ).getSize();
 		}
 		
@@ -244,7 +244,7 @@ namespace Ogre
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
-			offset += thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
+			thisVertexData->vertexDeclaration->addElement( newSource, offset, VET_FLOAT4, VES_TEXTURE_COORDINATES,
 				thisVertexData->vertexDeclaration->getNextFreeTextureCoordinate() ).getSize();
 			//Add two floats of padding here? or earlier?
 			//If not using bone matrix lookup, is it ok that it is 8 bytes since divides evenly into 16
@@ -302,31 +302,31 @@ namespace Ogre
 				{
 					size_t matrixIndex = useMatrixLookup ? entity->mTransformLookupNumber : i;
 					size_t instanceIdx = matrixIndex * mMatricesPerInstance * mRowLength;
-					*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - texelOffsets.x;
-					*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - texelOffsets.y;
+					*thisVec = ((instanceIdx % maxPixelsPerLine) / texWidth) - (float)(texelOffsets.x);
+					*(thisVec + 1) = ((instanceIdx / maxPixelsPerLine) / texHeight) - (float)(texelOffsets.y);
 					thisVec += 2;
 
 					if (useMatrixLookup)
 					{
 						const Matrix4& mat =  entity->_getParentNodeFullTransform();
-						*(thisVec)     = mat[0][0];
-						*(thisVec + 1) = mat[0][1];
-						*(thisVec + 2) = mat[0][2];
-						*(thisVec + 3) = mat[0][3];
-						*(thisVec + 4) = mat[1][0];
-						*(thisVec + 5) = mat[1][1];
-						*(thisVec + 6) = mat[1][2];
-						*(thisVec + 7) = mat[1][3];
-						*(thisVec + 8) = mat[2][0];
-						*(thisVec + 9) = mat[2][1];
-						*(thisVec + 10) = mat[2][2];
-						*(thisVec + 11) = mat[2][3];
+						*(thisVec)     = static_cast<float>( mat[0][0] );
+						*(thisVec + 1) = static_cast<float>( mat[0][1] );
+						*(thisVec + 2) = static_cast<float>( mat[0][2] );
+						*(thisVec + 3) = static_cast<float>( mat[0][3] );
+						*(thisVec + 4) = static_cast<float>( mat[1][0] );
+						*(thisVec + 5) = static_cast<float>( mat[1][1] );
+						*(thisVec + 6) = static_cast<float>( mat[1][2] );
+						*(thisVec + 7) = static_cast<float>( mat[1][3] );
+						*(thisVec + 8) = static_cast<float>( mat[2][0] );
+						*(thisVec + 9) = static_cast<float>( mat[2][1] );
+						*(thisVec + 10)= static_cast<float>( mat[2][2] );
+						*(thisVec + 11)= static_cast<float>( mat[2][3] );
 						if(currentCamera && mManager->getCameraRelativeRendering()) // && useMatrixLookup
 						{
 							const Vector3 &cameraRelativePosition = currentCamera->getDerivedPosition();
-							*(thisVec + 3) -= cameraRelativePosition.x;
-							*(thisVec + 7) -= cameraRelativePosition.y;
-							*(thisVec + 11) -=  cameraRelativePosition.z;
+							*(thisVec + 3) -= static_cast<float>( cameraRelativePosition.x );
+							*(thisVec + 7) -= static_cast<float>( cameraRelativePosition.y );
+							*(thisVec + 11) -=  static_cast<float>( cameraRelativePosition.z );
 						}
 						thisVec += 12;
 					}
@@ -430,7 +430,6 @@ namespace Ogre
 		float *pSource = static_cast<float*>(pixelBox.data);
 		
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
-		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 		
 		std::vector<bool> writtenPositions(getMaxLookupTableInstances(), false);
 
@@ -440,7 +439,7 @@ namespace Ogre
 		size_t instanceCount = mInstancedEntities.size();
 		size_t updatedInstances = 0;
 
-		float* transforms;
+		float* transforms = NULL;
 		//If using dual quaternions, write 3x4 matrices to a temporary buffer, then convert to dual quaternions
 		if(mUseBoneDualQuaternions)
 		{
@@ -480,7 +479,7 @@ namespace Ogre
 
 				if(mUseBoneDualQuaternions)
 				{
-					floatsWritten = convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
+					convert3x4MatricesToDualQuaternions(transforms, floatsWritten / 12, pDest);
 				}
 
 				if (useMatrixLookup)

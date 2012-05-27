@@ -169,8 +169,8 @@ public:
 	unsigned int	getNormalMapAnisotropy		() const { return mNormalMapAnisotropy; }
 
 	
-	/** Setup the normal map anisotropy value. 
-	@param anisotropy The anisotropy value.
+	/** Setup the normal map map mip bias value. 
+	@param mipBias The map mip bias value.
 	*/
 	void			setNormalMapMipBias		(Real mipBias) { mNormalMapMipBias = mipBias; }
 

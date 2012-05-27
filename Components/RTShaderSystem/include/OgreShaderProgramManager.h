@@ -162,7 +162,7 @@ protected:
 	@param programWriter The program writer instance.
 	@param language The target shader language.
 	@param profiles The profiles string for program compilation.
-	@param profiles The profiles string for program compilation as string list.
+	@param profilesList The profiles string for program compilation as string list.
 	@param cachePath The output path to write the program into.
 	*/
 	GpuProgramPtr	createGpuProgram		(Program* shaderProgram, 

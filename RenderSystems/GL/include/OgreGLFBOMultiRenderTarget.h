@@ -56,4 +56,4 @@ namespace Ogre {
 
 }
 
-#endif // __GLTEXTURE_H__
+#endif // __GLMULTIRENDERTARGET_H__

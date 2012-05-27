@@ -40,9 +40,9 @@ namespace Ogre {
     {
         protected:
             unsigned char* mData;
-        /// @copydoc HardwareBuffer::lock
+            /// @copydoc HardwareBuffer::lock
             void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /// @copydoc HardwareBuffer::unlock
+            /// @copydoc HardwareBuffer::unlock
             void unlockImpl(void);
 
         public:
@@ -51,9 +51,9 @@ namespace Ogre {
             GLES2DefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
                                           HardwareBuffer::Usage usage);
             virtual ~GLES2DefaultHardwareVertexBuffer();
-        /// @copydoc HardwareBuffer::readData
+            /// @copydoc HardwareBuffer::readData
             void readData(size_t offset, size_t length, void* pDest);
-        /// @copydoc HardwareBuffer::writeData
+            /// @copydoc HardwareBuffer::writeData
             void writeData(size_t offset, size_t length, const void* pSource,
                            bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */
@@ -69,17 +69,17 @@ namespace Ogre {
     {
         protected:
             unsigned char* mData;
-        /// @copydoc HardwareBuffer::lock
+            /// @copydoc HardwareBuffer::lock
             void* lockImpl(size_t offset, size_t length, LockOptions options);
-        /// @copydoc HardwareBuffer::unlock
+            /// @copydoc HardwareBuffer::unlock
             void unlockImpl(void);
 
         public:
             GLES2DefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
             virtual ~GLES2DefaultHardwareIndexBuffer();
-        /// @copydoc HardwareBuffer::readData
+            /// @copydoc HardwareBuffer::readData
             void readData(size_t offset, size_t length, void* pDest);
-        /// @copydoc HardwareBuffer::writeData
+            /// @copydoc HardwareBuffer::writeData
             void writeData(size_t offset, size_t length, const void* pSource,
                     bool discardWholeBuffer = false);
             /** Override HardwareBuffer to turn off all shadowing. */

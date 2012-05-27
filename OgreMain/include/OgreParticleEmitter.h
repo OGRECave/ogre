@@ -266,7 +266,7 @@ namespace Ogre {
             This allows you to create a scatter effect - if set to 0, all particles will be emitted
             exactly along the emitters direction vector, whereas if you set it to 180 degrees or more,
             particles will be emitted in a sphere, i.e. in all directions.
-        @param degrees
+        @param angle
             Maximum angle which initial particle direction can deviate from the emitter base direction vector.
         */
         virtual void setAngle(const Radian& angle);

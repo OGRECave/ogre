@@ -73,25 +73,18 @@ namespace Ogre {
 		};
 
         /** The usual constructor.
-            @param
-                cam Pointer to a camera to be the source for the image.
-            @param
-                target Pointer to the render target to be the destination
+            @param camera
+                Pointer to a camera to be the source for the image.
+            @param target
+                Pointer to the render target to be the destination
                 for the rendering.
-            @param
-                left
-            @param
-                top
-            @param
-                width
-            @param
-                height
+            @param left, top, width, height
                 Dimensions of the viewport, expressed as a value between
                 0 and 1. This allows the dimensions to apply irrespective of
                 changes in the target's size: e.g. to fill the whole area,
                 values of 0,0,1,1 are appropriate.
-            @param
-                ZOrder Relative Z-order on the target. Lower = further to
+            @param ZOrder
+                Relative Z-order on the target. Lower = further to
                 the front.
         */
         Viewport(
@@ -371,7 +364,7 @@ namespace Ogre {
 			be updated using a custom sequence of render queue invocations, with
 			potentially customised ordering and render state options. You should
 			create the named sequence through Root first, then set the name here.
-		@param The name of the RenderQueueInvocationSequence to use. If you
+		@param sequenceName The name of the RenderQueueInvocationSequence to use. If you
 			specify a blank string, behaviour will return to the default render
 			queue management.
 		*/

@@ -541,10 +541,10 @@ namespace Ogre {
         /** Inserts a new TextureUnitState object into the Pass.
         @remarks
         This unit is is added on top of all previous units.
-        @param
-        name The basic name of the texture e.g. brickwall.jpg, stonefloor.png
-        @param
-        texCoordSet The index of the texture coordinate set to use.
+        @param textureName
+            The basic name of the texture e.g. brickwall.jpg, stonefloor.png
+        @param texCoordSet
+            The index of the texture coordinate set to use.
         @note
         Applies to both fixed-function and programmable passes.
         */
@@ -735,7 +735,7 @@ namespace Ogre {
 			This function allows more control over blending since it allows you to select different blending
 			modes for the color and alpha channels
 			@param op The blending operation mode to use for color channels in this pass
-			@param op The blending operation mode to use for alpha channels in this pass
+			@param alphaOp The blending operation mode to use for alpha channels in this pass
 		*/
 		void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 

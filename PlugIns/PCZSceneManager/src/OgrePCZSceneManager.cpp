@@ -396,14 +396,24 @@ namespace Ogre
 
         if ( on != 0 )
 		{
-			// remove references to the node from zones
-            removeSceneNode( on );
+            // destroy the node
+            destroySceneNode( on );
 		}
-
-		// destroy the node
-        SceneManager::destroySceneNode( name );
-
     }
+    
+    // Destroy a scene node
+    void PCZSceneManager::destroySceneNode(SceneNode* sn)
+    {
+        if ( sn != 0 )
+		{
+			// remove references to the node from zones
+            removeSceneNode( sn );
+        
+            // destroy the node
+            SceneManager::destroySceneNode( sn );
+		}
+    }
+
 	//-----------------------------------------------------------------------
 	void PCZSceneManager::clearScene(void)
 	{

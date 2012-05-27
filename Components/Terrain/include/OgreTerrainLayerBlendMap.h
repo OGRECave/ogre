@@ -77,7 +77,6 @@ namespace Ogre
 		/** Constructor
 		@param parent The parent terrain
 		@param layerIndex The layer index (should be 1 or higher)
-		@param box The region of the blend map to address (in image space)
 		@param buf The buffer holding the data
 		*/
 		TerrainLayerBlendMap(Terrain* parent, uint8 layerIndex, HardwarePixelBuffer* buf);

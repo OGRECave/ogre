@@ -112,7 +112,7 @@ namespace Ogre {
         /// Tangent (X axis if normal is Z)
         VES_TANGENT = 9,
         /// The  number of VertexElementSemantic elements (note - the first value VES_POSITION is 1) 
-        VES_COUNT = 9,
+        VES_COUNT = 9
 	};
 
     /// Vertex element type, used to identify the base types of the vertex contents

@@ -37,9 +37,7 @@ THE SOFTWARE.
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardParticleRenderer.h"
 #include "OgreStringConverter.h"
-#if OGRE_USE_NEW_COMPILERS == 1
-#  include "OgreScriptCompiler.h"
-#endif
+#include "OgreScriptCompiler.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -59,10 +57,6 @@ namespace Ogre {
     ParticleSystemManager::ParticleSystemManager()
     {
 		OGRE_LOCK_AUTO_MUTEX
-#if OGRE_USE_NEW_COMPILERS == 0
-        mScriptPatterns.push_back("*.particle");
-		ResourceGroupManager::getSingleton()._registerScriptLoader(this);
-#endif
 		mFactory = OGRE_NEW ParticleSystemFactory();
 		Root::getSingleton().addMovableObjectFactory(mFactory);
     }
@@ -109,89 +103,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ParticleSystemManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
-#if OGRE_USE_NEW_COMPILERS == 1
 		ScriptCompilerManager::getSingleton().parseScript(stream, groupName);
-#else // OGRE_USE_NEW_COMPILERS
-        String line;
-        ParticleSystem* pSys;
-        vector<String>::type vecparams;
-
-        pSys = 0;
-
-        while(!stream->eof())
-        {
-            line = stream->getLine();
-            // Ignore comments & blanks
-            if (!(line.length() == 0 || line.substr(0,2) == "//"))
-            {
-                if (pSys == 0)
-                {
-                    // No current system
-                    // So first valid data should be a system name
-					if (StringUtil::startsWith(line, "particle_system "))
-					{
-						// chop off the 'particle_system ' needed by new compilers
-						line = line.substr(16);
-					}
-                    pSys = createTemplate(line, groupName);
-					pSys->_notifyOrigin(stream->getName());
-                    // Skip to and over next {
-                    skipToNextOpenBrace(stream);
-                }
-                else
-                {
-                    // Already in a system
-                    if (line == "}")
-                    {
-                        // Finished system
-                        pSys = 0;
-                    }
-                    else if (line.substr(0,7) == "emitter")
-                    {
-                        // new emitter
-                        // Get typename
-                        vecparams = StringUtil::split(line, "\t ");
-                        if (vecparams.size() < 2)
-                        {
-                            // Oops, bad emitter
-                            LogManager::getSingleton().logMessage("Bad particle system emitter line: '"
-                                + line + "' in " + pSys->getName());
-                            skipToNextCloseBrace(stream);
-
-                        }
-                        skipToNextOpenBrace(stream);
-                        parseNewEmitter(vecparams[1], stream, pSys);
-
-                    }
-                    else if (line.substr(0,8) == "affector")
-                    {
-                        // new affector
-                        // Get typename
-                        vecparams = StringUtil::split(line, "\t ");
-                        if (vecparams.size() < 2)
-                        {
-                            // Oops, bad affector
-                            LogManager::getSingleton().logMessage("Bad particle system affector line: '"
-                                + line + "' in " + pSys->getName());
-                            skipToNextCloseBrace(stream);
-
-                        }
-                        skipToNextOpenBrace(stream);
-                        parseNewAffector(vecparams[1],stream, pSys);
-                    }
-                    else
-                    {
-                        // Attribute
-                        parseAttrib(line, pSys);
-                    }
-
-                }
-
-            }
-
-
-        }
-#endif // OGRE_USE_NEW_COMPILERS
     }
     //-----------------------------------------------------------------------
     void ParticleSystemManager::addEmitterFactory(ParticleEmitterFactory* factory)

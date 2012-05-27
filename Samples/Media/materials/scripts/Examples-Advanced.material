@@ -274,7 +274,6 @@ material Examples/BumpMapping/MultiLight
 			// be an issue
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named_auto ambient ambient_light_colour
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
@@ -343,7 +342,6 @@ material Examples/BumpMapping/MultiLight
 			// be an issue
 			vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureUnified
 			{
-				param_named_auto worldViewProj worldviewproj_matrix
 				param_named ambient float4 1 1 1 1
 			}
 			fragment_program_ref Ogre/BasicFragmentPrograms/PassthroughFP
@@ -757,9 +755,27 @@ vertex_program Examples/TextureArrayVScg cg
 	{
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
-	
 }
 
+vertex_program Examples/TextureArrayVSglsl glsl
+{
+	source Example_TextureArrayVS.glsl
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program Examples/TextureArrayPSglsl glsl
+{
+	source Example_TextureArrayPS.glsl
+
+	default_params
+	{
+		param_named TextureArrayTex int 0
+	}
+}
 
 fragment_program Examples/TextureArrayPShlsl4 hlsl
 {
@@ -788,7 +804,7 @@ material Examples/TextureArray
 	}
 
 
-	technique
+	technique HLSL4
 	{
 		pass
 		{
@@ -798,6 +814,27 @@ material Examples/TextureArray
 
 			fragment_program_ref Examples/TextureArrayPShlsl4
 			{
+			}
+		}
+	}
+
+	technique GLSL
+	{
+		pass
+		{
+			vertex_program_ref Examples/TextureArrayVSglsl
+			{
+			}
+
+			fragment_program_ref Examples/TextureArrayPSglsl
+			{
+			}
+
+			texture_unit
+			{
+				// Will be filled in at runtime
+				texture TextureArrayTex
+				tex_address_mode clamp
 			}
 		}
 	}

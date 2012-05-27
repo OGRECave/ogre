@@ -217,7 +217,7 @@ namespace OgreBites
 			{
 				Ogre::TextureManager::getSingleton().reloadAll();
 			}
-			else if (evt.key == OIS::KC_SYSRQ)   // take a screenshot
+			else if (evt.key == OIS::KC_F6)   // take a screenshot
 			{
 				mWindow->writeContentsToTimestampedFile("screenshot", ".png");
 			}

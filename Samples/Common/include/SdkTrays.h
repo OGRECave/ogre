@@ -1812,12 +1812,12 @@ namespace OgreBites
 		}
 
 		/*-----------------------------------------------------------------------------
-		| Converts a 3D scene position to a 2D screen coordinate (in pixels).
+		| Converts a 3D scene position to a 2D screen position (in relative screen size, 0.0-1.0).
 		-----------------------------------------------------------------------------*/
 		static Ogre::Vector2 sceneToScreen(Ogre::Camera* cam, const Ogre::Vector3& pt)
 		{
 			Ogre::Vector3 result = cam->getProjectionMatrix() * cam->getViewMatrix() * pt;
-			return Ogre::Vector2((result.x + 1) / 2, -(result.y + 1) / 2);
+			return Ogre::Vector2((result.x + 1) / 2, (-result.y + 1) / 2);
 		}
 
 		// these methods get the underlying overlays and overlay elements

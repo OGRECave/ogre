@@ -498,15 +498,8 @@ namespace Ogre
             @remarks
                 This method assumes that the random number generator has already
                 been seeded appropriately.
-            @param
-                angle The angle at which to deviate in radians
-            @param
-                up Any vector perpendicular to this one (which could generated
-                by cross-product of this vector and any other non-colinear
-                vector). If you choose not to provide this the function will
-                derive one on it's own, however if you provide one yourself the
-                function will be faster (this allows you to reuse up vectors if
-                you call this method more than once)
+            @param angle
+                The angle at which to deviate in radians
             @return
                 A random vector which deviates from this vector by angle. This
                 vector will not be normalised, normalise it if you wish

@@ -61,13 +61,13 @@ namespace Ogre
 	const uint16 Terrain::TERRAIN_CHUNK_VERSION = 1;
 	const uint32 Terrain::TERRAINLAYERDECLARATION_CHUNK_ID = StreamSerialiser::makeIdentifier("TDCL");
 	const uint16 Terrain::TERRAINLAYERDECLARATION_CHUNK_VERSION = 1;
-	const uint32 Terrain::TERRAINLAYERSAMPLER_CHUNK_ID = StreamSerialiser::makeIdentifier("TSAM");;
+	const uint32 Terrain::TERRAINLAYERSAMPLER_CHUNK_ID = StreamSerialiser::makeIdentifier("TSAM");
 	const uint16 Terrain::TERRAINLAYERSAMPLER_CHUNK_VERSION = 1;
-	const uint32 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_ID = StreamSerialiser::makeIdentifier("TSEL");;
+	const uint32 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_ID = StreamSerialiser::makeIdentifier("TSEL");
 	const uint16 Terrain::TERRAINLAYERSAMPLERELEMENT_CHUNK_VERSION = 1;
-	const uint32 Terrain::TERRAINLAYERINSTANCE_CHUNK_ID = StreamSerialiser::makeIdentifier("TLIN");;
+	const uint32 Terrain::TERRAINLAYERINSTANCE_CHUNK_ID = StreamSerialiser::makeIdentifier("TLIN");
 	const uint16 Terrain::TERRAINLAYERINSTANCE_CHUNK_VERSION = 1;
-	const uint32 Terrain::TERRAINDERIVEDDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TDDA");;
+	const uint32 Terrain::TERRAINDERIVEDDATA_CHUNK_ID = StreamSerialiser::makeIdentifier("TDDA");
 	const uint16 Terrain::TERRAINDERIVEDDATA_CHUNK_VERSION = 1;
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
@@ -4470,7 +4470,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void Terrain::DefaultGpuBufferAllocator::warmStart(size_t numInstances, uint16 terrainSize, uint16 maxBatchSize, 
-		uint16 mMinBatchSize)
+		uint16 minBatchSize)
 	{
 		// TODO
 

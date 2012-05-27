@@ -19,8 +19,8 @@ fragment_program Ogre/Compositor/OldMovie_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/OldMovieFP unified
 {
-	delegate Ogre/Compositor/OldMovie_Cg_FP
 	delegate Ogre/Compositor/OldMovie_GLSLES_FP
+	delegate Ogre/Compositor/OldMovie_Cg_FP
 }
 
 material Ogre/Compositor/OldMovie

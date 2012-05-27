@@ -61,7 +61,7 @@ namespace Ogre
 		virtual ~GLSLESProgramPipeline();
 
         /// GL Program Pipeline Handle
-		const GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
+		GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
 
         /** Updates program pipeline object uniforms using data from GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
@@ -82,7 +82,8 @@ namespace Ogre
 	protected:
         enum {
             VERTEX_PROGRAM_LINKED = 0x01,
-            FRAGMENT_PROGRAM_LINKED = 0x10
+            FRAGMENT_PROGRAM_LINKED = 0x10,
+            ALL_PROGRAMS_LINKED = 0x11
         };
 		/// GL handle for pipeline object
         GLuint mGLProgramPipelineHandle;

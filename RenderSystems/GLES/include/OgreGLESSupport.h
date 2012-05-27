@@ -127,6 +127,6 @@ namespace Ogre
             std::set<String> extensionList;
     };
 
-};
+}
 
 #endif

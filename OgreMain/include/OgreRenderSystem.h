@@ -590,16 +590,16 @@ namespace Ogre
 		/** Sets the global instance vertex buffer.
 		*/
         void setGlobalInstanceVertexBuffer(const HardwareVertexBufferSharedPtr val);
-		/** gets vertex declaration for the global vertex buffer for the global instancing
+		/** Gets vertex declaration for the global vertex buffer for the global instancing
 		*/
         VertexDeclaration* getGlobalInstanceVertexBufferVertexDeclaration() const;
-		/** sets vertex declaration for the global vertex buffer for the global instancing
+		/** Sets vertex declaration for the global vertex buffer for the global instancing
 		*/
         void setGlobalInstanceVertexBufferVertexDeclaration( VertexDeclaration* val);
-		/** gets the global number of instances.
+		/** Gets the global number of instances.
 		*/
         size_t getGlobalNumberOfInstances() const;
-		/** sets the global number of instances.
+		/** Sets the global number of instances.
 		*/
         void setGlobalNumberOfInstances(const size_t val);
 
@@ -851,7 +851,7 @@ namespace Ogre
 		/** Sets the global alpha rejection approach for future renders.
 		By default images are rendered regardless of texture alpha. This method lets you change that.
 		@param func The comparison function which must pass for a pixel to be written.
-		@param val The value to compare each pixels alpha value to (0-255)
+		@param value The value to compare each pixels alpha value to (0-255)
 		@param alphaToCoverage Whether to enable alpha to coverage, if supported
 		*/
 		virtual void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) = 0;
@@ -911,7 +911,7 @@ namespace Ogre
 		rendering operations. This viewport is aware of it's own
 		camera and render target. Must be implemented by subclass.
 
-		@param target Pointer to the appropriate viewport.
+		@param vp Pointer to the appropriate viewport.
 		*/
 		virtual void _setViewport(Viewport *vp) = 0;
 		/** Get the current active viewport for rendering. */

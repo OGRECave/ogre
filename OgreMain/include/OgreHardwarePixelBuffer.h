@@ -115,7 +115,7 @@ namespace Ogre {
         
         /** Copies a box from another PixelBuffer to a region of the 
         	this PixelBuffer. 
-			@param dst		Source pixel buffer
+			@param src		Source pixel buffer
         	@param srcBox	Image::Box describing the source region in src
         	@param dstBox	Image::Box describing the destination region in this buffer
 			@remarks The source and destination regions dimensions don't have to match, in which
@@ -164,7 +164,7 @@ namespace Ogre {
 
 		/** Convience function that blits this entire buffer to a pixelbox.
 			The image is scaled as needed.
-			@param src		PixelBox containing the source pixels and format in memory
+			@param dst		PixelBox describing the destination pixels and format in memory
 			@note Only call this function when the buffer is unlocked. 
 		*/
 		void blitToMemory(const PixelBox &dst)

@@ -104,9 +104,9 @@ namespace Ogre {
 		class DummyGpuProgram : public GpuProgram
 		{
 		public:
-			DummyGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
-				const String& group, bool isManual, ManualResourceLoader* loader)
-				: GpuProgram(creator, name, handle, group, isManual, loader )
+			DummyGpuProgram(ResourceManager* creator, const String& inName, ResourceHandle inHandle,
+				const String& inGroup, bool inIsManual, ManualResourceLoader* inLoader)
+				: GpuProgram(creator, inName, inHandle, inGroup, inIsManual, inLoader )
 			{};
 			/** @copydoc Resource::unloadImpl */
 			void unloadImpl(void){};

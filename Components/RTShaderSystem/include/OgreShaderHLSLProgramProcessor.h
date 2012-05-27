@@ -50,7 +50,6 @@ class _OgreRTSSExport HLSLProgramProcessor : public ProgramProcessor
 public:	
 
 	/** Class constructor.
-	@param type The type of this program.
 	*/
 	HLSLProgramProcessor			();
 

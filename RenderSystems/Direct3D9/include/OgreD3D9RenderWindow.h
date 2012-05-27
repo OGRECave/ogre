@@ -39,9 +39,6 @@ namespace Ogre
 	public:
 		/** Constructor.
 		@param instance The application instance
-		@param driver The root driver
-		@param deviceIfSwapChain The existing D3D device to create an additional swap chain from, if this is not
-			the first window.
 		*/
 		D3D9RenderWindow					(HINSTANCE instance);
 		~D3D9RenderWindow					();
@@ -86,7 +83,7 @@ namespace Ogre
 		/// @copydoc RenderTarget::_beginUpdate
 		void _beginUpdate();
 	
-		/// @copydoc RenderTarget::_updateViewport
+		/// @copydoc RenderTarget::_updateViewport(Viewport* viewport, bool updateStatistics)
 		void _updateViewport(Viewport* viewport, bool updateStatistics = true);
 
 		/// @copydoc RenderTarget::_endUpdate

@@ -112,7 +112,6 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("XMLSkeletonSerializer: Reading Bones name...");
 		
-		Bone* btmp ;
 		Quaternion quat ;
 
         for (TiXmlElement* bonElem = mBonesNode->FirstChildElement();
@@ -120,8 +119,7 @@ namespace Ogre {
         {
             String name = bonElem->Attribute("name");
 			int id = StringConverter::parseInt(bonElem->Attribute("id"));				
-			btmp = skel->createBone(name,id) ;
-
+			skel->createBone(name,id) ;
         }
     }
 	// ---------------------------------------------------------

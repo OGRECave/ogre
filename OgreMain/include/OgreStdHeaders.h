@@ -47,6 +47,14 @@
 #       include <ext/hash_map>
 #       include <ext/hash_set>
 #   endif
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG)
+#   if defined(_LIBCPP_VERSION)
+#       include <unordered_map>
+#       include <unordered_set>
+#   else
+#       include <tr1/unordered_map>
+#       include <tr1/unordered_set>
+#   endif
 #else
 #   if (OGRE_COMPILER == OGRE_COMPILER_MSVC) && !defined(STLPORT) && OGRE_COMP_VER >= 1600 // VC++ 10.0
 #    	include <unordered_map>

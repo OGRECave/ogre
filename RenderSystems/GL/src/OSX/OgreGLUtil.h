@@ -38,6 +38,6 @@ inline GLSupport* getGLSupport()
     return new OSXGLSupport();
 }
 
-};
+}
 
 #endif // INCL_OGRE_GLUTIL_H

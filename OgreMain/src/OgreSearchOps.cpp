@@ -76,7 +76,7 @@ struct _find_search_t
     DIR *dirfd;
 };
         
-long _findfirst(const char *pattern, struct _finddata_t *data)
+intptr_t _findfirst(const char *pattern, struct _finddata_t *data)
 {
     _find_search_t *fs = new _find_search_t;
     fs->curfn = NULL;
@@ -102,7 +102,7 @@ long _findfirst(const char *pattern, struct _finddata_t *data)
     fs->dirfd = opendir (fs->directory);
     if (!fs->dirfd)
     {
-        _findclose ((long)fs);
+        _findclose ((intptr_t)fs);
         return -1;
     }
 
@@ -112,16 +112,16 @@ long _findfirst(const char *pattern, struct _finddata_t *data)
     fs->pattern = strdup (mask);
 
     /* Get the first entry */
-    if (_findnext ((long)fs, data) < 0)
+    if (_findnext ((intptr_t)fs, data) < 0)
     {
-        _findclose ((long)fs);
+        _findclose ((intptr_t)fs);
         return -1;
     }
 
-    return (long)fs;
+    return (intptr_t)fs;
 }
 
-int _findnext(long id, struct _finddata_t *data)
+int _findnext(intptr_t id, struct _finddata_t *data)
 {
     _find_search_t *fs = (_find_search_t *)id;
 
@@ -173,7 +173,7 @@ int _findnext(long id, struct _finddata_t *data)
     return 0;
 }
 
-int _findclose(long id)
+int _findclose(intptr_t id)
 {
     int ret;
     _find_search_t *fs = (_find_search_t *)id;

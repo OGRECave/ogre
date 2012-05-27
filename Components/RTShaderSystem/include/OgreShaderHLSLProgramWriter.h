@@ -50,7 +50,6 @@ class _OgreRTSSExport HLSLProgramWriter : public ProgramWriter
 public:
 
 	/** Class constructor. 
-	@param language The target shader language.
 	*/
 	HLSLProgramWriter	();
 

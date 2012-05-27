@@ -966,7 +966,7 @@ namespace Ogre {
 		// This is a 3 step process, converting each byte in the UTF-8 stream to UTF-32,
 		// then converting it to UTF-16, then finally appending the data buffer
 
-		unicode_char uc;          // temporary Unicode character buffer
+		unicode_char uc = 0;      // temporary Unicode character buffer
 		unsigned char utf8buf[7]; // temporary UTF-8 buffer
 		utf8buf[6] = 0;
 		size_t utf8len;           // UTF-8 length
@@ -1994,7 +1994,7 @@ namespace Ogre {
 		std::string& buffer = ( *mBuffer.mStrBuffer );
 		buffer.reserve( length() );
 
-		unsigned char utf8buf[6];
+		unsigned char utf8buf[6] = "";
 		char* charbuf = ( char* )utf8buf;
 		unicode_char c;
 		size_t len;

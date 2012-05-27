@@ -119,7 +119,7 @@ namespace Ogre {
             return OGRE_NEW ZipArchive(name, "Zip");
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* arch) { OGRE_DELETE arch; }
+        void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
     };
 
     /** Specialisation of ZipArchiveFactory for embedded Zip files. */

@@ -66,11 +66,6 @@ protected:
         mAnimState->setEnabled(true);
 	}
 
-	void cleanupContent()
-	{
-		MeshManager::getSingleton().remove("floor");
-	}
-
 	AnimationState* mAnimState;
 };
 

@@ -117,7 +117,7 @@ namespace Ogre {
 
 }
 
-#if OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 412 && OGRE_THREAD_SUPPORT
+#if (((OGRE_COMPILER == OGRE_COMPILER_GNUC) && (OGRE_COMP_VER >= 412)) || (OGRE_COMPILER == OGRE_COMPILER_CLANG)) && OGRE_THREAD_SUPPORT
 
 namespace Ogre {
 
@@ -185,7 +185,7 @@ namespace Ogre {
 
 		T operator+=(const T &add)
 		{
-			__sync_fetch_and_add (&mField, add);
+			return __sync_add_and_fetch (&mField, add);
 		}
 
         volatile T mField;

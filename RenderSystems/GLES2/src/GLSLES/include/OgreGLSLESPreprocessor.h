@@ -1,4 +1,4 @@
-/**
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -56,7 +56,7 @@ namespace Ogre {
  * <li>#ifdef/#ifndef/#else/#endif: Conditional suppression of parts of code.
  * <li>#if: Supports numeric expression of any complexity, also supports the
  *     defined() pseudo-function.
- * <ul>
+ * </ul>
  */
 class CPreprocessor
 {
@@ -90,7 +90,7 @@ class CPreprocessor
             TK_STRING,       // A string
             TK_COMMENT,      // A block comment
             TK_LINECOMMENT,  // A line comment
-            TK_TEXT,         // An unparsed text (cannot be returned from GetToken())
+            TK_TEXT          // An unparsed text (cannot be returned from GetToken())
         };
 
         /// Token type

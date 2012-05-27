@@ -4,12 +4,14 @@
 // Program Type: Vertex/Pixel shader
 // Language: GLSL
 //-----------------------------------------------------------------------------
+#version 120
+#extension GL_ARB_shader_texture_lod : require
 
 float mipmapLevel(vec2 coords, vec2 texSize)
 {
 	coords = coords.xy * texSize;
-	vec2 dx = ddx(coords.xy);
-	vec2 dy = ddy(coords.xy);
+	vec2 dx = dFdx(coords.xy);
+	vec2 dy = dFdy(coords.xy);
 	float Px = length(dx);
 	float Py = length(dy);
 	float Pmax = max(Px, Py);
@@ -66,7 +68,7 @@ void SGX_Atlas_Sample_Auto_Adjust(in sampler2D sample,
 	atlasTexcoord = atlasTexcoord * (relativeTileSize - lodSizeInv) + (0.5 * lodSizeInv) + startPos;
 	
 	//return the pixel from the correct mip surface of the atlas
-	texel = texture2DLod(sample, vec4(atlasTexcoord, 0, lod));
+	texel = texture2DLod(sample, atlasTexcoord, lod);
 }
 //-----------------------------------------------------------------------------
 void SGX_Atlas_Sample_Normal(in sampler2D sample, 
@@ -89,7 +91,7 @@ void SGX_Atlas_Sample_Normal(in sampler2D sample,
 //-----------------------------------------------------------------------------
 void SGX_Atlas_Wrap(in float inpCoord, out float outCoord)
 {
-	outCoord = frac(inpCoord);
+	outCoord = fract(inpCoord);
 }
 
 //-----------------------------------------------------------------------------
@@ -101,7 +103,7 @@ void SGX_Atlas_Clamp(in float inpCoord, out float outCoord)
 void SGX_Atlas_Mirror(in float inpCoord, out float outCoord)
 {
 	outCoord = (inpCoord + 1) * 0.5;
-	outCoord = abs(frac(outCoord) * 2 - 1);
+	outCoord = abs(fract(outCoord) * 2 - 1);
 }
 
 //-----------------------------------------------------------------------------

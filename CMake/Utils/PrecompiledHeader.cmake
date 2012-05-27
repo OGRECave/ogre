@@ -23,7 +23,7 @@ macro(use_precompiled_header TARGET HEADER_FILE SRC_FILE)
       PPROPERTIES COMPILE_FLAGS /Yc"${HEADER}"
 	)
     
-  elseif (CMAKE_COMPILER_IS_GNUCXX)
+  elseif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     # disabled because it seems to increase compile time
     ## this is some serious hack... we definitely need native 
     ## support in CMake for this!

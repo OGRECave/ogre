@@ -137,9 +137,11 @@ namespace Ogre {
         /// Overridden from GpuProgram
         bool isSupported(void) const;
         /// Overridden from GpuProgram
+		bool getPassTransformStates(void) const { return true; /* CG uses MVP matrix when -posinv argument passed */ }
+        /// Overridden from GpuProgram
         const String& getLanguage(void) const;
 
-		/// scan the file for #include and replace with source from the OGRE resources
+		/// Scan the file for #include and replace with source from the OGRE resources
 		static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
 }

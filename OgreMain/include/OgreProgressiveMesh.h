@@ -119,7 +119,7 @@ namespace Ogre {
 			VRQ_PROPORTIONAL,
 			/// All vertices with reduction error cost less than reductionValue * sqr(lodDistance[lodLevel] / lodDistance[0]) 
 			/// are removed at each reduction. Error cost is calculated as introduced error area divided by squared mesh diagonal
-			VRQ_ERROR_COST,
+			VRQ_ERROR_COST
 		};
 
 		
@@ -196,7 +196,7 @@ namespace Ogre {
 			work. Pass only shadowed buffers, or better yet perform mesh reduction as
 			an offline process using DefaultHardwareBufferManager to manage vertex
 			buffers in system memory.
-        @param buffer Pointer to x/y/z buffer with vertex positions. The number of vertices
+        @param vertexData Pointer to x/y/z buffer with vertex positions. The number of vertices
             must be the same as in the original GeometryData passed to the constructor.
         */
         virtual void addExtraVertexPositionBuffer(const VertexData* vertexData);

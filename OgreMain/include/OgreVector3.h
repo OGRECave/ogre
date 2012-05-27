@@ -464,8 +464,8 @@ namespace Ogre
                 vector of a plane, by calculating the cross-product of 2
                 non-equivalent vectors which lie on the plane (e.g. 2 edges
                 of a triangle).
-            @param
-                vec Vector which, together with this one, will be used to
+            @param rkVector
+                Vector which, together with this one, will be used to
                 calculate the cross-product.
             @return
                 A vector which is the result of the cross-product. This

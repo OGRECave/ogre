@@ -34,14 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Class which represents the renderable aspects of a set of shadow volume faces. 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Class which represents the renderable aspects of a set of shadow volume faces. 
     @remarks
         Note that for casters comprised of more than one set of vertex buffers (e.g. SubMeshes each
         using their own geometry), it will take more than one ShadowRenderable to render the 
@@ -54,25 +53,25 @@ namespace Ogre {
     protected:
         MaterialPtr mMaterial;
         RenderOperation mRenderOp;
-        ShadowRenderable* mLightCap; // used only if isLightCapSeparate == true
+        ShadowRenderable* mLightCap; /// Used only if isLightCapSeparate == true
     public:
         ShadowRenderable() : mMaterial(), mLightCap(0) {}
         virtual ~ShadowRenderable() { delete mLightCap; }
         /** Set the material to be used by the shadow, should be set by the caller 
-          before adding to a render queue
+            before adding to a render queue
         */
         void setMaterial(const MaterialPtr& mat) { mMaterial = mat; }
-        /// Overridden from Renderable
+        /// @copydoc Renderable::getMaterial
         const MaterialPtr& getMaterial(void) const { return mMaterial; }
-        /// Overridden from Renderable
+        /// @copydoc Renderable::getRenderOperation
         void getRenderOperation(RenderOperation& op) { op = mRenderOp; }
-        /// Get the internal render operation for set up
+        /// Get the internal render operation for set up.
         RenderOperation* getRenderOperationForUpdate(void) {return &mRenderOp;}
-        /// Overridden from Renderable
+        /// @copydoc Renderable::getWorldTransforms
         void getWorldTransforms(Matrix4* xform) const = 0;
-        /// Overridden from Renderable
+        /// @copydoc Renderable::getSquaredViewDepth
         Real getSquaredViewDepth(const Camera*) const{ return 0; /* not used */}
-        /// Overridden from Renderable
+        /// @copydoc Renderable::getLights.
         const LightList& getLights(void) const;
         /** Does this renderable require a separate light cap?
         @remarks
@@ -86,28 +85,29 @@ namespace Ogre {
         */
         bool isLightCapSeparate(void) const { return mLightCap != 0; }
 
-        /// Get the light cap version of this renderable
+        /// Get the light cap version of this renderable.
         ShadowRenderable* getLightCapRenderable(void) { return mLightCap; }
         /// Should this ShadowRenderable be treated as visible?
         virtual bool isVisible(void) const { return true; }
 
-		/** This function informs the shadow renderable that the global index buffer
-		from the SceneManager has been updated. As all shadow use this buffer their pointer 
-		must be updated as well
-		@indexBuffer pointer to the new index buffer
-		*/
-		virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) = 0;
+        /** This function informs the shadow renderable that the global index buffer
+            from the SceneManager has been updated. As all shadow use this buffer their pointer 
+            must be updated as well.
+        @param indexBuffer
+            Pointer to the new index buffer.
+        */
+        virtual void rebindIndexBuffer(const HardwareIndexBufferSharedPtr& indexBuffer) = 0;
 
     };
 
     /** A set of flags that can be used to influence ShadowRenderable creation. */
     enum ShadowRenderableFlags
     {
-        /// For shadow volume techniques only, generate a light cap on the volume
+        /// For shadow volume techniques only, generate a light cap on the volume.
         SRF_INCLUDE_LIGHT_CAP = 0x00000001,
-        /// For shadow volume techniques only, generate a dark cap on the volume
+        /// For shadow volume techniques only, generate a dark cap on the volume.
         SRF_INCLUDE_DARK_CAP  = 0x00000002,
-        /// For shadow volume techniques only, indicates volume is extruded to infinity
+        /// For shadow volume techniques only, indicates volume is extruded to infinity.
         SRF_EXTRUDE_TO_INFINITY  = 0x00000004
     };
 
@@ -122,14 +122,14 @@ namespace Ogre {
 
         /** Returns details of the edges which might be used to determine a silhouette. */
         virtual EdgeData* getEdgeList(void) = 0;
-		/** Returns whether the object has a valid edge list. */
-		virtual bool hasEdgeList(void) = 0;
+        /** Returns whether the object has a valid edge list. */
+        virtual bool hasEdgeList(void) = 0;
 
         /** Get the world bounding box of the caster. */
         virtual const AxisAlignedBox& getWorldBoundingBox(bool derive = false) const = 0;
-        /** Gets the world space bounding box of the light cap */
+        /** Gets the world space bounding box of the light cap. */
         virtual const AxisAlignedBox& getLightCapBounds(void) const = 0;
-        /** Gets the world space bounding box of the dark cap, as extruded using the light provided */
+        /** Gets the world space bounding box of the dark cap, as extruded using the light provided. */
         virtual const AxisAlignedBox& getDarkCapBounds(const Light& light, Real dirLightExtrusionDist) const = 0;
 
         typedef vector<ShadowRenderable*>::type ShadowRenderableList;
@@ -140,15 +140,21 @@ namespace Ogre {
             Shadowable geometry should ideally be designed such that there is only one
             ShadowRenderable required to render the the shadow; however this is not a necessary
             limitation and it can be exceeded if required.
-        @param shadowTechnique The technique being used to generate the shadow
-        @param light The light to generate the shadow from
-        @param indexBuffer The index buffer to build the renderables into, 
+        @param shadowTechnique
+            The technique being used to generate the shadow.
+        @param light
+            The light to generate the shadow from.
+        @param indexBuffer
+            The index buffer to build the renderables into, 
             the current contents are assumed to be disposable.
-        @param extrudeVertices If true, this means this class should extrude
+        @param extrudeVertices
+            If @c true, this means this class should extrude
             the vertices of the back of the volume in software. If false, it
             will not be done (a vertex program is assumed).
-        @param extrusionDistance The distance to extrude the shadow volume
-        @param flags Technique-specific flags, see ShadowRenderableFlags
+        @param extrusionDistance
+            The distance to extrude the shadow volume.
+        @param flags
+            Technique-specific flags, see ShadowRenderableFlags.
         */
         virtual ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light, 
@@ -164,29 +170,34 @@ namespace Ogre {
             0.0f). Therefore we extrude by a fixed distance, which may cause 
             some problems with larger scenes. Luckily better hardware (ie
             vertex programs) can fix this.
-        @param vertexBuffer The vertex buffer containing ONLY xyz position
-        values, which must be originalVertexCount * 2 * 3 floats long.
-        @param originalVertexCount The count of the original number of
-        vertices, i.e. the number in the mesh, not counting the doubling
-        which has already been done (by VertexData::prepareForShadowVolume)
-        to provide the extruded area of the buffer.
-        @param lightPos 4D light position in object space, when w=0.0f this
-        represents a directional light
-        @param extrudeDist The distance to extrude
+        @param vertexBuffer
+            The vertex buffer containing ONLY xyz position
+            values, which must be originalVertexCount * 2 * 3 floats long.
+        @param originalVertexCount
+            The count of the original number of
+            vertices, i.e. the number in the mesh, not counting the doubling
+            which has already been done (by VertexData::prepareForShadowVolume)
+            to provide the extruded area of the buffer.
+        @param lightPos
+            4D light position in object space, when w=0.0f this
+            represents a directional light.
+        @param extrudeDist
+            The distance to extrude.
         */
         static void extrudeVertices(const HardwareVertexBufferSharedPtr& vertexBuffer, 
             size_t originalVertexCount, const Vector4& lightPos, Real extrudeDist);
-        /** Get the distance to extrude for a point/spot light */
+        /** Get the distance to extrude for a point/spot light. */
         virtual Real getPointExtrusionDistance(const Light* l) const = 0;
     protected:
-        /// Helper method for calculating extrusion distance
+        /// Helper method for calculating extrusion distance.
         Real getExtrusionDistance(const Vector3& objectPos, const Light* light) const;
         /** Tells the caster to perform the tasks necessary to update the 
             edge data's light listing. Can be overridden if the subclass needs 
             to do additional things. 
-        @param edgeData The edge information to update
-        @param lightPos 4D vector representing the light, a directional light
-            has w=0.0
+        @param edgeData
+            The edge information to update.
+        @param lightPos
+            4D vector representing the light, a directional light has w=0.0.
        */
         virtual void updateEdgeListLightFacing(EdgeData* edgeData, 
             const Vector4& lightPos);
@@ -194,32 +205,40 @@ namespace Ogre {
         /** Generates the indexes required to render a shadow volume into the 
             index buffer which is passed in, and updates shadow renderables
             to use it.
-        @param edgeData The edge information to use
-        @param indexBuffer The buffer into which to write data into; current 
+        @param edgeData
+            The edge information to use.
+        @param indexBuffer
+            The buffer into which to write data into; current 
             contents are assumed to be discardable.
-        @param light The light, mainly for type info as silhouette calculations
+        @param light
+            The light, mainly for type info as silhouette calculations
             should already have been done in updateEdgeListLightFacing
-        @param shadowRenderables A list of shadow renderables which has 
+        @param shadowRenderables
+            A list of shadow renderables which has 
             already been constructed but will need populating with details of
             the index ranges to be used.
-        @param flags Additional controller flags, see ShadowRenderableFlags
+        @param flags
+            Additional controller flags, see ShadowRenderableFlags.
         */
         virtual void generateShadowVolume(EdgeData* edgeData, 
             const HardwareIndexBufferSharedPtr& indexBuffer, const Light* light,
             ShadowRenderableList& shadowRenderables, unsigned long flags);
         /** Utility method for extruding a bounding box. 
-        @param box Original bounding box, will be updated in-place
-        @param lightPos 4D light position in object space, when w=0.0f this
-        represents a directional light
-        @param extrudeDist The distance to extrude
+        @param box
+            Original bounding box, will be updated in-place.
+        @param lightPos
+            4D light position in object space, when w=0.0f this
+            represents a directional light.
+        @param extrudeDist
+            The distance to extrude.
         */
         virtual void extrudeBounds(AxisAlignedBox& box, const Vector4& lightPos, 
             Real extrudeDist) const;
 
 
     };
-	/** @} */
-	/** @} */
-}
+    /** @} */
+    /** @} */
+} // namespace Ogre
 
-#endif
+#endif // __ShadowCaster_H__

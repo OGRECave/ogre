@@ -398,10 +398,10 @@ namespace Ogre {
             current default (see setDefaultRenderablePriority).
         @note
             Called by implementation of MovableObject::_updateRenderQueue.
-        @param
-            pRend Pointer to the Renderable to be added to the queue
-		@param
-            groupID The group the renderable is to be added to. This
+        @param pRend
+            Pointer to the Renderable to be added to the queue
+		@param groupId
+            The group the renderable is to be added to. This
             can be used to schedule renderable objects in separate groups such that the SceneManager
             respects the divisions between the groupings and does not reorder them outside these
             boundaries. This can be handy for overlays where no matter what you want the overlay to 

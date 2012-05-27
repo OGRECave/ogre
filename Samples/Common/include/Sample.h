@@ -173,10 +173,14 @@ namespace OgreBites
 		virtual void _shutdown()
 
 		{
-			if (mContentSetup) cleanupContent();
-			if (mSceneMgr) mSceneMgr->clearScene();
+			if (mContentSetup)
+                cleanupContent();
+			if (mSceneMgr)
+                mSceneMgr->clearScene();
 			mContentSetup = false;
-			if (mResourcesLoaded) unloadResources();
+
+			if (mResourcesLoaded)
+                unloadResources();
 			mResourcesLoaded = false;
 			if (mSceneMgr) 
 			{

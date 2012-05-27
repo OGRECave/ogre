@@ -311,7 +311,6 @@ public:
 	@param semantic The semantic of this parameter.
 	@param index The index of this parameter.
 	@param content The content of this parameter.
-	@param variability How this parameter varies (bitwise combination of GpuProgramVariability).
 	*/
 	Parameter(GpuConstantType type, const String& name, 
 		const Semantic& semantic, int index, 
@@ -634,6 +633,7 @@ public:
 	static UniformParameterPtr	createSampler			(GpuConstantType type, int index);
 	static UniformParameterPtr	createSampler1D			(int index);
 	static UniformParameterPtr	createSampler2D			(int index);
+	static UniformParameterPtr	createSampler2DArray	(int index);
 	static UniformParameterPtr	createSampler3D			(int index);
 	static UniformParameterPtr	createSamplerCUBE		(int index);	
 

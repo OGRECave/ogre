@@ -136,26 +136,26 @@ namespace Ogre {
 				</ul>
 				Of course, you will never have multiple faces (cube map) and
 				depth too.
-			@param
+			@param data
                 The data pointer
-            @param
+            @param width
 				Width of image
-            @param
+            @param height
 				Height of image
-			@param
+			@param depth
                 Image Depth (in 3d images, numbers of layers, otherwise 1)
-            @param
+            @param format
 				Pixel Format
-            @param
-                if memory associated with this buffer is to be destroyed
+            @param autoDelete
+                If memory associated with this buffer is to be destroyed
 				with the Image object. Note: it's important that if you set
 				this option to true, that you allocated the memory using OGRE_ALLOC_T
 				with a category of MEMCATEGORY_GENERAL to ensure the freeing of memory 
 				matches up.
-			@param
-				the number of faces the image data has inside (6 for cubemaps, 1 otherwise)
-            @param
-                the number of mipmaps the image data has inside
+			@param numFaces
+				The number of faces the image data has inside (6 for cubemaps, 1 otherwise)
+            @param numMipMaps
+                The number of mipmaps the image data has inside
             @note
                  The memory associated with this buffer is NOT destroyed with the
                  Image object, unless autoDelete is set to true.
@@ -187,13 +187,13 @@ namespace Ogre {
 				</ul>
 				Of course, you will never have multiple faces (cube map) and
 				depth too.
-            @param
+            @param data
                 The data pointer
-            @param
+            @param width
 				Width of image
-            @param
+            @param height
 				Height of image
-            @param
+            @param format
 				Pixel Format
             @note
                  The memory associated with this buffer is NOT destroyed with the
@@ -325,7 +325,7 @@ namespace Ogre {
 			codec to use. Can be left blank if the stream data includes
 			a header to identify the data.
 		*/
-		Image & loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream, PixelFormat = PF_BYTE_RGBA,
+		Image & loadTwoImagesAsRGBA(DataStreamPtr& rgbStream, DataStreamPtr& alphaStream, PixelFormat format = PF_BYTE_RGBA,
 			const String& rgbType = StringUtil::BLANK, const String& alphaType = StringUtil::BLANK);
 
 		/** Utility method to combine 2 separate images into this one, with the first

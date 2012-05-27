@@ -74,7 +74,7 @@ namespace Ogre {
         /** @copydoc ScriptLoader::parseScript */
         void parseScript(DataStreamPtr& stream, const String& groupName);
 
-        /** @copydoc ScriptLoader::parseScript */
+        /** @copydoc ScriptLoader::getLoadingOrder */
         Real getLoadingOrder(void) const;
 
         /** Create implementation. */

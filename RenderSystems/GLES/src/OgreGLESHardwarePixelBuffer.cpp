@@ -289,10 +289,10 @@ namespace Ogre {
             {
                 String name;
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
-                GLESSurfaceDesc target;
-                target.buffer = this;
-                target.zoffset = zoffset;
-                RenderTexture *trt = GLESRTTManager::getSingleton().createRenderTexture(name, target, writeGamma, fsaa);
+                GLESSurfaceDesc surface;
+                surface.buffer = this;
+                surface.zoffset = zoffset;
+                RenderTexture *trt = GLESRTTManager::getSingleton().createRenderTexture(name, surface, writeGamma, fsaa);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }
@@ -830,4 +830,4 @@ namespace Ogre {
                                      GL_RENDERBUFFER_OES, mRenderbufferID);
         GL_CHECK_ERROR;
     }
-};
+}

@@ -41,7 +41,7 @@ void nvparse_errors::set(const char * e, int line_number)
 		elist[num_errors++] = strdup(buff);
 }
 
-char * const * const nvparse_errors::get_errors()
+char** nvparse_errors::get_errors()
 {
 	return elist;
 }

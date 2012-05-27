@@ -202,7 +202,7 @@ protected:
 	TexCoordCalcMethod		getTexCalcMethod		(TextureUnitState* textureUnitState);
 
 	/** 
-	Determines if the given texture unit state need to use texture transformation matrix..
+	Determines if the given texture unit state need to use texture transformation matrix.
 	*/
 	bool					needsTextureMatrix		(TextureUnitState* textureUnitState);
 

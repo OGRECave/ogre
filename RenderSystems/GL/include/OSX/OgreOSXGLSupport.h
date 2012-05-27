@@ -55,7 +55,7 @@ public:
 	/// @copydoc GLSupport::createWindow
 	RenderWindow* createWindow( bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle );
 	
-	/// @copydoc RenderSystem::createRenderWindow
+	/// @copydoc Root::createRenderWindow
 	virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
 		bool fullScreen, const NameValuePairList *miscParams = 0 );
 	
@@ -90,6 +90,6 @@ protected:
 	
 }; // class OSXGLSupport
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // OGRE_OSXGLSupport_H

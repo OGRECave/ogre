@@ -53,6 +53,7 @@ THE SOFTWARE.
 
 // Color order is actually RGB on iOS
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#undef FREEIMAGE_COLORORDER
 #define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
 #endif
 
@@ -165,9 +166,6 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	FIBITMAP* FreeImageCodec::encode(MemoryDataStreamPtr& input, CodecDataPtr& pData) const
 	{
-		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
-
 		FIBITMAP* ret = 0;
 
 		ImageData* pImgData = static_cast< ImageData * >( pData.getPointer() );
@@ -376,9 +374,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     DataStreamPtr FreeImageCodec::code(MemoryDataStreamPtr& input, Codec::CodecDataPtr& pData) const
     {        
-		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
-
 		FIBITMAP* fiBitmap = encode(input, pData);
 
 		// open memory chunk allocated by FreeImage
@@ -408,22 +403,14 @@ namespace Ogre {
     void FreeImageCodec::codeToFile(MemoryDataStreamPtr& input, 
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
-		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageSaveErrorHandler);
-
 		FIBITMAP* fiBitmap = encode(input, pData);
 
 		FreeImage_Save((FREE_IMAGE_FORMAT)mFreeImageType, fiBitmap, outFileName.c_str());
 		FreeImage_Unload(fiBitmap);
-
-
     }
     //---------------------------------------------------------------------
     Codec::DecodeResult FreeImageCodec::decode(DataStreamPtr& input) const
     {
-		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
-
 		// Buffer stream into memory (TODO: override IO functions instead?)
 		MemoryDataStream memStream(input, true);
 
@@ -605,9 +592,6 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	String FreeImageCodec::magicNumberToFileExt(const char *magicNumberPtr, size_t maxbytes) const
 	{
-		// Set error handler
-		FreeImage_SetOutputMessage(FreeImageLoadErrorHandler);
-
 		FIMEMORY* fiMem = 
 			FreeImage_OpenMemory((BYTE*)magicNumberPtr, static_cast<DWORD>(maxbytes));
 

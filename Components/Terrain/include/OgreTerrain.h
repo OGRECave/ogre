@@ -1043,8 +1043,8 @@ namespace Ogre
 		const String& getLayerTextureName(uint8 layerIndex, uint8 samplerIndex) const;
 		/** Set the name of the texture bound to a given index within a given layer.
 		See the LayerDeclaration for a list of sampelrs within a layer.
-		@param index The layer index.
-		@param size The world size of the texture before repeating
+		@param layerIndex The layer index.
+    	@param samplerIndex The sampler index within a layer
 		@param textureName The name of the texture to use
 		*/
 		void setLayerTextureName(uint8 layerIndex, uint8 samplerIndex, const String& textureName);
@@ -1266,7 +1266,7 @@ namespace Ogre
 		it safe to perform in a background thread. This call promotes those
 		calculations to the runtime values, and must be called in the main thread.
 		@param rect Rectangle describing the area to finalise 
-		@param normalsBox Pointer to a PixelBox full of normals
+		@param lightmapBox Pointer to a PixelBox full of normals
 		*/
 		void finaliseLightmap(const Rect& rect, PixelBox* lightmapBox);
 

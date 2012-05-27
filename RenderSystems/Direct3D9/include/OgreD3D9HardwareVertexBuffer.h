@@ -105,7 +105,6 @@ namespace Ogre {
 		D3DVERTEXBUFFER_DESC		mBufferDesc;					// Buffer description.		
 		BufferResources*			mSourceBuffer;					// Source buffer resources when working with multiple devices.
 		char*						mSourceLockedBytes;				// Source buffer locked bytes.
-		char*						mSystemMemoryBuffer;			// Consistent system memory buffer for multiple devices support in case of write only buffers.
     };
 }
 #endif

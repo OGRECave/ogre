@@ -16,7 +16,7 @@ enum ShaderSystemLightingModel
 	SSLM_PerVertexLighting,
 	SSLM_PerPixelLighting,
 	SSLM_NormalMapLightingTangentSpace,
-	SSLM_NormalMapLightingObjectSpace,		
+	SSLM_NormalMapLightingObjectSpace
 };
 
 // a hack class to get infinite frustum - needed by instanced viewports demo
@@ -140,7 +140,7 @@ protected:
     void addModelToScene(const String &  modelName);
 
 	/** Toggle instanced viewports */
-	void updateInstancedViewports(bool ebabled);
+	void updateInstancedViewports(bool enabled);
 
 	/** Toggle light visibility. */
 	void updateLightState(const String& lightName, bool visible);

@@ -91,11 +91,13 @@ if (NOT APPLE)
 endif ()
 
 # Set compiler specific build flags
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
   check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
   if (OGRE_GCC_HAS_SSE)
     add_definitions(-msse)
   endif ()
+  # This is a set of sensible warnings that provide meaningful output
+  add_definitions(-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -pedantic -Wshadow -Wno-unused-but-set-parameter -Wno-missing-field-initializers -Wno-long-long)
 endif ()
 if (MSVC)
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
@@ -120,7 +122,7 @@ if (MINGW)
   add_definitions(-D_WIN32_WINNT=0x0500)
 endif ()
 
-if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
+if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
   # Test for GCC visibility
   include(CheckCXXCompilerFlag)
   check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
@@ -147,7 +149,7 @@ if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
   endif()  
-endif (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
+endif ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
 
 # determine system endianess
 if (MSVC)
@@ -204,6 +206,9 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "")
   set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
   set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
+  set(XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
+  set(XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
+  set(XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   set(OGRE_BUILD_RENDERSYSTEM_GLES TRUE CACHE BOOL "Forcing OpenGL ES RenderSystem for iOS" FORCE)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
@@ -294,7 +299,6 @@ option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_ZIP "Build ZIP archive support. If you disable this option, you cannot use ZIP archives resource locations. The samples won't work." TRUE "ZZip_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE "Include Viewport orientation mode support." FALSE)
-option(OGRE_CONFIG_NEW_COMPILERS "Use the new script compilers." TRUE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_CG_SUPPORT "Enable Cg support to ES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER "Enable GLSL optimiser use in GLES 2 render system" FALSE "OGRE_BUILD_RENDERSYSTEM_GLES2" FALSE)
 cmake_dependent_option(OGRE_USE_BOOST "Use Boost extensions" TRUE "Boost_FOUND" FALSE)
@@ -330,7 +334,6 @@ mark_as_advanced(
   OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
   OGRE_CONFIG_MEMTRACK_DEBUG
   OGRE_CONFIG_MEMTRACK_RELEASE
-  OGRE_CONFIG_NEW_COMPILERS
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC

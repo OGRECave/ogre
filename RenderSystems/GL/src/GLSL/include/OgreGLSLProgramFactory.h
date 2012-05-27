@@ -45,7 +45,7 @@ namespace Ogre
         ~GLSLProgramFactory(void);
 		/// Get the name of the language this factory creates programs for
 		const String& getLanguage(void) const;
-		/// create an instance of GLSLProgram
+		/// Create an instance of GLSLProgram
         HighLevelGpuProgram* create(ResourceManager* creator, 
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);

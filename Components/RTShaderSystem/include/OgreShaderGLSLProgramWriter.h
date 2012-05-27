@@ -48,7 +48,6 @@ class _OgreRTSSExport GLSLProgramWriter : public ProgramWriter
 public:
 
 	/** Class constructor. 
-	@param language The target shader language.
 	*/
 	GLSLProgramWriter	();
 

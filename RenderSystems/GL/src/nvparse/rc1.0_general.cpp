@@ -26,11 +26,13 @@ void GeneralCombinersStruct::Validate(int numConsts, ConstColorStruct *pcc)
 		localConsts += general[i].numConsts;
 
 	if (localConsts > 0)
+    {
 		if (NULL == glCombinerStageParameterfvNV)
 			errors.set("local constant(s) specified, but not supported -- ignored");
 		else
 			for (i = 0; i < num; i++)
 				general[i].SetUnusedLocalConsts(numConsts, pcc);
+    }
 
 	for (i = 0; i < num; i++)
 		general[i].Validate(i);

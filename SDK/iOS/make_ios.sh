@@ -3,7 +3,7 @@
 # Build and package the SDK for iOS
 # Assumes that you are in the SDK/iOS directory
 
-LIPO=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/lipo
+LIPO=lipo
 SDKBUILDDIR=`pwd`
 
 set IPHONEOS_DEPLOYMENT_TARGET 4.0
@@ -49,15 +49,15 @@ echo API generation done.
 # Install targets will fail because they can't find libraries.  So we've added a post build phase to copy them to the
 # location that the target expects them then copy them to the correct location
 
-echo Building for devices...
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
-mkdir -p sdk/lib/Release-iphoneos
-mv -v lib/Release/*.a sdk/lib/Release-iphoneos
-
 echo Building for simulator...
 xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
 mkdir -p sdk/lib/Release-iphonesimulator
 mv -v lib/Release/*.a sdk/lib/Release-iphonesimulator
+
+echo Building for devices...
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
+mkdir -p sdk/lib/Release-iphoneos
+mv -v lib/Release/*.a sdk/lib/Release-iphoneos
 
 # Frameworks
 echo Copying frameworks...

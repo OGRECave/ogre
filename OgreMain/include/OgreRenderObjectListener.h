@@ -34,31 +34,35 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	class Pass;
-	class Renderable;
+    class Pass;
+    class Renderable;
 
     /** Abstract interface which classes must implement if they wish to receive
         events from the scene manager when single object is about to be rendered. 
     */
-	class _OgreExport RenderObjectListener
-	{
-	public:
-		virtual ~RenderObjectListener() {}
-		/** Event raised when render single object started.
-		@remarks
-		This method is called by the SceneManager.
-		@param pass The renderable that is going to be rendered.
-		@param pass The pass which was set.
-		@param source The auto parameter source used within this render call.
-		@pLightList The light list in use.
-		@suppressRenderStateChanges True if render state changes should be suppressed.
-		*/
-		virtual void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, 
-			const LightList* pLightList, bool suppressRenderStateChanges) = 0;
-	};
+    class _OgreExport RenderObjectListener
+    {
+    public:
+        virtual ~RenderObjectListener() {}
+        /** Event raised when render single object started.
+        @remarks
+            This method is called by the SceneManager.
+        @param rend
+            The renderable that is going to be rendered.
+        @param pass
+            The pass which was set.
+        @param source
+            The auto parameter source used within this render call.
+        @param pLightList
+            The light list in use.
+        @param suppressRenderStateChanges
+            True if render state changes should be suppressed.
+        */
+        virtual void notifyRenderSingleObject(Renderable* rend, const Pass* pass, const AutoParamDataSource* source, 
+            const LightList* pLightList, bool suppressRenderStateChanges) = 0;
+    };
 
+} // namespace Ogre
 
-}
-
-#endif
+#endif // __RenderObjectListener_H__
 

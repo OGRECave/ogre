@@ -78,13 +78,10 @@ namespace
 	{
         GLint  errPos;
         GLenum errCode;
-        const GLubyte *errString;
         int len = strlen(instring);
 
         glBindProgramARB(target, id);
         errCode = glGetError();
-        if (errCode == GL_INVALID_OPERATION)
-                errString = gluErrorString(errCode);
 
         glProgramStringARB(target, 
                            GL_PROGRAM_FORMAT_ASCII_ARB, 
@@ -93,8 +90,6 @@ namespace
 
 		if ((errCode = glGetError()) != GL_NO_ERROR)
 		{
-			errString = gluErrorString(errCode);
-			
 			glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errPos);
             if (errPos == -1)
                 return;

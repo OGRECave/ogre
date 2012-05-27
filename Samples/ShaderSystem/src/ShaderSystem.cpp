@@ -952,11 +952,11 @@ void Sample_ShaderSystem::updateAddLotsOfModels(bool addThem)
     }
 }
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::updateInstancedViewports(bool ebabled)
+void Sample_ShaderSystem::updateInstancedViewports(bool enabled)
 {
-	if (mInstancedViewportsEnable != ebabled)
+	if (mInstancedViewportsEnable != enabled)
 	{
-		mInstancedViewportsEnable = ebabled;
+		mInstancedViewportsEnable = enabled;
 
 		if (mInstancedViewportsEnable)
 		{

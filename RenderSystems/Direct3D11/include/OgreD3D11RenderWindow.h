@@ -72,7 +72,7 @@ namespace Ogre
 		DXGI_SWAP_CHAIN_DESC* getPresentationParameters(void);
 
 		/// @copydoc RenderTarget::update
-		void update(bool swap);
+		void update(bool swapBuffers);
 
 		/** Create (or recreate) the D3D device or SwapChain for this window.
 		*/

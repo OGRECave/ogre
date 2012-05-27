@@ -563,8 +563,7 @@ namespace Ogre {
                 return -1;
                 break;
         };
-        if (newPos >= curEmbeddedFileData.fileSize || 
-            newPos < 0 )
+        if (newPos >= curEmbeddedFileData.fileSize)
         {
             // bad whence - return an error - nonzero value.
             return -1;

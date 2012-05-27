@@ -634,7 +634,7 @@ namespace Ogre
 		
 		XGetWindowAttributes(xDisplay, mWindow, &windowAttrib);
 		
-		if (mWidth == windowAttrib.width && mHeight == windowAttrib.height)
+		if (mWidth == (unsigned)windowAttrib.width && mHeight == (unsigned)windowAttrib.height)
 			return;
 		
 		mWidth = windowAttrib.width;
@@ -694,8 +694,8 @@ namespace Ogre
 		if (mClosed)
 			return;
 		
-		if ((dst.left < 0) || (dst.right > mWidth) ||
-			(dst.top < 0) || (dst.bottom > mHeight) ||
+		if ((dst.right > mWidth) ||
+			(dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory" );

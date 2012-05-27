@@ -64,13 +64,6 @@
 			<key>Group</key>
 			<string>Basic Ogre Framework</string>
 		</dict>
-		<key>media</key>
-		<dict>
-			<key>Path</key>
-			<string>media</string>
-			<key>Group</key>
-			<string>Resources</string>
-		</dict>
 		<key>ogre.cfg</key>
 		<dict>
 			<key>Path</key>
@@ -105,7 +98,6 @@
 		<string>OgreFramework.cpp</string>
 		<string>OgreFramework.h</string>
 		<string>OgreStaticPluginLoader.h</string>
-		<string>media</string>
 		<string>ogre.cfg</string>
 		<string>plugins.cfg</string>
 		<string>resources.cfg</string>

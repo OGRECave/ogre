@@ -132,7 +132,7 @@ namespace Ogre
 			any messages.
 		@param window
 			The RenderWindow you are interested in monitoring
-		@param listner
+		@param listener
 			Your callback listener
 		*/
 		static void addWindowEventListener( RenderWindow* window, WindowEventListener* listener );
@@ -142,7 +142,7 @@ namespace Ogre
 			Remove previously added listener
 		@param window
 			The RenderWindow you registered with
-		@param listner
+		@param listener
 			The listener registered
 		*/
 		static void removeWindowEventListener( RenderWindow* window, WindowEventListener* listener );

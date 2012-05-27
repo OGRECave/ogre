@@ -732,7 +732,7 @@ namespace Ogre {
 
             // Now remove duplicate declarations, first we have to sort the vector.
             std::sort(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationLessThan());
-            FunctionVector::const_iterator endIt = forwardDecl.erase(std::unique(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationCompare()), forwardDecl.end());
+            forwardDecl.erase(std::unique(forwardDecl.begin(), forwardDecl.end(), FunctionInvocation::FunctionInvocationCompare()), forwardDecl.end());
 
             for(unsigned int i = 0; i < program->getDependencyCount(); ++i)
             {

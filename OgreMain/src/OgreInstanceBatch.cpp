@@ -159,7 +159,7 @@ namespace Ogre
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
 
-		while( itor != end )
+		while( itor != end && !mVisible )
 		{
 			//Trick to force Ogre not to render us if none of our instances is visible
 			//Because we do Camera::isVisible(), it is better if the SceneNode from the
@@ -223,9 +223,9 @@ namespace Ogre
 										mat3x4[(i+2) * 4 + 3] );
 			const Vector3 newPos( worldTrans - cameraRelativePosition );
 
-			mat3x4[(i+0) * 4 + 3] = newPos.x;
-			mat3x4[(i+1) * 4 + 3] = newPos.y;
-			mat3x4[(i+2) * 4 + 3] = newPos.z;
+			mat3x4[(i+0) * 4 + 3] = (float)newPos.x;
+			mat3x4[(i+1) * 4 + 3] = (float)newPos.y;
+			mat3x4[(i+2) * 4 + 3] = (float)newPos.z;
 		}
 	}
 	//-----------------------------------------------------------------------

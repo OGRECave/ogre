@@ -908,7 +908,6 @@ namespace Ogre
 		/** Destroy all RenderQueueInvocationSequences. 
 		@remarks
 			You must ensure that no Viewports are using custom sequences.
-		@param name The name to identify the sequence
 		*/
 		void destroyAllRenderQueueInvocationSequences(void);
 

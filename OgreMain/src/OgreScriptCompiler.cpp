@@ -287,57 +287,57 @@ namespace Ogre
 		return compile(nodes, group);
 	}
 
-	static void logAST(int tabs, const AbstractNodePtr &node)
-	{
-		String msg = "";
-		for(int i = 0; i < tabs; ++i)
-			msg += "\t";
-
-		switch(node->type)
-		{
-		case ANT_ATOM:
-			{
-				AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(node.get());
-				msg = msg + atom->value;
-			}
-			break;
-		case ANT_PROPERTY:
-			{
-				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>(node.get());
-				msg = msg + prop->name + " =";
-				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
-				{
-					if((*i)->type == ANT_ATOM)
-						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
-				}
-			}
-			break;
-		case ANT_OBJECT:
-			{
-				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-				msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
-				for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
-				{
-					if((*i)->type == ANT_ATOM)
-						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
-				}
-			}
-			break;
-		default:
-			msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
-		}
-
-		LogManager::getSingleton().logMessage(msg);
-
-		if(node->type == ANT_OBJECT)
-		{
-			ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
-			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
-			{
-				logAST(tabs + 1, *i);
-			}
-		}
-	}
+//	static void logAST(int tabs, const AbstractNodePtr &node)
+//	{
+//		String msg = "";
+//		for(int i = 0; i < tabs; ++i)
+//			msg += "\t";
+//
+//		switch(node->type)
+//		{
+//		case ANT_ATOM:
+//			{
+//				AtomAbstractNode *atom = reinterpret_cast<AtomAbstractNode*>(node.get());
+//				msg = msg + atom->value;
+//			}
+//			break;
+//		case ANT_PROPERTY:
+//			{
+//				PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>(node.get());
+//				msg = msg + prop->name + " =";
+//				for(AbstractNodeList::iterator i = prop->values.begin(); i != prop->values.end(); ++i)
+//				{
+//					if((*i)->type == ANT_ATOM)
+//						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//				}
+//			}
+//			break;
+//		case ANT_OBJECT:
+//			{
+//				ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//				msg = msg + node->file + " - " + StringConverter::toString(node->line) + " - " + obj->cls + " \"" + obj->name + "\" =";
+//				for(AbstractNodeList::iterator i = obj->values.begin(); i != obj->values.end(); ++i)
+//				{
+//					if((*i)->type == ANT_ATOM)
+//						msg = msg + " " + reinterpret_cast<AtomAbstractNode*>((*i).get())->value;
+//				}
+//			}
+//			break;
+//		default:
+//			msg = msg + "Unacceptable node type: " + StringConverter::toString(node->type);
+//		}
+//
+//		LogManager::getSingleton().logMessage(msg);
+//
+//		if(node->type == ANT_OBJECT)
+//		{
+//			ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+//			for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+//			{
+//				logAST(tabs + 1, *i);
+//			}
+//		}
+//	}
 
 	bool ScriptCompiler::compile(const ConcreteNodeListPtr &nodes, const String &group)
 	{
@@ -503,7 +503,7 @@ namespace Ogre
 	void ScriptCompiler::processImports(Ogre::AbstractNodeListPtr &nodes)
 	{
 		// We only need to iterate over the top-level of nodes
-		AbstractNodeList::iterator i = nodes->begin(), last = nodes->end();
+		AbstractNodeList::iterator i = nodes->begin();
 		while(i != nodes->end())
 		{
 			// We move to the next node here and save the current one.
@@ -1555,12 +1555,10 @@ namespace Ogre
 		:mListener(0), OGRE_THREAD_POINTER_INIT(mScriptCompiler)
 	{
 		OGRE_LOCK_AUTO_MUTEX
-#if OGRE_USE_NEW_COMPILERS == 1
 		mScriptPatterns.push_back("*.program");
 		mScriptPatterns.push_back("*.material");
 		mScriptPatterns.push_back("*.particle");
 		mScriptPatterns.push_back("*.compositor");
-#endif
         mScriptPatterns.push_back("*.os");
 		ResourceGroupManager::getSingleton()._registerScriptLoader(this);
 

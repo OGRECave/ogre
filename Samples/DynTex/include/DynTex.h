@@ -105,7 +105,7 @@ protected:
 		// initialise the texture to have full luminance
 		mConstantTexBuf = new uint8[mTexBuf->getSizeInBytes()];
 		memset(mConstantTexBuf, 0xff, mTexBuf->getSizeInBytes());
-		memcpy(mTexBuf->lock(HardwareBuffer::HBL_NORMAL), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
+		memcpy(mTexBuf->lock(HardwareBuffer::HBL_DISCARD), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
 		mTexBuf->unlock();
 
 		// create a penguin and attach him to our penguin node
@@ -170,7 +170,7 @@ protected:
 			}
 		}
 
-		memcpy(mTexBuf->lock(HardwareBuffer::HBL_NORMAL), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
+		memcpy(mTexBuf->lock(HardwareBuffer::HBL_DISCARD), mConstantTexBuf, TEXTURE_SIZE * TEXTURE_SIZE);
 		mTexBuf->unlock();
 	}
 
@@ -178,6 +178,7 @@ protected:
 	{
 		delete [] mConstantTexBuf;
 		TextureManager::getSingleton().remove("thaw");
+        mSceneMgr->destroyQuery(mCursorQuery);
 	}
 
 	const unsigned int TEXTURE_SIZE;

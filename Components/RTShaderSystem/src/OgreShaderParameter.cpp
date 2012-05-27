@@ -354,6 +354,7 @@ bool UniformParameter::isFloat() const
 	case GCT_INT4:
 	case GCT_SAMPLER1D:
 	case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
 	case GCT_SAMPLER3D:
 	case GCT_SAMPLERCUBE:
 	case GCT_SAMPLER1DSHADOW:
@@ -371,6 +372,7 @@ bool UniformParameter::isSampler() const
 	{
 	case GCT_SAMPLER1D:
 	case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
 	case GCT_SAMPLER3D:
 	case GCT_SAMPLERCUBE:
 	case GCT_SAMPLER1DSHADOW:
@@ -623,6 +625,7 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     default:
 	case GCT_SAMPLER1D:
     case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
     case GCT_SAMPLER3D:
     case GCT_SAMPLERCUBE:
     case GCT_SAMPLER1DSHADOW:
@@ -667,6 +670,7 @@ ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index
     default:
 	case GCT_SAMPLER1D:
     case GCT_SAMPLER2D:
+    case GCT_SAMPLER2DARRAY:
     case GCT_SAMPLER3D:
     case GCT_SAMPLERCUBE:
     case GCT_SAMPLER1DSHADOW:
@@ -766,6 +770,9 @@ UniformParameterPtr ParameterFactory::createSampler(GpuConstantType type, int in
 	case GCT_SAMPLER2D:
 		return createSampler2D(index);
 
+    case GCT_SAMPLER2DARRAY:
+        return createSampler2DArray(index);
+
 	case GCT_SAMPLER3D:
 		return createSampler3D(index);
 
@@ -812,6 +819,15 @@ UniformParameterPtr ParameterFactory::createSampler2D(int index)
 		Parameter::SPS_UNKNOWN, index, 
 		Parameter::SPC_UNKNOWN,
 		(uint16)GPV_GLOBAL, 1));
+}
+
+//-----------------------------------------------------------------------
+UniformParameterPtr ParameterFactory::createSampler2DArray(int index)
+{
+    return UniformParameterPtr(OGRE_NEW UniformParameter(GCT_SAMPLER2DARRAY, "gSampler2DArray_" + StringConverter::toString(index), 
+                                                         Parameter::SPS_UNKNOWN, index, 
+                                                         Parameter::SPC_UNKNOWN,
+                                                         (uint16)GPV_GLOBAL, 1));
 }
 
 //-----------------------------------------------------------------------

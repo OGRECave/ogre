@@ -41,403 +41,403 @@ namespace Ogre {
 
     /** Manages Overlay objects, parsing them from .overlay files and
         storing a lookup library of them. Alo manages the creation of 
-		OverlayContainers and OverlayElements, used for non-interactive 2D 
-		elements such as HUDs.
+        OverlayContainers and OverlayElements, used for non-interactive 2D 
+        elements such as HUDs.
     */
     class CgFxScriptLoader : public Singleton<CgFxScriptLoader>, public ScriptLoader, public ScriptCompilerAlloc
     {
     public:
     protected:
-		/** we want to comply to FXCompositor - this list is the enum FXComposer.Core.FXSemanticID
-			that existing in C:\Program Files\NVIDIA Corporation\FX Composer 2.5\FXComposer.Core.dll
-			if you reference if from managed project you can see the list.
-			description is from C:\Program Files\NVIDIA Corporation\FX Composer 2.5\Plugins\scene\render\Data\fxmapping.xml (open with a text editor and not with the browser)
-			           and from C:\Program Files\NVIDIA Corporation\FX Composer 2.5\FXComposer.Core.xml
-			*/
-		enum FXSemanticID
-		{
-			FXS_NONE,
-			FXS_UNKNOWN,
-			FXS_POSITION, // desc="A position vector." datatypes="float3"
-			FXS_DIRECTION, // desc="A direction vector." datatypes="float3"
-			FXS_COLOR, 
-			FXS_DIFFUSE, // desc="Color value to be used as the diffuse color.  The fourth channel represents diffuse alpha." datatypes="float4,float3,texture"
-			FXS_SPECULAR, // desc="Color value to be used as the specular color.  The fourth channel represents specular alpha." datatypes="float4,float3,texture"
-			FXS_AMBIENT, // desc="Color value to be used as the ambient color. The fourth channel represents ambient alpha." datatypes="float4,float3,texture"
-			FXS_EMISSION,
-			FXS_EMISSIVE, // desc="Color value to be used as the emissive color.  The fourth channel represents emissive alpha." datatypes="float4,float3,texture"
-			FXS_SPECULARPOWER, // desc="Power to use for the specular exponent." datatypes="float,float3,float4"
-			FXS_REFRACTION, // desc="A refraction map that give the coefficents to determine the norma for an environment map lookup" datatypes="texture"
-			FXS_OPACITY, // desc="Opacity of the object." datatypes="texture"
-			FXS_ENVIRONMENT, // desc="An environment map." datatypes="texture"
-			FXS_ENVIRONMENTNORMAL, // name="environmentnormal" desc="An environment normal map." datatypes="texture"
-			FXS_NORMAL, // desc="Normal for the element or texture" datatypes="texture"
-			FXS_HEIGHT, // desc="Height for the element when using bump mapping." datatypes="texture"
-			FXS_ATTENUATION, // desc="Light attenuation." datatypes="float3"
-			FXS_RENDERCOLORTARGET, // desc="Defines the texture as the render target of a pass in the effect." datatypes="texture"
-			FXS_RENDERDEPTHSTENCILTARGET, // desc="Defines the texture as the render target of a pass in the effect." datatypes="texture"
-			FXS_VIEWPORTPIXELSIZE, // desc="Size of the viewport in pixels" datatypes="float2"
-			FXS_CAMERAPOSITION, // desc="Viewer position in world space (replaced by position with space=view annotation)." datatypes="float3"
-			FXS_TIME, // desc="The current time (see units annotation for scale)." datatypes="float"
-			FXS_ELAPSEDTIME, // desc="The time between adjacent frames (see units annotation for scale)." datatypes="float"
-			FXS_ANIMATIONTIME,
-			FXS_ANIMATIONTICK,
-			FXS_MOUSEPOSITION, // desc="The mouse position on screen (x,y,time)" datatypes="float3"
-			FXS_LEFTMOUSEDOWN, // desc="The left mouse down state, and its position at that time ( x, y, isdown, timedown)" datatypes="float4"
-			FXS_WORLD, // desc="world-inverse matrix." datatypes="matrix"
-			FXS_VIEW, // desc="view matrix." datatypes="matrix"
-			FXS_PROJECTION, // desc="projection matrix." datatypes="matrix"
-			FXS_WORLDTRANSPOSE, // desc="world-transpose matrix." datatypes="matrix"
-			FXS_VIEWTRANSPOSE, // name="worldviewtranspose" desc="world-view-transpose matrix." datatypes="matrix"
-			FXS_PROJECTIONTRANSPOSE, // name="viewprojectiontranspose" desc="view-projection-transpose matrix." datatypes="matrix"
-			FXS_WORLDVIEW, // desc="world-view matrix." datatypes="matrix"
-			FXS_WORLDVIEWPROJECTION, // desc="world-view-projection matrix." datatypes="matrix"
-			FXS_WORLDINVERSE, //desc="world-inverse matrix." datatypes="matrix"
-			FXS_VIEWINVERSE, // desc="view-inverse matrix." datatypes="matrix"
-			FXS_PROJECTIONINVERSE, // desc="projection-inverse matrix." datatypes="matrix"
-			FXS_WORLDINVERSETRANSPOSE, // desc="world-inverse-transpose matrix." datatypes="matrix"
-			FXS_VIEWINVERSETRANSPOSE, // desc="view-inverse-transpose matrix." datatypes="matrix"
-			FXS_PROJECTIONINVERSETRANSPOSE, // desc="projection-inverse-transpose matrix." datatypes="matrix"
-			FXS_WORLDVIEWINVERSE, // desc="world-view-inverse matrix." datatypes="matrix"
-			FXS_WORLDVIEWTRANSPOSE, // desc="world-view-transpose matrix." datatypes="matrix"
-			FXS_WORLDVIEWINVERSETRANSPOSE, // desc="world-view-inverse-transpose matrix." datatypes="matrix"
-			FXS_WORLDVIEWPROJECTIONINVERSE, // desc="world-view-projection-inverse matrix." datatypes="matrix"
-			FXS_WORLDVIEWPROJECTIONTRANSPOSE,
-			FXS_WORLDVIEWPROJECTIONINVERSETRANSPOSE, // name="worldviewprojectioninversetranspose" desc="world-view-projection-inverse-transpose matrix." datatypes="matrix"
-			FXS_VIEWPROJECTION, // desc="view-projection matrix." datatypes="matrix"
-			FXS_VIEWPROJECTIONTRANSPOSE, // desc="view-projection-transpose matrix." datatypes="matrix"
-			FXS_VIEWPROJECTIONINVERSE, // desc="world-view-projection-inverse matrix." datatypes="matrix"
-			FXS_VIEWPROJECTIONINVERSETRANSPOSE, // desc="world-view-projection-inverse-transpose matrix." datatypes="matrix"
-			FXS_FXCOMPOSER_RESETPULSE, // desc="A pulsed boolean, reset on window resize or from the FX Composer user interface." datatypes="bool"
-			FXS_STANDARDSGLOBAL, // desc="Standards version and global annotations" datatypes="float"
-			FXS_UNITSSCALE, // desc="Defines the modeling proportions to the current unit/space." datatypes="float"
-			FXS_POWER, // Power factor
-			FXS_DIFFUSEMAP, // A diffuse texture map
-			FXS_SPECULARMAP, // A specular texture map
-			FXS_ENVMAP, // An env map
-			FXS_LIGHTPOSITION, // light position
-			FXS_TRANSFORM, // A transform
-			FXS_USER, // User Semantics - Semantics Remapper Special
-			FXS_CONSTANTATTENUATION,
-			FXS_LINEARATTENUATION,
-			FXS_QUADRATICATTENUATION,
-			FXS_FALLOFFANGLE,
-			FXS_FALLOFFEXPONENT,
-			FXS_BOUNDINGRADIUS
-		};
+        /** We want to comply to FXCompositor - this list is the enum FXComposer.Core.FXSemanticID
+            that existing in C:\\Program Files\\NVIDIA Corporation\\FX Composer 2.5\\FXComposer.Core.dll
+            if you reference if from managed project you can see the list.
+            description is from C:\\Program Files\\NVIDIA Corporation\\FX Composer 2.5\\Plugins\\scene\\render\\Data\\fxmapping.xml (open with a text editor and not with the browser)
+            and from C:\\Program Files\\NVIDIA Corporation\\FX Composer 2.5\\FXComposer.Core.xml
+            */
+        enum FXSemanticID
+        {
+            FXS_NONE,
+            FXS_UNKNOWN,
+            FXS_POSITION, // desc="A position vector." datatypes="float3"
+            FXS_DIRECTION, // desc="A direction vector." datatypes="float3"
+            FXS_COLOR, 
+            FXS_DIFFUSE, // desc="Color value to be used as the diffuse color.  The fourth channel represents diffuse alpha." datatypes="float4,float3,texture"
+            FXS_SPECULAR, // desc="Color value to be used as the specular color.  The fourth channel represents specular alpha." datatypes="float4,float3,texture"
+            FXS_AMBIENT, // desc="Color value to be used as the ambient color. The fourth channel represents ambient alpha." datatypes="float4,float3,texture"
+            FXS_EMISSION,
+            FXS_EMISSIVE, // desc="Color value to be used as the emissive color.  The fourth channel represents emissive alpha." datatypes="float4,float3,texture"
+            FXS_SPECULARPOWER, // desc="Power to use for the specular exponent." datatypes="float,float3,float4"
+            FXS_REFRACTION, // desc="A refraction map that give the coefficents to determine the norma for an environment map lookup" datatypes="texture"
+            FXS_OPACITY, // desc="Opacity of the object." datatypes="texture"
+            FXS_ENVIRONMENT, // desc="An environment map." datatypes="texture"
+            FXS_ENVIRONMENTNORMAL, // name="environmentnormal" desc="An environment normal map." datatypes="texture"
+            FXS_NORMAL, // desc="Normal for the element or texture" datatypes="texture"
+            FXS_HEIGHT, // desc="Height for the element when using bump mapping." datatypes="texture"
+            FXS_ATTENUATION, // desc="Light attenuation." datatypes="float3"
+            FXS_RENDERCOLORTARGET, // desc="Defines the texture as the render target of a pass in the effect." datatypes="texture"
+            FXS_RENDERDEPTHSTENCILTARGET, // desc="Defines the texture as the render target of a pass in the effect." datatypes="texture"
+            FXS_VIEWPORTPIXELSIZE, // desc="Size of the viewport in pixels" datatypes="float2"
+            FXS_CAMERAPOSITION, // desc="Viewer position in world space (replaced by position with space=view annotation)." datatypes="float3"
+            FXS_TIME, // desc="The current time (see units annotation for scale)." datatypes="float"
+            FXS_ELAPSEDTIME, // desc="The time between adjacent frames (see units annotation for scale)." datatypes="float"
+            FXS_ANIMATIONTIME,
+            FXS_ANIMATIONTICK,
+            FXS_MOUSEPOSITION, // desc="The mouse position on screen (x,y,time)" datatypes="float3"
+            FXS_LEFTMOUSEDOWN, // desc="The left mouse down state, and its position at that time ( x, y, isdown, timedown)" datatypes="float4"
+            FXS_WORLD, // desc="world-inverse matrix." datatypes="matrix"
+            FXS_VIEW, // desc="view matrix." datatypes="matrix"
+            FXS_PROJECTION, // desc="projection matrix." datatypes="matrix"
+            FXS_WORLDTRANSPOSE, // desc="world-transpose matrix." datatypes="matrix"
+            FXS_VIEWTRANSPOSE, // name="worldviewtranspose" desc="world-view-transpose matrix." datatypes="matrix"
+            FXS_PROJECTIONTRANSPOSE, // name="viewprojectiontranspose" desc="view-projection-transpose matrix." datatypes="matrix"
+            FXS_WORLDVIEW, // desc="world-view matrix." datatypes="matrix"
+            FXS_WORLDVIEWPROJECTION, // desc="world-view-projection matrix." datatypes="matrix"
+            FXS_WORLDINVERSE, //desc="world-inverse matrix." datatypes="matrix"
+            FXS_VIEWINVERSE, // desc="view-inverse matrix." datatypes="matrix"
+            FXS_PROJECTIONINVERSE, // desc="projection-inverse matrix." datatypes="matrix"
+            FXS_WORLDINVERSETRANSPOSE, // desc="world-inverse-transpose matrix." datatypes="matrix"
+            FXS_VIEWINVERSETRANSPOSE, // desc="view-inverse-transpose matrix." datatypes="matrix"
+            FXS_PROJECTIONINVERSETRANSPOSE, // desc="projection-inverse-transpose matrix." datatypes="matrix"
+            FXS_WORLDVIEWINVERSE, // desc="world-view-inverse matrix." datatypes="matrix"
+            FXS_WORLDVIEWTRANSPOSE, // desc="world-view-transpose matrix." datatypes="matrix"
+            FXS_WORLDVIEWINVERSETRANSPOSE, // desc="world-view-inverse-transpose matrix." datatypes="matrix"
+            FXS_WORLDVIEWPROJECTIONINVERSE, // desc="world-view-projection-inverse matrix." datatypes="matrix"
+            FXS_WORLDVIEWPROJECTIONTRANSPOSE,
+            FXS_WORLDVIEWPROJECTIONINVERSETRANSPOSE, // name="worldviewprojectioninversetranspose" desc="world-view-projection-inverse-transpose matrix." datatypes="matrix"
+            FXS_VIEWPROJECTION, // desc="view-projection matrix." datatypes="matrix"
+            FXS_VIEWPROJECTIONTRANSPOSE, // desc="view-projection-transpose matrix." datatypes="matrix"
+            FXS_VIEWPROJECTIONINVERSE, // desc="world-view-projection-inverse matrix." datatypes="matrix"
+            FXS_VIEWPROJECTIONINVERSETRANSPOSE, // desc="world-view-projection-inverse-transpose matrix." datatypes="matrix"
+            FXS_FXCOMPOSER_RESETPULSE, // desc="A pulsed boolean, reset on window resize or from the FX Composer user interface." datatypes="bool"
+            FXS_STANDARDSGLOBAL, // desc="Standards version and global annotations" datatypes="float"
+            FXS_UNITSSCALE, // desc="Defines the modeling proportions to the current unit/space." datatypes="float"
+            FXS_POWER, // Power factor
+            FXS_DIFFUSEMAP, // A diffuse texture map
+            FXS_SPECULARMAP, // A specular texture map
+            FXS_ENVMAP, // An env map
+            FXS_LIGHTPOSITION, // light position
+            FXS_TRANSFORM, // A transform
+            FXS_USER, // User Semantics - Semantics Remapper Special
+            FXS_CONSTANTATTENUATION,
+            FXS_LINEARATTENUATION,
+            FXS_QUADRATICATTENUATION,
+            FXS_FALLOFFANGLE,
+            FXS_FALLOFFEXPONENT,
+            FXS_BOUNDINGRADIUS
+        };
 
-		enum GlobalStateType
-		{
-			GST_UNKNOWN,
-			GST_ALPHABLENDENABLE,  //AlphaBlendEnable
-			GST_ALPHAFUNC,  //AlphaFunc
-			GST_ALPHAREF,  //AlphaRef
-			GST_BLENDOP,  //BlendOp
-			GST_BLENDEQUATION,  //BlendEquation
-			GST_BLENDFUNC,  //BlendFunc
-			GST_BLENDFUNCSEPARATE,  //BlendFuncSeparate
-			GST_BLENDEQUATIONSEPARATE,  //BlendEquationSeparate
-			GST_BLENDCOLOR,  //BlendColor
-			GST_CLEARCOLOR,  //ClearColor
-			GST_CLEARSTENCIL,  //ClearStencil
-			GST_CLEARDEPTH,  //ClearDepth
-			GST_CLIPPLANE,  //ClipPlane
-			GST_CLIPPLANEENABLE,  //ClipPlaneEnable
-			GST_COLORWRITEENABLE,  //ColorWriteEnable
-			GST_COLORMASK,  //ColorMask
-			GST_COLORVERTEX,  //ColorVertex
-			GST_COLORMATERIAL,  //ColorMaterial
-			GST_COLORMATRIX,  //ColorMatrix
-			GST_COLORTRANSFORM,  //ColorTransform
-			GST_CULLFACE,  //CullFace
-			GST_CULLMODE,  //CullMode
-			GST_DEPTHBOUNDS,  //DepthBounds
-			GST_DEPTHBIAS,  //DepthBias
-			GST_DESTBLEND,  //DestBlend
-			GST_DEPTHFUNC,  //DepthFunc
-			GST_ZFUNC,  //ZFunc
-			GST_DEPTHMASK,  //DepthMask
-			GST_ZWRITEENABLE,  //ZWriteEnable
-			GST_DEPTHRANGE,  //DepthRange
-			GST_FOGDISTANCEMODE,  //FogDistanceMode
-			GST_FOGMODE,  //FogMode
-			GST_FOGTABLEMODE,  //FogTableMode
-			GST_INDEXEDVERTEXBLENDENABLE,  //IndexedVertexBlendEnable
-			GST_FOGDENSITY,  //FogDensity
-			GST_FOGSTART,  //FogStart
-			GST_FOGEND,  //FogEnd
-			GST_FOGCOLOR,  //FogColor
-			GST_FRAGMENTENVPARAMETER,  //FragmentEnvParameter
-			GST_FRAGMENTLOCALPARAMETER,  //FragmentLocalParameter
-			GST_FOGCOORDSRC,  //FogCoordSrc
-			GST_FOGVERTEXMODE,  //FogVertexMode
-			GST_FRONTFACE,  //FrontFace
-			GST_LIGHTMODELAMBIENT,  //LightModelAmbient
-			GST_AMBIENT,  //Ambient
-			GST_LIGHTINGENABLE,  //LightingEnable
-			GST_LIGHTENABLE,  //LightEnable
-			GST_LIGHTAMBIENT,  //LightAmbient
-			GST_LIGHTCONSTANTATTENUATION,  //LightConstantAttenuation
-			GST_LIGHTATTENUATION0,  //LightAttenuation0
-			GST_LIGHTDIFFUSE,  //LightDiffuse
-			GST_LIGHTLINEARATTENUATION,  //LightLinearAttenuation
-			GST_LIGHTATTENUATION1,  //LightAttenuation1
-			GST_LIGHTPOSITION,  //LightPosition
-			GST_LIGHTQUADRATICATTENUATION,  //LightQuadraticAttenuation
-			GST_LIGHTATTENUATION2,  //LightAttenuation2
-			GST_LIGHTSPECULAR,  //LightSpecular
-			GST_LIGHTSPOTCUTOFF,  //LightSpotCutoff
-			GST_LIGHTFALLOFF,  //LightFalloff
-			GST_LIGHTSPOTDIRECTION,  //LightSpotDirection
-			GST_LIGHTDIRECTION,  //LightDirection
-			GST_LIGHTSPOTEXPONENT,  //LightSpotExponent
-			GST_LIGHTPHI,  //LightPhi
-			GST_LIGHTRANGE,  //LightRange
-			GST_LIGHTTHETA,  //LightTheta
-			GST_LIGHTTYPE,  //LightType
-			GST_LOCALVIEWER,  //LocalViewer
-			GST_MULTISAMPLEANTIALIAS,  //MultiSampleAntialias
-			GST_MULTISAMPLEMASK,  //MultiSampleMask
-			GST_PATCHSEGMENTS,  //PatchSegments
-			GST_POINTSCALE_A,  //PointScale_A
-			GST_POINTSCALE_B,  //PointScale_B
-			GST_POINTSCALE_C,  //PointScale_C
-			GST_POINTSCALEENABLE,  //PointScaleEnable
-			GST_RANGEFOGENABLE,  //RangeFogEnable
-			GST_SPECULARENABLE,  //SpecularEnable
-			GST_TWEENFACTOR,  //TweenFactor
-			GST_VERTEXBLEND,  //VertexBlend
-			GST_AMBIENTMATERIALSOURCE,  //AmbientMaterialSource
-			GST_DIFFUSEMATERIALSOURCE,  //DiffuseMaterialSource
-			GST_EMISSIVEMATERIALSOURCE,  //EmissiveMaterialSource
-			GST_SPECULARMATERIALSOURCE,  //SpecularMaterialSource
-			GST_CLIPPING,  //Clipping
-			GST_LIGHTMODELCOLORCONTROL,  //LightModelColorControl
-			GST_LINESTIPPLE,  //LineStipple
-			GST_LINEWIDTH,  //LineWidth
-			GST_LOGICOP,  //LogicOp
-			GST_MATERIALAMBIENT,  //MaterialAmbient
-			GST_MATERIALDIFFUSE,  //MaterialDiffuse
-			GST_MATERIALEMISSION,  //MaterialEmission
-			GST_MATERIALEMISSIVE,  //MaterialEmissive
-			GST_MATERIALSHININESS,  //MaterialShininess
-			GST_MATERIALPOWER,  //MaterialPower
-			GST_MATERIALSPECULAR,  //MaterialSpecular
-			GST_MODELVIEWMATRIX,  //ModelViewMatrix
-			GST_MODELVIEWTRANSFORM,  //ModelViewTransform
-			GST_VIEWTRANSFORM,  //ViewTransform
-			GST_WORLDTRANSFORM,  //WorldTransform
-			GST_POINTDISTANCEATTENUATION,  //PointDistanceAttenuation
-			GST_POINTFADETHRESHOLDSIZE,  //PointFadeThresholdSize
-			GST_POINTSIZE,  //PointSize
-			GST_POINTSIZEMIN,  //PointSizeMin
-			GST_POINTSIZEMAX,  //PointSizeMax
-			GST_POINTSPRITECOORDORIGIN,  //PointSpriteCoordOrigin
-			GST_POINTSPRITECOORDREPLACE,  //PointSpriteCoordReplace
-			GST_POINTSPRITERMODE,  //PointSpriteRMode
-			GST_POLYGONMODE,  //PolygonMode
-			GST_FILLMODE,  //FillMode
-			GST_LASTPIXEL,  //LastPixel
-			GST_POLYGONOFFSET,  //PolygonOffset
-			GST_PROJECTIONMATRIX,  //ProjectionMatrix
-			GST_PROJECTIONTRANSFORM,  //ProjectionTransform
-			GST_SCISSOR,  //Scissor
-			GST_SHADEMODEL,  //ShadeModel
-			GST_SHADEMODE,  //ShadeMode
-			GST_SLOPSCALEDEPTHBIAS,  //SlopScaleDepthBias
-			GST_SRCBLEND,  //SrcBlend
-			GST_STENCILFUNC,  //StencilFunc
-			GST_STENCILMASK,  //StencilMask
-			GST_STENCILPASS,  //StencilPass
-			GST_STENCILREF,  //StencilRef
-			GST_STENCILWRITEMASK,  //StencilWriteMask
-			GST_STENCILZFAIL,  //StencilZFail
-			GST_TEXTUREFACTOR,  //TextureFactor
-			GST_STENCILOP,  //StencilOp
-			GST_STENCILFUNCSEPARATE,  //StencilFuncSeparate
-			GST_STENCILMASKSEPARATE,  //StencilMaskSeparate
-			GST_STENCILOPSEPARATE,  //StencilOpSeparate
-			GST_TEXGENSMODE,  //TexGenSMode
-			GST_TEXGENSOBJECTPLANE,  //TexGenSObjectPlane
-			GST_TEXGENSEYEPLANE,  //TexGenSEyePlane
-			GST_TEXGENTMODE,  //TexGenTMode
-			GST_TEXGENTOBJECTPLANE,  //TexGenTObjectPlane
-			GST_TEXGENTEYEPLANE,  //TexGenTEyePlane
-			GST_TEXGENRMODE,  //TexGenRMode
-			GST_TEXGENROBJECTPLANE,  //TexGenRObjectPlane
-			GST_TEXGENREYEPLANE,  //TexGenREyePlane
-			GST_TEXGENQMODE,  //TexGenQMode
-			GST_TEXGENQOBJECTPLANE,  //TexGenQObjectPlane
-			GST_TEXGENQEYEPLANE,  //TexGenQEyePlane
-			GST_TEXTUREENVCOLOR,  //TextureEnvColor
-			GST_TEXTUREENVMODE,  //TextureEnvMode
-			GST_TEXTURE1D,  //Texture1D
-			GST_TEXTURE2D,  //Texture2D
-			GST_TEXTURE3D,  //Texture3D
-			GST_TEXTURERECTANGLE,  //TextureRectangle
-			GST_TEXTURECUBEMAP,  //TextureCubeMap
-			GST_TEXTURE1DENABLE,  //Texture1DEnable
-			GST_TEXTURE2DENABLE,  //Texture2DEnable
-			GST_TEXTURE3DENABLE,  //Texture3DEnable
-			GST_TEXTURERECTANGLEENABLE,  //TextureRectangleEnable
-			GST_TEXTURECUBEMAPENABLE,  //TextureCubeMapEnable
-			GST_TEXTURETRANSFORM,  //TextureTransform
-			GST_TEXTUREMATRIX,  //TextureMatrix
-			GST_VERTEXENVPARAMETER,  //VertexEnvParameter
-			GST_VERTEXLOCALPARAMETER,  //VertexLocalParameter
-			GST_ALPHATESTENABLE,  //AlphaTestEnable
-			GST_AUTONORMALENABLE,  //AutoNormalEnable
-			GST_BLENDENABLE,  //BlendEnable
-			GST_COLORLOGICOPENABLE,  //ColorLogicOpEnable
-			GST_CULLFACEENABLE,  //CullFaceEnable
-			GST_DEPTHBOUNDSENABLE,  //DepthBoundsEnable
-			GST_DEPTHCLAMPENABLE,  //DepthClampEnable
-			GST_DEPTHTESTENABLE,  //DepthTestEnable
-			GST_ZENABLE,  //ZEnable
-			GST_DITHERENABLE,  //DitherEnable
-			GST_FOGENABLE,  //FogEnable
-			GST_LIGHTMODELLOCALVIEWERENABLE,  //LightModelLocalViewerEnable
-			GST_LIGHTMODELTWOSIDEENABLE,  //LightModelTwoSideEnable
-			GST_LINESMOOTHENABLE,  //LineSmoothEnable
-			GST_LINESTIPPLEENABLE,  //LineStippleEnable
-			GST_LOGICOPENABLE,  //LogicOpEnable
-			GST_MULTISAMPLEENABLE,  //MultisampleEnable
-			GST_NORMALIZEENABLE,  //NormalizeEnable
-			GST_POINTSMOOTHENABLE,  //PointSmoothEnable
-			GST_POINTSPRITEENABLE,  //PointSpriteEnable
-			GST_POLYGONOFFSETFILLENABLE,  //PolygonOffsetFillEnable
-			GST_POLYGONOFFSETLINEENABLE,  //PolygonOffsetLineEnable
-			GST_POLYGONOFFSETPOINTENABLE,  //PolygonOffsetPointEnable
-			GST_POLYGONSMOOTHENABLE,  //PolygonSmoothEnable
-			GST_POLYGONSTIPPLEENABLE,  //PolygonStippleEnable
-			GST_RESCALENORMALENABLE,  //RescaleNormalEnable
-			GST_SAMPLEALPHATOCOVERAGEENABLE,  //SampleAlphaToCoverageEnable
-			GST_SAMPLEALPHATOONEENABLE,  //SampleAlphaToOneEnable
-			GST_SAMPLECOVERAGEENABLE,  //SampleCoverageEnable
-			GST_SCISSORTESTENABLE,  //ScissorTestEnable
-			GST_STENCILTESTENABLE,  //StencilTestEnable
-			GST_STENCILENABLE,  //StencilEnable
-			GST_STENCILTESTTWOSIDEENABLE,  //StencilTestTwoSideEnable
-			GST_STENCILFAIL,  //StencilFail
-			GST_TEXGENSENABLE,  //TexGenSEnable
-			GST_TEXGENTENABLE,  //TexGenTEnable
-			GST_TEXGENRENABLE,  //TexGenREnable
-			GST_TEXGENQENABLE,  //TexGenQEnable
-			GST_WRAP0,  //Wrap0
-			GST_WRAP1,  //Wrap1
-			GST_WRAP2,  //Wrap2
-			GST_WRAP3,  //Wrap3
-			GST_WRAP4,  //Wrap4
-			GST_WRAP5,  //Wrap5
-			GST_WRAP6,  //Wrap6
-			GST_WRAP7,  //Wrap7
-			GST_WRAP8,  //Wrap8
-			GST_WRAP9,  //Wrap9
-			GST_WRAP10,  //Wrap10
-			GST_WRAP11,  //Wrap11
-			GST_WRAP12,  //Wrap12
-			GST_WRAP13,  //Wrap13
-			GST_WRAP14,  //Wrap14
-			GST_WRAP15,  //Wrap15
-			GST_VERTEXPROGRAMPOINTSIZEENABLE,  //VertexProgramPointSizeEnable
-			GST_VERTEXPROGRAMTWOSIDEENABLE,  //VertexProgramTwoSideEnable
-			GST_GEOMETRYPROGRAM,  //GeometryProgram
-			GST_VERTEXPROGRAM,  //VertexProgram
-			GST_FRAGMENTPROGRAM,  //FragmentProgram
-			GST_VERTEXSHADER,  //VertexShader
-			GST_PIXELSHADER,  //PixelShader
-			GST_ALPHAOP,  //AlphaOp
-			GST_ALPHAARG0,  //AlphaArg0
-			GST_ALPHAARG1,  //AlphaArg1
-			GST_ALPHAARG2,  //AlphaArg2
-			GST_COLORARG0,  //ColorArg0
-			GST_COLORARG1,  //ColorArg1
-			GST_COLORARG2,  //ColorArg2
-			GST_COLOROP,  //ColorOp
-			GST_BUMPENVLSCALE,  //BumpEnvLScale
-			GST_BUMPENVLOFFSET,  //BumpEnvLOffset
-			GST_BUMPENVMAT00,  //BumpEnvMat00
-			GST_BUMPENVMAT01,  //BumpEnvMat01
-			GST_BUMPENVMAT10,  //BumpEnvMat10
-			GST_BUMPENVMAT11,  //BumpEnvMat11
-			GST_RESULTARG,  //ResultArg
-			GST_TEXCOORDINDEX,  //TexCoordIndex
-			GST_TEXTURETRANSFORMFLAGS,  //TextureTransformFlags
-			GST_TWOSIDEDSTENCILMODE, // TwoSidedStencilMode
-			GST_SEPARATEALPHABLENDENABLE, // SeparateAlphaBlendEnable
-			GST_NORMALIZENORMALS, // NormalizeNormals
-			GST_LIGHTING, // Lighting
-			GST_PIXELSHADERCONSTANTB, // PixelShaderConstantB
-			GST_VERTEXSHADERCONSTANTB, // VertexShaderConstantB
-			GST_COLORWRITEENABLE1, // ColorWriteEnable1
-			GST_COLORWRITEENABLE2, // ColorWriteEnable2
-			GST_COLORWRITEENABLE3, // ColorWriteEnable3
-			GST_PIXELSHADERCONSTANT1, // PixelShaderConstant1
-			GST_VERTEXSHADERCONSTANT1, // VertexShaderConstant1
-			GST_PIXELSHADERCONSTANTF, // PixelShaderConstantF
-			GST_VERTEXSHADERCONSTANTF, // VertexShaderConstantF
-			GST_PIXELSHADERCONSTANT2, // PixelShaderConstant2
-			GST_VERTEXSHADERCONSTANT2, // VertexShaderConstant2
-			GST_PIXELSHADERCONSTANT3, // PixelShaderConstant3
-			GST_VERTEXSHADERCONSTANT3, // VertexShaderConstant3
-			GST_PIXELSHADERCONSTANT, // PixelShaderConstant
-			GST_VERTEXSHADERCONSTANT, // VertexShaderConstant
-			GST_PIXELSHADERCONSTANT4, // PixelShaderConstant4
-			GST_VERTEXSHADERCONSTANT4, // VertexShaderConstant4
-			GST_PIXELSHADERCONSTANTI, // PixelShaderConstantI
-			GST_VERTEXSHADERCONSTANTI, // VertexShaderConstantI
-			GST_SAMPLER,  // Sampler
-			GST_TEXTURE, // Texture
+        enum GlobalStateType
+        {
+            GST_UNKNOWN,
+            GST_ALPHABLENDENABLE,  //AlphaBlendEnable
+            GST_ALPHAFUNC,  //AlphaFunc
+            GST_ALPHAREF,  //AlphaRef
+            GST_BLENDOP,  //BlendOp
+            GST_BLENDEQUATION,  //BlendEquation
+            GST_BLENDFUNC,  //BlendFunc
+            GST_BLENDFUNCSEPARATE,  //BlendFuncSeparate
+            GST_BLENDEQUATIONSEPARATE,  //BlendEquationSeparate
+            GST_BLENDCOLOR,  //BlendColor
+            GST_CLEARCOLOR,  //ClearColor
+            GST_CLEARSTENCIL,  //ClearStencil
+            GST_CLEARDEPTH,  //ClearDepth
+            GST_CLIPPLANE,  //ClipPlane
+            GST_CLIPPLANEENABLE,  //ClipPlaneEnable
+            GST_COLORWRITEENABLE,  //ColorWriteEnable
+            GST_COLORMASK,  //ColorMask
+            GST_COLORVERTEX,  //ColorVertex
+            GST_COLORMATERIAL,  //ColorMaterial
+            GST_COLORMATRIX,  //ColorMatrix
+            GST_COLORTRANSFORM,  //ColorTransform
+            GST_CULLFACE,  //CullFace
+            GST_CULLMODE,  //CullMode
+            GST_DEPTHBOUNDS,  //DepthBounds
+            GST_DEPTHBIAS,  //DepthBias
+            GST_DESTBLEND,  //DestBlend
+            GST_DEPTHFUNC,  //DepthFunc
+            GST_ZFUNC,  //ZFunc
+            GST_DEPTHMASK,  //DepthMask
+            GST_ZWRITEENABLE,  //ZWriteEnable
+            GST_DEPTHRANGE,  //DepthRange
+            GST_FOGDISTANCEMODE,  //FogDistanceMode
+            GST_FOGMODE,  //FogMode
+            GST_FOGTABLEMODE,  //FogTableMode
+            GST_INDEXEDVERTEXBLENDENABLE,  //IndexedVertexBlendEnable
+            GST_FOGDENSITY,  //FogDensity
+            GST_FOGSTART,  //FogStart
+            GST_FOGEND,  //FogEnd
+            GST_FOGCOLOR,  //FogColor
+            GST_FRAGMENTENVPARAMETER,  //FragmentEnvParameter
+            GST_FRAGMENTLOCALPARAMETER,  //FragmentLocalParameter
+            GST_FOGCOORDSRC,  //FogCoordSrc
+            GST_FOGVERTEXMODE,  //FogVertexMode
+            GST_FRONTFACE,  //FrontFace
+            GST_LIGHTMODELAMBIENT,  //LightModelAmbient
+            GST_AMBIENT,  //Ambient
+            GST_LIGHTINGENABLE,  //LightingEnable
+            GST_LIGHTENABLE,  //LightEnable
+            GST_LIGHTAMBIENT,  //LightAmbient
+            GST_LIGHTCONSTANTATTENUATION,  //LightConstantAttenuation
+            GST_LIGHTATTENUATION0,  //LightAttenuation0
+            GST_LIGHTDIFFUSE,  //LightDiffuse
+            GST_LIGHTLINEARATTENUATION,  //LightLinearAttenuation
+            GST_LIGHTATTENUATION1,  //LightAttenuation1
+            GST_LIGHTPOSITION,  //LightPosition
+            GST_LIGHTQUADRATICATTENUATION,  //LightQuadraticAttenuation
+            GST_LIGHTATTENUATION2,  //LightAttenuation2
+            GST_LIGHTSPECULAR,  //LightSpecular
+            GST_LIGHTSPOTCUTOFF,  //LightSpotCutoff
+            GST_LIGHTFALLOFF,  //LightFalloff
+            GST_LIGHTSPOTDIRECTION,  //LightSpotDirection
+            GST_LIGHTDIRECTION,  //LightDirection
+            GST_LIGHTSPOTEXPONENT,  //LightSpotExponent
+            GST_LIGHTPHI,  //LightPhi
+            GST_LIGHTRANGE,  //LightRange
+            GST_LIGHTTHETA,  //LightTheta
+            GST_LIGHTTYPE,  //LightType
+            GST_LOCALVIEWER,  //LocalViewer
+            GST_MULTISAMPLEANTIALIAS,  //MultiSampleAntialias
+            GST_MULTISAMPLEMASK,  //MultiSampleMask
+            GST_PATCHSEGMENTS,  //PatchSegments
+            GST_POINTSCALE_A,  //PointScale_A
+            GST_POINTSCALE_B,  //PointScale_B
+            GST_POINTSCALE_C,  //PointScale_C
+            GST_POINTSCALEENABLE,  //PointScaleEnable
+            GST_RANGEFOGENABLE,  //RangeFogEnable
+            GST_SPECULARENABLE,  //SpecularEnable
+            GST_TWEENFACTOR,  //TweenFactor
+            GST_VERTEXBLEND,  //VertexBlend
+            GST_AMBIENTMATERIALSOURCE,  //AmbientMaterialSource
+            GST_DIFFUSEMATERIALSOURCE,  //DiffuseMaterialSource
+            GST_EMISSIVEMATERIALSOURCE,  //EmissiveMaterialSource
+            GST_SPECULARMATERIALSOURCE,  //SpecularMaterialSource
+            GST_CLIPPING,  //Clipping
+            GST_LIGHTMODELCOLORCONTROL,  //LightModelColorControl
+            GST_LINESTIPPLE,  //LineStipple
+            GST_LINEWIDTH,  //LineWidth
+            GST_LOGICOP,  //LogicOp
+            GST_MATERIALAMBIENT,  //MaterialAmbient
+            GST_MATERIALDIFFUSE,  //MaterialDiffuse
+            GST_MATERIALEMISSION,  //MaterialEmission
+            GST_MATERIALEMISSIVE,  //MaterialEmissive
+            GST_MATERIALSHININESS,  //MaterialShininess
+            GST_MATERIALPOWER,  //MaterialPower
+            GST_MATERIALSPECULAR,  //MaterialSpecular
+            GST_MODELVIEWMATRIX,  //ModelViewMatrix
+            GST_MODELVIEWTRANSFORM,  //ModelViewTransform
+            GST_VIEWTRANSFORM,  //ViewTransform
+            GST_WORLDTRANSFORM,  //WorldTransform
+            GST_POINTDISTANCEATTENUATION,  //PointDistanceAttenuation
+            GST_POINTFADETHRESHOLDSIZE,  //PointFadeThresholdSize
+            GST_POINTSIZE,  //PointSize
+            GST_POINTSIZEMIN,  //PointSizeMin
+            GST_POINTSIZEMAX,  //PointSizeMax
+            GST_POINTSPRITECOORDORIGIN,  //PointSpriteCoordOrigin
+            GST_POINTSPRITECOORDREPLACE,  //PointSpriteCoordReplace
+            GST_POINTSPRITERMODE,  //PointSpriteRMode
+            GST_POLYGONMODE,  //PolygonMode
+            GST_FILLMODE,  //FillMode
+            GST_LASTPIXEL,  //LastPixel
+            GST_POLYGONOFFSET,  //PolygonOffset
+            GST_PROJECTIONMATRIX,  //ProjectionMatrix
+            GST_PROJECTIONTRANSFORM,  //ProjectionTransform
+            GST_SCISSOR,  //Scissor
+            GST_SHADEMODEL,  //ShadeModel
+            GST_SHADEMODE,  //ShadeMode
+            GST_SLOPSCALEDEPTHBIAS,  //SlopScaleDepthBias
+            GST_SRCBLEND,  //SrcBlend
+            GST_STENCILFUNC,  //StencilFunc
+            GST_STENCILMASK,  //StencilMask
+            GST_STENCILPASS,  //StencilPass
+            GST_STENCILREF,  //StencilRef
+            GST_STENCILWRITEMASK,  //StencilWriteMask
+            GST_STENCILZFAIL,  //StencilZFail
+            GST_TEXTUREFACTOR,  //TextureFactor
+            GST_STENCILOP,  //StencilOp
+            GST_STENCILFUNCSEPARATE,  //StencilFuncSeparate
+            GST_STENCILMASKSEPARATE,  //StencilMaskSeparate
+            GST_STENCILOPSEPARATE,  //StencilOpSeparate
+            GST_TEXGENSMODE,  //TexGenSMode
+            GST_TEXGENSOBJECTPLANE,  //TexGenSObjectPlane
+            GST_TEXGENSEYEPLANE,  //TexGenSEyePlane
+            GST_TEXGENTMODE,  //TexGenTMode
+            GST_TEXGENTOBJECTPLANE,  //TexGenTObjectPlane
+            GST_TEXGENTEYEPLANE,  //TexGenTEyePlane
+            GST_TEXGENRMODE,  //TexGenRMode
+            GST_TEXGENROBJECTPLANE,  //TexGenRObjectPlane
+            GST_TEXGENREYEPLANE,  //TexGenREyePlane
+            GST_TEXGENQMODE,  //TexGenQMode
+            GST_TEXGENQOBJECTPLANE,  //TexGenQObjectPlane
+            GST_TEXGENQEYEPLANE,  //TexGenQEyePlane
+            GST_TEXTUREENVCOLOR,  //TextureEnvColor
+            GST_TEXTUREENVMODE,  //TextureEnvMode
+            GST_TEXTURE1D,  //Texture1D
+            GST_TEXTURE2D,  //Texture2D
+            GST_TEXTURE3D,  //Texture3D
+            GST_TEXTURERECTANGLE,  //TextureRectangle
+            GST_TEXTURECUBEMAP,  //TextureCubeMap
+            GST_TEXTURE1DENABLE,  //Texture1DEnable
+            GST_TEXTURE2DENABLE,  //Texture2DEnable
+            GST_TEXTURE3DENABLE,  //Texture3DEnable
+            GST_TEXTURERECTANGLEENABLE,  //TextureRectangleEnable
+            GST_TEXTURECUBEMAPENABLE,  //TextureCubeMapEnable
+            GST_TEXTURETRANSFORM,  //TextureTransform
+            GST_TEXTUREMATRIX,  //TextureMatrix
+            GST_VERTEXENVPARAMETER,  //VertexEnvParameter
+            GST_VERTEXLOCALPARAMETER,  //VertexLocalParameter
+            GST_ALPHATESTENABLE,  //AlphaTestEnable
+            GST_AUTONORMALENABLE,  //AutoNormalEnable
+            GST_BLENDENABLE,  //BlendEnable
+            GST_COLORLOGICOPENABLE,  //ColorLogicOpEnable
+            GST_CULLFACEENABLE,  //CullFaceEnable
+            GST_DEPTHBOUNDSENABLE,  //DepthBoundsEnable
+            GST_DEPTHCLAMPENABLE,  //DepthClampEnable
+            GST_DEPTHTESTENABLE,  //DepthTestEnable
+            GST_ZENABLE,  //ZEnable
+            GST_DITHERENABLE,  //DitherEnable
+            GST_FOGENABLE,  //FogEnable
+            GST_LIGHTMODELLOCALVIEWERENABLE,  //LightModelLocalViewerEnable
+            GST_LIGHTMODELTWOSIDEENABLE,  //LightModelTwoSideEnable
+            GST_LINESMOOTHENABLE,  //LineSmoothEnable
+            GST_LINESTIPPLEENABLE,  //LineStippleEnable
+            GST_LOGICOPENABLE,  //LogicOpEnable
+            GST_MULTISAMPLEENABLE,  //MultisampleEnable
+            GST_NORMALIZEENABLE,  //NormalizeEnable
+            GST_POINTSMOOTHENABLE,  //PointSmoothEnable
+            GST_POINTSPRITEENABLE,  //PointSpriteEnable
+            GST_POLYGONOFFSETFILLENABLE,  //PolygonOffsetFillEnable
+            GST_POLYGONOFFSETLINEENABLE,  //PolygonOffsetLineEnable
+            GST_POLYGONOFFSETPOINTENABLE,  //PolygonOffsetPointEnable
+            GST_POLYGONSMOOTHENABLE,  //PolygonSmoothEnable
+            GST_POLYGONSTIPPLEENABLE,  //PolygonStippleEnable
+            GST_RESCALENORMALENABLE,  //RescaleNormalEnable
+            GST_SAMPLEALPHATOCOVERAGEENABLE,  //SampleAlphaToCoverageEnable
+            GST_SAMPLEALPHATOONEENABLE,  //SampleAlphaToOneEnable
+            GST_SAMPLECOVERAGEENABLE,  //SampleCoverageEnable
+            GST_SCISSORTESTENABLE,  //ScissorTestEnable
+            GST_STENCILTESTENABLE,  //StencilTestEnable
+            GST_STENCILENABLE,  //StencilEnable
+            GST_STENCILTESTTWOSIDEENABLE,  //StencilTestTwoSideEnable
+            GST_STENCILFAIL,  //StencilFail
+            GST_TEXGENSENABLE,  //TexGenSEnable
+            GST_TEXGENTENABLE,  //TexGenTEnable
+            GST_TEXGENRENABLE,  //TexGenREnable
+            GST_TEXGENQENABLE,  //TexGenQEnable
+            GST_WRAP0,  //Wrap0
+            GST_WRAP1,  //Wrap1
+            GST_WRAP2,  //Wrap2
+            GST_WRAP3,  //Wrap3
+            GST_WRAP4,  //Wrap4
+            GST_WRAP5,  //Wrap5
+            GST_WRAP6,  //Wrap6
+            GST_WRAP7,  //Wrap7
+            GST_WRAP8,  //Wrap8
+            GST_WRAP9,  //Wrap9
+            GST_WRAP10,  //Wrap10
+            GST_WRAP11,  //Wrap11
+            GST_WRAP12,  //Wrap12
+            GST_WRAP13,  //Wrap13
+            GST_WRAP14,  //Wrap14
+            GST_WRAP15,  //Wrap15
+            GST_VERTEXPROGRAMPOINTSIZEENABLE,  //VertexProgramPointSizeEnable
+            GST_VERTEXPROGRAMTWOSIDEENABLE,  //VertexProgramTwoSideEnable
+            GST_GEOMETRYPROGRAM,  //GeometryProgram
+            GST_VERTEXPROGRAM,  //VertexProgram
+            GST_FRAGMENTPROGRAM,  //FragmentProgram
+            GST_VERTEXSHADER,  //VertexShader
+            GST_PIXELSHADER,  //PixelShader
+            GST_ALPHAOP,  //AlphaOp
+            GST_ALPHAARG0,  //AlphaArg0
+            GST_ALPHAARG1,  //AlphaArg1
+            GST_ALPHAARG2,  //AlphaArg2
+            GST_COLORARG0,  //ColorArg0
+            GST_COLORARG1,  //ColorArg1
+            GST_COLORARG2,  //ColorArg2
+            GST_COLOROP,  //ColorOp
+            GST_BUMPENVLSCALE,  //BumpEnvLScale
+            GST_BUMPENVLOFFSET,  //BumpEnvLOffset
+            GST_BUMPENVMAT00,  //BumpEnvMat00
+            GST_BUMPENVMAT01,  //BumpEnvMat01
+            GST_BUMPENVMAT10,  //BumpEnvMat10
+            GST_BUMPENVMAT11,  //BumpEnvMat11
+            GST_RESULTARG,  //ResultArg
+            GST_TEXCOORDINDEX,  //TexCoordIndex
+            GST_TEXTURETRANSFORMFLAGS,  //TextureTransformFlags
+            GST_TWOSIDEDSTENCILMODE, // TwoSidedStencilMode
+            GST_SEPARATEALPHABLENDENABLE, // SeparateAlphaBlendEnable
+            GST_NORMALIZENORMALS, // NormalizeNormals
+            GST_LIGHTING, // Lighting
+            GST_PIXELSHADERCONSTANTB, // PixelShaderConstantB
+            GST_VERTEXSHADERCONSTANTB, // VertexShaderConstantB
+            GST_COLORWRITEENABLE1, // ColorWriteEnable1
+            GST_COLORWRITEENABLE2, // ColorWriteEnable2
+            GST_COLORWRITEENABLE3, // ColorWriteEnable3
+            GST_PIXELSHADERCONSTANT1, // PixelShaderConstant1
+            GST_VERTEXSHADERCONSTANT1, // VertexShaderConstant1
+            GST_PIXELSHADERCONSTANTF, // PixelShaderConstantF
+            GST_VERTEXSHADERCONSTANTF, // VertexShaderConstantF
+            GST_PIXELSHADERCONSTANT2, // PixelShaderConstant2
+            GST_VERTEXSHADERCONSTANT2, // VertexShaderConstant2
+            GST_PIXELSHADERCONSTANT3, // PixelShaderConstant3
+            GST_VERTEXSHADERCONSTANT3, // VertexShaderConstant3
+            GST_PIXELSHADERCONSTANT, // PixelShaderConstant
+            GST_VERTEXSHADERCONSTANT, // VertexShaderConstant
+            GST_PIXELSHADERCONSTANT4, // PixelShaderConstant4
+            GST_VERTEXSHADERCONSTANT4, // VertexShaderConstant4
+            GST_PIXELSHADERCONSTANTI, // PixelShaderConstantI
+            GST_VERTEXSHADERCONSTANTI, // VertexShaderConstantI
+            GST_SAMPLER,  // Sampler
+            GST_TEXTURE, // Texture
 
-			GST_ADDRESSU, // AddressU
-			GST_ADDRESSV, // AddressV
-			GST_ADDRESSW, // AddressW
-			GST_BORDERCOLOR, // BorderColor
-			GST_MAXANISOTROPY, // MaxAnisotropy
-			GST_MAXMIPLEVEL, // MaxMipLevel
-			GST_MINFILTER, // MinFilter
-			GST_MAGFILTER, // MagFilter
-			GST_MIPFILTER, // MipFilter
-			GST_MIPMAPLODBIAS, // MipMapLodBias
-			GST_BLENDOPALPHA, // BlendOpAlpha
-			GST_SRCBLENDALPHA, // SrcBlendAlpha
-			GST_DESTBLENDALPHA, // DestBlendAlpha
+            GST_ADDRESSU, // AddressU
+            GST_ADDRESSV, // AddressV
+            GST_ADDRESSW, // AddressW
+            GST_BORDERCOLOR, // BorderColor
+            GST_MAXANISOTROPY, // MaxAnisotropy
+            GST_MAXMIPLEVEL, // MaxMipLevel
+            GST_MINFILTER, // MinFilter
+            GST_MAGFILTER, // MagFilter
+            GST_MIPFILTER, // MipFilter
+            GST_MIPMAPLODBIAS, // MipMapLodBias
+            GST_BLENDOPALPHA, // BlendOpAlpha
+            GST_SRCBLENDALPHA, // SrcBlendAlpha
+            GST_DESTBLENDALPHA, // DestBlendAlpha
 
 
-			GST_COUNT
-		};
+            GST_COUNT
+        };
 #define GST_FIRST (GlobalStateType) (GST_UNKNOWN + (GlobalStateType)1)
 
-		enum SamplerStateType
-		{
-			SST_UNKNOWN,
-			SST_TEXTURE, // Texture
-			SST_ADDRESSU, // AddressU
-			SST_ADDRESSV, // AddressV
-			SST_ADDRESSW, // AddressW
-			SST_WRAPS, // WrapS
-			SST_WRAPT, // WrapT
-			SST_WRAPR, // WrapR
-			SST_MIPFILTER, // MipFilter
-			SST_MIPMAPLODBIAS, // MipMapLodBias
-			SST_LODBIAS, // LODBias
-			SST_SRGBTEXTURE, // SRGBTexture
-			SST_MINFILTER, // MinFilter
-			SST_MAGFILTER, // MagFilter
-			SST_BORDERCOLOR, // BorderColor
-			SST_MINMIPLEVEL, // MinMipLevel
-			SST_MAXMIPLEVEL, // MaxMipLevel
-			SST_MAXANISOTROPY, // MaxAnisotropy
-			SST_DEPTHMODE, // DepthMode
-			SST_COMPAREMODE, // CompareMode
-			SST_COMPAREFUNC, // CompareFunc
-			SST_GENERATEMIPMAP, // GenerateMipmap
-			SST_COUNT,
-		};
+        enum SamplerStateType
+        {
+            SST_UNKNOWN,
+            SST_TEXTURE, // Texture
+            SST_ADDRESSU, // AddressU
+            SST_ADDRESSV, // AddressV
+            SST_ADDRESSW, // AddressW
+            SST_WRAPS, // WrapS
+            SST_WRAPT, // WrapT
+            SST_WRAPR, // WrapR
+            SST_MIPFILTER, // MipFilter
+            SST_MIPMAPLODBIAS, // MipMapLodBias
+            SST_LODBIAS, // LODBias
+            SST_SRGBTEXTURE, // SRGBTexture
+            SST_MINFILTER, // MinFilter
+            SST_MAGFILTER, // MagFilter
+            SST_BORDERCOLOR, // BorderColor
+            SST_MINMIPLEVEL, // MinMipLevel
+            SST_MAXMIPLEVEL, // MaxMipLevel
+            SST_MAXANISOTROPY, // MaxAnisotropy
+            SST_DEPTHMODE, // DepthMode
+            SST_COMPAREMODE, // CompareMode
+            SST_COMPAREFUNC, // CompareFunc
+            SST_GENERATEMIPMAP, // GenerateMipmap
+            SST_COUNT,
+        };
 
 #define SST_FIRST (SamplerStateType) (SST_UNKNOWN + (SamplerStateType)1)
 
-		// some simple types to make working with CGstateassignment easier
+        // some simple types to make working with CGstateassignment easier
 
 		struct Vector1b
 		{
@@ -760,7 +760,7 @@ namespace Ogre {
 				BET_FUNCSUBTRACT,  // FuncSubtract
 				BET_MIN, // Min
 				BET_MAX,  // Max
-				BET_LOGICOP, // LogicOp
+				BET_LOGICOP // LogicOp
 			};
 			virtual void createState();
 		public:
@@ -780,7 +780,7 @@ namespace Ogre {
 				DFT_GREATER,  // Greater
 				DFT_NOTEQUAL, // NotEqual
 				DFT_GEQUAL,  // GEqual
-				DFT_ALWAYS, // Always
+				DFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -795,7 +795,7 @@ namespace Ogre {
 			{
 				FDMT_EYERADIAL, // EyeRadial
 				FDMT_EYEPLANE, // EyePlane
-				FDMT_EYEPLANEABSOLUTE, // EyePlaneAbsolute
+				FDMT_EYEPLANEABSOLUTE // EyePlaneAbsolute
 			};
 			virtual void createState();
 		public:
@@ -810,7 +810,7 @@ namespace Ogre {
 			{
 				FMT_LINEAR, // Linear
 				FMT_EXP,  // Exp
-				FMT_EXP2, // Exp2
+				FMT_EXP2 // Exp2
 			};
 			virtual void createState();
 		public:
@@ -825,7 +825,7 @@ namespace Ogre {
 			enum LightModelColorControlType
 			{
 				LMCCT_SINGLECOLOR, // SingleColor
-				LMCCT_SEPARATESPECULAR, // SeparateSpecular
+				LMCCT_SEPARATESPECULAR // SeparateSpecular
 			};
 			virtual void createState();
 		public:
@@ -852,7 +852,7 @@ namespace Ogre {
 				LOT_ORREVERSE, // OrReverse
 				LOT_COPYINVERTED, // CopyInverted
 				LOT_NAND,  // Nand
-				LOT_SET, // Set
+				LOT_SET // Set
 			};
 			virtual void createState();
 		public:
@@ -866,7 +866,7 @@ namespace Ogre {
 			enum PointSpriteCoordOriginType
 			{
 				PSCOT_LOWERLEFT, // LowerLeft
-				PSCOT_UPPERLEFT, // UpperLeft
+				PSCOT_UPPERLEFT // UpperLeft
 			};
 			virtual void createState();
 		public:
@@ -881,7 +881,7 @@ namespace Ogre {
 			{
 				PSRMT_ZERO,  // Zero
 				PSRMT_R,  // R
-				PSRMT_S, // S
+				PSRMT_S // S
 			};
 			virtual void createState();
 		public:
@@ -895,7 +895,7 @@ namespace Ogre {
 			enum ShadeModelType
 			{
 				SMT_FLAT,  // Flat
-				SMT_SMOOTH, // Smooth
+				SMT_SMOOTH // Smooth
 			};
 			virtual void createState();
 			virtual void updatePass( Pass * ogrePass, CGstateassignment cgStateAssignment );
@@ -912,7 +912,7 @@ namespace Ogre {
 				TGMT_EYELINEAR, // EyeLinear
 				TGMT_SPHEREMAP, // SphereMap
 				TGMT_REFLECTIONMAP, // ReflectionMap
-				TGMT_NORMALMAP, // NormalMap
+				TGMT_NORMALMAP // NormalMap
 			};
 			virtual void createState();
 		public:
@@ -929,7 +929,7 @@ namespace Ogre {
 				BET_DECAL, // Decal
 				BET_BLEND,  // Blend
 				BET_REPLACE, // Replace
-				BET_ADD, // Add
+				BET_ADD // Add
 			};
 			virtual void createState();
 		public:
@@ -947,7 +947,7 @@ namespace Ogre {
 				MFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
 				MFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
 				MFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MFT_LINEARMIPMAPLINEAR, // LinearMipMapLinear
+				MFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
 			};
 			virtual void createState();
 		public:
@@ -961,7 +961,7 @@ namespace Ogre {
 			enum MagFilterType
 			{
 				MFT_NEAREST,  // Nearest
-				MFT_LINEAR, // Linear
+				MFT_LINEAR // Linear
 			};
 			virtual void createState();
 		public:
@@ -975,7 +975,7 @@ namespace Ogre {
 			enum FrontFaceType
 			{
 				FFT_CW, // CW
-				FFT_CCW, // CCW
+				FFT_CCW // CCW
 			};
 			virtual void createState();
 		public:
@@ -990,7 +990,7 @@ namespace Ogre {
 			{
 				CFT_FRONT,  // Front
 				CFT_BACK, // Back
-				CFT_FRONTANDBACK, // FrontAndBack
+				CFT_FRONTANDBACK // FrontAndBack
 			};
 			virtual void createState();
 		public:
@@ -1004,7 +1004,7 @@ namespace Ogre {
 			enum FogCoordSrcType
 			{
 				FCST_FRAGMENTDEPTH, // FragmentDepth
-				FCST_FOGCOORD, // FogCoord
+				FCST_FOGCOORD // FogCoord
 			};
 			virtual void createState();
 		public:
@@ -1025,7 +1025,7 @@ namespace Ogre {
 				AFT_GREATER,  // Greater
 				AFT_NOTEQUAL, // NotEqual
 				AFT_GEQUAL,  // GEqual
-				AFT_ALWAYS, // Always
+				AFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1053,7 +1053,7 @@ namespace Ogre {
 				BF_CONSTANTCOLOR, // ConstantColor
 				BF_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
 				BF_CONSTANTALPHA, // ConstantAlpha
-				BF_ONEMINUSCONSTANTALPHA, // OneMinusConstantAlpha
+				BF_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
 			};
 			virtual void createState();
 		public:
@@ -1082,7 +1082,7 @@ namespace Ogre {
 				BFST_CONSTANTCOLOR, // ConstantColor
 				BFST_ONEMINUSCONSTANTCOLOR, // OneMinusConstantColor
 				BFST_CONSTANTALPHA, // ConstantAlpha
-				BFST_ONEMINUSCONSTANTALPHA, // OneMinusConstantAlpha
+				BFST_ONEMINUSCONSTANTALPHA // OneMinusConstantAlpha
 			};
 			virtual void createState();
 		public:
@@ -1100,7 +1100,7 @@ namespace Ogre {
 				BEST_FUNCSUBTRACT,  // FuncSubtract
 				BEST_MIN, // Min
 				BEST_MAX,  // Max
-				BEST_LOGICOP, // LogicOp
+				BEST_LOGICOP // LogicOp
 			};
 			virtual void createState();
 		public:
@@ -1122,7 +1122,7 @@ namespace Ogre {
 				CMT_AMBIENT, // Ambient
 				CMT_DIFFUSE, // Diffuse
 				CMT_SPECULAR, // Specular
-				CMT_AMBIENTANDDIFFUSE, // AmbientAndDiffuse
+				CMT_AMBIENTANDDIFFUSE // AmbientAndDiffuse
 			};
 			virtual void createState();
 		public:
@@ -1141,7 +1141,7 @@ namespace Ogre {
 				PMT_FRONTANDBACK, // FrontAndBack
 				PMT_POINT,  // Point
 				PMT_LINE,  // Line
-				PMT_FILL, // Fill
+				PMT_FILL // Fill
 			};
 			virtual void createState();
 		public:
@@ -1162,7 +1162,7 @@ namespace Ogre {
 				SFT_GREATER, // Greater
 				SFT_NOTEQUAL, // NotEqual
 				SFT_GEQUAL,  // GEqual
-				SFT_ALWAYS, // Always
+				SFT_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1183,7 +1183,7 @@ namespace Ogre {
 				SOT_DECR,  // Decr
 				SOT_INVERT, // Invert
 				SOT_INCRWRAP,  // IncrWrap
-				SOT_DECRWRAP, // DecrWrap
+				SOT_DECRWRAP // DecrWrap
 			};
 			virtual void createState();
 		public:
@@ -1207,7 +1207,7 @@ namespace Ogre {
 				SFST_GREATER,  // Greater
 				SFST_NOTEQUAL, // NotEqual
 				SFST_GEQUAL,  // GEqual
-				SFST_ALWAYS, // Always
+				SFST_ALWAYS // Always
 			};
 			virtual void createState();
 		public:
@@ -1223,7 +1223,7 @@ namespace Ogre {
 			{
 				BET_FRONT,  // Front
 				BET_BACK,  // Back
-				BET_FRONTANDBACK, // FrontAndBack
+				BET_FRONTANDBACK // FrontAndBack
 			};
 			virtual void createState();
 		public:
@@ -1244,7 +1244,7 @@ namespace Ogre {
 				BET_DECR, // Decr
 				BET_INVERT, // Invert
 				BET_INCRWRAP,  // IncrWrap
-				BET_DECRWRAP, // DecrWrap
+				BET_DECRWRAP // DecrWrap
 			};
 			virtual void createState();
 		public:
@@ -1319,7 +1319,7 @@ namespace Ogre {
 				WT_MIRROREDREPEAT, // MirroredRepeat
 				WT_MIRRORCLAMP, // MirrorClamp
 				WT_MIRRORCLAMPTOEDGE, // MirrorClampToEdge
-				WT_MIRRORCLAMPTOBORDER, // MirrorClampToBorder
+				WT_MIRRORCLAMPTOBORDER // MirrorClampToBorder
 			};
 			virtual void createState();
 			TextureUnitState::TextureAddressingMode getOgreTextureAddressingMode( CGstateassignment cgStateAssignment );
@@ -1334,7 +1334,7 @@ namespace Ogre {
 			enum CompareModeType
 			{
 				CMT_NONE, // None
-				CMT_COMPARERTOTEXTURE, // CompareRToTexture
+				CMT_COMPARERTOTEXTURE // CompareRToTexture
 			};
 			virtual void createState();
 		public:
@@ -1352,7 +1352,7 @@ namespace Ogre {
 				CFT_LEQUAL, // LEqual
 				CFT_EQUAL,  // Equal
 				CFT_GREATER, // Greater
-				CFT_NOTEQUAL, // NotEqual
+				CFT_NOTEQUAL // NotEqual
 			};
 			virtual void createState();
 		public:
@@ -1367,7 +1367,7 @@ namespace Ogre {
 			{
 				DMT_ALPHA,   // Alpha
 				DMT_INTENSITY,  // Intensity
-				DMT_LUMINANCE,  // Luminance
+				DMT_LUMINANCE   // Luminance
 			};
 			virtual void createState();
 		public:
@@ -1385,7 +1385,7 @@ namespace Ogre {
 				MINFT_LINEARMIPMAPNEAREST, // LinearMipMapNearest
 				MINFT_NEARESTMIPMAPNEAREST, // NearestMipMapNearest
 				MINFT_NEARESTMIPMAPLINEAR, // NearestMipMapLinear
-				MINFT_LINEARMIPMAPLINEAR, // LinearMipMapLinear
+				MINFT_LINEARMIPMAPLINEAR // LinearMipMapLinear
 			};
 
 			virtual void createState();
@@ -1400,7 +1400,7 @@ namespace Ogre {
 			enum MagFilterType
 			{
 				MAGFT_NEAREST, // Nearest
-				MAGFT_LINEAR, // Linear
+				MAGFT_LINEAR // Linear
 
 			};
 
@@ -1420,7 +1420,7 @@ namespace Ogre {
 				MIPFT_LINEAR          = 2,    // linear interpolation
 				MIPFT_ANISOTROPIC     = 3,    // anisotropic
 				MIPFT_PYRAMIDALQUAD   = 6,    // 4-sample tent
-				MIPFT_GAUSSIANQUAD    = 7,    // 4-sample gaussian
+				MIPFT_GAUSSIANQUAD    = 7     // 4-sample gaussian
 
 			};
 
@@ -1439,7 +1439,7 @@ namespace Ogre {
 				TAT_MIRROR, // Mirror
 				TAT_CLAMP, // Clamp
 				TAT_BORDER, // Border
-				TAT_MIRRORONCE, // MirrorOnce
+				TAT_MIRRORONCE // MirrorOnce
 			};
 
 			virtual void createState();
@@ -1477,8 +1477,8 @@ namespace Ogre {
 		void parseFloatCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		void parseIntCgProgramParameter( CGtype cgParamType, CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
 		bool parseAutoConstantParam( CGparameter cgParameter, GpuProgramParametersSharedPtr ogreProgramParameters, const String& ogreParamName );
-		const bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
-		const FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
+		bool cgSemanticToOgreAutoConstantType( const char * cgParamSemantic, const char * uiNameValue, GpuProgramParameters::AutoConstantType & ogreAutoConstantType, size_t & extraInfo );
+		FXSemanticID cgSemanticStringToType( const char * cgParamSemantic );
 
 		void buildStateNameStringToTypeMap();
 
@@ -1487,16 +1487,16 @@ namespace Ogre {
 		CgGlobalStateListener * createCgGlobalStateListener( const GlobalStateType type );
 		CgSamplerStateListener * createCgSamplerStateListener( const SamplerStateType type );
 
-	public:
+    public:
         CgFxScriptLoader();
-		virtual ~CgFxScriptLoader();
+        virtual ~CgFxScriptLoader();
 
         /// @copydoc ScriptLoader::getScriptPatterns
         const StringVector& getScriptPatterns(void) const;
         /// @copydoc ScriptLoader::parseScript
         void parseScript( DataStreamPtr& stream, const String& groupName );
 
-		/// @copydoc ScriptLoader::getLoadingOrder
+        /// @copydoc ScriptLoader::getLoadingOrder
         Real getLoadingOrder(void) const;
 
         /** Override standard Singleton retrieval.
@@ -1531,14 +1531,10 @@ namespace Ogre {
         preventing link errors.
         */
         static CgFxScriptLoader* getSingletonPtr(void);
-	private:
+    private:
 
-		
-	};
+    };
 
-
-
-}
-
+} // namespace Ogre
 
 #endif 

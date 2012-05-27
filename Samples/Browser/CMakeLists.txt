@@ -162,9 +162,9 @@ if (APPLE)
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_ICON_FILE SampleBrowser_OSX.icns)
 	set_property(TARGET SampleBrowser PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Samples/Common/misc/Info.plist)
+	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")
 
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
-	set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
     set(OGRE_SAMPLE_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app)
     add_custom_command(TARGET SampleBrowser POST_BUILD
       COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Common/misc/*.png ${OGRE_SAMPLE_CONTENTS_PATH}/
@@ -174,14 +174,7 @@ if (APPLE)
 	    add_custom_command(TARGET SampleBrowser POST_BUILD
           COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
 	      COMMAND ditto ${OGRE_BINARY_DIR}/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
-	      COMMAND ditto ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
 	    )
-	elseif(OGRE_INSTALL_SAMPLES_SOURCE)
-        add_custom_command(TARGET SampleBrowser POST_BUILD
-      	  COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
-	      COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Media ${OGRE_SAMPLE_CONTENTS_PATH}/Media
-	      COMMAND ditto ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/lib*.a ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/
-        )
     else()
         add_custom_command(TARGET SampleBrowser POST_BUILD
           COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/

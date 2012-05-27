@@ -157,7 +157,7 @@ namespace Ogre {
 			must not include any elements which do not already exist in the 
 			current declaration; you can drop elements by 
 			excluding them from the declaration if you wish, however.
-		@param bufferUsages Vector of usage flags which indicate the usage options
+		@param bufferUsage Vector of usage flags which indicate the usage options
 			for each new vertex buffer created. The indexes of the entries must correspond
 			to the buffer binding values referenced in the declaration.
 		@param mgr Optional pointer to the manager to use to create new declarations

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2009 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,12 @@ THE SOFTWARE.
 #define __ImageValidator_H__
 
 #include "Ogre.h"
+
+#if OGRE_DOUBLE_PRECISION == 1
+#define WITH_FLOAT_SUFFIX(x) x
+#else
+#define WITH_FLOAT_SUFFIX(x) x##f
+#endif
 
 /** Some functionality for comparing images */
 
@@ -183,7 +189,8 @@ protected:
         if(out.incorrectPixels != 0)
         {
             // average and clamp to [-1,1]
-            out.ssim = std::max(-1.0f, std::min(1.0f, ssim/(width*height/64.f)));
+            out.ssim = std::max(WITH_FLOAT_SUFFIX(-1.0),
+                                std::min(WITH_FLOAT_SUFFIX(1.0), ssim/(width*height/WITH_FLOAT_SUFFIX(64.))));
 
             // average the raw deviance value to get MSE
             out.mseChannels = disparity / (width*height);

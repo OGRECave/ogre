@@ -130,7 +130,7 @@ namespace Ogre {
         */
         Exception(const Exception& rhs);
 
-		/// Needed for  compatibility with std::exception
+		/// Needed for compatibility with std::exception
 		~Exception() throw() {}
 
         /** Assignment operator.

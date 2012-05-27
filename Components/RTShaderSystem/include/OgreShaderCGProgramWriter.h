@@ -50,7 +50,6 @@ class _OgreRTSSExport CGProgramWriter : public ProgramWriter
 public:
 
 	/** Class constructor. 
-	@param language The target shader language.
 	*/
 	CGProgramWriter	();
 

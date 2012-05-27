@@ -59,7 +59,7 @@ namespace Ogre {
         void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
 
         /** Sets the scale adjustment to be made per second to particles. 
-        @param Rate
+        @param rate
             Sets the adjustment to be made to the x and y scale components per second. These
             values will be added to the scale of all particles every second, scaled over each frame
             for a smooth adjustment.

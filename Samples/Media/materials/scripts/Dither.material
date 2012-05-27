@@ -13,8 +13,8 @@ fragment_program Ogre/Compositor/Dither_GLSLES_FP glsles
 
 fragment_program Ogre/Compositor/DitherFP unified
 {
-	delegate Ogre/Compositor/Dither_Cg_FP
 	delegate Ogre/Compositor/Dither_GLSLES_FP
+	delegate Ogre/Compositor/Dither_Cg_FP
 }
 
 material Ogre/Compositor/Dither

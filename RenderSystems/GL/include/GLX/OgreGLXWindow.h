@@ -45,52 +45,52 @@ namespace Ogre
 		void create(const String& name, unsigned int width, unsigned int height,
 					bool fullScreen, const NameValuePairList *miscParams);
 		
-		/** @copydoc see RenderWindow::setFullscreen */
+		/** @copydoc RenderWindow::setFullscreen */
 		void setFullscreen (bool fullscreen, uint width, uint height);
 		
-		/** @copydoc see RenderWindow::destroy */
+		/** @copydoc RenderWindow::destroy */
 		void destroy(void);
 		
-		/** @copydoc see RenderWindow::isClosed */
+		/** @copydoc RenderWindow::isClosed */
 		bool isClosed(void) const;
 		
-		/** @copydoc see RenderWindow::isVisible */
+		/** @copydoc RenderWindow::isVisible */
 		bool isVisible(void) const;
 		
-		/** @copydoc see RenderWindow::setVisible */
+		/** @copydoc RenderWindow::setVisible */
 		void setVisible(bool visible);
 
-		/** @copydoc see RenderWindow::isHidden */
+		/** @copydoc RenderWindow::isHidden */
 		bool isHidden(void) const { return mHidden; }
 
-		/** @copydoc see RenderWindow::setHidden */
+		/** @copydoc RenderWindow::setHidden */
 		void setHidden(bool hidden);
 
-		/** @copydoc see RenderWindow::setVSyncEnabled */
+		/** @copydoc RenderWindow::setVSyncEnabled */
 		void setVSyncEnabled(bool vsync);
 
-		/** @copydoc see RenderWindow::isVSyncEnabled */
+		/** @copydoc RenderWindow::isVSyncEnabled */
 		bool isVSyncEnabled() const;
 
-		/** @copydoc see RenderWindow::setVSyncInterval */
+		/** @copydoc RenderWindow::setVSyncInterval */
 		void setVSyncInterval(unsigned int interval);
 
-		/** @copydoc see RenderWindow::getVSyncInterval */
+		/** @copydoc RenderWindow::getVSyncInterval */
 		unsigned int getVSyncInterval() const;
 		
-		/** @copydoc see RenderWindow::reposition */
+		/** @copydoc RenderWindow::reposition */
 		void reposition(int left, int top);
 		
-		/** @copydoc see RenderWindow::resize */
+		/** @copydoc RenderWindow::resize */
 		void resize(unsigned int width, unsigned int height);
 
-		/** @copydoc see RenderWindow::windowMovedOrResized */
+		/** @copydoc RenderWindow::windowMovedOrResized */
 		void windowMovedOrResized();
 		
-		/** @copydoc see RenderWindow::swapBuffers */
+		/** @copydoc RenderWindow::swapBuffers */
 		void swapBuffers(bool waitForVSync);
 		
-		/** @copydoc see RenderTarget::copyContentsToMemory */
+		/** @copydoc RenderTarget::copyContentsToMemory */
 		void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
 		
 		/**

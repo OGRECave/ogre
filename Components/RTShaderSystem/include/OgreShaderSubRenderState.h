@@ -105,8 +105,8 @@ public:
 	@see RenderObjectListener::notifyRenderSingleObject.
 	@param rend The renderable that is about to be rendered.
 	@param pass The pass that used for this rendering.
-	@source The auto parameter source.
-	@pLightList The light list used in the current rendering context.
+	@param source The auto parameter source.
+	@param pLightList The light list used in the current rendering context.
 	*/
 	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList) { }
 
@@ -251,6 +251,7 @@ public:
 	@param compiler The compiler instance.
 	@param prop The abstract property node.
 	@param pass The pass that is the parent context of this node.
+    @param translator The translator instance holding existing scripts.
 	*/
 	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) { return NULL; }
 
@@ -260,6 +261,7 @@ public:
 	@param compiler The compiler instance.
 	@param prop The abstract property node.
 	@param texState The pass that is the parent context of this node.
+    @param translator The translator instance holding existing scripts.
 	*/
 	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) { return NULL; }
 

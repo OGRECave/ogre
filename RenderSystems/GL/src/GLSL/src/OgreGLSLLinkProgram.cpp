@@ -104,9 +104,10 @@ namespace Ogre {
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
 				"Geometry shader output operation type can only be point list,"
 				"line strip or triangle strip",
-				"GLSLLinkProgram::activate");
+                            "GLSLLinkProgram::getGLGeometryOutputPrimitiveType");
 		}
 	}
+
 	//-----------------------------------------------------------------------
 	GLSLLinkProgram::GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram)
         : mVertexProgram(vertexProgram)
@@ -366,6 +367,7 @@ namespace Ogre {
 					case GCT_SAMPLER1DSHADOW:
 					case GCT_SAMPLER2D:
 					case GCT_SAMPLER2DSHADOW:
+                    case GCT_SAMPLER2DARRAY:
 					case GCT_SAMPLER3D:
 					case GCT_SAMPLERCUBE:
 						// samplers handled like 1-element ints

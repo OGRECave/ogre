@@ -55,7 +55,7 @@ namespace Ogre {
 
 
         /// Get the assigned GL program id
-        const GLuint getProgramID(void) const
+        GLuint getProgramID(void) const
         { return mProgramID; }
 
     protected:
@@ -68,6 +68,6 @@ namespace Ogre {
         GLenum mProgramType;
     };
 
-}; // namespace Ogre
+} // namespace Ogre
 
 #endif // __GLES2GpuProgram_H__
