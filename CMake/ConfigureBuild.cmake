@@ -44,6 +44,10 @@ if (OGRE_CONFIG_THREADS)
 		# this behaviour is not available on all compilers, we need to find the libraries
 		# ourselves, anyway. Disable auto-linking to avoid mess-ups.
 		add_definitions(-DBOOST_ALL_NO_LIB)
+        if (MINGW AND Boost_USE_STATIC_LIBS)
+            # mingw needs this to link against static thread libraries
+            add_definitions(-DBOOST_THREAD_USE_LIB)
+        endif ()
 		set(OGRE_THREAD_LIBRARIES ${Boost_LIBRARIES})
 	endif ()
 

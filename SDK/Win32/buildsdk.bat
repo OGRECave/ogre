@@ -28,7 +28,10 @@ if "%2" == "clean" rmdir /Q/S %BUILD_DIR%
 mkdir %BUILD_DIR%
 pushd %BUILD_DIR%
 rem call CMake
-cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -G%GENERATOR% ..\..\..
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=%cd%\SDK -G%GENERATOR% ..\..\..
+if errorlevel 1 goto cmakeerror
+rem call twice to ensure all variables are set properly
+cmake -DOGRE_INSTALL_SAMPLES_SOURCE:BOOL=TRUE -DOGRE_INSTALL_DOCS:BOOL=TRUE -DOGRE_INSTALL_DEPENDENCIES:BOOL=TRUE -DCMAKE_INSTALL_PREFIX:PATH=%cd%\SDK -G%GENERATOR% ..\..\..
 if errorlevel 1 goto cmakeerror
 
 rem Read OGRE version
@@ -60,7 +63,7 @@ rem Build main binaries
 
 rem call CMake in sdk 
 pushd sdk
-cmake -G%GENERATOR% .\
+cmake -DBOOST_INCLUDEDIR:PATH=%cd%\boost -DBOOST_LIBRARYDIR=%cd%\boost\lib -DBoost_NO_SYSTEM_PATHS:BOOL=ON -G%GENERATOR% .\
 if errorlevel 1 goto cmakeerror
 rem delete cache (since it will include absolute paths)
 del CMakeCache.txt

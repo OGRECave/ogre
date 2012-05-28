@@ -24,9 +24,9 @@ option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE
 macro(install_debug INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/debug/${INPUT})
     if (IS_DIRECTORY ${OGRE_DEP_DIR}/bin/debug/${INPUT})
-      install(DIRECTORY ${OGRE_DEP_DIR}/bin/debug/${INPUT} DESTINATION lib/debug CONFIGURATIONS Debug)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/debug/${INPUT} DESTINATION bin/debug CONFIGURATIONS Debug)
     else ()
-      install(FILES ${OGRE_DEP_DIR}/bin/debug/${INPUT} DESTINATION lib/debug CONFIGURATIONS Debug)
+      install(FILES ${OGRE_DEP_DIR}/bin/debug/${INPUT} DESTINATION bin/debug CONFIGURATIONS Debug)
     endif ()
   else()
     message(send_error "${OGRE_DEP_DIR}/bin/debug/${INPUT} did not exist, can't install!")
@@ -36,13 +36,13 @@ endmacro()
 macro(install_release INPUT)
   if (EXISTS ${OGRE_DEP_DIR}/bin/release/${INPUT})
     if (IS_DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT})
-      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/release CONFIGURATIONS Release None "")
-      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(DIRECTORY ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
     else ()
-      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/release CONFIGURATIONS Release None "")
-      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
+      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/release CONFIGURATIONS Release None "")
+      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+      install(FILES ${OGRE_DEP_DIR}/bin/release/${INPUT} DESTINATION bin/minsizerel CONFIGURATIONS MinSizeRel)
     endif ()
   else()
     message(send_error "${OGRE_DEP_DIR}/bin/release/${INPUT} did not exist, can't install!")
@@ -174,7 +174,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
   # If we're installing the sample source for an SDK, also install Boost headers & libraries
   if (OGRE_INSTALL_SAMPLES_SOURCE AND Boost_FOUND AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # headers (try to exclude things we don't need)
-    install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost_${Boost_LIB_VERSION}"
+    install(DIRECTORY "${Boost_INCLUDE_DIR}/boost" DESTINATION "boost"
       PATTERN "accumulators" EXCLUDE
       PATTERN "archive" EXCLUDE
       PATTERN "asio" EXCLUDE
@@ -196,11 +196,9 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "graph" EXCLUDE
       PATTERN "interprocess" EXCLUDE
       PATTERN "intrusive" EXCLUDE
-      PATTERN "io" EXCLUDE
       PATTERN "iostreams" EXCLUDE
       PATTERN "lambda" EXCLUDE
       PATTERN "logic" EXCLUDE
-      PATTERN "move" EXCLUDE
       PATTERN "mpi" EXCLUDE
       PATTERN "multi_array" EXCLUDE
       PATTERN "multi_index" EXCLUDE
@@ -236,15 +234,19 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "xpressive" EXCLUDE
     )
     # License
-    install(FILES "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt" DESTINATION "boost_${Boost_LIB_VERSION}")
+    if (EXISTS "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt")
+        install(FILES "${Boost_INCLUDE_DIR}/boost/LICENSE_1_0.txt" DESTINATION "boost")
+    elseif (EXISTS "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt")
+        install(FILES "${Boost_INCLUDE_DIR}/LICENSE_1_0.txt" DESTINATION "boost")
+    endif ()
     # libraries
     if (Boost_THREAD_FOUND)
-      install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
+      install(FILES ${Boost_THREAD_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
+      install(FILES ${Boost_THREAD_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
     endif()
     if (Boost_DATE_TIME_FOUND)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Debug)
-      install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost_${Boost_LIB_VERSION}/lib" CONFIGURATIONS Release)
+      install(FILES ${Boost_DATE_TIME_LIBRARY_DEBUG} DESTINATION "boost/lib" CONFIGURATIONS Debug)
+      install(FILES ${Boost_DATE_TIME_LIBRARY_RELEASE} DESTINATION "boost/lib" CONFIGURATIONS Release)
     endif()
   endif()
 endif ()

@@ -1128,7 +1128,7 @@ namespace Ogre {
         /// Returns whether this unit has texture coordinate generation that depends on the camera.
         bool hasViewRelativeTextureCoordinateGeneration(void) const;
 
-        // Is this loaded?
+        /// Is this loaded?
         bool isLoaded(void) const;
         /** Tells the class that it needs recompilation. */
         void _notifyNeedsRecompile(void);
