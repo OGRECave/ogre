@@ -679,11 +679,7 @@ protected:
 		{
 			if (mTrayMgr->isDialogVisible()) return true;  // ignore keypresses when dialog is showing
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID // TODO: remove this once the BACK event in android is handled
-			if (evt.key == OIS::KC_BACK || evt.key == OIS::KC_COMMA)
-#else
 			if (evt.key == OIS::KC_ESCAPE)
-#endif
 			{
 				if (mTitleLabel->getTrayLocation() != TL_NONE)
 				{

@@ -183,9 +183,12 @@ namespace Ogre {
             
             EGLint format;
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-            ANativeWindow_setBuffersGeometry(mWindow, mWidth, mHeight, format);
+            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
             
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
+            
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             
             mHwGamma = false;
         }

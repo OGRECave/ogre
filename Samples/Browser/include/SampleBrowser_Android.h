@@ -120,11 +120,28 @@ namespace OgreBites
     private:
         SampleBrowser* mBrowser;
         AndroidMultiTouch* mTouch;
+        AndroidKeyboard* mKeyboard;
         
     public:
         
-        AndroidInputInjector(SampleBrowser* browser, AndroidMultiTouch* touch) 
-            : mBrowser(browser), mTouch(touch) {}
+        AndroidInputInjector(SampleBrowser* browser, AndroidMultiTouch* touch, AndroidKeyboard* keyboard) 
+            : mBrowser(browser), mTouch(touch), mKeyboard(keyboard) {}
+        
+        void injectKeyEvent(int action, int32_t keyCode)
+        {
+            if(keyCode == AKEYCODE_BACK)
+            {
+                OIS::KeyEvent evt(mKeyboard, OIS::KC_ESCAPE, 0);
+                if(action == 0)
+                {
+                    mBrowser->keyPressed(evt);
+                }
+                else
+                {
+                    mBrowser->keyReleased(evt);
+                }
+            }
+        }
         
         void injectTouchEvent(int action, float x, float y, int pointerId = 0)
         {
@@ -233,14 +250,21 @@ namespace OgreBites
         
         static int32_t handleInput(struct android_app* app, AInputEvent* event) 
         {
-            if(mInputInjector) /* AInputEvent_getType(event) always returns 2 seems like a bug */
+            if (mInputInjector)
             {
-                mInputInjector->injectTouchEvent(2, AMotionEvent_getX(event, 0), AMotionEvent_getY(event, 0) );
-                mInputInjector->injectTouchEvent(0, AMotionEvent_getX(event, 0), AMotionEvent_getY(event, 0) );
-                mInputInjector->injectTouchEvent(1, AMotionEvent_getX(event, 0), AMotionEvent_getY(event, 0) );
-                
+                if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) 
+                {
+                    int action = (int)(AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event));
+                    mInputInjector->injectTouchEvent(action, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0) );
+                }
+                else 
+                {
+                    mInputInjector->injectKeyEvent(AKeyEvent_getAction(event), AKeyEvent_getKeyCode(event));
+                }
+
+                return 1;
             }
-            return 1;
+            return 0;
         }
         
         static void handleCmd(struct android_app* app, int32_t cmd)
@@ -254,7 +278,7 @@ namespace OgreBites
                     {
                         Ogre::NameValuePairList opt;
                         opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
-                        mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 1280, 800, false, &opt);
+                        mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                         
                         if(!mTouch)
                             mTouch = new AndroidMultiTouch();
@@ -268,7 +292,7 @@ namespace OgreBites
                             mBrowser->initAppForAndroid(mRenderWnd, app, mTouch, mKeyboard);
                             mBrowser->initApp();
                             
-                            mInputInjector = new AndroidInputInjector(mBrowser, mTouch);
+                            mInputInjector = new AndroidInputInjector(mBrowser, mTouch, mKeyboard);
                         }
                     }
                     break;
