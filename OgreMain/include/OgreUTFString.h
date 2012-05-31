@@ -132,8 +132,6 @@ namespace Ogre {
 # else
 #   define OGRE_IS_NATIVE_WCHAR_T      0
 # endif
-#elif OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-#   define OGRE_IS_NATIVE_WCHAR_T      0
 #else   // OGRE_COMPILER != OGRE_COMPILER_MSVC
 
 // Assumed wchar_t is natively for other compilers

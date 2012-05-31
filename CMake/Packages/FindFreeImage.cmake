@@ -40,17 +40,8 @@ findpkg_framework(FreeImage)
 
 find_path(FreeImage_INCLUDE_DIR NAMES FreeImage.h HINTS ${FreeImage_INC_SEARCH_PATH} ${FreeImage_PKGC_INCLUDE_DIRS})
 
-if (SYMBIAN) 
-set(ORIGINAL_CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
-set(CMAKE_PREFIX_PATH ${CMAKE_SYSYEM_OUT_DIR})
-message(STATUS "Lib will be searched in Symbian out dir: ${CMAKE_SYSYEM_OUT_DIR}")
-endif (SYMBIAN)
 find_library(FreeImage_LIBRARY_REL NAMES ${FreeImage_LIBRARY_NAMES} HINTS ${FreeImage_LIB_SEARCH_PATH} ${FreeImage_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" release relwithdebinfo minsizerel)
 find_library(FreeImage_LIBRARY_DBG NAMES ${FreeImage_LIBRARY_NAMES_DBG} HINTS ${FreeImage_LIB_SEARCH_PATH} ${FreeImage_PKGC_LIBRARY_DIRS} PATH_SUFFIXES "" debug)
-if (SYMBIAN) 
-set(FreeImage_LIBRARY_REL "${FreeImage_LIBRARY_REL} LibJPEG.lib LibOpenJPEG.lib LibPNG.lib ZLib-freeImage.lib")
-set(CMAKE_PREFIX_PATH ${ORIGINAL_CMAKE_PREFIX_PATH})
-endif (SYMBIAN)
 
 make_library_set(FreeImage_LIBRARY)
 

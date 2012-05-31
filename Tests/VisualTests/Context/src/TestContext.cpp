@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 
 #include "OgrePlatform.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-#include <coecntrl.h>
-#endif
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -523,8 +520,6 @@ void TestContext::setTimestep(Ogre::Real timestep)
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    
-
 // since getting commandline args out of WinMain isn't pretty, just use plain main for now...
 //#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 //INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
@@ -566,5 +561,3 @@ int main(int argc, char *argv[])
 #endif
     return 0;
 }
-
-#endif // OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN    

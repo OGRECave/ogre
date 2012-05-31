@@ -596,21 +596,6 @@ elseif (UNIX)
   if (DL_LIBRARY)
     list(APPEND PLATFORM_LIBS dl)
   endif ()
-elseif (SYMBIAN)
-  include_directories(include/symbian)
-  set(PLATFORM_HEADER_FILES
-    include/GLX/OgreTimerImp.h
-    include/symbian/OgreConfigDialogImp.h
-    include/symbian/OgreErrorDialogImp.h
-  )
-  set(PLATFORM_SOURCE_FILES
-    src/OgreSearchOps.cpp
-    src/GLX/OgreTimer.cpp
-    src/symbian/OgreConfigDialog.cpp
-    src/symbian/OgreErrorDialog.cpp
-  )
-  set(PLATFORM_HEADER_INSTALL "SYMBIAN")
-
 endif()
 
 
