@@ -51,12 +51,6 @@ THE SOFTWARE.
 #endif
 #endif
 
-// Color order is actually RGB on iOS
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#undef FREEIMAGE_COLORORDER
-#define FREEIMAGE_COLORORDER FREEIMAGE_COLORORDER_RGB
-#endif
-
 namespace Ogre {
 
 	FreeImageCodec::RegisteredCodecList FreeImageCodec::msCodecList;
