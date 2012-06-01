@@ -41,7 +41,7 @@ popd
 echo API generation done.
 
 # Invoke Xcode build
-xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx ARCHS="i386 x86_64" MACOSX_DEPLOYMENT_TARGET=10.5
+xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk macosx ARCHS="i386 x86_64" MACOSX_DEPLOYMENT_TARGET=10.5 ONLY_ACTIVE_ARCH="NO"
 # Just release mode, debug is too big
 #xcodebuild -project OGRE.xcodeproj -target install -configuration Debug -sdk macosx10.4 ARCHS=i386 GCC_VERSION=4.0 MACOSX_DEPLOYMENT_TARGET=10.4
 
