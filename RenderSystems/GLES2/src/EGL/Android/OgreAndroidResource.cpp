@@ -25,17 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreAndroidResource.h"
+#include "OgreAndroidResourceManager.h"
+#include "OgreGLES2RenderSystem.h"
 
-#ifndef __GLES2Util_H__
-#define __GLES2Util_H__
+namespace Ogre
+{
+	AndroidResource::AndroidResource()
+	{				
+		GLES2RenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<AndroidResource*>(this));		
+	}
 
-#include "OgreAndroidEGLSupport.h"
-
-namespace Ogre {
-    inline GLES2Support* getGLSupport()
-    {
-        return new AndroidEGLSupport();
-    }
+	AndroidResource::~AndroidResource()
+	{	
+		GLES2RenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<AndroidResource*>(this));
+	}
 }
-
-#endif

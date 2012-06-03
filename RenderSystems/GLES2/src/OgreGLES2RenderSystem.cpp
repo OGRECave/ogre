@@ -51,6 +51,8 @@ THE SOFTWARE.
 #   include "OgreEAGL2Window.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #	include "OgreAndroidEGLWindow.h"
+#   include "OgreAndroidResourceManager.h"
+Ogre::AndroidResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #	include "OgreNaClWindow.h"
 #else
@@ -94,6 +96,10 @@ namespace Ogre {
 		mEnableFixedPipeline = false;
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        mResourceManager = OGRE_NEW AndroidResourceManager();
+#endif
+        
         mGLSupport = getGLSupport();
 
         
@@ -135,6 +141,14 @@ namespace Ogre {
 
         mRenderTargets.clear();
         OGRE_DELETE mGLSupport;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        if (mResourceManager != NULL)
+		{
+			OGRE_DELETE mResourceManager;
+			mResourceManager = NULL;
+		}
+#endif
     }
 
     const String& GLES2RenderSystem::getName(void) const
@@ -2145,4 +2159,11 @@ namespace Ogre {
                 mActiveBufferMap.erase(i);
         }
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    AndroidResourceManager* GLES2RenderSystem::getResourceManager()
+    {
+        return GLES2RenderSystem::mResourceManager;
+    }
+#endif
 }

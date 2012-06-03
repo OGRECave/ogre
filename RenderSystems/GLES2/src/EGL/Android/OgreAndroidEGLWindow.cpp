@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
+#include "OgreAndroidResourceManager.h"
 
 #include <iostream>
 #include <algorithm>
@@ -164,32 +165,8 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-            int minAttribs[] = {
-                EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-                EGL_BLUE_SIZE, 5, 
-                EGL_GREEN_SIZE, 6, 
-                EGL_RED_SIZE, 5,
-                EGL_DEPTH_SIZE, 16, 
-                EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-                EGL_NONE
-            };
-            
-            int maxAttribs[] = {
-                EGL_NONE
-            };
-            
-            mEglDisplay = mGLSupport->getGLDisplay();
-            mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
-            
-            EGLint format;
-            eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
-            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
-            
-            mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
-            
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-            
+
+            _createInternalResources(mWindow);
             mHwGamma = false;
         }
         
@@ -200,6 +177,46 @@ namespace Ogre {
 		mClosed = false;
 	}
 
-
-
+    void AndroidEGLWindow::_destroyInternalResources()
+    {
+        GLES2RenderSystem::getResourceManager()->notifyOnContextLost(static_cast<AndroidEGLContext*>(mContext));
+        mContext->_destroyInternalResources();
+    }
+    
+    void AndroidEGLWindow::_createInternalResources(NativeWindowType window)
+    {
+        mWindow = window;
+        
+        int minAttribs[] = {
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_BLUE_SIZE, 5, 
+            EGL_GREEN_SIZE, 6, 
+            EGL_RED_SIZE, 5,
+            EGL_DEPTH_SIZE, 16, 
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+            EGL_NONE
+        };
+        
+        int maxAttribs[] = {
+            EGL_NONE
+        };
+        
+        mEglDisplay = mGLSupport->getGLDisplay();
+        mEglConfig = mGLSupport->selectGLConfig(minAttribs, maxAttribs);
+        
+        EGLint format;
+        eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+        ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+        
+        mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
+        
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+        
+        if(mContext)
+        {
+            mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
+            GLES2RenderSystem::getResourceManager()->notifyOnContextReset(static_cast<AndroidEGLContext*>(mContext));
+        }
+    }
 }

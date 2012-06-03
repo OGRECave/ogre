@@ -31,16 +31,23 @@
 
 #include "OIS.h"
 #include <android_native_app_glue.h>
+#include <android/log.h>
+#include <EGL/egl.h>
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
+#include "Android/OgreAndroidEGLWindow.h"
+#include "OgreRTShaderSystem.h"
 
 #ifdef OGRE_STATIC_LIB
 #  include "OgreStaticPluginLoader.h"
 #endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#error This header is for use with Android only
+#   error This header is for use with Android only
 #endif
+
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "Ogre", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "Ogre", __VA_ARGS__))
 
 namespace OgreBites
 {
@@ -209,18 +216,30 @@ namespace OgreBites
     public:
         static void init(struct android_app* state)
         {
+            if(mInit)
+                return;
+            
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
             state->onInputEvent = &OgreAndroidBridge::handleInput;
+            
             mRoot = new Ogre::Root();
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader = new Ogre::StaticPluginLoader();
             mStaticPluginLoader->load();
 #endif
             mRoot->initialise(false);
+            
+            mUpdate = true;
+            mInit = true;
         }
         
         static void shutdown()
         {
+            if(!mInit)
+                return;
+                
+            mInit = false;
+            
             if(mBrowser)
             {
                 mBrowser->closeApp();
@@ -255,6 +274,10 @@ namespace OgreBites
                 if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) 
                 {
                     int action = (int)(AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event));
+                    
+                    if(action == 0)
+                        mInputInjector->injectTouchEvent(2, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0) );
+                    
                     mInputInjector->injectTouchEvent(action, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0) );
                 }
                 else 
@@ -274,34 +297,44 @@ namespace OgreBites
                 case APP_CMD_SAVE_STATE:
                 break;
                 case APP_CMD_INIT_WINDOW:
-                    if (app->window && mRoot && !mRenderWnd)
+                    if (app->window && mRoot)
                     {
-                        Ogre::NameValuePairList opt;
-                        opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
-                        mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
-                        
-                        if(!mTouch)
-                            mTouch = new AndroidMultiTouch();
-                        
-                        if(!mKeyboard)
-                            mKeyboard = new AndroidKeyboard();
-                        
-                        if(!mBrowser)
+                        LOGW("APP_CMD_INIT_WINDOW");
+                        mUpdate = true;
+                        if (!mRenderWnd) 
                         {
-                            mBrowser = OGRE_NEW SampleBrowser();
-                            mBrowser->initAppForAndroid(mRenderWnd, app, mTouch, mKeyboard);
-                            mBrowser->initApp();
+                            Ogre::NameValuePairList opt;
+                            opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
+                            mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                             
-                            mInputInjector = new AndroidInputInjector(mBrowser, mTouch, mKeyboard);
+                            if(!mTouch)
+                                mTouch = new AndroidMultiTouch();
+                            
+                            if(!mKeyboard)
+                                mKeyboard = new AndroidKeyboard();
+                            
+                            if(!mBrowser)
+                            {
+                                mBrowser = OGRE_NEW SampleBrowser();
+                                mBrowser->initAppForAndroid(mRenderWnd, app, mTouch, mKeyboard);
+                                mBrowser->initApp();
+                                
+                                mInputInjector = new AndroidInputInjector(mBrowser, mTouch, mKeyboard);
+                            }
+                        }
+                        else
+                        {
+                            LOGW("_createInternalResources");
+                            static_cast<AndroidEGLWindow*>(mRenderWnd)->_createInternalResources(app->window);
+                            Ogre::RTShader::ShaderGenerator::getSingletonPtr()->flushShaderCache();
                         }
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:
                     if(mRoot && mRenderWnd)
                     {
-                        mRenderWnd->destroy();
-                        mRoot->detachRenderTarget(mRenderWnd);
-                        mRenderWnd = NULL;
+                        static_cast<AndroidEGLWindow*>(mRenderWnd)->_destroyInternalResources();
+                        mUpdate = false;
                     }
                     break;
                 case APP_CMD_GAINED_FOCUS:
@@ -327,7 +360,7 @@ namespace OgreBites
                         return;
                 }
                 
-                if(mRenderWnd != NULL)
+                if(mUpdate && mRenderWnd != NULL)
                     mRoot->renderOneFrame();
             }
         }
@@ -344,6 +377,8 @@ namespace OgreBites
         static AndroidKeyboard* mKeyboard;
         static Ogre::RenderWindow* mRenderWnd;
         static Ogre::Root* mRoot;
+        static bool mUpdate;
+        static bool mInit;
         
 #ifdef OGRE_STATIC_LIB
         static Ogre::StaticPluginLoader* mStaticPluginLoader;

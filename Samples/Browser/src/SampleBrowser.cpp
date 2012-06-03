@@ -51,6 +51,8 @@ AndroidMultiTouch* OgreAndroidBridge::mTouch = NULL;
 AndroidKeyboard* OgreAndroidBridge::mKeyboard = NULL;
 Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
 Ogre::Root* OgreAndroidBridge::mRoot = NULL;
+bool OgreAndroidBridge::mUpdate = false;
+bool OgreAndroidBridge::mInit = false;
 
 #   ifdef OGRE_STATIC_LIB
 Ogre::StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
@@ -86,7 +88,7 @@ int main(int argc, char *argv[])
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     // Make sure glue isn't stripped.
     app_dummy();
-    
+
     OgreAndroidBridge::init(state);
     OgreAndroidBridge::go(state);
 #else

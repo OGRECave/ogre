@@ -1,8 +1,8 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org
 
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
@@ -26,16 +26,12 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GLES2Util_H__
-#define __GLES2Util_H__
-
-#include "OgreAndroidEGLSupport.h"
-
-namespace Ogre {
-    inline GLES2Support* getGLSupport()
-    {
-        return new AndroidEGLSupport();
-    }
-}
-
+#ifndef __GLES2ManagedResource_H__
+#define __GLES2ManagedResource_H__
+#   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#       include "OgreAndroidResource.h"
+#       define MANAGED_RESOURCE , public AndroidResource
+#   else
+#       define MANAGED_RESOURCE
+#   endif
 #endif

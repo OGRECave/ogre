@@ -31,9 +31,10 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2HardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLES2Export GLES2HardwareIndexBuffer : public HardwareIndexBuffer MANAGED_RESOURCE
     {
         private:
             GLuint mBufferId;
@@ -43,13 +44,25 @@ namespace Ogre {
             size_t mScratchSize;
             void* mScratchPtr;
             bool mScratchUploadOnUnlock;
-
+        
         protected:
             /** See HardwareBuffer. */
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
             void unlockImpl(void);
+        
+            void createBuffer();
+        
+            void destroyBuffer();
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            /** See AndroidResource. */
+            virtual void notifyOnContextLost(AndroidEGLContext* context);
+        
+            /** See AndroidResource. */
+            virtual void notifyOnContextReset(AndroidEGLContext* context);
+#endif
+        
         public:
             GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
                                   HardwareBuffer::Usage usage,

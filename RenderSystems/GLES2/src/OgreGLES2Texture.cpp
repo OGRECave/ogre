@@ -393,6 +393,18 @@ namespace Ogre {
         glDeleteTextures(1, &mTextureID);
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2Texture::notifyOnContextLost(AndroidEGLContext* context)
+    {
+        freeInternalResourcesImpl();
+    }
+    
+    void GLES2Texture::notifyOnContextReset(AndroidEGLContext* context)
+    {
+        createInternalResources();;
+    }
+#endif
 
     void GLES2Texture::_createSurfaceList()
     {

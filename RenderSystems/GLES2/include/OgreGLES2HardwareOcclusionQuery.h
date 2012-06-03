@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareOcclusionQuery.h"
-
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre { 
 
@@ -42,7 +42,7 @@ namespace Ogre {
 // Be sure to render all occluder first and whats out so the RenderQue don't switch places on 
 // the occluding objects and the tested objects because it thinks it's more effective..
 
-class _OgreGLES2Export GLES2HardwareOcclusionQuery : public HardwareOcclusionQuery
+class _OgreGLES2Export GLES2HardwareOcclusionQuery : public HardwareOcclusionQuery MANAGED_RESOURCE
 {
 //----------------------------------------------------------------------
 // Public methods
@@ -67,12 +67,27 @@ public:
 	bool isStillOutstanding(void);
 
 
-    //----------------------------------------------------------------------
-    // private members
-    //--
-    private:
+//----------------------------------------------------------------------
+// private members
+//--
+private:
 
-	    GLuint			mQueryID;
+    GLuint			mQueryID;
+    
+    void createQuery();
+    
+    void destroyQuery();
+    
+protected:
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    /** See AndroidResource. */
+    virtual void notifyOnContextLost(AndroidEGLContext* context);
+    
+    /** See AndroidResource. */
+    virtual void notifyOnContextReset(AndroidEGLContext* context);
+#endif
+    
 };
 
 }

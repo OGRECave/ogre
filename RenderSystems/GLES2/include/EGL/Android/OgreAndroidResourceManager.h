@@ -25,17 +25,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __AndroidResourceManager_H__
+#define __AndroidResourceManager_H__
 
-#ifndef __GLES2Util_H__
-#define __GLES2Util_H__
-
-#include "OgreAndroidEGLSupport.h"
+#include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
-    inline GLES2Support* getGLSupport()
-    {
-        return new AndroidEGLSupport();
-    }
+	class AndroidEGLContext;
+    class AndroidResource;
+    
+	class _OgrePrivate AndroidResourceManager : public ResourceAlloc
+	{
+	// Interface.
+	public:
+
+		// Called immediately after the Android context has entered a lost state.
+        void notifyOnContextLost(AndroidEGLContext* context);
+        
+		// Called immediately after the Android context has been reset.
+        void notifyOnContextReset(AndroidEGLContext* context);
+		
+		AndroidResourceManager();
+		~AndroidResourceManager();		
+
+	// Friends.
+	protected:
+		friend class AndroidResource;
+	
+	// Types.
+	protected:
+		typedef set<AndroidResource*>::type		ResourceContainer;
+		typedef ResourceContainer::iterator		ResourceContainerIterator;
+
+	// Protected methods.
+	protected:
+		
+		// Called when new resource created.
+		void _notifyResourceCreated		(AndroidResource* pResource);
+
+		// Called when resource is about to be destroyed.
+		void _notifyResourceDestroyed	(AndroidResource* pResource);
+				
+	// Attributes.
+	protected:		
+		ResourceContainer			mResources;
+	};
 }
 
 #endif

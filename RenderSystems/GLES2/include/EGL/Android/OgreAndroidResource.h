@@ -25,17 +25,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __AndroidResource_H__
+#define __AndroidResource_H__
 
-#ifndef __GLES2Util_H__
-#define __GLES2Util_H__
-
-#include "OgreAndroidEGLSupport.h"
+#include "OgreGLES2Prerequisites.h"
 
 namespace Ogre {
-    inline GLES2Support* getGLSupport()
-    {
-        return new AndroidEGLSupport();
-    }
-}
 
+    class AndroidEGLContext;
+    
+	/** Represents a Android rendering resource.
+	Provide unified interface to
+	handle various device states.
+	*/
+	class _OgrePrivate AndroidResource
+	{
+
+	// Interface.
+	public:
+
+		// Called immediately after the Android context has entered a lost state.
+		virtual void notifyOnContextLost(AndroidEGLContext* context) {}
+
+		// Called immediately after the Android context has been reset.
+		virtual void notifyOnContextReset(AndroidEGLContext* context) {}
+
+	public:
+		AndroidResource();
+		virtual ~AndroidResource();
+	};
+}
 #endif

@@ -12,3 +12,4 @@ Dependencies/include/FreeImage.h
 build
 AndroidBuild
 AndroidDependencies
+iOSBuild

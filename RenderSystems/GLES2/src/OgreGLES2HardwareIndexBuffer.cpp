@@ -54,24 +54,34 @@ namespace Ogre {
                         "GLES2HardwareIndexBuffer");
         }
 
-        glGenBuffers(1, &mBufferId);
-        GL_CHECK_ERROR;
-
-        if (!mBufferId)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Cannot create GL ES index buffer",
-                "GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer");
-        }
-
-        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
-
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
-                     GLES2HardwareBufferManager::getGLUsage(usage));
-        GL_CHECK_ERROR;
+        createBuffer();
     }
 
     GLES2HardwareIndexBuffer::~GLES2HardwareIndexBuffer()
+    {
+        destroyBuffer();
+    }
+    
+    void GLES2HardwareIndexBuffer::createBuffer()
+    {
+        glGenBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
+        
+        if (!mBufferId)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Cannot create GL ES index buffer",
+                        "GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer");
+        }
+        
+        dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)mSizeInBytes, NULL,
+                     GLES2HardwareBufferManager::getGLUsage(mUsage));
+        GL_CHECK_ERROR;
+    }
+    
+    void GLES2HardwareIndexBuffer::destroyBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
@@ -79,7 +89,20 @@ namespace Ogre {
         // Delete the cached value
         dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_deleteGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
     }
-
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2HardwareIndexBuffer::notifyOnContextLost(AndroidEGLContext* context)
+    {
+        destroyBuffer();
+    }
+    
+    void GLES2HardwareIndexBuffer::notifyOnContextReset(AndroidEGLContext* context)
+    {
+        createBuffer();
+        _updateFromShadow();
+    }
+#endif
+    
     void GLES2HardwareIndexBuffer::unlockImpl(void)
     {
         if (mLockedToScratch)

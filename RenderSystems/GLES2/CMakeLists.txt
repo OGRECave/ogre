@@ -31,6 +31,7 @@ set(HEADER_FILES
   include/OgreGLES2Support.h
   include/OgreGLES2Texture.h
   include/OgreGLES2TextureManager.h
+  include/OgreGLES2Context.h
 )
 
 set(SOURCE_FILES
@@ -136,6 +137,8 @@ elseif (ANDROID)
     include/EGL/Android/OgreAndroidEGLSupport.h
     include/EGL/Android/OgreAndroidEGLWindow.h
     include/EGL/Android/OgreGLES2Util.h
+    include/EGL/Android/OgreAndroidResourceManager.h
+    include/EGL/Android/OgreAndroidResource.h
     include/EGL/OgreEGLContext.h
     include/EGL/OgreEGLRenderTexture.h
     include/EGL/OgreEGLSupport.h
@@ -145,6 +148,8 @@ elseif (ANDROID)
     src/EGL/Android/OgreAndroidEGLContext.cpp
     src/EGL/Android/OgreAndroidEGLSupport.cpp
     src/EGL/Android/OgreAndroidEGLWindow.cpp
+    src/EGL/Android/OgreAndroidResourceManager.cpp
+    src/EGL/Android/OgreAndroidResource.cpp
     src/EGL/OgreEGLContext.cpp
     src/EGL/OgreEGLRenderTexture.cpp
     src/EGL/OgreEGLSupport.cpp

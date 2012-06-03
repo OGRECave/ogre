@@ -31,10 +31,11 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     /// Specialisation of HardwareVertexBuffer for OpenGL ES
-    class _OgreGLES2Export GLES2HardwareVertexBuffer : public HardwareVertexBuffer
+    class _OgreGLES2Export GLES2HardwareVertexBuffer : public HardwareVertexBuffer MANAGED_RESOURCE
     {
         private:
             GLuint mBufferId;
@@ -50,7 +51,19 @@ namespace Ogre {
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
             void unlockImpl(void);
-
+        
+            void createBuffer();
+        
+            void destroyBuffer();
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            /** See AndroidResource. */
+            virtual void notifyOnContextLost(AndroidEGLContext* context);
+        
+            /** See AndroidResource. */
+            virtual void notifyOnContextReset(AndroidEGLContext* context);
+#endif
+        
         public:
             GLES2HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices,
                                    HardwareBuffer::Usage usage, bool useShadowBuffer);
