@@ -157,7 +157,18 @@ namespace Ogre {
         glDeleteFramebuffers(1, &mTempFBO);      
         GL_CHECK_ERROR;
 	}
-
+    
+    void GLES2FBOManager::_reload()
+    {
+        glDeleteFramebuffers(1, &mTempFBO);      
+        GL_CHECK_ERROR;
+        
+        detectFBOFormats();
+        
+        glGenFramebuffers(1, &mTempFBO);
+        GL_CHECK_ERROR;
+    }
+    
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
                  false   if this combo is not supported

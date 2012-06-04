@@ -81,7 +81,11 @@ namespace Ogre {
     
     void EGLContext::_destroyInternalResources()
     {
+        endCurrent();
+        
         eglDestroyContext(mEglDisplay, mContext);
+        EGL_CHECK_ERROR
+        
         mContext = NULL;
     }
 

@@ -31,7 +31,9 @@ THE SOFTWARE.
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #       include "OgreAndroidResource.h"
 #       define MANAGED_RESOURCE , public AndroidResource
+#       define MANAGED_RESOURCE_SINGLE : public AndroidResource
 #   else
 #       define MANAGED_RESOURCE
+#       define MANAGED_RESOURCE_SINGLE 
 #   endif
 #endif

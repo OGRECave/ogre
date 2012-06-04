@@ -51,7 +51,6 @@ AndroidMultiTouch* OgreAndroidBridge::mTouch = NULL;
 AndroidKeyboard* OgreAndroidBridge::mKeyboard = NULL;
 Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
 Ogre::Root* OgreAndroidBridge::mRoot = NULL;
-bool OgreAndroidBridge::mUpdate = false;
 bool OgreAndroidBridge::mInit = false;
 
 #   ifdef OGRE_STATIC_LIB

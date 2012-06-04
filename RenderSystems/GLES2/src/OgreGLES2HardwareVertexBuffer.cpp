@@ -90,6 +90,7 @@ namespace Ogre {
     void GLES2HardwareVertexBuffer::notifyOnContextReset(AndroidEGLContext* context)
     {
         createBuffer();
+        mShadowUpdated = true;
         _updateFromShadow();
     }
 #endif

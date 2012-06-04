@@ -216,20 +216,18 @@ namespace OgreBites
     public:
         static void init(struct android_app* state)
         {
-            if(mInit)
-                return;
-            
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
             state->onInputEvent = &OgreAndroidBridge::handleInput;
             
+            if(mInit)
+                return;
+         
             mRoot = new Ogre::Root();
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader = new Ogre::StaticPluginLoader();
             mStaticPluginLoader->load();
 #endif
             mRoot->initialise(false);
-            
-            mUpdate = true;
             mInit = true;
         }
         
@@ -299,8 +297,6 @@ namespace OgreBites
                 case APP_CMD_INIT_WINDOW:
                     if (app->window && mRoot)
                     {
-                        LOGW("APP_CMD_INIT_WINDOW");
-                        mUpdate = true;
                         if (!mRenderWnd) 
                         {
                             Ogre::NameValuePairList opt;
@@ -324,18 +320,13 @@ namespace OgreBites
                         }
                         else
                         {
-                            LOGW("_createInternalResources");
                             static_cast<AndroidEGLWindow*>(mRenderWnd)->_createInternalResources(app->window);
-                            Ogre::RTShader::ShaderGenerator::getSingletonPtr()->flushShaderCache();
                         }
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:
                     if(mRoot && mRenderWnd)
-                    {
                         static_cast<AndroidEGLWindow*>(mRenderWnd)->_destroyInternalResources();
-                        mUpdate = false;
-                    }
                     break;
                 case APP_CMD_GAINED_FOCUS:
                     break;
@@ -360,8 +351,10 @@ namespace OgreBites
                         return;
                 }
                 
-                if(mUpdate && mRenderWnd != NULL)
+                if(mRenderWnd != NULL)
+                {
                     mRoot->renderOneFrame();
+                }
             }
         }
         
@@ -377,7 +370,6 @@ namespace OgreBites
         static AndroidKeyboard* mKeyboard;
         static Ogre::RenderWindow* mRenderWnd;
         static Ogre::Root* mRoot;
-        static bool mUpdate;
         static bool mInit;
         
 #ifdef OGRE_STATIC_LIB

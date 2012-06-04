@@ -397,12 +397,12 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLES2Texture::notifyOnContextLost(AndroidEGLContext* context)
     {
-        freeInternalResourcesImpl();
+        unload();
     }
     
     void GLES2Texture::notifyOnContextReset(AndroidEGLContext* context)
     {
-        createInternalResources();;
+        load();
     }
 #endif
 

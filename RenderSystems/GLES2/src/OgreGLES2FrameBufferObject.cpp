@@ -38,13 +38,31 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
+        createInternalResources();
+        
+        /// Initialise state
+        mDepth.buffer=0;
+        mStencil.buffer=0;
+        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+        {
+            mColour[x].buffer=0;
+        }
+    }
+    
+    GLES2FrameBufferObject::~GLES2FrameBufferObject()
+    {
+        destroyInternalResources();
+    }
+    
+    void GLES2FrameBufferObject::createInternalResources()
+    {
         /// Generate framebuffer object
         glGenFramebuffers(1, &mFB);
         GL_CHECK_ERROR;
-
+        
         mNumSamples = 0;
         mMultisampleFB = 0;
-
+        
         // Check multisampling if supported
 #if GL_APPLE_framebuffer_multisample
         // Check samples supported
@@ -59,17 +77,9 @@ namespace Ogre {
 		{
 			glGenFramebuffers(1, &mMultisampleFB);
 		}
-        
-        /// Initialise state
-        mDepth.buffer=0;
-        mStencil.buffer=0;
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-        {
-            mColour[x].buffer=0;
-        }
     }
     
-    GLES2FrameBufferObject::~GLES2FrameBufferObject()
+    void GLES2FrameBufferObject::destroyInternalResources()
     {
         mManager->releaseRenderBuffer(mDepth);
         mManager->releaseRenderBuffer(mStencil);
@@ -77,12 +87,28 @@ namespace Ogre {
         /// Delete framebuffer object
         glDeleteFramebuffers(1, &mFB);
         GL_CHECK_ERROR;
-
+        
 		if (mMultisampleFB)
 			glDeleteFramebuffers(1, &mMultisampleFB);
-
+        
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+
+    void GLES2FrameBufferObject::notifyOnContextLost(AndroidEGLContext* context)
+    {
+        destroyInternalResources();
+    }
+    
+    void GLES2FrameBufferObject::notifyOnContextReset(AndroidEGLContext* context)
+    {
+        createInternalResources();
+        
+        if(mColour[0].buffer)
+			initialise();
+    }
+#endif
     
     void GLES2FrameBufferObject::bindSurface(size_t attachment, const GLES2SurfaceDesc &target)
     {

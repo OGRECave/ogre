@@ -99,6 +99,7 @@ namespace Ogre {
     void GLES2HardwareIndexBuffer::notifyOnContextReset(AndroidEGLContext* context)
     {
         createBuffer();
+        mShadowUpdated = true;
         _updateFromShadow();
     }
 #endif
@@ -274,8 +275,7 @@ namespace Ogre {
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
         {
-            const void *srcData = mShadowBuffer->lock(mLockStart, mLockSize,
-                                                       HBL_READ_ONLY);
+            const void *srcData = mShadowBuffer->lock(mLockStart, mLockSize, HBL_READ_ONLY);
 
             dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
             GL_CHECK_ERROR;

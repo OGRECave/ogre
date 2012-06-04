@@ -496,7 +496,11 @@ namespace Ogre {
             void _bindGLBuffer(GLenum target, GLuint buffer);
             void _deleteGLBuffer(GLenum target, GLuint buffer);
         
+            void _destroyDepthBuffer(RenderWindow* pRenderWnd);
+        
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            void resetRenderer(RenderWindow* pRenderWnd);
+        
             static AndroidResourceManager* getResourceManager();
     private:
             static AndroidResourceManager* mResourceManager;

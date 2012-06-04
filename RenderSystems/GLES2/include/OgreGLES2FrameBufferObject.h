@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2RenderTexture.h"
 #include "OgreGLES2Context.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     
@@ -38,7 +39,7 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgreGLES2Export GLES2FrameBufferObject
+    class _OgreGLES2Export GLES2FrameBufferObject MANAGED_RESOURCE_SINGLE
     {
     public:
         GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa);
@@ -96,6 +97,19 @@ namespace Ogre {
             - Not all bound surfaces have the same internal format
         */
         void initialise();
+        
+        void createInternalResources();
+        
+        void destroyInternalResources();
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    protected:
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost(AndroidEGLContext* context);
+        
+        /** See AndroidResource. */
+        virtual void notifyOnContextReset(AndroidEGLContext* context);
+#endif
     };
 
 }

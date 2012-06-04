@@ -96,12 +96,12 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLSLESProgram::notifyOnContextLost(AndroidEGLContext* context)
     {
-        unloadImpl();
+        unloadHighLevelImpl();
     }
     
     void GLSLESProgram::notifyOnContextReset(AndroidEGLContext* context)
     {
-        compile(true);
+        
     }
 #endif
     //-----------------------------------------------------------------------
@@ -266,6 +266,9 @@ namespace Ogre {
                 glDeleteProgram(mGLProgramHandle);
                 GL_CHECK_ERROR;
             }
+            
+            mGLShaderHandle = 0;
+            mGLProgramHandle = 0;
             mCompiled = 0;
 		}
 	}

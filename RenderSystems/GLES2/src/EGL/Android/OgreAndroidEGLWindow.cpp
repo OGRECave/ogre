@@ -181,6 +181,19 @@ namespace Ogre {
     {
         GLES2RenderSystem::getResourceManager()->notifyOnContextLost(static_cast<AndroidEGLContext*>(mContext));
         mContext->_destroyInternalResources();
+        
+        eglDestroySurface(mEglDisplay, mEglSurface);
+        EGL_CHECK_ERROR
+        
+        eglTerminate(mEglDisplay);
+        EGL_CHECK_ERROR
+        
+        mEglDisplay = 0;
+        mEglSurface = 0;
+        
+        mActive = false;
+		mVisible = false;
+        mClosed = true;
     }
     
     void AndroidEGLWindow::_createInternalResources(NativeWindowType window)
@@ -206,6 +219,8 @@ namespace Ogre {
         
         EGLint format;
         eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
+        EGL_CHECK_ERROR
+        
         ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
         
         mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
@@ -215,8 +230,14 @@ namespace Ogre {
         
         if(mContext)
         {
+            mActive = true;
+            mVisible = true;
+            mClosed = false;
+            
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
-            GLES2RenderSystem::getResourceManager()->notifyOnContextReset(static_cast<AndroidEGLContext*>(mContext));
+            mContext->setCurrent();
+            
+            static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
         }
     }
 }

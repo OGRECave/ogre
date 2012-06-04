@@ -58,7 +58,7 @@ namespace Ogre {
     
     /** Factory for GL ES 2 Frame Buffer Objects, and related things.
     */
-    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager
+    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager 
     {
     public:
         GLES2FBOManager();
@@ -104,6 +104,10 @@ namespace Ogre {
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
         */
         GLuint getTemporaryFBO() { return mTempFBO; }
+        
+        /** Detects all supported fbo's and recreates the tempory fbo */
+        void _reload();
+        
     private:
         /** Frame Buffer Object properties for a certain texture format.
         */
