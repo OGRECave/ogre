@@ -41,15 +41,24 @@ THE SOFTWARE.
 namespace Ogre {
 
     AndroidEGLSupport::AndroidEGLSupport()
-    {
+    {        
+        mNativeDisplay = EGL_DEFAULT_DISPLAY;
+        mGLDisplay = getGLDisplay();
+        
         mCurrentMode.first.first = 1280; 
 		mCurrentMode.first.second = 800; 
 		mCurrentMode.second = 0;
 		mOriginalMode = mCurrentMode;
 		mVideoModes.push_back(mCurrentMode);
+
+        ConfigOption optOrientation;
+        optOrientation.name = "Orientation";
+        optOrientation.immutable = false;
+        optOrientation.possibleValues.push_back("Landscape");
+        optOrientation.possibleValues.push_back("Portrait");
+        optOrientation.currentValue = optOrientation.possibleValues[0];
         
-        mNativeDisplay = EGL_DEFAULT_DISPLAY;
-        mGLDisplay = getGLDisplay();
+        mOptions[optOrientation.name] = optOrientation;
     }
 
     AndroidEGLSupport::~AndroidEGLSupport()

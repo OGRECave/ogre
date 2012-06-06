@@ -297,10 +297,15 @@ namespace OgreBites
                 case APP_CMD_INIT_WINDOW:
                     if (app->window && mRoot)
                     {
+                        AConfiguration* config = AConfiguration_new();
+                        AConfiguration_fromAssetManager(config, app->activity->assetManager);
+                        
                         if (!mRenderWnd) 
                         {
                             Ogre::NameValuePairList opt;
                             opt["externalWindowHandle"] = Ogre::StringConverter::toString((int)app->window);
+                            opt["androidConfig"] = Ogre::StringConverter::toString((int)config);
+                            
                             mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                             
                             if(!mTouch)
@@ -320,8 +325,10 @@ namespace OgreBites
                         }
                         else
                         {
-                            static_cast<AndroidEGLWindow*>(mRenderWnd)->_createInternalResources(app->window);
+                            static_cast<AndroidEGLWindow*>(mRenderWnd)->_createInternalResources(app->window, config);
                         }
+                        
+                        AConfiguration_delete(config);
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:
@@ -331,6 +338,8 @@ namespace OgreBites
                 case APP_CMD_GAINED_FOCUS:
                     break;
                 case APP_CMD_LOST_FOCUS:
+                    break;
+                case APP_CMD_CONFIG_CHANGED:
                     break;
             }
         }

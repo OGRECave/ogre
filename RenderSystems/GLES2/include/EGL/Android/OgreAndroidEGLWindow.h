@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 #include "OgreEGLWindow.h"
 #include "OgreAndroidEGLSupport.h"
+#include "android/configuration.h"
 
 namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
@@ -52,7 +53,7 @@ namespace Ogre {
                     bool fullScreen, const NameValuePairList *miscParams);
         
         void _destroyInternalResources();
-        void _createInternalResources(NativeWindowType window);
+        void _createInternalResources(NativeWindowType window, AConfiguration* config);
 	};
 }
 

@@ -86,7 +86,10 @@ namespace Ogre {
 
 	void AndroidEGLWindow::windowMovedOrResized()
 	{
-		LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
+        // Notify viewports of resize
+        ViewportList::iterator it = mViewportList.begin();
+        while( it != mViewportList.end() )
+            (*it++).second->_updateDimensions();
 	}
 	
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)
@@ -106,6 +109,7 @@ namespace Ogre {
         mTop = 0;
         mIsFullScreen = fullScreen;
         void* eglContext = NULL;
+        AConfiguration* config = NULL;
         
         if (miscParams)
         {
@@ -131,6 +135,11 @@ namespace Ogre {
             if((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mWindow = (ANativeWindow*)(Ogre::StringConverter::parseInt(opt->second));
+            }
+            
+            if((opt = miscParams->find("androidConfig")) != end)
+            {
+                config = (AConfiguration*)(Ogre::StringConverter::parseInt(opt->second));
             }
             
             int ctxHandle = -1;
@@ -166,7 +175,7 @@ namespace Ogre {
         if (!mEglConfig)
         {
 
-            _createInternalResources(mWindow);
+            _createInternalResources(mWindow, config);
             mHwGamma = false;
         }
         
@@ -196,7 +205,7 @@ namespace Ogre {
         mClosed = true;
     }
     
-    void AndroidEGLWindow::_createInternalResources(NativeWindowType window)
+    void AndroidEGLWindow::_createInternalResources(NativeWindowType window, AConfiguration* config)
     {
         mWindow = window;
         
@@ -225,8 +234,15 @@ namespace Ogre {
         
         mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
         
+        if(config)
+        {
+            bool isLandscape = (int)AConfiguration_getOrientation(config) == 2;
+            mGLSupport->setConfigOption("Orientation", !isLandscape ? "Landscape" : "Portrait");
+        }
+        
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+        EGL_CHECK_ERROR
         
         if(mContext)
         {
@@ -237,6 +253,7 @@ namespace Ogre {
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
             mContext->setCurrent();
             
+            windowMovedOrResized();
             static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
         }
     }
