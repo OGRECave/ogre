@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHardwarePixelBuffer.h"
-#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     class _OgreGLES2Export GLES2HardwarePixelBuffer: public HardwarePixelBuffer
@@ -144,7 +143,7 @@ namespace Ogre {
 
      /** Renderbuffer surface.  Needs FBO extension.
      */
-    class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer MANAGED_RESOURCE
+    class _OgreGLES2Export GLES2RenderBuffer: public GLES2HardwarePixelBuffer
     {
         public:
             GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples);
@@ -157,18 +156,6 @@ namespace Ogre {
             // In case this is a render buffer
             GLuint mRenderbufferID;
             GLsizei mNumSamples;
-        
-            void createBuffer();
-            
-            void destroyBuffer();
-        
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        /** See AndroidResource. */
-        virtual void notifyOnContextLost();
-        
-        /** See AndroidResource. */
-        virtual void notifyOnContextReset();
-#endif
     };
 }
 

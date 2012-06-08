@@ -62,7 +62,6 @@ namespace Ogre {
         : Texture(creator, name, handle, group, isManual, loader),
           mTextureID(0), mGLSupport(support)
     {
-        LogManager::getSingleton().logMessage("*** GLES2Texture " + mName);
     }
 
     GLES2Texture::~GLES2Texture()
@@ -116,7 +115,7 @@ namespace Ogre {
 		// Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
-        
+           
 		// Set texture type
         glBindTexture(getGLES2TextureTarget(), mTextureID);
         GL_CHECK_ERROR;
@@ -398,6 +397,7 @@ namespace Ogre {
         mSurfaceList.clear();
         glDeleteTextures(1, &mTextureID);
         GL_CHECK_ERROR;
+        mTextureID = 0;
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -405,19 +405,21 @@ namespace Ogre {
     {
         if (!mIsManual) 
         {
-            unload();
+            freeInternalResources();
         }
-        
-        glDeleteTextures(1, &mTextureID);
-        GL_CHECK_ERROR;
-        mTextureID = 0;
+        else
+        {
+            glDeleteTextures(1, &mTextureID);
+            GL_CHECK_ERROR;
+            mTextureID = 0;
+        }
     }
     
     void GLES2Texture::notifyOnContextReset()
     {
         if (!mIsManual) 
         {
-            load();
+            reload();
         }
         else
         {

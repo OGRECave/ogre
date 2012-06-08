@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBOMultiRenderTarget.h"
+#include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
 
@@ -69,18 +71,13 @@ namespace Ogre {
     
     void GLES2FBORenderTexture::notifyOnContextReset()
     {
-        mFB.notifyOnContextReset();
-        
         GLES2SurfaceDesc target;
         target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
         target.zoffset = mZOffset;
         
-        // Bind target to surface 0 and initialise
-        mFB.bindSurface(0, target);
-        GL_CHECK_ERROR;
-                                              
-        mWidth = mFB.getWidth();
-        mHeight = mFB.getHeight();
+        mFB.notifyOnContextReset(target);
+        
+        static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->_createDepthBufferFor(this);
     }
 #endif
     
@@ -480,6 +477,8 @@ namespace Ogre {
     
     GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
     {
+        LogManager::getSingleton().logMessage("*** requestRenderBuffer ");
+        
         GLES2SurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if(format != GL_NONE)

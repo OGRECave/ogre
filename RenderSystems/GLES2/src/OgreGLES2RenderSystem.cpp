@@ -549,6 +549,7 @@ namespace Ogre {
 
 		if( fbo )
 		{
+             LogManager::getSingleton().logMessage("*** _createDepthBufferFor FBO ");
 			// Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
 			// Find best depth & stencil format suited for the RT's format
 			GLuint depthFormat, stencilFormat;
@@ -2177,6 +2178,16 @@ namespace Ogre {
         mGLSupport->initialiseExtensions();
         
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
+        
+        _destroyDepthBuffer(win);
+        
+        GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+                                                                  mMainContext, 0, 0,
+                                                                  win->getWidth(), win->getHeight(),
+                                                                  win->getFSAA(), 0, true );
+        
+        mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
+        win->attachDepthBuffer( depthBuffer );
         
         GLES2RenderSystem::mResourceManager->notifyOnContextReset();
         

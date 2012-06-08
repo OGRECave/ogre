@@ -83,7 +83,7 @@ namespace Ogre {
         void notifyOnContextLost();
         
         /** See AndroidResource. */
-        void notifyOnContextReset();
+        void notifyOnContextReset(const GLES2SurfaceDesc &target);
 #endif
         
     private:

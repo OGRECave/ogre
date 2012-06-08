@@ -87,6 +87,10 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLES2FrameBufferObject::notifyOnContextLost()
     {
+        mManager->releaseRenderBuffer(mDepth);
+        mManager->releaseRenderBuffer(mStencil);
+		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        
         glDeleteFramebuffers(1, &mFB);
         GL_CHECK_ERROR;
         
@@ -96,7 +100,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
     }
     
-    void GLES2FrameBufferObject::notifyOnContextReset()
+    void GLES2FrameBufferObject::notifyOnContextReset(const GLES2SurfaceDesc &target)
     {
         /// Generate framebuffer object
         glGenFramebuffers(1, &mFB);
@@ -105,10 +109,9 @@ namespace Ogre {
         glBindFramebuffer(GL_FRAMEBUFFER, mFB);
         GL_CHECK_ERROR;
         
-        for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
-        {
-            mColour[x].buffer=0;
-        }
+        // Bind target to surface 0 and initialise
+        bindSurface(0, target);
+        GL_CHECK_ERROR;
     }
 #endif
     
