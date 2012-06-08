@@ -477,8 +477,6 @@ namespace Ogre {
     
     GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)
     {
-        LogManager::getSingleton().logMessage("*** requestRenderBuffer ");
-        
         GLES2SurfaceDesc retval;
         retval.buffer = 0; // Return 0 buffer if GL_NONE is requested
         if(format != GL_NONE)

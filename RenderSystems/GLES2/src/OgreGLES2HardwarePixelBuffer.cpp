@@ -897,8 +897,6 @@ namespace Ogre {
     GLES2RenderBuffer::GLES2RenderBuffer(GLenum format, size_t width, size_t height, GLsizei numSamples):
     GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, PF_A8R8G8B8),HBU_WRITE_ONLY)
     {
-         LogManager::getSingleton().logMessage("*** GLES2RenderBuffer::GLES2RenderBuffer()");
-        
         mGLInternalFormat = format;
         mNumSamples = numSamples;
         
@@ -929,16 +927,12 @@ namespace Ogre {
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::~GLES2RenderBuffer()
     {
-        LogManager::getSingleton().logMessage("*** GLES2RenderBuffer::~GLES2RenderBuffer()");
-
         glDeleteRenderbuffers(1, &mRenderbufferID);
         GL_CHECK_ERROR;
     }
     //-----------------------------------------------------------------------------  
     void GLES2RenderBuffer::bindToFramebuffer(GLenum attachment, size_t zoffset)
     {
-        LogManager::getSingleton().logMessage("*** GLES2RenderBuffer attachment:: " + StringConverter::toString(attachment));
-        
         assert(zoffset < mDepth);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, attachment,
                                      GL_RENDERBUFFER, mRenderbufferID);
