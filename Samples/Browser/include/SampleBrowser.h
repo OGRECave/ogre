@@ -1008,8 +1008,8 @@ protected:
  			mPluginNameMap["Sample_Instancing"]			= (OgreBites::SdkSample *) OGRE_NEW Sample_Instancing();
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
-            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
 #   endif
+            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
             mPluginNameMap["Sample_SkeletalAnimation"]  = (OgreBites::SdkSample *) OGRE_NEW Sample_SkeletalAnimation();
@@ -1230,30 +1230,7 @@ protected:
 
 			Ogre::StringVector unloadedSamplePlugins;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			Ogre::String startupSampleTitle = "";
-			Ogre::String sampleDir = "";
-			Ogre::StringVector sampleList;
-			sampleList.push_back("Sample_BezierPatch");
-			sampleList.push_back("Sample_CameraTrack");
-			sampleList.push_back("Sample_CelShading");
-			sampleList.push_back("Sample_Character");     
-			sampleList.push_back("Sample_CubeMapping");    
-			//sampleList.push_back("Sample_Dot3Bump");
-			sampleList.push_back("Sample_DynTex");      
-			sampleList.push_back("Sample_FacialAnimation");
-			sampleList.push_back("Sample_Fresnel");
-			sampleList.push_back("Sample_Grass");
-			sampleList.push_back("Sample_ParticleFX");
-#   ifdef USE_RTSHADER_SYSTEM
-			//sampleList.push_back("Sample_ShaderSystem");
-#	endif
-			sampleList.push_back("Sample_Lighting");       
-			sampleList.push_back("Sample_SkyBox"); 
-			sampleList.push_back("Sample_SkyDome"); 
-			sampleList.push_back("Sample_SkyPlane"); 
-			sampleList.push_back("Sample_Smoke");      		
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             Ogre::String startupSampleTitle = "";
             Ogre::String sampleDir = "";
             Ogre::StringVector sampleList;
@@ -1280,7 +1257,11 @@ protected:
             sampleList.push_back("Sample_TextureFX");
 #else
 			Ogre::ConfigFile cfg;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            cfg.load(openAPKFile("samples.cfg"));
+#else
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
+#endif
 
 			Ogre::String sampleDir = cfg.getSetting("SampleFolder");        // Mac OS X just uses Resources/ directory
 			Ogre::StringVector sampleList = cfg.getMultiSetting("SamplePlugin");

@@ -62,6 +62,7 @@ namespace Ogre {
         : Texture(creator, name, handle, group, isManual, loader),
           mTextureID(0), mGLSupport(support)
     {
+        LogManager::getSingleton().logMessage("*** GLES2Texture " + mName);
     }
 
     GLES2Texture::~GLES2Texture()
@@ -92,39 +93,38 @@ namespace Ogre {
         };
     }
 
-    // Creation / loading methods
-    void GLES2Texture::createInternalResourcesImpl(void)
+    void GLES2Texture::_createGLTexResource()
     {
-		// Convert to nearest power-of-two size if required
+        // Convert to nearest power-of-two size if required
         mWidth = GLES2PixelUtil::optionalPO2(mWidth);
         mHeight = GLES2PixelUtil::optionalPO2(mHeight);
         mDepth = GLES2PixelUtil::optionalPO2(mDepth);
-
+        
 		// Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
-
+        
 		// Check requested number of mipmaps
         size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
-
+        
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;
-
+        
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
-
+        
 		// Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
-
+        
 		// Set texture type
         glBindTexture(getGLES2TextureTarget(), mTextureID);
         GL_CHECK_ERROR;
-
+        
 #if GL_APPLE_texture_max_level
         glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, mNumMipmaps );
 #endif
-
+        
         // Set some misc default parameters, these can of course be changed later
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -138,11 +138,11 @@ namespace Ogre {
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
-
+        
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
-
+        Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+        
         // FIXME: For some reason this is crashing on iOS 5
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         if ((mUsage & TU_AUTOMIPMAP) &&
@@ -153,7 +153,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
         }
 #endif
-
+        
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
@@ -161,22 +161,22 @@ namespace Ogre {
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
-
+        
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
             size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
+            
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
-
+            
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
-
+                
 				switch(mTextureType)
 				{
 					case TEX_TYPE_1D:
@@ -193,8 +193,8 @@ namespace Ogre {
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
 							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
-								width, height, 0, 
-								size, tmpdata);
+                                                   width, height, 0, 
+                                                   size, tmpdata);
                             GL_CHECK_ERROR;
 						}
 						break;
@@ -202,12 +202,12 @@ namespace Ogre {
                     default:
                         break;
                 };
-//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(format)
-//                                                      );
-
+                //                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
+                //                                                      " Width: " + StringConverter::toString(width) +
+                //                                                      " Height: " + StringConverter::toString(height) +
+                //                                                      " Internal Format: " + StringConverter::toString(format)
+                //                                                      );
+                
                 if(width > 1)
                 {
                     width = width / 2;
@@ -245,20 +245,20 @@ namespace Ogre {
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
 							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
-								width, height, 0, 
-								format, datatype, 0);
+                                         width, height, 0, 
+                                         format, datatype, 0);
 						}
 						break;
 					case TEX_TYPE_3D:
                     default:
                         break;
                 };
-//                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(format)
-//                                                      );
-
+                //                LogManager::getSingleton().logMessage("GLES2Texture::create - Mip: " + StringConverter::toString(mip) +
+                //                                                      " Width: " + StringConverter::toString(width) +
+                //                                                      " Height: " + StringConverter::toString(height) +
+                //                                                      " Internal Format: " + StringConverter::toString(format)
+                //                                                      );
+                
                 if (width > 1)
                 {
                     width = width / 2;
@@ -269,7 +269,13 @@ namespace Ogre {
                 }
             }
         }
-
+    }
+    
+    // Creation / loading methods
+    void GLES2Texture::createInternalResourcesImpl(void)
+    {
+		_createGLTexResource();
+        
         _createSurfaceList();
 
         // Get final internal format
@@ -395,14 +401,44 @@ namespace Ogre {
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    void GLES2Texture::notifyOnContextLost(AndroidEGLContext* context)
+    void GLES2Texture::notifyOnContextLost()
     {
-        unload();
+        if (!mIsManual) 
+        {
+            unload();
+        }
+        
+        glDeleteTextures(1, &mTextureID);
+        GL_CHECK_ERROR;
+        mTextureID = 0;
     }
     
-    void GLES2Texture::notifyOnContextReset(AndroidEGLContext* context)
+    void GLES2Texture::notifyOnContextReset()
     {
-        load();
+        if (!mIsManual) 
+        {
+            load();
+        }
+        else
+        {
+            preLoadImpl();
+            
+            _createGLTexResource();
+            
+            for(size_t i = 0; i < mSurfaceList.size(); i++)
+            {
+                static_cast<GLES2TextureBuffer*>(mSurfaceList[i].getPointer())->updateTextureId(mTextureID);
+            }
+            
+            if (mLoader)
+            {
+                mLoader->loadResource(this);
+            }
+            
+            postLoadImpl();
+        }
+        
+        LogManager::getSingleton().logMessage("*** GLES2Texture " + mName + " NewID:: " + StringConverter::toString(mTextureID));
     }
 #endif
 

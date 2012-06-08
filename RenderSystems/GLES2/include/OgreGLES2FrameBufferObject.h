@@ -39,7 +39,7 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgreGLES2Export GLES2FrameBufferObject MANAGED_RESOURCE_SINGLE
+    class _OgreGLES2Export GLES2FrameBufferObject 
     {
     public:
         GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa);
@@ -77,6 +77,15 @@ namespace Ogre {
         
         GLES2FBOManager *getManager() { return mManager; }
 		const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        void notifyOnContextReset();
+#endif
+        
     private:
         GLES2FBOManager *mManager;
 		GLsizei mNumSamples;
@@ -97,19 +106,6 @@ namespace Ogre {
             - Not all bound surfaces have the same internal format
         */
         void initialise();
-        
-        void createInternalResources();
-        
-        void destroyInternalResources();
-        
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    protected:
-        /** See AndroidResource. */
-        virtual void notifyOnContextLost(AndroidEGLContext* context);
-        
-        /** See AndroidResource. */
-        virtual void notifyOnContextReset(AndroidEGLContext* context);
-#endif
     };
 
 }

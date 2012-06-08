@@ -96,8 +96,10 @@ endif ()
 #######################################################################
 
 # Find OpenGL
-find_package(OpenGL)
-macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
+if(NOT ANDROID)
+  find_package(OpenGL)
+  macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
+endif()
 
 # Find OpenGL ES
 find_package(OpenGLES)
@@ -118,10 +120,10 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
-endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
 
 # Find Boost
 # Prefer static linking in all cases

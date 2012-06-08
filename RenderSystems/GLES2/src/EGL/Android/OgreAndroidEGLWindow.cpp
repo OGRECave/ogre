@@ -188,7 +188,7 @@ namespace Ogre {
 
     void AndroidEGLWindow::_destroyInternalResources()
     {
-        GLES2RenderSystem::getResourceManager()->notifyOnContextLost(static_cast<AndroidEGLContext*>(mContext));
+        GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
         mContext->_destroyInternalResources();
         
         eglDestroySurface(mEglDisplay, mEglSurface);
@@ -237,7 +237,7 @@ namespace Ogre {
         if(config)
         {
             bool isLandscape = (int)AConfiguration_getOrientation(config) == 2;
-            mGLSupport->setConfigOption("Orientation", !isLandscape ? "Landscape" : "Portrait");
+            mGLSupport->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
         }
         
         eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);

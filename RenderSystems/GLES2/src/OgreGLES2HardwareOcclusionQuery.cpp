@@ -72,12 +72,12 @@ void GLES2HardwareOcclusionQuery::destroyQuery()
 }
 //------------------------------------------------------------------
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-void GLES2HardwareOcclusionQuery::notifyOnContextLost(AndroidEGLContext* context)
+void GLES2HardwareOcclusionQuery::notifyOnContextLost()
 {
         destroyQuery();
 }
 //------------------------------------------------------------------
-void GLES2HardwareOcclusionQuery::notifyOnContextReset(AndroidEGLContext* context)
+void GLES2HardwareOcclusionQuery::notifyOnContextReset()
 {
         createQuery();
 }

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderTexture.h"
 #include "OgreGLES2Context.h"
 #include "OgreGLES2FrameBufferObject.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     class GLES2FBOManager;
@@ -38,11 +39,11 @@ namespace Ogre {
 
     /** RenderTexture for GL ES 2 FBO
     */
-    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture
+    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture MANAGED_RESOURCE
     {
     public:
         GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
-
+        
         virtual void getCustomAttribute(const String& name, void* pData);
 
 		/// Override needed to deal with multisample buffers
@@ -54,6 +55,14 @@ namespace Ogre {
 		virtual void _detachDepthBuffer();
     protected:
         GLES2FrameBufferObject mFB;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        virtual void notifyOnContextReset();
+#endif
     };
     
     /** Factory for GL ES 2 Frame Buffer Objects, and related things.

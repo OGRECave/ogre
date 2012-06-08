@@ -2172,25 +2172,13 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Reset Renderer Started ***");
         LogManager::getSingleton().logMessage("********************************************");
                 
-        
         initialiseContext(win);
         
         mGLSupport->initialiseExtensions();
         
         static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
         
-        _destroyDepthBuffer(win);
-        
-        GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                                  mMainContext, 0, 0,
-                                                                  win->getWidth(), win->getHeight(),
-                                                                  win->getFSAA(), 0, true );
-        
-        mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
-        
-        win->attachDepthBuffer( depthBuffer );
-        
-        GLES2RenderSystem::mResourceManager->notifyOnContextReset(static_cast<AndroidEGLContext*>(mMainContext));
+        GLES2RenderSystem::mResourceManager->notifyOnContextReset();
         
         _setViewport(NULL);
         _setRenderTarget(win);

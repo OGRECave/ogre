@@ -40,33 +40,35 @@ namespace Ogre
 	
 	}
     //-----------------------------------------------------------------------
-	void AndroidResourceManager::notifyOnContextLost(AndroidEGLContext* context)
+	void AndroidResourceManager::notifyOnContextLost()
 	{				
 		ResourceContainerIterator it = mResources.begin();
 		while (it != mResources.end())
 		{
-			(*it)->notifyOnContextLost(context);
+			(*it)->notifyOnContextLost();
 			++it;
 		}				
 	}
     //-----------------------------------------------------------------------
-	void AndroidResourceManager::notifyOnContextReset(AndroidEGLContext* context)
+	void AndroidResourceManager::notifyOnContextReset()
 	{
 		ResourceContainerIterator it = mResources.begin();
 		while (it != mResources.end())
 		{
-			(*it)->notifyOnContextReset(context);
+			(*it)->notifyOnContextReset();
 			++it;
 		}	
 	}
 	//-----------------------------------------------------------------------
 	void AndroidResourceManager::_notifyResourceCreated(AndroidResource* pResource)
 	{			
-		mResources.insert(pResource);
+		mResources.push_back(pResource);
 	}
 	//-----------------------------------------------------------------------
 	void AndroidResourceManager::_notifyResourceDestroyed(AndroidResource* pResource)
 	{		
-		mResources.erase(pResource);
+        ResourceContainerIterator it = std::find( mResources.begin(), mResources.end(), pResource );
+        if(it != mResources.end())
+            mResources.erase(it);
 	}
 }

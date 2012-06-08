@@ -40,10 +40,10 @@ namespace Ogre {
 	public:
 
 		// Called immediately after the Android context has entered a lost state.
-        void notifyOnContextLost(AndroidEGLContext* context);
+        void notifyOnContextLost();
         
 		// Called immediately after the Android context has been reset.
-        void notifyOnContextReset(AndroidEGLContext* context);
+        void notifyOnContextReset();
 		
 		AndroidResourceManager();
 		~AndroidResourceManager();		
@@ -54,7 +54,7 @@ namespace Ogre {
 	
 	// Types.
 	protected:
-		typedef set<AndroidResource*>::type		ResourceContainer;
+		typedef vector<AndroidResource*>::type	ResourceContainer;
 		typedef ResourceContainer::iterator		ResourceContainerIterator;
 
 	// Protected methods.

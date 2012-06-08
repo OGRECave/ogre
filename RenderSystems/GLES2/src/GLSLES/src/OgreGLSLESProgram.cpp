@@ -94,14 +94,9 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------------
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    void GLSLESProgram::notifyOnContextLost(AndroidEGLContext* context)
+    void GLSLESProgram::notifyOnContextLost()
     {
         unloadHighLevelImpl();
-    }
-    
-    void GLSLESProgram::notifyOnContextReset(AndroidEGLContext* context)
-    {
-        
     }
 #endif
     //-----------------------------------------------------------------------

@@ -47,7 +47,7 @@ namespace Ogre {
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
     }
-
+    
     void GLES2FBORenderTexture::getCustomAttribute(const String& name, void* pData)
     {
         if(name=="FBO")
@@ -60,6 +60,30 @@ namespace Ogre {
 	{
 		mFB.swapBuffers();
 	}
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2FBORenderTexture::notifyOnContextLost()
+    {
+        mFB.notifyOnContextLost();
+    }
+    
+    void GLES2FBORenderTexture::notifyOnContextReset()
+    {
+        mFB.notifyOnContextReset();
+        
+        GLES2SurfaceDesc target;
+        target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
+        target.zoffset = mZOffset;
+        
+        // Bind target to surface 0 and initialise
+        mFB.bindSurface(0, target);
+        GL_CHECK_ERROR;
+                                              
+        mWidth = mFB.getWidth();
+        mHeight = mFB.getHeight();
+    }
+#endif
+    
 	//-----------------------------------------------------------------------------
 	bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{

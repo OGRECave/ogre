@@ -58,10 +58,10 @@ namespace Ogre {
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             /** See AndroidResource. */
-            virtual void notifyOnContextLost(AndroidEGLContext* context);
+            virtual void notifyOnContextLost();
         
             /** See AndroidResource. */
-            virtual void notifyOnContextReset(AndroidEGLContext* context);
+            virtual void notifyOnContextReset();
 #endif
         
         public:

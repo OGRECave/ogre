@@ -82,12 +82,12 @@ namespace Ogre {
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    void GLES2HardwareVertexBuffer::notifyOnContextLost(AndroidEGLContext* context)
+    void GLES2HardwareVertexBuffer::notifyOnContextLost()
     {
         destroyBuffer();
     }
     
-    void GLES2HardwareVertexBuffer::notifyOnContextReset(AndroidEGLContext* context)
+    void GLES2HardwareVertexBuffer::notifyOnContextReset()
     {
         createBuffer();
         mShadowUpdated = true;

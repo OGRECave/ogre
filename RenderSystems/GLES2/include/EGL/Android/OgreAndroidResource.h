@@ -45,10 +45,10 @@ namespace Ogre {
 	public:
 
 		// Called immediately after the Android context has entered a lost state.
-		virtual void notifyOnContextLost(AndroidEGLContext* context) {}
+		virtual void notifyOnContextLost() {}
 
 		// Called immediately after the Android context has been reset.
-		virtual void notifyOnContextReset(AndroidEGLContext* context) {}
+		virtual void notifyOnContextReset() {}
 
 	public:
 		AndroidResource();
