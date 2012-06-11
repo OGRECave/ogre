@@ -258,7 +258,7 @@ namespace Ogre
 		do 
 		{
 			inFile.read(in, OGRE_DEFLATE_TMP_SIZE);
-			mZStream->avail_in = inFile.gcount();
+			mZStream->avail_in = (uInt)inFile.gcount();
 			if (inFile.bad()) 
 			{
 				deflateEnd(mZStream);

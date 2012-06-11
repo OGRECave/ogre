@@ -60,7 +60,7 @@ namespace Ogre {
 		BitArray(int bits_count)	: bits_ptr(NULL) { resize(bits_count); }
 		BitArray& operator=(const BitArray& ba)	{ bits = ba.bits; bits_ptr = bits.size() > 0 ? &bits.front() : NULL; return *this; }
 		
-		bool getBit(size_t i) const	{ return bits_ptr[i >> 3] & bit_mask[i & 7]; }
+		bool getBit(size_t i) const	{ return (bits_ptr[i >> 3] & bit_mask[i & 7]) != 0; }
 		void setBit(size_t i)		{ bits_ptr[i >> 3] |= bit_mask[i & 7]; }
 		void clearBit(size_t i)		{ bits_ptr[i >> 3] &= ~bit_mask[i & 7]; }
 		void clearAllBits()			{ memset(bits_ptr, 0, bits.size()); }
@@ -224,7 +224,7 @@ namespace Ogre {
 		
 		size_t mRemovedVertexDuplicatesCount;	
 		size_t mCurrNumIndexes;
-		float mInvSquaredBoundBoxDiagonal;
+		Real mInvSquaredBoundBoxDiagonal;
 		int mVertexComponentFlags;	
 
         // Internal classes
