@@ -43,6 +43,10 @@ namespace Ogre {
             char* mScratchBufferPool;
             OGRE_MUTEX(mScratchMutex)
             size_t mMapBufferThreshold;
+            /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
+            VertexDeclaration* createVertexDeclarationImpl(void);
+            /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
+            void destroyVertexDeclarationImpl(VertexDeclaration* decl);
 
         public:
             GLES2HardwareBufferManagerBase();

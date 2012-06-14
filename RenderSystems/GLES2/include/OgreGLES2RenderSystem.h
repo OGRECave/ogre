@@ -407,7 +407,11 @@ namespace Ogre {
             /** See
              RenderSystem
              */
-            void setVertexDeclaration(VertexDeclaration* decl) {}
+            void setVertexDeclaration(VertexDeclaration* decl);
+            /** See
+             RenderSystem
+             */
+            void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
             /** See
              RenderSystem
              */
