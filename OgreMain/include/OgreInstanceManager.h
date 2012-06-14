@@ -68,7 +68,7 @@ namespace Ogre
             TextureVTF,             ///< Needs Vertex Texture Fetch & SM 3.0+ @see InstanceBatchVTF
             HWInstancingBasic,      ///< Needs SM 3.0+ and HW instancing support @see InstanceBatchHW
             HWInstancingVTF,        ///< Needs SM 3.0+, HW instancing support & VTF @see InstanceBatchHW_VTF
-            InstancingTechniquesCount,
+            InstancingTechniquesCount
         };
 
         /** Values to be used in setSetting() & BatchSettings::setting */
