@@ -96,6 +96,9 @@ THE SOFTWARE.
 #if OGRE_NO_PVRTC_CODEC == 0
 #  include "OgrePVRTCCodec.h"
 #endif
+#if OGRE_NO_ETC1_CODEC == 0
+#  include "OgreETC1Codec.h"
+#endif
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -250,7 +253,11 @@ namespace Ogre {
 #if OGRE_NO_PVRTC_CODEC == 0
         PVRTCCodec::startup();
 #endif
+#if OGRE_NO_ETC1_CODEC == 0
+        ETC1Codec::startup();
+#endif
 
+        
         mHighLevelGpuProgramManager = OGRE_NEW HighLevelGpuProgramManager();
 
 		mExternalTextureSourceManager = OGRE_NEW ExternalTextureSourceManager();
@@ -309,6 +316,9 @@ namespace Ogre {
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
 		PVRTCCodec::shutdown();
+#endif
+#if OGRE_NO_ETC1_CODEC == 0
+        ETC1Codec::shutdown();
 #endif
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;
