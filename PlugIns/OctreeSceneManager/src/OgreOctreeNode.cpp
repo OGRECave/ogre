@@ -134,7 +134,7 @@ void OctreeNode::_updateBounds( void )
     //update the OctreeSceneManager that things might have moved.
     // if it hasn't been added to the octree, add it, and if has moved
     // enough to leave it's current node, we'll update it.
-    if ( ! mWorldAABB.isNull() )
+    if ( ! mWorldAABB.isNull() && mIsInSceneGraph )
     {
         static_cast < OctreeSceneManager * > ( mCreator ) -> _updateOctreeNode( this );
     }
