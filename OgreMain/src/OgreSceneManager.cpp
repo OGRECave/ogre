@@ -4012,13 +4012,14 @@ void SceneManager::addListener(Listener* newListener)
 //---------------------------------------------------------------------
 void SceneManager::removeListener(Listener* delListener)
 {
+    ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
-    iend = mListeners.end();
-    for (i = mListeners.begin(); i != iend; ++i)
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
     {
         if (*i == delListener)
         {
-            mListeners.erase(i);
+            listenersCopy.erase(i);
             break;
         }
     }
@@ -4084,10 +4085,11 @@ void SceneManager::fireRenderSingleObject(Renderable* rend, const Pass* pass,
 //---------------------------------------------------------------------
 void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
 {
+    ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
 
-    iend = mListeners.end();
-    for (i = mListeners.begin(); i != iend; ++i)
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
     {
         (*i)->shadowTexturesUpdated(numberOfShadowTextures);
     }
@@ -4095,10 +4097,11 @@ void SceneManager::fireShadowTexturesUpdated(size_t numberOfShadowTextures)
 //---------------------------------------------------------------------
 void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, size_t iteration)
 {
+    ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
 
-    iend = mListeners.end();
-    for (i = mListeners.begin(); i != iend; ++i)
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
     {
         (*i)->shadowTextureCasterPreViewProj(light, camera, iteration);
     }
@@ -4106,10 +4109,11 @@ void SceneManager::fireShadowTexturesPreCaster(Light* light, Camera* camera, siz
 //---------------------------------------------------------------------
 void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
 {
+    ListenerList listenersCopy = mListeners;
     ListenerList::iterator i, iend;
 
-    iend = mListeners.end();
-    for (i = mListeners.begin(); i != iend; ++i)
+    iend = listenersCopy.end();
+    for (i = listenersCopy.begin(); i != iend; ++i)
     {
         (*i)->shadowTextureReceiverPreViewProj(light, f);
     }
@@ -4117,10 +4121,11 @@ void SceneManager::fireShadowTexturesPreReceiver(Light* light, Frustum* f)
 //---------------------------------------------------------------------
 void SceneManager::firePreUpdateSceneGraph(Camera* camera)
 {
+    ListenerList listenersCopy = mListeners;
 	ListenerList::iterator i, iend;
 
-	iend = mListeners.end();
-	for (i = mListeners.begin(); i != iend; ++i)
+	iend = listenersCopy.end();
+	for (i = listenersCopy.begin(); i != iend; ++i)
 	{
 		(*i)->preUpdateSceneGraph(this, camera);
 	}
@@ -4128,10 +4133,11 @@ void SceneManager::firePreUpdateSceneGraph(Camera* camera)
 //---------------------------------------------------------------------
 void SceneManager::firePostUpdateSceneGraph(Camera* camera)
 {
+    ListenerList listenersCopy = mListeners;
 	ListenerList::iterator i, iend;
 
-	iend = mListeners.end();
-	for (i = mListeners.begin(); i != iend; ++i)
+	iend = listenersCopy.end();
+	for (i = listenersCopy.begin(); i != iend; ++i)
 	{
 		(*i)->postUpdateSceneGraph(this, camera);
 	}
@@ -4140,10 +4146,11 @@ void SceneManager::firePostUpdateSceneGraph(Camera* camera)
 //---------------------------------------------------------------------
 void SceneManager::firePreFindVisibleObjects(Viewport* v)
 {
+    ListenerList listenersCopy = mListeners;
 	ListenerList::iterator i, iend;
 
-	iend = mListeners.end();
-	for (i = mListeners.begin(); i != iend; ++i)
+	iend = listenersCopy.end();
+	for (i = listenersCopy.begin(); i != iend; ++i)
 	{
 		(*i)->preFindVisibleObjects(this, mIlluminationStage, v);
 	}
@@ -4152,10 +4159,11 @@ void SceneManager::firePreFindVisibleObjects(Viewport* v)
 //---------------------------------------------------------------------
 void SceneManager::firePostFindVisibleObjects(Viewport* v)
 {
+    ListenerList listenersCopy = mListeners;
 	ListenerList::iterator i, iend;
 
-	iend = mListeners.end();
-	for (i = mListeners.begin(); i != iend; ++i)
+	iend = listenersCopy.end();
+	for (i = listenersCopy.begin(); i != iend; ++i)
 	{
 		(*i)->postFindVisibleObjects(this, mIlluminationStage, v);
 	}
@@ -4165,10 +4173,11 @@ void SceneManager::firePostFindVisibleObjects(Viewport* v)
 //---------------------------------------------------------------------
 void SceneManager::fireSceneManagerDestroyed()
 {
+    ListenerList listenersCopy = mListeners;
 	ListenerList::iterator i, iend;
 
-	iend = mListeners.end();
-	for (i = mListeners.begin(); i != iend; ++i)
+	iend = listenersCopy.end();
+	for (i = listenersCopy.begin(); i != iend; ++i)
 	{
 		(*i)->sceneManagerDestroyed(this);
 	}
@@ -4437,8 +4446,9 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 			// Allow a Listener to override light sorting
 			// Reverse iterate so last takes precedence
 			bool overridden = false;
-			for (ListenerList::reverse_iterator ri = mListeners.rbegin();
-				ri != mListeners.rend(); ++ri)
+			ListenerList listenersCopy = mListeners;
+			for (ListenerList::reverse_iterator ri = listenersCopy.rbegin();
+				ri != listenersCopy.rend(); ++ri)
 			{
 				overridden = (*ri)->sortLightsAffectingFrustum(mLightsAffectingFrustum);
 				if (overridden)
