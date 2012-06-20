@@ -77,8 +77,8 @@ int main(int argc, char *argv[])
         if (Ogre::String(cmdLine).find("nograb") != Ogre::String::npos)
             nograb = true;
 #endif
-		OgreBites::SampleBrowser sb (nograb);
-		sb.go();
+		OgreBites::SampleBrowser brows (nograb);
+		brows.go();
 	}
 	catch (Ogre::Exception& e)
 	{
