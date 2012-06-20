@@ -26,11 +26,23 @@ THE SOFTWARE
 #ifndef __OgreThreadHeadersBoost_H__
 #define __OgreThreadHeadersBoost_H__
 
+#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wshadow"
+#   pragma GCC diagnostic ignored "-Wpadded"
+#   pragma GCC diagnostic ignored "-Wweak-vtables"
+#   pragma GCC diagnostic ignored "-Wall"
+#endif
+
 #include <boost/thread/tss.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/thread/locks.hpp>
+
+#if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
+#   pragma GCC diagnostic pop
+#endif
 
 #endif
