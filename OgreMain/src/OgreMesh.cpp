@@ -420,6 +420,7 @@ namespace Ogre {
 		newMesh->mIsLodManual = mIsLodManual;
 		newMesh->mNumLods = mNumLods;
 		newMesh->mMeshLodUsageList = mMeshLodUsageList;
+        newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
         // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
         MeshLodUsageList::iterator lodi;
         for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi) {
@@ -459,12 +460,10 @@ namespace Ogre {
 		newMesh->mSharedVertexDataAnimationType = mSharedVertexDataAnimationType;
 		newMesh->mAnimationTypesDirty = true;
 
-
         newMesh->load();
         newMesh->touch();
 
         return newMesh;
-
     }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& Mesh::getBounds(void) const
