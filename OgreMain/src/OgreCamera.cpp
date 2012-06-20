@@ -90,7 +90,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Camera::~Camera()
     {
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		ListenerList listenersCopy = mListeners;
+		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
 		{
 			(*i)->cameraDestroyed(this);
 		}
@@ -413,7 +414,8 @@ namespace Ogre {
 		}
 
 		//notify prerender scene
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		ListenerList listenersCopy = mListeners;
+		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
 		{
 			(*i)->cameraPreRenderScene(this);
 		}
@@ -421,8 +423,11 @@ namespace Ogre {
 		//render scene
 		mSceneMgr->_renderScene(this, vp, includeOverlays);
 
+		// Listener list may have change
+		listenersCopy = mListeners;
+
 		//notify postrender scene
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
 		{
 			(*i)->cameraPostRenderScene(this);
 		}
