@@ -124,16 +124,15 @@ endmacro(findpkg_finish)
 
 
 # Slightly customised framework finder
-MACRO(findpkg_framework fwk)
-  IF(APPLE)
-    SET(${fwk}_FRAMEWORK_PATH
+macro(findpkg_framework fwk)
+  if(APPLE)
+    set(${fwk}_FRAMEWORK_PATH
       ${${fwk}_FRAMEWORK_SEARCH_PATH}
       ${CMAKE_FRAMEWORK_PATH}
       ~/Library/Frameworks
       /Library/Frameworks
       /System/Library/Frameworks
       /Network/Library/Frameworks
-      /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Release
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/Debug
     )
@@ -146,16 +145,16 @@ MACRO(findpkg_framework fwk)
       set(${fwk}_FRAMEWORK_PATH ${${fwk}_FRAMEWORK_PATH} ${i}/lib/Release ${i}/lib/Debug)
     endforeach(i)
 
-    FOREACH(dir ${${fwk}_FRAMEWORK_PATH})
-      SET(fwkpath ${dir}/${fwk}.framework)
-      IF(EXISTS ${fwkpath})
-        SET(${fwk}_FRAMEWORK_INCLUDES ${${fwk}_FRAMEWORK_INCLUDES}
+    foreach(dir ${${fwk}_FRAMEWORK_PATH})
+      set(fwkpath ${dir}/${fwk}.framework)
+      if(EXISTS ${fwkpath})
+        set(${fwk}_FRAMEWORK_INCLUDES ${${fwk}_FRAMEWORK_INCLUDES}
           ${fwkpath}/Headers ${fwkpath}/PrivateHeaders)
-        SET(${fwk}_FRAMEWORK_PATH ${dir})
+        set(${fwk}_FRAMEWORK_PATH ${dir})
         if (NOT ${fwk}_LIBRARY_FWK)
-          SET(${fwk}_LIBRARY_FWK "-framework ${fwk}")
+          set(${fwk}_LIBRARY_FWK "-framework ${fwk}")
         endif ()
-      ENDIF(EXISTS ${fwkpath})
-    ENDFOREACH(dir)
-  ENDIF(APPLE)
-ENDMACRO(findpkg_framework)
+      endif(EXISTS ${fwkpath})
+    endforeach(dir)
+  endif(APPLE)
+endmacro(findpkg_framework)
