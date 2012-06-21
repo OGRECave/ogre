@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreArchiveManager.h"
-
+#include "macUtils.h"
 #include <fstream>
 #include <algorithm>
 
@@ -52,7 +52,7 @@ void RenderSystemCapabilitiesTests::setUp()
 
     mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
     // actual parsing happens here. test methods confirm parse results only
-    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../../../Media/CustomCapabilities", "FileSystem", true);
+    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(macBundlePath() + "/Contents/Resources/Media/CustomCapabilities", "FileSystem", true);
 }
 
 void RenderSystemCapabilitiesTests::tearDown()
@@ -270,7 +270,6 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
     // check that all the set caps are there
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "automipmap true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "max_point_size 10.5") != lines.end());
-    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "max_vertex_program_version vs999") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "shader_profile sp999") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "vertex_texture_units_shared true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "num_world_matrices 777") != lines.end());
@@ -354,6 +353,7 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_ati false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "pbuffer false") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "perstageconstant false") != lines.end());
+    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "separate_shader_objects false") != lines.end());
 
     // bool caps
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "vertex_texture_units_shared false") != lines.end());
@@ -412,7 +412,7 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     caps.setCapability(RSC_FBO_ATI);
     caps.setCapability(RSC_PBUFFER);
     caps.setCapability(RSC_PERSTAGECONSTANT);
-
+    caps.setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 
     // write them to file
     serializer.writeScript(&caps, name, filename);
@@ -477,6 +477,7 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "fbo_ati true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "pbuffer true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "perstageconstant true") != lines.end());
+    CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "separate_shader_objects true") != lines.end());
 
     // bool caps
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "vertex_texture_units_shared true") != lines.end());
@@ -518,6 +519,7 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setCapability(RSC_TEXTURE_COMPRESSION_DXT);
     caps.setCapability(RSC_TEXTURE_COMPRESSION_VTC);
     caps.setCapability(RSC_PERSTAGECONSTANT);
+    caps.setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 
     caps.setNumWorldMatrices(11);
     caps.setNumTextureUnits(22);
@@ -548,7 +550,8 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
 	driverversion.build = 0;
 
 	caps.setDriverVersion(driverversion);
-
+    caps.setDeviceName("Dummy Device");
+    caps.setRenderSystemName("Dummy RenderSystem");
 
      // write them to file
     serializer.writeScript(&caps, name, filename);
@@ -607,6 +610,7 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_FBO_ATI), caps2.hasCapability(RSC_FBO_ATI));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PBUFFER), caps2.hasCapability(RSC_PBUFFER));
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_PERSTAGECONSTANT), caps2.hasCapability(RSC_PERSTAGECONSTANT));
+    CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_SEPARATE_SHADER_OBJECTS), caps2.hasCapability(RSC_SEPARATE_SHADER_OBJECTS));
 
     CPPUNIT_ASSERT_EQUAL(caps.getNumWorldMatrices(), caps2.getNumWorldMatrices());
     CPPUNIT_ASSERT_EQUAL(caps.getNumTextureUnits(), caps2.getNumTextureUnits());

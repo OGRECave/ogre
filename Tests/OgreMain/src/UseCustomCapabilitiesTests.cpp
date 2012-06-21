@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLog.h"
 
-
+#include "macUtils.h"
 
 // Regsiter the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
@@ -122,6 +122,7 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ATI), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PBUFFER), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
+    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS), false);
 
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbvp1"));
@@ -206,7 +207,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 			setUpGLRenderSystemOptions(rs);
 			root->setRenderSystem(rs);
 			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-											"../../../Media/CustomCapabilities/customCapabilitiesTest.cfg");
+											macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 
 			const RenderSystemCapabilities* caps = rs->getCapabilities();
 

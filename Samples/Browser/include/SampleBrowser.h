@@ -1281,7 +1281,7 @@ protected:
 				if (info["Title"] == startupSampleTitle) startupSample = *j;   // we found the startup sample
 			}
 #  else
-#    if OGRE_DEBUG_MODE
+#    if OGRE_DEBUG_MODE && !(OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
 			sampleList.push_back("PlayPen_d");
 #    else
 			sampleList.push_back("PlayPen");
