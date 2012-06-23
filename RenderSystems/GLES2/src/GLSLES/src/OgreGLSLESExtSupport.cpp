@@ -47,7 +47,8 @@ namespace Ogre
                 GL_CHECK_ERROR
             }
 #if GL_EXT_separate_shader_objects
-            else if(glIsProgramPipelineEXT(obj))
+            else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                    glIsProgramPipelineEXT(obj))
             {
                 glValidateProgramPipelineEXT(obj);
                 glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength);
