@@ -9,6 +9,19 @@
 
 # Configure Browser demo build
 
+set (HEADER_FILES
+	include/SampleBrowser.h
+	include/FileSystemLayerImpl.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkCameraMan.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
+)
+
 set(SOURCE_FILES src/SampleBrowser.cpp)
 if (OGRE_BUILD_PLATFORM_NACL)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_NaCl.cpp)
@@ -50,7 +63,6 @@ if (SYMBIAN)
   Symbian/group/icons_scalable_dc.mk
   )
 
-
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/Symbian/inc
   )
@@ -72,21 +84,7 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystem)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_ShaderSystemMultiLight)
   endif()
-
 endif ()
-
-set (HEADER_FILES
-	include/SampleBrowser.h
-	include/FileSystemLayerImpl.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkCameraMan.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
-)
 
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
@@ -98,6 +96,10 @@ else ()
 	${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
 endif (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+
+if(ANDROID)
+  set(HEADER_FILES ${HEADER_FILES} include/SampleBrowser_Android.h)
+endif(ANDROID)
 
 if (OGRE_STATIC)
   # Find all samples headers, and copy them to a single include folder
@@ -117,6 +119,60 @@ if (OGRE_STATIC)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
+
+if(ANDROID)
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
+    ADD_LIBRARY(SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
+    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
+    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
+
+    SET(ANDROID_EXECUTABLE "android")
+    SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    SET(ANT_EXECUTABLE "ant")
+    SET(ANDROID_TARGET "android-15")
+    
+    SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
+    file(MAKE_DIRECTORY "${NDKOUT}")
+    file(MAKE_DIRECTORY "${NDKOUT}/jni")
+    file(MAKE_DIRECTORY "${NDKOUT}/assets")
+    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
+    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
+    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
+    
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/fonts" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
+    
+    
+	add_custom_command(
+	                    TARGET SampleBrowserDummy
+                        POST_BUILD
+	                    COMMAND ${ANDROID_EXECUTABLE} update project --target ${ANDROID_TARGET} --path "${NDKOUT}"
+	                    WORKING_DIRECTORY ${NDKOUT}
+	                  )
+	
+	add_custom_command(
+	                    TARGET SampleBrowserDummy
+                        POST_BUILD
+	                    COMMAND ${NDK_BUILD_EXECUTABLE} all
+	                    WORKING_DIRECTORY ${NDKOUT}
+	                  )
+	                  
+	add_custom_command(
+	                    TARGET SampleBrowserDummy
+                        POST_BUILD
+	                    COMMAND ${ANT_EXECUTABLE} debug
+	                    WORKING_DIRECTORY ${NDKOUT}
+	                  )
+
+else()
 
 if (OGRE_BUILD_TESTS)
 	add_definitions(-DSAMPLES_INCLUDE_PLAYPEN)
@@ -330,4 +386,6 @@ if (OGRE_INSTALL_SAMPLES)
 			)
 	endif ()
 endif ()	
+endif(ANDROID)
+
 

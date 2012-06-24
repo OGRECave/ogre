@@ -106,6 +106,8 @@ namespace Ogre {
         Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
 
+        virtual ~Texture() {}
+        
         /** Sets the type of texture; can only be changed before load() 
         */
         virtual void setTextureType(TextureType ttype ) { mTextureType = ttype; }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.ogre3d.browser"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
+
+    <!-- This .apk has no Java code itself, so set hasCode to false. -->
+    <application android:label="OgreSampleBrowser" android:hasCode="false">
+        <activity android:name="android.app.NativeActivity"
+                  android:label="OgreSampleBrowser"
+                  android:configChanges="orientation|keyboardHidden">
+            <!-- Tell NativeActivity the name of or .so -->
+            <meta-data android:name="android.app.lib_name" android:value="OgreSampleBrowser" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> 
+    </application>
+
+</manifest>

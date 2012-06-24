@@ -235,7 +235,7 @@ namespace Ogre {
                     "Framebuffer bind not possible for this pixelbuffer type",
                     "GLES2HardwarePixelBuffer::bindToFramebuffer");
     }
-
+    
     // TextureBuffer
     GLES2TextureBuffer::GLES2TextureBuffer(const String &baseName, GLenum target, GLuint id, 
                                            GLint width, GLint height, GLint internalFormat, GLint format,
@@ -248,7 +248,7 @@ namespace Ogre {
 
         glBindTexture(mTarget, mTextureID);
         GL_CHECK_ERROR;
-
+        
         // Get face identifier
         mFaceTarget = mTarget;
         if(mTarget == GL_TEXTURE_CUBE_MAP)
@@ -319,6 +319,13 @@ namespace Ogre {
         }
     }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2TextureBuffer::updateTextureId(GLuint textureID)
+    {
+        mTextureID = textureID;
+    }
+#endif
+    
     void GLES2TextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
         glBindTexture(mTarget, mTextureID);
@@ -896,33 +903,35 @@ namespace Ogre {
     GLES2HardwarePixelBuffer(width, height, 1, GLES2PixelUtil::getClosestOGREFormat(format, PF_A8R8G8B8),HBU_WRITE_ONLY)
     {
         mGLInternalFormat = format;
+        mNumSamples = numSamples;
+        
         // Generate renderbuffer
         glGenRenderbuffers(1, &mRenderbufferID);
         GL_CHECK_ERROR;
+        
         // Bind it to FBO
         glBindRenderbuffer(GL_RENDERBUFFER, mRenderbufferID);
         GL_CHECK_ERROR;
         
         // Allocate storage for depth buffer
-        if (numSamples > 0)
+        if (mNumSamples > 0)
         {
 #if GL_APPLE_framebuffer_multisample
             glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 
-                                                numSamples, format, width, height);
+                                                  mNumSamples, mGLInternalFormat, mWidth, mHeight);
             GL_CHECK_ERROR;
 #endif
         }
         else
         {
-            glRenderbufferStorage(GL_RENDERBUFFER, format,
-                                     width, height);
+            glRenderbufferStorage(GL_RENDERBUFFER, mGLInternalFormat,
+                                  mWidth, mHeight);
             GL_CHECK_ERROR;
         }
     }
     //----------------------------------------------------------------------------- 
     GLES2RenderBuffer::~GLES2RenderBuffer()
     {
-        // Generate renderbuffer
         glDeleteRenderbuffers(1, &mRenderbufferID);
         GL_CHECK_ERROR;
     }

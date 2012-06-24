@@ -35,16 +35,11 @@ THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || \
-    OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || \
-    OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
 #   define MAX_PATH MAXPATHLEN
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#else
 #  define WIN32_LEAN_AND_MEAN
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min

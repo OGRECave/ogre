@@ -25,6 +25,15 @@ if(OGRE_BUILD_PLATFORM_APPLE_IOS)
     "${OGRE_BINARY_DIR}/../iOSDependencies"
     "${OGRE_SOURCE_DIR}/../iOSDependencies"
   )
+elseif(OGRE_BUILD_PLATFORM_ANDROID)
+  set(OGRE_DEP_SEARCH_PATH 
+    ${OGRE_DEPENDENCIES_DIR}
+    ${ENV_OGRE_DEPENDENCIES_DIR}
+    "${OGRE_BINARY_DIR}/AndroidDependencies"
+    "${OGRE_SOURCE_DIR}/AndroidDependencies"
+    "${OGRE_BINARY_DIR}/../AndroidDependencies"
+    "${OGRE_SOURCE_DIR}/../AndroidDependencies"
+  )
 else()
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
@@ -72,7 +81,7 @@ find_package(Freetype)
 macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.freetype.org" TRUE "" "")
 
 # Find X11
-if (UNIX AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (UNIX AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
   macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
@@ -87,8 +96,10 @@ endif ()
 #######################################################################
 
 # Find OpenGL
-find_package(OpenGL)
-macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
+if(NOT ANDROID)
+  find_package(OpenGL)
+  macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
+endif()
 
 # Find OpenGL ES
 find_package(OpenGLES)
@@ -109,10 +120,10 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
-endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
 
 # Find Boost
 # Prefer static linking in all cases

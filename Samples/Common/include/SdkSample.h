@@ -518,6 +518,7 @@ namespace OgreBites
 			mCamera = mSceneMgr->createCamera("MainCamera");
 			mViewport = mWindow->addViewport(mCamera);
 			mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
+            mCamera->setAutoAspectRatio(true);
 			mCamera->setNearClipDistance(5);
 
 			mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller

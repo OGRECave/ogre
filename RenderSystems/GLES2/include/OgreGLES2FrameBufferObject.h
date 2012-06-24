@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2RenderTexture.h"
 #include "OgreGLES2Context.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     
@@ -38,7 +39,7 @@ namespace Ogre {
 
     /** Frame Buffer Object abstraction.
     */
-    class _OgreGLES2Export GLES2FrameBufferObject
+    class _OgreGLES2Export GLES2FrameBufferObject 
     {
     public:
         GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa);
@@ -76,6 +77,15 @@ namespace Ogre {
         
         GLES2FBOManager *getManager() { return mManager; }
 		const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        void notifyOnContextReset(const GLES2SurfaceDesc &target);
+#endif
+        
     private:
         GLES2FBOManager *mManager;
 		GLsizei mNumSamples;

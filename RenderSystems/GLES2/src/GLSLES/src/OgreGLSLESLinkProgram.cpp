@@ -64,7 +64,19 @@ namespace Ogre {
             GL_CHECK_ERROR
 		}
     }
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLSLESLinkProgram::notifyOnContextLost()
+    {
+        mLinked = false;
+        mTriedToLinkAndFailed = false;
+        mUniformRefsBuilt = false;
+    }
+    
+    void GLSLESLinkProgram::notifyOnContextReset()
+    {
+        activate();
+    }
+#endif
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::activate(void)
 	{

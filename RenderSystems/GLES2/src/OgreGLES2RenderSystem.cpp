@@ -51,7 +51,10 @@ THE SOFTWARE.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGL2Window.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#	include "OgreAndroidWindow.h"
+#	include "OgreAndroidEGLWindow.h"
+#	include "OgreAndroidEGLContext.h"
+#   include "OgreAndroidResourceManager.h"
+Ogre::AndroidResourceManager* Ogre::GLES2RenderSystem::mResourceManager = NULL;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
 #	include "OgreNaClWindow.h"
 #else
@@ -95,8 +98,13 @@ namespace Ogre {
 		mEnableFixedPipeline = false;
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        mResourceManager = OGRE_NEW AndroidResourceManager();
+#endif
+        
         mGLSupport = getGLSupport();
 
+        
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
 
@@ -135,6 +143,14 @@ namespace Ogre {
 
         mRenderTargets.clear();
         OGRE_DELETE mGLSupport;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        if (mResourceManager != NULL)
+		{
+			OGRE_DELETE mResourceManager;
+			mResourceManager = NULL;
+		}
+#endif
     }
 
     const String& GLES2RenderSystem::getName(void) const
@@ -536,6 +552,7 @@ namespace Ogre {
 
 		if( fbo )
 		{
+             LogManager::getSingleton().logMessage("*** _createDepthBufferFor FBO ");
 			// Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
 			// Find best depth & stencil format suited for the RT's format
 			GLuint depthFormat, stencilFormat;
@@ -587,44 +604,7 @@ namespace Ogre {
         {
             if (i->second == pWin)
             {
-				GLES2Context *windowContext;
-				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
-
-				// 1 Window <-> 1 Context, should be always true
-				assert( windowContext );
-
-				bool bFound = false;
-				// Find the depth buffer from this window and remove it.
-				DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-				DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-				while( itMap != enMap && !bFound )
-				{
-					DepthBufferVec::iterator itor = itMap->second.begin();
-					DepthBufferVec::iterator end  = itMap->second.end();
-
-					while( itor != end )
-					{
-						// A DepthBuffer with no depth & stencil pointers is a dummy one,
-						// look for the one that matches the same GL context
-						GLES2DepthBuffer *depthBuffer = static_cast<GLES2DepthBuffer*>(*itor);
-						GLES2Context *glContext = depthBuffer->getGLContext();
-
-						if( glContext == windowContext &&
-							(depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-						{
-							bFound = true;
-
-							delete *itor;
-							itMap->second.erase( itor );
-							break;
-						}
-						++itor;
-					}
-
-					++itMap;
-				}
-
+                _destroyDepthBuffer(pWin);
                 mRenderTargets.erase(i);
                 OGRE_DELETE pWin;
                 break;
@@ -632,6 +612,47 @@ namespace Ogre {
         }
     }
 
+    void GLES2RenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
+    {
+        GLES2Context *windowContext;
+        pWin->getCustomAttribute("GLCONTEXT", &windowContext);
+        
+        // 1 Window <-> 1 Context, should be always true
+        assert( windowContext );
+        
+        bool bFound = false;
+        // Find the depth buffer from this window and remove it.
+        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+        
+        while( itMap != enMap && !bFound )
+        {
+            DepthBufferVec::iterator itor = itMap->second.begin();
+            DepthBufferVec::iterator end  = itMap->second.end();
+            
+            while( itor != end )
+            {
+                // A DepthBuffer with no depth & stencil pointers is a dummy one,
+                // look for the one that matches the same GL context
+                GLES2DepthBuffer *depthBuffer = static_cast<GLES2DepthBuffer*>(*itor);
+                GLES2Context *glContext = depthBuffer->getGLContext();
+                
+                if( glContext == windowContext &&
+                   (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
+                {
+                    bFound = true;
+                    
+                    delete *itor;
+                    itMap->second.erase( itor );
+                    break;
+                }
+                ++itor;
+            }
+            
+            ++itMap;
+        }
+    }
+    
     String GLES2RenderSystem::getErrorDescription(long errorNumber) const
     {
         // TODO find a way to get error string
@@ -2189,4 +2210,39 @@ namespace Ogre {
                 mActiveBufferMap.erase(i);
         }
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2RenderSystem::resetRenderer(RenderWindow* win)
+    {
+        LogManager::getSingleton().logMessage("********************************************");
+        LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Reset Renderer Started ***");
+        LogManager::getSingleton().logMessage("********************************************");
+                
+        initialiseContext(win);
+        
+        mGLSupport->initialiseExtensions();
+        
+        static_cast<GLES2FBOManager*>(mRTTManager)->_reload();
+        
+        _destroyDepthBuffer(win);
+        
+        GLES2DepthBuffer *depthBuffer = OGRE_NEW GLES2DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+                                                                  mMainContext, 0, 0,
+                                                                  win->getWidth(), win->getHeight(),
+                                                                  win->getFSAA(), 0, true );
+        
+        mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
+        win->attachDepthBuffer( depthBuffer );
+        
+        GLES2RenderSystem::mResourceManager->notifyOnContextReset();
+        
+        _setViewport(NULL);
+        _setRenderTarget(win);
+    }
+    
+    AndroidResourceManager* GLES2RenderSystem::getResourceManager()
+    {
+        return GLES2RenderSystem::mResourceManager;
+    }
+#endif
 }
