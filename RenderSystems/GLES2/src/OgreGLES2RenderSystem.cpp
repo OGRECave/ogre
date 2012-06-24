@@ -1399,8 +1399,10 @@ namespace Ogre {
                         // linear min, linear mip
                         return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                         // linear min, point mip
                         return GL_LINEAR_MIPMAP_NEAREST;
+#endif
                     case FO_NONE:
                         // linear min, no mip
                         return GL_LINEAR;
@@ -1533,7 +1535,11 @@ namespace Ogre {
             static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         // Use a little shorthand
+#if OGRE_NO_GLES2_VAO_SUPPORT == 0
         bool useVAO = (gles2decl && gles2decl->isInitialised());
+#else
+        bool useVAO = false;
+#endif
 
         if(useVAO)
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
@@ -1691,9 +1697,11 @@ namespace Ogre {
             gles2decl->setInitialised(true);
         }
 
-#if GL_OES_vertex_array_object
+#if OGRE_NO_GLES2_VAO_SUPPORT == 0
+#   if GL_OES_vertex_array_object
         // Unbind the vertex array object.  Marks the end of what state will be included.
         glBindVertexArrayOES(0);
+#   endif
 #endif
 
  		// Unbind all attributes
