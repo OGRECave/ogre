@@ -69,7 +69,6 @@ void TerrainTests::tearDown()
 	OGRE_DELETE mRoot;
 }
 
-
 void TerrainTests::testCreate()
 {
 	Terrain* t = OGRE_NEW Terrain(mSceneMgr);
@@ -85,12 +84,6 @@ void TerrainTests::testCreate()
 	t->prepare(imp);
 	// don't load, this requires GPU access
 	//t->load();
-	
-
-	
-
-
 
 	OGRE_DELETE t;
 }
-

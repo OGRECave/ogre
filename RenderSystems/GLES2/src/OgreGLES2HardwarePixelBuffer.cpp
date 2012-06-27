@@ -141,26 +141,19 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-        else if ((src.format != mFormat) ||
-                 ((GLES2PixelUtil::getGLOriginFormat(src.format) == 0) && (src.format != PF_R8G8B8)))
+        else if (GLES2PixelUtil::getGLOriginFormat(src.format) == 0)
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
             allocateBuffer();
             scaled = mBuffer.getSubVolume(dstBox);
             PixelUtil::bulkPixelConversion(src, scaled);
-            
-            if(mFormat == PF_A4R4G4B4)
-            {
-                // ARGB->BGRA
-                GLES2PixelUtil::convertToGLformat(scaled, scaled);
-            }
         }
         else
         {
             allocateBuffer();
+            // No scaling or conversion needed
             scaled = src;
-
             if (src.format == PF_R8G8B8)
             {
                 scaled.format = PF_B8G8R8;
@@ -274,8 +267,8 @@ namespace Ogre {
 
         // Log a message
 //        std::stringstream str;
-//        str << "GLES2HardwarePixelBuffer constructed for texture " << mTextureID 
-//            << " face " << mFace << " level " << mLevel << ": "
+//        str << "GLES2HardwarePixelBuffer constructed for texture " << baseName
+//            << " id " << mTextureID << " face " << mFace << " level " << mLevel << ": "
 //            << "width=" << mWidth << " height="<< mHeight << " depth=" << mDepth
 //            << " format=" << PixelUtil::getFormatName(mFormat);
 //        LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
@@ -402,6 +395,10 @@ namespace Ogre {
                 GL_CHECK_ERROR;
             }
 
+//            LogManager::getSingleton().logMessage("GLES2TextureBuffer::upload - ID: " + StringConverter::toString(mTextureID) +
+//                                                  " Format: " + PixelUtil::getFormatName(data.format) +
+//                                                  " Origin format: " + StringConverter::toString(GLES2PixelUtil::getGLOriginFormat(data.format), 0, std::ios::hex) +
+//                                                  " Data type: " + StringConverter::toString(GLES2PixelUtil::getGLOriginDataType(data.format), 0, ' ', std::ios::hex));
             glTexSubImage2D(mFaceTarget,
                             mLevel,
                             dest.left, dest.top,

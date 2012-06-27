@@ -111,10 +111,6 @@ namespace Ogre {
                     // the compressed size of a folder, and if he does, its useless anyway
                     info.compressedSize = size_t (-1);
                 }
-                else
-                {
-                    info.filename = info.basename;
-                }
 
                 mFileList.push_back(info);
 

@@ -459,6 +459,7 @@ namespace Ogre
         addCapabilitiesMapping("pbuffer", RSC_PBUFFER);
         addCapabilitiesMapping("gl1_5_nohwocclusion", RSC_GL1_5_NOHWOCCLUSION);
         addCapabilitiesMapping("perstageconstant", RSC_PERSTAGECONSTANT);
+        addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);
 
     }
 

@@ -44,9 +44,7 @@ THE SOFTWARE.
 
 #include <dirent.h>
 #include <unistd.h>
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #include <fnmatch.h>
-#endif
 
 /* Our simplified data entry structure */
 struct _finddata_t
@@ -56,7 +54,6 @@ struct _finddata_t
     unsigned long size;
 };
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_SYMBIAN
 #define _A_NORMAL 0x00  /* Normalfile-Noread/writerestrictions */
 #define _A_RDONLY 0x01  /* Read only file */
 #define _A_HIDDEN 0x02  /* Hidden file */
@@ -68,7 +65,5 @@ struct _finddata_t
 intptr_t _findfirst(const char *pattern, struct _finddata_t *data);
 int _findnext(intptr_t id, struct _finddata_t *data);
 int _findclose(intptr_t id);
-
-#endif
 
 #endif

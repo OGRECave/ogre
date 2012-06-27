@@ -1174,6 +1174,15 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
+	void ParticleSystem::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+	{
+		MovableObject::setRenderQueueGroupAndPriority(queueID, priority);
+		if (mRenderer)
+		{
+			mRenderer->setRenderQueueGroupAndPriority(queueID, priority);
+		}
+	}
+	//-----------------------------------------------------------------------
 	void ParticleSystem::setKeepParticlesInLocalSpace(bool keepLocal)
 	{
 		mLocalSpace = keepLocal;

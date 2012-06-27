@@ -57,7 +57,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     pluginsPath = m_ResourcePath + "plugins.cfg";
 #endif
     
-    m_pRoot = new Ogre::Root(pluginsPath);//, Ogre::macBundlePath() + "/ogre.cfg");
+    m_pRoot = new Ogre::Root(pluginsPath, Ogre::macBundlePath() + "/ogre.cfg");
     
 #ifdef OGRE_STATIC_LIB
     m_StaticPluginLoader.load();

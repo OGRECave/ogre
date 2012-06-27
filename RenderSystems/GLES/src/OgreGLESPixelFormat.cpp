@@ -67,43 +67,22 @@ namespace Ogre  {
 #endif                
             case PF_R5G6B5:
             case PF_B5G6R5:
+            case PF_R8G8B8:
+            case PF_B8G8R8:
                 return GL_RGB;
 
-            case PF_A1R5G5B5:
+			case PF_X8R8G8B8:
+			case PF_A8R8G8B8:
+            case PF_A8B8G8R8:
             case PF_B8G8R8A8:
+            case PF_A2R10G10B10:
                 return GL_BGRA;
             case PF_A4R4G4B4:
-            case PF_X8R8G8B8:
-            case PF_A8R8G8B8:
             case PF_X8B8G8R8:
-            case PF_A8B8G8R8:
+			case PF_R8G8B8A8:
+            case PF_A2B10G10R10:
                 return GL_RGBA;
 
-#if OGRE_ENDIAN == OGRE_ENDIAN_BIG
-            // Formats are in native endian, so R8G8B8 on little endian is
-            // BGR, on big endian it is RGB.
-            case PF_R8G8B8:
-                return GL_RGB;
-            case PF_B8G8R8:
-                return 0;
-#else
-            case PF_R8G8B8:
-                return GL_RGB;
-            case PF_B8G8R8:
-                return 0;
-#endif
-            case PF_DXT1:
-            case PF_DXT3:
-            case PF_DXT5:
-            case PF_R3G3B2:
-            case PF_A2R10G10B10:
-            case PF_A2B10G10R10:
-            case PF_SHORT_RGB:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT32_RGB:
-            case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_RGBA:
-            case PF_SHORT_RGBA:
             default:
                 return 0;
         }
@@ -130,8 +109,8 @@ namespace Ogre  {
 
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
             case PF_X8B8G8R8:
-            case PF_A8B8G8R8:
             case PF_X8R8G8B8:
+            case PF_A8B8G8R8:
             case PF_A8R8G8B8:
                 return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_B8G8R8A8:
@@ -146,22 +125,6 @@ namespace Ogre  {
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
 #endif
-            case PF_DXT1:
-            case PF_DXT3:
-            case PF_DXT5:
-            case PF_R3G3B2:
-            case PF_A2R10G10B10:
-            case PF_A2B10G10R10:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_R:
-            case PF_FLOAT32_GR:
-            case PF_FLOAT32_RGB:
-            case PF_FLOAT32_RGBA:
-            case PF_SHORT_RGBA:
-            case PF_SHORT_RGB:
-            case PF_SHORT_GR:
-                // TODO not supported
             default:
                 return 0;
         }
@@ -192,36 +155,15 @@ namespace Ogre  {
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
                 
-            case PF_B8G8R8A8:
-            case PF_X8B8G8R8:
-            case PF_X8R8G8B8:
-            case PF_A8R8G8B8:
-            case PF_A1R5G5B5:
-            case PF_A4R4G4B4:
-                return GL_RGBA;
-            case PF_R5G6B5:
-            case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
                 return GL_RGB;
-            case PF_A4L4:
-            case PF_R3G3B2:
-            case PF_A2R10G10B10:
-            case PF_A2B10G10R10:
-            case PF_DXT1:
-            case PF_DXT3:
-            case PF_DXT5:
-            case PF_FLOAT16_R:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT16_GR:
-            case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_R:
-            case PF_FLOAT32_GR:
-            case PF_FLOAT32_RGB:
-            case PF_FLOAT32_RGBA:
-            case PF_SHORT_RGBA:
-            case PF_SHORT_RGB:
-            case PF_SHORT_GR:
+			case PF_X8B8G8R8:
+			case PF_X8R8G8B8:
+            case PF_A8R8G8B8:
+            case PF_A8B8G8R8:
+            case PF_B8G8R8A8:
+                return GL_RGBA;
             default:
                 return 0;
         }
@@ -240,7 +182,7 @@ namespace Ogre  {
             }
             else
             {
-                return GL_RGBA;
+                return GL_RGBA8_OES;
             }
         }
         else
@@ -277,7 +219,7 @@ namespace Ogre  {
                         return PF_B5G6R5;
                     default:
                         return PF_R8G8B8;
-                };
+                }
             case GL_RGBA:
                 switch(dataType)
                 {
@@ -286,20 +228,18 @@ namespace Ogre  {
                     case GL_UNSIGNED_SHORT_4_4_4_4:
                         return PF_A4R4G4B4;
                     default:
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-                        // seems that in iOS we need this value to get the right color
-                        return PF_A8R8G8B8;
-#else
-                        return PF_X8B8G8R8;
-#endif
+                        return PF_A8B8G8R8;
                 }
 #ifdef GL_BGRA
             case GL_BGRA:
-                return PF_A8B8G8R8;
+                return PF_A8R8G8B8;
 #endif
+            case GL_RGB8_OES:
+                return PF_X8R8G8B8;
+            case GL_RGBA8_OES:
+                return PF_A8R8G8B8;
 
             default:
-                //TODO: not supported
                 return PF_A8R8G8B8;
         };
     }

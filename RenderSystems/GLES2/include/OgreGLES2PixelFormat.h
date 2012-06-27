@@ -95,7 +95,6 @@ namespace Ogre {
                 RSC_NON_POWER_OF_2_TEXTURES is supported it returns value as-is.
             */
             static size_t optionalPO2(size_t value);
-            static void convertToGLformat(const PixelBox &src, const PixelBox &dst);
     };
 }
 

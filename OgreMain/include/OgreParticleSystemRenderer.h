@@ -108,6 +108,10 @@ namespace Ogre {
 			output.
 		*/
 		virtual void setRenderQueueGroup(uint8 queueID) = 0;
+		/** Sets which render queue group and priority this renderer should target with it's
+			output.
+		*/
+		virtual void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority) = 0;
 
 		/** Setting carried over from ParticleSystem.
 		*/

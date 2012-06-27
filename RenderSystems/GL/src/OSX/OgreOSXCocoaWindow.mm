@@ -497,7 +497,7 @@ namespace Ogre {
     void OSXCocoaWindow::windowHasResized()
     {
         // Ensure the context is current
-	[mGLContext flushBuffer];
+        [mGLContext flushBuffer];
     }
     
     void OSXCocoaWindow::windowMovedOrResized()
@@ -667,7 +667,6 @@ namespace Ogre {
                 // Set the drawable, and current context
                 // If you do this last, there is a moment before the rendering window pops-up
                 [mGLContext makeCurrentContext];
-                [mGLContext setView:mView]; // invalid drawable here
             }
             
             [mGLContext update];

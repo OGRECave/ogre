@@ -425,6 +425,7 @@ void MeshWithoutIndexDataTests::testGenerateExtremes()
         }
         else
         {
+            // FAIL: size == 4
             CPPUNIT_ASSERT(subMesh->extremityPoints.size() == 0);
         }
     }
@@ -461,7 +462,7 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     Mesh::LodValueList lodDistanceList;
     lodDistanceList.push_back(600.0);
     ProgressiveMesh::generateLodLevels(mesh.get(), lodDistanceList, ProgressiveMesh::VRQ_CONSTANT, 2);
-
+    // FAIL: Levels == 1
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)
     {

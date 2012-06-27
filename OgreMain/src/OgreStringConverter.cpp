@@ -317,7 +317,8 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		Real ret = defaultValue;
-		str >> ret;
+        if( !(str >> ret) )
+            return defaultValue;
 #endif
         return ret;
     }
@@ -327,7 +328,8 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		int ret = defaultValue;
-		str >> ret;
+        if( !(str >> ret) )
+            return defaultValue;
 
         return ret;
     }
@@ -337,7 +339,8 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		unsigned int ret = defaultValue;
-		str >> ret;
+        if( !(str >> ret) )
+            return defaultValue;
 
 		return ret;
     }
@@ -347,7 +350,8 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		long ret = defaultValue;
-		str >> ret;
+        if( !(str >> ret) )
+            return defaultValue;
 
 		return ret;
     }
@@ -357,7 +361,8 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		unsigned long ret = defaultValue;
-		str >> ret;
+        if( !(str >> ret) )
+            return defaultValue;
 
 		return ret;
     }

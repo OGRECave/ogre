@@ -1616,17 +1616,6 @@ namespace Ogre {
 			}
 			msPassGraveyard.clear();
 		}
-#if OGRE_PLATFORM == OGRE_PLATFORM_SYMBIAN
-		PassSet::iterator i, iend;
-		iend = msDirtyHashList.end();
-		for (i = msDirtyHashList.begin(); i != iend; ++i)
-		{
-			Pass* p = *i;
-			p->_recalculateHash();
-		}
-		msDirtyHashList.clear();
-
-#else
         PassSet tempDirtyHashList;
 		{
 			OGRE_LOCK_MUTEX(msDirtyHashListMutex)
@@ -1640,7 +1629,6 @@ namespace Ogre {
             Pass* p = *i;
             p->_recalculateHash();
         }
-#endif
     }
     //-----------------------------------------------------------------------
     void Pass::queueForDeletion(void)

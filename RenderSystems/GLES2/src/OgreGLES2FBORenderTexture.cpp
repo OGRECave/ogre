@@ -173,11 +173,11 @@ namespace Ogre {
 
             /// Bind it to FBO
             glBindRenderbuffer(GL_RENDERBUFFER, depthRB);
-            
+
             /// Allocate storage for depth buffer
             glRenderbufferStorage(GL_RENDERBUFFER, depthFormat,
                                 PROBE_SIZE, PROBE_SIZE);
-            
+
             /// Attach depth
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRB);
         }
@@ -187,7 +187,7 @@ namespace Ogre {
         {
             /// Generate stencil renderbuffer
             glGenRenderbuffers(1, &stencilRB);
-            
+
             /// Bind it to FBO
             glBindRenderbuffer(GL_RENDERBUFFER, stencilRB);
 
@@ -266,9 +266,10 @@ namespace Ogre {
             mProps[x].valid = false;
 
 			// Fetch GL format token
-			GLint fmt = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
+			GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
+            GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
 
-            if((fmt == GL_NONE) && (x != 0))
+            if((internalFormat == GL_NONE) && (x != 0))
                 continue;
 
 			// No test for compressed formats
@@ -278,12 +279,12 @@ namespace Ogre {
             // Create and attach framebuffer
             glGenFramebuffers(1, &fb);
             glBindFramebuffer(GL_FRAMEBUFFER, fb);
-            if (fmt != GL_NONE)
+            if (internalFormat != GL_NONE)
             {
 				// Create and attach texture
 				glGenTextures(1, &tid);
 				glBindTexture(target, tid);
-				
+
                 // Set some default parameters
 #if GL_APPLE_texture_max_level
                 glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
@@ -292,8 +293,8 @@ namespace Ogre {
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                            
-				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GLES2PixelUtil::getGLOriginDataType((PixelFormat)x), 0);
+
+				glTexImage2D(target, 0, internalFormat, PROBE_SIZE, PROBE_SIZE, 0, fmt, GLES2PixelUtil::getGLOriginDataType((PixelFormat)x), 0);
 				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                 target, tid, 0);
             }
@@ -304,7 +305,7 @@ namespace Ogre {
 			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
 			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
 			// might still be supported, so we must continue probing.
-            if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
+            if(internalFormat == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
             {
                 mProps[x].valid = true;
 				StringUtil::StrStreamType str;
@@ -360,7 +361,7 @@ namespace Ogre {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
 			
-            if (fmt!=GL_NONE)
+            if (internalFormat!=GL_NONE)
                 glDeleteTextures(1, &tid);
         }
 

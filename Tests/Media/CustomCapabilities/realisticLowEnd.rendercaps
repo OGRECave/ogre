@@ -28,12 +28,12 @@ mipmap_lod_bias true
 texture_compression true
 texture_compression_dxt true
 texture_compression_vtc false
-glew1_5_novbo false
+gl1_5_novbo false
 fbo true
 fbo_arb false
 fbo_ati false
 pbuffer false
-glew1_5_nohwocclusion false
+gl1_5_nohwocclusion false
 perstageconstant false
 shader_profile arbfp1
 shader_profile arbvp1
@@ -57,4 +57,5 @@ fragment_program_constant_float_count 64
 fragment_program_constant_int_count 0
 fragment_program_constant_bool_count 0
 num_vertex_texture_units 0
+separate_shader_objects false
 }

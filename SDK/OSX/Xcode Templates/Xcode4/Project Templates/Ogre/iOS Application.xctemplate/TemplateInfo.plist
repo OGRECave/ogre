@@ -85,6 +85,15 @@
 			<key>Group</key>
 			<string>Resources</string>
 		</dict>
+		<key>media</key>
+		<dict>
+			<key>Path</key>
+			<string>media</string>
+			<key>PathType</key>
+			<string>Group</string>
+            <key>TargetIndices</key>
+            <array/>
+		</dict>
 		<key>___PACKAGENAME___-Info.plist:UIStatusBarHidden</key>
 		<string>&lt;key&gt;UIStatusBarHidden&lt;/key&gt;
 &lt;true/&gt;</string>
@@ -101,6 +110,7 @@
 		<string>ogre.cfg</string>
 		<string>plugins.cfg</string>
 		<string>resources.cfg</string>
+		<string>media</string>
 		<string>___PACKAGENAME___-Info.plist:iPhone</string>
 		<string>___PACKAGENAME___-Info.plist:UIStatusBarHidden</string>
 	</array>

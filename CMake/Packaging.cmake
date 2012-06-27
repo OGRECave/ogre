@@ -18,7 +18,11 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "OGRE")
 set(CPACK_PACKAGE_NAME "OGRE")
 set(CPACK_PACKAGE_VENDOR "Torus Knot Software")
 
-set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_SOURCE_DIR}/COPYING")
+# CPack won't allow file without recognized extension to be used as
+# license file.
+configure_file("${OGRE_SOURCE_DIR}/COPYING" "${OGRE_BINARY_DIR}/COPYING.txt" COPYONLY)
+set(CPACK_RESOURCE_FILE_LICENSE "${OGRE_BINARY_DIR}/COPYING.txt")
+
 #set(CPACK_PACKAGE_ICON "${OGRE_SOURCE_DIR}\\\\ogrelogo.gif")
 
 set(CPACK_PACKAGE_CONTACT "OGRE Team <sinbad@ogre3d.org>")

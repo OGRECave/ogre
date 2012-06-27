@@ -548,6 +548,8 @@ namespace Ogre {
 
 		/** @copydoc MovableObject::setRenderQueueGroup */
 		void setRenderQueueGroup(uint8 queueID);
+		/** @copydoc MovableObject::setRenderQueueGroupAndPriority */
+		void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
 		/** Set whether or not particles are sorted according to the camera.
 		@remarks
