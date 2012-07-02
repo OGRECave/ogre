@@ -77,6 +77,8 @@
 			<string>media</string>
 			<key>Group</key>
 			<string>Resources</string>
+            <key>TargetIndices</key>
+            <array/>
 		</dict>
 		<key>ogre.cfg</key>
 		<dict>
