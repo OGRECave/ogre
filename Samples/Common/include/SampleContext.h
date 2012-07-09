@@ -89,6 +89,10 @@
 #endif
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#include <android_native_app_glue.h>
+#endif
+
 #include "Sample.h"
 
 #include "OIS.h"
@@ -587,16 +591,17 @@ namespace OgreBites
 			mRoot = Ogre::Root::getSingletonPtr();
 #else
             Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
-            #ifndef OGRE_STATIC_LIB
-				pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
-            #endif
+#   ifndef OGRE_STATIC_LIB
+            pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+#   endif
 			mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"), 
 				mFSLayer->getWritablePath("ogre.log"));
+            
+#   ifdef OGRE_STATIC_LIB
+            mStaticPluginLoader.load();
+#   endif
 #endif
 
-#ifdef OGRE_STATIC_LIB
-            mStaticPluginLoader.load();
-#endif
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -680,16 +685,17 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void locateResources()
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-			// TODO: This is handled externally for now
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Essential.zip", "EmbeddedZip", "Essential");
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation("Popular.zip", "EmbeddedZip", "Popular");
 #else
 			// load resource paths from config file
 			Ogre::ConfigFile cf;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            cf.load(openAPKFile("resources.cfg"));
+#else
 			cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
-
+#endif
 			Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
 			Ogre::String sec, type, arch;
 
@@ -832,6 +838,25 @@ namespace OgreBites
 			mMouse->capture();
 #endif
 		}
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName)
+        {
+            Ogre::DataStreamPtr stream;
+            AAsset* asset = AAssetManager_open(mAssetMgr, fileName.c_str(), AASSET_MODE_BUFFER);
+            if(asset)
+            {
+                off_t length = AAsset_getLength(asset);
+                void* membuf = OGRE_MALLOC(length, Ogre::MEMCATEGORY_GENERAL);
+                memcpy(membuf, AAsset_getBuffer(asset), length);
+                AAsset_close(asset);
+                
+                stream = Ogre::DataStreamPtr(new Ogre::MemoryDataStream(membuf, length, true, true));
+            }
+            return stream;
+        }
+        AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
+#endif
 
 		FileSystemLayer* mFSLayer; 		// File system abstraction layer
 		Ogre::Root* mRoot;              // OGRE root

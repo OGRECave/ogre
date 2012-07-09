@@ -15,7 +15,6 @@ PROJECT(OgreMain)
 
 include(PrecompiledHeader)
 
-
 # define header and source files for the library
 set (HEADER_FILES
   include/asm_math.h
@@ -574,6 +573,24 @@ elseif (APPLE)
     set(PLATFORM_LIBS ${Carbon_LIBRARY_FWK} ${Cocoa_LIBRARY_FWK})
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
+elseif(ANDROID)
+  set(PLATFORM_HEADER_FILES
+    include/Android/OgreConfigDialogImp.h
+    include/Android/OgreErrorDialogImp.h
+    include/Android/OgreTimerImp.h
+    include/Android/OgreAndroidLogListener.h
+    include/Android/OgreAPKFileSystemArchive.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/Android/OgreConfigDialog.cpp
+    src/Android/OgreErrorDialog.cpp
+    src/Android/OgreTimer.cpp
+    src/OgreSearchOps.cpp
+    src/Android/OgreAndroidLogListener.cpp
+    src/Android/OgreAPKFileSystemArchive.cpp
+  )
+
+  set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
   set(PLATFORM_HEADER_FILES
@@ -672,9 +689,21 @@ if (OGRE_CONFIG_ENABLE_PVRTC)
   list(APPEND SOURCE_FILES src/OgrePVRTCCodec.cpp)
 endif ()
 
+if (OGRE_CONFIG_ENABLE_ETC1)
+  list(APPEND HEADER_FILES include/OgreETC1Codec.h)
+  list(APPEND SOURCE_FILES src/OgreETC1Codec.cpp)
+endif ()
+
 if (OGRE_CONFIG_ENABLE_ZIP)
   list(APPEND HEADER_FILES include/OgreZip.h)
   list(APPEND SOURCE_FILES src/OgreZip.cpp)
+
+  if(ANDROID)
+    ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
+    list(APPEND PLATFORM_HEADER_FILES include/Android/OgreAPKZipArchive.h)
+    list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
+  endif()
+
   list(APPEND LIBRARIES "${ZZip_LIBRARIES}")
   list(APPEND LIBRARIES "${ZLIB_LIBRARIES}")
 endif ()

@@ -658,7 +658,19 @@ namespace Ogre {
         0xFF0000, 0x00FF00, 0, 0,
         8, 0, 0, 0
         },
-
+    //-----------------------------------------------------------------------
+		{"PF_ETC1_RGB8",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        }
     };
     //-----------------------------------------------------------------------
 	size_t PixelBox::getConsecutiveSize() const
@@ -741,6 +753,10 @@ namespace Ogre {
                 case PF_PVRTC_RGBA4:
 					assert(depth == 1);
                     return (std::max((int)width, 8) * std::max((int)height, 8) * 4 + 7) / 8;
+                    
+                case PF_ETC1_RGB8:
+                    return ((width * height) >> 1);
+                    
 				default:
 				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compressed pixel format",
 					"PixelUtil::getMemorySize");

@@ -58,8 +58,8 @@ public:
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
-	*/
-	virtual void			writeSourceCode			(std::ostream& os, Program* program);
+     */
+    virtual void writeSourceCode			(std::ostream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.

@@ -153,8 +153,10 @@ namespace Ogre {
         PF_R8 = 42,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
         PF_RG8 = 43,
+        /// ETC1 (Ericsson Texture Compression)
+        PF_ETC1_RGB8 = 44,
 		// Number of pixel formats currently defined
-        PF_COUNT = 44
+        PF_COUNT = 45
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 

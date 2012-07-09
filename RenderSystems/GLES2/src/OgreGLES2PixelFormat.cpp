@@ -78,6 +78,12 @@ namespace Ogre  {
             case PF_PVRTC_RGBA4:
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif                
+    
+#if OGRE_NO_ETC1_CODEC == 0
+            case PF_ETC1_RGB8:
+                return GL_ETC1_RGB8_OES;
+#endif
+                
             case PF_R5G6B5:
             case PF_B5G6R5:
             case PF_R8G8B8:
@@ -186,20 +192,26 @@ namespace Ogre  {
             case PF_PVRTC_RGBA4:
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
+                
+#if OGRE_NO_ETC1_CODEC == 0
+            case PF_ETC1_RGB8:
+                return GL_ETC1_RGB8_OES;
+#endif
+                
             case PF_R8G8B8:
             case PF_B8G8R8:
             case PF_FLOAT16_RGB:
             case PF_FLOAT32_RGB:
                 return GL_RGB;
-			case PF_X8B8G8R8:
-			case PF_X8R8G8B8:
+            case PF_X8B8G8R8:
+            case PF_X8R8G8B8:
             case PF_A8R8G8B8:
             case PF_A8B8G8R8:
             case PF_B8G8R8A8:
             case PF_FLOAT16_RGBA:
             case PF_FLOAT32_RGBA:
                 return GL_RGBA;
-
+                
 #if GL_EXT_texture_rg
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
@@ -251,6 +263,12 @@ namespace Ogre  {
             case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
                 return PF_PVRTC_RGBA4;
 #endif
+                
+#if OGRE_NO_ETC1_CODEC == 0
+            case GL_ETC1_RGB8_OES:
+                return PF_ETC1_RGB8;
+#endif
+                
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:

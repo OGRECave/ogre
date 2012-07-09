@@ -41,10 +41,10 @@ namespace Ogre {
         /// Generate framebuffer object
         glGenFramebuffers(1, &mFB);
         GL_CHECK_ERROR;
-
+        
         mNumSamples = 0;
         mMultisampleFB = 0;
-
+        
         // Check multisampling if supported
 #if GL_APPLE_framebuffer_multisample
         // Check samples supported
@@ -77,12 +77,44 @@ namespace Ogre {
         /// Delete framebuffer object
         glDeleteFramebuffers(1, &mFB);
         GL_CHECK_ERROR;
-
+        
 		if (mMultisampleFB)
 			glDeleteFramebuffers(1, &mMultisampleFB);
-
+        
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2FrameBufferObject::notifyOnContextLost()
+    {
+        mManager->releaseRenderBuffer(mDepth);
+        mManager->releaseRenderBuffer(mStencil);
+		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        
+        glDeleteFramebuffers(1, &mFB);
+        GL_CHECK_ERROR;
+        
+		if (mMultisampleFB)
+			glDeleteFramebuffers(1, &mMultisampleFB);
+        
+        GL_CHECK_ERROR;
+    }
+    
+    void GLES2FrameBufferObject::notifyOnContextReset(const GLES2SurfaceDesc &target)
+    {
+        /// Generate framebuffer object
+        glGenFramebuffers(1, &mFB);
+        GL_CHECK_ERROR;
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, mFB);
+        GL_CHECK_ERROR;
+        
+        // Bind target to surface 0 and initialise
+        bindSurface(0, target);
+        GL_CHECK_ERROR;
+    }
+#endif
+    
     
     void GLES2FrameBufferObject::bindSurface(size_t attachment, const GLES2SurfaceDesc &target)
     {
