@@ -189,7 +189,7 @@ namespace Ogre
     */
     class _OgreExport Math 
     {
-   public:
+	public:
        /** The angular units used by the API. This functionality is now deprecated in favor
 	       of discreet angular unit types ( see Degree and Radian above ). The only place
 		   this functionality is actually still used is when parsing files. Search for
@@ -199,6 +199,16 @@ namespace Ogre
        {
            AU_DEGREE,
            AU_RADIAN
+       };
+
+
+       /** This class is used to provide an external random value provider. 
+      */
+       class RandomValueProvider
+       {
+       public:
+            /** When called should return a random values in the range of [0,1] */
+            virtual Real getRandomUnit() = 0;
        };
 
     protected:
@@ -213,12 +223,15 @@ namespace Ogre
         static Real* mSinTable;
         static Real* mTanTable;
 
+        // A random value provider. overriding the default random number generator.
+        static RandomValueProvider* mRandProvider;
+
         /** Private function to build trig tables.
         */
         void buildTrigTables();
 
-		static Real SinTable (Real fValue);
-		static Real TanTable (Real fValue);
+        static Real SinTable (Real fValue);
+        static Real TanTable (Real fValue);
     public:
         /** Default constructor.
             @param
@@ -323,28 +336,38 @@ namespace Ogre
             @param fValue
                 The value to round down to the nearest integer.
          */
-		static inline Real Floor (Real fValue) { return Real(floor(fValue)); }
+        static inline Real Floor (Real fValue) { return Real(floor(fValue)); }
 
-		static inline Real Log (Real fValue) { return Real(log(fValue)); }
+        static inline Real Log (Real fValue) { return Real(log(fValue)); }
 
-		/// Stored value of log(2) for frequent use
-		static const Real LOG2;
+        /// Stored value of log(2) for frequent use
+        static const Real LOG2;
 
-		static inline Real Log2 (Real fValue) { return Real(log(fValue)/LOG2); }
+        static inline Real Log2 (Real fValue) { return Real(log(fValue)/LOG2); }
 
-		static inline Real LogN (Real base, Real fValue) { return Real(log(fValue)/log(base)); }
+        static inline Real LogN (Real base, Real fValue) { return Real(log(fValue)/log(base)); }
 
-		static inline Real Pow (Real fBase, Real fExponent) { return Real(pow(fBase,fExponent)); }
+        static inline Real Pow (Real fBase, Real fExponent) { return Real(pow(fBase,fExponent)); }
 
         static Real Sign (Real fValue);
-		static inline Radian Sign ( const Radian& rValue )
-		{
-			return Radian(Sign(rValue.valueRadians()));
-		}
-		static inline Degree Sign ( const Degree& dValue )
-		{
-			return Degree(Sign(dValue.valueDegrees()));
-		}
+        static inline Radian Sign ( const Radian& rValue )
+        {
+            return Radian(Sign(rValue.valueRadians()));
+        }
+        static inline Degree Sign ( const Degree& dValue )
+        {
+            return Degree(Sign(dValue.valueDegrees()));
+        }
+
+        //Simulate the shader function saturate that clamps a parameter value between 0 and 1
+        static inline float saturate(float t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
+        static inline double saturate(double t) { return (t < 0) ? 0 : ((t > 1) ? 1 : t); }
+        
+        //Simulate the shader function lerp which performers linear interpolation
+        //given 3 parameters v0, v1 and t the function returns the value of (1 – t)* v0 + t * v1. 
+        //where v0 and v1 are matching vector or scalar types and t can be either a scalar or a vector of the same type as a and b.
+        template<typename V, typename T> static V lerp(const V& v0, const V& v1, const T& t) { 
+            return v0 * (1 - t) + v1 * t; }
 
         /** Sine function.
             @param fValue
@@ -424,6 +447,8 @@ namespace Ogre
          */
         static Real SymmetricRandom ();
 
+        static void SetRandomValueProvider(RandomValueProvider* provider);
+       
         /** Tangent function.
             @param fValue
                 Angle in radians

@@ -57,6 +57,8 @@ namespace Ogre
     Real *Math::mSinTable = NULL;
     Real *Math::mTanTable = NULL;
 
+    Math::RandomValueProvider* Math::mRandProvider = NULL;
+
     //-----------------------------------------------------------------------
     Math::Math( unsigned int trigTableSize )
     {
@@ -161,15 +163,17 @@ namespace Ogre
 
         return 0.0;
     }
-	//-----------------------------------------------------------------------
-	Real Math::InvSqrt(Real fValue)
-	{
-		return Real(asm_rsq(fValue));
-	}
+    //-----------------------------------------------------------------------
+    Real Math::InvSqrt(Real fValue)
+    {
+        return Real(asm_rsq(fValue));
+    }
     //-----------------------------------------------------------------------
     Real Math::UnitRandom ()
     {
-        return asm_rand() / asm_rand_max();
+        if (mRandProvider)
+            return mRandProvider->getRandomUnit();
+        else return asm_rand() / asm_rand_max();
     }
     
     //-----------------------------------------------------------------------
@@ -181,8 +185,15 @@ namespace Ogre
     //-----------------------------------------------------------------------
     Real Math::SymmetricRandom ()
     {
-		return 2.0f * UnitRandom() - 1.0f;
+        return 2.0f * UnitRandom() - 1.0f;
     }
+
+    //-----------------------------------------------------------------------
+    void Math::SetRandomValueProvider(RandomValueProvider* provider)
+    {
+        mRandProvider = provider;
+    }
+
 
    //-----------------------------------------------------------------------
     void Math::setAngleUnit(Math::AngleUnit unit)
