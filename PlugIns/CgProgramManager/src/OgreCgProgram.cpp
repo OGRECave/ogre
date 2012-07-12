@@ -258,6 +258,42 @@ namespace Ogre {
                 fixHighLevelOutput(mProgramString);
                 LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
                 mDelegate->setSource(mProgramString);
+                if (mSelectedCgProfile == CG_PROFILE_GLSLG)
+                {
+                    // need to determine and set input and output operations
+                    CGenum input = cgGetProgramInput(cgProgram);
+                    CGenum output = cgGetProgramOutput(cgProgram);
+                    mDelegate->setAdjacencyInfoRequired(false);
+                    if (input == CG_POINT)
+                    {
+                        mDelegate->setParameter("input_operation_type", "point_list");
+                    }
+                    else if (input == CG_LINE)
+                    {
+                        mDelegate->setParameter("input_operation_type", "line_strip");
+                    }
+                    else if (input == CG_LINE_ADJ)
+                    {
+                        mDelegate->setParameter("input_operation_type", "line_strip");
+                        mDelegate->setAdjacencyInfoRequired(true);
+                    }
+                    else if (input == CG_TRIANGLE)
+                    {
+                        mDelegate->setParameter("input_operation_type", "triangle_strip");
+                    }
+                    else if (input == CG_TRIANGLE_ADJ)
+                    {
+                        mDelegate->setParameter("input_operation_type", "triangle_strip");
+                        mDelegate->setAdjacencyInfoRequired(true);
+                    }
+
+                    if (output == CG_POINT_OUT)
+                        mDelegate->setParameter("output_operation_type", "point_list");
+                    else if (output == CG_LINE_OUT)
+                        mDelegate->setParameter("output_operation_type", "line_strip");
+                    else if (output == CG_TRIANGLE_OUT)
+                        mDelegate->setParameter("output_operation_type", "triangle_strip");
+                }
                 mDelegate->load();
             }
 
@@ -442,7 +478,7 @@ namespace Ogre {
 				vector<String>::type cols = StringUtil::split(line, ":");
 				if (cols.size() < 3)
 					continue;
-				vector<String>::type def = StringUtil::split(cols[0], " ");
+				vector<String>::type def = StringUtil::split(cols[0], "[ ");
 				if (def.size() < 3)
 					continue;
 				StringUtil::trim(cols[2]);
@@ -459,26 +495,29 @@ namespace Ogre {
 				if (it != mParametersMap.end())
 				{
 					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
-                    // determine if the param is a matrix type, in which case we need
-                    // to revert the declaration, too.
-                    if (it->second.constType == GCT_MATRIX_2X2)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[2]", "uniform mat2 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_3X3)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[3]", "uniform mat3 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_4X4)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[4]", "uniform mat4 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_2X3)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[2]", "uniform mat2x3 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_2X4)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[2]", "uniform mat2x4 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_3X2)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[3]", "uniform mat3x2 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_3X4)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[3]", "uniform mat3x4 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_4X2)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[4]", "uniform mat4x2 "+oldName);
-                    else if (it->second.constType == GCT_MATRIX_4X3)
-                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[4]", "uniform mat4x3 "+oldName);
+                    if (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG)
+                    {
+                        // determine if the param is a matrix type, in which case we need
+                        // to revert the declaration, too.
+                        if (it->second.constType == GCT_MATRIX_2X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[2]", "uniform mat2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[3]", "uniform mat3 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[4]", "uniform mat4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_2X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[2]", "uniform mat2x3 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_2X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[2]", "uniform mat2x4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[3]", "uniform mat3x2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[3]", "uniform mat3x4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[4]", "uniform mat4x2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[4]", "uniform mat4x3 "+oldName);
+                    }
 				}
 			}
 		}
