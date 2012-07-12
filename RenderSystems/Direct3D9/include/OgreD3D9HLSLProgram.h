@@ -94,6 +94,15 @@ namespace Ogre {
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
+
+		/// Command object for enabling backwards compatibility
+		class CmdBackwardsCompatibility : public ParamCommand
+		{
+		public:
+			String doGet(const void* target) const;
+			void doSet(void* target, const String& val);
+		};
+
     protected:
 
         static CmdEntryPoint msCmdEntryPoint;
@@ -103,6 +112,7 @@ namespace Ogre {
 		static CmdOptimisation msCmdOptimisation;
 		static CmdMicrocode msCmdMicrocode;
 		static CmdAssemblerCode msCmdAssemblerCode;
+        static CmdBackwardsCompatibility msCmdBackwardsCompatibility;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
@@ -123,6 +133,7 @@ namespace Ogre {
         String mEntryPoint;
         String mPreprocessorDefines;
         bool mColumnMajorMatrices;
+        bool mBackwardsCompatibility;
 
         LPD3DXBUFFER mMicroCode;
 
@@ -177,6 +188,10 @@ namespace Ogre {
         void setColumnMajorMatrices(bool columnMajor) { mColumnMajorMatrices = columnMajor; }
         /** Gets whether matrix packed in column-major order. */
         bool getColumnMajorMatrices(void) const { return mColumnMajorMatrices; }
+		/** Sets whether backwards compatibility mode should be enabled. */
+		void setBackwardsCompatibility(bool compat) { mBackwardsCompatibility = compat; }
+		/** Gets whether backwards compatibility mode should be enabled. */
+		bool getBackwardsCompatibility(void) const { return mBackwardsCompatibility; }
 		/** Sets the optimisation level to use.
 		@param opt Optimisation level
 		*/

@@ -39,6 +39,7 @@ namespace Ogre {
 	D3D9HLSLProgram::CmdOptimisation D3D9HLSLProgram::msCmdOptimisation;
 	D3D9HLSLProgram::CmdMicrocode D3D9HLSLProgram::msCmdMicrocode;
 	D3D9HLSLProgram::CmdAssemblerCode D3D9HLSLProgram::msCmdAssemblerCode;
+    D3D9HLSLProgram::CmdBackwardsCompatibility D3D9HLSLProgram::msCmdBackwardsCompatibility;
 
 	class _OgreD3D9Export HLSLIncludeHandler : public ID3DXInclude
 	{
@@ -220,6 +221,8 @@ namespace Ogre {
             compileFlags |= D3DXSHADER_PACKMATRIX_COLUMNMAJOR;
         else
             compileFlags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
+        if (mBackwardsCompatibility)
+            compileFlags |= D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY;
 
 #if OGRE_DEBUG_MODE
 		compileFlags |= D3DXSHADER_DEBUG;
@@ -643,6 +646,7 @@ namespace Ogre {
         , mEntryPoint()
         , mPreprocessorDefines()
         , mColumnMajorMatrices(true)
+        , mBackwardsCompatibility(false)
         , mMicroCode(NULL)
 		, mOptimisationLevel(OPT_DEFAULT)
 		, mParametersMapSizeAsBuffer(0)
@@ -673,6 +677,9 @@ namespace Ogre {
 			dict->addParameter(ParameterDef("assemble_code", 
 				"the assemble code.",
 				PT_STRING),&msCmdAssemblerCode);
+            dict->addParameter(ParameterDef("backwards_compatibility",
+                "Enable backwards compatibility mode.",
+                PT_BOOL),&msCmdBackwardsCompatibility);
         }
         
     }
@@ -758,6 +765,15 @@ namespace Ogre {
     void D3D9HLSLProgram::CmdColumnMajorMatrices::doSet(void *target, const String& val)
     {
         static_cast<D3D9HLSLProgram*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
+    }
+    //-----------------------------------------------------------------------
+    String D3D9HLSLProgram::CmdBackwardsCompatibility::doGet(const void *target) const
+    {
+        return StringConverter::toString(static_cast<const D3D9HLSLProgram*>(target)->getBackwardsCompatibility());
+    }
+    void D3D9HLSLProgram::CmdBackwardsCompatibility::doSet(void *target, const String& val)
+    {
+        static_cast<D3D9HLSLProgram*>(target)->setBackwardsCompatibility(StringConverter::parseBool(val));
     }
 	//-----------------------------------------------------------------------
 	String D3D9HLSLProgram::CmdOptimisation::doGet(const void *target) const
