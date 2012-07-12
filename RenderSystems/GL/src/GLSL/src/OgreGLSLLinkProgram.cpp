@@ -116,6 +116,7 @@ namespace Ogre {
 		, mUniformRefsBuilt(false)
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
+        , mColumnMajorMatrices(true)
 	{
 	}
 
@@ -132,6 +133,26 @@ namespace Ogre {
 		if (!mLinked && !mTriedToLinkAndFailed)
 		{			
 			glGetError(); //Clean up the error. Otherwise will flood log.
+
+            // test if all linked programs use the same matrix ordering
+            bool vertexOrder = true, fragmentOrder = true, geometryOrder = true;
+            if (mVertexProgram)
+                vertexOrder = mVertexProgram->getGLSLProgram()->getColumnMajorMatrices();
+            if (mFragmentProgram)
+                fragmentOrder = mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices();
+            if (mGeometryProgram)
+                geometryOrder = mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices();
+            if ((mVertexProgram && mFragmentProgram && vertexOrder != fragmentOrder) || 
+                (mVertexProgram && mGeometryProgram && vertexOrder != geometryOrder) ||
+                (mFragmentProgram && mGeometryProgram && fragmentOrder != geometryOrder))
+            {
+                mTriedToLinkAndFailed = true;
+                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                    "Trying to link GLSL programs with different matrix ordering.", 
+                    "GLSLLinkProgram::activate");
+            }
+            mColumnMajorMatrices = vertexOrder;
+
 			mGLHandle = glCreateProgramObjectARB();
 
             GLenum glErr = glGetError();
@@ -273,6 +294,7 @@ namespace Ogre {
 				{
 
 					GLsizei glArraySize = (GLsizei)def->arraySize;
+                    int transpose = mColumnMajorMatrices ? GL_TRUE : GL_FALSE;
 
 					// get the index in the parameter real list
 					switch (def->constType)
@@ -295,57 +317,57 @@ namespace Ogre {
 						break;
 					case GCT_MATRIX_2X2:
 						glUniformMatrix2fvARB(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+							transpose, params->getFloatPointer(def->physicalIndex));
 						break;
 					case GCT_MATRIX_2X3:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_2X4:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_3X2:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_3X3:
 						glUniformMatrix3fvARB(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+							transpose, params->getFloatPointer(def->physicalIndex));
 						break;
 					case GCT_MATRIX_3X4:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_4X2:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_4X3:
 						if (GLEW_VERSION_2_1)
 						{
 							glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
-								GL_TRUE, params->getFloatPointer(def->physicalIndex));
+								transpose, params->getFloatPointer(def->physicalIndex));
 						}
 						break;
 					case GCT_MATRIX_4X4:
 						glUniformMatrix4fvARB(currentUniform->mLocation, glArraySize, 
-							GL_TRUE, params->getFloatPointer(def->physicalIndex));
+							transpose, params->getFloatPointer(def->physicalIndex));
 						break;
 					case GCT_INT1:
 						glUniform1ivARB(currentUniform->mLocation, glArraySize, 

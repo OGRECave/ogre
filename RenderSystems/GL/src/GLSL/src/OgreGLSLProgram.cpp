@@ -45,6 +45,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	GLSLProgram::CmdPreprocessorDefines GLSLProgram::msCmdPreprocessorDefines;
     GLSLProgram::CmdAttach GLSLProgram::msCmdAttach;
+    GLSLProgram::CmdColumnMajorMatrices GLSLProgram::msCmdColumnMajorMatrices;
 	GLSLProgram::CmdInputOperationType GLSLProgram::msInputOperationTypeCmd;
 	GLSLProgram::CmdOutputOperationType GLSLProgram::msOutputOperationTypeCmd;
 	GLSLProgram::CmdMaxOutputVertices GLSLProgram::msMaxOutputVerticesCmd;
@@ -253,6 +254,7 @@ namespace Ogre {
 		, mInputOperationType(RenderOperation::OT_TRIANGLE_LIST)
         , mOutputOperationType(RenderOperation::OT_TRIANGLE_LIST)
 		, mMaxOutputVertices(3)
+        , mColumnMajorMatrices(true)
     {
 		// add parameter command "attach" to the material serializer dictionary
         if (createParamDictionary("GLSLProgram"))
@@ -266,6 +268,9 @@ namespace Ogre {
             dict->addParameter(ParameterDef("attach", 
                 "name of another GLSL program needed by this program",
                 PT_STRING),&msCmdAttach);
+            dict->addParameter(ParameterDef("column_major_matrices", 
+                "Whether matrix packing in column-major order.",
+                PT_BOOL),&msCmdColumnMajorMatrices);
 			dict->addParameter(
 				ParameterDef("input_operation_type",
 				"The input operation type for this geometry program. \
@@ -469,6 +474,15 @@ namespace Ogre {
 			break;
 		}
 	}
+    //-----------------------------------------------------------------------
+    String GLSLProgram::CmdColumnMajorMatrices::doGet(const void *target) const
+    {
+        return StringConverter::toString(static_cast<const GLSLProgram*>(target)->getColumnMajorMatrices());
+    }
+    void GLSLProgram::CmdColumnMajorMatrices::doSet(void *target, const String& val)
+    {
+        static_cast<GLSLProgram*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
+    }
 	//-----------------------------------------------------------------------
     String GLSLProgram::CmdInputOperationType::doGet(const void* target) const
     {

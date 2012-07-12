@@ -243,29 +243,29 @@ namespace Ogre {
         {
 			// get program string (result of cg compile)
 			mProgramString = cgGetProgramString(cgProgram, CG_COMPILED_PROGRAM);
+            checkForCgError("CgProgram::compileMicrocode",
+                "Unable to retrieve program code for Cg program " + mName + ": ", mCgContext);
+
+			// get params
+			mParametersMap.clear();
+			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
+			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
 
             if (!mDelegate.isNull())
             {
                 // Delegating to HLSL or GLSL
-                LogManager::getSingleton().getDefaultLog()->logMessage(mProgramString);
+                LogManager::getSingleton().getDefaultLog()->logMessage("Cg output for " + mName + ": \n" + mProgramString);
                 fixHighLevelOutput(mProgramString);
-                LogManager::getSingleton().getDefaultLog()->logMessage(mProgramString);
+                LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
                 mDelegate->setSource(mProgramString);
                 mDelegate->load();
-            }
-            else
-            {			
-			    // get params
-			    mParametersMap.clear();
-			    recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
-			    recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
             }
 
 			// Unload Cg Program - we don't need it anymore
 			cgDestroyProgram(cgProgram);
-			checkForCgError("CgProgram::unloadImpl", 
-				"Error while unloading Cg program " + mName + ": ", 
-				mCgContext);
+			//checkForCgError("CgProgram::unloadImpl", 
+			//	"Error while unloading Cg program " + mName + ": ", 
+			//	mCgContext);
 			cgProgram = 0;
 
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() && mDelegate.isNull())
@@ -430,17 +430,7 @@ namespace Ogre {
 		// translating to another high level language. We need to revert that,
 		// otherwise Ogre parameter mappings fail.
 
-		// first, get a list of all relevant parameters
-		set<String>::type params;
-		CGparameter param = cgGetFirstParameter(mCgProgram, CG_PROGRAM);
-		while (param)
-		{
-			String paramName (cgGetParameterName(param));
-			params.insert(paramName);
-			param = cgGetNextParameter(param);
-		}
-
-		// now, Cg logs its renamings in the comments at the beginning of the
+		// Cg logs its renamings in the comments at the beginning of the
 		// processed source file. Get them from there.
 		vector<String>::type lines = StringUtil::split(hlSource, "\n");
 		for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
@@ -465,9 +455,30 @@ namespace Ogre {
 					continue;
 
 				// if that name is present in our list, replace all occurences with original name
-				if (params.find(oldName) != params.end())
+                GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
+				if (it != mParametersMap.end())
 				{
 					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
+                    // determine if the param is a matrix type, in which case we need
+                    // to revert the declaration, too.
+                    if (it->second.constType == GCT_MATRIX_2X2)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[2]", "uniform mat2 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_3X3)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[3]", "uniform mat3 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_4X4)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[4]", "uniform mat4 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_2X3)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[2]", "uniform mat2x3 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_2X4)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[2]", "uniform mat2x4 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_3X2)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[3]", "uniform mat3x2 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_3X4)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[3]", "uniform mat3x4 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_4X2)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[4]", "uniform mat4x2 "+oldName);
+                    else if (it->second.constType == GCT_MATRIX_4X3)
+                        hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[4]", "uniform mat4x3 "+oldName);
 				}
 			}
 		}
@@ -919,32 +930,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool CgProgram::isSupported(void) const
     {
+        if (!mDelegate.isNull())
+            return mDelegate->isSupported();
+
         if (mCompileError || !isRequiredCapabilitiesSupported())
             return false;
 
-		StringVector::const_iterator i, iend;
-        iend = mProfiles.end();
-        // Check to see if any of the profiles are supported
-        for (i = mProfiles.begin(); i != iend; ++i)
-        {
-            if (GpuProgramManager::getSingleton().isSyntaxSupported(*i))
-            {
-                return true;
-            }
-        }
-        return false;
-
+		return mSelectedCgProfile != CG_PROFILE_UNKNOWN;
     }
     //-----------------------------------------------------------------------
     void CgProgram::setProfiles(const StringVector& profiles)
     {
-        mProfiles.clear();
-        StringVector::const_iterator i, iend;
-        iend = profiles.end();
-        for (i = profiles.begin(); i != iend; ++i)
-        {
-            mProfiles.push_back(*i);
-        }
+        mProfiles = profiles;
+        selectProfile();
     }
 	//-----------------------------------------------------------------------
 	String CgProgram::resolveCgIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)
