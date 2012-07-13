@@ -108,6 +108,8 @@ namespace Ogre {
 		
 		GpuConstantDefinitionMap mParametersMap;
 		size_t mParametersMapSizeAsBuffer;
+        map<String,int>::type mSamplerRegisterMap;
+        CGenum mInputOp, mOutputOp;
 		
         /// Internal method which works out which profile to use for this program
         void selectProfile(void);
@@ -125,8 +127,6 @@ namespace Ogre {
         String getHighLevelLanguage() const;
         String getHighLevelTarget() const;
         void fixHighLevelOutput(String& hlSource);
-		/// Find the assigned register for each uniform sampler and assign to delegate
-		void findSamplerRegisters(CGparameter param);
 
 
     public:

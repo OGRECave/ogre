@@ -167,6 +167,57 @@ namespace Ogre {
 		{
 			compileMicrocode();
 		}
+
+        if (!mDelegate.isNull())
+        {
+            mDelegate->setSource(mProgramString);
+            mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
+            if (mSelectedCgProfile == CG_PROFILE_GLSLG)
+            {
+                // need to set input and output operations
+                if (mInputOp == CG_POINT)
+                {
+                    mDelegate->setParameter("input_operation_type", "point_list");
+                }
+                else if (mInputOp == CG_LINE)
+                {
+                    mDelegate->setParameter("input_operation_type", "line_strip");
+                }
+                else if (mInputOp == CG_LINE_ADJ)
+                {
+                    mDelegate->setParameter("input_operation_type", "line_strip");
+                    mDelegate->setAdjacencyInfoRequired(true);
+                }
+                else if (mInputOp == CG_TRIANGLE)
+                {
+                    mDelegate->setParameter("input_operation_type", "triangle_strip");
+                }
+                else if (mInputOp == CG_TRIANGLE_ADJ)
+                {
+                    mDelegate->setParameter("input_operation_type", "triangle_strip");
+                    mDelegate->setAdjacencyInfoRequired(true);
+                }
+
+                if (mOutputOp == CG_POINT_OUT)
+                    mDelegate->setParameter("output_operation_type", "point_list");
+                else if (mOutputOp == CG_LINE_OUT)
+                    mDelegate->setParameter("output_operation_type", "line_strip");
+                else if (mOutputOp == CG_TRIANGLE_OUT)
+                    mDelegate->setParameter("output_operation_type", "triangle_strip");
+            }
+            if (getHighLevelLanguage() == "glsl")
+            {
+                // for GLSL, also ensure we explicitly bind samplers to their register
+                // otherwise, GLSL will assign them in the order first used, which is
+                // not what we want.
+                GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
+                for (map<String,int>::type::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
+                {
+                    params->setNamedConstant(i->first, i->second);
+                }
+            }
+            mDelegate->load();
+        }
 	}
     //-----------------------------------------------------------------------
     void CgProgram::getMicrocodeFromCache(void)
@@ -208,6 +259,28 @@ namespace Ogre {
 			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 		}
 
+        if (!mDelegate.isNull())
+        {
+            // get sampler register mapping
+            size_t samplerMapSize = 0;
+            cacheMicrocode->read(&samplerMapSize, sizeof(size_t));
+            for (size_t i = 0; i < samplerMapSize; ++i)
+            {
+                String paramName;
+                size_t stringSize = 0;
+                int reg = -1;
+
+                cacheMicrocode->read(&stringSize, sizeof(size_t));
+                paramName.resize(stringSize);
+                cacheMicrocode->read(&paramName[0], stringSize);
+                cacheMicrocode->read(&reg, sizeof(int));
+            }
+
+            // get input/output operations type
+            cacheMicrocode->read(&mInputOp, sizeof(CGenum));
+            cacheMicrocode->read(&mOutputOp, sizeof(CGenum));
+        }
+
 	}
     //-----------------------------------------------------------------------
     void CgProgram::compileMicrocode(void)
@@ -248,61 +321,22 @@ namespace Ogre {
 
 			// get params
 			mParametersMap.clear();
+            mSamplerRegisterMap.clear();
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
 
             if (!mDelegate.isNull())
             {
-                // Delegating to HLSL or GLSL
+                // Delegating to HLSL or GLSL, need to clean up Cg's output
                 LogManager::getSingleton().getDefaultLog()->logMessage("Cg output for " + mName + ": \n" + mProgramString);
                 fixHighLevelOutput(mProgramString);
                 LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
-                mDelegate->setSource(mProgramString);
-                if (getHighLevelLanguage() == "glsl")
-                {
-                    // figure out all samplers and their assigned order
-                    // otherwise GLSL will assign them in the order they are used,
-                    // even if register(sX) was used in the Cg source.
-                    findSamplerRegisters(cgGetFirstParameter(cgProgram, CG_PROGRAM));
-                    findSamplerRegisters(cgGetFirstParameter(cgProgram, CG_GLOBAL));
-                }
                 if (mSelectedCgProfile == CG_PROFILE_GLSLG)
                 {
-                    // need to determine and set input and output operations
-                    CGenum input = cgGetProgramInput(cgProgram);
-                    CGenum output = cgGetProgramOutput(cgProgram);
-                    mDelegate->setAdjacencyInfoRequired(false);
-                    if (input == CG_POINT)
-                    {
-                        mDelegate->setParameter("input_operation_type", "point_list");
-                    }
-                    else if (input == CG_LINE)
-                    {
-                        mDelegate->setParameter("input_operation_type", "line_strip");
-                    }
-                    else if (input == CG_LINE_ADJ)
-                    {
-                        mDelegate->setParameter("input_operation_type", "line_strip");
-                        mDelegate->setAdjacencyInfoRequired(true);
-                    }
-                    else if (input == CG_TRIANGLE)
-                    {
-                        mDelegate->setParameter("input_operation_type", "triangle_strip");
-                    }
-                    else if (input == CG_TRIANGLE_ADJ)
-                    {
-                        mDelegate->setParameter("input_operation_type", "triangle_strip");
-                        mDelegate->setAdjacencyInfoRequired(true);
-                    }
-
-                    if (output == CG_POINT_OUT)
-                        mDelegate->setParameter("output_operation_type", "point_list");
-                    else if (output == CG_LINE_OUT)
-                        mDelegate->setParameter("output_operation_type", "line_strip");
-                    else if (output == CG_TRIANGLE_OUT)
-                        mDelegate->setParameter("output_operation_type", "triangle_strip");
+                    // need to determine input and output operations
+                    mInputOp = cgGetProgramInput(cgProgram);
+                    mOutputOp = cgGetProgramOutput(cgProgram);
                 }
-                mDelegate->load();
             }
 
 			// Unload Cg Program - we don't need it anymore
@@ -312,7 +346,7 @@ namespace Ogre {
 			//	mCgContext);
 			cgProgram = 0;
 
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() && mDelegate.isNull())
+            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
 			{
 				addMicrocodeToCache();
 			}
@@ -364,6 +398,31 @@ namespace Ogre {
 			// save def
 			newMicrocode->write(&def, sizeof(GpuConstantDefinition));
 		}
+
+        if (!mDelegate.isNull())
+        {
+            // save additional info required for delegating
+            size_t samplerMapSize = mSamplerRegisterMap.size();
+            newMicrocode->write(&samplerMapSize, sizeof(size_t));
+
+            // save sampler register mapping
+            map<String,int>::type::const_iterator iter = mSamplerRegisterMap.begin();
+            map<String,int>::type::const_iterator iterE = mSamplerRegisterMap.end();
+            for (; iter != iterE; ++iter)
+            {
+                const String& paramName = iter->first;
+                int reg = iter->second;
+
+                size_t stringSize = paramName.size();
+                newMicrocode->write(&stringSize, sizeof(size_t));
+                newMicrocode->write(paramName.data(), stringSize);
+                newMicrocode->write(&reg, sizeof(int));
+            }
+
+            // save input/output operations type
+            newMicrocode->write(&mInputOp, sizeof(CGenum));
+            newMicrocode->write(&mOutputOp, sizeof(CGenum));
+        }
 
 		// add to the microcode to the cache
 		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
@@ -473,10 +532,18 @@ namespace Ogre {
 		// for some unknown reason Cg chooses to change parameter names when
 		// translating to another high level language. We need to revert that,
 		// otherwise Ogre parameter mappings fail.
-
 		// Cg logs its renamings in the comments at the beginning of the
-		// processed source file. Get them from there.
+		// processed source file. We can get them from there.
+        // We'll also get rid of those comments to trim down source code size.
 		vector<String>::type lines = StringUtil::split(hlSource, "\n");
+        hlSource.clear();
+        for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
+        {
+            String& line = *i;
+            if (line.substr(0,2) != "//")
+                hlSource.append(line+'\n');
+        }
+
 		for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
 		{
 			String& line = *i;
@@ -498,9 +565,9 @@ namespace Ogre {
 				if (newName.empty() || newName[0] != '_')
 					continue;
 
-				// if that name is present in our list, replace all occurences with original name
+				// if that name is present in our lists, replace all occurences with original name
                 GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
-				if (it != mParametersMap.end() || def[1].substr(0,7) == "sampler")
+				if (it != mParametersMap.end() || mSamplerRegisterMap.find(oldName) != mSamplerRegisterMap.end())
 				{
 					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
                     if (it != mParametersMap.end() && (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG))
@@ -717,7 +784,7 @@ namespace Ogre {
 	{
 		while (parameter != 0)
         {
-            // Look for uniform (non-sampler) parameters only
+            // Look for uniform parameters only
             // Don't bother enumerating unused parameters, especially since they will
             // be optimised out and therefore not in the indexed versions
             CGtype paramType = cgGetParameterType(parameter);
@@ -838,21 +905,9 @@ namespace Ogre {
 					break;
 				}					
             }
-            // Get next
-            parameter = cgGetNextParameter(parameter);
-        }
 
-        
-    }
-	//---------------------------------------------------------------------
-	void CgProgram::findSamplerRegisters(CGparameter parameter)
-	{
-        GpuProgramParametersSharedPtr delegateParams = mDelegate->getDefaultParameters();
-		while (parameter != 0)
-        {
-            // Look for uniform sampler parameters only
-            CGtype paramType = cgGetParameterType(parameter);
-
+            // now handle uniform samplers. This is needed to fix their register positions
+            // if delegating to a GLSL shader.
             if (cgGetParameterVariability(parameter) == CG_UNIFORM && (
                 paramType == CG_SAMPLER1D ||
                 paramType == CG_SAMPLER2D ||
@@ -902,9 +957,10 @@ namespace Ogre {
                 }
                 if (pos != -1)
                 {
-                    delegateParams->setNamedConstant(paramName, pos);
+                    mSamplerRegisterMap.insert(std::make_pair(paramName, pos));
                 }
             }
+
             // Get next
             parameter = cgGetNextParameter(parameter);
         }
