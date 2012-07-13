@@ -22,6 +22,7 @@ SamplePlugin=Sample_ParticleGS_d
 SamplePlugin=Sample_ParticleFX_d
 SamplePlugin=Sample_ShaderSystem_d
 SamplePlugin=Sample_ShaderSystemMultiLight_d
+SamplePlugin=Sample_ShaderSystemTexturedFog_d
 SamplePlugin=Sample_Shadows_d
 SamplePlugin=Sample_SkeletalAnimation_d
 SamplePlugin=Sample_SkyBox_d
