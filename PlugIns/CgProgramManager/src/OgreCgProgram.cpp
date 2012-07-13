@@ -258,6 +258,14 @@ namespace Ogre {
                 fixHighLevelOutput(mProgramString);
                 LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
                 mDelegate->setSource(mProgramString);
+                if (getHighLevelLanguage() == "glsl")
+                {
+                    // figure out all samplers and their assigned order
+                    // otherwise GLSL will assign them in the order they are used,
+                    // even if register(sX) was used in the Cg source.
+                    findSamplerRegisters(cgGetFirstParameter(cgProgram, CG_PROGRAM));
+                    findSamplerRegisters(cgGetFirstParameter(cgProgram, CG_GLOBAL));
+                }
                 if (mSelectedCgProfile == CG_PROFILE_GLSLG)
                 {
                     // need to determine and set input and output operations
@@ -492,10 +500,10 @@ namespace Ogre {
 
 				// if that name is present in our list, replace all occurences with original name
                 GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
-				if (it != mParametersMap.end())
+				if (it != mParametersMap.end() || def[1].substr(0,7) == "sampler")
 				{
 					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
-                    if (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG)
+                    if (it != mParametersMap.end() && (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG))
                     {
                         // determine if the param is a matrix type, in which case we need
                         // to revert the declaration, too.
@@ -829,6 +837,73 @@ namespace Ogre {
 
 					break;
 				}					
+            }
+            // Get next
+            parameter = cgGetNextParameter(parameter);
+        }
+
+        
+    }
+	//---------------------------------------------------------------------
+	void CgProgram::findSamplerRegisters(CGparameter parameter)
+	{
+        GpuProgramParametersSharedPtr delegateParams = mDelegate->getDefaultParameters();
+		while (parameter != 0)
+        {
+            // Look for uniform sampler parameters only
+            CGtype paramType = cgGetParameterType(parameter);
+
+            if (cgGetParameterVariability(parameter) == CG_UNIFORM && (
+                paramType == CG_SAMPLER1D ||
+                paramType == CG_SAMPLER2D ||
+                paramType == CG_SAMPLER3D ||
+                paramType == CG_SAMPLERCUBE ||
+                paramType == CG_SAMPLERRECT) &&
+                cgGetParameterDirection(parameter) != CG_OUT && 
+                cgIsParameterReferenced(parameter))
+            {
+                String paramName = cgGetParameterName(parameter);
+                CGresource res = cgGetParameterResource(parameter);
+                int pos = -1;
+                switch (res)
+                {
+                case CG_TEXUNIT0: pos = 0; break;
+                case CG_TEXUNIT1: pos = 1; break;
+                case CG_TEXUNIT2: pos = 2; break;
+                case CG_TEXUNIT3: pos = 3; break;
+                case CG_TEXUNIT4: pos = 4; break;
+                case CG_TEXUNIT5: pos = 5; break;
+                case CG_TEXUNIT6: pos = 6; break;
+                case CG_TEXUNIT7: pos = 7; break;
+                case CG_TEXUNIT8: pos = 8; break;
+                case CG_TEXUNIT9: pos = 9; break;
+                case CG_TEXUNIT10: pos = 10; break;
+                case CG_TEXUNIT11: pos = 11; break;
+                case CG_TEXUNIT12: pos = 12; break;
+                case CG_TEXUNIT13: pos = 13; break;
+                case CG_TEXUNIT14: pos = 14; break;
+                case CG_TEXUNIT15: pos = 15; break;
+                case CG_TEXUNIT16: pos = 16; break;
+                case CG_TEXUNIT17: pos = 17; break;
+                case CG_TEXUNIT18: pos = 18; break;
+                case CG_TEXUNIT19: pos = 19; break;
+                case CG_TEXUNIT20: pos = 20; break;
+                case CG_TEXUNIT21: pos = 21; break;
+                case CG_TEXUNIT22: pos = 22; break;
+                case CG_TEXUNIT23: pos = 23; break;
+                case CG_TEXUNIT24: pos = 24; break;
+                case CG_TEXUNIT25: pos = 25; break;
+                case CG_TEXUNIT26: pos = 26; break;
+                case CG_TEXUNIT27: pos = 27; break;
+                case CG_TEXUNIT28: pos = 28; break;
+                case CG_TEXUNIT29: pos = 29; break;
+                case CG_TEXUNIT30: pos = 30; break;
+                case CG_TEXUNIT31: pos = 31; break;
+                }
+                if (pos != -1)
+                {
+                    delegateParams->setNamedConstant(paramName, pos);
+                }
             }
             // Get next
             parameter = cgGetNextParameter(parameter);

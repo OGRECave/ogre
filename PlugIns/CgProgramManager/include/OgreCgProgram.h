@@ -125,6 +125,9 @@ namespace Ogre {
         String getHighLevelLanguage() const;
         String getHighLevelTarget() const;
         void fixHighLevelOutput(String& hlSource);
+		/// Find the assigned register for each uniform sampler and assign to delegate
+		void findSamplerRegisters(CGparameter param);
+
 
     public:
         CgProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
