@@ -58,10 +58,10 @@ public:
 	};
 
 	/** Get the name of this function */
-	const String&				getName					() const { return mName; }
+	const String& getName() const { return mName; }
 
 	/** Get the description of this function */
-	const String&				getDescription			() const { return mDescription; }
+	const String& getDescription() const { return mDescription; }
 
 	/** Resolve input parameter of this function
 	@param semantic The desired parameter semantic.
@@ -71,7 +71,7 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	ParameterPtr				resolveInputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+	ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 
 	/** Resolve output parameter of this function
@@ -82,7 +82,7 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
 	*/
-	ParameterPtr				resolveOutputParameter	(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+	ParameterPtr resolveOutputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
 	@param semantic The desired parameter semantic.	
@@ -91,7 +91,7 @@ public:
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	ParameterPtr				resolveLocalParameter	(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
+	ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const String& name, GpuConstantType type);
 
 	/** Resolve local parameter of this function	
 	@param semantic The desired parameter semantic.	
@@ -100,7 +100,7 @@ public:
 	@param type The type of the desired parameter.	
 	Return parameter instance in case of that resolve operation succeeded.
 	*/
-	ParameterPtr				resolveLocalParameter	(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
+	ParameterPtr resolveLocalParameter(Parameter::Semantic semantic, int index, const Parameter::Content content, GpuConstantType type);
 	
 
 	/** 
@@ -109,7 +109,7 @@ public:
 	@param name The name of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	static ParameterPtr				getParameterByName		(const ShaderParameterList& parameterList, const String& name);
+	static ParameterPtr getParameterByName(const ShaderParameterList& parameterList, const String& name);
 
 	/** 
 	Get parameter by a given semantic and index from the given parameter list.
@@ -118,7 +118,7 @@ public:
 	@param index The index of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	static ParameterPtr				getParameterBySemantic	(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
+	static ParameterPtr getParameterBySemantic(const ShaderParameterList& parameterList, const Parameter::Semantic semantic, int index);
 
 
 	/** 
@@ -128,53 +128,53 @@ public:
 	@param type The type of the parameter to search in the list.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	ParameterPtr					getParameterByContent	(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+	ParameterPtr getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
 
 	/** Return a list of input parameters. */
-	const ShaderParameterList&		getInputParameters		() const { return mInputParameters; }	
+	const ShaderParameterList& getInputParameters() const { return mInputParameters; }	
 
 	/** Return a list of output parameters. */
-	const ShaderParameterList&		getOutputParameters		() const { return mOutputParameters; }
+	const ShaderParameterList& getOutputParameters() const { return mOutputParameters; }
 
 	/** Return a list of local parameters. */
-	const ShaderParameterList&		getLocalParameters		() const { return mLocalParameters; }	
+	const ShaderParameterList& getLocalParameters() const { return mLocalParameters; }	
 	
 	/** Add a function atom instance to this function. 
 	@param atomInstance The atom instance to add.
 	*/
-	void							addAtomInstance			(FunctionAtom* atomInstance);
+	void addAtomInstance(FunctionAtom* atomInstance);
 
 	/** Delete a function atom instance from this function. 
 	@param atomInstance The atom instance to OGRE_DELETE.
 	*/
-	bool							deleteAtomInstance		(FunctionAtom* atomInstance);
+	bool deleteAtomInstance(FunctionAtom* atomInstance);
 
 	/** Sort all atom instances of this function. */
-	void							sortAtomInstances		();
+	void sortAtomInstances();
 
 	/** Return list of atom instances composing this function. */
-	FunctionAtomInstanceList&		getAtomInstances		() { return mAtomInstances; }
+	FunctionAtomInstanceList& getAtomInstances() { return mAtomInstances; }
 
 	/** Return list of atom instances composing this function. (Const version) */
-	const FunctionAtomInstanceList&	getAtomInstances		() const { return mAtomInstances; }
+	const FunctionAtomInstanceList& getAtomInstances() const { return mAtomInstances; }
 
 	/** Add input parameter to this function. */
-	void						addInputParameter			(ParameterPtr parameter);
+	void addInputParameter(ParameterPtr parameter);
 
 	/** Add output parameter to this function. */
-	void						addOutputParameter			(ParameterPtr parameter);
+	void addOutputParameter(ParameterPtr parameter);
 
 	/** Delete input parameter from this function. */
-	void						deleteInputParameter		(ParameterPtr parameter);
+	void deleteInputParameter(ParameterPtr parameter);
 
 	/** Delete output parameter from this function. */
-	void						deleteOutputParameter		(ParameterPtr parameter);
+	void deleteOutputParameter(ParameterPtr parameter);
 
 	/** Delete all input parameters from this function. */
-	void						deleteAllInputParameters	();
+	void deleteAllInputParameters();
 
 	/** Delete all output parameters from this function. */
-	void						deleteAllOutputParameters	();
+	void deleteAllOutputParameters();
 
 	/** get function type. */
 	FunctionType getFunctionType() const;
@@ -187,28 +187,35 @@ protected:
 	@param desc The description of this function.
 	@remarks This class is allocated via an instance of Program class. 
 	*/
-	Function			(const String& name, const String& desc, const FunctionType functionType);
+	Function(const String& name, const String& desc, const FunctionType functionType);
 
 	/** Class destructor */
-	~Function			();
+	~Function();
 
 	/** Add parameter to given list */
-	void						addParameter				(ShaderParameterList& parameterList, ParameterPtr parameter);
+	void addParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
 	/** Delete parameter from a given list */
-	void						deleteParameter				(ShaderParameterList& parameterList, ParameterPtr parameter);
+	void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
 
 	/** Function atom comparison function used to sort atoms. */
-	static int					sAtomInstanceCompare		(const void * p0, const void *p1);
+	static int sAtomInstanceCompare(const void * p0, const void *p1);
 
 protected:
-	String						mName;						// Function name.
-	String						mDescription;				// Function description.
-	ShaderParameterList			mInputParameters;			// Input parameters.
-	ShaderParameterList			mOutputParameters;			// Output parameters.
-	ShaderParameterList			mLocalParameters;			// Local parameters.
-	FunctionAtomInstanceList	mAtomInstances;				// Atom instances composing this function.
-	FunctionType				mFunctionType;				// Function type
+	// Function name.
+	String mName;
+	// Function description.
+	String mDescription;
+	// Input parameters.
+	ShaderParameterList mInputParameters;
+	// Output parameters.
+	ShaderParameterList mOutputParameters;
+	// Local parameters.
+	ShaderParameterList mLocalParameters;
+	// Atom instances composing this function.
+	FunctionAtomInstanceList mAtomInstances;
+	// Function type
+	FunctionType mFunctionType;
 	
 private:
 	friend class Program;

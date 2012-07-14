@@ -60,20 +60,20 @@ public:
 	virtual ~RenderState();
 
 	/** Reset this render state */
-	void		reset						();
+	void reset();
 
 	/** Add a template sub render state to this render state.
 	@param subRenderState The sub render state template to add.
 	*/
-	void		addTemplateSubRenderState	(SubRenderState* subRenderState);
+	void addTemplateSubRenderState(SubRenderState* subRenderState);
 
 	/** Remove a template sub render state from this render state.
 	@param subRenderState The sub render state to remove.
 	*/
-	void		removeTemplateSubRenderState (SubRenderState* subRenderState);
+	void removeTemplateSubRenderState(SubRenderState* subRenderState);
 
 	/** Get the list of the template sub render states composing this render state. */
-	const SubRenderStateList&	getTemplateSubRenderStateList() const { return mSubRenderStateList; }
+	const SubRenderStateList& getTemplateSubRenderStateList() const { return mSubRenderStateList; }
 
 	/** 
 	Set the light count per light type.
@@ -83,7 +83,7 @@ public:
 	lightCount[1] defines the directional light count.
 	lightCount[2] defines the spot light count.
 	*/
-	void			setLightCount			(const int lightCount[3]);
+	void setLightCount(const int lightCount[3]);
 
 	/** 
 	Get the light count per light type.
@@ -93,7 +93,7 @@ public:
 	lightCount[1] defines the directional light count.
 	lightCount[2] defines the spot light count.
 	*/
-	void			getLightCount			(int lightCount[3]) const;
+	void getLightCount(int lightCount[3]) const;
 
 	/** 
 	Set the light count auto update state.
@@ -101,22 +101,25 @@ public:
 	If the value is true the light count will be updated from the owner shader generator scheme based on current scene lights.
 	The default is true.
 	*/
-	void			setLightCountAutoUpdate	(bool autoUpdate) { mLightCountAutoUpdate = autoUpdate; }
+	void setLightCountAutoUpdate(bool autoUpdate) { mLightCountAutoUpdate = autoUpdate; }
 
 	/** 
 	Return true if this render state override the light count. 
 	If light count is not overridden it will be updated from the shader generator based on current scene lights.
 	*/
-	bool			getLightCountAutoUpdate	() const { return mLightCountAutoUpdate; }
+	bool getLightCountAutoUpdate() const { return mLightCountAutoUpdate; }
 
 	
 
 
 	// Attributes.
 protected:
-	SubRenderStateList	mSubRenderStateList;			// The sub render states list.	
-	int					mLightCount[3];					// The light count per light type definition.
-	bool				mLightCountAutoUpdate;			// True if light count was explicitly set.
+	// The sub render states list.	
+	SubRenderStateList mSubRenderStateList;
+	// The light count per light type definition.
+	int mLightCount[3];
+	// True if light count was explicitly set.
+	bool mLightCountAutoUpdate;
 
 private:
 	friend class ProgramManager;
@@ -151,7 +154,7 @@ public:
 	@param srcPass The source pass that this render state is constructed from.
 	@param dstPass The destination pass that constructed from this render state.
 	*/
-	void		link				(const RenderState& other, Pass* srcPass, Pass* dstPass);
+	void link(const RenderState& other, Pass* srcPass, Pass* dstPass);
 
 	/** Update the GPU programs constant parameters before a renderable is rendered.
 	@param rend The renderable object that is going to be rendered.
@@ -159,48 +162,50 @@ public:
 	@param source The auto parameter auto source instance.
 	@param pLightList The light list used for the current rendering operation.
 	*/
-	void	updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 	
 // Protected methods
 protected:
 
 	/** Sort the sub render states composing this render state. */
-	void			sortSubRenderStates		();
+	void sortSubRenderStates();
 
 	/** Comparison function of the sub render states. */
-	static int		sSubRenderStateCompare	(const void * p0, const void *p1);
+	static int sSubRenderStateCompare(const void * p0, const void *p1);
 
 	
 	/** Create CPU programs that represent this render state. 	
 	*/
-	bool		createCpuPrograms		();
+	bool createCpuPrograms();
 
 	/** Create the program set of this render state.
 	*/
-	ProgramSet*	createProgramSet			();
+	ProgramSet* createProgramSet();
 
 	/* Destroy the program set of this render state. */
-	void		destroyProgramSet			();
+	void destroyProgramSet();
 
 	/** Return the program set of this render state.
 	*/
-	ProgramSet*	getProgramSet				() { return mProgramSet; }
+	ProgramSet* getProgramSet() { return mProgramSet; }
 
 	/** Add sub render state to this render state.
 	@param subRenderState The sub render state to add.
 	*/
-	void		addSubRenderStateInstance			(SubRenderState* subRenderState);
+	void addSubRenderStateInstance(SubRenderState* subRenderState);
 
 	/** Remove sub render state from this render state.
 	@param subRenderState The sub render state to remove.
 	*/
-	void		removeSubRenderStateInstance		(SubRenderState* subRenderState);
+	void removeSubRenderStateInstance(SubRenderState* subRenderState);
 
 	
 // Attributes.
 protected:
-	bool				mSubRenderStateSortValid;		// Tells if the list of the sub render states is sorted.
-	ProgramSet*			mProgramSet;					// The program set of this RenderState.
+	// Tells if the list of the sub render states is sorted.
+	bool mSubRenderStateSortValid;
+	// The program set of this RenderState.
+	ProgramSet* mProgramSet;
 	
 
 private:

@@ -63,27 +63,27 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	static String Type;
 
@@ -93,19 +93,32 @@ protected:
 	// Per texture unit parameters.
 	struct _OgreRTSSExport TextureUnitParams
 	{
-		TextureUnitState*		mTextureUnitState;				// Texture unit state.
-		const Frustum*			mTextureProjector;				// Texture projector.
-		unsigned short			mTextureSamplerIndex;			// Texture sampler index.
-		GpuConstantType			mTextureSamplerType;			// Texture sampler index.
-		GpuConstantType			mVSInTextureCoordinateType;		// Vertex shader input texture coordinate type.
-		GpuConstantType			mVSOutTextureCoordinateType;	// Vertex shader output texture coordinates type.		
-		TexCoordCalcMethod		mTexCoordCalcMethod;			// Texture coordinates calculation method.
-		UniformParameterPtr		mTextureMatrix;					// Texture matrix parameter.
-		UniformParameterPtr		mTextureViewProjImageMatrix;	// Texture View Projection Image space matrix parameter.
-		UniformParameterPtr		mTextureSampler;				// Texture sampler parameter.
-		ParameterPtr			mVSInputTexCoord;				// Vertex shader input texture coordinates parameter.
-		ParameterPtr			mVSOutputTexCoord;				// Vertex shader output texture coordinates parameter.
-		ParameterPtr			mPSInputTexCoord;				// Pixel shader input texture coordinates parameter.
+		// Texture unit state.
+		TextureUnitState* mTextureUnitState;
+		// Texture projector.
+		const Frustum* mTextureProjector;
+		// Texture sampler index.
+		unsigned short mTextureSamplerIndex;
+		// Texture sampler index.
+		GpuConstantType mTextureSamplerType;
+		// Vertex shader input texture coordinate type.
+		GpuConstantType mVSInTextureCoordinateType;
+		// Vertex shader output texture coordinates type.		
+		GpuConstantType mVSOutTextureCoordinateType;
+		// Texture coordinates calculation method.
+		TexCoordCalcMethod mTexCoordCalcMethod;
+		// Texture matrix parameter.
+		UniformParameterPtr mTextureMatrix;
+		// Texture View Projection Image space matrix parameter.
+		UniformParameterPtr mTextureViewProjImageMatrix;
+		// Texture sampler parameter.
+		UniformParameterPtr mTextureSampler;
+		// Vertex shader input texture coordinates parameter.
+		ParameterPtr mVSInputTexCoord;
+		// Vertex shader output texture coordinates parameter.
+		ParameterPtr mVSOutputTexCoord;
+		// Pixel shader input texture coordinates parameter.
+		ParameterPtr mPSInputTexCoord;
 	};
 
 	typedef vector<TextureUnitParams>::type			TextureUnitParamsList;
@@ -119,92 +132,79 @@ protected:
 	Set the number of texture units this texturing sub state has to handle.
 	@param count The number of texture unit states.
 	*/
-	void					setTextureUnitCount		(size_t count);
+	void setTextureUnitCount(size_t count);
 
 	/** 
 	Return the number of texture units this sub state handle. 
 	*/
-	size_t					getTextureUnitCount		() const { return mTextureUnitParamsList.size(); }
+	size_t getTextureUnitCount() const { return mTextureUnitParamsList.size(); }
 
 	/** 
 	Set texture unit of a given stage index.
 	@param index The stage index of the given texture unit state.
 	@param textureUnitState The texture unit state to bound the the stage index.
 	*/
-	void					setTextureUnit			(unsigned short index, TextureUnitState* textureUnitState);
+	void setTextureUnit(unsigned short index, TextureUnitState* textureUnitState);
 
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);
 
 	/** 
 	Internal method that resolves uniform parameters of the given texture unit parameters.
 	*/
-			bool			resolveUniformParams	(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
+	bool resolveUniformParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
 
 	/** 
 	Internal method that resolves functions parameters of the given texture unit parameters.
 	*/
-			bool			resolveFunctionsParams	(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
+	bool resolveFunctionsParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 
 	/** 
 	Internal method that adds vertex shader functions invocations.
 	*/
-	bool					addVSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* vsMain);
+	bool addVSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* vsMain);
 
 	/** 
 	Internal method that adds pixel shader functions invocations.
 	*/
-	bool					addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
+	bool addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
 
 	/** 
 	Adds the fragment shader code which samples the texel color in the texture
 	*/
-	virtual void					addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
+	virtual void addPSSampleTexelInvocation(TextureUnitParams* textureUnitParams, Function* psMain, 
 		const ParameterPtr& texel, int groupOrder, int& internalCounter);
 
-	virtual void					addPSArgumentInvocations(Function* psMain, 
-													 ParameterPtr arg,
-													 ParameterPtr texel,
-													 int samplerIndex,
-													 LayerBlendSource blendSrc,
-													 const ColourValue& colourValue,
-													 Real alphaValue,
-													 bool isAlphaArgument,
-													 const int groupOrder, 
-													 int& internalCounter);
+	virtual void addPSArgumentInvocations(Function* psMain, ParameterPtr arg, ParameterPtr texel,
+				int samplerIndex, LayerBlendSource blendSrc, const ColourValue& colourValue, Real alphaValue,
+				 bool isAlphaArgument, const int groupOrder, int& internalCounter);
 
-	virtual void					addPSBlendInvocations(Function* psMain, 
-												ParameterPtr arg1,
-												ParameterPtr arg2,
-												ParameterPtr texel,
-												int samplerIndex,
-												const LayerBlendModeEx& blendMode,
-												const int groupOrder, 
-												int& internalCounter,
-												int targetChannels);
+	virtual void addPSBlendInvocations(Function* psMain, ParameterPtr arg1,	ParameterPtr arg2,
+				ParameterPtr texel,int samplerIndex, const LayerBlendModeEx& blendMode,
+				const int groupOrder, int& internalCounter, int targetChannels);
 	
 	/** 
 	Determines the texture coordinates calculation method of the given texture unit state.
 	*/
-	TexCoordCalcMethod		getTexCalcMethod		(TextureUnitState* textureUnitState);
+	TexCoordCalcMethod getTexCalcMethod(TextureUnitState* textureUnitState);
 
 	/** 
 	Determines if the given texture unit state need to use texture transformation matrix..
 	*/
-	bool					needsTextureMatrix		(TextureUnitState* textureUnitState);
+	bool needsTextureMatrix(TextureUnitState* textureUnitState);
 
 	/** 
 	Determines whether a given texture unit needs to be processed by this srs
@@ -214,15 +214,24 @@ protected:
 
 // Attributes.
 protected:
-	TextureUnitParamsList	mTextureUnitParamsList;		// Texture units list. 		
-	UniformParameterPtr		mWorldMatrix;				// World matrix parameter.
-	UniformParameterPtr		mWorldITMatrix;				// World inverse transpose matrix parameter.
-	UniformParameterPtr		mViewMatrix;				// View matrix parameter.			
-	ParameterPtr			mVSInputNormal;				// Vertex shader input normal parameter.
-	ParameterPtr  			mVSInputPos;				// Vertex shader input position parameter.		
-	ParameterPtr			mPSOutDiffuse;				// Pixel shader output colour.
-	ParameterPtr			mPSDiffuse;					// Pixel shader diffuse colour.
-	ParameterPtr			mPSSpecular;				// Pixel shader specular colour.
+	// Texture units list. 		
+	TextureUnitParamsList mTextureUnitParamsList;
+	// World matrix parameter.
+	UniformParameterPtr mWorldMatrix;
+	// World inverse transpose matrix parameter.
+	UniformParameterPtr mWorldITMatrix;
+	// View matrix parameter.			
+	UniformParameterPtr mViewMatrix;
+	// Vertex shader input normal parameter.
+	ParameterPtr mVSInputNormal;
+	// Vertex shader input position parameter.		
+	ParameterPtr mVSInputPos;
+	// Pixel shader output colour.
+	ParameterPtr mPSOutDiffuse;
+	// Pixel shader diffuse colour.
+	ParameterPtr mPSDiffuse;
+	// Pixel shader specular colour.
+	ParameterPtr mPSSpecular;
 };
 
 
@@ -237,17 +246,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:
@@ -255,7 +264,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };

@@ -50,21 +50,21 @@ public:
 	/** Class constructor. 
 	@param language The target shader language.
 	*/
-	GLSLProgramWriter	();
+	GLSLProgramWriter();
 
 	/** Class destructor */
-	virtual ~GLSLProgramWriter	();
+	virtual ~GLSLProgramWriter();
 
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
-	virtual void			writeSourceCode			(std::ostream& os, Program* program);
+	virtual void writeSourceCode(std::ostream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
 	*/
-	virtual const String&  getTargetLanguage			() const { return TargetLanguage; }
+	virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
 	static String TargetLanguage;
 
@@ -73,35 +73,41 @@ public:
 protected:
 
 	/** Initialize string maps. */
-	void				initializeStringMaps		();
+	void initializeStringMaps();
 
 	/** Write a local parameter. */
-	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
 	/** Write forward declarations. This is needed so that we can attach library shader at a later step. */
-	void				writeForwardDeclarations	(std::ostream& os, Program* program);
+	void writeForwardDeclarations(std::ostream& os, Program* program);
 
 	/** Write the input params of the function */
-	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
+	void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 	
 	/** Write the output params of the function */
-	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
+	void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 protected:
-	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
-	typedef		std::map<Parameter::Content, const char*>	ParamContentToStringMap;
-	typedef		std::map<String, String>					StringMap;
+	typedef	std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
+	typedef	std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
+	typedef	std::map<Parameter::Content, const char*>	ParamContentToStringMap;
+	typedef	std::map<String, String>					StringMap;
 
 	// Attributes.
 protected:
-	GpuConstTypeToStringMap		mGpuConstTypeMap;				// Map between GPU constant type to string value.
-	ParamSemanticToStringMap	mParamSemanticMap;				// Map between parameter semantic to string value.
+	// Map between GPU constant type to string value.
+	GpuConstTypeToStringMap mGpuConstTypeMap;
+	// Map between parameter semantic to string value.
+	ParamSemanticToStringMap mParamSemanticMap;
 
-	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
-	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes 
-	int							mGLSLVersion;					// Holds the current glsl version
-	StringVector				mFragInputParams;				// Holds the fragment input params 
+	// Map parameter name to a new parameter name (sometime renaming is required to match names between vertex and fragment shader)
+	StringMap mInputToGLStatesMap;
+	// Map parameter content to vertex attributes 
+	ParamContentToStringMap mContentToPerVertexAttributes;
+	// Holds the current glsl version
+	int mGLSLVersion;
+	// Holds the fragment input params 
+	StringVector mFragInputParams;
 };
 
 /** GLSL program writer factory implementation.

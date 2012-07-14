@@ -67,28 +67,28 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 
 	
@@ -98,7 +98,7 @@ public:
 	far point, and each value in between is both a far point of the previous
 	split, and a near point for the next one.
 	*/
-	void			setSplitPoints					(const SplitPointList& newSplitPoints);
+	void setSplitPoints(const SplitPointList& newSplitPoints);
 
 	static String Type;
 
@@ -108,13 +108,20 @@ protected:
 	// Shadow texture parameters.
 	struct _OgreRTSSExport ShadowTextureParams
 	{					
-		Real				mMaxRange;				// The max range of this shadow texture in terms of PSSM (far plane of viewing camera).
-		unsigned int		mTextureSamplerIndex;	// The shadow map sampler index.
-		UniformParameterPtr	mTextureSampler;		// The shadow map sampler.			
-		UniformParameterPtr	mInvTextureSize;		// The inverse texture 
-		UniformParameterPtr	mWorldViewProjMatrix;	// The source light view projection matrix combined with world matrix.		
-		ParameterPtr		mVSOutLightPosition;	// The vertex shader output position in light space.
-		ParameterPtr		mPSInLightPosition;		// The pixel shader input position in light space.
+		// The max range of this shadow texture in terms of PSSM (far plane of viewing camera).
+		Real mMaxRange;
+		// The shadow map sampler index.
+		unsigned int mTextureSamplerIndex;
+		// The shadow map sampler.			
+		UniformParameterPtr mTextureSampler;
+		// The inverse texture 
+		UniformParameterPtr mInvTextureSize;
+		// The source light view projection matrix combined with world matrix.		
+		UniformParameterPtr mWorldViewProjMatrix;
+		// The vertex shader output position in light space.
+		ParameterPtr mVSOutLightPosition;
+		// The pixel shader input position in light space.
+		ParameterPtr mPSInLightPosition;
 
 	};
 
@@ -130,27 +137,27 @@ protected:
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 	/** 
 	Internal method that adds related vertex shader functions invocations.
 	*/
-	bool			addVSInvocation						(Function* vsMain, const int groupOrder, int& internalCounter);
+	bool addVSInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
 
 	/** 
 	Internal method that adds related pixel shader functions invocations.
 	*/
-	bool			addPSInvocation						(Program* psProgram, const int groupOrder, int& internalCounter);
+	bool addPSInvocation(Program* psProgram, const int groupOrder, int& internalCounter);
 
 
 
@@ -158,17 +165,28 @@ protected:
 
 	// Attributes.
 protected:		
-	ShadowTextureParamsList		mShadowTextureParamsList;		// Shadow texture parameter list.	
-	UniformParameterPtr			mPSSplitPoints;					// Split points parameter.
-	ParameterPtr				mVSInPos;						// Vertex shader input position parameter.	
-	ParameterPtr				mVSOutPos;						// Vertex shader output position (clip space) parameter.
-	ParameterPtr				mVSOutDepth;					// Vertex shader output depth (clip space) parameter.
-	ParameterPtr				mPSInDepth;						// Pixel shader input depth (clip space) parameter.
-	ParameterPtr				mPSLocalShadowFactor;			// Pixel shader local computed shadow colour parameter.
-	ParameterPtr				mPSDiffuse;						// Pixel shader in/local diffuse colour parameter.
-	ParameterPtr				mPSOutDiffuse;					// Pixel shader output diffuse colour parameter.
-	ParameterPtr				mPSSpecualr;					// Pixel shader in/local specular colour parameter.
-	UniformParameterPtr			mPSDerivedSceneColour;			// Derived scene colour (ambient term).
+	// Shadow texture parameter list.	
+	ShadowTextureParamsList mShadowTextureParamsList;
+	// Split points parameter.
+	UniformParameterPtr mPSSplitPoints;
+	// Vertex shader input position parameter.	
+	ParameterPtr mVSInPos;
+	// Vertex shader output position (clip space) parameter.
+	ParameterPtr mVSOutPos;
+	// Vertex shader output depth (clip space) parameter.
+	ParameterPtr mVSOutDepth;
+	// Pixel shader input depth (clip space) parameter.
+	ParameterPtr mPSInDepth;
+	// Pixel shader local computed shadow colour parameter.
+	ParameterPtr mPSLocalShadowFactor;
+	// Pixel shader in/local diffuse colour parameter.
+	ParameterPtr mPSDiffuse;
+	// Pixel shader output diffuse colour parameter.
+	ParameterPtr mPSOutDiffuse;
+	// Pixel shader in/local specular colour parameter.
+	ParameterPtr mPSSpecualr;
+	// Derived scene colour (ambient term).
+	UniformParameterPtr mPSDerivedSceneColour;
 
 };
 
@@ -184,12 +202,12 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 
 protected:
@@ -197,7 +215,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };

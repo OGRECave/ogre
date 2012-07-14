@@ -71,38 +71,38 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	/** 
 	Set the index of the input vertex shader texture coordinate set 
 	*/
-	void					setTexCoordIndex		(unsigned int index) { mVSTexCoordSetIndex = index;}
+	void setTexCoordIndex(unsigned int index) { mVSTexCoordSetIndex = index;}
 
 	/** 
 	Return the index of the input vertex shader texture coordinate set.
 	*/
-	unsigned int			getTexCoordIndex		() const { return mVSTexCoordSetIndex; }
+	unsigned int getTexCoordIndex() const { return mVSTexCoordSetIndex; }
 
 	// Type of this render state.
 	static String Type;
@@ -126,20 +126,20 @@ public:
 	Set the normal map space.
 	@param normalMapSpace The normal map space.
 	*/
-	void					setNormalMapSpace			(NormalMapSpace normalMapSpace) { mNormalMapSpace = normalMapSpace; }
+	void setNormalMapSpace(NormalMapSpace normalMapSpace) { mNormalMapSpace = normalMapSpace; }
 
 	/** Return the normal map space. */
-	NormalMapSpace			getNormalMapSpace			() const { return mNormalMapSpace; }
+	NormalMapSpace getNormalMapSpace() const { return mNormalMapSpace; }
 
 	/** 
 	Set the normal map texture name.
 	*/
-	void					setNormalMapTextureName		(const String& textureName) { mNormalMapTextureName = textureName; }
+	void setNormalMapTextureName(const String& textureName) { mNormalMapTextureName = textureName; }
 
 	/** 
 	Return the normal map texture name.
 	*/
-	const String&			getNormalMapTextureName		() const { return mNormalMapTextureName; }
+	const String& getNormalMapTextureName() const { return mNormalMapTextureName; }
 
 	/** 
 	Set the normal map filtering attributes.
@@ -147,7 +147,7 @@ public:
 	@param magFilter The desired mag filter.
 	@param mipFilter The desired mip filter.
 	*/
-	void					setNormalMapFiltering			(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
+	void setNormalMapFiltering(const FilterOptions minFilter, const FilterOptions magFilter, const FilterOptions mipFilter) 
 	{ mNormalMapMinFilter = minFilter; mNormalMapMagFilter = magFilter; mNormalMapMipFilter = mipFilter; }
 
 	/** 
@@ -156,27 +156,27 @@ public:
 	@param magFilter The desired mag filter.
 	@param mipFilter The desired mip filter.
 	*/
-	void					getNormalMapFiltering			(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
+	void getNormalMapFiltering(FilterOptions& minFilter, FilterOptions& magFilter, FilterOptions& mipFilter) const
 	{ minFilter = mNormalMapMinFilter; magFilter = mNormalMapMagFilter ; mipFilter = mNormalMapMipFilter; }
 
 	/** Setup the normal map anisotropy value. 
 	@param anisotropy The anisotropy value.
 	*/
-	void			setNormalMapAnisotropy		(unsigned int anisotropy) { mNormalMapAnisotropy = anisotropy; }
+	void setNormalMapAnisotropy(unsigned int anisotropy) { mNormalMapAnisotropy = anisotropy; }
 
 
 	/** Return the normal map anisotropy value. */
-	unsigned int	getNormalMapAnisotropy		() const { return mNormalMapAnisotropy; }
+	unsigned int getNormalMapAnisotropy() const { return mNormalMapAnisotropy; }
 
 	
 	/** Setup the normal map anisotropy value. 
 	@param anisotropy The anisotropy value.
 	*/
-	void			setNormalMapMipBias		(Real mipBias) { mNormalMapMipBias = mipBias; }
+	void setNormalMapMipBias(Real mipBias) { mNormalMapMipBias = mipBias; }
 
 
 	/** Return the normal map mip bias value. */
-	Real			getNormalMapMipBias		() const { return mNormalMapMipBias; }
+	Real getNormalMapMipBias() const { return mNormalMapMipBias; }
 
 
 
@@ -186,23 +186,34 @@ protected:
 	// Per light parameters.
 	struct _OgreRTSSExport LightParams
 	{
-		Light::LightTypes		mType;				// Light type.		
-		UniformParameterPtr		mPosition;			// Light position.
-		ParameterPtr			mVSOutToLightDir;	// Vertex shader output vertex position to light position direction (texture space).
-		ParameterPtr			mPSInToLightDir;	// Pixel shader input vertex position to light position direction (texture space).
-		UniformParameterPtr		mDirection;			// Light direction.
-		ParameterPtr			mVSOutDirection;	// Vertex shader output light direction (texture space).
-		ParameterPtr			mPSInDirection;		// Pixel shader input light direction (texture space).		
-		UniformParameterPtr		mAttenuatParams;	// Attenuation parameters.
-		UniformParameterPtr		mSpotParams;		// Spot light parameters.
-		UniformParameterPtr		mDiffuseColour;		// Diffuse colour.
-		UniformParameterPtr		mSpecularColour;	// Specular colour.
+		// Light type.
+		Light::LightTypes mType;
+		// Light position.
+		UniformParameterPtr mPosition;
+		// Vertex shader output vertex position to light position direction (texture space).
+		ParameterPtr mVSOutToLightDir;
+		// Pixel shader input vertex position to light position direction (texture space).
+		ParameterPtr mPSInToLightDir;
+		// Light direction.
+		UniformParameterPtr mDirection;
+		// Vertex shader output light direction (texture space).
+		ParameterPtr mVSOutDirection;
+		// Pixel shader input light direction (texture space).		
+		ParameterPtr mPSInDirection;
+		// Attenuation parameters.
+		UniformParameterPtr mAttenuatParams;
+		// Spot light parameters.
+		UniformParameterPtr mSpotParams;
+		// Diffuse colour.
+		UniformParameterPtr mDiffuseColour;
+		// Specular colour.
+		UniformParameterPtr mSpecularColour;
 
 	};
 
-	typedef vector<LightParams>::type				LightParamsList;
-	typedef LightParamsList::iterator				LightParamsIterator;
-	typedef LightParamsList::const_iterator			LightParamsConstIterator;
+	typedef vector<LightParams>::type LightParamsList;
+	typedef LightParamsList::iterator LightParamsIterator;
+	typedef LightParamsList::const_iterator LightParamsConstIterator;
 
 // Protected methods
 protected:
@@ -212,137 +223,180 @@ protected:
 	can be the vertex colour component. To establish such a link one should provide the matching flags to this
 	sub render state.
 	*/
-	void					setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
+	void setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
 
 	/** 
 	Return the current track per vertex type.
 	*/
-	TrackVertexColourType	getTrackVertexColourType() const { return mTrackVertexColourType; }
+	TrackVertexColourType getTrackVertexColourType() const { return mTrackVertexColourType; }
 
 
 	/** 
 	Set the light count per light type that this sub render state will generate.
 	@see ShaderGenerator::setLightCount.
 	*/
-	void					setLightCount			(const int lightCount[3]);
+	void setLightCount(const int lightCount[3]);
 
 	/** 
 	Get the light count per light type that this sub render state will generate.
 	@see ShaderGenerator::getLightCount.
 	*/
-	void					getLightCount			(int lightCount[3]) const;
+	void getLightCount(int lightCount[3]) const;
 	/** 
 	Set the specular component state. If set to true this sub render state will compute a specular
 	lighting component in addition to the diffuse component.
 	@param enable Pass true to enable specular component computation.
 	*/
-	void					setSpecularEnable		(bool enable) { mSpecularEnable = enable; }
+	void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
 
 	/** 
 	Get the specular component state. 
 	*/
-	bool					getSpecularEnable		() const	  { return mSpecularEnable; }
+	bool getSpecularEnable() const	  { return mSpecularEnable; }
 
 
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters			(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);
 
 	/** Resolve global lighting parameters */
-	bool					resolveGlobalParameters		(ProgramSet* programSet);
+	bool resolveGlobalParameters(ProgramSet* programSet);
 
 	/** Resolve per light parameters */
-	bool					resolvePerLightParameters	(ProgramSet* programSet);
+	bool resolvePerLightParameters(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 	
 
 	/** 
 	Internal method that adds related vertex shader functions invocations.
 	*/
-	bool			addVSInvocation						(Function* vsMain, const int groupOrder, int& internalCounter);
+	bool addVSInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
 
 	/** 
 	Internal method that adds per light illumination component functions invocations.
 	*/
-	bool			addVSIlluminationInvocation			(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
+	bool addVSIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
 
 	/** 
 	Internal method that perform normal fetch invocation.
 	*/
-	bool			addPSNormalFetchInvocation		(Function* psMain, const int groupOrder, int& internalCounter);
+	bool addPSNormalFetchInvocation(Function* psMain, const int groupOrder, int& internalCounter);
 
 
 	/** 
 	Internal method that adds global illumination component functions invocations.
 	*/
-	bool			addPSGlobalIlluminationInvocation	(Function* psMain, const int groupOrder, int& internalCounter);
+	bool addPSGlobalIlluminationInvocation(Function* psMain, const int groupOrder, int& internalCounter);
 
 	/** 
 	Internal method that adds per light illumination component functions invocations.
 	*/
-	bool			addPSIlluminationInvocation		(LightParams* curLightParams, Function* psMain, const int groupOrder, int& internalCounter);
+	bool addPSIlluminationInvocation(LightParams* curLightParams, Function* psMain, const int groupOrder, int& internalCounter);
 
 	/** 
 	Internal method that adds the final colour assignments.
 	*/
-	bool			addPSFinalAssignmentInvocation	(Function* psMain, const int groupOrder, int& internalCounter);
+	bool addPSFinalAssignmentInvocation(Function* psMain, const int groupOrder, int& internalCounter);
 
 
 // Attributes.
 protected:	
-	String					mNormalMapTextureName;			// The normal map texture name.
-	TrackVertexColourType	mTrackVertexColourType;			// Track per vertex colour type.
-	bool					mSpecularEnable;				// Specular component enabled/disabled.
-	LightParamsList			mLightParamsList;				// Light list.
-	unsigned short			mNormalMapSamplerIndex;			// Normal map texture sampler index.
-	unsigned int			mVSTexCoordSetIndex;			// Vertex shader input texture coordinate set index.
-	FilterOptions			mNormalMapMinFilter;			// The normal map min filter.
-	FilterOptions			mNormalMapMagFilter;			// The normal map mag filter.
-	FilterOptions			mNormalMapMipFilter;			// The normal map mip filter.
-	unsigned int			mNormalMapAnisotropy;			// The normal map max anisotropy value.
-	Real					mNormalMapMipBias;				// The normal map mip map bias.
-	NormalMapSpace			mNormalMapSpace;				// The normal map space.
-	UniformParameterPtr		mWorldMatrix;					// World matrix parameter.
-	UniformParameterPtr		mWorldInvRotMatrix;				// World matrix inverse rotation matrix parameter.
-	UniformParameterPtr		mCamPosWorldSpace;				// Camera position in world space parameter.	
-	ParameterPtr			mVSInPosition;					// Vertex shader input position parameter.
-	ParameterPtr			mVSWorldPosition;				// Vertex shader world position parameter.
-	ParameterPtr			mVSOutView;						// Vertex shader output view vector (position in camera space) parameter.
-	ParameterPtr			mPSInView;						// Pixel shader input view position (position in camera space) parameter.
-	ParameterPtr			mVSInNormal;					// Vertex shader input normal.
-	ParameterPtr			mVSInTangent;					// Vertex shader input tangent.
-	ParameterPtr			mVSTBNMatrix;					// Vertex shader local TNB matrix.
-	ParameterPtr			mVSLocalDir;					// Vertex shader local light direction.
-	UniformParameterPtr		mNormalMapSampler;				// Normal map texture sampler parameter.
-	ParameterPtr			mPSNormal;						// Pixel shader normal parameter.
-	ParameterPtr			mVSInTexcoord;					// Vertex shader input texture coordinates.
-	ParameterPtr			mVSOutTexcoord;					// Vertex shader output texture coordinates.
-	ParameterPtr			mPSInTexcoord;					// Pixel shader input texture coordinates.
-	ParameterPtr			mPSTempDiffuseColour;			// Pixel shader temporary diffuse calculation parameter.
-	ParameterPtr			mPSTempSpecularColour;			// Pixel shader temporary specular calculation parameter.
-	ParameterPtr			mPSDiffuse;						// Pixel shader input/local diffuse parameter.	
-	ParameterPtr			mPSSpecular;					// Pixel shader input/local specular parameter.	
-	ParameterPtr			mPSOutDiffuse;					// Pixel shader output diffuse parameter.	
-	ParameterPtr			mPSOutSpecular;					// Pixel shader output specular parameter.	
-	UniformParameterPtr		mDerivedSceneColour;			// Derived scene colour parameter.
-	UniformParameterPtr		mLightAmbientColour;			// Ambient light colour parameter.
-	UniformParameterPtr		mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
-	UniformParameterPtr		mSurfaceAmbientColour;			// Surface ambient colour parameter.
-	UniformParameterPtr		mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
-	UniformParameterPtr		mSurfaceSpecularColour;			// Surface specular colour parameter.
-	UniformParameterPtr		mSurfaceEmissiveColour;			// Surface emissive colour parameter.
-	UniformParameterPtr		mSurfaceShininess;				// Surface shininess parameter.
-	static Light			msBlankLight;					// Shared blank light.
+	// The normal map texture name.
+	String mNormalMapTextureName;
+	// Track per vertex colour type.
+	TrackVertexColourType mTrackVertexColourType;
+	// Specular component enabled/disabled.
+	bool mSpecularEnable;
+	// Light list.
+	LightParamsList mLightParamsList;
+	// Normal map texture sampler index.
+	unsigned short mNormalMapSamplerIndex;
+	// Vertex shader input texture coordinate set index.
+	unsigned int mVSTexCoordSetIndex;
+	// The normal map min filter.
+	FilterOptions mNormalMapMinFilter;
+	// The normal map mag filter.
+	FilterOptions mNormalMapMagFilter;
+	// The normal map mip filter.
+	FilterOptions mNormalMapMipFilter;
+	// The normal map max anisotropy value.
+	unsigned int mNormalMapAnisotropy;
+	// The normal map mip map bias.
+	Real mNormalMapMipBias;
+	// The normal map space.
+	NormalMapSpace mNormalMapSpace;
+	// World matrix parameter.
+	UniformParameterPtr mWorldMatrix;
+	// World matrix inverse rotation matrix parameter.
+	UniformParameterPtr mWorldInvRotMatrix;
+	// Camera position in world space parameter.	
+	UniformParameterPtr mCamPosWorldSpace;
+	// Vertex shader input position parameter.
+	ParameterPtr mVSInPosition;
+	// Vertex shader world position parameter.
+	ParameterPtr mVSWorldPosition;
+	// Vertex shader output view vector (position in camera space) parameter.
+	ParameterPtr mVSOutView;
+	// Pixel shader input view position (position in camera space) parameter.
+	ParameterPtr mPSInView;
+	// Vertex shader input normal.
+	ParameterPtr mVSInNormal;
+	// Vertex shader input tangent.
+	ParameterPtr mVSInTangent;
+	// Vertex shader local TNB matrix.
+	ParameterPtr mVSTBNMatrix;
+	// Vertex shader local light direction.
+	ParameterPtr mVSLocalDir;
+	// Normal map texture sampler parameter.
+	UniformParameterPtr mNormalMapSampler;
+	// Pixel shader normal parameter.
+	ParameterPtr mPSNormal;
+	// Vertex shader input texture coordinates.
+	ParameterPtr mVSInTexcoord;
+	// Vertex shader output texture coordinates.
+	ParameterPtr mVSOutTexcoord;
+	// Pixel shader input texture coordinates.
+	ParameterPtr mPSInTexcoord;
+	// Pixel shader temporary diffuse calculation parameter.
+	ParameterPtr mPSTempDiffuseColour;
+	// Pixel shader temporary specular calculation parameter.
+	ParameterPtr mPSTempSpecularColour;
+	// Pixel shader input/local diffuse parameter.	
+	ParameterPtr mPSDiffuse;
+	// Pixel shader input/local specular parameter.	
+	ParameterPtr mPSSpecular;
+	// Pixel shader output diffuse parameter.	
+	ParameterPtr mPSOutDiffuse;
+	// Pixel shader output specular parameter.	
+	ParameterPtr mPSOutSpecular;
+	// Derived scene colour parameter.
+	UniformParameterPtr mDerivedSceneColour;
+	// Ambient light colour parameter.
+	UniformParameterPtr mLightAmbientColour;
+	// Derived ambient light colour parameter.
+	UniformParameterPtr mDerivedAmbientLightColour;
+	// Surface ambient colour parameter.
+	UniformParameterPtr mSurfaceAmbientColour;
+	// Surface diffuse colour parameter.
+	UniformParameterPtr mSurfaceDiffuseColour;
+	// Surface specular colour parameter.
+	UniformParameterPtr mSurfaceSpecularColour;
+	// Surface emissive colour parameter.
+	UniformParameterPtr mSurfaceEmissiveColour;
+	// Surface shininess parameter.
+	UniformParameterPtr mSurfaceShininess;
+	// Shared blank light.
+	static Light msBlankLight;
 };
 
 
@@ -357,17 +411,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:
@@ -375,7 +429,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };

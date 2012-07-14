@@ -54,22 +54,22 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getExecutionOrder.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	/** 
 	@see SubRenderState::createCpuSubPrograms.
 	*/
-	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
+	virtual bool createCpuSubPrograms(ProgramSet* programSet);
 
 
 	static String Type;
@@ -87,24 +87,24 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 protected:
 
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 

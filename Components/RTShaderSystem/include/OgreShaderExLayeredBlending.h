@@ -97,10 +97,14 @@ public:
 	{
 		TextureBlend() : blendMode(LB_Invalid), sourceModifier(SM_Invalid), customNum(0) {}
 
-		BlendMode blendMode; //The blend mode to use
-		SourceModifier sourceModifier; //The source modification to use
-		int customNum; // The number of the custom param controlling the source modification
-		ParameterPtr modControlParam; //The parameter controlling the source modification
+		//The blend mode to use
+		BlendMode blendMode;
+		//The source modification to use
+		SourceModifier sourceModifier;
+		// The number of the custom param controlling the source modification
+		int customNum;
+		//The parameter controlling the source modification
+		ParameterPtr modControlParam;
 	};
 
 
@@ -145,7 +149,7 @@ public:
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	static String Type;
 
@@ -203,17 +207,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit);
 
 	
 protected:
@@ -221,7 +225,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 	/** 
 	@Converts string to Enum

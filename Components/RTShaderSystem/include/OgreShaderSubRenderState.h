@@ -60,17 +60,17 @@ class _OgreRTSSExport SubRenderState : public RTShaderSystemAlloc
 public:
 
 	/** Class default constructor */
-	SubRenderState			();
+	SubRenderState();
 
 	/** Class destructor */
-	virtual ~SubRenderState	();
+	virtual ~SubRenderState();
 
 
 	/** Get the type of this sub render state.
 	@remarks
 	The type string should be unique among all registered sub render states.	
 	*/
-	virtual const String&	getType					() const = 0;
+	virtual const String& getType() const = 0;
 
 
 	/** Get the execution order of this sub render state.
@@ -78,13 +78,13 @@ public:
 	The return value should be synchronized with the predefined values
 	of the FFPShaderStage enum.
 	*/
-	virtual int				getExecutionOrder		() const = 0;
+	virtual int getExecutionOrder() const = 0;
 
 
 	/** Copy details from a given sub render state to this one.
 	@param rhs the source sub state to copy from.	
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs) = 0;
+	virtual void copyFrom(const SubRenderState& rhs) = 0;
 
 	/** Operator = declaration. Assign the given source sub state to this sub state.
 	@param rhs the source sub state to copy from.	
@@ -97,7 +97,7 @@ public:
 	implement.
 	@param programSet container class of CPU and GPU programs that this sub state will affect on.
 	*/
-	virtual bool			createCpuSubPrograms	(ProgramSet* programSet);
+	virtual bool createCpuSubPrograms(ProgramSet* programSet);
 
 	/** Update GPU programs parameters before a rendering operation occurs.
 	This method is called in the context of SceneManager::renderSingle object via the RenderObjectListener interface and
@@ -108,7 +108,7 @@ public:
 	@source The auto parameter source.
 	@pLightList The light list used in the current rendering context.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList) { }
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass,  const AutoParamDataSource* source, 	const LightList* pLightList) { }
 
 	/** Called before adding this sub render state to the given render state.
 	Allows this sub render state class to configure specific parameters depending on source pass or parent render state.
@@ -117,17 +117,17 @@ public:
 	@param srcPass The source pass.
 	@param dstPass The destination pass.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass) { return true; }
 
 	/** Return the accessor object to this sub render state.
 	@see SubRenderStateAccessor.
 	*/
-	SubRenderStateAccessorPtr	getAccessor				();
+	SubRenderStateAccessorPtr getAccessor();
 
 	/** Return the accessor object to this sub render state.
 	@see SubRenderStateAccessor.
 	*/
-	SubRenderStateAccessorPtr	getAccessor				() const;
+	SubRenderStateAccessorPtr getAccessor() const;
 
 // Protected methods
 protected:
@@ -136,24 +136,26 @@ protected:
 	@param programSet container class of CPU and GPU programs that this sub state will affect on.
 	@remarks Internal method called in the context of SubRenderState::createCpuSubPrograms implementation.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);	
+	virtual bool resolveParameters(ProgramSet* programSet);	
 
 	/** Resolve dependencies that this sub render state requires.	
 	@param programSet container class of CPU and GPU programs that this sub state will affect on.
 	@remarks Internal method called in the context of SubRenderState::createCpuSubPrograms implementation.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** Add function invocation that this sub render state requires.	
 	@param programSet container class of CPU and GPU programs that this sub state will affect on.
 	@remarks Internal method called in the context of SubRenderState::createCpuSubPrograms implementation.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 // Attributes.
 private:	
-	mutable SubRenderStateAccessorPtr	mThisAccessor;			// The accessor of this instance.
-	SubRenderStateAccessorPtr			mOtherAccessor;			// The accessor of the source instance which used as base to create this instance.
+	// The accessor of this instance.
+	mutable SubRenderStateAccessorPtr mThisAccessor;
+	// The accessor of the source instance which used as base to create this instance.
+	SubRenderStateAccessorPtr mOtherAccessor;
 	
 };
 
@@ -195,10 +197,10 @@ public:
 	}
 
 	/** Return a set of all instances of the template SubRenderState. */
-	SubRenderStateSet&	getSubRenderStateInstanceSet() { return mSubRenderStateInstancesSet; }
+	SubRenderStateSet& getSubRenderStateInstanceSet() { return mSubRenderStateInstancesSet; }
 
 	/** Return a set of all instances of the template SubRenderState. (const version). */
-	const SubRenderStateSet&	getSubRenderStateInstanceSet() const { return mSubRenderStateInstancesSet; }
+	const SubRenderStateSet& getSubRenderStateInstanceSet() const { return mSubRenderStateInstancesSet; }
 
 protected:
 	/** Construct SubRenderState accessor based on the given template SubRenderState.
@@ -207,8 +209,8 @@ protected:
 
 
 protected:
-	const SubRenderState*		mTemplateSubRenderState;
-	mutable SubRenderStateSet	mSubRenderStateInstancesSet;
+	const SubRenderState* mTemplateSubRenderState;
+	mutable SubRenderStateSet mSubRenderStateInstancesSet;
 
 private:
 	friend class SubRenderState;
@@ -231,19 +233,19 @@ class _OgreRTSSExport SubRenderStateFactory : public RTShaderSystemAlloc
 {
 
 public:
-	SubRenderStateFactory			() {}
-	virtual ~SubRenderStateFactory	();
+	SubRenderStateFactory() {}
+	virtual ~SubRenderStateFactory();
 
 	/** Get the type of this sub render state factory.
 	@remarks
 	The type string should be the same as the type of the SubRenderState sub class it is going to create.	
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType				() const = 0;
+	virtual const String& getType() const = 0;
 	
 	/** Create an instance of the SubRenderState sub class it suppose to create.	
 	*/
-	virtual SubRenderState*	createInstance		();
+	virtual SubRenderState* createInstance();
 
 	/** Create an instance of the SubRenderState based on script properties.	
 	This method is called in the context of script parsing and let this factory
@@ -252,7 +254,7 @@ public:
 	@param prop The abstract property node.
 	@param pass The pass that is the parent context of this node.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) { return NULL; }
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator) { return NULL; }
 
 	/** Create an instance of the SubRenderState based on script properties.	
 	This method is called in the context of script parsing and let this factory
@@ -261,22 +263,22 @@ public:
 	@param prop The abstract property node.
 	@param texState The pass that is the parent context of this node.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) { return NULL; }
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, TextureUnitState* texState, SGScriptTranslator* translator) { return NULL; }
 
 	/** Retrieve the previous instance the SRS in the script translator or
 	* create a new instance if not found 
 	@param translator The translator instance holding existing scripts.
 	*/
-	virtual SubRenderState*	createOrRetrieveInstance(SGScriptTranslator* translator);
+	virtual SubRenderState* createOrRetrieveInstance(SGScriptTranslator* translator);
 
 	/** Destroy the given instance.	
 	@param subRenderState The instance to destroy.
 	*/
-	virtual void			destroyInstance		(SubRenderState* subRenderState);
+	virtual void destroyInstance(SubRenderState* subRenderState);
 
 	/** Destroy all the instances that created by this factory.		
 	*/
-	virtual void			destroyAllInstances	();
+	virtual void destroyAllInstances();
 
 	/** Write the given sub-render state instance using the material serializer.
 	This method is called in the context of material serialization. It is useful for integrating into
@@ -287,7 +289,7 @@ public:
 	@param srcPass The source pass.
 	@param dstPass The generated shader based pass.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) {}
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass) {}
 
 	/** Write the given sub-render state instance using the material serializer.
 	This method is called in the context of material serialization. It is useful for integrating into
@@ -298,17 +300,18 @@ public:
 	@param srcTextureUnit The source texture unit state.
 	@param dstTextureUnit The generated shader based texture unit state.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit) {}
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, const TextureUnitState* srcTextureUnit, const TextureUnitState* dstTextureUnit) {}
 protected:
 	/** Create instance implementation method. Each sub class of this interface
 	must implement this method in which it will allocate the specific sub class of 
 	the SubRenderState.
 	*/
-	virtual SubRenderState*	createInstanceImpl	() = 0;
+	virtual SubRenderState* createInstanceImpl() = 0;
 
 // Attributes.
 protected:
-	SubRenderStateSet		mSubRenderStateList;		// List of all sub render states instances this factory created.
+	// List of all sub render states instances this factory created.
+	SubRenderStateSet mSubRenderStateList;
 };
 
 /** @} */

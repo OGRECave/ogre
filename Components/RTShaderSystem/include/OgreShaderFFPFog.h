@@ -67,27 +67,27 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	/** 
 	Set the fog properties this fog sub render state should emulate.
@@ -98,7 +98,7 @@ public:
 	@param fogDensity Fog density used in exponential modes only.
 	@see http://msdn.microsoft.com/en-us/library/bb173401.aspx
 	*/
-	void			setFogProperties				(FogMode fogMode, 
+	void setFogProperties(FogMode fogMode, 
 		const ColourValue& fogColour, 
 		float fogStart, 
 		float fogEnd, 
@@ -108,12 +108,12 @@ public:
 	Set the fog calculation mode. Either per vertex or per pixel.
 	@param calcMode The calculation mode to set.
 	*/
-	void			setCalcMode						(CalcMode calcMode) { mCalcMode = calcMode; }
+	void setCalcMode(CalcMode calcMode) { mCalcMode = calcMode; }
 
 	/** 
 	Return the current calculation mode.
 	*/
-	CalcMode		getCalcMode						() const { return mCalcMode; }
+	CalcMode getCalcMode() const { return mCalcMode; }
 
 	static String Type;
 
@@ -123,35 +123,49 @@ protected:
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 // Attributes.
 protected:	
-	CalcMode			mCalcMode;				// Fog calculation mode.
-	FogMode				mFogMode;				// Fog formula. 
-	ColourValue			mFogColourValue;		// Fog colour value.
-	Vector4				mFogParamsValue;		// Fog parameters (density, start, end, 1/end-start).
-	bool				mPassOverrideParams;	// True if the fog parameters should be taken from the pass.
+	// Fog calculation mode.
+	CalcMode mCalcMode;
+	// Fog formula. 
+	FogMode mFogMode;
+	// Fog colour value.
+	ColourValue mFogColourValue;
+	// Fog parameters (density, start, end, 1/end-start).
+	Vector4 mFogParamsValue;
+	// True if the fog parameters should be taken from the pass.
+	bool mPassOverrideParams;
 
-	UniformParameterPtr	mWorldViewProjMatrix;	// World view projection parameter.		
-	UniformParameterPtr	mFogColour;				// Fog colour parameter.	
-	UniformParameterPtr	mFogParams;				// Fog parameters program parameter.	
-	ParameterPtr		mVSInPos;				// Vertex shader input position parameter.
-	ParameterPtr		mVSOutFogFactor;		// Vertex shader output fog colour parameter.
-	ParameterPtr		mPSInFogFactor;			// Pixel shader input fog factor.
-	ParameterPtr		mVSOutDepth;			// Vertex shader output depth.
-	ParameterPtr		mPSInDepth;				// Pixel shader input depth.
-	ParameterPtr		mPSOutDiffuse;			// Pixel shader output diffuse colour.
+	// World view projection parameter.		
+	UniformParameterPtr mWorldViewProjMatrix;
+	// Fog colour parameter.	
+	UniformParameterPtr mFogColour;
+	// Fog parameters program parameter.	
+	UniformParameterPtr mFogParams;
+	// Vertex shader input position parameter.
+	ParameterPtr mVSInPos;
+	// Vertex shader output fog colour parameter.
+	ParameterPtr mVSOutFogFactor;
+	// Pixel shader input fog factor.
+	ParameterPtr mPSInFogFactor;
+	// Vertex shader output depth.
+	ParameterPtr mVSOutDepth;
+	// Pixel shader input depth.
+	ParameterPtr mPSInDepth;
+	// Pixel shader output diffuse colour.
+	ParameterPtr mPSOutDiffuse;
 };
 
 
@@ -166,17 +180,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:
@@ -184,7 +198,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };

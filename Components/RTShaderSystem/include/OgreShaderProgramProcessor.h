@@ -55,26 +55,26 @@ public:
 	/** Class constructor.
 	@param type The type of this program.
 	*/
-	ProgramProcessor			();
+	ProgramProcessor();
 
 	/** Class destructor */
-	virtual ~ProgramProcessor	();
+	virtual ~ProgramProcessor();
 
 	/** Return the target language of this processor. */
-	virtual const String&		getTargetLanguage	() const = 0;
+	virtual const String& getTargetLanguage() const = 0;
 	
 	/** Called before creation of the GPU programs.
 	Do several preparation operation such as validation, register compaction and specific target language optimizations.
 	@param programSet The program set container.
 	Return true on success.
 	*/
-	virtual bool				preCreateGpuPrograms	(ProgramSet* programSet) = 0;
+	virtual bool preCreateGpuPrograms(ProgramSet* programSet) = 0;
 
 	/** Called after creation of the GPU programs.
 	@param programSet The program set container.
 	Return true on success.
 	*/
-	virtual bool				postCreateGpuPrograms	(ProgramSet* programSet) = 0;
+	virtual bool postCreateGpuPrograms(ProgramSet* programSet) = 0;
  
 // Protected types.
 protected:
@@ -90,42 +90,48 @@ protected:
 
 
 		/** Clear the state of this merge parameter. */
-		void			clear						();
+		void clear();
 		
 		/** Add source parameter to this merged */
-		void			addSourceParameter			(ParameterPtr srcParam, int mask);
+		void addSourceParameter(ParameterPtr srcParam, int mask);
 
 		/** Return the source parameter count. */
-		size_t			getSourceParameterCount		() const { return mSrcParameterCount; }
+		size_t getSourceParameterCount() const { return mSrcParameterCount; }
 
 		/** Return source parameter by index. */
-		ParameterPtr	getSourceParameter			(unsigned int index) { return mSrcParameter[index]; }
+		ParameterPtr getSourceParameter(unsigned int index) { return mSrcParameter[index]; }
 
 		/** Return source parameter mask by index. */
-		int				getSourceParameterMask		(unsigned int index) const { return mSrcParameterMask[index]; }
+		int getSourceParameterMask(unsigned int index) const { return mSrcParameterMask[index]; }
 
 		/** Return destination parameter mask by index. */
-		int				getDestinationParameterMask	(unsigned int index) const { return mDstParameterMask[index]; }
+		int getDestinationParameterMask(unsigned int index) const { return mDstParameterMask[index]; }
 
 		/** Return the number of used floats. */ 
-		int				getUsedFloatCount			();
+		int getUsedFloatCount();
 		
 		/** Return the destination parameter. */
-		ParameterPtr	getDestinationParameter		(int usage, int index);
+		ParameterPtr getDestinationParameter(int usage, int index);
 
 	protected:
 	
 		/** Creates the destination parameter by a given class and index. */
-		void			createDestinationParameter	(int usage, int index);
+		void createDestinationParameter(int usage, int index);
 
 
 	protected:
-		ParameterPtr	mDstParameter;			// Destination merged parameter.
-		ParameterPtr	mSrcParameter[4];		// Source parameters - 4 source at max 1,1,1,1 -> 4.
-		int				mSrcParameterMask[4];	// Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
-		int				mDstParameterMask[4];	// Destination parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
-		size_t			mSrcParameterCount;		// The actual source parameters count.
-		size_t			mUsedFloatCount;		// The number of used floats.
+		// Destination merged parameter.
+		ParameterPtr mDstParameter;
+		// Source parameters - 4 source at max 1,1,1,1 -> 4.
+		ParameterPtr mSrcParameter[4];
+		// Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
+		int mSrcParameterMask[4];
+		// Destination parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
+		int mDstParameterMask[4];
+		// The actual source parameters count.
+		size_t mSrcParameterCount;
+		// The number of used floats.
+		size_t mUsedFloatCount;
 	};
 	typedef vector<MergeParameter>::type	MergeParameterList;
 
@@ -134,8 +140,10 @@ protected:
 	// A struct that defines merge parameters combination.
 	struct _OgreRTSSExport MergeCombination
 	{		
-		size_t			srcParamterTypeCount[4];	// The count of each source type. I.E (1 FLOAT1, 0 FLOAT2, 1 FLOAT3, 0 FLOAT4).
-		int				srcParameterMask[4];		// Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
+		// The count of each source type. I.E (1 FLOAT1, 0 FLOAT2, 1 FLOAT3, 0 FLOAT4).
+		size_t srcParamterTypeCount[4];
+		// Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
+		int srcParameterMask[4];
 
 		MergeCombination(
 			int float1Count, int float1Mask,
@@ -164,48 +172,48 @@ protected:
 protected:
 
 	/** Build parameter merging combinations. */
-	void			buildMergeCombinations			();
+	void buildMergeCombinations();
 
 	/** Compact the vertex shader output registers.
 	@param vsMain The vertex shader entry function.
 	@param fsMain The fragment shader entry function.
 	Return true on success.
 	*/
-	virtual bool	compactVsOutputs				(Function* vsMain, Function* fsMain);
+	virtual bool compactVsOutputs(Function* vsMain, Function* fsMain);
 
 	/** Internal method that counts vertex shader texcoord output slots and output floats.
 	@param vsMain The vertex shader entry function.
 	@param outTexCoordSlots Will hold the number of used output texcoord slots.
 	@param outTexCoordFloats Will hold the total number of floats used by output texcoord slots.
 	*/
-	void			countVsTexcoordOutputs			(Function* vsMain, int& outTexCoordSlots, int& outTexCoordFloats);
+	void countVsTexcoordOutputs(Function* vsMain, int& outTexCoordSlots, int& outTexCoordFloats);
 
 	/** Internal function that builds parameters table.
 	@param paramList The parameter list.
 	@param outParamsTable Will hold the texcoord params sorted by types in each row.
 	*/
-	void			buildTexcoordTable				(const ShaderParameterList& paramList, ShaderParameterList outParamsTable[4]);
+	void buildTexcoordTable(const ShaderParameterList& paramList, ShaderParameterList outParamsTable[4]);
 
 
 	/** Merge the parameters from the given table. 
 	@param paramsTable Source parameters table.
 	@param mergedParams Will hold the merged parameters list.
 	*/
-	void			mergeParameters					(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
+	void mergeParameters(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
 
 
 	/** Internal function that creates merged parameter using pre defined combinations. 
 	@param paramsTable Source parameters table.
 	@param mergedParams The merged parameters list.
 	*/
-	void			mergeParametersByPredefinedCombinations(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams);
+	void mergeParametersByPredefinedCombinations(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams);
 
 	/** Internal function that creates merged parameter from given combination.
 	@param combination The merge combination to try.
 	@param paramsTable The params table sorted by types in each row.	
 	@param mergedParameter Will hold the merged parameter.
 	*/
-	bool			mergeParametersByCombination			(const MergeCombination& combination, ShaderParameterList paramsTable[4], 
+	bool mergeParametersByCombination(const MergeCombination& combination, ShaderParameterList paramsTable[4], 
 																 MergeParameter* mergedParameter);
 
 	/** Merge reminders parameters that could not be merged into one slot using the predefined combinations.
@@ -213,44 +221,47 @@ protected:
 	@param mergedParams The merged parameters list.
 	@param splitParams The split parameters list.
 	*/
-	void			mergeParametersReminders				(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
+	void mergeParametersReminders(ShaderParameterList paramsTable[4], MergeParameterList& mergedParams, ShaderParameterList& splitParams);
 
 
 	/** Generates local parameters for the split parameters and perform packing/unpacking operation using them. */
-	void			generateLocalSplitParameters				(Function* func, GpuProgramType progType, MergeParameterList& mergedParams, ShaderParameterList& splitParams, LocalParameterMap& localParamsMap);
+	void generateLocalSplitParameters(Function* func, GpuProgramType progType, MergeParameterList& mergedParams, ShaderParameterList& splitParams, LocalParameterMap& localParamsMap);
 	
 	/** Rebuild the given parameters list using the merged parameters.	
 	*/
-	void			rebuildParameterList				(Function* func, int paramsUsage, MergeParameterList& mergedParams);
+	void rebuildParameterList(Function* func, int paramsUsage, MergeParameterList& mergedParams);
 
 	/** Rebuild function invocations by replacing references to old source parameters with the matching merged parameters components. */
-	void			rebuildFunctionInvocations			(FunctionAtomInstanceList& funcAtomList, MergeParameterList& mergedParams, LocalParameterMap& localParamsMap);
+	void rebuildFunctionInvocations(FunctionAtomInstanceList& funcAtomList, MergeParameterList& mergedParams, LocalParameterMap& localParamsMap);
 
 	/** Builds a map between parameter and all the references to it. */
-	void			buildParameterReferenceMap			(FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap);
+	void buildParameterReferenceMap(FunctionAtomInstanceList& funcAtomList, ParameterOperandMap& paramsRefMap);
 
 	/** Replace references to old parameters with the new merged parameters. */
-	void			replaceParametersReferences			(MergeParameterList& mergedParams, ParameterOperandMap& paramsRefMap);
+	void replaceParametersReferences(MergeParameterList& mergedParams, ParameterOperandMap& paramsRefMap);
 
 	/** Replace references to old parameters that have been split with the new local parameters that represents them. */
-	void			replaceSplitParametersReferences	(LocalParameterMap& localParamsMap, ParameterOperandMap& paramsRefMap);
+	void replaceSplitParametersReferences(LocalParameterMap& localParamsMap, ParameterOperandMap& paramsRefMap);
 
 	/** Return number of floats needed by the given type. */
-	static int		getParameterFloatCount				(GpuConstantType type);		
+	static int getParameterFloatCount(GpuConstantType type);		
 
 	/** Return the parameter mask of by the given parameter type (I.E: X|Y for FLOAT2 etc..) */
-	static int		getParameterMaskByType				(GpuConstantType type);
+	static int getParameterMaskByType(GpuConstantType type);
 	
 	/** Return the parameter mask of by the float count type (I.E: X|Y for 2 etc..) */
-	static int		getParameterMaskByFloatCount		(int floatCount);
+	static int getParameterMaskByFloatCount(int floatCount);
 	
 	/** Bind the auto parameters for a given CPU and GPU program set. */
-	void			bindAutoParameters					(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+	void bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
 protected:
-	MergeCombinationList	mParamMergeCombinations;		// Merging combinations defs.
-	int						mMaxTexCoordSlots;				// Maximum texcoord slots.
-	int						mMaxTexCoordFloats;				// Maximum texcoord floats count.
+	// Merging combinations defs.
+	MergeCombinationList mParamMergeCombinations;
+	// Maximum texcoord slots.
+	int mMaxTexCoordSlots;
+	// Maximum texcoord floats count.
+	int mMaxTexCoordFloats;
     std::map<Function *, String *>  mFunctionMap;           // Map between function signatures and source code
 
 };
