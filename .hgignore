@@ -9,3 +9,4 @@ Dependencies/include/FreeImage.h
 *.tlog
 *.obj
 *.rule
+Dependencies/*
