@@ -44,11 +44,12 @@
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, INT)
+INT WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, INT) {
+    int argc = __argc;
+    char** argv = __argv;
 #else
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) {
 #endif
-{
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	int retVal = UIApplicationMain(argc, argv, @"UIApplication", @"AppDelegate");
@@ -69,15 +70,21 @@ int main(int argc, char *argv[])
 	try
 	{
         bool nograb = false;
-#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
         if (argc >= 2 && Ogre::String(argv[1]) == "nograb")
             nograb = true;
-#else
-        // somewhat hacky, but much simpler than other solutions
-        if (Ogre::String(cmdLine).find("nograb") != Ogre::String::npos)
-            nograb = true;
-#endif
-		OgreBites::SampleBrowser brows (nograb);
+
+        int startUpSampleIdx = -1;
+        if (argc >= 3)
+        {
+            startUpSampleIdx = Ogre::StringConverter::parseInt(Ogre::String(argv[2]), -1);
+        }
+        else if (argc >= 2)
+        {
+            // first parameter can be either nograb or index. in the former case, we'll just
+            // get -1, which is fine.
+            startUpSampleIdx = Ogre::StringConverter::parseInt(Ogre::String(argv[1]), -1);
+        }
+		OgreBites::SampleBrowser brows (nograb, startUpSampleIdx);
 		brows.go();
 	}
 	catch (Ogre::Exception& e)

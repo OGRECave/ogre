@@ -187,7 +187,7 @@ protected:
 	{
 	public:
 
-		SampleBrowser(bool nograb = false) : SampleContext()
+		SampleBrowser(bool nograb = false, int startSampleIndex = -1) : SampleContext()
 		{
             mIsShuttingDown = false;
             mNoGrabInput = nograb;
@@ -195,6 +195,7 @@ protected:
 			mLastViewCategory = 0;
 			mLastViewTitle = 0;
 			mLastSampleIndex = -1;
+            mStartSampleIndex = startSampleIndex;
 			mCategoryMenu = 0;
 			mSampleMenu = 0;
 			mSampleSlider = 0;
@@ -250,6 +251,20 @@ protected:
 			mKeyboard = keyboard;
 		}
 #endif
+
+        virtual void loadStartUpSample()
+        {
+            if (mStartSampleIndex != -1)
+            {
+                runSampleByIndex(mStartSampleIndex);
+                mStartSampleIndex = -1;
+            }
+        }
+
+        virtual void runSampleByIndex(int idx)
+        {
+            runSample(Ogre::any_cast<Sample*>(mThumbs[idx]->getUserAny()));
+        }
 
 		/*-----------------------------------------------------------------------------
 		| Extends runSample to handle creation and destruction of dummy scene.
@@ -1742,6 +1757,7 @@ protected:
 		int mLastViewTitle;                            // last sample title viewed
 		int mLastViewCategory;                         // last sample category viewed
 		int mLastSampleIndex;                          // index of last sample running
+		int mStartSampleIndex;                         // directly starts the sample with the given index
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
         pp::CompletionCallback* mNaClSwapCallback;
