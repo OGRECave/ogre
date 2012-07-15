@@ -209,14 +209,6 @@ public:
 	bool hasRenderState(const String& schemeName) const;
 	
 
-	/** 
-	Get render state of specific pass.
-	Using this method allows the user to customize the behavior of a specific pass.
-	@param schemeName The destination scheme name.
-	@param materialName The specific material name.
-	@param passIndex The pass index.
-	*/
-	RenderState*	getRenderState				(const String& schemeName, const String& materialName, unsigned short passIndex);
     /** 
 	Get render state of specific pass.
 	Using this method allows the user to customize the behavior of a specific pass.
@@ -272,14 +264,6 @@ public:
 	void destroySubRenderState(SubRenderState* subRenderState);
 
 
-	/** 
-	Checks if a shader based technique has been created for a given technique. 
-	Return true if exist. False if not.
-	@param materialName The source material name.
-	@param srcTechniqueSchemeName The source technique scheme name.
-	@param dstTechniqueSchemeName The destination shader based technique scheme name.
-	*/
-	bool			hasShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
     /** 
 	Checks if a shader based technique has been created for a given technique. 
 	Return true if exist. False if not.
@@ -291,16 +275,6 @@ public:
 	bool hasShaderBasedTechnique(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
 	bool hasShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName) const;
 
-	/** 
-	Create shader based technique from a given technique. 
-	Return true upon success. Failure may occur if the source technique is not FFP pure, or different
-	source technique is mapped to the requested destination scheme.
-	@param materialName The source material name.
-	@param srcTechniqueSchemeName The source technique scheme name.
-	@param dstTechniqueSchemeName The destination shader based technique scheme name.
-	@param overProgrammable If true a shader will be created even if the material has shaders
-	*/
-	bool			createShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
     /** 
 	Create shader based technique from a given technique. 
 	Return true upon success. Failure may occur if the source technique is not FFP pure, or different
@@ -315,15 +289,6 @@ public:
 	bool createShaderBasedTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName, bool overProgrammable = false);
 
 
-	/** 
-	Remove shader based technique from a given technique. 
-	Return true upon success. Failure may occur if the given source technique was not previously
-	registered successfully using the createShaderBasedTechnique method.
-	@param materialName The source material name.
-	@param srcTechniqueSchemeName The source technique scheme name.
-	@param dstTechniqueSchemeName The destination shader based technique scheme name.
-	*/
-	bool			removeShaderBasedTechnique	(const String& materialName, const String& srcTechniqueSchemeName, const String& dstTechniqueSchemeName);
     /** 
 	Remove shader based technique from a given technique. 
 	Return true upon success. Failure may occur if the given source technique was not previously
