@@ -95,55 +95,35 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 	// Resolve vertex shader output position in projective space.
 
 	mVSInPosition = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-	if (mVSInPosition.get() == NULL)
-		return false;
 
 	mVSOriginalOutPositionProjectiveSpace = vsMain->resolveOutputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_PROJECTIVE_SPACE, GCT_FLOAT4);
-	if (mVSOriginalOutPositionProjectiveSpace.get() == NULL)
-		return false;
 
 #define SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD ((Parameter::Content)(Parameter::SPC_CUSTOM_CONTENT_BEGIN + 1))
 
 	mVSOutPositionProjectiveSpace = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, SPC_POSITION_PROJECTIVE_SPACE_AS_TEXCORD, GCT_FLOAT4);
-	if (mVSOutPositionProjectiveSpace.get() == NULL)
-		return false;
 
 	// Resolve ps input position in projective space.
 	mPSInPositionProjectiveSpace = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		mVSOutPositionProjectiveSpace->getIndex(), 
 		mVSOutPositionProjectiveSpace->getContent(),
 		GCT_FLOAT4);
-	if (mPSInPositionProjectiveSpace.get() == NULL)
-		return false;
-
 	// Resolve vertex shader uniform monitors count
 	mVSInMonitorsCount = vsProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_GLOBAL, "monitorsCount");
-	if (mVSInMonitorsCount.get() == NULL)
-		return false;
 
 	// Resolve pixel shader uniform monitors count
 	mPSInMonitorsCount = psProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_GLOBAL, "monitorsCount");
-	if (mPSInMonitorsCount.get() == NULL)
-		return false;
-
-
 
 
 	// Resolve the current world & view matrices concatenated	
 	mWorldViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEW_MATRIX, 0);
-	if (mWorldViewMatrix.get() == NULL)
-		return false;	
 
 	// Resolve the current projection matrix
 	mProjectionMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_PROJECTION_MATRIX, 0);
-	if (mProjectionMatrix.get() == NULL)
-		return false;	
-
+	
+	
 #define SPC_MONITOR_INDEX Parameter::SPC_TEXTURE_COORDINATE3
 	// Resolve vertex shader  monitor index
 	mVSInMonitorIndex = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 3, SPC_MONITOR_INDEX, GCT_FLOAT4);
-	if (mVSInMonitorIndex.get() == NULL)
-		return false;
 
 #define SPC_MATRIX_R0 Parameter::SPC_TEXTURE_COORDINATE4
 #define SPC_MATRIX_R1 Parameter::SPC_TEXTURE_COORDINATE5
@@ -152,17 +132,9 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 
 	// Resolve vertex shader viewport offset matrix
 	mVSInViewportOffsetMatrixR0 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 4, SPC_MATRIX_R0, GCT_FLOAT4);
-	if (mVSInViewportOffsetMatrixR0.get() == NULL)
-		return false;
 	mVSInViewportOffsetMatrixR1 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 5, SPC_MATRIX_R1, GCT_FLOAT4);
-	if (mVSInViewportOffsetMatrixR1.get() == NULL)
-		return false;
 	mVSInViewportOffsetMatrixR2 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 6, SPC_MATRIX_R2, GCT_FLOAT4);
-	if (mVSInViewportOffsetMatrixR2.get() == NULL)
-		return false;
 	mVSInViewportOffsetMatrixR3 = vsMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 7, SPC_MATRIX_R3, GCT_FLOAT4);
-	if (mVSInViewportOffsetMatrixR3.get() == NULL)
-		return false;
 
 
 	
@@ -170,17 +142,25 @@ bool ShaderExInstancedViewports::resolveParameters(ProgramSet* programSet)
 	mVSOutMonitorIndex = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			SPC_MONITOR_INDEX,
 			GCT_FLOAT4);
-	if (mVSOutMonitorIndex.get() == NULL)
-		return false;
-
+	
 	// Resolve ps input monitor index.
 	mPSInMonitorIndex = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		mVSOutMonitorIndex->getIndex(), 
 		mVSOutMonitorIndex->getContent(),
 		GCT_FLOAT4);
-	if (mPSInMonitorIndex.get() == NULL)
-		return false;
 
+	if (!mVSInPosition.get() || !mWorldViewMatrix.get() || !mVSOriginalOutPositionProjectiveSpace.get() ||
+		!mVSOutPositionProjectiveSpace.get() || !mPSInPositionProjectiveSpace.get() || !mVSInMonitorsCount.get() ||
+		!mPSInMonitorsCount.get() || !mVSInMonitorIndex.get() || !mProjectionMatrix.get() || !mVSInViewportOffsetMatrixR0.get() ||
+		!mVSInViewportOffsetMatrixR1.get() || !mVSInViewportOffsetMatrixR2.get() || !mVSInViewportOffsetMatrixR3.get() ||
+		!mVSOutMonitorIndex.get() || !mPSInMonitorIndex.get())
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+					"Not all parameters could be constructed for the sub-render state.",
+					"ShaderExInstancedViewports::resolveParameters" );
+	}
+			
+	
 	return true;
 }
 

@@ -171,99 +171,84 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
 	
 	// Get input position parameter.
 	mVSInPos = vsMain->getParameterBySemantic(vsMain->getInputParameters(), Parameter::SPS_POSITION, 0);
-	if (mVSInPos.get() == NULL)	
-		return false;
-
+	
 	// Get output position parameter.
 	mVSOutPos = vsMain->getParameterBySemantic(vsMain->getOutputParameters(), Parameter::SPS_POSITION, 0);
-	if (mVSOutPos.get() == NULL)	
-		return false;	
-
+	
 	// Resolve vertex shader output depth.		
 	mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 		Parameter::SPC_DEPTH_VIEW_SPACE,
 		GCT_FLOAT1);
-	if (mVSOutDepth.get() == NULL)
-		return false;
-
+	
 	// Resolve input depth parameter.
 	mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
 		mVSOutDepth->getContent(),
 		GCT_FLOAT1);
-	if (mPSInDepth.get() == NULL)	
-		return false;
-
+	
 	// Get in/local diffuse parameter.
 	mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 0);
 	if (mPSDiffuse.get() == NULL)	
 	{
 		mPSDiffuse = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 0);
-		if (mPSDiffuse.get() == NULL)	
-			return false;
 	}
-
+	
 	// Resolve output diffuse parameter.
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse.get() == NULL)
-		return false;
 	
 	// Get in/local specular parameter.
 	mPSSpecualr = psMain->getParameterBySemantic(psMain->getInputParameters(), Parameter::SPS_COLOR, 1);
 	if (mPSSpecualr.get() == NULL)	
 	{
 		mPSSpecualr = psMain->getParameterBySemantic(psMain->getLocalParameters(), Parameter::SPS_COLOR, 1);
-		if (mPSSpecualr.get() == NULL)	
-			return false;
 	}
 	
 	// Resolve computed local shadow colour parameter.
 	mPSLocalShadowFactor = psMain->resolveLocalParameter(Parameter::SPS_UNKNOWN, 0, "lShadowFactor", GCT_FLOAT1);
-	if (mPSLocalShadowFactor.get() == NULL)	
-		return false;
 
 	// Resolve computed local shadow colour parameter.
 	mPSSplitPoints = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "pssm_split_points");
-	if (mPSSplitPoints.get() == NULL)	
-		return false;
 
 	// Get derived scene colour.
 	mPSDerivedSceneColour = psProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
-	if (mPSDerivedSceneColour.get() == NULL)		
-		return false;
-
+	
 	ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
 	int lightIndex = 0;
 
 	while(it != mShadowTextureParamsList.end())
 	{
 		it->mWorldViewProjMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_PER_OBJECT, "world_texture_view_proj");		
-		if (it->mWorldViewProjMatrix.get() == NULL)
-			return false;
 
 		it->mVSOutLightPosition = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1,
 			Parameter::Content(Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex),
 			GCT_FLOAT4);		
-		if (it->mVSOutLightPosition.get() == NULL)
-			return false;
 
 		it->mPSInLightPosition = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 			it->mVSOutLightPosition->getIndex(),
 			it->mVSOutLightPosition->getContent(),
 			GCT_FLOAT4);	
 
-		if (it->mPSInLightPosition.get() == NULL)
-			return false;
-
 		it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");		
-		if (it->mTextureSampler.get() == NULL)
-			return false;
 
 		it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");		
-		if (it->mInvTextureSize.get() == NULL)
-			return false;
+
+		if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) || !(it->mPSInLightPosition.get()) ||
+			!(it->mVSOutLightPosition.get()) || !(it->mWorldViewProjMatrix.get()))
+		{
+			OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Not all parameters could be constructed for the sub-render state.",
+				"IntegratedPSSM3::resolveParameters" );
+		}
 
 		++lightIndex;
 		++it;
+	}
+
+	if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mVSOutDepth.get()) || !(mPSInDepth.get()) || !(mPSDiffuse.get()) || !(mPSOutDiffuse.get()) || 
+		!(mPSSpecualr.get()) || !(mPSLocalShadowFactor.get()) || !(mPSSplitPoints.get()) || !(mPSDerivedSceneColour.get()))
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Not all parameters could be constructed for the sub-render state.",
+				"IntegratedPSSM3::resolveParameters" );
 	}
 
 	return true;

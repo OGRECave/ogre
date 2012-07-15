@@ -551,7 +551,7 @@ namespace Ogre {
     size_t FileStreamDataStream::read(void* buf, size_t count)
     {
 		mInStream->read(static_cast<char*>(buf), static_cast<std::streamsize>(count));
-        return mInStream->gcount();
+        return (size_t)mInStream->gcount();
     }
 	//-----------------------------------------------------------------------
 	size_t FileStreamDataStream::write(const void* buf, size_t count)
@@ -586,7 +586,7 @@ namespace Ogre {
 		}
 		// maxCount + 1 since count excludes terminator in getline
 		mInStream->getline(buf, static_cast<std::streamsize>(maxCount+1), delim.at(0));
-		size_t ret = mInStream->gcount();
+		size_t ret = (size_t)mInStream->gcount();
 		// three options
 		// 1) we had an eof before we read a whole line
 		// 2) we ran out of buffer space

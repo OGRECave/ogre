@@ -122,6 +122,7 @@ namespace Ogre
 		Window parentWindow = DefaultRootWindow(xDisplay);
 		int left = DisplayWidth(xDisplay, DefaultScreen(xDisplay))/2 - width/2;
 		int top  = DisplayHeight(xDisplay, DefaultScreen(xDisplay))/2 - height/2;
+		String border;
 		
 		mIsFullScreen = fullScreen;
 		
@@ -220,6 +221,9 @@ namespace Ogre
 					externalWindow = StringConverter::parseUnsignedLong(tokens[0]);
 				}
 			}
+
+			if ((opt = miscParams->find("border")) != end)
+				border = opt->second;
 		}
 		
 		// Ignore fatal XErrorEvents during parameter validation:
@@ -374,10 +378,17 @@ namespace Ogre
 					}
 				}
 				
-				// Is this really necessary ? Which broken WM might need it?
 				if ((sizeHints = XAllocSizeHints()) != NULL)
 				{
+					// Is this really necessary ? Which broken WM might need it?
 					sizeHints->flags = USPosition;
+
+					if(!fullScreen && border == "fixed")
+					{
+						sizeHints->min_width = sizeHints->max_width = width;
+						sizeHints->min_height = sizeHints->max_height = height;
+						sizeHints->flags |= PMaxSize | PMinSize;
+					}
 				}
 				
 				XTextProperty titleprop;

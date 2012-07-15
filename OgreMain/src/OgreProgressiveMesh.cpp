@@ -280,7 +280,7 @@ namespace Ogre {
 		
 		Ogre::Mesh* pMesh = pSubMesh->parent;
 		Real sqrDiag = pMesh->getBounds().getSize().squaredLength();
-		mInvSquaredBoundBoxDiagonal = (0.0 != sqrDiag) ? 1.0 / sqrDiag : 0.0;
+		mInvSquaredBoundBoxDiagonal = ((Real)0.0 != sqrDiag) ? (Real)1.0 / sqrDiag : (Real)0.0;
 		
 		mNextWorstCostHint = 0;
 		mInvalidCostCount = 0;
@@ -1152,7 +1152,7 @@ namespace Ogre {
 			// E = H * sqrt(S) / 2			(side triangle area)
 			// and since H = 3 * V / S		(pyramid volume)
 			// E = 3 * V / (2 * sqrt(S))
-			cost = areaSum > 1e-06 ? tripleVolumeSum / (2.0 * Math::Sqrt(areaSum)) * mInvSquaredBoundBoxDiagonal : 0.0;
+			cost = areaSum > (Real)1e-06 ? tripleVolumeSum / ((Real)2.0 * Math::Sqrt(areaSum)) * mInvSquaredBoundBoxDiagonal : (Real)0.0;
 		}
 		
 		// take into consideration texture coordinates and normal direction
