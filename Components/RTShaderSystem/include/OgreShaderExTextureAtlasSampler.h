@@ -166,9 +166,9 @@ public:
 
 // Protected methods
 protected:	
-	virtual bool			resolveParameters		(ProgramSet* programSet);	
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);	
+	virtual bool resolveDependencies(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 	/** 
 	Given an address mode returns the function name which calculates the UV values for that addressing mode
@@ -178,13 +178,18 @@ protected:
 
 // Attributes.
 protected:
-	ParameterPtr mVSInpTextureTableIndex; // The index of the information on the texture in the table
+	// The index of the information on the texture in the table
+	ParameterPtr mVSInpTextureTableIndex;
 	
 	TextureUnitState::UVWAddressingMode mTextureAddressings[TAS_MAX_TEXTURES]; // The addressing mode for each texture
-	ParameterPtr mVSOutTextureDatas[TAS_MAX_TEXTURES]; // The position and size of the texture in the atlas 
-	ParameterPtr mPSInpTextureDatas[TAS_MAX_TEXTURES]; // The position and size of the texture in the atlas
-	UniformParameterPtr mPSTextureSizes[TAS_MAX_TEXTURES]; //A parameter carrying the sizes of the atlas textures
-	UniformParameterPtr mVSTextureTable[TAS_MAX_TEXTURES]; // The table containing information on the textures in the atlas
+	// The position and size of the texture in the atlas 
+	ParameterPtr mVSOutTextureDatas[TAS_MAX_TEXTURES];
+	// The position and size of the texture in the atlas
+	ParameterPtr mPSInpTextureDatas[TAS_MAX_TEXTURES];
+	//A parameter carrying the sizes of the atlas textures
+	UniformParameterPtr mPSTextureSizes[TAS_MAX_TEXTURES];
+	// The table containing information on the textures in the atlas
+	UniformParameterPtr mVSTextureTable[TAS_MAX_TEXTURES];
 
 	//The position of the texture coordinates containing the index information 
 	ushort mAtlasTexcoordPos; 
@@ -357,7 +362,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl();
+	virtual SubRenderState* createInstanceImpl();
 
 private:
 

@@ -51,22 +51,22 @@ public:
 
 	/** Class constructor.
 	*/
-	HLSLProgramProcessor			();
+	HLSLProgramProcessor();
 
 	/** Class destructor */
-	virtual ~HLSLProgramProcessor	();
+	virtual ~HLSLProgramProcessor();
 
 	/** Return the target language of this processor. */
-	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
+	virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
 	/** 
 	@see ProgramProcessor::preCreateGpuPrograms
 	*/
-	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
+	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
 	/** 
 	@see ProgramProcessor::postCreateGpuPrograms
 	*/
-	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
+	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
 	static String TargetLanguage;
 

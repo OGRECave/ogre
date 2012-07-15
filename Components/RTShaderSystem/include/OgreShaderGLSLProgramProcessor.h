@@ -52,36 +52,37 @@ public:
 
 	/** Class constructor.
 	*/
-	GLSLProgramProcessor			();
+	GLSLProgramProcessor();
 
 	/** Class destructor */
-	virtual ~GLSLProgramProcessor	();
+	virtual ~GLSLProgramProcessor();
 
 	/** Return the target language of this processor. */
-	virtual const String&		getTargetLanguage	() const { return TargetLanguage; }
+	virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
 	/** 
 	@see ProgramProcessor::preCreateGpuPrograms
 	*/
-	virtual bool				preCreateGpuPrograms			(ProgramSet* programSet);
+	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
 
 	/** 
 	@see ProgramProcessor::postCreateGpuPrograms
 	*/
-	virtual bool				postCreateGpuPrograms			(ProgramSet* programSet);
+	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
 
 private:
 
 	/** Bind texture samplers. */
-	void						bindTextureSamplers				(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
+	void bindTextureSamplers(Program* pCpuProgram, GpuProgramPtr pGpuProgram);
 
 	/** Compiles sub shaders (only if the not exists) and attach them to the main gpu program. */
-	void						bindSubShaders					(Program* program, GpuProgramPtr pGpuProgram);
+	void bindSubShaders(Program* program, GpuProgramPtr pGpuProgram);
 
 	static String TargetLanguage;
 
-	StringVector	mLibraryPrograms;		// The list of created library shaders.
+	// The list of created library shaders.
+	StringVector mLibraryPrograms;
 
 };
 

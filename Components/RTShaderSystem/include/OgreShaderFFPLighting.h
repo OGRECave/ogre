@@ -62,27 +62,27 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
 	*/
-	virtual void			updateGpuProgramsParams	(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
+	virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 
 	static String Type;
@@ -94,12 +94,18 @@ protected:
 	struct _OgreRTSSExport LightParams
 	{
 		Light::LightTypes		mType;				// Light type.		
-		UniformParameterPtr		mPosition;			// Light position.
-		UniformParameterPtr		mDirection;			// Light direction.
-		UniformParameterPtr		mAttenuatParams;	// Attenuation parameters.
-		UniformParameterPtr		mSpotParams;		// Spot light parameters.
-		UniformParameterPtr		mDiffuseColour;		// Diffuse colour.
-		UniformParameterPtr		mSpecularColour;	// Specular colour.
+		// Light position.
+		UniformParameterPtr mPosition;
+		// Light direction.
+		UniformParameterPtr mDirection;
+		// Attenuation parameters.
+		UniformParameterPtr mAttenuatParams;
+		// Spot light parameters.
+		UniformParameterPtr mSpotParams;
+		// Diffuse colour.
+		UniformParameterPtr mDiffuseColour;
+		// Specular colour.
+		UniformParameterPtr mSpecularColour;
 
 	};
 
@@ -114,85 +120,104 @@ protected:
 	can be the vertex colour component. To establish such a link one should provide the matching flags to this
 	sub render state.
 	*/
-	void					setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
+	void setTrackVertexColourType(TrackVertexColourType type) { mTrackVertexColourType = type; }
 
 	/** 
 	Return the current track per vertex type.
 	*/
-	TrackVertexColourType	getTrackVertexColourType() const { return mTrackVertexColourType; }
+	TrackVertexColourType getTrackVertexColourType() const { return mTrackVertexColourType; }
 
 	/** 
 	Set the light count per light type that this sub render state will generate.
 	@see ShaderGenerator::setLightCount.
 	*/
-	void					setLightCount			(const int lightCount[3]);
+	void setLightCount(const int lightCount[3]);
 
 	/** 
 	Get the light count per light type that this sub render state will generate.
 	@see ShaderGenerator::getLightCount.
 	*/
-	void					getLightCount			(int lightCount[3]) const;
+	void getLightCount(int lightCount[3]) const;
 
 	/** 
 	Set the specular component state. If set to true this sub render state will compute a specular
 	lighting component in addition to the diffuse component.
 	@param enable Pass true to enable specular component computation.
 	*/
-	void					setSpecularEnable		(bool enable) { mSpecularEnable = enable; }
+	void setSpecularEnable(bool enable) { mSpecularEnable = enable; }
 
 	/** 
 	Get the specular component state. 
 	*/
-	bool					getSpecularEnable		() const	  { return mSpecularEnable; }
+	bool getSpecularEnable() const	  { return mSpecularEnable; }
 
 	/** 
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool			resolveParameters		(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
+	virtual bool resolveDependencies(ProgramSet* programSet);
 
 	/** 
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 
 	/** 
 	Internal method that adds global illumination component functions invocations.
 	*/
-	bool			addGlobalIlluminationInvocation	(Function* vsMain, const int groupOrder, int& internalCounter);
+	bool addGlobalIlluminationInvocation(Function* vsMain, const int groupOrder, int& internalCounter);
 			
 	/** 
 	Internal method that adds per light illumination component functions invocations.
 	*/
-	bool			addIlluminationInvocation		(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
+	bool addIlluminationInvocation(LightParams* curLightParams, Function* vsMain, const int groupOrder, int& internalCounter);
 
 
 // Attributes.
 protected:	
-	TrackVertexColourType	mTrackVertexColourType;			// Track per vertex colour type.
-	bool					mSpecularEnable;				// Specular component enabled/disabled.
-	LightParamsList			mLightParamsList;				// Light list.
-	UniformParameterPtr		mWorldViewMatrix;				// World view matrix parameter.
-	UniformParameterPtr		mWorldViewITMatrix;				// World view matrix inverse transpose parameter.
-	ParameterPtr			mVSInPosition;					// Vertex shader input position parameter.
-	ParameterPtr			mVSInNormal;					// Vertex shader input normal.
-	ParameterPtr			mVSDiffuse;						// Vertex shader diffuse.
-	ParameterPtr			mVSOutDiffuse;					// Vertex shader output diffuse colour parameter.
-	ParameterPtr			mVSOutSpecular;					// Vertex shader output specular colour parameter.
-	UniformParameterPtr		mDerivedSceneColour;			// Derived scene colour parameter.
-	UniformParameterPtr		mLightAmbientColour;			// Ambient light colour parameter.
-	UniformParameterPtr		mDerivedAmbientLightColour;		// Derived ambient light colour parameter.
-	UniformParameterPtr		mSurfaceAmbientColour;			// Surface ambient colour parameter.
-	UniformParameterPtr		mSurfaceDiffuseColour;			// Surface diffuse colour parameter.
-	UniformParameterPtr		mSurfaceSpecularColour;			// Surface specular colour parameter.
-	UniformParameterPtr		mSurfaceEmissiveColour;			// Surface emissive colour parameter.
-	UniformParameterPtr		mSurfaceShininess;				// Surface shininess parameter.
-	static Light			msBlankLight;					// Shared blank light.
+	// Track per vertex colour type.
+	TrackVertexColourType mTrackVertexColourType;
+	// Specular component enabled/disabled.
+	bool mSpecularEnable;
+	// Light list.
+	LightParamsList mLightParamsList;
+	// World view matrix parameter.
+	UniformParameterPtr mWorldViewMatrix;
+	// World view matrix inverse transpose parameter.
+	UniformParameterPtr mWorldViewITMatrix;
+	// Vertex shader input position parameter.
+	ParameterPtr mVSInPosition;
+	// Vertex shader input normal.
+	ParameterPtr mVSInNormal;
+	// Vertex shader diffuse.
+	ParameterPtr mVSDiffuse;
+	// Vertex shader output diffuse colour parameter.
+	ParameterPtr mVSOutDiffuse;
+	// Vertex shader output specular colour parameter.
+	ParameterPtr mVSOutSpecular;
+	// Derived scene colour parameter.
+	UniformParameterPtr mDerivedSceneColour;
+	// Ambient light colour parameter.
+	UniformParameterPtr mLightAmbientColour;
+	// Derived ambient light colour parameter.
+	UniformParameterPtr mDerivedAmbientLightColour;
+	// Surface ambient colour parameter.
+	UniformParameterPtr mSurfaceAmbientColour;
+	// Surface diffuse colour parameter.
+	UniformParameterPtr mSurfaceDiffuseColour;
+	// Surface specular colour parameter.
+	UniformParameterPtr mSurfaceSpecularColour;
+	// Surface emissive colour parameter.
+	UniformParameterPtr mSurfaceEmissiveColour;
+	// Surface shininess parameter.
+	UniformParameterPtr mSurfaceShininess;
+	// Shared blank light.
+	static Light msBlankLight;
 
 };
 
@@ -208,17 +233,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:
@@ -226,7 +251,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };
