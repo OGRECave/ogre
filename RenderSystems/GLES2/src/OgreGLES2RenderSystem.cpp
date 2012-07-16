@@ -552,7 +552,6 @@ namespace Ogre {
 
 		if( fbo )
 		{
-             LogManager::getSingleton().logMessage("*** _createDepthBufferFor FBO ");
 			// Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
 			// Find best depth & stencil format suited for the RT's format
 			GLuint depthFormat, stencilFormat;

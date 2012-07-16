@@ -35,7 +35,6 @@ namespace Ogre {
                                      ::EGLSurface drawable)
     : EGLContext(eglDisplay, glsupport, glconfig, drawable)
     {
-        LogManager::getSingleton().logMessage("\tAndroidEGLContext called");
     }
     
     AndroidEGLContext::~AndroidEGLContext()

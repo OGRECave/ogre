@@ -71,17 +71,14 @@ namespace Ogre {
 
 	void AndroidEGLWindow::createNativeWindow( int &left, int &top, uint &width, uint &height, String &title )
 	{
-		LogManager::getSingleton().logMessage("\tcreateNativeWindow called");
 	}
 
 	void AndroidEGLWindow::reposition( int left, int top )
 	{
-		LogManager::getSingleton().logMessage("\treposition called");
 	}
 
 	void AndroidEGLWindow::resize(uint width, uint height)
 	{
-		LogManager::getSingleton().logMessage("\tresize called");
 	}
 
 	void AndroidEGLWindow::windowMovedOrResized()
@@ -100,8 +97,6 @@ namespace Ogre {
     void AndroidEGLWindow::create(const String& name, uint width, uint height,
                                bool fullScreen, const NameValuePairList *miscParams)
     {
-        LogManager::getSingleton().logMessage("\tcreate called");
-				
 		mName = name;
         mWidth = width;
         mHeight = height;
