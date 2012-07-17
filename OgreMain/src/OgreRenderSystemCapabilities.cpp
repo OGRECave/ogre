@@ -313,7 +313,7 @@ namespace Ogre {
 			msGPUVendorStrings.resize(GPU_VENDOR_COUNT);
 			msGPUVendorStrings[GPU_UNKNOWN] = "unknown";
 			msGPUVendorStrings[GPU_NVIDIA] = "nvidia";
-			msGPUVendorStrings[GPU_ATI] = "ati";
+			msGPUVendorStrings[GPU_AMD] = "amd";
 			msGPUVendorStrings[GPU_INTEL] = "intel";
 			msGPUVendorStrings[GPU_3DLABS] = "3dlabs";
 			msGPUVendorStrings[GPU_S3] = "s3";
@@ -321,6 +321,11 @@ namespace Ogre {
 			msGPUVendorStrings[GPU_SIS] = "sis";
 			msGPUVendorStrings[GPU_IMAGINATION_TECHNOLOGIES] = "imagination technologies";
 			msGPUVendorStrings[GPU_APPLE] = "apple";    // iOS Simulator
+			msGPUVendorStrings[GPU_NOKIA] = "nokia";
+			msGPUVendorStrings[GPU_MS_SOFTWARE] = "microsoft"; // Microsoft software device
+			msGPUVendorStrings[GPU_MS_WARP] = "ms warp";
+			msGPUVendorStrings[GPU_ARM] = "arm";
+			msGPUVendorStrings[GPU_QUALCOMM] = "qualcomm";
 		}
 	}
 
