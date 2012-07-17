@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for OpenGL 
@@ -46,7 +47,7 @@ namespace Ogre {
 		not create a program object.  It's up to GLES2GpuProgram class to request a program object
 		to link the shader object to.
     */
-    class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram
+    class _OgreGLES2Export GLSLESProgram : public HighLevelGpuProgram MANAGED_RESOURCE
     {
     public:
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
@@ -137,6 +138,12 @@ namespace Ogre {
 			delete the needed lines from the source if needed then try to re-compile.
 		*/
 		void checkAndFixInvalidDefaultPrecisionError( String &message );
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost();
+#endif
+        
 	private:
 		/// GL handle for shader object
 		GLuint mGLShaderHandle;

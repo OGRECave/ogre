@@ -1,0 +1,24 @@
+LOCAL_PATH := $(call my-dir)
+    include $(CLEAR_VARS)
+    LOCAL_MODULE    := OgreSampleBrowser
+
+    LOCAL_LDLIBS	:= -landroid -lc -lm -ldl -llog -lEGL -lGLESv2
+    LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib 
+    LOCAL_LDLIBS	+= -lSample_CameraTrack -lSample_CelShading -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_CubeMapping -lSample_DynTex
+    LOCAL_LDLIBS	+= -lSample_FacialAnimation -lSample_Fresnel -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke
+    LOCAL_LDLIBS	+= -lPlugin_ParticleFXStatic -lPlugin_OctreeSceneManagerStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lOgreMainStatic
+    LOCAL_LDLIBS	+= -lzzip -lzlib -lFreeImage -lfreetype -lOIS @OGRE_BINARY_DIR@/systemlibs/@ANDROID_ABI@/libsupc++.a @OGRE_BINARY_DIR@/systemlibs/@ANDROID_ABI@/libstdc++.a
+    LOCAL_STATIC_LIBRARIES := android_native_app_glue 
+    
+    LOCAL_CFLAGS := -DGL_GLEXT_PROTOTYPES=1 -I@OGRE_BINARY_DIR@/include -I@CMAKE_SOURCE_DIR@/OgreMain/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include/EGL
+    LOCAL_CFLAGS += -I@CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include -I@CMAKE_SOURCE_DIR@/PlugIns/ParticleFX/include -I@CMAKE_SOURCE_DIR@/PlugIns/OctreeSceneManager/include 
+    LOCAL_CFLAGS += -I@OGRE_DEPENDENCIES_DIR@/include -I@OGRE_DEPENDENCIES_DIR@/include/ois -I@OGRE_BINARY_DIR@/Samples/include
+    LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1 
+    
+    LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src
+    LOCAL_SRC_FILES := FileSystemLayerImpl_Android.cpp SampleBrowser.cpp 
+        
+    include $(BUILD_SHARED_LIBRARY) 
+     
+    $(call import-module,android/native_app_glue) 
+      

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLES2RenderTexture.h"
 #include "OgreGLES2Context.h"
 #include "OgreGLES2FrameBufferObject.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     class GLES2FBOManager;
@@ -38,11 +39,11 @@ namespace Ogre {
 
     /** RenderTexture for GL ES 2 FBO
     */
-    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture
+    class _OgreGLES2Export GLES2FBORenderTexture: public GLES2RenderTexture MANAGED_RESOURCE
     {
     public:
         GLES2FBORenderTexture(GLES2FBOManager *manager, const String &name, const GLES2SurfaceDesc &target, bool writeGamma, uint fsaa);
-
+        
         virtual void getCustomAttribute(const String& name, void* pData);
 
 		/// Override needed to deal with multisample buffers
@@ -54,11 +55,19 @@ namespace Ogre {
 		virtual void _detachDepthBuffer();
     protected:
         GLES2FrameBufferObject mFB;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        virtual void notifyOnContextReset();
+#endif
     };
     
     /** Factory for GL ES 2 Frame Buffer Objects, and related things.
     */
-    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager
+    class _OgreGLES2Export GLES2FBOManager: public GLES2RTTManager 
     {
     public:
         GLES2FBOManager();
@@ -104,6 +113,10 @@ namespace Ogre {
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
         */
         GLuint getTemporaryFBO() { return mTempFBO; }
+        
+        /** Detects all supported fbo's and recreates the tempory fbo */
+        void _reload();
+        
     private:
         /** Frame Buffer Object properties for a certain texture format.
         */

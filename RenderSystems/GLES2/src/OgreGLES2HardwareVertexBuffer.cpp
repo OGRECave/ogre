@@ -46,31 +46,55 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer");
         }
 
+        createBuffer();
+    }
+
+    GLES2HardwareVertexBuffer::~GLES2HardwareVertexBuffer()
+    {
+        destroyBuffer();
+    }
+
+    void GLES2HardwareVertexBuffer::createBuffer()
+    {
         glGenBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
-
+        
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Cannot create GL ES vertex buffer",
                         "GLES2HardwareVertexBuffer::GLES2HardwareVertexBuffer");
         }
-
+        
         dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
         glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
-                     GLES2HardwareBufferManager::getGLUsage(usage));
+                     GLES2HardwareBufferManager::getGLUsage(mUsage));
         GL_CHECK_ERROR;
     }
-
-    GLES2HardwareVertexBuffer::~GLES2HardwareVertexBuffer()
+    
+    void GLES2HardwareVertexBuffer::destroyBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
-
+        
         // Delete the cached value
         dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->_deleteGLBuffer(GL_ARRAY_BUFFER, mBufferId);
     }
-
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2HardwareVertexBuffer::notifyOnContextLost()
+    {
+        destroyBuffer();
+    }
+    
+    void GLES2HardwareVertexBuffer::notifyOnContextReset()
+    {
+        createBuffer();
+        mShadowUpdated = true;
+        _updateFromShadow();
+    }
+#endif
+    
     void* GLES2HardwareVertexBuffer::lockImpl(size_t offset,
                                            size_t length,
                                            LockOptions options)

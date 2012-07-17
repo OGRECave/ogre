@@ -258,6 +258,23 @@ namespace Ogre {
 #endif
 
 //----------------------------------------------------------------------------
+// Android Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#   ifdef OGRE_UNICODE_SUPPORT
+#       undef OGRE_UNICODE_SUPPORT
+#   endif
+#	define OGRE_UNICODE_SUPPORT 0
+#   define OGRE_DEBUG_MODE 0
+#	  define CLOCKS_PER_SEC  1000
+    // A quick define to overcome different names for the same function
+#   define stricmp strcasecmp
+#   ifdef DEBUG
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
+#endif
+//----------------------------------------------------------------------------
 // Endian Settings
 // check for BIG_ENDIAN config flag, set OGRE_ENDIAN correctly
 #ifdef OGRE_CONFIG_BIG_ENDIAN

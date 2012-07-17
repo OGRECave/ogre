@@ -32,6 +32,7 @@ set(HEADER_FILES
   include/OgreGLES2Texture.h
   include/OgreGLES2TextureManager.h
   include/OgreGLES2VertexDeclaration.h
+  include/OgreGLES2Context.h
 )
 
 set(SOURCE_FILES
@@ -132,6 +133,34 @@ elseif (WIN32)
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
   link_directories(${OPENGLES2_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "WIN32")
+elseif (ANDROID)
+  set(PLATFORM_HEADERS 
+    include/EGL/Android/OgreAndroidEGLContext.h
+    include/EGL/Android/OgreAndroidEGLSupport.h
+    include/EGL/Android/OgreAndroidEGLWindow.h
+    include/EGL/Android/OgreGLES2Util.h
+    include/EGL/Android/OgreAndroidResourceManager.h
+    include/EGL/Android/OgreAndroidResource.h
+    include/EGL/OgreEGLContext.h
+    include/EGL/OgreEGLRenderTexture.h
+    include/EGL/OgreEGLSupport.h
+    include/EGL/OgreEGLWindow.h
+  )
+  set(PLATFORM_SOURCES
+    src/EGL/Android/OgreAndroidEGLContext.cpp
+    src/EGL/Android/OgreAndroidEGLSupport.cpp
+    src/EGL/Android/OgreAndroidEGLWindow.cpp
+    src/EGL/Android/OgreAndroidResourceManager.cpp
+    src/EGL/Android/OgreAndroidResource.cpp
+    src/EGL/OgreEGLContext.cpp
+    src/EGL/OgreEGLRenderTexture.cpp
+    src/EGL/OgreEGLSupport.cpp
+    src/EGL/OgreEGLWindow.cpp
+  )
+
+  include_directories(src/EGL/Android include/EGL/Android)
+  link_directories(${OPENGLES2_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (APPLE)
   set(PLATFORM_HEADERS 
     include/EAGL/OgreEAGLES2Context.h
