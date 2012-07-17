@@ -1128,7 +1128,7 @@ protected:
             miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
             miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
             // create 1x1 window - we will resize later
-            res = mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
+            return mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			return NULL;
