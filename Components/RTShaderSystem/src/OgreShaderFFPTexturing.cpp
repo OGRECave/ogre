@@ -86,20 +86,17 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 {
 	Program* vsProgram = programSet->getCpuVertexProgram();
 	Program* psProgram = programSet->getCpuFragmentProgram();
-	
+	bool hasError = false;
 	
 	// Resolve texture sampler parameter.		
 	textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
-	if (textureUnitParams->mTextureSampler.get() == NULL)
-		return false;
+	hasError |= !(textureUnitParams->mTextureSampler.get());
 	
-		
 	// Resolve texture matrix parameter.
 	if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
 	{				
 		textureUnitParams->mTextureMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_TEXTURE_MATRIX, textureUnitParams->mTextureSamplerIndex);
-		if (textureUnitParams->mTextureMatrix.get() == NULL)
-			return false;
+		hasError |= !(textureUnitParams->mTextureMatrix.get());
 	}
 
 	switch (textureUnitParams->mTexCoordCalcMethod)
@@ -113,41 +110,26 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 	case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 		
 		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
-		if (mWorldITMatrix.get() == NULL)		
-			return false;	
-		
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
-		if (mViewMatrix.get() == NULL)		
-			return false;				
 		
+		hasError |= !(mWorldITMatrix.get()) || !(mViewMatrix.get());
 		break;
 
 	case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		if (mWorldMatrix.get() == NULL)		
-			return false;	
-
 		mWorldITMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX, 0);
-		if (mWorldITMatrix.get() == NULL)		
-			return false;	
-
 		mViewMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_VIEW_MATRIX, 0);
-		if (mViewMatrix.get() == NULL)		
-			return false;	
-
+		
+		hasError |= !(mWorldMatrix.get()) || !(mWorldITMatrix.get()) || !(mViewMatrix.get());
 		break;
-
 
 	case TEXCALC_PROJECTIVE_TEXTURE:
 
 		mWorldMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLD_MATRIX, 0);
-		if (mWorldMatrix.get() == NULL)		
-			return false;	
-
 		textureUnitParams->mTextureViewProjImageMatrix = vsProgram->resolveParameter(GCT_MATRIX_4X4, -1, (uint16)GPV_LIGHTS, "gTexViewProjImageMatrix");
-		if (textureUnitParams->mTextureViewProjImageMatrix.get() == NULL)		
-			return false;	
-
+		
+		hasError |= !(mWorldMatrix.get()) || !(textureUnitParams->mTextureViewProjImageMatrix.get());
+		
 		const TextureUnitState::EffectMap&		effectMap = textureUnitParams->mTextureUnitState->getEffects();	
 		TextureUnitState::EffectMap::const_iterator	effi;
 
@@ -160,14 +142,17 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
 			}
 		}
 
-		
-
-		if (textureUnitParams->mTextureProjector == NULL)		
-			return false;	
-
+		hasError |= !(textureUnitParams->mTextureProjector);
 		break;
 	}
 
+	
+	if (hasError)
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Not all parameters could be constructed for the sub-render state.",
+				"FFPTexturing::resolveUniformParams" );
+	}
 	return true;
 }
 
@@ -181,7 +166,8 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	Function* vsMain   = vsProgram->getEntryPointFunction();
 	Function* psMain   = psProgram->getEntryPointFunction();
 	Parameter::Content texCoordContent = Parameter::SPC_UNKNOWN;
-	
+	bool hasError = false;
+
 	switch (textureUnitParams->mTexCoordCalcMethod)
 	{
 		case TEXCALC_NONE:					
@@ -194,8 +180,7 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 				textureUnitParams->mTextureUnitState->getTextureCoordSet(), 
 				Parameter::Content(Parameter::SPC_TEXTURE_COORDINATE0 + textureUnitParams->mTextureUnitState->getTextureCoordSet()),
 				textureUnitParams->mVSInTextureCoordinateType);	
-			if (textureUnitParams->mVSInputTexCoord.get() == NULL)			
-				return false;		
+			hasError |= !(textureUnitParams->mVSInputTexCoord.get());
 			break;
 
 		case TEXCALC_ENVIRONMENT_MAP:
@@ -203,28 +188,23 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		case TEXCALC_ENVIRONMENT_MAP_NORMAL:
 			// Resolve vertex normal.
 			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-			if (mVSInputNormal.get() == NULL)			
-				return false;									
+			hasError |= !(mVSInputNormal.get());
 			break;	
 
 		case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
 
 			// Resolve vertex normal.
 			mVSInputNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
-			if (mVSInputNormal.get() == NULL)			
-				return false;		
-
 			// Resolve vertex position.
 			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInputPos.get() == NULL)			
-				return false;		
+			
+			hasError |= !(mVSInputNormal.get()) || !(mVSInputPos.get());
 			break;
 
 		case TEXCALC_PROJECTIVE_TEXTURE:
 			// Resolve vertex position.
 			mVSInputPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-			if (mVSInputPos.get() == NULL)			
-				return false;		
+			hasError |= !(mVSInputPos.get());
 			break;
 	}
 
@@ -234,18 +214,11 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 		texCoordContent,
 		textureUnitParams->mVSOutTextureCoordinateType);
 
-	if (textureUnitParams->mVSOutputTexCoord.get() == NULL)
-		return false;
-		
-
 	// Resolve ps input texture coordinates.
 	textureUnitParams->mPSInputTexCoord = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
 		textureUnitParams->mVSOutputTexCoord->getIndex(),
 		textureUnitParams->mVSOutputTexCoord->getContent(),
 		textureUnitParams->mVSOutTextureCoordinateType);
-
-	if (textureUnitParams->mPSInputTexCoord.get() == NULL)
-		return false;
 
 	const ShaderParameterList& inputParams = psMain->getInputParameters();
 	const ShaderParameterList& localParams = psMain->getLocalParameters();
@@ -254,23 +227,25 @@ bool FFPTexturing::resolveFunctionsParams(TextureUnitParams* textureUnitParams, 
 	if (mPSDiffuse.get() == NULL)
 	{
 		mPSDiffuse = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-		if (mPSDiffuse.get() == NULL)
-			return false;
 	}
 
 	mPSSpecular = psMain->getParameterByContent(inputParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
 	if (mPSSpecular.get() == NULL)
 	{
 		mPSSpecular = psMain->getParameterByContent(localParams, Parameter::SPC_COLOR_SPECULAR, GCT_FLOAT4);
-		if (mPSSpecular.get() == NULL)
-			return false;
 	}
 
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse.get() == NULL)	
-		return false;
-
 	
+	hasError |= !(textureUnitParams->mVSOutputTexCoord.get()) || !(textureUnitParams->mPSInputTexCoord.get()) || 
+		!(mPSDiffuse.get()) || !(mPSSpecular.get()) || !(mPSOutDiffuse.get());
+	
+	if (hasError)
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Not all parameters could be constructed for the sub-render state.",
+				"FFPTexturing::resolveFunctionsParams" );
+	}
 	return true;
 }
 

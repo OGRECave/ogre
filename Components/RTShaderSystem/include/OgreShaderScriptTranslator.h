@@ -134,7 +134,8 @@ protected:
 			
 protected:
 
-	RenderState* mGeneratedRenderState; //Render state created as a result of the current node being parsed
+	//Render state created as a result of the current node being parsed
+	RenderState* mGeneratedRenderState;
 
 };
 

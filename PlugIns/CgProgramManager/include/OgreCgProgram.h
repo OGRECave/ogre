@@ -88,6 +88,9 @@ namespace Ogre {
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
 
+        /// Load the high-level part in a thread-safe way, required for delegate functionality
+        void loadHighLevelSafe();
+
 		/// Recurse down structures getting data on parameters
 		void recurseParams(CGparameter param, size_t contextArraySize = 1);
 		/// Turn a Cg type into a GpuConstantType and number of elements
@@ -105,6 +108,8 @@ namespace Ogre {
 		
 		GpuConstantDefinitionMap mParametersMap;
 		size_t mParametersMapSizeAsBuffer;
+        map<String,int>::type mSamplerRegisterMap;
+        CGenum mInputOp, mOutputOp;
 		
         /// Internal method which works out which profile to use for this program
         void selectProfile(void);
@@ -116,6 +121,14 @@ namespace Ogre {
 		void getMicrocodeFromCache(void);
 		void compileMicrocode(void);
 		void addMicrocodeToCache();
+
+    private:
+        HighLevelGpuProgramPtr mDelegate;
+        String getHighLevelLanguage() const;
+        String getHighLevelTarget() const;
+        void fixHighLevelOutput(String& hlSource);
+
+
     public:
         CgProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader, 
@@ -137,9 +150,24 @@ namespace Ogre {
         /// Overridden from GpuProgram
         bool isSupported(void) const;
         /// Overridden from GpuProgram
-		bool getPassTransformStates(void) const { return true; /* CG uses MVP matrix when -posinv argument passed */ }
-        /// Overridden from GpuProgram
         const String& getLanguage(void) const;
+
+        GpuProgramParametersSharedPtr createParameters();
+        GpuProgram* _getBindingDelegate();
+
+        bool isSkeletalAnimationIncluded(void) const;
+        bool isMorphAnimationIncluded(void) const;
+        bool isPoseAnimationIncluded(void) const;
+        bool isVertexTextureFetchRequired(void) const;
+        GpuProgramParametersSharedPtr getDefaultParameters(void);
+        bool hasDefaultParameters(void) const;
+        bool getPassSurfaceAndLightStates(void) const;
+        bool getPassFogStates(void) const;
+        bool getPassTransformStates(void) const;
+        bool hasCompileError(void) const;
+        void resetCompileError(void);
+        size_t getSize(void) const;
+        void touch(void);
 
 		/// Scan the file for #include and replace with source from the OGRE resources
 		static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);

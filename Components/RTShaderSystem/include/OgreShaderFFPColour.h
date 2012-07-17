@@ -72,22 +72,22 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual const String&	getType					() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int				getExecutionOrder		() const;
+	virtual int getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::copyFrom.
 	*/
-	virtual void			copyFrom				(const SubRenderState& rhs);
+	virtual void copyFrom(const SubRenderState& rhs);
 
 	/** 
 	@see SubRenderState::preAddToRenderState.
 	*/
-	virtual bool			preAddToRenderState		(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
+	virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
 
 	/** 
 	Set the resolve stage flags that this sub render state will produce.
@@ -95,44 +95,53 @@ public:
 	and the pixel shader should output diffuse component he should pass SF_VS_INPUT_DIFFUSE | SF_PS_OUTPUT_DIFFUSE.
 	@param flags The stage flag to set.
 	*/
-	void				setResolveStageFlags		(unsigned int flags) { mResolveStageFlags = flags; }
+	void setResolveStageFlags(unsigned int flags) { mResolveStageFlags = flags; }
 
 	/** 
 	Get the current resolve stage flags.		
 	*/
-	unsigned int		getResolveStageFlags		() const			 { return mResolveStageFlags; }
+	unsigned int getResolveStageFlags() const			 { return mResolveStageFlags; }
 
 	/** 
 	Add the given mask to resolve stage flags that this sub render state will produce.	
 	@param mask The mask to add to current flag set.
 	*/
-	void				addResolveStageMask 		(unsigned int mask)  { mResolveStageFlags |= mask; }
+	void addResolveStageMask(unsigned int mask)  { mResolveStageFlags |= mask; }
 
 	/** 
 	Remove the given mask from the resolve stage flags that this sub render state will produce.	
 	@param mask The mask to remove from current flag set.
 	*/
-	void				removeResolveStageMask 		(unsigned int mask)  { mResolveStageFlags &= ~mask; }
+	void removeResolveStageMask(unsigned int mask)  { mResolveStageFlags &= ~mask; }
 
 	static String Type;
 
 // Protected methods
 protected:	
-	virtual bool			resolveParameters		(ProgramSet* programSet);	
-	virtual bool			resolveDependencies		(ProgramSet* programSet);
-	virtual bool			addFunctionInvocations	(ProgramSet* programSet);
+	virtual bool resolveParameters(ProgramSet* programSet);	
+	virtual bool resolveDependencies(ProgramSet* programSet);
+	virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 // Attributes.
 protected:
-	ParameterPtr	mVSInputDiffuse;			// Vertex shader input diffuse component.
-	ParameterPtr	mVSInputSpecular;			// Vertex shader input specular component.
-	ParameterPtr	mVSOutputDiffuse;			// Vertex shader output diffuse component.
-	ParameterPtr	mVSOutputSpecular;			// Vertex shader input specular component.
-	ParameterPtr	mPSInputDiffuse;			// Pixel shader input diffuse component.
-	ParameterPtr	mPSInputSpecular;			// Pixel shader input specular component.
-	ParameterPtr	mPSOutputDiffuse;			// Pixel shader output diffuse component.
-	ParameterPtr	mPSOutputSpecular;			// Pixel shader input specular component.
-	unsigned int	mResolveStageFlags;			// Stage flags that defines resolve parameters definitions.
+	// Vertex shader input diffuse component.
+	ParameterPtr mVSInputDiffuse;
+	// Vertex shader input specular component.
+	ParameterPtr mVSInputSpecular;
+	// Vertex shader output diffuse component.
+	ParameterPtr mVSOutputDiffuse;
+	// Vertex shader input specular component.
+	ParameterPtr mVSOutputSpecular;
+	// Pixel shader input diffuse component.
+	ParameterPtr mPSInputDiffuse;
+	// Pixel shader input specular component.
+	ParameterPtr mPSInputSpecular;
+	// Pixel shader output diffuse component.
+	ParameterPtr mPSOutputDiffuse;
+	// Pixel shader input specular component.
+	ParameterPtr mPSOutputSpecular;
+	// Stage flags that defines resolve parameters definitions.
+	unsigned int mResolveStageFlags;
 };
 
 
@@ -147,17 +156,17 @@ public:
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String&	getType				() const;
+	virtual const String& getType() const;
 
 	/** 
 	@see SubRenderStateFactory::createInstance.
 	*/
-	virtual SubRenderState*	createInstance		(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
+	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
 
 	/** 
 	@see SubRenderStateFactory::writeInstance.
 	*/
-	virtual void			writeInstance		(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
+	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
 
 	
 protected:
@@ -165,7 +174,7 @@ protected:
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState*	createInstanceImpl	();
+	virtual SubRenderState* createInstanceImpl();
 
 
 };

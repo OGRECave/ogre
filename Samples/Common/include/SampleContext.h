@@ -317,6 +317,7 @@ namespace OgreBites
 				mLastRun = true;  // assume this is our last run
 
 				initApp(initialSample);
+                loadStartUpSample();
         
                 if (mRoot->getRenderSystem() != NULL)
                 {
@@ -330,6 +331,8 @@ namespace OgreBites
 #endif
 		}
 #endif
+
+        virtual void loadStartUpSample() {}
         
 		virtual bool isCurrentSamplePaused()
 		{

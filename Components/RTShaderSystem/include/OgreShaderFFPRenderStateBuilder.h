@@ -51,8 +51,8 @@ class _OgreRTSSExport FFPRenderStateBuilder : public Singleton<FFPRenderStateBui
 {
 // Interface.
 public:
-	FFPRenderStateBuilder	();
-	~FFPRenderStateBuilder	();
+	FFPRenderStateBuilder();
+	~FFPRenderStateBuilder();
 
 	/** Override standard Singleton retrieval.
 	@remarks
@@ -69,7 +69,7 @@ public:
 	but the implementation stays in this single compilation unit,
 	preventing link errors.
 	*/
-	static FFPRenderStateBuilder&			getSingleton	();	
+	static FFPRenderStateBuilder& getSingleton();	
 
 	/** Override standard Singleton retrieval.
 	@remarks
@@ -86,26 +86,26 @@ public:
 	but the implementation stays in this single compilation unit,
 	preventing link errors.
 	*/
-	static FFPRenderStateBuilder*			getSingletonPtr	();
+	static FFPRenderStateBuilder* getSingletonPtr();
 
 
 	/** 
 	Initialize the FFP builder instance.
 	Return true upon success.
 	*/
-	bool		initialize					();
+	bool initialize();
 
 	/** 
 	Finalize the FFP builder instance.	
 	*/
-	void		finalize					();
+	void finalize();
 
 	/** 
 	Build render state from the given pass that emulates the fixed function pipeline behaviour.	
 	@param sgPass The shader generator pass representation. Contains both source and destination pass.
 	@param renderState The target render state that will hold the given pass FFP representation.
 	*/
-	void		buildRenderState			(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
+	void buildRenderState(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
 
 	
 // Protected types.
@@ -120,18 +120,19 @@ protected:
 	/** 
 	Internal method that builds FFP sub render state.
 	*/
-	void		buildFFPSubRenderState			(int subRenderStateOrder, const String& subRenderStateType, 
+	void buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType, 
 												 ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
 	
 	/** 
 	Internal method that resolves the colour stage flags.
 	*/
-	void		resolveColourStageFlags		(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
+	void resolveColourStageFlags(ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState);
 
 
 // Attributes.
 protected:
-	SubRenderStateFactoryList	mFFPSubRenderStateFactoyList;		// All factories needed by the FFP.
+	// All factories needed by the FFP.
+	SubRenderStateFactoryList mFFPSubRenderStateFactoyList;
 	
 };
 

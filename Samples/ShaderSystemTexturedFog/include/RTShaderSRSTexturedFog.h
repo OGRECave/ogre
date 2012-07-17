@@ -24,45 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _ShaderFFPFog_
-#define _ShaderFFPFog_
+#ifndef _ShaderSRSTexturedFog_
+#define _ShaderSRSTexturedFog_
 
 #include "OgreShaderPrerequisites.h"
-#ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 #include "OgreShaderParameter.h"
 #include "OgreShaderSubRenderState.h"
 #include "OgreVector4.h"
 
-namespace Ogre {
-namespace RTShader {
+using namespace Ogre;
+using namespace RTShader;
 
-/** \addtogroup Core
-*  @{
-*/
-/** \addtogroup RTShader
-*  @{
-*/
+class RTShaderSRSTexturedFogFactory;
+/** Textured Fog sub render state implementation.
+This class implements a sub render state which is viewed as fog like effect. However, unlike a regular for
+that as objects get further they become a single color, in this implementation they take the texture of a background image. 
 
-/** Fog sub render state implementation of the Fixed Function Pipeline.
-@see http://msdn.microsoft.com/en-us/library/bb173398.aspx
 Derives from SubRenderState class.
 */
-class _OgreRTSSExport FFPFog : public SubRenderState
+class RTShaderSRSTexturedFog : public SubRenderState
 {
 public:
-
-	// Fog calculation mode enum.
-	enum CalcMode
-	{
-		CM_PER_VERTEX	= 1,		// Per vertex fog calculations. (Default).
-		CM_PER_PIXEL	= 2			// Per pixel fog calculations.
-	};
-
 // Interface.
 public:
 
 	/** Class default constructor */
-	FFPFog();
+	RTShaderSRSTexturedFog(RTShaderSRSTexturedFogFactory* factory = NULL);
 
 	/** 
 	@see SubRenderState::getType.
@@ -72,7 +59,7 @@ public:
 	/** 
 	@see SubRenderState::getType.
 	*/
-	virtual int getExecutionOrder() const;
+	virtual int	getExecutionOrder() const;
 
 	/** 
 	@see SubRenderState::updateGpuProgramsParams.
@@ -92,28 +79,11 @@ public:
 	/** 
 	Set the fog properties this fog sub render state should emulate.
 	@param fogMode The fog mode to emulate (FOG_NONE, FOG_EXP, FOG_EXP2, FOG_LINEAR).
-	@param fogColour The colour of the fog.
 	@param fogStart Start distance of fog, used for linear mode only.
 	@param fogEnd End distance of fog, used for linear mode only.
 	@param fogDensity Fog density used in exponential modes only.
-	@see http://msdn.microsoft.com/en-us/library/bb173401.aspx
 	*/
-	void setFogProperties(FogMode fogMode, 
-		const ColourValue& fogColour, 
-		float fogStart, 
-		float fogEnd, 
-		float fogDensity);
-
-	/** 
-	Set the fog calculation mode. Either per vertex or per pixel.
-	@param calcMode The calculation mode to set.
-	*/
-	void setCalcMode(CalcMode calcMode) { mCalcMode = calcMode; }
-
-	/** 
-	Return the current calculation mode.
-	*/
-	CalcMode getCalcMode() const { return mCalcMode; }
+	void setFogProperties(FogMode fogMode, float fogStart, float fogEnd, float fogDensity);
 
 	static String Type;
 
@@ -137,78 +107,75 @@ protected:
 
 // Attributes.
 protected:	
-	// Fog calculation mode.
-	CalcMode mCalcMode;
-	// Fog formula. 
-	FogMode mFogMode;
-	// Fog colour value.
-	ColourValue mFogColourValue;
-	// Fog parameters (density, start, end, 1/end-start).
-	Vector4 mFogParamsValue;
-	// True if the fog parameters should be taken from the pass.
-	bool mPassOverrideParams;
+	/// The factory which created the texture fog instance
+	RTShaderSRSTexturedFogFactory* mFactory;    
+	/// Fog formula. 
+	FogMode	mFogMode;				
+	/// Fog parameters (density, start, end, 1/end-start).
+	Vector4	mFogParamsValue;		
+	/// True if the fog parameters should be taken from the pass.
+	bool mPassOverrideParams;	
+	/// The index of the background texture unit state in the pass 
+	unsigned int mBackgroundSamplerIndex;
 
-	// World view projection parameter.		
-	UniformParameterPtr mWorldViewProjMatrix;
-	// Fog colour parameter.	
-	UniformParameterPtr mFogColour;
+	// World matrix parameter.	
+	UniformParameterPtr	mWorldMatrix;				
+	// camera position parameter.		
+	UniformParameterPtr	mCameraPos;			    
 	// Fog parameters program parameter.	
-	UniformParameterPtr mFogParams;
+	UniformParameterPtr	mFogParams;				
 	// Vertex shader input position parameter.
-	ParameterPtr mVSInPos;
+	ParameterPtr mVSInPos;				
+	// Fog colour parameter.	
+	ParameterPtr mFogColour;				
 	// Vertex shader output fog colour parameter.
-	ParameterPtr mVSOutFogFactor;
+	ParameterPtr mVSOutFogFactor;		
 	// Pixel shader input fog factor.
-	ParameterPtr mPSInFogFactor;
+	ParameterPtr mPSInFogFactor;			
 	// Vertex shader output depth.
-	ParameterPtr mVSOutDepth;
+	ParameterPtr mVSOutDepth;			
 	// Pixel shader input depth.
-	ParameterPtr mPSInDepth;
+	ParameterPtr mPSInDepth;				
+	// Vertex shader world position relative to camera.
+	ParameterPtr mVSOutPosView;			
+	// Pixel shader world position relative to camera.
+	ParameterPtr mPSInPosView;			 
 	// Pixel shader output diffuse colour.
-	ParameterPtr mPSOutDiffuse;
+	ParameterPtr mPSOutDiffuse;			
+	//Background color texture parameter
+	ParameterPtr mBackgroundTextureSampler; 
+	
 };
 
 
 /** 
-A factory that enables creation of FFPFog instances.
+A factory that enables creation of RTShaderSRSTexturedFog instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class _OgreRTSSExport FFPFogFactory : public SubRenderStateFactory
+class RTShaderSRSTexturedFogFactory : public SubRenderStateFactory
 {
 public:
 
 	/** 
 	@see SubRenderStateFactory::getType.
 	*/
-	virtual const String& getType() const;
+	virtual const String&	getType() const;
 
-	/** 
-	@see SubRenderStateFactory::createInstance.
-	*/
-	virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
-
-	/** 
-	@see SubRenderStateFactory::writeInstance.
-	*/
-	virtual void writeInstance(MaterialSerializer* ser, SubRenderState* subRenderState, Pass* srcPass, Pass* dstPass);
-
+	/** Set the name of the texture to use as a background for the fog */
+	const String& getBackgroundTextureName() const { return mBackgroundTextureName; }
+	/** Return the name of the texture used as a background for the fog */
+	void setBackgroundTextureName(const String& name) { mBackgroundTextureName = name; }
 	
 protected:
 
 	/** 
 	@see SubRenderStateFactory::createInstanceImpl.
 	*/
-	virtual SubRenderState* createInstanceImpl();
+	virtual SubRenderState*	createInstanceImpl();
 
-
+private:
+	String mBackgroundTextureName;
 };
 
-/** @} */
-/** @} */
-
-}
-}
-
-#endif
 #endif
 

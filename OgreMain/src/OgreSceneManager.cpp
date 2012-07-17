@@ -4010,18 +4010,9 @@ void SceneManager::addListener(Listener* newListener)
 //---------------------------------------------------------------------
 void SceneManager::removeListener(Listener* delListener)
 {
-    ListenerList listenersCopy = mListeners;
-    ListenerList::iterator i, iend;
-    iend = listenersCopy.end();
-    for (i = listenersCopy.begin(); i != iend; ++i)
-    {
-        if (*i == delListener)
-        {
-            listenersCopy.erase(i);
-            break;
-        }
-    }
-
+    ListenerList::iterator i = std::find(mListeners.begin(), mListeners.end(), delListener);
+    if (i != mListeners.end())
+        mListeners.erase(i);
 }
 //---------------------------------------------------------------------
 void SceneManager::firePreRenderQueues()
@@ -4478,8 +4469,8 @@ bool SceneManager::ShadowCasterSceneQueryListener::queryResult(
     if (object->getCastShadows() && object->isVisible() && 
 		mSceneMgr->isRenderQueueToBeProcessed(object->getRenderQueueGroup()) &&
 		// objects need an edge list to cast shadows (shadow volumes only)
-		(((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
-		 (mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL)) && object->hasEdgeList()
+		((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_TEXTURE) ||
+        ((mSceneMgr->getShadowTechnique() & SHADOWDETAILTYPE_STENCIL) && object->hasEdgeList())
 		)
 	   )
     {

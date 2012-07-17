@@ -39,21 +39,59 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void CgProgram::selectProfile(void)
     {
+        static const String specialCgProfiles[] = {"hlslv", "hlslf", "glslv", "glslf", "glslg"};
+        static const size_t specialCgProfilesCount = sizeof(specialCgProfiles)/sizeof(String);
+        static const String* specialCgProfilesEnd = specialCgProfiles + specialCgProfilesCount;
+
         mSelectedProfile.clear();
         mSelectedCgProfile = CG_PROFILE_UNKNOWN;
 
         StringVector::iterator i, iend;
         iend = mProfiles.end();
         GpuProgramManager& gpuMgr = GpuProgramManager::getSingleton();
+        bool useDelegate = false;
         for (i = mProfiles.begin(); i != iend; ++i)
         {
-            if (gpuMgr.isSyntaxSupported(*i))
+            bool syntaxSupported = gpuMgr.isSyntaxSupported(*i);
+            if (!syntaxSupported && find(specialCgProfiles, specialCgProfilesEnd, *i) != specialCgProfilesEnd)
+            {
+				// Cg has some "special" profiles which don't have direct equivalents
+				// in the GpuProgramManager's supported syntaxes.
+				// For now, the following works
+				if (gpuMgr.isSyntaxSupported(i->substr(0,4)))
+				{
+					syntaxSupported = true;
+					useDelegate = true;
+				}
+            }
+            if (syntaxSupported)
             {
                 mSelectedProfile = *i;
                 mSelectedCgProfile = cgGetProfile(mSelectedProfile.c_str());
                 // Check for errors
                 checkForCgError("CgProgram::selectProfile", 
                     "Unable to find CG profile enum for program " + mName + ": ", mCgContext);
+                
+                // do we need a delegate?
+                if (useDelegate && mDelegate.isNull())
+                {
+					mDelegate =
+						HighLevelGpuProgramManager::getSingleton().createProgram(
+								mName+"/Delegate", mGroup, getHighLevelLanguage(), mType);
+					mDelegate->setParameter("target", getHighLevelTarget());
+					mDelegate->setParameter("entry_point", "main");
+					// HLSL output uses row major matrices, so need to tell Ogre that
+					mDelegate->setParameter("column_major_matrices", "false");
+					// HLSL output requires backwards compatibility to be enabled
+					mDelegate->setParameter("backwards_compatibility", "true");
+                }
+                else if (!useDelegate && !mDelegate.isNull())
+                {
+					ResourcePtr rs (mDelegate);
+					HighLevelGpuProgramManager::getSingleton().remove(rs);
+					mDelegate.setNull();
+                }
+                
                 break;
             }
         }
@@ -129,6 +167,57 @@ namespace Ogre {
 		{
 			compileMicrocode();
 		}
+
+        if (!mDelegate.isNull())
+        {
+            mDelegate->setSource(mProgramString);
+            mDelegate->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
+            if (mSelectedCgProfile == CG_PROFILE_GLSLG)
+            {
+                // need to set input and output operations
+                if (mInputOp == CG_POINT)
+                {
+                    mDelegate->setParameter("input_operation_type", "point_list");
+                }
+                else if (mInputOp == CG_LINE)
+                {
+                    mDelegate->setParameter("input_operation_type", "line_strip");
+                }
+                else if (mInputOp == CG_LINE_ADJ)
+                {
+                    mDelegate->setParameter("input_operation_type", "line_strip");
+                    mDelegate->setAdjacencyInfoRequired(true);
+                }
+                else if (mInputOp == CG_TRIANGLE)
+                {
+                    mDelegate->setParameter("input_operation_type", "triangle_strip");
+                }
+                else if (mInputOp == CG_TRIANGLE_ADJ)
+                {
+                    mDelegate->setParameter("input_operation_type", "triangle_strip");
+                    mDelegate->setAdjacencyInfoRequired(true);
+                }
+
+                if (mOutputOp == CG_POINT_OUT)
+                    mDelegate->setParameter("output_operation_type", "point_list");
+                else if (mOutputOp == CG_LINE_OUT)
+                    mDelegate->setParameter("output_operation_type", "line_strip");
+                else if (mOutputOp == CG_TRIANGLE_OUT)
+                    mDelegate->setParameter("output_operation_type", "triangle_strip");
+            }
+            if (getHighLevelLanguage() == "glsl")
+            {
+                // for GLSL, also ensure we explicitly bind samplers to their register
+                // otherwise, GLSL will assign them in the order first used, which is
+                // not what we want.
+                GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
+                for (map<String,int>::type::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
+                {
+                    params->setNamedConstant(i->first, i->second);
+                }
+            }
+            mDelegate->load();
+        }
 	}
     //-----------------------------------------------------------------------
     void CgProgram::getMicrocodeFromCache(void)
@@ -170,6 +259,28 @@ namespace Ogre {
 			mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
 		}
 
+        if (!mDelegate.isNull())
+        {
+            // get sampler register mapping
+            size_t samplerMapSize = 0;
+            cacheMicrocode->read(&samplerMapSize, sizeof(size_t));
+            for (size_t i = 0; i < samplerMapSize; ++i)
+            {
+                String paramName;
+                size_t stringSize = 0;
+                int reg = -1;
+
+                cacheMicrocode->read(&stringSize, sizeof(size_t));
+                paramName.resize(stringSize);
+                cacheMicrocode->read(&paramName[0], stringSize);
+                cacheMicrocode->read(&reg, sizeof(int));
+            }
+
+            // get input/output operations type
+            cacheMicrocode->read(&mInputOp, sizeof(CGenum));
+            cacheMicrocode->read(&mOutputOp, sizeof(CGenum));
+        }
+
 	}
     //-----------------------------------------------------------------------
     void CgProgram::compileMicrocode(void)
@@ -205,20 +316,37 @@ namespace Ogre {
         {
 			// get program string (result of cg compile)
 			mProgramString = cgGetProgramString(cgProgram, CG_COMPILED_PROGRAM);
-			
+            checkForCgError("CgProgram::compileMicrocode",
+                "Unable to retrieve program code for Cg program " + mName + ": ", mCgContext);
+
 			// get params
 			mParametersMap.clear();
+            mSamplerRegisterMap.clear();
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
 
+            if (!mDelegate.isNull())
+            {
+                // Delegating to HLSL or GLSL, need to clean up Cg's output
+                LogManager::getSingleton().getDefaultLog()->logMessage("Cg output for " + mName + ": \n" + mProgramString);
+                fixHighLevelOutput(mProgramString);
+                LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
+                if (mSelectedCgProfile == CG_PROFILE_GLSLG)
+                {
+                    // need to determine input and output operations
+                    mInputOp = cgGetProgramInput(cgProgram);
+                    mOutputOp = cgGetProgramOutput(cgProgram);
+                }
+            }
+
 			// Unload Cg Program - we don't need it anymore
 			cgDestroyProgram(cgProgram);
-			checkForCgError("CgProgram::unloadImpl", 
-				"Error while unloading Cg program " + mName + ": ", 
-				mCgContext);
+			//checkForCgError("CgProgram::unloadImpl", 
+			//	"Error while unloading Cg program " + mName + ": ", 
+			//	mCgContext);
 			cgProgram = 0;
 
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
 			{
 				addMicrocodeToCache();
 			}
@@ -271,12 +399,40 @@ namespace Ogre {
 			newMicrocode->write(&def, sizeof(GpuConstantDefinition));
 		}
 
+        if (!mDelegate.isNull())
+        {
+            // save additional info required for delegating
+            size_t samplerMapSize = mSamplerRegisterMap.size();
+            newMicrocode->write(&samplerMapSize, sizeof(size_t));
+
+            // save sampler register mapping
+            map<String,int>::type::const_iterator iter = mSamplerRegisterMap.begin();
+            map<String,int>::type::const_iterator iterE = mSamplerRegisterMap.end();
+            for (; iter != iterE; ++iter)
+            {
+                const String& paramName = iter->first;
+                int reg = iter->second;
+
+                size_t stringSize = paramName.size();
+                newMicrocode->write(&stringSize, sizeof(size_t));
+                newMicrocode->write(paramName.data(), stringSize);
+                newMicrocode->write(&reg, sizeof(int));
+            }
+
+            // save input/output operations type
+            newMicrocode->write(&mInputOp, sizeof(CGenum));
+            newMicrocode->write(&mOutputOp, sizeof(CGenum));
+        }
+
 		// add to the microcode to the cache
 		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
 	}
     //-----------------------------------------------------------------------
     void CgProgram::createLowLevelImpl(void)
     {
+        if (!mDelegate.isNull())
+            return;
+
 		// ignore any previous error
 		if (mSelectedCgProfile != CG_PROFILE_UNKNOWN && !mCompileError)
 		{
@@ -321,6 +477,261 @@ namespace Ogre {
 			mAssemblerProgram->setAdjacencyInfoRequired(isAdjacencyInfoRequired());
 		}
     }
+    //-----------------------------------------------------------------------
+    String CgProgram::getHighLevelLanguage() const
+    {
+		switch (mSelectedCgProfile)
+		{
+			case CG_PROFILE_GLSLF:
+			case CG_PROFILE_GLSLV:
+			case CG_PROFILE_GLSLG:
+				return "glsl";
+			case CG_PROFILE_HLSLF:
+			case CG_PROFILE_HLSLV:
+				return "hlsl";
+			default:
+				return "unknown";
+		}
+    }
+    //-----------------------------------------------------------------------
+    String CgProgram::getHighLevelTarget() const
+    {
+		// HLSL delegates need a target to compile to.
+		// Return value for GLSL delegates is ignored.
+		GpuProgramManager* gpuMgr = GpuProgramManager::getSingletonPtr();
+		const GpuProgramManager::SyntaxCodes& syntaxes = gpuMgr->getSupportedSyntax();
+
+		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
+		{
+			static const String fpProfiles[] = {"ps_3_0", "ps_2_x", "ps_2_0", "ps_1_4", "ps_1_3", "ps_1_2", "ps_1_1"};
+			static const size_t numFpProfiles = sizeof(fpProfiles)/sizeof(String);
+			// find the highest profile available
+			for (size_t i = 0; i < numFpProfiles; ++i)
+			{
+				if (gpuMgr->isSyntaxSupported(fpProfiles[i]))
+					return fpProfiles[i];
+			}
+		}
+		else if (mSelectedCgProfile == CG_PROFILE_HLSLV)
+		{
+			static const String vpProfiles[] = {"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
+			static const size_t numVpProfiles = sizeof(vpProfiles)/sizeof(String);
+			// find the highest profile available
+			for (size_t i = 0; i < numVpProfiles; ++i)
+			{
+				if (gpuMgr->isSyntaxSupported(vpProfiles[i]))
+					return vpProfiles[i];
+			}
+		}
+
+		return "unknown";
+    }
+    //-----------------------------------------------------------------------
+    void CgProgram::fixHighLevelOutput(String& hlSource)
+    {
+		// for some unknown reason Cg chooses to change parameter names when
+		// translating to another high level language. We need to revert that,
+		// otherwise Ogre parameter mappings fail.
+		// Cg logs its renamings in the comments at the beginning of the
+		// processed source file. We can get them from there.
+        // We'll also get rid of those comments to trim down source code size.
+		vector<String>::type lines = StringUtil::split(hlSource, "\n");
+        hlSource.clear();
+        for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
+        {
+            String& line = *i;
+            if (line.substr(0,2) != "//")
+                hlSource.append(line+'\n');
+        }
+
+		for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
+		{
+			String& line = *i;
+			// comment format: //var type parameter : [something] : new name : [something] : [something]
+			if (line.substr(0, 5) == "//var")
+			{
+				vector<String>::type cols = StringUtil::split(line, ":");
+				if (cols.size() < 3)
+					continue;
+				vector<String>::type def = StringUtil::split(cols[0], "[ ");
+				if (def.size() < 3)
+					continue;
+				StringUtil::trim(cols[2]);
+				vector<String>::type repl = StringUtil::split(cols[2], "[ ");
+				String oldName = def[2];
+				String newName = repl[0];
+				StringUtil::trim(oldName);
+				StringUtil::trim(newName);
+				if (newName.empty() || newName[0] != '_')
+					continue;
+
+				// if that name is present in our lists, replace all occurences with original name
+                GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
+				if (it != mParametersMap.end() || mSamplerRegisterMap.find(oldName) != mSamplerRegisterMap.end())
+				{
+					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
+                    if (it != mParametersMap.end() && (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG))
+                    {
+                        // determine if the param is a matrix type, in which case we need
+                        // to revert the declaration, too.
+                        if (it->second.constType == GCT_MATRIX_2X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[2]", "uniform mat2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[3]", "uniform mat3 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[4]", "uniform mat4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_2X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[2]", "uniform mat2x3 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_2X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[2]", "uniform mat2x4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[3]", "uniform mat3x2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_3X4)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[3]", "uniform mat3x4 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X2)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[4]", "uniform mat4x2 "+oldName);
+                        else if (it->second.constType == GCT_MATRIX_4X3)
+                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[4]", "uniform mat4x3 "+oldName);
+                    }
+				}
+			}
+		}
+    }
+
+
+    //-----------------------------------------------------------------------
+    void CgProgram::loadHighLevelSafe()
+    {
+		OGRE_LOCK_AUTO_MUTEX
+		if (this->isSupported())
+			loadHighLevel();
+    }
+    //-----------------------------------------------------------------------
+    GpuProgramParametersSharedPtr CgProgram::createParameters()
+    {
+		loadHighLevelSafe();
+		if (!mDelegate.isNull())
+			return mDelegate->createParameters();
+		else
+			return HighLevelGpuProgram::createParameters();
+    }
+    //-----------------------------------------------------------------------
+    GpuProgram* CgProgram::_getBindingDelegate()
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->_getBindingDelegate();
+		else
+			return HighLevelGpuProgram::_getBindingDelegate();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::isSkeletalAnimationIncluded(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->isSkeletalAnimationIncluded();
+		else
+			return HighLevelGpuProgram::isSkeletalAnimationIncluded();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::isMorphAnimationIncluded(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->isMorphAnimationIncluded();
+		else
+			return HighLevelGpuProgram::isMorphAnimationIncluded();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::isPoseAnimationIncluded(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->isPoseAnimationIncluded();
+		else
+			return HighLevelGpuProgram::isPoseAnimationIncluded();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::isVertexTextureFetchRequired(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->isVertexTextureFetchRequired();
+		else
+			return HighLevelGpuProgram::isVertexTextureFetchRequired();
+    }
+    //-----------------------------------------------------------------------
+    GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
+    {
+		loadHighLevelSafe();
+		if (!mDelegate.isNull())
+			return mDelegate->getDefaultParameters();
+		else
+			return HighLevelGpuProgram::getDefaultParameters();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::hasDefaultParameters(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->hasDefaultParameters();
+		else
+			return HighLevelGpuProgram::hasDefaultParameters();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::getPassSurfaceAndLightStates(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->getPassSurfaceAndLightStates();
+		else
+			return HighLevelGpuProgram::getPassSurfaceAndLightStates();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::getPassFogStates(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->getPassFogStates();
+		else
+			return HighLevelGpuProgram::getPassFogStates();
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::getPassTransformStates(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->getPassTransformStates();
+		else
+        {
+			return true; /* CG uses MVP matrix when -posinv argument passed */
+        }
+    }
+    //-----------------------------------------------------------------------
+    bool CgProgram::hasCompileError(void) const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->hasCompileError();
+		else
+			return HighLevelGpuProgram::hasCompileError();
+    }
+    //-----------------------------------------------------------------------
+    void CgProgram::resetCompileError(void)
+    {
+		if (!mDelegate.isNull())
+			mDelegate->resetCompileError();
+		else
+			HighLevelGpuProgram::resetCompileError();
+    }
+    //-----------------------------------------------------------------------
+    size_t CgProgram::getSize() const
+    {
+		if (!mDelegate.isNull())
+			return mDelegate->getSize();
+		else
+			return HighLevelGpuProgram::getSize();
+    }
+    //-----------------------------------------------------------------------
+    void CgProgram::touch()
+    {
+		if (!mDelegate.isNull())
+			mDelegate->touch();
+		else
+			HighLevelGpuProgram::touch();
+    }
+
+
     //-----------------------------------------------------------------------
     void CgProgram::unloadHighLevelImpl(void)
     {
@@ -373,7 +784,7 @@ namespace Ogre {
 	{
 		while (parameter != 0)
         {
-            // Look for uniform (non-sampler) parameters only
+            // Look for uniform parameters only
             // Don't bother enumerating unused parameters, especially since they will
             // be optimised out and therefore not in the indexed versions
             CGtype paramType = cgGetParameterType(parameter);
@@ -494,6 +905,62 @@ namespace Ogre {
 					break;
 				}					
             }
+
+            // now handle uniform samplers. This is needed to fix their register positions
+            // if delegating to a GLSL shader.
+            if (cgGetParameterVariability(parameter) == CG_UNIFORM && (
+                paramType == CG_SAMPLER1D ||
+                paramType == CG_SAMPLER2D ||
+                paramType == CG_SAMPLER3D ||
+                paramType == CG_SAMPLERCUBE ||
+                paramType == CG_SAMPLERRECT) &&
+                cgGetParameterDirection(parameter) != CG_OUT && 
+                cgIsParameterReferenced(parameter))
+            {
+                String paramName = cgGetParameterName(parameter);
+                CGresource res = cgGetParameterResource(parameter);
+                int pos = -1;
+                switch (res)
+                {
+                case CG_TEXUNIT0: pos = 0; break;
+                case CG_TEXUNIT1: pos = 1; break;
+                case CG_TEXUNIT2: pos = 2; break;
+                case CG_TEXUNIT3: pos = 3; break;
+                case CG_TEXUNIT4: pos = 4; break;
+                case CG_TEXUNIT5: pos = 5; break;
+                case CG_TEXUNIT6: pos = 6; break;
+                case CG_TEXUNIT7: pos = 7; break;
+                case CG_TEXUNIT8: pos = 8; break;
+                case CG_TEXUNIT9: pos = 9; break;
+                case CG_TEXUNIT10: pos = 10; break;
+                case CG_TEXUNIT11: pos = 11; break;
+                case CG_TEXUNIT12: pos = 12; break;
+                case CG_TEXUNIT13: pos = 13; break;
+                case CG_TEXUNIT14: pos = 14; break;
+                case CG_TEXUNIT15: pos = 15; break;
+                case CG_TEXUNIT16: pos = 16; break;
+                case CG_TEXUNIT17: pos = 17; break;
+                case CG_TEXUNIT18: pos = 18; break;
+                case CG_TEXUNIT19: pos = 19; break;
+                case CG_TEXUNIT20: pos = 20; break;
+                case CG_TEXUNIT21: pos = 21; break;
+                case CG_TEXUNIT22: pos = 22; break;
+                case CG_TEXUNIT23: pos = 23; break;
+                case CG_TEXUNIT24: pos = 24; break;
+                case CG_TEXUNIT25: pos = 25; break;
+                case CG_TEXUNIT26: pos = 26; break;
+                case CG_TEXUNIT27: pos = 27; break;
+                case CG_TEXUNIT28: pos = 28; break;
+                case CG_TEXUNIT29: pos = 29; break;
+                case CG_TEXUNIT30: pos = 30; break;
+                case CG_TEXUNIT31: pos = 31; break;
+                }
+                if (pos != -1)
+                {
+                    mSamplerRegisterMap.insert(std::make_pair(paramName, pos));
+                }
+            }
+
             // Get next
             parameter = cgGetNextParameter(parameter);
         }
@@ -633,32 +1100,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool CgProgram::isSupported(void) const
     {
+        if (!mDelegate.isNull())
+            return mDelegate->isSupported();
+
         if (mCompileError || !isRequiredCapabilitiesSupported())
             return false;
 
-		StringVector::const_iterator i, iend;
-        iend = mProfiles.end();
-        // Check to see if any of the profiles are supported
-        for (i = mProfiles.begin(); i != iend; ++i)
-        {
-            if (GpuProgramManager::getSingleton().isSyntaxSupported(*i))
-            {
-                return true;
-            }
-        }
-        return false;
-
+		return mSelectedCgProfile != CG_PROFILE_UNKNOWN;
     }
     //-----------------------------------------------------------------------
     void CgProgram::setProfiles(const StringVector& profiles)
     {
-        mProfiles.clear();
-        StringVector::const_iterator i, iend;
-        iend = profiles.end();
-        for (i = profiles.begin(); i != iend; ++i)
-        {
-            mProfiles.push_back(*i);
-        }
+        mProfiles = profiles;
+        selectProfile();
     }
 	//-----------------------------------------------------------------------
 	String CgProgram::resolveCgIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)

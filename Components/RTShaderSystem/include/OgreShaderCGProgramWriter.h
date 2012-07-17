@@ -51,20 +51,20 @@ public:
 
 	/** Class constructor. 
 	*/
-	CGProgramWriter	();
+	CGProgramWriter();
 
 	/** Class destructor */
-	virtual ~CGProgramWriter ();
+	virtual ~CGProgramWriter();
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
-     */
-    virtual void writeSourceCode			(std::ostream& os, Program* program);
+	*/
+	virtual void writeSourceCode(std::ostream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
 	*/
-	virtual const String&  getTargetLanguage			() const { return TargetLanguage; }
+	virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
 	static String TargetLanguage;
 
@@ -72,35 +72,37 @@ public:
 protected:
 
 	/** Initialize string maps. */
-	void		initializeStringMaps		();
+	void initializeStringMaps();
 
 	/** Write the program dependencies. */
-	void		writeProgramDependencies	(std::ostream& os, Program* program);
+	void writeProgramDependencies(std::ostream& os, Program* program);
 	
 	/** Write a uniform parameter. */
-	void		writeUniformParameter		(std::ostream& os, UniformParameterPtr parameter);
+	void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void		writeFunctionParameter		(std::ostream& os, ParameterPtr parameter);
+	void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a local parameter. */
-	void		writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
+	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function declaration. */
-	void		writeFunctionDeclaration	(std::ostream& os, Function* function, ParameterPtr & colorParameter);
+	void writeFunctionDeclaration(std::ostream& os, Function* function, ParameterPtr & colorParameter);
 
 	/** Write function atom instance. */
-	void		writeAtomInstance			(std::ostream& os, FunctionAtom* atom);
+	void writeAtomInstance(std::ostream& os, FunctionAtom* atom);
 
 
 protected:
-	typedef		map<GpuConstantType, const char*>::type		GpuConstTypeToStringMap;
-	typedef		map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
+	typedef map<GpuConstantType, const char*>::type GpuConstTypeToStringMap;
+	typedef map<Parameter::Semantic, const char*>::type	ParamSemanticToStringMap;
 
 // Attributes.
 protected:
-	GpuConstTypeToStringMap		mGpuConstTypeMap;		// Map between GPU constant type to string value.
-	ParamSemanticToStringMap	mParamSemanticMap;		// Map between parameter semantic to string value.
+	// Map between GPU constant type to string value.
+	GpuConstTypeToStringMap mGpuConstTypeMap;
+	// Map between parameter semantic to string value.
+	ParamSemanticToStringMap mParamSemanticMap;
 };
 
 /** CG program writer factory implementation.

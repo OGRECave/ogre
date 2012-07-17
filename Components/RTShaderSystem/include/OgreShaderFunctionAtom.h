@@ -50,27 +50,29 @@ class _OgreRTSSExport FunctionAtom : public RTShaderSystemAlloc
 // Interface.
 public:
 	/** Class default constructor. */
-	FunctionAtom			();
+	FunctionAtom();
 
 	/** Class default destructor. */
-	virtual ~FunctionAtom	() {}
+	virtual ~FunctionAtom() {}
 
 	/** Get the group execution order of this function atom. */
-	int						getGroupExecutionOrder		() const;
+	int getGroupExecutionOrder() const;
 	
 	/** Get an internal execution order within a group of this function atom. */
-	int						getInternalExecutionOrder	() const;
+	int getInternalExecutionOrder() const;
 	
 	/** Abstract method that writes a source code to the given output stream in the target shader language. */
-	virtual void			writeSourceCode				(std::ostream& os, const String& targetLanguage) const = 0;
+	virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const = 0;
 	
 	/** Return the type of this atom instance implementation. */
-	virtual const String&	getFunctionAtomType			() = 0;
+	virtual const String& getFunctionAtomType() = 0;
 
 // Attributes.
 protected:
-	int			mGroupExecutionOrder;		// The owner group execution order.	
-	int			mInternalExecutionOrder;		// The execution order within the group.		
+	// The owner group execution order.	
+	int mGroupExecutionOrder;
+	// The execution order within the group.		
+	int mInternalExecutionOrder;
 };
 
 /** A class that represents a function operand (its the combination of a parameter the in/out semantic and the used fields)
@@ -130,41 +132,45 @@ public:
 	~Operand();
 
 	/** Returns the parameter object as weak reference */
-	const ParameterPtr& getParameter	()	const { return mParameter; }
+	const ParameterPtr& getParameter()	const { return mParameter; }
 
 	/** Returns true if not all fields used. (usage is described through semantic)*/
-	bool				hasFreeFields	()	const { return ((mMask & ~OPM_ALL) && ((mMask & ~OPM_X) || (mMask & ~OPM_Y) || (mMask & ~OPM_Z) || (mMask & ~OPM_W))); }
+	bool hasFreeFields()	const { return ((mMask & ~OPM_ALL) && ((mMask & ~OPM_X) || (mMask & ~OPM_Y) || (mMask & ~OPM_Z) || (mMask & ~OPM_W))); }
 	
 	/** Returns the mask bitfield. */
-	int					getMask			()	const { return mMask; }
+	int getMask()	const { return mMask; }
 
 	/** Returns the operand semantic (do we read/write or both with the parameter). */
-	OpSemantic			getSemantic		()	const { return mSemantic; }
+	OpSemantic getSemantic()	const { return mSemantic; }
 
 	/** Returns the level of indirection. 
 	The greater the indirection level the more the parameter needs to be nested in brackets.
 	For example given 4 parameters x1...x4 with the indirections levels 0,1,1,2 
 	respectively. The parameters should form the following string: x1[x2][x3[x4]].
 	*/
-	ushort				getIndirectionLevel()	const { return mIndirectionLevel; }
+	ushort getIndirectionLevel()	const { return mIndirectionLevel; }
 
 	/** Returns the parameter name and the usage mask like this 'color.xyz' */
-	String				toString		()	const;
+	String toString()	const;
 
 	/** Returns the given mask as string representation. */
-	static String				getMaskAsString		(int mask);
+	static String getMaskAsString(int mask);
 
 	/** Return the float count of the given mask. */
-	static int					getFloatCount		(int mask);
+	static int getFloatCount(int mask);
 
 	/** Return the gpu constant type of the given mask. */
-	static GpuConstantType		getGpuConstantType	(int mask);
+	static GpuConstantType getGpuConstantType(int mask);
 
 protected:
-	ParameterPtr	mParameter;			/// The parameter being carried by the operand
-	OpSemantic		mSemantic;			/// Tells if the parameter is of type input,output or both
-	int				mMask;				/// Which part of the parameter should be passed (x,y,z,w)
-	ushort			mIndirectionLevel;  /// The level of indirection. @see getIndirectionLevel
+	/// The parameter being carried by the operand
+	ParameterPtr mParameter;
+	/// Tells if the parameter is of type input,output or both
+	OpSemantic mSemantic;
+	/// Which part of the parameter should be passed (x,y,z,w)
+	int mMask;
+	/// The level of indirection. @see getIndirectionLevel
+	ushort mIndirectionLevel;
 };
 
 /** A class that represents function invocation code from shader based program function.
@@ -189,15 +195,15 @@ public:
 	/** 
 	@see FunctionAtom::writeSourceCode
 	*/
-	virtual void			writeSourceCode	(std::ostream& os, const String& targetLanguage) const;
+	virtual void writeSourceCode(std::ostream& os, const String& targetLanguage) const;
 
 	/** 
 	@see FunctionAtom::getFunctionAtomType
 	*/
-	virtual const String&	getFunctionAtomType () { return Type; }
+	virtual const String& getFunctionAtomType() { return Type; }
 
 	/** Get a list of parameters this function invocation will use in the function call as arguments. */
-	OperandVector&			getOperandList	() { return mOperands; }
+	OperandVector& getOperandList() { return mOperands; }
 	
 	/** Push a new operand (on the end) to the function. 
 	@param parameter A function parameter.
@@ -205,13 +211,13 @@ public:
 	@param opMask The field mask of the parameter.
 	@param indirectionLevel The level of nesting inside brackets
 	*/
-	void					pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, int indirectionLevel = 0);
+	void pushOperand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, int indirectionLevel = 0);
 
 	/** Return the function name */
-	const String&			getFunctionName	() const { return mFunctionName; }
+	const String& getFunctionName() const { return mFunctionName; }
 
 	/** Return the return type */
-	const String&			getReturnType	() const { return mReturnType; }
+	const String& getReturnType() const { return mReturnType; }
 
     /** Determines if the current object is equal to the compared one. */
     bool operator == ( const FunctionInvocation& rhs ) const;
@@ -227,7 +233,7 @@ public:
     */
     struct FunctionInvocationLessThan
     {
-        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+        bool operator()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
     };
 
     /** Comparator function to be used for comparisons.
@@ -235,7 +241,7 @@ public:
     */
     struct FunctionInvocationCompare
     {
-        bool operator ()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
+        bool operator()(FunctionInvocation const& lhs, FunctionInvocation const& rhs) const;
     };
 
 	/// The type of this class.
@@ -243,9 +249,9 @@ public:
 
 	// Attributes.
 protected:	
-	String				mFunctionName;
-	String				mReturnType;
-	OperandVector		mOperands;	
+	String mFunctionName;
+	String mReturnType;
+	OperandVector mOperands;	
 };
 
 typedef vector<FunctionAtom*>::type					FunctionAtomInstanceList;

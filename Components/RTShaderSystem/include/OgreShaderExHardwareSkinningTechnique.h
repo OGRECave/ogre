@@ -101,17 +101,17 @@ public:
 	/**
 	@see SubRenderState::resolveParameters.
 	*/
-	virtual bool resolveParameters (ProgramSet* programSet) = 0;
+	virtual bool resolveParameters(ProgramSet* programSet) = 0;
 
 	/**
 	@see SubRenderState::resolveDependencies.
 	*/
-	virtual bool resolveDependencies (ProgramSet* programSet) = 0;
+	virtual bool resolveDependencies(ProgramSet* programSet) = 0;
 
 	/**
 	@see SubRenderState::addFunctionInvocations.
 	*/
-	virtual bool addFunctionInvocations (ProgramSet* programSet) = 0;
+	virtual bool addFunctionInvocations(ProgramSet* programSet) = 0;
 
 protected:
 	/** Translates an index number to a mask value */

@@ -9,7 +9,4 @@ Dependencies/include/FreeImage.h
 *.tlog
 *.obj
 *.rule
-build
-AndroidBuild
-AndroidDependencies
-iOSBuild
+Dependencies/*

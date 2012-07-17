@@ -87,7 +87,7 @@ protected:
 	~SGMaterialSerializerListener();
 
 	/** Internal method that creates list of SGPass instances composing the given material. */
-	void						createSGPassList		(Material* mat, SGPassList& passList);
+	void createSGPassList(Material* mat, SGPassList& passList);
 
 	/** Internal method that returns SGPass instance from a given source pass. */
 	ShaderGenerator::SGPass*	getShaderGeneratedPass	(const Pass* srcPass);
@@ -95,8 +95,10 @@ protected:
 
 // Attributes.
 protected:	
-	Material*		mSourceMaterial;		// The current source material that is being written.
-	SGPassList		mSGPassList;			// List of SGPass instances composing this material.
+	// The current source material that is being written.
+	Material* mSourceMaterial;
+	// List of SGPass instances composing this material.
+	SGPassList mSGPassList;
 	
 	
 private:

@@ -49,10 +49,10 @@ class _OgreRTSSExport ProgramManager : public Singleton<ProgramManager>, public 
 public:
 
 	/** Class default constructor */
-	ProgramManager	();
+	ProgramManager();
 
 	/** Class destructor */
-	~ProgramManager	();
+	~ProgramManager();
 
 
 	/** Override standard Singleton retrieval.
@@ -70,7 +70,7 @@ public:
 	but the implementation stays in this single compilation unit,
 	preventing link errors.
 	*/
-	static ProgramManager&			getSingleton	();	
+	static ProgramManager& getSingleton();	
 
 	/** Override standard Singleton retrieval.
 	@remarks
@@ -87,23 +87,23 @@ public:
 	but the implementation stays in this single compilation unit,
 	preventing link errors.
 	*/
-	static ProgramManager*			getSingletonPtr				();
+	static ProgramManager* getSingletonPtr();
 
 	/** Acquire CPU/GPU programs set associated with the given render state and bind them to the pass.
 	@param pass The pass to bind the programs to.
 	@param renderState The render state that describes the program that need to be generated.
 	*/
-	void							acquirePrograms			(Pass* pass, TargetRenderState* renderState);
+	void acquirePrograms(Pass* pass, TargetRenderState* renderState);
 
 	/** Release CPU/GPU programs set associated with the given render state and pass.
 	@param pass The pass to release the programs from.
 	@param renderState The render state holds the programs.
 	*/
-	void							releasePrograms			(Pass* pass, TargetRenderState* renderState);
+	void releasePrograms(Pass* pass, TargetRenderState* renderState);
 
 	/** Flush the local GPU programs cache.
 	*/
-	void							flushGpuProgramsCache	();
+	void flushGpuProgramsCache();
 
 protected:
 
@@ -128,34 +128,34 @@ protected:
 	
 protected:
 	/** Create default program processors. */
-	void			createDefaultProgramProcessors	();
+	void createDefaultProgramProcessors();
 	
 	/** Destroy default program processors. */
-	void			destroyDefaultProgramProcessors	();
+	void destroyDefaultProgramProcessors();
 
 	/** Create default program processors. */
-	void			createDefaultProgramWriterFactories	();
+	void createDefaultProgramWriterFactories();
 
 	/** Destroy default program processors. */
-	void			destroyDefaultProgramWriterFactories();
+	void destroyDefaultProgramWriterFactories();
 
 	/** Destroy all program writers. */
-	void			destroyProgramWriters	();
+	void destroyProgramWriters();
 
 	/** Create CPU program . 	
 	@param type The type of the program to create.
 	*/
-	Program*		createCpuProgram		(GpuProgramType type);
+	Program* createCpuProgram(GpuProgramType type);
 
 	/** Destroy a CPU program by name.
 	@param shaderProgram The CPU program instance to destroy.
 	*/
-	void			destroyCpuProgram		(Program* shaderProgram);
+	void destroyCpuProgram(Program* shaderProgram);
 
 	/** Create GPU programs for the given program set based on the CPU programs it contains.
 	@param programSet The program set container.
 	*/
-	bool			createGpuPrograms		(ProgramSet* programSet);
+	bool createGpuPrograms(ProgramSet* programSet);
 
 	/** Create GPU program based on the give CPU program.
 	@param shaderProgram The CPU program instance.
@@ -165,7 +165,7 @@ protected:
 	@param profilesList The profiles string for program compilation as string list.
 	@param cachePath The output path to write the program into.
 	*/
-	GpuProgramPtr	createGpuProgram		(Program* shaderProgram, 
+	GpuProgramPtr createGpuProgram(Program* shaderProgram, 
 		ProgramWriter* programWriter,
 		const String& language,
 		const String& profiles,
@@ -176,49 +176,56 @@ protected:
 	Add program processor instance to this manager.
 	@param processor The instance to add.
 	*/
-	void			addProgramProcessor		(ProgramProcessor* processor);
+	void addProgramProcessor(ProgramProcessor* processor);
 
 	/** 
 	Remove program processor instance from this manager. 
 	@param processor The instance to remove.
 	*/
-	void			removeProgramProcessor	(ProgramProcessor* processor);
+	void removeProgramProcessor(ProgramProcessor* processor);
 
 	/** Destroy a GPU program by name.
 	@param name The name of the program to destroy.
 	@param type The type of the program to destroy.
 	*/
-	void			destroyGpuProgram		(GpuProgramPtr& gpuProgram);
+	void destroyGpuProgram(GpuProgramPtr& gpuProgram);
 
 	/** Flush the local GPU programs cache.
 	@param gpuProgramsMap The GPU programs cache.
 	*/
-	void			flushGpuProgramsCache	(GpuProgramsMap& gpuProgramsMap);
+	void flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap);
 	
 	/** Return the number of created vertex shaders. */
-	size_t			getVertexShaderCount		() const { return mVertexShaderMap.size(); }
+	size_t getVertexShaderCount() const { return mVertexShaderMap.size(); }
 
 	/** Return the number of created fragment shaders. */
-	size_t			getFragmentShaderCount		() const { return mFragmentShaderMap.size(); }
+	size_t getFragmentShaderCount() const { return mFragmentShaderMap.size(); }
 
 	/** Fix the input of the pixel shader to be the same as the output of the vertex shader */
-	void			synchronizePixelnToBeVertexOut	(ProgramSet* programSet);
+	void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
 
 	/** Bind the uniform parameters of a given CPU and GPU program set. */
-	void			bindUniformParameters			(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
+	void bindUniformParameters(Program* pCpuProgram, const GpuProgramParametersSharedPtr& passParams);
 
 
 protected:
 	
 
 protected:
-	ProgramList					mCpuProgramsList;				// CPU programs list.					
-	ProgramWriterMap			mProgramWritersMap;				// Map between target language and shader program writer.					
-	ProgramProcessorMap			mProgramProcessorsMap;			// Map between target language and shader program processor.	
-	ProgramWriterFactoryList	mProgramWriterFactories;		// Holds standard shader writer factories
-	GpuProgramsMap				mVertexShaderMap;				// The generated vertex shaders.
-	GpuProgramsMap				mFragmentShaderMap;				// The generated fragment shaders.
-	ProgramProcessorList		mDefaultProgramProcessors;		// The default program processors.
+	// CPU programs list.					
+	ProgramList mCpuProgramsList;
+	// Map between target language and shader program writer.					
+	ProgramWriterMap mProgramWritersMap;
+	// Map between target language and shader program processor.	
+	ProgramProcessorMap mProgramProcessorsMap;
+	// Holds standard shader writer factories
+	ProgramWriterFactoryList mProgramWriterFactories;
+	// The generated vertex shaders.
+	GpuProgramsMap mVertexShaderMap;
+	// The generated fragment shaders.
+	GpuProgramsMap mFragmentShaderMap;
+	// The default program processors.
+	ProgramProcessorList mDefaultProgramProcessors;
 
 private:
 	friend class ProgramSet;

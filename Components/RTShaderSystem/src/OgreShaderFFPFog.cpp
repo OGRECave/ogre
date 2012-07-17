@@ -121,82 +121,65 @@ bool FFPFog::resolveParameters(ProgramSet* programSet)
 	Program* psProgram = programSet->getCpuFragmentProgram();
 	Function* vsMain = vsProgram->getEntryPointFunction();
 	Function* psMain = psProgram->getEntryPointFunction();
-
+	bool hasError = false;
 
 	// Resolve world view matrix.
 	mWorldViewProjMatrix = vsProgram->resolveAutoParameterInt(GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX, 0);
-	if (mWorldViewProjMatrix.get() == NULL)
-		return false;
 	
 	// Resolve vertex shader input position.
 	mVSInPos = vsMain->resolveInputParameter(Parameter::SPS_POSITION, 0, Parameter::SPC_POSITION_OBJECT_SPACE, GCT_FLOAT4);
-	if (mVSInPos.get() == NULL)
-		return false;
-
 	
 	// Resolve fog colour.
 	mFogColour = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogColor");
-	if (mFogColour.get() == NULL)
-		return false;
-		
-
+	
 	// Resolve pixel shader output diffuse color.
 	mPSOutDiffuse = psMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-	if (mPSOutDiffuse.get() == NULL)	
-		return false;
 	
 	// Per pixel fog.
 	if (mCalcMode == CM_PER_PIXEL)
 	{
 		// Resolve fog params.		
 		mFogParams = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
-		if (mFogParams.get() == NULL)
-			return false;
-
-
+		
 		// Resolve vertex shader output depth.		
 		mVSOutDepth = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			Parameter::SPC_DEPTH_VIEW_SPACE,
 			GCT_FLOAT1);
-		if (mVSOutDepth.get() == NULL)
-			return false;
-
-
+		
 		// Resolve pixel shader input depth.
 		mPSInDepth = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutDepth->getIndex(), 
 			mVSOutDepth->getContent(),
 			GCT_FLOAT1);
-		if (mPSInDepth.get() == NULL)
-			return false;		
 		
+		hasError |= !(mPSInDepth.get()) || !(mVSOutDepth.get()) || !(mFogParams.get());
 	}
-
 	// Per vertex fog.
 	else
 	{		
 		// Resolve fog params.		
 		mFogParams = vsProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "gFogParams");
-		if (mFogParams.get() == NULL)
-			return false;
 		
-											
 		// Resolve vertex shader output fog factor.		
 		mVSOutFogFactor = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, 
 			Parameter::SPC_UNKNOWN,
 			GCT_FLOAT1);
-		if (mVSOutFogFactor.get() == NULL)
-			return false;
 		
-	
 		// Resolve pixel shader input fog factor.
 		mPSInFogFactor = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, mVSOutFogFactor->getIndex(), 
 			mVSOutFogFactor->getContent(),
 			GCT_FLOAT1);
-		if (mPSInFogFactor.get() == NULL)
-			return false;			
+
+		hasError |= !(mPSInFogFactor.get()) || !(mVSOutFogFactor.get()) || !(mFogParams.get());
 	}
 
-
+	hasError |= !(mWorldViewProjMatrix.get()) || !(mVSInPos.get()) || !(mFogColour.get()) || !(mPSOutDiffuse.get());
+		
+	if (hasError)
+	{
+		OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
+				"Not all parameters could be constructed for the sub-render state.",
+				"FFPFog::resolveParameters" );
+	}
 	return true;
 }
 

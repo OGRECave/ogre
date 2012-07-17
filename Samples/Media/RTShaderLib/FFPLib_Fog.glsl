@@ -97,6 +97,19 @@ void FFP_PixelFog_Depth(in mat4 mWorldViewProj,
 	oDepth			= vOutPos.w;	
 }
 
+
+//-----------------------------------------------------------------------------
+void FFP_PixelFog_PositionDepth(in mat4 mWorld, 
+				   in vec3 cameraPos,
+				   in vec4 pos, 				   				   				   
+				   out vec3 oPosView,
+				   out float oDepth)
+{
+	vec4 vOutPos  = mWorld * pos;
+	oPosView      = vOutPos.xyz - cameraPos;
+	oDepth        = length(oPosView);	
+}
+
 //-----------------------------------------------------------------------------
 void FFP_PixelFog_Linear(in float depth,		   
 				   in vec4 fogParams,				   

@@ -53,7 +53,7 @@ class _OgreRTSSExport Program : public RTShaderSystemAlloc
 // Interface.
 public:	
 	/** Get the type of this program. */
-	GpuProgramType				getType						() const;
+	GpuProgramType getType() const;
 
 	/** Resolve uniform auto constant parameter with associated real data of this program.
 	@param autoType The auto type of the desired parameter.	
@@ -61,7 +61,7 @@ public:
 	@param size number of elements in the parameter.	
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, Real data, size_t size = 0);
+	UniformParameterPtr resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, Real data, size_t size = 0);
 	
 	/** Resolve uniform auto constant parameter with associated real data of this program.
 	@param autoType The auto type of the desired parameter.	
@@ -70,7 +70,7 @@ public:
 	@param size number of elements in the parameter.	
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	UniformParameterPtr		resolveAutoParameterReal	(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
+	UniformParameterPtr resolveAutoParameterReal(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, Real data, size_t size = 0);
 
 	/** Resolve uniform auto constant parameter with associated int data of this program.
 	@param autoType The auto type of the desired parameter.	
@@ -78,7 +78,7 @@ public:
 	@param size number of elements in the parameter.	
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, size_t data, size_t size = 0);
+	UniformParameterPtr resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, size_t data, size_t size = 0);
 	
 	/** Resolve uniform auto constant parameter with associated int data of this program.
 	@param autoType The auto type of the desired parameter.
@@ -87,7 +87,7 @@ public:
 	@param size number of elements in the parameter.
 	Return parameter instance in case of that resolve operation succeeded.	
 	*/
-	UniformParameterPtr		resolveAutoParameterInt		(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, size_t data, size_t size = 0);
+	UniformParameterPtr resolveAutoParameterInt(GpuProgramParameters::AutoConstantType autoType, GpuConstantType type, size_t data, size_t size = 0);
 
 	/** Resolve uniform parameter of this program.
 	@param type The type of the desired parameter.
@@ -98,68 +98,68 @@ public:
 	Return parameter instance in case of that resolve operation succeeded.
 	@remarks Pass -1 as index parameter to create a new parameter with the desired type and index.
 	*/
-	UniformParameterPtr		resolveParameter			(GpuConstantType type, int index, uint16 variability, const String& suggestedName, size_t size = 0);
+	UniformParameterPtr resolveParameter(GpuConstantType type, int index, uint16 variability, const String& suggestedName, size_t size = 0);
 	
 	/** Get parameter by a given name.	
 	@param name The name of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	UniformParameterPtr		getParameterByName			(const String& name);
+	UniformParameterPtr getParameterByName(const String& name);
 
 	/** Get parameter by a given auto constant type.	
 	@param autoType The auto type of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	UniformParameterPtr		getParameterByAutoType		(GpuProgramParameters::AutoConstantType autoType);
+	UniformParameterPtr getParameterByAutoType(GpuProgramParameters::AutoConstantType autoType);
 
 	/** Get parameter by a given type and index.	
 	@param type The type of the parameter to search for.
 	@param index The index of the parameter to search for.
 	@remarks Return NULL if no matching parameter found.
 	*/
-	UniformParameterPtr		getParameterByType			(GpuConstantType type, int index);
+	UniformParameterPtr getParameterByType(GpuConstantType type, int index);
 
 	/** Get the list of uniform parameters of this program.
 	*/
-	const UniformParameterList&	getParameters		() const { return mParameters; };
+	const UniformParameterList& getParameters() const { return mParameters; };
 
 	/** Create new function in this program. Return the newly created function instance.
 	@param name The name of the function to create.
 	@param desc The description of the function.
 	*/
-	Function*					createFunction				(const String& name, const String& desc, const Function::FunctionType functionType);
+	Function* createFunction(const String& name, const String& desc, const Function::FunctionType functionType);
 
 	/** Get a function by a given name. Return NULL if no matching function found.
 	@param name The name of the function to search for.
 	*/
-	Function*					getFunctionByName			(const String& name);
+	Function* getFunctionByName(const String& name);
 
 	/** Get the function list of this program.
 	*/
-	const ShaderFunctionList&	getFunctions				() const { return mFunctions; };
+	const ShaderFunctionList& getFunctions() const { return mFunctions; };
 
 	/** Set the entry point function.
 	@param function The function that will use as entry point of this program.
 	*/
-	void						setEntryPointFunction		(Function* function) { mEntryPointFunction = function; }
+	void setEntryPointFunction(Function* function) { mEntryPointFunction = function; }
 
 	/** Get the entry point function of this program.*/
-	Function*					getEntryPointFunction		()					 { return mEntryPointFunction; }
+	Function* getEntryPointFunction()					 { return mEntryPointFunction; }
 
 	/** Add dependency for this program. Basically a filename that will be included in this
 	program and provide predefined shader functions code.
 	One should verify that the given library file he provides can be reached by the resource manager.
 	This step can be achieved using the ResourceGroupManager::addResourceLocation method.
 	*/
-	void						addDependency				(const String& libFileName);
+	void addDependency(const String& libFileName);
 
 	/** Get the number of external libs this program depends on */
-	size_t						getDependencyCount			() const;
+	size_t getDependencyCount() const;
 
 	/** Get the library name of the given index dependency.
 	@param index The index of the dependecy.
 	*/
-	const String&				getDependency				(unsigned int index) const;
+	const String& getDependency(unsigned int index) const;
 	
 
 	/** Sets whether a vertex program includes the required instructions
@@ -178,32 +178,38 @@ protected:
 	/** Class constructor.
 	@param type The type of this program.
 	*/
-	Program			(GpuProgramType type);
+	Program(GpuProgramType type);
 
 	/** Class destructor */
-	~Program		();
+	~Program();
 
 	/** Destroy all parameters of this program. */
-	void						destroyParameters	();
+	void destroyParameters();
 
 	/** Destroy all functions of this program. */
-	void						destroyFunctions	();
+	void destroyFunctions();
 
 	/** Add parameter to this program. */
-	void						addParameter				(UniformParameterPtr parameter);
+	void addParameter(UniformParameterPtr parameter);
 		
 	/** Remove parameter from this program. */
-	void						removeParameter				(UniformParameterPtr parameter);
+	void removeParameter(UniformParameterPtr parameter);
 
 
 // Attributes.
 protected:
-	GpuProgramType					mType;						// Program type. (Vertex, Fragment, Geometry).
-	UniformParameterList			mParameters;				// Program uniform parameters.	
-	ShaderFunctionList				mFunctions;					// Function list.
-	Function*						mEntryPointFunction;		// Entry point function for this program.	
-	StringVector					mDependencies;				// Program dependencies.
-	bool							mSkeletalAnimation;			// Skeletal animation calculation
+	// Program type. (Vertex, Fragment, Geometry).
+	GpuProgramType mType;
+	// Program uniform parameters.	
+	UniformParameterList mParameters;
+	// Function list.
+	ShaderFunctionList mFunctions;
+	// Entry point function for this program.	
+	Function* mEntryPointFunction;
+	// Program dependencies.
+	StringVector mDependencies;
+	// Skeletal animation calculation
+	bool mSkeletalAnimation;
 private:
 	friend class ProgramManager;
 };
