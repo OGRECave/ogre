@@ -953,7 +953,7 @@ namespace Ogre
 				rsc->setVendor(GPU_NVIDIA);
 				break;
 			case 0x1002:
-				rsc->setVendor(GPU_ATI);
+				rsc->setVendor(GPU_AMD);
 				break;
 			case 0x163C:
 			case 0x8086:

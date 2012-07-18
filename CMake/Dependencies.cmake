@@ -101,9 +101,9 @@ if(NOT ANDROID)
   macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
 endif()
 
-# Find OpenGL ES
+# Find OpenGL ES 1.x
 find_package(OpenGLES)
-macro_log_feature(OPENGLES_FOUND "OpenGL ES 1.x" "Support for the OpenGL ES 1.x render system" "http://www.khronos.org/opengles/" FALSE "" "")
+macro_log_feature(OPENGLES_FOUND "OpenGL ES 1.x" "Support for the OpenGL ES 1.x render system (DEPRECATED)" "http://www.khronos.org/opengles/" FALSE "" "")
 
 # Find OpenGL ES 2.x
 find_package(OpenGLES2)
@@ -136,24 +136,32 @@ endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
 	set(Boost_COMPILER "-xgcc42")
 endif()
-set(Boost_ADDITIONAL_VERSIONS "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
+set(Boost_ADDITIONAL_VERSIONS "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
 # Components that need linking (NB does not include header-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
-find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-if (NOT Boost_FOUND)
-	# Try again with the other type of libs
-	if(Boost_USE_STATIC_LIBS)
-		set(Boost_USE_STATIC_LIBS OFF)
-	else()
-		set(Boost_USE_STATIC_LIBS ON)
-	endif()
-	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
-endif()
 find_package(Boost QUIET)
+if (NOT Boost_FOUND)
+        if(Boost_USE_STATIC_LIBS)
+                set(Boost_USE_STATIC_LIBS OFF)
+        else()
+                set(Boost_USE_STATIC_LIBS ON)
+        endif()
+        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+endif()
+
+if(Boost_FOUND AND Boost_VERSION GREATER 104900)
+        set(OGRE_BOOST_COMPONENTS thread date_time system chrono)
+        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+endif()
+
 # Optional Boost libs (Boost_${COMPONENT}_FOUND
 macro_log_feature(Boost_FOUND "boost" "Boost (general)" "http://boost.org" FALSE "" "")
 macro_log_feature(Boost_THREAD_FOUND "boost-thread" "Used for threading support" "http://boost.org" FALSE "" "")
 macro_log_feature(Boost_DATE_TIME_FOUND "boost-date_time" "Used for threading support" "http://boost.org" FALSE "" "")
+if(Boost_VERSION GREATER 104900)
+    macro_log_feature(Boost_SYSTEM_FOUND "boost-system" "Used for threading support" "http://boost.org" FALSE "" "")
+    macro_log_feature(Boost_CHRONO_FOUND "boost-chrono" "Used for threading support" "http://boost.org" FALSE "" "")
+endif()
 
 # POCO
 find_package(POCO)

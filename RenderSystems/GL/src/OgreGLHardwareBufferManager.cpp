@@ -67,7 +67,7 @@ namespace Ogre {
 		// Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
 		// disable for now until we figure out where the problem lies			
 #	if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_ATI) 
+		if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD)
 		{
 			mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
 		}

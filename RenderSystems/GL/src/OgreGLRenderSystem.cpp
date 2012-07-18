@@ -222,9 +222,9 @@ namespace Ogre {
 		if (strstr(vendorName, "NVIDIA"))
 			rsc->setVendor(GPU_NVIDIA);
 		else if (strstr(vendorName, "ATI"))
-			rsc->setVendor(GPU_ATI);
+			rsc->setVendor(GPU_AMD);
 		else if (strstr(vendorName, "AMD"))
-			rsc->setVendor(GPU_ATI);
+			rsc->setVendor(GPU_AMD);
 		else if (strstr(vendorName, "Intel"))
 			rsc->setVendor(GPU_INTEL);
 		else if (strstr(vendorName, "S3"))
@@ -252,7 +252,7 @@ namespace Ogre {
 			bool disableAutoMip = false;
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 			// Apple & Linux ATI drivers have faults in hardware mipmap generation
-			if (rsc->getVendor() == GPU_ATI)
+			if (rsc->getVendor() == GPU_AMD)
 				disableAutoMip = true;
 #endif
 			// The Intel 915G frequently corrupts textures when using hardware mip generation

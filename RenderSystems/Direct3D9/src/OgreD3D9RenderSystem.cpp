@@ -1055,7 +1055,7 @@ namespace Ogre
 			rsc->setVendor(GPU_NVIDIA);
 			break;
 		case 0x1002:
-			rsc->setVendor(GPU_ATI);
+			rsc->setVendor(GPU_AMD);
 			break;
 		case 0x163C:
 		case 0x8086:
@@ -1163,7 +1163,7 @@ namespace Ogre
 				}
 
 			}
-			else if (rsc->getVendor() == GPU_ATI)
+			else if (rsc->getVendor() == GPU_AMD)
 			{
 				// There is no check on ATI, we have to assume SM3 == support
 				rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
@@ -2499,7 +2499,7 @@ namespace Ogre
 				}
 
 			}
-			else if ((getCapabilities()->getVendor() == GPU_ATI))
+			else if ((getCapabilities()->getVendor() == GPU_AMD))
 			{
 				if (a2c)
 				{
