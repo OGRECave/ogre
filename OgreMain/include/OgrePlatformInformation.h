@@ -47,11 +47,6 @@ namespace Ogre {
 #if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64))) || \
     (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
 #   define OGRE_CPU OGRE_CPU_X86
-
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__BIG_ENDIAN__)
-#   define OGRE_CPU OGRE_CPU_PPC
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#	define OGRE_CPU OGRE_CPU_X86
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS && (defined(__i386__) || defined(__x86_64__))
 #	define OGRE_CPU OGRE_CPU_X86
 #elif defined(__arm__)
@@ -97,13 +92,13 @@ namespace Ogre {
 
 /* Define whether or not Ogre compiled with VFP supports.
  */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
+#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__VFP_FP__)
 #   define __OGRE_HAVE_VFP  1
 #endif
 
 /* Define whether or not Ogre compiled with NEON supports.
  */
-#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
+#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_NEON__)
 #   define __OGRE_HAVE_NEON  1
 #endif
 
