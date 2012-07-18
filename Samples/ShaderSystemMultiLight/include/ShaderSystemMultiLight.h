@@ -112,7 +112,8 @@ protected:
 
     void testCapabilities( const RenderSystemCapabilities* caps )
     {
-        if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0"))
+        if ((!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0")) &&
+			(!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("fp40")))
 		{
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in cg type shader language, your graphic card must support shader 3 profile or above."
                 " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
