@@ -40,7 +40,9 @@ THE SOFTWARE.
 #include <signal.h>
 #include <setjmp.h>
 
-    #if OGRE_CPU == OGRE_CPU_ARM && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+    #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        #include <cpu-features.h>
+    #elif OGRE_CPU == OGRE_CPU_ARM 
         #include <sys/sysctl.h>
         #if _MACH_
             #include <mach/machine.h>
@@ -464,6 +466,52 @@ namespace Ogre {
 		return "X86";
     }
 
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    static uint _detectCpuFeatures(void)
+    {
+        uint features = 0;
+        uint64_t cpufeatures = android_getCpuFeatures();
+        
+        if (cpufeatures & ANDROID_CPU_ARM_FEATURE_NEON) 
+        {
+            features |= PlatformInformation::CPU_FEATURE_NEON;
+        }
+        
+        if (cpufeatures & ANDROID_CPU_ARM_FEATURE_VFPv3) 
+        {
+            features |= PlatformInformation::CPU_FEATURE_VFP;
+        }
+        return features;
+    }
+    //---------------------------------------------------------------------
+    static String _detectCpuIdentifier(void)
+    {
+        String cpuID;
+        AndroidCpuFamily cpuInfo = android_getCpuFamily();
+        
+        switch (cpuInfo) {
+            case ANDROID_CPU_FAMILY_ARM:
+            {
+                if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_ARMv7) 
+                {
+                    cpuID = "ARMv7";
+                }
+                else
+                {
+                    cpuID = "Unknown ARM";
+                }
+            }
+            break;
+            case ANDROID_CPU_FAMILY_X86:
+                cpuID = "Unknown X86";
+                break;   
+            default:
+                cpuID = "Unknown";
+                break;
+        }
+        return cpuID;
+    }
+    
 #elif OGRE_CPU == OGRE_CPU_ARM  // OGRE_CPU == OGRE_CPU_X86
 
     //---------------------------------------------------------------------
@@ -615,7 +663,7 @@ namespace Ogre {
 			pLog->logMessage(
 				" *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
 		}
-#elif OGRE_CPU == OGRE_CPU_ARM
+#elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         pLog->logMessage(
 				" *      VFP: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_VFP), true));
         pLog->logMessage(

@@ -713,7 +713,7 @@ endif()
 set( LIBRARY_OUTPUT_PATH "${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}" CACHE PATH "path for android libs" )
 
 #includes
-list( APPEND ANDROID_SYSTEM_INCLUDE_DIRS "${ANDROID_SYSROOT}/usr/include" )
+list( APPEND ANDROID_SYSTEM_INCLUDE_DIRS "${ANDROID_SYSROOT}/usr/include" "${ANDROID_NDK}/sources/cpufeatures")
 if( __stlIncludePath AND EXISTS "${__stlIncludePath}" )
  list( APPEND ANDROID_SYSTEM_INCLUDE_DIRS "${__stlIncludePath}" )
 endif()
