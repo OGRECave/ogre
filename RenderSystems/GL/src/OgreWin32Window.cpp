@@ -440,6 +440,14 @@ namespace Ogre {
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
 				"wglCreateContext failed: " + translateWGLError(), "Win32Window::create");
 		}
+
+        if (old_context && old_context != mGlrc)
+        {
+            // Share lists with old context
+		    if (!wglShareLists(old_context, mGlrc))
+			    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
+        }
+
 		if (!wglMakeCurrent(mHDC, mGlrc))
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglMakeCurrent", "Win32Window::create");
 
@@ -457,10 +465,6 @@ namespace Ogre {
             // Restore old context
 		    if (!wglMakeCurrent(old_hdc, old_context))
 			    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglMakeCurrent() failed", "Win32Window::create");
-
-            // Share lists with old context
-		    if (!wglShareLists(old_context, mGlrc))
-			    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
         }
 
 		// Create RenderSystem context
