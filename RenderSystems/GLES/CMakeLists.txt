@@ -105,6 +105,9 @@ elseif (APPLE)
   include_directories(src/EAGL include/EAGL)
   link_directories(${OPENGLES_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "APPLE")
+elseif(ANDROID)
+  link_directories(${OPENGLES_LIBRARY_PATH})
+  set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (UNIX)
   set(PLATFORM_HEADERS
     include/EGL/X11/OgreX11EGLContext.h

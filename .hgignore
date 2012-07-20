@@ -10,3 +10,4 @@ Dependencies/include/FreeImage.h
 *.obj
 *.rule
 Dependencies/*
+build/*

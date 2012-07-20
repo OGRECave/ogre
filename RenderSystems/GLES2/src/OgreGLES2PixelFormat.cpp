@@ -78,22 +78,53 @@ namespace Ogre  {
             case PF_PVRTC_RGBA4:
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif                
+    
+#if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+            case PF_ETC1_RGB8:
+                return GL_ETC1_RGB8_OES;
+#endif
+                
             case PF_R5G6B5:
             case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
                 return GL_RGB;
-
+                
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            case PF_A1R5G5B5:
+                return GL_BGRA;
+            case PF_A4R4G4B4:
+            case PF_X8R8G8B8:
+            case PF_A8R8G8B8:
+            case PF_B8G8R8A8:
+            case PF_X8B8G8R8:
+            case PF_A8B8G8R8:
+                return GL_RGBA;
+#else
 			case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
             case PF_A8B8G8R8:
             case PF_B8G8R8A8:
             case PF_A2R10G10B10:
                 return GL_BGRA;
-			case PF_X8B8G8R8:
+            case PF_X8B8G8R8:
 			case PF_R8G8B8A8:
             case PF_A2B10G10R10:
                 return GL_RGBA;
+#endif
+            case PF_DXT1:
+#if GL_EXT_texture_compression_dxt1
+                return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+#endif
+            case PF_DXT3:
+#if GL_EXT_texture_compression_s3tc
+                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
+            case PF_DXT5:
+#if GL_EXT_texture_compression_s3tc
+                return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+#endif
+                
             default:
                 return 0;
         }
@@ -186,20 +217,51 @@ namespace Ogre  {
             case PF_PVRTC_RGBA4:
                 return GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
 #endif
+                
+#if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+            case PF_ETC1_RGB8:
+                return GL_ETC1_RGB8_OES;
+#endif
+            case PF_X8B8G8R8:
+            case PF_X8R8G8B8:
+			case PF_A8B8G8R8:
+            case PF_A8R8G8B8:
+            case PF_B8G8R8A8:
+            case PF_A1R5G5B5:
+            case PF_A4R4G4B4:
+                return GL_RGBA;
+                
+            case PF_R5G6B5:
+            case PF_B5G6R5:
             case PF_R8G8B8:
             case PF_B8G8R8:
-            case PF_FLOAT16_RGB:
-            case PF_FLOAT32_RGB:
                 return GL_RGB;
-			case PF_X8B8G8R8:
-			case PF_X8R8G8B8:
-            case PF_A8R8G8B8:
-            case PF_A8B8G8R8:
-            case PF_B8G8R8A8:
+            case PF_A4L4:
+            case PF_R3G3B2:
+            case PF_A2R10G10B10:
+            case PF_A2B10G10R10:
             case PF_FLOAT16_RGBA:
+            case PF_FLOAT32_RGB:
             case PF_FLOAT32_RGBA:
-                return GL_RGBA;
-
+            case PF_SHORT_RGBA:
+            case PF_SHORT_RGB:
+            case PF_SHORT_GR:
+			case PF_DXT1:
+#if GL_EXT_texture_compression_dxt1
+				if (!hwGamma)
+					return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+#endif
+            case PF_DXT3:
+#if GL_EXT_texture_compression_s3tc
+				if (!hwGamma)
+	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
+            case PF_DXT5:
+#if GL_EXT_texture_compression_s3tc
+				if (!hwGamma)
+	                return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+#endif
+                
 #if GL_EXT_texture_rg
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
@@ -251,6 +313,12 @@ namespace Ogre  {
             case GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
                 return PF_PVRTC_RGBA4;
 #endif
+                
+#if OGRE_NO_ETC1_CODEC == 0 && defined(GL_OES_compressed_ETC1_RGB8_texture)
+            case GL_ETC1_RGB8_OES:
+                return PF_ETC1_RGB8;
+#endif
+                
             case GL_LUMINANCE:
                 return PF_L8;
             case GL_ALPHA:
@@ -284,7 +352,19 @@ namespace Ogre  {
                 return PF_X8R8G8B8;
             case GL_RGBA8_OES:
                 return PF_A8R8G8B8;
-
+                
+#if GL_EXT_texture_compression_dxt1
+            case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:
+            case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:
+                return PF_DXT1;
+#endif
+#if GL_EXT_texture_compression_s3tc
+            case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:
+                return PF_DXT3;
+            case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:
+                return PF_DXT5;
+#endif
+                
 #if GL_EXT_texture_rg
             case GL_R8_EXT:
                 return PF_R8;

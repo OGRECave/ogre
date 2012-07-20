@@ -49,115 +49,80 @@ public:
 
 	/** Class constructor. 
 	*/
-	GLSLESProgramWriter();
+	GLSLESProgramWriter	();
 
 	/** Class destructor */
-	virtual ~GLSLESProgramWriter();
+	virtual ~GLSLESProgramWriter	();
 
 
 	/** 
 	@see ProgramWriter::writeSourceCode.
 	*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	virtual void writeSourceCode(StringSerialiser& os, Program* program);
-#else
-	virtual void writeSourceCode(std::ostream& os, Program* program);
-#endif
+	virtual void            writeSourceCode			(std::ostream& os, Program* program);
 
 	/** 
 	@see ProgramWriter::getTargetLanguage.
 	*/
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+	virtual const String&   getTargetLanguage		() const { return TargetLanguage; }
 
 	static String TargetLanguage;
 
     protected:
-	typedef	std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
-	typedef	std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
-	typedef	std::map<Parameter::Content, const char*>	ParamContentToStringMap;
-	typedef	std::map<String, String>					StringMap;
-	typedef	std::map<FunctionInvocation, String>		FunctionMap;
-	typedef	std::vector<FunctionInvocation>             FunctionVector;
-    typedef FunctionMap::const_iterator                 FunctionMapIterator;
-    typedef FunctionVector::const_iterator              FunctionVectorIterator;
-    typedef GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
+	typedef		std::map<GpuConstantType, const char*>		GpuConstTypeToStringMap;
+	typedef		std::map<Parameter::Semantic, const char*>	ParamSemanticToStringMap;
+	typedef		std::map<Parameter::Content, const char*>	ParamContentToStringMap;
+	typedef		std::map<String, String>					StringMap;
+	typedef		std::map<FunctionInvocation, String>		FunctionMap;
+	typedef		std::vector<FunctionInvocation>             FunctionVector;
+    typedef     FunctionMap::const_iterator                 FunctionMapIterator;
+    typedef     FunctionVector::const_iterator              FunctionVectorIterator;
+    typedef     GpuConstTypeToStringMap::const_iterator     GpuConstTypeToStringMapIterator;
 
 	// Protected methods.
 protected:
 
 	/** Initialize string maps. */
-	void initializeStringMaps();
+	void				initializeStringMaps		();
 
     /** Cache functions of a dependency */
-    virtual void cacheDependencyFunctions(const String & libName);
+    virtual void        cacheDependencyFunctions(const String & libName);
 
 
     /** Create a FunctionInvocation object from a string taken out of a shader library. */
 	FunctionInvocation	*createInvocationFromString	(const String & input);
 
     /** Write the program dependencies. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeProgramDependencies(StringSerialiser& os, Program* program);
-#else
-	void writeProgramDependencies(std::ostream& os, Program* program);
-#endif
+	void                writeProgramDependencies	(std::ostream& os, Program* program);
 
 	/** Write a local parameter. */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeLocalParameter(StringSerialiser& os, ParameterPtr parameter);
-#else
-	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
-#endif
+	void				writeLocalParameter			(std::ostream& os, ParameterPtr parameter);
 
 	/** Write the input params of the function */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeInputParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType);
-#else
-	void writeInputParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
-#endif
+	void				writeInputParameters		(std::ostream& os, Function* function, GpuProgramType gpuType);
 	
 	/** Write the output params of the function */
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeOutParameters(StringSerialiser& os, Function* function, GpuProgramType gpuType);
-#else
-	void writeOutParameters(std::ostream& os, Function* function, GpuProgramType gpuType);
-#endif
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	void writeAssignFunction(StringSerialiser& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
-#else
-	void writeAssignFunction(std::stringstream& os, FunctionInvocation::OperandVector::iterator itOperand, FunctionInvocation::OperandVector::iterator itOperandEnd, GpuProgramType gpuType);
-#endif
+	void				writeOutParameters			(std::ostream& os, Function* function, GpuProgramType gpuType);
 
 	String processOperand(Operand op, GpuProgramType gpuType);
 	
     /** Check if a string matches one of the GLSL ES basic types */
-    bool isBasicType(String &type);
+    bool                isBasicType(String &type);
     
     /** Search within a function body for non-builtin functions that a given function invocation depends on. */
-    void discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector);
+    void                discoverFunctionDependencies(const FunctionInvocation &invoc, FunctionVector &depVector);
 
 	// Attributes.
 protected:
-	// Map between GPU constant type to string value.
-	GpuConstTypeToStringMap mGpuConstTypeMap;
-	// Map between parameter semantic to string value.
-	ParamSemanticToStringMap mParamSemanticMap;
+	GpuConstTypeToStringMap		mGpuConstTypeMap;				// Map between GPU constant type to string value.
+	ParamSemanticToStringMap	mParamSemanticMap;				// Map between parameter semantic to string value.
 
-	// Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
-	StringMap mInputToGLStatesMap;
-	// Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
-	FunctionMap mFunctionCacheMap;
-    // Map of #defines and the function library that contains them
-    StringMap mDefinesMap;
-	// Map parameter content to vertex attributes
-	ParamContentToStringMap mContentToPerVertexAttributes;
-	// Holds the current glsl es version
-	int mGLSLVersion;
-	// Holds the fragment input params 
-	StringVector mFragInputParams;
-    // Holds the cached function libraries
-    StringMap mCachedFunctionLibraries;
+	StringMap					mInputToGLStatesMap;			// Map parameter name to a new parameter name (sometimes renaming is required to match names between vertex and fragment shader)
+	FunctionMap                 mFunctionCacheMap;              // Map function invocation to body.  Used as a cache to reduce library file reads and for inlining
+    StringMap                   mDefinesMap;                    // Map of #defines and the function library that contains them
+	ParamContentToStringMap		mContentToPerVertexAttributes;	// Map parameter content to vertex attributes
+	int							mGLSLVersion;					// Holds the current glsl es version
+	StringVector				mFragInputParams;				// Holds the fragment input params 
+    StringMap                   mCachedFunctionLibraries;       // Holds the cached function libraries
 };
 
 /** GLSL ES program writer factory implementation.

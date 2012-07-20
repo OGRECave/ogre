@@ -48,9 +48,6 @@ THE SOFTWARE.
 #include "OgreShaderGLSLESProgramProcessor.h"
 #include "OgreGpuProgramManager.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include "OgreStringSerialiser.h"
-#endif
 
 namespace Ogre {
 
@@ -383,13 +380,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const StringVector& profilesList,
 											   const String& cachePath)
 {
-
-	
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-	Ogre::StringSerialiser sourceCodeStringStream;
-#else
 	std::stringstream sourceCodeStringStream;
-#endif
 	_StringHash stringHash;
 	uint32 programHashCode;
 	String programName;

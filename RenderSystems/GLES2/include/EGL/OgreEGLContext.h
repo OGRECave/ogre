@@ -31,6 +31,7 @@ THE SOFTWARE.
 #define __EGLContext_H__
 
 #include "OgreGLES2Context.h"
+#include <EGL/egl.h>
 
 namespace Ogre {
     class EGLSupport;
@@ -49,6 +50,9 @@ namespace Ogre {
 
             virtual ~EGLContext();
 
+            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
+            virtual void _destroyInternalResources();
+        
             virtual void setCurrent();
             virtual void endCurrent();
             virtual GLES2Context* clone() const = 0;

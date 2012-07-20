@@ -39,30 +39,19 @@ namespace Ogre {
                            ::EGLConfig glconfig,
                            ::EGLSurface drawable)
         : mGLSupport(glsupport),
-          mDrawable(drawable),
-          mContext(0),
-          mConfig(glconfig),
-		  mEglDisplay(eglDisplay)
+          mContext(0)
     {
 		assert(drawable);
-        GLES2RenderSystem* renderSystem =
-            static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
-        EGLContext* mainContext =
-            static_cast<EGLContext*>(renderSystem->_getMainContext());
+        GLES2RenderSystem* renderSystem = static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
+        EGLContext* mainContext = static_cast<EGLContext*>(renderSystem->_getMainContext());
         ::EGLContext shareContext = (::EGLContext) 0;
 
         if (mainContext)
         {
             shareContext = mainContext->mContext;
         }
-        mContext = mGLSupport->createNewContext(eglDisplay, mConfig, shareContext);
 
-        if (!mContext)
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Unable to create a suitable EGLContext",
-                        "EGLContext::EGLContext");
-        }
+        _createInternalResources(eglDisplay, glconfig, drawable, shareContext);
     }
 
     EGLContext::~EGLContext()
@@ -70,8 +59,34 @@ namespace Ogre {
         GLES2RenderSystem *rs =
             static_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem());
 
-        eglDestroyContext(mEglDisplay, mContext);
+        _destroyInternalResources();
         rs->_unregisterContext(this);
+    }
+    
+    void EGLContext::_createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext)
+    {
+        mDrawable = drawable;
+        mConfig = glconfig;
+        mEglDisplay = eglDisplay;
+        
+        mContext = mGLSupport->createNewContext(mEglDisplay, mConfig, shareContext);
+        
+        if (!mContext)
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Unable to create a suitable EGLContext",
+                        "EGLContext::EGLContext");
+        }
+    }
+    
+    void EGLContext::_destroyInternalResources()
+    {
+        endCurrent();
+        
+        eglDestroyContext(mEglDisplay, mContext);
+        EGL_CHECK_ERROR
+        
+        mContext = NULL;
     }
 
     void EGLContext::setCurrent()

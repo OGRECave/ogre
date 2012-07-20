@@ -92,43 +92,42 @@ namespace Ogre {
         };
     }
 
-    // Creation / loading methods
-    void GLES2Texture::createInternalResourcesImpl(void)
+    void GLES2Texture::_createGLTexResource()
     {
-		// Convert to nearest power-of-two size if required
+        // Convert to nearest power-of-two size if required
         mWidth = GLES2PixelUtil::optionalPO2(mWidth);
         mHeight = GLES2PixelUtil::optionalPO2(mHeight);
         mDepth = GLES2PixelUtil::optionalPO2(mDepth);
-
+        
 		// Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
-
+        
 		// Check requested number of mipmaps
         size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
-
+        
         if(PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0))
             mNumRequestedMipmaps = 0;
-
+        
         mNumMipmaps = mNumRequestedMipmaps;
         if (mNumMipmaps > maxMips)
             mNumMipmaps = maxMips;
-
+        
 		// Generate texture name
         glGenTextures(1, &mTextureID);
         GL_CHECK_ERROR;
-
+           
 		// Set texture type
         glBindTexture(getGLES2TextureTarget(), mTextureID);
         GL_CHECK_ERROR;
-
+        
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
-            Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
-
+        Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
+        
 #if GL_APPLE_texture_max_level
         glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 #endif
-
+        
         // Set some misc default parameters, these can of course be changed later
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -142,6 +141,7 @@ namespace Ogre {
         glTexParameteri(getGLES2TextureTarget(),
                         GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GL_CHECK_ERROR;
+        
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
@@ -151,16 +151,16 @@ namespace Ogre {
         size_t width = mWidth;
         size_t height = mHeight;
         size_t depth = mDepth;
-
+        
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
             size_t size = PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat);
-
+            
             // Provide temporary buffer filled with zeroes as glCompressedTexImageXD does not
             // accept a 0 pointer like normal glTexImageXD
             // Run through this process for every mipmap to pregenerate mipmap pyramid
-
+            
             uint8* tmpdata = new uint8[size];
             memset(tmpdata, 0, size);
             for (size_t mip = 0; mip <= mNumMipmaps; mip++)
@@ -174,7 +174,7 @@ namespace Ogre {
 //                                                      );
 
                 size = PixelUtil::getMemorySize(width, height, depth, mFormat);
-
+                
 				switch(mTextureType)
 				{
 					case TEX_TYPE_1D:
@@ -200,7 +200,7 @@ namespace Ogre {
                     default:
                         break;
                 };
-
+                
                 if(width > 1)
                 {
                     width = width / 2;
@@ -256,7 +256,7 @@ namespace Ogre {
                     default:
                         break;
                 };
-
+                
                 if (width > 1)
                 {
                     width = width / 2;
@@ -267,7 +267,13 @@ namespace Ogre {
                 }
             }
         }
-
+    }
+    
+    // Creation / loading methods
+    void GLES2Texture::createInternalResourcesImpl(void)
+    {
+		_createGLTexResource();
+        
         _createSurfaceList();
 
         // Get final internal format
@@ -309,7 +315,8 @@ namespace Ogre {
 			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
             PixelFormat imageFormat = (*loadedImages)[0].getFormat();
 			if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
-                imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4)
+                imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4 ||
+                imageFormat == PF_ETC1_RGB8)
 			{
                 size_t imageMips = (*loadedImages)[0].getNumMipmaps();
                 if (imageMips == 0)
@@ -390,7 +397,50 @@ namespace Ogre {
         mSurfaceList.clear();
         glDeleteTextures(1, &mTextureID);
         GL_CHECK_ERROR;
+        mTextureID = 0;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2Texture::notifyOnContextLost()
+    {
+        if (!mIsManual) 
+        {
+            freeInternalResources();
+        }
+        else
+        {
+            glDeleteTextures(1, &mTextureID);
+            GL_CHECK_ERROR;
+            mTextureID = 0;
+        }
+    }
+    
+    void GLES2Texture::notifyOnContextReset()
+    {
+        if (!mIsManual) 
+        {
+            reload();
+        }
+        else
+        {
+            preLoadImpl();
+            
+            _createGLTexResource();
+            
+            for(size_t i = 0; i < mSurfaceList.size(); i++)
+            {
+                static_cast<GLES2TextureBuffer*>(mSurfaceList[i].getPointer())->updateTextureId(mTextureID);
+            }
+            
+            if (mLoader)
+            {
+                mLoader->loadResource(this);
+            }
+            
+            postLoadImpl();
+        }
+    }
+#endif
 
     void GLES2Texture::_createSurfaceList()
     {

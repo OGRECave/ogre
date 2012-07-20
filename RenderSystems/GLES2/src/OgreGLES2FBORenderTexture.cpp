@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBOMultiRenderTarget.h"
+#include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
 
@@ -47,7 +49,7 @@ namespace Ogre {
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
     }
-
+    
     void GLES2FBORenderTexture::getCustomAttribute(const String& name, void* pData)
     {
         if(name=="FBO")
@@ -60,6 +62,25 @@ namespace Ogre {
 	{
 		mFB.swapBuffers();
 	}
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLES2FBORenderTexture::notifyOnContextLost()
+    {
+        mFB.notifyOnContextLost();
+    }
+    
+    void GLES2FBORenderTexture::notifyOnContextReset()
+    {
+        GLES2SurfaceDesc target;
+        target.buffer = static_cast<GLES2HardwarePixelBuffer*>(mBuffer);
+        target.zoffset = mZOffset;
+        
+        mFB.notifyOnContextReset(target);
+        
+        static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->_createDepthBufferFor(this);
+    }
+#endif
+    
 	//-----------------------------------------------------------------------------
 	bool GLES2FBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
@@ -157,7 +178,18 @@ namespace Ogre {
         glDeleteFramebuffers(1, &mTempFBO);      
         GL_CHECK_ERROR;
 	}
-
+    
+    void GLES2FBOManager::_reload()
+    {
+        glDeleteFramebuffers(1, &mTempFBO);      
+        GL_CHECK_ERROR;
+        
+        detectFBOFormats();
+        
+        glGenFramebuffers(1, &mTempFBO);
+        GL_CHECK_ERROR;
+    }
+    
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
                  false   if this combo is not supported
@@ -269,9 +301,13 @@ namespace Ogre {
 			GLint internalFormat = GLES2PixelUtil::getGLInternalFormat((PixelFormat)x);
             GLenum fmt = GLES2PixelUtil::getGLOriginFormat((PixelFormat)x);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            if(internalFormat == GL_NONE)
+                continue;
+#else
             if((internalFormat == GL_NONE) && (x != 0))
                 continue;
-
+#endif
 			// No test for compressed formats
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;

@@ -54,10 +54,10 @@ THE SOFTWARE
 namespace Ogre {
     // Define ogre version
     #define OGRE_VERSION_MAJOR 2
-    #define OGRE_VERSION_MINOR 0
+    #define OGRE_VERSION_MINOR 1
     #define OGRE_VERSION_PATCH 0
 	#define OGRE_VERSION_SUFFIX "unstable"
-    #define OGRE_VERSION_NAME "Tindalos"
+    #define OGRE_VERSION_NAME "unnamed"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 

@@ -39,6 +39,19 @@ namespace Ogre {
   */
 GLES2HardwareOcclusionQuery::GLES2HardwareOcclusionQuery() 
 { 
+    createQuery();
+}
+//------------------------------------------------------------------
+/**
+  * Object destructor
+  */
+GLES2HardwareOcclusionQuery::~GLES2HardwareOcclusionQuery() 
+{ 
+    destroyQuery();
+}
+//------------------------------------------------------------------
+void GLES2HardwareOcclusionQuery::createQuery()
+{
 	// Check for hardware occlusion support
 #ifdef GL_EXT_occlusion_query_boolean
     glGenQueriesEXT(1, &mQueryID );
@@ -47,19 +60,28 @@ GLES2HardwareOcclusionQuery::GLES2HardwareOcclusionQuery()
     OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                 "Cannot allocate a Hardware query. This video card doesn't support it, sorry.", 
                 "GLES2HardwareOcclusionQuery::GLES2HardwareOcclusionQuery" );
-#endif
+#endif        
 }
 //------------------------------------------------------------------
-/**
-  * Object destructor
-  */
-GLES2HardwareOcclusionQuery::~GLES2HardwareOcclusionQuery() 
-{ 
+void GLES2HardwareOcclusionQuery::destroyQuery()
+{
 #ifdef GL_EXT_occlusion_query_boolean
     glDeleteQueriesEXT(1, &mQueryID);
     GL_CHECK_ERROR;
-#endif
+#endif        
 }
+//------------------------------------------------------------------
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+void GLES2HardwareOcclusionQuery::notifyOnContextLost()
+{
+        destroyQuery();
+}
+//------------------------------------------------------------------
+void GLES2HardwareOcclusionQuery::notifyOnContextReset()
+{
+        createQuery();
+}
+#endif
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::beginOcclusionQuery() 
 { 

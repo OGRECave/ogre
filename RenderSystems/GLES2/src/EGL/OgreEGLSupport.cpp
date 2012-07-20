@@ -104,12 +104,12 @@ namespace Ogre {
         refreshConfig();
         if (!mSampleLevels.empty())
         {
-            StringVector::const_iterator value = mSampleLevels.begin();
-            StringVector::const_iterator end = mSampleLevels.end();
+            StringVector::const_iterator sampleValue = mSampleLevels.begin();
+            StringVector::const_iterator sampleEnd = mSampleLevels.end();
 
-            for (; value != end; value++)
+            for (; sampleValue != sampleEnd; sampleValue++)
             {
-                optFSAA.possibleValues.push_back(*value);
+                optFSAA.possibleValues.push_back(*sampleValue);
             }
 
             optFSAA.currentValue = optFSAA.possibleValues[0];

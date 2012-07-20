@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLSLESProgramCommon.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
     
@@ -41,7 +42,7 @@ namespace Ogre {
 
 	*/
 
-	class _OgreGLES2Export GLSLESLinkProgram : public GLSLESProgramCommon
+	class _OgreGLES2Export GLSLESLinkProgram : public GLSLESProgramCommon MANAGED_RESOURCE
 	{
 	protected:
         virtual void extractLayoutQualifiers(void) {}
@@ -53,6 +54,14 @@ namespace Ogre {
 
 		void buildGLUniformReferences(void);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        virtual void notifyOnContextReset();
+#endif
+        
 	public:
 		/// Constructor should only be used by GLSLESLinkProgramManager
 		GLSLESLinkProgram(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);

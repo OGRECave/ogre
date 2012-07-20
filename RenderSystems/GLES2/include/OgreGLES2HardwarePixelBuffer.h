@@ -58,7 +58,7 @@ namespace Ogre {
 
             // Download a box of pixels from the card
             virtual void download(const PixelBox &data);
-
+        
         public:
             /// Should be called by HardwareBufferManager
             GLES2HardwarePixelBuffer(size_t mWidth, size_t mHeight, size_t mDepth,
@@ -117,6 +117,15 @@ namespace Ogre {
             void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
             // Blitting implementation
             void blitFromTexture(GLES2TextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
+            
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        // Friends.
+        protected:
+            friend class GLES2Texture;
+                
+            void updateTextureId(GLuint textureID);
+#endif
+                
         protected:
             // In case this is a texture level
             GLenum mTarget;
@@ -125,7 +134,7 @@ namespace Ogre {
             GLint mFace;
             GLint mLevel;
             bool mSoftwareMipmap;
-
+                
             typedef vector<RenderTexture*>::type SliceTRT;
             SliceTRT mSliceTRT;
 
@@ -146,6 +155,7 @@ namespace Ogre {
         protected:
             // In case this is a render buffer
             GLuint mRenderbufferID;
+            GLsizei mNumSamples;
     };
 }
 

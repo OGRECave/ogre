@@ -35,9 +35,10 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreTexture.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2Texture : public Texture
+    class _OgreGLES2Export GLES2Texture : public Texture MANAGED_RESOURCE
     {
         public:
             // Constructor
@@ -87,6 +88,16 @@ namespace Ogre {
              */
             LoadedImages mLoadedImages;
 
+            /// Create gl texture
+            void _createGLTexResource();
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            /** See AndroidResource. */
+            virtual void notifyOnContextLost();
+        
+            /** See AndroidResource. */
+            virtual void notifyOnContextReset();
+#endif
 
         private:
             GLuint mTextureID;
