@@ -1867,7 +1867,18 @@ namespace Ogre
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
 		if (D3D9RenderSystem::getResourceManager()->getCreationPolicy() == RCP_CREATE_ON_ALL_DEVICES)
-			createTextureResources(d3d9Device);
+        {
+            try
+            {
+			    createTextureResources(d3d9Device);
+            }
+            catch (...)
+            {
+                mLoadingState.set(LOADSTATE_UNLOADED);
+                LogManager::getSingleton().stream() << "Warning: Failed to restore texture " << getName()
+                    << " on DeviceCreate.";
+            }
+        }
 	}
 
 	//---------------------------------------------------------------------
