@@ -1263,7 +1263,7 @@ namespace Ogre {
 			{
 				tangentsCalc.clear();
 				tangentsCalc.setVertexData(sm->vertexData);
-				tangentsCalc.addIndexData(sm->indexData);
+                tangentsCalc.addIndexData(sm->indexData, sm->operationType);
 				TangentSpaceCalc::Result res = 
 					tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
