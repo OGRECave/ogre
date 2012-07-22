@@ -1534,28 +1534,34 @@ namespace Ogre
 		return retval;
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::destroyRenderTarget(const String& name)
-	{		
-		D3D9RenderWindow* renderWindow = NULL;
-
-	
+	RenderTarget* D3D9RenderSystem::detachRenderTarget(const String &name)
+	{
+		RenderTarget* target = RenderSystem::detachRenderTarget(name);
+		detachRenderTargetImpl(name);
+		return target;
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::detachRenderTargetImpl(const String& name)
+	{
 		// Check render windows
 		D3D9RenderWindowList::iterator sw;
 		for (sw = mRenderWindows.begin(); sw != mRenderWindows.end(); ++sw)
 		{
 			if ((*sw)->getName() == name)
-			{
-				renderWindow = (*sw);					
+			{					
 				mRenderWindows.erase(sw);
 				break;
 			}
 		}
-		
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::destroyRenderTarget(const String& name)
+	{		
+		detachRenderTargetImpl(name);
 
 		// Do the real removal
 		RenderSystem::destroyRenderTarget(name);	
 	}
-
 	//---------------------------------------------------------------------
 	String D3D9RenderSystem::getErrorDescription( long errorNumber ) const
 	{

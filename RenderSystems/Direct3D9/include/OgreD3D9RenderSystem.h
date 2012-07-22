@@ -146,6 +146,7 @@ namespace Ogre
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
 		bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
+		void detachRenderTargetImpl(const String& name);
 		
         HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
@@ -224,6 +225,9 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
+
+		/// @copydoc RenderSystem::detachRenderTarget
+		virtual RenderTarget * detachRenderTarget(const String &name);
 
 		String getErrorDescription( long errorNumber ) const;
 		const String& getName() const;

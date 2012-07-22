@@ -112,7 +112,7 @@ namespace Ogre
 		void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
 		void convertGeometryShaderCaps(RenderSystemCapabilities* rsc) const;
 		bool checkVertexTextureFormats(void);
-
+		void detachRenderTargetImpl(const String& name);
 
 		CompareFunction mSceneAlphaRejectFunc; // should be merged with - mBlendDesc
 		unsigned char mSceneAlphaRejectValue; // should be merged with - mBlendDesc
@@ -227,6 +227,8 @@ namespace Ogre
 		DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
 											uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
 
+		/// @copydoc RenderSystem::detachRenderTarget
+		virtual RenderTarget * detachRenderTarget(const String &name);
 
 		const String& getName(void) const;
 		// Low-level overridden members
