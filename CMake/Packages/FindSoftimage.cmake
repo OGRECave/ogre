@@ -32,6 +32,7 @@ set(Softimage_PREFIX_PATH
   "$ENV{ProgramFiles}/Autodesk/Softimage 2011 SP1/XSISDK"
   "$ENV{ProgramFiles}/Autodesk/Softimage 2012/XSISDK"
   "$ENV{ProgramFiles}/Autodesk/Softimage 2012 SP1/XSISDK"
+  "$ENV{ProgramFiles}/Autodesk/Softimage 2013/XSISDK"
   "C:/Softimage/XSI_6.0_x64/XSISDK"
   "C:/Softimage/XSI_6.01_x64/XSISDK"
   "C:/Softimage/XSI_6.02_x64/XSISDK"
@@ -45,6 +46,7 @@ set(Softimage_PREFIX_PATH
   "$ENV{ProgramW6432}/Autodesk/Softimage 2011 SP1/XSISDK"
   "$ENV{ProgramW6432}/Autodesk/Softimage 2012/XSISDK"
   "$ENV{ProgramW6432}/Autodesk/Softimage 2012 SP1/XSISDK"
+  "$ENV{ProgramW6432}/Autodesk/Softimage 2013/XSISDK"
 )
 
 if (CMAKE_CL_64)
