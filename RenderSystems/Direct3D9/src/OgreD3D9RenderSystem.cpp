@@ -4359,7 +4359,9 @@ namespace Ogre
 					// drop samples
 					--fsaa;
 
-					if (fsaa == 1)
+					OgreAssert(fsaa > 0, "FSAA underflow: infinite loop (this should never happen)");
+
+					if (fsaa <= 1)
 					{
 						// ran out of options, no FSAA
 						fsaa = 0;
