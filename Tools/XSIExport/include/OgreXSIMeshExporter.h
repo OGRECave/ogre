@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreColourValue.h"
 #include "OgreMesh.h"
+#include "OgreProgressiveMesh.h"
 #include "OgreXSIHelper.h"
 #include <xsi_x3dobject.h>
 #include <xsi_string.h>

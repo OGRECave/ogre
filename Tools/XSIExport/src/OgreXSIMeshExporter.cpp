@@ -146,7 +146,7 @@ namespace Ogre {
 
 		if (lod)
 		{
-			mMesh->generateLodLevels(lod->distances, lod->quota, lod->reductionValue);
+			ProgressiveMesh::generateLodLevels(mMesh.get(), lod->distances, lod->quota, lod->reductionValue);
 			// progress report
 			ProgressManager::getSingleton().progress();
 		}
