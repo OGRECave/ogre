@@ -3495,6 +3495,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				LogManager::getSingleton().logMessage("Using FSAA from GL_ARB_multisample extension.");
 			}            
 		}
+
+		static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_switchContext(GLContext *context)

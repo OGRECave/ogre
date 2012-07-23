@@ -38,8 +38,6 @@ namespace Ogre {
     {
         // register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
-		createWarningTexture();
     }
     //-----------------------------------------------------------------------------
     GLTextureManager::~GLTextureManager()
