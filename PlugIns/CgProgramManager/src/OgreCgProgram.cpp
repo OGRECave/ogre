@@ -80,7 +80,7 @@ namespace Ogre {
 								mName+"/Delegate", mGroup, getHighLevelLanguage(), mType);
 					mDelegate->setParameter("target", getHighLevelTarget());
 					mDelegate->setParameter("entry_point", "main");
-					// HLSL output uses row major matrices, so need to tell Ogre that
+					// HLSL/GLSL output uses row major matrices, so need to tell Ogre that
 					mDelegate->setParameter("column_major_matrices", "false");
 					// HLSL output requires backwards compatibility to be enabled
 					mDelegate->setParameter("backwards_compatibility", "true");
@@ -621,34 +621,37 @@ namespace Ogre {
     void CgProgram::replaceDelegateParamNames(GpuProgramParametersSharedPtr params)
     {
         // replace parameter names with our own
-        GpuNamedConstantsPtr constants (OGRE_NEW GpuNamedConstants(params->getConstantDefinitions()));
-        GpuConstantDefinitionMap replMap;
-        LogManager::getSingleton().stream() << "Replacing parameter names.";
-        for (GpuConstantDefinitionMap::const_iterator it = constants->map.begin(); it != constants->map.end(); ++it)
+        if (mDelegateConstants.isNull())
         {
-            // parameter might contain array index
-            String paramName = it->first;
-            String suffix = "";
-            String::size_type pos = it->first.find('[');
-            if (pos != String::npos)
+            mDelegateConstants = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants(params->getConstantDefinitions()));
+            GpuConstantDefinitionMap replMap;
+            LogManager::getSingleton().stream() << "Replacing parameter names.";
+            for (GpuConstantDefinitionMap::const_iterator it = mDelegateConstants->map.begin(); it != mDelegateConstants->map.end(); ++it)
             {
-                paramName = it->first.substr(0, pos);
-                suffix = it->first.substr(pos, String::npos);
+                // parameter might contain array index
+                String paramName = it->first;
+                String suffix = "";
+                String::size_type pos = it->first.find('[');
+                if (pos != String::npos)
+                {
+                    paramName = it->first.substr(0, pos);
+                    suffix = it->first.substr(pos, String::npos);
+                }
+                map<String,String>::type::const_iterator pi = mDelegateParamMap.find(paramName);
+                if (pi != mDelegateParamMap.end())
+                {
+                    LogManager::getSingleton().stream() << "  replaced " << paramName << suffix << " with " << pi->second << suffix;
+                    replMap.insert(std::make_pair(pi->second+suffix, it->second));
+                }
+                else
+                {
+                    LogManager::getSingleton().stream() << "  no replacement for " << it->first;
+                    replMap.insert(*it);
+                }
             }
-            map<String,String>::type::const_iterator pi = mDelegateParamMap.find(paramName);
-            if (pi != mDelegateParamMap.end())
-            {
-                LogManager::getSingleton().stream() << "  replaced " << paramName << suffix << " with " << pi->second << suffix;
-                replMap.insert(std::make_pair(pi->second+suffix, it->second));
-            }
-            else
-            {
-                LogManager::getSingleton().stream() << "  no replacement for " << it->first;
-                replMap.insert(*it);
-            }
+            mDelegateConstants->map = replMap;
         }
-        constants->map = replMap;
-        params->_setNamedConstants(constants);
+        params->_setNamedConstants(mDelegateConstants);
     }
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr CgProgram::createParameters()
