@@ -626,11 +626,20 @@ namespace Ogre {
         LogManager::getSingleton().stream() << "Replacing parameter names.";
         for (GpuConstantDefinitionMap::const_iterator it = constants->map.begin(); it != constants->map.end(); ++it)
         {
-            map<String,String>::type::const_iterator pi = mDelegateParamMap.find(it->first);
+            // parameter might contain array index
+            String paramName = it->first;
+            String suffix = "";
+            String::size_type pos = it->first.find('[');
+            if (pos != String::npos)
+            {
+                paramName = it->first.substr(0, pos);
+                suffix = it->first.substr(pos, String::npos);
+            }
+            map<String,String>::type::const_iterator pi = mDelegateParamMap.find(paramName);
             if (pi != mDelegateParamMap.end())
             {
-                LogManager::getSingleton().stream() << "  replaced " << it->first << " with " << pi->second;
-                replMap.insert(std::make_pair(pi->second, it->second));
+                LogManager::getSingleton().stream() << "  replaced " << paramName << suffix << " with " << pi->second << suffix;
+                replMap.insert(std::make_pair(pi->second+suffix, it->second));
             }
             else
             {
