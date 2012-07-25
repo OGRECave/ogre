@@ -380,7 +380,7 @@ namespace Ogre  {
                                       PixelFormat format)
     {
 		size_t count = 0;
-        if((width > 0) && (height > 0))
+        if((width > 0) && (height > 0) && (depth > 0))
         {
             do {
                 if(width>1)		width = width/2;

@@ -766,7 +766,7 @@ namespace Ogre
 		for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
 		{
 			if (i->second->instance)
-				i->second->instance->update();
+				i->second->instance->update(synchronous);
 		}
 
 	}
@@ -786,7 +786,7 @@ namespace Ogre
 		for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
 		{
 			if (i->second->instance)
-				i->second->instance->updateDerivedData();
+				i->second->instance->updateDerivedData(synchronous, typeMask);
 		}
 
 	}

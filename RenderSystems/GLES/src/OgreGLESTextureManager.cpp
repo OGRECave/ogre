@@ -40,8 +40,6 @@ namespace Ogre {
         GL_CHECK_ERROR;
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
-        createWarningTexture();
     }
 
     GLESTextureManager::~GLESTextureManager()

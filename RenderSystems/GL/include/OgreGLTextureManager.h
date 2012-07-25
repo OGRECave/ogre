@@ -52,6 +52,8 @@ namespace Ogre {
             bool preciseFormatOnly = false);
 
     protected:
+		friend class GLRenderSystem;
+
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 

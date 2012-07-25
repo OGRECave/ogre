@@ -1237,9 +1237,16 @@ namespace Ogre
 		return newDepthBuffer;
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderSystem::destroyRenderTarget(const String& name)
+	RenderTarget* D3D11RenderSystem::detachRenderTarget(const String &name)
 	{
-		// Check in specialised lists
+		RenderTarget* target = RenderSystem::detachRenderTarget(name);
+		detachRenderTargetImpl(name);
+		return target;
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::detachRenderTargetImpl(const String& name)
+	{
+		// Check in specialized lists
 		if (mPrimaryWindow->getName() == name)
 		{
 			// We're destroying the primary window, so reset device and window
@@ -1258,6 +1265,12 @@ namespace Ogre
 				}
 			}
 		}
+	}
+	//---------------------------------------------------------------------
+	void D3D11RenderSystem::destroyRenderTarget(const String& name)
+	{
+		detachRenderTargetImpl(name);
+
 		// Do the real removal
 		RenderSystem::destroyRenderTarget(name);
 

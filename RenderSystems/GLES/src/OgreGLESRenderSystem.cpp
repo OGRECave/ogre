@@ -2680,6 +2680,8 @@ namespace Ogre {
             GL_CHECK_ERROR;
             LogManager::getSingleton().logMessage("Using FSAA OpenGL ES.");
         }
+        
+        static_cast<GLESTextureManager*>(mTextureManager)->createWarningTexture();
     }
 
     void GLESRenderSystem::initialiseContext(RenderWindow* primary)

@@ -486,36 +486,44 @@ namespace Ogre {
     {
         // Add up requests for emission
         static vector<unsigned>::type requested;
+        static vector<unsigned>::type emittedRequested;
+
         if( requested.size() != mEmitters.size() )
             requested.resize( mEmitters.size() );
+        if( emittedRequested.size() != mEmittedEmitterPoolSize)
+            emittedRequested.resize( mEmittedEmitterPoolSize );
 
-        size_t totalRequested, emitterCount, i, emissionAllowed;
+        size_t totalRequested, emitterCount, emittedEmitterCount, i, emissionAllowed;
         ParticleEmitterList::iterator itEmit, iEmitEnd;
-		ActiveEmittedEmitterList::iterator itActiveEmit;
+        ActiveEmittedEmitterList::iterator itActiveEmit, itActiveEnd;
+
         iEmitEnd = mEmitters.end();
         emitterCount = mEmitters.size();
+        emittedEmitterCount=mActiveEmittedEmitters.size();
+        itActiveEnd=mActiveEmittedEmitters.end();
         emissionAllowed = mFreeParticles.size();
         totalRequested = 0;
 
         // Count up total requested emissions for regular emitters (and exclude the ones that are used as
-		// a template for emitted emitters)
+        // a template for emitted emitters)
         for (itEmit = mEmitters.begin(), i = 0; itEmit != iEmitEnd; ++itEmit, ++i)
         {
-			if (!(*itEmit)->isEmitted())
-			{
-				requested[i] = (*itEmit)->_getEmissionCount(timeElapsed);
-				totalRequested += requested[i];
-			}
+            if (!(*itEmit)->isEmitted())
+            {
+                requested[i] = (*itEmit)->_getEmissionCount(timeElapsed);
+                totalRequested += requested[i];
+            }
         }
 
-		// Add up total requested emissions for (active) emitted emitters
-		for (itActiveEmit = mActiveEmittedEmitters.begin(); itActiveEmit != mActiveEmittedEmitters.end(); ++itActiveEmit)
-		{
-			totalRequested += (*itActiveEmit)->_getEmissionCount(timeElapsed);
-		}
+        // Add up total requested emissions for (active) emitted emitters
+        for (itActiveEmit = mActiveEmittedEmitters.begin(), i=0; itActiveEmit != itActiveEnd; ++itActiveEmit, ++i)
+        {
+            emittedRequested[i] = (*itActiveEmit)->_getEmissionCount(timeElapsed);
+            totalRequested += emittedRequested[i];
+        }
 
         // Check if the quota will be exceeded, if so reduce demand
-		Real ratio =  1.0f;
+        Real ratio =  1.0f;
         if (totalRequested > emissionAllowed)
         {
             // Apportion down requested values to allotted values
@@ -524,24 +532,28 @@ namespace Ogre {
             {
                 requested[i] = static_cast<unsigned>(requested[i] * ratio);
             }
+            for (i = 0; i < emittedEmitterCount; ++i)
+            {
+                emittedRequested[i] = static_cast<unsigned>(emittedRequested[i] * ratio);
+            }
         }
 
         // Emit
-		// For each emission, apply a subset of the motion for the frame
-		// this ensures an even distribution of particles when many are
-		// emitted in a single frame
+        // For each emission, apply a subset of the motion for the frame
+        // this ensures an even distribution of particles when many are
+        // emitted in a single frame
         for (itEmit = mEmitters.begin(), i = 0; itEmit != iEmitEnd; ++itEmit, ++i)
         {
-			// Trigger the emitters, but exclude the emitters that are already in the emitted emitters list; 
-			// they are handled in a separate loop
-			if (!(*itEmit)->isEmitted())
-				_executeTriggerEmitters (*itEmit, static_cast<unsigned>(requested[i]), timeElapsed);
+            // Trigger the emitters, but exclude the emitters that are already in the emitted emitters list; 
+            // they are handled in a separate loop
+            if (!(*itEmit)->isEmitted())
+                _executeTriggerEmitters (*itEmit, static_cast<unsigned>(requested[i]), timeElapsed);
         }
 
-		// Do the same with all active emitted emitters
-		for (itActiveEmit = mActiveEmittedEmitters.begin(), i = 0; itActiveEmit != mActiveEmittedEmitters.end(); ++itActiveEmit, ++i)
-			_executeTriggerEmitters (*itActiveEmit, static_cast<unsigned>((*itActiveEmit)->_getEmissionCount(timeElapsed) * ratio), timeElapsed);
-	}
+        // Do the same with all active emitted emitters
+        for (itActiveEmit = mActiveEmittedEmitters.begin(), i = 0; itActiveEmit != mActiveEmittedEmitters.end(); ++itActiveEmit, ++i)
+            _executeTriggerEmitters (*itActiveEmit, emittedRequested[i], timeElapsed);
+    }
     //-----------------------------------------------------------------------
     void ParticleSystem::_executeTriggerEmitters(ParticleEmitter* emitter, unsigned requested, Real timeElapsed)
     {

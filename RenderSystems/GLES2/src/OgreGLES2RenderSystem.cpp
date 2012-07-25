@@ -1934,6 +1934,7 @@ namespace Ogre {
     void GLES2RenderSystem::_oneTimeContextInitialization()
     {
 		glDisable(GL_DITHER);
+        static_cast<GLES2TextureManager*>(mTextureManager)->createWarningTexture();
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)

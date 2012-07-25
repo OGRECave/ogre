@@ -119,9 +119,23 @@ namespace Ogre
             if(mTempFileName.empty())
             {
                 // Write to temp file
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+                char* tmpname = _tempnam(".", "ogre");
+                if (!tmpname)
+                {
+                    // Having no file name here will cause various problems later.
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Temporary file name generation failed.", "DeflateStream::init");
+                }
+                else
+                {
+                    mTempFileName = tmpname;
+                    free(tmpname);
+                }
+#else
                 char tmpname[L_tmpnam];
                 tmpnam(tmpname);
                 mTempFileName = tmpname;
+#endif
             }
 
 			std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();

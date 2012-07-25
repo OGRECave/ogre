@@ -996,8 +996,14 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
  			CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
  			if(refCompInst)
  			{
- 				refTexDef = refCompInst->getCompositor()->
-                getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(name);
+                refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
+                    refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
+                // if the texture with the reference name can not be found, try the name
+                if (refTexDef == 0)
+                {
+ 				    refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
+                        refCompInst->getScheme())->getTextureDefinition(name);
+                }
  			}
 			else
 			{
