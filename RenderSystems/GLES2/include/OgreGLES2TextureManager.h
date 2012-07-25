@@ -51,6 +51,8 @@ namespace Ogre {
             bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
                                               bool preciseFormatOnly = false);
     protected:
+        friend class GLES2RenderSystem;
+        
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle,
                              const String& group, bool isManual, ManualResourceLoader* loader, 
