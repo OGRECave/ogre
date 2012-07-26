@@ -8480,7 +8480,11 @@ GLboolean GLEWAPIENTRY glewGetExtension (const char* name)
 //static
 //#endif
 // SJS
+#ifdef _WIN32
+GLenum glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
+#else
 GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
+#endif
 {
   const GLubyte* s;
   GLuint dot;
@@ -10832,7 +10836,11 @@ GLboolean GLEWAPIENTRY wglewGetExtension (const char* name)
   return _glewSearchExtension(name, start, end);
 }
 
+#ifdef _WIN32
+GLenum wglewContextInit (WGLEW_CONTEXT_ARG_DEF_LIST)
+#else
 GLenum GLEWAPIENTRY wglewContextInit (WGLEW_CONTEXT_ARG_DEF_LIST)
+#endif
 {
   GLboolean crippled;
   const GLubyte* extStart;
