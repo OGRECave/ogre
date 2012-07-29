@@ -122,14 +122,9 @@ namespace Ogre {
 
     private:
         HighLevelGpuProgramPtr mDelegate;
-        map<String,String>::type mDelegateParamMap;
-        GpuNamedConstantsPtr mDelegateConstants;
-        bool mDefaultParamsInitialised;
         String getHighLevelLanguage() const;
         String getHighLevelTarget() const;
         void fixHighLevelOutput(String& hlSource);
-        /// Replace parameter names 
-        void replaceDelegateParamNames(GpuProgramParametersSharedPtr params);
 
 
     public:

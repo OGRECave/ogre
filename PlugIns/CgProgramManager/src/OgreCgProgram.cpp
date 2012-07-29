@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
+#include <cctype>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -212,19 +213,7 @@ namespace Ogre {
                 // not what we want.
                 GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
                 for (map<String,int>::type::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
-                {
-                    String samplerName = i->first;
-                    // unfortunately, need a reverse lookup in the delegate param map
-                    for (map<String,String>::type::iterator j = mDelegateParamMap.begin(); j != mDelegateParamMap.end(); ++j)
-                    {
-                        if (j->second == i->first)
-                        {
-                            samplerName = j->first;
-                            break;
-                        }
-                    }
-                    params->setNamedConstant(samplerName, i->second);
-                }
+                    params->setNamedConstant(i->first, i->second);
             }
             mDelegate->load();
         }
@@ -338,9 +327,7 @@ namespace Ogre {
             if (!mDelegate.isNull())
             {
                 // Delegating to HLSL or GLSL, need to clean up Cg's output
-                LogManager::getSingleton().getDefaultLog()->logMessage("Cg output for " + mName + ": \n" + mProgramString);
                 fixHighLevelOutput(mProgramString);
-                LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
                 if (mSelectedCgProfile == CG_PROFILE_GLSLG)
                 {
                     // need to determine input and output operations
@@ -537,31 +524,45 @@ namespace Ogre {
 		return "unknown";
     }
     //-----------------------------------------------------------------------
-    void CgProgram::fixHighLevelOutput(String& hlSource)
+    struct HighLevelOutputFixer
     {
-		// for some unknown reason Cg chooses to change parameter names when
-		// translating to another high level language. We need to revert that,
-		// otherwise Ogre parameter mappings fail.
-		// Cg logs its renamings in the comments at the beginning of the
-		// processed source file. We can get them from there.
-        // We'll also get rid of those comments to trim down source code size.
-        mDelegateParamMap.clear();
-		vector<String>::type lines = StringUtil::split(hlSource, "\n");
-        hlSource.clear();
-        for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
+        const String& source;
+        const GpuConstantDefinitionMap& paramMap;
+        const map<String,int>::type samplerMap;
+        bool glsl;
+        String output;
+        map<String,String>::type paramNameMap;
+        String::size_type start;
+        struct ReplacementMark
         {
-            String& line = *i;
-            if (line.substr(0,2) != "//")
-                hlSource.append(line+'\n');
+            String::size_type pos, len;
+            String replaceWith;
+            bool operator<(const ReplacementMark& o) const { return pos < o.pos; }
+        };
+        vector<ReplacementMark>::type replacements;
+
+        HighLevelOutputFixer(const String& src, const GpuConstantDefinitionMap& params, 
+            const map<String,int>::type& samplers, bool isGLSL) 
+            : source(src), paramMap(params), samplerMap(samplers), glsl(isGLSL), start(0)
+        {
+            findNameMappings();
+            replaceParameterNames();
+            buildOutput();
         }
 
-		for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
-		{
-			String& line = *i;
-			// comment format: //var type parameter : [something] : new name : [something] : [something]
-			if (line.substr(0, 5) == "//var")
-			{
-				vector<String>::type cols = StringUtil::split(line, ":");
+        void findNameMappings()
+        {
+            String::size_type cur = 0, end = 0;
+            while (cur < source.size())
+            {
+                // look for a comment line describing a parameter name mapping
+    			// comment format: //var type parameter : [something] : new name : [something] : [something]
+                cur = source.find("//var", cur);
+                if (cur == String::npos)
+                    break;
+                end = source.find('\n', cur);
+				vector<String>::type cols = StringUtil::split(source.substr(cur, end-cur), ":");
+                cur = end;
 				if (cols.size() < 3)
 					continue;
 				vector<String>::type def = StringUtil::split(cols[0], "[ ");
@@ -575,38 +576,134 @@ namespace Ogre {
 				StringUtil::trim(newName);
 				if (newName.empty() || newName[0] != '_')
 					continue;
-
 				// if that name is present in our lists, mark in name translation map
-                GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
-				if (it != mParametersMap.end() || mSamplerRegisterMap.find(oldName) != mSamplerRegisterMap.end())
-				{
-					mDelegateParamMap.insert(std::make_pair(newName, oldName));
-                    if (it != mParametersMap.end() && (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG))
+                GpuConstantDefinitionMap::const_iterator it = paramMap.find(oldName);
+				if (it != paramMap.end() || samplerMap.find(oldName) != samplerMap.end())
+                {
+                    LogManager::getSingleton().stream() << "Replacing parameter name: " << newName << " -> " << oldName;
+					paramNameMap.insert(std::make_pair(oldName, newName));
+                }
+            }
+            // end now points at the end of the last comment, so we can strip anything before
+            start = (end == String::npos ? end : end+1);
+        }
+
+        void replaceParameterNames()
+        {
+            for (GpuConstantDefinitionMap::const_iterator it = paramMap.begin(); it != paramMap.end(); ++it)
+            {
+                const String& oldName = it->first;
+                map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+                if (pi != paramNameMap.end())
+                {
+                    const String& newName = pi->second;
+                    String::size_type beg = start;
+                    // do we need to replace the definition of the parameter? (GLSL only)
+                    if (glsl)
                     {
-                        // determine if the param is a matrix type, in which case we need
-                        // to revert the declaration.
                         if (it->second.constType == GCT_MATRIX_2X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+newName+"[2]", "uniform mat2 "+newName);
+                            beg = findAndMark("uniform vec2 "+newName+"[2]", "uniform mat2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+newName+"[3]", "uniform mat3 "+newName);
+                            beg = findAndMark("uniform vec3 "+newName+"[3]", "uniform mat3 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+newName+"[4]", "uniform mat4 "+newName);
+                            beg = findAndMark("uniform vec4 "+newName+"[4]", "uniform mat4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_2X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+newName+"[2]", "uniform mat2x3 "+newName);
+                            beg = findAndMark("uniform vec3 "+newName+"[2]", "uniform mat2x3 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_2X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+newName+"[2]", "uniform mat2x4 "+newName);
+                            beg = findAndMark("uniform vec4 "+newName+"[2]", "uniform mat2x4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+newName+"[3]", "uniform mat3x2 "+newName);
+                            beg = findAndMark("uniform vec2 "+newName+"[3]", "uniform mat3x2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+newName+"[3]", "uniform mat3x4 "+newName);
+                            beg = findAndMark("uniform vec4 "+newName+"[3]", "uniform mat3x4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+newName+"[4]", "uniform mat4x2 "+newName);
+                            beg = findAndMark("uniform vec2 "+newName+"[4]", "uniform mat4x2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+newName+"[4]", "uniform mat4x3 "+newName);
+                            beg = findAndMark("uniform vec3 "+newName+"[4]", "uniform mat4x3 "+oldName, beg);
                     }
-				}
-			}
-		}
+
+                    // mark all occurences of the parameter name for replacement
+                    findAndMark(newName, oldName, beg);
+                }
+            }
+
+            for (map<String,int>::type::const_iterator it = samplerMap.begin(); it != samplerMap.end(); ++it)
+            {
+                const String& oldName = it->first;
+                map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+                if (pi != paramNameMap.end())
+                {
+                    const String& newName = pi->second;
+                    findAndMark(newName, oldName, start);
+                }
+            }
+        }
+
+        String::size_type findAndMark(const String& search, const String& replaceWith, String::size_type cur)
+        {
+            ReplacementMark mark;
+            mark.pos = String::npos;
+            mark.len = search.size();
+            mark.replaceWith = replaceWith;
+            while (cur < source.size())
+            {
+                cur = source.find(search, cur);
+                if (cur == String::npos)
+                    break;
+                mark.pos = cur;
+                cur += search.size();
+                // check if previous or following character continue an identifier
+                // in that case, skip this occurence as it's part of a longer identifier
+                if (mark.pos > 0)
+                {
+                    char c = source[mark.pos-1];
+                    if (c == '_' || std::isalnum(c))
+                        continue;
+                }
+                if (mark.pos+1 < search.size())
+                {
+                    char c = source[mark.pos+1];
+                    if (c == '_' || std::isalnum(c))
+                        continue;
+                }
+                replacements.push_back(mark);
+            }
+            if (mark.pos != String::npos)
+                return mark.pos + search.size();
+            else
+                return String::npos;
+        }
+
+        void buildOutput()
+        {
+            // sort replacements in order of occurence
+            std::sort(replacements.begin(), replacements.end());
+            String::size_type cur = start;
+            for (vector<ReplacementMark>::type::iterator it = replacements.begin(); it != replacements.end(); ++it)
+            {
+                ReplacementMark& mark = *it;
+                if (mark.pos > cur)
+                    output.append(source, cur, mark.pos-cur);
+                output.append(mark.replaceWith);
+                cur = mark.pos+mark.len;
+            }
+            if (cur < source.size())
+                output.append(source, cur, String::npos);
+        }
+    };
+    //-----------------------------------------------------------------------
+    void CgProgram::fixHighLevelOutput(String& hlSource)
+    {
+		// Cg chooses to change parameter names when translating to another 
+        // high level language, possibly to avoid clashes with reserved keywords. 
+        // We need to revert that, otherwise Ogre parameter mappings fail.
+		// Cg logs its renamings in the comments at the beginning of the
+		// processed source file. We can get them from there.
+        // We'll also get rid of those comments to trim down source code size.
+        LogManager::getSingleton().stream() << "Cg high level output for " << getName() << ":\n" << hlSource;
+        hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap, 
+            mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || 
+            mSelectedCgProfile == CG_PROFILE_GLSLG).output;
+        LogManager::getSingleton().stream() << "Cleaned high level output for " << getName() << ":\n" << hlSource;
     }
 
 
@@ -618,56 +715,13 @@ namespace Ogre {
 			loadHighLevel();
     }
     //-----------------------------------------------------------------------
-    void CgProgram::replaceDelegateParamNames(GpuProgramParametersSharedPtr params)
-    {
-        // replace parameter names with our own
-        if (mDelegateConstants.isNull())
-        {
-            mDelegateConstants = GpuNamedConstantsPtr(OGRE_NEW GpuNamedConstants(params->getConstantDefinitions()));
-            GpuConstantDefinitionMap replMap;
-            LogManager::getSingleton().stream() << "Replacing parameter names.";
-            for (GpuConstantDefinitionMap::const_iterator it = mDelegateConstants->map.begin(); it != mDelegateConstants->map.end(); ++it)
-            {
-                // parameter might contain array index
-                String paramName = it->first;
-                String suffix = "";
-                String::size_type pos = it->first.find('[');
-                if (pos != String::npos)
-                {
-                    paramName = it->first.substr(0, pos);
-                    suffix = it->first.substr(pos, String::npos);
-                }
-                map<String,String>::type::const_iterator pi = mDelegateParamMap.find(paramName);
-                if (pi != mDelegateParamMap.end())
-                {
-                    LogManager::getSingleton().stream() << "  replaced " << paramName << suffix << " with " << pi->second << suffix;
-                    replMap.insert(std::make_pair(pi->second+suffix, it->second));
-                }
-                else
-                {
-                    LogManager::getSingleton().stream() << "  no replacement for " << it->first;
-                    replMap.insert(*it);
-                }
-            }
-            mDelegateConstants->map = replMap;
-        }
-        params->_setNamedConstants(mDelegateConstants);
-    }
-    //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr CgProgram::createParameters()
     {
-		loadHighLevelSafe();
-        LogManager::getSingleton().stream() << "Requested GpuProgramParameters for " << getName();
+        loadHighLevelSafe();
         if (!mDelegate.isNull())
-        {
-			GpuProgramParametersSharedPtr params = mDelegate->createParameters();
-            replaceDelegateParamNames(params);
-            return params;
-        }
+            return mDelegate->createParameters();
 		else
-        {
 			return HighLevelGpuProgram::createParameters();
-        }
     }
     //-----------------------------------------------------------------------
     GpuProgram* CgProgram::_getBindingDelegate()
@@ -712,25 +766,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
     {
-		loadHighLevelSafe();
-        LogManager::getSingleton().stream() << "Getting default parameters for " << getName();
+        loadHighLevelSafe();
 		if (!mDelegate.isNull())
-        {
-            LogManager::getSingleton().stream() << " Delegating...";
-			GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
-            if (!mDefaultParamsInitialised)
-            {
-                // on first creation, replace parameter names
-                LogManager::getSingleton().stream() << " Replacing parameters...";
-                replaceDelegateParamNames(params);
-                mDefaultParamsInitialised = true;
-            }
-            return params;
-        }
+			return mDelegate->getDefaultParameters();
 		else
-        {
 			return HighLevelGpuProgram::getDefaultParameters();
-        }
     }
     //-----------------------------------------------------------------------
     bool CgProgram::hasDefaultParameters(void) const
@@ -976,7 +1016,7 @@ namespace Ogre {
 
             // now handle uniform samplers. This is needed to fix their register positions
             // if delegating to a GLSL shader.
-            if (cgGetParameterVariability(parameter) == CG_UNIFORM && (
+            if (!mDelegate.isNull() && cgGetParameterVariability(parameter) == CG_UNIFORM && (
                 paramType == CG_SAMPLER1D ||
                 paramType == CG_SAMPLER2D ||
                 paramType == CG_SAMPLER3D ||
@@ -1132,8 +1172,7 @@ namespace Ogre {
         ManualResourceLoader* loader, CGcontext context)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader), 
         mCgContext(context), 
-        mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0),
-        mDefaultParamsInitialised(false)
+        mSelectedCgProfile(CG_PROFILE_UNKNOWN), mCgArguments(0), mParametersMapSizeAsBuffer(0)
     {
         if (createParamDictionary("CgProgram"))
         {
