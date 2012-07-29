@@ -264,9 +264,9 @@ namespace Ogre {
 
         // determine if we need to transpose matrices when binding
         int transpose = GL_TRUE;
-        if ((fromProgType == GPT_FRAGMENT_PROGRAM && !mVertexProgram->getGLSLProgram()->getColumnMajorMatrices()) ||
-            (fromProgType == GPT_VERTEX_PROGRAM && !mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices()) ||
-            (fromProgType == GPT_GEOMETRY_PROGRAM && !mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices()))
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices())))
         {
             transpose = GL_FALSE;
         }
