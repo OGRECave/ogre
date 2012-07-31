@@ -206,7 +206,7 @@ namespace Ogre {
 
         GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
         OSXCocoaContext *mainContext = (OSXCocoaContext*)rs->_getMainContext();
-        NSOpenGLContext *shareContext = mainContext == 0? nil : mainContext->getContext();
+        NSOpenGLContext *shareContext = mainContext == 0 ? nil : mainContext->getContext();
         mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
         
         // Set vsync by default to save battery and reduce tearing
@@ -256,13 +256,12 @@ namespace Ogre {
                 mHeight = (int)b.size.height;
             }
 
-            [mGLContext setView:mView];
-            
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);
         }
 
         [mGLContext makeCurrentContext];
+        [mView setNeedsDisplay:YES];
 
         // Create register the context with the rendersystem and associate it with this window
         mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
@@ -341,8 +340,8 @@ namespace Ogre {
 
         mContext->endCurrent();
         
-            if(mGLContext != [NSOpenGLContext currentContext])
-                [mGLContext makeCurrentContext];
+        if(mGLContext != [NSOpenGLContext currentContext])
+            [mGLContext makeCurrentContext];
 	}
     
 	bool OSXCocoaWindow::isVSyncEnabled() const
@@ -614,7 +613,7 @@ namespace Ogre {
         bufferRect[3] = viewBounds.size.height;   // height of buffer rect 
         CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
         CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-        
+
         mIsExternal = true;
     }
 
