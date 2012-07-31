@@ -35,7 +35,6 @@ namespace Ogre {
     GLES2TextureManager::GLES2TextureManager(GLES2Support& support)
         : TextureManager(), mGLSupport(support), mWarningTextureID(0)
     {
-        GL_CHECK_ERROR;
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
@@ -76,6 +75,7 @@ namespace Ogre {
             }
         }
 
+		GL_CHECK_ERROR;
         // Create GL resource
         glGenTextures(1, &mWarningTextureID);
         GL_CHECK_ERROR;

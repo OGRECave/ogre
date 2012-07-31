@@ -90,7 +90,7 @@ namespace Ogre  {
             case PF_B8G8R8:
                 return GL_RGB;
                 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             case PF_A1R5G5B5:
                 return GL_BGRA;
             case PF_A4R4G4B4:

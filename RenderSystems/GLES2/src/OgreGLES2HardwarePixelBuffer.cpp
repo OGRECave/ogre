@@ -141,7 +141,7 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         else if ((src.format != mFormat) ||                 
                  ((GLES2PixelUtil::getGLOriginFormat(src.format) == 0) && (src.format != PF_R8G8B8)))
 #else
@@ -918,7 +918,7 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
-#if GL_APPLE_framebuffer_multisample
+#if GL_APPLE_framebuffer_multisample && OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 
                                                   mNumSamples, mGLInternalFormat, mWidth, mHeight);
             GL_CHECK_ERROR;
