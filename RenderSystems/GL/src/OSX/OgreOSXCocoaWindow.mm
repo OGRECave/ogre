@@ -234,7 +234,7 @@ namespace Ogre {
         {
             NameValuePairList::const_iterator param_useNSView_pair(NULL);
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
-            
+
             if(param_useNSView_pair != miscParams->end())
                 if(param_useNSView_pair->second == "true")
                     mUseNSView = true;
@@ -256,18 +256,31 @@ namespace Ogre {
                 mHeight = (int)b.size.height;
             }
 
+            mWindow = [mView window];
+
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);
         }
-
-        [mGLContext makeCurrentContext];
-        [mView setNeedsDisplay:YES];
 
         // Create register the context with the rendersystem and associate it with this window
         mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
 
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+
+        CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
+
+        [mView setNeedsDisplay:YES];
+
+        if([mGLContext view] != mView)
+            [mGLContext setView:mView];
+        [mGLContext makeCurrentContext];
+        [mGLContext update];
+
+        rs->clearFrameBuffer(FBT_COLOUR);
+
+        [mGLContext flushBuffer];
+        CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
         [pool drain];
     }
