@@ -28,6 +28,13 @@ THE SOFTWARE.
 
 #include "OgreD3D9Plugin.h"
 #include "OgreRoot.h"
+// When building D3D9 with MinGW (tatic build), we need to ensure 
+// the dummy functions are included and called correctly
+#ifdef __MINGW32__
+  #include "WIN32\OgreMinGWSupport.h"
+  void _chkstk();
+  void _fastcall __security_check_cookie(intptr_t i);
+#endif
 
 namespace Ogre 
 {
@@ -46,6 +53,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D9Plugin::install()
 	{
+	// Call dummy functions
+#ifdef __MINGW32__
+        _chkstk();
+        __security_check_cookie((intptr_t)NULL);
+#endif
+
 		// Create the DirectX 9 rendering api
 #ifdef OGRE_STATIC_LIB
 		HINSTANCE hInst = GetModuleHandle( NULL );
