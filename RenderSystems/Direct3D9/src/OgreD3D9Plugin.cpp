@@ -31,9 +31,11 @@ THE SOFTWARE.
 // When building D3D9 with MinGW (tatic build), we need to ensure 
 // the dummy functions are included and called correctly
 #ifdef __MINGW32__
+extern "C" {
   #include "WIN32\OgreMinGWSupport.h"
   void _chkstk();
   void _fastcall __security_check_cookie(intptr_t i);
+}
 #endif
 
 namespace Ogre 
