@@ -95,7 +95,7 @@ THE SOFTWARE.
 #endif
 #if OGRE_NO_PVRTC_CODEC == 0
 #  include "OgrePVRTCCodec.h"
-#endif
+#endif     
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -266,7 +266,7 @@ namespace Ogre {
 		addMovableObjectFactory(mBillboardChainFactory);
 		mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
 		addMovableObjectFactory(mRibbonTrailFactory);
-
+     
 		// Load plugins
         if (!pluginFileName.empty())
             loadPlugins(pluginFileName);

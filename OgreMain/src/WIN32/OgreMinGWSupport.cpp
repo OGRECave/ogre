@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
+                    
 #include <stdint.h>
 
 // Define some symbols referred to by MSVC libs. Not having these symbols
@@ -33,16 +33,16 @@ THE SOFTWARE.
 
 extern "C" {
 	// MSVC libs use _chkstk for stack-probing. MinGW equivalent is _alloca.
-	void _alloca();
+	//void _alloca();
 	void _chkstk()
 	{
-		_alloca();
+		//_alloca();
 	}
 	
 	// MSVC uses security cookies to prevent some buffer overflow attacks.
 	// provide dummy implementations.
 	intptr_t __security_cookie;
-	
+	    
 	void _fastcall __security_check_cookie(intptr_t i)
 	{
 	}
