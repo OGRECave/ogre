@@ -357,6 +357,15 @@ namespace Ogre
 
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const;
+
+		/// @copydoc RenderSystem::beginProfileEvent
+        virtual void beginProfileEvent( const String &eventName );
+
+		/// @copydoc RenderSystem::endProfileEvent
+        virtual void endProfileEvent( void );
+
+		/// @copydoc RenderSystem::markProfileEvent
+        virtual void markProfileEvent( const String &eventName );
 		
 		/// fires a device releated event
 		void fireDeviceEvent( D3D9Device* device, const String & name );

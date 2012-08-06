@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 #include "OgreDepthBuffer.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
 
@@ -607,6 +608,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::update(bool swap)
     {
+        OgreProfileBeginGPUEvent("RenderTarget: " + getName());
         // call implementation
         updateImpl();
 
@@ -616,6 +618,7 @@ namespace Ogre {
 			// Swap buffers
     	    swapBuffers(Root::getSingleton().getRenderSystem()->getWaitForVerticalBlank());
 		}
+        OgreProfileEndGPUEvent("RenderTarget: " + getName());
     }
 	
 

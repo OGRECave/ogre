@@ -492,6 +492,15 @@ namespace Ogre {
 
             void _bindGLBuffer(GLenum target, GLuint buffer);
             void _deleteGLBuffer(GLenum target, GLuint buffer);
+
+            /// @copydoc RenderSystem::beginProfileEvent
+            virtual void beginProfileEvent( const String &eventName );
+            
+            /// @copydoc RenderSystem::endProfileEvent
+            virtual void endProfileEvent( void );
+            
+            /// @copydoc RenderSystem::markProfileEvent
+            virtual void markProfileEvent( const String &eventName );
     };
 }
 

@@ -2920,4 +2920,33 @@ namespace Ogre
 	{
 		return mBoundGeometryProgram;
 	}
+
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::beginProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
+
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::endProfileEvent( void )
+    {
+        (void)D3DPERF_EndEvent();
+    }
+
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
+    
 }

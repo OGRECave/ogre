@@ -3715,6 +3715,28 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		return mGLSupport->getDisplayMonitorCount();
 	}
 
+    //---------------------------------------------------------------------
+    void GLRenderSystem::beginProfileEvent( const String &eventName )
+    {
+        markProfileEvent("Begin Event: " + eventName);
+    }
+
+    //---------------------------------------------------------------------
+    void GLRenderSystem::endProfileEvent( void )
+    {
+        markProfileEvent("End Event");
+    }
+
+    //---------------------------------------------------------------------
+    void GLRenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        if(GLEW_GREMEDY_string_marker)
+            glStringMarkerGREMEDY(eventName.length(), eventName.c_str());
+    }
+
 	//---------------------------------------------------------------------
     void GLRenderSystem::bindVertexElementToGpu( const VertexElement &elem, 
             HardwareVertexBufferSharedPtr vertexBuffer, const size_t vertexStart,

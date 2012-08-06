@@ -2145,4 +2145,30 @@ namespace Ogre {
                 mActiveBufferMap.erase(i);
         }
     }
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::beginProfileEvent( const String &eventName )
+    {
+#if GL_EXT_debug_marker
+        glPushGroupMarkerEXT(0, eventName.c_str());
+#endif
+    }
+    
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::endProfileEvent( void )
+    {
+#if GL_EXT_debug_marker
+        glPopGroupMarkerEXT();
+#endif
+    }
+    
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+#if GL_EXT_debug_marker
+        glInsertEventMarkerEXT(0, eventName.c_str());
+#endif
+    }
 }
