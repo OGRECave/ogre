@@ -429,9 +429,8 @@ namespace Ogre
 		D3D9DriverList*			driverList = renderSystem->getDirect3DDrivers();
 
 		// Find the monitor this render window belongs to.
-		hRenderWindowMonitor = MonitorFromWindow(renderWindow->getWindowHandle(), MONITOR_DEFAULTTONEAREST);
-
-
+		hRenderWindowMonitor = renderWindow->getDeviceMonitorHandle();
+		
 		// Find the matching driver using window monitor handle.
 		for (uint i = 0; i < driverList->count(); ++i)
 		{

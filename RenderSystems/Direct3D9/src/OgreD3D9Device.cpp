@@ -961,8 +961,8 @@ namespace Ogre
 		HMONITOR	hRenderWindowMonitor = NULL;
 
 		// Find the monitor this render window belongs to.
-		hRenderWindowMonitor = MonitorFromWindow(renderWindow->getWindowHandle(), MONITOR_DEFAULTTONULL);
-
+		hRenderWindowMonitor = renderWindow->getDeviceMonitorHandle();
+ 
 		// This window doesn't intersect with any of the display monitor
 		if (hRenderWindowMonitor == NULL)		
 			return false;		
