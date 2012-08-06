@@ -47,7 +47,7 @@ void ThingRenderable::addTime(float t)
 // Generate float between -1 and 1
 float randFloat()
 {
-	return ((float)rand()/RAND_MAX)*2.0f-1.0f;
+	return ((float)arc4random()/RAND_MAX)*2.0f-1.0f;
 }
 void ThingRenderable::initialise()
 {

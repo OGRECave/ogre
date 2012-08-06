@@ -155,6 +155,12 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void runSample(Sample* s)
 		{
+#if OGRE_PROFILING
+            Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+            if (prof)
+                prof->setEnabled(false);
+#endif
+
 			if (mCurrentSample)
 			{
 				mCurrentSample->_shutdown();    // quit current sample
@@ -165,7 +171,7 @@ namespace OgreBites
 
 			if (s)
 			{
-				// retrieve sample's required plugins and currently installed plugins
+                // retrieve sample's required plugins and currently installed plugins
 				Ogre::Root::PluginInstanceList ip = mRoot->getInstalledPlugins();
 				Ogre::StringVector rp = s->getRequiredPlugins();
 
@@ -206,7 +212,11 @@ namespace OgreBites
 #else
 				s->_setup(mWindow, mKeyboard, mMouse, mFSLayer);   // start new sample
 #endif
-			}
+            }
+#if OGRE_PROFILING
+            if (prof)
+                prof->setEnabled(true);
+#endif
 
 			mCurrentSample = s;
 		}
