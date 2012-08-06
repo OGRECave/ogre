@@ -92,7 +92,7 @@ namespace Ogre {
         for (i = args.begin(); i != args.end(); ++i, ++index)
         {
             mCgArguments[index] = OGRE_ALLOC_T(char, i->length() + 1, MEMCATEGORY_RESOURCE);
-            strcpy(mCgArguments[index], i->c_str());
+            strlcpy(mCgArguments[index], i->c_str(), i->length() + 1);
         }
         // Null terminate list
         mCgArguments[index] = 0;
