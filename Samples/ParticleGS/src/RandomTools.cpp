@@ -20,7 +20,7 @@ TexturePtr RandomTools::generateRandomVelocityTexture()
 	float randomData[NUM_RAND_VALUES*4];
 	for(int i=0; i<NUM_RAND_VALUES*4; i++)
     {
-        randomData[i] = float( (arc4random()%10000) - 5000 );
+        randomData[i] = float( (rand()%10000) - 5000 );
     }
 
 	PixelBox pixelBox(1024, 1, 1, PF_FLOAT32_RGBA, &randomData[0]);

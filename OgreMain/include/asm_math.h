@@ -47,7 +47,7 @@ float asm_arccos( float r ) {
 
 #else
 
-	return float( acos( r ) );
+	return acosf( r );
 
 #endif
 }
@@ -71,7 +71,7 @@ float asm_arcsin( float r ) {
 
 #else
 
-	return float( asin( r ) );
+	return asinf( r );
 
 #endif
 
@@ -89,7 +89,7 @@ float asm_arctan( float r ) {
 
 #else
 
-	return float( atan( r ) );
+	return atanf( r );
 
 #endif
 
@@ -106,7 +106,7 @@ float asm_sin( float r ) {
 
 #else
 
-	return sin( r );
+	return sinf( r );
 
 #endif
 
@@ -123,7 +123,7 @@ float asm_cos( float r ) {
 
 #else
 	
-	return cos( r );
+	return cosf( r );
 
 #endif
 }
@@ -143,7 +143,7 @@ float asm_tan( float r ) {
 
 #else
 	
-	return tan( r );
+	return tanf( r );
 
 #endif
 }
@@ -160,7 +160,7 @@ float asm_sqrt( float r )
 
 #else
 
-	return sqrt( r );
+	return sqrtf( r );
 
 #endif
 }
@@ -180,7 +180,7 @@ float asm_rsq( float r )
 
 #else
 
-	return 1. / sqrt( r );
+	return 1. / sqrtf( r );
 
 #endif
 }
@@ -210,7 +210,7 @@ float apx_rsq( float r ) {
 
 #else
 
-	return 1. / sqrt( r );
+	return 1. / sqrtf( r );
 
 #endif
 }
@@ -292,7 +292,7 @@ FORCEINLINE float asm_rand()
 #else
     // GCC etc
 
-	return float( rand() );
+	return (float)rand();
 
 #endif
 }
@@ -359,7 +359,7 @@ float asm_ln( float r ) {
 
 #else
 
-	return log( r );
+	return logf( r );
 
 #endif
 }
