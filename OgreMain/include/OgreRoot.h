@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreResourceGroupManager.h"
 #include "OgreLodStrategyManager.h"
-#include "OgreWorkQueue.h"
+#include "OgreWorkQueue.h"       
 
 #include <exception>
 
