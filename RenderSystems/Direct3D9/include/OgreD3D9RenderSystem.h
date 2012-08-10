@@ -334,6 +334,11 @@ namespace Ogre
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();		
 		
+		/*
+		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
+		*/
+		virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
+
 		static D3D9ResourceManager* getResourceManager();
 		static D3D9DeviceManager* getDeviceManager();
 		static IDirect3D9* getDirect3D9();

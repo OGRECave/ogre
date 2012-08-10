@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreException.h"
 #include "OgrePixelFormat.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -144,6 +146,10 @@ namespace Ogre {
         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
 		uint fsaa, const String& fsaaHint)
     {
+        if (((usage & (int)TU_STATIC) != 0) && (!Root::getSingleton().getRenderSystem()->isStaticBufferLockable()))
+        {
+            usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
+        }
         TexturePtr ret = create(name, group, true, loader);
         ret->setTextureType(texType);
         ret->setWidth(width);

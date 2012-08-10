@@ -212,6 +212,12 @@ namespace Ogre
 		*/
 		virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
 
+		/*
+		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
+		@remarks
+		Needed in the implementation of DirectX9 with DirectX9Ex driver
+		*/
+		virtual bool isStaticBufferLockable() const { return true; }
 
 		/** Query the real capabilities of the GPU and driver in the RenderSystem*/
 		virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
