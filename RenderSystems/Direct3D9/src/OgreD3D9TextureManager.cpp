@@ -65,6 +65,10 @@ namespace Ogre
 		// Calculate usage
 		DWORD d3dusage = 0;
 		D3DPOOL pool = D3DPOOL_MANAGED;
+		if (D3D9RenderSystem::isDirectX9Ex())
+		{
+			pool = D3DPOOL_DEFAULT;
+		}
 		if (usage & TU_RENDERTARGET) 
 		{
 			d3dusage |= D3DUSAGE_RENDERTARGET;

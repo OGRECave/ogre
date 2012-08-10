@@ -79,6 +79,12 @@ namespace Ogre
 		bool mPerStageConstantSupport;
 		/// Fast singleton access.
 		static D3D9RenderSystem* msD3D9RenderSystem;
+		/// Tells whether to attempt to initialize the system with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mAllowDirectX9Ex;
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mIsDirectX9Ex;
 
 		/// structure holding texture unit settings for every stage
 		struct sD3DTextureStageDesc
@@ -177,6 +183,7 @@ namespace Ogre
 		// Overridden RenderSystem functions
 		ConfigOptionMap& getConfigOptions();
 		String validateConfigOptions();
+
 		RenderWindow* _initialise( bool autoCreateWindow, const String& windowTitle = "OGRE Render Window"  );
 		/// @copydoc RenderSystem::_createRenderWindow
 		RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
@@ -330,6 +337,10 @@ namespace Ogre
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();		
 		
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
+
 		static D3D9ResourceManager* getResourceManager();
 		static D3D9DeviceManager* getDeviceManager();
 		static IDirect3D9* getDirect3D9();
