@@ -79,6 +79,12 @@ namespace Ogre
 		bool mPerStageConstantSupport;
 		/// Fast singleton access.
 		static D3D9RenderSystem* msD3D9RenderSystem;
+		/// Tells whether to attempt to initialize the system with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mAllowDirectX9Ex;
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mIsDirectX9Ex;
 
 		/// structure holding texture unit settings for every stage
 		struct sD3DTextureStageDesc
@@ -333,12 +339,16 @@ namespace Ogre
 		void unregisterThread();
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();		
-		
+				
 		/*
 		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
 		*/
 		virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
-
+		
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
+		
 		static D3D9ResourceManager* getResourceManager();
 		static D3D9DeviceManager* getDeviceManager();
 		static IDirect3D9* getDirect3D9();

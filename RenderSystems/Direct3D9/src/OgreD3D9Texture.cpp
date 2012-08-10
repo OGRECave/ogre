@@ -46,7 +46,7 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader)
         :Texture(creator, name, handle, group, isManual, loader),              
-        mD3DPool(D3DPOOL_MANAGED),
+		mD3DPool(D3D9RenderSystem::isDirectX9Ex() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
 		mDynamicTextures(false),
 		mHwGammaReadSupported(false),
 		mHwGammaWriteSupported(false),	
@@ -1858,7 +1858,8 @@ namespace Ogre
 		// Use managed unless we're a render target or user has asked for 
 		// a dynamic texture, and device supports D3DUSAGE_DYNAMIC (because default pool
 		// resources without the dynamic flag are not lockable)
-		return (mUsage & TU_RENDERTARGET) || ((mUsage & TU_DYNAMIC) && mDynamicTextures);
+		// or use if we are using directX9Ex as there is no managed pool under it.
+		return (D3D9RenderSystem::isDirectX9Ex()) || (mUsage & TU_RENDERTARGET) || ((mUsage & TU_DYNAMIC) && mDynamicTextures);
 	}
 	
 	//---------------------------------------------------------------------

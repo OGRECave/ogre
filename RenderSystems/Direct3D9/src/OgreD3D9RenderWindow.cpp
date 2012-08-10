@@ -531,9 +531,17 @@ namespace Ogre
 
 		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
 		presentParams->Windowed					= !mIsFullScreen;
-		presentParams->SwapEffect				= D3DSWAPEFFECT_DISCARD;
-		// triple buffer if VSync is on
-		presentParams->BackBufferCount			= mVSync ? 2 : 1;
+		
+		DWORD version = GetVersion();
+		DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+		DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+		bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));
+
+		bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7;
+			
+		presentParams->SwapEffect				= useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
+		// triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
+		presentParams->BackBufferCount			= mVSync || useFlipSwap ? 2 : 1;
 		presentParams->EnableAutoDepthStencil	= (mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH);
 		presentParams->hDeviceWindow			= mHWnd;
 		presentParams->BackBufferWidth			= mWidth;

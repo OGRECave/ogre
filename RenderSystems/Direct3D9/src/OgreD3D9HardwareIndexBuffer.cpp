@@ -54,7 +54,7 @@ namespace Ogre {
 		eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : 
 			// If not system mem, use managed pool UNLESS buffer is discardable
 			// if discardable, keeping the software backing is expensive
-			(usage & HardwareBuffer::HBU_DISCARDABLE)? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+			((usage & HardwareBuffer::HBU_DISCARDABLE) || (D3D9RenderSystem::isDirectX9Ex())) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 #else
 		eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : D3DPOOL_DEFAULT;
 #endif

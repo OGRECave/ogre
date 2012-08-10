@@ -61,7 +61,9 @@ namespace Ogre
 
 	//---------------------------------------------------------------------
 	D3D9RenderSystem::D3D9RenderSystem( HINSTANCE hInstance ) :
-		mMultiheadUse(mutAuto)
+		mMultiheadUse(mutAuto),
+		mAllowDirectX9Ex(false),
+		mIsDirectX9Ex(false)
 	{
 		LogManager::getSingleton().logMessage( "D3D9 : " + getName() + " created." );
 
@@ -185,6 +187,7 @@ namespace Ogre
 		D3D9Driver* driver;
 
 		ConfigOption optDevice;
+		ConfigOption optAllowDirectX9Ex;
 		ConfigOption optVideoMode;
 		ConfigOption optFullScreen;
 		ConfigOption optMultihead;
@@ -206,6 +209,12 @@ namespace Ogre
 		optDevice.currentValue.clear();
 		optDevice.possibleValues.clear();
 		optDevice.immutable = false;
+
+		optAllowDirectX9Ex.name = "Allow DirectX9Ex";
+		optAllowDirectX9Ex.possibleValues.push_back( "Yes" );
+		optAllowDirectX9Ex.possibleValues.push_back( "No" );
+		optAllowDirectX9Ex.currentValue = "No";
+		optAllowDirectX9Ex.immutable = false;
 
 		optVideoMode.name = "Video Mode";
 		optVideoMode.currentValue = "800 x 600 @ 32-bit colour";
@@ -305,6 +314,7 @@ namespace Ogre
 #endif
 
 		mOptions[optDevice.name] = optDevice;
+		mOptions[optAllowDirectX9Ex.name] = optAllowDirectX9Ex;
 		mOptions[optVideoMode.name] = optVideoMode;
 		mOptions[optFullScreen.name] = optFullScreen;
 		mOptions[optMultihead.name] = optMultihead;
@@ -396,6 +406,30 @@ namespace Ogre
 		// Refresh other options if D3DDriver changed
 		if( name == "Rendering Device" )
 			refreshD3DSettings();
+
+		if ( name == "Allow DirectX9Ex" )
+		{
+			if (value == "Yes")
+				mAllowDirectX9Ex = true;
+			else mAllowDirectX9Ex = false;
+
+			// Create our Direct3D object
+			if (mAllowDirectX9Ex && !mIsDirectX9Ex)
+			{
+				SAFE_RELEASE(mD3D);
+				IDirect3D9Ex* d3dEx = NULL;
+				if (S_OK == Direct3DCreate9Ex(D3D_SDK_VERSION, &d3dEx))
+				{
+					mD3D = d3dEx;
+					mIsDirectX9Ex = true;
+				}
+			}
+			if ((mD3D == NULL) || (!mAllowDirectX9Ex && mIsDirectX9Ex))
+			{
+				if ( NULL == (mD3D = Direct3DCreate9(D3D_SDK_VERSION)) )
+					OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Failed to create Direct3D9 object", "D3D9RenderSystem::D3D9RenderSystem" );
+			}
+		}
 
 		if( name == "Full Screen" )
 		{
