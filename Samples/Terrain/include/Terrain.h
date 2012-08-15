@@ -874,6 +874,7 @@ protected:
 			OGRE_DELETE mTerrainGroup;
 
 		OGRE_DELETE mTerrainGlobals;
+        mHouseList.clear();
 
 		SdkSample::_shutdown();
 	}
