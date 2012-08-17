@@ -42,24 +42,23 @@
 #include "ShaderSystem.h"
 #endif
 #include "BSP.h"
+#include "BezierPatch.h"
+#include "CameraTrack.h"
 #include "CelShading.h"
+#include "CharacterSample.h"
 #include "Compositor.h"
 #include "CubeMapping.h"
 #include "DeferredShadingDemo.h"
 #include "Dot3Bump.h"
-#include "Fresnel.h"
-#include "OceanDemo.h"
-#include "Terrain.h"
-#include "Water.h"
-#include "BezierPatch.h"
-#include "CameraTrack.h"
-#include "CharacterSample.h"
+#include "DualQuaternion.h"
 #include "DynTex.h"
 #include "FacialAnimation.h"
+#include "Fresnel.h"
 #include "Grass.h"
 #include "Instancing.h"
-#include "NewInstancing.h"
 #include "Lighting.h"
+#include "NewInstancing.h"
+#include "OceanDemo.h"
 #include "ParticleFX.h"
 #include "Shadows.h"
 #include "SkeletalAnimation.h"
@@ -69,9 +68,11 @@
 #include "Smoke.h"
 #include "SphereMapping.h"
 #include "SSAO.h"
+#include "Terrain.h"
 #include "TextureFX.h"
 #include "TextureArray.h"
 #include "Transparency.h"
+#include "Water.h"
 #  if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
 #    include "PlayPenTestPlugin.h"
@@ -976,6 +977,7 @@ protected:
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
+            mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
