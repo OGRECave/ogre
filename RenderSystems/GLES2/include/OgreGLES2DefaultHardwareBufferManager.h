@@ -112,6 +112,14 @@ namespace Ogre {
                     HardwareBuffer::Usage usage, bool useShadowBuffer = false);
             /// Create a render to vertex buffer
 	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer(void);
+
+        HardwareUniformBufferSharedPtr 
+            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "GLES2 does not support render to vertex buffer objects", 
+                "GLES2DefaultHardwareBufferManagerBase::createUniformBuffer");
+        }
     };
 
 	/// GLES2DefaultHardwareBufferManagerBase as a Singleton
@@ -127,7 +135,15 @@ namespace Ogre {
 		{
 			OGRE_DELETE mImpl;
 		}
-	};
+        HardwareUniformBufferSharedPtr 
+            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "GLES2 does not support render to vertex buffer objects", 
+                "GLES2DefaultHardwareBufferManager::createUniformBuffer");
+        }
+
+    };
 }
 
 #endif

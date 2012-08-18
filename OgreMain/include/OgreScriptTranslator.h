@@ -142,6 +142,9 @@ namespace Ogre{
 		void translateVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateGeometryProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+		void translateTesselationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+		void translateTesselationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
+		void translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowCasterVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowCasterFragmentProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);
 		void translateShadowReceiverVertexProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node);

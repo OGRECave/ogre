@@ -50,9 +50,6 @@ THE SOFTWARE.
 #define D3D11_DEVICE_ACCESS_CRITICAL_SECTION
 #endif
 
-// Define versions for if DirectX is in use (Win32 only)
-#define DIRECT3D_VERSION 0x1100
-
 // some D3D commonly used macros
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
@@ -61,17 +58,41 @@ THE SOFTWARE.
 
 #undef NOMINMAX
 #define NOMINMAX // required to stop windows.h screwing up std::min definition
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #include <d3d11.h>
-#include <d3dx11.h>
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#include <d3d11_1.h>
+#endif
 #include <d3d11shader.h>
 #include <D3Dcompiler.h>
 
 
 namespace Ogre
 {
+	// typedefs to work with Direct3D 11 or 11.1 as appropriate
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+	typedef ID3D11Device			ID3D11DeviceN;
+	typedef ID3D11DeviceContext		ID3D11DeviceContextN;
+	typedef ID3D11RasterizerState	ID3D11RasterizerStateN;
+	typedef IDXGIFactory1			IDXGIFactoryN;
+	typedef IDXGIAdapter1			IDXGIAdapterN;
+	typedef IDXGIDevice1			IDXGIDeviceN;
+	typedef IDXGISwapChain			IDXGISwapChainN;
+	typedef DXGI_SWAP_CHAIN_DESC	DXGI_SWAP_CHAIN_DESC_N;
+#elif  OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+	typedef ID3D11Device1			ID3D11DeviceN;
+	typedef ID3D11DeviceContext1	ID3D11DeviceContextN;
+	typedef ID3D11RasterizerState1	ID3D11RasterizerStateN;
+	typedef IDXGIFactory2			IDXGIFactoryN;
+	typedef IDXGIAdapter1			IDXGIAdapterN;			// we don`t need IDXGIAdapter2 functionality
+	typedef IDXGIDevice2			IDXGIDeviceN;
+	typedef IDXGISwapChain1			IDXGISwapChainN;
+	typedef DXGI_SWAP_CHAIN_DESC1	DXGI_SWAP_CHAIN_DESC_N;
+#endif
+
 	// Predefine classes
 	class D3D11RenderSystem;
-	class D3D11RenderWindow;
+	class D3D11RenderWindowBase;
 	class D3D11Texture;
 	class D3D11TextureManager;
 	class D3D11DepthBuffer;
@@ -98,7 +119,7 @@ namespace Ogre
 	//-------------------------------------------
 	// Windows setttings
 	//-------------------------------------------
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(OGRE_STATIC_LIB)
 #	ifdef OGRED3DENGINEDLL_EXPORTS
 #		define _OgreD3D11Export __declspec(dllexport)
 #	else

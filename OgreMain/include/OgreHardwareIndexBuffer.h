@@ -82,6 +82,10 @@ namespace Ogre {
         HardwareIndexBufferSharedPtr() : SharedPtr<HardwareIndexBuffer>() {}
         explicit HardwareIndexBufferSharedPtr(HardwareIndexBuffer* buf);
     };
+    
+    /** Locking helper. */    
+    typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> HardwareIndexBufferLockGuard;
+
 	/** @} */
 	/** @} */
 }

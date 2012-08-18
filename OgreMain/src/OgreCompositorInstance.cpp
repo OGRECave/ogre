@@ -56,6 +56,7 @@ CompositorInstance::CompositorInstance(CompositionTechnique *technique,
 		mEnabled(false),
 		mAlive(false)
 {
+	mEnabled = false;
 	const String& logicName = mTechnique->getCompositorLogicName();
 	if (!logicName.empty())
 	{

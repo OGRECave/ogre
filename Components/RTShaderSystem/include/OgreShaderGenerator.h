@@ -820,7 +820,7 @@ protected:
 	void _finalize();
 
 	/** Find source technique to generate shader based technique based on it. */
-	Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName);
+	Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
 
 	/** Checks if a given technique has passes with shaders. */
 	bool isProgrammable(Technique* tech) const;

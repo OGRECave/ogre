@@ -40,10 +40,10 @@ namespace Ogre
 		vector<D3D11Driver*>::type mDriverList;
 
 	public:
-		D3D11DriverList( IDXGIFactory1*	pDXGIFactory );
+		D3D11DriverList( IDXGIFactoryN*	pDXGIFactory );
 		~D3D11DriverList();
 
-		BOOL enumerate(IDXGIFactory1*	pDXGIFactory);
+		BOOL enumerate(IDXGIFactoryN*	pDXGIFactory);
 		size_t count() const;
 		D3D11Driver* item( size_t index );
 

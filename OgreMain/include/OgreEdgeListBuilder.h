@@ -51,6 +51,9 @@ namespace Ogre {
 	class _OgreExport EdgeData : public EdgeDataAlloc
     {
     public:
+		
+		EdgeData();
+		
         /** Basic triangle structure. */
         struct Triangle {
             /** The set of indexes this triangle came from (NB it is possible that the triangles on 

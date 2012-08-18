@@ -32,12 +32,16 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #  define WIN32_LEAN_AND_MEAN
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #  include <windows.h>
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#include "OgreUTFString.h"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -75,7 +79,7 @@ namespace Ogre {
         // dlopen() does not add .dylib to the filename, like windows does for .dll
         if (name.substr(name.length() - 6, 6) != ".dylib")
 			name += ".dylib";
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 		// Although LoadLibraryEx will add .dll itself when you only specify the library name,
 		// if you include a relative path then it does not. So, add it to be sure.
 		if (name.substr(name.length() - 4, 4) != ".dll")
@@ -117,7 +121,7 @@ namespace Ogre {
     String DynLib::dynlibError( void ) 
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        LPVOID lpMsgBuf; 
+        LPTSTR lpMsgBuf; 
         FormatMessage( 
             FORMAT_MESSAGE_ALLOCATE_BUFFER | 
             FORMAT_MESSAGE_FROM_SYSTEM | 
@@ -125,13 +129,43 @@ namespace Ogre {
             NULL, 
             GetLastError(), 
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-            (LPTSTR) &lpMsgBuf, 
+            (LPTSTR)&lpMsgBuf, 
             0, 
             NULL 
             ); 
-        String ret = (char*)lpMsgBuf;
+        String ret = lpMsgBuf;
         // Free the buffer.
         LocalFree( lpMsgBuf );
+        return ret;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+        WCHAR wideMsgBuf[1024]; 
+        if(0 == FormatMessageW( 
+            FORMAT_MESSAGE_FROM_SYSTEM | 
+            FORMAT_MESSAGE_IGNORE_INSERTS, 
+            NULL, 
+            GetLastError(), 
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+            wideMsgBuf, 
+            sizeof(wideMsgBuf) / sizeof(wideMsgBuf[0]), 
+            NULL 
+            ))
+		{
+			wideMsgBuf[0] = 0;
+		}
+#if OGRE_WCHAR_T_STRINGS
+        String ret = wideMsgBuf;
+#else
+		char narrowMsgBuf[2048] = "";
+		if(0 == WideCharToMultiByte(
+			CP_ACP, 0,
+			wideMsgBuf, -1,
+			narrowMsgBuf, sizeof(narrowMsgBuf) / sizeof(narrowMsgBuf[0]),
+			NULL, NULL))
+		{
+			narrowMsgBuf[0] = 0;
+		}
+        String ret = narrowMsgBuf;
+#endif
         return ret;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         return String(dlerror());

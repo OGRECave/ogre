@@ -40,8 +40,10 @@ THE SOFTWARE.
 #include "OgreShaderExHardwareSkinning.h"
 #include "OgreShaderMaterialSerializerListener.h"
 #include "OgreShaderProgramWriterManager.h"
+#include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShaderExTextureAtlasSampler.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -125,8 +127,8 @@ ShaderGenerator::ShaderGenerator()
 		mShaderLanguage	= "cg"; // HACK for now
 	}
 
-	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
-	setFragmentShaderProfiles("ps_4_0 ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
+	setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
+	setFragmentShaderProfiles("ps_4_0 ps_4_0_level_9_1 ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
 }
 
 //-----------------------------------------------------------------------------
@@ -195,25 +197,32 @@ void ShaderGenerator::createSubRenderStateExFactories()
 
 	SubRenderStateFactory* curFactory;
 
-	curFactory = OGRE_NEW PerPixelLightingFactory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+    // check if we are running an old shader level in d3d11
+    bool d3d11AndLowProfile = ( (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1") ||
+        GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
+        && !GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"));
+    if(!d3d11AndLowProfile)
+    {
+        curFactory = OGRE_NEW PerPixelLightingFactory;	
+        addSubRenderStateFactory(curFactory);
+        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
-	curFactory = OGRE_NEW NormalMapLightingFactory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        curFactory = OGRE_NEW NormalMapLightingFactory;	
+        addSubRenderStateFactory(curFactory);
+        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
-	curFactory = OGRE_NEW IntegratedPSSM3Factory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        curFactory = OGRE_NEW IntegratedPSSM3Factory;	
+        addSubRenderStateFactory(curFactory);
+        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
-	curFactory = OGRE_NEW LayeredBlendingFactory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        curFactory = OGRE_NEW LayeredBlendingFactory;	
+        addSubRenderStateFactory(curFactory);
+        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
-	curFactory = OGRE_NEW HardwareSkinningFactory;	
-	addSubRenderStateFactory(curFactory);
-	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+        curFactory = OGRE_NEW HardwareSkinningFactory;	
+        addSubRenderStateFactory(curFactory);
+        mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+    }
 
 	curFactory = new TextureAtlasSamplerFactory;
 	addSubRenderStateFactory(curFactory);
@@ -750,7 +759,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 
 	// No technique created -> check if one can be created from the given source technique scheme.	
 	Technique* srcTechnique = NULL;
-	srcTechnique = findSourceTechnique(materialName, trueGroupName, srcTechniqueSchemeName);
+	srcTechnique = findSourceTechnique(materialName, trueGroupName, srcTechniqueSchemeName, overProgrammable);
 
 	// No appropriate source technique found.
 	if ((srcTechnique == NULL) ||
@@ -1021,7 +1030,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 												 
 //-----------------------------------------------------------------------------
  Technique* ShaderGenerator::findSourceTechnique(const String& materialName, 
-				const String& groupName, const String& srcTechniqueSchemeName)
+				const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable)
  {
 	 MaterialPtr mat = MaterialManager::getSingleton().getByName(materialName, groupName);
 	 Material::TechniqueIterator itMatTechniques = mat->getTechniqueIterator();
@@ -1032,7 +1041,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 	 {
 		 Technique* curTechnique = itMatTechniques.getNext();
 
-		 if (curTechnique->getSchemeName() == srcTechniqueSchemeName)
+		 if (curTechnique->getSchemeName() == srcTechniqueSchemeName && (allowProgrammable || !isProgrammable(curTechnique)))
 		 {
 			 return curTechnique;				
 		 }		

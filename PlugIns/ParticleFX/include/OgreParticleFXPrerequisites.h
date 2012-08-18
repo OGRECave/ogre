@@ -33,7 +33,7 @@ THE SOFTWARE.
 //-----------------------------------------------------------------------
 // Windows Settings
 //-----------------------------------------------------------------------
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(OGRE_STATIC_LIB)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_PARTICLEFXPLUGIN_EXPORTS
 #       define _OgreParticleFXExport __declspec(dllexport)
 #   else

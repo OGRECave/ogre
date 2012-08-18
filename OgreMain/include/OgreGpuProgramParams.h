@@ -75,6 +75,7 @@ namespace Ogre {
 		GCT_INT2 = 22,
 		GCT_INT3 = 23,
 		GCT_INT4 = 24,
+		GCT_SUBROUTINE = 25,
 		GCT_UNKNOWN = 99
 	};
 
@@ -168,6 +169,15 @@ namespace Ogre {
 
 		}
 
+		bool isSubroutine() const
+		{
+			return isSubroutine(constType);
+		}
+
+		static bool isSubroutine(GpuConstantType c)
+		{
+			return c == GCT_SUBROUTINE;
+		}
 
 		/** Get the element size of a given type, including whether to pad the 
 			elements into multiples of 4 (e.g. SM1 and D3D does, GLSL doesn't)
@@ -490,6 +500,10 @@ namespace Ogre {
 		/// Get a pointer to the 'nth' item in the int buffer
 		const int* getIntPointer(size_t pos) const { return &mIntConstants[pos]; }
 
+		/// Get a reference to the list of float constants
+		const FloatConstantList& getFloatConstantList() const { return mFloatConstants; }
+		/// Get a reference to the list of int constants
+		const IntConstantList& getIntConstantList() const { return mIntConstants; }
 
 		/** Internal method that the RenderSystem might use to store optional data. */
 		void _setRenderSystemData(const Any& data) const { mRenderSystemData = data; }
@@ -1120,7 +1134,13 @@ namespace Ogre {
 
 		typedef vector<GpuSharedParametersUsage>::type GpuSharedParamUsageList;
 
+		// Map that store subroutines associated with slots
+		typedef HashMap<unsigned int, String> SubroutineMap;
+		typedef HashMap<unsigned int, String>::const_iterator SubroutineIterator;
+
 	protected:
+		SubroutineMap mSubroutineMap;
+
 		static AutoConstantDefinition AutoConstantDictionary[];
 		/// Packed list of floating-point constants (physical indexing)
 		FloatConstantList mFloatConstants;
@@ -1827,7 +1847,17 @@ namespace Ogre {
 		void _copySharedParams();
 
 
+		/** Set subroutine name by slot name
+		 */
+		void setNamedSubroutine(const String& subroutineSlot, const String& subroutine);
+		
+		/** Set subroutine name by slot index
+		 */
+		void setSubroutine(size_t index, const String& subroutine);
 
+		/** Get map with 
+		 */
+		const SubroutineMap& getSubroutineMap() const { return mSubroutineMap; }
 	};
 
 	/// Shared pointer used to hold references to GpuProgramParameters instances

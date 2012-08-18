@@ -993,12 +993,18 @@ namespace Ogre
 		mIds["vertex_program"] = ID_VERTEX_PROGRAM;
 		mIds["geometry_program"] = ID_GEOMETRY_PROGRAM;
 		mIds["fragment_program"] = ID_FRAGMENT_PROGRAM;
+		mIds["tesselation_hull_program"] = ID_TESSELATION_HULL_PROGRAM;
+		mIds["tesselation_domain_program"] = ID_TESSELATION_DOMAIN_PROGRAM;
+		mIds["compute_program"] = ID_COMPUTE_PROGRAM;
 		mIds["technique"] = ID_TECHNIQUE;
 		mIds["pass"] = ID_PASS;
 		mIds["texture_unit"] = ID_TEXTURE_UNIT;
 		mIds["vertex_program_ref"] = ID_VERTEX_PROGRAM_REF;
 		mIds["geometry_program_ref"] = ID_GEOMETRY_PROGRAM_REF;
 		mIds["fragment_program_ref"] = ID_FRAGMENT_PROGRAM_REF;
+		mIds["tesselation_hull_program_ref"] = ID_TESSELATION_HULL_PROGRAM_REF;
+		mIds["tesselation_domain_program_ref"] = ID_TESSELATION_DOMAIN_PROGRAM_REF;
+		mIds["compute_program_ref"] = ID_COMPUTE_PROGRAM_REF;
 		mIds["shadow_caster_vertex_program_ref"] = ID_SHADOW_CASTER_VERTEX_PROGRAM_REF;
 		mIds["shadow_caster_fragment_program_ref"] = ID_SHADOW_CASTER_FRAGMENT_PROGRAM_REF;
 		mIds["shadow_receiver_vertex_program_ref"] = ID_SHADOW_RECEIVER_VERTEX_PROGRAM_REF;
@@ -1118,6 +1124,7 @@ namespace Ogre
         mIds["3d"] = ID_3D;
         mIds["cubic"] = ID_CUBIC;
         mIds["unlimited"] = ID_UNLIMITED;
+		mIds["2darray"] = ID_2DARRAY;
         mIds["alpha"] = ID_ALPHA;
         mIds["gamma"] = ID_GAMMA;
 		mIds["anim_texture"] = ID_ANIM_TEXTURE;
@@ -1135,6 +1142,8 @@ namespace Ogre
         mIds["bilinear"] = ID_BILINEAR;
         mIds["trilinear"] = ID_TRILINEAR;
         mIds["anisotropic"] = ID_ANISOTROPIC;
+		mIds["compare_test"] = ID_CMPTEST;
+		mIds["compare_func"] = ID_CMPFUNC;
 		mIds["max_anisotropy"] = ID_MAX_ANISOTROPY;
 		mIds["mipmap_bias"] = ID_MIPMAP_BIAS;
 		mIds["colour_op"] = ID_COLOUR_OP;
@@ -1189,6 +1198,10 @@ namespace Ogre
 		mIds["binding_type"] = ID_BINDING_TYPE;
         mIds["vertex"] = ID_VERTEX;
         mIds["fragment"] = ID_FRAGMENT;
+		mIds["geometry"] = ID_GEOMETRY;
+		mIds["tesselation_hull"] = ID_TESSELATION_HULL;
+		mIds["tesselation_domain"] = ID_TESSELATION_DOMAIN;
+		mIds["compute"] = ID_COMPUTE;
 		mIds["content_type"] = ID_CONTENT_TYPE;
         mIds["named"] = ID_NAMED;
         mIds["shadow"] = ID_SHADOW;
@@ -1266,6 +1279,8 @@ namespace Ogre
 #ifdef RTSHADER_SYSTEM_BUILD_CORE_SHADERS
 		mIds["rtshader_system"] = ID_RT_SHADER_SYSTEM;
 #endif
+
+		mIds["subroutine"] = ID_SUBROUTINE;
 	}
 
 	// AbstractTreeeBuilder

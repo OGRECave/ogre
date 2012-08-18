@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreD3D11Driver.h"
 
+struct ID3D11Resource;
+
 namespace Ogre {
 
 	class D3D11HardwarePixelBuffer: public HardwarePixelBuffer
@@ -56,6 +58,7 @@ namespace Ogre {
 
 		Image::Box mLockBox;
 		PixelBox mCurrentLock;
+		LockOptions mCurrentLockOptions;
 
 		D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
@@ -65,6 +68,18 @@ namespace Ogre {
 		/// Render targets
 		typedef vector<RenderTexture*>::type SliceTRT;
 		SliceTRT mSliceTRT;
+
+		void createStagingBuffer();
+		bool mUsingStagingBuffer;
+		ID3D11Resource *mStagingBuffer;
+		
+		void *_map(ID3D11Resource *res, D3D11_MAP flags);
+		void *_mapstagingbuffer(D3D11_MAP flags);
+		void *_mapstaticbuffer(PixelBox lock);
+		void _unmap(ID3D11Resource *res);
+		void _unmapstagingbuffer(bool copyback = true);
+		void _unmapstaticbuffer();
+
 	public:
 		D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
 			size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage);

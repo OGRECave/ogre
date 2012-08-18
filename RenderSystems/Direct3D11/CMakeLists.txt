@@ -21,6 +21,7 @@ set (HEADER_FILES
   include/OgreD3D11HardwareIndexBuffer.h
   include/OgreD3D11HardwareOcclusionQuery.h
   include/OgreD3D11HardwarePixelBuffer.h
+  include/OgreD3D11HardwareUniformBuffer.h
   include/OgreD3D11HardwareVertexBuffer.h
   include/OgreD3D11HLSLProgram.h
   include/OgreD3D11HLSLProgramFactory.h
@@ -51,6 +52,7 @@ set (SOURCE_FILES
   src/OgreD3D11HardwareIndexBuffer.cpp
   src/OgreD3D11HardwareOcclusionQuery.cpp
   src/OgreD3D11HardwarePixelBuffer.cpp
+  src/OgreD3D11HardwareUniformBuffer.cpp
   src/OgreD3D11HardwareVertexBuffer.cpp
   src/OgreD3D11HLSLProgram.cpp
   src/OgreD3D11HLSLProgramFactory.cpp

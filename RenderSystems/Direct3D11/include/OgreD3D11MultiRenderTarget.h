@@ -53,6 +53,8 @@ namespace Ogre {
 
 		/** Check surfaces and update RenderTarget extent */
 		void checkAndUpdate();
+
+		Ogre::RenderTexture*	mRenderTargets[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 	};
 };
 

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 #include "OgreTextureManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -60,6 +61,8 @@ namespace Ogre {
 		, mMinFilter(FO_LINEAR)
 		, mMagFilter(FO_LINEAR)
 		, mMipFilter(FO_POINT)
+		, mCompareEnabled(false)
+		, mCompareFunc(CMPF_GREATER_EQUAL)
 		, mMaxAniso(MaterialManager::getSingleton().getDefaultAnisotropy())
 		, mMipmapBias(0)
 		, mIsDefaultAniso(true)
@@ -1306,7 +1309,7 @@ namespace Ogre {
             setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_LINEAR);
             break;
         case TFO_ANISOTROPIC:
-            setTextureFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR);
+            setTextureFiltering(FO_ANISOTROPIC, FO_ANISOTROPIC, Root::getSingleton().getRenderSystem()->hasAnisotropicMipMapFilter() ? FO_ANISOTROPIC : FO_LINEAR);
             break;
         }
         mIsDefaultFiltering = false;
@@ -1356,7 +1359,26 @@ namespace Ogre {
 		// to keep compiler happy
 		return mMinFilter;
 	}
-
+	//-----------------------------------------------------------------------
+	void TextureUnitState::setTextureCompareEnabled(bool enabled)
+	{
+		mCompareEnabled=enabled;
+	}
+	//-----------------------------------------------------------------------
+	bool TextureUnitState::getTextureCompareEnabled() const
+	{
+		return mCompareEnabled;
+	}
+	//-----------------------------------------------------------------------
+	void TextureUnitState::setTextureCompareFunction(CompareFunction function)
+	{
+		mCompareFunc=function;
+	}
+	//-----------------------------------------------------------------------
+	CompareFunction TextureUnitState::getTextureCompareFunction() const
+	{
+		return mCompareFunc;
+	}
 	//-----------------------------------------------------------------------
 	void TextureUnitState::setTextureAnisotropy(unsigned int maxAniso)
 	{

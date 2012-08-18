@@ -25,7 +25,6 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
-
 #ifndef __SampleBrowser_H__
 #define __SampleBrowser_H__
 
@@ -82,6 +81,7 @@
 #   include "SkyPlane.h"
 #   include "Smoke.h"
 #   include "SphereMapping.h"
+#	include "Tesselation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
@@ -229,6 +229,23 @@ protected:
 		}
 
 		/*-----------------------------------------------------------------------------
+		| init data members needed only by WinRT
+		-----------------------------------------------------------------------------*/
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
+		{
+			mNativeWindow = nativeWindow;
+			mNativeControl = nullptr;
+			mInputContext = inputContext;
+		}
+		void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
+		{
+			mNativeWindow = nullptr;
+			mNativeControl = nativeControl;
+			mInputContext = inputContext;
+		}
+#endif
+		/*-----------------------------------------------------------------------------
 		| init data members needed only by NaCl
 		-----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
@@ -255,8 +272,8 @@ protected:
 		void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app, OIS::MultiTouch *mouse, OIS::Keyboard *keyboard)
 		{
 			mWindow = window;
-			mMouse = mouse;
-			mKeyboard = keyboard;
+			mInputContext.mMultiTouch = mouse;
+			mInputContext.mKeyboard = keyboard;
             
             if(app != NULL)
             {
@@ -1019,6 +1036,7 @@ protected:
             mPluginNameMap["Sample_SkyPlane"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_SkyPlane();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
+			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
 
@@ -1048,10 +1066,21 @@ protected:
 #endif
 
 			Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-			mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mMouse, this);
+			mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mInputContext, this);
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
+
+#ifdef	ENABLE_SHADERS_CACHE
+            Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
             
+            FILE * inFile = fopen("cache.bin", "rb");
+            if (inFile)
+            {
+                Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream("cache.bin", inFile, Ogre::DataStream::READ));
+                Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
+            }
+#endif
+
 			createDummyScene();
 
 #ifdef USE_RTSHADER_SYSTEM
@@ -1060,18 +1089,6 @@ protected:
                 Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
             }
 #endif // USE_RTSHADER_SYSTEM
-
-
-#ifdef	ENABLE_SHADERS_CACHE
-            FILE * inFile = fopen("cache.bin", "rb");
-            if (inFile)
-            {
-            	Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
-            	Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream("cache.bin", inFile, Ogre::DataStream::READ));
-            	Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
-            }
-#endif
-
 
 			loadResources();
 
@@ -1102,7 +1119,16 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void windowMovedOrResized()
 		{
-			mWindow->windowMovedOrResized();
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+			if(mNativeControl)
+			{
+				// in WinRT.Xaml case Ogre::RenderWindow is actually brush
+				// applied to native control and we need resize this brush manually
+				mWindow->resize(mNativeControl->ActualWidth, mNativeControl->ActualHeight);
+			}
+#endif
+			mWindow->windowMovedOrResized();	// notify window
+			windowResized(mWindow);				// notify window event listeners
 		}
         
 	protected:
@@ -1129,6 +1155,24 @@ protected:
             miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
             // create 1x1 window - we will resize later
             return mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
+
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+			Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
+			Ogre::NameValuePairList miscParams;
+			if(mNativeWindow)
+			{
+				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned long)reinterpret_cast<void*>(mNativeWindow));
+				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
+			}
+			else if(mNativeControl)
+			{
+				miscParams["windowType"] = "SurfaceImageSource";
+				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeControl->ActualWidth, mNativeControl->ActualHeight, false, &miscParams);
+				void* pUnk = NULL;
+				res->getCustomAttribute("ImageBrush", &pUnk);
+				mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
+			}
+			return res;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 			return NULL;
@@ -1195,10 +1239,13 @@ protected:
 					Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);	
 			    mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
 					"BaseWhite");
-				baseWhite->getTechnique(0)->getPass(0)->setVertexProgram(
-				baseWhite->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
-				baseWhite->getTechnique(0)->getPass(0)->setFragmentProgram(
-				baseWhite->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+                if(baseWhite->getNumTechniques() > 1)
+                {
+				    baseWhite->getTechnique(0)->getPass(0)->setVertexProgram(
+				    baseWhite->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
+				    baseWhite->getTechnique(0)->getPass(0)->setFragmentProgram(
+				    baseWhite->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+                }
 
 				// creates shaders for base material BaseWhiteNoLighting using the RTSS
 				mShaderGenerator->createShaderBasedTechnique(
@@ -1208,10 +1255,13 @@ protected:
 			    mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME, 
 					"BaseWhiteNoLighting");
 				Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-				baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
-				baseWhiteNoLighting->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
-				baseWhiteNoLighting->getTechnique(0)->getPass(0)->setFragmentProgram(
-				baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+                if(baseWhite->getNumTechniques() > 1)
+                {
+				    baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
+				    baseWhiteNoLighting->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
+				    baseWhiteNoLighting->getTechnique(0)->getPass(0)->setFragmentProgram(
+				    baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
+                }
 			}
 #endif // USE_RTSHADER_SYSTEM
 		}
@@ -1248,6 +1298,7 @@ protected:
             sampleList.push_back("Sample_SkyPlane"); 
             sampleList.push_back("Sample_Smoke");
             sampleList.push_back("Sample_Water");
+			sampleList.push_back("Sample_Tesselation");
             sampleList.push_back("Sample_Transparency");
             sampleList.push_back("Sample_TextureFX");
 #else
@@ -1270,7 +1321,7 @@ protected:
 			char lastChar = sampleDir[sampleDir.length() - 1];
 			if (lastChar != '/' && lastChar != '\\')
 			{
-				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 				sampleDir += "\\";
 				#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 				sampleDir += "/";
@@ -1586,6 +1637,7 @@ protected:
 			mHiddenOverlays.clear();
 			mThumbs.clear();
 			mCarouselPlace = 0;
+            mWindow = 0;
 
 			SampleContext::shutdown();
 
@@ -1761,6 +1813,10 @@ protected:
 		int mLastViewCategory;                         // last sample category viewed
 		int mLastSampleIndex;                          // index of last sample running
 		int mStartSampleIndex;                         // directly starts the sample with the given index
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		Windows::UI::Core::CoreWindow^ mNativeWindow;
+		Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
+#endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
         pp::CompletionCallback* mNaClSwapCallback;

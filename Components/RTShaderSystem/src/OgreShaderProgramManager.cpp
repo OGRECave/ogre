@@ -273,7 +273,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	//  shader models 4 and 5.
 	// This change may incrase the number of register used in older shader
 	//  models - this is why the check is present here.
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 	if (isVs4)
 	{
 		synchronizePixelnToBeVertexOut(programSet);
@@ -380,33 +380,63 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const StringVector& profilesList,
 											   const String& cachePath)
 {
-	std::stringstream sourceCodeStringStream;
-	_StringHash stringHash;
-	uint32 programHashCode;
-	String programName;
+    std::stringstream sourceCodeStringStream;
 
 	// Generate source code.
 	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
+    String source = sourceCodeStringStream.str();
 
-	// Generate program hash code.
-	programHashCode = static_cast<uint32>(stringHash(sourceCodeStringStream.str()));
 
-	// Generate program name.
-	programName = StringConverter::toString(programHashCode);
-	
-	if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
-	{
-		programName += "_VS";
-	}
-	else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
-	{
-		programName += "_FS";
-	}
+    HighLevelGpuProgramPtr pGpuProgram;
+     String programName;
 
-	HighLevelGpuProgramPtr pGpuProgram;
+    ProgramSourceToNameMap::iterator foundName = mProgramSourceToNameMap.find(source) ;
+    if(foundName != mProgramSourceToNameMap.end())
+    {
+        programName = foundName->second;
+        pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+    }
+    else
+    {
+        _StringHash stringHash;
+        uint32 programHashCode;
+        
+        // Generate program hash code.
+        programHashCode = static_cast<uint32>(stringHash(source));
 
-	// Try to get program by name.
-	pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+        while(true)
+        {
+            // Generate program name.
+            programName = StringConverter::toString(programHashCode);
+
+            if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+            {
+                programName += "_VS";
+            }
+            else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+            {
+                programName += "_FS";
+            }
+
+            // get program by name
+            pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+
+            if (pGpuProgram.isNull() || pGpuProgram->getSource() == source)
+            {
+                // meaning we don't have the double hash problem
+                // add to the list - and continue
+                mProgramSourceToNameMap[source] = programName;
+                break;
+            }
+
+            // if the source of the shader we found isn't equal to the new shader source
+            // it mean that the hash code is equal - but not the source, so - we add
+            // one to programHashCode to make is possibly unique
+            programHashCode++;
+        }
+
+    }
+
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
@@ -446,7 +476,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 				if (!outFile)
 					return GpuProgramPtr();
 
-				outFile << sourceCodeStringStream.str();
+				outFile << source;
 				outFile.close();
 			}
 
@@ -456,7 +486,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		// No cache directory specified -> create program from system memory.
 		else
 		{
-			pGpuProgram->setSource(sourceCodeStringStream.str());
+			pGpuProgram->setSource(source);
 		}
 		
 		
@@ -476,6 +506,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 					break;
 				}
 			}
+
+			pGpuProgram->setParameter("enable_backwards_compatibility", "true");
 		}
 		
 		pGpuProgram->setParameter("profiles", profiles);

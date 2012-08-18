@@ -40,9 +40,12 @@ THE SOFTWARE
 #include "OgrePass.h"
 #include "OgreMaterial.h"
 #include "OgreBitwise.h"
+
+#define generic _generic	// keyword for C++/CX
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
+#undef generic
 
 
 

@@ -89,6 +89,7 @@ set (HEADER_FILES
   include/OgreHardwareIndexBuffer.h
   include/OgreHardwareOcclusionQuery.h
   include/OgreHardwarePixelBuffer.h
+  include/OgreHardwareUniformBuffer.h
   include/OgreHardwareVertexBuffer.h
   include/OgreHeaderPrefix.h
   include/OgreHeaderSuffix.h
@@ -320,6 +321,7 @@ set (SOURCE_FILES
   src/OgreHardwareIndexBuffer.cpp
   src/OgreHardwareOcclusionQuery.cpp
   src/OgreHardwarePixelBuffer.cpp
+  src/OgreHardwareUniformBuffer.cpp
   src/OgreHardwareVertexBuffer.cpp
   src/OgreHighLevelGpuProgram.cpp
   src/OgreHighLevelGpuProgramManager.cpp
@@ -481,6 +483,20 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (WIN32)
+  if (OGRE_BUILD_PLATFORM_WINRT)
+    include_directories("include/WIN32")
+    set(PLATFORM_HEADER_FILES
+      include/WIN32/OgreConfigDialogImpWinRT.h
+      include/WIN32/OgreErrorDialogImpWinRT.h
+      include/WIN32/OgreTimerImp.h
+    )
+    set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreConfigDialogWinRT.cpp
+      src/WIN32/OgreErrorDialogWinRT.cpp
+      src/WIN32/OgreTimer.cpp
+    )  
+    set(PLATFORM_HEADER_INSTALL "WIN32")
+  else ()
   include_directories("include/WIN32")
   set(PLATFORM_HEADER_FILES
     include/WIN32/OgreConfigDialogImp.h
@@ -523,6 +539,7 @@ elseif (WIN32)
 	list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
   else ()
     list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
+  endif ()
   endif ()
 
 elseif (APPLE)
