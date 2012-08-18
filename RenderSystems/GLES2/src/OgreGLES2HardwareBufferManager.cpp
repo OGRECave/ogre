@@ -269,4 +269,12 @@ namespace Ogre {
 	{
 		mMapBufferThreshold = value;
 	}
+    //---------------------------------------------------------------------
+    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name /*= ""*/ )
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+            "GLES2 does not support render to vertex buffer objects", 
+            "GLES2HardwareBufferManagerBase::createUniformBuffer");
+    }
+
 }

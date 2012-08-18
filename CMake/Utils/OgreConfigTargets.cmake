@@ -154,6 +154,16 @@ function(ogre_config_common TARGETNAME)
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
 
+  if(OGRE_BUILD_PLATFORM_WINRT)
+    # enable WinRT features, support available since CMake 2.8.8
+    set_target_properties(${TARGETNAME} PROPERTIES VS_WINRT_EXTENSIONS "YES")
+
+    # WinRT uses precompiled headers by default, that needs to be overriden, but unfortunately CMake can`t do this
+    #if(NOT ${TARGET_NAME} STREQUAL "OgreMain")
+    #  set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/Y-")
+    #endif(NOT ${TARGET_NAME} STREQUAL "OgreMain")
+  endif(OGRE_BUILD_PLATFORM_WINRT)
+
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 

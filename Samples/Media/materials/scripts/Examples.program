@@ -21,7 +21,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
 {
-    source Example_Basic.cg
+    source Example_Basic_sm4.cg
     entry_point ambientOneTexture_vp
     profiles vs_4_0
 
@@ -123,7 +123,7 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 {
     entry_point main
-    source PassthroughFP.cg
+    source PassthroughFP_sm4.cg
     profiles ps_4_0
 }
 
@@ -131,14 +131,14 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
 {
     entry_point mainCg
     source PassthroughFP.cg
-    profiles ps_4_0 ps_2_0 arbfp1
+    profiles ps_2_0 arbfp1
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTexture cg
 {
     entry_point mainForAmbientOneTexture
-    source PassthroughFP.cg
+    source PassthroughFP_sm4.cg
     profiles ps_4_0
 }
 

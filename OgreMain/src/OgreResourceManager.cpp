@@ -485,7 +485,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void ResourceManager::_notifyResourceUnloaded(Resource* res)
 	{
-		mMemoryUsage += -(res->getSize());
+		mMemoryUsage -= res->getSize();
 	}
 	//---------------------------------------------------------------------
 	ResourceManager::ResourcePool* ResourceManager::getResourcePool(const String& name)

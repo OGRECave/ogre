@@ -41,7 +41,7 @@ namespace Ogre
 	class D3D11Driver;
 
 	/**
-	Implementation of DirectX9 as a rendering system.
+	Implementation of DirectX11 as a rendering system.
 	*/
 	class D3D11RenderSystem : public RenderSystem
 	{
@@ -57,7 +57,9 @@ namespace Ogre
 		};
 
 		OGRE_D3D11_DRIVER_TYPE mDriverType; // d3d11 driver type
-
+		D3D_FEATURE_LEVEL mFeatureLevel;
+        D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
+        D3D_FEATURE_LEVEL mMaxRequestedFeatureLevel;
 		/// Direct3D
 		//int			mpD3D;
 		/// Direct3D rendering device
@@ -111,6 +113,10 @@ namespace Ogre
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
 		void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
 		void convertGeometryShaderCaps(RenderSystemCapabilities* rsc) const;
+		void convertHullShaderCaps(RenderSystemCapabilities* rsc) const;
+		void convertDomainShaderCaps(RenderSystemCapabilities* rsc) const;
+		void convertComputeShaderCaps(RenderSystemCapabilities* rsc) const;
+
 		bool checkVertexTextureFormats(void);
 		void detachRenderTargetImpl(const String& name);
 
@@ -130,6 +136,7 @@ namespace Ogre
 		FilterOptions FilterMinification;
 		FilterOptions FilterMagnification;
 		FilterOptions FilterMips;
+		bool		  CompareEnabled;
 
 		D3D11_RECT mScissorRect;
 
@@ -137,6 +144,9 @@ namespace Ogre
 		D3D11HLSLProgram* mBoundVertexProgram;
 		D3D11HLSLProgram* mBoundFragmentProgram;
 		D3D11HLSLProgram* mBoundGeometryProgram;
+		D3D11HLSLProgram* mBoundTesselationHullProgram;
+		D3D11HLSLProgram* mBoundTesselationDomainProgram;
+		D3D11HLSLProgram* mBoundComputeProgram;
 
 		ID3D11BlendState * mBoundBlendState;
 		ID3D11RasterizerState * mBoundRasterizer;
@@ -147,6 +157,16 @@ namespace Ogre
 		ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
 		size_t mBoundTexturesCount;
 
+		// List of class instances per shader stage
+		ID3D11ClassInstance* mClassInstances[6][8];
+
+		// Number of class instances per shader stage
+		UINT mNumClassInstances[6];
+		
+		// Store created shader subroutines, to prevent creation and destruction every frame
+		typedef std::map<String, ID3D11ClassInstance*> ClassInstanceMap;
+		typedef std::map<String, ID3D11ClassInstance*>::iterator ClassInstanceIterator;
+		ClassInstanceMap mInstanceMap;
 
 		/// structure holding texture unit settings for every stage
 		struct sD3DTextureStageDesc
@@ -176,9 +196,9 @@ namespace Ogre
 		// easier to deal with lost devices
 		
 		/// Primary window, the one used to create the device
-		D3D11RenderWindow* mPrimaryWindow;
+		D3D11RenderWindowBase* mPrimaryWindow;
 
-		typedef vector<D3D11RenderWindow*>::type SecondaryWindowList;
+		typedef vector<D3D11RenderWindowBase*>::type SecondaryWindowList;
 		// List of additional windows after the first (swap chains)
 		SecondaryWindowList mSecondaryWindows;
 
@@ -186,12 +206,20 @@ namespace Ogre
 		
 		bool mRenderSystemWasInited;
 
-		IDXGIFactory1*	mpDXGIFactory;
+		IDXGIFactoryN*	mpDXGIFactory;
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
+
+
+		/**
+         * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
+		 * from us each Present(), and we need the way to reestablish connection.
+         */
+		void _setRenderTargetViews();
+
 	public:
 		// constructor
-		D3D11RenderSystem( HINSTANCE hInstance );
+		D3D11RenderSystem( );
 
 		// destructor
 		~D3D11RenderSystem();
@@ -227,10 +255,11 @@ namespace Ogre
 		DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
 											uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
 
-		/// @copydoc RenderSystem::detachRenderTarget
-		virtual RenderTarget * detachRenderTarget(const String &name);
+		/// Reverts _addManualDepthBuffer actions
+		void _removeManualDepthBuffer(DepthBuffer *depthBuffer);
 
 		const String& getName(void) const;
+		void getCustomAttribute(const String& name, void* pData);
 		// Low-level overridden members
 		void setConfigOption( const String &name, const String &value );
 		void reinitialise();
@@ -255,6 +284,9 @@ namespace Ogre
 		D3D11HLSLProgram* _getBoundVertexProgram() const;
 		D3D11HLSLProgram* _getBoundFragmentProgram() const;
 		D3D11HLSLProgram* _getBoundGeometryProgram() const;
+		D3D11HLSLProgram* _getBoundTesselationHullProgram() const;
+		D3D11HLSLProgram* _getBoundTesselationDomainProgram() const;
+		D3D11HLSLProgram* _getBoundComputeProgram() const;
         void _useLights(const LightList& lights, unsigned short limit);
 		void _setWorldMatrix( const Matrix4 &m );
 		void _setViewMatrix( const Matrix4 &m );
@@ -302,6 +334,8 @@ namespace Ogre
             bool forGpuProgram);
 		void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
+		void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+		void _setTextureUnitCompareEnabled(size_t unit, bool compare);
 		void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding);
@@ -355,6 +389,20 @@ namespace Ogre
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const {return 1;} //todo
 
-	};
+		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
+		virtual bool hasAnisotropicMipMapFilter() const { return true; }  
+
+		D3D11Device &_getDevice() { return mDevice; }
+		
+		
+        D3D_FEATURE_LEVEL _getFeatureLevel() const { return mFeatureLevel; }
+
+		/// @copydoc RenderSystem::setSubroutine
+		void setSubroutine(GpuProgramType gptype, unsigned int slotIndex, const String& subroutineName);
+		
+		/// @copydoc RenderSystem::setSubroutineName
+		void setSubroutine(GpuProgramType gptype, const String& slotName, const String& subroutineName);
+
+    };
 }
 #endif

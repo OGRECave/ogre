@@ -72,7 +72,7 @@ namespace Ogre {
 		// source dependent part, only first buffer of several with shared mSource holds lock on hardware vertex buffer
 		int mSource;
 		HardwareVertexBufferSharedPtr mBuffer;
-		std::auto_ptr<VertexBufferLockGuard> mLockGuard;	// only first by source takes lock
+		std::auto_ptr<HardwareVertexBufferLockGuard> mLockGuard;	// only first by source takes lock
 		
 		friend class VertexDataVariantList;
 		
@@ -92,7 +92,7 @@ namespace Ogre {
 				if(NULL == bufferOwner)
 				{
 					// buffer is not locked yet, so lock it and became buffer owner
-					mLockGuard.reset(new VertexBufferLockGuard(mBuffer, HardwareBuffer::HBL_READ_ONLY));
+					mLockGuard.reset(new HardwareVertexBufferLockGuard(mBuffer, HardwareBuffer::HBL_READ_ONLY));
 					bufferOwner = this;
 				}
 				
@@ -169,7 +169,7 @@ namespace Ogre {
 		size_t mIndexCount;
 		size_t mOffsetSize;
 		bool mUse32bitIndexes;
-		std::auto_ptr<IndexBufferLockGuard> mLockGuard;
+		std::auto_ptr<HardwareIndexBufferLockGuard> mLockGuard;
 		
 		IndexDataVariant(const IndexData * indexData, HardwareBuffer::LockOptions lockOpt)
 			: mIndexCount(0)
@@ -190,7 +190,7 @@ namespace Ogre {
 			mUse32bitIndexes = (mBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
 			mOffsetSize = mUse32bitIndexes ? sizeof(unsigned int) : sizeof(unsigned short);
 			
-			mLockGuard.reset(new IndexBufferLockGuard(mBuffer, lockOpt));
+			mLockGuard.reset(new HardwareIndexBufferLockGuard(mBuffer, lockOpt));
 			mBaseDataPointer = (unsigned char*)mLockGuard->pData;
 			
 			reset();
@@ -241,7 +241,7 @@ namespace Ogre {
 					  use16bitIndexes ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
 					  indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 			
-			IndexBufferLockGuard outIdataLock(pIndexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
+			HardwareIndexBufferLockGuard outIdataLock(pIndexData->indexBuffer, HardwareBuffer::HBL_DISCARD);
 			
 			unsigned short* pShortOut = use16bitIndexes ? (unsigned short*)outIdataLock.pData : NULL;
 			unsigned int* pIntOut = use16bitIndexes ? NULL : (unsigned int*)outIdataLock.pData;
@@ -1547,7 +1547,7 @@ namespace Ogre {
 			use32bitindexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT,
 			pData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
 		
-		IndexBufferLockGuard lockGuard(
+		HardwareIndexBufferLockGuard lockGuard(
 			pData->indexBuffer, 0, pData->indexBuffer->getSizeInBytes(), HardwareBuffer::HBL_DISCARD
 				);
 
@@ -1644,7 +1644,7 @@ namespace Ogre {
 		HardwareBufferManager::getSingleton().createVertexBuffer(
 																 vertexDeclaration->getVertexSize(source), outVData->vertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 		
-		VertexBufferLockGuard outVdataLock(outVbuffer, HardwareBuffer::HBL_DISCARD);
+		HardwareVertexBufferLockGuard outVdataLock(outVbuffer, HardwareBuffer::HBL_DISCARD);
 		float* p = (float*)outVdataLock.pData;
 		
 		assert(outVData->vertexCount == usedVertices.size());

@@ -1,0 +1,69 @@
+vertex_program Ogre/Tesselation/VertexProgram hlsl
+{
+	source Tesselation.hlsl
+	entry_point VS
+	target vs_5_0
+}
+
+tesselation_hull_program Ogre/Tesselation/TesselationHullProgram hlsl
+{
+	source Tesselation.hlsl
+	entry_point HS
+	target hs_5_0
+
+	default_params
+	{
+		param_named g_fTessellationFactor float 16
+	}
+}
+
+tesselation_domain_program Ogre/Tesselation/TesselationDomainProgram hlsl
+{
+	source Tesselation.hlsl
+	entry_point DS
+	target ds_5_0
+
+	default_params
+	{
+		param_named_auto g_mViewProjection worldviewproj_matrix
+	}
+}
+
+fragment_program Ogre/Tesselation/FragmentProgram hlsl
+{
+	source Tesselation.hlsl
+	entry_point SolidColorPS
+	target ps_5_0
+}
+
+material Ogre/TesselationExample
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			depth_write off
+			
+			vertex_program_ref Ogre/Tesselation/VertexProgram
+			{
+			
+			}
+			
+			tesselation_hull_program_ref Ogre/Tesselation/TesselationHullProgram
+			{
+			
+			}
+			
+			tesselation_domain_program_ref Ogre/Tesselation/TesselationDomainProgram
+			{
+			
+			}
+			
+			fragment_program_ref Ogre/Tesselation/FragmentProgram hlsl
+			{
+			
+			}			
+		}
+	}
+}

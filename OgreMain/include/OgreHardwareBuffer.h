@@ -134,7 +134,9 @@ namespace Ogre {
                 /** As HBL_NORMAL, except the application guarantees not to overwrite any 
                 region of the buffer which has already been used in this frame, can allow
                 some optimisation on some APIs. */
-                HBL_NO_OVERWRITE
+                HBL_NO_OVERWRITE,
+				/** Lock the buffer for writing only.*/
+				HBL_WRITE_ONLY
     			
 		    };
 	    protected:
@@ -350,6 +352,28 @@ namespace Ogre {
     };
 	/** @} */
 	/** @} */
+
+	/** Locking helper. Guaranteed unlocking even in case of exception. */
+    template <typename T> struct HardwareBufferLockGuard
+    {
+        HardwareBufferLockGuard(const T& p, HardwareBuffer::LockOptions options)
+            : pBuf(p)
+        {
+            pData = pBuf->lock(options);
+        }
+        HardwareBufferLockGuard(const T& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
+            : pBuf(p)
+        {
+            pData = pBuf->lock(offset, length, options);
+        }		
+        ~HardwareBufferLockGuard()
+        {
+            pBuf->unlock();
+        }
+        
+        const T& pBuf;
+        void* pData;
+    };
 }
 #endif
 

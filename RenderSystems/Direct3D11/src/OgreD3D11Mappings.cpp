@@ -214,6 +214,24 @@ namespace Ogre
 		return D3D11_BLEND_ZERO;
 	}
 	//---------------------------------------------------------------------
+	D3D11_BLEND_OP D3D11Mappings::get(SceneBlendOperation sbo)
+	{
+		switch( sbo )
+		{
+		case SBO_ADD:
+			return D3D11_BLEND_OP_ADD;
+		case SBO_SUBTRACT:
+			return D3D11_BLEND_OP_SUBTRACT;
+		case SBO_REVERSE_SUBTRACT:
+			return D3D11_BLEND_OP_REV_SUBTRACT;
+		case SBO_MIN:
+			return D3D11_BLEND_OP_MIN;
+		case SBO_MAX:
+			return D3D11_BLEND_OP_MAX;
+		}
+		return D3D11_BLEND_OP_ADD;
+	}
+	//---------------------------------------------------------------------
 	D3D11_COMPARISON_FUNC D3D11Mappings::get(CompareFunction cf)
 	{
 		switch( cf )
@@ -887,26 +905,27 @@ namespace Ogre
 		return false;
 	}
 	//---------------------------------------------------------------------
+	bool D3D11Mappings::_isDynamic(int mUsage)
+	{
+		return _isDynamic(static_cast<HardwareBuffer::Usage>(mUsage));
+	}
+	//---------------------------------------------------------------------
 	D3D11_USAGE D3D11Mappings::_getUsage(int mUsage)
 	{
-		return D3D11_USAGE_DEFAULT;
+		return _getUsage(static_cast<HardwareBuffer::Usage>(mUsage));
 	}
 	//---------------------------------------------------------------------
 	UINT D3D11Mappings::_getAccessFlags(int mUsage)
 	{
-		return 0;
+		return _getAccessFlags(static_cast<HardwareBuffer::Usage>(mUsage));
 	}
 	//---------------------------------------------------------------------
 	UINT D3D11Mappings::_getAccessFlags(HardwareBuffer::Usage mUsage)
 	{
-		if (_isDynamic(mUsage))
-		{
+		if(_isDynamic(mUsage))
 			return D3D11_CPU_ACCESS_WRITE;
-		}
 		else
-		{
 			return 0;
-		}
 	}
 	//---------------------------------------------------------------------
 	DXGI_FORMAT D3D11Mappings::get(HardwareIndexBuffer::IndexType itype)
@@ -922,4 +941,130 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	TextureType D3D11Mappings::_getTexType(D3D11_SRV_DIMENSION type)
+	{
+		switch(type)
+		{
+		case D3D_SRV_DIMENSION_TEXTURE1D:
+			return TEX_TYPE_1D;
+		case D3D_SRV_DIMENSION_TEXTURE2D:
+		case D3D_SRV_DIMENSION_TEXTURE2DMS:
+			return TEX_TYPE_2D;
+		case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
+		case D3D_SRV_DIMENSION_TEXTURE2DMSARRAY:
+			return TEX_TYPE_2D_ARRAY;
+		case D3D_SRV_DIMENSION_TEXTURE3D:
+			return TEX_TYPE_3D;
+		case D3D_SRV_DIMENSION_TEXTURECUBE:
+			return TEX_TYPE_CUBE_MAP;
+		default:
+			// unknown
+			return static_cast<TextureType>(0);
+		}
+	}
+	//---------------------------------------------------------------------
+	size_t D3D11Mappings::_getSizeInBytes(PixelFormat pf, size_t xcount, size_t ycount)
+	{
+		if(xcount == 0 || ycount == 0)
+			return 0;
+
+		if(PixelUtil::isCompressed(pf))
+		{
+			// D3D wants the width of one row of cells in bytes
+			if (pf == PF_DXT1)
+			{
+				// 64 bits (8 bytes) per 4x4 block
+				return std::max<size_t>(1, xcount / 4) * std::max<size_t>(1, ycount / 4) * 8;
+			}
+			else
+			{
+				// 128 bits (16 bytes) per 4x4 block
+				return std::max<size_t>(1, xcount / 4) * std::max<size_t>(1, ycount / 4) * 16;
+			}
+		}
+		else
+		{
+			return xcount * ycount * PixelUtil::getNumElemBytes(pf);
+		}
+	}
+
+	UINT D3D11Mappings::_getTextureBindFlags(DXGI_FORMAT format, bool isdynamic)
+	{
+		if(isdynamic)
+			return D3D11_BIND_SHADER_RESOURCE; 
+
+		switch(format)
+		{
+		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_FLOAT:
+		case DXGI_FORMAT_R32G32B32_UINT:
+		case DXGI_FORMAT_R32G32B32_SINT:
+		case DXGI_FORMAT_R16G16B16A16_TYPELESS:
+		case DXGI_FORMAT_R32G32_TYPELESS:
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
+		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT:
+		case DXGI_FORMAT_R10G10B10A2_TYPELESS:
+		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:
+		case DXGI_FORMAT_R16G16_TYPELESS:
+		case DXGI_FORMAT_R32_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT:
+		case DXGI_FORMAT_R24G8_TYPELESS:
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:
+		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
+		case DXGI_FORMAT_X24_TYPELESS_G8_UINT:
+		case DXGI_FORMAT_R8G8_TYPELESS:
+		case DXGI_FORMAT_R16_TYPELESS:
+		case DXGI_FORMAT_D16_UNORM:
+		case DXGI_FORMAT_R8_TYPELESS:
+		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:
+		case DXGI_FORMAT_R8G8_B8G8_UNORM:
+		case DXGI_FORMAT_G8R8_G8B8_UNORM:
+		case DXGI_FORMAT_BC1_TYPELESS:
+		case DXGI_FORMAT_BC1_UNORM:
+		case DXGI_FORMAT_BC1_UNORM_SRGB:
+		case DXGI_FORMAT_BC2_TYPELESS:
+		case DXGI_FORMAT_BC2_UNORM:
+		case DXGI_FORMAT_BC2_UNORM_SRGB:
+		case DXGI_FORMAT_BC3_TYPELESS:
+		case DXGI_FORMAT_BC3_UNORM:
+		case DXGI_FORMAT_BC3_UNORM_SRGB:
+		case DXGI_FORMAT_BC4_TYPELESS:
+		case DXGI_FORMAT_BC4_UNORM:
+		case DXGI_FORMAT_BC4_SNORM:
+		case DXGI_FORMAT_BC5_TYPELESS:
+		case DXGI_FORMAT_BC5_UNORM:
+		case DXGI_FORMAT_BC5_SNORM:
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8X8_TYPELESS:
+		case DXGI_FORMAT_BC6H_TYPELESS:
+		case DXGI_FORMAT_BC6H_UF16:
+		case DXGI_FORMAT_BC6H_SF16:
+		case DXGI_FORMAT_BC7_TYPELESS:
+		case DXGI_FORMAT_BC7_UNORM:
+		case DXGI_FORMAT_BC7_UNORM_SRGB:
+			return D3D11_BIND_SHADER_RESOURCE;
+		default:
+			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		}
+	}
+
+	UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic)
+	{
+		if(isdynamic)
+			return 0;
+
+		UINT flags = 0;
+
+		if(bindflags & D3D11_BIND_RENDER_TARGET)
+			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+		if(textype == TEX_TYPE_CUBE_MAP)
+			flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+		return flags;
+	}
 }

@@ -57,6 +57,8 @@ namespace Ogre {
             HardwareBuffer::Usage usage, bool useShadowBuffer = false);
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+		/// Create a uniform buffer
+		HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
         /// Utility function to get the correct GL usage based on HBU's
         static GLenum getGLUsage(unsigned int usage);
 

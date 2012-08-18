@@ -116,10 +116,9 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
 	{
 		Function* curFunction = *itFunction;
-		ParameterPtr colorParameter;
 
 		writeFunctionTitle(os, curFunction);
-		writeFunctionDeclaration(os, curFunction, colorParameter);
+		writeFunctionDeclaration(os, curFunction);
 
 		os << "{" << std::endl;
 
@@ -230,7 +229,7 @@ void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr paramet
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, ParameterPtr & colorParameter)
+void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();

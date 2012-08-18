@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareUniformBuffer.h"
 #include "OgreRenderToVertexBuffer.h"
 
 namespace Ogre {
@@ -119,8 +120,12 @@ namespace Ogre {
         */
         typedef set<HardwareVertexBuffer*>::type VertexBufferList;
         typedef set<HardwareIndexBuffer*>::type IndexBufferList;
+		typedef set<HardwareUniformBuffer*>::type UniformBufferList;
+		//typedef HashMap<std::string, HardwareUniformBuffer*> SharedUniformBufferMap;
         VertexBufferList mVertexBuffers;
         IndexBufferList mIndexBuffers;
+		UniformBufferList mUniformBuffers;
+		//SharedUniformBufferMap mSharedUniformBuffers;
 
 
         typedef set<VertexDeclaration*>::type VertexDeclarationList;
@@ -131,6 +136,7 @@ namespace Ogre {
         // Mutexes
         OGRE_MUTEX(mVertexBuffersMutex)
         OGRE_MUTEX(mIndexBuffersMutex)
+		OGRE_MUTEX(mUniformBuffersMutex)
         OGRE_MUTEX(mVertexDeclarationsMutex)
         OGRE_MUTEX(mVertexBufferBindingsMutex)
 
@@ -275,6 +281,15 @@ namespace Ogre {
         */
         virtual RenderToVertexBufferSharedPtr createRenderToVertexBuffer() = 0;
 
+		/**
+		 * Create uniform buffer. This type of buffer allows the upload of shader constants once,
+		 * and sharing between shader stages or even shaders from another materials. 
+		 * The update shall be triggered by GpuProgramParameters, if is dirty
+		 */
+		virtual HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
+									HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
+									bool useShadowBuffer = false, const String& name = "") = 0;
+
         /** Creates a new vertex declaration. */
         virtual VertexDeclaration* createVertexDeclaration(void);
         /** Destroys a vertex declaration. */
@@ -393,7 +408,8 @@ namespace Ogre {
         void _notifyVertexBufferDestroyed(HardwareVertexBuffer* buf);
         /// Notification that a hardware index buffer has been destroyed.
         void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
-
+		/// Notification that at hardware uniform buffer has been destroyed
+		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf);
     };
 
     /** Singleton wrapper for hardware buffer manager. */
@@ -429,6 +445,13 @@ namespace Ogre {
         }
 
         /** @copydoc HardwareBufferManagerBase::createVertexDeclaration */
+		HardwareUniformBufferSharedPtr
+				createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
+		{
+			return mImpl->createUniformBuffer(sizeBytes, usage, useShadowBuffer, name);
+		}
+
+		/** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
         virtual VertexDeclaration* createVertexDeclaration(void)
         {
             return mImpl->createVertexDeclaration();
@@ -510,7 +533,11 @@ namespace Ogre {
         {
             mImpl->_notifyIndexBufferDestroyed(buf);
         }
-
+		/** @copydoc HardwareBufferManagerInterface::_notifyIndexBufferDestroyed */
+		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
+		{
+			mImpl->_notifyUniformBufferDestroyed(buf);
+		}
 
         /** Override standard Singleton retrieval.
         @remarks

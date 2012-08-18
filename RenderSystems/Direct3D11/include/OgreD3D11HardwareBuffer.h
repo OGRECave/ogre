@@ -43,7 +43,8 @@ namespace Ogre {
 		enum BufferType
 		{
 			VERTEX_BUFFER,
-			INDEX_BUFFER
+			INDEX_BUFFER,
+			CONSTANT_BUFFER
 		};
 	protected:
 		ID3D11Buffer* mlpD3DBuffer;

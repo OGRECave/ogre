@@ -2258,3 +2258,13 @@ namespace Ogre {
     }
 #endif
 }
+
+void GLES2RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
+{
+    //no effect in GLES2 rendersystem
+}
+
+void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
+{
+    //no effect in GLES2 rendersystem
+}

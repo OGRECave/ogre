@@ -802,6 +802,20 @@ namespace Ogre
 		*/
 		virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
+		/** Sets wether the compare func is enabled or not for this texture unit 
+		@param unit The texture unit to set the filtering options for
+		@param compare The state (enabled/disabled)
+		*/
+		virtual void _setTextureUnitCompareEnabled(size_t unit, bool compare) = 0;
+
+
+		/** Sets the compare function to use for a given texture unit
+		@param unit The texture unit to set the filtering options for
+		@param function The comparison function
+		*/
+		virtual void _setTextureUnitCompareFunction(size_t unit, CompareFunction function) = 0;
+
+
 		/** Sets the maximal anisotropy for the specified texture unit.*/
 		virtual void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy) = 0;
 
@@ -1459,6 +1473,18 @@ namespace Ogre
 		@see Root::getDisplayMonitorCount
 		*/
 		virtual unsigned int getDisplayMonitorCount() const = 0;
+
+		/** Determines if the system has anisotropic mip map filter support
+		*/
+		virtual bool hasAnisotropicMipMapFilter() const = 0;
+
+		/** Gets a custom (maybe platform-specific) attribute.
+        @remarks This is a nasty way of satisfying any API's need to see platform-specific details.
+        @param name The name of the attribute.
+        @param pData Pointer to memory of the right kind of structure to receive the info.
+        */
+		virtual void getCustomAttribute(const String& name, void* pData);
+
 	protected:
 
 		/** DepthBuffers to be attached to render targets */
@@ -1475,6 +1501,9 @@ namespace Ogre
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTesselationHullGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTesselationDomainGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveComputeGpuProgramParameters;
 
 		// Texture manager
 		// A concrete class of this will be created and
@@ -1545,6 +1574,9 @@ namespace Ogre
 		bool mVertexProgramBound;
 		bool mGeometryProgramBound;
 		bool mFragmentProgramBound;
+		bool mTesselationHullProgramBound;
+		bool mTesselationDomainProgramBound;
+		bool mComputeProgramBound;
 
 		// Recording user clip planes
 		PlaneList mClipPlanes;

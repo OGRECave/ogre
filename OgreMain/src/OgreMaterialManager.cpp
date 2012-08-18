@@ -62,6 +62,9 @@ namespace Ogre {
 	    mDefaultMinFilter = FO_LINEAR;
 	    mDefaultMagFilter = FO_LINEAR;
 	    mDefaultMipFilter = FO_POINT;
+		mDefaultCompareEnabled	= false;
+		mDefaultCompareFunction = CMPF_GREATER_EQUAL;
+
 		mDefaultMaxAniso = 1;
 
 		// Create primary thread copies of script compiler / serializer

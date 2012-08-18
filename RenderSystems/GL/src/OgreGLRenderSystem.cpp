@@ -2582,6 +2582,16 @@ namespace Ogre {
 		activateGLTextureUnit(0);
 	}
 	//---------------------------------------------------------------------
+	void GLRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
+	{
+		//TODO: implement (opengl 3 only?)
+	}
+	//---------------------------------------------------------------------
+	void GLRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
+	{
+		//TODO: implement (opengl 3 only?)
+	}
+	//---------------------------------------------------------------------
 	GLfloat GLRenderSystem::_getCurrentAnisotropy(size_t unit)
 	{
 		GLfloat curAniso = 0;

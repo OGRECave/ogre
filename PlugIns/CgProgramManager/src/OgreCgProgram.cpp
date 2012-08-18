@@ -68,7 +68,16 @@ namespace Ogre {
             if (syntaxSupported)
             {
                 mSelectedProfile = *i;
-                mSelectedCgProfile = cgGetProfile(mSelectedProfile.c_str());
+                String selectedProfileForFind = mSelectedProfile;
+                if(StringUtil::startsWith(mSelectedProfile,"vs_4_0_", true))
+                {
+                    selectedProfileForFind = "vs_4_0";
+                }
+                if(StringUtil::startsWith(mSelectedProfile,"ps_4_0_", true))
+                {
+                    selectedProfileForFind = "ps_4_0";
+                }
+                mSelectedCgProfile = cgGetProfile(selectedProfileForFind.c_str());
                 // Check for errors
                 checkForCgError("CgProgram::selectProfile", 
                     "Unable to find CG profile enum for program " + mName + ": ", mCgContext);
@@ -438,7 +447,13 @@ namespace Ogre {
 // the hlsl 4 profiles are only supported in OGRE from CG 2.2
 #if(CG_VERSION_NUM >= 2200)
 				|| mSelectedCgProfile == CG_PROFILE_VS_4_0
-				 || mSelectedCgProfile == CG_PROFILE_PS_4_0
+				|| mSelectedCgProfile == CG_PROFILE_PS_4_0
+#endif
+#if(CG_VERSION_NUM >= 3000)
+				|| mSelectedCgProfile == CG_PROFILE_VS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_PS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_DS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_HS_5_0
 #endif
 				 )
 			{
@@ -482,6 +497,7 @@ namespace Ogre {
 			case CG_PROFILE_GLSLF:
 			case CG_PROFILE_GLSLV:
 			case CG_PROFILE_GLSLG:
+			case CG_PROFILE_GLSLC:
 				return "glsl";
 			case CG_PROFILE_HLSLF:
 			case CG_PROFILE_HLSLV:
@@ -500,7 +516,14 @@ namespace Ogre {
 
 		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
 		{
-			static const String fpProfiles[] = {"ps_3_0", "ps_2_x", "ps_2_0", "ps_1_4", "ps_1_3", "ps_1_2", "ps_1_1"};
+			static const String fpProfiles[] = {
+#if(CG_VERSION_NUM >= 3000)
+			"ps_5_0",
+#endif
+#if(CG_VERSION_NUM >= 2200)
+			"ps_4_0",
+#endif
+			"ps_3_0", "ps_2_x", "ps_2_0", "ps_1_4", "ps_1_3", "ps_1_2", "ps_1_1"};
 			static const size_t numFpProfiles = sizeof(fpProfiles)/sizeof(String);
 			// find the highest profile available
 			for (size_t i = 0; i < numFpProfiles; ++i)
@@ -511,7 +534,14 @@ namespace Ogre {
 		}
 		else if (mSelectedCgProfile == CG_PROFILE_HLSLV)
 		{
-			static const String vpProfiles[] = {"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
+			static const String vpProfiles[] = {
+#if(CG_VERSION_NUM >= 3000)
+			"vs_5_0",
+#endif
+#if(CG_VERSION_NUM >= 2200)
+			"vs_4_0",
+#endif				
+			"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
 			static const size_t numVpProfiles = sizeof(vpProfiles)/sizeof(String);
 			// find the highest profile available
 			for (size_t i = 0; i < numVpProfiles; ++i)

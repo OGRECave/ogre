@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+	EdgeData::EdgeData() : isClosed(false){}
+	
     void EdgeData::log(Log* l)
     {
         EdgeGroupList::iterator i, iend;

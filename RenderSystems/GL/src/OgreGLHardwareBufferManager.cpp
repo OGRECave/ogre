@@ -114,6 +114,14 @@ namespace Ogre {
 	{
         return RenderToVertexBufferSharedPtr(new GLRenderToVertexBuffer);
     }
+	//---------------------------------------------------------------------
+	HardwareUniformBufferSharedPtr 
+		GLHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name)
+	{
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				"Uniform buffer not supported in OpenGL RenderSystem.",
+				"GLHardwareBufferManagerBase::createUniformBuffer");
+	}
     //---------------------------------------------------------------------
     GLenum GLHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
