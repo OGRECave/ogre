@@ -42,10 +42,10 @@ namespace Ogre{
 
 		// Set up some constant characters of interest
 #if OGRE_WCHAR_T_STRINGS
-		const wchar_t varopener = L'$', quote = L'\"', slash = L'/', backslash = L'\\', openbrace = L'{', closebrace = L'}', colon = L':', star = L'*';
+		const wchar_t varopener = L'$', quote = L'\"', slash = L'/', backslash = L'\\', openbrace = L'{', closebrace = L'}', colon = L':', star = L'*', cr = L'\r', lf = L'\n';
 		wchar_t c = 0, lastc = 0;
 #else
-		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*';
+		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*', cr = '\r', lf = '\n';
 		char c = 0, lastc = 0;
 #endif
 
@@ -206,7 +206,7 @@ namespace Ogre{
 			}
 
 			// Separate check for newlines just to track line numbers
-			if(isNewline(c))
+			if(c == cr || (c == lf && lastc != cr))
 				line++;
 			
 			i++;
