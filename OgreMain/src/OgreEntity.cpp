@@ -575,8 +575,12 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                mAnimationState->copyMatchingState(
-					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
+                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
+				if (mAnimationState != targetState) // only copy if lods use different skeleton instances
+				{
+					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
+						mAnimationState->copyMatchingState(targetState);
+				}
             }
             displayEntity = mLodEntityList[mMeshLodIndex - 1];
         }
@@ -1859,8 +1863,12 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                mAnimationState->copyMatchingState(
-					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
+                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
+				if (mAnimationState != targetState) // only copy if lods have different skeleton instances
+				{
+					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
+						mAnimationState->copyMatchingState(targetState);
+				}
             }
             return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
                 shadowTechnique, light, indexBuffer, extrude,
