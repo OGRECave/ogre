@@ -99,8 +99,13 @@ void CompositorChain::createOriginalScene()
     };
     */
 
+    // If two viewports use the same scheme but differ in settings like visibility masks, shadows, etc we don't
+    // want compositors to share their technique.  Otherwise both compositors will have to recompile every time they
+    // render.  Thus we generate a unique compositor per viewport.
+	String compName("Ogre/Scene/");
+    compName += StringConverter::toString((intptr_t)mViewport);
+
 	mOriginalSceneScheme = mViewport->getMaterialScheme();
-	String compName = "Ogre/Scene/" + mOriginalSceneScheme;
 	CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
 	if (scene.isNull())
 	{
