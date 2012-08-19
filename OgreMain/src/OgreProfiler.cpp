@@ -133,14 +133,13 @@ namespace Ogre {
 		frame.calls = 0;
 	}
 	Profiler::ProfileInstance::~ProfileInstance(void)
-	{
-                                        
+	{                                        
 		for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
 		{
 			ProfileInstance* instance = it->second;
-			children.erase(it);
 			OGRE_DELETE instance;
 		}
+		children.clear();
 	}
     //-----------------------------------------------------------------------
     Profiler::~Profiler()
@@ -280,9 +279,11 @@ namespace Ogre {
             if(mProfileGui)
                 OverlayManager::getSingleton().destroyOverlayElement(mProfileGui);
             if(mOverlay)
-                OverlayManager::getSingleton().destroy(mOverlay);
-
+                OverlayManager::getSingleton().destroy(mOverlay);			
+			
+			mProfileBars.clear();
             mInitialized = false;
+			mEnabled = false;
         }
         // We store this enable/disable request until the frame ends
         // (don't want to screw up any open profiles!)

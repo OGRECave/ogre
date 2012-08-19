@@ -56,6 +56,10 @@ THE SOFTWARE.
 // DXGetErrorDescription
 #include "DXErr.h"
 
+#ifdef OGRE_PROFILING == 1
+#include "d3d9.h"
+#endif
+
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 //---------------------------------------------------------------------
@@ -2924,29 +2928,35 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {
+#ifdef OGRE_PROFILING == 1
         if( eventName.empty() )
             return;
 
         vector<wchar_t>::type result(eventName.length() + 1, '\0');
         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
         (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+#endif
     }
 
     //---------------------------------------------------------------------
     void D3D11RenderSystem::endProfileEvent( void )
     {
+#ifdef OGRE_PROFILING == 1
         (void)D3DPERF_EndEvent();
+#endif
     }
 
     //---------------------------------------------------------------------
     void D3D11RenderSystem::markProfileEvent( const String &eventName )
     {
+#ifdef OGRE_PROFILING == 1
         if( eventName.empty() )
             return;
 
         vector<wchar_t>::type result(eventName.length() + 1, '\0');
         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
         (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+#endif
     }
     
 }
