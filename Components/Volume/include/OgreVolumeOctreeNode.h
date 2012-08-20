@@ -524,6 +524,15 @@ namespace Volume {
         {
             return mCenterValue;
         }
+
+        inline const bool isNearEnough(void) const
+        {
+            if (mCenterValue.w == (Real)0.0)
+            {
+                return true;
+            }
+            return Math::Abs(mCenterValue.w) < (mFrom - mTo).length() * (Real)2.0;
+        }
     };
 }
 }

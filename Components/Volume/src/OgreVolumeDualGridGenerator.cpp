@@ -35,6 +35,14 @@ namespace Volume {
 
     void DualGridGenerator::nodeProc(const OctreeNode *n)
     {
+        /*Vector4 centerValue = n->getCenterValue();
+        if (centerValue.x != (Real)0.0 && centerValue.y != (Real)0.0 && centerValue.z != (Real)0.0 && centerValue.w != (Real)0.0)
+        {
+            if (Math::Abs(centerValue.w) < (n->getFrom() - n->getTo()).length() * (Real)0.5)
+            {
+                return;
+            }
+        }*/
         if (n->isSubdivided())
         {
         
@@ -293,6 +301,13 @@ namespace Volume {
         }
         else
         {
+
+            if (!n0->isNearEnough() && !n1->isNearEnough() && !n2->isNearEnough() && !n3->isNearEnough() &&
+                !n4->isNearEnough() && !n5->isNearEnough() && !n6->isNearEnough() && !n7->isNearEnough())
+            {
+                return;
+            }
+
             mDualCells.push_back(DualCell(n0->getCenter(), n1->getCenter(), n2->getCenter(), n3->getCenter(),
                 n4->getCenter(), n5->getCenter(), n6->getCenter(), n7->getCenter(),
                 n0->getCenterValue(), n1->getCenterValue(), n2->getCenterValue(), n3->getCenterValue(),
