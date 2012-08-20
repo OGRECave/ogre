@@ -27,3 +27,7 @@ endif ()
 if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 	add_subdirectory(RTShaderSystem)
 endif ()
+
+if (OGRE_BUILD_COMPONENT_VOLUME)
+	add_subdirectory(Volume)
+endif ()
