@@ -35,5 +35,7 @@ SamplePlugin=Sample_Terrain
 SamplePlugin=Sample_TextureArray
 SamplePlugin=Sample_TextureFX
 SamplePlugin=Sample_Transparency
+SamplePlugin=Sample_VolumeCSG
+SamplePlugin=Sample_VolumeTerrain
 SamplePlugin=Sample_VolumeTex
 SamplePlugin=Sample_Water

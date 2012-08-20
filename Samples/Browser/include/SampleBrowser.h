@@ -1021,6 +1021,8 @@ protected:
             mPluginNameMap["Sample_SphereMapping"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_SphereMapping();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
+            mPluginNameMap["Sample_VolumeCSG"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
+            mPluginNameMap["Sample_VolumeTerrain"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 
 #ifdef USE_RTSHADER_SYSTEM
             if(hasProgrammableGPU)
