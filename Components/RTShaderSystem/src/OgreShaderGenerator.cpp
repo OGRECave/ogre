@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreShaderExTextureAtlasSampler.h"
+#include "OgreShaderExTriplanarTexturing.h"
 
 namespace Ogre {
 
@@ -216,6 +217,10 @@ void ShaderGenerator::createSubRenderStateExFactories()
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 
 	curFactory = new TextureAtlasSamplerFactory;
+	addSubRenderStateFactory(curFactory);
+	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+	
+	curFactory = new TriplanarTexturingFactory;
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 #endif

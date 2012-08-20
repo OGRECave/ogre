@@ -34,6 +34,7 @@ set (HEADER_FILES
   include/OgreShaderExNormalMapLighting.h
   include/OgreShaderExPerPixelLighting.h
   include/OgreShaderExIntegratedPSSM3.h
+  include/OgreShaderExTriplanarTexturing.h
   include/OgreShaderScriptTranslator.h
   include/OgreShaderMaterialSerializerListener.h
   include/OgreShaderProgramProcessor.h
@@ -74,6 +75,7 @@ set (SOURCE_FILES
   src/OgreShaderExNormalMapLighting.cpp
   src/OgreShaderExPerPixelLighting.cpp
   src/OgreShaderExIntegratedPSSM3.cpp
+  src/OgreShaderExTriplanarTexturing.cpp
   src/OgreShaderScriptTranslator.cpp
   src/OgreShaderMaterialSerializerListener.cpp
   src/OgreShaderProgramProcessor.cpp
