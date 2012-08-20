@@ -33,10 +33,12 @@ THE SOFTWARE.
 
 extern "C" {
 	// MSVC libs use _chkstk for stack-probing. MinGW equivalent is _alloca.
-	void _alloca();
+	// But calling it to ensure Ogre build with D3D9 static does cause a crash.
+	// Might have to investige further here, later.
+	//void _alloca();
 	void _chkstk()
 	{
-		_alloca();
+		//_alloca();
 	}
 	
 	// MSVC uses security cookies to prevent some buffer overflow attacks.

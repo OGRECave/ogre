@@ -46,6 +46,8 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreOverlayManager.h"
 #include "OgreOverlayElement.h"
 #include "OgreOverlayContainer.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -65,15 +67,12 @@ namespace Ogre {
 		: mName(profileName)
 		, mGroupID(groupID)
 	{
-
         Ogre::Profiler::getSingleton().beginProfile(profileName, groupID);
-
     }
     //-----------------------------------------------------------------------
-    Profile::~Profile() {
-
+    Profile::~Profile()
+    {
         Ogre::Profiler::getSingleton().endProfile(mName, mGroupID);
-
     }
     //-----------------------------------------------------------------------
 
@@ -82,7 +81,10 @@ namespace Ogre {
     // PROFILER DEFINITIONS
     //-----------------------------------------------------------------------
     Profiler::Profiler() 
-		: mInitialized(false)
+        : mCurrent(&mRoot)
+        , mLast(NULL)
+        , mRoot()
+        , mInitialized(false)
 		, mMaxDisplayProfiles(50)
 		, mOverlay(0)
 		, mProfileGui(0)
@@ -100,7 +102,6 @@ namespace Ogre {
 		, mTimer(0)
 		, mTotalFrameTime(0)
 		, mEnabled(false)
-		, mEnableStateChangePending(false)
 		, mNewEnableState(false)
 		, mProfileMask(0xFFFFFFFF)
 		, mDisplayMode(DISPLAY_MILLISECONDS)
@@ -108,24 +109,50 @@ namespace Ogre {
 		, mAverageFrameTime(0)
 		, mResetExtents(false)
 	{
-		
+		mRoot.hierarchicalLvl = 0 - 1;
     }
-    //-----------------------------------------------------------------------
-    Profiler::~Profiler() {
+	//-----------------------------------------------------------------------
+	Profiler::ProfileInstance::ProfileInstance(void)
+		: parent(NULL)
+        , frameNumber(0)
+		, accum(0)
+		, hierarchicalLvl(0)
+	{
+		history.numCallsThisFrame = 0;
+		history.totalTimePercent = 0;
+		history.totalTimeMillisecs = 0;
+		history.totalCalls = 0;
+		history.maxTimePercent = 0;
+		history.maxTimeMillisecs = 0;
+		history.minTimePercent = 1;
+		history.minTimeMillisecs = 100000;
+		history.currentTimePercent = 0;
+		history.currentTimeMillisecs = 0;
 
-        if (!mProfileHistory.empty()) {
+		frame.frameTime = 0;
+		frame.calls = 0;
+	}
+	Profiler::ProfileInstance::~ProfileInstance(void)
+	{                                        
+		for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+		{
+			ProfileInstance* instance = it->second;
+			OGRE_DELETE instance;
+		}
+		children.clear();
+	}
+    //-----------------------------------------------------------------------
+    Profiler::~Profiler()
+    {
+		if (!mRoot.children.empty()) 
+		{
             // log the results of our profiling before we quit
             logResults();
         }
 
         // clear all our lists
-        mProfiles.clear();
-        mProfileFrame.clear();
-        mProfileHistoryMap.clear();
-        mProfileHistory.clear();
         mDisabledProfiles.clear();
         mProfileBars.clear();
-
     }
 	//---------------------------------------------------------------------
 	void Profiler::setOverlayDimensions(Real width, Real height)
@@ -135,7 +162,6 @@ namespace Ogre {
 		mBarIndent = mGuiWidth;
 
 		mProfileGui->setDimensions(width, height);
-
 	}
 	//---------------------------------------------------------------------
 	void Profiler::setOverlayPosition(Real left, Real top)
@@ -168,8 +194,6 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     void Profiler::initialize() 
 	{
-
-
         // create a new overlay to hold our Profiler display
         mOverlay = OverlayManager::getSingleton().create("Profiler");
         mOverlay->setZOrder(500);
@@ -180,7 +204,8 @@ namespace Ogre {
         OverlayElement* element;
 
         // we create an initial pool of 50 profile bars
-        for (uint i = 0; i < mMaxDisplayProfiles; ++i) {
+        for (uint i = 0; i < mMaxDisplayProfiles; ++i) 
+		{
 
             // this is for the profile name and the number of times it was called in a frame
             element = createTextArea("profileText" + StringConverter::toString(i), 90, mBarHeight, mGuiBorderWidth + (mBarHeight + mBarSpacing) * i, 0, 14, "", false);
@@ -215,403 +240,331 @@ namespace Ogre {
 
         // throw everything all the GUI stuff into the overlay and display it
         mOverlay->add2D(mProfileGui);
-        mOverlay->show();
-
     }
     //-----------------------------------------------------------------------
-    void Profiler::setTimer(Timer* t) {
-
+    void Profiler::setTimer(Timer* t)
+    {
         mTimer = t;
-
     }
     //-----------------------------------------------------------------------
-    Timer* Profiler::getTimer() {
-
+    Timer* Profiler::getTimer()
+    {
         assert(mTimer && "Timer not set!");
         return mTimer;
-
     }
     //-----------------------------------------------------------------------
-    void Profiler::setEnabled(bool enabled) {
-
-        if (!mInitialized && enabled) {
-
+    void Profiler::setEnabled(bool enabled) 
+	{
+        if (!mInitialized && enabled) 
+		{
             // the user wants to enable the Profiler for the first time
             // so we initialize the GUI stuff
             initialize();
             mInitialized = true;
-            mEnabled = true;
-
         }
-        else {
-            // We store this enable/disable request until the frame ends
-            // (don't want to screw up any open profiles!)
-            mEnableStateChangePending = true;
-            mNewEnableState = enabled;
+        else
+        {
+            OverlayContainer* container = dynamic_cast<OverlayContainer*>(mProfileGui);
+			if (container)
+			{
+				OverlayContainer::ChildIterator children = container->getChildIterator();
+				while (children.hasMoreElements())
+				{
+                    OverlayElement* element = children.getNext();
+                    OverlayContainer* parent = element->getParent();
+                    if (parent) parent->removeChild(element->getName());
+                    OverlayManager::getSingleton().destroyOverlayElement(element);
+				}
+			}
+            if(mProfileGui)
+                OverlayManager::getSingleton().destroyOverlayElement(mProfileGui);
+            if(mOverlay)
+                OverlayManager::getSingleton().destroy(mOverlay);			
+			
+			mProfileBars.clear();
+            mInitialized = false;
+			mEnabled = false;
         }
-
+        // We store this enable/disable request until the frame ends
+        // (don't want to screw up any open profiles!)
+        mNewEnableState = enabled;
     }
     //-----------------------------------------------------------------------
-    bool Profiler::getEnabled() const {
-
+    bool Profiler::getEnabled() const
+    {
         return mEnabled;
-
     }
     //-----------------------------------------------------------------------
-    void Profiler::disableProfile(const String& profileName) {
+    void Profiler::disableProfile(const String& profileName)
+	{
+        // even if we are in the middle of this profile, endProfile() will still end it.
 
-        // make sure the profile isn't already disabled
-        DisabledProfileMap::iterator iter;
-        iter = mDisabledProfiles.find(profileName);
-
-        // make sure you don't disable a profile in the middle of that profile
-        ProfileStack::iterator pIter;
-        for (pIter = mProfiles.begin(); pIter != mProfiles.end(); ++pIter) {
-
-            if (profileName == (*pIter).name)
-                break;
-
-        }
-
-        // if those two conditions are met, disable the profile
-        if ( (iter == mDisabledProfiles.end()) && (pIter == mProfiles.end()) ) {
-
-            mDisabledProfiles.insert(std::pair<String, bool>(profileName, true));
-
-        }
-
+        mDisabledProfiles.insert(profileName);
     }
     //-----------------------------------------------------------------------
-    void Profiler::enableProfile(const String& profileName) {
-
-        // make sure the profile is actually disabled
-        DisabledProfileMap::iterator iter;
-        iter = mDisabledProfiles.find(profileName);
-
-        // make sure you don't enable a profile in the middle of that profile
-        ProfileStack::iterator pIter;
-        for (pIter = mProfiles.begin(); pIter != mProfiles.end(); ++pIter) {
-
-            if (profileName == (*pIter).name)
-                break;
-
-        }
-
-        // if those two conditions are met, enable the profile by removing it from
-        // the disabled list
-        if ( (iter != mDisabledProfiles.end()) && (pIter == mProfiles.end()) ) {
-
-            mDisabledProfiles.erase(iter);
-
-        }
-
+    void Profiler::enableProfile(const String& profileName) 
+	{
+		mDisabledProfiles.erase(profileName);
     }
     //-----------------------------------------------------------------------
     void Profiler::beginProfile(const String& profileName, uint32 groupID) 
 	{
-
-        // if the profiler is enabled
-        if (!mEnabled) {
-
-            return;
-
-        }
-
-		// mask groups
-		if ((groupID & mProfileMask) == 0)
-		{
-			return;
-		}
-
-
-		// we only process this profile if isn't disabled
-		DisabledProfileMap::iterator dIter;
-		dIter = mDisabledProfiles.find(profileName);
-		if ( dIter != mDisabledProfiles.end() ) {
-
-			return;
-
-		}
-
-        // empty string is reserved for the root
-        assert ((profileName != "") && ("Profile name can't be an empty string"));
-
-        ProfileStack::iterator iter;
-        for (iter = mProfiles.begin(); iter != mProfiles.end(); ++iter) {
-
-            if ((*iter).name == profileName) {
-
-                break;
-
-            }
-        }
-
-        // make sure this profile isn't being used more than once
-        assert ((iter == mProfiles.end()) && ("This profile name is already being used"));
-
-
-        ProfileInstance p;
-		p.hierarchicalLvl = static_cast<uint>(mProfiles.size());
-
-        // this is the root, it has no parent
-        if (mProfiles.empty()) {
-
-            p.parent = "";
-
-        }
-        // otherwise peek at the stack and use the top as the parent
-        else {
-
-            ProfileInstance parent = mProfiles.back();
-            p.parent = parent.name;
-
-        }
-
-        // need a timer to profile!
-        assert (mTimer && "Timer not set!");
-
-        ProfileFrameList::iterator fIter;
-        ProfileHistoryList::iterator hIter;
-
-        // we check to see if this profile has been called in the frame before
-        for (fIter = mProfileFrame.begin(); fIter != mProfileFrame.end(); ++fIter) {
-
-            if ((*fIter).name == profileName)
-                break;
-
-        }
-        // if it hasn't been called before, set its position in the stack
-        if (fIter == mProfileFrame.end()) {
-
-            ProfileFrame f;
-            f.name = profileName;
-            f.frameTime = 0;
-            f.calls = 0;
-            f.hierarchicalLvl = (uint) mProfiles.size();
-            mProfileFrame.push_back(f);
-
-        }
-
-        // we check to see if this profile has been called in the app before
-        ProfileHistoryMap::iterator histMapIter;
-        histMapIter = mProfileHistoryMap.find(profileName);
-
-        // if not we add a profile with just the name into the history
-        if (histMapIter == mProfileHistoryMap.end()) {
-
-            ProfileHistory h;
-            h.name = profileName;
-            h.numCallsThisFrame = 0;
-            h.totalTimePercent = 0;
-			h.totalTimeMillisecs = 0;
-            h.totalCalls = 0;
-            h.maxTimePercent = 0;
-			h.maxTimeMillisecs = 0;
-            h.minTimePercent = 1;
-			h.minTimeMillisecs = 100000;
-            h.hierarchicalLvl = p.hierarchicalLvl;
-            h.currentTimePercent = 0;
-			h.currentTimeMillisecs = 0;
-
-            // we add this to the history
-            hIter = mProfileHistory.insert(mProfileHistory.end(), h);
-
-            // for quick look-ups, we'll add it to the history map as well
-            mProfileHistoryMap.insert(std::pair<String, ProfileHistoryList::iterator>(profileName, hIter));
-
-        }
-
-        // add the stats to this profile and push it on the stack
-        // we do this at the very end of the function to get the most
-        // accurate timing results
-        p.name = profileName;
-        p.currTime = mTimer->getMicroseconds();
-        p.accum = 0;
-        mProfiles.push_back(p);
-
-    }
-    //-----------------------------------------------------------------------
-    void Profiler::endProfile(const String& profileName, uint32 groupID) {
-
-		// if the profiler received a request to be enabled or disabled
-		// we reached the end of the frame so we can safely do this
-		if (mEnableStateChangePending) {
-
-			changeEnableState();
-
-		}
+		// regardless of whether or not we are enabled, we need the application's root profile (ie the first profile started each frame)
+		// we need this so bogus profiles don't show up when users enable profiling mid frame
+		// so we check
 
 		// if the profiler is enabled
-        if(!mEnabled) {
-
-            return;
-        }
+		if (!mEnabled) 
+			return;
 
 		// mask groups
 		if ((groupID & mProfileMask) == 0)
-		{
 			return;
-		}
 
 		// we only process this profile if isn't disabled
-		DisabledProfileMap::iterator dIter;
-		dIter = mDisabledProfiles.find(profileName);
-		if ( dIter != mDisabledProfiles.end() ) {
-
+		if (mDisabledProfiles.find(profileName) != mDisabledProfiles.end()) 
 			return;
 
+		// empty string is reserved for the root
+		// not really fatal anymore, however one shouldn't name one's profile as an empty string anyway.
+		assert ((profileName != "") && ("Profile name can't be an empty string"));
+
+		// this would be an internal error.
+		assert (mCurrent);
+
+		// need a timer to profile!
+		assert (mTimer && "Timer not set!");
+
+		ProfileInstance*& instance = mCurrent->children[profileName];
+		if(instance)
+		{	// found existing child.
+
+			// Sanity check.
+			assert(instance->name == profileName);
+
+			if(instance->frameNumber != mCurrentFrame)
+			{	// new frame, reset stats
+				instance->frame.calls = 0;
+				instance->frame.frameTime = 0;
+				instance->frameNumber = mCurrentFrame;
+			}
+		}
+		else
+		{	// new child!
+			instance = OGRE_NEW ProfileInstance();
+			instance->name = profileName;
+			instance->parent = mCurrent;
+			instance->hierarchicalLvl = mCurrent->hierarchicalLvl + 1;
 		}
 
-        // need a timer to profile!
-        assert (mTimer && "Timer not set!");
+		instance->frameNumber = mCurrentFrame;
 
-        // get the end time of this profile
-        // we do this as close the beginning of this function as possible
-        // to get more accurate timing results
-        ulong endTime = mTimer->getMicroseconds();
+		mCurrent = instance;
 
-        // empty string is reserved for designating an empty parent
-        assert ((profileName != "") && ("Profile name can't be an empty string"));
-      
-        // stack shouldn't be empty
-        assert (!mProfiles.empty());
-
-        // get the start of this profile
-        ProfileInstance bProfile;
-        bProfile = mProfiles.back();
-        mProfiles.pop_back();
-
-        // calculate the elapsed time of this profile
-        ulong timeElapsed = endTime - bProfile.currTime;
-
-        // update parent's accumulator if it isn't the root
-        if (bProfile.parent != "") {
-
-            // find the parent
-            ProfileStack::iterator iter;
-            for(iter = mProfiles.begin(); iter != mProfiles.end(); ++iter) {
-
-                if ((*iter).name == bProfile.parent)
-                    break;
-
-            }
-
-            // the parent should be found 
-            assert(iter != mProfiles.end());
-
-            // add this profile's time to the parent's accumlator
-            (*iter).accum += timeElapsed;
-
-        }
-
-        // we find the profile in this frame
-        ProfileFrameList::iterator iter;
-        for (iter = mProfileFrame.begin(); iter != mProfileFrame.end(); ++iter) {
-
-            if ((*iter).name == bProfile.name)
-                break;
-
-        }
-
-		// nested profiles are cumulative
-        (*iter).frameTime += timeElapsed;
-        (*iter).calls++;
-
-        // the stack is empty and all the profiles have been completed
-        // we have reached the end of the frame so process the frame statistics
-        if (mProfiles.empty()) {
-
-            // we know that the time elapsed of the main loop is the total time the frame took
-            mTotalFrameTime = timeElapsed;
-
-			if (timeElapsed > mMaxTotalFrameTime)
-				mMaxTotalFrameTime = timeElapsed;
-
-            // we got all the information we need, so process the profiles
-            // for this frame
-            processFrameStats();
-
-            // clear the frame stats for next frame
-            mProfileFrame.clear();
-
-            // we display everything to the screen
-            displayResults();
-
-        }
-
+		// we do this at the very end of the function to get the most
+		// accurate timing results
+		mCurrent->currTime = mTimer->getMicroseconds();
     }
     //-----------------------------------------------------------------------
-    void Profiler::processFrameStats() {
+    void Profiler::endProfile(const String& profileName, uint32 groupID) 
+	{
+		if(!mEnabled) 
+		{
+			// if the profiler received a request to be enabled or disabled
+			if(mNewEnableState != mEnabled) 
+			{	// note mNewEnableState == true to reach this.
+				changeEnableState();
 
-        ProfileFrameList::iterator frameIter;
-        ProfileHistoryList::iterator historyIter;
+				// NOTE we will be in an 'error' state until the next begin. ie endProfile will likely get invoked using a profileName that was never started.
+				// even then, we can't be sure that the next beginProfile will be the true start of a new frame
+			}
 
-        // we set the number of times each profile was called per frame to 0
-        // because not all profiles are called every frame
-        for (historyIter = mProfileHistory.begin(); historyIter != mProfileHistory.end(); ++historyIter) {
+			return;
+		}
+		else
+		{
+			if(mNewEnableState != mEnabled) 
+			{	// note mNewEnableState == false to reach this.
+				changeEnableState();
 
-            (*historyIter).numCallsThisFrame = 0;
+				// unwind the hierarchy, should be easy enough
+				mCurrent = &mRoot;
+				mLast = NULL;
+			}
 
-        }
+			if(&mRoot == mCurrent && mLast)
+			{	// profiler was enabled this frame, but the first subsequent beginProfile was NOT the beinging of a new frame as we had hoped.
+				// we have a bogus ProfileInstance in our hierarchy, we will need to remove it, then update the overlays so as not to confuse ze user
 
+				// we could use mRoot.children.find() instead of this, except we'd be compairing strings instead of a pointer.
+				// the string way could be faster, but i don't believe it would.
+				ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
+				for(;it != endit; ++it)
+				{
+					if(mLast == it->second)
+					{
+						mRoot.children.erase(it);
+						break;
+					}
+				}
+
+				// with mLast == NULL we won't reach this code, in case this isn't the end of the top level profile
+				ProfileInstance* last = mLast;
+				mLast = NULL;
+				OGRE_DELETE last;
+
+				processFrameStats();
+				displayResults();
+			}
+		}
+
+		if(&mRoot == mCurrent)
+			return;
+
+		// mask groups
+		if ((groupID & mProfileMask) == 0)
+			return;
+
+		// need a timer to profile!
+		assert (mTimer && "Timer not set!");
+
+		// get the end time of this profile
+		// we do this as close the beginning of this function as possible
+		// to get more accurate timing results
+		const ulong endTime = mTimer->getMicroseconds();
+
+		// empty string is reserved for designating an empty parent
+		assert ((profileName != "") && ("Profile name can't be an empty string"));
+
+		// we only process this profile if isn't disabled
+		// we check the current instance name against the provided profileName as a guard against disabling a profile name /after/ said profile began
+		if(mCurrent->name != profileName && mDisabledProfiles.find(profileName) != mDisabledProfiles.end()) 
+			return;
+
+		// calculate the elapsed time of this profile
+		const ulong timeElapsed = endTime - mCurrent->currTime;
+
+		// update parent's accumulator if it isn't the root
+		if (&mRoot != mCurrent->parent) 
+		{
+			// add this profile's time to the parent's accumlator
+			mCurrent->parent->accum += timeElapsed;
+		}
+
+		mCurrent->frame.frameTime += timeElapsed;
+		++mCurrent->frame.calls;
+
+		mLast = mCurrent;
+		mCurrent = mCurrent->parent;
+
+		if (&mRoot == mCurrent) 
+		{
+			// the stack is empty and all the profiles have been completed
+			// we have reached the end of the frame so process the frame statistics
+
+			// we know that the time elapsed of the main loop is the total time the frame took
+			mTotalFrameTime = timeElapsed;
+
+			if(timeElapsed > mMaxTotalFrameTime)
+				mMaxTotalFrameTime = timeElapsed;
+
+			// we got all the information we need, so process the profiles
+			// for this frame
+			processFrameStats();
+
+			// we display everything to the screen
+			displayResults();
+		}
+
+	}
+    void Profiler::beginGPUEvent(const String& event)
+    {
+        Root::getSingleton().getRenderSystem()->beginProfileEvent(event);
+    }
+    void Profiler::endGPUEvent(const String& event)
+    {
+        Root::getSingleton().getRenderSystem()->endProfileEvent();
+    }
+    void Profiler::markGPUEvent(const String& event)
+    {
+        Root::getSingleton().getRenderSystem()->markProfileEvent(event);
+    }
+	//-----------------------------------------------------------------------
+	void Profiler::processFrameStats(ProfileInstance* instance, Real& maxFrameTime)
+	{
+		// calculate what percentage of frame time this profile took
+		const Real framePercentage = (Real) instance->frame.frameTime / (Real) mTotalFrameTime;
+
+		const Real frameTimeMillisecs = (Real) instance->frame.frameTime / 1000.0f;
+
+		// update the profile stats
+		instance->history.currentTimePercent = framePercentage;
+		instance->history.currentTimeMillisecs = frameTimeMillisecs;
+		if(mResetExtents)
+		{
+			instance->history.totalTimePercent = framePercentage;
+			instance->history.totalTimeMillisecs = frameTimeMillisecs;
+			instance->history.totalCalls = 1;
+		}
+		else
+		{
+			instance->history.totalTimePercent += framePercentage;
+			instance->history.totalTimeMillisecs += frameTimeMillisecs;
+			instance->history.totalCalls++;
+		}
+		instance->history.numCallsThisFrame = instance->frame.calls;
+
+		// if we find a new minimum for this profile, update it
+		if (frameTimeMillisecs < instance->history.minTimeMillisecs || mResetExtents)
+		{
+			instance->history.minTimePercent = framePercentage;
+			instance->history.minTimeMillisecs = frameTimeMillisecs;
+		}
+
+		// if we find a new maximum for this profile, update it
+		if (frameTimeMillisecs > instance->history.maxTimeMillisecs || mResetExtents)
+		{
+			instance->history.maxTimePercent = framePercentage;
+			instance->history.maxTimeMillisecs = frameTimeMillisecs;
+		}
+
+		if(instance->frame.frameTime > maxFrameTime)
+			maxFrameTime = (Real)instance->frame.frameTime;
+
+		ProfileChildren::iterator it = instance->children.begin(), endit = instance->children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
+
+			// we set the number of times each profile was called per frame to 0
+			// because not all profiles are called every frame
+			child->history.numCallsThisFrame = 0;
+
+			if(child->frame.calls > 0)
+			{
+				processFrameStats(child, maxFrameTime);
+			}
+		}
+	}
+	//-----------------------------------------------------------------------
+	void Profiler::processFrameStats(void) 
+	{
 		Real maxFrameTime = 0;
 
-        // iterate through each of the profiles processed during this frame
-        for (frameIter = mProfileFrame.begin(); frameIter != mProfileFrame.end(); ++frameIter) {
+		ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
 
-            String s = (*frameIter).name;
+			// we set the number of times each profile was called per frame to 0
+			// because not all profiles are called every frame
+			child->history.numCallsThisFrame = 0;
 
-            // use our map to find the appropriate profile in the history
-            historyIter = (*mProfileHistoryMap.find(s)).second;
-
-            // extract the frame stats
-            ulong frameTime = (*frameIter).frameTime;
-            uint calls = (*frameIter).calls;
-            uint lvl = (*frameIter).hierarchicalLvl;
-
-            // calculate what percentage of frame time this profile took
-            Real framePercentage = (Real) frameTime / (Real) mTotalFrameTime;
-
-			Real frameTimeMillisecs = (Real)frameTime / 1000.0f;
-
-            // update the profile stats
-			(*historyIter).currentTimePercent = framePercentage;
-			(*historyIter).currentTimeMillisecs = frameTimeMillisecs;
-			if (mResetExtents)
+			if(child->frame.calls > 0)
 			{
-				(*historyIter).totalTimePercent = framePercentage;
-				(*historyIter).totalTimeMillisecs = frameTimeMillisecs;
-				(*historyIter).totalCalls = 1;
+				processFrameStats(child, maxFrameTime);
 			}
-			else
-			{
-				(*historyIter).totalTimePercent += framePercentage;
-				(*historyIter).totalTimeMillisecs += frameTimeMillisecs;
-				(*historyIter).totalCalls++;
-			}
-            (*historyIter).numCallsThisFrame = calls;
-            (*historyIter).hierarchicalLvl = lvl;
-
-            // if we find a new minimum for this profile, update it
-            if (frameTimeMillisecs < ((*historyIter).minTimeMillisecs)
-				|| mResetExtents)
-			{
-                (*historyIter).minTimePercent = framePercentage;
-				(*historyIter).minTimeMillisecs = frameTimeMillisecs;
-            }
-
-            // if we find a new maximum for this profile, update it
-            if (frameTimeMillisecs > ((*historyIter).maxTimeMillisecs) 
-				|| mResetExtents)
-			{
-                (*historyIter).maxTimePercent = framePercentage;
-				(*historyIter).maxTimeMillisecs = frameTimeMillisecs;
-            }
-
-			if (frameTime > maxFrameTime)
-				maxFrameTime = (Real)frameTime;
-
-        }
+		}
 
 		// Calculate whether the extents are now so out of date they need regenerating
 		if (mCurrentFrame == 0)
@@ -626,260 +579,270 @@ namespace Ogre {
 		}
 		else
 			mResetExtents = false;
+	}
+	//-----------------------------------------------------------------------
+	void Profiler::displayResults(ProfileInstance* instance, ProfileBarList::iterator& bIter, Real& maxTimeMillisecs, Real& newGuiHeight, int& profileCount)
+	{
+		OverlayElement* g;
 
-    }
-    //-----------------------------------------------------------------------
-    void Profiler::displayResults() {
-
-        if (!mEnabled) {
-
-            return;
-
-        }
-
-        // if its time to update the display
-        if (!(mCurrentFrame % mUpdateDisplayFrequency)) {
+		// display the profile's name and the number of times it was called in a frame
+		g = *bIter;
+		++bIter;
+		g->show();
+		g->setCaption(String(instance->name + " (" + StringConverter::toString(instance->history.numCallsThisFrame) + ")"));
+		g->setLeft(10 + instance->hierarchicalLvl * 15.0f);
 
 
-            ProfileHistoryList::iterator iter;
-            ProfileBarList::iterator bIter;
+		// display the main bar that show the percentage of the frame time that this
+		// profile has taken
+		g = *bIter;
+		++bIter;
+		g->show();
+		// most of this junk has been set before, but we do this to get around a weird
+		// Ogre gui issue (bug?)
+		g->setMetricsMode(GMM_PIXELS);
+		g->setHeight(mBarHeight);
 
-            OverlayElement* g;
+		if (mDisplayMode == DISPLAY_PERCENTAGE)
+			g->setWidth( (instance->history.currentTimePercent) * mGuiWidth);
+		else
+			g->setWidth( (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
 
-            Real newGuiHeight = mGuiHeight;
+		g->setLeft(mGuiWidth);
+		g->setTop(mGuiBorderWidth + profileCount * (mBarHeight + mBarSpacing));
 
-            int profileCount = 0; 
 
+
+		// display line to indicate the minimum frame time for this profile
+		g = *bIter;
+		++bIter;
+		g->show();
+		if(mDisplayMode == DISPLAY_PERCENTAGE)
+			g->setLeft(mBarIndent + instance->history.minTimePercent * mGuiWidth);
+		else
+			g->setLeft(mBarIndent + (instance->history.minTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
+
+		// display line to indicate the maximum frame time for this profile
+		g = *bIter;
+		++bIter;
+		g->show();
+		if(mDisplayMode == DISPLAY_PERCENTAGE)
+			g->setLeft(mBarIndent + instance->history.maxTimePercent * mGuiWidth);
+		else
+			g->setLeft(mBarIndent + (instance->history.maxTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
+
+		// display line to indicate the average frame time for this profile
+		g = *bIter;
+		++bIter;
+		g->show();
+		if(instance->history.totalCalls != 0)
+		{
+			if (mDisplayMode == DISPLAY_PERCENTAGE)
+				g->setLeft(mBarIndent + (instance->history.totalTimePercent / instance->history.totalCalls) * mGuiWidth);
+			else
+				g->setLeft(mBarIndent + ((instance->history.totalTimeMillisecs / instance->history.totalCalls) / maxTimeMillisecs) * mGuiWidth);
+		}
+		else
+			g->setLeft(mBarIndent);
+
+		// display text
+		g = *bIter;
+		++bIter;
+		g->show();
+		if (mDisplayMode == DISPLAY_PERCENTAGE)
+		{
+			g->setLeft(mBarIndent + instance->history.currentTimePercent * mGuiWidth + 2);
+			g->setCaption(StringConverter::toString(instance->history.currentTimePercent * 100.0f, 3, 3) + "%");
+		}
+		else
+		{
+			g->setLeft(mBarIndent + (instance->history.currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth + 2);
+			g->setCaption(StringConverter::toString(instance->history.currentTimeMillisecs, 3, 3) + "ms");
+		}
+
+		// we set the height of the display with respect to the number of profiles displayed
+		newGuiHeight += mBarHeight + mBarSpacing;
+
+		++profileCount;
+
+		// display children
+		ProfileChildren::iterator it = instance->children.begin(), endit = instance->children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
+			displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
+		}
+	}
+	//-----------------------------------------------------------------------
+    void Profiler::displayResults(void) 
+	{
+		// if its time to update the display
+		if (!(mCurrentFrame % mUpdateDisplayFrequency)) 
+		{
+			Real newGuiHeight = mGuiHeight;
+			int profileCount = 0;
 			Real maxTimeMillisecs = (Real)mMaxTotalFrameTime / 1000.0f;
 
-            // go through each profile and display it
-            for (iter = mProfileHistory.begin(), bIter = mProfileBars.begin(); 
-				iter != mProfileHistory.end() && bIter != mProfileBars.end(); 
-				++iter, ++bIter) 
+			// ensure the root won't be culled
+			mRoot.frame.calls = 1;
+
+			ProfileBarList::iterator bIter = mProfileBars.begin();
+			ProfileChildren::iterator it = mRoot.children.begin(), endit = mRoot.children.end();
+			for(;it != endit; ++it)
 			{
+				ProfileInstance* child = it->second;
+				displayResults(child, bIter, maxTimeMillisecs, newGuiHeight, profileCount);
+			}
+			
 
-                // display the profile's name and the number of times it was called in a frame
-                g = *bIter;
-                g->show();
-                g->setCaption(String((*iter).name + " (" + StringConverter::toString((*iter).numCallsThisFrame) + ")"));
-                g->setLeft(10 + (*iter).hierarchicalLvl * 15.0f);
+			// set the main display dimensions
+			mProfileGui->setMetricsMode(GMM_PIXELS);
+			mProfileGui->setHeight(newGuiHeight);
+			mProfileGui->setWidth(mGuiWidth * 2 + 15);
+			mProfileGui->setTop(5);
+			mProfileGui->setLeft(5);
 
-                // display the main bar that show the percentage of the frame time that this
-                // profile has taken
-                bIter++;
-                g = *bIter;
-                g->show();
-                // most of this junk has been set before, but we do this to get around a weird
-                // Ogre gui issue (bug?)
-                g->setMetricsMode(GMM_PIXELS);
-                g->setHeight(mBarHeight);
-				if (mDisplayMode == DISPLAY_PERCENTAGE)
-					g->setWidth(((*iter).currentTimePercent) * mGuiWidth);
-				else
-					g->setWidth(((*iter).currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
-                g->setLeft(mGuiWidth);
-                g->setTop(mGuiBorderWidth + profileCount * (mBarHeight + mBarSpacing));
-
-                // display line to indicate the minimum frame time for this profile
-                bIter++;
-                g = *bIter;
-                g->show();
-				if (mDisplayMode == DISPLAY_PERCENTAGE)
-		            g->setLeft(mBarIndent + (*iter).minTimePercent * mGuiWidth);
-				else
-					g->setLeft(mBarIndent + ((*iter).minTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
-
-                // display line to indicate the maximum frame time for this profile
-                bIter++;
-                g = *bIter;
-                g->show();
-				if (mDisplayMode == DISPLAY_PERCENTAGE)
-	                g->setLeft(mBarIndent + (*iter).maxTimePercent * mGuiWidth);
-				else
-					g->setLeft(mBarIndent + ((*iter).maxTimeMillisecs / maxTimeMillisecs) * mGuiWidth);
-                // display line to indicate the average frame time for this profile
-                bIter++;
-                g = *bIter;
-                g->show();
-                if ((*iter).totalCalls != 0)
-					if (mDisplayMode == DISPLAY_PERCENTAGE)
-	                    g->setLeft(mBarIndent + ((*iter).totalTimePercent / (*iter).totalCalls) * mGuiWidth);
-					else
-						g->setLeft(mBarIndent + (((*iter).totalTimeMillisecs / (*iter).totalCalls) / maxTimeMillisecs) * mGuiWidth);
-                else
-                    g->setLeft(mBarIndent);
-
-				// display text
-				bIter++;
-				g = *bIter;
-				g->show();
-				if (mDisplayMode == DISPLAY_PERCENTAGE)
-				{
-					g->setLeft(mBarIndent + (*iter).currentTimePercent * mGuiWidth + 2);
-					g->setCaption(StringConverter::toString((*iter).currentTimePercent * 100.0f, 3, 3) + "%");
-				}
-				else
-				{
-					g->setLeft(mBarIndent + ((*iter).currentTimeMillisecs / maxTimeMillisecs) * mGuiWidth + 2);
-					g->setCaption(StringConverter::toString((*iter).currentTimeMillisecs, 3, 3) + "ms");
-				}
-
-				// we set the height of the display with respect to the number of profiles displayed
-                newGuiHeight += mBarHeight + mBarSpacing;
-
-                profileCount++;
-
-            }
-
-            // set the main display dimensions
-            mProfileGui->setMetricsMode(GMM_PIXELS);
-            mProfileGui->setHeight(newGuiHeight);
-            mProfileGui->setWidth(mGuiWidth * 2 + 15);
-            mProfileGui->setTop(5);
-            mProfileGui->setLeft(5);
-
-            // we hide all the remaining pre-created bars
-            for (; bIter != mProfileBars.end(); ++bIter) {
-
-                (*bIter)->hide();
-
-            }
-
-        }
-
-		mCurrentFrame++;
-
+			// we hide all the remaining pre-created bars
+			for (; bIter != mProfileBars.end(); ++bIter) 
+			{
+				(*bIter)->hide();
+			}
+		}
+		++mCurrentFrame;
     }
     //-----------------------------------------------------------------------
-    bool Profiler::watchForMax(const String& profileName) {
+    bool Profiler::watchForMax(const String& profileName) 
+	{
+		assert ((profileName != "") && ("Profile name can't be an empty string"));
 
-        ProfileHistoryMap::iterator mapIter;
-        ProfileHistoryList::iterator iter;
-
-        mapIter = mProfileHistoryMap.find(profileName);
-
-        // if we don't find the profile, return false
-        if (mapIter == mProfileHistoryMap.end())
-            return false;
-
-        iter = (*mapIter).second;
-
-        return ((*iter).currentTimePercent == (*iter).maxTimePercent);
-
+		return mRoot.watchForMax(profileName);
+    }
+	//-----------------------------------------------------------------------
+	bool Profiler::ProfileInstance::watchForMax(const String& profileName) 
+	{
+        ProfileChildren::iterator it = children.begin(), endit = children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
+			if( (child->name == profileName && child->watchForMax()) || child->watchForMax(profileName))
+				return true;
+		}
+		return false;
     }
     //-----------------------------------------------------------------------
-    bool Profiler::watchForMin(const String& profileName) {
-
-        ProfileHistoryMap::iterator mapIter;
-        ProfileHistoryList::iterator iter;
-
-        mapIter = mProfileHistoryMap.find(profileName);
-
-        // if we don't find the profile, return false
-        if (mapIter == mProfileHistoryMap.end())
-            return false;
-
-        iter = (*mapIter).second;
-
-        return ((*iter).currentTimePercent == (*iter).minTimePercent);
-
+    bool Profiler::watchForMin(const String& profileName) 
+	{
+		assert ((profileName != "") && ("Profile name can't be an empty string"));
+		return mRoot.watchForMin(profileName);
+    }
+	//-----------------------------------------------------------------------
+    bool Profiler::ProfileInstance::watchForMin(const String& profileName) 
+	{
+		ProfileChildren::iterator it = children.begin(), endit = children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
+			if( (child->name == profileName && child->watchForMin()) || child->watchForMin(profileName))
+				return true;
+		}
+		return false;
     }
     //-----------------------------------------------------------------------
-    bool Profiler::watchForLimit(const String& profileName, Real limit, bool greaterThan) {
-
-        ProfileHistoryMap::iterator mapIter;
-        ProfileHistoryList::iterator iter;
-
-        mapIter = mProfileHistoryMap.find(profileName);
-
-        // if we don't find the profile, return false
-        if (mapIter == mProfileHistoryMap.end())
-            return false;
-
-        iter = (*mapIter).second;
-
-        if (greaterThan)
-            return ((*iter).currentTimePercent > limit);
-        else
-            return ((*iter).currentTimePercent < limit);
-
+    bool Profiler::watchForLimit(const String& profileName, Real limit, bool greaterThan) 
+	{
+        assert ((profileName != "") && ("Profile name can't be an empty string"));
+		return mRoot.watchForLimit(profileName, limit, greaterThan);
+    }
+	//-----------------------------------------------------------------------
+    bool Profiler::ProfileInstance::watchForLimit(const String& profileName, Real limit, bool greaterThan) 
+	{
+        ProfileChildren::iterator it = children.begin(), endit = children.end();
+		for(;it != endit; ++it)
+		{
+			ProfileInstance* child = it->second;
+			if( (child->name == profileName && child->watchForLimit(limit, greaterThan)) || child->watchForLimit(profileName, limit, greaterThan))
+				return true;
+		}
+		return false;
     }
     //-----------------------------------------------------------------------
-    void Profiler::logResults() {
-
-        ProfileHistoryList::iterator iter;
-
+    void Profiler::logResults() 
+	{
         LogManager::getSingleton().logMessage("----------------------Profiler Results----------------------");
 
-        for (iter = mProfileHistory.begin(); iter != mProfileHistory.end(); ++iter) {
-
-            // create an indent that represents the hierarchical order of the profile
-            String indent = "";
-            for (uint i = 0; i < (*iter).hierarchicalLvl; ++i) {
-
-                indent = indent + "   ";
-
-            }
-
-            LogManager::getSingleton().logMessage(indent + "Name " + (*iter).name + 
-				" | Min " + StringConverter::toString((*iter).minTimePercent) + 
-				" | Max " + StringConverter::toString((*iter).maxTimePercent) + 
-				" | Avg "+ StringConverter::toString((*iter).totalTimePercent / (*iter).totalCalls));
-
-        }
+		for(ProfileChildren::iterator it = mRoot.children.begin(); it != mRoot.children.end(); ++it)
+		{
+			it->second->logResults();
+		}
 
         LogManager::getSingleton().logMessage("------------------------------------------------------------");
-
     }
+	//-----------------------------------------------------------------------
+	void Profiler::ProfileInstance::logResults() 
+	{
+		// create an indent that represents the hierarchical order of the profile
+		String indent = "";
+		for (uint i = 0; i < hierarchicalLvl; ++i) 
+		{
+			indent = indent + "\t";
+		}
+
+		LogManager::getSingleton().logMessage(indent + "Name " + name + 
+						" | Min " + StringConverter::toString(history.minTimePercent) + 
+						" | Max " + StringConverter::toString(history.maxTimePercent) + 
+						" | Avg "+ StringConverter::toString(history.totalTimePercent / history.totalCalls));   
+
+		for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+		{
+			it->second->logResults();
+		}
+	}
     //-----------------------------------------------------------------------
-    void Profiler::reset() {
-
-        ProfileHistoryList::iterator iter;
-        for (iter = mProfileHistory.begin(); iter != mProfileHistory.end(); ++iter) {
-        
-            (*iter).currentTimePercent = (*iter).maxTimePercent = (*iter).totalTimePercent = 0;
-			(*iter).currentTimeMillisecs = (*iter).maxTimeMillisecs = (*iter).totalTimeMillisecs = 0;
-            (*iter).numCallsThisFrame = (*iter).totalCalls = 0;
-
-            (*iter).minTimePercent = 1;
-			(*iter).minTimeMillisecs = 100000;
-
-        }
-		mMaxTotalFrameTime = 0;
-
+    void Profiler::reset() 
+	{
+        mRoot.reset();
+        mMaxTotalFrameTime = 0;
     }
-    //-----------------------------------------------------------------------
-    void Profiler::setUpdateDisplayFrequency(uint freq) {
+	//-----------------------------------------------------------------------
+	void Profiler::ProfileInstance::reset(void)
+	{
+		history.currentTimePercent = history.maxTimePercent = history.totalTimePercent = 0;
+		history.currentTimeMillisecs = history.maxTimeMillisecs = history.totalTimeMillisecs = 0;
+		history.numCallsThisFrame = history.totalCalls = 0;
 
+		history.minTimePercent = 1;
+		history.minTimeMillisecs = 100000;
+		for(ProfileChildren::iterator it = children.begin(); it != children.end(); ++it)
+		{
+			it->second->reset();
+		}
+	}
+    //-----------------------------------------------------------------------
+    void Profiler::setUpdateDisplayFrequency(uint freq)
+    {
         mUpdateDisplayFrequency = freq;
-
     }
     //-----------------------------------------------------------------------
-    uint Profiler::getUpdateDisplayFrequency() const {
-
+    uint Profiler::getUpdateDisplayFrequency() const
+    {
         return mUpdateDisplayFrequency;
-
     }
     //-----------------------------------------------------------------------
-    void Profiler::changeEnableState() {
-
-        if (mNewEnableState) {
-
+    void Profiler::changeEnableState() 
+	{
+        if (mNewEnableState) 
+		{
             mOverlay->show();
-
         }
-        else {
-
+        else 
+		{
             mOverlay->hide();
-
         }
         mEnabled = mNewEnableState;
-        mEnableStateChangePending = false;
-
     }
     //-----------------------------------------------------------------------
-    OverlayContainer* Profiler::createContainer() {
-
+    OverlayContainer* Profiler::createContainer()
+    {
         OverlayContainer* container = (OverlayContainer*) 
 			OverlayManager::getSingleton().createOverlayElement(
 				"BorderPanel", "profiler");
@@ -901,13 +864,11 @@ namespace Ogre {
         container->setTop(5);
 
         return container;
-
     }
     //-----------------------------------------------------------------------
     OverlayElement* Profiler::createTextArea(const String& name, Real width, Real height, Real top, Real left, 
-                                         uint fontSize, const String& caption, bool show) {
-
-
+                                         uint fontSize, const String& caption, bool show)
+    {
         OverlayElement* textArea = 
 			OverlayManager::getSingleton().createOverlayElement("TextArea", name);
         textArea->setMetricsMode(GMM_PIXELS);
@@ -915,7 +876,7 @@ namespace Ogre {
         textArea->setHeight(height);
         textArea->setTop(top);
         textArea->setLeft(left);
-        textArea->setParameter("font_name", "BlueHighway");
+        textArea->setParameter("font_name", "SdkTrays/Value");
         textArea->setParameter("char_height", StringConverter::toString(fontSize));
         textArea->setCaption(caption);
         textArea->setParameter("colour_top", "1 1 1");
@@ -929,12 +890,11 @@ namespace Ogre {
         }
 
         return textArea;
-
     }
     //-----------------------------------------------------------------------
     OverlayElement* Profiler::createPanel(const String& name, Real width, Real height, Real top, Real left, 
-                                      const String& materialName, bool show) {
-
+                                      const String& materialName, bool show)
+    {
         OverlayElement* panel = 
 			OverlayManager::getSingleton().createOverlayElement("Panel", name);
         panel->setMetricsMode(GMM_PIXELS);
@@ -952,7 +912,6 @@ namespace Ogre {
         }
 
         return panel;
-		
     }
     //-----------------------------------------------------------------------
 

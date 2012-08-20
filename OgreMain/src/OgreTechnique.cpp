@@ -664,7 +664,8 @@ namespace Ogre {
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
 			mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName);
-			mShadowCasterMaterial->load();
+            if (!mShadowCasterMaterial.isNull())
+			    mShadowCasterMaterial->load();
 		}
 		if (!mShadowReceiverMaterial.isNull())
 		{
@@ -674,7 +675,8 @@ namespace Ogre {
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
 			mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName);
-			mShadowReceiverMaterial->load();
+            if (!mShadowReceiverMaterial.isNull())
+			    mShadowReceiverMaterial->load();
 		}
     }
     //-----------------------------------------------------------------------------

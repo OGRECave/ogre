@@ -351,7 +351,7 @@ namespace Ogre  {
 	size_t GLPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format)
 	{
 		size_t count = 0;
-        if((width > 0) && (height > 0))
+        if((width > 0) && (height > 0) && (depth > 0))
         {
             do {
                 if(width>1)		width = width/2;

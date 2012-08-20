@@ -149,6 +149,12 @@ namespace OgreBites
 		-----------------------------------------------------------------------------*/
 		virtual void runSample(Sample* s)
 		{
+#if OGRE_PROFILING
+            Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+            if (prof)
+                prof->setEnabled(false);
+#endif
+
 			if (mCurrentSample)
 			{
 				mCurrentSample->_shutdown();    // quit current sample

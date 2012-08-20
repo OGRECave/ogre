@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
+#include "OgreProfiler.h"
 
 namespace Ogre {
 
@@ -403,6 +404,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Camera::_renderScene(Viewport *vp, bool includeOverlays)
     {
+        OgreProfileBeginGPUEvent("Camera: " + getName());
+
 		//update the pixel display ratio
 		if (mProjType == Ogre::PT_PERSPECTIVE)
 		{
@@ -431,6 +434,7 @@ namespace Ogre {
 		{
 			(*i)->cameraPostRenderScene(this);
 		}
+        OgreProfileEndGPUEvent("Camera: " + getName());
 	}
 	//---------------------------------------------------------------------
 	void Camera::addListener(Listener* l)

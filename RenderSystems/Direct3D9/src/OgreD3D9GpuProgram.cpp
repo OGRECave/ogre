@@ -299,8 +299,24 @@ namespace Ogre {
 
 			if (FAILED(hr))
 			{
+				String errMsg = "Cannot create D3D9 vertex shader " + mName + " from microcode ";
+				switch (hr)
+				{
+				case D3DERR_INVALIDCALL:
+					errMsg += "(D3DERR_INVALIDCALL)";
+					break;
+				case D3DERR_OUTOFVIDEOMEMORY:
+					errMsg += "(D3DERR_OUTOFVIDEOMEMORY)";
+					break;
+				case E_OUTOFMEMORY:
+					errMsg += "(E_OUTOFMEMORY)";
+					break;
+				default:
+					break;
+				}				
+
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"Cannot create D3D9 vertex shader " + mName + " from microcode",
+					errMsg,
 					"D3D9GpuVertexProgram::loadFromMicrocode");
 	            
 			}

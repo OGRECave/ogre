@@ -282,7 +282,7 @@ namespace Ogre {
 		addMovableObjectFactory(mBillboardChainFactory);
 		mRibbonTrailFactory = OGRE_NEW RibbonTrailFactory();
 		addMovableObjectFactory(mRibbonTrailFactory);
-
+     
 		// Load plugins
         if (!pluginFileName.empty())
             loadPlugins(pluginFileName);

@@ -3505,6 +3505,8 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				LogManager::getSingleton().logMessage("Using FSAA from GL_ARB_multisample extension.");
 			}            
 		}
+
+		static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
 	}
 	//---------------------------------------------------------------------
 	void GLRenderSystem::_switchContext(GLContext *context)
@@ -3722,6 +3724,28 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 	{
 		return mGLSupport->getDisplayMonitorCount();
 	}
+
+    //---------------------------------------------------------------------
+    void GLRenderSystem::beginProfileEvent( const String &eventName )
+    {
+        markProfileEvent("Begin Event: " + eventName);
+    }
+
+    //---------------------------------------------------------------------
+    void GLRenderSystem::endProfileEvent( void )
+    {
+        markProfileEvent("End Event");
+    }
+
+    //---------------------------------------------------------------------
+    void GLRenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        if(GLEW_GREMEDY_string_marker)
+            glStringMarkerGREMEDY(eventName.length(), eventName.c_str());
+    }
 
 	//---------------------------------------------------------------------
     void GLRenderSystem::bindVertexElementToGpu( const VertexElement &elem, 

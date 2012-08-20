@@ -1934,6 +1934,7 @@ namespace Ogre {
     void GLES2RenderSystem::_oneTimeContextInitialization()
     {
 		glDisable(GL_DITHER);
+        static_cast<GLES2TextureManager*>(mTextureManager)->createWarningTexture();
     }
 
     void GLES2RenderSystem::initialiseContext(RenderWindow* primary)
@@ -2221,7 +2222,7 @@ namespace Ogre {
                 mActiveBufferMap.erase(i);
         }
     }
-    
+    //---------------------------------------------------------------------    
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLES2RenderSystem::resetRenderer(RenderWindow* win)
     {
@@ -2249,21 +2250,43 @@ namespace Ogre {
         
         _setViewport(NULL);
         _setRenderTarget(win);
+    }    
+#endif
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::beginProfileEvent( const String &eventName )
+    {
+#if GL_EXT_debug_marker
+        glPushGroupMarkerEXT(0, eventName.c_str());
+#endif
+    }    
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::endProfileEvent( )
+    {
+#if GL_EXT_debug_marker
+        glPopGroupMarkerEXT();
+#endif
     }
     
-    AndroidResourceManager* GLES2RenderSystem::getResourceManager()
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::markProfileEvent( const String &eventName )
     {
-        return GLES2RenderSystem::mResourceManager;
-    }
+        if( eventName.empty() )
+            return;
+
+#if GL_EXT_debug_marker
+        glInsertEventMarkerEXT(0, eventName.c_str());
 #endif
+    }
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
+    {
+        //no effect in GLES2 rendersystem
+    }
+    //---------------------------------------------------------------------
+    void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
+    {
+        //no effect in GLES2 rendersystem
+    }
+    //---------------------------------------------------------------------
 }
 
-void GLES2RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-{
-    //no effect in GLES2 rendersystem
-}
-
-void GLES2RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-{
-    //no effect in GLES2 rendersystem
-}

@@ -77,7 +77,7 @@ set (BOOST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/boost")
 
 # Set compiler specific build flags
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-  add_definitions(-msse)
+  list(APPEND CMAKE_CXX_FLAGS -msse)
 endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
   # Set build variables

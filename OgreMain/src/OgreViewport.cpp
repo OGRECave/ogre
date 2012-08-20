@@ -87,6 +87,11 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Viewport::~Viewport()
     {
+		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		{
+			(*i)->viewportDestroyed(this);
+		}
+
 		RenderSystem* rs = Root::getSingleton().getRenderSystem();
 		if ((rs) && (rs->_getViewport() == this))
 		{

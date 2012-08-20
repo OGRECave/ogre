@@ -918,7 +918,7 @@ namespace Ogre {
         // Allocate storage for depth buffer
         if (mNumSamples > 0)
         {
-#if GL_APPLE_framebuffer_multisample
+#if GL_APPLE_framebuffer_multisample && (OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
             glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, 
                                                   mNumSamples, mGLInternalFormat, mWidth, mHeight);
             GL_CHECK_ERROR;

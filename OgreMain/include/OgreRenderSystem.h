@@ -1485,6 +1485,20 @@ namespace Ogre
         */
 		virtual void getCustomAttribute(const String& name, void* pData);
 
+        /**
+        * Begin an active GPU profiling event.
+        */
+        virtual void beginProfileEvent( const String &eventName ) = 0;
+        /**
+        * Ends the currently active GPU profiling event.
+        */
+        virtual void endProfileEvent( void ) = 0;
+        /**
+        * Marks the currently active GPU profiling event.
+        */
+        virtual void markProfileEvent( const String &eventName ) = 0;
+
+
 	protected:
 
 		/** DepthBuffers to be attached to render targets */

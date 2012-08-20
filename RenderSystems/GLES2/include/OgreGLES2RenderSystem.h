@@ -521,6 +521,15 @@ namespace Ogre {
     private:
             static AndroidResourceManager* mResourceManager;
 #endif
+
+            /// @copydoc RenderSystem::beginProfileEvent
+            virtual void beginProfileEvent( const String &eventName );
+            
+            /// @copydoc RenderSystem::endProfileEvent
+            virtual void endProfileEvent( void );
+            
+            /// @copydoc RenderSystem::markProfileEvent
+            virtual void markProfileEvent( const String &eventName );
     };
 }
 

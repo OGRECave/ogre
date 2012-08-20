@@ -1568,28 +1568,34 @@ namespace Ogre
 		return retval;
 	}
 	//---------------------------------------------------------------------
-	void D3D9RenderSystem::destroyRenderTarget(const String& name)
-	{		
-		D3D9RenderWindow* renderWindow = NULL;
-
-	
+	RenderTarget* D3D9RenderSystem::detachRenderTarget(const String &name)
+	{
+		RenderTarget* target = RenderSystem::detachRenderTarget(name);
+		detachRenderTargetImpl(name);
+		return target;
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::detachRenderTargetImpl(const String& name)
+	{
 		// Check render windows
 		D3D9RenderWindowList::iterator sw;
 		for (sw = mRenderWindows.begin(); sw != mRenderWindows.end(); ++sw)
 		{
 			if ((*sw)->getName() == name)
-			{
-				renderWindow = (*sw);					
+			{					
 				mRenderWindows.erase(sw);
 				break;
 			}
 		}
-		
+	}
+	//---------------------------------------------------------------------
+	void D3D9RenderSystem::destroyRenderTarget(const String& name)
+	{		
+		detachRenderTargetImpl(name);
 
 		// Do the real removal
 		RenderSystem::destroyRenderTarget(name);	
 	}
-
 	//---------------------------------------------------------------------
 	String D3D9RenderSystem::getErrorDescription( long errorNumber ) const
 	{
@@ -2050,7 +2056,10 @@ namespace Ogre
 		// Record settings
 		mTexStageDesc[stage].coordIndex = index;
 
-		hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(mTexStageDesc[stage].autoTexCoordType, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | index );
+        if (mVertexProgramBound)
+            hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, index );
+        else
+		    hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(mTexStageDesc[stage].autoTexCoordType, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | index );
 		if( FAILED( hr ) )
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture coord. set index", "D3D9RenderSystem::_setTextureCoordSet" );
 	}
@@ -2063,7 +2072,10 @@ namespace Ogre
 		mTexStageDesc[stage].autoTexCoordType = m;
 		mTexStageDesc[stage].frustum = frustum;
 
-		hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(m, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | mTexStageDesc[stage].coordIndex );
+        if (mVertexProgramBound)
+            hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, mTexStageDesc[stage].coordIndex );
+        else
+		    hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXCOORDINDEX, D3D9Mappings::get(m, mDeviceManager->getActiveDevice()->getD3D9DeviceCaps()) | mTexStageDesc[stage].coordIndex );
 		if(FAILED(hr))
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set texture auto tex.coord. generation mode", "D3D9RenderSystem::_setTextureCoordCalculation" );
 	}
@@ -4224,6 +4236,34 @@ namespace Ogre
 		return mD3D->GetAdapterCount();
 	}
 
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::beginProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
+
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::endProfileEvent( void )
+    {
+        (void)D3DPERF_EndEvent();
+    }
+
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
+
 	//---------------------------------------------------------------------
 	DWORD D3D9RenderSystem::getSamplerId(size_t unit) 
 	{
@@ -4391,7 +4431,9 @@ namespace Ogre
 					// drop samples
 					--fsaa;
 
-					if (fsaa == 1)
+					OgreAssert(fsaa > 0, "FSAA underflow: infinite loop (this should never happen)");
+
+					if (fsaa <= 1)
 					{
 						// ran out of options, no FSAA
 						fsaa = 0;

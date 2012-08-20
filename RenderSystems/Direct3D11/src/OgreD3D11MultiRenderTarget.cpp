@@ -36,7 +36,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11MultiRenderTarget::D3D11MultiRenderTarget(const String &name) :
 	//---------------------------------------------------------------------
-	MultiRenderTarget(name)
+	MultiRenderTarget(name), mNumberOfViews(0)
 	{
 		/// Clear targets
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)

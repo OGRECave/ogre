@@ -36,60 +36,49 @@
 #include "macUtils.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#include <android_native_app_glue.h>
-#include "Android/OgreAPKFileSystemArchive.h"
-#include "Android/OgreAPKZipArchive.h"
-#endif
-
 #ifdef OGRE_STATIC_LIB
-#   ifdef OGRE_BUILD_PLUGIN_BSP
-#       include "BSP.h"
-#   endif
-#   if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-#       ifdef USE_RTSHADER_SYSTEM
-#           include "ShaderSystem.h"
-#       endif
-#       include "DeferredShadingDemo.h"
-#       include "Instancing.h"
-#       include "NewInstancing.h"
-#       include "TextureArray.h"
-#       include "SSAO.h"
-#       include "OceanDemo.h"
-#       ifdef OGRE_BUILD_COMPONENT_TERRAIN
-#           include "Terrain.h"
-#       endif
-#   endif
-#   include "CelShading.h"
-#   include "Compositor.h"
-#   include "CubeMapping.h"
-#   include "Dot3Bump.h"
-#   include "Fresnel.h"
-#   include "Water.h"
-#   include "BezierPatch.h"
-#   include "CameraTrack.h"
-#   include "CharacterSample.h"
-#   include "DynTex.h"
-#   include "FacialAnimation.h"
-#   include "Grass.h"
-#   include "Lighting.h"
-#   include "ParticleFX.h"
-#   include "Shadows.h"
-#   include "SkeletalAnimation.h"
-#   include "SkyBox.h"
-#   include "SkyDome.h"
-#   include "SkyPlane.h"
-#   include "Smoke.h"
-#   include "SphereMapping.h"
-#	include "Tesselation.h"
-#   include "TextureFX.h"
-#   include "Transparency.h"
-#   if SAMPLES_INCLUDE_PLAYPEN
-#       include "PlayPen.h"
-        PlayPenPlugin* playPenPlugin = 0;
-#   endif
-#   ifdef USE_RTSHADER_SYSTEM
-#       include "OgreRTShaderSystem.h"
+#ifdef USE_RTSHADER_SYSTEM
+#include "ShaderSystem.h"
+#endif
+#include "BSP.h"
+#include "CelShading.h"
+#include "Compositor.h"
+#include "CubeMapping.h"
+#include "DeferredShadingDemo.h"
+#include "Dot3Bump.h"
+#include "Fresnel.h"
+#include "OceanDemo.h"
+#include "Terrain.h"
+#include "Water.h"
+#include "BezierPatch.h"
+#include "CameraTrack.h"
+#include "CharacterSample.h"
+#include "DynTex.h"
+#include "FacialAnimation.h"
+#include "Grass.h"
+#include "Instancing.h"
+#include "NewInstancing.h"
+#include "Lighting.h"
+#include "ParticleFX.h"
+#include "Shadows.h"
+#include "SkeletalAnimation.h"
+#include "SkyBox.h"
+#include "SkyDome.h"
+#include "SkyPlane.h"
+#include "Smoke.h"
+#include "SphereMapping.h"
+#include "SSAO.h"
+#include "TextureFX.h"
+#include "TextureArray.h"
+#include "Transparency.h"
+#  if SAMPLES_INCLUDE_PLAYPEN
+#    include "PlayPen.h"
+     PlayPenPlugin* playPenPlugin = 0;
+#  endif
+
+#ifdef USE_RTSHADER_SYSTEM
+#include "OgreRTShaderSystem.h"
+
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
@@ -1019,6 +1008,7 @@ protected:
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
+            mPluginNameMap["Sample_DualQuaternion"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_DualQuaternion();
             mPluginNameMap["Sample_DynTex"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_DynTex();
             mPluginNameMap["Sample_FacialAnimation"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_FacialAnimation();
             mPluginNameMap["Sample_Grass"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Grass();
@@ -1348,12 +1338,37 @@ protected:
 				if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
 				mSampleCategories.insert(info["Category"]);   // add sample category
 				if (info["Title"] == startupSampleTitle) startupSample = *j;   // we found the startup sample
+                sampleList.push_back(info["Title"]);
+                mPluginNameMap[info["Title"]] = (OgreBites::SdkSample *)(*j);
 			}
+
+			playPenTestPlugin = OGRE_NEW PlaypenTestPlugin();
+			mRoot->installPlugin(playPenTestPlugin);
+            newSamples = playPenTestPlugin->getSamples();
+			for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
+			{
+				Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
+				Ogre::NameValuePairList::iterator k;
+                
+				// give sample default title and category if none found
+				k= info.find("Title");
+				if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
+				k = info.find("Category");
+				if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
+				k = info.find("Thumbnail");
+				if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
+				mSampleCategories.insert(info["Category"]);   // add sample category
+				if (info["Title"] == startupSampleTitle) startupSample = *j;   // we found the startup sample
+                sampleList.push_back(info["Title"]);
+                mPluginNameMap[info["Title"]] = (OgreBites::SdkSample *)(*j);
+			}
+
 #  else
 #    if OGRE_DEBUG_MODE && !(OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
 			sampleList.push_back("PlayPen_d");
 #    else
 			sampleList.push_back("PlayPen");
+			sampleList.push_back("PlayPenTests");
 #    endif
 #  endif
 #endif
@@ -1460,6 +1475,8 @@ protected:
 #  ifdef SAMPLES_INCLUDE_PLAYPEN
 			mRoot->uninstallPlugin(playPenPlugin);
 			delete playPenPlugin;
+			mRoot->uninstallPlugin(playPenTestPlugin);
+			delete playPenTestPlugin;
 #  endif
 #else
             for (unsigned int i = 0; i < mLoadedSamplePlugins.size(); i++)
