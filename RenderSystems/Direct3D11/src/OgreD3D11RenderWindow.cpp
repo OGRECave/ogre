@@ -412,6 +412,12 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowSwapChainBased::destroy()
 	{
+        if(mIsFullScreen && mpSwapChain != NULL)
+        {
+            mpSwapChain->SetFullscreenState(false, NULL); // get back from fullscreen
+            mIsFullScreen = false;
+        }
+
 		SAFE_RELEASE(mpSwapChain);
 
 		D3D11RenderWindowBase::destroy();
@@ -1001,7 +1007,7 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::setActive(bool state)
     {
-            if (mHWnd && mpSwapChain)
+            if (mHWnd && mpSwapChain && mIsFullScreen)
             {
                     if (state)
                     {
