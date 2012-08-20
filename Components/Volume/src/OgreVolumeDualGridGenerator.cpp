@@ -302,8 +302,8 @@ namespace Volume {
         else
         {
 
-            if (!n0->isNearEnough() && !n1->isNearEnough() && !n2->isNearEnough() && !n3->isNearEnough() &&
-                !n4->isNearEnough() && !n5->isNearEnough() && !n6->isNearEnough() && !n7->isNearEnough())
+            if (!n0->isIsoSurfaceNear() && !n1->isIsoSurfaceNear() && !n2->isIsoSurfaceNear() && !n3->isIsoSurfaceNear() &&
+                !n4->isIsoSurfaceNear() && !n5->isIsoSurfaceNear() && !n6->isIsoSurfaceNear() && !n7->isIsoSurfaceNear())
             {
                 return;
             }

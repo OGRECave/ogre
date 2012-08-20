@@ -525,7 +525,11 @@ namespace Volume {
             return mCenterValue;
         }
 
-        inline const bool isNearEnough(void) const
+        /** Gets whether the isosurface is somewhat near to this node.
+        @return
+            true if somewhat near.
+        */
+        inline const bool isIsoSurfaceNear(void) const
         {
             if (mCenterValue.w == (Real)0.0)
             {
