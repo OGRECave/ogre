@@ -37,7 +37,7 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    const bool OctreeNodeSplitPolicy::doSplit(const OctreeNode *node, const Real geometricError) const
+    const bool OctreeNodeSplitPolicy::doSplit(OctreeNode *node, const Real geometricError) const
     {
 
         // We have a highest resolution.
@@ -53,6 +53,7 @@ namespace Volume {
         Real centerValue = mSrc->getValueAndGradient(node->getCenter(), centerGradient);
         if (Math::Abs(centerValue) >= (to - from).length() * (Real)2.0)
         {
+            node->setCenterValue(centerValue, centerGradient);
             return false;
         }
 
@@ -112,6 +113,7 @@ namespace Volume {
                 return true;
             }
         }
+        node->setCenterValue(centerValue, centerGradient);
         return false;
     }
 

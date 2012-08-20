@@ -502,6 +502,20 @@ namespace Volume {
             mCenterValue.z = normal.z;
         }
 
+        /** Raw setter for the center value.
+        @param value
+            The density value.
+        @param gradient
+            The gradient at this position.
+        */
+        inline void setCenterValue(Real value, const Vector3 &gradient)
+        {
+            mCenterValue.x = gradient.x;
+            mCenterValue.y = gradient.y;
+            mCenterValue.z = gradient.z;
+            mCenterValue.w = value;
+        }
+
         /** Gets the center value.
         @return
             The center value, one Vector4 consisting of gradient (x, y, z) and density (w).

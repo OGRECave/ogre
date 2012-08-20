@@ -134,7 +134,10 @@ namespace Volume {
         }
         else
         {
-            setCenterValue(src);
+            if (mCenterValue.x == (Real)0.0 && mCenterValue.y == (Real)0.0 && mCenterValue.z == (Real)0.0 && mCenterValue.w == (Real)0.0)
+            {
+                setCenterValue(src);
+            }
         }
     }
     
