@@ -12,7 +12,6 @@ same license as the rest of the engine.
 -----------------------------------------------------------------------------
 */
 
-
 #include "GBufferMaterialGenerator.h"
 
 #include "OgreMaterialManager.h"
@@ -28,15 +27,10 @@ same license as the rest of the engine.
 class GBufferMaterialGeneratorImpl : public MaterialGenerator::Impl
 {
 public:
-	GBufferMaterialGeneratorImpl(const Ogre::String& baseName) : 
-      mBaseName(baseName)
-      {
-          mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-      }
+	GBufferMaterialGeneratorImpl(const Ogre::String& baseName) : mBaseName(baseName) {}
 	
 protected:
 	Ogre::String mBaseName;
-    bool mIsSm4;
 	virtual Ogre::GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
 	virtual Ogre::GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
 	virtual Ogre::MaterialPtr generateTemplateMaterial(MaterialGenerator::Perm permutation);
@@ -44,7 +38,7 @@ protected:
 };
 
 GBufferMaterialGenerator::GBufferMaterialGenerator() {
-    vsMask = VS_MASK;
+	vsMask = VS_MASK;
 	fsMask = FS_MASK;
 	matMask = MAT_MASK;
 	materialBaseName = "DeferredShading/GBuffer/";
@@ -67,14 +61,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialG
 
 	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
 	{
-        if(mIsSm4)
-        {
-            ss << "	float3 iTangent : TANGENT," << std::endl;
-        }
-        else
-        {
-            ss << "	float3 iTangent : TANGENT0," << std::endl;
-        }
+		ss << "	float3 iTangent : TANGENT0," << std::endl;
 	}
 
 	//TODO : Skinning inputs
@@ -82,12 +69,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialG
 	
 
 
-	ss << "	out float4 oPosition : " ;
-    if(mIsSm4)
-    {
-        ss << "SV_";
-    }
-    ss << "POSITION," << std::endl;
+	ss << "	out float4 oPosition : POSITION," << std::endl;
 #ifdef WRITE_LINEAR_DEPTH
     ss << "	out float3 oViewPos : TEXCOORD0," << std::endl;
 #else
@@ -147,14 +129,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialG
 		"cg", Ogre::GPT_VERTEX_PROGRAM);
 	ptrProgram->setSource(programSource);
 	ptrProgram->setParameter("entry_point","ToGBufferVP");
-    if(mIsSm4)
-    {
-        ptrProgram->setParameter("profiles","vs_4_0");
-    }
-    else
-    {
-        ptrProgram->setParameter("profiles","vs_1_1 arbvp1");
-    }
+	ptrProgram->setParameter("profiles","vs_1_1 arbvp1");
 
 	const Ogre::GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
 	params->setNamedAutoConstant("cWorldViewProj", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
@@ -169,11 +144,6 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(Materia
 	Ogre::StringStream ss;
 	
 	ss << "void ToGBufferFP(" << std::endl;
-    if(mIsSm4)
-    {
-        ss << "float4 oPosition : SV_POSITION," << std::endl;
-    }
-
 #ifdef WRITE_LINEAR_DEPTH
     ss << "	float3 iViewPos : TEXCOORD0," << std::endl;
 #else
@@ -204,25 +174,11 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(Materia
 	int samplerNum = 0;
 	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
 	{
-        if(mIsSm4)
-        {
-            ss << "	uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
-        }
-        else
-        {
-    		ss << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
-        }
+		ss << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
 	}
 	Ogre::uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
 	for (Ogre::uint32 i=0; i<numTextures; i++) {
-        if(mIsSm4)
-        {
-            ss << "	uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
-        }
-        else
-        {
-    		ss << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
-        }
+		ss << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
 	}
     if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
 	{
@@ -242,7 +198,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(Materia
 
 	if (numTexCoords > 0 && numTextures > 0) 
 	{
-		ss << "	oColor0.rgb = tex2D(sTex0, iUV0).rgb;" << std::endl;
+		ss << "	oColor0.rgb = tex2D(sTex0, iUV0);" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
         {
             ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
@@ -257,7 +213,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(Materia
 	ss << "	oColor0.a = cSpecularity;" << std::endl;
 	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
 	{
-		ss << "	float3 texNormal = (tex2D(sNormalMap, iUV0).rgb-0.5)*2;" << std::endl;
+		ss << "	float3 texNormal = (tex2D(sNormalMap, iUV0)-0.5)*2;" << std::endl;
 		ss << "	float3x3 normalRotation = float3x3(iTangent, iBiNormal, iNormal);" << std::endl;
 		ss << "	oColor1.rgb = normalize(mul(texNormal, normalRotation));" << std::endl;
 	} else 
@@ -285,14 +241,7 @@ Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(Materia
 		"cg", Ogre::GPT_FRAGMENT_PROGRAM);
 	ptrProgram->setSource(programSource);
 	ptrProgram->setParameter("entry_point","ToGBufferFP");
-    if(mIsSm4)
-    {
-        ptrProgram->setParameter("profiles","ps_4_0");
-    }
-    else
-    {
-        ptrProgram->setParameter("profiles","ps_2_0 arbfp1");
-    }
+	ptrProgram->setParameter("profiles","ps_2_0 arbfp1");
 
 	const Ogre::GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
 	params->setNamedAutoConstant("cSpecularity", Ogre::GpuProgramParameters::ACT_SURFACE_SHININESS);
