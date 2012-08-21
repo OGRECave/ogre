@@ -537,7 +537,7 @@ namespace Ogre
 		DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
 		bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));
 
-		bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7;
+		bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && mFSAA == 0;
 			
 		presentParams->SwapEffect				= useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
 		// triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
