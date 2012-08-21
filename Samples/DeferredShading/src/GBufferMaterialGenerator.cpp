@@ -31,7 +31,7 @@ public:
 	GBufferMaterialGeneratorImpl(const Ogre::String& baseName) : 
       mBaseName(baseName)
       {
-          mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+          mIsSm4 = Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
       }
 	
 protected:

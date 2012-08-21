@@ -35,7 +35,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const Real CacheSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Real CacheSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
     {
         Vector4 result;
         if (mCache.find(position) == mCache.end())
@@ -58,7 +58,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const Real CacheSource::getValue(const Vector3 &position) const
+    Real CacheSource::getValue(const Vector3 &position) const
     {
         Vector4 result;
         if (mCache.find(position) == mCache.end())

@@ -37,7 +37,7 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    const bool OctreeNodeSplitPolicy::doSplit(OctreeNode *node, const Real geometricError) const
+    bool OctreeNodeSplitPolicy::doSplit(OctreeNode *node, const Real geometricError) const
     {
 
         // We have a highest resolution.

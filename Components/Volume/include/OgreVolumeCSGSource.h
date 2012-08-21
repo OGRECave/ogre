@@ -60,11 +60,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** A plane.
@@ -91,11 +91,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** A not rotated cube.
@@ -149,11 +149,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** Abstract operation volume source holding two sources as operants.
@@ -193,11 +193,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** Builds the union between two sources.
@@ -216,11 +216,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** Builds the difference between two sources.
@@ -240,11 +240,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** Source which does a unary operation to another one.
@@ -277,11 +277,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
     /** Scales the given volume source.
@@ -304,11 +304,11 @@ namespace Volume {
         
         /** Overridden from Source.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
     };
 
 }

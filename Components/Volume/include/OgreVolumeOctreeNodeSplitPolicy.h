@@ -106,7 +106,7 @@ namespace Volume {
         @return
             true on valid split.
         */
-        const bool doSplit(OctreeNode *node, const Real geometricError) const;
+        bool doSplit(OctreeNode *node, const Real geometricError) const;
     };
 
 }
