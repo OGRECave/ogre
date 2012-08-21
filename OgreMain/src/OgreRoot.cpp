@@ -120,7 +120,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
 		const String& logFileName)
-      : mLogManager(0)
+      : mQueuedEnd(false)
+      , mLogManager(0)
 	  , mRenderSystemCapabilitiesManager(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
@@ -130,7 +131,6 @@ namespace Ogre {
 	  , mIsInitialised(false)
 	  , mIsBlendIndicesGpuRedundant(true)
 	  , mIsBlendWeightsGpuRedundant(true)
-	  , mQueuedEnd(false)
     {
         // superclass will do singleton checking
         String msg;
