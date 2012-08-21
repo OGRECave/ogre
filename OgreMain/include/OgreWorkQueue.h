@@ -526,9 +526,9 @@ namespace Ogre
 		bool mAcceptRequests;
 		bool mShuttingDown;
 
-		OGRE_MUTEX(mRequestMutex);
-		OGRE_MUTEX(mProcessMutex);
-		OGRE_MUTEX(mResponseMutex);
+		OGRE_MUTEX(mRequestMutex)
+		OGRE_MUTEX(mProcessMutex)
+		OGRE_MUTEX(mResponseMutex)
 		OGRE_RW_MUTEX(mRequestHandlerMutex);
 
 

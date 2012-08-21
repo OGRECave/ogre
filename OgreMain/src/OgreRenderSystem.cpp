@@ -76,6 +76,9 @@ namespace Ogre {
 #endif
 		, mGeometryProgramBound(false)
         , mFragmentProgramBound(false)
+		, mTesselationHullProgramBound(false)
+		, mTesselationDomainProgramBound(false)
+		, mComputeProgramBound(false)
 		, mClipPlanesDirty(true)
 		, mRealCapabilities(0)
 		, mCurrentCapabilities(0)
@@ -154,6 +157,9 @@ namespace Ogre {
         mVertexProgramBound = false;
 		mGeometryProgramBound = false;
         mFragmentProgramBound = false;
+		mTesselationHullProgramBound = false;
+		mTesselationDomainProgramBound = false;
+		mComputeProgramBound = false;
 
         return 0;
     }
@@ -339,6 +345,11 @@ namespace Ogre {
 
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
+
+		//Set texture layer compare state and function 
+		_setTextureUnitCompareEnabled(texUnit,tl.getTextureCompareEnabled());
+		_setTextureUnitCompareFunction(texUnit,tl.getTextureCompareFunction());
+
 
         // Set texture layer filtering
         _setTextureUnitFiltering(texUnit, 
@@ -742,6 +753,21 @@ namespace Ogre {
             mActiveFragmentGpuProgramParameters->incPassIterationNumber();
             bindGpuProgramPassIterationParameters(GPT_FRAGMENT_PROGRAM);
         }
+		if (!mActiveTesselationHullGpuProgramParameters.isNull())
+        {
+            mActiveTesselationHullGpuProgramParameters->incPassIterationNumber();
+			bindGpuProgramPassIterationParameters(GPT_HULL_PROGRAM);
+        }
+		if (!mActiveTesselationDomainGpuProgramParameters.isNull())
+        {
+            mActiveTesselationDomainGpuProgramParameters->incPassIterationNumber();
+			bindGpuProgramPassIterationParameters(GPT_DOMAIN_PROGRAM);
+        }
+		if (!mActiveComputeGpuProgramParameters.isNull())
+        {
+            mActiveComputeGpuProgramParameters->incPassIterationNumber();
+            bindGpuProgramPassIterationParameters(GPT_COMPUTE_PROGRAM);
+        }
         return true;
     }
 
@@ -793,6 +819,15 @@ namespace Ogre {
         case GPT_FRAGMENT_PROGRAM:
             mFragmentProgramBound = true;
 	        break;
+		case GPT_HULL_PROGRAM:
+			mTesselationHullProgramBound = true;
+	        break;
+		case GPT_DOMAIN_PROGRAM:
+			mTesselationDomainProgramBound = true;
+	        break;
+		case GPT_COMPUTE_PROGRAM:
+            mComputeProgramBound = true;
+	        break;
 	    }
 	}
 	//-----------------------------------------------------------------------
@@ -812,6 +847,15 @@ namespace Ogre {
         case GPT_FRAGMENT_PROGRAM:
             mFragmentProgramBound = false;
 	        break;
+		case GPT_HULL_PROGRAM:
+			mTesselationHullProgramBound = false;
+	        break;
+		case GPT_DOMAIN_PROGRAM:
+			mTesselationDomainProgramBound = false;
+	        break;
+		case GPT_COMPUTE_PROGRAM:
+            mComputeProgramBound = false;
+	        break;
 	    }
 	}
 	//-----------------------------------------------------------------------
@@ -825,6 +869,12 @@ namespace Ogre {
             return mGeometryProgramBound;
         case GPT_FRAGMENT_PROGRAM:
             return mFragmentProgramBound;
+		case GPT_HULL_PROGRAM:
+			return mTesselationHullProgramBound;
+		case GPT_DOMAIN_PROGRAM:
+			return mTesselationDomainProgramBound;
+		case GPT_COMPUTE_PROGRAM:
+            return mComputeProgramBound;
 	    }
         // Make compiler happy
         return false;
@@ -901,5 +951,9 @@ namespace Ogre {
         mGlobalInstanceVertexBufferVertexDeclaration = val;
     }
     //---------------------------------------------------------------------
+	void RenderSystem::getCustomAttribute(const String& name, void* pData)
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found.", "RenderSystem::getCustomAttribute");
+    }
 }
 

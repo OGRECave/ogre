@@ -126,6 +126,14 @@ namespace Ogre
 		RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
 		/// Supports rendering to vertex buffers
 		RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
+		/// Supports hardware tesselation hull programs
+		RSC_TESSELATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
+		/// Supports hardware tesselation domain programs
+		RSC_TESSELATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 29),
+		/// Supports hardware compute programs
+		RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 30),
+		/// Supports asynchronous hardware occlusion queries
+		RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 31),
 
 		/// Supports compressed textures
 		RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -155,6 +163,8 @@ namespace Ogre
 		RSC_VERTEX_BUFFER_INSTANCE_DATA = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 11),
 		/// Supports using vertex buffers for instance data
 		RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
+		/// Supports dynamic linkage/shader subroutine
+		RSC_SHADER_SUBROUTINE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported
@@ -179,7 +189,7 @@ namespace Ogre
 		RSC_POINT_EXTENDED_PARAMETERS_EXT = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 8),
 		/// Support for Separate Shader Objects
 		RSC_SEPARATE_SHADER_OBJECTS = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 9),
-        /// Support for Vertex Array Objects (VAOs)
+		/// Support for Vertex Array Objects (VAOs)
         RSC_VAO              = OGRE_CAPS_VALUE(CAPS_CATEGORY_GL, 10)
 	};
 
@@ -317,6 +327,28 @@ namespace Ogre
 
 		/// The list of supported shader profiles
 		ShaderProfiles mSupportedShaderProfiles;
+
+		// Support for new shader stages in shader model 5.0
+		/// The number of floating-point constants tesselation Hull programs support
+		ushort mTesselationHullProgramConstantFloatCount;           
+		/// The number of integer constants tesselation Hull programs support
+		ushort mTesselationHullProgramConstantIntCount;           
+		/// The number of boolean constants tesselation Hull programs support
+		ushort mTesselationHullProgramConstantBoolCount;
+		/// The number of floating-point constants tesselation Domain programs support
+		ushort mTesselationDomainProgramConstantFloatCount;           
+		/// The number of integer constants tesselation Domain programs support
+		ushort mTesselationDomainProgramConstantIntCount;           
+		/// The number of boolean constants tesselation Domain programs support
+		ushort mTesselationDomainProgramConstantBoolCount;
+		/// The number of floating-point constants compute programs support
+		ushort mComputeProgramConstantFloatCount;           
+		/// The number of integer constants compute programs support
+		ushort mComputeProgramConstantIntCount;           
+		/// The number of boolean constants compute programs support
+		ushort mComputeProgramConstantBoolCount;
+
+
 
 	public:	
 		RenderSystemCapabilities ();
@@ -720,6 +752,100 @@ namespace Ogre
 
 		/** Write the capabilities to the pass in Log */
 		void log(Log* pLog);
+
+		// Support for new shader stages in shader model 5.0
+		/// The number of floating-point constants tesselation Hull programs support
+		void setTesselationHullProgramConstantFloatCount(ushort c)
+		{
+			mTesselationHullProgramConstantFloatCount = c;           
+		}
+		/// The number of integer constants tesselation Domain programs support
+		void setTesselationHullProgramConstantIntCount(ushort c)
+		{
+			mTesselationHullProgramConstantIntCount = c;           
+		}
+		/// The number of boolean constants tesselation Domain programs support
+		void setTesselationHullProgramConstantBoolCount(ushort c)
+		{
+			mTesselationHullProgramConstantBoolCount = c;           
+		}
+		/// The number of floating-point constants fragment programs support
+		ushort getTesselationHullProgramConstantFloatCount(void) const
+		{
+			return mTesselationHullProgramConstantFloatCount;           
+		}
+		/// The number of integer constants fragment programs support
+		ushort getTesselationHullProgramConstantIntCount(void) const
+		{
+			return mTesselationHullProgramConstantIntCount;           
+		}
+		/// The number of boolean constants fragment programs support
+		ushort getTesselationHullProgramConstantBoolCount(void) const
+		{
+			return mTesselationHullProgramConstantBoolCount;           
+		}
+
+		/// The number of floating-point constants tesselation Domain programs support
+		void setTesselationDomainProgramConstantFloatCount(ushort c)
+		{
+			mTesselationDomainProgramConstantFloatCount = c;           
+		}
+		/// The number of integer constants tesselation Domain programs support
+		void setTesselationDomainProgramConstantIntCount(ushort c)
+		{
+			mTesselationDomainProgramConstantIntCount = c;           
+		}
+		/// The number of boolean constants tesselation Domain programs support
+		void setTesselationDomainProgramConstantBoolCount(ushort c)
+		{
+			mTesselationDomainProgramConstantBoolCount = c;           
+		}
+		/// The number of floating-point constants fragment programs support
+		ushort getTesselationDomainProgramConstantFloatCount(void) const
+		{
+			return mTesselationDomainProgramConstantFloatCount;           
+		}
+		/// The number of integer constants fragment programs support
+		ushort getTesselationDomainProgramConstantIntCount(void) const
+		{
+			return mTesselationDomainProgramConstantIntCount;           
+		}
+		/// The number of boolean constants fragment programs support
+		ushort getTesselationDomainProgramConstantBoolCount(void) const
+		{
+			return mTesselationDomainProgramConstantBoolCount;           
+		}
+
+		/// The number of floating-point constants compute programs support
+		void setComputeProgramConstantFloatCount(ushort c)
+		{
+			mComputeProgramConstantFloatCount = c;           
+		}
+		/// The number of integer constants compute programs support
+		void setComputeProgramConstantIntCount(ushort c)
+		{
+			mComputeProgramConstantIntCount = c;           
+		}
+		/// The number of boolean constants compute programs support
+		void setComputeProgramConstantBoolCount(ushort c)
+		{
+			mComputeProgramConstantBoolCount = c;           
+		}
+		/// The number of floating-point constants fragment programs support
+		ushort getComputeProgramConstantFloatCount(void) const
+		{
+			return mComputeProgramConstantFloatCount;           
+		}
+		/// The number of integer constants fragment programs support
+		ushort getComputeProgramConstantIntCount(void) const
+		{
+			return mComputeProgramConstantIntCount;           
+		}
+		/// The number of boolean constants fragment programs support
+		ushort getComputeProgramConstantBoolCount(void) const
+		{
+			return mComputeProgramConstantBoolCount;           
+		}
 
 	};
 

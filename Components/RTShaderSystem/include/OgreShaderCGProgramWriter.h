@@ -87,7 +87,7 @@ protected:
 	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function declaration. */
-	void writeFunctionDeclaration(std::ostream& os, Function* function, ParameterPtr & colorParameter);
+	void writeFunctionDeclaration(std::ostream& os, Function* function);
 
 	/** Write function atom instance. */
 	void writeAtomInstance(std::ostream& os, FunctionAtom* atom);

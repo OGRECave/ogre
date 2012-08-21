@@ -1083,6 +1083,7 @@ namespace Ogre
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
 		case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
+		case ACT_SHADOW_EXTRUSION_DISTANCE:
 
 			// These depend on BOTH lights and objects
 			return ((uint16)GPV_PER_OBJECT) | ((uint16)GPV_LIGHTS);
@@ -1094,7 +1095,6 @@ namespace Ogre
 		case ACT_LIGHT_DIRECTION:
 		case ACT_LIGHT_POSITION_VIEW_SPACE:
 		case ACT_LIGHT_DIRECTION_VIEW_SPACE:
-		case ACT_SHADOW_EXTRUSION_DISTANCE:
 		case ACT_SHADOW_SCENE_DEPTH_RANGE:
 		case ACT_SHADOW_COLOUR:
 		case ACT_LIGHT_POWER_SCALE:
@@ -2366,6 +2366,21 @@ namespace Ogre
 		if (def)
 			_writeRawConstants(def->physicalIndex, val, rawCount);
 	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::setNamedSubroutine(const String& subroutineSlot, const String& subroutine)
+	{
+		const GpuConstantDefinition* def = 
+			_findNamedConstantDefinition(subroutineSlot, !mIgnoreMissingParams);
+		if (def)
+		{
+			setSubroutine(def->logicalIndex, subroutine);
+		}
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::setSubroutine(size_t index, const String& subroutine)
+	{
+		mSubroutineMap.insert(std::make_pair(index, subroutine));
+	}
 	//---------------------------------------------------------------------------
 	void GpuProgramParameters::setNamedAutoConstant(const String& name, 
 		AutoConstantType acType, size_t extraInfo)
@@ -2707,7 +2722,6 @@ namespace Ogre
 		}
 
 	}
-
 
 
 

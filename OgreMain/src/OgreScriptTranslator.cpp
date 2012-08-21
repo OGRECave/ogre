@@ -61,6 +61,12 @@ namespace Ogre{
 				return GPT_GEOMETRY_PROGRAM;
 			case ID_FRAGMENT_PROGRAM:
 				return GPT_FRAGMENT_PROGRAM;
+			case ID_TESSELATION_HULL_PROGRAM:
+				return GPT_HULL_PROGRAM;
+			case ID_TESSELATION_DOMAIN_PROGRAM:
+				return GPT_DOMAIN_PROGRAM;
+			case ID_COMPUTE_PROGRAM:
+				return GPT_COMPUTE_PROGRAM;
 		}
 	}
 	
@@ -125,11 +131,12 @@ namespace Ogre{
 			return false;
 		
 		AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
+
 #if OGRE_DOUBLE_PRECISION == 0
 		int n = sscanf(atom->value.c_str(), "%f", result);
 #else
 		int n = sscanf(atom->value.c_str(), "%lf", result);
-#endif
+#endif		
 		
 		if(n == 0 || n == EOF)
 			return false; // Conversion failed
@@ -2343,6 +2350,15 @@ namespace Ogre{
 				case ID_GEOMETRY_PROGRAM_REF:
 					translateGeometryProgramRef(compiler, child);
 					break;
+				case ID_TESSELATION_HULL_PROGRAM_REF:
+					translateTesselationHullProgramRef(compiler, child);
+					break;
+				case ID_TESSELATION_DOMAIN_PROGRAM_REF:
+					translateTesselationDomainProgramRef(compiler, child);
+					break;
+				case ID_COMPUTE_PROGRAM_REF:
+					translateComputeProgramRef(compiler, child);
+					break;
 				case ID_SHADOW_CASTER_VERTEX_PROGRAM_REF:
 					translateShadowCasterVertexProgramRef(compiler, child);
 					break;
@@ -2436,6 +2452,84 @@ namespace Ogre{
 		if(pass->getGeometryProgram()->isSupported())
 		{
 			GpuProgramParametersSharedPtr params = pass->getGeometryProgramParameters();
+			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+		}
+	}
+	//-------------------------------------------------------------------------
+	void PassTranslator::translateTesselationHullProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+	{
+		if(node->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
+			return;
+		}
+
+		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
+		compiler->_fireEvent(&evt, 0);
+
+		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+		{
+			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+			return;
+		}
+
+		Pass *pass = any_cast<Pass*>(node->parent->context);
+		pass->setTesselationHullProgram(evt.mName);
+		if(pass->getTesselationHullProgram()->isSupported())
+		{
+			GpuProgramParametersSharedPtr params = pass->getTesselationHullProgramParameters();
+			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+		}
+	}
+	//-------------------------------------------------------------------------
+	void PassTranslator::translateTesselationDomainProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+	{
+		if(node->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
+			return;
+		}
+
+		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
+		compiler->_fireEvent(&evt, 0);
+
+		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+		{
+			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+			return;
+		}
+
+		Pass *pass = any_cast<Pass*>(node->parent->context);
+		pass->setTesselationDomainProgram(evt.mName);
+		if(pass->getTesselationDomainProgram()->isSupported())
+		{
+			GpuProgramParametersSharedPtr params = pass->getTesselationDomainProgramParameters();
+			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
+		}
+	}
+	//-------------------------------------------------------------------------
+	void PassTranslator::translateComputeProgramRef(ScriptCompiler *compiler, ObjectAbstractNode *node)
+	{
+		if(node->name.empty())
+		{
+			compiler->addError(ScriptCompiler::CE_OBJECTNAMEEXPECTED, node->file, node->line);
+			return;
+		}
+
+		ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
+		compiler->_fireEvent(&evt, 0);
+
+		if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+		{
+			compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+			return;
+		}
+
+		Pass *pass = any_cast<Pass*>(node->parent->context);
+		pass->setComputeProgram(evt.mName);
+		if(pass->getComputeProgram()->isSupported())
+		{
+			GpuProgramParametersSharedPtr params = pass->getComputeProgramParameters();
 			GpuProgramTranslator::translateProgramParameters(compiler, params, node);
 		}
 	}
@@ -2633,6 +2727,9 @@ namespace Ogre{
 										break;
 									case ID_CUBIC:
 										texType = TEX_TYPE_CUBE_MAP;
+										break;
+									case ID_2DARRAY:
+										texType = TEX_TYPE_2D_ARRAY;
 										break;
 									case ID_UNLIMITED:
 										mipmaps = MIP_UNLIMITED;
@@ -3062,6 +3159,89 @@ namespace Ogre{
 					{
 						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
 							"filtering must have either 1 or 3 arguments");
+					}
+					break;
+				case ID_CMPTEST:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"compare_test must have at most 1 argument");
+					}
+					else
+					{
+						if(prop->values.front()->type == ANT_ATOM)
+						{
+							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+							bool enabled;
+							switch(atom->id)
+							{
+							case ScriptCompiler::ID_ON:
+								enabled=true;
+								break;
+							case ScriptCompiler::ID_OFF:
+								enabled=false;
+								break;
+							default:
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									prop->values.front()->getValue() + " is not a valid parameter");
+							}
+							mUnit->setTextureCompareEnabled(enabled);
+						}
+					}
+					break;
+				case ID_CMPFUNC:
+					if(prop->values.empty())
+					{
+						compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+					}
+					else if(prop->values.size() > 1)
+					{
+						compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+							"compare_func must have at most 1 argument");
+					}
+					else
+					{
+						if(prop->values.front()->type == ANT_ATOM)
+						{
+							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
+							CompareFunction func;
+							switch(atom->id)
+							{
+							case ID_ALWAYS_FAIL:
+								func = CMPF_ALWAYS_FAIL;
+								break;
+							case ID_ALWAYS_PASS:
+								func = CMPF_ALWAYS_PASS;
+								break;
+							case ID_LESS:
+								func = CMPF_LESS;
+								break;
+							case ID_LESS_EQUAL:
+								func = CMPF_LESS_EQUAL;
+								break;
+							case ID_EQUAL:
+								func = CMPF_EQUAL;
+								break;
+							case ID_NOT_EQUAL:
+								func = CMPF_NOT_EQUAL;
+								break;
+							case ID_GREATER_EQUAL:
+								func = CMPF_GREATER_EQUAL;
+								break;
+							case ID_GREATER:
+								func = CMPF_GREATER;
+								break;
+							default:
+								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+									prop->values.front()->getValue() + "is not a valid parameter");
+							}
+
+							mUnit->setTextureCompareFunction(func);
+						}
 					}
 					break;
 				case ID_MAX_ANISOTROPY:
@@ -3815,6 +3995,18 @@ namespace Ogre{
 							case ID_FRAGMENT:
 								mUnit->setBindingType(TextureUnitState::BT_FRAGMENT);
 								break;
+							case ID_GEOMETRY:
+								mUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
+								break;
+							case ID_TESSELATION_HULL:
+								mUnit->setBindingType(TextureUnitState::BT_TESSELATION_HULL);
+								break;
+							case ID_TESSELATION_DOMAIN:
+								mUnit->setBindingType(TextureUnitState::BT_TESSELATION_DOMAIN);
+								break;
+							case ID_COMPUTE:
+								mUnit->setBindingType(TextureUnitState::BT_COMPUTE);
+								break;
 							default:
 								compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
 									atom->value + " is not a valid binding type (must be \"vertex\" or \"fragment\")");
@@ -4103,7 +4295,7 @@ namespace Ogre{
 		
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported(syntax))
 		{
-			compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line);
+			compiler->addError(ScriptCompiler::CE_UNSUPPORTEDBYRENDERSYSTEM, obj->file, obj->line, ", Shader name: " + obj->name);
 			//Register the unsupported program so that materials that use it know that
 			//it exists but is unsupported
 			GpuProgramPtr unsupportedProg = GpuProgramManager::getSingleton().create(obj->name, 
@@ -4448,6 +4640,30 @@ namespace Ogre{
 								{
 									compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line,
 										"incorrect matrix4x4 declaration");
+								}
+							}
+							else if (atom1->value == "subroutine")
+							{
+								String s;
+								if (getString(*k, &s))
+								{
+									try
+									{
+										if (named)
+											params->setNamedSubroutine(name, s);
+										else
+											params->setSubroutine(index, s);
+									}
+									catch(...)
+									{
+										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+											"setting subroutine parameter failed");
+									}
+								}
+								else
+								{
+									compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+										"incorrect subroutine declaration");
 								}
 							}
 							else
@@ -6189,7 +6405,12 @@ namespace Ogre{
 				translator = &mTextureUnitTranslator;
 			else if(obj->id == ID_TEXTURE_SOURCE && parent && parent->id == ID_TEXTURE_UNIT)
 				translator = &mTextureSourceTranslator;
-			else if(obj->id == ID_FRAGMENT_PROGRAM || obj->id == ID_VERTEX_PROGRAM || obj->id == ID_GEOMETRY_PROGRAM)
+			else if(obj->id == ID_FRAGMENT_PROGRAM || 
+					obj->id == ID_VERTEX_PROGRAM || 
+					obj->id == ID_GEOMETRY_PROGRAM ||
+					obj->id == ID_TESSELATION_HULL_PROGRAM || 
+					obj->id == ID_TESSELATION_DOMAIN_PROGRAM ||
+					obj->id == ID_COMPUTE_PROGRAM)
 				translator = &mGpuProgramTranslator;
 			else if(obj->id == ID_SHARED_PARAMS)
 				translator = &mSharedParamsTranslator;

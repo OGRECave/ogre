@@ -32,6 +32,12 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreRenderTexture.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
+    #ifndef USE_D3DX11_LIBRARY
+        #define USE_D3DX11_LIBRARY
+    #endif
+#endif
+
 namespace Ogre {
 	class D3D11Texture : public Texture
 	{
@@ -54,6 +60,29 @@ namespace Ogre {
 		ID3D11Resource 	*mpTex;		
 
 		ID3D11ShaderResourceView* mpShaderResourceView;
+
+		bool mAutoMipMapGeneration;
+
+		template<typename fromtype, typename totype>
+		void _queryInterface(fromtype *from, totype **to)
+		{
+			HRESULT hr = from->QueryInterface(__uuidof(totype), (void **)to);
+
+			if(FAILED(hr) || mDevice.isError())
+			{
+				this->freeInternalResources();
+				String errorDescription = mDevice.getErrorDescription();
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Can't get base texture\nError Description:" + errorDescription, 
+					"D3D11Texture::_queryInterface" );
+			}
+		}
+
+#ifdef USE_D3DX11_LIBRARY		
+		void _loadDDS(DataStreamPtr &dstream);
+#endif
+        void _create1DResourceView();
+		void _create2DResourceView();
+		void _create3DResourceView();
 
 		// is dynamic
 		bool mIsDynamic; 
@@ -99,7 +128,7 @@ namespace Ogre {
 		/// internal method, set Texture class source image protected attributes
 		void _setSrcAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
 		/// internal method, set Texture class final texture protected attributes
-		void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format);
+		void _setFinalAttributes(unsigned long width, unsigned long height, unsigned long depth, PixelFormat format, UINT miscflags);
 
 		/// internal method, the cube map face name for the spec. face index
 		String _getCubeFaceName(unsigned char face) const
@@ -169,6 +198,7 @@ namespace Ogre {
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const;
 
+		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
 
 	};
 

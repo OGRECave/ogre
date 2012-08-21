@@ -67,6 +67,21 @@ namespace Ogre {
 			return new D3D11GpuVertexProgram(this, name, handle, group, 
 				isManual, loader, mDevice);
 		}
+		else if (paramIt->second == "domain_program")
+		{
+			return new D3D11GpuDomainProgram(this, name, handle, group, 
+				isManual, loader, mDevice);
+		}
+		else if (paramIt->second == "hull_program")
+		{
+			return new D3D11GpuHullProgram(this, name, handle, group, 
+				isManual, loader, mDevice);
+		}
+		else if (paramIt->second == "geometry_program")
+		{
+			return new D3D11GpuGeometryProgram(this, name, handle, group, 
+				isManual, loader, mDevice);
+		}
 		else
 		{
 			return new D3D11GpuFragmentProgram(this, name, handle, group, 
@@ -83,7 +98,21 @@ namespace Ogre {
 			return new D3D11GpuVertexProgram(this, name, handle, group, 
 				isManual, loader, mDevice);
 		}
-		else
+		else if (gptype == GPT_DOMAIN_PROGRAM)
+		{
+			return new D3D11GpuDomainProgram(this, name, handle, group, 
+				isManual, loader, mDevice);
+		}
+		else if (gptype == GPT_HULL_PROGRAM)
+		{
+			return new D3D11GpuHullProgram(this, name, handle, group, 
+				isManual, loader, mDevice);
+		}
+		else if (gptype == GPT_GEOMETRY_PROGRAM)
+		{
+			return new D3D11GpuGeometryProgram(this, name, handle, group,
+				isManual, loader, mDevice);
+		}
 		{
 			return new D3D11GpuFragmentProgram(this, name, handle, group, 
 				isManual, loader, mDevice);

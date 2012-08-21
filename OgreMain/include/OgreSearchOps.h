@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 
 #include <dirent.h>
 #include <unistd.h>

@@ -36,6 +36,8 @@
 
 #include "OgreTimer.h"
 
+#include "InputContext.h"
+
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // TODO - remove this
 #   pragma warning (disable : 4244)
@@ -1701,12 +1703,8 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Creates backdrop, cursor, and trays.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, OIS::MultiTouch* mouse, SdkTrayListener* listener = 0) :
-#else
-		SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, OIS::Mouse* mouse, SdkTrayListener* listener = 0) :
-#endif
-		  mName(name), mWindow(window), mMouse(mouse), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
+		SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, InputContext inputContext, SdkTrayListener* listener = 0) :
+		  mName(name), mWindow(window), mInputContext(inputContext), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
                 mWidgetSpacing(2), mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0),
                 mNo(0), mCursorWasVisible(false), mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),
 				mGroupInitProportion(0.0f), mGroupLoadProportion(0.0f), mLoadInc(0.0f)
@@ -1909,13 +1907,9 @@ namespace OgreBites
             // the position should be based on the orientation, for now simply return
             return;
 #endif
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-            std::vector<OIS::MultiTouchState> states = mMouse->getMultiTouchStates();
-            if(states.size() > 0)
-                mCursor->setPosition(states[0].X.abs, states[0].Y.abs);
-#else
-			mCursor->setPosition(mMouse->getMouseState().X.abs, mMouse->getMouseState().Y.abs);
-#endif
+            Ogre::Real x, y;
+            if(mInputContext.getCursorPosition(x, y))
+                mCursor->setPosition(x, y);
 		}
 
 		void showTrays()
@@ -3120,11 +3114,7 @@ namespace OgreBites
 
 		Ogre::String mName;                   // name of this tray system
 		Ogre::RenderWindow* mWindow;          // render window
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		OIS::MultiTouch* mMouse;              // multitouch device
-#else
-		OIS::Mouse* mMouse;                   // mouse device
-#endif
+		InputContext mInputContext;
 		Ogre::Overlay* mBackdropLayer;        // backdrop layer
 		Ogre::Overlay* mTraysLayer;           // widget layer
 		Ogre::Overlay* mPriorityLayer;        // top priority layer

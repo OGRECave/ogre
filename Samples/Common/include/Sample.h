@@ -31,7 +31,7 @@
 #include "Ogre.h"
 #include <iostream>
 
-#include "OIS.h"
+#include "InputContext.h"
 
 #ifdef USE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
@@ -53,7 +53,6 @@ namespace OgreBites
 	class Sample : public Ogre::GeneralAllocatedObject
     {
     public:
-
 		/*=============================================================================
 		| Utility comparison structure for sorting samples using SampleSet.
 		=============================================================================*/
@@ -83,13 +82,6 @@ namespace OgreBites
 			mResourcesLoaded = false;
 			mContentSetup = false;
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-			mMouse = 0;
-			mAccelerometer = 0;
-#else
-			mKeyboard = 0;
-			mMouse = 0;
-#endif
 			mFSLayer = 0;
         }
 
@@ -140,19 +132,12 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, FileSystemLayer* fsLayer)
-#else
-		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
-#endif
+		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer)
 		{
 			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
 			mRoot = Ogre::Root::getSingletonPtr();
 			mWindow = window;
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-			mKeyboard = keyboard;
-#endif
-			mMouse = mouse;
+			mInputContext = inputContext;
 			mFSLayer = fsLayer;
 
 			locateResources();
@@ -296,13 +281,7 @@ namespace OgreBites
 
 		Ogre::Root* mRoot;                // OGRE root object
 		Ogre::RenderWindow* mWindow;      // context render window
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		OIS::MultiTouch* mMouse;          // context multitouch device
-		OIS::JoyStick* mAccelerometer;    // context accelerometer device
-#else
-		OIS::Keyboard* mKeyboard;         // context keyboard device
-		OIS::Mouse* mMouse;               // context mouse device
-#endif
+		InputContext mInputContext;
 		FileSystemLayer* mFSLayer; 		  // file system abstraction layer
 		Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
 		Ogre::NameValuePairList mInfo;    // custom sample info

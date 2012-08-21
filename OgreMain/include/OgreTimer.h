@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 //Bring in the specific platform's header file
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 # include "WIN32/OgreTimerImp.h"
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 # include "GLX/OgreTimerImp.h"

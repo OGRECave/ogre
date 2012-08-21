@@ -47,7 +47,7 @@ Code Style Update	 :
 // Windows Settings
 //-----------------------------------------------------------------------
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 ) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_PCZPLUGIN_EXPORTS
 #       define _OgrePCZPluginExport __declspec(dllexport)
 #   else

@@ -303,6 +303,8 @@ namespace Ogre
             bool forGpuProgram);
 		void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
+		void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+		void _setTextureUnitCompareEnabled(size_t unit, bool compare);
 		void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, bool useGlobalInstancingVertexBufferIsAvailable);
@@ -372,7 +374,8 @@ namespace Ogre
 
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const;
-		
+		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
+		virtual bool hasAnisotropicMipMapFilter() const { return false; }  	
 		/// fires a device releated event
 		void fireDeviceEvent( D3D9Device* device, const String & name );
 

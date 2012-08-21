@@ -385,29 +385,6 @@ namespace Ogre {
 		/** Internal debugging method */
 		void dumpContents(const String& log);
     };
-			
-	template <typename T> struct HardwareBufferLockGuard
-	{
-		HardwareBufferLockGuard(const T& p, HardwareBuffer::LockOptions options)
-		: pBuf(p)
-		{
-			pData = pBuf->lock(options);
-		}
-		HardwareBufferLockGuard(const T& p, size_t offset, size_t length, HardwareBuffer::LockOptions options)
-		: pBuf(p)
-		{
-			pData = pBuf->lock(offset, length, options);
-		}		
-		~HardwareBufferLockGuard()
-		{
-			pBuf->unlock();
-		}
-		const T& pBuf;
-		void* pData;
-	};
-	
-	typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> VertexBufferLockGuard;
-	typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> IndexBufferLockGuard;
 	
 	/** @} */
 	/** @} */

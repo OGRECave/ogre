@@ -865,13 +865,54 @@ namespace Ogre
         else
         {
             logParseError(
-                "Bad filtering attribute, wrong number of parameters (expected 1 or 3)",
+                "Bad filtering attribute, wrong number of parameters (expected 1, 3 or 4)",
                 context);
         }
 
         return false;
     }
     //-----------------------------------------------------------------------
+	bool parseCompareTest(String& params, MaterialScriptContext& context)
+    {
+        StringUtil::toLowerCase(params);
+        try 
+		{
+			if(params == "on")
+			{
+				context.textureUnit->setTextureCompareEnabled(true);
+			}
+			else if(params == "off")
+			{
+				context.textureUnit->setTextureCompareEnabled(false);
+			}
+			else
+			{
+				  OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid compare setting", "parseCompareEnabled");
+			}
+        }
+        catch (...)
+        {
+            logParseError("Bad compare_test attribute, invalid function parameter.", context);
+        }
+
+        return false;
+    }
+	//-----------------------------------------------------------------------
+	bool parseCompareFunction(String& params, MaterialScriptContext& context)
+	{
+		StringUtil::toLowerCase(params);
+		try {
+			CompareFunction func = convertCompareFunction(params);
+			context.textureUnit->setTextureCompareFunction(func);
+		}
+		catch (...)
+		{
+			logParseError("Bad compare_func attribute, invalid function parameter.", context);
+		}
+
+		return false;
+	}
+	//-----------------------------------------------------------------------
     // Texture layer attributes
     bool parseTexture(String& params, MaterialScriptContext& context)
     {
@@ -950,6 +991,22 @@ namespace Ogre
 		else if (params == "vertex")
 		{
 			context.textureUnit->setBindingType(TextureUnitState::BT_VERTEX);
+		}
+		else if (params == "geometry")
+		{
+			context.textureUnit->setBindingType(TextureUnitState::BT_GEOMETRY);
+		}
+		else if (params == "tesselation_hull")
+		{
+			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_HULL);
+		}
+		else if (params == "tesselation_domain")
+		{
+			context.textureUnit->setBindingType(TextureUnitState::BT_TESSELATION_DOMAIN);
+		}
+		else if (params == "compute")
+		{
+			context.textureUnit->setBindingType(TextureUnitState::BT_COMPUTE);
 		}
 		else
 		{
@@ -3116,6 +3173,8 @@ namespace Ogre
         mTextureUnitAttribParsers.insert(AttribParserList::value_type("wave_xform", (ATTRIBUTE_PARSER)parseWaveXform));
 		mTextureUnitAttribParsers.insert(AttribParserList::value_type("transform", (ATTRIBUTE_PARSER)parseTransform));
         mTextureUnitAttribParsers.insert(AttribParserList::value_type("filtering", (ATTRIBUTE_PARSER)parseFiltering));
+		mTextureUnitAttribParsers.insert(AttribParserList::value_type("compare_test", (ATTRIBUTE_PARSER)parseCompareTest));
+		mTextureUnitAttribParsers.insert(AttribParserList::value_type("compare_func", (ATTRIBUTE_PARSER)parseCompareFunction));
         mTextureUnitAttribParsers.insert(AttribParserList::value_type("max_anisotropy", (ATTRIBUTE_PARSER)parseAnisotropy));
         mTextureUnitAttribParsers.insert(AttribParserList::value_type("texture_alias", (ATTRIBUTE_PARSER)parseTextureAlias));
 		mTextureUnitAttribParsers.insert(AttribParserList::value_type("mipmap_bias", (ATTRIBUTE_PARSER)parseMipmapBias));
@@ -4625,6 +4684,11 @@ namespace Ogre
 				case TextureUnitState::BT_VERTEX:
 					writeValue("vertex");
 					break;
+                case TextureUnitState::BT_GEOMETRY:
+                case TextureUnitState::BT_TESSELATION_DOMAIN:
+                case TextureUnitState::BT_TESSELATION_HULL:
+                case TextureUnitState::BT_COMPUTE:
+                    break;
 				};
 		
 			}

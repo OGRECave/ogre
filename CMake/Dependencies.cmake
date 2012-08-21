@@ -120,10 +120,10 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
+if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR OGRE_BUILD_PLATFORM_WINRT OR ANDROID))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
-endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
+endif ()
 
 # Find Boost
 # Prefer static linking in all cases
@@ -141,12 +141,13 @@ set(Boost_ADDITIONAL_VERSIONS "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1
 set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 if (NOT Boost_FOUND)
-        if(Boost_USE_STATIC_LIBS)
-                set(Boost_USE_STATIC_LIBS OFF)
-        else()
-                set(Boost_USE_STATIC_LIBS ON)
-        endif()
-        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	# Try again with the other type of libs
+	if(Boost_USE_STATIC_LIBS)
+		set(Boost_USE_STATIC_LIBS OFF)
+	else()
+		set(Boost_USE_STATIC_LIBS ON)
+	endif()
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
 if(Boost_FOUND AND Boost_VERSION GREATER 104900)
@@ -185,8 +186,16 @@ macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.
 #######################################################################
 
 # Find OIS
-find_package(OIS)
-macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+if (OGRE_BUILD_PLATFORM_WINRT)
+	# for WinRT we need only includes
+	set(OIS_FIND_QUIETLY TRUE)
+        find_package(OIS)
+	set(OIS_INCLUDE_DIRS ${OIS_INCLUDE_DIR})
+	macro_log_feature(OIS_INCLUDE_DIRS "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+else ()
+	find_package(OIS)
+	macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+endif ()
 
 #######################################################################
 # Tools

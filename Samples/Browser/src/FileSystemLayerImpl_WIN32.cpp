@@ -26,22 +26,55 @@
  -----------------------------------------------------------------------------
  */
 #include "FileSystemLayerImpl.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #include <shlobj.h>
-#include <io.h>
+#endif
 
 namespace OgreBites
 {
+	bool widePathToOgreString(Ogre::String& dest, const WCHAR* wpath)
+	{
+#if OGRE_WCHAR_T_STRINGS
+		// Ogre`s strings are wide, no conversion needed
+		dest = wpath;
+#else
+		// need to convert to narrow (OEM or ANSI) codepage so that fstream can use it 
+		// properly on international systems.
+		char npath[MAX_PATH];
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+		// Note, that on legacy CRT versions codepage for narrow CRT file functions can be changed using 
+		// SetFileApisANSI/OEM, but on modern runtimes narrow pathes are always widened using ANSI codepage.
+		// We suppose that on such runtimes file APIs codepage is left in default, ANSI state.
+		UINT codepage = AreFileApisANSI() ? CP_ACP : CP_OEMCP;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		// Runtime is modern, narrow calls are widened inside CRT using CP_ACP codepage.
+		UINT codepage = CP_ACP;
+#endif
+		if(0 == WideCharToMultiByte(codepage, 0 /* Use default flags */, wpath, -1, npath, sizeof(npath), NULL, NULL))
+		{
+			dest.clear();
+			return false;
+		}
+
+		// success
+		dest = npath;
+		return true;
+#endif
+	}
+
 	void FileSystemLayerImpl::getConfigPaths()
 	{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		// try to determine the application's path
 		DWORD bufsize = 256;
 		char* resolved = 0;
 		do
 		{
 			char* buf = OGRE_ALLOC_T(char, bufsize, Ogre::MEMCATEGORY_GENERAL);
-			DWORD retval = GetModuleFileName(NULL, buf, bufsize);
+			DWORD retval = GetModuleFileNameA(NULL, buf, bufsize);
 			if (retval == 0)
 			{
 				// failed
@@ -78,23 +111,35 @@ namespace OgreBites
 			appPath = ".";
 		}
 
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		Ogre::String appPath;
+		if(!widePathToOgreString(appPath, Windows::ApplicationModel::Package::Current->InstalledLocation->Path->Data()))
+		{
+			// fall back to current working dir
+			appPath = ".";
+		}
+#endif
+
 		// use application path as config search path
 		mConfigPaths.push_back(appPath + '\\');
 	}
     //---------------------------------------------------------------------
 	void FileSystemLayerImpl::prepareUserHome(const Ogre::String& subdir)
 	{
-		TCHAR path[MAX_PATH];
-		if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, path)))
+		// fill mHomePath
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+		WCHAR wpath[MAX_PATH];
+		if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PERSONAL|CSIDL_FLAG_CREATE, NULL, 0, wpath)))
+			widePathToOgreString(mHomePath, wpath);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		widePathToOgreString(mHomePath, Windows::Storage::ApplicationData::Current->LocalFolder->Path->Data());
+#endif
+
+		if(!mHomePath.empty())
 		{
-			// need to convert to OEM codepage so that fstream can use
-			// it properly on international systems.
-			TCHAR oemPath[MAX_PATH];
-			CharToOem(path, oemPath);
-			mHomePath = oemPath;
 			// create Ogre subdir
 			mHomePath += "\\Ogre\\";
-			if (! CreateDirectory(mHomePath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+			if (!createDirectory(mHomePath))
 			{
 				// couldn't create directory, fall back to current working dir
 				mHomePath.clear();
@@ -103,29 +148,31 @@ namespace OgreBites
 			{
 				mHomePath += subdir + '\\';
 				// create release subdir
-				if (! CreateDirectory(mHomePath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
+				if (!createDirectory(mHomePath))
 				{
 					// couldn't create directory, fall back to current working dir
 					mHomePath.clear();
 				}
 			}
 		}
-
-		if (mHomePath.empty())
-		{
-			// couldn't create dir in home directory, fall back to cwd
-			mHomePath = "";
-		}
 	}
     //---------------------------------------------------------------------
 	bool FileSystemLayerImpl::fileExists(const Ogre::String& path) const
 	{
-		return _access(path.c_str(), 00) == 0;
+        WIN32_FILE_ATTRIBUTE_DATA attr_data;
+#if OGRE_WCHAR_T_STRINGS
+        return GetFileAttributesExW(path.c_str(), GetFileExInfoStandard, &attr_data) != 0;
+#else
+        return GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &attr_data) != 0;
+#endif
 	}
     //---------------------------------------------------------------------
 	bool FileSystemLayerImpl::createDirectory(const Ogre::String& path)
 	{
-		return CreateDirectory(path.c_str(), NULL) != 0 || 
-			GetLastError() == ERROR_ALREADY_EXISTS;
+#if OGRE_WCHAR_T_STRINGS
+		return CreateDirectoryW(path.c_str(), NULL) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
+#else
+		return CreateDirectoryA(path.c_str(), NULL) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
+#endif
 	}
 }

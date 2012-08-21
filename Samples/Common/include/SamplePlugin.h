@@ -36,7 +36,7 @@
 #  define _OgreSampleExport
 #  define _OgreSampleClassExport
 #else
-#  if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__)
+#  if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && !defined(__MINGW32__)
 #    define _OgreSampleExport __declspec(dllexport)
 #    define _OgreSampleClassExport
 #  elif defined ( OGRE_GCC_VISIBILITY )

@@ -1,6 +1,6 @@
 # Configure Samples build
 
-if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND)
+if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT (OGRE_BUILD_PLATFORM_WINRT AND OIS_INCLUDE_DIRS))
   message(STATUS "Could not find dependency: OIS")
   message(STATUS "Skipping samples build")
   set(OGRE_BUILD_SAMPLES 0)
@@ -119,7 +119,7 @@ if (OGRE_BUILD_SAMPLES)
   add_subdirectory(ParticleFX)
   if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     add_subdirectory(ShaderSystem)
-    add_subdirectory(ShaderSystemTexturedFog)
+	add_subdirectory(ShaderSystemTexturedFog)
     add_subdirectory(ShaderSystemMultiLight)
   endif ()
   add_subdirectory(Shadows)
@@ -132,6 +132,7 @@ if (OGRE_BUILD_SAMPLES)
 if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
 endif ()
+  add_subdirectory(Tesselation)
   add_subdirectory(TextureFX)
   add_subdirectory(TextureArray)
   add_subdirectory(Transparency)
@@ -154,8 +155,18 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(SSAO)
 endif ()
 
+if (NOT OGRE_BUILD_PLATFORM_WINRT)
   # Add browser last
   add_subdirectory(Browser)
+else ()
+  # create link to dependencies in well known place for SampleBrowserWinRT
+  if (NOT EXISTS "${OGRE_BINARY_DIR}/Dependencies" AND NOT OGRE_BINARY_DIR STREQUAL OGRE_SOURCE_DIR)
+    file(TO_NATIVE_PATH "${OGRE_BINARY_DIR}/Dependencies" OGRE_BINARY_DEPENDENCIES_DIR_NATIVE )
+	file(TO_NATIVE_PATH "${OGRE_DEPENDENCIES_DIR}" OGRE_DEPENDENCIES_DIR_NATIVE )
+	execute_process(COMMAND cmd /c mklink /J "${OGRE_BINARY_DEPENDENCIES_DIR_NATIVE}" "${OGRE_DEPENDENCIES_DIR_NATIVE}" )
+  endif ()
+endif ()
+
 endif ()
 
 

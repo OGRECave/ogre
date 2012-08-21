@@ -120,7 +120,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Root::Root(const String& pluginFileName, const String& configFileName, 
 		const String& logFileName)
-      : mLogManager(0)
+      : mQueuedEnd(false)
+      , mLogManager(0)
 	  , mRenderSystemCapabilitiesManager(0)
 	  , mNextFrame(0)
 	  , mFrameSmoothingTime(0.0f)
@@ -968,9 +969,14 @@ namespace Ogre {
         return Real(times.back() - times.front()) / ((times.size()-1) * 1000);
     }
     //-----------------------------------------------------------------------
-    void Root::queueEndRendering(void)
+    void Root::queueEndRendering(bool state /* = true */)
     {
-	    mQueuedEnd = true;
+	    mQueuedEnd = state;
+    }
+    //-----------------------------------------------------------------------
+    bool Root::endRenderingQueued(void)
+    {
+	    return mQueuedEnd;
     }
     //-----------------------------------------------------------------------
     void Root::startRendering(void)
@@ -1069,7 +1075,7 @@ namespace Ogre {
 
         if (!pluginDir.empty() && *pluginDir.rbegin() != '/' && *pluginDir.rbegin() != '\\')
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
             pluginDir += "\\";
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
             pluginDir += "/";

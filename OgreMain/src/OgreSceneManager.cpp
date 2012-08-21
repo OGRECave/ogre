@@ -988,6 +988,36 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 			}
 			// Set fixed-function vertex parameters
 		}
+		if (pass->hasTesselationHullProgram())
+		{
+			bindGpuProgram(pass->getTesselationHullProgram()->_getBindingDelegate());
+			// bind parameters later
+		}
+		else
+		{
+			// Unbind program?
+			if (mDestRenderSystem->isGpuProgramBound(GPT_HULL_PROGRAM))
+			{
+				mDestRenderSystem->unbindGpuProgram(GPT_HULL_PROGRAM);
+			}
+			// Set fixed-function tesselation control parameters
+		}
+
+		if (pass->hasTesselationDomainProgram())
+		{
+			bindGpuProgram(pass->getTesselationDomainProgram()->_getBindingDelegate());
+			// bind parameters later
+		}
+		else
+		{
+			// Unbind program?
+			if (mDestRenderSystem->isGpuProgramBound(GPT_DOMAIN_PROGRAM))
+			{
+				mDestRenderSystem->unbindGpuProgram(GPT_DOMAIN_PROGRAM);
+			}
+			// Set fixed-function tesselation evaluation parameters
+		}
+
 
 		if (passSurfaceAndLightParams)
 		{
@@ -3446,9 +3476,22 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
 				// Finalise GPU parameter bindings
 				updateGpuProgramParameters(pass);
+                if (rend->preRender(this, mDestRenderSystem))
+                {
+                    try
+                    {
+                        mDestRenderSystem->_render(ro);
+                    }
+                    catch (RenderingAPIException& e)
+                    {
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                            "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
+                            "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
+                            "SceneManager::renderSingleObject");
 
-				if (rend->preRender(this, mDestRenderSystem))
-					mDestRenderSystem->_render(ro);
+                    }
+
+                }
 				rend->postRender(this, mDestRenderSystem);
 
 				if (scissored == CLIPPED_SOME)
@@ -3514,7 +3557,21 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					updateGpuProgramParameters(pass);
 
 					if (rend->preRender(this, mDestRenderSystem))
-						mDestRenderSystem->_render(ro);
+                    {
+                        try
+                        {
+                            mDestRenderSystem->_render(ro);
+                        }
+                        catch (RenderingAPIException& e)
+                        {
+                            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                                "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
+                                "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
+                                "SceneManager::renderSingleObject");
+
+                        }
+
+                    }
 					rend->postRender(this, mDestRenderSystem);
 				}
 				if (scissored == CLIPPED_SOME)
@@ -7216,6 +7273,18 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 		{
 			mDestRenderSystem->bindGpuProgramParameters(GPT_FRAGMENT_PROGRAM, 
 				pass->getFragmentProgramParameters(), mGpuParamsDirty);
+		}
+
+		if (pass->hasTesselationHullProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_HULL_PROGRAM, 
+				pass->getTesselationHullProgramParameters(), mGpuParamsDirty);
+		}
+
+		if (pass->hasTesselationHullProgram())
+		{
+			mDestRenderSystem->bindGpuProgramParameters(GPT_DOMAIN_PROGRAM, 
+				pass->getTesselationDomainProgramParameters(), mGpuParamsDirty);
 		}
 
 		mGpuParamsDirty = 0;

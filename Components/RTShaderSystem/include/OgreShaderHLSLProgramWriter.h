@@ -81,13 +81,13 @@ protected:
 	void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
 
 	/** Write a function parameter. */
-	void writeFunctionParameter(std::ostream& os, ParameterPtr parameter);
+	void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic);
 
 	/** Write a local parameter. */
 	void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
 
 	/** Write a function declaration. */
-	void writeFunctionDeclaration(std::ostream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter);
+	void writeFunctionDeclaration(std::ostream& os, Function* function);
 
 	/** Write function atom instance. */
 	void writeAtomInstance(std::ostream& os, FunctionAtom* atom);	

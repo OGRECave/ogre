@@ -487,7 +487,15 @@ namespace Ogre
             @see
                 Root, Root::startRendering
         */
-        void queueEndRendering(void);
+        void queueEndRendering(bool state = true);
+
+        /** Check for planned end of rendering.
+            @remarks
+                This method return true if queueEndRendering() was called before.
+            @see
+                Root, Root::queueEndRendering, Root::startRendering
+        */
+        bool endRenderingQueued(void);
 
         /** Starts / restarts the automatic rendering cycle.
             @remarks

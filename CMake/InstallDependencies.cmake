@@ -132,8 +132,10 @@ if (OGRE_INSTALL_DEPENDENCIES)
     
   if(WIN32)
     # copy the dependency DLLs to the right places
-    install_debug(OIS_d.dll)
-    install_release(OIS.dll)
+    if(NOT OGRE_BUILD_PLATFORM_WINRT)
+        install_debug(OIS_d.dll)
+        install_release(OIS.dll)
+    endif ()
 
     if (OGRE_BUILD_PLUGIN_CG)
 	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
@@ -263,8 +265,10 @@ if (OGRE_COPY_DEPENDENCIES)
 
   if (WIN32)
     # copy the required DLLs to the build directory (configure_file is the only copy-like op I found in CMake)
-    copy_debug(OIS_d.dll)
-    copy_release(OIS.dll)
+    if(NOT OGRE_BUILD_PLATFORM_WINRT)
+        copy_debug(OIS_d.dll)
+        copy_release(OIS.dll)
+    endif ()
 
     if (OGRE_BUILD_PLUGIN_CG)
 	  # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
