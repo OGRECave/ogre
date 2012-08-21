@@ -36,6 +36,9 @@ if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
 	endif ()
 	
 endif ()
+if (OGRE_BUILD_COMPONENT_VOLUME)
+	set(_components "${_components}  + Volume\n")
+endif ()
 
 if (DEFINED _components)
 	set(_features "${_features}Building components:\n${_components}")

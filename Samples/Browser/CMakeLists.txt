@@ -88,6 +88,7 @@ if (OGRE_STATIC)
 	
 	ogre_add_component_include_dir(Paging)
 	ogre_add_component_include_dir(Terrain)
+	ogre_add_component_include_dir(Volume)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
@@ -329,6 +330,12 @@ if (APPLE)
 	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreTerrain.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_VOLUME OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreVolume.dylib 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()

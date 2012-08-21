@@ -84,6 +84,8 @@
 #	include "Tesselation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
+#   include "VolumeCSG.h"
+#   include "VolumeTerrain.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
 #       include "PlayPen.h"
         PlayPenPlugin* playPenPlugin = 0;
@@ -1039,8 +1041,8 @@ protected:
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
             mPluginNameMap["Sample_TextureFX"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureFX();
             mPluginNameMap["Sample_Transparency"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Transparency();
-            mPluginNameMap["Sample_VolumeCSG"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
-            mPluginNameMap["Sample_VolumeTerrain"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
+            mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
+            mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 
 #ifdef USE_RTSHADER_SYSTEM
             if(hasProgrammableGPU)
