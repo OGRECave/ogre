@@ -123,7 +123,7 @@ namespace Volume {
         @return
             true if so.
         */
-        inline const bool hasValues(void) const
+        inline bool hasValues(void) const
         {
             return mValues[0].x != (Real)0.0 || mValues[0].y != (Real)0.0 || mValues[0].z != (Real)0.0;
         }

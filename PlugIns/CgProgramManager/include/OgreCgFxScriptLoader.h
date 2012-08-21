@@ -432,7 +432,7 @@ namespace Ogre {
             SST_COMPAREMODE, // CompareMode
             SST_COMPAREFUNC, // CompareFunc
             SST_GENERATEMIPMAP, // GenerateMipmap
-            SST_COUNT,
+            SST_COUNT
         };
 
 #define SST_FIRST (SamplerStateType) (SST_UNKNOWN + (SamplerStateType)1)

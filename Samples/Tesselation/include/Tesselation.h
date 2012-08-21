@@ -56,7 +56,7 @@ protected:
 		// create material and set the texture unit to our texture
         MaterialPtr tMat = MaterialManager::getSingleton().createOrRetrieve("Ogre/TesselationExample", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
         tMat->compile();
-        Pass * pass = tMat->getBestTechnique()->getPass(0);
+        tMat->getBestTechnique()->getPass(0);
 
 		// create a plain with float3 tex cord
 	    ManualObject* tObject = mSceneMgr->createManualObject("TesselatedObject");

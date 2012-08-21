@@ -356,7 +356,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const bool Chunk::getDualGridVisible(void) const
+    bool Chunk::getDualGridVisible(void) const
     {
         return mDualGridVisible;
     }
@@ -384,14 +384,14 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const bool Chunk::getOctreeVisible(void) const
+    bool Chunk::getOctreeVisible(void) const
     {
         return mOctreeVisible;
     }
     
     //-----------------------------------------------------------------------
 
-    const bool Chunk::getVolumeVisible(void) const
+    bool Chunk::getVolumeVisible(void) const
     {
         return mVolumeVisible;
     }

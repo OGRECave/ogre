@@ -412,12 +412,12 @@ namespace Ogre {
             newMicrocode->write(&samplerMapSize, sizeof(size_t));
 
             // save sampler register mapping
-            map<String,int>::type::const_iterator iter = mSamplerRegisterMap.begin();
-            map<String,int>::type::const_iterator iterE = mSamplerRegisterMap.end();
-            for (; iter != iterE; ++iter)
+            map<String,int>::type::const_iterator sampRegister = mSamplerRegisterMap.begin();
+            map<String,int>::type::const_iterator sampRegisterE = mSamplerRegisterMap.end();
+            for (; sampRegister != sampRegisterE; ++sampRegister)
             {
-                const String& paramName = iter->first;
-                int reg = iter->second;
+                const String& paramName = sampRegister->first;
+                int reg = sampRegister->second;
 
                 size_t stringSize = paramName.size();
                 newMicrocode->write(&stringSize, sizeof(size_t));
@@ -512,8 +512,7 @@ namespace Ogre {
 		// HLSL delegates need a target to compile to.
 		// Return value for GLSL delegates is ignored.
 		GpuProgramManager* gpuMgr = GpuProgramManager::getSingletonPtr();
-		const GpuProgramManager::SyntaxCodes& syntaxes = gpuMgr->getSupportedSyntax();
-
+        
 		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
 		{
 			static const String fpProfiles[] = {

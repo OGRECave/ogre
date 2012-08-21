@@ -50,9 +50,9 @@ class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
 public:
 
 	Sample_ShaderSystemMultiLight() :
-		mPathNameGen("RTPath"),
+        mTwirlLights(false),
 		mSRSSegLightFactory(NULL),
-		mTwirlLights(false)
+        mPathNameGen("RTPath")
 	{
 		mInfo["Title"] = "ShaderSystem - Multi Light";
 		mInfo["Description"] = "Shows a possible way to support a large varying amount of spot lights in the RTSS using a relatively simple system."

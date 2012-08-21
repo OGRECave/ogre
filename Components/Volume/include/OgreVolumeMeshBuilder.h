@@ -101,8 +101,8 @@ namespace Volume {
         @param n3
             The normal of the third vertex.
         */
-        Triangle(const Vector3 &v1, const Vector3 &n1, const Vector3 &v2, const Vector3 &n2, const Vector3 &v3, const Vector3 &n3) :
-            v1(v1, n1), v2(v2, n2), v3(v3, n3)
+        Triangle(const Vector3 &vIn1, const Vector3 &nIn1, const Vector3 &vIn2, const Vector3 &nIn2, const Vector3 &vIn3, const Vector3 &nIn3) :
+            v1(vIn1, nIn1), v2(vIn2, nIn2), v3(vIn3, nIn3)
         {
         }
     } Triangle;

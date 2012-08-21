@@ -83,7 +83,7 @@ namespace Volume {
         @return
             The density.
         */
-        inline const float getVolumeArrayValue(int x, int y, int z) const
+        inline float getVolumeArrayValue(int x, int y, int z) const
         {
             if (x >= mWidth)
             {
@@ -170,29 +170,29 @@ namespace Volume {
 
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
         
         /** Overridden from VolumeSource.
         */
-        virtual const Real getValue(const Vector3 &position) const;
+        virtual Real getValue(const Vector3 &position) const;
 
         /** Gets the width of the texture.
         @return
             The width of the texture.
         */
-        const size_t getWidth(void) const;
+        size_t getWidth(void) const;
         
         /** Gets the height of the texture.
         @return
             The height of the texture.
         */
-        const size_t getHeight(void) const;
+        size_t getHeight(void) const;
         
         /** Gets the depth of the texture.
         @return
             The depth of the texture.
         */
-        const size_t getDepth(void) const;
+        size_t getDepth(void) const;
     };
 
 }

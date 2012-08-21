@@ -84,8 +84,8 @@ namespace Volume {
         /** Constructor.
         */
         ChunkParameters(void) :
-            createOctreeVisualization(false), createDualGridVisualization(false), baseError((Real)0.0), errorMultiplicator((Real)1.0),
-            sceneManager(0), src(0), lodCallback(0), lodCallbackLod(0), scale((Real)1.0)
+            sceneManager(0), src(0), baseError(0.0), errorMultiplicator(1.0), createOctreeVisualization(false), createDualGridVisualization(false),
+            lodCallback(0), lodCallbackLod(0), scale(1.0)
         {
         }
     } ChunkParameters;
@@ -321,7 +321,7 @@ namespace Volume {
         @return
             true if visible.
         */
-        virtual const bool getDualGridVisible(void) const;
+        virtual bool getDualGridVisible(void) const;
         
         /** Shows the debug visualization entity of the octree.
         @param visible
@@ -334,7 +334,7 @@ namespace Volume {
         @return
             true if visible.
         */
-        virtual const bool getOctreeVisible(void) const;
+        virtual bool getOctreeVisible(void) const;
         
         /** Sets whether the volume mesh is visible.
         @param visible
@@ -346,7 +346,7 @@ namespace Volume {
         @return
             true if visible
         */
-        virtual const bool getVolumeVisible(void) const;
+        virtual bool getVolumeVisible(void) const;
         
         /** Overridden from FrameListener.
         */
