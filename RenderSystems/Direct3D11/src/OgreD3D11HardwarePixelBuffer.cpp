@@ -397,29 +397,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------------  
 	void D3D11HardwarePixelBuffer::unlockImpl(void)
 	{
-		/*if(mUsage == HBU_STATIC || mUsage & HBU_DYNAMIC)
-		{
-			if(mUsage == HBU_STATIC || mCurrentLockOptions == HBL_READ_ONLY || mCurrentLockOptions == HBL_NORMAL || mCurrentLockOptions == HBL_WRITE_ONLY)
-			{
-//				size_t sizeinbytes = D3D11Mappings::_getSizeInBytes(mParentTexture->getFormat(), mParentTexture->getWidth(), mParentTexture->getHeight());
-// 
-// 				void *data = _map(mParentTexture->getTextureResource(), D3D11_MAP_WRITE_DISCARD);
-// 
-// 				memcpy(data, mCurrentLock.data, sizeinbytes);
-// 
-// 				// unmap the texture and the staging buffer
-// 				_unmap(mParentTexture->getTextureResource());
-
-				_unmapstagingbuffer();
- 			}
-			else
-				_unmap(mParentTexture->getTextureResource());
-
-		}
-		else
-			_unmapstaticbuffer();
-		
-		_genMipmaps();*/
 		if(mUsage == HBU_STATIC)
 			_unmapstagingbuffer();
 		else if(mUsage & HBU_DYNAMIC)

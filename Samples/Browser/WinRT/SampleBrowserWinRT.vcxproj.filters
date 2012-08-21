@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>6574395b-17f6-492a-94a7-3c04d9f4a714</UniqueIdentifier>
+      <Extensions>ico;bmp;dlg;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;resw;resjson</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1853a8e4-8d91-46cf-88cc-07bb1b4465c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ec1abab6-757c-48c5-85e7-285018528267}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SampleBrowserWinRT.cpp" />
+    <ClCompile Include="..\src\FileSystemLayerImpl_WIN32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SampleBrowserWinRT.h" />
+    <ClInclude Include="BasicTimer.h" />
+    <ClInclude Include="..\..\Common\include\FileSystemLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\InputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\OgreStaticPluginLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\Sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SampleContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SamplePlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkCameraMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkSample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkTrays.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FileSystemLayerImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SampleBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\InputManagerWinRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Logo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.png">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ogre.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="ogre_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="plugins.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="plugins_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="resources.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="resources_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="samples.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="samples_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+  </ItemGroup>
+</Project>

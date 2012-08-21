@@ -42,24 +42,23 @@ no more errors and "Generate".
 
 8. In WinRT mode VS2012 by default uses precompiled headers, and CMake can not yet prevent this.
 So, open OGRE.sln in Visual Studio, select All projects (but not the solution itself) 
-Right click, than go to "Properties" select "Configuration Properties", than "All Configurations" 
-and under "Configuration Properties > C/C++ > Precompiled Headers > Precompiled Header" choose 
-"Not Using Precompiled Headers". (if you still have precompiled header issues when compiling
-do this step one more time - I guess this a vs bug)
-Then go to "Configuration Properties > General > Metro Style App Support" 
-choose "Yes".
+Right click, than go to "Properties" select "Configuration Properties", than "All Configurations"
+and under "Configuration Properties > General > Windows Store App Support" choose "Yes". After this
+(not before) go to "Configuration Properties > C/C++ > Precompiled Headers > Precompiled Header"
+and choose "Not Using Precompiled Headers".
 
 9. As CMake can not generate valid WinRT app project we need to use our own.
-Therefore "File > Add > Existing Project ..." and  select
-"Samples > Browser > WinRT > SampleBrowserWinRT.vcxproj".   
+Therefore "File > Add > Existing Project ..." and select
+"Samples > Browser > WinRT > SampleBrowserWinRT.vcxproj". 
+Repeat this for "Samples > Browser > WinRT.Xaml > SampleBrowserWinRTXaml.vcxproj".
 if this is your first time on that computer - you will be asked for a developer licence, do the
 required steps.
 
 10. Add project dependencies: "SampleBrowserWinRT > Properties", than 
 "Common Properties > Framework and References", remove all existing references
-and then "add" and in that window add a check mark next to all the projects on the list,
-note - it takes a long time to add them. But this way - the dlls will be deployed with
-the resulted exe. 
+and then "add" and in that window add a check mark next to all the projects on the list.
+Repeat this for SampleBrowserWinRTXaml. 
+In prerelease version of VS2012 it take big amount of time, but this bug was fixed in RTM.
 
 11. Try to build the solution.
 
@@ -71,4 +70,4 @@ include directories" config.
 10. If you get any compile\link error with "...mklink /J..." failed - it mean that the 
 code is not on a local drive (VMWare shared folder will not work for this...)
 
-11. Select SampleBrowserWinRT as the start up project and run.
+11. Select SampleBrowserWinRT or SampleBrowserWinRTXaml as the start up project and run.

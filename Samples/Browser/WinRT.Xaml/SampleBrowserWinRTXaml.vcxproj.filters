@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>7ca0bb24-46bc-41d7-b866-27ee9ab3bfde</UniqueIdentifier>
+    </Filter>
+    <Page Include="Common\StandardStyles.xaml">
+      <Filter>Common</Filter>
+    </Page>
+    <Image Include="Assets\Logo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\SmallLogo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.png">
+      <Filter>Resources</Filter>
+    </Image>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{25b71760-16e2-4031-988a-2e7088e07cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6079cb8f-ed29-4d9c-ba8d-9cb7ef42fef2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>749a8534-962f-47a6-b532-6a47371e22a4</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="App.xaml.h" />
+    <ClInclude Include="SampleBrowserWinRT.xaml.h" />
+    <ClInclude Include="..\include\FileSystemLayerImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\InputManagerWinRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SampleBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\FileSystemLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\InputContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\OgreStaticPluginLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\Sample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SampleContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SamplePlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkCameraMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkSample.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\include\SdkTrays.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.xaml.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="SampleBrowserWinRT.xaml.cpp" />
+    <ClCompile Include="..\src\FileSystemLayerImpl_WIN32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="SampleBrowserWinRT.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ogre.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="ogre_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="plugins.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="plugins_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="resources.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="resources_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="samples.cfg">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="samples_d.cfg">
+      <Filter>Resources</Filter>
+    </None>
+  </ItemGroup>
+</Project>

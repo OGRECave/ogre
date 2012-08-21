@@ -131,13 +131,6 @@ namespace Ogre {
 
 		struct ShaderVarWithPosInBuf
 		{
-		/*	bool wasInit;
-			bool isFloat;
-			size_t physicalIndex;
-			void * src;
-			String name;
-
-			D3D11_SHADER_VARIABLE_DESC var;*/
 			mutable String name;
 			size_t size;
 			size_t startOffset;

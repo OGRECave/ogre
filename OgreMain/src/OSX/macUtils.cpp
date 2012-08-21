@@ -114,7 +114,7 @@ namespace Ogre {
         CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
         assert(cfStringRef);
         
-        CFStringGetCString(cfStringRef, path, 1024, kCFStringEncodingASCII);
+        CFStringGetFileSystemRepresentation(cfStringRef, path, 1024);
         
         CFRelease(mainBundleURL);
         CFRelease(cfStringRef);
