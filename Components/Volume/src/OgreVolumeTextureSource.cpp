@@ -62,7 +62,6 @@ namespace Volume {
         float *pbptr = static_cast<float*>(pb.data);
         mData = OGRE_ALLOC_T(float, mWidth * mHeight * mDepth, MEMCATEGORY_GENERAL);
         float * dataRunner = mData;
-        PixelFormat format = tex->getFormat();
         ColourValue cv;
         size_t x, y;
         size_t zEnd = pb.back;
@@ -96,7 +95,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const Real TextureSource::getValueAndGradient(const Vector3 &position, Vector3 &normal) const
+    Real TextureSource::getValueAndGradient(const Vector3 &position, Vector3 &normal) const
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
         if (mTrilinearNormal)
@@ -132,7 +131,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const Real TextureSource::getValue(const Vector3 &position) const
+    Real TextureSource::getValue(const Vector3 &position) const
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
         Real value;
@@ -171,21 +170,21 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    const size_t TextureSource::getWidth(void) const
+    size_t TextureSource::getWidth(void) const
     {
         return mWidth;
     }
     
     //-----------------------------------------------------------------------
 
-    const size_t TextureSource::getHeight(void) const
+    size_t TextureSource::getHeight(void) const
     {
         return mHeight;
     }
     
     //-----------------------------------------------------------------------
 
-    const size_t TextureSource::getDepth(void) const
+    size_t TextureSource::getDepth(void) const
     {
         return mDepth;
     }
