@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -87,23 +87,23 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
 if errorlevel 1 goto VCEnd
 
-robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_45.dll
+robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_46.dll
 rem suppress successful robocopy exit statuses, only report genuine errors (bitmask 16 and 8 settings)
 set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_45.dll</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_46.dll</Outputs>
       <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</TreatOutputAsContent>
-      <Inputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_45.dll</Inputs>
+      <Inputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_46.dll</Inputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
 if errorlevel 1 goto VCEnd
 
-robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_45.dll
+robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_46.dll
 rem suppress successful robocopy exit statuses, only report genuine errors (bitmask 16 and 8 settings)
 set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_45.dll</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_46.dll</Outputs>
       <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</TreatOutputAsContent>
-      <Inputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_45.dll</Inputs>
+      <Inputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_46.dll</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>

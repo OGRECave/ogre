@@ -46,7 +46,6 @@ namespace Ogre
 		// Unknown PixelFormat at the moment
 		PixelFormat format = D3D11Mappings::_getPF(pDesc.Format);
 		mBitDepth = D3D11Mappings::_getSizeInBytes(format) * 8;
-		//mBitDepth = 32;
 	}
 
 	D3D11DepthBuffer::~D3D11DepthBuffer()

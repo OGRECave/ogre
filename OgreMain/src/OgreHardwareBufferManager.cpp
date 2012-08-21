@@ -416,22 +416,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void HardwareBufferManagerBase::_notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
 	{
-		//OGRE_LOCK_MUTEX(mUniformBuffersMutex)
-
-		//UniformBufferList::iterator i = mUniformBuffers.find(buf);
-		//UniformBufferList::iterator i = mUniformBuffers.lower_bound(buf);
-		//if (i != mUniformBuffers.end())
-		//{
-		//	mUniformBuffers.erase(i);
-		//}
-
-		// If buffer is shared, delete from map
-		/*
-		if (buf->getName() != "")
-		{
-			mSharedUniformBuffers.erase(mSharedUniformBuffers.find(buf->getName()));
-		}
-		*/
 	}
     //-----------------------------------------------------------------------
     HardwareVertexBufferSharedPtr 

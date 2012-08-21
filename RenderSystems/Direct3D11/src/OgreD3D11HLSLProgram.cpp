@@ -375,13 +375,14 @@ namespace Ogre {
 
 
         UINT compileFlags=0;
-#if defined(OGRE_DEBUG_MODE) && (OGRE_PLATFORM != OGRE_PLATFORM_WINRT)
+#if OGRE_DEBUG_MODE
         compileFlags |= D3DCOMPILE_DEBUG;
         compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 
         // There is nasty bug in Intel drivers that causes broken shaders.
         // Can be reproduced on Samsung Slate PC from \\BUILD conference
         // with at least Win8 builds 8102(DP), 8250(CP), 8400(RP)
+        // in both Win32 and WinRT modes.
         const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
         if(caps->getVendor() == GPU_INTEL)

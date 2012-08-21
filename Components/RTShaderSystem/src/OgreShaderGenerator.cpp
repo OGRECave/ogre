@@ -766,8 +766,7 @@ bool ShaderGenerator::createShaderBasedTechnique(const String& materialName,
 	srcTechnique = findSourceTechnique(materialName, trueGroupName, srcTechniqueSchemeName, overProgrammable);
 
 	// No appropriate source technique found.
-	if ((srcTechnique == NULL) ||
-		((overProgrammable == false) && (isProgrammable(srcTechnique) == true)))
+	if (srcTechnique == NULL)
 	{
 		return false;
 	}

@@ -46,16 +46,7 @@ namespace Ogre
 	void D3D11Plugin::install()
 	{
 		// Create the DirectX 10 rendering api
-/*#ifdef OGRE_STATIC_LIB
-		HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-#	if OGRE_DEBUG_MODE == 1
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11_d.dll" );
-#	else
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11.dll" );
-#	endif
-#endif*/
-		mRenderSystem = new D3D11RenderSystem( );
+		mRenderSystem = new D3D11RenderSystem();
 		// Register the render system
 		Root::getSingleton().addRenderSystem( mRenderSystem );
 	}

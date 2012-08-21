@@ -349,7 +349,6 @@ namespace Ogre
 
 		// determine total number of mipmaps including main one (d3d11 convention)
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > mSrcWidth) ? 0 : mNumRequestedMipmaps + 1;
-		//UINT numMips = static_cast<UINT>(mNumRequestedMipmaps);
 
 		D3D11_TEXTURE1D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -357,17 +356,9 @@ namespace Ogre
 		desc.ArraySize		= 1;
 		desc.Format			= d3dPF;
 		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
-		desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;//D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
+		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
-		desc.MiscFlags		= D3D11_RESOURCE_MISC_GENERATE_MIPS;//D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
-		
-        if (mIsDynamic)
-        {
-                desc.Usage              = D3D11_USAGE_DYNAMIC;
-                desc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
-                desc.MiscFlags			= 0;
-                desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE ;
-        }
+		desc.MiscFlags		= D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
 		// create the texture
 		hr = mDevice->CreateTexture1D(	
@@ -442,17 +433,7 @@ namespace Ogre
 		// determine total number of mipmaps including main one (d3d11 convention)
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumRequestedMipmaps + 1;
 		if(isBinaryCompressedFormat && numMips > 1)
-		numMips = std::max(1U, numMips - 2);
-
-		/*if (mNumRequestedMipmaps == MIP_UNLIMITED)
-		{
-			numMips = 0;
-			mNumMipmaps = 0; // Will get this value from the created texture
-		}
-		else
-		{
-			numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
-		}*/
+			numMips = std::max(1U, numMips - 2);
 
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
@@ -460,17 +441,7 @@ namespace Ogre
 		desc.MipLevels		= numMips;
 		desc.ArraySize		= mDepth == 0 ? 1 : mDepth;
 		desc.Format			= d3dPF;
-		DXGI_SAMPLE_DESC sampleDesc;
-		sampleDesc.Count = 1;
-		sampleDesc.Quality = 0;
-		desc.SampleDesc		= sampleDesc;
-		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
 
-		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
-		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
-
-		desc.MiscFlags		= D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
-		
 		// Handle multisampled render target
         if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
         {
@@ -483,35 +454,24 @@ namespace Ogre
                 desc.SampleDesc.Quality = 0;
         }
 
-        desc.Usage                      = D3D11Mappings::_getUsage(mUsage);
-        desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        desc.Usage          = D3D11Mappings::_getUsage(mUsage);
+        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
         desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
-        desc.MiscFlags          = 0;//D3D11_RESOURCE_MISC_GENERATE_MIPS;
-        //if (mMipmapsHardwareGenerated)
-        {
-                desc.MiscFlags          |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
-        }
+        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
         if (mIsDynamic)
         {
-                desc.Usage                      = D3D11_USAGE_DYNAMIC;
-                desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-                desc.MiscFlags = 0;
-                desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE;
                 desc.SampleDesc.Count = 1;
                 desc.SampleDesc.Quality = 0;
         }
 
         if (this->getTextureType() == TEX_TYPE_CUBE_MAP)
         {
-                desc.MiscFlags          |= D3D11_RESOURCE_MISC_TEXTURECUBE;
                 desc.ArraySize          = 6;
         }
 
 		if( isBinaryCompressedFormat )
         {
-                desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE;
-                desc.MiscFlags = 0;
                 desc.SampleDesc.Count = 1;
                 desc.SampleDesc.Quality = 0;
         }
@@ -526,17 +486,12 @@ namespace Ogre
                 desc.MipLevels = 1;
             }
 
-        }
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        // there seems to be a Microsoft bug that crash if you do GenerateMips 
-        // in a level less then D3D_FEATURE_LEVEL_10_0
-        if(rs->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0)
-        {
-            desc.MipLevels = 1;
-        }
+#if 0
+           // there seems to be a Microsoft bug that crash if you do GenerateMips in a level less then D3D_FEATURE_LEVEL_10_0
+           // is this still true or addressed by the code above?
+           desc.MipLevels = 1;
 #endif
-
+        }
 
 		// create the texture
 		hr = mDevice->CreateTexture2D(	
@@ -552,13 +507,6 @@ namespace Ogre
 				"Error creating texture\nError Description:" + errorDescription, 
 				"D3D11Texture::_create2DTex" );
 		}
-
-		if(mNumMipmaps == 0)
-        {
-                D3D11_TEXTURE2D_DESC texDesc;
-                mp2DTex->GetDesc(&texDesc);
-                mNumMipmaps = texDesc.MipLevels;                
-        }
 
 		//set the base texture we'll use in the render system
 		_queryInterface<ID3D11Texture2D, ID3D11Resource>(mp2DTex, &mpTex);
@@ -591,7 +539,7 @@ namespace Ogre
 			{
 				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
 				mSRVDesc.Texture2DMSArray.FirstArraySlice = 0;
-				mSRVDesc.Texture2DMSArray.ArraySize = mDepth;//desc.ArraySize;
+				mSRVDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
 			}
 			else
 			{
@@ -599,7 +547,7 @@ namespace Ogre
 				mSRVDesc.Texture2DArray.MostDetailedMip = 0;
 				mSRVDesc.Texture2DArray.MipLevels = desc.MipLevels;
 				mSRVDesc.Texture2DArray.FirstArraySlice = 0;
-				mSRVDesc.Texture2DArray.ArraySize = mDepth;//desc.ArraySize;
+				mSRVDesc.Texture2DArray.ArraySize = desc.ArraySize;
 			}
 			break;
 
@@ -616,15 +564,6 @@ namespace Ogre
 			}
 			break;
 		}
-		
-        if (this->getTextureType() == TEX_TYPE_2D_ARRAY)
-        {
-                mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-                mSRVDesc.Texture2DArray.MipLevels = desc.MipLevels;
-                mSRVDesc.Texture2DArray.MostDetailedMip = 0;
-                mSRVDesc.Texture2DArray.ArraySize = desc.ArraySize;
-                mSRVDesc.Texture2DArray.FirstArraySlice = 0;
-        }
 
 		hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
 		if (FAILED(hr) || mDevice.isError())
@@ -649,7 +588,7 @@ namespace Ogre
 
 		// determine total number of mipmaps including main one (d3d11 convention)
 		UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(std::max(mSrcWidth, mSrcHeight), mDepth)) ? 0 : mNumRequestedMipmaps + 1;
-		//UINT numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
+
 		D3D11_TEXTURE3D_DESC desc;
 		desc.Width			= static_cast<UINT>(mSrcWidth);
 		desc.Height			= static_cast<UINT>(mSrcHeight);
@@ -660,17 +599,6 @@ namespace Ogre
 		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
 		desc.MiscFlags		= 0;
-
-        desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
-        desc.MiscFlags          = 0;
-
-        if (mIsDynamic)
-        {
-                desc.Usage              = D3D11_USAGE_DYNAMIC;
-                desc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
-                desc.BindFlags          = D3D11_BIND_SHADER_RESOURCE ;
-        }
 
 		// create the texture
 		hr = mDevice->CreateTexture3D(	

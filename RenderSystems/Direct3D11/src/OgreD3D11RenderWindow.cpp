@@ -481,90 +481,6 @@ namespace Ogre
 
 		_createSizeDependedD3DResources();
 
-mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
-        // Additional swap chains need their own depth buffer
-        // to support resizing them
-
-        HRESULT hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
-        if( FAILED(hr) )
-        {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to Get Back Buffer for swap chain",
-                        "D3D11RenderWindow::windowMovedOrResized");
-        }
-
-        // get the backbuffer desc
-        D3D11_TEXTURE2D_DESC BBDesc;
-        mpBackBuffer->GetDesc( &BBDesc );
-
-        // create the render target view
-        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-        ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
-
-        RTVDesc.Format = BBDesc.Format;
-        RTVDesc.ViewDimension = mFSAA ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        RTVDesc.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
-
-        if( FAILED(hr) )
-        {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to create rendertagert view\nError Description:" + errorDescription,
-                        "D3D11RenderWindow::windowMovedOrResized");
-        }
-
-        if( mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH )
-        {
-                // get the backbuffer
-
-                // Create depth stencil texture
-                ID3D11Texture2D* pDepthStencil = NULL;
-                D3D11_TEXTURE2D_DESC descDepth;
-
-                descDepth.Width = width;
-                descDepth.Height = height;
-                descDepth.MipLevels = 1;
-                descDepth.ArraySize = 1;
-                descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
-                descDepth.SampleDesc.Count = mFSAAType.Count;
-                descDepth.SampleDesc.Quality = mFSAAType.Quality;
-                descDepth.Usage = D3D11_USAGE_DEFAULT;
-                descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-                descDepth.CPUAccessFlags = 0;
-                descDepth.MiscFlags = 0;
-
-                hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-                if( FAILED(hr) || mDevice.isError())
-                {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "Unable to create depth texture\nError Description:" + errorDescription,
-                                "D3D11RenderWindow::windowMovedOrResized");
-                }
-
-                // Create the depth stencil view
-                D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-                ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
-
-                descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-                descDSV.ViewDimension = mFSAA ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-                descDSV.Texture2D.MipSlice = 0;
-                hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
-
-                SAFE_RELEASE(pDepthStencil);
-
-                if( FAILED(hr) )
-                {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "Unable to create depth stencil view\nError Description:" + errorDescription,
-                                "D3D11RenderWindow::windowMovedOrResized");
-                }
-
-                static_cast<D3D11DepthBuffer*>(this->getDepthBuffer())->_resized(mDepthStencilView, width, height);
-        } 
-
 		// Notify viewports of resize
 		_updateViewportsDimensions();
 	}
@@ -776,7 +692,6 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	{
 		ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
 		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		mSwapChainDesc.OutputWindow			= mHWnd;
 		mSwapChainDesc.BufferDesc.Width		= mWidth;
 		mSwapChainDesc.BufferDesc.Height	= mHeight;
 		mSwapChainDesc.BufferDesc.Format	= format;
@@ -976,7 +891,6 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowHwnd::_finishSwitchingFullscreen()
 	{
-
 		if(mIsFullScreen)
 		{
 			// Need to reset the region on the window sometimes, when the 
