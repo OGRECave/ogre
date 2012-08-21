@@ -118,7 +118,7 @@ namespace Ogre
 		void convertComputeShaderCaps(RenderSystemCapabilities* rsc) const;
 
 		bool checkVertexTextureFormats(void);
-		void detachRenderTargetImpl(const String& name);
+        void detachRenderTargetImpl(const String& name);
 
 		CompareFunction mSceneAlphaRejectFunc; // should be merged with - mBlendDesc
 		unsigned char mSceneAlphaRejectValue; // should be merged with - mBlendDesc
@@ -210,7 +210,6 @@ namespace Ogre
 	protected:
 		void setClipPlanesImpl(const PlaneList& clipPlanes);
 
-
 		/**
          * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
 		 * from us each Present(), and we need the way to reestablish connection.
@@ -257,6 +256,8 @@ namespace Ogre
 
 		/// Reverts _addManualDepthBuffer actions
 		void _removeManualDepthBuffer(DepthBuffer *depthBuffer);
+		/// @copydoc RenderSystem::detachRenderTarget
+		virtual RenderTarget * detachRenderTarget(const String &name);
 
 		const String& getName(void) const;
 		void getCustomAttribute(const String& name, void* pData);
@@ -403,6 +404,14 @@ namespace Ogre
 		/// @copydoc RenderSystem::setSubroutineName
 		void setSubroutine(GpuProgramType gptype, const String& slotName, const String& subroutineName);
 
+        /// @copydoc RenderSystem::beginProfileEvent
+        virtual void beginProfileEvent( const String &eventName );
+
+        /// @copydoc RenderSystem::endProfileEvent
+        virtual void endProfileEvent( void );
+
+        /// @copydoc RenderSystem::markProfileEvent
+        virtual void markProfileEvent( const String &eventName );
     };
 }
 #endif
