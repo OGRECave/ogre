@@ -1,5 +1,10 @@
 // Auxiliary lights
-vertex_program DeferredShading/Shadows/CasterVP cg
+vertex_program DeferredShading/Shadows/CasterVP unified
+{
+	delegate DeferredShading/Shadows/CasterVP_pCg
+	delegate DeferredShading/Shadows/CasterVP_pCg_sm4
+}
+vertex_program DeferredShading/Shadows/CasterVP_pCg cg
 {
 	source ShadowCaster.cg
 	profiles vs_1_1 arbvp1
@@ -10,11 +15,40 @@ vertex_program DeferredShading/Shadows/CasterVP cg
 		param_named_auto cWorldView worldview_matrix
 	}
 }
+vertex_program DeferredShading/Shadows/CasterVP_pCg_sm4 cg
+{
+	source ShadowCaster_sm4.cg
+	profiles vs_4_0
+	entry_point ShadowCasterVP
+	default_params
+	{
+		param_named_auto cWorldViewProj worldviewproj_matrix
+		param_named_auto cWorldView worldview_matrix
+	}
+}
 
-fragment_program DeferredShading/Shadows/CasterFP cg
+
+fragment_program DeferredShading/Shadows/CasterFP unified
+{
+	delegate DeferredShading/Shadows/CasterFP_pCg
+	delegate DeferredShading/Shadows/CasterFP_pCg_sm4
+}
+fragment_program DeferredShading/Shadows/CasterFP_pCg cg
 {
 	source ShadowCaster.cg
 	profiles ps_2_0 arbfp1
+	entry_point ShadowCasterFP
+
+	default_params
+	{
+		param_named_auto cFarDistance far_clip_distance
+	}
+}
+
+fragment_program DeferredShading/Shadows/CasterFP_pCg_sm4 cg
+{
+	source ShadowCaster_sm4.cg
+	profiles ps_4_0
 	entry_point ShadowCasterFP
 
 	default_params
