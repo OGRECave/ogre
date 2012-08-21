@@ -433,11 +433,23 @@ namespace Ogre {
             /** See
              RenderSystem
              */
+            void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+            /** See
+             RenderSystem
+             */
+            void _setTextureUnitCompareEnabled(size_t unit, bool compare);
+            /** See
+             RenderSystem
+             */
             void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
             /** See
              RenderSystem
              */
             void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
+            /** See
+             RenderSystem
+             */
+            virtual bool hasAnisotropicMipMapFilter() const { return false; }
             /** See
              RenderSystem
              */
