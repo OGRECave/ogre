@@ -79,6 +79,10 @@ target_link_libraries(RenderSystem_Direct3D11
   ${DirectX_D3D11_LIBRARIES}
 )
 
+if(OGRE_PROFILING)
+  target_link_libraries(RenderSystem_Direct3D11 ${DirectX_LIBRARY})
+endif()
+
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_Direct3D11 PROPERTIES
     COMPILE_DEFINITIONS OGRED3DENGINEDLL_EXPORTS

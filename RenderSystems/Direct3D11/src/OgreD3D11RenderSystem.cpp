@@ -62,6 +62,10 @@ THE SOFTWARE.
 #include "DXErr.h"
 #endif
 
+// #ifdef OGRE_PROFILING == 1
+// #include "d3d9.h"
+// #endif
+
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
 //---------------------------------------------------------------------
@@ -673,15 +677,15 @@ bail:
 				mDriverType = DT_WARP;
 			}
 
-			UINT deviceFlags = 0;
+            UINT deviceFlags = 0;
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-			// This flag is required in order to enable compatibility with Direct2D.
-			deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+            // This flag is required in order to enable compatibility with Direct2D.
+            deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-			if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
-			{
-				deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-			}
+            if (D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel() && OGRE_DEBUG_MODE)
+            {
+                deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+            }
 #if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 			if (!OGRE_THREAD_SUPPORT)
 			{
@@ -1472,6 +1476,15 @@ bail:
 
 		return newDepthBuffer;
 	}
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_removeManualDepthBuffer(DepthBuffer *depthBuffer)
+    {
+        if(depthBuffer != NULL)
+        {
+            DepthBufferVec& pool = mDepthBufferPool[depthBuffer->getPoolId()];
+            pool.erase(std::remove(pool.begin(), pool.end(), depthBuffer), pool.end());
+        }
+    }
 	//---------------------------------------------------------------------
 	DepthBuffer* D3D11RenderSystem::_addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
 															uint32 width, uint32 height,
@@ -1499,18 +1512,16 @@ bail:
 		return newDepthBuffer;
 	}
 	//---------------------------------------------------------------------
-	void D3D11RenderSystem::_removeManualDepthBuffer(DepthBuffer *depthBuffer)
-	{
-		if(depthBuffer != NULL)
-		{
-			DepthBufferVec& pool = mDepthBufferPool[depthBuffer->getPoolId()];
-			pool.erase(std::remove(pool.begin(), pool.end(), depthBuffer), pool.end());
-		}
-	}
-	//---------------------------------------------------------------------	
-	void D3D11RenderSystem::destroyRenderTarget(const String& name)
-	{
-		// Check in specialized lists
+    RenderTarget* D3D11RenderSystem::detachRenderTarget(const String &name)
+    {
+        RenderTarget* target = RenderSystem::detachRenderTarget(name);
+        detachRenderTargetImpl(name);
+        return target;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::detachRenderTargetImpl(const String& name)
+    {
+        // Check in specialized lists
 		if (mPrimaryWindow->getName() == name)
 		{
 			// We're destroying the primary window, so reset device and window
@@ -1529,11 +1540,11 @@ bail:
 				}
 			}
 		}
-	}
-	//---------------------------------------------------------------------
-	void D3D11RenderSystem::destroyRenderTarget(const String& name)
-	{
-		detachRenderTargetImpl(name);
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::destroyRenderTarget(const String& name)
+    {
+        detachRenderTargetImpl(name);
 
 		// Do the real removal
 		RenderSystem::destroyRenderTarget(name);
@@ -2349,7 +2360,6 @@ bail:
 				opState->mTextures[opState->mTexturesCount] = texture;
 				opState->mTexturesCount++;
 
-				stage.samplerDesc.ComparisonFunc = /*D3D11_COMPARISON_NEVER;//*/D3D11Mappings::get(mSceneAlphaRejectFunc);
 				stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 				stage.samplerDesc.MinLOD = 0;
 				stage.samplerDesc.MipLODBias = 0.f;
@@ -3764,4 +3774,37 @@ bail:
 	{
 		return mBoundComputeProgram;
 	}
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::beginProfileEvent( const String &eventName )
+    {
+// #ifdef OGRE_PROFILING == 1
+//         if( eventName.empty() )
+//             return;
+// 
+//         vector<wchar_t>::type result(eventName.length() + 1, '\0');
+//         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+//         (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+// #endif
+    }
+
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::endProfileEvent( void )
+    {
+// #ifdef OGRE_PROFILING == 1
+//         (void)D3DPERF_EndEvent();
+// #endif
+    }
+
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::markProfileEvent( const String &eventName )
+    {
+// #ifdef OGRE_PROFILING == 1
+//         if( eventName.empty() )
+//             return;
+// 
+//         vector<wchar_t>::type result(eventName.length() + 1, '\0');
+//         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+//         (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+// #endif
+    }    
 }
