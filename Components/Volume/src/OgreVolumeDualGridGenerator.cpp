@@ -102,16 +102,16 @@ namespace Volume {
             const OctreeNode *c5 = n0Subdivided ? n0->getChild(6) : n0;
             const OctreeNode *c6 = n1Subdivided ? n1->getChild(5) : n1;
             const OctreeNode *c7 = n1Subdivided ? n1->getChild(4) : n1;
-    
-            edgeProcX(c0, c3, c7, c4);
-            edgeProcX(c1, c2, c6, c5);
-            edgeProcY(c0, c1, c2, c3);
-            edgeProcY(c4, c5, c6, c7);
         
             faceProcXY(c0, c3);
             faceProcXY(c1, c2);
             faceProcXY(c4, c7);
             faceProcXY(c5, c6);
+    
+            edgeProcX(c0, c3, c7, c4);
+            edgeProcX(c1, c2, c6, c5);
+            edgeProcY(c0, c1, c2, c3);
+            edgeProcY(c4, c5, c6, c7);
     
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
@@ -135,16 +135,16 @@ namespace Volume {
             const OctreeNode *c5 = n1Subdivided ? n1->getChild(4) : n1;
             const OctreeNode *c6 = n1Subdivided ? n1->getChild(7) : n1;
             const OctreeNode *c7 = n0Subdivided ? n0->getChild(6) : n0;
-    
-            edgeProcY(c0, c1, c2, c3);
-            edgeProcY(c4, c5, c6, c7);
-            edgeProcZ(c7, c6, c2, c3);
-            edgeProcZ(c4, c5, c1, c0);
 
             faceProcZY(c0, c1);
             faceProcZY(c3, c2);
             faceProcZY(c4, c5);
             faceProcZY(c7, c6);
+    
+            edgeProcY(c0, c1, c2, c3);
+            edgeProcY(c4, c5, c6, c7);
+            edgeProcZ(c7, c6, c2, c3);
+            edgeProcZ(c4, c5, c1, c0);
     
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
@@ -169,16 +169,16 @@ namespace Volume {
             const OctreeNode *c6 = n0Subdivided ? n0->getChild(2) : n0;
             const OctreeNode *c7 = n0Subdivided ? n0->getChild(3) : n0;
     
+            faceProcXZ(c4, c0);
+            faceProcXZ(c5, c1);
+            faceProcXZ(c7, c3);
+            faceProcXZ(c6, c2);
+
             edgeProcX(c0, c3, c7, c4);
             edgeProcX(c1, c2, c6, c5);
             edgeProcZ(c7, c6, c2, c3);
             edgeProcZ(c4, c5, c1, c0);
         
-            faceProcXZ(c4, c0);
-            faceProcXZ(c5, c1);
-            faceProcXZ(c7, c3);
-            faceProcXZ(c6, c2);
-    
             vertProc(c0, c1, c2, c3, c4, c5, c6, c7);
         }
     }
