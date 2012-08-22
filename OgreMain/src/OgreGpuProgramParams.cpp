@@ -1218,8 +1218,9 @@ namespace Ogre
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
+                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
 					if (i->physicalIndex > physicalIndex &&
-						getAutoConstantDefinition(i->paramType)->elementType == ET_REAL)
+						def && def->elementType == ET_REAL)
 					{
 						i->physicalIndex += insertCount;
 					}
@@ -1324,8 +1325,9 @@ namespace Ogre
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
+                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
 					if (i->physicalIndex > physicalIndex &&
-						getAutoConstantDefinition(i->paramType)->elementType == ET_INT)
+						def && def->elementType == ET_INT)
 					{
 						i->physicalIndex += insertCount;
 					}
