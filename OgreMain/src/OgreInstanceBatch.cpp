@@ -441,10 +441,10 @@ namespace Ogre
 		//We use our own because our SceneNode is just filled with zeroes, and updating it
 		//with real values is expensive, plus we would need to make sure it doesn't get to
 		//the shader
-		Real squaredDepth = getSquaredViewDepth(cam) -
-							Math::Sqr( mMeshReference->getBoundingSphereRadius() );
-        squaredDepth = std::max( squaredDepth, Real(0) );
-        Real lodValue = squaredDepth * cam->_getLodBiasInverse();
+		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
+					 mMeshReference->getBoundingSphereRadius();
+        depth = std::max( depth, Real(0) );
+        Real lodValue = depth * cam->_getLodBiasInverse();
 
 		//Now calculate Material LOD
         /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
@@ -494,7 +494,8 @@ namespace Ogre
 
 			while( itor != end )
 			{
-				mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
+				if( (*itor)->isVisible() )
+					mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
 				++itor;
 			}
 

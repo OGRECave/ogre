@@ -62,11 +62,17 @@ public:
     }
 
     /** Does some basic setup tasks */
-    virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, 
-        OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+    virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, OgreBites::FileSystemLayer* fsLayer)
+    {
+        OgreBites::Sample::_setup(window, mouse, fsLayer);
+    }
+#else
+    virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, OgreBites::FileSystemLayer* fsLayer)
     {
         OgreBites::Sample::_setup(window, keyboard, mouse, fsLayer);
     }
+#endif
 
     /** Clean up */
     virtual void _shutdown()

@@ -514,6 +514,15 @@ namespace Ogre {
         
             void _destroyDepthBuffer(RenderWindow* pRenderWnd);
         
+            /// @copydoc RenderSystem::beginProfileEvent
+            virtual void beginProfileEvent( const String &eventName );
+            
+            /// @copydoc RenderSystem::endProfileEvent
+            virtual void endProfileEvent( void );
+            
+            /// @copydoc RenderSystem::markProfileEvent
+            virtual void markProfileEvent( const String &eventName );
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             void resetRenderer(RenderWindow* pRenderWnd);
         

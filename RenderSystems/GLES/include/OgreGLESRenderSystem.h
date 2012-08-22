@@ -534,6 +534,15 @@ namespace Ogre {
 
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
+
+            /// @copydoc RenderSystem::beginProfileEvent
+            virtual void beginProfileEvent( const String &eventName ) {}
+
+            /// @copydoc RenderSystem::endProfileEvent
+            virtual void endProfileEvent( void ) {}
+            
+            /// @copydoc RenderSystem::markProfileEvent
+            virtual void markProfileEvent( const String &eventName ) {}
     };
 }
 

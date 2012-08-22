@@ -194,10 +194,17 @@ namespace Ogre {
 			mGLShaderHandle = glCreateShader(shaderType);
             GL_CHECK_ERROR
 
+#if GL_EXT_debug_label
+            glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
+#endif
+
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 mGLProgramHandle = glCreateProgram();
                 GL_CHECK_ERROR
+#if GL_EXT_debug_label
+                glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
+#endif
             }
 		}
 

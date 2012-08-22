@@ -47,48 +47,18 @@ THE SOFTWARE.
 // For intel's compiler, simply calling alloca seems to do the right
 // thing. The size of the allocated block seems to be irrelevant.
 #define __OGRE_SIMD_ALIGN_STACK()   _alloca(16)
+#define __OGRE_SIMD_ALIGN_ATTRIBUTE
 
-#elif OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
-//
-// Horrible hack to align the stack to a 16-bytes boundary for gcc.
-//
-// We assume a gcc version >= 2.95 so that
-// -mreferred-stack-boundary works.  Otherwise, all bets are
-// off.  However, -mreferred-stack-boundary does not create a
-// stack alignment, but it only preserves it.  Unfortunately,
-// since Ogre are designed as a flexibility library, user might
-// compile their application with wrong stack alignment, even
-// if user taken care with stack alignment, but many versions
-// of libc on linux call main() with the wrong initial stack
-// alignment the result that the code is now pessimally aligned
-// instead of having a 50% chance of being correct.
-//
-#if OGRE_ARCH_TYPE != OGRE_ARCHITECTURE_64
-
-#define __OGRE_SIMD_ALIGN_STACK()                                   \
-    {                                                               \
-        /* Use alloca to allocate some memory on the stack.  */     \
-        /* This alerts gcc that something funny is going on, */     \
-        /* so that it does not omit the frame pointer etc.   */     \
-        (void)__builtin_alloca(16);                                 \
-        /* Now align the stack pointer */                           \
-        __asm__ __volatile__ ("andl $-16, %esp");                   \
-    }
-
-#else // 64
-#define __OGRE_SIMD_ALIGN_STACK()                                   \
-    {                                                               \
-        /* Use alloca to allocate some memory on the stack.  */     \
-        /* This alerts gcc that something funny is going on, */     \
-        /* so that it does not omit the frame pointer etc.   */     \
-        (void)__builtin_alloca(16);                                 \
-        /* Now align the stack pointer */                           \
-        __asm__ __volatile__ ("andq $-16, %rsp");                   \
-    }
-#endif //64
+#elif OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && (OGRE_ARCH_TYPE != OGRE_ARCHITECTURE_64)
+// mark functions with GCC attribute to force stack alignment to 16 bytes
+#define __OGRE_SIMD_ALIGN_ATTRIBUTE __attribute__((force_align_arg_pointer))
 
 #elif defined(_MSC_VER)
 // Fortunately, MSVC will align the stack automatically
+#define __OGRE_SIMD_ALIGN_ATTRIBUTE
+
+#else
+#define __OGRE_SIMD_ALIGN_ATTRIBUTE
 
 #endif
 

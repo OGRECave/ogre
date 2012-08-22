@@ -214,7 +214,29 @@ namespace Ogre
 			}
 		}
 
-		
+		template <typename ValueType>
+		ValueType get(void) const
+		{
+			if (!mContent) 
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"Bad cast from uninitialised Any", 
+					"Any::operator()");
+			}
+			else if(getType() == typeid(ValueType))
+			{
+             	return static_cast<Any::holder<ValueType> *>(mContent)->held;
+			}
+			else
+			{
+				StringUtil::StrStreamType str;
+				str << "Bad cast from type '" << getType().name() << "' "
+					<< "to '" << typeid(ValueType).name() << "'";
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					 str.str(), 
+					"Any::operator()");
+			}
+		}
 
     };
 

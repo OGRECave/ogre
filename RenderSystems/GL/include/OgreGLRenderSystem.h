@@ -525,7 +525,16 @@ namespace Ogre {
 		unsigned int getDisplayMonitorCount() const;
 
 		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
-		virtual bool hasAnisotropicMipMapFilter() const { return false; }  
+		virtual bool hasAnisotropicMipMapFilter() const { return false; }
+        
+		/// @copydoc RenderSystem::beginProfileEvent
+        virtual void beginProfileEvent( const String &eventName );
+
+		/// @copydoc RenderSystem::endProfileEvent
+        virtual void endProfileEvent( void );
+
+		/// @copydoc RenderSystem::markProfileEvent
+        virtual void markProfileEvent( const String &eventName );
     };
 }
 #endif

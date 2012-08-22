@@ -62,9 +62,9 @@ THE SOFTWARE.
 #include "DXErr.h"
 #endif
 
-// #ifdef OGRE_PROFILING == 1
-// #include "d3d9.h"
-// #endif
+#ifdef OGRE_PROFILING == 1 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
+#include "d3d9.h"
+#endif
 
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
@@ -729,7 +729,6 @@ bail:
 				driverType = D3D_DRIVER_TYPE_SOFTWARE; 
 				SAFE_RELEASE(pSelectedAdapter);
 			}
-
 			
 			if (mDriverType == DT_WARP)
 			{
@@ -3721,34 +3720,34 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {
-// #ifdef OGRE_PROFILING == 1
-//         if( eventName.empty() )
-//             return;
-// 
-//         vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//         (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-// #endif
+#ifdef OGRE_PROFILING == 1
+		if( eventName.empty() )
+			return;
+ 
+		vector<wchar_t>::type result(eventName.length() + 1, '\0');
+		(void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+		(void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+#endif
     }
 
     //---------------------------------------------------------------------
     void D3D11RenderSystem::endProfileEvent( void )
     {
-// #ifdef OGRE_PROFILING == 1
-//         (void)D3DPERF_EndEvent();
-// #endif
+#ifdef OGRE_PROFILING == 1
+		(void)D3DPERF_EndEvent();
+#endif
     }
 
     //---------------------------------------------------------------------
     void D3D11RenderSystem::markProfileEvent( const String &eventName )
     {
-// #ifdef OGRE_PROFILING == 1
-//         if( eventName.empty() )
-//             return;
-// 
-//         vector<wchar_t>::type result(eventName.length() + 1, '\0');
-//         (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
-//         (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
-// #endif
+#ifdef OGRE_PROFILING == 1
+		if( eventName.empty() )
+			return;
+
+		vector<wchar_t>::type result(eventName.length() + 1, '\0');
+		(void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+		(void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+#endif
     }    
 }
