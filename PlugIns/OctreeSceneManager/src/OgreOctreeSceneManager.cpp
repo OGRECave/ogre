@@ -31,9 +31,7 @@ octreescenemanager.cpp  -  description
 begin                : Fri Sep 27 2002
 copyright            : (C) 2002 by Jon Anderson
 email                : janders@users.sf.net
- 
-Enhancements 2003 - 2004 (C) The OGRE Team
- 
+  
 ***************************************************************************/
 
 #include <OgreOctreeSceneManager.h>
