@@ -54,7 +54,7 @@ namespace Ogre
 	{
 	public:
 		TerrainMaterialGeneratorA();
-		~TerrainMaterialGeneratorA();
+		virtual ~TerrainMaterialGeneratorA();
 
 		/** Shader model 2 profile target. 
 		*/
@@ -62,7 +62,7 @@ namespace Ogre
 		{
 		public:
 			SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
-			~SM2Profile();
+			virtual ~SM2Profile();
 			MaterialPtr generate(const Terrain* terrain);
 			MaterialPtr generateForCompositeMap(const Terrain* terrain);
 			uint8 getMaxLayers(const Terrain* terrain) const;

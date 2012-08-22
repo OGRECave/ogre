@@ -58,7 +58,9 @@ namespace Ogre
 {
 	//---------------------------------------------------------------------
 	const uint32 Terrain::TERRAIN_CHUNK_ID = StreamSerialiser::makeIdentifier("TERR");
-	const uint16 Terrain::TERRAIN_CHUNK_VERSION = 1;
+	const uint16 Terrain::TERRAIN_CHUNK_VERSION = 2;
+	const uint32 Terrain::TERRAINGENERALINFO_CHUNK_ID = StreamSerialiser::makeIdentifier("TGIN");
+	const uint16 Terrain::TERRAINGENERALINFO_CHUNK_VERSION = 1;
 	const uint32 Terrain::TERRAINLAYERDECLARATION_CHUNK_ID = StreamSerialiser::makeIdentifier("TDCL");
 	const uint16 Terrain::TERRAINLAYERDECLARATION_CHUNK_VERSION = 1;
 	const uint32 Terrain::TERRAINLAYERSAMPLER_CHUNK_ID = StreamSerialiser::makeIdentifier("TSAM");
@@ -72,6 +74,8 @@ namespace Ogre
 	// since 129^2 is the greatest power we can address in 16-bit index
 	const uint16 Terrain::TERRAIN_MAX_BATCH_SIZE = 129; 
 	const uint16 Terrain::WORKQUEUE_DERIVED_DATA_REQUEST = 1;
+	const uint64 Terrain::TERRAIN_GENERATE_MATERIAL_INTERVAL_MS = 400;
+	const uint16 Terrain::WORKQUEUE_GENERATE_MATERIAL_REQUEST = 2;
 	const size_t Terrain::LOD_MORPH_CUSTOM_PARAM = 1001;
 	const uint8 Terrain::DERIVED_DATA_DELTAS = 1;
 	const uint8 Terrain::DERIVED_DATA_NORMALS = 2;
@@ -148,7 +152,9 @@ namespace Ogre
 		, mDirtyGeometryRectForNeighbours(0, 0, 0, 0)
 		, mDirtyLightmapFromNeighboursRect(0, 0, 0, 0)
 		, mDerivedDataUpdateInProgress(false)
-		, mDerivedUpdatePendingMask(0)
+        , mDerivedUpdatePendingMask(0)
+		, mGenerateMaterialInProgress(false)
+		, mPrepareInProgress(false)
 		, mMaterialGenerationCount(0)
 		, mMaterialDirty(false)
 		, mMaterialParamsDirty(false)
@@ -171,6 +177,7 @@ namespace Ogre
 		, mLastLODFrame(0)
 		, mLastViewportHeight(0)
 		, mCustomGpuBufferAllocator(0)
+		, mLodManager(0)
 
 	{
 		mRootNode = sm->getRootSceneNode()->createChildSceneNode();
@@ -199,6 +206,7 @@ namespace Ogre
 		wq->removeRequestHandler(mWorkQueueChannel, this);
 		wq->removeResponseHandler(mWorkQueueChannel, this);	
 
+		freeLodData();
 		freeTemporaryResources();
 		freeGPUResources();
 		freeCPUResources();
@@ -253,10 +261,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::save(const String& filename)
 	{
+		// force to load highest lod, or quadTree may contain hole
+		load(0,true);
+
 		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, _getDerivedResourceGroup(), true);
-		// Compress
-		DataStreamPtr compressStream(OGRE_NEW DeflateStream(filename, stream));
-		StreamSerialiser ser(compressStream);
+		StreamSerialiser ser(stream);
 		save(ser);
 	}
 	//---------------------------------------------------------------------
@@ -280,6 +289,7 @@ namespace Ogre
 
 		stream.writeChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
 
+		stream.writeChunkBegin(TERRAINGENERALINFO_CHUNK_ID, TERRAINGENERALINFO_CHUNK_VERSION);
 		uint8 align = (uint8)mAlign;
 		stream.write(&align);
 
@@ -288,7 +298,12 @@ namespace Ogre
 		stream.write(&mMaxBatchSize);
 		stream.write(&mMinBatchSize);
 		stream.write(&mPos);
-		stream.write(mHeightData, mSize * mSize);
+		stream.writeChunkEnd(TERRAINGENERALINFO_CHUNK_ID);
+
+		TerrainLodManager::saveLodData(stream,this);
+
+		// start compressing
+		stream.startDeflate();
 
 		writeLayerDeclaration(mLayerDecl, stream);
 
@@ -431,10 +446,11 @@ namespace Ogre
 			stream.writeChunkEnd(TERRAINDERIVEDDATA_CHUNK_ID);
 		}
 
-		// write deltas
-		stream.write(mDeltaData, mSize * mSize);
 		// write the quadtree
 		mQuadTree->save(stream);
+
+		// stop compressing
+		stream.stopDeflate();
 
 		stream.writeChunkEnd(TERRAIN_CHUNK_ID);
 
@@ -569,29 +585,31 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const String& filename)
 	{
+		freeLodData();
+		mLodManager = OGRE_NEW TerrainLodManager( this, filename );
+
 		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
 			_getDerivedResourceGroup());
 		
-		// uncompress
-		// Note DeflateStream automatically falls back on reading the underlying
-		// stream direct if it's not actually compressed so this will still work
-		// with uncompressed streams
-		DataStreamPtr uncompressStream(OGRE_NEW DeflateStream(filename, stream));
-		StreamSerialiser ser(uncompressStream);
+		StreamSerialiser ser(stream);
 		return prepare(ser);
 
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(StreamSerialiser& stream)
 	{
+		mPrepareInProgress = true;
+
 		freeTemporaryResources();
 		freeCPUResources();
 
 		copyGlobalOptions();
 
-		if (!stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION))
+		const StreamSerialiser::Chunk *mainChunk = stream.readChunkBegin(TERRAIN_CHUNK_ID, TERRAIN_CHUNK_VERSION);
+		if (!mainChunk)
 			return false;
 
+		stream.readChunkBegin(Terrain::TERRAINGENERALINFO_CHUNK_ID, Terrain::TERRAINGENERALINFO_CHUNK_VERSION);
 		uint8 align;
 		stream.read(&align);
 		mAlign = (Alignment)align;
@@ -604,11 +622,24 @@ namespace Ogre
 		mRootNode->setPosition(mPos);
 		updateBaseScale();
 		determineLodLevels();
+		stream.readChunkEnd(Terrain::TERRAINGENERALINFO_CHUNK_ID);
 
 		size_t numVertices = mSize * mSize;
 		mHeightData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
-		stream.read(mHeightData, numVertices);
+		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
+		// As we may not load full data, so we should make it clean first
+		memset(mHeightData, 0.0f, sizeof(float)*numVertices);
+		memset(mDeltaData, 0.0f, sizeof(float)*numVertices);
 
+		// skip height/delta data
+		for (int i = 0; i < mNumLodLevels; i++)
+		{
+			stream.readChunkBegin(TerrainLodManager::TERRAINLODDATA_CHUNK_ID, TerrainLodManager::TERRAINLODDATA_CHUNK_VERSION);
+			stream.readChunkEnd(TerrainLodManager::TERRAINLODDATA_CHUNK_ID);
+		}
+
+		// start uncompressing
+		stream.startDeflate( mainChunk->length - stream.getOffsetFromChunkStart() );
 
 		// Layer declaration
 		if (!readLayerDeclaration(stream, mLayerDecl))
@@ -683,28 +714,30 @@ namespace Ogre
 
 		}
 
-		// Load delta data
-		mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
-		stream.read(mDeltaData, numVertices);
-
 		// Create & load quadtree
 		mQuadTree = OGRE_NEW TerrainQuadTreeNode(this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
 		mQuadTree->prepare(stream);
 
-		stream.readChunkEnd(TERRAIN_CHUNK_ID);
+		// stop uncompressing
+		stream.stopDeflate();
 
-		distributeVertexData();
+		stream.readChunkEnd(TERRAIN_CHUNK_ID);
 
 		mModified = false;
 		mHeightDataModified = false;
+
+		mPrepareInProgress = false;
 
 		return true;
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::prepare(const ImportData& importData)
 	{
+		mPrepareInProgress = true;
 		freeTemporaryResources();
+		freeLodData();
 		freeCPUResources();
+		mLodManager = OGRE_NEW TerrainLodManager( this );
 
 		copyGlobalOptions();
 
@@ -831,6 +864,7 @@ namespace Ogre
 		mModified = true;
 		mHeightDataModified = true;
 
+		mPrepareInProgress = false;
 
 		return true;
 
@@ -1033,14 +1067,14 @@ namespace Ogre
 			__FUNCTION__);
 	}
 	//---------------------------------------------------------------------
-	void Terrain::load()
+	void Terrain::load(int lodLevel, bool synchronous)
 	{
-		if (mIsLoaded)
+		if (mQuadTree)
+			mLodManager->updateToLodLevel(lodLevel,synchronous);
+
+		if (mIsLoaded || mGenerateMaterialInProgress)
 			return;
 
-		if (mQuadTree)
-			mQuadTree->load();
-		
 		checkLayers(true);
 		createOrDestroyGPUColourMap();
 		createOrDestroyGPUNormalMap();
@@ -1049,8 +1083,16 @@ namespace Ogre
 		
 		mMaterialGenerator->requestOptions(this);
 
-		mIsLoaded = true;
+		GenerateMaterialRequest req;
+		req.terrain = this;
+		req.stage = GEN_MATERIAL;
+		req.startTime = synchronous ? 0 : Root::getSingletonPtr()->getTimer()->getMilliseconds() + TERRAIN_GENERATE_MATERIAL_INTERVAL_MS;
+		req.synchronous = synchronous;
 
+		Root::getSingleton().getWorkQueue()->addRequest(
+			mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
+			Any(req), 0, synchronous);
+		mGenerateMaterialInProgress = true;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
@@ -1095,11 +1137,28 @@ namespace Ogre
 		y = std::min(y, (long)mSize - 1L);
 		y = std::max(y, 0L);
 
+		long skip = 1 << mLodManager->getHighestLodPrepared();
+		if (x % skip == 0 && y % skip == 0)
 		return *getHeightData(x, y);
+
+		long x1 = std::min( (x/skip) * skip         , (long)mSize - 1L );
+		long x2 = std::min( ((x+skip) / skip) * skip, (long)mSize - 1L );
+		long y1 = std::min( (y/skip) * skip         , (long)mSize - 1L );
+		long y2 = std::min( ((y+skip) / skip) * skip, (long)mSize - 1L );
+
+		float rx = (float(x % skip) / skip);
+		float ry = (float(y % skip) / skip);
+
+		return *getHeightData(x1, y1) * (1.0f-rx) * (1.0f-ry)
+			+ *getHeightData(x2, y1) * rx * (1.0f-ry)
+			+ *getHeightData(x1, y2) * (1.0f-rx) * ry
+			+ *getHeightData(x2, y2) * rx * ry;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::setHeightAtPoint(long x, long y, float h)
 	{
+		// force to load all data
+		load(0,true);
 		// clamp
 		x = std::min(x, (long)mSize - 1L);
 		x = std::max(x, 0L);
@@ -1849,7 +1908,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void Terrain::waitForDerivedProcesses()
 	{
-		while (mDerivedDataUpdateInProgress)
+		while (mDerivedDataUpdateInProgress || mGenerateMaterialInProgress || mPrepareInProgress)
 		{
 			// we need to wait for this to finish
 			OGRE_THREAD_SLEEP(50);
@@ -1935,6 +1994,15 @@ namespace Ogre
 		}
 
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::freeLodData()
+	{
+		if(mLodManager)
+		{
+			OGRE_DELETE mLodManager;
+			mLodManager = 0;
+		}
 	}
 	//---------------------------------------------------------------------
 	Rect Terrain::calculateHeightDeltas(const Rect& rect)
@@ -2115,6 +2183,13 @@ namespace Ogre
 	uint16 Terrain::getResolutionAtLod(uint16 lodLevel)
 	{
 		return ((mSize - 1) >> lodLevel) + 1;
+	}
+	//---------------------------------------------------------------------
+	uint Terrain::getGeoDataSizeAtLod(uint16 lodLevel)
+	{
+		uint size = getResolutionAtLod(lodLevel);
+		uint prevSize = (lodLevel<mNumLodLevels-1) ? getResolutionAtLod(lodLevel+1) : 0;
+		return size*size - prevSize*prevSize;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::preFindVisibleObjects(SceneManager* source, 
@@ -2966,37 +3041,54 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool Terrain::canHandleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 	{
+		if(req->getType()==WORKQUEUE_DERIVED_DATA_REQUEST)
+		{
 		DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
 		// only deal with own requests
 		// we do this because if we delete a terrain we want any pending tasks to be discarded
 		if (ddr.terrain != this)
 			return false;
-		else
+		}
+		else if(req->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
+		{
+			GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(req->getData());
+			if (gmreq.terrain != this)
+				return false;
+		}
+
 			return RequestHandler::canHandleRequest(req, srcQ);
 
 	}
 	//---------------------------------------------------------------------
 	bool Terrain::canHandleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
 	{
-		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
+		const WorkQueue::Request* req = res->getRequest();
+		if(req->getType()==WORKQUEUE_DERIVED_DATA_REQUEST)
+		{
+			DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(req->getData());
 		// only deal with own requests
 		// we do this because if we delete a terrain we want any pending tasks to be discarded
 		if (ddreq.terrain != this)
 			return false;
-		else
+		}
+		else if(req->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
+		{
+			GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(req->getData());
+			if (gmreq.terrain != this)
+				return false;
+		}
 			return true;
-
 	}
 	//---------------------------------------------------------------------
 	WorkQueue::Response* Terrain::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 	{
 		// Background thread (maybe)
+		if(req->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
+		{
+			return OGRE_NEW WorkQueue::Response(req, true, Any());
+		}
 
 		DerivedDataRequest ddr = any_cast<DerivedDataRequest>(req->getData());
-		// only deal with own requests; we shouldn't ever get here though
-		if (ddr.terrain != this)
-			return 0;
-
 		DerivedDataResponse ddres;
 		ddres.remainingTypeMask = ddr.typeMask & DERIVED_DATA_ALL;
 
@@ -3028,6 +3120,11 @@ namespace Ogre
 	void Terrain::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
 	{
 		// Main thread
+		if(res->getRequest()->getType()==WORKQUEUE_GENERATE_MATERIAL_REQUEST)
+		{
+			handleGenerateMaterialResponse(res,srcQ);
+			return;
+		}
 
 		DerivedDataResponse ddres = any_cast<DerivedDataResponse>(res->getData());
 		DerivedDataRequest ddreq = any_cast<DerivedDataRequest>(res->getRequest()->getData());
@@ -3087,6 +3184,48 @@ namespace Ogre
 				updateCompositeMap();
 		}
 
+	}
+	//---------------------------------------------------------------------
+	void Terrain::handleGenerateMaterialResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		GenerateMaterialRequest gmreq = any_cast<GenerateMaterialRequest>(res->getRequest()->getData());
+		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
+		// haven't reached the time
+		if(currentTime<gmreq.startTime)
+		{
+			Root::getSingleton().getWorkQueue()->addRequest(
+				mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
+				Any(gmreq), 0, false);
+			return;
+		}
+
+		// process
+		switch(gmreq.stage)
+		{
+		case GEN_MATERIAL:
+			mMaterial = mMaterialGenerator->generate(this);
+			mMaterial->load();
+			// init next stage
+			if (mCompositeMapRequired)
+			{
+				gmreq.stage = GEN_COMPOSITE_MAP_MATERIAL;
+				gmreq.startTime = currentTime + TERRAIN_GENERATE_MATERIAL_INTERVAL_MS;
+				Root::getSingleton().getWorkQueue()->addRequest(
+					mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
+					Any(gmreq), 0, gmreq.synchronous);
+				return;
+			}
+			break;
+		case GEN_COMPOSITE_MAP_MATERIAL:
+			mCompositeMapMaterial = mMaterialGenerator->generateForCompositeMap(this);
+			mCompositeMapMaterial->load();
+			break;
+		}
+		mMaterialGenerationCount = mMaterialGenerator->getChangeCount();
+		mMaterialDirty = false;
+
+		mGenerateMaterialInProgress = false;
+		mIsLoaded = true;
 	}
 	//---------------------------------------------------------------------
 	uint16 Terrain::getLODLevelWhenVertexEliminated(long x, long y)
@@ -4285,7 +4424,7 @@ namespace Ogre
 		uint16 row = mainIndex / vdatasize;
 		uint16 col = mainIndex % vdatasize;
 
-		// skrits are after main vertices, so skip them
+		// skirts are after main vertices, so skip them
 		uint16 base = vdatasize * vdatasize;
 
 		// The layout in vertex data is:
@@ -4340,6 +4479,8 @@ namespace Ogre
 		if(mSize != newSize)
 		{
 			waitForDerivedProcesses();
+			// load full HeightData
+			load(0,true);
 
 			size_t numVertices = newSize * newSize;
 
@@ -4357,7 +4498,9 @@ namespace Ogre
                 mTerrainNormalMap.setNull();
             }
 
+			freeLodData();
             freeCPUResources();
+			mLodManager = OGRE_NEW TerrainLodManager( this );
 			mSize = newSize;
 
 			determineLodLevels();
@@ -4382,12 +4525,9 @@ namespace Ogre
 			calculateHeightDeltas(rect);
 			finaliseHeightDeltas(rect, true);
 
-			distributeVertexData();
-
 			if(mIsLoaded)
 			{
-				if (mQuadTree)
-					mQuadTree->load();
+				load(0,true);
 			}
 
 			mModified = true;
@@ -4496,18 +4636,20 @@ namespace Ogre
 		return ret;
 
 	}
-
-
-
-
-
-
-
-
-
-
-
-	
-	
+	//---------------------------------------------------------------------
+	void Terrain::increaseLodLevel(bool synchronous /* = false */)
+	{
+		int lodLevel = mLodManager->getTargetLodLevel();
+		if(lodLevel<0)
+			mLodManager->updateToLodLevel(-1, synchronous);
+		else if( --lodLevel >= 0 )
+			mLodManager->updateToLodLevel(lodLevel, synchronous);
+	}
+	//---------------------------------------------------------------------
+	void Terrain::decreaseLodLevel()
+	{
+		int lodLevel = mLodManager->getTargetLodLevel() + 1;
+		if( lodLevel>0 && lodLevel<mNumLodLevels )
+			mLodManager->updateToLodLevel(lodLevel);
+	}
 }
-

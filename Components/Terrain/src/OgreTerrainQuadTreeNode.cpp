@@ -138,6 +138,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	TerrainQuadTreeNode::~TerrainQuadTreeNode()
 	{
+		if (mMovable->isAttached())
+			mLocalNode->detachObject(mMovable);
 		OGRE_DELETE mMovable;
 		mMovable = 0;
 		OGRE_DELETE mRend;
@@ -243,17 +245,34 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::load()
 	{
-		createGpuVertexData();
-		createGpuIndexData();
+		loadSelf();
 
 		if (!isLeaf())
 			for (int i = 0; i < 4; ++i)
 				mChildren[i]->load();
+	}
+	//---------------------------------------------------------------------
+	void TerrainQuadTreeNode::load(uint16 treeDepthStart, uint16 treeDepthEnd)
+	{
+		if (mDepth >= treeDepthEnd)
+			return ;
 
+		if (mDepth >= treeDepthStart && mDepth < treeDepthEnd && mNodeWithVertexData)
+			loadSelf();
+
+		if (!isLeaf())
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->load(treeDepthStart, treeDepthEnd);
+	}
+	void TerrainQuadTreeNode::loadSelf()
+	{
+		createGpuVertexData();
+		createGpuIndexData();
 		if (!mLocalNode)
 			mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(mLocalCentre);
 
-		mLocalNode->attachObject(mMovable);
+		if (!mMovable->isAttached())
+			mLocalNode->attachObject(mMovable);
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::unload()
@@ -266,7 +285,24 @@ namespace Ogre
 
 		if (mMovable->isAttached())
 			mLocalNode->detachObject(mMovable);
+	}
 
+	void TerrainQuadTreeNode::unload(uint16 treeDepthStart, uint16 treeDepthEnd)
+	{
+		if (mDepth >= treeDepthEnd)
+			return ;
+
+		if (!isLeaf())
+			for (int i = 0; i < 4; ++i)
+				mChildren[i]->unload(treeDepthStart, treeDepthEnd);
+
+		if (mDepth >= treeDepthStart && mDepth < treeDepthEnd)
+		{
+			destroyGpuVertexData();
+			if (mMovable->isAttached())
+			    mLocalNode->detachObject(mMovable);
+
+		}
 	}
 	//---------------------------------------------------------------------
 	void TerrainQuadTreeNode::unprepare()
@@ -442,7 +478,8 @@ namespace Ogre
 		{
 			// we own this vertex data
 			mNodeWithVertexData = this;
-			mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, sz, treeDepthEnd - treeDepthStart);
+			if (!mVertexDataRecord)
+				mVertexDataRecord = OGRE_NEW VertexDataRecord(resolution, sz, treeDepthEnd - treeDepthStart);
 
 			createCpuVertexData();
 
@@ -609,9 +646,9 @@ namespace Ogre
 			
 			Rect updateRect(mOffsetX, mOffsetY, mBoundaryX, mBoundaryY);
 			updateVertexBuffer(posbuf, deltabuf, updateRect);
-			mVertexDataRecord->gpuVertexDataDirty = true;
 			bufbind->setBinding(POSITION_BUFFER, posbuf);
 			bufbind->setBinding(DELTA_BUFFER, deltabuf);
+			mVertexDataRecord->gpuVertexDataDirty = true;
 		}
 	}
 	//----------------------------------------------------------------------
@@ -929,6 +966,8 @@ namespace Ogre
 	{
 		if (mVertexDataRecord && mVertexDataRecord->cpuVertexData)
 		{
+			// avoid copy empty buffer
+			mVertexDataRecord->gpuVertexDataDirty = false;
 			// delete the bindings and declaration manually since not from a buf mgr
 			OGRE_DELETE mVertexDataRecord->cpuVertexData->vertexDeclaration;
 			mVertexDataRecord->cpuVertexData->vertexDeclaration = 0;
@@ -1007,9 +1046,6 @@ namespace Ogre
 					ei->getSemantic(),
 					ei->getIndex() );
 			}
-
-
-			mVertexDataRecord->gpuVertexDataDirty = false;
 
 			// We don't need the CPU copy anymore
 			destroyCpuVertexData();
@@ -1186,6 +1222,13 @@ namespace Ogre
 					++childRenderedCount;
 			}
 
+		}
+
+		// this node not loaded yet so skip
+		if (!mMovable->isAttached())
+		{
+			mCurrentLod = -1;
+			return mSelfOrChildRendered;
 		}
 
 		if (childRenderedCount == 0)

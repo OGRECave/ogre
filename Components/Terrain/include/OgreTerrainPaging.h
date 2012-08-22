@@ -76,7 +76,7 @@ namespace Ogre
 		@param pageMgr The PageManager which this class should attach to.
 		*/
 		TerrainPaging(PageManager* pageMgr);
-		~TerrainPaging();
+		virtual ~TerrainPaging();
 
 		/** Create a TerrainPagedWorldSection.
 		@remarks

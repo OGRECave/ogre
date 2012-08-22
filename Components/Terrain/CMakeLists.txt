@@ -22,6 +22,8 @@ set (HEADER_FILES
 	include/OgreTerrainMaterialGeneratorA.h
 	include/OgreTerrainPrerequisites.h
     include/OgreTerrainQuadTreeNode.h
+	include/OgreTerrainAutoUpdateLod.h
+	include/OgreTerrainLodManager.h
 )
 
 set (SOURCE_FILES
@@ -31,6 +33,8 @@ set (SOURCE_FILES
 	src/OgreTerrainMaterialGenerator.cpp
 	src/OgreTerrainMaterialGeneratorA.cpp
 	src/OgreTerrainQuadTreeNode.cpp
+	src/OgreTerrainAutoUpdateLod.cpp
+	src/OgreTerrainLodManager.cpp
 )
 
 

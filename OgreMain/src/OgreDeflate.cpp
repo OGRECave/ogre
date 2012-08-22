@@ -44,28 +44,45 @@ namespace Ogre
 	}
 	#define OGRE_DEFLATE_TMP_SIZE 16384
     //---------------------------------------------------------------------
-	DeflateStream::DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName)
+	DeflateStream::DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName, size_t avail_in)
 	: DataStream(compressedStream->getAccessMode())
 	, mCompressedStream(compressedStream)
     , mTempFileName(tmpFileName)
 	, mZStream(0)
 	, mCurrentPos(0)
+	, mAvailIn(avail_in)
 	, mTmp(0)
 	, mIsCompressedValid(true)
 	{
 		init();
 	}
     //---------------------------------------------------------------------
-	DeflateStream::DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName)		
+	DeflateStream::DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName, size_t avail_in)
 	: DataStream(name, compressedStream->getAccessMode())
 	, mCompressedStream(compressedStream)
     , mTempFileName(tmpFileName)
 	, mZStream(0)
 	, mCurrentPos(0)
+	, mAvailIn(avail_in)
 	, mTmp(0)
 	, mIsCompressedValid(true)
 	{
 		init();
+	}
+    //---------------------------------------------------------------------
+	size_t DeflateStream::getAvailInForSinglePass()
+	{
+		size_t ret = OGRE_DEFLATE_TMP_SIZE;
+
+		// if we are doing particial-uncompressing
+		if(mAvailIn>0)
+		{
+			if(mAvailIn<ret)
+				ret = mAvailIn;
+			mAvailIn -= ret;
+		}
+
+		return ret;
 	}
     //---------------------------------------------------------------------
 	void DeflateStream::init()
@@ -80,7 +97,7 @@ namespace Ogre
 			size_t restorePoint = mCompressedStream->tell();
 			// read early chunk
 			mZStream->next_in = mTmp;
-			mZStream->avail_in = mCompressedStream->read(mTmp, OGRE_DEFLATE_TMP_SIZE);
+			mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());
 			
 			if (inflateInit(mZStream) != Z_OK)
 			{
@@ -193,7 +210,7 @@ namespace Ogre
 					// Pull next chunk of compressed data from the underlying stream
 					if (!mZStream->avail_in && !mCompressedStream->eof())
 					{
-						mZStream->avail_in = mCompressedStream->read(mTmp, OGRE_DEFLATE_TMP_SIZE);
+						mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());
 						mZStream->next_in = mTmp;
 					}
 					
@@ -363,7 +380,7 @@ namespace Ogre
 				mCurrentPos = 0;
 				mZStream->next_in = mTmp;
 				mCompressedStream->seek(0);
-				mZStream->avail_in = mCompressedStream->read(mTmp, OGRE_DEFLATE_TMP_SIZE);			
+				mZStream->avail_in = mCompressedStream->read(mTmp, getAvailInForSinglePass());			
 				inflateReset(mZStream);
 			}
 			else 

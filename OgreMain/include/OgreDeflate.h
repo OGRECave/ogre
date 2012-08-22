@@ -60,6 +60,7 @@ namespace Ogre
 		String mTempFileName;
 		z_stream* mZStream;
 		size_t mCurrentPos;
+		size_t mAvailIn;
 		
 		/// Cache for read data in case skipping around
 		StaticCache<16 * OGRE_STREAM_TEMP_SIZE> mReadCache;
@@ -70,24 +71,35 @@ namespace Ogre
 		/// Whether the underlying stream is valid compressed data
 		bool mIsCompressedValid;
 		
-		
+		/**
+		 @param avail_in Available data length to be uncompressed. With it we can uncompress
+			DataStream partly.
+		*/
 		void init();
 		void destroy();
 		void compressFinal();
+
+		size_t getAvailInForSinglePass();
 	public:
 		/** Constructor for creating unnamed stream wrapping another stream.
 		 @param compressedStream The stream that this stream will use when reading / 
 			writing compressed data. The access mode from this stream will be matched.
 		 @param tmpFileName Path/Filename to be used for temporary storage of incoming data
+		 @param avail_in Available data length to be uncompressed. With it we can uncompress
+			DataStream partly.
 		*/
-        DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName = "");
+        DeflateStream(const DataStreamPtr& compressedStream, const String& tmpFileName = "",
+			size_t avail_in = 0);
 		/** Constructor for creating named stream wrapping another stream.
 		 @param name The name to give this stream
 		 @param compressedStream The stream that this stream will use when reading / 
 			writing compressed data. The access mode from this stream will be matched.
 		 @param tmpFileName Path/Filename to be used for temporary storage of incoming data
+		 @param avail_in Available data length to be uncompressed. With it we can uncompress
+			DataStream partly.
 		 */
-		DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName="");	
+		DeflateStream(const String& name, const DataStreamPtr& compressedStream, const String& tmpFileName="",
+			size_t avail_in = 0);
 		
 		~DeflateStream();
 		

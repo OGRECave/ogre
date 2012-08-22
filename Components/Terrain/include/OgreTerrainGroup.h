@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreTerrainAutoUpdateLod.h"
 
 namespace Ogre
 {
@@ -328,7 +329,7 @@ namespace Ogre
 			Terrain* instance;
 
 			TerrainSlot(long _x, long _y) : x(_x), y(_y), instance(0) {}
-			~TerrainSlot();
+			virtual ~TerrainSlot();
 			void freeInstance();
 		};
 		
@@ -500,6 +501,16 @@ namespace Ogre
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
 
+		/// Loads terrain's next LOD level.
+		void increaseLodLevel(long x, long y, bool synchronous = false);
+		/// Removes terrain's highest LOD level.
+		void decreaseLodLevel(long x, long y);
+
+		void setAutoUpdateLodStrategy(uint32 strategy);
+		/// Automatically checks if terrain's LOD level needs to be updated.
+		void autoUpdateLod(long x, long y, bool synchronous, const Any &data);
+		void autoUpdateLodAll(bool synchronous, const Any &data);
+
 	protected:
 		SceneManager *mSceneManager;
 		Terrain::Alignment mAlignment;
@@ -512,6 +523,7 @@ namespace Ogre
 		String mFilenamePrefix;
 		String mFilenameExtension;
 		String mResourceGroup;
+		uint32 mAutoUpdateLodStrategy;
 		Terrain::DefaultGpuBufferAllocator mBufferAllocator;
 		
 		/// Get the position of a terrain instance
@@ -528,6 +540,7 @@ namespace Ogre
 		{
 			TerrainSlot* slot;
 			TerrainGroup* origin;
+			static uint loadingTaskNum;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
 			{ return o; }		
 		};

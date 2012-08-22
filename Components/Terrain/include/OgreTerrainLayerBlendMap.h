@@ -80,7 +80,7 @@ namespace Ogre
 		@param buf The buffer holding the data
 		*/
 		TerrainLayerBlendMap(Terrain* parent, uint8 layerIndex, HardwarePixelBuffer* buf);
-		~TerrainLayerBlendMap();
+		virtual ~TerrainLayerBlendMap();
 		/// Get the parent terrain
 		Terrain* getParent() const { return mParent; }
 		/// Get the index of the layer this is targeting

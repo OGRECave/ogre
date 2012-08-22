@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreNode.h"
 #include "OgreRay.h"
 #include "OgreSphere.h"
+#include "OgreDeflate.h"
 
 namespace Ogre
 {
@@ -831,9 +832,19 @@ namespace Ogre
 		return c;
 
 	}
-
-
-
+	void StreamSerialiser::startDeflate(size_t avail_in)
+	{
+		assert( mOriginalStream.isNull() && "Don't start (un)compressing twice!" );
+		DataStreamPtr deflateStream(OGRE_NEW DeflateStream(mStream,"",avail_in));
+		mOriginalStream = mStream;
+		mStream = deflateStream;
+	}
+	void StreamSerialiser::stopDeflate()
+	{
+		assert( !mOriginalStream.isNull() && "Must start (un)compressing first!" );
+		mStream = mOriginalStream;
+		mOriginalStream.setNull();
+	}
 }
 
 

@@ -30,22 +30,50 @@ THE SOFTWARE.
 #include "OgreGrid2DPageStrategy.h"
 #include "OgrePagedWorld.h"
 #include "OgrePageManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
+	const uint16 TerrainPagedWorldSection::WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST = 1;
+	const uint64 TerrainPagedWorldSection::LOADING_TERRAIN_PAGE_INTERVAL_MS = 900;
+
 	//---------------------------------------------------------------------
 	TerrainPagedWorldSection::TerrainPagedWorldSection(const String& name, PagedWorld* parent, SceneManager* sm)
 		: PagedWorldSection(name, parent, sm)
 		, mTerrainGroup(0)
+		, mTerrainDefiner(0)
+		, mHasRunningTasks(false)
 	{
 		// we always use a grid strategy
 		setStrategy(parent->getManager()->getStrategy("Grid2D"));
 
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		mWorkQueueChannel = wq->getChannel("Ogre/TerrainPagedWorldSection");
+		wq->addRequestHandler(mWorkQueueChannel, this);
+		wq->addResponseHandler(mWorkQueueChannel, this);
+
+		mNextLoadingTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
 	}
 	//---------------------------------------------------------------------
 	TerrainPagedWorldSection::~TerrainPagedWorldSection()
 	{
+		//remove the pending tasks, but keep the front one, as it may have been in running
+		if(!mPagesInLoading.empty())
+			mPagesInLoading.erase( ++mPagesInLoading.begin(), mPagesInLoading.end() );
+
+		while(!mPagesInLoading.empty())
+		{
+			OGRE_THREAD_SLEEP(50);
+			Root::getSingleton().getWorkQueue()->processResponses();
+		}
+
+		WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		wq->removeRequestHandler(mWorkQueueChannel, this);
+		wq->removeResponseHandler(mWorkQueueChannel, this);
+
 		OGRE_DELETE mTerrainGroup;
+		if(mTerrainDefiner)
+			OGRE_DELETE mTerrainDefiner;
 	}
 	//---------------------------------------------------------------------
 	void TerrainPagedWorldSection::init(TerrainGroup* grp)
@@ -193,12 +221,20 @@ namespace Ogre
 		PageMap::iterator i = mPages.find(pageID);
 		if (i == mPages.end())
 		{
-			// trigger terrain load
-			long x, y;
-			// pageID is the same as a packed index
-			mTerrainGroup->unpackIndex(pageID, &x, &y);
-			mTerrainGroup->defineTerrain(x, y);
-			mTerrainGroup->loadTerrain(x, y, forceSynchronous);
+			std::list<PageID>::iterator it = find( mPagesInLoading.begin(), mPagesInLoading.end(), pageID);
+			if(it==mPagesInLoading.end())
+			{
+				mPagesInLoading.push_back(pageID);
+				mHasRunningTasks = true;
+			}
+			
+			// no running tasks, start the new one
+			if(mPagesInLoading.size()==1)
+			{
+				Root::getSingleton().getWorkQueue()->addRequest(
+					mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
+					Any(), 0, forceSynchronous);
+			}
 		}
 
 		PagedWorldSection::loadPage(pageID, forceSynchronous);
@@ -211,18 +247,63 @@ namespace Ogre
 
 		PagedWorldSection::unloadPage(pageID, forceSynchronous);
 
-
-		// trigger terrain unload
-		long x, y;
-		// pageID is the same as a packed index
-		mTerrainGroup->unpackIndex(pageID, &x, &y);
-		mTerrainGroup->unloadTerrain(x, y);
-
-
+		std::list<PageID>::iterator it = find( mPagesInLoading.begin(), mPagesInLoading.end(), pageID);
+		// hasn't been loaded, just remove from the queue
+		if(it!=mPagesInLoading.end())
+		{
+			mPagesInLoading.erase(it);
+		}
+		else
+		{
+			// trigger terrain unload
+			long x, y;
+			// pageID is the same as a packed index
+			mTerrainGroup->unpackIndex(pageID, &x, &y);
+			mTerrainGroup->unloadTerrain(x, y);
+		}
 	}
+	//---------------------------------------------------------------------
+	WorkQueue::Response* TerrainPagedWorldSection::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
+	{
+		return OGRE_NEW WorkQueue::Response(req, true, Any());
+	}
+	//---------------------------------------------------------------------
+	void TerrainPagedWorldSection::handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ)
+	{
+		if(mPagesInLoading.empty())
+		{
+			mHasRunningTasks = false;
+			return;
+		}
 
+		unsigned long currentTime = Root::getSingletonPtr()->getTimer()->getMilliseconds();
+		if(currentTime>mNextLoadingTime)
+		{
+			PageID pageID = mPagesInLoading.front();
 
+			// trigger terrain load
+			long x, y;
+			// pageID is the same as a packed index
+			mTerrainGroup->unpackIndex(pageID, &x, &y);
 
+			if(!mTerrainDefiner)
+				mTerrainDefiner = OGRE_NEW TerrainDefiner();
+			mTerrainDefiner->define(mTerrainGroup,x,y);
 
+			mTerrainGroup->loadTerrain(x, y, false);
+
+			mPagesInLoading.pop_front();
+			mNextLoadingTime = currentTime + LOADING_TERRAIN_PAGE_INTERVAL_MS;
+		}
+
+		if(!mPagesInLoading.empty())
+		{
+			Root::getSingleton().getWorkQueue()->addRequest(
+				mWorkQueueChannel, WORKQUEUE_LOAD_TERRAIN_PAGE_REQUEST, 
+				Any(), 0, false);
+		}
+		else
+			mHasRunningTasks = false;
+	}
 }
 

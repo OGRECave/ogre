@@ -318,8 +318,16 @@ namespace Ogre
 		virtual void read(Node* node, size_t count = 1);
 		virtual void read(bool* val, size_t count = 1);
 
+		/** Start (un)compressing data
+		@param avail_in Available bytes for uncompressing
+		*/
+		virtual void startDeflate(size_t avail_in = 0);
+		/** Stop (un)compressing data
+		*/
+		virtual void stopDeflate();
 	protected:
 		DataStreamPtr mStream;
+		DataStreamPtr mOriginalStream;
 		Endian mEndian;
 		bool mFlipEndian;
 		bool mReadWriteHeader;
