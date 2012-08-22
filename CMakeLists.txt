@@ -40,7 +40,6 @@ if (APPLE)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
 endif ()
 
-
 project(OGRE)
 
 # Include necessary submodules
@@ -235,6 +234,19 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   #set(CMAKE_OSX_ARCHITECTURES ${ARCHS_UNIVERSAL_IPHONE_OS})
 
   remove_definitions(-msse)
+elseif (ANDROID)
+  set(TargetPlatform "Android")
+  set(OGRE_PLATFORM OGRE_PLATFORM_ANDROID)
+  set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE FALSE CACHE BOOL "Disable viewport orientation Android" FORCE)
+  set(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT FALSE CACHE BOOL "Disable VAO on Android" FORCE)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for Android" FORCE)
+  set(OGRE_BUILD_RENDERSYSTEM_GLES FALSE CACHE BOOL "Disable OpenGL ES 1 RenderSystem for Android" FORCE)
+  set(OGRE_BUILD_COMPONENT_PAGING FALSE CACHE BOOL "Disable paging component on Android" FORCE)
+  set(OGRE_BUILD_COMPONENT_TERRAIN FALSE CACHE BOOL "Disable terrain component on Android" FORCE)
+  set(OGRE_BUILD_PLUGIN_PCZ FALSE CACHE BOOL "Disable pcz on Android" FORCE)
+  set(OGRE_BUILD_TESTS FALSE CACHE BOOL "Disable tests on Android" FORCE)
+  set(OGRE_BUILD_TOOLS FALSE CACHE BOOL "Disable tools on Android" FORCE)
+  set(OGRE_STATIC TRUE CACHE BOOL "Forcing static buil for Android" FORCE)  
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.5 as the base SDK by default
@@ -339,15 +351,6 @@ set(OGRE_LIB_DIRECTORY "lib${LIB_SUFFIX}" CACHE STRING "Install path for librari
 # to potentially speed up the compilation.
 option(OGRE_UNITY_BUILD "Enable unity build for Ogre." FALSE)
 set(OGRE_UNITY_FILES_PER_UNIT "50" CACHE STRING "Number of files per compilation unit in Unity build.")
-
-
-if (ANDROID)
-  SET(TargetPlatform "Android")
-  SET(OGRE_BUILD_RENDERSYSTEM_GLES FALSE)
-  SET(OGRE_PLATFORM OGRE_PLATFORM_ANDROID)
-  SET(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE FALSE)
-  SET(OGRE_CONFIG_ENABLE_GLES2_VAO_SUPPORT FALSE)
-endif()
 
 # hide advanced options
 mark_as_advanced(
