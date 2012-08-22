@@ -44,16 +44,17 @@ bool TriplanarTexturing::resolveParameters(ProgramSet* programSet)
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* psMain   = psProgram->getEntryPointFunction();
     
-    // Resolve pixel shader output diffuse color.
-    mVSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
-
+   
     // Resolve input vertex shader normal.
     mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
 
     // Resolve output vertex shader normal.
     mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
-    // Resolve input pixel shader normal.
+	// Resolve pixel shader output diffuse color.
+	mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+
+	// Resolve input pixel shader normal.
     mPSInNormal = psMain->resolveInputParameter(Parameter::SPS_TEXTURE_COORDINATES, 
         mVSOutNormal->getIndex(), 
         mVSOutNormal->getContent(),
@@ -120,7 +121,7 @@ bool TriplanarTexturing::addFunctionInvocations(ProgramSet* programSet)
     vsMain->addAtomInstance(curFuncInvocation);
     
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING, internalCounter++);
-    curFuncInvocation->pushOperand(mVSInDiffuse, Operand::OPS_IN);
+	curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInPosition, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mSamplerFromX, Operand::OPS_IN);
@@ -169,28 +170,9 @@ bool TriplanarTexturing::preAddToRenderState(const RenderState* renderState, Pas
 void TriplanarTexturing::copyFrom(const SubRenderState& rhs)
 {
     const TriplanarTexturing& rhsTP = static_cast<const TriplanarTexturing&>(rhs);
-    mPSOutDiffuse = rhsTP.mPSOutDiffuse;
-    mVSInDiffuse = rhsTP.mVSInDiffuse;
-
-    mVSInPosition = rhsTP.mVSInPosition;
-    mVSOutPosition = rhsTP.mVSOutPosition;
-
-    mVSOutNormal = rhsTP.mVSOutNormal;
-    mVSInNormal = rhsTP.mVSInNormal;
-    mPSInNormal = rhsTP.mPSInNormal;
-
-    mVSOutPosition = rhsTP.mVSOutPosition;
-    mVSInPosition = rhsTP.mVSInPosition;
-    mPSInPosition = rhsTP.mPSInPosition;
-
-    mSamplerFromX = rhsTP.mSamplerFromX;
-    mSamplerFromY = rhsTP.mSamplerFromY;
-    mSamplerFromZ = rhsTP.mSamplerFromZ;
-
-    mPSTPParams = rhsTP.mPSTPParams;
-    mParameters = rhsTP.mParameters;
-
-    mTextureNameFromX = rhsTP.mTextureNameFromX;
+    
+	mParameters = rhsTP.mParameters;
+	mTextureNameFromX = rhsTP.mTextureNameFromX;
     mTextureNameFromY = rhsTP.mTextureNameFromY;
     mTextureNameFromZ = rhsTP.mTextureNameFromZ;
 }
