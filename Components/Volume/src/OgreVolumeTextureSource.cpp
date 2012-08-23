@@ -40,10 +40,16 @@ namespace Volume {
     {
     
         Timer t;
-        TexturePtr tex = TextureManager::getSingleton().load(volumeTextureName,
-            ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
-            TEX_TYPE_3D,
-            0);
+        //we to load then read a 3d texture. we cannot load it directly as that will mean we might
+        //not be able to read it. we need to change it's usage from dynamic (default) to a readable static.
+        Ogre::ResourceManager::ResourceCreateOrRetrieveResult res =
+            TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
+            Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            false,0,0,Ogre::TEX_TYPE_3D);
+        Ogre::TexturePtr tex = res.first;
+        tex->setUsage(TU_DYNAMIC);
+        tex->load();
+       
         LogManager::getSingleton().stream() << "Loaded texture in " << t.getMilliseconds() << "ms.";
         t.reset();
 
@@ -81,9 +87,12 @@ namespace Volume {
                 pbptr += pb.rowPitch;
             }
             pbptr += sliceSkip;
-        }
-        buffer->unlock();
-        LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
+		}
+		buffer->unlock();
+
+		TextureManager::getSingleton().remove(tex->getHandle());
+
+		LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }
     
     //-----------------------------------------------------------------------

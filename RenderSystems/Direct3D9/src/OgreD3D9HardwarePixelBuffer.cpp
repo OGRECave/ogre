@@ -423,7 +423,7 @@ Ogre::PixelBox D3D9HardwarePixelBuffer::lockBuffer(BufferResources* bufferResour
 		else
 		{
 			D3DBOX pbox = toD3DBOX(lockBox); // specify range to lock
-			bufferResources->volume->LockBox(&lbox, &pbox, flags);
+			hr = bufferResources->volume->LockBox(&lbox, &pbox, flags);
 		}
 		if (FAILED(hr))		
 		{
