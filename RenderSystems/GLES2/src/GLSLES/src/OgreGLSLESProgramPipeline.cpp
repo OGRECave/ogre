@@ -59,8 +59,13 @@ namespace Ogre
 		// Compile and attach Vertex Program
         if(mVertexProgram && !mVertexProgram->isLinked())
         {
-            if (!mVertexProgram->getGLSLProgram()->compile(true))
+            try
             {
+                mVertexProgram->getGLSLProgram()->compile(true);
+            }
+            catch (Exception& e)
+            {
+				LogManager::getSingleton().stream() << e.getDescription();
                 mTriedToLinkAndFailed = true;
                 return;
             }
@@ -80,19 +85,23 @@ namespace Ogre
             }
             
             GL_CHECK_ERROR
-            // TODO: Just fail out here if the program doesn't link?
             mTriedToLinkAndFailed = !linkStatus;
             
             logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
-            
+
             setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
         }
         
 		// Compile and attach Fragment Program
         if(mFragmentProgram && !mFragmentProgram->isLinked())
         {
-            if (!mFragmentProgram->getGLSLProgram()->compile(true))
+            try
             {
+                mFragmentProgram->getGLSLProgram()->compile(true);
+            }
+            catch (Exception& e)
+            {
+				LogManager::getSingleton().stream() << e.getDescription();
                 mTriedToLinkAndFailed = true;
                 return;
             }

@@ -1519,7 +1519,7 @@ namespace Ogre {
             {
                 GLSLESProgramPipeline* programPipeline = 
                     GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
-                if (!programPipeline->isAttributeValid(sem, elem->getIndex()))
+                if (!programPipeline || !programPipeline->isAttributeValid(sem, elem->getIndex()))
                 {
                     continue;
                 }
@@ -1529,7 +1529,7 @@ namespace Ogre {
             else
             {
                 GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
-                if (!linkProgram->isAttributeValid(sem, elem->getIndex()))
+                if (!linkProgram || !linkProgram->isAttributeValid(sem, elem->getIndex()))
                 {
                     continue;
                 }

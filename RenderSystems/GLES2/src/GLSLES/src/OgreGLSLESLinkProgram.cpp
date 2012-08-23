@@ -116,22 +116,31 @@ namespace Ogre {
 	void GLSLESLinkProgram::compileAndLink()
 	{
 		// Compile and attach Vertex Program
-		if (!mVertexProgram->getGLSLProgram()->compile(true))
-		{
-			// TODO error
+        try
+        {
+            mVertexProgram->getGLSLProgram()->compile(true);
+        }
+        catch (Exception& e)
+        {
+            LogManager::getSingleton().stream() << e.getDescription();
             mTriedToLinkAndFailed = true;
-			return;
-		}
+            return;
+        }
+
         mVertexProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
         setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
         
 		// Compile and attach Fragment Program
-		if (!mFragmentProgram->getGLSLProgram()->compile(true))
-		{
-			// TODO error
+        try
+        {
+            mFragmentProgram->getGLSLProgram()->compile(true);
+        }
+        catch (Exception& e)
+        {
+            LogManager::getSingleton().stream() << e.getDescription();
             mTriedToLinkAndFailed = true;
-			return;
-		}
+            return;
+        }
         mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
         
         // The link
