@@ -26,6 +26,8 @@ THE SOFTWARE.
 */
 #include "OgreVolumeMeshBuilder.h"
 
+#include <limits.h>
+
 #include "OgreHardwareBufferManager.h"
 #include "OgreManualObject.h"
 #include "OgreMeshManager.h"
