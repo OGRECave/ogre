@@ -62,7 +62,6 @@ namespace Volume {
         float *pbptr = static_cast<float*>(pb.data);
         mData = OGRE_ALLOC_T(float, mWidth * mHeight * mDepth, MEMCATEGORY_GENERAL);
         float * dataRunner = mData;
-        PixelFormat format = tex->getFormat();
         ColourValue cv;
         size_t x, y;
         size_t zEnd = pb.back;
