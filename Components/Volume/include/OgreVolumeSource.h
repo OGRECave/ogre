@@ -53,7 +53,7 @@ namespace Volume {
         @return
             The density.
         */
-        virtual const Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const = 0;
+        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const = 0;
 
         /** Gets the density value.
         @param position
@@ -61,7 +61,7 @@ namespace Volume {
         @return
             The density.
         */
-        virtual const Real getValue(const Vector3 &position) const = 0;
+        virtual Real getValue(const Vector3 &position) const = 0;
 
     };
 

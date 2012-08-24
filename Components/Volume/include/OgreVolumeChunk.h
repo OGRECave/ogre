@@ -321,7 +321,7 @@ namespace Volume {
         @return
             true if visible.
         */
-        virtual const bool getDualGridVisible(void) const;
+        virtual bool getDualGridVisible(void) const;
         
         /** Shows the debug visualization entity of the octree.
         @param visible
@@ -334,7 +334,7 @@ namespace Volume {
         @return
             true if visible.
         */
-        virtual const bool getOctreeVisible(void) const;
+        virtual bool getOctreeVisible(void) const;
         
         /** Sets whether the volume mesh is visible.
         @param visible
@@ -346,7 +346,7 @@ namespace Volume {
         @return
             true if visible
         */
-        virtual const bool getVolumeVisible(void) const;
+        virtual bool getVolumeVisible(void) const;
         
         /** Overridden from FrameListener.
         */

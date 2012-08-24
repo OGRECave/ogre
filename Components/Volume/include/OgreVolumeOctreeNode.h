@@ -172,7 +172,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isSubdivided(void) const 
+        inline bool isSubdivided(void) const 
         {
             return mChildren != 0;
         }
@@ -223,7 +223,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderLeft(const OctreeNode &root) const
+        inline bool isBorderLeft(const OctreeNode &root) const
         {
             return mFrom.x == root.mFrom.x;
         }
@@ -232,7 +232,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderRight(const OctreeNode &root) const
+        inline bool isBorderRight(const OctreeNode &root) const
         {
             return mTo.x == root.mTo.x;
         }
@@ -241,7 +241,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderBottom(const OctreeNode &root) const
+        inline bool isBorderBottom(const OctreeNode &root) const
         {
             return mFrom.y == root.mFrom.y;
         }
@@ -250,7 +250,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderTop(const OctreeNode &root) const
+        inline bool isBorderTop(const OctreeNode &root) const
         {
             return mTo.y == root.mTo.y;
         }
@@ -259,7 +259,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderBack(const OctreeNode &root) const
+        inline bool isBorderBack(const OctreeNode &root) const
         {
             return mFrom.z == root.mFrom.z;
         }
@@ -268,7 +268,7 @@ namespace Volume {
         @return
             True if so.
         */
-        inline const bool isBorderFront(const OctreeNode &root) const
+        inline bool isBorderFront(const OctreeNode &root) const
         {
             return mTo.z == root.mTo.z;
         }
@@ -529,7 +529,7 @@ namespace Volume {
         @return
             true if somewhat near.
         */
-        inline const bool isIsoSurfaceNear(void) const
+        inline bool isIsoSurfaceNear(void) const
         {
             if (mCenterValue.w == (Real)0.0)
             {
