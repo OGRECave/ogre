@@ -51,7 +51,7 @@ namespace Volume {
         // Don't split if nothing is inside.
         Vector3 centerGradient;
         Real centerValue = mSrc->getValueAndGradient(node->getCenter(), centerGradient);
-        if (Math::Abs(centerValue) >= (to - from).length() * (Real)2.0)
+        if (Math::Abs(centerValue) > (to - from).length() * (Real)1.5)
         {
             node->setCenterValue(centerValue, centerGradient);
             return false;
