@@ -111,6 +111,7 @@ void Sample_VolumeCSG::setupControls(void)
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         setDragLook(true);
 #endif
+    mCameraMan->setStyle(OgreBites::CS_MANUAL);
     mCameraMan->setTopSpeed((Real)25.0);
     // make room for the volume
     mTrayMgr->showLogo(TL_TOPRIGHT);

@@ -79,13 +79,13 @@ namespace Volume {
     typedef struct _OgreVolumeExport Triangle
     {
         /// The first triangle corner.
-        const Vertex v1;
+        const Vertex mV1;
         
         /// The second triangle corner.
-        const Vertex v2;
+        const Vertex mV2;
         
         /// The third triangle corner.
-        const Vertex v3;
+        const Vertex mV3;
         
         /** Convinience constructor.
         @param v1
@@ -102,7 +102,7 @@ namespace Volume {
             The normal of the third vertex.
         */
         Triangle(const Vector3 &vIn1, const Vector3 &nIn1, const Vector3 &vIn2, const Vector3 &nIn2, const Vector3 &vIn3, const Vector3 &nIn3) :
-            v1(vIn1, nIn1), v2(vIn2, nIn2), v3(vIn3, nIn3)
+            mV1(v1, n1), mV2(v2, n2), mV3(v3, n3)
         {
         }
     } Triangle;
@@ -305,9 +305,9 @@ namespace Volume {
         */
         inline void addTriangle(Triangle t)
         {
-            addVertex(t.v1);
-            addVertex(t.v2);
-            addVertex(t.v3);
+            addVertex(t.mV1);
+            addVertex(t.mV2);
+            addVertex(t.mV3);
         }
 
         /** Generates the vertex- and indexbuffer of this mesh on the given
@@ -337,6 +337,10 @@ namespace Volume {
         */
         AxisAlignedBox getBoundingBox(void);
 
+        /** Executes a MeshBuilderCallback on this instance.
+         @param callback
+            The callback to execute.
+        */
         void executeCallback(MeshBuilderCallback *callback) const;
 
     };
