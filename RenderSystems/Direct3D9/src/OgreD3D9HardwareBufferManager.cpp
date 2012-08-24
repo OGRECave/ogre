@@ -25,6 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreD3D9RenderSystem.h"
 #include "OgreD3D9HardwareBufferManager.h"
 #include "OgreD3D9HardwareVertexBuffer.h"
 #include "OgreD3D9HardwareIndexBuffer.h"
