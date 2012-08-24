@@ -79,6 +79,8 @@ void Sample_VolumeTerrain::setupControls(void)
     mTrayMgr->showLogo(TL_TOPRIGHT);
     mTrayMgr->showFrameStats(TL_TOPRIGHT);
     mTrayMgr->toggleAdvancedFrameStats();
+
+    mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "To move arround:\n\nHold the left mouse button,\n press wasd for movement\nand move the mouse\n for the direction.", 245, 115);
 }
     
 //-----------------------------------------------------------------------
