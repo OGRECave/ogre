@@ -68,7 +68,11 @@ protected:
     /** Sets up the UI.
     */
     virtual void setupControls(void);
-        
+
+    /** Sets up the shader generator.
+    */
+    virtual void setupShaderGenerator(void);
+
     /** Is called when the sample is stopped.
     */
     virtual void cleanupContent(void);
@@ -78,9 +82,17 @@ public:
     */
     Sample_VolumeCSG(void);
     
+    /** Overridden from SdkSample.
+    */
     virtual bool keyPressed(const OIS::KeyEvent& evt);
-
+    
+    /** Overridden from SdkSample.
+    */
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+
+    /** Overridden from SdkSample.
+    */
+    virtual void _shutdown();
 };
 
 #endif
