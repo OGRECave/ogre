@@ -152,7 +152,7 @@ namespace Volume {
     
             for (VecIndices::const_iterator iter = mIndices.begin(); iter != endIndices; ++iter)
             {
-                *indices++ = *iter;
+                *indices++ = (unsigned short)*iter;
             }
         }
 
