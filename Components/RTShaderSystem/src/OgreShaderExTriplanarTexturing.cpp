@@ -45,7 +45,7 @@ bool TriplanarTexturing::resolveParameters(ProgramSet* programSet)
     Function* psMain   = psProgram->getEntryPointFunction();
     
     // Resolve pixel shader output diffuse color.
-    mVSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+    mPSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
     // Resolve input vertex shader normal.
     mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
@@ -120,7 +120,7 @@ bool TriplanarTexturing::addFunctionInvocations(ProgramSet* programSet)
     vsMain->addAtomInstance(curFuncInvocation);
     
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING, internalCounter++);
-    curFuncInvocation->pushOperand(mVSInDiffuse, Operand::OPS_IN);
+    curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInPosition, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mSamplerFromX, Operand::OPS_IN);
@@ -170,7 +170,7 @@ void TriplanarTexturing::copyFrom(const SubRenderState& rhs)
 {
     const TriplanarTexturing& rhsTP = static_cast<const TriplanarTexturing&>(rhs);
     mPSOutDiffuse = rhsTP.mPSOutDiffuse;
-    mVSInDiffuse = rhsTP.mVSInDiffuse;
+    mPSInDiffuse = rhsTP.mPSInDiffuse;
 
     mVSInPosition = rhsTP.mVSInPosition;
     mVSOutPosition = rhsTP.mVSOutPosition;

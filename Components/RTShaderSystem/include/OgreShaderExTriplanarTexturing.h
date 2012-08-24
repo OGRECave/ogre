@@ -86,7 +86,7 @@ protected:
     UniformParameterPtr mSamplerFromZ;
     
     /// Pixel shader input diffuse colour.
-    ParameterPtr mVSInDiffuse;
+    ParameterPtr mPSInDiffuse;
 
     /// Pixel shader output diffuse colour.
     ParameterPtr mPSOutDiffuse;
