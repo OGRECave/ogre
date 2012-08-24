@@ -174,7 +174,7 @@ void TriplanarTexturing::copyFrom(const SubRenderState& rhs)
     const TriplanarTexturing& rhsTP = static_cast<const TriplanarTexturing&>(rhs);
     
     mPSOutDiffuse = rhsTP.mPSOutDiffuse;
-    mVSInDiffuse = rhsTP.mVSInDiffuse;
+    mPSInDiffuse = rhsTP.mPSInDiffuse;
 
     mVSInPosition = rhsTP.mVSInPosition;
     mVSOutPosition = rhsTP.mVSOutPosition;
