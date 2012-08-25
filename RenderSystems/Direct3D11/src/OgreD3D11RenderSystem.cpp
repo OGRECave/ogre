@@ -56,7 +56,7 @@ THE SOFTWARE.
 // DXGetErrorDescription
 #include "DXErr.h"
 
-#ifdef OGRE_PROFILING == 1
+#if OGRE_PROFILING == 1
 #include "d3d9.h"
 #endif
 
@@ -2928,7 +2928,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::beginProfileEvent( const String &eventName )
     {
-#ifdef OGRE_PROFILING == 1
+#if OGRE_PROFILING == 1
         if( eventName.empty() )
             return;
 
@@ -2941,7 +2941,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::endProfileEvent( void )
     {
-#ifdef OGRE_PROFILING == 1
+#if OGRE_PROFILING == 1
         (void)D3DPERF_EndEvent();
 #endif
     }
@@ -2949,7 +2949,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::markProfileEvent( const String &eventName )
     {
-#ifdef OGRE_PROFILING == 1
+#if OGRE_PROFILING == 1
         if( eventName.empty() )
             return;
 
