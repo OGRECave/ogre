@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ogre3d.browser"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" 
+	android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
 
@@ -10,7 +11,8 @@
     <application android:label="OgreSampleBrowser" android:hasCode="false">
         <activity android:name="android.app.NativeActivity"
                   android:label="OgreSampleBrowser"
-                  android:configChanges="orientation|keyboardHidden">
+                  android:configChanges="orientation|keyboardHidden"
+				  android:debuggable="true">
             <!-- Tell NativeActivity the name of or .so -->
             <meta-data android:name="android.app.lib_name" android:value="OgreSampleBrowser" />
             <intent-filter>

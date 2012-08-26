@@ -56,6 +56,10 @@
 #       include "TextureArray.h"
 #       include "SSAO.h"
 #       include "OceanDemo.h"
+#		ifdef OGRE_BUILD_COMPONENT_VOLUME
+#			include "VolumeCSG.h"
+#			include "VolumeTerrain.h"
+#		endif
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
 #           include "Terrain.h"
 #       endif
@@ -84,8 +88,6 @@
 #	include "Tesselation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
-#   include "VolumeCSG.h"
-#   include "VolumeTerrain.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPen.h"
 #    include "PlayPenTestPlugin.h"
