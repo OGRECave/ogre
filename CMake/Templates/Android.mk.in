@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_MODULE    := OgreSampleBrowser
 
     LOCAL_LDLIBS	:= -landroid -lc -lm -ldl -llog -lEGL -lGLESv2
-    LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib 
+    LOCAL_LDLIBS	+= -L@OGRE_BINARY_DIR@/lib -L@OGRE_DEPENDENCIES_DIR@/lib/@ANDROID_ABI@
     LOCAL_LDLIBS	+= -lSample_CameraTrack -lSample_CelShading -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_CubeMapping -lSample_DynTex
     LOCAL_LDLIBS	+= -lSample_FacialAnimation -lSample_Fresnel -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke
     LOCAL_LDLIBS	+= -lPlugin_ParticleFXStatic -lPlugin_OctreeSceneManagerStatic -lRenderSystem_GLES2Static -lOgreRTShaderSystemStatic -lOgreMainStatic
