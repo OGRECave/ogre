@@ -429,15 +429,18 @@ namespace Ogre {
             return;
 
 		NSRect frame = [mWindow frame];
+        NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 		frame.origin.x = left;
-		frame.origin.y = top-frame.size.height;
+		frame.origin.y = screenFrame.size.height - frame.size.height - top;
         mWindowOrigin = frame.origin;
 		[mWindow setFrame:frame display:YES];
     }
 
     void OSXCocoaWindow::resize(unsigned int width, unsigned int height)
     {
-		if(!mWindow) return;
+		if(!mWindow)
+            return;
+        
         if(mIsFullScreen)
             return;
 
@@ -485,6 +488,7 @@ namespace Ogre {
         {
             NSRect viewFrame = [mView frame];
             NSRect windowFrame = [[mView window] frame];
+            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 
             GLint bufferRect[4];
             bufferRect[0] = viewFrame.origin.x; // 0 = left edge 
@@ -494,9 +498,10 @@ namespace Ogre {
             CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
             CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
             [mGLContext update];
+
             
             mLeft = viewFrame.origin.x; 
-            mTop = bufferRect[1]; 
+            mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
         
@@ -517,10 +522,11 @@ namespace Ogre {
         if(!mIsFullScreen)
         {
             NSRect frame = [mView frame];
+            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
             mWidth = (unsigned int)frame.size.width;
             mHeight = (unsigned int)frame.size.height;
             mLeft = (int)frame.origin.x;
-            mTop = (int)frame.origin.y+(unsigned int)frame.size.height;
+            mTop = screenFrame.size.height - frame.size.height;
 		
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
