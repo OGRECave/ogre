@@ -148,6 +148,25 @@ namespace Volume {
             The seventh node.
         */
         void vertProc(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3, const OctreeNode *n4, const OctreeNode *n5, const OctreeNode *n6, const OctreeNode *n7);
+        
+        /* Creates the bordercells.
+        @param n0
+            The first node.
+        @param n1
+            The second node.
+        @param n3
+            The third node.
+        @param n4
+            The fourth node.
+        @param n5
+            The fifth node.
+        @param n6
+            The sixth node.
+        @param n7
+            The seventh node.
+        */
+        void createBorderCells(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3, const OctreeNode *n4, const OctreeNode *n5, const OctreeNode *n6, const OctreeNode *n7);
+
    public:
 
         /** Constructor.
