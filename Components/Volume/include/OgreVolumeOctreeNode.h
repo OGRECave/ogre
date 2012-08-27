@@ -45,6 +45,9 @@ namespace Volume {
     class _OgreVolumeExport OctreeNode : public UtilityAlloc
     {
     protected:
+        
+        /// Factor to the diagonal of the cell to decide whether this cell is near the isosurface or not.
+        static Real NEAR_FACTOR;
 
         /// To count some indices while creating the debug view and recursing through the instances.
         static size_t mGridPositionCount;
@@ -535,7 +538,7 @@ namespace Volume {
             {
                 return true;
             }
-            return Math::Abs(mCenterValue.w) < (mFrom - mTo).length() * (Real)2.0;
+            return Math::Abs(mCenterValue.w) < (mFrom - mTo).length() * NEAR_FACTOR;
         }
     };
 }
