@@ -388,7 +388,7 @@ namespace Ogre
 
 		// copy the the texture to the dest
 		PixelUtil::bulkPixelConversion(
-			PixelBox(mWidth, mHeight, 1, PF_A8B8G8R8, mappedTex2D.pData), 
+			PixelBox(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D.pData), 
 			dst);
 
 		// unmap the temp buffer

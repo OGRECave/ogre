@@ -38,7 +38,6 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
 	"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
   )
 
-if(OGRE_BUILD_PLATFORM_WINRT)
   # Windows 8 SDK has custom layout
   set(DirectX_INC_SEARCH_PATH 
     "C:/Program Files (x86)/Windows Kits/8.0/Include/shared"
@@ -47,7 +46,6 @@ if(OGRE_BUILD_PLATFORM_WINRT)
   set(DirectX_LIB_SEARCH_PATH 
     "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um"
   )
-endif()
 
   create_search_paths(DirectX)
   # redo search if prefix path changed
