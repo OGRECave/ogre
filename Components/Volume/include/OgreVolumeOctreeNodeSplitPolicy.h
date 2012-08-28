@@ -46,6 +46,10 @@ namespace Volume {
     class _OgreVolumeExport OctreeNodeSplitPolicy
     {
     protected:
+
+        /// The factor on the diagonal used to decide as min distance to the isosurface whether to proceed with the splitting decision.
+        static const Real MIN_SPLIT_DISTANCE_DIAGONAL_FACTOR;
+
         /// Holds the volume source to decide something.
         const Source *mSrc;
         
