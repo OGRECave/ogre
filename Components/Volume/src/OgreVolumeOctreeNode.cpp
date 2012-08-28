@@ -31,8 +31,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
-
-    size_t OctreeNode::OCTREE_CHILDREN_COUNT = 8;
+    
+    const Real OctreeNode::NEAR_FACTOR = (Real)2.0;
+    const size_t OctreeNode::OCTREE_CHILDREN_COUNT = 8;
     size_t OctreeNode::mGridPositionCount = 0;
     size_t OctreeNode::mNodeI = 0;
     
