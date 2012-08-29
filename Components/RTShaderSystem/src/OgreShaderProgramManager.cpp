@@ -386,9 +386,9 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
     String source = sourceCodeStringStream.str();
 
-
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     HighLevelGpuProgramPtr pGpuProgram;
-     String programName;
+    String programName;
 
     ProgramSourceToNameMap::iterator foundName = mProgramSourceToNameMap.find(source) ;
     if(foundName != mProgramSourceToNameMap.end())
@@ -436,7 +436,22 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         }
 
     }
-
+#else // Disable caching on android devices 
+    // Generate program name.
+    static int gpuProgramID = 0;
+    
+    String programName = "RTSS_"  + StringConverter::toString(++gpuProgramID);
+    if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+    {
+        programName += "_VS";
+    }
+    else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+    {
+        programName += "_FS";
+    }
+    
+    HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+#endif
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
