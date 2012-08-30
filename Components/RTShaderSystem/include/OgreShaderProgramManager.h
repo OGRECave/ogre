@@ -109,7 +109,6 @@ protected:
 
 	//-----------------------------------------------------------------------------
 	typedef map<String, GpuProgramPtr>::type			GpuProgramsMap;
-    typedef map<String, String>::type			        ProgramSourceToNameMap;
 	typedef GpuProgramsMap::iterator					GpuProgramsMapIterator;
 	typedef GpuProgramsMap::const_iterator				GpuProgramsMapConstIterator;
 
@@ -157,6 +156,13 @@ protected:
 	@param programSet The program set container.
 	*/
 	bool createGpuPrograms(ProgramSet* programSet);
+		
+	/** 
+	Generates a unique guid value from a string
+	@param programString string to generate a hash value for
+	@return A string representing a 128 bit hash value of the original string
+	*/
+	String generateGUID(const String& programString);
 
 	/** Create GPU program based on the give CPU program.
 	@param shaderProgram The CPU program instance.
@@ -227,8 +233,6 @@ protected:
 	GpuProgramsMap mFragmentShaderMap;
 	// The default program processors.
 	ProgramProcessorList mDefaultProgramProcessors;
-    // map the source code of the shaders to a name for them
-    ProgramSourceToNameMap mProgramSourceToNameMap;
 
 private:
 	friend class ProgramSet;
