@@ -615,10 +615,6 @@ namespace Ogre
 		delete mesh->sharedVertexData;
 		mesh->sharedVertexData = NULL;
 		mesh->clearBoneAssignments();
-
-		MeshSerializer* serializer = new MeshSerializer();
-		serializer->exportMesh(mesh.getPointer(),  "D:/OGRE 18/Samples/Media/models/aiGDEV.mesh", MESH_VERSION_LATEST);
-		delete serializer;
 	}
 	//-----------------------------------------------------------------------
 }
