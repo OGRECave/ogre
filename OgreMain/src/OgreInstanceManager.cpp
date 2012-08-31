@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
 #include "OgreMeshSerializer.h"
+#include "OgreHardwareBufferManager.h"
 
 namespace Ogre
 {
