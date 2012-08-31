@@ -187,7 +187,7 @@ namespace Ogre {
 			mGLShaderHandle = glCreateShader(shaderType);
             GL_CHECK_ERROR
 
-#if GL_EXT_debug_label
+#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
 #endif
 
@@ -195,7 +195,7 @@ namespace Ogre {
             {
                 mGLProgramHandle = glCreateProgram();
                 GL_CHECK_ERROR
-#if GL_EXT_debug_label
+#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
 #endif
             }

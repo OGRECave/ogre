@@ -40,7 +40,7 @@ namespace Ogre
 
     GLSLESProgramPipeline::~GLSLESProgramPipeline()
     {
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glDeleteProgramPipelinesEXT(1, &mGLProgramPipelineHandle);
         GL_CHECK_ERROR;
 #endif
@@ -48,7 +48,7 @@ namespace Ogre
 
     void GLSLESProgramPipeline::compileAndLink()
 	{
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLint linkStatus = 0;
         
         glGenProgramPipelinesEXT(1, &mGLProgramPipelineHandle);
@@ -168,7 +168,7 @@ namespace Ogre
 
             // Validate pipeline
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-#if GL_EXT_debug_label
+#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
                              (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
 #endif
@@ -180,7 +180,7 @@ namespace Ogre
     {
 		if (mLinked)
 		{
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             GL_CHECK_ERROR
             glBindProgramPipelineEXT(mGLProgramPipelineHandle);
             GL_CHECK_ERROR
@@ -299,7 +299,7 @@ namespace Ogre
 		// Iterate through uniform reference list and update uniform values
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLuint progID = 0;
         if(fromProgType == GPT_VERTEX_PROGRAM)
             progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
@@ -409,7 +409,7 @@ namespace Ogre
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
                     GLuint progID = 0;
                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {

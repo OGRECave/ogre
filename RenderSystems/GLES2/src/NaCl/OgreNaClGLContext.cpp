@@ -39,8 +39,6 @@ THE SOFTWARE.
 #include "OgreGLES2RenderSystem.h"
 
 #include "OgreNaClGLSupport.h"
-#include "OgreNaClWindow.h"
-#include "OgreNaClGLContext.h"
 
 #include <stdint.h>
 

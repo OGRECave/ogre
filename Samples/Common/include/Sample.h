@@ -41,6 +41,11 @@
 #	include "macUtils.h"
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(USE_RTSHADER_SYSTEM)
+#   define USE_RTSHADER_SYSTEM
+#include "OgreShaderGenerator.h"
+#endif
+
 
 namespace OgreBites
 {
