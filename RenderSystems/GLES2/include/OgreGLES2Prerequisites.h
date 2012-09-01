@@ -109,7 +109,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 // Define GL_NONE for convenience
 #define GL_NONE 0
 
-#ifndef GL_BGRA && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 #   define GL_BGRA  0x80E1
 #endif
 
