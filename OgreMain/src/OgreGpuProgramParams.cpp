@@ -599,7 +599,7 @@ namespace Ogre
 			{
 				// Check that the definitions are the same 
 				if (instdef->constType == shareddef.constType && 
-					instdef->arraySize == shareddef.arraySize)
+					instdef->arraySize <= shareddef.arraySize)
 				{
 					CopyDataEntry e;
 					e.srcDefinition = &shareddef;
