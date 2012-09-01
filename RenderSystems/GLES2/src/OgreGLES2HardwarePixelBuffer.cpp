@@ -159,6 +159,13 @@ namespace Ogre {
                 scaled.format = PF_B8G8R8;
                 PixelUtil::bulkPixelConversion(src, scaled);
             }
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            if (src.format == PF_A8R8G8B8)
+            {
+                scaled.format = PF_A8B8G8R8;
+                PixelUtil::bulkPixelConversion(src, scaled);
+            }
+#endif
         }
 
         upload(scaled, dstBox);
