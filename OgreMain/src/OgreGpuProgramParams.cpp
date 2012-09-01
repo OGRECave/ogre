@@ -679,7 +679,7 @@ namespace Ogre
 					size_t iterations = (e.dstDefinition->elementSize / 4)
 						* e.dstDefinition->arraySize;
 					assert(iterations > 0);
-					size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
+					size_t valsPerIteration = e.srcDefinition->elementSize;
 					for (size_t l = 0; l < iterations; ++l)
 					{
 						memcpy(pDst, pSrc, sizeof(int) * valsPerIteration);
