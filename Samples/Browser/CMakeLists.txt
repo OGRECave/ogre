@@ -18,6 +18,7 @@ elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iOS.mm)
 elseif (APPLE)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
+  set(OGRE_UNITY_BUILD FALSE) # not working for the Browser, so disable
 elseif (UNIX)
   list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Unix.cpp)
 else ()
