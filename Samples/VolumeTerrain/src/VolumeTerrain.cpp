@@ -57,7 +57,6 @@ void Sample_VolumeTerrain::setupContent(void)
     mVolumeRoot = OGRE_NEW Chunk();
     SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
     mVolumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg");
-    mVolumeRoot->setMaterial("triplanarReference");
 
     // Camera
     mCamera->setPosition(to * mVolumeRoot->getScale());

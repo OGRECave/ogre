@@ -331,6 +331,9 @@ namespace Volume {
         parameters.skirtFactor = StringConverter::parseReal(config.getSetting("skirtFactor"));
     
         load(parent, from, to, level, &parameters);
+
+        String material = config.getSetting("material");
+        setMaterial(material);
     }
     
     //-----------------------------------------------------------------------
