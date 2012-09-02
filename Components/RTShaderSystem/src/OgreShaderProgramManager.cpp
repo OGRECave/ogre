@@ -380,63 +380,37 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const StringVector& profilesList,
 											   const String& cachePath)
 {
-    std::stringstream sourceCodeStringStream;
+    stringstream sourceCodeStringStream;
+	String programName;
 
 	// Generate source code.
 	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
     String source = sourceCodeStringStream.str();
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+	
+	// Generate program name.
+	programName = generateGUID(source);
 
-    HighLevelGpuProgramPtr pGpuProgram;
-     String programName;
+#else // Disable caching on android devices 
 
-    ProgramSourceToNameMap::iterator foundName = mProgramSourceToNameMap.find(source) ;
-    if(foundName != mProgramSourceToNameMap.end())
-    {
-        programName = foundName->second;
-        pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
-    }
-    else
-    {
-        _StringHash stringHash;
-        uint32 programHashCode;
-        
-        // Generate program hash code.
-        programHashCode = static_cast<uint32>(stringHash(source));
+    // Generate program name.
+    static int gpuProgramID = 0;
+    programName = "RTSS_"  + StringConverter::toString(++gpuProgramID);
+   
+#endif
+	
+	if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+	{
+		programName += "_VS";
+	}
+	else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
+	{
+		programName += "_FS";
+	}
 
-        while(true)
-        {
-            // Generate program name.
-            programName = StringConverter::toString(programHashCode);
-
-            if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
-            {
-                programName += "_VS";
-            }
-            else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
-            {
-                programName += "_FS";
-            }
-
-            // get program by name
-            pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
-
-            if (pGpuProgram.isNull() || pGpuProgram->getSource() == source)
-            {
-                // meaning we don't have the double hash problem
-                // add to the list - and continue
-                mProgramSourceToNameMap[source] = programName;
-                break;
-            }
-
-            // if the source of the shader we found isn't equal to the new shader source
-            // it mean that the hash code is equal - but not the source, so - we add
-            // one to programHashCode to make is possibly unique
-            programHashCode++;
-        }
-
-    }
-
+	// Try to get program by name.
+	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
@@ -533,6 +507,61 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	
 	return GpuProgramPtr(pGpuProgram);
 }
+
+
+//-----------------------------------------------------------------------------
+String ProgramManager::generateGUID(const String& programString)
+{
+	//To generate a unique value this component used to use _StringHash class.
+	//However when this generates a hash value it selects a maximum of 10 places within the string
+	//and bases the hash value on those position. This is not good enough for this situation.
+	//
+	//Different programs must have unique hash values. Some programs only differ in the size of array parameters.
+	//This means that only 1 or 2 letters will be changed. Using the _StringHash class in these case will, in all 
+	//likelihood, produce the same values.
+
+	unsigned int val1 = 0x9e3779b9;
+	unsigned int val2 = 0x61C88646;
+	unsigned int val3 = 0x9e3779b9;
+	unsigned int val4 = 0x61C88646;
+
+	//instead of generating the hash from the individual characters we will treat this string as a long 
+	//integer value for faster processing. We dismiss the last non-full int.
+	size_t sizeInInts = (programString.size() - 3) / 4;
+	const uint32* intBuffer = (const uint32*)programString.c_str();
+
+	size_t i = 0;
+	for( ; i < sizeInInts - 2 ; i += 3) 
+	{
+		uint32 bufVal0 = *(intBuffer + i);
+		uint32 bufVal1 = *(intBuffer + i + 1);
+		uint32 bufVal2 = *(intBuffer + i + 2);
+		val1 ^= (val1<<6) + (val1>>2) + bufVal0;
+		val2 ^= (val2<<6) + (val2>>2) + bufVal1;
+		val3 ^= (val3<<6) + (val3>>2) + bufVal2;
+		//ensure greater uniqueness by having the forth int value dependent on the entire string
+		val4 ^= (val4<<6) + (val4>>2) + bufVal0 + bufVal1 + bufVal2;
+	}
+	//read the end of the string we missed
+	if (i < sizeInInts - 1)
+		val1 ^= (val1<<6) + (val1>>2) + *(intBuffer + i - 1);
+	if (i < sizeInInts)
+		val2 ^= (val2<<6) + (val2>>2) + *(intBuffer + i);
+
+	//Generate the guid string
+	stringstream stream;
+	stream.fill('0');
+	stream.setf(std::ios::fixed);
+	stream.setf(std::ios::hex, std::ios::basefield);
+	stream.width(8); stream << val1 << "-";
+	stream.width(4); stream << (uint16)(val2 >> 16) << "-";
+	stream.width(4); stream << (uint16)(val2) << "-";
+	stream.width(4); stream << (uint16)(val3 >> 16) << "-";
+	stream.width(4); stream << (uint16)(val3);
+	stream.width(8); stream << val4;
+	return stream.str();
+}
+
 
 //-----------------------------------------------------------------------------
 void ProgramManager::addProgramProcessor(ProgramProcessor* processor)
