@@ -1807,12 +1807,9 @@ bail:
 		else
 		{
 			mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-			mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor);
-			mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor);
-			mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(op);
-			mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD ;
-			mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
-			mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+			mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
+			mBlendDesc.RenderTarget[0].DestBlend = mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor);
+			mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);
 			mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 			mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
 		}  
