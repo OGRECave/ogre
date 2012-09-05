@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __Overlay_H__
 #define __Overlay_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreSceneNode.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreMatrix4.h"
@@ -67,7 +67,7 @@ namespace Ogre {
         don't want the overlay displayed in the smaller viewports. You turn this off for 
         a specific viewport by calling the Viewport::setDisplayOverlays method.
     */
-	class _OgreExport Overlay : public OverlayAlloc
+	class _OgreOverlayExport Overlay : public OverlayAlloc
     {
 
     public:

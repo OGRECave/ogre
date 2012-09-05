@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __OverlayContainer_H__
 #define __OverlayContainer_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreOverlayElement.h"
 #include "OgreIteratorWrappers.h"
 
@@ -53,7 +53,7 @@ namespace Ogre {
         instantiating / deleting elements, and also for accepting new types of element
         from plugins etc.
     */
-    class _OgreExport OverlayContainer : public OverlayElement
+    class _OgreOverlayExport OverlayContainer : public OverlayElement
     {
     public:
         typedef map<String, OverlayElement*>::type ChildMap;

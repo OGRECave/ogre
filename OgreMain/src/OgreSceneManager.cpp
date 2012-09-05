@@ -43,8 +43,6 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgreOverlay.h"
-#include "OgreOverlayManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"
@@ -1508,11 +1506,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 			firePostFindVisibleObjects(vp);
 
 			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-		}
-		// Add overlays, if viewport deems it
-		if (vp->getOverlaysEnabled() && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
-		{
-			OverlayManager::getSingleton()._queueOverlaysForRendering(camera, getRenderQueue(), vp);
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)

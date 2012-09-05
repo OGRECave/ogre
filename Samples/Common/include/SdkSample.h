@@ -414,13 +414,14 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Extended to setup a default tray interface and camera controller.
 		-----------------------------------------------------------------------------*/
-		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer)
+		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
 		{
 			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
 			mRoot = Ogre::Root::getSingletonPtr();
 			mWindow = window;
 			mInputContext = inputContext;
 			mFSLayer = fsLayer;
+			mOverlaySystem = overlaySys;
 
 			locateResources();
 			createSceneManager();

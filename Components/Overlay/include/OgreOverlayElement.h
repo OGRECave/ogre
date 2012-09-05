@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef __OverlayElement_H__
 #define __OverlayElement_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreString.h"
 #include "OgreRenderable.h"
 #include "OgreUTFString.h"
@@ -106,7 +106,7 @@ namespace Ogre {
     Because this class is designed to be extensible, it subclasses from StringInterface
     so its parameters can be set in a generic way.
     */
-    class _OgreExport OverlayElement : public StringInterface, public Renderable, public OverlayAlloc
+    class _OgreOverlayExport OverlayElement : public StringInterface, public Renderable, public OverlayAlloc
     {
     public:
 

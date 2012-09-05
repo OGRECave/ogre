@@ -27,7 +27,7 @@ THE SOFTWARE
 #ifndef _FontManager_H__
 #define _FontManager_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreResourceManager.h"
 #include "OgreFont.h"
@@ -41,7 +41,7 @@ namespace Ogre
 	*  @{
 	*/
 	/** Manages Font resources, parsing .fontdef files and generally organising them.*/
-    class _OgreExport FontManager : public ResourceManager, public Singleton< FontManager >
+    class _OgreOverlayExport FontManager : public ResourceManager, public Singleton< FontManager >
     {
     public:
 

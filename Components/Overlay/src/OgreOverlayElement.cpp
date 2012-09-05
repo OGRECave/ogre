@@ -25,7 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreStableHeaders.h"
 
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
@@ -796,7 +795,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	bool OverlayElement::contains(Real x, Real y) const
 	{
-        return mClippingRegion.inside(x, y);
+		return x >= mClippingRegion.left && x <= mClippingRegion.right && y >= mClippingRegion.top && y <= mClippingRegion.bottom;
 	}
 
     //-----------------------------------------------------------------------

@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreStableHeaders.h"
+
 #include "OgreOverlayElementCommands.h"
 #include "OgreOverlayElement.h"
 #include "OgreStringConverter.h"

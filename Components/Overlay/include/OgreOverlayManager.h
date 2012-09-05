@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OverlayManager_H__
 #define __OverlayManager_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreSingleton.h"
 #include "OgreStringVector.h"
 #include "OgreOverlay.h"
@@ -48,7 +48,7 @@ namespace Ogre {
 		OverlayContainers and OverlayElements, used for non-interactive 2D 
 		elements such as HUDs.
     */
-    class _OgreExport OverlayManager : public Singleton<OverlayManager>, public ScriptLoader, public OverlayAlloc
+    class _OgreOverlayExport OverlayManager : public Singleton<OverlayManager>, public ScriptLoader, public OverlayAlloc
     {
     public:
         typedef map<String, Overlay*>::type OverlayMap;

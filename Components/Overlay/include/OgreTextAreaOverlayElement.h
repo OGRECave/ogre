@@ -40,7 +40,7 @@ namespace Ogre
 	*/
 	/** This class implements an overlay element which contains simple unformatted text.
     */
-    class _OgreExport TextAreaOverlayElement : public OverlayElement
+    class _OgreOverlayExport TextAreaOverlayElement : public OverlayElement
     {
     public:
         enum Alignment

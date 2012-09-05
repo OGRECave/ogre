@@ -342,6 +342,12 @@ if (APPLE)
 			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
 			)
 	endif()
+	if (OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreOverlay.dylib 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			)
+	endif()
 
 	# Add links for the sample plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD

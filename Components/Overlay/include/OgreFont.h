@@ -27,7 +27,7 @@ THE SOFTWARE
 #ifndef _Font_H__
 #define _Font_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreOverlayPrerequisites.h"
 #include "OgreResource.h"
 #include "OgreTexture.h"
 #include "OgreMaterial.h"
@@ -64,45 +64,45 @@ namespace Ogre
 	both a resource in it's own right, but it also provides the manual load
 	implementation for the Texture it creates.
     */
-	class _OgreExport Font : public Resource, public ManualResourceLoader
+	class _OgreOverlayExport Font : public Resource, public ManualResourceLoader
     {
     protected:
 		/// Command object for Font - see ParamCommand 
-		class _OgreExport CmdType : public ParamCommand
+		class _OgreOverlayExport CmdType : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for Font - see ParamCommand 
-		class _OgreExport CmdSource : public ParamCommand
+		class _OgreOverlayExport CmdSource : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
- 		class _OgreExport CmdCharSpacer : public ParamCommand
+ 		class _OgreOverlayExport CmdCharSpacer : public ParamCommand
  		{
  		public:
  			String doGet(const void* target) const;
  			void doSet(void* target, const String& val);
  		};
         /// Command object for Font - see ParamCommand 
-		class _OgreExport CmdSize : public ParamCommand
+		class _OgreOverlayExport CmdSize : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for Font - see ParamCommand 
-		class _OgreExport CmdResolution : public ParamCommand
+		class _OgreOverlayExport CmdResolution : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
 			void doSet(void* target, const String& val);
 		};
 		/// Command object for Font - see ParamCommand 
-		class _OgreExport CmdCodePoints : public ParamCommand
+		class _OgreOverlayExport CmdCodePoints : public ParamCommand
 		{
 		public:
 			String doGet(const void* target) const;
@@ -422,7 +422,7 @@ namespace Ogre
 	except to do so requires a form VC6 does not support i.e.
 	ResourceSubclassPtr<T> : public SharedPtr<T>
 	*/
-	class _OgreExport FontPtr : public SharedPtr<Font> 
+	class _OgreOverlayExport FontPtr : public SharedPtr<Font> 
 	{
 	public:
 		FontPtr() : SharedPtr<Font>() {}

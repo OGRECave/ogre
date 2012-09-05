@@ -159,9 +159,6 @@ namespace Ogre {
     class ErrorDialog;
     class ExternalTextureSourceManager;
     class Factory;
-    class Font;
-    class FontPtr;
-    class FontManager;
     struct FrameEvent;
     class FrameListener;
     class Frustum;
@@ -215,11 +212,6 @@ namespace Ogre {
 	class NodeKeyFrame;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;

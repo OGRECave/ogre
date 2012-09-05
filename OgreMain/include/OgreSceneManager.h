@@ -3542,6 +3542,8 @@ namespace Ogre {
 
         /** Handle lod events. */
         void _handleLodEvents();
+
+		IlluminationRenderStage _getCurrentRenderStage() {return mIlluminationStage;}
     };
 
     /** Default implementation of IntersectionSceneQuery. */

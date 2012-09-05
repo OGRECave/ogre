@@ -29,6 +29,7 @@
 #define __Sample_H__
 
 #include "Ogre.h"
+#include "OgreOverlaySystem.h"
 #include <iostream>
 
 #include "InputContext.h"
@@ -132,10 +133,11 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
-		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer)
+		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
 		{
 			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
 			mRoot = Ogre::Root::getSingletonPtr();
+			mOverlaySystem = overlaySys;
 			mWindow = window;
 			mInputContext = inputContext;
 			mFSLayer = fsLayer;
@@ -172,6 +174,7 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
+				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
 				mRoot->destroySceneManager(mSceneMgr);				
 			}
 			mSceneMgr = 0;
@@ -247,6 +250,7 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
+			mSceneMgr->addRenderQueueListener(mOverlaySystem);
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -280,6 +284,7 @@ namespace OgreBites
 		}	
 
 		Ogre::Root* mRoot;                // OGRE root object
+		Ogre::OverlaySystem* mOverlaySystem; // OverlaySystem
 		Ogre::RenderWindow* mWindow;      // context render window
 		InputContext mInputContext;
 		FileSystemLayer* mFSLayer; 		  // file system abstraction layer

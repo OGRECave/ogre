@@ -29,9 +29,7 @@
 #define __SdkTrays_H__
 
 #include "Ogre.h"
-#include "OgreFontManager.h"
-#include "OgreBorderPanelOverlayElement.h"
-#include "OgreTextAreaOverlayElement.h"
+#include "OgreOverlaySystem.h"
 #include <math.h>
 
 #include "OgreTimer.h"

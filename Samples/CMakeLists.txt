@@ -39,6 +39,11 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
   endif ()
   
+  if (OGRE_BUILD_COMPONENT_OVERLAY)
+	ogre_add_component_include_dir(Overlay)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
+  endif ()
+  
   if (OGRE_BUILD_COMPONENT_TERRAIN)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
   endif ()
@@ -105,6 +110,9 @@ if (OGRE_BUILD_SAMPLES)
 	# Link to RT Shader System if enabled.
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
+	endif () 
+	if (OGRE_BUILD_COMPONENT_OVERLAY)	
+  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
 	endif () 
   endif ()
   

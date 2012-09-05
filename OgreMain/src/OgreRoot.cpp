@@ -45,8 +45,6 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreParticleSystemManager.h"
 #include "OgreSkeletonManager.h"
-#include "OgreOverlayElementFactory.h"
-#include "OgreOverlayManager.h"
 #include "OgreProfiler.h"
 #include "OgreErrorDialog.h"
 #include "OgreConfigDialog.h"
@@ -77,17 +75,11 @@ THE SOFTWARE.
 #include "OgreZip.h"
 #endif
 
-#include "OgreFontManager.h"
 #include "OgreHardwareBufferManager.h"
-
-#include "OgreOverlay.h"
 #include "OgreHighLevelGpuProgramManager.h"
-
 #include "OgreExternalTextureSourceManager.h"
 #include "OgreCompositorManager.h"
-
 #include "OgreScriptCompiler.h"
-
 #include "OgreWindowEventUtilities.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -210,20 +202,6 @@ namespace Ogre {
 
         mTimer = OGRE_NEW Timer();
 
-        // Overlay manager
-        mOverlayManager = OGRE_NEW OverlayManager();
-
-        mPanelFactory = OGRE_NEW PanelOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mPanelFactory);
-
-        mBorderPanelFactory = OGRE_NEW BorderPanelOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mBorderPanelFactory);
-
-        mTextAreaFactory = OGRE_NEW TextAreaOverlayElementFactory();
-        mOverlayManager->addOverlayElementFactory(mTextAreaFactory);
-        // Font manager
-        mFontManager = OGRE_NEW FontManager();
-
         // Lod strategy manager
         mLodStrategyManager = OGRE_NEW LodStrategyManager();
 
@@ -324,8 +302,7 @@ namespace Ogre {
 #if OGRE_PROFILING
         OGRE_DELETE mProfiler;
 #endif
-        OGRE_DELETE mOverlayManager;
-        OGRE_DELETE mFontManager;
+
 		OGRE_DELETE mLodStrategyManager;
         OGRE_DELETE mArchiveManager;
         
@@ -343,10 +320,6 @@ namespace Ogre {
             OGRE_DELETE mControllerManager;
         if (mHighLevelGpuProgramManager)
             OGRE_DELETE mHighLevelGpuProgramManager;
-
-        OGRE_DELETE mTextAreaFactory;
-        OGRE_DELETE mBorderPanelFactory;
-        OGRE_DELETE mPanelFactory;
 
         unloadPlugins();
         OGRE_DELETE mMaterialManager;

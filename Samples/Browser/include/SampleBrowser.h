@@ -50,6 +50,7 @@
 #       ifdef USE_RTSHADER_SYSTEM
 #           include "ShaderSystem.h"
 #       endif
+#		include "DualQuaternion.h"
 #       include "DeferredShadingDemo.h"
 #       include "Instancing.h"
 #       include "NewInstancing.h"
@@ -562,7 +563,11 @@ protected:
 
 				mRoot->saveConfig();
 				shutdown();
-				if (mRoot) OGRE_DELETE mRoot;
+				if (mRoot)
+				{
+					OGRE_DELETE mOverlaySystem;
+					OGRE_DELETE mRoot;
+				}
 #endif
             }
 		}
@@ -1034,8 +1039,10 @@ protected:
             mPluginNameMap["Sample_NewInstancing"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_NewInstancing();
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
 			mPluginNameMap["Sample_Tesselation"]		= (OgreBites::SdkSample *) OGRE_NEW Sample_Tesselation();
+#		ifdef OGRE_BUILD_COMPONENT_VOLUME
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
+#		endif
 #   endif
             mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
@@ -1224,6 +1231,7 @@ protected:
 		{
 			mWindow->removeAllViewports();
 			Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+			sm->addRenderQueueListener(mOverlaySystem);
 			Ogre::Camera* cam = sm->createCamera("DummyCamera");
 			mWindow->addViewport(cam);
 #ifdef USE_RTSHADER_SYSTEM
@@ -1695,6 +1703,7 @@ protected:
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->removeSceneManager(dummyScene);
 #endif
+			dummyScene->removeRenderQueueListener(mOverlaySystem);
 			mWindow->removeAllViewports();
 			mRoot->destroySceneManager(dummyScene);
 		}	

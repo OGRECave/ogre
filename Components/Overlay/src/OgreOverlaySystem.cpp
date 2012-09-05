@@ -1,0 +1,88 @@
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+    (Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2012 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+#include "OgreOverlaySystem.h"
+#include "OgreRoot.h"
+
+namespace Ogre {
+	//---------------------------------------------------------------------
+	OverlaySystem::OverlaySystem()
+	{
+		mOverlayManager = OGRE_NEW Ogre::OverlayManager();
+	    mPanelFactory = OGRE_NEW Ogre::PanelOverlayElementFactory();
+		mOverlayManager->addOverlayElementFactory(mPanelFactory);
+
+		mBorderPanelFactory = OGRE_NEW Ogre::BorderPanelOverlayElementFactory();
+		mOverlayManager->addOverlayElementFactory(mBorderPanelFactory);
+
+		mTextAreaFactory = OGRE_NEW Ogre::TextAreaOverlayElementFactory();
+		mOverlayManager->addOverlayElementFactory(mTextAreaFactory);
+
+		mFontManager = OGRE_NEW FontManager();
+#if OGRE_PROFILING
+		mProfileListener = new Ogre::OverlayProfileSessionListener();
+		Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+        if (prof)
+		{
+			prof->addListener(mProfileListener);
+		}
+#endif
+	}
+	//---------------------------------------------------------------------
+	OverlaySystem::~OverlaySystem()
+	{
+#if OGRE_PROFILING
+		Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
+        if (prof)
+		{
+			prof->removeListener(mProfileListener);
+		}
+		delete mProfileListener;
+#endif
+		OGRE_DELETE mOverlayManager;
+		OGRE_DELETE mFontManager;
+	}
+	//---------------------------------------------------------------------
+	void OverlaySystem::renderQueueStarted(uint8 queueGroupId, const String& invocation, 
+			bool& skipThisInvocation)
+	{
+		if(queueGroupId == Ogre::RENDER_QUEUE_OVERLAY)
+		{
+			Ogre::Viewport* vp = Ogre::Root::getSingletonPtr()->getRenderSystem()->_getViewport();
+			if(vp != NULL)
+			{
+				Ogre::SceneManager* sceneMgr = vp->getCamera()->getSceneManager();
+				if (vp->getOverlaysEnabled() && sceneMgr->_getCurrentRenderStage() != Ogre::SceneManager::IRS_RENDER_TO_TEXTURE)
+				{
+					OverlayManager::getSingleton()._queueOverlaysForRendering(vp->getCamera(), sceneMgr->getRenderQueue(), vp);
+				}
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+}
