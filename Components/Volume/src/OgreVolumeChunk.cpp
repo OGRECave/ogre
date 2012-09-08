@@ -420,13 +420,13 @@ namespace Volume {
         
         // Get the distance to the center.
         Vector3 camPos = mCamera->getRealPosition();
-        Real d = (mBox.getCenter() * mScale).squaredDistance(camPos);
+        Real d = (mBox.getCenter() * mScale).distance(camPos);
         if (d < 1.0)
         {
             d = 1.0;
         }
 
-        Real screenSpaceError = (mError / Math::Sqrt(d)) * k;
+        Real screenSpaceError = mError / d * k;
 
         if (screenSpaceError <= mMaxPixelError / mScale)
         {
