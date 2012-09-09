@@ -415,7 +415,7 @@ namespace Volume {
             return true;
         }
     
-        Real k = ((Real)mCamera->getViewport()->getActualWidth() / ((Real)2.0 * tan(mCamera->getFOVy().valueRadians() / (Real)2.0)));
+        Real k = ((Real)mCamera->getViewport()->getActualHeight() / ((Real)2.0 * tan(mCamera->getFOVy().valueRadians() / (Real)2.0)));
 
         
         // Get the distance to the center.
