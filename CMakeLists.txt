@@ -234,7 +234,7 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   # armv7 only
   #set(CMAKE_OSX_ARCHITECTURES ${ARCHS_UNIVERSAL_IPHONE_OS})
 
-  remove_definitions(-msse)
+  string (REPLACE "-msse" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
   # Set 10.5 as the base SDK by default
