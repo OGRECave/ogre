@@ -224,13 +224,15 @@ void ShaderGenerator::createSubRenderStateExFactories()
         mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
     }
 
-	curFactory = new TextureAtlasSamplerFactory;
+	curFactory = OGRE_NEW TextureAtlasSamplerFactory;
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
 	
-	curFactory = new TriplanarTexturingFactory;
+#	if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+	curFactory = OGRE_NEW TriplanarTexturingFactory;
 	addSubRenderStateFactory(curFactory);
 	mSubRenderStateExFactories[curFactory->getType()] = (curFactory);
+#	endif
 #endif
 }
 
