@@ -12,8 +12,19 @@ fragment_program SSAO/ShowViewPos_fp_cg cg
     profiles ps_2_0 arbfp1
 }
 
+fragment_program SSAO/ShowViewPos_fp_glsl glsl
+{
+	source ShowViewPosFP.glsl
+	
+	default_params
+	{
+		param_named mrt2 int 0
+	}
+}
+
 fragment_program SSAO/ShowViewPos_fp unified
 {
+	delegate SSAO/ShowViewPos_fp_glsl 
 	delegate SSAO/ShowViewPos_fp_hlsl 
 	delegate SSAO/ShowViewPos_fp_cg
 }

@@ -12,8 +12,21 @@ fragment_program SSAO/Volumetric_fp_cg cg
     profiles arbfp1 ps_3_0
 }
 
+fragment_program SSAO/Volumetric_fp_glsl glsl
+{
+    source VolumetricFP.glsl
+
+	default_params
+	{
+		param_named sMRT1 int 0
+		param_named sMRT2 int 1
+		param_named sRand int 2
+	}
+}
+
 fragment_program SSAO/Volumetric_fp unified
 {
+	delegate SSAO/Volumetric_fp_glsl 
 	delegate SSAO/Volumetric_fp_hlsl 
 	delegate SSAO/Volumetric_fp_cg
 }

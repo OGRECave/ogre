@@ -125,6 +125,7 @@ vertex_program Ogre/Compositor/StdQuad_HLSL_vp hlsl
 // Unified definitions
 vertex_program Ogre/Compositor/StdQuad_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Cg_vp
 }

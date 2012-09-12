@@ -12,8 +12,20 @@ fragment_program SSAO/HorizonBased_fp_cg cg
     profiles ps_3_0 arbfp1
 }
 
+fragment_program SSAO/HorizonBased_fp_glsl glsl
+{
+	source HorizonBasedFP.glsl
+	
+	default_params
+	{
+		param_named sMRT1 int 0
+		param_named sMRT2 int 1
+		param_named sRand int 2
+	}
+}
 fragment_program SSAO/HorizonBased_fp unified
 {
+	delegate SSAO/HorizonBased_fp_glsl 
 	delegate SSAO/HorizonBased_fp_hlsl 
 	delegate SSAO/HorizonBased_fp_cg
 }

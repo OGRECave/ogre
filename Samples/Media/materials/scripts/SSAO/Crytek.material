@@ -12,8 +12,20 @@ fragment_program SSAO/Crytek_fp_cg cg
     profiles ps_3_0 arbfp1 
 }
 
+fragment_program SSAO/Crytek_fp_glsl glsl
+{
+    source CrytekFP.glsl
+	
+	default_params
+	{
+		param_named sSceneDepthSampler int 0
+		param_named sRotSampler4x4 int 1
+	}
+}
+
 fragment_program SSAO/Crytek_fp unified
 {
+	delegate SSAO/Crytek_fp_glsl 
 	delegate SSAO/Crytek_fp_hlsl 
 	delegate SSAO/Crytek_fp_cg
 }

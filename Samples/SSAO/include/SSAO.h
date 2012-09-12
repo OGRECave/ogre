@@ -127,7 +127,7 @@ public:
     StringVector getRequiredPlugins()
     {
         StringVector names;
-        names.push_back("Cg Program Manager");
+        //names.push_back("Cg Program Manager");
         return names;
     }
     
