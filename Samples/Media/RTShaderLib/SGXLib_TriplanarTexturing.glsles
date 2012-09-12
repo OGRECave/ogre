@@ -1,3 +1,4 @@
+#version 120
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
@@ -29,17 +30,17 @@ void SGX_TriplanarTexturing(in vec4 diffuse, in vec3 normal, in vec4 position, i
 
 	vec3 blendWeights = abs(normalize(normal));
 	blendWeights = blendWeights - parameters.y;
-	//blendWeights = pow(max(blendWeights, 0), parameters.z);
-	//blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z ).xxx;
+	blendWeights = pow(max(blendWeights, 0), parameters.z);
+	blendWeights /= (blendWeights.x + blendWeights.y + blendWeights.z ).xxx;
 	// Move the planar mapping a bit according to the normal length to avoid bad looking skirts.
 	float nLength = length(normal - 1.0);
 	vec2 coord1 = (position.yz + nLength) * parameters.x;
 	vec2 coord2 = (position.zx + nLength) * parameters.x;
 	vec2 coord3 = (position.xy + nLength) * parameters.x;
 	
-	float4 col1 = texture2D(texFromX, coord1);
-	float4 col2 = texture2D(texFromY, coord2);
-	float4 col3 = texture2D(texFromZ, coord3);
+	vec4 col1 = texture2D(texFromX, coord1);
+	vec4 col2 = texture2D(texFromY, coord2);
+	vec4 col3 = texture2D(texFromZ, coord3);
 	cOut = diffuse * vec4(col1.xyz * blendWeights.x +
 		col2.xyz * blendWeights.y +
 		col3.xyz * blendWeights.z, 1);

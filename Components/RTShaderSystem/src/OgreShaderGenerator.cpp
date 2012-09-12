@@ -1345,7 +1345,7 @@ size_t ShaderGenerator::getFragmentShaderCount() const
 void ShaderGenerator::setTargetLanguage(const String& shaderLanguage)
 {
 	// Make sure that the shader language is supported.
-	if (mProgramWriterManager->isLanguageSupported(shaderLanguage) == false)
+	if (HighLevelGpuProgramManager::getSingleton().isLanguageSupported(shaderLanguage) == false)
 	{
 		OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 			"The language " + shaderLanguage + " is not supported !!",
