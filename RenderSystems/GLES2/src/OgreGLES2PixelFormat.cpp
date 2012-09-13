@@ -245,7 +245,6 @@ namespace Ogre  {
             case PF_A2R10G10B10:
             case PF_A2B10G10R10:
             case PF_FLOAT16_RGBA:
-            case PF_FLOAT32_RGB:
             case PF_FLOAT32_RGBA:
             case PF_SHORT_RGBA:
             case PF_SHORT_RGB:
