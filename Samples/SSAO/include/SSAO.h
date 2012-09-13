@@ -123,6 +123,7 @@ public:
         mCompositorNames.push_back("SSAO/ShowViewPos");
         
         mPostNames.push_back("SSAO/Post/NoFilter");
+        mPostNames.push_back("SSAO/Post/Modulate");
         mPostNames.push_back("SSAO/Post/CrossBilateralFilter");
         mPostNames.push_back("SSAO/Post/SmartBoxFilter");
         mPostNames.push_back("SSAO/Post/BoxFilter");
