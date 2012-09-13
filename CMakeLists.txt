@@ -231,7 +231,7 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
   add_definitions(-mno-thumb)
 
-  set(CMAKE_OSX_ARCHITECTURES ${ARCHS_STANDARD_32_BIT})
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)")
   string (REPLACE "-msse" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 elseif (ANDROID)
   set(TargetPlatform "Android")
