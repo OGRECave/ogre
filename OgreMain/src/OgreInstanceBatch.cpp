@@ -276,6 +276,12 @@ namespace Ogre
 						" with a different InstanceBatch",
 						"InstanceBatch::removeInstancedEntity()");
 		}
+		if( !instancedEntity->isInUse() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+						"Trying to remove an InstancedEntity that is already removed!",
+						"InstanceBatch::removeInstancedEntity()");
+		}
 
 		if( instancedEntity->getParentSceneNode() )
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );

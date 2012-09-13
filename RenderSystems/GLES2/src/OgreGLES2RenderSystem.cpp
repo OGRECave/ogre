@@ -322,8 +322,10 @@ namespace Ogre {
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
         // Separate shader objects
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+#endif
 
         GLfloat floatConstantCount = 0;
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_VECTORS, &floatConstantCount);
@@ -2225,14 +2227,14 @@ namespace Ogre {
 	//---------------------------------------------------------------------
     void GLES2RenderSystem::beginProfileEvent( const String &eventName )
     {
-#if GL_EXT_debug_marker
+#if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glPushGroupMarkerEXT(0, eventName.c_str());
 #endif
     }
     //---------------------------------------------------------------------
     void GLES2RenderSystem::endProfileEvent( void )
     {
-#if GL_EXT_debug_marker
+#if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glPopGroupMarkerEXT();
 #endif
     }
@@ -2242,7 +2244,7 @@ namespace Ogre {
         if( eventName.empty() )
             return;
 
-#if GL_EXT_debug_marker
+#if GL_EXT_debug_marker && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glInsertEventMarkerEXT(0, eventName.c_str());
 #endif
     }  

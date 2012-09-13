@@ -46,7 +46,7 @@ namespace Ogre
                 glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
                 GL_CHECK_ERROR
             }
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
                     glIsProgramPipelineEXT(obj))
             {
@@ -74,7 +74,7 @@ namespace Ogre
                     glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
                     GL_CHECK_ERROR
                 }
-#if GL_EXT_separate_shader_objects
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
                         glIsProgramPipelineEXT(obj))
                 {

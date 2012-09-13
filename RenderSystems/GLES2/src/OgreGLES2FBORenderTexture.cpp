@@ -322,7 +322,7 @@ namespace Ogre {
 				glBindTexture(target, tid);
 
                 // Set some default parameters
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 #endif
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

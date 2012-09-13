@@ -135,8 +135,7 @@ namespace Ogre
 	{
 		if( mSharedTransformEntity )
 		{
-			unlinkTransform();
-			createSkeletonInstance();
+			stopSharingTransformAsSlave( true );
 		}
 		else
 		{
@@ -145,7 +144,7 @@ namespace Ogre
 			InstancedEntityVec::const_iterator end  = mSharingPartners.end();
 			while( itor != end )
 			{
-				(*itor)->stopSharingTransform();
+				(*itor)->stopSharingTransformAsSlave( false );
 				++itor;
 			}
 			mSharingPartners.clear();
@@ -314,12 +313,19 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstancedEntity::unlinkTransform()
+	void InstancedEntity::stopSharingTransformAsSlave( bool notifyMaster )
+	{
+		unlinkTransform( notifyMaster );
+		createSkeletonInstance();
+	}
+	//-----------------------------------------------------------------------
+	void InstancedEntity::unlinkTransform( bool notifyMaster )
 	{
 		if( mSharedTransformEntity )
 		{
 			//Tell our master we're no longer his slave
-			mSharedTransformEntity->notifyUnlink( this );
+			if( notifyMaster )
+				mSharedTransformEntity->notifyUnlink( this );
 			mBatchOwner->_markTransformSharingDirty();
 
 			mSkeletonInstance	= 0;
