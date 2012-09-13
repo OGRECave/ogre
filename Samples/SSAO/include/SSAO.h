@@ -61,28 +61,29 @@ using namespace OgreBites;
 class _OgreSampleClassExport SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
 {
 public:
+	SSAOGBufferSchemeHandler()
+	{
+		mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+	}
+
+	virtual ~SSAOGBufferSchemeHandler()
+	{
+		mGBufRefMat.setNull();
+	}
 
 	/** @copydoc MaterialManager::Listener::handleSchemeNotFound */
 	virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
 		const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
 		const Ogre::Renderable* rend)
 	{
-			Ogre::MaterialManager& matMgr = Ogre::MaterialManager::getSingleton();
-			String curSchemeName = matMgr.getActiveScheme();
-			matMgr.setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
-			Technique* originalTechnique = originalMaterial->getBestTechnique(lodIndex, rend);
-			matMgr.setActiveScheme(curSchemeName);
-
 			Technique* gBufferTech = originalMaterial->createTechnique();
-			gBufferTech->removeAllPasses();
 			gBufferTech->setSchemeName(schemeName);
 			Ogre::Pass* gbufPass = gBufferTech->createPass();
-
-			Ogre::MaterialPtr gbuf = matMgr.getByName("SSAO/GBuffer");
-			*gbufPass = *gbuf->getTechnique(0)->getPass(0);
-
+			*gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
 			return gBufferTech;
 	}
+private:
+	Ogre::MaterialPtr mGBufRefMat;
 };
 
 class _OgreSampleClassExport Sample_SSAO : public SdkSample
