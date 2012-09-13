@@ -55,6 +55,36 @@ using namespace OgreBites;
 #define SSAO_CAMERA_SIBENIK "Sibenik"
 #define SSAO_CAMERA_CORNELL "Cornell Box"
 
+/** Class for handling materials who did not specify techniques for rendering
+ *  themselves into the GBuffer.
+ */
+class _OgreSampleClassExport SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
+{
+public:
+
+	/** @copydoc MaterialManager::Listener::handleSchemeNotFound */
+	virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+		const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
+		const Ogre::Renderable* rend)
+	{
+			Ogre::MaterialManager& matMgr = Ogre::MaterialManager::getSingleton();
+			String curSchemeName = matMgr.getActiveScheme();
+			matMgr.setActiveScheme(MaterialManager::DEFAULT_SCHEME_NAME);
+			Technique* originalTechnique = originalMaterial->getBestTechnique(lodIndex, rend);
+			matMgr.setActiveScheme(curSchemeName);
+
+			Technique* gBufferTech = originalMaterial->createTechnique();
+			gBufferTech->removeAllPasses();
+			gBufferTech->setSchemeName(schemeName);
+			Ogre::Pass* gbufPass = gBufferTech->createPass();
+
+			Ogre::MaterialPtr gbuf = matMgr.getByName("SSAO/GBuffer");
+			*gbufPass = *gbuf->getTechnique(0)->getPass(0);
+
+			return gBufferTech;
+	}
+};
+
 class _OgreSampleClassExport Sample_SSAO : public SdkSample
 {
 private:
@@ -67,6 +97,8 @@ private:
 	
 	std::vector<String> mPostNames;
 	String mCurrentPost;
+
+	SSAOGBufferSchemeHandler* mGBufSchemeHandler;
     
 public:
 	Sample_SSAO()
@@ -96,10 +128,16 @@ public:
 		
         mCurrentCompositor = mCompositorNames[0];
         mCurrentPost = mPostNames[0];
+
+		mGBufSchemeHandler = NULL;
     }
     
     void cleanupContent()
     {
+		MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
+		delete mGBufSchemeHandler;
+		mGBufSchemeHandler = NULL;
+
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         
@@ -126,9 +164,7 @@ public:
     
     StringVector getRequiredPlugins()
     {
-        StringVector names;
-        //names.push_back("Cg Program Manager");
-        return names;
+        return StringVector();
     }
     
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -398,7 +434,6 @@ protected:
         for (unsigned int i = 0; i < mMeshNames.size(); i++) {
             Entity* ent = mSceneMgr->createEntity(mMeshNames[i], mMeshNames[i] + ".mesh");
             ent->setVisible(false);
-            ent->setMaterialName("SSAO/GBuffer");
             
             mSceneMgr->getRootSceneNode()->attachObject(ent);
             mMeshes.push_back(ent);
@@ -412,6 +447,9 @@ protected:
         
         changeCompositor(mCompositorNames[0]);
         changePost(mPostNames[0]);
+
+		mGBufSchemeHandler = new SSAOGBufferSchemeHandler();
+		MaterialManager::getSingleton().addListener(mGBufSchemeHandler, "GBuffer");
     }
     
 	/**
@@ -545,8 +583,8 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         mCurrentPost = post;
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
-        
-        if (post == "SSAO/Post/CrossBilateralFilter")
+		
+		if (post == "SSAO/Post/CrossBilateralFilter")
         {
             mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)->show();
             mTrayMgr->moveWidgetToTray(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT, TL_TOPLEFT);

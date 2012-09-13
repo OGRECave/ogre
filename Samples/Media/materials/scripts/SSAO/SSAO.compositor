@@ -10,15 +10,15 @@ compositor SSAO/GBuffer
         // use a better packing of variables in the mrt to (possibly) increase
         // performance!
         // ---------------------------------------------------------------------
-        
         texture mrt target_width target_height PF_FLOAT32_RGBA PF_FLOAT32_RGBA PF_FLOAT32_RGBA chain_scope
         texture occlusion target_width target_height PF_FLOAT32_RGBA chain_scope
-
+		
         target mrt
         {
             input none
             shadows off
-            
+            material_scheme GBuffer
+			
             pass clear 
 			{
 			    buffers colour depth stencil
