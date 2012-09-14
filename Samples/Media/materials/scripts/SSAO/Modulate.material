@@ -18,8 +18,8 @@ fragment_program SSAO/Post/Modulate_fp_glsl glsl
     	
 	default_params
 	{
-		param_named scene int 0
-		param_named occlusion int 1
+		param_named ssao int 0
+		param_named scene int 1
 	}
 }
 
@@ -41,16 +41,15 @@ material SSAO/Post/Modulate
 			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/Post/Modulate_fp {}
 			
-            texture_unit
-            {
-				content_type compositor SSAO/GBuffer scene
-                filtering bilinear
-            }
-
 			texture_unit
             {
-                content_type compositor SSAO/GBuffer occlusion
-                tex_address_mode clamp
+				content_type compositor SSAO/Post/Modulate ssao
+                filtering none
+            }
+			
+			texture_unit
+            {
+				content_type compositor SSAO/GBuffer scene
                 filtering bilinear
             }
         }

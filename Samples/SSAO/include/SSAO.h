@@ -35,6 +35,7 @@ using namespace OgreBites;
 #define SSAO_CREASE_AVERAGER_NAME "mCreaseAverager"
 #define SSAO_CREASE_KERNELSIZE_NAME "mCreaseKernelsize"
 
+#define SSAO_MODUALTE "mdoulate"
 #define SSAO_SAMPLE_SPACE_NAME "sampleSpace"
 #define SSAO_SAMPLE_LENGTH_SCREENSPACE "sampleScreenSpace"
 #define SSAO_SAMPLE_LENGTH_WORLDSPACE "sampleWorldSpace"
@@ -98,6 +99,7 @@ private:
 	
 	std::vector<String> mPostNames;
 	String mCurrentPost;
+	String mCurrentModulateScheme;
 
 	SSAOGBufferSchemeHandler* mGBufSchemeHandler;
     
@@ -123,7 +125,6 @@ public:
         mCompositorNames.push_back("SSAO/ShowViewPos");
         
         mPostNames.push_back("SSAO/Post/NoFilter");
-        mPostNames.push_back("SSAO/Post/Modulate");
         mPostNames.push_back("SSAO/Post/CrossBilateralFilter");
         mPostNames.push_back("SSAO/Post/SmartBoxFilter");
         mPostNames.push_back("SSAO/Post/BoxFilter");
@@ -306,9 +307,13 @@ protected:
                                     0,
                                     10,
                                     101); // snaps ???
-        
         // --- sample length parameter ---
-        mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
+		mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
+
+		mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_MODUALTE, "Modulate with scene", SSAO_GUI_WIDTH);
+
+        // --- sample length parameter ---
+        mTrayMgr->createSeparator(TL_TOPLEFT, "sep2");
         mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_SAMPLE_SPACE_NAME, "Sample in Screen Space", SSAO_GUI_WIDTH);
         mTrayMgr->createThickSlider(TL_TOPLEFT,
                                     SSAO_SAMPLE_LENGTH_SCREENSPACE,
@@ -693,7 +698,20 @@ protected:
     
     void checkBoxToggled(OgreBites::CheckBox *box) 
     {
-        if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
+		if(box->getName() == SSAO_MODUALTE)
+		{
+			if (box->isChecked())
+			{
+				CompositorManager::getSingleton().addCompositor(mViewport, "SSAO/Post/Modulate");
+	            CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
+			}
+			else
+			{  
+                CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", false);
+				CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/Post/Modulate");
+			}
+		}
+        else if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
         {
             setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleInScreenspace", box->isChecked(), false, 1);
             setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cSampleInScreenspace", box->isChecked(), false, 1);
