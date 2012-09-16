@@ -220,7 +220,7 @@ material SSAO/Post/SmartBoxFilter
 
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
@@ -247,6 +247,7 @@ material SSAO/HorizonBased/CrossBilateralFilter/X
             fragment_program_ref SSAO/HorizonBased/CrossBilateralFilter/X_fp
             {
                 param_named_auto stepX inverse_viewport_width
+                param_named cPhotometricExponent float 10
             }
             
             texture_unit // the accessability texture
@@ -258,7 +259,7 @@ material SSAO/HorizonBased/CrossBilateralFilter/X
             
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 2
+                content_type compositor SSAO/GBuffer mrt 1
                 tex_address_mode clamp
                 filtering none
             }
@@ -278,6 +279,7 @@ material SSAO/HorizonBased/CrossBilateralFilter/Y
             fragment_program_ref SSAO/HorizonBased/CrossBilateralFilter/Y_fp
             {
                 param_named_auto stepY inverse_viewport_height
+                param_named cPhotometricExponent float 10
             }
             
             texture_unit // the accessability texture, injected by the compositor
@@ -288,7 +290,7 @@ material SSAO/HorizonBased/CrossBilateralFilter/Y
             
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 2
+                content_type compositor SSAO/GBuffer mrt 1
                 tex_address_mode clamp
                 filtering none
             }

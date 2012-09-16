@@ -46,18 +46,24 @@ material SSAO/HemisphereMC
             {
                 param_named_auto cViewportSize viewport_size
                 param_named_auto cFov fov
+				
+                param_named cSampleInScreenspace float 0
+                param_named cSampleLengthScreenSpace float 0.06
+                param_named cSampleLengthWorldSpace float 2
+                param_named cSampleLengthExponent float 1
+				
             }
 
             texture_unit // normals
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
 
             texture_unit // view space position
             {
-                content_type compositor SSAO/GBuffer mrt 2
+                content_type compositor SSAO/GBuffer mrt 1
                 tex_address_mode clamp
                 filtering none
             }

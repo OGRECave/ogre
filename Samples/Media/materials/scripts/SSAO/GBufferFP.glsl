@@ -9,9 +9,7 @@ uniform float cFarClipDistance; // !!! might be 0 for infinite view projection.
 
 void main() 
 {
-	gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);
-
 	float clipDistance = cFarClipDistance - cNearClipDistance;
-	gl_FragData[1] = vec4(normalize(oNormal).xyz, (length(oViewPos) - cNearClipDistance) / clipDistance); // normal + linear depth [0, 1]
-	gl_FragData[2] = vec4(oViewPos, 0.0); // view space position
+	gl_FragData[0] = vec4(normalize(oNormal).xyz, (length(oViewPos) - cNearClipDistance) / clipDistance); // normal + linear depth [0, 1]
+	gl_FragData[1] = vec4(oViewPos, 0.0); // view space position
 }

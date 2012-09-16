@@ -102,7 +102,8 @@ private:
 	String mCurrentModulateScheme;
 
 	SSAOGBufferSchemeHandler* mGBufSchemeHandler;
-    
+    Light* mLight;
+
 public:
 	Sample_SSAO()
     {
@@ -133,6 +134,7 @@ public:
         mCurrentPost = mPostNames[0];
 
 		mGBufSchemeHandler = NULL;
+		mLight = NULL;
     }
     
     void cleanupContent()
@@ -685,8 +687,8 @@ protected:
         
         else if (slider->getName() == SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)
         {
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue(), false);
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue(), false);
+            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue(), false, 2);
+            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue(), false, 2);
         }
         
         else if(slider->getName() == SSAO_SAMPLE_LENGTH_EXPONENT_NAME)
@@ -704,9 +706,14 @@ protected:
 			{
 				CompositorManager::getSingleton().addCompositor(mViewport, "SSAO/Post/Modulate");
 	            CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
+				mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+				mLight = mSceneMgr->createLight();
+				mLight->setPosition(30, 80, 30);
 			}
 			else
 			{  
+				mSceneMgr->destroyLight(mLight);
+				mLight = NULL;
                 CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", false);
 				CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/Post/Modulate");
 			}
