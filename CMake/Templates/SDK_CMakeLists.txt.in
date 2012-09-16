@@ -202,6 +202,16 @@ if (OGRE_Paging_FOUND)
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Paging_LIBRARIES})
 endif ()
 
+if (OGRE_Volume_FOUND)
+    ogre_add_component_include_dir(Volume)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Volume_LIBRARIES})
+endif ()
+
+if (OGRE_Overlay_FOUND)
+    ogre_add_component_include_dir(Overlay)
+    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Overlay_LIBRARIES})
+endif ()
+
 if (UNIX AND NOT APPLE)
   # on Linux, shipped samples will still be compiled with CMake, so we need
   # the .cfg files in the build directory.
