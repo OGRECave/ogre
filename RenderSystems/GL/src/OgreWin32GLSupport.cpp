@@ -658,7 +658,7 @@ namespace Ogre {
 			attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
 			attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
 			attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
-			if (useHwGamma && checkExtension("WGL_EXT_framebuffer_sRGB"))
+			if (useHwGamma && mHasHardwareGamma)
 			{
 				attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);
 			}
