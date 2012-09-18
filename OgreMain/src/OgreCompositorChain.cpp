@@ -103,7 +103,7 @@ void CompositorChain::createOriginalScene()
     // want compositors to share their technique.  Otherwise both compositors will have to recompile every time they
     // render.  Thus we generate a unique compositor per viewport.
 	String compName("Ogre/Scene/");
-    compName += StringConverter::toString((intptr_t)mViewport);
+    compName += StringConverter::toString((size_t)mViewport);
 
 	mOriginalSceneScheme = mViewport->getMaterialScheme();
 	CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
