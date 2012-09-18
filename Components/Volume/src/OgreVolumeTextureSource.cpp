@@ -123,7 +123,7 @@ namespace Volume {
         }
         else
         {
-            normal = getGradient((size_t)scaledPosition.x, (size_t)scaledPosition.y, (size_t)scaledPosition.z);
+            normal = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
             normal *= (Real)-1.0;
         }
         return getValue(position);
