@@ -100,7 +100,6 @@ namespace Volume {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
         if (mTrilinearNormal)
         {
-            // http://en.wikipedia.org/wiki/Trilinear_interpolation
             size_t x0 = (size_t)scaledPosition.x;
             size_t x1 = (size_t)ceil(scaledPosition.x);
             size_t y0 = (size_t)scaledPosition.y;
@@ -112,13 +111,31 @@ namespace Volume {
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
         
-            Vector3 i1 = getGradient(x0, y0, z0) * ((Real)1.0 - dZ) + getGradient(x0, y0, z1) * dZ;
-            Vector3 i2 = getGradient(x0, y1, z0) * ((Real)1.0 - dZ) + getGradient(x0, y1, z1) * dZ;
-            Vector3 j1 = getGradient(x1, y0, z0) * ((Real)1.0 - dZ) + getGradient(x1, y0, z1) * dZ;
-            Vector3 j2 = getGradient(x1, y1, z0) * ((Real)1.0 - dZ) + getGradient(x1, y1, z1) * dZ;
-            Vector3 w1 = i1 * ((Real)1.0 - dY) + i2 * dY;
-            Vector3 w2 = j1 * ((Real)1.0 - dY) + j2 * dY;
-            normal = w1 * ((Real)1.0 - dX) + w2 * dX;
+            Vector3 v000 = getGradient(x0, y0, z0);
+            Vector3 v100 = getGradient(x1, y0, z0);
+            Vector3 v010 = getGradient(x0, y1, z0);
+            Vector3 v001 = getGradient(x0, y0, z1);
+            Vector3 v101 = getGradient(x1, y0, z1);
+            Vector3 v011 = getGradient(x0, y1, z1);
+            Vector3 v110 = getGradient(x1, y1, z0);
+            Vector3 v111 = getGradient(x1, y1, z1);
+
+            Real oneMinX = (Real)1.0 - dX;
+            Real oneMinY = (Real)1.0 - dY;
+            Real oneMinZ = (Real)1.0 - dZ;
+            Real dXdY = dX * dY;
+            Real oneMinXoneMinY = oneMinX * oneMinY;
+            Real dXOneMinY = dX * oneMinY;
+
+            normal = oneMinZ * (v000 * oneMinXoneMinY
+                + v100 * dXOneMinY
+                + v010 * oneMinX * dY)
+                + dZ * (v001 * oneMinXoneMinY
+                + v101 * dXOneMinY
+                + v011 * oneMinX * dY)
+                + dXdY * (v110 * oneMinZ
+                + v111 * dZ);
+
             normal *= (Real)-1.0;
         }
         else
@@ -137,25 +154,42 @@ namespace Volume {
         Real value;
         if (mTrilinearValue)
         {
-            // http://en.wikipedia.org/wiki/Trilinear_interpolation
             size_t x0 = (size_t)scaledPosition.x;
             size_t x1 = (size_t)ceil(scaledPosition.x);
             size_t y0 = (size_t)scaledPosition.y;
             size_t y1 = (size_t)ceil(scaledPosition.y);
             size_t z0 = (size_t)scaledPosition.z;
             size_t z1 = (size_t)ceil(scaledPosition.z);
-        
+
             Real dX = scaledPosition.x - (Real)x0;
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
 
-            Real i1 = getVolumeArrayValue(x0, y0, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x0, y0, z1) * dZ;
-            Real i2 = getVolumeArrayValue(x0, y1, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x0, y1, z1) * dZ;
-            Real j1 = getVolumeArrayValue(x1, y0, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x1, y0, z1) * dZ;
-            Real j2 = getVolumeArrayValue(x1, y1, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x1, y1, z1) * dZ;
-            Real w1 = i1 * ((Real)1.0 - dY) + i2 * dY;
-            Real w2 = j1 * ((Real)1.0 - dY) + j2 * dY;
-            value = w1 * ((Real)1.0 - dX) + w2 * dX;
+            Real v000 = getVolumeArrayValue(x0, y0, z0);
+            Real v100 = getVolumeArrayValue(x1, y0, z0);
+            Real v010 = getVolumeArrayValue(x0, y1, z0);
+            Real v001 = getVolumeArrayValue(x0, y0, z1);
+            Real v101 = getVolumeArrayValue(x1, y0, z1);
+            Real v011 = getVolumeArrayValue(x0, y1, z1);
+            Real v110 = getVolumeArrayValue(x1, y1, z0);
+            Real v111 = getVolumeArrayValue(x1, y1, z1);
+
+            Real oneMinX = (Real)1.0 - dX;
+            Real oneMinY = (Real)1.0 - dY;
+            Real oneMinZ = (Real)1.0 - dZ;
+            Real dXdY = dX * dY;
+            Real oneMinXoneMinY = oneMinX * oneMinY;
+            Real dXOneMinY = dX * oneMinY;
+
+            value = oneMinZ * (v000 * oneMinXoneMinY
+                + v100 * dXOneMinY
+                + v010 * oneMinX * dY)
+                + dZ * (v001 * oneMinXoneMinY
+                + v101 * dXOneMinY
+                + v011 * oneMinX * dY)
+                + dXdY * (v110 * oneMinZ
+                + v111 * dZ);
+        
         }
         else
         {
