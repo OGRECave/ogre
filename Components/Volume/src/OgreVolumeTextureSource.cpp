@@ -123,7 +123,6 @@ namespace Volume {
             Real oneMinX = (Real)1.0 - dX;
             Real oneMinY = (Real)1.0 - dY;
             Real oneMinZ = (Real)1.0 - dZ;
-            Real dXdY = dX * dY;
             Real oneMinXoneMinY = oneMinX * oneMinY;
             Real dXOneMinY = dX * oneMinY;
 
@@ -133,7 +132,7 @@ namespace Volume {
                 + dZ * (v001 * oneMinXoneMinY
                 + v101 * dXOneMinY
                 + v011 * oneMinX * dY)
-                + dXdY * (v110 * oneMinZ
+                + dX * dY * (v110 * oneMinZ
                 + v111 * dZ);
 
             normal *= (Real)-1.0;
@@ -177,7 +176,6 @@ namespace Volume {
             Real oneMinX = (Real)1.0 - dX;
             Real oneMinY = (Real)1.0 - dY;
             Real oneMinZ = (Real)1.0 - dZ;
-            Real dXdY = dX * dY;
             Real oneMinXoneMinY = oneMinX * oneMinY;
             Real dXOneMinY = dX * oneMinY;
 
@@ -187,7 +185,7 @@ namespace Volume {
                 + dZ * (v001 * oneMinXoneMinY
                 + v101 * dXOneMinY
                 + v011 * oneMinX * dY)
-                + dXdY * (v110 * oneMinZ
+                + dX * dY * (v110 * oneMinZ
                 + v111 * dZ);
         
         }
