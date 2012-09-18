@@ -150,7 +150,7 @@ namespace Ogre {
 
 			if ((opt = miscParams->find("externalWindowHandle")) != end)
 			{
-				mHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				mHWnd = (HWND)StringConverter::parseSizeT(opt->second);
 				if (mHWnd)
 				{
 					mIsExternal = true;
@@ -193,7 +193,7 @@ namespace Ogre {
 
 			// incompatible with fullscreen
 			if ((opt = miscParams->find("parentWindowHandle")) != end)
-				parent = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				parent = (HWND)StringConverter::parseSizeT(opt->second);
 
 
 			// monitor index

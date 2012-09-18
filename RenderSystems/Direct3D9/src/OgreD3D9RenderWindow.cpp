@@ -109,11 +109,11 @@ namespace Ogre
 			// parentWindowHandle		-> parentHWnd
 			opt = miscParams->find("parentWindowHandle");
 			if(opt != miscParams->end())
-				parentHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
 			// vsync	[parseBool]
 			opt = miscParams->find("vsync");
 			if(opt != miscParams->end())

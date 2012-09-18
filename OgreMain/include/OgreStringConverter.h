@@ -200,6 +200,11 @@ namespace Ogre {
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0);
+        /** Converts a String to size_t. 
+        @return
+            defaultValue if the value could not be parsed, otherwise the numeric version of the String.
+        */
+        static size_t parseSizeT(const String& val, size_t defaultValue = 0);
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string

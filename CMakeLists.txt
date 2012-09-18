@@ -40,6 +40,7 @@ if (APPLE)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
 endif ()
 
+
 project(OGRE)
 
 # Include necessary submodules
@@ -228,12 +229,10 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_BUILD_RENDERSYSTEM_GLES2 TRUE CACHE BOOL "Forcing OpenGL ES 2 RenderSystem for iOS" FORCE)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static build for iOS" FORCE)
   set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
+  add_definitions(-mno-thumb)
 
-  set(CMAKE_OSX_ARCHITECTURES ${ARCHS_STANDARD_32_BIT})
-  # armv7 only
-  #set(CMAKE_OSX_ARCHITECTURES ${ARCHS_UNIVERSAL_IPHONE_OS})
-
-  remove_definitions(-msse)
+  set(CMAKE_OSX_ARCHITECTURES "$(ARCHS_STANDARD_32_BIT)")
+  string (REPLACE "-msse" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
 elseif (ANDROID)
   set(TargetPlatform "Android")
   set(OGRE_PLATFORM OGRE_PLATFORM_ANDROID)
@@ -365,6 +364,7 @@ mark_as_advanced(
   OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
   OGRE_CONFIG_MEMTRACK_DEBUG
   OGRE_CONFIG_MEMTRACK_RELEASE
+  OGRE_CONFIG_NEW_COMPILERS
   OGRE_CONFIG_ENABLE_DDS
   OGRE_CONFIG_ENABLE_FREEIMAGE
   OGRE_CONFIG_ENABLE_PVRTC

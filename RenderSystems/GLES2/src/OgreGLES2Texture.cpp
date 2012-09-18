@@ -124,7 +124,7 @@ namespace Ogre {
         mMipmapsHardwareGenerated =
         Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
         
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 #endif
         
@@ -236,6 +236,14 @@ namespace Ogre {
 				{
 					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+                        if(internalformat != format)
+                        {
+                            LogManager::getSingleton().logMessage("glTexImage2D: format != internalFormat, "
+                                "format=" + StringConverter::toString(format) + 
+                                ", internalFormat=" + StringConverter::toString(internalformat));
+                        }
+#endif
                         glTexImage2D(GL_TEXTURE_2D,
                                      mip,
                                      internalformat,

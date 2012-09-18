@@ -40,20 +40,54 @@ fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_cg cg
     profiles ps_2_0 arbfp1
 }
 
+fragment_program SSAO/UnsharpMask_fp_glsl glsl
+{
+    source UnsharpMaskFP.glsl
+
+	default_params
+	{
+		param_named blurred int 0
+		param_named mrt0 int 1
+	}
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurX_fp_glsl glsl
+{
+    source GaussianBlurXFP.glsl
+
+	default_params
+	{
+		param_named mrt1 int 0
+	}	
+}
+
+fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_glsl glsl
+{
+    source GaussianBlurYFP.glsl
+
+	default_params
+	{
+		param_named mrt1 int 0
+	}
+}
+
 fragment_program SSAO/UnsharpMask_fp unified
 {
+	delegate SSAO/UnsharpMask_fp_glsl 
 	delegate SSAO/UnsharpMask_fp_hlsl 
 	delegate SSAO/UnsharpMask_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurX_fp unified
 {
+	delegate SSAO/UnsharpMask/GaussianBlurX_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurX_fp_hlsl 
 	delegate SSAO/UnsharpMask/GaussianBlurX_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurY_fp unified
 {
+	delegate SSAO/UnsharpMask/GaussianBlurY_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurY_fp_hlsl 
 	delegate SSAO/UnsharpMask/GaussianBlurY_fp_cg
 }
@@ -70,11 +104,12 @@ material SSAO/UnsharpMask/GaussianBlurX
             fragment_program_ref SSAO/UnsharpMask/GaussianBlurX_fp
             {
                 param_named_auto stepX inverse_viewport_width
+				param_named cKernelWidthBias float 1
             }
             
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
@@ -94,11 +129,12 @@ material SSAO/UnsharpMask/GaussianBlurY
             fragment_program_ref SSAO/UnsharpMask/GaussianBlurY_fp
             {
                 param_named_auto stepY inverse_viewport_height
+				param_named cKernelWidthBias float 1
             }
             
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
@@ -115,7 +151,10 @@ material SSAO/UnsharpMask
             depth_check off
 
 			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
-            fragment_program_ref SSAO/UnsharpMask_fp {}
+            fragment_program_ref SSAO/UnsharpMask_fp 
+			{
+				param_named cLambda float 5
+			}
             
             texture_unit // blurred depth buffer
             {
@@ -123,16 +162,9 @@ material SSAO/UnsharpMask
                 filtering none
             }
             
-            texture_unit // color component of the GBuffer
-            {
-                content_type compositor SSAO/GBuffer mrt 0
-                tex_address_mode clamp
-                filtering none
-            }
-
             texture_unit // original depth buffer
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }

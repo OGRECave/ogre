@@ -164,6 +164,13 @@ namespace Ogre {
                 scaled.format = PF_B8G8R8;
                 PixelUtil::bulkPixelConversion(src, scaled);
             }
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+            if (src.format == PF_A8R8G8B8)
+            {
+                scaled.format = PF_A8B8G8R8;
+                PixelUtil::bulkPixelConversion(src, scaled);
+            }
+#endif
         }
 
         upload(scaled, dstBox);
@@ -593,7 +600,7 @@ namespace Ogre {
             GL_CHECK_ERROR;
             glBindTexture(GL_TEXTURE_2D, tempTex);
             GL_CHECK_ERROR;
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
             GL_CHECK_ERROR;
 #endif
@@ -797,7 +804,7 @@ namespace Ogre {
         glBindTexture(target, id);
         GL_CHECK_ERROR;
 
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000 );
         GL_CHECK_ERROR;
 #endif

@@ -125,7 +125,7 @@ void Sample_VolumeCSG::setupControls(void)
 void Sample_VolumeCSG::setupShaderGenerator()
 {
     RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-    mGen->setTargetLanguage("cg");
+    //mGen->setTargetLanguage("cg");
         
     RTShader::RenderState* pMainRenderState = 
         mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;

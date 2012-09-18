@@ -35,6 +35,7 @@ using namespace OgreBites;
 #define SSAO_CREASE_AVERAGER_NAME "mCreaseAverager"
 #define SSAO_CREASE_KERNELSIZE_NAME "mCreaseKernelsize"
 
+#define SSAO_MODUALTE "mdoulate"
 #define SSAO_SAMPLE_SPACE_NAME "sampleSpace"
 #define SSAO_SAMPLE_LENGTH_SCREENSPACE "sampleScreenSpace"
 #define SSAO_SAMPLE_LENGTH_WORLDSPACE "sampleWorldSpace"
@@ -55,6 +56,37 @@ using namespace OgreBites;
 #define SSAO_CAMERA_SIBENIK "Sibenik"
 #define SSAO_CAMERA_CORNELL "Cornell Box"
 
+/** Class for handling materials who did not specify techniques for rendering
+ *  themselves into the GBuffer.
+ */
+class _OgreSampleClassExport SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
+{
+public:
+	SSAOGBufferSchemeHandler()
+	{
+		mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+	}
+
+	virtual ~SSAOGBufferSchemeHandler()
+	{
+		mGBufRefMat.setNull();
+	}
+
+	/** @copydoc MaterialManager::Listener::handleSchemeNotFound */
+	virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+		const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex, 
+		const Ogre::Renderable* rend)
+	{
+			Technique* gBufferTech = originalMaterial->createTechnique();
+			gBufferTech->setSchemeName(schemeName);
+			Ogre::Pass* gbufPass = gBufferTech->createPass();
+			*gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
+			return gBufferTech;
+	}
+private:
+	Ogre::MaterialPtr mGBufRefMat;
+};
+
 class _OgreSampleClassExport Sample_SSAO : public SdkSample
 {
 private:
@@ -67,7 +99,11 @@ private:
 	
 	std::vector<String> mPostNames;
 	String mCurrentPost;
-    
+	String mCurrentModulateScheme;
+
+	SSAOGBufferSchemeHandler* mGBufSchemeHandler;
+    Light* mLight;
+
 public:
 	Sample_SSAO()
     {
@@ -96,10 +132,17 @@ public:
 		
         mCurrentCompositor = mCompositorNames[0];
         mCurrentPost = mPostNames[0];
+
+		mGBufSchemeHandler = NULL;
+		mLight = NULL;
     }
     
     void cleanupContent()
     {
+		MaterialManager::getSingleton().removeListener(mGBufSchemeHandler, "GBuffer");
+		delete mGBufSchemeHandler;
+		mGBufSchemeHandler = NULL;
+
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentCompositor, false);
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         
@@ -126,9 +169,7 @@ public:
     
     StringVector getRequiredPlugins()
     {
-        StringVector names;
-        names.push_back("Cg Program Manager");
-        return names;
+        return StringVector();
     }
     
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -268,9 +309,13 @@ protected:
                                     0,
                                     10,
                                     101); // snaps ???
-        
         // --- sample length parameter ---
-        mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
+		mTrayMgr->createSeparator(TL_TOPLEFT, "sep");
+
+		mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_MODUALTE, "Modulate with scene", SSAO_GUI_WIDTH);
+
+        // --- sample length parameter ---
+        mTrayMgr->createSeparator(TL_TOPLEFT, "sep2");
         mTrayMgr->createCheckBox(TL_TOPLEFT, SSAO_SAMPLE_SPACE_NAME, "Sample in Screen Space", SSAO_GUI_WIDTH);
         mTrayMgr->createThickSlider(TL_TOPLEFT,
                                     SSAO_SAMPLE_LENGTH_SCREENSPACE,
@@ -398,7 +443,6 @@ protected:
         for (unsigned int i = 0; i < mMeshNames.size(); i++) {
             Entity* ent = mSceneMgr->createEntity(mMeshNames[i], mMeshNames[i] + ".mesh");
             ent->setVisible(false);
-            ent->setMaterialName("SSAO/GBuffer");
             
             mSceneMgr->getRootSceneNode()->attachObject(ent);
             mMeshes.push_back(ent);
@@ -412,6 +456,9 @@ protected:
         
         changeCompositor(mCompositorNames[0]);
         changePost(mPostNames[0]);
+
+		mGBufSchemeHandler = new SSAOGBufferSchemeHandler();
+		MaterialManager::getSingleton().addListener(mGBufSchemeHandler, "GBuffer");
     }
     
 	/**
@@ -545,8 +592,8 @@ protected:
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, false);
         mCurrentPost = post;
         CompositorManager::getSingleton().setCompositorEnabled(mViewport, mCurrentPost, true);
-        
-        if (post == "SSAO/Post/CrossBilateralFilter")
+		
+		if (post == "SSAO/Post/CrossBilateralFilter")
         {
             mTrayMgr->getWidget(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)->show();
             mTrayMgr->moveWidgetToTray(SSAO_BILATERAL_PHOTOMETRIC_EXPONENT, TL_TOPLEFT);
@@ -640,8 +687,8 @@ protected:
         
         else if (slider->getName() == SSAO_BILATERAL_PHOTOMETRIC_EXPONENT)
         {
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue(), false);
-            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue(), false);
+            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/X", "cPhotometricExponent", slider->getValue(), false, 2);
+            setUniform("SSAO/Post/CrossBilateralFilter", "SSAO/HorizonBased/CrossBilateralFilter/Y", "cPhotometricExponent", slider->getValue(), false, 2);
         }
         
         else if(slider->getName() == SSAO_SAMPLE_LENGTH_EXPONENT_NAME)
@@ -653,7 +700,25 @@ protected:
     
     void checkBoxToggled(OgreBites::CheckBox *box) 
     {
-        if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
+		if(box->getName() == SSAO_MODUALTE)
+		{
+			if (box->isChecked())
+			{
+				CompositorManager::getSingleton().addCompositor(mViewport, "SSAO/Post/Modulate");
+	            CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", true);
+				mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
+				mLight = mSceneMgr->createLight();
+				mLight->setPosition(30, 80, 30);
+			}
+			else
+			{  
+				mSceneMgr->destroyLight(mLight);
+				mLight = NULL;
+                CompositorManager::getSingleton().setCompositorEnabled(mViewport, "SSAO/Post/Modulate", false);
+				CompositorManager::getSingleton().removeCompositor(mViewport, "SSAO/Post/Modulate");
+			}
+		}
+        else if (box->getName() == SSAO_SAMPLE_SPACE_NAME)
         {
             setUniform("SSAO/Crytek", "SSAO/Crytek", "cSampleInScreenspace", box->isChecked(), false, 1);
             setUniform("SSAO/HorizonBased", "SSAO/HorizonBased", "cSampleInScreenspace", box->isChecked(), false, 1);

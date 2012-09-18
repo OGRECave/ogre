@@ -30,6 +30,8 @@ THE SOFTWARE.
 #define __NaClGLContext_H__
 
 #include "OgreGLES2Context.h"
+#include "OgreNaClWindow.h"
+#include "OgreNaClGLContext.h"
 
 namespace Ogre {
     class NaClGLSupport;

@@ -81,7 +81,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
         glBindTexture(GL_TEXTURE_2D, mWarningTextureID);
         GL_CHECK_ERROR;
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 #endif
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,

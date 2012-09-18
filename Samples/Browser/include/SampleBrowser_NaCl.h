@@ -61,6 +61,7 @@
 #include "ppapi/c/pp_file_info.h"
 #include "ppapi/c/ppb_file_io.h"
 #include "ppapi/cpp/completion_callback.h"
+#include "ppapi/utility/completion_callback_factory.h"
 #include "ppapi/cpp/input_event.h"
 #include "OgreZip.h"
 #include <GLES2\gl2.h>

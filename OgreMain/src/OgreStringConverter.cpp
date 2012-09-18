@@ -367,6 +367,17 @@ namespace Ogre {
 		return ret;
     }
     //-----------------------------------------------------------------------
+    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
+    {
+		// Use istringstream for direct correspondence with toString
+		StringStream str(val);
+		size_t ret = defaultValue;
+        if( !(str >> ret) )
+            return defaultValue;
+
+		return ret;
+    }
+    //-----------------------------------------------------------------------
     bool StringConverter::parseBool(const String& val, bool defaultValue)
     {
 		if ((StringUtil::startsWith(val, "true") || StringUtil::startsWith(val, "yes")

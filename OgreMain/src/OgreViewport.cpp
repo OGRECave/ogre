@@ -87,7 +87,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Viewport::~Viewport()
     {
-		for (ListenerList::iterator i = mListeners.begin(); i != mListeners.end(); ++i)
+		ListenerList listenersCopy;
+		std::swap(mListeners, listenersCopy);
+		for (ListenerList::iterator i = listenersCopy.begin(); i != listenersCopy.end(); ++i)
 		{
 			(*i)->viewportDestroyed(this);
 		}

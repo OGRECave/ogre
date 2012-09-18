@@ -729,15 +729,16 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void  Mesh::_compileBoneAssignments(void)
     {
-        unsigned short maxBones =
-            _rationaliseBoneAssignments(sharedVertexData->vertexCount, mBoneAssignments);
+		if (sharedVertexData)
+		{
+			unsigned short maxBones = _rationaliseBoneAssignments(sharedVertexData->vertexCount, mBoneAssignments);
 
-        if (maxBones != 0)
-        {
-            compileBoneAssignments(mBoneAssignments, maxBones, 
-                sharedBlendIndexToBoneIndexMap, sharedVertexData);
-        }
-
+			if (maxBones != 0)
+			{
+				compileBoneAssignments(mBoneAssignments, maxBones, 
+					sharedBlendIndexToBoneIndexMap, sharedVertexData);
+			}
+		}
         mBoneAssignmentsOutOfDate = false;
     }
     //---------------------------------------------------------------------
