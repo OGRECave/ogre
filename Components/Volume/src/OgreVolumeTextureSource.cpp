@@ -111,14 +111,14 @@ namespace Volume {
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
         
-            Vector3 v000 = getGradient(x0, y0, z0);
-            Vector3 v100 = getGradient(x1, y0, z0);
-            Vector3 v010 = getGradient(x0, y1, z0);
-            Vector3 v001 = getGradient(x0, y0, z1);
-            Vector3 v101 = getGradient(x1, y0, z1);
-            Vector3 v011 = getGradient(x0, y1, z1);
-            Vector3 v110 = getGradient(x1, y1, z0);
-            Vector3 v111 = getGradient(x1, y1, z1);
+            Vector3 f000 = getGradient(x0, y0, z0);
+            Vector3 f100 = getGradient(x1, y0, z0);
+            Vector3 f010 = getGradient(x0, y1, z0);
+            Vector3 f001 = getGradient(x0, y0, z1);
+            Vector3 f101 = getGradient(x1, y0, z1);
+            Vector3 f011 = getGradient(x0, y1, z1);
+            Vector3 f110 = getGradient(x1, y1, z0);
+            Vector3 f111 = getGradient(x1, y1, z1);
 
             Real oneMinX = (Real)1.0 - dX;
             Real oneMinY = (Real)1.0 - dY;
@@ -126,14 +126,14 @@ namespace Volume {
             Real oneMinXoneMinY = oneMinX * oneMinY;
             Real dXOneMinY = dX * oneMinY;
 
-            normal = oneMinZ * (v000 * oneMinXoneMinY
-                + v100 * dXOneMinY
-                + v010 * oneMinX * dY)
-                + dZ * (v001 * oneMinXoneMinY
-                + v101 * dXOneMinY
-                + v011 * oneMinX * dY)
-                + dX * dY * (v110 * oneMinZ
-                + v111 * dZ);
+            normal = oneMinZ * (f000 * oneMinXoneMinY
+                + f100 * dXOneMinY
+                + f010 * oneMinX * dY)
+                + dZ * (f001 * oneMinXoneMinY
+                + f101 * dXOneMinY
+                + f011 * oneMinX * dY)
+                + dX * dY * (f110 * oneMinZ
+                + f111 * dZ);
 
             normal *= (Real)-1.0;
         }
@@ -164,14 +164,14 @@ namespace Volume {
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
 
-            Real v000 = getVolumeArrayValue(x0, y0, z0);
-            Real v100 = getVolumeArrayValue(x1, y0, z0);
-            Real v010 = getVolumeArrayValue(x0, y1, z0);
-            Real v001 = getVolumeArrayValue(x0, y0, z1);
-            Real v101 = getVolumeArrayValue(x1, y0, z1);
-            Real v011 = getVolumeArrayValue(x0, y1, z1);
-            Real v110 = getVolumeArrayValue(x1, y1, z0);
-            Real v111 = getVolumeArrayValue(x1, y1, z1);
+            Real f000 = getVolumeArrayValue(x0, y0, z0);
+            Real f100 = getVolumeArrayValue(x1, y0, z0);
+            Real f010 = getVolumeArrayValue(x0, y1, z0);
+            Real f001 = getVolumeArrayValue(x0, y0, z1);
+            Real f101 = getVolumeArrayValue(x1, y0, z1);
+            Real f011 = getVolumeArrayValue(x0, y1, z1);
+            Real f110 = getVolumeArrayValue(x1, y1, z0);
+            Real f111 = getVolumeArrayValue(x1, y1, z1);
 
             Real oneMinX = (Real)1.0 - dX;
             Real oneMinY = (Real)1.0 - dY;
@@ -179,14 +179,14 @@ namespace Volume {
             Real oneMinXoneMinY = oneMinX * oneMinY;
             Real dXOneMinY = dX * oneMinY;
 
-            value = oneMinZ * (v000 * oneMinXoneMinY
-                + v100 * dXOneMinY
-                + v010 * oneMinX * dY)
-                + dZ * (v001 * oneMinXoneMinY
-                + v101 * dXOneMinY
-                + v011 * oneMinX * dY)
-                + dX * dY * (v110 * oneMinZ
-                + v111 * dZ);
+            value = oneMinZ * (f000 * oneMinXoneMinY
+                + f100 * dXOneMinY
+                + f010 * oneMinX * dY)
+                + dZ * (f001 * oneMinXoneMinY
+                + f101 * dXOneMinY
+                + f011 * oneMinX * dY)
+                + dX * dY * (f110 * oneMinZ
+                + f111 * dZ);
         
         }
         else
