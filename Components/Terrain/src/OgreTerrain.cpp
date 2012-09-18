@@ -2257,7 +2257,8 @@ namespace Ogre
 			Real A = 1.0f / Math::Tan(cam->getFOVy() * 0.5f);
 			// T = 2 * maxPixelError / vertRes
 			Real maxPixelError = TerrainGlobalOptions::getSingleton().getMaxPixelError() * cam->_getLodBiasInverse();
-			Real T = 2.0f * maxPixelError / (Real)vp->getActualHeight();
+            Viewport* lodVp = cam->getViewport();
+			Real T = 2.0f * maxPixelError / (Real)lodVp->getActualHeight();
 
 			// CFactor = A / T
 			Real cFactor = A / T;
