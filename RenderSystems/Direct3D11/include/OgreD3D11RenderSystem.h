@@ -133,9 +133,9 @@ namespace Ogre
 
 		PolygonMode mPolygonMode;
 
-		FilterOptions FilterMinification;
-		FilterOptions FilterMagnification;
-		FilterOptions FilterMips;
+		FilterOptions FilterMinification[OGRE_MAX_TEXTURE_LAYERS];
+		FilterOptions FilterMagnification[OGRE_MAX_TEXTURE_LAYERS];
+		FilterOptions FilterMips[OGRE_MAX_TEXTURE_LAYERS];
 		bool		  CompareEnabled;
 
 		D3D11_RECT mScissorRect;
