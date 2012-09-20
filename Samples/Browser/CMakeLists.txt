@@ -105,10 +105,20 @@ if(ANDROID)
     target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
     add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
 
-    SET(ANDROID_EXECUTABLE "android")
-    SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    if(APPLE OR WIN32)
+      SET(ANDROID_EXECUTABLE "android")
+    else()
+      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
+    endif()
+
+    if(APPLE OR WIN32)
+      SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    else()
+      SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
+    endif()
+
     SET(ANT_EXECUTABLE "ant")
-	MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
+    MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
 	
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
     

@@ -13,7 +13,7 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_CFLAGS := -DGL_GLEXT_PROTOTYPES=1 -I@OGRE_BINARY_DIR@/include -I@CMAKE_SOURCE_DIR@/OgreMain/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include -I@CMAKE_SOURCE_DIR@/RenderSystems/GLES2/include/EGL
     LOCAL_CFLAGS += -I@ANDROID_NDK@/sources/cpufeatures -I@CMAKE_SOURCE_DIR@/Components/RTShaderSystem/include -I@CMAKE_SOURCE_DIR@/Components/Overlay/include 
     LOCAL_CFLAGS += -I@CMAKE_SOURCE_DIR@/PlugIns/ParticleFX/include -I@CMAKE_SOURCE_DIR@/PlugIns/OctreeSceneManager/include 
-    LOCAL_CFLAGS += -I@OGRE_DEPENDENCIES_DIR@/include -I@OGRE_DEPENDENCIES_DIR@/include/ois -I@OGRE_BINARY_DIR@/Samples/include
+    LOCAL_CFLAGS += -I@OGRE_DEPENDENCIES_DIR@/include -I@OGRE_DEPENDENCIES_DIR@/include/OIS -I@OGRE_BINARY_DIR@/Samples/include
     LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1 
     
     LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src
