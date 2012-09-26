@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __AllocatedObject_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 
 // Anything that has done a #define new <blah> will screw operator new definitions up
 // so undefine
@@ -126,4 +127,7 @@ namespace Ogre
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

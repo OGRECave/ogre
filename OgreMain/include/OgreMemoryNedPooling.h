@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NEDPOOLING
 
+#include "OgreHeaderPrefix.h"
+
 namespace Ogre
 {
 	/** \addtogroup Core
@@ -138,6 +140,8 @@ namespace Ogre
 }// namespace Ogre
 
 #endif 
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __MemoryNedPooling_H__
 

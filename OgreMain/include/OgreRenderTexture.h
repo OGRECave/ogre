@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define __RenderTexture_H__
 
 #include "OgrePrerequisites.h"
-
 #include "OgreRenderTarget.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {    
@@ -136,5 +136,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

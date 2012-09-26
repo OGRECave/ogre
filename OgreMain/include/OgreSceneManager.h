@@ -55,6 +55,8 @@ Torus Knot Software Ltd.
 #include "OgreLodListener.h"
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreHeaderPrefix.h"
+
 namespace Ogre {
 	/** \addtogroup Core
 	*  @{
@@ -3667,6 +3669,6 @@ namespace Ogre {
 
 } // Namespace
 
-
+#include "OgreHeaderSuffix.h"
 
 #endif

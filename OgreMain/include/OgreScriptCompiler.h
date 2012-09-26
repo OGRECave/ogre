@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreCompositor.h"
 #include "OgreCompositionPass.h"
 #include "OgreAny.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -869,5 +870,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

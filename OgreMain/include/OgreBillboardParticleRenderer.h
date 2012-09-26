@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreParticleSystemRenderer.h"
 #include "OgreBillboardSet.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -258,6 +259,8 @@ namespace Ogre {
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __BillboardParticleRenderer_H__
 

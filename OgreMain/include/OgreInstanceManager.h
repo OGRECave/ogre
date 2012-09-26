@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreMesh.h"
 #include "OgreRenderOperation.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -283,5 +284,7 @@ namespace Ogre
         }
     };
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __InstanceManager_H__

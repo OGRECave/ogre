@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreMovablePlane.h"
 #include "OgreSharedPtr.h"
-
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -103,5 +103,7 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

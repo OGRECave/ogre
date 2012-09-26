@@ -28,6 +28,7 @@ THE SOFTWARE.
 #ifndef __Ogre_Iterator_Range_H__
 #define __Ogre_Iterator_Range_H__
 
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_USE_BOOST
 #   if OGRE_COMPILER == OGRE_COMPILER_CLANG || OGRE_COMPILER == OGRE_COMPILER_GCC
@@ -326,7 +327,7 @@ struct ConstMapRange : public iterator_range<typename T::const_iterator>::type
 	
 };
 
-
+#include "OgreHeaderSuffix.h"
 
 }
 #endif

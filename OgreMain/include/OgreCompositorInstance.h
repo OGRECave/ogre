@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreRenderQueue.h"
 #include "OgreCompositionTechnique.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -389,5 +390,7 @@ namespace Ogre {
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __CompositorInstance_H__

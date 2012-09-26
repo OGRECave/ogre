@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreAny.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	class HardwareBufferManagerBase;
@@ -72,4 +73,7 @@ namespace Ogre {
     };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

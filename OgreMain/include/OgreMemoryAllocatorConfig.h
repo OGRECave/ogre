@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __MemoryAllocatorConfig_H__
 
 #include "OgreMemoryAllocatedObject.h" 
+#include "OgreHeaderPrefix.h"
 
 /** \addtogroup Core
 *  @{
@@ -489,5 +490,8 @@ namespace Ogre
 
 /** @} */
 /** @} */
+
+
+#include "OgreHeaderSuffix.h"
 
 #endif

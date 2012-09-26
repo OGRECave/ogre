@@ -470,7 +470,7 @@ namespace Ogre
         // Check origin inside first
         if (rayorig.squaredLength() <= radius*radius && discardInside)
         {
-            return std::pair<bool, Real>(true, 0);
+            return std::pair<bool, Real>(true, (Real)0);
         }
 
         // Mmm, quadratics

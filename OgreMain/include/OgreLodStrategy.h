@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreMovableObject.h"
 #include "OgreCamera.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -128,5 +129,7 @@ namespace Ogre {
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

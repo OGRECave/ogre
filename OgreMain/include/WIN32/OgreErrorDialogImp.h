@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef __WIN32ERRORDIALOG_H__
 #define __WIN32ERRORDIALOG_H__
 
+#include "OgreHeaderPrefix.h"
+
 #define WIN32_LEAN_AND_MEAN
 #if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min
@@ -74,4 +76,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

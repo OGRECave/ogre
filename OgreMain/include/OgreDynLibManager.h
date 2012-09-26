@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -113,5 +114,7 @@ namespace Ogre {
     /** @} */
     /** @} */
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __DynLibManager_H__

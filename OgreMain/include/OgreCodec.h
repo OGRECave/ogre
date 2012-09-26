@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -174,5 +175,7 @@ namespace Ogre {
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif
