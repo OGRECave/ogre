@@ -23,10 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE
 -------------------------------------------------------------------------*/
-#ifndef __OgreHeaderSuffix_H__
-#define __OgreHeaderSuffix_H__
-
-#include "OgrePrerequisites.h"
+// ATTENTION: No header guard as this header is meant to be included
+// multiple times.
+//#ifndef __OgreHeaderSuffix_H__
+//#define __OgreHeaderSuffix_H__
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 
@@ -37,8 +37,4 @@ THE SOFTWARE
 #endif
 
 
-#endif
-// allow inclusion of prefix again now (this is scoped)
-#undef __OgreHeaderSuffix_H__
-
-
+//#endif

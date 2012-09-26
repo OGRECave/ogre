@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreNode.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -468,5 +469,7 @@ namespace Ogre {
 
 
 }// namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

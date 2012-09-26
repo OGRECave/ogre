@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreException.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -424,5 +425,7 @@ namespace Ogre {
 
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif //__Renderable_H__

@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreCommon.h"
 #include "OgreColourValue.h"
 #include "OgreBlendMode.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -737,5 +738,7 @@ namespace Ogre {
 	/** @} */
 
 } //namespace 
+
+#include "OgreHeaderSuffix.h"
 
 #endif

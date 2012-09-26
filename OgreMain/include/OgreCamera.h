@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include "OgreFrustum.h"
 #include "OgreRay.h"
 #include "OgrePlaneBoundedVolume.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -677,4 +678,7 @@ namespace Ogre {
 	 /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
+
 #endif
