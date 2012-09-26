@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreRenderOperation.h"
+#include "OgreHeaderPrefix.h"
 #include "OgreSmallVector.h"
 
 namespace Ogre {
@@ -412,5 +413,7 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif 

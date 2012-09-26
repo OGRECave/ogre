@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreMesh.h"
 #include "OgreUserObjectBindings.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -770,5 +771,7 @@ namespace Ogre {
 	/** @} */
 
 } //namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif
