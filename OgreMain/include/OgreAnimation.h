@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreAnimable.h"
 #include "OgreAnimationTrack.h"
 #include "OgreAnimationState.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -539,6 +540,7 @@ namespace Ogre {
     /** @} */
 } // namespace Ogre
 
+#include "OgreHeaderSuffix.h"
 
 #endif // __Animation_H__
 

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	class HardwareBufferManagerBase;
@@ -580,5 +581,8 @@ namespace Ogre {
 
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
 

@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -141,5 +142,7 @@ namespace Ogre {
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __FileSystem_H__

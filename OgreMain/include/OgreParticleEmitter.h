@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreStringInterface.h"
 #include "OgreParticleEmitterCommands.h"
 #include "OgreParticle.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -546,6 +547,7 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

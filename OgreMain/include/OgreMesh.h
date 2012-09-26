@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreAnimationTrack.h"
 #include "OgrePose.h"
 #include "OgreDataStream.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -972,5 +973,7 @@ namespace Ogre {
 
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __Mesh_H__

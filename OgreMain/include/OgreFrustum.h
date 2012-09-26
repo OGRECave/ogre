@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreAxisAlignedBox.h"
 #include "OgreVertexIndexData.h"
 #include "OgreMovablePlane.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -685,5 +686,7 @@ namespace Ogre
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __Frustum_H__

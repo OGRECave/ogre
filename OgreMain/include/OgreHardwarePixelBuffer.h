@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 #include "OgrePixelFormat.h"
 #include "OgreImage.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -204,5 +205,8 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
 

@@ -61,11 +61,6 @@ using namespace Ogre;
     [super didReceiveMemoryWarning];
 }
 
-- (void)loadView
-{
-    [super loadView];
-}
-
 - (void)viewDidUnload
 {
     [super viewDidUnload];
