@@ -58,3 +58,8 @@ if (OGRE_BUILD_RENDERSYSTEM_GLES2)
     add_subdirectory(GLES2)
   endif()
 endif()
+
+
+if (OGRE_BUILD_RENDERSYSTEM_STAGE3D AND FLASHCC)
+    add_subdirectory(Stage3D)
+endif()

@@ -112,6 +112,8 @@ namespace Ogre {
 #	else
 #		define OGRE_PLATFORM OGRE_PLATFORM_WIN32
 #	endif
+#elif defined(__FLASHCC__)
+#	define OGRE_PLATFORM OGRE_PLATFORM_FLASHCC
 #elif defined( __APPLE_CC__)
     // Device                                                     Simulator
     // Both requiring OS version 4.0 or greater
@@ -212,7 +214,7 @@ namespace Ogre {
 //----------------------------------------------------------------------------
 // Linux/Apple/iOs/Android/NaCl Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
-    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 
 // Enable GCC symbol visibility
 #   if defined( OGRE_GCC_VISIBILITY )
@@ -253,8 +255,7 @@ namespace Ogre {
 #       undef OGRE_UNICODE_SUPPORT
 #   endif
 #	define OGRE_UNICODE_SUPPORT 0
-#   define OGRE_DEBUG_MODE 0
-#	  define CLOCKS_PER_SEC  1000
+#	define CLOCKS_PER_SEC  1000
     // A quick define to overcome different names for the same function
 #   define stricmp strcasecmp
 #   ifdef DEBUG
@@ -263,6 +264,21 @@ namespace Ogre {
 #       define OGRE_DEBUG_MODE 0
 #   endif
 #endif
+    
+//----------------------------------------------------------------------------
+// FlashCC Settings
+#if OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
+#   ifdef OGRE_UNICODE_SUPPORT
+#       undef OGRE_UNICODE_SUPPORT
+#   endif
+#	define OGRE_UNICODE_SUPPORT 0
+#   ifdef DEBUG
+#       define OGRE_DEBUG_MODE 1
+#   else
+#       define OGRE_DEBUG_MODE 0
+#   endif
+#endif
+
 //----------------------------------------------------------------------------
 // Endian Settings
 // check for BIG_ENDIAN config flag, set OGRE_ENDIAN correctly

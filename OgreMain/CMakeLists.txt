@@ -584,6 +584,15 @@ elseif(ANDROID)
   )
 
   set(PLATFORM_HEADER_INSTALL "Android")
+elseif(FLASHCC)
+  set(PLATFORM_HEADER_FILES
+    include/FlashCC/OgreTimerImp.h
+  )
+  set(PLATFORM_SOURCE_FILES
+    src/FlashCC/OgreTimer.cpp
+  )
+
+  set(PLATFORM_HEADER_INSTALL "FlashCC")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
   set(PLATFORM_HEADER_FILES
