@@ -243,8 +243,13 @@ namespace Ogre {
 
 			// Fetch GL format token
 			GLenum fmt = GLESPixelUtil::getGLInternalFormat((PixelFormat)x);
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            if(fmt == GL_NONE)
+                continue;
+#else
             if(fmt == GL_NONE && x!=0)
                 continue;
+#endif
 
 			// No test for compressed formats
 			if(PixelUtil::isCompressed((PixelFormat)x))

@@ -71,6 +71,17 @@ namespace Ogre  {
             case PF_B8G8R8:
                 return GL_RGB;
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            case PF_A1R5G5B5:
+                return GL_BGRA;
+            case PF_A4R4G4B4:
+            case PF_X8R8G8B8:
+            case PF_A8R8G8B8:
+            case PF_B8G8R8A8:
+            case PF_X8B8G8R8:
+            case PF_A8B8G8R8:
+                return GL_RGBA;
+#else
 			case PF_X8R8G8B8:
 			case PF_A8R8G8B8:
             case PF_A8B8G8R8:
@@ -82,7 +93,7 @@ namespace Ogre  {
 			case PF_R8G8B8A8:
             case PF_A2B10G10R10:
                 return GL_RGBA;
-
+#endif
             default:
                 return 0;
         }

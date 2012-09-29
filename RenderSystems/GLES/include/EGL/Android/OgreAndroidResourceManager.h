@@ -1,10 +1,9 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,39 +25,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __AndroidResourceManager_H__
+#define __AndroidResourceManager_H__
 
-#ifndef __EGLContext_H__
-#define __EGLContext_H__
-
-#include "OgreGLESContext.h"
+#include "OgreGLESPrerequisites.h"
 
 namespace Ogre {
-    class EGLSupport;
+	class AndroidEGLContext;
+    class AndroidResource;
+    
+	class _OgrePrivate AndroidResourceManager : public ResourceAlloc
+	{
+	// Interface.
+	public:
 
-    class _OgrePrivate EGLContext: public GLESContext
-    {
-        protected:
-            ::EGLConfig    mConfig;
-            const EGLSupport*    mGLSupport;
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
-            EGLDisplay mEglDisplay;
-
-        public:
-            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
-
-            virtual ~EGLContext();
+		// Called immediately after the Android context has entered a lost state.
+        void notifyOnContextLost();
         
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
+		// Called immediately after the Android context has been reset.
+        void notifyOnContextReset();
+		
+		AndroidResourceManager();
+		~AndroidResourceManager();		
 
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
+	// Friends.
+	protected:
+		friend class AndroidResource;
+	
+	// Types.
+	protected:
+		typedef vector<AndroidResource*>::type	ResourceContainer;
+		typedef ResourceContainer::iterator		ResourceContainerIterator;
 
-			EGLSurface getDrawable() const;
+	// Protected methods.
+	protected:
+		
+		// Called when new resource created.
+		void _notifyResourceCreated		(AndroidResource* pResource);
 
-    };
+		// Called when resource is about to be destroyed.
+		void _notifyResourceDestroyed	(AndroidResource* pResource);
+				
+	// Attributes.
+	protected:		
+		ResourceContainer			mResources;
+	};
 }
 
 #endif

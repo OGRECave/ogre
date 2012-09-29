@@ -42,6 +42,11 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGLWindow.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#	include "OgreAndroidEGLWindow.h"
+#	include "OgreAndroidEGLContext.h"
+#   include "OgreAndroidResourceManager.h"
+Ogre::AndroidResourceManager* Ogre::GLESRenderSystem::mResourceManager = NULL;
 #else
 #   include "OgreEGLWindow.h"
 
@@ -117,6 +122,10 @@ namespace Ogre {
 
 		LogManager::getSingleton().logMessage(getName() + " created.");
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        mResourceManager = OGRE_NEW AndroidResourceManager();
+#endif
+        
         mGLSupport = getGLSupport();
 
         for (i = 0; i < MAX_LIGHTS; i++)
@@ -159,6 +168,14 @@ namespace Ogre {
 
         mRenderTargets.clear();
         OGRE_DELETE mGLSupport;
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        if (mResourceManager != NULL)
+		{
+			OGRE_DELETE mResourceManager;
+			mResourceManager = NULL;
+		}
+#endif
     }
 
     const String& GLESRenderSystem::getName(void) const
@@ -609,44 +626,7 @@ namespace Ogre {
         {
             if (i->second == pWin)
             {
-				GLESContext *windowContext;
-				pWin->getCustomAttribute("GLCONTEXT", &windowContext);
-
-				//1 Window <-> 1 Context, should be always true
-				assert( windowContext );
-
-				bool bFound = false;
-				//Find the depth buffer from this window and remove it.
-				DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-				DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-				while( itMap != enMap && !bFound )
-				{
-					DepthBufferVec::iterator itor = itMap->second.begin();
-					DepthBufferVec::iterator end  = itMap->second.end();
-
-					while( itor != end )
-					{
-						// A DepthBuffer with no depth & stencil pointers is a dummy one,
-						// look for the one that matches the same GL context
-						GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(*itor);
-						GLESContext *glContext = depthBuffer->getGLContext();
-
-						if( glContext == windowContext &&
-							(depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-						{
-							bFound = true;
-
-							delete *itor;
-							itMap->second.erase( itor );
-							break;
-						}
-						++itor;
-					}
-
-					++itMap;
-				}
-
+                _destroyDepthBuffer(pWin);
                 mRenderTargets.erase(i);
                 OGRE_DELETE pWin;
                 break;
@@ -654,6 +634,47 @@ namespace Ogre {
         }
     }
 
+    void GLESRenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
+    {
+        GLESContext *windowContext;
+        pWin->getCustomAttribute("GLCONTEXT", &windowContext);
+        
+        //1 Window <-> 1 Context, should be always true
+        assert( windowContext );
+        
+        bool bFound = false;
+        //Find the depth buffer from this window and remove it.
+        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+        
+        while( itMap != enMap && !bFound )
+        {
+            DepthBufferVec::iterator itor = itMap->second.begin();
+            DepthBufferVec::iterator end  = itMap->second.end();
+            
+            while( itor != end )
+            {
+                // A DepthBuffer with no depth & stencil pointers is a dummy one,
+                // look for the one that matches the same GL context
+                GLESDepthBuffer *depthBuffer = static_cast<GLESDepthBuffer*>(*itor);
+                GLESContext *glContext = depthBuffer->getGLContext();
+                
+                if( glContext == windowContext &&
+                   (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
+                {
+                    bFound = true;
+                    
+                    delete *itor;
+                    itMap->second.erase( itor );
+                    break;
+                }
+                ++itor;
+            }
+            
+            ++itMap;
+        }
+    }
+    
     String GLESRenderSystem::getErrorDescription(long errorNumber) const
     {
         // TODO find a way to get error string
@@ -2027,8 +2048,10 @@ namespace Ogre {
                         // linear min, linear mip
                         return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                         // linear min, point mip
                         return GL_LINEAR_MIPMAP_NEAREST;
+#endif
                     case FO_NONE:
                         // linear min, no mip
                         return GL_LINEAR;
@@ -2956,6 +2979,42 @@ namespace Ogre {
 			return true;
 		}
 	}
+	//---------------------------------------------------------------------
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESRenderSystem::resetRenderer(RenderWindow* win)
+    {
+        LogManager::getSingleton().logMessage("********************************************");
+        LogManager::getSingleton().logMessage("*** OpenGL ES 1.x Reset Renderer Started ***");
+        LogManager::getSingleton().logMessage("********************************************");
+        
+        initialiseContext(win);
+        
+        mGLSupport->initialiseExtensions();
+        
+        //static_cast<GLESFBOManager*>(mRTTManager)->_reload();
+        
+        _destroyDepthBuffer(win);
+        
+        GLESDepthBuffer *depthBuffer = OGRE_NEW GLESDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+                                                                  mMainContext, 0, 0,
+                                                                  win->getWidth(), win->getHeight(),
+                                                                  win->getFSAA(), 0, true );
+        
+        mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
+        win->attachDepthBuffer( depthBuffer );
+        
+        GLESRenderSystem::mResourceManager->notifyOnContextReset();
+        
+        _setViewport(NULL);
+        _setRenderTarget(win);
+    }
+    
+    AndroidResourceManager* GLESRenderSystem::getResourceManager()
+    {
+        return GLESRenderSystem::mResourceManager;
+    }
+#endif
+
     //---------------------------------------------------------------------
     void GLESRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {

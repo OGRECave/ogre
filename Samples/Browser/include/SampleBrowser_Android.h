@@ -36,10 +36,13 @@
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
 #include "Android/OgreAndroidEGLWindow.h"
-#include "OgreRTShaderSystem.h"
+
+#ifdef USE_RTSHADER_SYSTEM
+#   include "OgreRTShaderSystem.h"
+#endif
 
 #ifdef OGRE_STATIC_LIB
-#  include "OgreStaticPluginLoader.h"
+#   include "OgreStaticPluginLoader.h"
 #endif
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
@@ -227,6 +230,7 @@ namespace OgreBites
             mStaticPluginLoader = new Ogre::StaticPluginLoader();
             mStaticPluginLoader->load();
 #endif
+            mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
             mRoot->initialise(false);
             mInit = true;
         }

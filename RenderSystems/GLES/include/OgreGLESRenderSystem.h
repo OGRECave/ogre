@@ -40,7 +40,9 @@ namespace Ogre {
     class GLESRTTManager;
     class GLESGpuProgramManager;
     class HardwareBufferManager;
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    class AndroidResourceManager;
+#endif
     /**
       Implementation of GL as a rendering system.
      */
@@ -535,6 +537,8 @@ namespace Ogre {
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
+            void _destroyDepthBuffer(RenderWindow* pRenderWnd);
+        
             /// @copydoc RenderSystem::beginProfileEvent
             virtual void beginProfileEvent( const String &eventName ) {}
 
@@ -543,6 +547,14 @@ namespace Ogre {
             
             /// @copydoc RenderSystem::markProfileEvent
             virtual void markProfileEvent( const String &eventName ) {}
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            void resetRenderer(RenderWindow* pRenderWnd);
+        
+            static AndroidResourceManager* getResourceManager();
+    private:
+            static AndroidResourceManager* mResourceManager;
+#endif
     };
 }
 

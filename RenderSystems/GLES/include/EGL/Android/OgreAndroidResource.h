@@ -1,10 +1,9 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,39 +25,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __AndroidResource_H__
+#define __AndroidResource_H__
 
-#ifndef __EGLContext_H__
-#define __EGLContext_H__
-
-#include "OgreGLESContext.h"
+#include "OgreGLESPrerequisites.h"
 
 namespace Ogre {
-    class EGLSupport;
 
-    class _OgrePrivate EGLContext: public GLESContext
-    {
-        protected:
-            ::EGLConfig    mConfig;
-            const EGLSupport*    mGLSupport;
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
-            EGLDisplay mEglDisplay;
+    class AndroidEGLContext;
+    
+	/** Represents a Android rendering resource.
+	Provide unified interface to
+	handle various device states.
+	*/
+	class _OgrePrivate AndroidResource
+	{
 
-        public:
-            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
+	// Interface.
+	public:
 
-            virtual ~EGLContext();
-        
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
+		// Called immediately after the Android context has entered a lost state.
+		virtual void notifyOnContextLost() {}
 
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
+		// Called immediately after the Android context has been reset.
+		virtual void notifyOnContextReset() {}
 
-			EGLSurface getDrawable() const;
-
-    };
+	public:
+		AndroidResource();
+		virtual ~AndroidResource();
+	};
 }
-
 #endif

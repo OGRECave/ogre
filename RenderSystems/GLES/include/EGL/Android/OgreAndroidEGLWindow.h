@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,38 +26,35 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EGLContext_H__
-#define __EGLContext_H__
+#ifndef __AndroidEGLWindow_H__
+#define __AndroidEGLWindow_H__
 
-#include "OgreGLESContext.h"
+#include "OgreEGLWindow.h"
+#include "OgreAndroidEGLSupport.h"
+#include "android/configuration.h"
 
 namespace Ogre {
-    class EGLSupport;
-
-    class _OgrePrivate EGLContext: public GLESContext
+    class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
-        protected:
-            ::EGLConfig    mConfig;
-            const EGLSupport*    mGLSupport;
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
-            EGLDisplay mEglDisplay;
-
-        public:
-            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
-
-            virtual ~EGLContext();
+	protected:
+		virtual EGLContext * createEGLContext() const;
+		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
+		virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
+		virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
+		virtual void reposition(int left, int top);
+		virtual void resize(unsigned int width, unsigned int height);
+		virtual void windowMovedOrResized();
+		virtual void switchFullScreen(bool fullscreen);
         
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
-
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
-
-			EGLSurface getDrawable() const;
-
-    };
+    public:
+		AndroidEGLWindow(AndroidEGLSupport* glsupport);
+		virtual ~AndroidEGLWindow();
+        void create(const String& name, unsigned int width, unsigned int height,
+                    bool fullScreen, const NameValuePairList *miscParams);
+        
+        void _destroyInternalResources();
+        void _createInternalResources(NativeWindowType window, AConfiguration* config);
+	};
 }
 
 #endif

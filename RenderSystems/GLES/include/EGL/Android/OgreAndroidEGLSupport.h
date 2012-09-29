@@ -4,7 +4,6 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,38 +26,28 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __EGLContext_H__
-#define __EGLContext_H__
+#ifndef __AndroidEGLSupport_H__
+#define __AndroidEGLSupport_H__
 
-#include "OgreGLESContext.h"
+#include "OgreEGLSupport.h"
 
 namespace Ogre {
-    class EGLSupport;
-
-    class _OgrePrivate EGLContext: public GLESContext
+    class _OgrePrivate AndroidEGLSupport : public EGLSupport
     {
-        protected:
-            ::EGLConfig    mConfig;
-            const EGLSupport*    mGLSupport;
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
-            EGLDisplay mEglDisplay;
+    public:
+        AndroidEGLSupport();
+        virtual ~AndroidEGLSupport();
 
-        public:
-            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
-
-            virtual ~EGLContext();
+        virtual void switchMode(uint& width, uint& height, short& frequency);
         
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
-
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
-
-			EGLSurface getDrawable() const;
-
-    };
+        virtual RenderWindow* newWindow(const String& name,
+                                        unsigned int width, unsigned int height,
+                                        bool fullScreen,
+                                        const NameValuePairList *miscParams = 0);
+        
+        virtual GLESPBuffer* createPBuffer(PixelComponentType format,
+                                           size_t width, size_t height);
+	};
 }
 
 #endif

@@ -1,10 +1,9 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
 Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,39 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreAndroidResource.h"
+#include "OgreAndroidResourceManager.h"
+#include "OgreGLESRenderSystem.h"
 
-#ifndef __EGLContext_H__
-#define __EGLContext_H__
+namespace Ogre
+{
+	AndroidResource::AndroidResource()
+	{				
+		GLESRenderSystem::getResourceManager()->_notifyResourceCreated(static_cast<AndroidResource*>(this));		
+	}
 
-#include "OgreGLESContext.h"
-
-namespace Ogre {
-    class EGLSupport;
-
-    class _OgrePrivate EGLContext: public GLESContext
-    {
-        protected:
-            ::EGLConfig    mConfig;
-            const EGLSupport*    mGLSupport;
-            ::EGLSurface   mDrawable;
-            ::EGLContext   mContext;
-            EGLDisplay mEglDisplay;
-
-        public:
-            EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
-
-            virtual ~EGLContext();
-        
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
-
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLESContext* clone() const = 0;
-
-			EGLSurface getDrawable() const;
-
-    };
+	AndroidResource::~AndroidResource()
+	{	
+		GLESRenderSystem::getResourceManager()->_notifyResourceDestroyed(static_cast<AndroidResource*>(this));
+	}
 }
-
-#endif

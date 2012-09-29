@@ -155,17 +155,15 @@ protected:
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
 
-/*#ifdef USE_RTSHADER_SYSTEM
+#ifdef USE_RTSHADER_SYSTEM
 			if (mShaderGenerator->getTargetLanguage() == "glsles")*/
             if (mShaderGenerator->getTargetLanguage() == "glsles")
             {
                 MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
                 mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
             }
-                ent->setMaterialName("jaiqua");
-/*            else
 #endif
-                ent->setMaterialName("jaiquaDualQuatTest");*/
+            ent->setMaterialName("jaiqua"); //"jaiquaDualQuatTest"
 			sn->attachObject(ent);
 
 /*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)

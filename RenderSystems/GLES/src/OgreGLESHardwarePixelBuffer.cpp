@@ -137,7 +137,12 @@ namespace Ogre {
             scaled = mBuffer.getSubVolume(dstBox);
             Image::scale(src, scaled, Image::FILTER_BILINEAR);
         }
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        else if ((src.format != mFormat) ||
+                 ((GLESPixelUtil::getGLOriginFormat(src.format) == 0) && (src.format != PF_R8G8B8)))
+#else
         else if (GLESPixelUtil::getGLOriginFormat(src.format) == 0)
+#endif
         {
             // Extents match, but format is not accepted as valid source format for GL
             // do conversion in temporary buffer
