@@ -95,9 +95,10 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real TextureSource::getValueAndGradient(const Vector3 &position, Vector3 &normal) const
+    Vector4 TextureSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
+        Vector3 normal;
         if (mTrilinearNormal)
         {
             size_t x0 = (size_t)scaledPosition.x;
@@ -142,7 +143,7 @@ namespace Volume {
             normal = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
             normal *= (Real)-1.0;
         }
-        return getValue(position);
+        return Vector4(normal.x, normal.y, normal.z, getValue(position));
     }
     
     //-----------------------------------------------------------------------

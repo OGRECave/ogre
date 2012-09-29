@@ -47,11 +47,16 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGSphereSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGSphereSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector3 pMinCenter = position- mCenter;
-        gradient = pMinCenter;
-        return mR - gradient.normalise();
+        Vector3 gradient = pMinCenter;
+        return Vector4(
+            gradient.x,
+            gradient.y,
+            gradient.z,
+            mR - gradient.normalise()
+            );
     }
     
     //-----------------------------------------------------------------------
@@ -71,11 +76,15 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGPlaneSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGPlaneSource::getValueAndGradient(const Vector3 &position) const
     {
-        gradient = mNormal;
         // Lineare Algebra: Ein geometrischer Zugang, S.180-181
-        return mD - mNormal.dotProduct(position);
+        return Vector4(
+            mNormal.x,
+            mNormal.y,
+            mNormal.z,
+            mD - mNormal.dotProduct(position)
+            );
     }
     
     //-----------------------------------------------------------------------
@@ -95,15 +104,19 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGCubeSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGCubeSource::getValueAndGradient(const Vector3 &position) const
     { 
         // Just approximate the normal via a simple Prewitt. To get the real normal, 26 cases had to be evaluated...
-        gradient.x = getValue(Vector3(position.x + (Real)1.0, position.y, position.z)) - getValue(Vector3(position.x - (Real)1.0, position.y, position.z));
-        gradient.y = getValue(Vector3(position.x, position.y + (Real)1.0, position.z)) - getValue(Vector3(position.x, position.y - (Real)1.0, position.z));
-        gradient.z = getValue(Vector3(position.x, position.y, position.z + (Real)1.0)) - getValue(Vector3(position.x, position.y, position.z - (Real)1.0));
+        Vector3 gradient(getValue(Vector3(position.x + (Real)1.0, position.y, position.z)) - getValue(Vector3(position.x - (Real)1.0, position.y, position.z)),
+            getValue(Vector3(position.x, position.y + (Real)1.0, position.z)) - getValue(Vector3(position.x, position.y - (Real)1.0, position.z)),
+            getValue(Vector3(position.x, position.y, position.z + (Real)1.0)) - getValue(Vector3(position.x, position.y, position.z - (Real)1.0)));
         gradient.normalise();
         gradient *= (Real)-1.0;
-        return distanceTo(position);
+        return Vector4(
+            gradient.x,
+            gradient.y,
+            gradient.z,
+            distanceTo(position));
     }
     
     //-----------------------------------------------------------------------
@@ -127,18 +140,14 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGIntersectionSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGIntersectionSource::getValueAndGradient(const Vector3 &position) const
     {
-        Vector3 gradientA;
-        Vector3 gradientB;
-        Real valueA = mA->getValueAndGradient(position, gradientA);
-        Real valueB = mB->getValueAndGradient(position, gradientB);
-        if (valueA < valueB)
+        Vector4 valueA = mA->getValueAndGradient(position);
+        Vector4 valueB = mB->getValueAndGradient(position);
+        if (valueA.w < valueB.w)
         {
-            gradient = gradientA;
             return valueA;
         }
-        gradient = gradientB;
         return valueB;
     }
     
@@ -163,18 +172,14 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGUnionSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGUnionSource::getValueAndGradient(const Vector3 &position) const
     {
-        Vector3 gradientA;
-        Vector3 gradientB;
-        Real valueA = mA->getValueAndGradient(position, gradientA);
-        Real valueB = mB->getValueAndGradient(position, gradientB);
-        if (valueA > valueB)
+        Vector4 valueA = mA->getValueAndGradient(position);
+        Vector4 valueB = mB->getValueAndGradient(position);
+        if (valueA.w > valueB.w)
         {
-            gradient = gradientA;
             return valueA;
         }
-        gradient = gradientB;
         return valueB;
     }
     
@@ -199,20 +204,14 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGDifferenceSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGDifferenceSource::getValueAndGradient(const Vector3 &position) const
     {
-        // Like in the isosurfe project
-        Vector3 gradientA;
-        Vector3 gradientB;
-        Real valueA = mA->getValueAndGradient(position, gradientA);
-        Real valueB = (Real)-1.0 * mB->getValueAndGradient(position, gradientB);
-        gradientB *= (Real)-1.0;
-        if (valueA < valueB)
+        Vector4 valueA = mA->getValueAndGradient(position);
+        Vector4 valueB = (Real)-1.0 * mB->getValueAndGradient(position);
+        if (valueA.w < valueB.w)
         {
-            gradient = gradientA;
             return valueA;
         }
-        gradient = gradientB;
         return valueB;
     }
     
@@ -220,7 +219,6 @@ namespace Volume {
 
     Real CSGDifferenceSource::getValue(const Vector3 &position) const
     {
-        // Like in the isosurfe project
         Real valueA = mA->getValue(position);
         Real valueB = (Real)-1.0 * mB->getValue(position);
         if (valueA < valueB)
@@ -244,11 +242,9 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGNegateSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGNegateSource::getValueAndGradient(const Vector3 &position) const
     {
-        Real result = (Real)-1.0 * mSrc->getValueAndGradient(position, gradient);
-        gradient *= (Real)-1.0;
-        return result;
+        return (Real)-1.0 * mSrc->getValueAndGradient(position);
     }
     
     //-----------------------------------------------------------------------
@@ -266,11 +262,9 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CSGScaleSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CSGScaleSource::getValueAndGradient(const Vector3 &position) const
     {
-        Real density = mSrc->getValueAndGradient(position / mScale, gradient) * mScale;
-        gradient *= mScale;
-        return density;
+        return mSrc->getValueAndGradient(position / mScale) * mScale;
     }
     
     //-----------------------------------------------------------------------

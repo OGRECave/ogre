@@ -51,11 +51,10 @@ namespace Volume {
         }
 
         // Don't split if nothing is inside.
-        Vector3 centerGradient;
-        Real centerValue = mSrc->getValueAndGradient(node->getCenter(), centerGradient);
-        if (Math::Abs(centerValue) > (to - from).length() * MIN_SPLIT_DISTANCE_DIAGONAL_FACTOR)
+        Vector4 centerValue = mSrc->getValueAndGradient(node->getCenter());
+        if (Math::Abs(centerValue.w) > (to - from).length() * MIN_SPLIT_DISTANCE_DIAGONAL_FACTOR)
         {
-            node->setCenterValue(centerValue, centerGradient);
+            node->setCenterValue(centerValue);
             return false;
         }
 
@@ -70,7 +69,7 @@ namespace Volume {
         Real f111 = mSrc->getValue(to);
     
         Vector3 gradients[19];
-        gradients[9] = centerGradient;
+        gradients[9] = Vector3(centerValue.x, centerValue.y, centerValue.z);
 
         Vector3 positions[19][2] = {
             {node->getCenterBackBottom(), Vector3((Real)0.5, (Real)0.0, (Real)0.0)},
@@ -98,24 +97,28 @@ namespace Volume {
 
     
         Real error = (Real)0.0;
-        Real value, interpolated, gradientMagnitude;
+        Real interpolated, gradientMagnitude;
+        Vector4 value;
         Vector3 gradient;
         for (size_t i = 0; i < 19; ++i)
         {
-            value = mSrc->getValueAndGradient(positions[i][0], gradient);
+            value = mSrc->getValueAndGradient(positions[i][0]);
+            gradient.x = value.x;
+            gradient.y = value.y;
+            gradient.z = value.z;
             interpolated = interpolate(f000, f001, f010, f011, f100, f101, f110, f111, positions[i][1]);
             gradientMagnitude = gradient.length();
             if (gradientMagnitude < FLT_EPSILON)
             {
                 gradientMagnitude = (Real)1.0;
             }
-            error += Math::Abs(value - interpolated) / gradientMagnitude;
+            error += Math::Abs(value.w - interpolated) / gradientMagnitude;
             if (error >= geometricError)
             {
                 return true;
             }
         }
-        node->setCenterValue(centerValue, centerGradient);
+        node->setCenterValue(centerValue);
         return false;
     }
 

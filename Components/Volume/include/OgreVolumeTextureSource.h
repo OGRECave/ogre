@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_TextureSource_H__
 #define __Ogre_Volume_TextureSource_H__
 
+#include "OgreVector4.h"
+
 #include "OgreVolumeSource.h"
 #include "OgreVolumePrerequisites.h"
 
@@ -170,7 +172,7 @@ namespace Volume {
 
         /** Overridden from VolumeSource.
         */
-        virtual Real getValueAndGradient(const Vector3 &position, Vector3 &gradient) const;
+        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
         
         /** Overridden from VolumeSource.
         */
