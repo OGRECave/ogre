@@ -156,7 +156,6 @@ protected:
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
 
 #ifdef USE_RTSHADER_SYSTEM
-			if (mShaderGenerator->getTargetLanguage() == "glsles")*/
             if (mShaderGenerator->getTargetLanguage() == "glsles")
             {
                 MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
