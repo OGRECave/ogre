@@ -36,9 +36,10 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreTexture.h"
 #include "OgreHardwarePixelBuffer.h"
+#include "OgreGLESManagedResource.h"
 
 namespace Ogre {
-    class _OgreGLESExport GLESTexture : public Texture
+    class _OgreGLESExport GLESTexture : public Texture MANAGED_RESOURCE
     {
         public:
             // Constructor
@@ -78,7 +79,7 @@ namespace Ogre {
              actually allocate the buffer
              */
             void _createSurfaceList();
-            
+        
             /// Used to hold images between calls to prepare and load.
             typedef SharedPtr<std::vector<Image> > LoadedImages;
             
@@ -87,6 +88,17 @@ namespace Ogre {
              by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
              */
             LoadedImages mLoadedImages;
+
+            /// Create gl texture
+            void _createGLTexResource();
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            /** See AndroidResource. */
+            virtual void notifyOnContextLost();
+        
+            /** See AndroidResource. */
+            virtual void notifyOnContextReset();
+#endif
 
         private:
             GLuint mTextureID;

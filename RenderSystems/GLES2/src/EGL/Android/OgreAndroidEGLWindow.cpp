@@ -83,10 +83,17 @@ namespace Ogre {
 
 	void AndroidEGLWindow::windowMovedOrResized()
 	{
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();
+        if(mActive)
+        {
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+            EGL_CHECK_ERROR
+            
+            // Notify viewports of resize
+            ViewportList::iterator it = mViewportList.begin();
+            while( it != mViewportList.end() )
+                (*it++).second->_updateDimensions();
+        }
 	}
 	
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)
@@ -215,6 +222,13 @@ namespace Ogre {
         };
         
         int maxAttribs[] = {
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_BLUE_SIZE, 8,
+            EGL_GREEN_SIZE, 8,
+            EGL_RED_SIZE, 8,
+            EGL_DEPTH_SIZE, 24,
+            EGL_STENCIL_SIZE, 8,
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
             EGL_NONE
         };
         

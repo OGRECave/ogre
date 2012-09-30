@@ -32,9 +32,10 @@ THE SOFTWARE.
 
 #include "OgreGLESPrerequisites.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreGLESManagedResource.h"
 
 namespace Ogre {
-    class _OgreGLESExport GLESHardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreGLESExport GLESHardwareIndexBuffer : public HardwareIndexBuffer MANAGED_RESOURCE
     {
         private:
             GLuint mBufferId;
@@ -50,6 +51,18 @@ namespace Ogre {
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
             void unlockImpl(void);
+
+            void createBuffer();
+        
+            void destroyBuffer();
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            /** See AndroidResource. */
+            virtual void notifyOnContextLost();
+        
+            /** See AndroidResource. */
+            virtual void notifyOnContextReset();
+#endif
 
         public:
             GLESHardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,

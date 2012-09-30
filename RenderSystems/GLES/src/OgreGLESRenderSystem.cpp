@@ -974,21 +974,17 @@ namespace Ogre {
             {
                 // Note used
                 tex->touch();
+                glEnable(tex->getGLESTextureTarget());
             }
-
-            glEnable(GL_TEXTURE_2D);
+            else
+                glEnable(GL_TEXTURE_2D); // Assume 2D
             GL_CHECK_ERROR;
             
             if (!tex.isNull())
-            {
                 glBindTexture(GL_TEXTURE_2D, tex->getGLID());
-                GL_CHECK_ERROR;
-            }
             else
-            {
                 glBindTexture(GL_TEXTURE_2D, static_cast<GLESTextureManager*>(mTextureManager)->getWarningTextureID());
-                GL_CHECK_ERROR;
-            }
+            GL_CHECK_ERROR;
         }
         else
         {
@@ -2991,7 +2987,7 @@ namespace Ogre {
         
         mGLSupport->initialiseExtensions();
         
-        //static_cast<GLESFBOManager*>(mRTTManager)->_reload();
+        static_cast<GLESFBOManager*>(mRTTManager)->_reload();
         
         _destroyDepthBuffer(win);
         

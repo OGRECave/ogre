@@ -239,7 +239,7 @@ namespace Ogre {
         mTarget(target), mTextureID(id), mFace(face), mLevel(level), mSoftwareMipmap(crappyCard)
     {
         GL_CHECK_ERROR;
-        glBindTexture(GL_TEXTURE_2D, mTextureID);
+        glBindTexture(mTarget, mTextureID);
         GL_CHECK_ERROR;
 
         // Get face identifier
@@ -310,6 +310,13 @@ namespace Ogre {
         }
     }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESTextureBuffer::updateTextureId(GLuint textureID)
+    {
+        mTextureID = textureID;
+    }
+#endif
+    
     void GLESTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
     {
         glBindTexture(mTarget, mTextureID);
@@ -327,7 +334,7 @@ namespace Ogre {
             // for compressed formats
             if (dest.left == 0 && dest.top == 0)
             {
-                glCompressedTexImage2D(GL_TEXTURE_2D, mLevel,
+                glCompressedTexImage2D(mFaceTarget, mLevel,
                                        format,
                                        dest.getWidth(),
                                        dest.getHeight(),
@@ -338,7 +345,7 @@ namespace Ogre {
             }
             else
             {
-                glCompressedTexSubImage2D(GL_TEXTURE_2D, mLevel,
+                glCompressedTexSubImage2D(mFaceTarget, mLevel,
                                           dest.left, dest.top,
                                           dest.getWidth(), dest.getHeight(),
                                           format, data.getConsecutiveSize(),
@@ -430,9 +437,9 @@ namespace Ogre {
     
     void GLESTextureBuffer::copyFromFramebuffer(size_t zoffset)
     {
-        glBindTexture(GL_TEXTURE_2D, mTextureID);
+        glBindTexture(mFaceTarget, mTextureID);
         GL_CHECK_ERROR;
-        glCopyTexSubImage2D(GL_TEXTURE_2D, mLevel, 0, 0, 0, 0, mWidth, mHeight);
+        glCopyTexSubImage2D(mFaceTarget, mLevel, 0, 0, 0, 0, mWidth, mHeight);
         GL_CHECK_ERROR;
     }
 
@@ -605,6 +612,7 @@ namespace Ogre {
                 switch(mTarget)
                 {
                     case GL_TEXTURE_2D:
+                    case GL_TEXTURE_CUBE_MAP_OES:
                         glCopyTexSubImage2D(mFaceTarget, mLevel, 
                                             dstBox.left, dstBox.top, 
                                             0, 0, dstBox.getWidth(), dstBox.getHeight());
@@ -762,7 +770,7 @@ namespace Ogre {
             GLenum glFormat = GLESPixelUtil::getGLOriginFormat(scaled.format);
             GLenum dataType = GLESPixelUtil::getGLOriginDataType(scaled.format);
 
-            glTexImage2D(GL_TEXTURE_2D,
+            glTexImage2D(mFaceTarget,
                          mip,
                          glFormat,
                          width, height,

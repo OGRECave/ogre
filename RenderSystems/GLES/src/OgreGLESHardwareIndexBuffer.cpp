@@ -53,28 +53,52 @@ namespace Ogre {
                         "GLESHardwareIndexBuffer");
         }
 
-        glGenBuffers(1, &mBufferId);
-        GL_CHECK_ERROR;
-
-        if (!mBufferId)
-        {
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                "Cannot create GL ES index buffer",
-                "GLESHardwareIndexBuffer::GLESHardwareIndexBuffer");
-        }
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
-        GL_CHECK_ERROR;
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
-                     GLESHardwareBufferManager::getGLUsage(usage));
-        GL_CHECK_ERROR;
+        createBuffer();
     }
 
     GLESHardwareIndexBuffer::~GLESHardwareIndexBuffer()
     {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareIndexBuffer::createBuffer()
+    {
+        glGenBuffers(1, &mBufferId);
+        GL_CHECK_ERROR;
+        
+        if (!mBufferId)
+        {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Cannot create GL ES index buffer",
+                        "GLESHardwareIndexBuffer::GLESHardwareIndexBuffer");
+        }
+        
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferId);
+        GL_CHECK_ERROR;
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, NULL,
+                     GLESHardwareBufferManager::getGLUsage(mUsage));
+        GL_CHECK_ERROR;
+    }
+    
+    void GLESHardwareIndexBuffer::destroyBuffer()
+    {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESHardwareIndexBuffer::notifyOnContextLost()
+    {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareIndexBuffer::notifyOnContextReset()
+    {
+        createBuffer();
+        mShadowUpdated = true;
+        _updateFromShadow();
+    }
+#endif
 
     void GLESHardwareIndexBuffer::unlockImpl(void)
     {

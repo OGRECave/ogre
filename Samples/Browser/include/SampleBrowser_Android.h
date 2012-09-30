@@ -364,8 +364,9 @@ namespace OgreBites
                         return;
                 }
                 
-                if(mRenderWnd != NULL)
+                if(mRenderWnd != NULL && mRenderWnd->isActive())
                 {
+                    mRenderWnd->windowMovedOrResized();
                     mRoot->renderOneFrame();
                 }
             }

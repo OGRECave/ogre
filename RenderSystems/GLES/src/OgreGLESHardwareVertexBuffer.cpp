@@ -46,29 +46,53 @@ namespace Ogre {
                         "Only supported with shadowBuffer",
                         "GLESHardwareVertexBuffer");
         }
+        
+        createBuffer();
+    }
 
+    GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
+    {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareVertexBuffer::createBuffer()
+    {
         glGenBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
-
+        
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Cannot create GL ES vertex buffer",
                         "GLESHardwareVertexBuffer::GLESHardwareVertexBuffer");
         }
-
+        
         glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
         glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
-                     GLESHardwareBufferManager::getGLUsage(usage));
+                     GLESHardwareBufferManager::getGLUsage(mUsage));
         GL_CHECK_ERROR;
     }
-
-    GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
+    
+    void GLESHardwareVertexBuffer::destroyBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESHardwareVertexBuffer::notifyOnContextLost()
+    {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareVertexBuffer::notifyOnContextReset()
+    {
+        createBuffer();
+        mShadowUpdated = true;
+        _updateFromShadow();
+    }
+#endif
 
     void* GLESHardwareVertexBuffer::lockImpl(size_t offset,
                                            size_t length,

@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreGLESRenderTexture.h"
 #include "OgreGLESContext.h"
 #include "OgreGLESFrameBufferObject.h"
+#include "OgreGLESManagedResource.h"
 
 namespace Ogre {
     class GLESFBOManager;
@@ -38,7 +39,7 @@ namespace Ogre {
 
     /** RenderTexture for GL ES FBO
     */
-    class _OgreGLESExport GLESFBORenderTexture: public GLESRenderTexture
+    class _OgreGLESExport GLESFBORenderTexture: public GLESRenderTexture MANAGED_RESOURCE
     {
     public:
         GLESFBORenderTexture(GLESFBOManager *manager, const String &name, const GLESSurfaceDesc &target, bool writeGamma, uint fsaa);
@@ -54,6 +55,14 @@ namespace Ogre {
 		virtual void _detachDepthBuffer();
     protected:
         GLESFrameBufferObject mFB;
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        virtual void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        virtual void notifyOnContextReset();
+#endif
     };
     
     /** Factory for GL Frame Buffer Objects, and related things.
@@ -104,6 +113,10 @@ namespace Ogre {
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
         */
         GLuint getTemporaryFBO() { return mTempFBO; }
+        
+        /** Detects all supported fbo's and recreates the tempory fbo */
+        void _reload();
+        
     private:
         /** Frame Buffer Object properties for a certain texture format.
         */

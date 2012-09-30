@@ -76,6 +76,15 @@ namespace Ogre {
 
         GLESFBOManager *getManager() { return mManager; }
 		const GLESSurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        /** See AndroidResource. */
+        void notifyOnContextLost();
+        
+        /** See AndroidResource. */
+        void notifyOnContextReset(const GLESSurfaceDesc &target);
+#endif
+        
     private:
         GLESFBOManager *mManager;
 		GLsizei mNumSamples;

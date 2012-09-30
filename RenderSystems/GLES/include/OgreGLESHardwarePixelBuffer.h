@@ -119,6 +119,14 @@ namespace Ogre {
             // Blitting implementation
             void blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
         
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        // Friends.
+        protected:
+            friend class GLESTexture;
+        
+            void updateTextureId(GLuint textureID);
+#endif
+        
         protected:
             // In case this is a texture level
             GLenum mTarget;
@@ -131,7 +139,7 @@ namespace Ogre {
             typedef std::vector<RenderTexture*> SliceTRT;
             SliceTRT mSliceTRT;
 
-            static void buildMipmaps(const PixelBox &data);
+            void buildMipmaps(const PixelBox &data);
     };
 
      /** Renderbuffer surface.  Needs FBO extension.
