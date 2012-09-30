@@ -62,7 +62,7 @@ namespace Volume {
         mChunksBeingProcessed++;
         mNode = parent->createChildSceneNode();
         mScale = parameters->scale;
-        mMaxPixelError = parameters->maxPixelError;
+        mMaxScreenSpaceError = parameters->maxScreenSpaceError;
 
         // Call worker
         ChunkRequest req;
@@ -315,7 +315,7 @@ namespace Volume {
         Vector3 to = StringConverter::parseVector3(config.getSetting("scanTo"));
         size_t level = StringConverter::parseUnsignedInt(config.getSetting("level"));
         Real scale = StringConverter::parseReal(config.getSetting("scale"));
-        Real maxPixelError = StringConverter::parseReal(config.getSetting("maxPixelError"));
+        Real maxPixelError = StringConverter::parseReal(config.getSetting("maxScreenSpaceError"));
     
         ChunkParameters parameters;
         parameters.sceneManager = sceneManager;
@@ -323,7 +323,7 @@ namespace Volume {
         parameters.lodCallbackLod = lodCallbackLod;
         parameters.src = &textureSource;
         parameters.scale = scale;
-        parameters.maxPixelError = maxPixelError;
+        parameters.maxScreenSpaceError = maxPixelError;
         parameters.baseError = StringConverter::parseReal(config.getSetting("baseError"));
         parameters.errorMultiplicator = StringConverter::parseReal(config.getSetting("errorMultiplicator"));
         parameters.createOctreeVisualization = StringConverter::parseBool(config.getSetting("createOctreeVisualization"));
@@ -420,15 +420,15 @@ namespace Volume {
         
         // Get the distance to the center.
         Vector3 camPos = mCamera->getRealPosition();
-        Real d = (mBox.getCenter() * mScale).squaredDistance(camPos);
+        Real d = (mBox.getCenter() * mScale).distance(camPos);
         if (d < 1.0)
         {
             d = 1.0;
         }
 
-        Real screenSpaceError = (mError / Math::Sqrt(d)) * k;
+        Real screenSpaceError = mError / d * k;
 
-        if (screenSpaceError <= mMaxPixelError / mScale)
+        if (screenSpaceError <= mMaxScreenSpaceError / mScale)
         {
             setChunkVisible(true, false);
             if (mChildren)

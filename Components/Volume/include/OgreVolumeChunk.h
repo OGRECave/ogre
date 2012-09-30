@@ -78,8 +78,8 @@ namespace Volume {
         /// The scale of the volume.
         Real scale;
 
-        /// The maximum accepted geometric error when chosing the LOD levels to render.
-        Real maxPixelError;
+        /// The maximum accepted screen space error when chosing the LOD levels to render.
+        Real maxScreenSpaceError;
         
         /** Constructor.
         */
@@ -148,8 +148,8 @@ namespace Volume {
         /// Holds the amount of generated triangles.
         static size_t mGeneratedTriangles;
 
-        /// The maximum accepted pixel error.
-        Real mMaxPixelError;
+        /// The maximum accepted screen space error.
+        Real mMaxScreenSpaceError;
         
         /// The scale.
         Real mScale;

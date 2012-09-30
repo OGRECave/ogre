@@ -498,11 +498,7 @@ namespace Volume {
         */
         inline void setCenterValue(const Source *src)
         {
-            Vector3 normal;
-            mCenterValue.w = src->getValueAndGradient(getCenter(), normal);
-            mCenterValue.x = normal.x;
-            mCenterValue.y = normal.y;
-            mCenterValue.z = normal.z;
+            mCenterValue = src->getValueAndGradient(getCenter());
         }
 
         /** Raw setter for the center value.
@@ -511,12 +507,9 @@ namespace Volume {
         @param gradient
             The gradient at this position.
         */
-        inline void setCenterValue(Real value, const Vector3 &gradient)
+        inline void setCenterValue(Vector4 value)
         {
-            mCenterValue.x = gradient.x;
-            mCenterValue.y = gradient.y;
-            mCenterValue.z = gradient.z;
-            mCenterValue.w = value;
+            mCenterValue = value;
         }
 
         /** Gets the center value.

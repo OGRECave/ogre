@@ -57,33 +57,40 @@ namespace Volume {
             The value for the first vector.
         @param val2
             The value for the second vector.
-        @param normal1
-            The normal of the first vector.
-        @param normal2
-            The normal of the second vector.
         @param normal
             Reference to a vector where the normal will be stored.
+        @return
+            The interpolated position.
         */
-        inline Vector3 interpolate(const Vector3 &v1, const Vector3 &v2, const Real val1, const Real val2, const Vector3 &normal1, const Vector3 &normal2, Vector3 &normal) const
+        inline Vector3 interpolate(const Vector3 &v1, const Vector3 &v2, const Vector4 val1, const Vector4 val2, Vector3 &normal) const
         {
             // Don't use Math::RealEqual here as it isn't inlined and this function is performance critical.
-            if (fabs(val1 - ISO_LEVEL) <= FLT_EPSILON)
+            if (fabs(val1.w - ISO_LEVEL) <= FLT_EPSILON)
             {
-                normal = normal1;
+                normal.x = val1.x;
+                normal.y = val1.y;
+                normal.z = val1.z;
                 return v1;
             }
-            if (fabs(val2 - ISO_LEVEL) <= FLT_EPSILON)
+            if (fabs(val2.w - ISO_LEVEL) <= FLT_EPSILON)
             {
-                normal = normal2;
+                normal.x = val2.x;
+                normal.y = val2.y;
+                normal.z = val2.z;
                 return v2;
             }
-            if (fabs(val2 - val1) <= FLT_EPSILON)
+            if (fabs(val2.w - val1.w) <= FLT_EPSILON)
             {
-                normal = normal1;
+                normal.x = val1.x;
+                normal.y = val1.y;
+                normal.z = val1.z;
                 return v1;
             }
-            Real mu = (ISO_LEVEL - val1) / (val2 - val1);
-            normal = normal1 + mu * (normal2 - normal1);
+            Real mu = (ISO_LEVEL - val1.w) / (val2.w - val1.w);
+            Vector4 normal4 = val1 + mu * (val2 - val1);
+            normal.x = normal4.x;
+            normal.y = normal4.y;
+            normal.z = normal4.z;
             normal.normalise();
             return v1 + mu * (v2 - v1);
         }

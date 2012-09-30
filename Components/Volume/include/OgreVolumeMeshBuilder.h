@@ -145,7 +145,7 @@ namespace Volume {
         @param indices
             Contains the indices of the triangles.
         */
-        virtual void getTriangles(const VecVertex &vertices, const VecIndices &indices) = 0;
+        virtual void trianglesReady(const VecVertex &vertices, const VecIndices &indices) = 0;
     };
 
     /** Class to build up a mesh with vertices and indices.

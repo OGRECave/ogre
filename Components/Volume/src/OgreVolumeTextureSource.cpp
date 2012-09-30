@@ -104,12 +104,12 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real TextureSource::getValueAndGradient(const Vector3 &position, Vector3 &normal) const
+    Vector4 TextureSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
+        Vector3 normal;
         if (mTrilinearNormal)
         {
-            // http://en.wikipedia.org/wiki/Trilinear_interpolation
             size_t x0 = (size_t)scaledPosition.x;
             size_t x1 = (size_t)ceil(scaledPosition.x);
             size_t y0 = (size_t)scaledPosition.y;
@@ -121,21 +121,38 @@ namespace Volume {
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
         
-            Vector3 i1 = getGradient(x0, y0, z0) * ((Real)1.0 - dZ) + getGradient(x0, y0, z1) * dZ;
-            Vector3 i2 = getGradient(x0, y1, z0) * ((Real)1.0 - dZ) + getGradient(x0, y1, z1) * dZ;
-            Vector3 j1 = getGradient(x1, y0, z0) * ((Real)1.0 - dZ) + getGradient(x1, y0, z1) * dZ;
-            Vector3 j2 = getGradient(x1, y1, z0) * ((Real)1.0 - dZ) + getGradient(x1, y1, z1) * dZ;
-            Vector3 w1 = i1 * ((Real)1.0 - dY) + i2 * dY;
-            Vector3 w2 = j1 * ((Real)1.0 - dY) + j2 * dY;
-            normal = w1 * ((Real)1.0 - dX) + w2 * dX;
+            Vector3 f000 = getGradient(x0, y0, z0);
+            Vector3 f100 = getGradient(x1, y0, z0);
+            Vector3 f010 = getGradient(x0, y1, z0);
+            Vector3 f001 = getGradient(x0, y0, z1);
+            Vector3 f101 = getGradient(x1, y0, z1);
+            Vector3 f011 = getGradient(x0, y1, z1);
+            Vector3 f110 = getGradient(x1, y1, z0);
+            Vector3 f111 = getGradient(x1, y1, z1);
+
+            Real oneMinX = (Real)1.0 - dX;
+            Real oneMinY = (Real)1.0 - dY;
+            Real oneMinZ = (Real)1.0 - dZ;
+            Real oneMinXoneMinY = oneMinX * oneMinY;
+            Real dXOneMinY = dX * oneMinY;
+
+            normal = oneMinZ * (f000 * oneMinXoneMinY
+                + f100 * dXOneMinY
+                + f010 * oneMinX * dY)
+                + dZ * (f001 * oneMinXoneMinY
+                + f101 * dXOneMinY
+                + f011 * oneMinX * dY)
+                + dX * dY * (f110 * oneMinZ
+                + f111 * dZ);
+
             normal *= (Real)-1.0;
         }
         else
         {
-            normal = getGradient((size_t)scaledPosition.x, (size_t)scaledPosition.y, (size_t)scaledPosition.z);
+            normal = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
             normal *= (Real)-1.0;
         }
-        return getValue(position);
+        return Vector4(normal.x, normal.y, normal.z, getValue(position));
     }
     
     //-----------------------------------------------------------------------
@@ -146,25 +163,41 @@ namespace Volume {
         Real value;
         if (mTrilinearValue)
         {
-            // http://en.wikipedia.org/wiki/Trilinear_interpolation
             size_t x0 = (size_t)scaledPosition.x;
             size_t x1 = (size_t)ceil(scaledPosition.x);
             size_t y0 = (size_t)scaledPosition.y;
             size_t y1 = (size_t)ceil(scaledPosition.y);
             size_t z0 = (size_t)scaledPosition.z;
             size_t z1 = (size_t)ceil(scaledPosition.z);
-        
+
             Real dX = scaledPosition.x - (Real)x0;
             Real dY = scaledPosition.y - (Real)y0;
             Real dZ = scaledPosition.z - (Real)z0;
 
-            Real i1 = getVolumeArrayValue(x0, y0, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x0, y0, z1) * dZ;
-            Real i2 = getVolumeArrayValue(x0, y1, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x0, y1, z1) * dZ;
-            Real j1 = getVolumeArrayValue(x1, y0, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x1, y0, z1) * dZ;
-            Real j2 = getVolumeArrayValue(x1, y1, z0) * ((Real)1.0 - dZ) + getVolumeArrayValue(x1, y1, z1) * dZ;
-            Real w1 = i1 * ((Real)1.0 - dY) + i2 * dY;
-            Real w2 = j1 * ((Real)1.0 - dY) + j2 * dY;
-            value = w1 * ((Real)1.0 - dX) + w2 * dX;
+            Real f000 = getVolumeArrayValue(x0, y0, z0);
+            Real f100 = getVolumeArrayValue(x1, y0, z0);
+            Real f010 = getVolumeArrayValue(x0, y1, z0);
+            Real f001 = getVolumeArrayValue(x0, y0, z1);
+            Real f101 = getVolumeArrayValue(x1, y0, z1);
+            Real f011 = getVolumeArrayValue(x0, y1, z1);
+            Real f110 = getVolumeArrayValue(x1, y1, z0);
+            Real f111 = getVolumeArrayValue(x1, y1, z1);
+
+            Real oneMinX = (Real)1.0 - dX;
+            Real oneMinY = (Real)1.0 - dY;
+            Real oneMinZ = (Real)1.0 - dZ;
+            Real oneMinXoneMinY = oneMinX * oneMinY;
+            Real dXOneMinY = dX * oneMinY;
+
+            value = oneMinZ * (f000 * oneMinXoneMinY
+                + f100 * dXOneMinY
+                + f010 * oneMinX * dY)
+                + dZ * (f001 * oneMinXoneMinY
+                + f101 * dXOneMinY
+                + f011 * oneMinX * dY)
+                + dX * dY * (f110 * oneMinZ
+                + f111 * dZ);
+        
         }
         else
         {

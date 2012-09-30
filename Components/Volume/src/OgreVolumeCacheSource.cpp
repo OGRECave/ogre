@@ -35,25 +35,19 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    Real CacheSource::getValueAndGradient(const Vector3 &position, Vector3 &gradient) const
+    Vector4 CacheSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector4 result;
         if (mCache.find(position) == mCache.end())
         {
-            result.w = mSrc->getValueAndGradient(position, gradient);
-            result.x = gradient.x;
-            result.y = gradient.y;
-            result.z = gradient.z;
+            result = mSrc->getValueAndGradient(position);
             mCache[position] = result;
         }
         else
         {
             result = mCache[position];
-            gradient.x = result.x;
-            gradient.y = result.y;
-            gradient.z = result.z;
         }
-        return result.w;
+        return result;
     }
     
     //-----------------------------------------------------------------------
@@ -63,11 +57,7 @@ namespace Volume {
         Vector4 result;
         if (mCache.find(position) == mCache.end())
         {
-            Vector3 gradient;
-            result.w = mSrc->getValueAndGradient(position, gradient);
-            result.x = gradient.x;
-            result.y = gradient.y;
-            result.z = gradient.z;
+            result = mSrc->getValueAndGradient(position);
             mCache[position] = result;
         }
         else

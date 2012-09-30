@@ -196,7 +196,7 @@ namespace Volume {
 
     void MeshBuilder::executeCallback(MeshBuilderCallback *callback) const
     {
-        callback->getTriangles(mVertices, mIndices);
+        callback->trianglesReady(mVertices, mIndices);
     }
 
 }

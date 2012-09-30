@@ -84,10 +84,16 @@ namespace Volume {
             Real oneMinX = (Real)1.0 - position.x;
             Real oneMinY = (Real)1.0 - position.y;
             Real oneMinZ = (Real)1.0 - position.z;
-            return f000 * oneMinX * oneMinY * oneMinZ + f001 * oneMinX * oneMinY * position.z
-                + f010 * oneMinX * position.y * oneMinZ + f011 * oneMinX * position.y * position.z
-                + f100 * position.x * oneMinY * oneMinZ + f101 * position.x * oneMinY * position.z
-                + f110 * position.x * position.y * oneMinZ + f111 * position.x * position.y * position.z;
+            Real oneMinXoneMinY = oneMinX * oneMinY;
+            Real xOneMinY = position.x * oneMinY;
+            return oneMinZ * (f000 * oneMinXoneMinY
+                + f100 * xOneMinY
+                + f010 * oneMinX * position.y)
+                + position.z * (f001 * oneMinXoneMinY
+                + f101 * xOneMinY
+                + f011 * oneMinX * position.y)
+                + position.x * position.y * (f110 * oneMinZ
+                + f111 * position.z);
         }
 
     public:
