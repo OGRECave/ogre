@@ -1026,12 +1026,23 @@ namespace Ogre {
 
         if (!activateGLTextureUnit(stage))
             return;
+        
+        bool hasCubeMapExt = mCurrentCapabilities->hasCapability(RSC_CUBEMAPPING);
+        
         switch(m)
         {
             case TEXCALC_NONE:
+                if(hasCubeMapExt)
+                    glDisable(GL_TEXTURE_GEN_STR_OES);
                 break;
 
             case TEXCALC_ENVIRONMENT_MAP:
+                if(hasCubeMapExt)
+                {
+                    glEnable(GL_TEXTURE_GEN_STR_OES);
+                    glTexGeniOES( GL_TEXTURE_GEN_STR_OES, GL_TEXTURE_GEN_MODE_OES, GL_REFLECTION_MAP_OES );
+                    
+                }
                 mUseAutoTextureMatrix = true;
                 memset(mAutoTextureMatrix, 0, sizeof(GLfloat)*16);
                 mAutoTextureMatrix[0] = mAutoTextureMatrix[10] = mAutoTextureMatrix[15] = 1.0f;
@@ -1039,10 +1050,15 @@ namespace Ogre {
                 break;
 
             case TEXCALC_ENVIRONMENT_MAP_PLANAR:
-                // TODO not implemented
                 break;
 
             case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
+                if(hasCubeMapExt)
+                {
+                    glEnable(GL_TEXTURE_GEN_STR_OES);
+                    glTexGeniOES( GL_TEXTURE_GEN_STR_OES, GL_TEXTURE_GEN_MODE_OES, GL_REFLECTION_MAP_OES );
+                
+                }
                 // We need an extra texture matrix here
                 // This sets the texture matrix to be the inverse of the view matrix
                 mUseAutoTextureMatrix = true;
@@ -1060,6 +1076,12 @@ namespace Ogre {
                 break;
 
             case TEXCALC_ENVIRONMENT_MAP_NORMAL:
+                if(hasCubeMapExt)
+                {
+                    glEnable(GL_TEXTURE_GEN_STR_OES);
+                    glTexGeniOES( GL_TEXTURE_GEN_STR_OES, GL_TEXTURE_GEN_MODE_OES, GL_NORMAL_MAP_OES );
+                    
+                }
                 break;
 
             case TEXCALC_PROJECTIVE_TEXTURE:
