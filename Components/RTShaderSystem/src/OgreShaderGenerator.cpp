@@ -96,17 +96,17 @@ ShaderGenerator::ShaderGenerator()
 	
 	HighLevelGpuProgramManager& hmgr = HighLevelGpuProgramManager::getSingleton();
 
-	if (hmgr.isLanguageSupported("cg"))
+	if (hmgr.isLanguageSupported("glsles"))
+	{
+		mShaderLanguage	= "glsles";
+	}
+	else if (hmgr.isLanguageSupported("cg"))
 	{
 		mShaderLanguage	= "cg";
 	}
 	else if (hmgr.isLanguageSupported("glsl"))
 	{
 		mShaderLanguage	= "glsl";
-	}
-	else if (hmgr.isLanguageSupported("glsles"))
-	{
-		mShaderLanguage	= "glsles";
 	}
 	else if (hmgr.isLanguageSupported("hlsl"))
 	{
