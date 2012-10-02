@@ -31,7 +31,6 @@ THE SOFTWARE.
 #define __GLESRenderSystem_H__
 
 #include "OgreGLESPrerequisites.h"
-
 #include "OgreRenderSystem.h"
 
 namespace Ogre {
@@ -40,6 +39,7 @@ namespace Ogre {
     class GLESRTTManager;
     class GLESGpuProgramManager;
     class HardwareBufferManager;
+    class GLESStateCacheManager;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     class AndroidResourceManager;
 #endif
@@ -80,24 +80,18 @@ namespace Ogre {
             /// Number of fixed-function texture units
             unsigned short mFixedFunctionTextureUnits;
 
-            /// Store last colour write state
-            bool mColourWrite[4];
-
-            /// Store last depth write state
-            GLboolean mDepthWrite;
-
-            /// Store last stencil mask state
-            uint32 mStencilMask;
-
             GLfloat mAutoTextureMatrix[16];
 
             bool mUseAutoTextureMatrix;
             size_t mTextureCount;
             bool mTextureEnabled;
-
+        
             /// GL support class, used for creating windows etc.
             GLESSupport *mGLSupport;
 
+            /// State cache manager which responsible to reduce redundant state changes
+            GLESStateCacheManager* mStateCacheManager;
+        
             /* The main GL context - main thread only */
             GLESContext *mMainContext;
 
@@ -113,44 +107,8 @@ namespace Ogre {
               */
             GLESRTTManager *mRTTManager;
 
-            /** These variables are used for caching RenderSystem state.
-                They are cached because OpenGL state changes can be quite expensive,
-                which is especially important on mobile or embedded systems.
-             */
-            ushort mActiveTextureUnit;
-            ushort mActiveClientTextureUnit;
-            TexEnviMap mActiveTexEnviMap;
-            TexEnvfMap mActiveTexEnvfMap;
-            TexEnvfvMap mActiveTexEnvfvMap;
-            PointParamfMap mActivePointParamfMap;
-            PointParamfvMap mActivePointParamfvMap;
-            MaterialfvMap mActiveMaterialfvMap;
-            LightfMap mActiveLightfMap;
-            LightfvMap mActiveLightfvMap;
-            GLint mActiveSourceBlend;
-            GLint mActiveDestBlend;
-            GLint mActiveDepthFunc;
-            GLenum mActiveShadeModel;
-            GLenum mActiveMatrixMode;
-            GLfloat mActivePointSize;
-            GLenum mActiveCullFaceMode;
-            GLfloat mTexMaxAnisotropy;
-            GLfloat mMaxTexMaxAnisotropy;
-            GLclampf mActiveClearDepth;
-            ColourValue mActiveClearColor;
-            GLenum mActiveAlphaFunc;
-            GLclampf mActiveAlphaFuncValue;
-
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
-
-            /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
-            unsigned int mDiscardBuffers;
-
-            /** OpenGL ES doesn't support setting the PolygonMode like desktop GL
-                So we will cache the value and set it manually
-             */
-            GLenum mPolygonMode;
 
             GLuint getCombinedMinMipFilter(void) const;
 
@@ -165,18 +123,6 @@ namespace Ogre {
 
             bool activateGLTextureUnit(size_t unit);
             bool activateGLClientTextureUnit(size_t unit);
-            void setGLTexEnvi(GLenum target, GLenum name, GLint param);
-            void setGLTexEnvf(GLenum target, GLenum name, GLfloat param);
-            void setGLTexEnvfv(GLenum target, GLenum name, const GLfloat *param);
-            void setGLPointParamf(GLenum name, GLfloat param);
-            void setGLPointParamfv(GLenum name, const GLfloat *param);
-            void setGLMaterialfv(GLenum face, GLenum name, const GLfloat *param);
-            void setGLMatrixMode(GLenum mode);
-            void setGLDepthMask(GLboolean flag);
-            void setGLClearDepthf(GLclampf depth);
-            void setGLColorMask(bool red, bool green, bool blue, bool alpha);
-            void setGLLightf(GLenum light, GLenum name, GLfloat param);
-            void setGLLightfv(GLenum light, GLenum name, const GLfloat *param);
 
         public:
             // Default constructor / destructor
@@ -468,9 +414,6 @@ namespace Ogre {
              RenderSystem
              */
             void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
-        
-            void _setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
-            unsigned int getDiscardBuffers(void) { return mDiscardBuffers; }
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
@@ -528,8 +471,6 @@ namespace Ogre {
 			void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
 			/// @copydoc RenderSystem::getDisplayMonitorCount
 			unsigned int getDisplayMonitorCount() const;
-
-            GLenum _getPolygonMode(void) { return mPolygonMode; }
 
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);

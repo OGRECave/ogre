@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreGLESPixelFormat.h"
 #include "OgreGLESRenderSystem.h"
 #include "OgreGLESHardwarePixelBuffer.h"
-
+#include "OgreGLESStateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -122,22 +122,20 @@ namespace Ogre {
         GL_CHECK_ERROR;
         
 		// Set texture type
-        glBindTexture(getGLESTextureTarget(), mTextureID);
-        GL_CHECK_ERROR;
+        mGLSupport.getStateCacheManager()->bindGLTexture(getGLESTextureTarget(), mTextureID);
         
         // Set some misc default parameters, these can of course be changed later
-        glTexParameteri(getGLESTextureTarget(),
-                        GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLESTextureTarget(),
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLESTextureTarget(),
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLESTextureTarget(),
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLESTextureTarget(),
+                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =

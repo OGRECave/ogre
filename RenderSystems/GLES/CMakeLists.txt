@@ -32,6 +32,7 @@ set(HEADER_FILES
   include/OgreGLESTexture.h
   include/OgreGLESTextureManager.h
   include/OgreGLESManagedResource.h
+  include/OgreGLESStateCacheManager.h
 )
 
 
@@ -56,7 +57,29 @@ set(SOURCE_FILES
   src/OgreGLESSupport.cpp
   src/OgreGLESTexture.cpp
   src/OgreGLESTextureManager.cpp
+  src/OgreGLESStateCacheManager.cpp
 )
+
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GLES_STATE_CACHE_SUPPORT)
+  set(HEADER_FILES
+      ${HEADER_FILES} 
+      src/StateCacheManager/OgreGLESStateCacheManagerImp.h
+  )
+  set(SOURCE_FILES 
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLESStateCacheManagerImp.cpp
+  )
+else()
+  set(HEADER_FILES 
+      ${HEADER_FILES} 
+      src/StateCacheManager/OgreGLESNullStateCacheManagerImp.h
+  )
+  set(SOURCE_FILES 
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLESNullStateCacheManagerImp.cpp
+  )
+endif()
 
 # Add system specific settings
 if (WIN32)

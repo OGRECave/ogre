@@ -113,6 +113,11 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
 #   define GL_BGRA  0x80E1
 #endif
 
+// Used for polygon modes
+#ifndef GL_FILL
+#   define GL_FILL    0x1B02
+#endif
+
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLESPLUGIN_EXPORTS
 #       define _OgreGLESExport __declspec(dllexport)
