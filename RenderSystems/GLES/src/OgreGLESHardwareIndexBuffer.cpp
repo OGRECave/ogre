@@ -37,7 +37,7 @@ namespace Ogre {
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, true)
     {
 		if (idxType == HardwareIndexBuffer::IT_32BIT)
 		{
@@ -276,18 +276,18 @@ namespace Ogre {
             GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal
-            if (mLockStart == 0 && mLockSize == mSizeInBytes)
-            {
+//            if (mLockStart == 0 && mLockSize == mSizeInBytes)
+//            {
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, mSizeInBytes, srcData,
                              GLESHardwareBufferManager::getGLUsage(mUsage));
                 GL_CHECK_ERROR;
-            }
-            else
-            {
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
-                                mLockStart, mLockSize, srcData);
-                GL_CHECK_ERROR;
-            }
+//            }
+//            else
+//            {
+//                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
+//                                mLockStart, mLockSize, srcData);
+//                GL_CHECK_ERROR;
+ //           }
 
             mShadowBuffer->unlock();
             mShadowUpdated = false;

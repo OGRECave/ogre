@@ -38,7 +38,7 @@ namespace Ogre {
                                                      size_t numIndexes,
                                                      HardwareBuffer::Usage usage,
                                                      bool useShadowBuffer)
-        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
+        : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, true)
     {
 		if (!dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->checkExtension("GL_OES_element_index_uint") && idxType == HardwareIndexBuffer::IT_32BIT)
 		{

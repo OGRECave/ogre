@@ -38,7 +38,7 @@ namespace Ogre {
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, true)
     {
         if (!useShadowBuffer)
         {
@@ -274,17 +274,17 @@ namespace Ogre {
             GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal
-            if (mLockStart == 0 && mLockSize == mSizeInBytes)
-            {
+//           if (mLockStart == 0 && mLockSize == mSizeInBytes)
+//            {
                 glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, srcData,
                              GLESHardwareBufferManager::getGLUsage(mUsage));
                 GL_CHECK_ERROR;
-            }
-            else
-            {
-                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
-                GL_CHECK_ERROR;
-            }
+//            }
+//            else
+//            {
+//                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
+//                GL_CHECK_ERROR;
+//            }
 
             mShadowBuffer->unlock();
             mShadowUpdated = false;
