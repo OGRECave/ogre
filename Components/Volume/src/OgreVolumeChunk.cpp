@@ -307,10 +307,10 @@ namespace Volume {
         String source = config.getSetting("source");
         Vector3 dimensions = StringConverter::parseVector3(config.getSetting("sourceDimensions"));
         bool trilinearValue = StringConverter::parseBool(config.getSetting("trilinearValue"));
-        bool trilinearNormal = StringConverter::parseBool(config.getSetting("trilinearNormal"));
-        bool sobelNormal = StringConverter::parseBool(config.getSetting("sobelNormal"));
+        bool trilinearGradient = StringConverter::parseBool(config.getSetting("trilinearGradient"));
+        bool sobelGradient = StringConverter::parseBool(config.getSetting("sobelGradient"));
 
-        TextureSource textureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearNormal, sobelNormal);
+        TextureSource textureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
     
         Vector3 from = StringConverter::parseVector3(config.getSetting("scanFrom"));
         Vector3 to = StringConverter::parseVector3(config.getSetting("scanTo"));
