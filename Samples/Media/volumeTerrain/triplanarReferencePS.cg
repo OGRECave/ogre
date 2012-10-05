@@ -71,7 +71,9 @@ void main_triplanar_reference_fp(
 	#endif
 	
     uniform float4x4 world,
+	#if !USESPECULARMAP
 	uniform float exponent,
+	#endif
 	uniform float texScale,
 	uniform float plateauSize,
 	uniform float transitionSpeed,
