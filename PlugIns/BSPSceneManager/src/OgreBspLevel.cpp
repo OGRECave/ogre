@@ -145,9 +145,9 @@ namespace Ogre {
         mLeafFaceGroups = 0;
         mBrushes = 0;
         mVisData.tableData = 0;
-        for (PatchMap::iterator pi = mPatches.begin(); pi != mPatches.end(); ++pi)
+        for (PatchMap::iterator pistart = mPatches.begin(); pistart != mPatches.end(); ++pistart)
         {
-            OGRE_DELETE pi->second;
+            OGRE_DELETE pistart->second;
         }
         mPatches.clear();
     }

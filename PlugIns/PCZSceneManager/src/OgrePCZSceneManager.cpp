@@ -1139,11 +1139,11 @@ namespace Ogre
 			zone = i->second;
 			// go through all the portals in the zone
 			Portal* portal;
-			PortalList::iterator pi, piend;
+			PortalList::iterator pistart, piend;
 			piend = zone->mPortals.end();
-			for (pi = zone->mPortals.begin(); pi != piend; pi++)
+			for (pistart = zone->mPortals.begin(); pistart != piend; pistart++)
 			{
-				portal = *pi;
+				portal = *pistart;
 				//portal->updateDerivedValues();
 				if (portal->getTargetZone() == 0)
 				{

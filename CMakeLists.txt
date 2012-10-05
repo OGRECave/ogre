@@ -176,6 +176,12 @@ else()
   test_big_endian(OGRE_TEST_BIG_ENDIAN)
 endif()
 
+# Add OgreMath include path
+include_directories(
+  ${OGRE_SOURCE_DIR}/Components/Math/include/Default
+  ${OGRE_SOURCE_DIR}/Components/Math/include/SSE
+  ${OGRE_SOURCE_DIR}/Components/Math/include/NEON)
+
 # Add OgreMain include path
 include_directories("${OGRE_SOURCE_DIR}/OgreMain/include")
 include_directories("${OGRE_BINARY_DIR}/include")
@@ -193,7 +199,7 @@ endif (APPLE)
 # Find dependencies
 include(Dependencies)
 # definitions for samples
-set(OGRE_LIBRARIES OgreMain) 
+set(OGRE_LIBRARIES OgreMath OgreMain) 
 set(OGRE_Paging_LIBRARIES OgrePaging)
 set(OGRE_Terrain_LIBRARIES OgreTerrain)
 set(OGRE_Volume_LIBRARIES OgreVolume)
@@ -315,6 +321,7 @@ option(OGRE_BUILD_PLUGIN_OCTREE "Build Octree SceneManager plugin" TRUE)
 option(OGRE_BUILD_PLUGIN_PFX "Build ParticleFX plugin" TRUE)
 
 cmake_dependent_option(OGRE_BUILD_PLUGIN_PCZ "Build PCZ SceneManager plugin" TRUE "" FALSE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_MATH "Build Math component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_PAGING "Build Paging component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_TERRAIN "Build Terrain component" TRUE "" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_VOLUME "Build Volume component" TRUE "" FALSE)

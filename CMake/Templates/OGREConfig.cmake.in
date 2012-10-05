@@ -21,7 +21,7 @@ include(FindPackageMessage)
 set(OGRE_PREFIX_DIR "@CMAKE_INSTALL_PREFIX@")
 get_filename_component(OGRE_LIBRARY_DIRS "${OGRE_PREFIX_DIR}/lib" ABSOLUTE)
 get_filename_component(OGRE_INCLUDE_DIRS "${OGRE_PREFIX_DIR}/include/OGRE" ABSOLUTE)
-set(OGRE_LIBRARIES "OgreMain")
+set(OGRE_LIBRARIES "OgreMath" "OgreMain")
 
 message(STATUS "Found OGRE")
 message(STATUS "  libraries : '${OGRE_LIBRARIES}' from ${OGRE_LIBRARY_DIRS}")

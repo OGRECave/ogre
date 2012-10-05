@@ -17,7 +17,6 @@ include(PrecompiledHeader)
 
 # define header and source files for the library
 set (HEADER_FILES
-  include/asm_math.h
   include/Ogre.h
   include/OgreAlignedAllocator.h
   include/OgreAnimable.h
@@ -30,12 +29,10 @@ set (HEADER_FILES
   include/OgreArchiveManager.h
   include/OgreAtomicWrappers.h
   include/OgreAutoParamDataSource.h
-  include/OgreAxisAlignedBox.h
   include/OgreBillboard.h
   include/OgreBillboardChain.h
   include/OgreBillboardParticleRenderer.h
   include/OgreBillboardSet.h
-  include/OgreBitwise.h
   include/OgreBlendMode.h
   include/OgreBone.h
   ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
@@ -57,17 +54,14 @@ set (HEADER_FILES
   include/OgreConfigOptionMap.h
   include/OgreController.h
   include/OgreControllerManager.h
-  include/OgreConvexBody.h
   include/OgreCustomCompositionPass.h
   include/OgreDataStream.h
   include/OgreDefaultHardwareBufferManager.h
   include/OgreDeflate.h
   include/OgreDepthBuffer.h
   include/OgreDistanceLodStrategy.h
-  include/OgreDualQuaternion.h
   include/OgreDynLib.h
   include/OgreDynLibManager.h
-  include/OgreEdgeListBuilder.h
   include/OgreEntity.h
   include/OgreErrorDialog.h
   include/OgreException.h
@@ -76,7 +70,6 @@ set (HEADER_FILES
   include/OgreFactoryObj.h
   include/OgreFileSystem.h
   include/OgreFrameListener.h
-  include/OgreFrustum.h
   include/OgreGpuProgram.h
   include/OgreGpuProgramManager.h
   include/OgreGpuProgramParams.h
@@ -114,9 +107,6 @@ set (HEADER_FILES
   include/OgreMaterial.h
   include/OgreMaterialManager.h
   include/OgreMaterialSerializer.h
-  include/OgreMath.h
-  include/OgreMatrix3.h
-  include/OgreMatrix4.h
   include/OgreMemoryAllocatedObject.h
   include/OgreMemoryAllocatorConfig.h
   include/OgreMemoryNedAlloc.h
@@ -132,8 +122,6 @@ set (HEADER_FILES
   include/OgreMovableObject.h
   include/OgreMovablePlane.h
   include/OgreNode.h
-  include/OgreNumerics.h
-  include/OgreOptimisedUtil.h
   include/OgreParticle.h
   include/OgreParticleAffector.h
   include/OgreParticleAffectorFactory.h
@@ -150,21 +138,16 @@ set (HEADER_FILES
   include/OgrePatchSurface.h
   include/OgrePixelCountLodStrategy.h
   include/OgrePixelFormat.h
-  include/OgrePlane.h
-  include/OgrePlaneBoundedVolume.h
   include/OgrePlatform.h
   include/OgrePlatformInformation.h
   include/OgrePlugin.h
-  include/OgrePolygon.h
   include/OgrePose.h
   include/OgrePredefinedControllers.h
   include/OgrePrefabFactory.h
   include/OgrePrerequisites.h
   include/OgreProfiler.h
   include/OgreProgressiveMesh.h
-  include/OgreQuaternion.h
   include/OgreRadixSort.h
-  include/OgreRay.h
   include/OgreRectangle.h
   include/OgreRectangle2D.h
   include/OgreRenderable.h
@@ -189,7 +172,6 @@ set (HEADER_FILES
   include/OgreResourceManager.h
   include/OgreRibbonTrail.h
   include/OgreRoot.h
-  include/OgreRotationalSpline.h
   include/OgreSceneManager.h
   include/OgreSceneManagerEnumerator.h
   include/OgreSceneNode.h
@@ -211,7 +193,6 @@ set (HEADER_FILES
   include/OgreShadowVolumeExtrudeProgram.h
   include/OgreSharedPtr.h
   include/OgreSimpleRenderable.h
-  include/OgreSimpleSpline.h
   include/OgreSingleton.h
   include/OgreSkeleton.h
   include/OgreSkeletonFileFormat.h
@@ -219,7 +200,6 @@ set (HEADER_FILES
   include/OgreSkeletonManager.h
   include/OgreSkeletonSerializer.h
   include/OgreSmallVector.h
-  include/OgreSphere.h
   include/OgreSpotShadowFadePng.h
   include/OgreStableHeaders.h
   include/OgreStaticFaceGroup.h
@@ -233,7 +213,6 @@ set (HEADER_FILES
   include/OgreSubEntity.h
   include/OgreSubMesh.h
   include/OgreTagPoint.h
-  include/OgreTangentSpaceCalc.h
   include/OgreTechnique.h
   include/OgreTexture.h
   include/OgreTextureManager.h
@@ -242,9 +221,6 @@ set (HEADER_FILES
   include/OgreUnifiedHighLevelGpuProgram.h
   include/OgreUserObjectBindings.h
   include/OgreUTFString.h
-  include/OgreVector2.h
-  include/OgreVector3.h
-  include/OgreVector4.h
   include/OgreVertexBoneAssignment.h
   include/OgreVertexIndexData.h
   include/OgreViewport.h
@@ -261,7 +237,6 @@ set (SOURCE_FILES
   src/OgreAnimationTrack.cpp
   src/OgreArchiveManager.cpp
   src/OgreAutoParamDataSource.cpp
-  src/OgreAxisAlignedBox.cpp
   src/OgreBillboard.cpp
   src/OgreBillboardChain.cpp
   src/OgreBillboardParticleRenderer.cpp
@@ -280,23 +255,19 @@ set (SOURCE_FILES
   src/OgreCompositorManager.cpp
   src/OgreConfigFile.cpp
   src/OgreControllerManager.cpp
-  src/OgreConvexBody.cpp
   src/OgreDataStream.cpp
   src/OgreDefaultHardwareBufferManager.cpp
   src/OgreDefaultSceneQueries.cpp
   src/OgreDeflate.cpp
   src/OgreDepthBuffer.cpp
   src/OgreDistanceLodStrategy.cpp
-  src/OgreDualQuaternion.cpp
   src/OgreDynLib.cpp
   src/OgreDynLibManager.cpp
-  src/OgreEdgeListBuilder.cpp
   src/OgreEntity.cpp
   src/OgreException.cpp
   src/OgreExternalTextureSource.cpp
   src/OgreExternalTextureSourceManager.cpp
   src/OgreFileSystem.cpp
-  src/OgreFrustum.cpp
   src/OgreGpuProgram.cpp
   src/OgreGpuProgramManager.cpp
   src/OgreGpuProgramParams.cpp
@@ -330,9 +301,6 @@ set (SOURCE_FILES
   src/OgreMaterial.cpp
   src/OgreMaterialManager.cpp
   src/OgreMaterialSerializer.cpp
-  src/OgreMath.cpp
-  src/OgreMatrix3.cpp
-  src/OgreMatrix4.cpp
   src/OgreMemoryAllocatedObject.cpp
   src/OgreMemoryNedAlloc.cpp
   src/OgreMemoryNedPooling.cpp
@@ -344,12 +312,6 @@ set (SOURCE_FILES
   src/OgreMovableObject.cpp
   src/OgreMovablePlane.cpp
   src/OgreNode.cpp
-  src/OgreNumerics.cpp
-  src/OgreOptimisedUtil.cpp
-  src/OgreOptimisedUtilGeneral.cpp
-#  src/OgreOptimisedUtilNEON.cpp
-  src/OgreOptimisedUtilSSE.cpp
-#  src/OgreOptimisedUtilVFP.cpp
   src/OgreParticle.cpp
   src/OgreParticleEmitter.cpp
   src/OgreParticleEmitterCommands.cpp
@@ -362,16 +324,13 @@ set (SOURCE_FILES
   src/OgrePixelConversions.h
   src/OgrePixelCountLodStrategy.cpp
   src/OgrePixelFormat.cpp
-  src/OgrePlane.cpp
   src/OgrePlatformInformation.cpp
-  src/OgrePolygon.cpp
   src/OgrePose.cpp
   src/OgrePrecompiledHeaders.cpp
   src/OgrePredefinedControllers.cpp
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
   src/OgreProgressiveMesh.cpp
-  src/OgreQuaternion.cpp
   src/OgreRectangle2D.cpp
   src/OgreRenderQueue.cpp
   src/OgreRenderQueueInvocation.cpp
@@ -390,7 +349,6 @@ set (SOURCE_FILES
   src/OgreResourceManager.cpp
   src/OgreRibbonTrail.cpp
   src/OgreRoot.cpp
-  src/OgreRotationSpline.cpp
   src/OgreSceneManager.cpp
   src/OgreSceneManagerEnumerator.cpp
   src/OgreSceneNode.cpp
@@ -408,9 +366,7 @@ set (SOURCE_FILES
   src/OgreShadowCaster.cpp
   src/OgreShadowTextureManager.cpp
   src/OgreShadowVolumeExtrudeProgram.cpp
-  src/OgreSIMDHelper.h
   src/OgreSimpleRenderable.cpp
-  src/OgreSimpleSpline.cpp
   src/OgreSkeleton.cpp
   src/OgreSkeletonInstance.cpp
   src/OgreSkeletonManager.cpp
@@ -424,7 +380,6 @@ set (SOURCE_FILES
   src/OgreSubEntity.cpp
   src/OgreSubMesh.cpp
   src/OgreTagPoint.cpp
-  src/OgreTangentSpaceCalc.cpp
   src/OgreTechnique.cpp
   src/OgreTexture.cpp
   src/OgreTextureManager.cpp
@@ -432,9 +387,6 @@ set (SOURCE_FILES
   src/OgreUnifiedHighLevelGpuProgram.cpp
   src/OgreUserObjectBindings.cpp
   src/OgreUTFString.cpp
-  src/OgreVector2.cpp
-  src/OgreVector3.cpp
-  src/OgreVector4.cpp
   src/OgreVertexIndexData.cpp
   src/OgreViewport.cpp
   src/OgreWindowEventUtilities.cpp
@@ -759,7 +711,7 @@ if (APPLE)
   # Framework is called 'Ogre'
   set_target_properties(OgreMain PROPERTIES	OUTPUT_NAME Ogre)
 endif ()
-target_link_libraries(OgreMain ${LIBRARIES})
+target_link_libraries(OgreMain OgreMath ${LIBRARIES})
 if (MINGW)
   # may need winsock htons functions for FreeImage
   target_link_libraries(OgreMain ws2_32)

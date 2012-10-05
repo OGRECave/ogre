@@ -68,7 +68,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void LinearForceAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        ParticleIterator pi = pSystem->_getIterator();
+        ParticleIterator itor = pSystem->_getIterator();
         Particle *p;
 
         Vector3 scaledVector = Vector3::ZERO;
@@ -80,9 +80,9 @@ namespace Ogre {
             scaledVector = mForceVector * timeElapsed;
         }
 
-        while (!pi.end())
+        while (!itor.end())
         {
-            p = pi.getNext();
+            p = itor.getNext();
             if (mForceApplication == FA_ADD)
             {
                 p->direction += scaledVector;

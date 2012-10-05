@@ -493,11 +493,11 @@ namespace Ogre
 
 		// Check all portals of the start zone for crossings!
 		Portal* portal;
-		PortalList::iterator pi, piend;
+		PortalList::iterator pistart, piend;
 		piend = mPortals.end();
-		for (pi = mPortals.begin(); pi != piend; pi++)
+		for (pistart = mPortals.begin(); pistart != piend; pistart++)
 		{
-			portal = *pi;
+			portal = *pistart;
 
 			Portal::PortalIntersectResult pir = portal->intersects(pczsn);
 			switch (pir)

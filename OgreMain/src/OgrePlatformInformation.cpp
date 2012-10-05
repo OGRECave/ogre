@@ -528,8 +528,6 @@ namespace Ogre {
         if(hasNEON)
 #endif
             features |= PlatformInformation::CPU_FEATURE_NEON;
-#elif defined(__VFP_FP__)
-            features |= PlatformInformation::CPU_FEATURE_VFP;
 #endif
         return features;
     }
@@ -636,8 +634,6 @@ namespace Ogre {
 				" *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
 		}
 #elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        pLog->logMessage(
-				" *      VFP: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_VFP), true));
         pLog->logMessage(
 				" *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
 #endif

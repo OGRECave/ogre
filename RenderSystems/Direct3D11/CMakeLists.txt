@@ -75,7 +75,7 @@ add_definitions(-D_USRDLL)
 
 ogre_add_library(RenderSystem_Direct3D11 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D11
-  OgreMain
+  OgreMath OgreMain
   ${DirectX_D3D11_LIBRARIES}
 )
 

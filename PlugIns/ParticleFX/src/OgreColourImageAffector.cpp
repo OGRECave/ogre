@@ -66,18 +66,18 @@ namespace Ogre {
     void ColourImageAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
         Particle*			p;
-		ParticleIterator	pi				= pSystem->_getIterator();
+		ParticleIterator	 itor = pSystem->_getIterator();
 
         if (!mColourImageLoaded)
         {
             _loadImage();
         }
 
-		int				   width			= (int)mColourImage.getWidth()  - 1;
+		int width = (int)mColourImage.getWidth()  - 1;
         
-		while (!pi.end())
+		while (!itor.end())
 		{
-			p = pi.getNext();
+			p = itor.getNext();
 			const Real		life_time		= p->totalTimeToLive;
 			Real			particle_time	= 1.0f - (p->timeToLive / life_time); 
 

@@ -29,7 +29,7 @@
 #  Plugin_OctreeSceneManager, Plugin_OctreeZone,
 #  Plugin_ParticleFX, Plugin_PCZSceneManager,
 #  RenderSystem_GL, RenderSystem_Direct3D9,
-#  Paging, Terrain, Volume, Overlay
+#  Math, Paging, Terrain, Volume, Overlay
 #
 # For each of these components, the following variables are defined:
 #
@@ -128,7 +128,7 @@ else()
 endif ()
 
 # redo search if any of the environmental hints changed
-set(OGRE_COMPONENTS Paging Terrain Volume Overlay 
+set(OGRE_COMPONENTS Math Paging Terrain Volume Overlay 
   Plugin_BSPSceneManager Plugin_CgProgramManager Plugin_OctreeSceneManager
   Plugin_OctreeZone Plugin_PCZSceneManager Plugin_ParticleFX
   RenderSystem_Direct3D11 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GLES RenderSystem_GLES2)
