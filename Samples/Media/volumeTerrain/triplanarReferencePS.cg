@@ -130,6 +130,12 @@ void main_triplanar_reference_fp(
 	float3 normal2 = unitNormal;
 	#endif
 	
+	#if USESPECULARMAP
+	float specularExponent = textColour.a;
+	#else
+	float specularExponent = exponent;
+	#endif
+	
 	// Light
 	float4 lightContribution = float4(0, 0, 0, 0);
 	#if LIGHT0
@@ -142,7 +148,7 @@ void main_triplanar_reference_fp(
 	float3 lightSpotDir02 = lightSpotDir0;
 	float3 lightDir02 = lightDir0;
 	#endif
-	lightContribution += doLighting(position, normal2, eyeDir2, exponent, lightDir02, lightPosition0, lightDiffuse0, lightSpecular0, lightAttenuation0, lightSpotlight0, lightSpotDir02);
+	lightContribution += doLighting(position, normal2, eyeDir2, specularExponent, lightDir02, lightPosition0, lightDiffuse0, lightSpecular0, lightAttenuation0, lightSpotlight0, lightSpotDir02);
 	#endif
 	
 	#if LIGHT1
@@ -155,7 +161,7 @@ void main_triplanar_reference_fp(
 	float3 lightSpotDir12 = lightSpotDir1;
 	float3 lightDir12 = lightDir1;
 	#endif
-	lightContribution += doLighting(position, normal2, eyeDir2, exponent, lightDir12, lightPosition1, lightDiffuse1, lightSpecular1, lightAttenuation1, lightSpotlight1, lightSpotDir12);
+	lightContribution += doLighting(position, normal2, eyeDir2, specularExponent, lightDir12, lightPosition1, lightDiffuse1, lightSpecular1, lightAttenuation1, lightSpotlight1, lightSpotDir12);
 	#endif
 	
 	#if LIGHT2
@@ -168,7 +174,7 @@ void main_triplanar_reference_fp(
 	float3 lightSpotDir22 = lightSpotDir2;
 	float3 lightDir22 = lightDir2;
 	#endif
-	lightContribution += doLighting(position, normal2, eyeDir2, exponent, lightDir22, lightPosition2, lightDiffuse2, lightSpecular2, lightAttenuation2, lightSpotlight2, lightSpotDir22);
+	lightContribution += doLighting(position, normal2, eyeDir2, specularExponent, lightDir22, lightPosition2, lightDiffuse2, lightSpecular2, lightAttenuation2, lightSpotlight2, lightSpotDir22);
 	#endif
 	
 	oColor = saturate(textColour * (lightContribution + ambient));
