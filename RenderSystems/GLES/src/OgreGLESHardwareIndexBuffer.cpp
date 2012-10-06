@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLESHardwareIndexBuffer.h"
 #include "OgreGLESHardwareBufferManager.h"
 #include "OgreException.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
     GLESHardwareIndexBuffer::GLESHardwareIndexBuffer(HardwareBufferManagerBase* mgr, 

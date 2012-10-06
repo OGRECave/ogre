@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 
 #include "OgreGLESFBOMultiRenderTarget.h"
+#include "OgreLogManager.h"
 
 namespace Ogre {
 

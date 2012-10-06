@@ -145,13 +145,25 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
     }
 
 #define ENABLE_GL_CHECK 0
+
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
         int e = glGetError(); \
         if (e != 0) \
         { \
-            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+            const char * errorString = ""; \
+            switch(e) \
+            { \
+            case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
+            case GL_INVALID_VALUE:      errorString = "GL_INVALID_VALUE";       break; \
+            case GL_INVALID_OPERATION:  errorString = "GL_INVALID_OPERATION";   break; \
+            case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
+            default:                                                            break; \
+            } \
+            char msgBuf[1024]; \
+            sprintf(msgBuf, "OpenGL ES error 0x%04X %s in %s at line %i in %s \n", e, errorString, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+            LogManager::getSingleton().logMessage(msgBuf); \
         } \
     }
 #else
@@ -165,8 +177,9 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
-            assert(false); \
+            char msgBuf[1024]; \
+            sprintf(msgBuf, "EGL error 0x%04X in %s at line %i in %s \n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__);\
+            LogManager::getSingleton().logMessage(msgBuf);\
         } \
     }
 #else

@@ -317,6 +317,7 @@ namespace Ogre {
         glFlush();
         if (eglSwapBuffers(mEglDisplay, mEglSurface) == EGL_FALSE)
         {
+			EGL_CHECK_ERROR
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Fail to SwapBuffers",
                         __FUNCTION__);
@@ -413,9 +414,7 @@ namespace Ogre {
     ::EGLSurface EGLWindow::createSurfaceFromWindow(::EGLDisplay display,
                                                     NativeWindowType win)
     {
-        ::EGLSurface surface;
-
-        surface = eglCreateWindowSurface(display, mEglConfig, win, NULL);
+        ::EGLSurface surface = eglCreateWindowSurface(display, mEglConfig, win, NULL);
 
         if (surface == EGL_NO_SURFACE)
         {

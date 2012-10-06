@@ -86,6 +86,8 @@ namespace Ogre {
         if(mActive)
         {
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+			EGL_CHECK_ERROR
+			
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             EGL_CHECK_ERROR
             
