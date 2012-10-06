@@ -278,8 +278,12 @@ namespace Ogre
 			Because not all techniques support custom params, and some users may not need it while
 			using millions of InstancedEntities, the params have been detached from InstancedEntity
 			and stored in it's InstanceBatch instead, to reduce memory overhead.
-			@param Index of the param. In the range [0; InstanceManager::getNumCustomParams())
-			@param New parameter
+		@remarks
+			If this function is never called, all instances default to Vector4::ZERO. Watch out!
+			If you destroy an instanced entity and then create it again (remember! Instanced entities
+			are pre-allocated) it's custom param will contain the old value when it was destroyed.
+		@param Index of the param. In the range [0; InstanceManager::getNumCustomParams())
+		@param New parameter
 		*/
 		void setCustomParam( unsigned char idx, const Vector4 &newParam );
 		const Vector4& getCustomParam( unsigned char idx );
