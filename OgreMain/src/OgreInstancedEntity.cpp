@@ -521,4 +521,14 @@ namespace Ogre
 		//Remove the use of local transform if the object is deleted
 		mUseLocalTransform &= used;
 	}
+	//---------------------------------------------------------------------------
+	void InstancedEntity::setCustomParam( unsigned char idx, const Vector4 &newParam )
+	{
+		mBatchOwner->_setCustomParam( this, idx, newParam );
+	}
+	//---------------------------------------------------------------------------
+	const Vector4& InstancedEntity::getCustomParam( unsigned char idx )
+	{
+		return mBatchOwner->_getCustomParam( this, idx );
+	}
 }

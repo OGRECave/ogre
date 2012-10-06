@@ -52,7 +52,8 @@ namespace Ogre
 				mInstancingFlags( instancingFlags ),
 				mSubMeshIdx( subMeshIdx ),
                 mSceneManager( sceneManager ),
-				mMaxLookupTableInstances(16)
+				mMaxLookupTableInstances(16),
+				mNumCustomParams( 0 )
 	{
 		mMeshReference = MeshManager::getSingleton().load( meshName, groupName );
 
@@ -98,12 +99,23 @@ namespace Ogre
 		if( !mInstanceBatches.empty() )
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-				" building the batch.", "InstanceManager::setInstancesPerBatch");
+				" building the batch.", "InstanceManager::setMaxLookupTableInstances");
 		}
 
 		mMaxLookupTableInstances = maxLookupTableInstances;
 	}
 	
+	//----------------------------------------------------------------------
+	void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
+	{
+		if( !mInstanceBatches.empty() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
+				" building the batch.", "InstanceManager::setNumCustomParams");
+		}
+
+		mNumCustomParams = numCustomParams;
+	}
 	//----------------------------------------------------------------------
 	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize,
 																uint16 flags )
@@ -317,6 +329,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::defragmentBatches( bool optimizeCull,
 												InstanceBatch::InstancedEntityVec &usedEntities,
+												InstanceBatch::CustomParamsVec &usedParams,
 												InstanceBatchVec &fragmentedBatches )
 	{
 		InstanceBatchVec::iterator itor = fragmentedBatches.begin();
@@ -325,7 +338,7 @@ namespace Ogre
 		while( itor != end && !usedEntities.empty() )
 		{
 			if( !(*itor)->isStatic() )
-				(*itor)->_defragmentBatch( optimizeCull, usedEntities );
+				(*itor)->_defragmentBatch( optimizeCull, usedEntities, usedParams );
 			++itor;
 		}
 
@@ -367,7 +380,8 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			InstanceBatch::InstancedEntityVec usedEntities;
+			InstanceBatch::InstancedEntityVec	usedEntities;
+			InstanceBatch::CustomParamsVec		usedParams;
 			usedEntities.reserve( itor->second.size() * mInstancesPerBatch );
 
 			//Collect all Instanced Entities being used by _all_ batches from this material
@@ -379,11 +393,11 @@ namespace Ogre
 				//Don't collect instances from static batches, we assume they're correctly set
 				//Plus, we don't want to put InstancedEntities from non-static into static batches
 				if( !(*it)->isStatic() )
-					(*it)->getInstancedEntitiesInUse( usedEntities );
+					(*it)->getInstancedEntitiesInUse( usedEntities, usedParams );
 				++it;
 			}
 
-			defragmentBatches( optimizeCulling, usedEntities, itor->second );
+			defragmentBatches( optimizeCulling, usedEntities, usedParams, itor->second );
 
 			++itor;
 		}
