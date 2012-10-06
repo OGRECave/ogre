@@ -297,13 +297,13 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
 {
     set<SceneNode*>::type checkedSceneNodes;
 
-    PlaneBoundedVolumeList::iterator pistart, piend;
+    PlaneBoundedVolumeList::iterator pi, piend;
     piend = mVolumes.end();
-    for (pistart = mVolumes.begin(); pistart != piend; ++pistart)
+    for (pi = mVolumes.begin(); pi != piend; ++pi)
     {
         list< SceneNode * >::type _list;
         //find the nodes that intersect the AAB
-        static_cast<OctreeSceneManager*>( mParentSceneMgr ) -> findNodesIn( *pistart, _list, 0 );
+        static_cast<OctreeSceneManager*>( mParentSceneMgr ) -> findNodesIn( *pi, _list, 0 );
 
         //grab all moveables from the node that intersect...
         list< SceneNode * >::type::iterator it, itend;
@@ -320,7 +320,7 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
                 if( (m->getQueryFlags() & mQueryMask) && 
 					(m->getTypeFlags() & mQueryTypeMask) && 
 					m->isInScene() &&
-					(*pistart).intersects( m->getWorldBoundingBox() ) )
+					(*pi).intersects( m->getWorldBoundingBox() ) )
                 {
                     listener -> queryResult( m );
 					// deal with attached objects, since they are not directly attached to nodes
@@ -332,7 +332,7 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
 						{
 							MovableObject* c = childIt.getNext();
 							if (c->getQueryFlags() & mQueryMask &&
-								(*pistart).intersects( c->getWorldBoundingBox()))
+								(*pi).intersects( c->getWorldBoundingBox()))
 							{
 								listener->queryResult(c);
 							}

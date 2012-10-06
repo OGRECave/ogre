@@ -56,7 +56,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void ScaleAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
-        ParticleIterator itor = pSystem->_getIterator();
+        ParticleIterator pi = pSystem->_getIterator();
         Particle *p;
         Real ds;
 
@@ -65,9 +65,9 @@ namespace Ogre {
 
 		Real NewWide, NewHigh;
 
-        while (!itor.end())
+        while (!pi.end())
         {
-            p = itor.getNext();
+            p = pi.getNext();
 
 			if( p->hasOwnDimensions() == false )
 			{

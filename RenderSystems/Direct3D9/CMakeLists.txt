@@ -80,7 +80,7 @@ add_definitions(-D_USRDLL)
 
 ogre_add_library(RenderSystem_Direct3D9 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_Direct3D9
-  OgreMath OgreMain
+  OgreMain
   ${DirectX_LIBRARIES}
 )
 

@@ -185,11 +185,6 @@ if (APPLE)
   endif ()
 endif (APPLE)
 
-if (OGRE_Math_FOUND)
-    ogre_add_component_include_dir(Math)
-    set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_Math_LIBRARIES})
-endif ()
-
 if (OGRE_RTShaderSystem_FOUND)
 	add_definitions(-DUSE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)

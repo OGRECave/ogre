@@ -71,7 +71,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_definitions(-D_USRDLL)
 
 ogre_add_library(Plugin_ParticleFX ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(Plugin_ParticleFX OgreMath OgreMain)
+target_link_libraries(Plugin_ParticleFX OgreMain)
 if (NOT OGRE_STATIC)
   set_target_properties(Plugin_ParticleFX PROPERTIES
     COMPILE_DEFINITIONS OGRE_PARTICLEFXPLUGIN_EXPORTS

@@ -15,9 +15,6 @@ set(_features "${_features}  FEATURE SUMMARY\n")
 set(_features "${_features}----------------------------------------------------------------------------\n\n")
 
 #summarise components
-if (OGRE_BUILD_COMPONENT_MATH)
-	set(_components "${_components}  + Math\n")
-endif ()
 if (OGRE_BUILD_COMPONENT_PAGING)
 	set(_components "${_components}  + Paging\n")
 endif ()

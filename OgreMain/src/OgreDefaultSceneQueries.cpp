@@ -285,11 +285,11 @@ namespace Ogre {
 				if (!(a->getTypeFlags() & mQueryTypeMask))
 					break;
 
-				PlaneBoundedVolumeList::iterator pistart, piend;
+				PlaneBoundedVolumeList::iterator pi, piend;
 				piend = mVolumes.end();
-				for (pistart = mVolumes.begin(); pistart != piend; ++pistart)
+				for (pi = mVolumes.begin(); pi != piend; ++pi)
 				{
-					PlaneBoundedVolume& vol = *pistart;
+					PlaneBoundedVolume& vol = *pi;
 					// Do AABB / plane volume test
 					if ((a->getQueryFlags() & mQueryMask) && 
 						a->isInScene() && 

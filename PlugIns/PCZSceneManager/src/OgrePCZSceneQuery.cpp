@@ -306,13 +306,13 @@ namespace Ogre
     {
         set<SceneNode*>::type checkedSceneNodes;
 
-        PlaneBoundedVolumeList::iterator pistart, piend;
+        PlaneBoundedVolumeList::iterator pi, piend;
         piend = mVolumes.end();
-        for (pistart = mVolumes.begin(); pistart != piend; ++pistart)
+        for (pi = mVolumes.begin(); pi != piend; ++pi)
         {
             PCZSceneNodeList list;
             //find the nodes that intersect the Plane bounded Volume
-            static_cast<PCZSceneManager*>( mParentSceneMgr ) -> findNodesIn( *pistart, list, mStartZone, (PCZSceneNode*)mExcludeNode );
+            static_cast<PCZSceneManager*>( mParentSceneMgr ) -> findNodesIn( *pi, list, mStartZone, (PCZSceneNode*)mExcludeNode );
 
             //grab all moveables from the node that intersect...
             PCZSceneNodeList::iterator it, itend;
@@ -329,7 +329,7 @@ namespace Ogre
                     if( (m->getQueryFlags() & mQueryMask) && 
 					    (m->getTypeFlags() & mQueryTypeMask) && 
 					    m->isInScene() &&
-					    (*pistart).intersects( m->getWorldBoundingBox() ) )
+					    (*pi).intersects( m->getWorldBoundingBox() ) )
                     {
                         listener -> queryResult( m );
 					    // deal with attached objects, since they are not directly attached to nodes
@@ -341,7 +341,7 @@ namespace Ogre
 						    {
 							    MovableObject* c = childIt.getNext();
 							    if (c->getQueryFlags() & mQueryMask &&
-								    (*pistart).intersects( c->getWorldBoundingBox()))
+								    (*pi).intersects( c->getWorldBoundingBox()))
 							    {
 								    listener->queryResult(c);
 							    }

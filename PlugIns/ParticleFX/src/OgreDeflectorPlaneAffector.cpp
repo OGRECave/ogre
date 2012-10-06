@@ -73,12 +73,12 @@ namespace Ogre {
         Real planeDistance = - mPlaneNormal.dotProduct(mPlanePoint) / Math::Sqrt(mPlaneNormal.dotProduct(mPlaneNormal));
 		Vector3 directionPart;
 
-        ParticleIterator itor = pSystem->_getIterator();
+        ParticleIterator pi = pSystem->_getIterator();
         Particle *p;
 
-        while (!itor.end())
+        while (!pi.end())
         {
-            p = itor.getNext();
+            p = pi.getNext();
 
             Vector3 direction(p->direction * timeElapsed);
             if (mPlaneNormal.dotProduct(p->position + direction) + planeDistance <= 0.0)

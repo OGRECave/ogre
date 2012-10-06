@@ -177,11 +177,11 @@ bool CompositionTechnique::isSupported(bool acceptTextureDegradation)
     }
 
     // Check all target passes is supported
-    TargetPasses::iterator pistart, piend;
+    TargetPasses::iterator pi, piend;
     piend = mTargetPasses.end();
-    for (pistart = mTargetPasses.begin(); pistart != piend; ++pistart)
+    for (pi = mTargetPasses.begin(); pi != piend; ++pi)
     {
-        CompositionTargetPass* targetPass = *pistart;
+        CompositionTargetPass* targetPass = *pi;
         if (!targetPass->_isSupported())
         {
             return false;

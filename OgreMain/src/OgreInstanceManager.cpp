@@ -570,11 +570,11 @@ namespace Ogre
 				uint8 *oldLock = (uint8*)sharedVertexBuffer->lock(0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
 				uint8 *newLock = (uint8*)newVertexBuffer->lock(0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
 
-				IndicesMap::iterator indIt = indicesMap.begin();
+				IndicesMap::iterator it = indicesMap.begin(); 
 				IndicesMap::iterator endIt = indicesMap.end();
-				for (; indIt != endIt; indIt++) 
+				for (; it != endIt; it++) 
 				{
-					memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
+					memcpy(newLock + vertexSize * it->second, oldLock + vertexSize * it->first, vertexSize);
 				}
 
 				sharedVertexBuffer->unlock();

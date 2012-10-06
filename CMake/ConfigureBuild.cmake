@@ -207,11 +207,6 @@ if (UNIX)
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-PCZ.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc @ONLY)
     install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-PCZ.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
-
-  if (OGRE_BUILD_COMPONENT_MATH)
-    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Math.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Math.pc @ONLY)
-    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Math.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
-  endif ()
   
   if (OGRE_BUILD_COMPONENT_PAGING)
     configure_file(${OGRE_TEMPLATES_DIR}/OGRE-Paging.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Paging.pc @ONLY)

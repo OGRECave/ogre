@@ -95,6 +95,12 @@ namespace Ogre {
 #   define __OGRE_HAVE_SSE  1
 #endif
 
+/* Define whether or not Ogre compiled with VFP supports.
+ */
+#if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_6K__) && defined(__VFP_FP__)
+#   define __OGRE_HAVE_VFP  1
+#endif
+
 /* Define whether or not Ogre compiled with NEON supports.
  */
 #if OGRE_DOUBLE_PRECISION == 0 && OGRE_CPU == OGRE_CPU_ARM && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && defined(__ARM_ARCH_7A__) && defined(__ARM_NEON__)
@@ -103,6 +109,10 @@ namespace Ogre {
 
 #ifndef __OGRE_HAVE_SSE
 #   define __OGRE_HAVE_SSE  0
+#endif
+
+#ifndef __OGRE_HAVE_VFP
+#   define __OGRE_HAVE_VFP  0
 #endif
 
 #ifndef __OGRE_HAVE_NEON
@@ -151,7 +161,8 @@ namespace Ogre {
             CPU_FEATURE_PRO         = 1 << 10,
             CPU_FEATURE_HTT         = 1 << 11,
 #elif OGRE_CPU == OGRE_CPU_ARM
-            CPU_FEATURE_NEON        = 1 << 12,
+            CPU_FEATURE_VFP         = 1 << 12,
+            CPU_FEATURE_NEON        = 1 << 13,
 #endif
 
             CPU_FEATURE_NONE        = 0

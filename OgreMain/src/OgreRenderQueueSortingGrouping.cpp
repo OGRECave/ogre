@@ -125,7 +125,7 @@ namespace Ogre {
     void RenderPriorityGroup::addSolidRenderable(Technique* pTech, 
         Renderable* rend, bool addToNoShadow)
     {
-        Technique::PassIterator pistart = pTech->getPassIterator();
+        Technique::PassIterator pi = pTech->getPassIterator();
 
 		QueuedRenderableCollection* collection;
         if (addToNoShadow)
@@ -138,10 +138,10 @@ namespace Ogre {
         }
 
 
-        while (pistart.hasMoreElements())
+        while (pi.hasMoreElements())
         {
             // Insert into solid list
-            Pass* p = pistart.getNext();
+            Pass* p = pi.getNext();
 			collection->addRenderable(p, rend);
         }
     }
@@ -150,13 +150,13 @@ namespace Ogre {
         Renderable* rend)
     {
         // Divide the passes into the 3 categories
-        Technique::IlluminationPassIterator pistart = 
+        Technique::IlluminationPassIterator pi = 
             pTech->getIlluminationPassIterator();
 
-        while (pistart.hasMoreElements())
+        while (pi.hasMoreElements())
         {
             // Insert into solid list
-            IlluminationPass* p = pistart.getNext();
+            IlluminationPass* p = pi.getNext();
             QueuedRenderableCollection* collection = NULL;
             switch(p->stage)
             {
@@ -179,23 +179,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addUnsortedTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        Technique::PassIterator pistart = pTech->getPassIterator();
+        Technique::PassIterator pi = pTech->getPassIterator();
 
-        while (pistart.hasMoreElements())
+        while (pi.hasMoreElements())
         {
             // Insert into transparent list
-            mTransparentsUnsorted.addRenderable(pistart.getNext(), rend);
+            mTransparentsUnsorted.addRenderable(pi.getNext(), rend);
         }
     }
     //-----------------------------------------------------------------------
     void RenderPriorityGroup::addTransparentRenderable(Technique* pTech, Renderable* rend)
     {
-        Technique::PassIterator pistart = pTech->getPassIterator();
+        Technique::PassIterator pi = pTech->getPassIterator();
 
-        while (pistart.hasMoreElements())
+        while (pi.hasMoreElements())
         {
             // Insert into transparent list
-            mTransparents.addRenderable(pistart.getNext(), rend);
+            mTransparents.addRenderable(pi.getNext(), rend);
         }
     }
     //-----------------------------------------------------------------------

@@ -101,7 +101,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 ogre_add_library(OgreRTShaderSystem ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreRTShaderSystem PROPERTIES VERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreRTShaderSystem OgreMath OgreMain)
+target_link_libraries(OgreRTShaderSystem OgreMain)
 
 ogre_config_component(OgreRTShaderSystem)
 
