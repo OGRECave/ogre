@@ -35,10 +35,9 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    /** Marching Cubes implementation like at
-        http://local.wasp.uwa.edu.au/~pbourke/geometry/polygonise/
+    /** Abstract IsoSurface.
      */
-    class _OgreVolumeExport IsoSurface
+    class _OgreVolumeExport IsoSurface : public UtilityAlloc
     {
     protected:
         
@@ -48,52 +47,11 @@ namespace Volume {
         /// To get the isovalue and normal.
         const Source *mSrc;
 
-        /** Linear interpolation between two vectors based on some values associated to them.
-        @param v1
-            The first vector.
-        @param v2
-            The second vector.
-        @param val1
-            The value for the first vector.
-        @param val2
-            The value for the second vector.
-        @param normal
-            Reference to a vector where the normal will be stored.
-        @return
-            The interpolated position.
+        /** Constructor.
+        @param src
+            The source to use.
         */
-        inline Vector3 interpolate(const Vector3 &v1, const Vector3 &v2, const Vector4 val1, const Vector4 val2, Vector3 &normal) const
-        {
-            // Don't use Math::RealEqual here as it isn't inlined and this function is performance critical.
-            if (fabs(val1.w - ISO_LEVEL) <= FLT_EPSILON)
-            {
-                normal.x = val1.x;
-                normal.y = val1.y;
-                normal.z = val1.z;
-                return v1;
-            }
-            if (fabs(val2.w - ISO_LEVEL) <= FLT_EPSILON)
-            {
-                normal.x = val2.x;
-                normal.y = val2.y;
-                normal.z = val2.z;
-                return v2;
-            }
-            if (fabs(val2.w - val1.w) <= FLT_EPSILON)
-            {
-                normal.x = val1.x;
-                normal.y = val1.y;
-                normal.z = val1.z;
-                return v1;
-            }
-            Real mu = (ISO_LEVEL - val1.w) / (val2.w - val1.w);
-            Vector4 normal4 = val1 + mu * (val2 - val1);
-            normal.x = normal4.x;
-            normal.y = normal4.y;
-            normal.z = normal4.z;
-            normal.normalise();
-            return v1 + mu * (v2 - v1);
-        }
+        explicit IsoSurface(const Source *src);
 
     public:
 
@@ -114,13 +72,9 @@ namespace Volume {
                 
         /// To call Marching Squares with a cube on its bottom.
         static const size_t MS_CORNERS_BOTTOM[4];
-        
-        /** Constructor.
-        @param src
-            The source for the isovalues and normals there.
-        */
-        explicit IsoSurface(const Source *src);
 
+        virtual ~IsoSurface(void);
+        
         /** Adds triangles to a MeshBuilder via Marching Cubes.
         @param corners
             The corners of the cube to triangulate via Marching Cubes.
@@ -129,7 +83,7 @@ namespace Volume {
         @param mb
             The MeshBuilder to add the triangles to.
         */
-        void addMarchingCubesTriangles(const Vector3 *corners, const Vector4 *volumeValues, MeshBuilder *mb) const;
+        virtual void addMarchingCubesTriangles(const Vector3 *corners, const Vector4 *volumeValues, MeshBuilder *mb) const = 0;
 
         /** Adds triangles to a MeshBuilder via Marching Squares.
         @param corners
@@ -143,7 +97,7 @@ namespace Volume {
         @param mb
             The MeshBuilder to add the triangles to.
         */
-        void addMarchingSquaresTriangles(const Vector3 *corners, const Vector4 *volumeValues, const size_t *indices, const Real maxDistance, MeshBuilder *mb) const;
+        virtual void addMarchingSquaresTriangles(const Vector3 *corners, const Vector4 *volumeValues, const size_t *indices, const Real maxDistance, MeshBuilder *mb) const = 0;
     };
 }
 }

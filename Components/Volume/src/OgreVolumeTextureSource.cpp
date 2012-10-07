@@ -35,8 +35,8 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    TextureSource::TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue, const bool trilinearNormal, const bool sobelNormal) :
-        mTrilinearValue(trilinearValue), mTrilinearNormal(trilinearNormal), mSobelNormal(sobelNormal)
+    TextureSource::TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue, const bool trilinearGradient, const bool sobelGradient) :
+        mTrilinearValue(trilinearValue), mTrilinearGradient(trilinearGradient), mSobelGradient(sobelGradient)
     {
     
         Timer t;
@@ -108,7 +108,7 @@ namespace Volume {
     {
         Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
         Vector3 normal;
-        if (mTrilinearNormal)
+        if (mTrilinearGradient)
         {
             size_t x0 = (size_t)scaledPosition.x;
             size_t x1 = (size_t)ceil(scaledPosition.x);

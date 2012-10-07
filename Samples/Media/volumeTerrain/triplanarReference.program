@@ -44,8 +44,8 @@ fragment_program TriplanarReferenceHigh_PS cg
 		param_named transitionSpeed float 2.0
 		param_named ambient float4 0.41 0.41 0.41 1.0
 	}
-	// Supported defines: -DLIGHTNORMALMAPPING -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
-	compile_arguments -DLIGHTNORMALMAPPING -DLIGHT0 -DLIGHT1
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	compile_arguments -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0
 	entry_point main_triplanar_reference_fp
 	profiles ps_2_x arbfp1
 }
@@ -97,8 +97,8 @@ fragment_program TriplanarReferenceLow_PS cg
 		param_named transitionSpeed float 2.0
 		param_named ambient float4 0.41 0.41 0.41 1.0
 	}
-	// Supported defines: -DLIGHTNORMALMAPPING -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
-	compile_arguments -DLIGHT0 -DLIGHT1
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	compile_arguments -DUSESPECULARMAP -DLIGHT0
 	entry_point main_triplanar_reference_fp
 	profiles ps_2_x arbfp1
 }

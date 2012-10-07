@@ -492,15 +492,6 @@ namespace Volume {
             return Vector3(mFrom.x, mTo.y, mTo.z);
         }
 
-        /** Calculates the center value.
-        @param src
-            The volume source.
-        */
-        inline void setCenterValue(const Source *src)
-        {
-            mCenterValue = src->getValueAndGradient(getCenter());
-        }
-
         /** Raw setter for the center value.
         @param value
             The density value.
