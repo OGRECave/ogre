@@ -4,7 +4,8 @@ vertex_program TriplanarReferenceHigh_VS cg
 	source triplanarReferenceVS.cg
 	default_params
 	{
-		param_named_auto fogParams fog_params
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
 		param_named_auto eyePosition camera_position_object_space
 		param_named_auto worldviewproj worldviewproj_matrix
 	}
@@ -18,26 +19,36 @@ fragment_program TriplanarReferenceHigh_PS cg
 	source triplanarReferencePS.cg
 	default_params 
 	{
-		param_named_auto lightDiffuse0 light_diffuse_colour 0
-		param_named_auto lightDiffuse1 light_diffuse_colour 1
-		param_named_auto lightDiffuse2 light_diffuse_colour 2
+		
 		param_named_auto lightSpecular0 light_specular_colour 0
-		param_named_auto lightSpecular1 light_specular_colour 1
-		param_named_auto lightSpecular2 light_specular_colour 2
-		param_named_auto lightAttenuation0 light_attenuation 0
-		param_named_auto lightAttenuation1 light_attenuation 1
-		param_named_auto lightAttenuation2 light_attenuation 2
-		param_named_auto lightSpotlight0 spotlight_params 0
-		param_named_auto lightSpotlight1 spotlight_params 1
-		param_named_auto lightSpotlight2 spotlight_params 2
-        param_named_auto spotlightDir0 light_direction_object_space 0
-        param_named_auto spotlightDir1 light_direction_object_space 1
-        param_named_auto spotlightDir2 light_direction_object_space 2
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
-		param_named_auto lightPosition1 light_position_object_space 1
-		param_named_auto lightPosition2 light_position_object_space 2
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
 		param_named_auto world world_matrix
-		param_named_auto fogColour fog_colour
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
 		param_named exponent float 2000
 		param_named texScale float 0.1
 		param_named plateauSize float 0.2
@@ -57,7 +68,8 @@ vertex_program TriplanarReferenceLow_VS cg
 	source triplanarReferenceVS.cg
 	default_params
 	{
-		param_named_auto fogParams fog_params
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
 		param_named_auto eyePosition camera_position_object_space
 		param_named_auto worldviewproj worldviewproj_matrix
 	}
@@ -71,26 +83,35 @@ fragment_program TriplanarReferenceLow_PS cg
 	source triplanarReferencePS.cg
 	default_params 
 	{
-		param_named_auto lightDiffuse0 light_diffuse_colour 0
-		param_named_auto lightDiffuse1 light_diffuse_colour 1
-		param_named_auto lightDiffuse2 light_diffuse_colour 2
 		param_named_auto lightSpecular0 light_specular_colour 0
-		param_named_auto lightSpecular1 light_specular_colour 1
-		param_named_auto lightSpecular2 light_specular_colour 2
-		param_named_auto lightAttenuation0 light_attenuation 0
-		param_named_auto lightAttenuation1 light_attenuation 1
-		param_named_auto lightAttenuation2 light_attenuation 2
-		param_named_auto lightSpotlight0 spotlight_params 0
-		param_named_auto lightSpotlight1 spotlight_params 1
-		param_named_auto lightSpotlight2 spotlight_params 2
-        param_named_auto spotlightDir0 light_direction_object_space 0
-        param_named_auto spotlightDir1 light_direction_object_space 1
-        param_named_auto spotlightDir2 light_direction_object_space 2
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
 		param_named_auto lightPosition0 light_position_object_space 0
-		param_named_auto lightPosition1 light_position_object_space 1
-		param_named_auto lightPosition2 light_position_object_space 2
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
 		param_named_auto world world_matrix
-		param_named_auto fogColour fog_colour
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
 		param_named exponent float 2000
 		param_named texScale float 0.1
 		param_named plateauSize float 0.2
