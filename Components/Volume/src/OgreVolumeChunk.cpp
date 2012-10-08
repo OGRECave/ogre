@@ -335,6 +335,17 @@ namespace Volume {
 
         String material = config.getSetting("material");
         setMaterial(material);
+
+        for (size_t i = 0; i < level; ++i)
+        {
+            StringUtil::StrStreamType stream;
+            stream << "materialOfLevel" << i;
+            String materialOfLevel = config.getSetting(stream.str());
+            if (materialOfLevel != StringUtil::BLANK)
+            {
+                setMaterialOfLevel(i, materialOfLevel);
+            }
+        }
     }
     
     //-----------------------------------------------------------------------
@@ -502,6 +513,31 @@ namespace Volume {
         }
     }
     
+    //-----------------------------------------------------------------------
+
+    void Chunk::setMaterialOfLevel(size_t level, const String& matName)
+    {
+        if (level == 0)
+        {
+            SimpleRenderable::setMaterial(matName);
+        }
+        
+        if (level > 0 && mChildren)
+        {
+            mChildren[0]->setMaterialOfLevel(level - 1, matName);
+            if (mChildren[1])
+            {
+                mChildren[1]->setMaterialOfLevel(level - 1, matName);
+                mChildren[2]->setMaterialOfLevel(level - 1, matName);
+                mChildren[3]->setMaterialOfLevel(level - 1, matName);
+                mChildren[4]->setMaterialOfLevel(level - 1, matName);
+                mChildren[5]->setMaterialOfLevel(level - 1, matName);
+                mChildren[6]->setMaterialOfLevel(level - 1, matName);
+                mChildren[7]->setMaterialOfLevel(level - 1, matName);
+            }
+        }
+    }
+
     //-----------------------------------------------------------------------
 
     void Chunk::getChunksOfLevel(const size_t level, VecChunk &result) const

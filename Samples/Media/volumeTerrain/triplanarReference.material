@@ -1,9 +1,7 @@
-material triplanarReference
+material triplanarReferenceHigh
 {
-    lod_values 2000.0
     technique TriplanarTexturingHigh
     {
-        lod_index 0
         pass
         {
             vertex_program_ref TriplanarReferenceHigh_VS    
@@ -45,9 +43,11 @@ material triplanarReference
             }
         }
     }
+}
+material triplanarReferenceLow
+{
     technique TriplanarTexturingLow
     {
-        lod_index 1
         pass
         {
             vertex_program_ref TriplanarReferenceLow_VS    
@@ -89,4 +89,16 @@ material triplanarReference
             }
         }
     }
+}
+
+material justWhite 
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.5 0.5 0.5
+			diffuse 1.0 1.0 1.0
+		}
+	}
 }
