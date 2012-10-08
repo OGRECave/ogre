@@ -363,6 +363,16 @@ namespace Volume {
         */
         virtual void setMaterial(const String& matName);
 
+        /** Sets the material of all chunks of a specific level in the tree.
+        This allows LODs where the lower levels (== less detail and more far away)
+        have simpler materials.
+        @param level
+            The tree level getting the material, 0 based. 0 means the chunk with the lowest level of detail.
+        @param matName
+            The material name to set.
+        */
+        virtual void setMaterialOfLevel(size_t level, const String& matName);
+
         /** A list of Chunks.
         */
         typedef vector<const Chunk*>::type VecChunk;

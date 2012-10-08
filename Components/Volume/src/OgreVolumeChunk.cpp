@@ -504,6 +504,31 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
+    void Chunk::setMaterialOfLevel(size_t level, const String& matName)
+    {
+        if (level == 0)
+        {
+            SimpleRenderable::setMaterial(matName);
+        }
+        
+        if (mChildren)
+        {
+            mChildren[0]->setMaterialOfLevel(level - 1, matName);
+            if (mChildren[1])
+            {
+                mChildren[1]->setMaterialOfLevel(level - 1, matName);
+                mChildren[2]->setMaterialOfLevel(level - 1, matName);
+                mChildren[3]->setMaterialOfLevel(level - 1, matName);
+                mChildren[4]->setMaterialOfLevel(level - 1, matName);
+                mChildren[5]->setMaterialOfLevel(level - 1, matName);
+                mChildren[6]->setMaterialOfLevel(level - 1, matName);
+                mChildren[7]->setMaterialOfLevel(level - 1, matName);
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------
+
     void Chunk::getChunksOfLevel(const size_t level, VecChunk &result) const
     {
         if (level == 0)
