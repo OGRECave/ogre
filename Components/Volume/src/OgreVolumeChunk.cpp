@@ -335,6 +335,17 @@ namespace Volume {
 
         String material = config.getSetting("material");
         setMaterial(material);
+
+        for (size_t i = 0; i < level; ++i)
+        {
+            StringUtil::StrStreamType stream;
+            stream << "materialOfLevel" << i;
+            String materialOfLevel = config.getSetting(stream.str());
+            if (materialOfLevel != StringUtil::BLANK)
+            {
+                setMaterialOfLevel(i, materialOfLevel);
+            }
+        }
     }
     
     //-----------------------------------------------------------------------
