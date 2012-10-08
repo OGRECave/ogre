@@ -522,7 +522,7 @@ namespace Volume {
             SimpleRenderable::setMaterial(matName);
         }
         
-        if (mChildren)
+        if (level > 0 && mChildren)
         {
             mChildren[0]->setMaterialOfLevel(level - 1, matName);
             if (mChildren[1])
