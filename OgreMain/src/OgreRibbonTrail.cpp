@@ -462,12 +462,10 @@ namespace Ogre
 
 					if (e == seg.tail)
 						break;
-					
 				}
 			}
-
 		}
-
+		mVertexContentDirty = true;
 	}
     //-----------------------------------------------------------------------
     void RibbonTrail::resetTrail(size_t index, const Node* node)
