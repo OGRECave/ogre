@@ -26,7 +26,7 @@ THE SOFTWARE.
 */
 #include "OgreVolumeIsoSurfaceMC.h"
 
-#include "OgreVolumeIsoSurfaceTables.h"
+#include "OgreVolumeIsoSurfaceTablesMC.h"
 
 namespace Ogre {
 namespace Volume {
