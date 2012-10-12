@@ -586,7 +586,7 @@ namespace Ogre
 				}
 			}
 
-			queue->addRenderable( this );
+			queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 
 		//Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
