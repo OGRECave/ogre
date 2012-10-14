@@ -1013,10 +1013,13 @@ namespace Ogre {
         if (!mStateCacheManager->activateGLTextureUnit(stage))
             return;
         
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         bool hasCubeMapExt = mCurrentCapabilities->hasCapability(RSC_CUBEMAPPING);
+#endif
         
         switch(m)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             case TEXCALC_NONE:
                 if(hasCubeMapExt)
                 {
@@ -1024,14 +1027,16 @@ namespace Ogre {
                     GL_CHECK_ERROR
                 }
                 break;
-
+#endif
             case TEXCALC_ENVIRONMENT_MAP:
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
                 if(hasCubeMapExt)
                 {
                     glEnable(GL_TEXTURE_GEN_STR_OES);
                     glTexGeniOES( GL_TEXTURE_GEN_STR_OES, GL_TEXTURE_GEN_MODE_OES, GL_REFLECTION_MAP_OES );
                     GL_CHECK_ERROR
                 }
+#endif
                 mUseAutoTextureMatrix = true;
                 memset(mAutoTextureMatrix, 0, sizeof(GLfloat)*16);
                 mAutoTextureMatrix[0] = mAutoTextureMatrix[10] = mAutoTextureMatrix[15] = 1.0f;
@@ -1042,12 +1047,14 @@ namespace Ogre {
                 break;
 
             case TEXCALC_ENVIRONMENT_MAP_REFLECTION:
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
                 if(hasCubeMapExt)
                 {
                     glEnable(GL_TEXTURE_GEN_STR_OES);
                     glTexGeniOES( GL_TEXTURE_GEN_STR_OES, GL_TEXTURE_GEN_MODE_OES, GL_REFLECTION_MAP_OES );
                     GL_CHECK_ERROR
                 }
+#endif
                 // We need an extra texture matrix here
                 // This sets the texture matrix to be the inverse of the view matrix
                 mUseAutoTextureMatrix = true;
@@ -1064,6 +1071,7 @@ namespace Ogre {
                 mAutoTextureMatrix[15] = 1.0f;
                 break;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             case TEXCALC_ENVIRONMENT_MAP_NORMAL:
                 if(hasCubeMapExt)
                 {
@@ -1072,7 +1080,8 @@ namespace Ogre {
                     GL_CHECK_ERROR
                 }
                 break;
-
+#endif
+                
             case TEXCALC_PROJECTIVE_TEXTURE:
                 mUseAutoTextureMatrix = true;
 

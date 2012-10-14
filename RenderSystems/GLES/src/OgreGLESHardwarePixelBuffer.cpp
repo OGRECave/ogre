@@ -612,7 +612,9 @@ namespace Ogre {
                 switch(mTarget)
                 {
                     case GL_TEXTURE_2D:
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
                     case GL_TEXTURE_CUBE_MAP_OES:
+#endif
                         glCopyTexSubImage2D(mFaceTarget, mLevel, 
                                             dstBox.left, dstBox.top, 
                                             0, 0, dstBox.getWidth(), dstBox.getHeight());
