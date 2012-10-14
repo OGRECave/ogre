@@ -68,14 +68,13 @@ else ()
   set(OGRE_LIB_SUFFIX "")
 endif ()
 
-
-if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if(APPLE AND NOT OGRE_STATIC)
 	set(OGRE_LIBRARY_NAMES "Ogre${OGRE_LIB_SUFFIX}")
 else()
     set(OGRE_LIBRARY_NAMES "OgreMain${OGRE_LIB_SUFFIX}")
 endif()
 get_debug_names(OGRE_LIBRARY_NAMES)
-
+          
 # construct search paths from environmental hints and
 # OS specific guesses
 if (WIN32)
@@ -145,7 +144,7 @@ endforeach (comp)
 set(OGRE_PREFIX_WATCH ${OGRE_PREFIX_PATH} ${OGRE_PREFIX_SOURCE} ${OGRE_PREFIX_BUILD})
 clear_if_changed(OGRE_PREFIX_WATCH ${OGRE_RESET_VARS})
 
-if(NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if(NOT OGRE_STATIC)
 	# try to locate Ogre via pkg-config
 	use_pkgconfig(OGRE_PKGC "OGRE${OGRE_LIB_SUFFIX}")
 
@@ -383,11 +382,9 @@ ogre_find_component(Volume OgreVolume.h)
 # look for Overlay component
 ogre_find_component(Overlay OgreOverlaySystem.h)
 
-
 #########################################################
 # Find Ogre plugins
-#########################################################
-
+#########################################################        
 macro(ogre_find_plugin PLUGIN HEADER)
   # On Unix, the plugins might have no prefix
   if (CMAKE_FIND_LIBRARY_PREFIXES)
@@ -411,9 +408,9 @@ macro(ogre_find_plugin PLUGIN HEADER)
   get_debug_names(OGRE_${PLUGIN}_LIBRARY_NAMES)
   set(OGRE_${PLUGIN}_LIBRARY_FWK ${OGRE_LIBRARY_FWK})
   find_library(OGRE_${PLUGIN}_LIBRARY_REL NAMES ${OGRE_${PLUGIN}_LIBRARY_NAMES}
-    HINTS ${OGRE_LIBRARY_DIRS} PATH_SUFFIXES "" OGRE opt release release/opt relwithdebinfo relwithdebinfo/opt minsizerel minsizerel/opt)
+    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} PATH_SUFFIXES "" OGRE opt release release/opt relwithdebinfo relwithdebinfo/opt minsizerel minsizerel/opt)
   find_library(OGRE_${PLUGIN}_LIBRARY_DBG NAMES ${OGRE_${PLUGIN}_LIBRARY_NAMES_DBG}
-    HINTS ${OGRE_LIBRARY_DIRS} PATH_SUFFIXES "" OGRE opt debug debug/opt)
+    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} PATH_SUFFIXES "" OGRE opt debug debug/opt)
   make_library_set(OGRE_${PLUGIN}_LIBRARY)
 
   if (OGRE_${PLUGIN}_LIBRARY OR OGRE_${PLUGIN}_INCLUDE_DIR)
@@ -446,9 +443,9 @@ macro(ogre_find_plugin PLUGIN HEADER)
           PATH_SUFFIXES "" bin bin/debug debug)
       elseif (UNIX)
         get_filename_component(OGRE_PLUGIN_DIR_TMP ${OGRE_${PLUGIN}_LIBRARY_REL} PATH)
-        set(OGRE_PLUGIN_DIR_REL ${OGRE_PLUGIN_DIR_TMP} CACHE STRING "Ogre plugin dir (release)")
-        get_filename_component(OGRE_PLUGIN_DIR_TMP ${OGRE_${PLUGIN}_LIBRARY_DBG} PATH)
-        set(OGRE_PLUGIN_DIR_DBG ${OGRE_PLUGIN_DIR_TMP} CACHE STRING "Ogre plugin dir (debug)")
+        set(OGRE_PLUGIN_DIR_REL ${OGRE_PLUGIN_DIR_TMP} CACHE STRING "Ogre plugin dir (release)" FORCE)
+	    get_filename_component(OGRE_PLUGIN_DIR_TMP ${OGRE_${PLUGIN}_LIBRARY_DBG} PATH)
+        set(OGRE_PLUGIN_DIR_DBG ${OGRE_PLUGIN_DIR_TMP} CACHE STRING "Ogre plugin dir (debug)" FORCE)  
       endif ()
     endif ()
 	
@@ -479,7 +476,7 @@ ogre_find_plugin(RenderSystem_GLES OgreGLESRenderSystem.h RenderSystems/GLES/inc
 ogre_find_plugin(RenderSystem_GLES2 OgreGLES2RenderSystem.h RenderSystems/GLES2/include)
 ogre_find_plugin(RenderSystem_Direct3D9 OgreD3D9RenderSystem.h RenderSystems/Direct3D9/include)
 ogre_find_plugin(RenderSystem_Direct3D11 OgreD3D11RenderSystem.h RenderSystems/Direct3D11/include)
-
+        
 if (OGRE_STATIC)
   # check if dependencies for plugins are met
   if (NOT DirectX_FOUND)
