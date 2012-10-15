@@ -378,8 +378,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::unloadHighLevelImpl(void)
     {
+        mParametersMap.clear();
+        mParametersMapSizeAsBuffer = 0;
         SAFE_RELEASE(mMicroCode);
-
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::buildConstantDefinitions() const
