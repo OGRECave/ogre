@@ -23,7 +23,7 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
-from ogre_mesh_exporter.mesh_properties import MeshProperties
+#~ from ogre_mesh_exporter.mesh_properties import MeshProperties
 
 STATIC_CONFIG_FILENAME = "ogre_mesh_exporter.cfg"
 
@@ -93,15 +93,15 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		description = "Generate Error message when part of a mesh is not assigned with a material.",
 		default = True
 	)
-	skeletonNameFollowMesh = BoolProperty(
-		name = "Skeleton Name Follow Mesh",
-		description = "Use mesh name for exported skeleton name instead of the armature name.",
-		default = True
-	)
 	applyModifiers = BoolProperty(
 		name = "Apply Modifiers",
 		description = "Apply mesh modifiers before export. (Slow and may break vertex order for morph targets!)",
 		default = False
+	)
+	skeletonNameFollowMesh = BoolProperty(
+		name = "Skeleton Name Follow Mesh",
+		description = "Use mesh name for exported skeleton name instead of the armature name.",
+		default = True
 	)
 	runOgreXMLConverter = BoolProperty(
 		name = "OgreXMLConverter",
@@ -182,6 +182,20 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		name = "Optimise Animation",
 		description = "Optimise out redundant tracks & keyframes.",
 		default = True
+	)
+
+	# ##############################################
+	# Log properties.
+	logPageSize = IntProperty(
+		name = "Log Page Size",
+		description = "Size of a visible log page",
+		default = 10
+	)
+	logPercentage = IntProperty(
+		name = "Log Percentage",
+		description = "Log progress",
+		default = 100, min = 0, max = 100,
+		subtype = 'PERCENTAGE'
 	)
 
 	# ##############################################

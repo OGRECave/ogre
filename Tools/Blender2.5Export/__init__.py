@@ -24,8 +24,8 @@ bl_info = {
 	"name": "Ogre Mesh Exporter",
 	"description": "Exports mesh and (skeletal/morph/pose) animations to Ogre3D format.",
 	"author": "Lih-Hern Pang",
-	"version": (2, 0, 2),
-	"blender": (2, 6, 2),
+	"version": (2, 0, 3),
+	"blender": (2, 6, 4),
 	"api": 44136,
 	"location": "3D View Side Panel",
 	"warning": '', # used for warning icon and text in addons panel
@@ -39,6 +39,7 @@ if "bpy" in locals():
 	imp.reload(material_properties)
 	imp.reload(mesh_properties)
 	imp.reload(main_exporter_panel)
+	imp.reload(log_manager)
 	imp.reload(mesh_panel)
 	imp.reload(mesh_exporter)
 	imp.reload(mesh_impl)
@@ -47,6 +48,7 @@ else:
 	from . import material_properties
 	from . import mesh_properties
 	from . import main_exporter_panel
+	from . import log_manager
 	from . import mesh_panel
 	from . import mesh_exporter
 	from . import mesh_impl
@@ -90,7 +92,7 @@ def unregister():
 	# NOTE: This is due to a hack to allow us to list selected objects on the fly.
 	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
 	panel = bpy.types.ogre3d_exporter_panel
-	if (panel.mSelectionRefreshState == 1):
+	if (panel.sSelectionRefreshState == 1):
 		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
 
 if __name__ == "__main__":
