@@ -162,11 +162,11 @@ namespace Ogre {
 
 				if(start_pos==pos)
 				{
-					if(pos==stringBuffer.length())
+					if( pos >= stringBuffer.length() - 1 )
 					{
 						break;
 					}
-					pos++;
+					++pos;
 					continue;
 				}
 
