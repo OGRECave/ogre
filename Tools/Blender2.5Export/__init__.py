@@ -24,9 +24,9 @@ bl_info = {
 	"name": "Ogre Mesh Exporter",
 	"description": "Exports mesh and (skeletal/morph/pose) animations to Ogre3D format.",
 	"author": "Lih-Hern Pang",
-	"version": (2,0,1),
-	"blender": (2, 5, 7),
-	"api": 31236,
+	"version": (2, 0, 3),
+	"blender": (2, 6, 4),
+	"api": 44136,
 	"location": "3D View Side Panel",
 	"warning": '', # used for warning icon and text in addons panel
 	"wiki_url": "http://www.ogre3d.org/tikiwiki/Blender+2.5+Exporter",
@@ -39,6 +39,7 @@ if "bpy" in locals():
 	imp.reload(material_properties)
 	imp.reload(mesh_properties)
 	imp.reload(main_exporter_panel)
+	imp.reload(log_manager)
 	imp.reload(mesh_panel)
 	imp.reload(mesh_exporter)
 else:
@@ -46,6 +47,7 @@ else:
 	from . import material_properties
 	from . import mesh_properties
 	from . import main_exporter_panel
+	from . import log_manager
 	from . import mesh_panel
 	from . import mesh_exporter
 
@@ -81,6 +83,13 @@ def register():
 # unregistering and removing menus
 def unregister():
 	bpy.utils.unregister_module(__name__)
+
+	# try to unregister scene update callback if we need to.
+	# NOTE: This is due to a hack to allow us to list selected objects on the fly.
+	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
+	panel = bpy.types.ogre3d_exporter_panel
+	if (panel.sSelectionRefreshState == 1):
+		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
 
 if __name__ == "__main__":
 	register()

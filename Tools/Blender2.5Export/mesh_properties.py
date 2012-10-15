@@ -44,17 +44,6 @@ class MeshProperties(bpy.types.PropertyGroup):
 		default = True
 	)
 
-	skeletonNameFollowMesh_override = BoolProperty(
-		name = "Skeleton Name Follow Mesh Override",
-		description = "Override global setting.",
-		default = False
-	)
-	skeletonNameFollowMesh = BoolProperty(
-		name = "Skeleton Name Follow Mesh",
-		description = "Use mesh name for exported skeleton name instead of the armature name.",
-		default = True
-	)
-
 	applyModifiers_override = BoolProperty(
 		name = "Apply Modifiers Override",
 		description = "Override global setting.",
@@ -64,6 +53,17 @@ class MeshProperties(bpy.types.PropertyGroup):
 		name = "Apply Modifiers",
 		description = "Apply mesh modifiers before export. (Slow and may break vertex order for morph targets!)",
 		default = False
+	)
+
+	skeletonNameFollowMesh_override = BoolProperty(
+		name = "Skeleton Name Follow Mesh Override",
+		description = "Override global setting.",
+		default = False
+	)
+	skeletonNameFollowMesh = BoolProperty(
+		name = "Skeleton Name Follow Mesh",
+		description = "Use mesh name for exported skeleton name instead of the armature name.",
+		default = True
 	)
 
 	# ##############################################

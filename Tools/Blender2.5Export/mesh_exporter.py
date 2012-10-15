@@ -53,28 +53,35 @@
 
 import bpy
 
+from ogre_mesh_exporter.mesh_impl import Mesh
+from ogre_mesh_exporter.mesh_impl import MeshExportSettings
+from ogre_mesh_exporter.log_manager import LogManager, Message
+
 def exportMesh(meshObject, filepath):
-	globalSettings = bpy.context.scene.ogre_mesh_exporter
-	meshSettings = meshObject.mesh.ogre_mesh_exporter
+	LogManager.logMessage("Output: %s" % filepath, Message.LVL_INFO)
+
+	# get combined mesh override & global settings.
+	meshExportSettings = MeshExportSettings.fromRNA(meshObject)
 
 	# If modifiers need to be applied, we will need to create a new mesh with flattened modifiers.
-	if ((meshSettings.applyModifiers_override and meshSettings.applyModifiers) or globalSettings.applyModifiers):
+	LogManager.logMessage("Apply Modifier: %s" % meshExportSettings.applyModifiers, Message.LVL_INFO)
+	if (meshExportSettings.applyModifiers):
 		mesh = meshObject.to_mesh(meshObject.users_scene, True, 'PREVIEW')
 		cleanUpMesh = True
 	else:
 		mesh = meshObject.mesh
 		cleanUpMesh = False
 
-	file = open(filepath, "w", encoding="utf8", newline="\n")
-	file.write('<mesh>')
-	file.write('	<submeshes>')
-
-	#TODO: Prepare submeshes (grouped by materials and vertex group settings).
-	#TODO: Write to mesh.xml format.
+	# prepare mesh.
+	ogreMesh = Mesh(mesh, meshExportSettings)
+	LogManager.logMessage("Shared Vertices: %d" % len(ogreMesh.mSharedVertexBuffer.mVertexData), Message.LVL_INFO);
+	LogManager.logMessage("Submeshes: %d" % len(ogreMesh.mSubMeshDict), Message.LVL_INFO);
 
 	file.write('</mesh>')
 	file.close()
 
 	# remove mesh if we created a new one that has modifiers applied.
-	if (cleanUpMesh):
-		bpy.data.meshes.remove(mesh)
+	if (cleanUpMesh): bpy.data.meshes.remove(mesh)
+	ogreMesh = None
+
+	LogManager.logMessage("Done exporting XML.")
