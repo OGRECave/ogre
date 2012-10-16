@@ -155,14 +155,3 @@ class MeshExporterPanel(bpy.types.Panel):
 			row = row.row(True)
 			row.enabled = False
 		row.prop(meshSettings, "optimiseAnimation", toggle = True)
-
-# registering and menu integration
-def register():
-	bpy.utils.register_module(__name__)
-
-# unregistering and removing menus
-def unregister():
-	bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-	register()

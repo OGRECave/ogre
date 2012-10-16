@@ -42,6 +42,7 @@ if "bpy" in locals():
 	imp.reload(log_manager)
 	imp.reload(mesh_panel)
 	imp.reload(mesh_exporter)
+	imp.reload(mesh_impl)
 else:
 	from . import global_properties
 	from . import material_properties
@@ -50,12 +51,15 @@ else:
 	from . import log_manager
 	from . import mesh_panel
 	from . import mesh_exporter
+	from . import mesh_impl
 
-import bpy, pprint
+import bpy, mathutils
 from bpy.props import PointerProperty
+from bpy.app.handlers import persistent
 from ogre_mesh_exporter.global_properties import GlobalProperties
 from ogre_mesh_exporter.material_properties import MaterialProperties
 from ogre_mesh_exporter.mesh_properties import MeshProperties
+from ogre_mesh_exporter.main_exporter_panel import MainExporterPanel
 
 # registering and menu integration
 def register():

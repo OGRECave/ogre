@@ -143,10 +143,8 @@ class MainExporterPanel(bpy.types.Panel):
 
 		# display selection list.
 		col = layout.column()
+		col.label("Selected:")
 		selectedObjectList = globalSettings.selectedObjectList
-		row = col.row()
-		row.label("Selected:")
-		row.operator("ogre3d.refresh_selection", "", 'FILE_REFRESH')
 		col.template_list(selectedObjectList, "collection", selectedObjectList, "collectionIndex")
 
 		# ####################################################
@@ -186,9 +184,12 @@ class MainExporterPanel(bpy.types.Panel):
 		row.prop(globalSettings, "skeletonNameFollowMesh", icon = 'NONE', toggle = True)
 		row.prop(globalSettings, "runOgreXMLConverter", icon = 'NONE', toggle = True)
 
+		exportPathValid = os.path.isdir(globalSettings.exportPath)
+
 		exportPathBox = layout.column(True)
 		exportPathBox.label("Export Path:")
-		exportPathBox.prop(globalSettings, "exportPath", "")
+		exportPathBox.prop(globalSettings, "exportPath", "",
+			icon = ('NONE' if (exportPathValid) else 'ERROR'))
 
 		row = layout.row(True)
 		row.scale_y = 1.5
@@ -201,26 +202,6 @@ class MainExporterPanel(bpy.types.Panel):
 		row.operator("ogre3d.preferences", icon = 'SETTINGS')
 		row.operator("ogre3d.help", icon = 'HELP')
 		row.operator("ogre3d.log", "", icon = 'CONSOLE')
-
-class OperatorRefreshSelection(bpy.types.Operator):
-	bl_idname = "ogre3d.refresh_selection"
-	bl_label = "Refresh selection"
-	bl_description = "Refresh object selection for export."
-
-	def invoke(self, context, event):
-		globalSettings = bpy.context.scene.ogre_mesh_exporter
-		collection = globalSettings.selectedObjectList.collection
-
-		# CollectionProperty stupidly has no clear function. So we have to remove one by one.
-		while (len(collection) > 0):
-			collection.remove(0)
-
-		for object in bpy.context.selected_objects:
-			if (object.type == 'MESH'):
-				item = collection.add()
-				item.name = object.name
-
-		return('FINISHED')
 
 class OperatorExport(bpy.types.Operator):
 	bl_idname = "ogre3d.export"
@@ -296,7 +277,16 @@ class OperatorHelp(bpy.types.Operator):
 	bl_description = "Open help document."
 
 	def invoke(self, context, event):
-		return('FINISHED')
+		return {'FINISHED'}
+
+class OperatorShowLog(bpy.types.Operator):
+	bl_idname = "ogre3d.log"
+	bl_label = "Log History"
+	bl_description = "Show log history."
+
+	def invoke(self, context, event):
+		MainExporterPanel.sViewState = MainExporterPanel.VS_LOG
+		return {'FINISHED'}
 
 class OperatorShowLog(bpy.types.Operator):
 	bl_idname = "ogre3d.log"
@@ -314,7 +304,7 @@ class OperatorPrefApplyStaticConfig(bpy.types.Operator):
 
 	def invoke(self, context, event):
 		saveStaticConfig()
-		return('FINISHED')
+		return {'FINISHED'}
 
 class OperatorPrefBack(bpy.types.Operator):
 	bl_idname = "ogre3d.preferences_back"

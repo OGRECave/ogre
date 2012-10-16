@@ -34,18 +34,25 @@
 # Imagine an animated character with skeletal and pose animation for facial expressions.
 # To be optimal, the facial vertex pose animation should be keyed in it's own submesh
 # so as to avoid updating a huge data set of vertex points in software mode.
-# In hardware mode, this is also essential to split parts that has more complex vertex
-# animations from the skeletal skinning only parts.
 #
-# In the case of a complex character with a lot of bones, hardware skinning may hit the
-# limit of vertex shader registers for each bone matrix. To fix this, the mesh should be
-# split into it's own individual submeshes in a way where the total number of bones
-# affecting each submesh does not exceed the bone limit.
+# In hardware mode, it is also essential to split parts that has more complex vertex
+# animations from the skeletal skinning only parts. However as they will be using different
+# shaders and hence different materials, this feature is not of any use here.
 #
-# In preparation of these cases, this exporter will take in to consideration of the
-# vertex group settings. In the exporter settings, there will be a setting to specify
-# the vertex groups that will be used to split meshes into it's own non shared vertex
-# data sub meshes.
+# Even so, in the case of a complex character with a lot of bones, hardware skinning may
+# hit the limit of vertex shader registers for each bone matrix. To fix this, the mesh
+# should be split into it's own individual submeshes in a way where the total number of
+# bones affecting each submesh does not exceed the bone limit.
+#
+# One interesting case is the submesh alpha sorting case. When modelling things like cars
+# or any models that have multiple transparent pieces, we may want to split the transparent
+# parts into submeshes that can be depth sorted. Though in this case, we do not want to
+# apply non shared vertex data on each submesh.
+#
+# In preparation of these cases, this exporter will take into consideration of the
+# material settings. In the exporter settings under mesh tab, there will be a setting to
+# flag materials to split meshes into it's own shared/non-shared vertex data submeshes.
+# It will also have an option to allow custom naming of submeshes.
 #
 # For info on implementation see mesh_impl.py
 #

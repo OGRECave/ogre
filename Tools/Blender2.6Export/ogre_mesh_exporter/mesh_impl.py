@@ -50,10 +50,11 @@ class MeshExportSettings():
 			runOgreXMLConverter = globalSettings.runOgreXMLConverter)
 
 class Vertex():
-	def __init__(self, pos, norm, uvs):
+	def __init__(self, pos, norm, uvs = list(), colors = list()):
 		self.mPosition = pos
 		self.mNormal = norm
 		self.mUVs = uvs
+		self.mColors = colors
 
 	def match(self, norm, uvs, colors):
 		# Test normal.
@@ -154,9 +155,9 @@ class VertexBuffer():
 				color = vertex.mColors[1]
 				file.write('%s\t\t<colour_diffuse value="%.6f %.6f %.6f" />\n' % (indent, color[0], color[1], color[2]))
 
-class SubMesh():
-	# True if submesh is sharing vertex data.
-	mShareVertexData = True
+			file.write('%s\t</vertex>\n' % indent)
+
+		file.write('%s</vertexbuffer>\n' % indent)
 
 class SubMesh():
 	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None):
@@ -237,11 +238,7 @@ class SubMesh():
 			file.write('\t\t\t\t<face v1="%d" v2="%d" v3="%d" />\n' % tuple(face))
 		file.write('\t\t\t</faces>\n')
 
-	def __init__(self, vertexData = None):
-		if (vertexData is None):
-			self.mShareVertexData = False
-		else
-			self.mVertexData = vertexData
+		file.write('\t\t</submesh>\n')
 
 class Mesh():
 	def __init__(self, blendMesh = None, exportSettings = MeshExportSettings()):
@@ -298,5 +295,4 @@ class Mesh():
 			subMesh.serialize(file)
 		file.write('\t</submeshes>\n')
 
-	# collection of submeshes.
-	mSubMeshDict = dict()
+		file.write('</mesh>\n')

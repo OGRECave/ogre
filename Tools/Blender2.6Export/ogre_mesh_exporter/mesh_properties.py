@@ -173,14 +173,3 @@ class MeshProperties(bpy.types.PropertyGroup):
 		description = "Optimise out redundant tracks & keyframes.",
 		default = True
 	)
-
-# registering and menu integration
-def register():
-	bpy.utils.register_module(__name__)
-
-# unregistering and removing menus
-def unregister():
-	bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-	register()
