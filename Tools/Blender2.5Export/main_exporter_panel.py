@@ -40,16 +40,11 @@ class MainExporterPanel(bpy.types.Panel):
 	VS_LOG = 2
 	sViewState = VS_MAIN
 	sFirstLoad = True
-	sSelectionRefreshState = 0
 
 	@persistent
-	def refreshSelection(context):
+	def refreshSelection(scene):
 		globalSettings = bpy.context.scene.ogre_mesh_exporter
 		collection = globalSettings.selectedObjectList.collection
-
-		# CollectionProperty stupidly has no clear function.
-		# To avoid recreating the list stupidly,
-		# we play smart and reuse as nessesary.
 
 		# get valid selection count.
 		selected_objects = bpy.context.selected_objects
@@ -57,6 +52,20 @@ class MainExporterPanel(bpy.types.Panel):
 		for object in bpy.context.selected_objects:
 			if (object.type != 'MESH'): selectedCount -= 1
 
+		# do check to avoid updating if selection is not changed.
+		if (selectedCount == len(collection)):
+			i = 0
+			changed = False
+			for object in bpy.context.selected_objects:
+				if (object.type == 'MESH'):
+					if (collection[i].name != object.name):
+						changed = True
+						break;
+					i += 1
+			if (not changed): return
+
+		# To avoid recreating the list stupidly,
+		# we play smart and reuse as nessesary.
 		# resize collection as necessary.
 		while (len(collection) < selectedCount): collection.add() # add more items if needed.
 		while (len(collection) > selectedCount): collection.remove(0) # remove items if needed.
@@ -68,31 +77,13 @@ class MainExporterPanel(bpy.types.Panel):
 				collection[i].name = object.name
 				i += 1
 
-		# NOTE1: we need to remove the callback first before setting the frame.
-		# this is because calling frame_set() refreshes the whole scene again which will end up
-		# randomly(?) calling this callback function again if we don't stop listening first.
-		# NOTE2: we call frame_set() for a stupid hackish reason to refresh the UI to reflect the selection change.
-		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
-		context.frame_set(context.frame_current)
-		# flag selection refresh state to 2.
-		# this is because the poll() event will be triggered again due to scene refresh.
-		# this way, the poll event will correctly ignore registering callback for refreshing of selection.
-		MainExporterPanel.sSelectionRefreshState = 2
-
-	# take advantage of the poll event to refresh our selection.
-	@classmethod
-	def poll(cls, context):
-		# due to context issue, we cannot modify RNA data during drawing stage which is what this poll stage is.
-		# hence we take advantage of the scene update handler callback to do the actual refresh.
-		# however, we do not want to keep refreshing every frame which is rediculous.
-		# this is why we have the mRefreshingSelection flag to make sure we only refresh when nessesary.
-		# once the selection is refreshed, we reset this flag and remove the callback so this polling path can continue again.
-		if (MainExporterPanel.sSelectionRefreshState == 0) :
-			MainExporterPanel.sSelectionRefreshState = 1
-			bpy.app.handlers.scene_update_pre.append(MainExporterPanel.refreshSelection)
-		elif (MainExporterPanel.sSelectionRefreshState == 2):
-			MainExporterPanel.sSelectionRefreshState = 0
-		return True
+		# tell blender to refresh.
+		for screen in bpy.data.screens:
+			for area in screen.areas:
+				if area.type == 'VIEW_3D':
+					for region in area.regions:
+						if region.type == 'TOOLS':
+							region.tag_redraw()
 
 	def draw(self, context):
 		layout = self.layout
@@ -254,7 +245,14 @@ class OperatorExport(bpy.types.Operator):
 
 		# update progress bar.
 		LogManager.setProgress((100 * self.itemIndex) / self.collectionCount)
-		for area in context.screen.areas: area.tag_redraw()
+
+		# tell blender to refresh.
+		for area in context.screen.areas:
+			if area.type == 'VIEW_3D':
+				for region in area.regions:
+					if region.type == 'TOOLS':
+						region.tag_redraw()
+
 		if (self.itemIndex == self.collectionCount): return {'FINISHED'}
 		LogManager.addObjectLog(self.collection[self.itemIndex].name, ObjectLog.TYPE_MESH)
 		return {'RUNNING_MODAL'}

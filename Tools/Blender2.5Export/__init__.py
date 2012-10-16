@@ -80,16 +80,19 @@ def register():
 		description = "Ogre Mesh Exporter properties"
 	)
 
+	# register scene update callback.
+	# NOTE: This is for a hack to allow us to list selected objects on the fly.
+	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
+	bpy.app.handlers.scene_update_pre.append(MainExporterPanel.refreshSelection)
+
 # unregistering and removing menus
 def unregister():
 	bpy.utils.unregister_module(__name__)
 
-	# try to unregister scene update callback if we need to.
-	# NOTE: This is due to a hack to allow us to list selected objects on the fly.
+	# unregister scene update callback.
+	# NOTE: This is for a hack to allow us to list selected objects on the fly.
 	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
-	panel = bpy.types.ogre3d_exporter_panel
-	if (panel.sSelectionRefreshState == 1):
-		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
 
 if __name__ == "__main__":
 	register()
