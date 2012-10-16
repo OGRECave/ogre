@@ -245,10 +245,6 @@ class SubMesh():
 
 class Mesh():
 	def __init__(self, blendMesh = None, exportSettings = MeshExportSettings()):
-		# Lets do some pre checking to show warnings if needed.
-		if (len(blendMesh.uv_layers) > 8): LogManager.logMessage("More than 8 UV layers in this mesh. Only 8 will be exported.", Message.LVL_WARNING)
-		if (len(blendMesh.vertex_colors) > 2): LogManager.logMessage("More than 2 color layers in this mesh. Only 2 will be exported.", Message.LVL_WARNING)
-
 		# shared vertex buffer.
 		self.mSharedVertexBuffer = VertexBuffer()
 		# Blender mesh -> shared vertex index link.
@@ -259,10 +255,14 @@ class Mesh():
 		# skip blend mesh conversion if no blend mesh passed in.
 		if (blendMesh is None): return
 
+		# Lets do some pre checking to show warnings if needed.
+		uvLayerCount = len(blendMesh.uv_layers)
+		colorLayerCount = len(blendMesh.vertex_colors)
+		if (uvLayerCount > 8): LogManager.logMessage("More than 8 UV layers in this mesh. Only 8 will be exported.", Message.LVL_WARNING)
+		if (colorLayerCount > 2): LogManager.logMessage("More than 2 color layers in this mesh. Only 2 will be exported.", Message.LVL_WARNING)
+
 		# setup shared vertex buffer.
-		self.mSharedVertexBuffer.reset(
-			len(blendMesh.uv_layers),
-			len(blendMesh.vertex_colors))
+		self.mSharedVertexBuffer.reset(uvLayerCount, colorLayerCount)
 
 		# split up the mesh into submeshes by materials.
 		materialList = blendMesh.materials

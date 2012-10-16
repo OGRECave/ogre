@@ -36,7 +36,7 @@ class Message():
 class ObjectLog():
 	ST_PROCESSING = 'TIME'
 	ST_SUCCEED = 'FILE_TICK'
-	ST_FAILED = 'ERROR'
+	ST_FAILED = 'CANCEL'
 
 	TYPE_MESH = 'MESH_MONKEY'
 	TYPE_MATERIAL = 'MATERIAL'
@@ -136,19 +136,20 @@ class LogManager():
 				subRow = row.row()
 				subRow.alignment = 'LEFT'
 				subRow.label(icon = objLog.mState)
-				subRow.label(objLog.mName, objLog.mType)
+				prop = subRow.operator("ogre3d.log_show_object", objLog.mName, icon = objLog.mType, emboss = False)
+				prop.index = i
 
 				subRow = row.row()
 				subRow.alignment = 'RIGHT'
 				if (objLog.mWarningCount): subRow.label("%d" % objLog.mWarningCount, Message.LVL_WARNING)
 				if (objLog.mErrorCount): subRow.label("%d" % objLog.mErrorCount, Message.LVL_ERROR)
 				if (objLog.mState == ObjectLog.ST_FAILED): subRow.alert = True
-				prop = subRow.operator("ogre3d.log_show_object", "", icon = 'WORDWRAP_ON')
+				prop = subRow.operator("ogre3d.log_show_object", icon = 'CONSOLE')
 				prop.index = i
 
 class OperatorLogShowObject(bpy.types.Operator):
 	bl_idname = "ogre3d.log_show_object"
-	bl_label = "Show Object Export Log"
+	bl_label = "Show Log"
 	bl_description = "Show object's export log."
 
 	index = bpy.props.IntProperty()

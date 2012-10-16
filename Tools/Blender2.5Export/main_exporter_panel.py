@@ -239,8 +239,8 @@ class OperatorExport(bpy.types.Operator):
 		item = self.collection[self.itemIndex]
 		object = bpy.data.objects[item.name]
 		#~ time.sleep(0.1)
-		exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
-		LogManager.getObjectLog(-1).mState = ObjectLog.ST_SUCCEED
+		result = exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
+		LogManager.getObjectLog(-1).mState = ObjectLog.ST_SUCCEED if (result) else ObjectLog.ST_FAILED
 		self.itemIndex += 1
 
 		# update progress bar.
@@ -313,7 +313,6 @@ class OperatorPrefApplyStaticConfig(bpy.types.Operator):
 	bl_description = "Apply static configs."
 
 	def invoke(self, context, event):
-		MainExporterPanel.sViewState = MainExporterPanel.VS_MAIN
 		saveStaticConfig()
 		return('FINISHED')
 
