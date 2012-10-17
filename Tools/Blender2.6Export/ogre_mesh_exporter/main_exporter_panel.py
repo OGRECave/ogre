@@ -20,12 +20,11 @@
 # THE SOFTWARE.
 # ##### END MIT LICENSE BLOCK #####
 
-from ogre_mesh_exporter.global_properties import loadStaticConfig
 from ogre_mesh_exporter.global_properties import saveStaticConfig
 from ogre_mesh_exporter.mesh_exporter import exportMesh
-from ogre_mesh_exporter.log_manager import LogManager, ObjectLog
+from ogre_mesh_exporter.log_manager import LogManager, ObjectLog, Message
 
-import bpy, os, time
+import bpy, os, time, multiprocessing
 from bpy.app.handlers import persistent
 
 class MainExporterPanel(bpy.types.Panel):
@@ -39,7 +38,6 @@ class MainExporterPanel(bpy.types.Panel):
 	VS_PREFERENCE = 1
 	VS_LOG = 2
 	sViewState = VS_MAIN
-	sFirstLoad = True
 
 	@persistent
 	def refreshSelection(scene):
@@ -208,25 +206,9 @@ class OperatorExport(bpy.types.Operator):
 	bl_label = "Export"
 	bl_description = "Export selected meshes"
 
-	def modal(self, context, event):
-		if (LogManager.getLogCount() == 0):
-			# add first item to log so we can see the progress.
-			# TODO: Fix this for when no mesh data are exported but materials are.
-			LogManager.addObjectLog(self.collection[0].name, ObjectLog.TYPE_MESH)
-			LogManager.setProgress(0)
-			return {'RUNNING_MODAL'}
+	MAX_PENDING_PROCESSES = multiprocessing.cpu_count()
 
-		# TODO: Handle exportMeshes == FALSE state.
-		item = self.collection[self.itemIndex]
-		object = bpy.data.objects[item.name]
-		#~ time.sleep(0.1)
-		result = exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
-		LogManager.getObjectLog(-1).mState = ObjectLog.ST_SUCCEED if (result) else ObjectLog.ST_FAILED
-		self.itemIndex += 1
-
-		# update progress bar.
-		LogManager.setProgress((100 * self.itemIndex) / self.collectionCount)
-
+	def refresh(self, context):
 		# tell blender to refresh.
 		for area in context.screen.areas:
 			if area.type == 'VIEW_3D':
@@ -234,22 +216,94 @@ class OperatorExport(bpy.types.Operator):
 					if region.type == 'TOOLS':
 						region.tag_redraw()
 
-		if (self.itemIndex == self.collectionCount): return {'FINISHED'}
-		LogManager.addObjectLog(self.collection[self.itemIndex].name, ObjectLog.TYPE_MESH)
+	def modal(self, context, event):
+		if (event.type == 'ESC'):  # Cancel
+			for objectLog, process in self.pendingProcesses.items():
+				process.kill() 
+				objectLog.mStatus = "(Canceling...)"
+			self.canceling = True
+			self.refresh(context)
+			return {'RUNNING_MODAL'}
+
+		if (LogManager.getLogCount() == 0):
+			# add first item to log so we can see the progress.
+			# TODO: Fix this for when no mesh data are exported but materials are.
+			LogManager.addObjectLog(self.collection[0].name, ObjectLog.TYPE_MESH)
+			LogManager.setProgress(0)
+			self.refresh(context)
+			return {'RUNNING_MODAL'}
+
+		# poll subprocesses to make sure they are done and log accordingly.
+		pendingDelete = list()
+		for objectLog, process in self.pendingProcesses.items():
+			result = process.poll()
+			if (result == None): continue
+			if (result == 0):
+				objectLog.mStatus = ""
+				objectLog.logMessage("OgreXMLConverter Success!")
+				objectLog.mState = ObjectLog.ST_SUCCEED
+				self.completedCount += 1
+			elif (self.canceling):
+				objectLog.mStatus = "(Canceled)"
+				objectLog.logMessage("OgreXMLConverter Canceled.", Message.LVL_INFO)
+				objectLog.mState = ObjectLog.ST_CANCELED
+			else:
+				objectLog.mStatus = ""
+				objectLog.logMessage("OgreXMLConverter Failed! Check log file for more detail.", Message.LVL_ERROR)
+				objectLog.mState = ObjectLog.ST_FAILED
+			pendingDelete.append(objectLog) # cache it for delete.
+		# delete from dictionary what needs to be deleted.
+		# (Wish python has smarter way to do this -_-" Why can't they have erase iterator system?)
+		for objectLog in pendingDelete: del self.pendingProcesses[objectLog]
+		# check that we do not have too many process running. If so, skip until done.
+		if (len(self.pendingProcesses) == OperatorExport.MAX_PENDING_PROCESSES):
+			self.refresh(context)
+			return {'RUNNING_MODAL'}
+
+		# Check exit strategy.
+		if (self.itemIndex == self.collectionCount or self.canceling):
+			if (len(self.pendingProcesses)): return {'RUNNING_MODAL'}
+			context.window_manager.event_timer_remove(self.timer)
+			LogManager.setProgress(100)
+			self.refresh(context)
+			return {'FINISHED'}
+
+		# TODO: Handle exportMeshes == FALSE state.
+		item = self.collection[self.itemIndex]
+		object = bpy.data.objects[item.name]
+		#~ time.sleep(0.1)
+		result = exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
+		objectLog = LogManager.getObjectLog(-1)
+		if (not result[0]): objectLog.mState = ObjectLog.ST_FAILED
+		elif (result[1]):
+			self.pendingProcesses[objectLog] = result[1]
+			objectLog.mStatus = "(Converting...)"
+			objectLog.mState = ObjectLog.ST_CONVERTING
+		else:
+			objectLog.mState = ObjectLog.ST_SUCCEED
+			self.completedCount += 1
+
+		# update progress bar.
+		LogManager.setProgress((100 * self.completedCount) / self.collectionCount)
+
+		self.itemIndex += 1
+		if (self.itemIndex < self.collectionCount):
+			LogManager.addObjectLog(self.collection[self.itemIndex].name, ObjectLog.TYPE_MESH)
+
+		# tell blender to refresh.
+		self.refresh(context)
 		return {'RUNNING_MODAL'}
 
 	def invoke(self, context, event):
-		# make sure the global data is loaded first if it hasn't already.
-		if (MainExporterPanel.sFirstLoad):
-			loadStaticConfig()
-			MainExporterPanel.sFirstLoad = False
-
 		# change our view to log panel.
 		MainExporterPanel.sViewState = MainExporterPanel.VS_LOG
 
 		self.globalSettings = bpy.context.scene.ogre_mesh_exporter
 		self.collection = self.globalSettings.selectedObjectList.collection
 		self.collectionCount = len(self.collection)
+		self.pendingProcesses = dict()
+		self.completedCount = 0
+		self.canceling = False
 		self.itemIndex = 0
 
 		# clear log.
@@ -257,6 +311,7 @@ class OperatorExport(bpy.types.Operator):
 
 		# run modal operator mode.
 		context.window_manager.modal_handler_add(self)
+		self.timer = context.window_manager.event_timer_add(0.1, context.window)
 		return {'RUNNING_MODAL'}
 
 class OperatorPreferences(bpy.types.Operator):
@@ -266,9 +321,6 @@ class OperatorPreferences(bpy.types.Operator):
 
 	def invoke(self, context, event):
 		MainExporterPanel.sViewState = MainExporterPanel.VS_PREFERENCE
-		if (MainExporterPanel.sFirstLoad):
-			loadStaticConfig()
-			MainExporterPanel.sFirstLoad = False
 		return {'FINISHED'}
 
 class OperatorHelp(bpy.types.Operator):

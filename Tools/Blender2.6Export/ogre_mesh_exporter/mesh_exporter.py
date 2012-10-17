@@ -94,7 +94,7 @@ class MeshXMLConverterSettings():
 			optimiseAnimation = meshSettings.optimiseAnimation if (meshSettings.optimiseAnimation_override) else globalSettings.optimiseAnimation)
 
 def exportMesh(meshObject, filepath):
-	result = True
+	result = (False, None)
 	try:
 		LogManager.logMessage("Output: %s" % filepath, Message.LVL_INFO)
 
@@ -131,19 +131,23 @@ def exportMesh(meshObject, filepath):
 			globalSettings = bpy.context.scene.ogre_mesh_exporter
 			LogManager.logMessage("Converting mesh to Ogre binary format...")
 			result = convertToOgreMesh(globalSettings.ogreXMLConverterPath, filepath, MeshXMLConverterSettings.fromRNA(meshObject))
+		else:
+			LogManager.logMessage("Success!")
+			result[0] = True
 
 	except IOError as err:
 		LogManager.logMessage("I/O error(%d): %s" % (err.errno, err.strerror), Message.LVL_ERROR)
-		result = False
 	except Exception as err:
 		LogManager.logMessage(str(err), Message.LVL_ERROR)
-		result = False
 	except:
 		traceback.print_exc()
 
 	return result
 
+gDevNull = open(os.devnull, "w")
+
 def convertToOgreMesh(converterpath, filepath, settings = MeshXMLConverterSettings()):
+	global gDevNull
 	try:
 		if os.path.exists(converterpath):
 			filepath = os.path.normpath(filepath)
@@ -182,14 +186,11 @@ def convertToOgreMesh(converterpath, filepath, settings = MeshXMLConverterSettin
 			command.append(filepath)
 
 			LogManager.logMessage("Executing OgrXMLConverter: " + " ".join(command))
-			p = subprocess.Popen(command)
-			p.wait() # wait for process to finish.
-			# TODO! Allow multiple XML Converter process to happen at once? This will speed up exporting many meshes.
-			LogManager.logMessage("Success!")
-			return (p.returncode == 0)
+			p = subprocess.Popen(command, stdout = gDevNull, stderr = gDevNull)
+			return (True, p)
 		else:
 			LogManager.logMessage("No converter found at %s" % converterpath, Message.LVL_ERROR)
 	except:
 		traceback.print_exc()
 
-	return False
+	return (False, None)
