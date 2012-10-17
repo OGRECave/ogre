@@ -35,8 +35,10 @@ class Message():
 
 class ObjectLog():
 	ST_PROCESSING = 'TIME'
+	ST_CONVERTING = 'SCRIPTWIN'
 	ST_SUCCEED = 'FILE_TICK'
 	ST_FAILED = 'CANCEL'
+	ST_CANCELED = 'X'
 
 	TYPE_MESH = 'MESH_MONKEY'
 	TYPE_MATERIAL = 'MATERIAL'
@@ -44,6 +46,7 @@ class ObjectLog():
 	def __init__(self, name, type):
 		self.mName = name
 		self.mType = type
+		self.mStatus = ''
 		self.mLogMessages = list()
 		self.mState = ObjectLog.ST_PROCESSING
 		self.mWarningCount = 0
@@ -137,6 +140,8 @@ class LogManager():
 				subRow.alignment = 'LEFT'
 				subRow.label(icon = objLog.mState)
 				prop = subRow.operator("ogre3d.log_show_object", objLog.mName, icon = objLog.mType, emboss = False)
+				prop.index = i
+				prop = subRow.operator("ogre3d.log_show_object", objLog.mStatus, emboss = False)
 				prop.index = i
 
 				subRow = row.row()

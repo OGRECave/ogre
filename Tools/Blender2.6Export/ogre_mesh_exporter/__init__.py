@@ -56,10 +56,14 @@ else:
 import bpy, mathutils
 from bpy.props import PointerProperty
 from bpy.app.handlers import persistent
-from ogre_mesh_exporter.global_properties import GlobalProperties
+from ogre_mesh_exporter.global_properties import GlobalProperties, loadStaticConfig
 from ogre_mesh_exporter.material_properties import MaterialProperties
 from ogre_mesh_exporter.mesh_properties import MeshProperties
 from ogre_mesh_exporter.main_exporter_panel import MainExporterPanel
+
+@persistent
+def onBlendLoadHandler(dummy):
+	loadStaticConfig()
 
 # registering and menu integration
 def register():
@@ -88,6 +92,7 @@ def register():
 	# NOTE: This is for a hack to allow us to list selected objects on the fly.
 	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
 	bpy.app.handlers.scene_update_pre.append(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.load_post.append(onBlendLoadHandler)
 
 # unregistering and removing menus
 def unregister():
@@ -97,6 +102,7 @@ def unregister():
 	# NOTE: This is for a hack to allow us to list selected objects on the fly.
 	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
 	bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.load_post.remove(onBlendLoadHandler)
 
 if __name__ == "__main__":
 	register()
