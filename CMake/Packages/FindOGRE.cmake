@@ -257,12 +257,6 @@ if (OGRE_STATIC)
       set(OGRE_DEPS_FOUND FALSE)
     endif ()
   endif ()
-  if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
-    find_package(iOSSDK QUIET)
-    if (NOT iOSSDK_FOUND)
-      set(OGRE_DEPS_FOUND FALSE)
-    endif ()
-  endif ()
 
   set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${ZZip_LIBRARIES} ${ZLIB_LIBRARIES} ${FreeImage_LIBRARIES} ${FREETYPE_LIBRARIES} )
 

@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreKeyFrame.h"
 #include "OgreAnimable.h"
 #include "OgrePose.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre 
 {
@@ -576,5 +577,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

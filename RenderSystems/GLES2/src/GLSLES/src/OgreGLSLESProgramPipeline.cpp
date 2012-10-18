@@ -169,8 +169,9 @@ namespace Ogre
             // Validate pipeline
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 #if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
-                             (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
+            if(mVertexProgram && mFragmentProgram)
+                glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
+                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
 #endif
 		}
 #endif

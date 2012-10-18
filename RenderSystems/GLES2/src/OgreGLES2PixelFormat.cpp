@@ -266,6 +266,10 @@ namespace Ogre  {
                 {
                     case GL_UNSIGNED_SHORT_5_6_5:
                         return PF_B5G6R5;
+                    case GL_HALF_FLOAT_OES:
+                        return PF_FLOAT16_RGB;
+                    case GL_FLOAT:
+                        return PF_FLOAT32_RGB;
                     default:
                         return PF_R8G8B8;
                 }
@@ -276,6 +280,10 @@ namespace Ogre  {
                         return PF_A1R5G5B5;
                     case GL_UNSIGNED_SHORT_4_4_4_4:
                         return PF_A4R4G4B4;
+                    case GL_HALF_FLOAT_OES:
+                        return PF_FLOAT16_RGBA;
+                    case GL_FLOAT:
+                        return PF_FLOAT32_RGBA;
                     default:
                         return PF_A8B8G8R8;
                 }

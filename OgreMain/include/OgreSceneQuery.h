@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreRay.h"
 #include "OgreRenderOperation.h"
 #include "OgrePlaneBoundedVolume.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -559,6 +560,6 @@ namespace Ogre {
 
 }
     
-
+#include "OgreHeaderSuffix.h"
 
 #endif

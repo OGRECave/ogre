@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgrePlaneBoundedVolume.h"
 #include "OgreShadowCameraSetup.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -594,4 +595,7 @@ namespace Ogre {
 	/** @} */
 
 } // Namespace
+
+#include "OgreHeaderPrefix.h"
+
 #endif

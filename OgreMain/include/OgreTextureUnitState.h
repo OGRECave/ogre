@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreString.h"
 #include "OgreTexture.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -1261,5 +1262,7 @@ protected:
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

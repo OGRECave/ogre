@@ -246,7 +246,7 @@ namespace Ogre
 			//Completely override base functionality, since we don't cull on an "all-or-nothing" basis
 			//and we don't support skeletal animation
 			if( (mRenderOperation.numberOfInstances = updateVertexBuffer( mCurrentCamera )) )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 		else
 		{
@@ -259,7 +259,7 @@ namespace Ogre
 
 			//Don't update when we're static
 			if( mRenderOperation.numberOfInstances )
-				queue->addRenderable( this );
+				queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 	}
 }

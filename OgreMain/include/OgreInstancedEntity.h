@@ -137,8 +137,12 @@ namespace Ogre
 		void createSkeletonInstance();
 		void destroySkeletonInstance();
 
+		/// When this entity is a slave, stopSharingTransform delegates to this function.
+		///	nofityMaster = false is used to prevent iterator invalidation in specific cases.
+		void stopSharingTransformAsSlave( bool notifyMaster );
+
 		/// Just unlinks, and tells our master we're no longer sharing
-		void unlinkTransform();
+		void unlinkTransform( bool notifyMaster=true );
 
 		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );

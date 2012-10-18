@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -221,5 +222,7 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif
