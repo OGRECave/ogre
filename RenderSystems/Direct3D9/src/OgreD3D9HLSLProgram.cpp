@@ -163,11 +163,11 @@ namespace Ogre {
 
 				if(start_pos==pos)
 				{
-					if(pos==stringBuffer.length())
+					if( pos >= stringBuffer.length() - 1 )
 					{
 						break;
 					}
-					pos++;
+					++pos;
 					continue;
 				}
 
@@ -381,8 +381,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::unloadHighLevelImpl(void)
     {
+        mParametersMap.clear();
+        mParametersMapSizeAsBuffer = 0;
         SAFE_RELEASE(mMicroCode);
-
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::buildConstantDefinitions() const

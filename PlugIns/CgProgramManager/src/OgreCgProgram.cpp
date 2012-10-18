@@ -329,6 +329,7 @@ namespace Ogre {
 
 			// get params
 			mParametersMap.clear();
+			mParametersMapSizeAsBuffer = 0;
             mSamplerRegisterMap.clear();
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
