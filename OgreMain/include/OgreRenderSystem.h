@@ -204,10 +204,8 @@ namespace Ogre
 		automatically, based on settings chosen so far. This saves
 		an extra call to _createRenderWindow
 		for the main render window.
-		@par
-		If an application has more specific window requirements,
-		however (e.g. a level design app), it should specify false
-		for this parameter and do it manually.
+		@param
+		windowTitle Sets the app window title
 		@return
 		A pointer to the automatically created window, if requested, otherwise null.
 		*/
