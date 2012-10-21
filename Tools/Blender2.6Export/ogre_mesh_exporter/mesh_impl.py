@@ -160,22 +160,22 @@ class VertexBuffer():
 		file.write('%s</vertexbuffer>\n' % indent)
 
 class SubMesh():
-	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None):
+	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None, name = None):
 		# True if submesh is sharing vertex buffer.
 		self.mShareVertexBuffer = False
 		# Vertex buffer.
-		self.mVertexBuffer = VertexBuffer()
+		self.mVertexBuffer = vertexBuffer if (vertexBuffer) else VertexBuffer()
 		# Blender mesh -> local/shared vertex index link.
-		self.mMeshVertexIndexLink = dict()
+		self.mMeshVertexIndexLink = meshVertexIndexLink if (meshVertexIndexLink) else dict()
 		# Face data.
 		self.mFaceData = list()
 		# Blender material.
 		self.mMaterial = None
+		# Name of submesh
+		self.mName = name
 
 		if ((vertexBuffer is not None) and (meshVertexIndexLink is not None)):
 			self.mShareVertexBuffer = True
-			self.mVertexBuffer = vertexBuffer
-			self.mMeshVertexIndexLink = meshVertexIndexLink
 
 	def insertPolygon(self, blendMesh, polygon, fixUpAxisToY):
 		polygonVertices = polygon.vertices
@@ -262,14 +262,26 @@ class Mesh():
 		self.mSharedVertexBuffer.reset(uvLayerCount, colorLayerCount)
 
 		# split up the mesh into submeshes by materials.
+		# we first get sub mesh shared vertices option.
 		materialList = blendMesh.materials
+		materialCount = len(materialList)
+		subMeshProperties = blendMesh.ogre_mesh_exporter.subMeshProperties
+		while (len(subMeshProperties) < materialCount): subMeshProperties.add() # add more items if needed.
+		while (len(subMeshProperties) > materialCount): subMeshProperties.remove(0) # remove items if needed.
+
 		LogManager.logMessage("Material Count: %d" % len(materialList), Message.LVL_INFO)
 		for polygon in blendMesh.polygons:
 			# get or create submesh.
 			if (polygon.material_index in self.mSubMeshDict):
 				subMesh = self.mSubMeshDict[polygon.material_index]
 			else:
-				subMesh = SubMesh(self.mSharedVertexBuffer, self.mSharedMeshVertexIndexLink)
+				# instantiate submesh base on wether sharing vertices or not.
+				subMeshProperty = subMeshProperties[polygon.material_index]
+				if (subMeshProperty.useSharedVertices):
+					subMesh = SubMesh(self.mSharedVertexBuffer, self.mSharedMeshVertexIndexLink, subMeshProperty.name)
+				else:
+					subMesh = SubMesh(VertexBuffer(uvLayerCount, colorLayerCount), name = subMeshProperty.name)
+
 				subMesh.mMaterial = None if (len(materialList) == 0) else materialList[polygon.material_index]
 				if (exportSettings.requireMaterials and subMesh.mMaterial == None):
 					LogManager.logMessage("Some faces are not assigned with a material!", Message.LVL_WARNING)
@@ -289,10 +301,25 @@ class Mesh():
 			self.mSharedVertexBuffer.serialize(file, '\t\t')
 			file.write('\t</sharedgeometry>\n')
 
+		subMeshNames = list()
+
 		# write submeshes.
 		file.write('\t<submeshes>\n')
 		for subMesh in self.mSubMeshDict.values():
+			name = subMesh.mName
+			if (name):
+				if (not name in subMeshNames):
+					subMeshNames.append(name)
+				else:
+					LogManager.logMessage("Mulitple submesh with same name defined: %s" % name, Message.LVL_WARNING)
 			subMesh.serialize(file)
 		file.write('\t</submeshes>\n')
+
+		# write submesh names
+		if (len(subMeshNames)):
+			file.write('\t<submeshnames>\n')
+			for index, name in enumerate(subMeshNames):
+				file.write('\t\t<submeshname name="%s" index="%d" />\n' % (name, index))
+			file.write('\t</submeshnames>\n')
 
 		file.write('</mesh>\n')

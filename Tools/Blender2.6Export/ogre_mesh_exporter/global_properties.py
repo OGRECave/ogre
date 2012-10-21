@@ -23,8 +23,6 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
-#~ from ogre_mesh_exporter.mesh_properties import MeshProperties
-
 STATIC_CONFIG_FILENAME = "ogre_mesh_exporter.cfg"
 
 class SelectedObject(bpy.types.PropertyGroup):

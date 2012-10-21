@@ -146,7 +146,7 @@ class MainExporterPanel(bpy.types.Panel):
 		col = layout.column()
 		col.label("Selected:")
 		selectedObjectList = globalSettings.selectedObjectList
-		col.template_list(selectedObjectList, "collection", selectedObjectList, "collectionIndex", prop_list = "objectName")
+		col.template_list(selectedObjectList, "collection", selectedObjectList, "collectionIndex")
 
 		# ####################################################
 		# Material settings
@@ -193,15 +193,19 @@ class MainExporterPanel(bpy.types.Panel):
 			icon = ('NONE' if (exportPathValid) else 'ERROR'))
 
 		row = layout.row(True)
-		row.scale_y = 1.5
-		exportRow = row.row(True)
+		subrow = row.row()
+		subrow.scale_y = 1.5
+		exportRow = subrow.row(True)
 		exportRow.scale_y = 1.5
 		if (not exportPathValid or len(selectedObjectList.collection) == 0 or \
 			(not globalSettings.exportMeshes and not globalSettings.exportMaterials)):
 			exportRow.enabled = False
 		exportRow.operator("ogre3d.export", icon = 'SCRIPTWIN')
-		row.operator("ogre3d.preferences", icon = 'SETTINGS')
-		row.operator("ogre3d.help", icon = 'HELP')
+		subrow.operator("ogre3d.preferences", icon = 'SETTINGS')
+		subrow.operator("ogre3d.help", icon = 'HELP')
+		row = row.row()
+		row.scale_y = 1.5
+		row.alignment = 'RIGHT'
 		row.operator("ogre3d.log", "", icon = 'CONSOLE')
 
 class OperatorExport(bpy.types.Operator):
