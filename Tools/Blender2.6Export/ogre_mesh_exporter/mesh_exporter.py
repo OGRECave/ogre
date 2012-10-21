@@ -114,6 +114,9 @@ def exportMesh(meshObject, filepath):
 		ogreMesh = Mesh(mesh, meshExportSettings)
 		LogManager.logMessage("Shared Vertices: %d" % len(ogreMesh.mSharedVertexBuffer.mVertexData), Message.LVL_INFO);
 		LogManager.logMessage("Submeshes: %d" % len(ogreMesh.mSubMeshDict), Message.LVL_INFO);
+		for index, submesh in enumerate(ogreMesh.mSubMeshDict.values()):
+			if (submesh.mShareVertexBuffer): continue
+			LogManager.logMessage(" [%d]%s: vertices: %d" % (index, submesh.mName if (submesh.mName) else '' , len(submesh.mVertexBuffer.mVertexData)), Message.LVL_INFO);
 
 		# write mesh.
 		file = open(filepath, "w", encoding="utf8", newline="\n")

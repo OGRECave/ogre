@@ -44,36 +44,39 @@ class MainExporterPanel(bpy.types.Panel):
 		globalSettings = bpy.context.scene.ogre_mesh_exporter
 		collection = globalSettings.selectedObjectList.collection
 
-		# get valid selection count.
+		# get valid selection and store in dictionary.
+		# note that we filter of objects sharing the same datablock.
+		# Hence only the first object pointing to the same datablock will be used.
+		# Also note that we observe the mesh datablock level export setting here.
 		selected_objects = bpy.context.selected_objects
-		selectedCount = len(selected_objects)
+		selectedDataObjects = dict()
 		for object in bpy.context.selected_objects:
-			if (object.type != 'MESH'): selectedCount -= 1
-
-		# do check to avoid updating if selection is not changed.
-		if (selectedCount == len(collection)):
-			i = 0
-			changed = False
-			for object in bpy.context.selected_objects:
-				if (object.type == 'MESH'):
-					if (collection[i].name != object.name):
-						changed = True
-						break;
-					i += 1
-			if (not changed): return
+			dataName = object.data.name
+			if (object.type == 'MESH' and (not dataName in selectedDataObjects)):
+				meshSettings = object.data.ogre_mesh_exporter
+				if (meshSettings.exportEnabled):
+					selectedDataObjects[dataName] = object
 
 		# To avoid recreating the list stupidly,
 		# we play smart and reuse as nessesary.
 		# resize collection as necessary.
+		selectedCount = len(selectedDataObjects)
+		changed = (selectedCount != len(collection))
 		while (len(collection) < selectedCount): collection.add() # add more items if needed.
 		while (len(collection) > selectedCount): collection.remove(0) # remove items if needed.
 
-		# set proper values.
+		# update list if changed.
 		i = 0
-		for object in bpy.context.selected_objects:
-			if (object.type == 'MESH'):
-				collection[i].name = object.name
-				i += 1
+		for dataName, object in selectedDataObjects.items():
+			collectionItem = collection[i]
+			if (collectionItem.name != dataName or collectionItem.objectName != object.name):
+				collectionItem.name = dataName
+				collectionItem.objectName = object.name
+				changed = True
+			i += 1
+
+		# skip refreshing if not changed.
+		if (not changed): return
 
 		# tell blender to refresh.
 		for screen in bpy.data.screens:
@@ -190,15 +193,19 @@ class MainExporterPanel(bpy.types.Panel):
 			icon = ('NONE' if (exportPathValid) else 'ERROR'))
 
 		row = layout.row(True)
-		row.scale_y = 1.5
-		exportRow = row.row(True)
+		subrow = row.row()
+		subrow.scale_y = 1.5
+		exportRow = subrow.row(True)
 		exportRow.scale_y = 1.5
 		if (not exportPathValid or len(selectedObjectList.collection) == 0 or \
 			(not globalSettings.exportMeshes and not globalSettings.exportMaterials)):
 			exportRow.enabled = False
 		exportRow.operator("ogre3d.export", icon = 'SCRIPTWIN')
-		row.operator("ogre3d.preferences", icon = 'SETTINGS')
-		row.operator("ogre3d.help", icon = 'HELP')
+		subrow.operator("ogre3d.preferences", icon = 'SETTINGS')
+		subrow.operator("ogre3d.help", icon = 'HELP')
+		row = row.row()
+		row.scale_y = 1.5
+		row.alignment = 'RIGHT'
 		row.operator("ogre3d.log", "", icon = 'CONSOLE')
 
 class OperatorExport(bpy.types.Operator):
@@ -270,7 +277,7 @@ class OperatorExport(bpy.types.Operator):
 
 		# TODO: Handle exportMeshes == FALSE state.
 		item = self.collection[self.itemIndex]
-		object = bpy.data.objects[item.name]
+		object = bpy.data.objects[item.objectName]
 		#~ time.sleep(0.1)
 		result = exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
 		objectLog = LogManager.getObjectLog(-1)
@@ -329,15 +336,6 @@ class OperatorHelp(bpy.types.Operator):
 	bl_description = "Open help document."
 
 	def invoke(self, context, event):
-		return {'FINISHED'}
-
-class OperatorShowLog(bpy.types.Operator):
-	bl_idname = "ogre3d.log"
-	bl_label = "Log History"
-	bl_description = "Show log history."
-
-	def invoke(self, context, event):
-		MainExporterPanel.sViewState = MainExporterPanel.VS_LOG
 		return {'FINISHED'}
 
 class OperatorShowLog(bpy.types.Operator):

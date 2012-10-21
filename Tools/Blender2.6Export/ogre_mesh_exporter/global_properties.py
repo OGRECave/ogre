@@ -23,17 +23,16 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
-#~ from ogre_mesh_exporter.mesh_properties import MeshProperties
-
 STATIC_CONFIG_FILENAME = "ogre_mesh_exporter.cfg"
 
 class SelectedObject(bpy.types.PropertyGroup):
-	name = StringProperty(name="Name", default="Unknown")
+	name = StringProperty(name = "Name", default = "Unknown")
+	objectName = StringProperty(name = "Object", default = "Unknown")
 
 class SelectedObjectList(bpy.types.PropertyGroup):
 	def onSelectionChanged(self, context):
 		# Set the selected object as active.
-		bpy.context.scene.objects.active = bpy.data.objects[self.collection[self.collectionIndex].name]
+		bpy.context.scene.objects.active = bpy.data.objects[self.collection[self.collectionIndex].objectName]
 
 	collection = CollectionProperty(type = SelectedObject)
 	collectionIndex = IntProperty(min = -1, default = -1, update=onSelectionChanged)
@@ -200,7 +199,7 @@ class GlobalProperties(bpy.types.PropertyGroup):
 
 	# ##############################################
 	# temporary collection for listing selected meshes.
-	selectedObjectList = bpy.props.PointerProperty(type = SelectedObjectList)
+	selectedObjectList = PointerProperty(type = SelectedObjectList)
 
 # Load static data from config file.
 def loadStaticConfig():

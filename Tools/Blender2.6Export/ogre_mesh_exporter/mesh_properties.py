@@ -23,6 +23,21 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
+class SubMeshProperties(bpy.types.PropertyGroup):
+	# Flag to tell if this submesh should use shared vertices.
+	useSharedVertices = BoolProperty(
+		name = "Use Shared Vertices",
+		description = "Use shared vertices with other submeshes.",
+		default = True
+	)
+
+	# Custom name of submesh.
+	name = StringProperty(
+		name = "Custom name",
+		description = "Custom name of submesh.",
+		default = ""
+	)
+
 # ##############################################
 # Mesh Properties on the mesh objects
 class MeshProperties(bpy.types.PropertyGroup):
@@ -32,6 +47,11 @@ class MeshProperties(bpy.types.PropertyGroup):
 		description = "Export this mesh.",
 		default = True
 	)
+
+	subMeshProperties = CollectionProperty(type = SubMeshProperties)
+
+	# ##############################################
+	# Export override specific Properties
 
 	requireMaterials_override = BoolProperty(
 		name = "Require Materials Override",
