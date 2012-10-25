@@ -40,6 +40,37 @@ class MeshExporterPanel(bpy.types.Panel):
 		layout.prop(meshSettings, "exportEnabled", icon = 'MESH_MONKEY', toggle = True)
 		if (not meshSettings.exportEnabled): return
 
+		# prepare material slot shared vertex info.
+		subMeshProperties = meshSettings.subMeshProperties
+		materialList = context.mesh.materials
+		materialCount = len(materialList)
+		while (len(subMeshProperties) < materialCount): subMeshProperties.add() # add more items if needed.
+		while (len(subMeshProperties) > materialCount): subMeshProperties.remove(0) # remove items if needed.
+
+		layout.label("Submesh Properties:")
+		submeshNames = list()
+		box = layout.box()
+		for index, subMeshProperty in enumerate(subMeshProperties):
+			row = box.row(True)
+
+			# Material index & name.
+			material = materialList[index]
+			row.label("[%d]%s" % (index, "NONE" if (material == None) else materialList[index].name), icon = 'ERROR' if (material == None) else 'MATERIAL')
+
+			# Submesh name.
+			subrow = row.row()
+			if (subMeshProperty.name in submeshNames): subrow.alert = True
+			else: submeshNames.append(subMeshProperty.name)
+			subrow.prop(subMeshProperty, "name", "")
+
+			# Use shared vertices.
+			row.prop(subMeshProperty, "useSharedVertices", "", icon = 'GROUP_VERTEX')
+
+			# Select vertices under this submesh.
+			if (context.mode == 'EDIT_MESH'):
+				prop = row.operator("ogre3d.select_submesh_vertices", "", icon='MESH_DATA')
+				prop.index = index
+
 		# Mesh override settings:
 		layout.label("Mesh Override Settings:")
 		col = layout.column(True)
@@ -155,3 +186,16 @@ class MeshExporterPanel(bpy.types.Panel):
 			row = row.row(True)
 			row.enabled = False
 		row.prop(meshSettings, "optimiseAnimation", toggle = True)
+
+class OperatorSelectSubmeshVertices(bpy.types.Operator):
+	bl_idname = "ogre3d.select_submesh_vertices"
+	bl_label = "Select"
+	bl_description = "Select submesh vertices."
+
+	index = bpy.props.IntProperty()
+
+	def invoke(self, context, event):
+		context.object.active_material_index = self.index
+		bpy.ops.mesh.select_all(action = 'DESELECT')
+		bpy.ops.object.material_slot_select()
+		return {'FINISHED'}

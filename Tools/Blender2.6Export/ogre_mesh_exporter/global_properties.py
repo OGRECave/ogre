@@ -23,17 +23,16 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
-from ogre_mesh_exporter.mesh_properties import MeshProperties
-
 STATIC_CONFIG_FILENAME = "ogre_mesh_exporter.cfg"
 
 class SelectedObject(bpy.types.PropertyGroup):
-	name = StringProperty(name="Name", default="Unknown")
+	name = StringProperty(name = "Name", default = "Unknown")
+	objectName = StringProperty(name = "Object", default = "Unknown")
 
 class SelectedObjectList(bpy.types.PropertyGroup):
 	def onSelectionChanged(self, context):
 		# Set the selected object as active.
-		bpy.context.scene.objects.active = bpy.data.objects[self.collection[self.collectionIndex].name]
+		bpy.context.scene.objects.active = bpy.data.objects[self.collection[self.collectionIndex].objectName]
 
 	collection = CollectionProperty(type = SelectedObject)
 	collectionIndex = IntProperty(min = -1, default = -1, update=onSelectionChanged)
@@ -93,15 +92,15 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		description = "Generate Error message when part of a mesh is not assigned with a material.",
 		default = True
 	)
-	skeletonNameFollowMesh = BoolProperty(
-		name = "Skeleton Name Follow Mesh",
-		description = "Use mesh name for exported skeleton name instead of the armature name.",
-		default = True
-	)
 	applyModifiers = BoolProperty(
 		name = "Apply Modifiers",
 		description = "Apply mesh modifiers before export. (Slow and may break vertex order for morph targets!)",
 		default = False
+	)
+	skeletonNameFollowMesh = BoolProperty(
+		name = "Skeleton Name Follow Mesh",
+		description = "Use mesh name for exported skeleton name instead of the armature name.",
+		default = True
 	)
 	runOgreXMLConverter = BoolProperty(
 		name = "OgreXMLConverter",
@@ -185,8 +184,22 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	)
 
 	# ##############################################
+	# Log properties.
+	logPageSize = IntProperty(
+		name = "Log Page Size",
+		description = "Size of a visible log page",
+		default = 10
+	)
+	logPercentage = IntProperty(
+		name = "Log Percentage",
+		description = "Log progress",
+		default = 100, min = 0, max = 100,
+		subtype = 'PERCENTAGE'
+	)
+
+	# ##############################################
 	# temporary collection for listing selected meshes.
-	selectedObjectList = bpy.props.PointerProperty(type = SelectedObjectList)
+	selectedObjectList = PointerProperty(type = SelectedObjectList)
 
 # Load static data from config file.
 def loadStaticConfig():

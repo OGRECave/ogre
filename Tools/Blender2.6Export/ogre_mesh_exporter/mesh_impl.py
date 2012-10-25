@@ -24,7 +24,30 @@
 # See mesh_exporter.py for explanation.
 # ########################################################################
 
-import bpy, pprint, mathutils
+import bpy, mathutils
+
+from ogre_mesh_exporter.log_manager import LogManager, Message
+
+# Mesh export settings class to define how we are going to export the mesh.
+class MeshExportSettings():
+	def __init__(self, fixUpAxisToY = True, requireMaterials = True, applyModifiers = False, skeletonNameFollowMesh = True, runOgreXMLConverter = True):
+		self.fixUpAxisToY = fixUpAxisToY
+		self.requireMaterials = requireMaterials
+		self.applyModifiers = applyModifiers
+		self.skeletonNameFollowMesh = skeletonNameFollowMesh
+		self.runOgreXMLConverter = runOgreXMLConverter
+
+	@classmethod
+	def fromRNA(cls, meshObject):
+		globalSettings = bpy.context.scene.ogre_mesh_exporter
+		meshSettings = meshObject.data.ogre_mesh_exporter
+
+		return MeshExportSettings(
+			fixUpAxisToY = globalSettings.fixUpAxisToY,
+			requireMaterials = meshSettings.requireMaterials if (meshSettings.requireMaterials_override) else globalSettings.requireMaterials,
+			applyModifiers = meshSettings.applyModifiers if (meshSettings.applyModifiers_override) else globalSettings.applyModifiers,
+			skeletonNameFollowMesh = meshSettings.skeletonNameFollowMesh if (meshSettings.skeletonNameFollowMesh_override) else globalSettings.skeletonNameFollowMesh,
+			runOgreXMLConverter = globalSettings.runOgreXMLConverter)
 
 class Vertex():
 	def __init__(self, pos, norm, uvs = list(), colors = list()):
@@ -33,18 +56,24 @@ class Vertex():
 		self.mUVs = uvs
 		self.mColors = colors
 
-	def matchUVs(self, uvs):
+	def match(self, norm, uvs, colors):
+		# Test normal.
+		if (self.mNormal != norm): return False;
+
+		# Test UVs.
 		if (len(self.mUVs) is not len(uvs)): return False
 		for uv1, uv2 in zip(self.mUVs, uvs):
 			if (uv1 != uv2): return False
+
+		# Test Colors.
+		if (len(self.mColors) is not len(colors)): return False
+		for color1, color2 in zip(self.mColors, colors):
+			if (color1 != color2): return False
+
 		return True
 
 class VertexBuffer():
 	def __init__(self, uvLayers = 0, colorLayers = 0):
-		# TODO: Post warning about ignoring more than 8 UV layers.
-		# TODO: Post warning about ignoring more than 2 color layers.
-		#~ if (uvLayers > 8): print("Warning")
-
 		# Vertex data.
 		self.mVertexData = list()
 		self.mUVLayers = uvLayers
@@ -65,7 +94,12 @@ class VertexBuffer():
 	# This method adds a vertex from the given blend mesh index into the buffer.
 	# If the uv information does not match the recorded vertex, it will automatically
 	# clone a new vertex for use.
-	def addVertex(self, blendMesh, index, uvs, colors):
+	def addVertex(self, index, pos, norm, uvs, colors, fixUpAxisToY):
+		# Fix Up axis to Y (swap Y and Z and negate Z)
+		if (fixUpAxisToY):
+			pos = [pos[0], pos[2], -pos[1]]
+			norm = [norm[0], norm[2], -norm[1]]
+
 		# make sure uv layers and color layers matches as defined.
 		if (len(uvs) != self.mUVLayers or len(colors) != self.mColorLayers):
 			raise Exception("Invalid UV layer or Color layer count! Expecting uv(%d), color(%d). Got uv(%d), color(%d)" %
@@ -75,15 +109,14 @@ class VertexBuffer():
 		if (index in self.mMeshVertexIndexLink):
 			localIndexList = self.mMeshVertexIndexLink[index]
 			for localIndex in localIndexList:
-				if (self.mVertexData[localIndex].matchUVs(uvs)):
+				if (self.mVertexData[localIndex].match(norm, uvs, colors)):
 					return localIndex
 
 		# nothing found. so we add a new vertex.
-		vertex = blendMesh.vertices[index]
 		localIndex = len(self.mVertexData)
 		if (index not in self.mMeshVertexIndexLink): self.mMeshVertexIndexLink[index] = list()
 		self.mMeshVertexIndexLink[index].append(localIndex)
-		self.mVertexData.append(Vertex(vertex.co, vertex.normal, uvs, colors))
+		self.mVertexData.append(Vertex(pos, norm, uvs, colors))
 		return localIndex
 
 	def serialize(self, file, indent = ''):
@@ -107,19 +140,19 @@ class VertexBuffer():
 			file.write('%s\t\t<position x="%.6f" y="%.6f" z="%.6f" />\n' % (indent, vertex.mPosition[0], vertex.mPosition[1], vertex.mPosition[2]))
 			file.write('%s\t\t<normal x="%.6f" y="%.6f" z="%.6f" />\n' % (indent, vertex.mNormal[0], vertex.mNormal[1], vertex.mNormal[2]))
 
-			# write UV layers.
+			# write UV layers. (NOTE: Blender uses bottom left coord! Ogre uses top left! So we have to flip Y.)
 			for i in range(uvLayerCount):
-				uv = mUVs[i]
-				file.write('%s\t\t<texcoord u="%.6f" v="%.6f" />\n' % (indent, uv[0], uv[1]))
+				uv = vertex.mUVs[i]
+				file.write('%s\t\t<texcoord u="%.6f" v="%.6f" />\n' % (indent, uv[0], (1.0 - uv[1])))
 
 			# write diffuse.
 			if (colorLayerCount > 0):
-				color = self.mColors[0]
+				color = vertex.mColors[0]
 				file.write('%s\t\t<colour_diffuse value="%.6f %.6f %.6f" />\n' % (indent, color[0], color[1], color[2]))
 
 			# write specular.
 			if (colorLayerCount > 1):
-				color = self.mColors[1]
+				color = vertex.mColors[1]
 				file.write('%s\t\t<colour_diffuse value="%.6f %.6f %.6f" />\n' % (indent, color[0], color[1], color[2]))
 
 			file.write('%s\t</vertex>\n' % indent)
@@ -127,73 +160,59 @@ class VertexBuffer():
 		file.write('%s</vertexbuffer>\n' % indent)
 
 class SubMesh():
-	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None):
+	def __init__(self, vertexBuffer = None, meshVertexIndexLink = None, name = None):
 		# True if submesh is sharing vertex buffer.
 		self.mShareVertexBuffer = False
 		# Vertex buffer.
-		self.mVertexBuffer = VertexBuffer()
+		self.mVertexBuffer = vertexBuffer if (vertexBuffer) else VertexBuffer()
 		# Blender mesh -> local/shared vertex index link.
-		self.mMeshVertexIndexLink = dict()
+		self.mMeshVertexIndexLink = meshVertexIndexLink if (meshVertexIndexLink) else dict()
 		# Face data.
 		self.mFaceData = list()
 		# Blender material.
 		self.mMaterial = None
+		# Name of submesh
+		self.mName = name
 
 		if ((vertexBuffer is not None) and (meshVertexIndexLink is not None)):
 			self.mShareVertexBuffer = True
-			self.mVertexBuffer = vertexBuffer
-			self.mMeshVertexIndexLink = meshVertexIndexLink
 
-	def insertFace(self, blendMesh, face):
-		faceVertices = face.vertices
-		faceVertexCount = len(faceVertices)
+	def insertPolygon(self, blendMesh, polygon, fixUpAxisToY):
+		polygonVertices = polygon.vertices
+		polygonVertexCount = polygon.loop_total
 
 		# extract uv information.
 		# Here we convert blender uv data into our own
 		# uv information that lists uvs by vertices.
-		blendFaceUVLayers = blendMesh.uv_textures
-		# construct empty face vertex uv list.
-		faceVertUVs = list()
-		for i in range(faceVertexCount): faceVertUVs.append(list())
-		for faceUVLayer in blendFaceUVLayers:
-			# get and merge face uv data into a list of
-			# uvs where list is following vertex order.
-			faceUV = faceUVLayer.data[face.index]
-			if (faceVertexCount is 3):
-				uvs = faceUV.uv1[:], faceUV.uv2[:], faceUV.uv3[:]
-			else:
-				uvs = faceUV.uv1[:], faceUV.uv2[:], faceUV.uv3[:], faceUV.uv4[:]
-
-			# loop through colors and insert them to our color list by vertices
-			for i, uv in enumerate(uvs): faceVertUVs[i].append(uv)
+		blendUVLoopLayers = blendMesh.uv_layers
+		# construct empty polygon vertex uv list.
+		polygonVertUVs = list()
+		for i in range(polygonVertexCount): polygonVertUVs.append(list())
+		for uvLoopLayer in blendUVLoopLayers:
+			for i, loopIndex in enumerate(polygon.loop_indices):
+				polygonVertUVs[i].append(uvLoopLayer.data[loopIndex].uv)
 
 		# extract color information.
 		# Here we convert blender color data into our own
 		# color information that lists colors by vertices.
-		blendFaceColorLayers = blendMesh.vertex_colors
-		# construct empty face vertex color list.
-		faceVertColors = list()
-		for i in range(faceVertexCount): faceVertColors.append(list())
-		for faceColorLayer in blendFaceColorLayers:
-			# get and merge face color data into a list of
-			# colors where list is following vertex order.
-			faceColor = faceColorLayer.data[face.index]
-			if (faceVertexCount is 3):
-				colors = faceColor.color1[:], faceColor.color2[:], faceColor.color3[:]
-			else:
-				colors = faceColor.color1[:], faceColor.color2[:], faceColor.color3[:], faceColor.color4[:]
-
-			# loop through colors and insert them to our color list by vertices
-			for i, color in enumerate(colors):
-				faceVertColors[i].append(color)
+		blendColorLoopLayers = blendMesh.vertex_colors
+		# construct empty polygon vertex color list.
+		polygonVertColors = list()
+		for i in range(polygonVertexCount): polygonVertColors.append(list())
+		for colorLoopLayer in blendColorLoopLayers:
+			for i, loopIndex in enumerate(polygon.loop_indices):
+				polygonVertColors[i].append(colorLoopLayer.data[loopIndex].color)
 
 		# loop through the vertices and add to this submesh.
 		localIndices = list()
-		for index, uvs, colors in zip(faceVertices, faceVertUVs, faceVertColors):
-			localIndices.append(self.mVertexBuffer.addVertex(blendMesh, index, uvs, colors))
+		useSmooth = polygon.use_smooth
+		for index, uvs, colors in zip(polygonVertices, polygonVertUVs, polygonVertColors):
+			vertex = blendMesh.vertices[index]
+			norm = vertex.normal if (useSmooth) else polygon.normal
+			localIndices.append(self.mVertexBuffer.addVertex(index, vertex.co, norm, uvs, colors, fixUpAxisToY))
 
 		# construct triangle index data.
-		if (faceVertexCount is 3):
+		if (polygonVertexCount is 3):
 			self.mFaceData.append(localIndices)
 		else:
 			# split quad into triangles.
@@ -222,7 +241,7 @@ class SubMesh():
 		file.write('\t\t</submesh>\n')
 
 class Mesh():
-	def __init__(self, blendMesh = None):
+	def __init__(self, blendMesh = None, exportSettings = MeshExportSettings()):
 		# shared vertex buffer.
 		self.mSharedVertexBuffer = VertexBuffer()
 		# Blender mesh -> shared vertex index link.
@@ -233,24 +252,44 @@ class Mesh():
 		# skip blend mesh conversion if no blend mesh passed in.
 		if (blendMesh is None): return
 
+		# Lets do some pre checking to show warnings if needed.
+		uvLayerCount = len(blendMesh.uv_layers)
+		colorLayerCount = len(blendMesh.vertex_colors)
+		if (uvLayerCount > 8): LogManager.logMessage("More than 8 UV layers in this mesh. Only 8 will be exported.", Message.LVL_WARNING)
+		if (colorLayerCount > 2): LogManager.logMessage("More than 2 color layers in this mesh. Only 2 will be exported.", Message.LVL_WARNING)
+
 		# setup shared vertex buffer.
-		self.mSharedVertexBuffer.reset(
-			len(blendMesh.uv_textures),
-			len(blendMesh.vertex_colors))
+		self.mSharedVertexBuffer.reset(uvLayerCount, colorLayerCount)
 
 		# split up the mesh into submeshes by materials.
+		# we first get sub mesh shared vertices option.
 		materialList = blendMesh.materials
-		for face in blendMesh.faces:
-			# get or create submesh.
-			if (face.material_index in self.mSubMeshDict):
-				subMesh = self.mSubMeshDict[face.material_index]
-			else:
-				subMesh = SubMesh(self.mSharedVertexBuffer, self.mSharedMeshVertexIndexLink)
-				subMesh.mMaterial = None if (len(materialList) == 0) else materialList[face.material_index]
-				self.mSubMeshDict[face.material_index] = subMesh
+		materialCount = len(materialList)
+		subMeshProperties = blendMesh.ogre_mesh_exporter.subMeshProperties
+		while (len(subMeshProperties) < materialCount): subMeshProperties.add() # add more items if needed.
+		while (len(subMeshProperties) > materialCount): subMeshProperties.remove(0) # remove items if needed.
 
-			# insert face.
-			subMesh.insertFace(blendMesh, face)
+		LogManager.logMessage("Material Count: %d" % len(materialList), Message.LVL_INFO)
+		for polygon in blendMesh.polygons:
+			# get or create submesh.
+			if (polygon.material_index in self.mSubMeshDict):
+				subMesh = self.mSubMeshDict[polygon.material_index]
+			else:
+				# instantiate submesh base on wether sharing vertices or not.
+				subMeshProperty = subMeshProperties[polygon.material_index]
+				if (subMeshProperty.useSharedVertices):
+					subMesh = SubMesh(self.mSharedVertexBuffer, self.mSharedMeshVertexIndexLink, subMeshProperty.name)
+				else:
+					subMesh = SubMesh(VertexBuffer(uvLayerCount, colorLayerCount), name = subMeshProperty.name)
+
+				subMesh.mMaterial = None if (len(materialList) == 0) else materialList[polygon.material_index]
+				if (exportSettings.requireMaterials and subMesh.mMaterial == None):
+					LogManager.logMessage("Some faces are not assigned with a material!", Message.LVL_WARNING)
+					LogManager.logMessage("To hide this warning, please uncheck the 'Require Materials' option.", Message.LVL_WARNING)
+				self.mSubMeshDict[polygon.material_index] = subMesh
+
+			# insert polygon.
+			subMesh.insertPolygon(blendMesh, polygon, exportSettings.fixUpAxisToY)
 
 	def serialize(self, file):
 		file.write('<mesh>\n')
@@ -262,10 +301,25 @@ class Mesh():
 			self.mSharedVertexBuffer.serialize(file, '\t\t')
 			file.write('\t</sharedgeometry>\n')
 
+		subMeshNames = list()
+
 		# write submeshes.
 		file.write('\t<submeshes>\n')
 		for subMesh in self.mSubMeshDict.values():
+			name = subMesh.mName
+			if (name):
+				if (not name in subMeshNames):
+					subMeshNames.append(name)
+				else:
+					LogManager.logMessage("Mulitple submesh with same name defined: %s" % name, Message.LVL_WARNING)
 			subMesh.serialize(file)
 		file.write('\t</submeshes>\n')
+
+		# write submesh names
+		if (len(subMeshNames)):
+			file.write('\t<submeshnames>\n')
+			for index, name in enumerate(subMeshNames):
+				file.write('\t\t<submeshname name="%s" index="%d" />\n' % (name, index))
+			file.write('\t</submeshnames>\n')
 
 		file.write('</mesh>\n')

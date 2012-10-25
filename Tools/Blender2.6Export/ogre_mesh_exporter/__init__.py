@@ -24,8 +24,8 @@ bl_info = {
 	"name": "Ogre Mesh Exporter",
 	"description": "Exports mesh and (skeletal/morph/pose) animations to Ogre3D format.",
 	"author": "Lih-Hern Pang",
-	"version": (2, 0, 2),
-	"blender": (2, 6, 2),
+	"version": (2, 0, 3),
+	"blender": (2, 6, 4),
 	"api": 44136,
 	"location": "3D View Side Panel",
 	"warning": '', # used for warning icon and text in addons panel
@@ -39,6 +39,7 @@ if "bpy" in locals():
 	imp.reload(material_properties)
 	imp.reload(mesh_properties)
 	imp.reload(main_exporter_panel)
+	imp.reload(log_manager)
 	imp.reload(mesh_panel)
 	imp.reload(mesh_exporter)
 	imp.reload(mesh_impl)
@@ -47,6 +48,7 @@ else:
 	from . import material_properties
 	from . import mesh_properties
 	from . import main_exporter_panel
+	from . import log_manager
 	from . import mesh_panel
 	from . import mesh_exporter
 	from . import mesh_impl
@@ -54,10 +56,14 @@ else:
 import bpy, mathutils
 from bpy.props import PointerProperty
 from bpy.app.handlers import persistent
-from ogre_mesh_exporter.global_properties import GlobalProperties
+from ogre_mesh_exporter.global_properties import GlobalProperties, loadStaticConfig
 from ogre_mesh_exporter.material_properties import MaterialProperties
 from ogre_mesh_exporter.mesh_properties import MeshProperties
 from ogre_mesh_exporter.main_exporter_panel import MainExporterPanel
+
+@persistent
+def onBlendLoadHandler(dummy):
+	loadStaticConfig()
 
 # registering and menu integration
 def register():
@@ -82,16 +88,21 @@ def register():
 		description = "Ogre Mesh Exporter properties"
 	)
 
+	# register scene update callback.
+	# NOTE: This is for a hack to allow us to list selected objects on the fly.
+	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
+	bpy.app.handlers.scene_update_pre.append(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.load_post.append(onBlendLoadHandler)
+
 # unregistering and removing menus
 def unregister():
 	bpy.utils.unregister_module(__name__)
 
-	# try to unregister scene update callback if we need to.
-	# NOTE: This is due to a hack to allow us to list selected objects on the fly.
+	# unregister scene update callback.
+	# NOTE: This is for a hack to allow us to list selected objects on the fly.
 	# SEE: MainExporterPanel.refreshSelection in mesh_exporter_panel.py
-	panel = bpy.types.ogre3d_exporter_panel
-	if (panel.mSelectionRefreshState == 1):
-		bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.scene_update_pre.remove(MainExporterPanel.refreshSelection)
+	bpy.app.handlers.load_post.remove(onBlendLoadHandler)
 
 if __name__ == "__main__":
 	register()
