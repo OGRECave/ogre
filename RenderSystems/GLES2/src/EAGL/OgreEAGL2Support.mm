@@ -60,7 +60,7 @@ namespace Ogre {
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
-
+        
         // Get the application frame size.  On all iPhones(including iPhone 4) this will be 320 x 480
         // The iPad, at least with iPhone OS 3.2 will report 768 x 1024
         CGSize screenSize = [[UIScreen mainScreen] bounds].size;
@@ -105,6 +105,17 @@ namespace Ogre {
         mOptions[optContentScalingFactor.name] = optContentScalingFactor;
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optRTTMode.name] = optRTTMode;
+        
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+        ConfigOption optOrientation;
+        optOrientation.name = "Orientation";
+        optOrientation.possibleValues.push_back("Portrait");
+        optOrientation.possibleValues.push_back("Landscape Left");
+        optOrientation.possibleValues.push_back("Landscape Right");
+        optOrientation.currentValue = "Portrait";
+        optOrientation.immutable = false;
+        mOptions[optOrientation.name] = optOrientation;
+#endif
         
         // Set the shader cache path
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
