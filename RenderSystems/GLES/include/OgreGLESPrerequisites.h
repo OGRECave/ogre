@@ -170,8 +170,9 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
     #define GL_CHECK_ERROR {}
 #endif
 
+#define ENABLE_EGL_CHECK 1
 
-#if ENABLE_GL_CHECK
+#if ENABLE_EGL_CHECK
     #define EGL_CHECK_ERROR \
     { \
         int e = eglGetError(); \
