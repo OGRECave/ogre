@@ -1083,6 +1083,7 @@ namespace Ogre
 		
 		mMaterialGenerator->requestOptions(this);
 
+		mGenerateMaterialInProgress = true;
 		GenerateMaterialRequest req;
 		req.terrain = this;
 		req.stage = GEN_MATERIAL;
@@ -1092,7 +1093,6 @@ namespace Ogre
 		Root::getSingleton().getWorkQueue()->addRequest(
 			mWorkQueueChannel, WORKQUEUE_GENERATE_MATERIAL_REQUEST, 
 			Any(req), 0, synchronous);
-		mGenerateMaterialInProgress = true;
 	}
 	//---------------------------------------------------------------------
 	void Terrain::unload()
@@ -1852,6 +1852,15 @@ namespace Ogre
 
 		// propagate changes
 		notifyNeighbours();
+	}
+	//---------------------------------------------------------------------
+	void Terrain::updateGeometryWithoutNotifyNeighbours()
+	{
+		if (!mDirtyGeometryRect.isNull())
+		{
+			mQuadTree->updateVertexData(true, false, mDirtyGeometryRect, false);
+			mDirtyGeometryRect.setNull();
+		}
 	}
 	//---------------------------------------------------------------------
 	void Terrain::updateDerivedData(bool synchronous, uint8 typeMask)

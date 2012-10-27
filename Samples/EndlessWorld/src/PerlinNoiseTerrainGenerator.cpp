@@ -16,6 +16,7 @@ PerlinNoiseTerrainGenerator::PerlinNoiseTerrainGenerator(const Real& alpha, cons
 	, mIterationNum(iterationNum)
 	, mCycle(cycle)
 	, mHeightScale(heightScale)
+	, mOriginPoint(0.f)
 {
 	for (int i = 0 ; i < B ; i++) {
 		p[i] = i;
@@ -50,6 +51,8 @@ void PerlinNoiseTerrainGenerator::define( TerrainGroup* terrainGroup, long x, lo
 	float* heightMap = OGRE_ALLOC_T(float, terrainSize*terrainSize, MEMCATEGORY_GEOMETRY);
 
 	Vector2 worldOffset( Real(x*(terrainSize-1)), Real(y*(terrainSize-1)) );
+	worldOffset += mOriginPoint;
+
 	Vector2 revisedValuePoint;
 	for( uint16 i=0; i<terrainSize; i++ )
 		for( uint16 j=0; j<terrainSize; j++ )
@@ -113,4 +116,10 @@ void PerlinNoiseTerrainGenerator::setup( const Real& target, int& b0, int& b1, R
 	b1 = (b0+1) & BM;
 	r0 = t - (int)t;
 	r1 = r0 - 1;
+}
+
+void PerlinNoiseTerrainGenerator:: randomize()
+{
+	mOriginPoint.x = Math::RangeRandom( -1000, 1000 );
+	mOriginPoint.y = Math::RangeRandom( -1000, 1000 );
 }

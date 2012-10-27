@@ -49,10 +49,13 @@ public:
 		, mTerrainPaging(0)
 		, mPageManager(0)
 		, mPagedWorld(0)
+		, mTerrainPagedWorldSection(0)
+		, mPerlinNoiseTerrainGenerator(0)
         , mLodStatus(false)
+		, mAutoLod(true)
 		, mFly(true)
 		, mFallVelocity(0)
-		, mTerrainPos(0,0,0)
+        , mTerrainPos(0,0,0)
 
 	{
 		mInfo["Title"] = "Endless World";
@@ -60,7 +63,8 @@ public:
 		mInfo["Thumbnail"] = "thumb_terrain.png";
 		mInfo["Category"] = "Environment";
 		mInfo["Help"] = "Left click and drag anywhere in the scene to look around. Let go again to show "
-			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down.";
+			"cursor and access widgets. Use WASD keys to move. You can increase/decrease terrains' LOD level using Page Up/Page Down."
+			"Use G to generate another random terrain";
 	}
 
     void testCapabilities(const RenderSystemCapabilities* caps)
@@ -177,6 +181,24 @@ public:
 				}
 			}
 			break;
+		// generate new random offset, to make terrains different
+		case OIS::KC_G:
+			if(mPerlinNoiseTerrainGenerator)
+			{
+				// random a new origin point
+				mPerlinNoiseTerrainGenerator->randomize();
+
+				// reload all terrains
+				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
+				while(ti.hasMoreElements())
+				{
+					TerrainGroup::TerrainSlot* slot = ti.getNext();
+					PageID pageID = mTerrainGroup->packIndex( slot->x, slot->y );
+					mTerrainPagedWorldSection->unloadPage(pageID);
+					mTerrainPagedWorldSection->loadPage(pageID);
+				}
+			}
+			break;
 		default:
 			return SdkSample::keyPressed(e);
 		}
@@ -208,10 +230,16 @@ public:
 		{
 			if( mTerrainGroup )
 			{
-				if(mAutoBox->isChecked())
-					mTerrainGroup->setAutoUpdateLodStrategy(DEFAULT);
-				else
-					mTerrainGroup->setAutoUpdateLodStrategy(NONE);
+				if(!mAutoLod && mAutoBox->isChecked())
+				{
+					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
+					mAutoLod = true;
+				}
+				else if(mAutoLod && !mAutoBox->isChecked())
+				{
+					mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
+					mAutoLod = false;
+				}
 			}
 		}
 	}
@@ -223,7 +251,10 @@ protected:
 	TerrainPaging* mTerrainPaging;
 	PageManager* mPageManager;
 	PagedWorld* mPagedWorld;
+	TerrainPagedWorldSection* mTerrainPagedWorldSection;
+	PerlinNoiseTerrainGenerator* mPerlinNoiseTerrainGenerator;
 	bool mLodStatus;
+	bool mAutoLod;
 
 	/// This class just pretends to provide procedural page content to avoid page loading
 	class DummyPageProvider : public PageProvider
@@ -379,7 +410,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
-		mTerrainGroup->setAutoUpdateLodStrategy(DEFAULT);
+		mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
 
 		configureTerrainDefaults(l);
 
@@ -392,11 +423,13 @@ protected:
 		mPageManager->setDebugDisplayLevel(0);
 		mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
 		mPagedWorld = mPageManager->createWorld();
-		TerrainPagedWorldSection* section = mTerrainPaging->createWorldSection(mPagedWorld, mTerrainGroup, 400, 500, 
+		mTerrainPagedWorldSection = mTerrainPaging->createWorldSection(mPagedWorld, mTerrainGroup, 400, 500, 
 			TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
 			TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
-		section->setDefiner( OGRE_NEW PerlinNoiseTerrainGenerator );
-//		section->setDefiner( OGRE_NEW SimpleTerrainDefiner );
+
+		mPerlinNoiseTerrainGenerator = OGRE_NEW PerlinNoiseTerrainGenerator;
+		mTerrainPagedWorldSection->setDefiner( mPerlinNoiseTerrainGenerator );
+//		mTerrainPagedWorldSection->setDefiner( OGRE_NEW SimpleTerrainDefiner );
 
 		mTerrainGroup->freeTemporaryResources();
 

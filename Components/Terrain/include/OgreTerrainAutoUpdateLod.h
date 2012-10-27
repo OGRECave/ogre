@@ -47,11 +47,11 @@ namespace Ogre
 		This set of classes is used for automatic change of terrain LOD level. Base is TerrainAutoUpdateLod interface with just
 		one public method autoUpdateLod. This method gets called by terrain whenever user thinks something has
 		changed(typically in application's main loop) what could affect terrain's LOD level. It is designed in such a way
-		so user can use whatever algorithm he likes to change terrin's LOD level. For example see TerrainAutoUpdateLod
-		implemetation TerrainAutoUpdateLodByDistance.
+		so user can use whatever algorithm he likes to change terrain's LOD level. For example see TerrainAutoUpdateLod
+		implementation TerrainAutoUpdateLodByDistance.
+		It is also used as a null object for auto-LOD-updating.
 	*/
-
-	class _OgreTerrainExport TerrainAutoUpdateLod : public Singleton<TerrainAutoUpdateLod>
+	class _OgreTerrainExport TerrainAutoUpdateLod : public TerrainAlloc
 	{
 	public:
 		/** Method to be called to change terrain's LOD level.
@@ -60,6 +60,14 @@ namespace Ogre
 			@param data Any user specific data.
 		*/
 		virtual void autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data) = 0;
+		virtual uint32 getStrategyId() = 0;
+	};
+
+	// other Strategy's id start from 2
+	enum TerrainAutoUpdateLodStrategy
+	{
+		NONE = 0,
+		BY_DISTANCE = 1
 	};
 
 	/** Class implementing TerrainAutoUpdateLod interface. It does LOD level increase/decrease according to camera's
@@ -68,7 +76,8 @@ namespace Ogre
 	class _OgreTerrainExport TerrainAutoUpdateLodByDistance : public TerrainAutoUpdateLod
 	{
 	public:
-		void autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data);
+		virtual void autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data);
+		virtual uint32 getStrategyId() { return BY_DISTANCE; }
 
 	protected:
 		/** Modifies Terrain's LOD level according to it's distance from camera.
@@ -77,41 +86,23 @@ namespace Ogre
 		void autoUpdateLodByDistance(Terrain *terrain, bool synchronous, const Real holdDistance);
 		/// Traverse Terrain's QuadTree and calculate what LOD level is needed.
 		int traverseTreeByDistance(TerrainQuadTreeNode *node, const Camera *cam, Real cFactor, const Real holdDistance);
-	private:
-		// the only instance
-		static TerrainAutoUpdateLodByDistance me;
 	};
 
-	// other Strategy's id start from 2
-	enum DefaultTerrainAutoUpdateLodStrategy
-	{
-		NONE = 0,
-		BY_DISTANCE = 1,
-		DEFAULT = 1
-	};
 	class _OgreTerrainExport TerrainAutoUpdateLodFactory
 	{
 	public:
-		static void registerAutoUpdateLodStrategy( uint32 strategy, TerrainAutoUpdateLod* updater )
-		{
-			assert(strategy>1 && "User defined strategy must start from 2");
-			mAutoUpdateLodStrategyMap[strategy] = updater;
-		}
 		static TerrainAutoUpdateLod* getAutoUpdateLod( uint32 strategy )
 		{
 			switch(strategy)
 			{
-			case NONE: return 0;
-			case BY_DISTANCE: return TerrainAutoUpdateLodByDistance::getSingletonPtr();
+			case BY_DISTANCE:
+				return OGRE_NEW TerrainAutoUpdateLodByDistance;
+			case NONE:
 			default:
-				std::map<int,TerrainAutoUpdateLod*>::iterator iter = mAutoUpdateLodStrategyMap.find(strategy);
-				assert(iter!=mAutoUpdateLodStrategyMap.end() && "Unregistered AutoUpdateLodStrategy");
-				return iter->second;
+				return 0;
 			}
 			return 0;
 		}
-	private:
-		static std::map<int,TerrainAutoUpdateLod*> mAutoUpdateLodStrategyMap;
 	};
 	/** @} */
 	/** @} */

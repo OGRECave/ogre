@@ -1169,6 +1169,12 @@ namespace Ogre
 			Terrain geometry will be updated when this method returns.
 		*/
 		void updateGeometry();
+		/** Performs an update on the terrain geometry based on the dirty region.
+		@remarks
+			Terrain geometry will be updated when this method returns, and no
+			neighbours will be notified.
+		*/
+		void updateGeometryWithoutNotifyNeighbours();
 
 		// Used as a type mask for updateDerivedData
 		static const uint8 DERIVED_DATA_DELTAS;

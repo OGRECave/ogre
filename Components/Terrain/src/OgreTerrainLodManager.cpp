@@ -146,6 +146,14 @@ namespace Ogre
 					--mHighestLodLoaded;
 				}
 			}
+
+			// has streamed in new data, should update terrain
+			if(lreq.currentPreparedLod>lreq.requestedLod)
+			{
+				mTerrain->dirty();
+				mTerrain->updateGeometryWithoutNotifyNeighbours();
+			}
+
 			// there are new requests
 			if(mHighestLodLoaded != mTargetLodLevel)
 				updateToLodLevel(mTargetLodLevel,mLastRequestSynchronous);

@@ -20,6 +20,8 @@ public:
 
 	/// Define terrain
 	virtual void define( Ogre::TerrainGroup* terrainGroup, long x, long y );
+	/// Random terrain origin point to make it looks different
+	void randomize();
 private:
 	/** Produce a noise according to PerlinNoise algorithm
 		Generate multiple values by calling noise():
@@ -44,6 +46,7 @@ private:
 	int mIterationNum;
 	Real mCycle;
 	Real mHeightScale;
+	Vector2 mOriginPoint;
 
 	int p[B + B + 2];
 	Vector3 g3[B + B + 2];

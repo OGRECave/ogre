@@ -59,10 +59,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    template<> TerrainAutoUpdateLod* Singleton<TerrainAutoUpdateLod>::msSingleton = 0;
-	TerrainAutoUpdateLodByDistance TerrainAutoUpdateLodByDistance::me;
-	std::map<int,TerrainAutoUpdateLod*> TerrainAutoUpdateLodFactory::mAutoUpdateLodStrategyMap;
-
 	void TerrainAutoUpdateLodByDistance::autoUpdateLod(Terrain *terrain, bool synchronous, const Any &data)
 	{
 		if( terrain )

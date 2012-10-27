@@ -506,7 +506,7 @@ namespace Ogre
 		/// Removes terrain's highest LOD level.
 		void decreaseLodLevel(long x, long y);
 
-		void setAutoUpdateLodStrategy(uint32 strategy);
+		void setAutoUpdateLod(TerrainAutoUpdateLod* updater);
 		/// Automatically checks if terrain's LOD level needs to be updated.
 		void autoUpdateLod(long x, long y, bool synchronous, const Any &data);
 		void autoUpdateLodAll(bool synchronous, const Any &data);
@@ -523,7 +523,7 @@ namespace Ogre
 		String mFilenamePrefix;
 		String mFilenameExtension;
 		String mResourceGroup;
-		uint32 mAutoUpdateLodStrategy;
+		TerrainAutoUpdateLod *mAutoUpdateLod;
 		Terrain::DefaultGpuBufferAllocator mBufferAllocator;
 		
 		/// Get the position of a terrain instance
