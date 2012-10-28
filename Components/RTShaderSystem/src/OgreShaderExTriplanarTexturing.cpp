@@ -235,7 +235,6 @@ namespace RTShader {
                 SubRenderState* subRenderState = createOrRetrieveInstance(translator);
                 TriplanarTexturing* tpSubRenderState = static_cast<TriplanarTexturing*>(subRenderState);
                 float parameters[3];
-                ColourValue cValue;
                 AbstractNodeList::const_iterator it = prop->values.begin();
                 if (false == SGScriptTranslator::getFloat(*it, parameters))
                 {
