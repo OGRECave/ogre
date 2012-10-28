@@ -21,7 +21,7 @@ set (HEADER_FILES
 	include/OgreVolumeDualGridGenerator.h
 	include/OgreVolumeIsoSurface.h
 	include/OgreVolumeIsoSurfaceMC.h
-	include/OgreVolumeIsoSurfaceTables.h
+	include/OgreVolumeIsoSurfaceTablesMC.h
 	include/OgreVolumeMeshBuilder.h
 	include/OgreVolumeTextureSource.h
 	include/OgreVolumeChunk.h
