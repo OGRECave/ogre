@@ -30,6 +30,9 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2VertexDeclaration.h"
+#include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Support.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -61,6 +64,7 @@ namespace Ogre {
 #	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 		mMapBufferThreshold = 0;
 #	endif
+		mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
 }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()

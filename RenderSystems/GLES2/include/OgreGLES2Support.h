@@ -36,11 +36,12 @@ THE SOFTWARE.
 namespace Ogre
 {
     class GLES2RenderSystem;
+    class GLES2StateCacheManager;
 
     class _OgreGLES2Export GLES2Support
     {
         public:
-            GLES2Support() { }
+            GLES2Support() : mStateCacheMgr(0)  { }
             virtual ~GLES2Support() { }
 
             /**
@@ -136,6 +137,22 @@ namespace Ogre
                 return 1;
             }
 
+			/**
+            * Get the state cache manager
+            */
+            GLES2StateCacheManager* getStateCacheManager() const
+            {
+                return mStateCacheMgr;
+            }
+        
+            /**
+            * Set a valid state cache manager
+            */
+            void setStateCacheManager(GLES2StateCacheManager* stateCacheMgr)
+            {
+                mStateCacheMgr = stateCacheMgr;
+            }
+			
             /**
             * Start anything special
             */
@@ -157,6 +174,9 @@ namespace Ogre
 
             // This contains the complete list of supported extensions
             set<String>::type extensionList;
+			
+			// State cache management
+			GLES2StateCacheManager* mStateCacheMgr;
     };
 
 }

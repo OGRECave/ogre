@@ -27,25 +27,25 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLESNullStateCacheManagerImp.h"
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2NullStateCacheManagerImp.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
     
-    GLESStateCacheManagerImp::GLESStateCacheManagerImp(void) 
+    GLES2StateCacheManagerImp::GLES2StateCacheManagerImp(void) 
     {
         clearCache();
     }
     
-    GLESStateCacheManagerImp::~GLESStateCacheManagerImp(void)
+    GLES2StateCacheManagerImp::~GLES2StateCacheManagerImp(void)
     {
     }
     
-    void GLESStateCacheManagerImp::initializeCache()
+    void GLES2StateCacheManagerImp::initializeCache()
     {
-        glBlendEquationOES(GL_FUNC_ADD_OES);
+        glBlendEquation(GL_FUNC_ADD);
         GL_CHECK_ERROR
         
         glBlendFunc(GL_ONE, GL_ZERO);
@@ -75,10 +75,10 @@ namespace Ogre {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         GL_CHECK_ERROR
         
-        glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         GL_CHECK_ERROR
         
-        glBindRenderbufferOES(GL_RENDERBUFFER_OES, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
         GL_CHECK_ERROR
         
         glActiveTexture(GL_TEXTURE0);
@@ -91,11 +91,11 @@ namespace Ogre {
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::clearCache()
+    void GLES2StateCacheManagerImp::clearCache()
     {
         mDepthMask = GL_TRUE;
         mPolygonMode = GL_FILL;
-        mBlendEquation = GL_FUNC_ADD_OES;
+        mBlendEquation = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
@@ -103,43 +103,43 @@ namespace Ogre {
         mDiscardBuffers = 0;
         mClearDepth = 1.0f;
         
-        mClearColour.resize(4);
+		mClearColour.resize(4);
         mClearColour[0] = mClearColour[1] = mClearColour[2] = mClearColour[3] = 0.0f;
         
         mColourMask.resize(4);
         mColourMask[0] = mColourMask[1] = mColourMask[2] = mColourMask[3] = GL_TRUE;
     }
     
-    void GLESStateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLES2StateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Update GL
-        if(target == GL_FRAMEBUFFER_OES)
-            glBindFramebufferOES(target, buffer);
-        else if(target == GL_RENDERBUFFER_OES)
-            glBindRenderbufferOES(target, buffer);
+        if(target == GL_FRAMEBUFFER)
+            glBindFramebuffer(target, buffer);
+        else if(target == GL_RENDERBUFFER)
+            glBindRenderbuffer(target, buffer);
         else
             glBindBuffer(target, buffer);
         
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
         
-        if(target == GL_FRAMEBUFFER_OES)
-            glDeleteFramebuffersOES(1, &buffer);
-        else if(target == GL_RENDERBUFFER_OES)
-            glDeleteRenderbuffersOES(1, &buffer);
+        if(target == GL_FRAMEBUFFER)
+            glDeleteFramebuffers(1, &buffer);
+        else if(target == GL_RENDERBUFFER)
+            glDeleteRenderbuffers(1, &buffer);
         else
             glDeleteBuffers(1, &buffer);
         
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
+    void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Update GL
         glTexParameteri(target, pname, param);
@@ -147,20 +147,20 @@ namespace Ogre {
     }
     
 
-    void GLESStateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
+    void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {
         // Update GL
         glBindTexture(target, texture);
         GL_CHECK_ERROR
     }
     
-    bool GLESStateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
+    bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
 	{
         // Always return true for the currently bound texture unit
         if (mActiveTextureUnit == unit)
             return true;
         
-        if (unit < dynamic_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+        if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
         {
             glActiveTexture(GL_TEXTURE0 + unit);
             GL_CHECK_ERROR
@@ -175,20 +175,20 @@ namespace Ogre {
         }
 	}
     
-    void GLESStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
+    void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {
         glBlendFunc(source, dest);
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::setBlendEquation(GLenum eq)
+    void GLES2StateCacheManagerImp::setBlendEquation(GLenum eq)
     {
         mBlendEquation = eq;
-        glBlendEquationOES(eq);
+        glBlendEquation(eq);
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::setDepthMask(GLboolean mask)
+    void GLES2StateCacheManagerImp::setDepthMask(GLboolean mask)
     {
         if(mDepthMask != mask)
         {
@@ -199,7 +199,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setDepthFunc(GLenum func)
+    void GLES2StateCacheManagerImp::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
@@ -210,7 +210,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setClearDepth(GLclampf depth)
+    void GLES2StateCacheManagerImp::setClearDepth(GLclampf depth)
     {
         if(mClearDepth != depth)
         {
@@ -221,7 +221,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+    void GLES2StateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
@@ -238,7 +238,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    void GLES2StateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
@@ -255,7 +255,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setStencilMask(GLuint mask)
+    void GLES2StateCacheManagerImp::setStencilMask(GLuint mask)
     {
         if(mStencilMask != mask)
         {
@@ -266,19 +266,19 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setEnabled(GLenum flag)
+    void GLES2StateCacheManagerImp::setEnabled(GLenum flag)
     {
         glEnable(flag);
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::setDisabled(GLenum flag)
+    void GLES2StateCacheManagerImp::setDisabled(GLenum flag)
     {
         glDisable(flag);
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::setCullFace(GLenum face)
+    void GLES2StateCacheManagerImp::setCullFace(GLenum face)
     {
         if(mCullFace != face)
         {

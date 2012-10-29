@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
+#include "OgreGLES2Support.h"
+#include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -117,32 +119,26 @@ namespace Ogre {
         GL_CHECK_ERROR;
            
 		// Set texture type
-        glBindTexture(getGLES2TextureTarget(), mTextureID);
-        GL_CHECK_ERROR;
+		mGLSupport.getStateCacheManager()->bindGLTexture(getGLES2TextureTarget(), mTextureID);
         
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
         Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
         
 #if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 #endif
-        
-        // Set some misc default parameters, these can of course be changed later
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        
 
+		// Set some misc default parameters, these can of course be changed later
+		mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat);

@@ -43,6 +43,7 @@ namespace Ogre {
 		, mNumVertexBlendMatrices(0)
 		, mNumMultiRenderTargets(1)
 		, mNonPOW2TexturesLimited(false)
+		, mMaxSupportedAnisotropy(0)
 	{
 
 		for(int i = 0; i < CAPS_CATEGORY_COUNT; i++)

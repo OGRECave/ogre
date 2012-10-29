@@ -41,6 +41,7 @@ namespace Ogre {
     class GLES2RTTManager;
     class GLES2GpuProgramManager;
     class GLSLESProgramFactory;
+    class GLES2StateCacheManager;
 #if !OGRE_NO_GLES2_CG_SUPPORT
     class GLSLESCgProgramFactory;
 #endif
@@ -56,8 +57,6 @@ namespace Ogre {
     class _OgreGLES2Export GLES2RenderSystem : public RenderSystem
     {
         private:
-            typedef HashMap<GLenum, GLuint>  BindBufferMap;
-
             /// View matrix to set world against
             Matrix4 mViewMatrix;
             Matrix4 mWorldMatrix;
@@ -76,15 +75,6 @@ namespace Ogre {
             /// Number of fixed-function texture units
             unsigned short mFixedFunctionTextureUnits;
 
-            /// Store last colour write state
-            bool mColourWrite[4];
-
-            /// Store last depth write state
-            bool mDepthWrite;
-
-            /// Store last stencil mask state
-            uint32 mStencilMask;
-
             GLfloat mAutoTextureMatrix[16];
 
             bool mUseAutoTextureMatrix;
@@ -92,6 +82,9 @@ namespace Ogre {
             /// GL support class, used for creating windows etc.
             GLES2Support *mGLSupport;
 
+			/// State cache manager which responsible to reduce redundant state changes
+            GLES2StateCacheManager* mStateCacheManager;
+			
             /* The main GL context - main thread only */
             GLES2Context *mMainContext;
 
@@ -111,23 +104,8 @@ namespace Ogre {
               */
             GLES2RTTManager *mRTTManager;
 
-            /** These variables are used for caching RenderSystem state.
-                They are cached because OpenGL state changes can be quite expensive,
-                which is especially important on mobile or embedded systems.
-             */
-            GLenum mActiveTextureUnit;
-            BindBufferMap mActiveBufferMap;
-
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
-
-            /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
-            unsigned int mDiscardBuffers;
-
-            /** OpenGL ES doesn't support setting the PolygonMode like desktop GL
-                So we will cache the value and set it manually
-             */
-            GLenum mPolygonMode;
 
             // local data member of _render that were moved here to improve performance
             // (save allocations)
@@ -140,8 +118,6 @@ namespace Ogre {
 
             GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
             GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
-
-            bool activateGLTextureUnit(size_t unit);
 
         public:
             // Default constructor / destructor
@@ -439,9 +415,6 @@ namespace Ogre {
              RenderSystem
              */
             void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
-        
-            void _setDiscardBuffers(unsigned int flags) { mDiscardBuffers = flags; }
-            unsigned int getDiscardBuffers(void) { return mDiscardBuffers; }
 
             void clearFrameBuffer(unsigned int buffers,
                 const ColourValue& colour = ColourValue::Black,
@@ -504,13 +477,8 @@ namespace Ogre {
             /// Internal method for anisotropy validation
             GLfloat _getCurrentAnisotropy(size_t unit);
 
-            GLenum _getPolygonMode(void) { return mPolygonMode; }
-
             void _setSceneBlendingOperation(SceneBlendOperation op);
             void _setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
-
-            void _bindGLBuffer(GLenum target, GLuint buffer);
-            void _deleteGLBuffer(GLenum target, GLuint buffer);
         
             void _destroyDepthBuffer(RenderWindow* pRenderWnd);
         

@@ -318,6 +318,8 @@ namespace Ogre
 		Real mMaxPointSize;
 		/// Are non-POW2 textures feature-limited?
 		bool mNonPOW2TexturesLimited;
+		/// The maximum supported anisotropy
+		Real mMaxSupportedAnisotropy;
 		/// The number of vertex texture units supported
 		ushort mNumVertexTextureUnits;
 		/// Are vertex texture units shared with fragment processor?
@@ -692,6 +694,16 @@ namespace Ogre
 		bool getNonPOW2TexturesLimited(void) const
 		{
 			return mNonPOW2TexturesLimited;
+		}
+		/// Set the maximum supported anisotropic filtering
+		void setMaxSupportedAnisotropy(Real s)
+		{
+			mMaxSupportedAnisotropy = s;
+		}
+		/// Get the maximum supported anisotropic filtering
+		Real getMaxSupportedAnisotropy()
+		{
+			return mMaxSupportedAnisotropy;
 		}
 
 		/// Set the number of vertex texture units supported

@@ -33,6 +33,7 @@ set(HEADER_FILES
   include/OgreGLES2TextureManager.h
   include/OgreGLES2VertexDeclaration.h
   include/OgreGLES2Context.h
+  include/OgreGLES2StateCacheManager.h
 )
 
 set(SOURCE_FILES
@@ -58,7 +59,29 @@ set(SOURCE_FILES
   src/OgreGLES2Texture.cpp
   src/OgreGLES2TextureManager.cpp
   src/OgreGLES2VertexDeclaration.cpp
+  src/OgreGLES2StateCacheManager.cpp
 )
+
+include_directories(src/StateCacheManager)
+if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
+  set(HEADER_FILES
+      ${HEADER_FILES} 
+      src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
+  )
+  set(SOURCE_FILES 
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
+  )
+else()
+  set(HEADER_FILES 
+      ${HEADER_FILES} 
+      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
+  )
+  set(SOURCE_FILES 
+      ${SOURCE_FILES}
+      src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
+  )
+endif()
 
 set(GLSLES_FILES
   src/GLSLES/include/OgreGLSLESExtSupport.h

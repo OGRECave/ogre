@@ -27,21 +27,21 @@
  */
 
 #include "OgreStableHeaders.h"
-#include "OgreGLESStateCacheManagerImp.h"
-#include "OgreGLESRenderSystem.h"
+#include "OgreGLES2StateCacheManagerImp.h"
+#include "OgreGLES2RenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
     
-    GLESStateCacheManagerImp::GLESStateCacheManagerImp(void)
+    GLES2StateCacheManagerImp::GLES2StateCacheManagerImp(void)
     {
         clearCache();
     }
     
-    void GLESStateCacheManagerImp::initializeCache()
+    void GLES2StateCacheManagerImp::initializeCache()
     {
-        glBlendEquationOES(GL_FUNC_ADD_OES);
+        glBlendEquation(GL_FUNC_ADD);
         GL_CHECK_ERROR
         
         glBlendFunc(GL_ONE, GL_ZERO);
@@ -71,10 +71,10 @@ namespace Ogre {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         GL_CHECK_ERROR
         
-        glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         GL_CHECK_ERROR
         
-        glBindRenderbufferOES(GL_RENDERBUFFER_OES, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
         GL_CHECK_ERROR
         
         glActiveTexture(GL_TEXTURE0);
@@ -87,11 +87,11 @@ namespace Ogre {
         GL_CHECK_ERROR
     }
     
-    void GLESStateCacheManagerImp::clearCache()
+    void GLES2StateCacheManagerImp::clearCache()
     {
         mDepthMask = GL_TRUE;
         mPolygonMode = GL_FILL;
-        mBlendEquation = GL_FUNC_ADD_OES;
+        mBlendEquation = GL_FUNC_ADD;
         mCullFace = GL_BACK;
         mDepthFunc = GL_LESS;
         mStencilMask = 0xFFFFFFFF;
@@ -102,7 +102,7 @@ namespace Ogre {
         
         // Initialize our cache variables and also the GL so that the
         // stored values match the GL state
-        mBlendFuncSrc = GL_ONE;
+        mBlendFuncSource = GL_ONE;
         mBlendFuncDest = GL_ZERO;
         
         mClearColour.resize(4);
@@ -118,7 +118,7 @@ namespace Ogre {
         mActiveTextureMap.clear();
     }
     
-    GLESStateCacheManagerImp::~GLESStateCacheManagerImp(void)
+    GLES2StateCacheManagerImp::~GLES2StateCacheManagerImp(void)
     {
         mColourMask.clear();
         mClearColour.clear();
@@ -128,74 +128,60 @@ namespace Ogre {
         mActiveTextureMap.clear();
     }
     
-#pragma mark Buffer bindings
-    void GLESStateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+//#pragma mark Buffer bindings
+    void GLES2StateCacheManagerImp::bindGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
     {
-        GLuint hash = target | (attach << 16);
-        GLBindingMap::iterator i = mActiveBufferMap.find(hash);
+		bool update = false;
+        BindBufferMap::iterator i = mActiveBufferMap.find(target);
         if (i == mActiveBufferMap.end())
         {
-            // Update GL
-            if(target == GL_FRAMEBUFFER_OES)
-                glBindFramebufferOES(target, buffer);
-            else if(target == GL_RENDERBUFFER_OES)
-                glBindRenderbufferOES(target, buffer);
+            // Haven't cached this state yet.  Insert it into the map
+            mActiveBufferMap.insert(BindBufferMap::value_type(target, buffer));
+			update = true;
+        }
+        else if((*i).second != buffer || force) // Update the cached value if needed
+        {
+			(*i).second = buffer;
+			update = true;
+        }
+
+		// Update GL
+		if(update)
+		{
+            if(target == GL_FRAMEBUFFER)
+                glBindFramebuffer(target, buffer);
+            else if(target == GL_RENDERBUFFER)
+                glBindRenderbuffer(target, buffer);
             else
                 glBindBuffer(target, buffer);
             
             GL_CHECK_ERROR
-            
-            // Haven't cached this state yet.  Insert it into the map
-            mActiveBufferMap.insert(GLBindingMap::value_type(hash, buffer));
-        }
-        else
-        {
-            // Update the cached value if needed
-            if((*i).second != buffer || force)
-            {
-                (*i).second = buffer;
-                
-                // Update GL
-                if(target == GL_FRAMEBUFFER_OES)
-                    glBindFramebufferOES(target, buffer);
-                else if(target == GL_RENDERBUFFER_OES)
-                    glBindRenderbufferOES(target, buffer);
-                else
-                    glBindBuffer(target, buffer);
-                
-                GL_CHECK_ERROR
-            }
-        }
+		}
     }
     
-    void GLESStateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
+    void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, GLenum attach, bool force)
     {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
         
-        GLuint hash = target | (attach << 16);
-        GLBindingMap::iterator i = mActiveBufferMap.find(hash);
+        BindBufferMap::iterator i = mActiveBufferMap.find(target);
         
-        if (i != mActiveBufferMap.end())
+        if (i != mActiveBufferMap.end() && ((*i).second == buffer || force))
         {
-            if((*i).second == buffer || force)
-            {
-                if(target == GL_FRAMEBUFFER_OES)
-                    glDeleteFramebuffersOES(1, &buffer);
-                else if(target == GL_RENDERBUFFER_OES)
-                    glDeleteRenderbuffersOES(1, &buffer);
-                else
-                    glDeleteBuffers(1, &buffer);
-                
-                GL_CHECK_ERROR
-            }
+			if(target == GL_FRAMEBUFFER)
+				glDeleteFramebuffers(1, &buffer);
+            else if(target == GL_RENDERBUFFER)
+				glDeleteRenderbuffers(1, &buffer);
+            else
+				glDeleteBuffers(1, &buffer);
+			GL_CHECK_ERROR
         }
     }
     
-#pragma mark Texture settings and bindings
+//#pragma mark Texture settings and bindings
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
-    void GLESStateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
+    void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Check if we have a map entry for this texture id. If not, create a blank one and insert it.
         TexUnitsMap::iterator it = mTexUnitsMap.find(mLastBoundedTexID);
@@ -224,7 +210,7 @@ namespace Ogre {
         else
         {
             // Update the cached value if needed
-            if((*i).second != param)
+            //if((*i).second != param)
             {
                 (*i).second = param;
                 
@@ -236,15 +222,15 @@ namespace Ogre {
     }
     
     // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
-    void GLESStateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
+    void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundedTexID = texture;
         
-        GLBindingMap::iterator i = mActiveTextureMap.find(target);
+        BindBufferMap::iterator i = mActiveTextureMap.find(target);
         if (i == mActiveTextureMap.end())
         {
             // Haven't cached this state yet. Insert it into the map
-            mActiveTextureMap.insert(GLBindingMap::value_type(target, texture));
+            mActiveTextureMap.insert(BindBufferMap::value_type(target, texture));
             
             // Update GL
             glBindTexture(target, texture);
@@ -260,13 +246,9 @@ namespace Ogre {
         }
     }
     
-    bool GLESStateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
+    bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
 	{
-        // Always return true for the currently bound texture unit
-        if (mActiveTextureUnit == unit)
-            return true;
-        
-        if (unit < dynamic_cast<GLESRenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+        if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
         {
             glActiveTexture(GL_TEXTURE0 + unit);
             GL_CHECK_ERROR
@@ -275,20 +257,16 @@ namespace Ogre {
             
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
 	}
     
-#pragma mark Blending settings
+//#pragma mark Blending settings
     // TODO: Store as high/low bits of a GLuint
-    void GLESStateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
+    void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {
-        if(mBlendFuncSrc != source ||
-           mBlendFuncDest != dest)
+        if(mBlendFuncSource != source || mBlendFuncDest != dest)
         {
-            mBlendFuncSrc = source;
+            mBlendFuncSource = source;
             mBlendFuncDest = dest;
             
             glBlendFunc(source, dest);
@@ -296,19 +274,19 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setBlendEquation(GLenum eq)
+    void GLES2StateCacheManagerImp::setBlendEquation(GLenum eq)
     {
         if(mBlendEquation != eq)
         {
             mBlendEquation = eq;
             
-            glBlendEquationOES(eq);
+            glBlendEquation(eq);
             GL_CHECK_ERROR
         }
     }
     
-#pragma mark Depth settings
-    void GLESStateCacheManagerImp::setDepthMask(GLboolean mask)
+//#pragma mark Depth settings
+    void GLES2StateCacheManagerImp::setDepthMask(GLboolean mask)
     {
         if(mDepthMask != mask)
         {
@@ -319,7 +297,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setDepthFunc(GLenum func)
+    void GLES2StateCacheManagerImp::setDepthFunc(GLenum func)
     {
         if(mDepthFunc != func)
         {
@@ -330,8 +308,8 @@ namespace Ogre {
         }
     }
     
-#pragma mark Clear settings
-    void GLESStateCacheManagerImp::setClearDepth(GLclampf depth)
+//#pragma mark Clear settings
+    void GLES2StateCacheManagerImp::setClearDepth(GLclampf depth)
     {
         if(mClearDepth != depth)
         {
@@ -342,7 +320,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
+    void GLES2StateCacheManagerImp::setClearColour(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     {
         if((mClearColour[0] != red) ||
            (mClearColour[1] != green) ||
@@ -359,8 +337,8 @@ namespace Ogre {
         }
     }
     
-#pragma mark Masks
-    void GLESStateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+//#pragma mark Masks
+    void GLES2StateCacheManagerImp::setColourMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         if((mColourMask[0] != red) ||
            (mColourMask[1] != green) ||
@@ -377,7 +355,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setStencilMask(GLuint mask)
+    void GLES2StateCacheManagerImp::setStencilMask(GLuint mask)
     {
         if(mStencilMask != mask)
         {
@@ -388,8 +366,8 @@ namespace Ogre {
         }
     }
     
-#pragma mark Enable/Disable
-    void GLESStateCacheManagerImp::setEnabled(GLenum flag)
+//#pragma mark Enable/Disable
+    void GLES2StateCacheManagerImp::setEnabled(GLenum flag)
     {
         bool found = std::find(mEnableVector.begin(), mEnableVector.end(), flag) != mEnableVector.end();
         if(!found)
@@ -401,7 +379,7 @@ namespace Ogre {
         }
     }
     
-    void GLESStateCacheManagerImp::setDisabled(GLenum flag)
+    void GLES2StateCacheManagerImp::setDisabled(GLenum flag)
     {
         vector<GLenum>::iterator iter = std::find(mEnableVector.begin(), mEnableVector.end(), flag);
         if(iter != mEnableVector.end())
@@ -413,8 +391,8 @@ namespace Ogre {
         }
     }
     
-#pragma mark Other
-    void GLESStateCacheManagerImp::setCullFace(GLenum face)
+//#pragma mark Other
+    void GLES2StateCacheManagerImp::setCullFace(GLenum face)
     {
         if(mCullFace != face)
         {
