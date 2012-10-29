@@ -48,7 +48,6 @@ namespace Volume {
         /** Gets the density value and gradient.
         @param position
             The position.
-        @param gradient
         @return
             A vector with x, y, z containing the gradient and w containing the density.
         */

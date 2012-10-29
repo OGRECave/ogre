@@ -161,8 +161,6 @@ namespace Volume {
         }
         
         /** Setter for the to-part of this cell.
-        @param from
-            The back lower left corner of the cell.
         @param to
             The front upper right corner of the cell.
         */
@@ -495,8 +493,6 @@ namespace Volume {
         /** Raw setter for the center value.
         @param value
             The density value.
-        @param gradient
-            The gradient at this position.
         */
         inline void setCenterValue(Vector4 value)
         {

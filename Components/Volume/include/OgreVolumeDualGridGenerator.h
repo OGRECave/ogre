@@ -97,9 +97,9 @@ namespace Volume {
             The first node.
         @param n1
             The second node.
-        @param n3
+        @param n2
             The third node.
-        @param n4
+        @param n3
             The fourth node.
         */
         void edgeProcX(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3);
@@ -110,9 +110,9 @@ namespace Volume {
             The first node.
         @param n1
             The second node.
-        @param n3
+        @param n2
             The third node.
-        @param n4
+        @param n3
             The fourth node.
         */
         void edgeProcY(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3);
@@ -123,9 +123,9 @@ namespace Volume {
             The first node.
         @param n1
             The second node.
-        @param n3
+        @param n2
             The third node.
-        @param n4
+        @param n3
             The fourth node.
         */
         void edgeProcZ(const OctreeNode *n0, const OctreeNode *n1, const OctreeNode *n2, const OctreeNode *n3);

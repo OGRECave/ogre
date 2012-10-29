@@ -107,14 +107,12 @@ namespace Volume {
         OctreeNodeSplitPolicy(const Source *src, const Real maxCellSize);
                 
         /** Decider for the splitting.
-        @param from
-            The lower back left corner of the split candidate cell.
-        @param to
-            The upper front right corner of the split candidate cell.
+        @param node
+            The split candidate.
         @param geometricError
             The accepted geometric error.
         @return
-            true on valid split.
+            true if the node should be splitted.
         */
         bool doSplit(OctreeNode *node, const Real geometricError) const;
     };
