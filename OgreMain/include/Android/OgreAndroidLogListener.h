@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     
-    class AndroidLogListener : public Ogre::LogListener
+    class AndroidLogListener : public Ogre::LogListener, public Ogre::LogAlloc
     {
     public:
         AndroidLogListener();
