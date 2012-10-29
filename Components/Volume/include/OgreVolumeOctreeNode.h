@@ -221,8 +221,10 @@ namespace Volume {
         }
 
         /** Gets whether this cell is at the left of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderLeft(const OctreeNode &root) const
         {
@@ -230,8 +232,10 @@ namespace Volume {
         }
         
         /** Gets whether this cell is at the right of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderRight(const OctreeNode &root) const
         {
@@ -239,8 +243,10 @@ namespace Volume {
         }
         
         /** Gets whether this cell is at the bottom of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderBottom(const OctreeNode &root) const
         {
@@ -248,8 +254,10 @@ namespace Volume {
         }
         
         /** Gets whether this cell is at the top of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderTop(const OctreeNode &root) const
         {
@@ -257,8 +265,10 @@ namespace Volume {
         }
         
         /** Gets whether this cell is at the back of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderBack(const OctreeNode &root) const
         {
@@ -266,8 +276,10 @@ namespace Volume {
         }
         
         /** Gets whether this cell is at the front of the given root cell.
+        @param root
+            The octree root node to test against.
         @return
-            True if so.
+            true if so.
         */
         inline bool isBorderFront(const OctreeNode &root) const
         {

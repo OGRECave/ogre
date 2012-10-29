@@ -57,13 +57,13 @@ namespace Volume {
         /// The smallest allowed geometric error of the highest LOD.
         Real baseError;
 
-        /// The error multiplicator per LOD level.
+        /// The error multiplicator per LOD level with 1.0 as default.
         Real errorMultiplicator;
 
-        /// Whether to create the octree debug visualization entity.
+        /// Whether to create the octree debug visualization entity with false as default.
         bool createOctreeVisualization;
 
-        /// Whether to create the dualgrid debug visualization entity.
+        /// Whether to create the dualgrid debug visualization entity with false as default.
         bool createDualGridVisualization;
 
         /// Factor for the skirt length generation.
@@ -75,7 +75,7 @@ namespace Volume {
         /// On which LOD level the callback should be called.
         size_t lodCallbackLod;
 
-        /// The scale of the volume.
+        /// The scale of the volume with 1.0 as default.
         Real scale;
 
         /// The maximum accepted screen space error when chosing the LOD levels to render.
@@ -154,6 +154,7 @@ namespace Volume {
         /// The scale.
         Real mScale;
 
+        /// The amount of chunks currently being processed.
         static size_t mChunksBeingProcessed;
 
         /// To attach this node to.
