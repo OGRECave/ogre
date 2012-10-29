@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __Ogre_Volume_MarchingCubesTables_H__
-#define __Ogre_Volume_MarchingCubesTables_H__
+#ifndef __Ogre_Volume_IsoSurfaceTablesMC_H__
+#define __Ogre_Volume_IsoSurfaceTablesMC_H__
 
 namespace Ogre {
 namespace Volume {

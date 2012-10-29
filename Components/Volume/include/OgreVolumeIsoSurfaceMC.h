@@ -42,22 +42,29 @@ namespace Volume {
         
 
         /** Linear interpolation between two vectors based on some values associated to them.
-        @param v1
+        @param v0
             The first vector.
-        @param v2
+        @param v1
             The second vector.
-        @param val1
+        @param val0
             The value for the first vector.
-        @param val2
+        @param val1
             The value for the second vector.
         @param normal
             Reference to a vector where the normal will be stored.
         @return
             The interpolated position.
         */
-        inline Vector3 interpolate(const Vector3 &v1, const Vector3 &v2, const Vector4 val1, const Vector4 val2, Vector3 &normal) const
+        inline Vector3 interpolate(const Vector3 &v0, const Vector3 &v1, const Vector4 val0, const Vector4 val1, Vector3 &normal) const
         {
             // Don't use Math::RealEqual here as it isn't inlined and this function is performance critical.
+            if (fabs(val0.w - ISO_LEVEL) <= FLT_EPSILON)
+            {
+                normal.x = val1.x;
+                normal.y = val1.y;
+                normal.z = val1.z;
+                return v0;
+            }
             if (fabs(val1.w - ISO_LEVEL) <= FLT_EPSILON)
             {
                 normal.x = val1.x;
@@ -65,27 +72,20 @@ namespace Volume {
                 normal.z = val1.z;
                 return v1;
             }
-            if (fabs(val2.w - ISO_LEVEL) <= FLT_EPSILON)
+            if (fabs(val1.w - val0.w) <= FLT_EPSILON)
             {
-                normal.x = val2.x;
-                normal.y = val2.y;
-                normal.z = val2.z;
-                return v2;
+                normal.x = val0.x;
+                normal.y = val0.y;
+                normal.z = val0.z;
+                return v0;
             }
-            if (fabs(val2.w - val1.w) <= FLT_EPSILON)
-            {
-                normal.x = val1.x;
-                normal.y = val1.y;
-                normal.z = val1.z;
-                return v1;
-            }
-            Real mu = (ISO_LEVEL - val1.w) / (val2.w - val1.w);
-            Vector4 normal4 = val1 + mu * (val2 - val1);
+            Real mu = (ISO_LEVEL - val0.w) / (val1.w - val0.w);
+            Vector4 normal4 = val0 + mu * (val1 - val0);
             normal.x = normal4.x;
             normal.y = normal4.y;
             normal.z = normal4.z;
             normal.normalise();
-            return v1 + mu * (v2 - v1);
+            return v0 + mu * (v1 - v0);
         }
 
     public:

@@ -79,30 +79,30 @@ namespace Volume {
     typedef struct _OgreVolumeExport Triangle
     {
         /// The first triangle corner.
-        const Vertex mV1;
+        const Vertex mV0;
         
         /// The second triangle corner.
-        const Vertex mV2;
+        const Vertex mV1;
         
         /// The third triangle corner.
-        const Vertex mV3;
+        const Vertex mV2;
         
         /** Convinience constructor.
-        @param v1
+        @param v0
             The first vertex of the triangle.
-        @param n1
+        @param n0
             The normal of the first vertex.
-        @param v2
+        @param v1
             The second vertex of the triangle.
-        @param n2
+        @param n1
             The normal of the second vertex.
-        @param v3
+        @param v2
             The third vertex of the triangle.
-        @param n3
+        @param n2
             The normal of the third vertex.
         */
-        Triangle(const Vector3 &v1, const Vector3 &n1, const Vector3 &v2, const Vector3 &n2, const Vector3 &v3, const Vector3 &n3) :
-            mV1(v1, n1), mV2(v2, n2), mV3(v3, n3)
+        Triangle(const Vector3 &v0, const Vector3 &n0, const Vector3 &v1, const Vector3 &n1, const Vector3 &v2, const Vector3 &n2) :
+            mV0(v0, n0), mV1(v1, n1), mV2(v2, n2)
         {
         }
     } Triangle;
@@ -305,9 +305,9 @@ namespace Volume {
         */
         inline void addTriangle(Triangle t)
         {
+            addVertex(t.mV0);
             addVertex(t.mV1);
             addVertex(t.mV2);
-            addVertex(t.mV3);
         }
 
         /** Generates the vertex- and indexbuffer of this mesh on the given

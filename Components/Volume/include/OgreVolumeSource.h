@@ -45,16 +45,15 @@ namespace Volume {
         */
         virtual ~Source(void);
 
-        /** Gets the density value and gradient.
+        /** Gets the density value and gradient at a specific position.
         @param position
             The position.
-        @param gradient
         @return
             A vector with x, y, z containing the gradient and w containing the density.
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const = 0;
 
-        /** Gets the density value.
+        /** Gets the density value at a specific position.
         @param position
             The position.
         @return

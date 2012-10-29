@@ -110,6 +110,12 @@ namespace Volume {
         /// The box.
         AxisAlignedBox mBox;
 
+        /** Gets the distance of a point to the nearest cube element.
+        @param position
+            The point to test.
+        @return
+            The distance.
+        */
         inline Real distanceTo(const Vector3 &position) const
         {
             Real distance;
