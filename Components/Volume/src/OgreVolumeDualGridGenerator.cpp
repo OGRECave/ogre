@@ -505,6 +505,8 @@ namespace Volume {
             ManualObject* manual = sceneManager->createManualObject();
             manual->begin("BaseWhiteNoLighting", RenderOperation::OT_LINE_LIST);
             manual->colour((Real)0.0, (Real)1.0, (Real)0.0);
+            manual->estimateVertexCount(mDualCells.size() * 8);
+            manual->estimateIndexCount(mDualCells.size() * 24);
 
             size_t baseIndex = 0;
             for (VecDualCell::iterator it = mDualCells.begin(); it != mDualCells.end(); ++it)
