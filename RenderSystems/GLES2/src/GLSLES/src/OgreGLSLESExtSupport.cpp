@@ -50,14 +50,12 @@ namespace Ogre
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
                     glIsProgramPipelineEXT(obj))
             {
-                glValidateProgramPipelineEXT(obj);
                 glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength);
                 GL_CHECK_ERROR
             }
 #endif
             else if(glIsProgram(obj))
             {
-                glValidateProgram(obj);
                 glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
                 GL_CHECK_ERROR
             }
