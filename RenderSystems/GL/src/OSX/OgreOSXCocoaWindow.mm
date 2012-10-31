@@ -644,7 +644,7 @@ namespace Ogre {
             {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
-                GLint backingStoreDimensions[2] = { mWidth, mHeight };
+                GLint backingStoreDimensions[2] = { (GLint)mWidth, (GLint)mHeight };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 
