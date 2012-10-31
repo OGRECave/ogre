@@ -198,7 +198,7 @@ GLTextureBuffer::GLTextureBuffer(const String &baseName, GLenum target, GLuint i
 								 bool writeGamma, uint fsaa):
 	GLHardwarePixelBuffer(0, 0, 0, PF_UNKNOWN, usage),
 	mTarget(target), mFaceTarget(0), mTextureID(id), mFace(face), mLevel(level),
-    mSoftwareMipmap(crappyCard), mSliceTRT(0)
+    mSoftwareMipmap(crappyCard), mHwGamma(writeGamma), mSliceTRT(0)
 {
 	// devise mWidth, mHeight and mDepth and mFormat
 	GLint value = 0;
@@ -298,7 +298,7 @@ void GLTextureBuffer::upload(const PixelBox &data, const Image::Box &dest)
 			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
 			"Compressed images must be consecutive, in the source format",
 		 	"GLTextureBuffer::upload");
-		GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat);
+		GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
 		// Data must be consecutive and at beginning of buffer as PixelStorei not allowed
 		// for compressed formats
 		switch(mTarget) {
@@ -673,7 +673,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
     if(!fboMan->checkFormat(mFormat))
     {
         /// If target format not directly supported, create intermediate texture
-        GLenum tempFormat = GLPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat));
+        GLenum tempFormat = GLPixelUtil::getClosestGLInternalFormat(fboMan->getSupportedAlternative(mFormat), mHwGamma);
         glGenTextures(1, &tempTex);
         glBindTexture(GL_TEXTURE_2D, tempTex);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
@@ -830,7 +830,7 @@ void GLTextureBuffer::blitFromMemory(const PixelBox &src_orig, const Image::Box 
     GLsizei width = GLPixelUtil::optionalPO2(src.getWidth());
     GLsizei height = GLPixelUtil::optionalPO2(src.getHeight());
     GLsizei depth = GLPixelUtil::optionalPO2(src.getDepth());
-    GLenum format = GLPixelUtil::getClosestGLInternalFormat(src.format);
+    GLenum format = GLPixelUtil::getClosestGLInternalFormat(src.format, mHwGamma);
     
     /// Generate texture name
     glGenTextures(1, &id);
