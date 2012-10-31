@@ -242,15 +242,19 @@ protected:
 		void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
 		{
 			mNativeWindow = nativeWindow;
+#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
 			mNativeControl = nullptr;
+#	endif //(OGRE_WINRT_TARGET_TYPE != PHONE)
 			mInputContext = inputContext;
 		}
+#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
 		void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
 		{
 			mNativeWindow = nullptr;
 			mNativeControl = nativeControl;
 			mInputContext = inputContext;
 		}
+#	endif // (OGRE_WINRT_TARGET_TYPE != PHONE)
 #endif
 		/*-----------------------------------------------------------------------------
 		| init data members needed only by NaCl
@@ -710,6 +714,18 @@ protected:
 
 			if (evt.key == OIS::KC_ESCAPE)
 			{
+#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+				// If there is a quit button, assume that we intended to press it via 'ESC'.
+				if (mTrayMgr->areTraysVisible())
+				{
+					Widget *pWidget = mTrayMgr->getWidget("Quit");
+					if (pWidget)
+					{
+						buttonHit((Button*)pWidget);  // on phone, quit entirely.
+						return false;  // now act as if we didn't handle the button to get AppModel to exit.
+					}
+				}
+#endif
 				if (mTitleLabel->getTrayLocation() != TL_NONE)
 				{
 					// if we're in the main screen and a sample's running, toggle sample pause state
@@ -1087,14 +1103,27 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
-#ifdef	ENABLE_SHADERS_CACHE
-            Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
-            
-            FILE * inFile = fopen("cache.bin", "rb");
+#if defined(ENABLE_SHADERS_CACHE_SAVE)
+			Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+#endif
+#if	defined(ENABLE_SHADERS_CACHE_LOAD)
+			// Load for a package version of the shaders.
+			Ogre::String path = "cache.bin";
+			FILE * inFile = NULL;
+			inFile = fopen(path.c_str(), "rb");
+			// If that does not exist, see if there is a version in the writable location.
+			if (!inFile)
+			{
+				path = mFSLayer->getWritablePath("cache.bin");
+				inFile = fopen(path.c_str(), "rb");
+			}
             if (inFile)
             {
-                Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream("cache.bin", inFile, Ogre::DataStream::READ));
-                Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
+				OutputDebugStringA("Loading shader cache from ");
+				OutputDebugStringA(path.c_str());
+				OutputDebugStringA("\n");
+            	Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream(path.c_str(), inFile, Ogre::DataStream::READ));                
+				Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
             }
 #endif
 
@@ -1136,7 +1165,8 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void windowMovedOrResized()
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE != PHONE)
+
 			if(mNativeControl)
 			{
 				// in WinRT.Xaml case Ogre::RenderWindow is actually brush
@@ -1176,19 +1206,22 @@ protected:
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 			Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
 			Ogre::NameValuePairList miscParams;
-			if(mNativeWindow)
+			if(mNativeWindow.Get())
 			{
-				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned long)reinterpret_cast<void*>(mNativeWindow));
+				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned long)reinterpret_cast<void*>(mNativeWindow.Get()));
 				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
 			}
+#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
 			else if(mNativeControl)
 			{
 				miscParams["windowType"] = "SurfaceImageSource";
 				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeControl->ActualWidth, mNativeControl->ActualHeight, false, &miscParams);
 				void* pUnk = NULL;
-				res->getCustomAttribute("ImageBrush", &pUnk);
+				res->getCustomAttribute("ImageBrush", &pUnk)
 				mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
 			}
+#	endif // (OGRE_WINRT_TARGET_TYPE != PHONE)
+
 			return res;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -1557,7 +1590,7 @@ protected:
 
 			// create configuration screen label and renderer menu
 			mTrayMgr->createLabel(TL_NONE, "ConfigLabel", "Configuration");
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 			mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 216, 115, 10);
 #else
 			mRendererMenu = mTrayMgr->createLongSelectMenu(TL_NONE, "RendererMenu", "Render System", 450, 240, 10);
@@ -1652,12 +1685,20 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void shutdown()
 		{
-#ifdef	ENABLE_SHADERS_CACHE
-            FILE * outFile = fopen("cache.bin", "wb");
-            if (outFile)
-            {
-            	Ogre::DataStreamPtr ostream(new Ogre::FileHandleDataStream("cache.bin", outFile, Ogre::DataStream::WRITE));
-            	Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
+#if defined(ENABLE_SHADERS_CACHE_SAVE) 
+			if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
+			{
+				Ogre::String path = mFSLayer->getWritablePath("cache.bin");
+				FILE * outFile = fopen(path.c_str(), "wb");
+				if (outFile)
+				{
+					OutputDebugStringA("Writing shader cache to ");
+					OutputDebugStringA(path.c_str());
+					OutputDebugStringA("\n");
+            		Ogre::DataStreamPtr ostream(new Ogre::FileHandleDataStream(path.c_str(), outFile, Ogre::DataStream::WRITE));
+            		Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
+            		ostream->close();
+				}
             }
 #endif
 
@@ -1859,8 +1900,10 @@ protected:
 		int mLastSampleIndex;                          // index of last sample running
 		int mStartSampleIndex;                         // directly starts the sample with the given index
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-		Windows::UI::Core::CoreWindow^ mNativeWindow;
+		Platform::Agile<Windows::UI::Core::CoreWindow> mNativeWindow;
+#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
 		Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
+#	endif //(OGRE_WINRT_TARGET_TYPE != PHONE)
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;

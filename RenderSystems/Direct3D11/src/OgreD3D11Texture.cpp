@@ -322,8 +322,14 @@ namespace Ogre
 		switch (this->getTextureType())
 		{
 		case TEX_TYPE_1D:
-			this->_create1DTex();
-			break;
+			{
+				D3D11RenderSystem* rs = (D3D11RenderSystem*)Root::getSingleton().getRenderSystem();
+				if(rs->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+				{
+					this->_create1DTex();
+					break; // For Feature levels that do not support 1D textures, revert to creating a 2D texture.
+				}
+			}
 		case TEX_TYPE_2D:
 		case TEX_TYPE_CUBE_MAP:
 		case TEX_TYPE_2D_ARRAY:
@@ -552,6 +558,7 @@ namespace Ogre
 			break;
 
 		case TEX_TYPE_2D:
+		case TEX_TYPE_1D:  // For Feature levels that do not support 1D textures, revert to creating a 2D texture.
 			if (mUsage & TU_RENDERTARGET && (mFSAA > 1 || atoi(mFSAAHint.c_str()) > 0))
 			{
 				mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
@@ -596,9 +603,20 @@ namespace Ogre
 		desc.MipLevels		= numMips;
 		desc.Format			= d3dPF;
 		desc.Usage			= D3D11Mappings::_getUsage(mUsage);
-		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
+		desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE;
+
+		D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+		   desc.BindFlags		|= D3D11_BIND_RENDER_TARGET;
+
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
 		desc.MiscFlags		= 0;
+		if (mIsDynamic)
+		{
+			desc.Usage			= D3D11_USAGE_DYNAMIC;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.BindFlags		= D3D11_BIND_SHADER_RESOURCE ;
+		}
 
 		// create the texture
 		hr = mDevice->CreateTexture3D(	
@@ -724,6 +742,15 @@ namespace Ogre
 		// Choose frame buffer pixel format in case PF_UNKNOWN was requested
 		if(mFormat == PF_UNKNOWN)
 			return mBBPixelFormat;
+
+		D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0 && mFormat == PF_L8)
+		{
+			// For 3D textures, PF_L8, which maps to DXGI_FORMAT_R8_UNORM, is not supported but PF_A8, which maps to DXGI_FORMAT_R8_UNORM is supported.
+			mFormat = PF_A8; 
+			mNumRequestedMipmaps = 0;
+		}
+
 		// Choose closest supported D3D format as a D3D format
 		return D3D11Mappings::_getPF(D3D11Mappings::_getClosestSupportedPF(mFormat));
 
@@ -761,7 +788,7 @@ namespace Ogre
 				{ 
 
 					D3D11HardwarePixelBuffer *buffer;
-					size_t subresourceIndex = mip + face * mNumMipmaps;
+					size_t subresourceIndex = D3D11CalcSubresource(mip, face, mNumMipmaps);
 					if (getNumFaces() > 0)
 					{
 						subresourceIndex = mip;

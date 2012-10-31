@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <ctype.h>
 
 /* Win32 directory operations emulation */
-#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
     
 struct _find_search_t
 {

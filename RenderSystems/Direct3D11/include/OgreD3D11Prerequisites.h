@@ -28,6 +28,8 @@ THE SOFTWARE.
 #ifndef __D3D11PREREQUISITES_H__
 #define __D3D11PREREQUISITES_H__
 
+
+
 #include "OgrePrerequisites.h"
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 
@@ -63,9 +65,14 @@ THE SOFTWARE.
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #include <d3d11_1.h>
 #endif
-#include <d3d11shader.h>
-#include <D3Dcompiler.h>
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE == PHONE)
+#	include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
+#else
+#	include <d3d11shader.h>
+#	include <D3Dcompiler.h>
+#endif
+ 
 
 namespace Ogre
 {

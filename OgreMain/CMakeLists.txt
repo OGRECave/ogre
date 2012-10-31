@@ -470,7 +470,10 @@ elseif (WIN32)
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
       src/WIN32/OgreTimer.cpp
+      src/WIN32/OgreTimer.cpp
+	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
+
     set(PLATFORM_HEADER_INSTALL "WIN32")
   else ()
   include_directories("include/WIN32")
@@ -720,8 +723,13 @@ endif ()
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
-# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
-ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
+if (OGRE_BUILD_PLATFORM_WINRT)
+	# exclude OgreTimer.cpp from unity builds; causes problem
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
+else ()
+	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
+endif ()
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
   set_target_properties(OgreMain PROPERTIES 

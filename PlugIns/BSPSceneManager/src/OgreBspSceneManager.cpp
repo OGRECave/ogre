@@ -105,7 +105,11 @@ namespace Ogre {
         strncpy(extension, filename.substr(pos + 1, filename.length() - pos).c_str(), 5);
 		extension[5] = 0;
 
-        if (stricmp(extension, "bsp"))
+#if  OGRE_COMPILER == OGRE_COMPILER_MSVC
+		if (_stricmp(extension, "bsp"))
+#else
+		if (stricmp(extension, "bsp"))
+#endif
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
 			"Unable to load world geometry. Invalid extension (must be .bsp).",
             "BspSceneManager::setWorldGeometry");

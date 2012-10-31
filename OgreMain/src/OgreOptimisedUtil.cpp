@@ -48,7 +48,10 @@ namespace Ogre {
 //#elif __OGRE_HAVE_VFP
 //    extern OptimisedUtil* _getOptimisedUtilVFP(void);
 #endif
-    
+#if __OGRE_HAVE_DIRECTXMATH
+    extern OptimisedUtil* _getOptimisedUtilDirectXMath(void);
+#endif
+
 #ifdef __DO_PROFILE__
     //---------------------------------------------------------------------
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -417,8 +420,12 @@ namespace Ogre {
 //        else
 #endif  // __OGRE_HAVE_SSE
         {
-            return _getOptimisedUtilGeneral();
-        }
+#if __OGRE_HAVE_DIRECTXMATH
+            return _getOptimisedUtilDirectXMath();
+#else // __OGRE_HAVE_DIRECTXMATH
+             return _getOptimisedUtilGeneral();
+#endif
+		}
 
 #endif  // __DO_PROFILE__
     }

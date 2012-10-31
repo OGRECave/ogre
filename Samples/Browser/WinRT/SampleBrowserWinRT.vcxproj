@@ -1,25 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Phone Debug|ARM">
+      <Configuration>Phone Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Phone Debug|Win32">
+      <Configuration>Phone Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Phone Release|ARM">
+      <Configuration>Phone Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Phone Release|Win32">
+      <Configuration>Phone Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
       <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|ARM">
       <Configuration>Release</Configuration>
@@ -32,56 +40,117 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <VCTargetsPath Condition="'$(VCTargetsPath11)' != '' and '$(VSVersion)' == '' and '$(VisualStudioVersion)' == ''">$(VCTargetsPath11)</VCTargetsPath>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
-    <AppContainerApplication>true</AppContainerApplication>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Desktop Globals">
+    <WindowsSDKDesktopARMSupport>true</WindowsSDKDesktopARMSupport>
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
+    <AppContainerApplication>true</AppContainerApplication>
+    <TargetPlatformSdkPath>$(ProgramFiles)\Windows Kits\8.0</TargetPlatformSdkPath>
+    <Immersive>true</Immersive>
+    <WindowsAppContainer>true</WindowsAppContainer>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Desktop Globals">
+    <WindowsSDKDesktopARMSupport>true</WindowsSDKDesktopARMSupport>
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v110</PlatformToolset>
+    <AppContainerApplication>true</AppContainerApplication>
+    <TargetPlatformSdkPath>$(ProgramFiles)\Windows Kits\8.0</TargetPlatformSdkPath>
+    <Immersive>true</Immersive>
+    <WindowsAppContainer>true</WindowsAppContainer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Phone Debug'" Label="Phone Globals">
+    <XapOutputs>true</XapOutputs>
+    <XapFilename>SampleWinRTBrowser_$(Configuration)_$(Platform).xap</XapFilename>
+    <WinMDAssembly>true</WinMDAssembly>
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_wp80</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Phone Release'" Label="Phone Globals">
+    <XapOutputs>true</XapOutputs>
+    <XapFilename>SampleWinRTBrowser_$(Configuration)_$(Platform).xap</XapFilename>
+    <WinMDAssembly>true</WinMDAssembly>
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110_wp80</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='ARM'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='x64'">
+  <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSDK_IncludePath);</IncludePath>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">
+    <OutDir>$(SolutionDir)..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\lib\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>d2d1.lib; d3d11.lib; dxgi.lib; ole32.lib; windowscodecs.lib; dwrite.lib; %(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateWindowsMetadata>true</GenerateWindowsMetadata>
-    </Link>
     <ClCompile>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(IntermediateOutputPath);$(ProjectDir)..\include;$(ProjectDir)..\..\common\include;$(ProjectDir)..\..\..\OgreMain\include;$(ProjectDir)..\..\..\Components\RTShaderSystem\include;$(SolutionDir)include;$(SolutionDir)Dependencies\include\OIS;$(SolutionDir)..\Dependencies\include\OIS;$(ProjectDir)..\..\..\Dependencies\include\OIS;$(ProjectDir)..\..\..\..\Dependencies\include\OIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\include;..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\..\OgreMain/include;C:/hg code/build8/include;C:/hg code/ogre-dependencies-winrt/include;C:/hg code/ogre-dependencies-winrt/include/OIS;C:/hg code/trunk;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">USE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_WINDOWS;_DEBUG;DEBUG;USE_RTSHADER_SYSTEM;CMAKE_INTDIR="Debug";Sample_SkeletalAnimation_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">platform.winmd</ForcedUsingFiles>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">platform.winmd</ForcedUsingFiles>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">NotUsing</PrecompiledHeader>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">NotUsing</PrecompiledHeader>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">platform.winmd</ForcedUsingFiles>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">platform.winmd</ForcedUsingFiles>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">Disabled</Optimization>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</CompileAsWinRT>
     </ClCompile>
     <CustomBuildStep>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
@@ -90,9 +159,13 @@ if errorlevel 1 goto VCEnd
 robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_46.dll
 rem suppress successful robocopy exit statuses, only report genuine errors (bitmask 16 and 8 settings)
 set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
+if errorlevel 1 goto VCEnd
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_46.dll</Outputs>
       <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</TreatOutputAsContent>
-      <Inputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_46.dll</Inputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</TreatOutputAsContent>
+      <Inputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_45.dll</Inputs>
     </CustomBuildStep>
     <CustomBuildStep>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
@@ -101,16 +174,565 @@ if errorlevel 1 goto VCEnd
 robocopy "$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)" "$(ProjectDir)." d3dcompiler_46.dll
 rem suppress successful robocopy exit statuses, only report genuine errors (bitmask 16 and 8 settings)
 set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">if not exist "$(ProjectDir)Media" mklink /J "$(ProjectDir)Media" "$(ProjectDir)..\..\Media"
+if errorlevel 1 goto VCEnd
+</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)Media;$(ProjectDir)d3dcompiler_46.dll</Outputs>
       <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</TreatOutputAsContent>
-      <Inputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_46.dll</Inputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</TreatOutputAsContent>
+      <Inputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(WindowsSdkDir)Redist\D3D\$(TargetedSDKArchitecture)\d3dcompiler_45.dll</Inputs>
     </CustomBuildStep>
+    <Link>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' or '$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Link>
+      <AdditionalDependencies>d2d1.lib;d3d11.lib;dxgi.lib;ois.lib;ole32.lib;windowscodecs.lib;dwrite.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateWindowsMetadata>true</GenerateWindowsMetadata>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ClCompile>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</MultiProcessorCompilation>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">platform.winmd</ForcedUsingFiles>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsWinRT>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Level3</WarningLevel>
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</SDLCheck>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <InlineFunctionExpansion Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</InlineFunctionExpansion>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</MultiProcessorCompilation>
+      <ForcedUsingFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">platform.winmd</ForcedUsingFiles>
+      <AdditionalUsingDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(VSInstallDir)\VC\vcpackages;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32' or '$(Configuration)|$(Platform)'=='Phone Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\shadersystem\include;..\..\DualQuaternion\include;..\..\DeferredShading\include;..\..\Instancing\include;..\..\NewInstancing\include;..\..\TextureArray\include;..\..\SSAO\include;..\..\OceanDemo\include;..\..\VolumeCSG\include;..\..\VolumeTerrain\include;..\..\Terrain\include;..\..\CelShading\include;..\..\Compositor\include;..\..\CubeMapping\include;..\..\Dot3Bump\include;..\..\Fresnel\include;..\..\Water\include;..\..\BezierPatch\include;..\..\CameraTrack\include;..\..\Character\include;..\..\DynTex\include;..\..\FacialAnimation\include;..\..\Grass\include;..\..\Lighting\include;..\..\ParticleFX\include;..\..\Shadows\include;..\..\SkeletalAnimation\include;..\..\SkyBox\include;..\..\SkyDome\include;..\..\SkyPlane\include;..\..\Smoke\include;..\..\SphereMapping\include;..\..\Tesselation\include;..\..\TextureFX\include;..\..\Transparency\include;..\..\OgreRTShaderSystem;..\..\BSP\include\;..\..\..\OgreMain/include;C:/hg code/build8/include;C:/hg code/ogre-dependencies-winrt/include;C:/hg code/ogre-dependencies-winrt/include/OIS;C:/hg code/trunk;..\..\..\OgreMain/include/Threading;..\..\..\Samples/Common/include;..\..\..\Components/RTShaderSystem/include;..\..\..\Components/Overlay/include;..\..\..\PlugIns/BSPSceneManager/include;..\..\..\PlugIns/CgProgramManager/include;..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\PlugIns/OctreeZone/include;..\..\..\PlugIns/ParticleFX/include;..\..\..\PlugIns/PCZSceneManager/include;..\..\..\RenderSystems/Direct3D9/include;..\..\..\RenderSystems/Direct3D11/include;..\..\..\RenderSystems/GLES/include;..\..\..\RenderSystems/GLES2/include;..\..\..\RenderSystems/GL/include;..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\RenderSystems/GL/src/nvparse;..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedUsingFiles>platform.winmd</ForcedUsingFiles>
+      <AdditionalUsingDirectories>$(ProgramFiles)\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\Microsoft.VCLibs\11.0\References\CommonConfiguration\neutral</AdditionalUsingDirectories>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</CompileAsWinRT>
+      <CompileAsWinRT Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- TODO:Please remove below IgnoreSpecificDefaultLibraries once dev11 bug 362091 is fixed -->
+      <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">$(IntDir)$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">$(SolutionDir)..\Dep\bin\$(Platform)\$(Configuration);$(SolutionDir)..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+    <BuildLog>
+      <Path Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Image Include="Assets\Logo.png" />
     <Image Include="Assets\SmallLogo.png" />
     <Image Include="Assets\StoreLogo.png" />
     <Image Include="Assets\SplashScreen.png" />
+    <Image Include="Media\ApplicationIcon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\10points.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\1d_debug.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\1D_Noise.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\1D_Noise2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\1d_SPIRAL.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\8x8PagesSplotches2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ASCII.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\atheneNormalMap.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\aureola.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\basic_droplet.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\BeachStones.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\blue_jaiqua.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\BumpyMetal.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\cel_shading_diffuse.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\cel_shading_edge.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\cel_shading_specular.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\checker.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Chrome.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\circuit.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\clouds.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\cursor.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\dark_grid.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Dirt.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\dirt01.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\dkyellow.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\droplet.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Dr_Bunsen_Head.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\egyptrockyfull.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\flare.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\flaretrail.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\flare_alpha.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\frost.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\fw12b.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\GLX_icon.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\grass_1024.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\gras_02.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\GreenSkin.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\img1.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\img2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\KAMEN-stup.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\KAMEN320x240-bump.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\KAMEN320x240.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\leaf.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\LowRes.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\MRAMOR-bump.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\MRAMOR6X6.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\MtlPlat2.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\NMBalls.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\NMBumpsOut.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\NMHollyBumps.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\NMStripes.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_bk.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_dn.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_fr.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_lf.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_rt.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nm_up.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\NoiseVolume.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\normalNoiseColor.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nskingr.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\dirt_grayrocky_diffusespecular.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\dirt_grayrocky_normalheight.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\grass_green-01_diffusespecular.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\grass_green-01_normalheight.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\growth_weirdfungus-03_diffusespecular.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\nvidia\growth_weirdfungus-03_normalheight.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ogreborder.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ogrebordercenter.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ogreborderUp.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ogrelogo-small.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ogrelogo.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Panels_Diffuse.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Panels_Normal_Obj.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Panels_Normal_Tangent.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Panels_reflection.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Panels_refmask.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\particle.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\penguin.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\perlinvolume.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\r2skin.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\radial.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\random.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Random3D.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\ribbonband.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\RustedMetal.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\RustyBarrel.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\RustySteel.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\RZR-002.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-back.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-down-p.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-down.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-thumb.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-up-p.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\scr-up.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\SmallLeaf_BP.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\smoke.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\smokecolors.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\snow_1024.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\spacesky.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\spheremap.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\spine_strips.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\spotlight_image.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\SSAO\4InterleavedKMeansDisk8x4.png" />
+    <Image Include="Media\materials\textures\SSAO\gray256.png" />
+    <Image Include="Media\materials\textures\SSAO\importance4InterleavedSphereHemisphere8x4.png" />
+    <Image Include="Media\materials\textures\SSAO\rand1x32.png" />
+    <Image Include="Media\materials\textures\SSAO\randCosSinJitter4x4.png" />
+    <Image Include="Media\materials\textures\SSAO\regularSphereJittered4.png" />
+    <Image Include="Media\materials\textures\steelhead.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\strugotine.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terrain.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terrain_detail.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terrain_texture.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terr_dirt-grass.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terr_rock-dirt.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\terr_rock6.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\texmap2.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\TextureAtlasSampleOrg0.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\TextureAtlasSampleWrap0.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\tusk.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Water01.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\Water02.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\waveNM.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\waves2.dds">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\white.bmp">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\materials\textures\WoodPallet.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Carpet_Diamond_Olive.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Brass_Ceiling.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Embossed.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Rusted.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Rusted1.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Steel_Textured.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Metal_Steel_Textured_White.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Roofing_Tile_Spanish.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\terrain2.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Translucent_Glass_Tinted.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Translucent_Glass_Tinted1.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\PCZAppMedia\Wood_Floor.jpg">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="Media\thumbnails\thumb_bezier.png" />
+    <Image Include="Media\thumbnails\thumb_bsp.png" />
+    <Image Include="Media\thumbnails\thumb_bump.png" />
+    <Image Include="Media\thumbnails\thumb_camtrack.png" />
+    <Image Include="Media\thumbnails\thumb_cel.png" />
+    <Image Include="Media\thumbnails\thumb_char.png" />
+    <Image Include="Media\thumbnails\thumb_comp.png" />
+    <Image Include="Media\thumbnails\thumb_cubemap.png" />
+    <Image Include="Media\thumbnails\thumb_deferred.png" />
+    <Image Include="Media\thumbnails\thumb_dualquaternionskinning.png" />
+    <Image Include="Media\thumbnails\thumb_dyntex.png" />
+    <Image Include="Media\thumbnails\thumb_error.png" />
+    <Image Include="Media\thumbnails\thumb_facial.png" />
+    <Image Include="Media\thumbnails\thumb_fresnel.png" />
+    <Image Include="Media\thumbnails\thumb_grass.png" />
+    <Image Include="Media\thumbnails\thumb_instancing.png" />
+    <Image Include="Media\thumbnails\thumb_isosurf.png" />
+    <Image Include="Media\thumbnails\thumb_lighting.png" />
+    <Image Include="Media\thumbnails\thumb_newinstancing.png" />
+    <Image Include="Media\thumbnails\thumb_ocean.png" />
+    <Image Include="Media\thumbnails\thumb_particlegs.png" />
+    <Image Include="Media\thumbnails\thumb_particles.png" />
+    <Image Include="Media\thumbnails\thumb_playpen.png" />
+    <Image Include="Media\thumbnails\thumb_shadersystem.png" />
+    <Image Include="Media\thumbnails\thumb_shadows.png" />
+    <Image Include="Media\thumbnails\thumb_skelanim.png" />
+    <Image Include="Media\thumbnails\thumb_skybox.png" />
+    <Image Include="Media\thumbnails\thumb_skydome.png" />
+    <Image Include="Media\thumbnails\thumb_skyplane.png" />
+    <Image Include="Media\thumbnails\thumb_smoke.png" />
+    <Image Include="Media\thumbnails\thumb_spheremap.png" />
+    <Image Include="Media\thumbnails\thumb_ssao.png" />
+    <Image Include="Media\thumbnails\thumb_terrain.png" />
+    <Image Include="Media\thumbnails\thumb_texarray.png" />
+    <Image Include="Media\thumbnails\thumb_texfx.png" />
+    <Image Include="Media\thumbnails\thumb_trans.png" />
+    <Image Include="Media\thumbnails\thumb_visual_tests.png" />
+    <Image Include="Media\thumbnails\thumb_voltex.png" />
+    <Image Include="Media\thumbnails\thumb_water.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\include\FileSystemLayer.h" />
@@ -138,6 +760,665 @@ set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <None Include="cache.bin">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="D3DCompiler_46.dll">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\deferred.compositor">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\deferreddemo.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\deferred_post.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\deferred_post.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\deferred_post_minilight.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\ShadowCaster.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\ShadowCaster.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\ssao.compositor">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\DeferredShadingMedia\ssao.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\fonts\bluehighway-10.font">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\fonts\bluehighway-12.font">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\fonts\bluehighway-8.font">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\fonts\sample.fontdef">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Example_FresnelPS.asm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Example_TextureArrayPS.asm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Example_TextureArrayPS.hlsl4">
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+    </None>
+    <None Include="Media\materials\programs\HWBasicInstancing.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\HW_VTFInstancing.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Instancing.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Instancing.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\InstancingMisc.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Ocean2HLSL_Cg.frag">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Ocean2HLSL_Cg.vert">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\oceanHLSL_Cg.frag">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\oceanHLSL_Cg.vert">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\OffsetMapping_specular.asm">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\pssm.cg">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\ShaderInstancing.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Swizzle.gp">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\TilingFP.cg">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\VTFInstancing.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\ASCII.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\ASMSwizzle.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\BlackAndWhite.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Bloom.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Bloom2.material">
+      <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\CGSwizzle.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\CompositorDemo.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\DepthShadowmap.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Dither.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\DOF.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\DualQuaternion.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\DualQuaternion.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Embossed.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Example-Water.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Examples-DynTex.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Examples-Water.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Examples.compositor">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Examples.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Examples.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\facial.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Glass.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\GLSLSwizzle.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Halftone.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\hdr.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\HeatVision.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Hurt.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\HWInstancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\HW_VTFInstancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\HW_VTF_LUTInstancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\instancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\InstancingMisc.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Invert.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Laplace.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\MotionBlur.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\MRTtest.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\NightVision.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Ocean.controls">
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Ocean.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\OffsetMapping.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Ogre.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\OldMovie.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\OldTV.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Penguin.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Posterize.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\pssm.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\RadialBlur.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\RZR-002.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\ShaderInstancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\ShaderSystem.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\shadows.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SharpenEdges.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\sibenik.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\smoke.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\CreaseShading.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\GBuffer.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\HemisphereMC.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\HorizonBased.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\ShowDepth.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\ShowNormals.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\ShowViewPos.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\SSAO.compositor">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\SSAOPost.compositor">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\SSAOPost.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\UnsharpMask.cg">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\UnsharpMask.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\SSAO\Volumetric.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\StdQuad_vp.program">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\TextureAtlasSampleOrg.tai">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\TextureAtlasSampleWrap.tai">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\Tiling.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\VarianceShadowmap.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\scripts\VTFInstancing.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\grassWalpha.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\HeatLookup.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\HeatNoise.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\NPRMetallic.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\ogregui.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\rockwall.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\rockwall_NH.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\Sepia1D.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\WaterNormal1.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\textures\WaterNormal2.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\athene.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\Barrel.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\column.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\cornell.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\cube.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\facial.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\fish.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\fish.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\geosphere4500.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\geosphere8000.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\jaiqua.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\jaiqua.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\knot.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\ninja.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\ninja.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\ogrehead.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\penguin.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\penguin.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\razor.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\robot.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\robot.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\RZR-002.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\ShaderSystem.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\sibenik.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\sphere.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\spine.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\spine.mesh.skeleton">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\tudorhouse.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\models\WoodPallet.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\chiropteraDM.pk3">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\cubemap.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\cubemapsJS.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\dragon.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\fresneldemo.zip">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\ogredance.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\ogretestmap.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\SdkTrays.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\Sinbad.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\packs\skybox.zip">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+    </None>
+    <None Include="Media\particle\emitted_emitter.particle">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\particle\Examples-Water.particle">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\particle\Examples.particle">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\particle\smoke.particle">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\building_exterior.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_NX.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxnynz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpx.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpxnypynzpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpxnz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpxnzpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpxpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpynz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nxpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_NY.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nypy.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nypy_4y.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_NZ.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_nzpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_PX.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_pxnynz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_pxpynz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\room_pxpz.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_PY.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\ROOM_PZ.mesh">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\PCZAppMedia\terrain2.cfg">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\materials\DualQuaternionSkinning_Shadow.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\materials\HardwareSkinningShadow.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\materials\RTShaderSystem.material">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Media\terrain.cfg">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="ogre.cfg">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -156,6 +1437,7 @@ set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
     <None Include="resources_d.cfg">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="SampleBrowserWinRT_2012_08_31_18_35_59.sap" />
     <None Include="samples.cfg">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -163,7 +1445,757 @@ set/A ERRORLEVEL="%ERRORLEVEL% &amp; 24"</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="WMAppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Media\materials\programs\Bloom2_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Bloom_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Bloom_vs11.hlsl">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Blur0_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Blur0_vs11.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Blur1_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Blur1_vs11.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\BlurH_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\BlurV_ps20.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Blur_vs11.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\BrightBloom2_ps20.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\DepthShadowmap.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Example_Basic.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\hdr.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\hdrutils.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\isosurf.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Media\materials\programs\mrttestfp.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\OffsetMapping.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\ParticleGS.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Media\materials\programs\particlesgs.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</DeploymentContent>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Media\materials\programs\pssm.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\Radial_Blur_FP.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">Pixel</ShaderType>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\materials\programs\StdQuad_vp.hlsl">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">/Gec %(AdditionalOptions)</AdditionalOptions>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Media\RTShaderLib\FFPLib_Common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\FFPLib_Fog.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\FFPLib_Lighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\FFPLib_Texturing.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\FFPLib_Transform.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SampleLib_InstancedViewports.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SampleLib_ReflectionMap.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SGXLib_IntegratedPSSM.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SGXLib_LayeredBlending.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SGXLib_NormalMapLighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SGXLib_PerPixelLighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+    <None Include="Media\RTShaderLib\SGXLib_TextureAtlas.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Media\fonts\bluebold.ttf">
+      <DeploymentContent>true</DeploymentContent>
+    </Font>
+    <Font Include="Media\fonts\bluecond.ttf">
+      <DeploymentContent>true</DeploymentContent>
+    </Font>
+    <Font Include="Media\fonts\bluehigh.ttf">
+      <DeploymentContent>true</DeploymentContent>
+    </Font>
+    <Font Include="Media\fonts\solo5.ttf">
+      <DeploymentContent>true</DeploymentContent>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Media\packs\chiropteraDM.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Media\RTShaderLib\SGXLib_TriplanarTexturing.hlsl">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Phone Debug|Win32'">true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\build8\Components\Overlay\OgreOverlay.vcxproj">
+      <Project>{a82464cd-1d58-4696-9ccf-7fac5ee29bff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Components\Paging\OgrePaging.vcxproj">
+      <Project>{368538e5-682e-4e9a-bc65-17f131da975b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Components\RTShaderSystem\OgreRTShaderSystem.vcxproj">
+      <Project>{104cdbff-93bb-4b53-aa9d-1915dea85e54}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Components\Terrain\OgreTerrain.vcxproj">
+      <Project>{f24ad38d-efa8-4fdd-91fd-bc5b5b71a40b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Components\Volume\OgreVolume.vcxproj">
+      <Project>{3995d5b5-eec5-4708-b35e-83fa306934d1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\OgreMain\OgreMain.vcxproj">
+      <Project>{6e786c7b-1f86-4641-9b5b-192707b805d2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\PlugIns\BSPSceneManager\Plugin_BSPSceneManager.vcxproj">
+      <Project>{f178a0f8-4306-4c52-ac12-6974525d69e2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\PlugIns\OctreeSceneManager\Plugin_OctreeSceneManager.vcxproj">
+      <Project>{0eda29bf-ac92-4056-a728-c036d76d54b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\PlugIns\OctreeZone\Plugin_OctreeZone.vcxproj">
+      <Project>{2834f2c7-497c-4781-8f9d-ff50d666d0ff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\PlugIns\ParticleFX\Plugin_ParticleFX.vcxproj">
+      <Project>{6ca58455-e179-4f49-9ee8-d784a1c677a2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\PlugIns\PCZSceneManager\Plugin_PCZSceneManager.vcxproj">
+      <Project>{70ba8aa1-9f01-41a5-8949-855037f4b055}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\RenderSystems\Direct3D11\RenderSystem_Direct3D11.vcxproj">
+      <Project>{4b2b4ef5-90c3-43f0-95d4-6d23a16f2f40}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\BezierPatch\Sample_BezierPatch.vcxproj">
+      <Project>{56e1402c-b428-46db-8bf3-77585bcbc228}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\BSP\Sample_BSP.vcxproj">
+      <Project>{aeea29c8-148b-41ed-963d-32c35f9d28bd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\CameraTrack\Sample_CameraTrack.vcxproj">
+      <Project>{60d5732e-651d-4585-af16-a4354ceadcb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\CelShading\Sample_CelShading.vcxproj">
+      <Project>{84ce8691-ef9b-4c34-9d7a-cdfac0dba293}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Character\Sample_Character.vcxproj">
+      <Project>{e3a8ffee-d600-4bdf-bc8a-0c7a4d5f3b53}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Compositor\Sample_Compositor.vcxproj">
+      <Project>{7153fa98-4dc8-4622-82bc-ecf7d5e9eef6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\CubeMapping\Sample_CubeMapping.vcxproj">
+      <Project>{ea2f76ea-2365-4082-8632-e0d2a9a6e8be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\DeferredShading\Sample_DeferredShading.vcxproj">
+      <Project>{35b2f485-ba5b-4fa2-ad2d-9c65a581df7e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Dot3Bump\Sample_Dot3Bump.vcxproj">
+      <Project>{3e5031cd-562a-4949-99a2-92a0b001f85b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\DualQuaternion\Sample_DualQuaternion.vcxproj">
+      <Project>{7a930809-7cd6-4073-94a4-ae2b26601fb3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\DynTex\Sample_DynTex.vcxproj">
+      <Project>{82743df4-247c-4356-8e5c-b9c4025580ea}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\EndlessWorld\Sample_EndlessWorld.vcxproj">
+      <Project>{9a2d7063-0f95-49e8-a9af-cc40a928dbd9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\FacialAnimation\Sample_FacialAnimation.vcxproj">
+      <Project>{934e22b5-5e36-46a1-8ee7-6b15715c2c82}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Fresnel\Sample_Fresnel.vcxproj">
+      <Project>{c117b6f8-fa3b-4d33-b1a0-d96eaf1193d5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Grass\Sample_Grass.vcxproj">
+      <Project>{37af833b-c6dd-4e94-b8b1-17036ca040f5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Instancing\Sample_Instancing.vcxproj">
+      <Project>{457ef1b9-00d5-41c2-9c80-247e9880df65}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Isosurf\Sample_Isosurf.vcxproj">
+      <Project>{36fefc64-64a6-4fb3-b08c-4ba4a603d869}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Lighting\Sample_Lighting.vcxproj">
+      <Project>{31396274-0e5e-44b3-b230-87b26be6eb16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\NewInstancing\Sample_NewInstancing.vcxproj">
+      <Project>{e0b3cc21-f09b-4046-865b-c5d71c4310cc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\OceanDemo\Sample_Ocean.vcxproj">
+      <Project>{b812c719-6da7-4174-ac3f-4c5d33f45052}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\ParticleFX\Sample_ParticleFX.vcxproj">
+      <Project>{2679f71f-03eb-4905-a6fd-36faf46d3a11}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\ParticleGS\Sample_ParticleGS.vcxproj">
+      <Project>{2d77599e-f619-46b4-ad45-a26b039f6a9b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\ShaderSystemMultiLight\Sample_ShaderSystemMultiLight.vcxproj">
+      <Project>{467b10df-32b7-4de9-aa35-b3dab988db45}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\ShaderSystemTexturedFog\Sample_ShaderSystemTexturedFog.vcxproj">
+      <Project>{b09bcd16-c86d-462b-83e0-015c317a1737}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\ShaderSystem\Sample_ShaderSystem.vcxproj">
+      <Project>{aa9b615b-7efe-4099-9c60-9763734ab30c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Shadows\Sample_Shadows.vcxproj">
+      <Project>{a8e327c3-749f-45e0-a423-9a8b0e87095f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SkeletalAnimation\Sample_SkeletalAnimation.vcxproj">
+      <Project>{50e7e811-0e67-4ae2-9378-2ef4d0e882fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SkyBox\Sample_SkyBox.vcxproj">
+      <Project>{349ec8db-87e2-4ddc-a7f5-cc828644e2aa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SkyDome\Sample_SkyDome.vcxproj">
+      <Project>{04320239-01a5-43d8-ae52-6b6fa4a1f458}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SkyPlane\Sample_SkyPlane.vcxproj">
+      <Project>{8252b25e-2cb2-4d28-9e7a-861599b0cf71}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Smoke\Sample_Smoke.vcxproj">
+      <Project>{a66eee0f-cc5e-4aac-8b92-7ef1166362f3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SphereMapping\Sample_SphereMapping.vcxproj">
+      <Project>{519d5eef-076a-4a92-aa97-e8f610e39c7f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\SSAO\Sample_SSAO.vcxproj">
+      <Project>{38184224-d2d6-4d99-a412-4e5b9881bfe6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Terrain\Sample_Terrain.vcxproj">
+      <Project>{5b99756e-fe63-404c-ac00-aeb71f3cc7c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Tesselation\Sample_Tesselation.vcxproj">
+      <Project>{26a10a68-8fdf-4bca-8a14-d74b9b023fb6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\TextureArray\Sample_TextureArray.vcxproj">
+      <Project>{f13b8709-90ee-4127-92b9-a466051f1e84}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\TextureFX\Sample_TextureFX.vcxproj">
+      <Project>{c47b0b71-24b6-4882-ae1e-f5b2cbe34b97}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Transparency\Sample_Transparency.vcxproj">
+      <Project>{3ee56382-0bf6-4846-b2e1-5a14fec00a50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\VolumeCSG\Sample_VolumeCSG.vcxproj">
+      <Project>{65122285-a197-4b97-b3f8-b86aef59f89e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\VolumeTerrain\Sample_VolumeTerrain.vcxproj">
+      <Project>{17c6287e-821e-4283-85d7-651959c3f0d7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\VolumeTex\Sample_VolumeTex.vcxproj">
+      <Project>{9f1bd809-1121-4604-b212-eca54c05c1bc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\build8\Samples\Water\Sample_Water.vcxproj">
+      <Project>{e2ee8206-4ea4-4602-a203-8bafa9d9c903}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\FreeImageLib\FreeImageLib.2012.WinRT.vcxproj">
+      <Project>{9e219df2-315d-478e-8a07-8960c377ce1e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibJPEG\LibJPEG.2012.WinRT.vcxproj">
+      <Project>{5e1d4e5f-e10c-4ba3-b663-f33014fd21d9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibMNG\LibMNG.2012.WinRT.vcxproj">
+      <Project>{912a2d43-35a3-4af2-b2eb-0d81effda6dc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibOpenJPEG\LibOpenJPEG.2012.WinRT.vcxproj">
+      <Project>{e3536c28-a7f1-4b53-8e52-7d2232f9e098}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibPNG\LibPNG.2012.WinRT.vcxproj">
+      <Project>{7db10b50-ce00-4d7a-b322-6824f05d2fcb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibRawLite\LibRawLite.2012.WinRT.vcxproj">
+      <Project>{07f662c1-1323-42ab-b6af-fbfd34a7437a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibTIFF\LibTIFF.2012.WinRT.vcxproj">
+      <Project>{431e3f3f-7c4d-430a-b8f1-4f165db64edc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\OpenEXR\OpenEXR.2012.WinRT.vcxproj">
+      <Project>{17a4874b-0606-4687-90b6-f91f8cb3b8af}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\ZLib\ZLib.FreeImage.2012.WinRT.vcxproj">
+      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\freetype-2.3.11\builds\win32\vc2005\freetype.2012.WinRT.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\zlib-1.2.3\projects\visualc6\zlib.2012.WinRT.vcxproj">
+      <Project>{e2c146f9-f840-4c21-9ca9-e1dd9649ab7a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\ogre-dependencies-winrt\src\zziplib-0.13.57\msvc8\zziplib.2012.WinRT.vcxproj">
+      <Project>{cb440073-2ed3-48ce-a1a1-b6eacb3a44bd}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Condition="'$(Configuration)'=='Phone Debug' or '$(Configuration)'=='Phone Release'" Project="$(MSBuildExtensionsPath)\Microsoft\WindowsPhone\v$(TargetPlatformVersion)\Microsoft.Cpp.WindowsPhone.$(TargetPlatformVersion).targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

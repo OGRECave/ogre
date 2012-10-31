@@ -223,4 +223,16 @@ namespace Ogre {
 
 #include "OgreHeaderSuffix.h"
 
+#if _DEBUG && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+#   pragma push_macro("NOMINMAX")
+#   define NOMINMAX
+#   include <windows.h>
+#   pragma pop_macro("NOMINMAX")
+#	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
+#	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
+#else
+#	define Ogre_OutputCString(str) std::cerr << str
+#	define Ogre_OutputWString(str) std::cerr << str
+#endif
+
 #endif // _String_H__

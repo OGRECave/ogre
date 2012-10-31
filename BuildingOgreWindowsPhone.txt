@@ -1,0 +1,40 @@
+To build Ogre for Windows Phone some manual steps are required:
+
+1.	Install Windows Phone 8 SDK.
+2.	Get the OGRE WinRT dependencies from here: https://bitbucket.org/assaframan/ogre-dependencies-for-windows-phone/changesets
+3.	
+4.	Build dependencies in debug and release config.
+5.	Download and install latest cmake
+Now we need to fix cmake to support visual studio express.
+6.	Run visual studio express for windows phone 8 as admin (right click panel then "run as admin")
+7.	open this file in visual studio "C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CMakeVS11FindMake.cmake"
+8.	Goto line 19 and change it from:
+NAMES devenv
+To
+NAMES devenv VPDExpress
+9.	Open cmake, select source path (make sure you are using OGRE 1.9 or above) and create a build project (visual studio 11 project...)
+10.	Set the following cmake parameters:
+OGRE_DEPENDENCIES_DIR = the path of the dependencies from previous steps 
+OGRE_STATIC = ON
+OGRE_UNITY_BUILD = ON
+OGRE_BUILD_PLATFORM_WINDOWS_PHONE = ON
+Press Config button then set:
+OGRE_BUILD_PLATFORM_WINRT = ON
+
+11.	Generate solution
+12.	Open it
+13.	Remove  ALL_BUILD, INSTALL and PACKAGE projects from the solution
+14.	Select all projects in the solution tree, right click, properties, select all configs and "win32" platform in the combos at the top of the properties window, select "configuration properties" on the tree on the left of that window, then change "platform toolset" on the right of the window to v110_wp80
+15.	Select only RenderSystem_Direct3D11 project in the solution tree, right click, properties, select all configs and "win32" platform in the combos at the top of the properties window, select "configuration properties"->"C++"->"Command line" on the tree on the left of that window, add
+/ZW /AI "c:\Program Files (x86)\Windows Phone Kits\8.0\Windows Metadata"
+To the command line
+
+16.	Delete OgreWin32Resources.rc from Sample_CubeMapping
+17.	Open the configuration manager by right clicking the solution in the solution tree, on the right, active solution platform combo, select new, select arm, copy setting from win32
+18.	Add dependencies to solution by right clicking the solution, selecting add existing project then select the dependencies solution, all the dependencies should be now a part of the solution.
+19.	Add the following project to the solution - Samples\Browser\WinRT\SampleBrowserWinRT.vcxproj
+20.	Change to Phone debug or Phone release config.
+21.	Select Win32 or arm platform (win32 for emulation, arm for running on the device)
+22.	You may need to add the references to all of the solution projects for this project, so check by opening the "common properties"->"configuration properties" – and see that you don't have any error icons in the references.
+23.	Compile.
+24.	Before you run for the first time make sure you have a shader cache for the project you are running – as you can't compile shader on the phone. (TODO – explain more)  

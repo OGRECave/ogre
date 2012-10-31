@@ -79,7 +79,15 @@ namespace Ogre
                 }
 #else
                 if (mDebugOut && !maskDebug)
-                    std::cerr << message << std::endl;
+#	if _DEBUG && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
+				{
+					String logMessageString(message);
+					logMessageString.append( "\n" );
+                    Ogre_OutputCString( logMessageString.c_str());
+				}
+#	else
+					std::cerr << message << std::endl;
+#	endif
 #endif
 
 				// Write time into log

@@ -546,11 +546,11 @@ namespace Ogre
 			// parentWindowHandle		-> parentHWnd
 			opt = miscParams->find("parentWindowHandle");
 			if(opt != miscParams->end())
-				parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
+				parentHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
+				externalHandle = (HWND)StringConverter::parseUnsignedInt(opt->second);
 			// window border style
 			opt = miscParams->find("border");
 			if(opt != miscParams->end())
@@ -999,7 +999,7 @@ namespace Ogre
 	{
 		D3D11RenderWindowSwapChainBased::destroy();
 
-		if (mCoreWindow && !mIsExternal)
+		if (mCoreWindow.Get() && !mIsExternal)
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Only external window handles are supported."
 				, "D3D11RenderWindow::destroy" );
@@ -1018,6 +1018,15 @@ namespace Ogre
 
 		// triple buffer if VSync is on
 		mSwapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+#if  OGRE_WINRT_TARGET_TYPE == PHONE
+		mSwapChainDesc.BufferCount			= 1;									// WP8: One buffer.
+		mSwapChainDesc.Scaling				= DXGI_SCALING_STRETCH;					// WP8: Must be stretch scaling mode.
+		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;				// WP8: No swap effect.
+#else
+		mSwapChainDesc.BufferCount			= 2;									// Use two buffers to enable flip effect.
+		mSwapChainDesc.Scaling				= DXGI_SCALING_NONE;					// Otherwise stretch would be used by default.
+		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;		// MS recommends using this swap effect for all applications.
+#endif
 		mSwapChainDesc.BufferCount			= 2;									// Use two buffers to enable flip effect.
 		mSwapChainDesc.Scaling				= DXGI_SCALING_NONE;					// Otherwise stretch would be used by default.
 		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;		// MS recommends using this swap effect for all applications.
@@ -1029,13 +1038,13 @@ namespace Ogre
 		mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
 
 		// Create swap chain
-		HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow), &mSwapChainDesc, NULL, &mpSwapChain);
+		HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
     
 		if (FAILED(hr))
 		{
 			// Try a second time, may fail the first time due to back buffer count,
 			// which will be corrected by the runtime
-			hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow), &mSwapChainDesc, NULL, &mpSwapChain);
+			hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
 		}
 		if (FAILED(hr))
 			return hr;
@@ -1049,7 +1058,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	bool D3D11RenderWindowCoreWindow::isVisible() const
 	{
-		return (mCoreWindow && Windows::UI::Core::CoreWindow::GetForCurrentThread() == mCoreWindow);
+		return (mCoreWindow.Get() && Windows::UI::Core::CoreWindow::GetForCurrentThread() == mCoreWindow.Get());
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowCoreWindow::windowMovedOrResized()
@@ -1071,7 +1080,7 @@ namespace Ogre
 	// class D3D11RenderWindowImageSource
 	//---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE != PHONE
 	//---------------------------------------------------------------------
 	D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
 		: D3D11RenderWindowBase(device, pDXGIFactory)

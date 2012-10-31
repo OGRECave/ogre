@@ -638,23 +638,26 @@ namespace Ogre {
 			switch(mParentTexture->getTextureType()) {
 			case TEX_TYPE_1D:
  				{
-
-					mDevice.GetImmediateContext()->UpdateSubresource( 
-						mParentTexture->GetTex1D(), 
-						0,
-						&dstBoxDx11,
-						converted.data,
-						rowWidth,
-						0 );
-					if (mDevice.isError())
+					D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+					if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
 					{
-						String errorDescription = mDevice.getErrorDescription();
-						OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-							"D3D11 device cannot update 1d subresource\nError Description:" + errorDescription,
-							"D3D11HardwarePixelBuffer::blitFromMemory");
-					}
- 				}
-				break;
+						mDevice.GetImmediateContext()->UpdateSubresource( 
+							mParentTexture->GetTex1D(), 
+							0,
+							&dstBoxDx11,
+							converted.data,
+							rowWidth,
+							0 );
+						if (mDevice.isError())
+						{
+							String errorDescription = mDevice.getErrorDescription();
+							OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+								"D3D11 device cannot update 1d subresource\nError Description:" + errorDescription,
+								"D3D11HardwarePixelBuffer::blitFromMemory");
+						}
+						break; // For Feature levels that do not support 1D textures, revert to creating a 2D texture.
+ 					}
+				}
 			case TEX_TYPE_CUBE_MAP:
 			case TEX_TYPE_2D:
  				{

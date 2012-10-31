@@ -35,7 +35,11 @@ THE SOFTWARE.
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #pragma warning( disable : 4451 ) // http://social.msdn.microsoft.com/Forums/en-US/winappswithnativecode/thread/314b5826-0a66-4307-abfe-87b8052c3c07/
 
-#include <windows.ui.xaml.media.dxinterop.h>
+#    include <agile.h>
+#    if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+#    include <windows.ui.xaml.media.dxinterop.h>
+#    endif
+ 
 #endif
 
 namespace Ogre 
@@ -169,7 +173,7 @@ namespace Ogre
 		virtual void create(const String& name, unsigned width, unsigned height, bool fullScreen, const NameValuePairList *miscParams);
 		virtual void destroy(void);
 
-		Windows::UI::Core::CoreWindow^ getCoreWindow() const	{ return mCoreWindow; }
+		Windows::UI::Core::CoreWindow^ getCoreWindow() const	{ return mCoreWindow.Get(); }
 
 		bool isVisible() const;
 
@@ -180,9 +184,10 @@ namespace Ogre
 		virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice);
 
 	protected:
-		Windows::UI::Core::CoreWindow^ mCoreWindow;
+		Platform::Agile<Windows::UI::Core::CoreWindow> mCoreWindow;
 	};
 
+#if  OGRE_WINRT_TARGET_TYPE != PHONE
 
 	class D3D11RenderWindowImageSource
 		: public D3D11RenderWindowBase
@@ -210,6 +215,7 @@ namespace Ogre
 		Windows::UI::Xaml::Media::Imaging::SurfaceImageSource^	mImageSource;		// size depended, can be NULL
 		ISurfaceImageSourceNative*								mImageSourceNative;	// size depended, can be NULL
 	};
+#endif // OGRE_WINRT_TARGET_TYPE != PHONE
 
 #endif
 
