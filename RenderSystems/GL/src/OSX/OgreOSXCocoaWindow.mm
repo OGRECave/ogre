@@ -491,7 +491,7 @@ namespace Ogre {
             NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 
             GLint bufferRect[4];
-            bufferRect[0] = viewFrame.origin.x; // 0 = left edge
+            bufferRect[0] = viewFrame.origin.x; // 0 = left edge 
             bufferRect[1] = windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height); // 0 = bottom edge 
             bufferRect[2] = viewFrame.size.width; // width of buffer rect 
             bufferRect[3] = viewFrame.size.height; // height of buffer rect 
@@ -500,8 +500,8 @@ namespace Ogre {
             [mGLContext update];
 
             
-            mLeft = windowFrame.origin.x; 
-            mTop = screenFrame.size.height - windowFrame.size.height;
+            mLeft = viewFrame.origin.x; 
+            mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
         
@@ -521,7 +521,7 @@ namespace Ogre {
     {
         if(!mIsFullScreen)
         {
-            NSRect frame = [mWindow frame];
+            NSRect frame = [mView frame];
             NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
             mWidth = (unsigned int)frame.size.width;
             mHeight = (unsigned int)frame.size.height;
