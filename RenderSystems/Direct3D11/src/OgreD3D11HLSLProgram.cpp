@@ -367,11 +367,11 @@ namespace Ogre {
         HLSLIncludeHandler includeHandler(this);
 
         ID3DBlob * errors = 0;
+        String stringBuffer;
+        vector<D3D_SHADER_MACRO>::type defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
         if (!shaderMacroSet)
         {
-            String stringBuffer;
-            vector<D3D_SHADER_MACRO>::type defines;
             getDefines(stringBuffer, defines, mPreprocessorDefines);
             pDefines = defines.empty() ? NULL : &defines[0];
         }

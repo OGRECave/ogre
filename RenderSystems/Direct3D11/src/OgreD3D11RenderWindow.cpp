@@ -546,11 +546,11 @@ namespace Ogre
 			// parentWindowHandle		-> parentHWnd
 			opt = miscParams->find("parentWindowHandle");
 			if(opt != miscParams->end())
-				parentHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
 			// window border style
 			opt = miscParams->find("border");
 			if(opt != miscParams->end())
@@ -962,7 +962,7 @@ namespace Ogre
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = reinterpret_cast<Windows::UI::Core::CoreWindow^>((void*)StringConverter::parseUnsignedInt(opt->second));
+				externalHandle = reinterpret_cast<Windows::UI::Core::CoreWindow^>((void*)StringConverter::parseSizeT(opt->second));
 		}
 
 		// Reset current window if any
@@ -1027,9 +1027,6 @@ namespace Ogre
 		mSwapChainDesc.Scaling				= DXGI_SCALING_NONE;					// Otherwise stretch would be used by default.
 		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;		// MS recommends using this swap effect for all applications.
 #endif
-		mSwapChainDesc.BufferCount			= 2;									// Use two buffers to enable flip effect.
-		mSwapChainDesc.Scaling				= DXGI_SCALING_NONE;					// Otherwise stretch would be used by default.
-		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;		// MS recommends using this swap effect for all applications.
 		mSwapChainDesc.AlphaMode			= DXGI_ALPHA_MODE_UNSPECIFIED;
 
 		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());

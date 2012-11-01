@@ -1208,7 +1208,7 @@ protected:
 			Ogre::NameValuePairList miscParams;
 			if(mNativeWindow.Get())
 			{
-				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((unsigned long)reinterpret_cast<void*>(mNativeWindow.Get()));
+				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
 				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
 			}
 #	if (OGRE_WINRT_TARGET_TYPE != PHONE)
@@ -1217,7 +1217,7 @@ protected:
 				miscParams["windowType"] = "SurfaceImageSource";
 				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeControl->ActualWidth, mNativeControl->ActualHeight, false, &miscParams);
 				void* pUnk = NULL;
-				res->getCustomAttribute("ImageBrush", &pUnk)
+				res->getCustomAttribute("ImageBrush", &pUnk);
 				mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
 			}
 #	endif // (OGRE_WINRT_TARGET_TYPE != PHONE)
