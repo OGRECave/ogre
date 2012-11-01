@@ -1829,15 +1829,14 @@ bail:
 		else
 		{
 			mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-			/*mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
+			mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
 			mBlendDesc.RenderTarget[0].DestBlend = mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor);
-			mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);*/
+			mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);
 
 			// feature level 9 and below does not support alpha to coverage.
 			if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
 				mBlendDesc.AlphaToCoverageEnable = false;
 			else
-			mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 				mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 
 			mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
