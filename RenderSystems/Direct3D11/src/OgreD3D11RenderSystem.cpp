@@ -298,12 +298,10 @@ bail:
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #	 if  OGRE_WINRT_TARGET_TYPE == PHONE
         optMaxFeatureLevels.possibleValues.push_back("9.2");
-        optMaxFeatureLevels.possibleValues.push_back("9.3");
-        optMaxFeatureLevels.currentValue = "9.3";
-#    else
-        optMaxFeatureLevels.currentValue = "9.3";
 #    endif
+        optMaxFeatureLevels.currentValue = "9.3";
 #else     
+        optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.possibleValues.push_back("10.0");
         optMaxFeatureLevels.possibleValues.push_back("10.1");
         optMaxFeatureLevels.possibleValues.push_back("11.0");
