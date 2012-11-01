@@ -592,7 +592,11 @@ namespace Ogre {
 			{
 				syntax = "vs_1_1";
 			}
-			else if (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
+			else if (
+                        (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
+                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1"))
+                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
+                    )
 			{
 				syntax = "vs_4_0";
 			}
@@ -623,7 +627,21 @@ namespace Ogre {
 						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
 							vertexProgramLightTypes[v], syntax, 
 							vertexProgramFinite[v], vertexProgramDebug[v]));
-						vp->setParameter("target", syntax);
+
+                        String targetSuffix = "s_4_0";
+                        if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") == false)
+                        {
+                            if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
+                            {
+                                targetSuffix = "s_4_0_level_9_3";
+                            }
+                            else
+                            {
+                                targetSuffix = "s_4_0_level_9_1";
+                            }
+                        }
+
+						vp->setParameter("target", "v" + targetSuffix);
 						vp->setParameter("entry_point", "vs_main");			
 						vp->load();
 
@@ -635,7 +653,7 @@ namespace Ogre {
 								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"hlsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_4_0);
-							fp->setParameter("target", "ps_4_0");
+							fp->setParameter("target", "p" + targetSuffix);
 							fp->setParameter("entry_point", "fs_main");			
 							fp->load();
 						}
