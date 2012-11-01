@@ -280,7 +280,6 @@ bail:
         optMinFeatureLevels;
         optMinFeatureLevels.name = "Min Requested Feature Levels";
         optMinFeatureLevels.possibleValues.push_back("9.1");
-        optMinFeatureLevels.possibleValues.push_back("9.2");
         optMinFeatureLevels.possibleValues.push_back("9.3");
         optMinFeatureLevels.possibleValues.push_back("10.0");
         optMinFeatureLevels.possibleValues.push_back("10.1");
@@ -299,6 +298,7 @@ bail:
 #	 if  OGRE_WINRT_TARGET_TYPE == PHONE
         optMaxFeatureLevels.possibleValues.push_back("9.2");
 #    endif
+        optMaxFeatureLevels.possibleValues.push_back("9.3");
         optMaxFeatureLevels.currentValue = "9.3";
 #else     
         optMaxFeatureLevels.possibleValues.push_back("9.3");
@@ -1265,10 +1265,6 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_1)
         {
             rsc->addShaderProfile("ps_4_0_level_9_1");
-        }
-        if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_2)
-        {
-            rsc->addShaderProfile("ps_4_0_level_9_2");
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_3)
         {
