@@ -46,7 +46,10 @@ THE SOFTWARE.
 
 namespace Ogre {
 	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
-		: EGLWindow(glsupport)
+		: EGLWindow(glsupport),
+		  mMaxBufferSize(32),
+		  mMaxDepthSize(24),
+		  mMaxStencilSize(8)
 	{
 	}
 
@@ -152,6 +155,21 @@ namespace Ogre {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);
             }
+			
+			if((opt = miscParams->find("maxColourBufferSize")) != end)
+            {
+                mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
+            }
+			
+			if((opt = miscParams->find("maxDepthBufferSize")) != end)
+            {
+                mMaxDepthSize = Ogre::StringConverter::parseInt(opt->second);
+            }
+			
+			if((opt = miscParams->find("maxStencilBufferSize")) != end)
+            {
+                mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
+            }
         }
         
         initNativeCreatedWindow(miscParams);
@@ -215,23 +233,16 @@ namespace Ogre {
         
         int minAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-            EGL_BLUE_SIZE, 5,
-            EGL_GREEN_SIZE, 6,
-            EGL_RED_SIZE, 5,
+            EGL_BUFFER_SIZE, 16,
             EGL_DEPTH_SIZE, 16,
-            EGL_STENCIL_SIZE, 8,
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
             EGL_NONE
         };
         
         int maxAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES_BIT,
-            EGL_BLUE_SIZE, 8,
-            EGL_GREEN_SIZE, 8,
-            EGL_RED_SIZE, 8,
-            EGL_DEPTH_SIZE, 24,
-            EGL_STENCIL_SIZE, 8,
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+			EGL_BUFFER_SIZE, mMaxBufferSize,
+            EGL_DEPTH_SIZE, mMaxDepthSize,
+            EGL_STENCIL_SIZE, mMaxStencilSize,
             EGL_NONE
         };
         

@@ -36,6 +36,11 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
+	private:
+		uint mMaxBufferSize;
+		uint mMaxDepthSize;
+		uint mMaxStencilSize;
+		
 	protected:
 		virtual EGLContext * createEGLContext() const;
 		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
@@ -46,7 +51,7 @@ namespace Ogre {
 		virtual void windowMovedOrResized();
 		virtual void switchFullScreen(bool fullscreen);
         
-    public:
+    public:		
 		AndroidEGLWindow(AndroidEGLSupport* glsupport);
 		virtual ~AndroidEGLWindow();
         void create(const String& name, unsigned int width, unsigned int height,

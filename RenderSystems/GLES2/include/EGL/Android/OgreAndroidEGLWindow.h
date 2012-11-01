@@ -36,6 +36,11 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
+	private:
+		uint mMaxBufferSize;
+		uint mMaxDepthSize;
+		uint mMaxStencilSize;
+		
 	protected:
 		virtual EGLContext * createEGLContext() const;
 		virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
