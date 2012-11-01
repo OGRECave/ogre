@@ -411,15 +411,6 @@ namespace Ogre {
 
         ID3DBlob * pMicroCode;
 
-        if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0)
-        {
-            const String& shaderTarget = getCompatibleTarget();
-			if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_3)
-	            target = shaderTarget.find("vs") == 0 ? "vs_4_0_level_9_3" : "ps_4_0_level_9_3";
-			else
-	            target = shaderTarget.find("vs") == 0 ? "vs_4_0_level_9_1" : "ps_4_0_level_9_1";
-        }
-
 
         HRESULT hr = D3DCompile(
             mSource.c_str(),	// [in] Pointer to the shader in memory. 

@@ -1230,12 +1230,10 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_1)
         {
             rsc->addShaderProfile("vs_4_0_level_9_1");
-            rsc->addShaderProfile("vs_4_0"); // this will be removed later - for now it saves time adding level profile to the scripts
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_3)
         {
             rsc->addShaderProfile("vs_4_0_level_9_3");
-            rsc->addShaderProfile("vs_4_0"); // this will be removed later - for now it saves time adding level profile to the scripts
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
@@ -1267,7 +1265,6 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_1)
         {
             rsc->addShaderProfile("ps_4_0_level_9_1");
-            rsc->addShaderProfile("ps_4_0"); // this will be removed later - for now it saves time adding level profile to the scripts
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_2)
         {
@@ -1276,7 +1273,6 @@ bail:
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_9_3)
         {
             rsc->addShaderProfile("ps_4_0_level_9_3");
-            rsc->addShaderProfile("ps_4_0"); // this will be removed later - for now it saves time adding level profile to the scripts
         }
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
         {
