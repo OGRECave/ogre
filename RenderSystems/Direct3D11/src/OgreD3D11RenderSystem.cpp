@@ -3622,11 +3622,10 @@ bail:
 #if  OGRE_WINRT_TARGET_TYPE == PHONE
         mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
 #    else
-// Technically WINRT should only support up to 9_1, however to generate the proper cache file for the phone we need to be running with 9_3 on Win8.
-        mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
+        mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
 #    endif
 #else
-		mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
+		mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
 #endif
 		mUseNVPerfHUD = false;
 		mHLSLProgramFactory = NULL;
