@@ -1744,7 +1744,7 @@ bail:
 	{
 		static D3D11TexturePtr dt;
 		dt = tex;
-		if (enabled)
+		if (enabled && dt->getSize() > 0)
 		{
 			// note used
 			dt->touch();
@@ -1829,14 +1829,15 @@ bail:
 		else
 		{
 			mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-			mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
+			/*mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
 			mBlendDesc.RenderTarget[0].DestBlend = mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor);
-			mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);
+			mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);*/
 
 			// feature level 9 and below does not support alpha to coverage.
 			if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
 				mBlendDesc.AlphaToCoverageEnable = false;
 			else
+			mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 				mBlendDesc.AlphaToCoverageEnable = mSceneAlphaToCoverage;
 
 			mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
@@ -1987,18 +1988,17 @@ bail:
 	{
 		switch(ftype) {
 		case FT_MIN:
-			FilterMinification = filter;
+			FilterMinification[unit] = filter;
 			break;
 		case FT_MAG:
-			FilterMagnification = filter;
+			FilterMagnification[unit] = filter;
 			break;
 		case FT_MIP:
-			FilterMips = filter;
+			FilterMips[unit] = filter;
 			break;
 		}
 
-		mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification, FilterMagnification, FilterMips,CompareEnabled);
-
+		mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],CompareEnabled);
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
@@ -2334,6 +2334,9 @@ bail:
 				opState->mTextures[opState->mTexturesCount] = texture;
 				opState->mTexturesCount++;
 
+				stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
+								FilterMips[n],false );
+				stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
 				stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 				stage.samplerDesc.MinLOD = 0;
 				stage.samplerDesc.MipLODBias = 0.f;
@@ -2352,6 +2355,11 @@ bail:
 				opState->mSamplerStates[n] = (samplerState);		
 			}
 			opState->mSamplerStatesCount = numberOfSamplers;
+		}
+
+		for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
+		{
+			opState->mTextures[n] = NULL;
 		}
 
 		//if (opState->mBlendState != mBoundBlendState)
@@ -3647,9 +3655,13 @@ bail:
 		ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
 		ZeroMemory( &mScissorRect, sizeof(mScissorRect));
 
-		FilterMinification = FO_NONE;
-		FilterMagnification = FO_NONE;
-		FilterMips = FO_NONE;
+		// set filters to defaults
+		for (size_t n = 0; n < OGRE_MAX_TEXTURE_LAYERS; n++)
+		{
+			FilterMinification[n] = FO_NONE;
+			FilterMagnification[n] = FO_NONE;
+			FilterMips[n] = FO_NONE;
+		}
 
 		mPolygonMode = PM_SOLID;
 
