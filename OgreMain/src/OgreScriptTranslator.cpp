@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDepthBuffer.h"
+#include "OgreRoot.h"
 
 namespace Ogre{
 	
@@ -2717,9 +2718,17 @@ namespace Ogre{
 									switch(atom->id)
 									{
 									case ID_1D:
-										texType = TEX_TYPE_1D;
-										break;
-									case ID_2D:
+										// fallback to 2d texture if 1d is not supported
+										{
+											// Use the current render system
+											RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+											if (rs->getCapabilities()->hasCapability(RSC_TEXTURE_1D))
+											{
+												texType = TEX_TYPE_1D;
+												break;
+											}
+										}									case ID_2D:
 										texType = TEX_TYPE_2D;
 										break;
 									case ID_3D:

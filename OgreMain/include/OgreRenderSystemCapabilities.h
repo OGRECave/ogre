@@ -166,6 +166,10 @@ namespace Ogre
 		RSC_CAN_GET_COMPILED_SHADER_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 12),
 		/// Supports dynamic linkage/shader subroutine
 		RSC_SHADER_SUBROUTINE = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 13),
+		/// Supports 3d texture render targets
+		RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 14),
+		/// Supports 1d textures
+		RSC_TEXTURE_1D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported
