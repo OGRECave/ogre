@@ -350,6 +350,8 @@ namespace Ogre {
         if(mGLSupport->checkExtension("GL_OES_texture_float") || mGLSupport->checkExtension("GL_OES_texture_float"))
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
+		rsc->setCapability(RSC_TEXTURE_1D);			
+
         // Alpha to coverage always 'supported' when MSAA is available
         // although card may ignore it if it doesn't specifically support A2C
         rsc->setCapability(RSC_ALPHA_TO_COVERAGE);

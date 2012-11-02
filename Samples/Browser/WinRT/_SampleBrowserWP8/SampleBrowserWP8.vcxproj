@@ -1,0 +1,340 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4ded2767-4587-4171-aa6e-6ee9bbc351f3}</ProjectGuid>
+    <RootNamespace>SampleBrowserWP8</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <XapOutputs>true</XapOutputs>
+    <XapFilename>SampleBrowserWP8_$(Configuration)_$(Platform).xap</XapFilename>
+    <WinMDAssembly>true</WinMDAssembly>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_wp80</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110_wp80</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v110_wp80</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v110_wp80</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PreprocessorDefinitions>USE_RTSHADER_SYSTEM;ENABLE_SHADERS_CACHE;PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>;..\..\src;..\..\include;..\..\..\shadersystem\include;..\..\..\DualQuaternion\include;..\..\..\DeferredShading\include;..\..\..\Instancing\include;..\..\..\NewInstancing\include;..\..\..\TextureArray\include;..\..\..\SSAO\include;..\..\..\OceanDemo\include;..\..\..\VolumeCSG\include;..\..\..\VolumeTerrain\include;..\..\..\Terrain\include;..\..\..\CelShading\include;..\..\..\Compositor\include;..\..\..\CubeMapping\include;..\..\..\Dot3Bump\include;..\..\..\Fresnel\include;..\..\..\Water\include;..\..\..\BezierPatch\include;..\..\..\CameraTrack\include;..\..\..\Character\include;..\..\..\DynTex\include;..\..\..\FacialAnimation\include;..\..\..\Grass\include;..\..\..\Lighting\include;..\..\..\ParticleFX\include;..\..\..\Shadows\include;..\..\..\SkeletalAnimation\include;..\..\..\SkyBox\include;..\..\..\SkyDome\include;..\..\..\SkyPlane\include;..\..\..\Smoke\include;..\..\..\SphereMapping\include;..\..\..\Tesselation\include;..\..\..\TextureFX\include;..\..\..\Transparency\include;..\..\..\OgreRTShaderSystem;..\..\..\BSP\include\;..\..\..\..\OgreMain/include;C:/hg code/build8/include;C:/hg code/ogre-dependencies-winrt/include;C:/hg code/ogre-dependencies-winrt/include/OIS;C:/hg code/trunk;..\..\..\..\OgreMain/include/Threading;..\..\..\..\Samples/Common/include;..\..\..\..\Components/RTShaderSystem/include;..\..\..\..\Components/Overlay/include;..\..\..\..\PlugIns/BSPSceneManager/include;..\..\..\..\PlugIns/CgProgramManager/include;..\..\..\..\PlugIns/OctreeSceneManager/include;..\..\..\..\PlugIns/OctreeZone/include;..\..\..\..\PlugIns/ParticleFX/include;..\..\..\..\PlugIns/PCZSceneManager/include;..\..\..\..\RenderSystems/Direct3D9/include;..\..\..\..\RenderSystems/Direct3D11/include;..\..\..\..\RenderSystems/GLES/include;..\..\..\..\RenderSystems/GLES2/include;..\..\..\..\RenderSystems/GL/include;..\..\..\..\RenderSystems/GL/src/GLSL/include;..\..\..\..\RenderSystems/GL/src/atifs/include;..\..\..\..\RenderSystems/GL/src/nvparse;..\..\..\..\Samples/Water/include;$(ProjectDir);$(IntermediateOutputPath);$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PreprocessorDefinitions>PSAPI_VERSION=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsWinRT>true</CompileAsWinRT>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <IgnoreSpecificDefaultLibraries>ole32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="platform.winmd">
+      <IsWinMDFile>true</IsWinMDFile>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="WMAppManifest.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\build8\Components\Overlay\OgreOverlay.vcxproj">
+      <Project>{a82464cd-1d58-4696-9ccf-7fac5ee29bff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Components\Paging\OgrePaging.vcxproj">
+      <Project>{368538e5-682e-4e9a-bc65-17f131da975b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Components\RTShaderSystem\OgreRTShaderSystem.vcxproj">
+      <Project>{104cdbff-93bb-4b53-aa9d-1915dea85e54}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Components\Terrain\OgreTerrain.vcxproj">
+      <Project>{f24ad38d-efa8-4fdd-91fd-bc5b5b71a40b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Components\Volume\OgreVolume.vcxproj">
+      <Project>{3995d5b5-eec5-4708-b35e-83fa306934d1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\OgreMain\OgreMain.vcxproj">
+      <Project>{6e786c7b-1f86-4641-9b5b-192707b805d2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\PlugIns\BSPSceneManager\Plugin_BSPSceneManager.vcxproj">
+      <Project>{f178a0f8-4306-4c52-ac12-6974525d69e2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\PlugIns\OctreeSceneManager\Plugin_OctreeSceneManager.vcxproj">
+      <Project>{0eda29bf-ac92-4056-a728-c036d76d54b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\PlugIns\OctreeZone\Plugin_OctreeZone.vcxproj">
+      <Project>{2834f2c7-497c-4781-8f9d-ff50d666d0ff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\PlugIns\ParticleFX\Plugin_ParticleFX.vcxproj">
+      <Project>{6ca58455-e179-4f49-9ee8-d784a1c677a2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\PlugIns\PCZSceneManager\Plugin_PCZSceneManager.vcxproj">
+      <Project>{70ba8aa1-9f01-41a5-8949-855037f4b055}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\RenderSystems\Direct3D11\RenderSystem_Direct3D11.vcxproj">
+      <Project>{4b2b4ef5-90c3-43f0-95d4-6d23a16f2f40}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\BezierPatch\Sample_BezierPatch.vcxproj">
+      <Project>{56e1402c-b428-46db-8bf3-77585bcbc228}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\BSP\Sample_BSP.vcxproj">
+      <Project>{aeea29c8-148b-41ed-963d-32c35f9d28bd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\CameraTrack\Sample_CameraTrack.vcxproj">
+      <Project>{60d5732e-651d-4585-af16-a4354ceadcb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\CelShading\Sample_CelShading.vcxproj">
+      <Project>{84ce8691-ef9b-4c34-9d7a-cdfac0dba293}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Character\Sample_Character.vcxproj">
+      <Project>{e3a8ffee-d600-4bdf-bc8a-0c7a4d5f3b53}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Compositor\Sample_Compositor.vcxproj">
+      <Project>{7153fa98-4dc8-4622-82bc-ecf7d5e9eef6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\CubeMapping\Sample_CubeMapping.vcxproj">
+      <Project>{ea2f76ea-2365-4082-8632-e0d2a9a6e8be}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\DeferredShading\Sample_DeferredShading.vcxproj">
+      <Project>{35b2f485-ba5b-4fa2-ad2d-9c65a581df7e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Dot3Bump\Sample_Dot3Bump.vcxproj">
+      <Project>{3e5031cd-562a-4949-99a2-92a0b001f85b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\DualQuaternion\Sample_DualQuaternion.vcxproj">
+      <Project>{7a930809-7cd6-4073-94a4-ae2b26601fb3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\DynTex\Sample_DynTex.vcxproj">
+      <Project>{82743df4-247c-4356-8e5c-b9c4025580ea}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\EndlessWorld\Sample_EndlessWorld.vcxproj">
+      <Project>{9a2d7063-0f95-49e8-a9af-cc40a928dbd9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\FacialAnimation\Sample_FacialAnimation.vcxproj">
+      <Project>{934e22b5-5e36-46a1-8ee7-6b15715c2c82}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Fresnel\Sample_Fresnel.vcxproj">
+      <Project>{c117b6f8-fa3b-4d33-b1a0-d96eaf1193d5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Grass\Sample_Grass.vcxproj">
+      <Project>{37af833b-c6dd-4e94-b8b1-17036ca040f5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Instancing\Sample_Instancing.vcxproj">
+      <Project>{457ef1b9-00d5-41c2-9c80-247e9880df65}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Isosurf\Sample_Isosurf.vcxproj">
+      <Project>{36fefc64-64a6-4fb3-b08c-4ba4a603d869}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Lighting\Sample_Lighting.vcxproj">
+      <Project>{31396274-0e5e-44b3-b230-87b26be6eb16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\NewInstancing\Sample_NewInstancing.vcxproj">
+      <Project>{e0b3cc21-f09b-4046-865b-c5d71c4310cc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\OceanDemo\Sample_Ocean.vcxproj">
+      <Project>{b812c719-6da7-4174-ac3f-4c5d33f45052}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\ParticleFX\Sample_ParticleFX.vcxproj">
+      <Project>{2679f71f-03eb-4905-a6fd-36faf46d3a11}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\ParticleGS\Sample_ParticleGS.vcxproj">
+      <Project>{2d77599e-f619-46b4-ad45-a26b039f6a9b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\ShaderSystemMultiLight\Sample_ShaderSystemMultiLight.vcxproj">
+      <Project>{467b10df-32b7-4de9-aa35-b3dab988db45}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\ShaderSystemTexturedFog\Sample_ShaderSystemTexturedFog.vcxproj">
+      <Project>{b09bcd16-c86d-462b-83e0-015c317a1737}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\ShaderSystem\Sample_ShaderSystem.vcxproj">
+      <Project>{aa9b615b-7efe-4099-9c60-9763734ab30c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Shadows\Sample_Shadows.vcxproj">
+      <Project>{a8e327c3-749f-45e0-a423-9a8b0e87095f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SkeletalAnimation\Sample_SkeletalAnimation.vcxproj">
+      <Project>{50e7e811-0e67-4ae2-9378-2ef4d0e882fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SkyBox\Sample_SkyBox.vcxproj">
+      <Project>{349ec8db-87e2-4ddc-a7f5-cc828644e2aa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SkyDome\Sample_SkyDome.vcxproj">
+      <Project>{04320239-01a5-43d8-ae52-6b6fa4a1f458}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SkyPlane\Sample_SkyPlane.vcxproj">
+      <Project>{8252b25e-2cb2-4d28-9e7a-861599b0cf71}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Smoke\Sample_Smoke.vcxproj">
+      <Project>{a66eee0f-cc5e-4aac-8b92-7ef1166362f3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SphereMapping\Sample_SphereMapping.vcxproj">
+      <Project>{519d5eef-076a-4a92-aa97-e8f610e39c7f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\SSAO\Sample_SSAO.vcxproj">
+      <Project>{38184224-d2d6-4d99-a412-4e5b9881bfe6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Terrain\Sample_Terrain.vcxproj">
+      <Project>{5b99756e-fe63-404c-ac00-aeb71f3cc7c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Tesselation\Sample_Tesselation.vcxproj">
+      <Project>{26a10a68-8fdf-4bca-8a14-d74b9b023fb6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\TextureArray\Sample_TextureArray.vcxproj">
+      <Project>{f13b8709-90ee-4127-92b9-a466051f1e84}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\TextureFX\Sample_TextureFX.vcxproj">
+      <Project>{c47b0b71-24b6-4882-ae1e-f5b2cbe34b97}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Transparency\Sample_Transparency.vcxproj">
+      <Project>{3ee56382-0bf6-4846-b2e1-5a14fec00a50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\VolumeCSG\Sample_VolumeCSG.vcxproj">
+      <Project>{65122285-a197-4b97-b3f8-b86aef59f89e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\VolumeTerrain\Sample_VolumeTerrain.vcxproj">
+      <Project>{17c6287e-821e-4283-85d7-651959c3f0d7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\VolumeTex\Sample_VolumeTex.vcxproj">
+      <Project>{9f1bd809-1121-4604-b212-eca54c05c1bc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\build8\Samples\Water\Sample_Water.vcxproj">
+      <Project>{e2ee8206-4ea4-4602-a203-8bafa9d9c903}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\FreeImageLib\FreeImageLib.2012.WinRT.vcxproj">
+      <Project>{9e219df2-315d-478e-8a07-8960c377ce1e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibJPEG\LibJPEG.2012.WinRT.vcxproj">
+      <Project>{5e1d4e5f-e10c-4ba3-b663-f33014fd21d9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibMNG\LibMNG.2012.WinRT.vcxproj">
+      <Project>{912a2d43-35a3-4af2-b2eb-0d81effda6dc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibOpenJPEG\LibOpenJPEG.2012.WinRT.vcxproj">
+      <Project>{e3536c28-a7f1-4b53-8e52-7d2232f9e098}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibPNG\LibPNG.2012.WinRT.vcxproj">
+      <Project>{7db10b50-ce00-4d7a-b322-6824f05d2fcb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibRawLite\LibRawLite.2012.WinRT.vcxproj">
+      <Project>{07f662c1-1323-42ab-b6af-fbfd34a7437a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\LibTIFF\LibTIFF.2012.WinRT.vcxproj">
+      <Project>{431e3f3f-7c4d-430a-b8f1-4f165db64edc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\OpenEXR\OpenEXR.2012.WinRT.vcxproj">
+      <Project>{17a4874b-0606-4687-90b6-f91f8cb3b8af}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\FreeImage-3.13.1\Source\ZLib\ZLib.FreeImage.2012.WinRT.vcxproj">
+      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\freetype-2.3.11\builds\win32\vc2005\freetype.2012.WinRT.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\zlib-1.2.3\projects\visualc6\zlib.2012.WinRT.vcxproj">
+      <Project>{e2c146f9-f840-4c21-9ca9-e1dd9649ab7a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\ogre-dependencies-winrt\src\zziplib-0.13.57\msvc8\zziplib.2012.WinRT.vcxproj">
+      <Project>{cb440073-2ed3-48ce-a1a1-b6eacb3a44bd}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\FileSystemLayerImpl_WIN32.cpp" />
+    <ClCompile Include="..\SampleBrowserWinRT.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Logo.png" />
+    <Image Include="SmallLogo.png" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsPhone\v$(TargetPlatformVersion)\Microsoft.Cpp.WindowsPhone.$(TargetPlatformVersion).targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
