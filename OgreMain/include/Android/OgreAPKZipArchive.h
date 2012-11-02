@@ -47,7 +47,7 @@ namespace Ogre{
 		const String& getType(void) const;
 
 		/// @copydoc FactoryObj::createInstance
-		Archive *createInstance( const String& name )
+		Archive *createInstance( const String& name, bool readOnly )
 		{
 			String apkName = name;
 	        if (apkName.size() > 0 && apkName[0] == '/')

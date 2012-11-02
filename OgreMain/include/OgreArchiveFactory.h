@@ -60,7 +60,15 @@ namespace Ogre {
     {
     public:
         virtual ~ArchiveFactory() {}
-        // No methods, must just override all methods inherited from FactoryObj
+        /** Creates a new object.
+        @param name Name of the object to create
+        @return
+            An object created by the factory. The type of the object depends on
+            the factory.
+        */
+        virtual Archive* createInstance(const String& name, bool readOnly) = 0;
+
+        virtual Archive* createInstance(const String& name) { return createInstance(name, true); }
     };
 	/** @} */
 	/** @} */
