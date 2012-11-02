@@ -909,6 +909,7 @@ namespace Ogre
 		rsc->setCapability(RSC_HWOCCLUSION);		
 		rsc->setCapability(RSC_USER_CLIP_PLANES);			
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);			
+		rsc->setCapability(RSC_TEXTURE_1D);			
 		rsc->setCapability(RSC_TEXTURE_3D);			
 		rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 		rsc->setNonPOW2TexturesLimited(false);

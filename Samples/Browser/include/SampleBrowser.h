@@ -1798,7 +1798,7 @@ protected:
 
 				mShaderGenerator->addSceneManager(sceneMgr);
 
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 				// Setup core libraries and shader cache path.
 				Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
 				Ogre::StringVector::iterator itGroup = groupVector.begin();
