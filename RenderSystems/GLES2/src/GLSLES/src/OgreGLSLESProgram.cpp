@@ -56,8 +56,8 @@ namespace Ogre {
 		, mGLShaderHandle(0)
         , mGLProgramHandle(0)
         , mCompiled(0)
-        , mIsOptimised(false)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        , mIsOptimised(false)
         , mOptimiserEnabled(true)
 #endif
     {

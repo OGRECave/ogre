@@ -150,11 +150,11 @@ namespace Ogre {
         GLuint mGLProgramHandle;
 		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
-        /// Flag indicating if shader has been successfully optimised
-        bool mIsOptimised;
 		/// Preprocessor options
 		String mPreprocessorDefines;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        /// Flag indicating if shader has been successfully optimised
+        bool mIsOptimised;
         bool mOptimiserEnabled;
 #endif
     };
