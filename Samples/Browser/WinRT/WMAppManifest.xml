@@ -1,32 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
-  <DefaultLanguage xmlns="" code="en" />
-  <App xmlns="" ProductID="{16664be1-875d-45b2-8c46-9d001629deb1}" Title="Ogre WinRT Browser" RuntimeType="Modern Native" Version="1.0.0.0" Genre="apps.normal" Author="Microsoft" Description="Ogre Graphics Engine Sample Browser&#xD;&#xA;" Publisher="Ogre WinRT Native Publisher" PublisherID="{3091fdc5-5f88-4f24-bdd8-51c46b94dd01}">
+  <DefaultLanguage xmlns="" code="en-US" />
+  <App xmlns="" ProductID="{4ded2767-4587-4171-aa6e-6ee9bbc351f3}" Title="OGRE Sample Browser" RuntimeType="Modern Native" Version="1.0.0.0" Genre="apps.normal" Author="OGRE Team" Description="" Publisher="OGRE" PublisherID="{4f39215b-e5f7-460e-8690-fb64c74430ef}">
     <IconPath IsRelative="true" IsResource="false">Assets\Logo.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_SENSORS" />
     </Capabilities>
     <Tasks>
-      <DefaultTask Name="_default" ImagePath="SampleBrowserWinRT.exe" ImageParams="" />
+      <DefaultTask Name="_default" ImagePath="SampleBrowserWP8.exe" ImageParams="" />
     </Tasks>
     <Tokens>
-      <PrimaryToken TokenID="TestToken" TaskName="_default">
+      <PrimaryToken TokenID="SampleBrowserWP8Token" TaskName="_default">
         <TemplateFlip>
           <SmallImageURI IsRelative="true" IsResource="false">Assets\SmallLogo.png</SmallImageURI>
           <Count>0</Count>
-          <BackgroundImageURI IsRelative="true" IsResource="false">Assets\StoreLogo.png</BackgroundImageURI>
-          <Title>SampleBrowserWinRT</Title>
+          <BackgroundImageURI IsRelative="true" IsResource="false">Assets\Logo.png</BackgroundImageURI>
+          <Title>SampleBrowserWP8</Title>
           <BackContent>
           </BackContent>
           <BackBackgroundImageURI>
           </BackBackgroundImageURI>
           <BackTitle>
           </BackTitle>
-          <LargeBackgroundImageURI>Assets\Logo.png</LargeBackgroundImageURI>
-          <LargeBackContent>
-          </LargeBackContent>
-          <LargeBackBackgroundImageURI>
-          </LargeBackBackgroundImageURI>
           <DeviceLockImageURI>
           </DeviceLockImageURI>
           <HasLarge>
