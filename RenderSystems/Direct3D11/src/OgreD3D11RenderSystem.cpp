@@ -1176,8 +1176,7 @@ bail:
 		if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
 		{
 			rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
-			rsc->setCapability(RSC_HWRENDER_TO_TEXTURE_3D);
-			rsc->setCapability(RSC_TEXTURE_1D);
+
 		}
 
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);

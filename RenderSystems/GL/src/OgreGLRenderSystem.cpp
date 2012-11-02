@@ -576,7 +576,6 @@ namespace Ogre {
 		}
 
 		// 3D textures should be supported by GL 1.2, which is our minimum version
-		rsc->setCapability(RSC_TEXTURE_1D);			
 		rsc->setCapability(RSC_TEXTURE_3D);
 
 		// Check for framebuffer object extension

@@ -304,8 +304,6 @@ namespace Ogre {
 //        if (mGLSupport->checkExtension("GL_IMG_user_clip_plane"))
             rsc->setCapability(RSC_USER_CLIP_PLANES);
 
-		rsc->setCapability(RSC_TEXTURE_1D);			
-
         if (mGLSupport->checkExtension("GL_OES_texture3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 

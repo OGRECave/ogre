@@ -51,7 +51,6 @@ namespace Ogre {
 		// Resource type
 		mResourceType = "GpuProgram";
 		mSaveMicrocodesToCache = false;
-		mCacheDirty = false;
 
 		// subclasses should register with resource group manager
 	}
@@ -222,11 +221,6 @@ namespace Ogre {
 		mSaveMicrocodesToCache = val;		
 	}
 	//---------------------------------------------------------------------
-	bool GpuProgramManager::isCacheDirty( void ) const
-	{
-		return mCacheDirty;		
-	}
-	//---------------------------------------------------------------------
 	String GpuProgramManager::addRenderSystemToName( const String & name )
 	{
 		// Use the current render system
@@ -257,8 +251,6 @@ namespace Ogre {
 		if ( foundIter == mMicrocodeCache.end() )
 		{
 			mMicrocodeCache.insert(make_pair(nameWithRenderSystem, microcode));
-			// if cache is modified, mark it as dirty.
-			mCacheDirty = true;
 		}
 		else
 		{
@@ -269,10 +261,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
 	{
-		if (!mCacheDirty)
-			return; 
-
-		if (!stream->isWriteable() )
+		if (!stream->isWriteable())
 		{
 			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
 				"Unable to write to stream " + stream->getName(),
@@ -334,10 +323,6 @@ namespace Ogre {
 
 			mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
 		}
-
-		// if cache is not modified, mark it as clean.
-		mCacheDirty = false;
-		
 	}
 	//---------------------------------------------------------------------
 
