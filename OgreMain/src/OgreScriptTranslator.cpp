@@ -3176,7 +3176,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							bool enabled;
+							bool enabled = false;
 							switch(atom->id)
 							{
 							case ScriptCompiler::ID_ON:
@@ -3208,7 +3208,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							CompareFunction func;
+							CompareFunction func = CMPF_GREATER_EQUAL;
 							switch(atom->id)
 							{
 							case ID_ALWAYS_FAIL:

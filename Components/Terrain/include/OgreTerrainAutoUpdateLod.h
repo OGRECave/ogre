@@ -54,6 +54,7 @@ namespace Ogre
 	class _OgreTerrainExport TerrainAutoUpdateLod : public TerrainAlloc
 	{
 	public:
+        virtual ~TerrainAutoUpdateLod() {}
 		/** Method to be called to change terrain's LOD level.
 			@param terrain Instance of Terrain which LOD level is going to be changed
 			@param synchronous Run this as part of main thread or in background

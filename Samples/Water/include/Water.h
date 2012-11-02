@@ -101,7 +101,6 @@ private:
 	static HardwareIndexBufferSharedPtr indexBuffer ; // indices for 2 faces
 	static HardwareVertexBufferSharedPtr *texcoordsVertexBuffers ;
     
-	float *texBufData;
 	void _prepareMesh()
 	{
 		int i,texLvl ;

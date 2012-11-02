@@ -290,7 +290,7 @@ namespace Ogre {
 			};
 
 			VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
-				: size ( cachesize ), type ( cachetype ), tail (0), buffersize (0), hit (0), miss (0)
+				: size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
 			{
 				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
 			}
@@ -310,7 +310,6 @@ namespace Ogre {
 		private:
 			unsigned int size;
 			uint32 *cache;
-			CacheType type;
 
 			unsigned int tail, buffersize;
 			unsigned int hit, miss;
