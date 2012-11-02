@@ -543,7 +543,7 @@ namespace Ogre {
 	}
     //-----------------------------------------------------------------------
     void ResourceGroupManager::addResourceLocation(const String& name, 
-        const String& locType, const String& resGroup, bool recursive)
+        const String& locType, const String& resGroup, bool recursive, bool readOnly)
     {
         ResourceGroup* grp = getResourceGroup(resGroup);
         if (!grp)
@@ -555,7 +555,7 @@ namespace Ogre {
 		OGRE_LOCK_MUTEX(grp->OGRE_AUTO_MUTEX_NAME) // lock group mutex
 
         // Get archive
-        Archive* pArch = ArchiveManager::getSingleton().load( name, locType );
+        Archive* pArch = ArchiveManager::getSingleton().load( name, locType, readOnly );
         // Add to location list
 		ResourceLocation* loc = OGRE_NEW_T(ResourceLocation, MEMCATEGORY_RESOURCE);
 		loc->archive = pArch;

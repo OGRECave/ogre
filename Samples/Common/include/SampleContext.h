@@ -28,7 +28,6 @@
 #ifndef __SampleContext_H__
 #define __SampleContext_H__
 
-#include "OgreBuildSettings.h"
 #include "OgreLogManager.h"
 #include "OgrePlugin.h"
 #include "FileSystemLayerImpl.h"
@@ -49,11 +48,11 @@
 #    define USE_RTSHADER_SYSTEM
 #    define OGRE_STATIC_GLES2
 #  endif
-#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
 #		define OGRE_STATIC_Direct3D9
 #    endif
-// dx11 will only work on vista and above, so be careful about statically linking
+// dx11 will only work on vista, so be careful about statically linking
 #    ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
 #      define OGRE_STATIC_Direct3D11
 #    endif

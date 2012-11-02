@@ -88,7 +88,7 @@ namespace Ogre{
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
         /// @copydoc FactoryObj::createInstance
-        Archive *createInstance( const String& name ) 
+        Archive *createInstance( const String& name, bool readOnly ) 
         {
             return OGRE_NEW APKFileSystemArchive(name, getType(), mAssetMgr);
         }

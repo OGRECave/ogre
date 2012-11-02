@@ -76,7 +76,7 @@ namespace Ogre {
             @par
                 If the function fails, an exception is thrown.
         */
-        Archive* load( const String& filename, const String& archiveType);
+        Archive* load( const String& filename, const String& archiveType, bool readOnly = true);
 
 		/** Unloads an archive.
 		@remarks

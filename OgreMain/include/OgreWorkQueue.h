@@ -473,7 +473,7 @@ namespace Ogre
 		class _OgreExport RequestHandlerHolder : public UtilityAlloc
 		{
 		protected:
-			OGRE_RW_MUTEX(mRWMutex);
+			OGRE_RW_MUTEX(mRWMutex)
 			RequestHandler* mHandler;
 		public:
 			RequestHandlerHolder(RequestHandler* handler)
@@ -530,7 +530,7 @@ namespace Ogre
 		OGRE_MUTEX(mRequestMutex)
 		OGRE_MUTEX(mProcessMutex)
 		OGRE_MUTEX(mResponseMutex)
-		OGRE_RW_MUTEX(mRequestHandlerMutex);
+		OGRE_RW_MUTEX(mRequestHandlerMutex)
 
 
 		void processRequestResponse(Request* r, bool synchronous);

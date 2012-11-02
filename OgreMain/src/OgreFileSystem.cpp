@@ -60,9 +60,13 @@ namespace Ogre {
 	bool FileSystemArchive::msIgnoreHidden = true;
 
     //-----------------------------------------------------------------------
-    FileSystemArchive::FileSystemArchive(const String& name, const String& archType )
+    FileSystemArchive::FileSystemArchive(const String& name, const String& archType, bool readOnly )
         : Archive(name, archType)
     {
+		// Even failed attempt to write to read only location violates Apple AppStore validation process.
+		// And successfull writing to some probe file does not prove that whole location with subfolders 
+		// is writable. Therefore we accept read only flag from outside and do not try to be too smart.
+		mReadOnly = readOnly;
     }
     //-----------------------------------------------------------------------
     bool FileSystemArchive::isCaseSensitive(void) const
@@ -191,19 +195,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileSystemArchive::load()
     {
-		OGRE_LOCK_AUTO_MUTEX
-        // test to see if this folder is writeable
-		String testPath = concatenate_path(mName, "__testwrite.ogre");
-		std::ofstream writeStream;
-		writeStream.open(testPath.c_str());
-		if (writeStream.fail())
-			mReadOnly = true;
-		else
-		{
-			mReadOnly = false;
-			writeStream.close();
-			::remove(testPath.c_str());
-		}
+		// nothing to do here
     }
     //-----------------------------------------------------------------------
     void FileSystemArchive::unload()

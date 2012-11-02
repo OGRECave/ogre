@@ -59,7 +59,6 @@ namespace Ogre {
 		SharedParametersMap mSharedParametersMap;
 		MicrocodeMap mMicrocodeCache;
 		bool mSaveMicrocodesToCache;
-		bool mCacheDirty;			// When this is true the cache is 'dirty' and should be resaved to disk.
 			
 		static String addRenderSystemToName( const String &  name );
 
@@ -188,10 +187,6 @@ namespace Ogre {
         /** Set if the microcode of a shader should be saved to a cache
         */
 		void setSaveMicrocodesToCache( const bool val );
-
-		/** Returns true if the microcodecache changed during the run.
-		*/
-		bool isCacheDirty(void) const;
 
 		bool canGetCompiledShaderBuffer();
         /** Check if a microcode is available for a program in the microcode cache.
