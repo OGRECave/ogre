@@ -679,8 +679,8 @@ void Sample_Compositor::createTextures(void)
 		}
 	}
 	ptr->unlock();
-
-	Ogre::Viewport *vp = mRoot->getAutoCreatedWindow()->getViewport(0); 
+    
+	Ogre::Viewport *vp = mWindow->getViewport(0); 
 
 	TexturePtr tex2 = TextureManager::getSingleton().createManual(
 		"DitherTex",
