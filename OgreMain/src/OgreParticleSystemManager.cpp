@@ -196,9 +196,14 @@ namespace Ogre {
 		// check name
 		if (mSystemTemplates.find(name) != mSystemTemplates.end())
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+			LogManager::getSingleton().logMessage("ParticleSystem template with name '" + name + "' already exists.");
+			return NULL;
+#else
 			OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, 
 				"ParticleSystem template with name '" + name + "' already exists.", 
 				"ParticleSystemManager::createTemplate");
+#endif
 		}
 
         ParticleSystem* tpl = OGRE_NEW ParticleSystem(name, resourceGroup);
