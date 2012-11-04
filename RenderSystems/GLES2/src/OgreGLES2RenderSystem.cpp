@@ -82,7 +82,8 @@ namespace Ogre {
         : mGpuProgramManager(0),
           mGLSLESProgramFactory(0),
           mHardwareBufferManager(0),
-          mRTTManager(0)
+          mRTTManager(0),
+		  mCurTexMipCount(0)
     {
         size_t i;
 
@@ -708,6 +709,9 @@ namespace Ogre {
 
 		if (enabled)
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+			mCurTexMipCount = 0;
+#endif
 			GLuint texID =  0;
 			if (!tex.isNull())
 			{
@@ -715,6 +719,9 @@ namespace Ogre {
 				tex->touch();
 				mTextureTypes[stage] = tex->getGLES2TextureTarget();
 				texID = tex->getGLID();
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+				mCurTexMipCount = tex->getNumMipmaps();
+#endif
 			}
 			else
 			{
@@ -1375,10 +1382,8 @@ namespace Ogre {
                         // linear min, linear mip
                         return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                         // linear min, point mip
                         return GL_LINEAR_MIPMAP_NEAREST;
-#endif
                     case FO_NONE:
                         // linear min, no mip
                         return GL_LINEAR;
@@ -1406,6 +1411,20 @@ namespace Ogre {
         return 0;
     }
 
+	void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+				FilterOptions magFilter, FilterOptions mipFilter)
+	{ 		
+		mMipFilter = mipFilter;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
+		{
+			mMipFilter = FO_NONE;			
+		}
+#endif
+		_setTextureUnitFiltering(unit, FT_MAG, magFilter);
+		_setTextureUnitFiltering(unit, FT_MIN, minFilter);
+	}
+				
     void GLES2RenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
 		if (!mStateCacheManager->activateGLTextureUnit(unit))
@@ -1424,12 +1443,11 @@ namespace Ogre {
         {
             case FT_MIN:
                 mMinFilter = fo;
-                // Combine with existing mip filter
-                mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                GL_TEXTURE_MIN_FILTER,
-                                getCombinedMinMipFilter());
-                break;
-
+				// Combine with existing mip filter
+				mStateCacheManager->setTexParameteri(mTextureTypes[unit],
+								GL_TEXTURE_MIN_FILTER,
+								getCombinedMinMipFilter());
+				break;
             case FT_MAG:
                 switch (fo)
                 {
@@ -1449,11 +1467,6 @@ namespace Ogre {
                 break;
             case FT_MIP:
                 mMipFilter = fo;
-
-                // Combine with existing min filter
-                mStateCacheManager->setTexParameteri(mTextureTypes[unit],
-                                GL_TEXTURE_MIN_FILTER,
-                                getCombinedMinMipFilter());
                 break;
         }
 
