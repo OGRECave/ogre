@@ -127,14 +127,6 @@ namespace Ogre
 		RSC_GEOMETRY_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 26),
 		/// Supports rendering to vertex buffers
 		RSC_HWRENDER_TO_VERTEX_BUFFER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 27),
-		/// Supports hardware tesselation hull programs
-		RSC_TESSELATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 28),
-		/// Supports hardware tesselation domain programs
-		RSC_TESSELATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 29),
-		/// Supports hardware compute programs
-		RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 30),
-		/// Supports asynchronous hardware occlusion queries
-		RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON, 31),
 
 		/// Supports compressed textures
 		RSC_TEXTURE_COMPRESSION = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 0),
@@ -170,6 +162,14 @@ namespace Ogre
 		RSC_HWRENDER_TO_TEXTURE_3D = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 14),
 		/// Supports 1d textures
 		RSC_TEXTURE_1D              = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 15),
+		/// Supports hardware tesselation hull programs
+		RSC_TESSELATION_HULL_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 16),
+		/// Supports hardware tesselation domain programs
+		RSC_TESSELATION_DOMAIN_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 17),
+		/// Supports hardware compute programs
+		RSC_COMPUTE_PROGRAM = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 18),
+		/// Supports asynchronous hardware occlusion queries
+		RSC_HWOCCLUSION_ASYNCHRONOUS = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_2, 19),
 
 		// ***** DirectX specific caps *****
 		/// Is DirectX feature "per stage constants" supported

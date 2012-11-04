@@ -143,6 +143,42 @@ namespace Ogre {
 		pLog->logMessage(
              " * Number of boolean constants for geometry programs: "
              + StringConverter::toString(mGeometryProgramConstantBoolCount));
+		pLog->logMessage(
+			" * Tesselation Hull programs: "
+			+ StringConverter::toString(hasCapability(RSC_TESSELATION_HULL_PROGRAM), true));
+		pLog->logMessage(
+             " * Number of floating-point constants for tesselation hull programs: "
+             + StringConverter::toString(mTesselationHullProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for tesselation hull programs: "
+             + StringConverter::toString(mTesselationHullProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for tesselation hull programs: "
+             + StringConverter::toString(mTesselationHullProgramConstantBoolCount));
+		pLog->logMessage(
+			" * Tesselation Domain programs: "
+			+ StringConverter::toString(hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM), true));
+		pLog->logMessage(
+             " * Number of floating-point constants for tesselation domain programs: "
+             + StringConverter::toString(mTesselationDomainProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for tesselation domain programs: "
+             + StringConverter::toString(mTesselationDomainProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for tesselation domain programs: "
+             + StringConverter::toString(mTesselationDomainProgramConstantBoolCount));
+		pLog->logMessage(
+			" * Compute programs: "
+			+ StringConverter::toString(hasCapability(RSC_COMPUTE_PROGRAM), true));
+		pLog->logMessage(
+             " * Number of floating-point constants for compute programs: "
+             + StringConverter::toString(mComputeProgramConstantFloatCount));
+		pLog->logMessage(
+             " * Number of integer constants for compute programs: "
+             + StringConverter::toString(mComputeProgramConstantIntCount));
+		pLog->logMessage(
+             " * Number of boolean constants for compute programs: "
+             + StringConverter::toString(mComputeProgramConstantBoolCount));
 		String profileList = "";
 		for(ShaderProfiles::iterator iter = mSupportedShaderProfiles.begin(), end = mSupportedShaderProfiles.end();
 			iter != end; ++iter)
