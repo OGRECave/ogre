@@ -63,8 +63,6 @@ namespace Ogre
 
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
-        /// A map of different texture types and the currently bound texture for each type
-        BindBufferMap mActiveTextureMap;
         /// A map of texture parameters for each texture unit
         TexUnitsMap mTexUnitsMap;
         /// Array of each OpenGL feature that is enabled i.e. blending, depth test, etc.
@@ -92,7 +90,7 @@ namespace Ogre
 		/// Stores the last bounded texture id
         GLuint mLastBoundedTexID;
         /// Stores the currently active texture unit
-        unsigned char mActiveTextureUnit;
+        GLenum mActiveTextureUnit;
         /// Mask of buffers who contents can be discarded if GL_EXT_discard_framebuffer is supported
         unsigned int mDiscardBuffers;
         /// Stores the current depth clearing colour
@@ -121,7 +119,7 @@ namespace Ogre
         void setTexParameteri(GLenum target, GLenum pname, GLint param);
         
         /// See GLES2StateCacheManager.activateGLTextureUnit.
-        bool activateGLTextureUnit(unsigned char unit);
+        bool activateGLTextureUnit(size_t unit);
         
         /// See GLES2StateCacheManager.getBlendEquation.
         GLenum getBlendEquation(void) const { return mBlendEquation; }

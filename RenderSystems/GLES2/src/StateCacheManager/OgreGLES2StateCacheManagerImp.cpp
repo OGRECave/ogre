@@ -115,7 +115,6 @@ namespace Ogre {
         mEnableVector.clear();
         mActiveBufferMap.clear();
         mTexUnitsMap.clear();
-        mActiveTextureMap.clear();
     }
     
     GLES2StateCacheManagerImp::~GLES2StateCacheManagerImp(void)
@@ -125,7 +124,6 @@ namespace Ogre {
         mActiveBufferMap.clear();
         mEnableVector.clear();
         mTexUnitsMap.clear();
-        mActiveTextureMap.clear();
     }
     
 //#pragma mark Buffer bindings
@@ -210,7 +208,7 @@ namespace Ogre {
         else
         {
             // Update the cached value if needed
-            //if((*i).second != param)
+            if((*i).second != param)
             {
                 (*i).second = param;
                 
@@ -221,43 +219,40 @@ namespace Ogre {
         }
     }
     
-    // TODO: Store as high/low bits of a GLuint, use vector instead of map for TexParameteriMap
     void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {
         mLastBoundedTexID = texture;
         
-        BindBufferMap::iterator i = mActiveTextureMap.find(target);
-        if (i == mActiveTextureMap.end())
-        {
-            // Haven't cached this state yet. Insert it into the map
-            mActiveTextureMap.insert(BindBufferMap::value_type(target, texture));
-            
-            // Update GL
-            glBindTexture(target, texture);
-            GL_CHECK_ERROR
-        }
-        else
-        {
-            (*i).second = texture;
-                
-            // Update GL
-            glBindTexture(target, texture);
-            GL_CHECK_ERROR
-        }
+        // Update GL
+        glBindTexture(target, texture);
+        GL_CHECK_ERROR
     }
     
-    bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
+    bool GLES2StateCacheManagerImp::activateGLTextureUnit(size_t unit)
 	{
-        if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
-        {
-            glActiveTexture(GL_TEXTURE0 + unit);
-            GL_CHECK_ERROR
-            
-            mActiveTextureUnit = unit;
-            
-            return true;
-        }
-        return false;
+		if (mActiveTextureUnit != unit)
+		{
+			if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
+			{
+				glActiveTexture(GL_TEXTURE0 + unit);
+                GL_CHECK_ERROR;
+				mActiveTextureUnit = unit;
+				return true;
+			}
+			else if (!unit)
+			{
+				// always ok to use the first unit
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
     
 //#pragma mark Blending settings
