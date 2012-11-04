@@ -171,8 +171,10 @@ namespace Ogre {
         {
             glValidateProgramPipelineEXT(mGLProgramHandle);
         }
-#endif
         else if(glIsProgram(mGLProgramHandle))
+#else
+		if(glIsProgram(mGLProgramHandle))
+#endif
         {
             glValidateProgram(mGLProgramHandle);
         }

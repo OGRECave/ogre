@@ -709,7 +709,7 @@ namespace Ogre {
 
 		if (enabled)
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 			mCurTexMipCount = 0;
 #endif
 			GLuint texID =  0;
@@ -719,7 +719,7 @@ namespace Ogre {
 				tex->touch();
 				mTextureTypes[stage] = tex->getGLES2TextureTarget();
 				texID = tex->getGLID();
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 				mCurTexMipCount = tex->getNumMipmaps();
 #endif
 			}
@@ -1415,7 +1415,7 @@ namespace Ogre {
 				FilterOptions magFilter, FilterOptions mipFilter)
 	{ 		
 		mMipFilter = mipFilter;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
 		{
 			mMipFilter = FO_NONE;			
