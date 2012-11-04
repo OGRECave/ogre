@@ -40,9 +40,6 @@ void Sample_VolumeTerrain::setupContent(void)
 {
     setupControls();
         
-    Real size = (Real)256.0;
-    Vector3 to(size);
-
     // Skydome
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
@@ -59,8 +56,8 @@ void Sample_VolumeTerrain::setupContent(void)
     mVolumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg");
 
     // Camera
-    mCamera->setPosition(to * mVolumeRoot->getScale());
-    mCamera->lookAt((Real)5.5, (Real)5.5, (Real)0.0);
+    mCamera->setPosition((Real)(2560 - 384), (Real)2000, (Real)(2560 - 384));
+    mCamera->lookAt((Real)0, (Real)100, (Real)0);
     mCamera->setNearClipDistance((Real)0.5);
 
 }
