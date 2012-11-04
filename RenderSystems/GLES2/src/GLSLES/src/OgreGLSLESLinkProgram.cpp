@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -163,6 +164,20 @@ namespace Ogre {
         mTriedToLinkAndFailed = !mLinked;
 
         logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
+
+#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
+                glIsProgramPipelineEXT(mGLProgramHandle))
+        {
+            glValidateProgramPipelineEXT(mGLProgramHandle);
+        }
+#endif
+        else if(glIsProgram(mGLProgramHandle))
+        {
+            glValidateProgram(mGLProgramHandle);
+        }
+
+		logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
 
 		if(mLinked)
 		{

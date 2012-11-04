@@ -115,6 +115,7 @@ namespace Ogre {
 		GLint mFace;
 		GLint mLevel;
 		bool mSoftwareMipmap;		// Use GLU for mip mapping
+        bool mHwGamma;
         
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
