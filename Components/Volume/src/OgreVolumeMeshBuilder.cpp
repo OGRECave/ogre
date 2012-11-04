@@ -50,7 +50,7 @@ namespace Volume {
 
     bool operator<(const Vertex& a, const Vertex& b)
     {
-         return memcmp(&a, &b, sizeof(Ogre::Volume::Vertex)) < 0;
+         return memcmp(&a, &b, sizeof(Vertex)) < 0;
     }
     
     //-----------------------------------------------------------------------
