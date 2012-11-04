@@ -1110,13 +1110,13 @@ protected:
 #endif
 #if	defined(ENABLE_SHADERS_CACHE_LOAD)
 			// Load for a package version of the shaders.
-			Ogre::String path = "cache.bin";
+			Ogre::String path = getShaderCacheFileName();
 			FILE * inFile = NULL;
 			inFile = fopen(path.c_str(), "rb");
 			// If that does not exist, see if there is a version in the writable location.
 			if (!inFile)
 			{
-				path = mFSLayer->getWritablePath("cache.bin");
+				path = mFSLayer->getWritablePath(getShaderCacheFileName());
 				inFile = fopen(path.c_str(), "rb");
 			}
             if (inFile)
@@ -1692,7 +1692,7 @@ protected:
 #if defined(ENABLE_SHADERS_CACHE_SAVE) 
 			if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
 			{
-				Ogre::String path = mFSLayer->getWritablePath("cache.bin");
+				Ogre::String path = mFSLayer->getWritablePath(getShaderCacheFileName());
 				FILE * outFile = fopen(path.c_str(), "wb");
 				if (outFile)
 				{
@@ -1787,6 +1787,18 @@ protected:
 			}
 
 			mHiddenOverlays.clear();
+		}
+
+		/*-----------------------------------------------------------------------------
+		| Finalize the RT Shader system.	
+		-----------------------------------------------------------------------------*/
+		virtual Ogre::String getShaderCacheFileName()
+		{
+#if OGRE_DEBUG_MODE
+			return "cache_d.bin";
+#else
+			return "cache.bin";
+#endif
 		}
 
 #ifdef USE_RTSHADER_SYSTEM
