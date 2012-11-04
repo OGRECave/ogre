@@ -50,7 +50,7 @@ THE SOFTWARE
 #define OGRE_LOCK_RW_MUTEX_READ(name) boost::shared_lock<boost::shared_mutex> ogrenameLock(name);
 #define OGRE_LOCK_RW_MUTEX_WRITE(name) boost::unique_lock<boost::shared_mutex> ogrenameLock(name);
 // Thread-local pointer
-#define OGRE_THREAD_POINTER(T, var) boost::thread_specific_ptr<T> var;
+#define OGRE_THREAD_POINTER(T, var) boost::thread_specific_ptr<T> var
 #define OGRE_THREAD_POINTER_INIT(var) var(&deletePtr)
 #define OGRE_THREAD_POINTER_VAR(T, var) boost::thread_specific_ptr<T> var (&deletePtr<T>);
 #define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr);
