@@ -150,14 +150,18 @@ namespace Ogre {
         PF_PVRTC_RGB4 = 40,
         /// PVRTC (PowerVR) RGBA 4 bpp
         PF_PVRTC_RGBA4 = 41,
+        /// PVRTC (PowerVR) Version 2, 2 bpp
+        PF_PVRTC2_2BPP = 42,
+        /// PVRTC (PowerVR) Version 2, 4 bpp
+        PF_PVRTC2_4BPP = 43,
         /// 8-bit pixel format, all bits red.
-        PF_R8 = 42,
+        PF_R8 = 44,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
-        PF_RG8 = 43,
+        PF_RG8 = 45,
         /// ETC1 (Ericsson Texture Compression)
-        PF_ETC1_RGB8 = 44,
+        PF_ETC1_RGB8 = 46,
 		// Number of pixel formats currently defined
-        PF_COUNT = 45
+        PF_COUNT = 47
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 

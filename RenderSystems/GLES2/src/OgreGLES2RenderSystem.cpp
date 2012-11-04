@@ -253,7 +253,8 @@ namespace Ogre {
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 
-            if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc"))
+            if(mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc") ||
+               mGLSupport->checkExtension("GL_IMG_texture_compression_pvrtc2"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_PVRTC);
             if(mGLSupport->checkExtension("GL_EXT_texture_compression_dxt1") && 
                mGLSupport->checkExtension("GL_EXT_texture_compression_s3tc"))

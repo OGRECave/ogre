@@ -631,6 +631,32 @@ namespace Ogre {
         0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
+        {"PF_PVRTC2_2BPP",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_PVRTC2_4BPP",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
         {"PF_R8",
         /* Bytes per element */
         1,
@@ -747,11 +773,11 @@ namespace Ogre {
                 // Basically, 32 bytes is the minimum texture size.  Smaller textures are padded up to 32 bytes
                 case PF_PVRTC_RGB2:
                 case PF_PVRTC_RGBA2:
-					assert(depth == 1);
+                case PF_PVRTC2_2BPP:
                     return (std::max((int)width, 16) * std::max((int)height, 8) * 2 + 7) / 8;
                 case PF_PVRTC_RGB4:
                 case PF_PVRTC_RGBA4:
-					assert(depth == 1);
+                case PF_PVRTC2_4BPP:
                     return (std::max((int)width, 8) * std::max((int)height, 8) * 4 + 7) / 8;
                     
                 case PF_ETC1_RGB8:
