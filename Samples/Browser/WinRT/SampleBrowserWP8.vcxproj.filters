@@ -2251,5 +2251,8 @@
     <None Include="cache.bin">
       <Filter>Assets</Filter>
     </None>
+    <None Include="cache_d.bin">
+      <Filter>Assets</Filter>
+    </None>
   </ItemGroup>
 </Project>
