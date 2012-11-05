@@ -36,15 +36,17 @@ To the command line
 20.	Change to Phone debug or Phone release config.
 21.	Select Win32 or arm platform (win32 for emulation, arm for running on the device)
 22.	You may need to add the references to all of the solution projects for this project, so check by opening the "common properties"->"configuration properties" - and see that you don't have any error icons in the references.
-23.  right click SampleBrowserWP8 -> Properties -> C++ -> General -> Additional Include Directories
-24.   select debug config, select all projects, right click any project from the selected ones -> Properties -> C++ -> Code generation -> Multi threaded Debug DLL (then do the same to release) 
+23. Right click SampleBrowserWP8 -> Properties -> C++ -> General -> Additional Include Directories
+24. Delect debug config, select all projects, right click any project from the selected ones -> Properties -> C++ -> Code generation -> Multi threaded Debug DLL (then do the same to release) 
+
+25. right click SampleBrowserWP8 -> Properties -> C++ -> General -> Additional Include Directories 
 Add the path of
 [your build directory]\include ex: c:\ogre\build6\include
 [your dependencies dir]\include ex: C:\ogre\dep\include
 [your dependencies dir]\include\ois
-25.	Compile.
-26.	Before you run for the first time make sure you have a shader cache for the project you are running - as you can't compile shader on the phone. (TODO - explain more)  
-27. In Windows Phone and (Store versions of WinRT) you don't have the shader compiler, meaning you have to use the shader cache, they tricky part is that you need to create the shader cache, to do that, compile OGRE for WinRT and add ENABLE_SHADERS_CACHE_SAVE to the preprocessor definitions in the config, run the project, act out all the use cases you are going to do in the final version, then go to the home directory of the  WinRT (I find the home directory by putting a breakpoint in FileSystemLayerImpl_WIN32.cpp line 138) and copy the file cache.bin from the OGRE dir there to Samples\Browser\WinRT. 
+26.	Compile.
+27.	Before you run for the first time make sure you have a shader cache for the project you are running - as you can't compile shader on the phone. (TODO - explain more)  
+28. In Windows Phone and (Store versions of WinRT) you don't have the shader compiler, meaning you have to use the shader cache, they tricky part is that you need to create the shader cache, to do that, compile OGRE for WinRT and add ENABLE_SHADERS_CACHE_SAVE to the preprocessor definitions in the config, run the project, act out all the use cases you are going to do in the final version, then go to the home directory of the  WinRT (I find the home directory by putting a breakpoint in FileSystemLayerImpl_WIN32.cpp line 138) and copy the file cache.bin from the OGRE dir there to Samples\Browser\WinRT. 
 
 
 Note about adding resources - you must right click each resource you want to be copied as part of the release, select "properties", select all configurations and all platforms, set "exclude from build" to "No", "Content" to "Yes", "Item type" to "Does not participate in build" and press the "OK" button. You can also multi select a group of resource and set the properties for all of them together. Note that if the file is under the path of project file - the file will be copied with the relative path to the project file, else it will be at the root of the resources folder of the deployed project. 
