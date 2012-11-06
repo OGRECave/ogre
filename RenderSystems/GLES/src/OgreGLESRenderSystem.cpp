@@ -87,7 +87,8 @@ namespace Ogre {
     GLESRenderSystem::GLESRenderSystem()
         : mGpuProgramManager(0),
           mHardwareBufferManager(0),
-          mRTTManager(0)
+          mRTTManager(0),
+		  mCurTexMipCount(0)
     {
             // Get function pointers on platforms that doesn't have prototypes
 #ifndef GL_GLEXT_PROTOTYPES
@@ -951,9 +952,6 @@ namespace Ogre {
 
     void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
     {
-        GL_CHECK_ERROR;
-
-        // TODO We need control texture types?????
         GLESTexturePtr tex = texPtr;
 
         if (!mStateCacheManager->activateGLTextureUnit(stage))
@@ -961,13 +959,18 @@ namespace Ogre {
 
         if (enabled)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+			mCurTexMipCount = 0;
+#endif
             if (!tex.isNull())
             {
                 // Note used
                 tex->touch();
                 glEnable(tex->getGLESTextureTarget());
                 mStateCacheManager->bindGLTexture(tex->getGLESTextureTarget(), tex->getGLID());
-                
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+				mCurTexMipCount = tex->getNumMipmaps();
+#endif
             }
             else
             {
@@ -2030,10 +2033,8 @@ namespace Ogre {
                         // linear min, linear mip
                         return GL_LINEAR_MIPMAP_LINEAR;
                     case FO_POINT:
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
                         // linear min, point mip
                         return GL_LINEAR_MIPMAP_NEAREST;
-#endif
                     case FO_NONE:
                         // linear min, no mip
                         return GL_LINEAR;
@@ -2061,6 +2062,20 @@ namespace Ogre {
         return 0;
     }
 
+	void GLESRenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+				FilterOptions magFilter, FilterOptions mipFilter)
+	{ 		
+		mMipFilter = mipFilter;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+		if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
+		{
+			mMipFilter = FO_NONE;			
+		}
+#endif
+		_setTextureUnitFiltering(unit, FT_MAG, magFilter);
+		_setTextureUnitFiltering(unit, FT_MIN, minFilter);
+	}
+	
     void GLESRenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
     {
 		if (!mStateCacheManager->activateGLTextureUnit(unit))
@@ -2096,11 +2111,6 @@ namespace Ogre {
                 break;
             case FT_MIP:
                 mMipFilter = fo;
-
-                // Combine with existing min filter
-                mStateCacheManager->setTexParameteri(GL_TEXTURE_2D,
-                                                     GL_TEXTURE_MIN_FILTER,
-                                                     getCombinedMinMipFilter());
                 break;
         }
 

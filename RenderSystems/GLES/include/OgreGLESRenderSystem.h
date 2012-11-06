@@ -127,6 +127,8 @@ namespace Ogre {
             bool activateGLTextureUnit(size_t unit);
             bool activateGLClientTextureUnit(size_t unit);
 
+			// Mipmap count of the actual bounded texture
+			size_t mCurTexMipCount;
         public:
             // Default constructor / destructor
             GLESRenderSystem();
@@ -385,6 +387,11 @@ namespace Ogre {
              RenderSystem
              */
             void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+			/** See
+             RenderSystem
+             */
+			virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
+				FilterOptions magFilter, FilterOptions mipFilter);
             /** See
              RenderSystem
              */

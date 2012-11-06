@@ -384,14 +384,12 @@ namespace Ogre {
 		     /** See
               RenderSystem
              */
-		    void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-			
+		    void _setTextureUnitCompareEnabled(size_t unit, bool compare);			
 			/** See
              RenderSystem
              */
 			virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-				FilterOptions magFilter, FilterOptions mipFilter);
-				
+				FilterOptions magFilter, FilterOptions mipFilter);				
             /** See
              RenderSystem
              */
