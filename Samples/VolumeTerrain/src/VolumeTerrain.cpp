@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreVolumeCacheSource.h"
 #include "OgreVolumeTextureSource.h"
 #include "OgreVolumeMeshBuilder.h"
+#include "OgreVolumeSimplexNoise.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -42,6 +43,12 @@ void Sample_VolumeTerrain::setupContent(void)
         
     // Skydome
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+
+    SimplexNoise sn(100);
+    LogManager::getSingleton().stream() << sn.noise((Real)1.3, (Real)2.3, (Real)3.3);
+    //LogManager::getSingleton().stream() << sn.noise(2, 3, 4);
+    //LogManager::getSingleton().stream() << sn.noise(3, 4, 5);
+    //LogManager::getSingleton().stream() << sn.noise(4, 5, 6);
 
     // Light
     Light* directionalLight0 = mSceneMgr->createLight("directionalLight0");

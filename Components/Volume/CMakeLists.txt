@@ -27,6 +27,7 @@ set (HEADER_FILES
 	include/OgreVolumeChunk.h
 	include/OgreVolumeOctreeNode.h
 	include/OgreVolumeOctreeNodeSplitPolicy.h
+	include/OgreVolumeSimplexNoise.h
 	include/OgreVolumeSource.h
 	include/OgreVolumePrerequisites.h
 )
@@ -42,6 +43,7 @@ set(SOURCE_FILES
 	src/OgreVolumeChunk.cpp
 	src/OgreVolumeOctreeNode.cpp
 	src/OgreVolumeOctreeNodeSplitPolicy.cpp
+	src/OgreVolumeSimplexNoise.cpp
 	src/OgreVolumeSource.cpp
 )
 
