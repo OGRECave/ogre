@@ -419,7 +419,7 @@ namespace Ogre {
 
 
 				// Get the nearest monitor to this window.
-				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);				
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTOPRIMARY);				
 			}
 
 			newParams["monitorHandle"] = StringConverter::toString((size_t)hMonitor);																
