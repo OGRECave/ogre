@@ -75,9 +75,6 @@
   <ItemGroup>
     <None Include="D3DCompiler_46.dll" />
     <None Include="SampleBrowserWinRT_2012_08_31_18_35_59.sap" />
-    <None Include="cache.bin">
-      <Filter>Assets</Filter>
-    </None>
     <None Include="OGRE.CFG">
       <Filter>Assets\cfg</Filter>
     </None>
