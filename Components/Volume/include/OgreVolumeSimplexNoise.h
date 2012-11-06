@@ -76,7 +76,7 @@ namespace Volume {
         @return
             The dot product.
         */
-        inline Real dot(const Vector3 &g, Real x, Real y, Real z)
+        inline Real dot(const Vector3 &g, Real x, Real y, Real z) const
         {
             return g.x * x + g.y * y + g.z * z;
         }
@@ -107,7 +107,7 @@ namespace Volume {
         @return
             The noise value.
         */
-        Real noise(Real xIn, Real yIn, Real zIn);
+        Real noise(Real xIn, Real yIn, Real zIn) const;
         
     };
 

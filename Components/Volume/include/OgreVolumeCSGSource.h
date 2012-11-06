@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreVector3.h"
 #include "OgreAxisAlignedBox.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreVolumeSimplexNoise.h"
 
 namespace Ogre {
 namespace Volume {
@@ -307,6 +308,46 @@ namespace Volume {
             The scale of the source.
         */
         CSGScaleSource(const Source *src, const Real scale);
+        
+        /** Overridden from Source.
+        */
+        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
+
+        /** Overridden from VolumeSource.
+        */
+        virtual Real getValue(const Vector3 &position) const;
+    };
+
+    class _OgreVolumeExport CSGNoiseSource: public CSGUnarySource
+    {
+    protected:
+        
+        Real *mOctaves;
+        
+        size_t mNumOctaves;
+        
+        SimplexNoise mNoise;
+
+        Real mSmallestOctave;
+
+        void setSmallestOctave(void);
+
+        inline Real getInternalValue(const Vector3 &position) const
+        {
+            Real toAdd = (Real)0.0;
+            Real noise = mNoise.noise(position.x, position.y, position.z);
+            for (size_t i = 0; i < mNumOctaves; ++i)
+            {
+                toAdd += noise * mOctaves[i];
+            }
+            return mSrc->getValue(position) + toAdd;
+        }
+
+    public:
+        
+        CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves, long seed);
+        
+        CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves);
         
         /** Overridden from Source.
         */

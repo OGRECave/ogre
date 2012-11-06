@@ -274,5 +274,50 @@ namespace Volume {
         return mSrc->getValue(position / mScale) * mScale;
     }
 
+    void CSGNoiseSource::setSmallestOctave(void)
+    {
+        mSmallestOctave = fabs(mOctaves[0]);
+        for (size_t i = 1; i < mNumOctaves; ++i)
+        {
+            if (fabs(mOctaves[i]) < mSmallestOctave)
+            {
+                mSmallestOctave = mOctaves[i];
+            }
+        }
+    }
+    
+    //-----------------------------------------------------------------------
+
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves, long seed) :
+        CSGUnarySource(src), mOctaves(octaves), mNumOctaves(numOctaves), mNoise(seed)
+    {
+        setSmallestOctave();
+    }
+
+    //-----------------------------------------------------------------------
+
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves) :
+        CSGUnarySource(src), mOctaves(octaves), mNumOctaves(numOctaves)
+    {
+        setSmallestOctave();
+    }
+        
+    //-----------------------------------------------------------------------
+
+    Vector4 CSGNoiseSource::getValueAndGradient(const Vector3 &position) const
+    {
+        return Vector4(
+            getInternalValue(Vector3(position.x + mSmallestOctave, position.y, position.z)) - getInternalValue(Vector3(position.x - mSmallestOctave, position.y, position.z)),
+            getInternalValue(Vector3(position.x, position.y + mSmallestOctave, position.z)) - getInternalValue(Vector3(position.x, position.y - mSmallestOctave, position.z)),
+            getInternalValue(Vector3(position.x, position.y, position.z + mSmallestOctave)) - getInternalValue(Vector3(position.x, position.y, position.z - mSmallestOctave)),
+            getInternalValue(position));
+    }
+    
+    //-----------------------------------------------------------------------
+
+    Real CSGNoiseSource::getValue(const Vector3 &position) const
+    {
+        return getInternalValue(position);
+    }
 }
 }

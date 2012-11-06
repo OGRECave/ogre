@@ -84,7 +84,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
     
-    Real SimplexNoise::noise(Real xIn, Real yIn, Real zIn)
+    Real SimplexNoise::noise(Real xIn, Real yIn, Real zIn) const
     {
         Real n0, n1, n2, n3; // Noise contributions from the four corners
         // Skew the input space to determine which simplex cell we're in
