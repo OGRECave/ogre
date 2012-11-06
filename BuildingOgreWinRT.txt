@@ -40,8 +40,10 @@ Dependencies for Win32 and for WinRT must be located in separate folders, Win32 
 can be built from OgreDependencies.VS2012.sln, WinRT from OgreDependencies.VS2012.WinRT.sln
 Run CMake, select "Visual Studio 11" generator,  specify source and binaries folders, 
 than "Configure", specify WinRT dependencies folder, again "Configure", set 
-OGRE_BUILD_PLATFORM_WINRT check ignoring other errors, again "Configure", should be 
-no more errors and "Generate".
+OGRE_BUILD_PLATFORM_WINRT  check ignoring other errors, again "Configure", should be 
+no more errors and "Generate". Also set OGRE_STATIC to on.
+If you want build time to be shorter - set OGRE_UNITY_BUILD to on.
+
 
 7. Remove the following projects from the solution: ALL_BUILD, INSTALL, PACKAGE.
 

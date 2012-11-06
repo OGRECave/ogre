@@ -31,7 +31,7 @@ To the command line
 
 16.	Delete OgreWin32Resources.rc from Sample_CubeMapping
 17.	Open the configuration manager by right clicking the solution in the solution tree, on the right, active solution platform combo, select new, select arm, copy setting from win32
-18.	Add dependencies to solution by right clicking the solution, selecting add existing project, select "solution" in the combo next to the file select edit at the bottom then select the dependencies solution, all the dependencies should be now a part of the solution.
+18.	Add dependencies to solution by right clicking the solution, selecting add existing project, select "solution" in the combo next to the file select edit at the bottom then select the dependencies solution, all the dependencies should be now a part of the solution. Remove OIS Project.
 19.	Add the following project to the solution - Samples\Browser\WinRT\SampleBrowserWinRT.vcxproj
 20.	Change to Phone debug or Phone release config.
 21.	Select Win32 or arm platform (win32 for emulation, arm for running on the device)
@@ -51,7 +51,7 @@ Add the path of
 
 Note about adding resources - you must right click each resource you want to be copied as part of the release, select "properties", select all configurations and all platforms, set "exclude from build" to "No", "Content" to "Yes", "Item type" to "Does not participate in build" and press the "OK" button. You can also multi select a group of resource and set the properties for all of them together. Note that if the file is under the path of project file - the file will be copied with the relative path to the project file, else it will be at the root of the resources folder of the deployed project. 
 Resource related troubleshooting:
-1.	When you compile you get shader compiler issues (like "VS_2_0 is doesn't support doing this") - it mean that you didn’t set "Item type" to "Does not participate in build".
+1.	When you compile you get shader compiler issues (like "VS_2_0 is doesn't support doing this") - it mean that you didn't set "Item type" to "Does not participate in build".
 2.	Missing file exception for some file - you didn't use the relative path, or the file is not in a sub folder in the deployed project because you didn't put it under the project dir, or you didn't set "Content" to "Yes".
 3.	A strange compiler\linker error - no message, something about FCX.exe error, this mean that the resource doesn't exist on your drive anymore or that you forgot to set "Item type" to "Does not participate in build". The FCX.exe is a compiler that can compile some resource types - to help with performance, like images and shader. Microsoft idea was that it will help runtime performance - by compiling shaders as part of the compile, this is why they didn't include the shader compiler as part of WinRT. I guess they didn't think of our scenario of runtime shader generation. The way to disable that nice compiler is to "Item type" to "Does not participate in build".  
 
