@@ -322,33 +322,71 @@ namespace Volume {
     {
     protected:
         
-        Real *mOctaves;
+        /// The frequencies of the octaves.
+        Real *mFrequencies;
+
+        /// The amplitudes of the octaves.
+        Real *mAmplitudes;
         
+        /// The amount of octaves.
         size_t mNumOctaves;
         
+        /// To make some noise.
         SimplexNoise mNoise;
 
-        Real mSmallestOctave;
+        /// To calculate the gradient.
+        Real mGradientOff;
 
-        void setSmallestOctave(void);
+        /// The initial seed.
+        long mSeed;
 
+        /// Prepares the node members.
+        void setData(void);
+
+        /* Gets the density value.
+        @param position
+            The position of the value.
+        @return
+            The value.
+        */
         inline Real getInternalValue(const Vector3 &position) const
         {
             Real toAdd = (Real)0.0;
-            Real noise = mNoise.noise(position.x, position.y, position.z);
             for (size_t i = 0; i < mNumOctaves; ++i)
             {
-                toAdd += noise * mOctaves[i];
+                toAdd += mNoise.noise(position.x * mFrequencies[i], position.y * mFrequencies[i], position.z * mFrequencies[i]) * mAmplitudes[i];
             }
             return mSrc->getValue(position) + toAdd;
         }
 
     public:
         
-        CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves, long seed);
+        /** Constructor.
+        @param src
+            The source to add the noise to.
+        @param frequencies
+            The frequencies of the added noise octaves.
+        @param amplitudes
+            The amplitudes of the added noise octaves.
+        @param numOctaves
+            The amount of octaves.
+        @param seed
+            The seed to initialize the random number generator with.
+        */
+        CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed);
         
-        CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves);
-        
+        /** Constructor with current time as seed.
+        @param src
+            The source to add the noise to.
+        @param frequencies
+            The frequencies of the added noise octaves.
+        @param amplitudes
+            The amplitudes of the added noise octaves.
+        @param numOctaves
+            The amount of octaves.
+        */
+        CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves);
+                
         /** Overridden from Source.
         */
         virtual Vector4 getValueAndGradient(const Vector3 &position) const;
@@ -356,6 +394,12 @@ namespace Volume {
         /** Overridden from VolumeSource.
         */
         virtual Real getValue(const Vector3 &position) const;
+        
+        /** Gets the initial seed.
+        @return
+            The initial seed.
+        */
+        long getSeed(void) const;
     };
 
 }

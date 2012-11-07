@@ -71,9 +71,10 @@ void Sample_VolumeCSG::setupContent(void)
     CSGIntersectionSource intersection1(&cube3, &sphere5);
 
     // A plane with noise
-    CSGPlaneSource plane1((Real)0.5, Vector3::UNIT_Y);
-    Real octaves[] = {(Real)0.1, (Real)0.4};
-    CSGNoiseSource noise1(&plane1, octaves, 2, 100);
+    CSGPlaneSource plane1((Real)1.0, Vector3::UNIT_Y);
+    Real frequencies[] = {(Real)1.01, (Real)0.48};
+    Real amplitudes[] = {(Real)0.25, (Real)0.5};
+    CSGNoiseSource noise1(&plane1, frequencies, amplitudes, 2, 100);
 
     // Combine everything
     CSGUnionSource union1(&sphere1, &sphere2);

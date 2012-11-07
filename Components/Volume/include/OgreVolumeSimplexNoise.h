@@ -50,7 +50,7 @@ namespace Volume {
         static Real G3;
 
         /// Random seed.
-        long seed;
+        long mSeed;
 
         /// Permutation table.
         short perm[512];
@@ -109,6 +109,12 @@ namespace Volume {
         */
         Real noise(Real xIn, Real yIn, Real zIn) const;
         
+        /** Gets the current seed.
+        @return
+            The current seed.
+        */
+        long getSeed(void) const;
+
     };
 
 }

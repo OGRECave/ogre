@@ -273,43 +273,47 @@ namespace Volume {
     {
         return mSrc->getValue(position / mScale) * mScale;
     }
+    
+    //-----------------------------------------------------------------------
 
-    void CSGNoiseSource::setSmallestOctave(void)
+    void CSGNoiseSource::setData(void)
     {
-        mSmallestOctave = fabs(mOctaves[0]);
+        mGradientOff = fabs(mFrequencies[0]);
         for (size_t i = 1; i < mNumOctaves; ++i)
         {
-            if (fabs(mOctaves[i]) < mSmallestOctave)
+            if (fabs(mFrequencies[i]) < mGradientOff)
             {
-                mSmallestOctave = mOctaves[i];
+                mGradientOff = mFrequencies[i];
             }
         }
+        mGradientOff /= (Real)4.0;
+        mSeed = mNoise.getSeed();
     }
     
     //-----------------------------------------------------------------------
 
-    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves, long seed) :
-        CSGUnarySource(src), mOctaves(octaves), mNumOctaves(numOctaves), mNoise(seed)
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed) :
+        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes), mNoise(seed)
     {
-        setSmallestOctave();
+        setData();
     }
 
     //-----------------------------------------------------------------------
 
-    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *octaves, size_t numOctaves) :
-        CSGUnarySource(src), mOctaves(octaves), mNumOctaves(numOctaves)
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves) :
+        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes)
     {
-        setSmallestOctave();
+        setData();
     }
-        
+
     //-----------------------------------------------------------------------
 
     Vector4 CSGNoiseSource::getValueAndGradient(const Vector3 &position) const
     {
         return Vector4(
-            getInternalValue(Vector3(position.x + mSmallestOctave, position.y, position.z)) - getInternalValue(Vector3(position.x - mSmallestOctave, position.y, position.z)),
-            getInternalValue(Vector3(position.x, position.y + mSmallestOctave, position.z)) - getInternalValue(Vector3(position.x, position.y - mSmallestOctave, position.z)),
-            getInternalValue(Vector3(position.x, position.y, position.z + mSmallestOctave)) - getInternalValue(Vector3(position.x, position.y, position.z - mSmallestOctave)),
+            getInternalValue(Vector3(position.x + mGradientOff, position.y, position.z)) - getInternalValue(Vector3(position.x - mGradientOff, position.y, position.z)),
+            getInternalValue(Vector3(position.x, position.y + mGradientOff, position.z)) - getInternalValue(Vector3(position.x, position.y - mGradientOff, position.z)),
+            getInternalValue(Vector3(position.x, position.y, position.z + mGradientOff)) - getInternalValue(Vector3(position.x, position.y, position.z - mGradientOff)),
             getInternalValue(position));
     }
     
@@ -318,6 +322,13 @@ namespace Volume {
     Real CSGNoiseSource::getValue(const Vector3 &position) const
     {
         return getInternalValue(position);
+    }
+    
+    //-----------------------------------------------------------------------
+
+    long CSGNoiseSource::getSeed(void) const
+    {
+        return mSeed;
     }
 }
 }

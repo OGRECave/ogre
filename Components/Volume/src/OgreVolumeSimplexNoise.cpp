@@ -45,16 +45,16 @@ namespace Volume {
     unsigned long SimplexNoise::random(void)
     {
         // Simple XORShift random number generator like in http://www.jstatsoft.org/v08/i14/paper
-        seed ^= seed << 13;
-        seed = seed >> 17;
-        return seed ^= seed << 5;
+        mSeed ^= mSeed << 13;
+        mSeed = mSeed >> 17;
+        return mSeed ^= mSeed << 5;
     }
     
     //-----------------------------------------------------------------------
     
     void SimplexNoise::init(unsigned long definedSeed)
     {
-        seed = definedSeed;
+        mSeed = definedSeed;
         short p[256];
         for (int i = 0; i < 256; ++i)
         {
@@ -79,7 +79,7 @@ namespace Volume {
     
     SimplexNoise::SimplexNoise(unsigned long definedSeed)
     {
-        init(seed);
+        init(definedSeed);
     }
     
     //-----------------------------------------------------------------------
@@ -228,6 +228,13 @@ namespace Volume {
         // Add contributions from each corner to get the final noise value.
         // The result is scaled to stay just inside [-1,1]
         return (Real)32.0 * (n0 + n1 + n2 + n3);
+    }
+    
+    //-----------------------------------------------------------------------
+    
+    long SimplexNoise::getSeed(void) const
+    {
+        return mSeed;
     }
 
 }
