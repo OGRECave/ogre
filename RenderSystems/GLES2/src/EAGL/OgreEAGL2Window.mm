@@ -95,10 +95,7 @@ namespace Ogre {
         {
             switchFullScreen(false);
         }
-        
-        if(!mUsingExternalView)
-            [mView release];
-        
+
         if(!mUsingExternalViewController)
             [mViewController release];
     }
