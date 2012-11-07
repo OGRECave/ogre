@@ -70,8 +70,11 @@ void Sample_VolumeCSG::setupContent(void)
     CSGSphereSource sphere5(innerHalfWidth + (Real)0.75, center);
     CSGIntersectionSource intersection1(&cube3, &sphere5);
 
-    // A plane
-    CSGPlaneSource plane1((Real)0.1, Vector3::UNIT_Y);
+    // A plane with noise
+    CSGPlaneSource plane1((Real)1.0, Vector3::UNIT_Y);
+    Real frequencies[] = {(Real)1.01, (Real)0.48};
+    Real amplitudes[] = {(Real)0.25, (Real)0.5};
+    CSGNoiseSource noise1(&plane1, frequencies, amplitudes, 2, 100);
 
     // Combine everything
     CSGUnionSource union1(&sphere1, &sphere2);
@@ -79,7 +82,7 @@ void Sample_VolumeCSG::setupContent(void)
     CSGUnionSource union3(&union2, &sphere4);
     CSGUnionSource union4(&union3, &difference1);
     CSGUnionSource union5(&union4, &intersection1);
-    CSGUnionSource union6(&union5, &plane1);
+    CSGUnionSource union6(&union5, &noise1);
     Source *src = &union6;
 
     mVolumeRoot = OGRE_NEW Chunk();

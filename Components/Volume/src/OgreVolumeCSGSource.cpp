@@ -273,6 +273,62 @@ namespace Volume {
     {
         return mSrc->getValue(position / mScale) * mScale;
     }
+    
+    //-----------------------------------------------------------------------
 
+    void CSGNoiseSource::setData(void)
+    {
+        mGradientOff = fabs(mFrequencies[0]);
+        for (size_t i = 1; i < mNumOctaves; ++i)
+        {
+            if (fabs(mFrequencies[i]) < mGradientOff)
+            {
+                mGradientOff = mFrequencies[i];
+            }
+        }
+        mGradientOff /= (Real)4.0;
+        mSeed = mNoise.getSeed();
+    }
+    
+    //-----------------------------------------------------------------------
+
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed) :
+        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes), mNoise(seed)
+    {
+        setData();
+    }
+
+    //-----------------------------------------------------------------------
+
+    CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves) :
+        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes)
+    {
+        setData();
+    }
+
+    //-----------------------------------------------------------------------
+
+    Vector4 CSGNoiseSource::getValueAndGradient(const Vector3 &position) const
+    {
+        return Vector4(
+            getInternalValue(Vector3(position.x + mGradientOff, position.y, position.z)) - getInternalValue(Vector3(position.x - mGradientOff, position.y, position.z)),
+            getInternalValue(Vector3(position.x, position.y + mGradientOff, position.z)) - getInternalValue(Vector3(position.x, position.y - mGradientOff, position.z)),
+            getInternalValue(Vector3(position.x, position.y, position.z + mGradientOff)) - getInternalValue(Vector3(position.x, position.y, position.z - mGradientOff)),
+            getInternalValue(position));
+    }
+    
+    //-----------------------------------------------------------------------
+
+    Real CSGNoiseSource::getValue(const Vector3 &position) const
+    {
+        return getInternalValue(position);
+    }
+    
+    //-----------------------------------------------------------------------
+
+    long CSGNoiseSource::getSeed(void) const
+    {
+        return mSeed;
+    }
 }
 }
