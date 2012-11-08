@@ -2378,7 +2378,7 @@ namespace Ogre {
 		bool twoSidedOperation)
 	{
 		bool flip;
-		mStencilMask = mask;
+		mStencilMask = refValue;
 
 		if (twoSidedOperation)
 		{
@@ -2412,7 +2412,7 @@ namespace Ogre {
 				glEnable(GL_STENCIL_TEST_TWO_SIDE_EXT);
 				// Back
 				glActiveStencilFaceEXT(GL_BACK);
-				glStencilMask(mask);
+				glStencilMask(refValue);
 				glStencilFunc(convertCompareFunction(func), refValue, mask);
 				glStencilOp(
 					convertStencilOp(stencilFailOp, !flip), 
@@ -2420,7 +2420,7 @@ namespace Ogre {
 					convertStencilOp(passOp, !flip));
 				// Front
 				glActiveStencilFaceEXT(GL_FRONT);
-				glStencilMask(mask);
+				glStencilMask(refValue);
 				glStencilFunc(convertCompareFunction(func), refValue, mask);
 				glStencilOp(
 					convertStencilOp(stencilFailOp, flip),
@@ -2434,7 +2434,7 @@ namespace Ogre {
                 glDisable(GL_STENCIL_TEST_TWO_SIDE_EXT);
 
 			flip = false;
-			glStencilMask(mask);
+			glStencilMask(refValue);
 			glStencilFunc(convertCompareFunction(func), refValue, mask);
 			glStencilOp(
 				convertStencilOp(stencilFailOp, flip),
