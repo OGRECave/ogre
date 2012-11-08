@@ -62,6 +62,7 @@ import bpy, os, traceback, shlex, subprocess
 
 from ogre_mesh_exporter.mesh_impl import Mesh
 from ogre_mesh_exporter.mesh_impl import MeshExportSettings
+from ogre_mesh_exporter.skeleton_impl import Skeleton
 from ogre_mesh_exporter.log_manager import LogManager, Message
 
 # Mesh XML Converter settings class to define how we are going to convert the mesh.
@@ -93,13 +94,59 @@ class MeshXMLConverterSettings():
 			reorganiseVertBuff = meshSettings.reorganiseVertBuff if (meshSettings.reorganiseVertBuff_override) else globalSettings.reorganiseVertBuff,
 			optimiseAnimation = meshSettings.optimiseAnimation if (meshSettings.optimiseAnimation_override) else globalSettings.optimiseAnimation)
 
+# NOTE: filepath must NOT contain extension part. Mesh will append mesh.xml and Skeleton will append skeleton.xml.
 def exportMesh(meshObject, filepath):
-	result = (False, None)
+	result = list()
 	try:
-		LogManager.logMessage("Output: %s" % filepath, Message.LVL_INFO)
+		LogManager.logMessage("Output: %s.mesh.xml" % filepath, Message.LVL_INFO)
 
 		# get combined mesh override & global settings.
 		meshExportSettings = MeshExportSettings.fromRNA(meshObject)
+		if (meshExportSettings.runOgreXMLConverter):
+			meshXMLConverterSettings = MeshXMLConverterSettings.fromRNA(meshObject)
+
+		# get linked armature
+		parentObject = meshObject.parent
+		if (parentObject and meshObject.parent_type == 'ARMATURE'):
+			armatureObject = parentObject
+		else:
+			# check modifier stack, use first valid armature modifier.
+			for modifier in meshObject.modifiers:
+				if (modifier.type == 'ARMATURE' and
+					(modifier.use_vertex_groups or
+					modifier.use_bone_envelopes)):
+					armatureObject = modifier.object
+
+		# Do skeleton export first if armature exist.
+		if (armatureObject):
+			# get skeleton file path and name.
+			if (meshExportSettings.skeletonNameFollowMesh):
+				skeletonFilePath = filepath + '.skeleton.xml';
+				skeletonName = os.path.basename(filepath)
+			else:
+				dirname = os.path.dirname(filepath)
+				skeletonFilePath = dirname + armatureObject.data.name + '.skeleton.xml';
+				skeletonName = armatureObject.data.name
+
+			LogManager.logMessage("Skeleton: " + skeletonName, Message.LVL_INFO);
+
+			# prepare skeleton.
+			meshInverseMatrix = meshObject.matrix_world.inverted()
+			ogreSkeleton = Skeleton(skeletonName, armatureObject, meshInverseMatrix, meshExportSettings.fixUpAxisToY)
+			LogManager.logMessage("Bones: %d" % len(ogreSkeleton.mBones), Message.LVL_INFO);
+
+			# write skeleton.
+			file = open(skeletonFilePath, "w", encoding="utf8", newline="\n")
+			ogreSkeleton.serialize(file)
+			file.close()
+
+			LogManager.logMessage("Done exporting skeleton XML.")
+
+			# Run XML Converter if needed.
+			if (meshExportSettings.runOgreXMLConverter):
+				globalSettings = bpy.context.scene.ogre_mesh_exporter
+				LogManager.logMessage("Converting skeleton to Ogre binary format...")
+				result.append(executeOgreXMLConverter(globalSettings.ogreXMLConverterPath, skeletonFilePath, meshXMLConverterSettings))
 
 		# If modifiers need to be applied, we will need to create a new mesh with flattened modifiers.
 		LogManager.logMessage("Apply Modifier: %s" % meshExportSettings.applyModifiers, Message.LVL_INFO)
@@ -111,7 +158,7 @@ def exportMesh(meshObject, filepath):
 			cleanUpMesh = False
 
 		# prepare mesh.
-		ogreMesh = Mesh(mesh, meshExportSettings)
+		ogreMesh = Mesh(mesh, meshObject.vertex_groups, ogreSkeleton, meshExportSettings)
 		LogManager.logMessage("Shared Vertices: %d" % len(ogreMesh.mSharedVertexBuffer.mVertexData), Message.LVL_INFO);
 		LogManager.logMessage("Submeshes: %d" % len(ogreMesh.mSubMeshDict), Message.LVL_INFO);
 		for index, submesh in enumerate(ogreMesh.mSubMeshDict.values()):
@@ -119,7 +166,8 @@ def exportMesh(meshObject, filepath):
 			LogManager.logMessage(" [%d]%s: vertices: %d" % (index, submesh.mName if (submesh.mName) else '' , len(submesh.mVertexBuffer.mVertexData)), Message.LVL_INFO);
 
 		# write mesh.
-		file = open(filepath, "w", encoding="utf8", newline="\n")
+		meshFilePath = filepath + ".mesh.xml"
+		file = open(meshFilePath, "w", encoding="utf8", newline="\n")
 		ogreMesh.serialize(file)
 		file.close()
 
@@ -127,29 +175,31 @@ def exportMesh(meshObject, filepath):
 		if (cleanUpMesh): bpy.data.meshes.remove(mesh)
 		ogreMesh = None
 
-		LogManager.logMessage("Done exporting XML.")
+		LogManager.logMessage("Done exporting mesh XML.")
 
-		# check if we need to convert to ogre mesh.
+		# Run XML Converter if needed.
 		if (meshExportSettings.runOgreXMLConverter):
 			globalSettings = bpy.context.scene.ogre_mesh_exporter
 			LogManager.logMessage("Converting mesh to Ogre binary format...")
-			result = convertToOgreMesh(globalSettings.ogreXMLConverterPath, filepath, MeshXMLConverterSettings.fromRNA(meshObject))
+			result.append(executeOgreXMLConverter(globalSettings.ogreXMLConverterPath, meshFilePath, meshXMLConverterSettings))
 		else:
 			LogManager.logMessage("Success!")
-			result[0] = True
 
 	except IOError as err:
 		LogManager.logMessage("I/O error(%d): %s" % (err.errno, err.strerror), Message.LVL_ERROR)
-	except Exception as err:
-		LogManager.logMessage(str(err), Message.LVL_ERROR)
-	except:
-		traceback.print_exc()
+		result.append(False)
+	#~ except Exception as err:
+		#~ LogManager.logMessage(str(err), Message.LVL_ERROR)
+		#~ result.append(False)
+	#~ except:
+		#~ traceback.print_exc()
+		#~ result.append(False)
 
 	return result
 
 gDevNull = open(os.devnull, "w")
 
-def convertToOgreMesh(converterpath, filepath, settings = MeshXMLConverterSettings()):
+def executeOgreXMLConverter(converterpath, filepath, settings = MeshXMLConverterSettings()):
 	global gDevNull
 	try:
 		if os.path.exists(converterpath):
@@ -190,10 +240,10 @@ def convertToOgreMesh(converterpath, filepath, settings = MeshXMLConverterSettin
 
 			LogManager.logMessage("Executing OgrXMLConverter: " + " ".join(command))
 			p = subprocess.Popen(command, stdout = gDevNull, stderr = gDevNull)
-			return (True, p)
+			return p
 		else:
 			LogManager.logMessage("No converter found at %s" % converterpath, Message.LVL_ERROR)
 	except:
 		traceback.print_exc()
 
-	return (False, None)
+	return False

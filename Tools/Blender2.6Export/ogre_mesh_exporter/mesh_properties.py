@@ -28,14 +28,16 @@ class SubMeshProperties(bpy.types.PropertyGroup):
 	useSharedVertices = BoolProperty(
 		name = "Use Shared Vertices",
 		description = "Use shared vertices with other submeshes.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	# Custom name of submesh.
 	name = StringProperty(
 		name = "Custom name",
 		description = "Custom name of submesh.",
-		default = ""
+		default = "",
+		options = set()
 	)
 
 # ##############################################
@@ -45,7 +47,8 @@ class MeshProperties(bpy.types.PropertyGroup):
 	exportEnabled = BoolProperty(
 		name = "Export",
 		description = "Export this mesh.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	subMeshProperties = CollectionProperty(type = SubMeshProperties)
@@ -56,34 +59,40 @@ class MeshProperties(bpy.types.PropertyGroup):
 	requireMaterials_override = BoolProperty(
 		name = "Require Materials Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	requireMaterials = BoolProperty(
 		name = "Require Materials",
 		description = "Generate Error message when part of this mesh is not assigned with a material.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	applyModifiers_override = BoolProperty(
 		name = "Apply Modifiers Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	applyModifiers = BoolProperty(
 		name = "Apply Modifiers",
 		description = "Apply mesh modifiers before export. (Slow and may break vertex order for morph targets!)",
-		default = False
+		default = False,
+		options = set()
 	)
 
 	skeletonNameFollowMesh_override = BoolProperty(
 		name = "Skeleton Name Follow Mesh Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	skeletonNameFollowMesh = BoolProperty(
 		name = "Skeleton Name Follow Mesh",
 		description = "Use mesh name for exported skeleton name instead of the armature name.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	# ##############################################
@@ -91,41 +100,48 @@ class MeshProperties(bpy.types.PropertyGroup):
 	extremityPoints_override = BoolProperty(
 		name = "Extremity Points Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	extremityPoints = IntProperty(
 		name = "Extremity Points",
 		description = "Generate no more than num eXtremes for every submesh. (For submesh render sorting when using alpha materials on submesh)",
 		soft_min = 0,
-		soft_max = 65536
+		soft_max = 65536,
+		options = set()
 	)
 
 	edgeLists_override = BoolProperty(
 		name = "Edge Lists Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	edgeLists = BoolProperty(
 		name = "Edge Lists",
 		description = "Generate edge lists. (Useful for outlining or doing stencil shadows)",
-		default = False
+		default = False,
+		options = set()
 	)
 
 	tangent_override = BoolProperty(
 		name = "Tangent Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	tangent = BoolProperty(
 		name = "Tangent",
 		description = "Generate tangent.",
-		default = False
+		default = False,
+		options = set()
 	)
 
 	tangentSemantic_override = BoolProperty(
 		name = "Tangent Semantic Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	tangentSemantic = EnumProperty(
 		name = "Tangent Semantic",
@@ -133,13 +149,15 @@ class MeshProperties(bpy.types.PropertyGroup):
 		items=(("uvw", "uvw", "Use UV semantic."),
 				("tangent", "tangent", "Use tangent semantic."),
 				),
-		default= "tangent"
+		default= "tangent",
+		options = set()
 	)
 
 	tangentSize_override = BoolProperty(
 		name = "Tangent Size Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	tangentSize = EnumProperty(
 		name = "Tangent Size",
@@ -147,49 +165,58 @@ class MeshProperties(bpy.types.PropertyGroup):
 		items=(("4", "4 component (parity)", "Use 4 component tangent where 4th component is parity."),
 				("3", "3 component", "Use 3 component tangent."),
 				),
-		default= "3"
+		default= "3",
+		options = set()
 	)
 
 	splitMirrored_override = BoolProperty(
 		name = "Split Mirrored Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	splitMirrored = BoolProperty(
 		name = "Split Mirrored",
 		description = "Split tangent vertices at UV mirror points.",
-		default = False
+		default = False,
+		options = set()
 	)
 
 	splitRotated_override = BoolProperty(
 		name = "Split Rotated Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	splitRotated = BoolProperty(
 		name = "Split Rotated",
 		description = "Split tangent vertices where basis is rotated > 90 degrees.",
-		default = False
+		default = False,
+		options = set()
 	)
 
 	reorganiseVertBuff_override = BoolProperty(
 		name = "Reorganise Vertex Buffers Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	reorganiseVertBuff = BoolProperty(
 		name = "Reorganise Vertex Buffers",
 		description = "Reorganise vertex buffer to make it GPU vertex cache friendly.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	optimiseAnimation_override = BoolProperty(
 		name = "Optimise Animation Override",
 		description = "Override global setting.",
-		default = False
+		default = False,
+		options = set()
 	)
 	optimiseAnimation = BoolProperty(
 		name = "Optimise Animation",
 		description = "Optimise out redundant tracks & keyframes.",
-		default = True
+		default = True,
+		options = set()
 	)

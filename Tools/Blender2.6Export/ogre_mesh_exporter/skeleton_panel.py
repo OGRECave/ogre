@@ -1,5 +1,5 @@
 # ##### BEGIN MIT LICENSE BLOCK #####
-# Copyright (C) 2011 by Lih-Hern Pang
+# Copyright (C) 2012 by Lih-Hern Pang
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,28 @@
 # THE SOFTWARE.
 # ##### END MIT LICENSE BLOCK #####
 
-import bpy, os, sys, configparser
-from bpy.props import *
+import bpy, pprint
 
-# ##############################################
-# Material Properties on the material objects
-class MaterialProperties(bpy.types.PropertyGroup):
-	materialExportMode_override = BoolProperty(
-		name = "Material Export Mode Override",
-		description = "Override global setting.",
-		default = True,
-		options = set()
-	)
-	materialExportMode = EnumProperty(
-		name= "Material Export Mode",
-		description= "Diffrent Material Export Modes.",
-		items=(("rend", "Rendering Materials", "Export using rendering materials."),
-				("game", "Game Engine Materials", "Export using game engine materials."),
-				("custom",  "Custom Materials", "Export using custom template based materials."),
-				),
-		default= "rend",
-		options = set()
-	)
-	template_name = StringProperty(
-		name = "Template Name",
-		description = "Name of material template.",
-		options = set()
-	)
+class SkeletonExporterPanel(bpy.types.Panel):
+	bl_idname = "ogre3d_skeleton_panel"
+	bl_label = "Ogre Mesh Exporter"
+	bl_space_type = "PROPERTIES"
+	bl_region_type = "WINDOW"
+	bl_context = "data"
+
+	@classmethod
+	def poll(cls, context):
+		return context.armature
+
+	def draw(self, context):
+		layout = self.layout
+		skeletonSettings = context.armature.ogre_mesh_exporter
+
+		layout.label("Export bone filter:", icon = 'FILTER')
+		row = layout.row(True)
+		row.prop_enum(skeletonSettings, "exportFilter", 'all', icon = 'ARMATURE_DATA')
+		row.prop_enum(skeletonSettings, "exportFilter", 'layers', icon = 'MESH_GRID')
+
+		col = layout.column()
+		col.enabled = skeletonSettings.exportFilter == 'layers'
+		col.prop(skeletonSettings, "exportLayerMaskVector", text = "")

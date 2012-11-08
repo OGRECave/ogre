@@ -20,7 +20,7 @@
 # THE SOFTWARE.
 # ##### END MIT LICENSE BLOCK #####
 
-from ogre_mesh_exporter.global_properties import saveStaticConfig
+from ogre_mesh_exporter.global_properties import loadStaticConfig, saveStaticConfig
 from ogre_mesh_exporter.mesh_exporter import exportMesh
 from ogre_mesh_exporter.log_manager import LogManager, ObjectLog, Message
 
@@ -197,7 +197,7 @@ class MainExporterPanel(bpy.types.Panel):
 		subrow.scale_y = 1.5
 		exportRow = subrow.row(True)
 		exportRow.scale_y = 1.5
-		if (not exportPathValid or len(selectedObjectList.collection) == 0 or \
+		if (not exportPathValid or len(selectedObjectList.collection) == 0 or
 			(not globalSettings.exportMeshes and not globalSettings.exportMaterials)):
 			exportRow.enabled = False
 		exportRow.operator("ogre3d.export", icon = 'SCRIPTWIN')
@@ -225,8 +225,8 @@ class OperatorExport(bpy.types.Operator):
 
 	def modal(self, context, event):
 		if (event.type == 'ESC'):  # Cancel
-			for objectLog, process in self.pendingProcesses.items():
-				process.kill() 
+			for objectLog, processList in self.pendingProcesses.items():
+				for process in processList: process.kill() 
 				objectLog.mStatus = "(Canceling...)"
 			self.canceling = True
 			self.refresh(context)
@@ -242,9 +242,12 @@ class OperatorExport(bpy.types.Operator):
 
 		# poll subprocesses to make sure they are done and log accordingly.
 		pendingDelete = list()
-		for objectLog, process in self.pendingProcesses.items():
-			result = process.poll()
-			if (result == None): continue
+		for objectLog, processList in self.pendingProcesses.items():
+			result = 0
+			for process in processList:
+				pResult = process.poll()
+				if (pResult == None): continue
+				result += pResult
 			if (result == 0):
 				objectLog.mStatus = ""
 				objectLog.logMessage("OgreXMLConverter Success!")
@@ -279,11 +282,11 @@ class OperatorExport(bpy.types.Operator):
 		item = self.collection[self.itemIndex]
 		object = bpy.data.objects[item.objectName]
 		#~ time.sleep(0.1)
-		result = exportMesh(object, "%s%s.mesh.xml" % (self.globalSettings.exportPath, item.name))
+		result = exportMesh(object, self.globalSettings.exportPath + item.name)
 		objectLog = LogManager.getObjectLog(-1)
-		if (not result[0]): objectLog.mState = ObjectLog.ST_FAILED
-		elif (result[1]):
-			self.pendingProcesses[objectLog] = result[1]
+		if (False in result): objectLog.mState = ObjectLog.ST_FAILED
+		elif (len(result)):
+			self.pendingProcesses[objectLog] = result
 			objectLog.mStatus = "(Converting...)"
 			objectLog.mState = ObjectLog.ST_CONVERTING
 		else:

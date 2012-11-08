@@ -26,16 +26,16 @@ from bpy.props import *
 STATIC_CONFIG_FILENAME = "ogre_mesh_exporter.cfg"
 
 class SelectedObject(bpy.types.PropertyGroup):
-	name = StringProperty(name = "Name", default = "Unknown")
-	objectName = StringProperty(name = "Object", default = "Unknown")
+	name = StringProperty(name = "Name", default = "Unknown", options = set())
+	objectName = StringProperty(name = "Object", default = "Unknown", options = set())
 
 class SelectedObjectList(bpy.types.PropertyGroup):
 	def onSelectionChanged(self, context):
 		# Set the selected object as active.
 		bpy.context.scene.objects.active = bpy.data.objects[self.collection[self.collectionIndex].objectName]
 
-	collection = CollectionProperty(type = SelectedObject)
-	collectionIndex = IntProperty(min = -1, default = -1, update=onSelectionChanged)
+	collection = CollectionProperty(type = SelectedObject, options = set())
+	collectionIndex = IntProperty(min = -1, default = -1, options = set(), update=onSelectionChanged)
 
 class GlobalProperties(bpy.types.PropertyGroup):
 	# ##############################################
@@ -43,17 +43,20 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	exportMaterials = BoolProperty(
 		name = "Export Materials",
 		description = "Enable/Disable material file exporting.",
-		default = True
+		default = True,
+		options = set()
 	)
 	materialFile = StringProperty(
 		name = "Material File",
 		description = "File name of material.",
-		default = "Scene.material"
+		default = "Scene.material",
+		options = set()
 	)
 	copyTextures = BoolProperty(
 		name = "Copy Textures",
 		description = "Copy textures to export path.",
-		default = False
+		default = False,
+		options = set()
 	)
 	materialExportMode = EnumProperty(
 		name= "Material Export Mode",
@@ -62,12 +65,14 @@ class GlobalProperties(bpy.types.PropertyGroup):
 				("game", "Game Engine Materials", "Export using game engine materials."),
 				("custom",  "Custom Materials", "Export using custom template based materials."),
 				),
-		default= "rend"
+		default= "rend",
+		options = set()
 	)
 	templatePath = StringProperty(
 		name = "Template Path",
 		description = "Path to material templates for generating custom materials.",
-		subtype = "DIR_PATH"
+		subtype = "DIR_PATH",
+		options = set()
 	)
 
 	# ##############################################
@@ -75,37 +80,44 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	exportMeshes = BoolProperty(
 		name = "Export Meshes",
 		description = "Enable/Disable mesh & skeleton file exporting.",
-		default = True
+		default = True,
+		options = set()
 	)
 	exportPath = StringProperty(
 		name = "Export Path",
 		description = "Path to export files.",
-		subtype = "DIR_PATH"
+		subtype = "DIR_PATH",
+		options = set()
 	)
 	fixUpAxisToY = BoolProperty(
 		name = "Fix Up Axis to Y",
 		description = "Fix up axis as Y instead of Z.",
-		default = True
+		default = True,
+		options = set()
 	)
 	requireMaterials = BoolProperty(
 		name = "Require Materials",
 		description = "Generate Error message when part of a mesh is not assigned with a material.",
-		default = True
+		default = True,
+		options = set()
 	)
 	applyModifiers = BoolProperty(
 		name = "Apply Modifiers",
 		description = "Apply mesh modifiers before export. (Slow and may break vertex order for morph targets!)",
-		default = False
+		default = False,
+		options = set()
 	)
 	skeletonNameFollowMesh = BoolProperty(
 		name = "Skeleton Name Follow Mesh",
 		description = "Use mesh name for exported skeleton name instead of the armature name.",
-		default = True
+		default = True,
+		options = set()
 	)
 	runOgreXMLConverter = BoolProperty(
 		name = "OgreXMLConverter",
 		description = "Run OgreXMLConverter on exported XML files.",
-		default = True
+		default = True,
+		options = set()
 	)
 
 	# ##############################################
@@ -117,34 +129,40 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	ogreXMLConverterPath = StringProperty(
 		name = "Ogre XML Converter Path",
 		description = "Path to OgreXMLConverter.",
-		subtype = "FILE_PATH"
+		subtype = "FILE_PATH",
+		options = {'SKIP_SAVE'}
 	)
 	# Saved to the shared config file as above.
 	ogreXMLConverterAdditionalArg = StringProperty(
 		name = "Additional Arguments",
-		description = "Additional Arguments outside of the provided options below. Note that this is shared across all blend files."
+		description = "Additional Arguments outside of the provided options below. Note that this is shared across all blend files.",
+		options = {'SKIP_SAVE'}
 	)
 
 	useXMLConverterOptions = BoolProperty(
 		name = "Use XML Converter Options",
 		description = "Use the settings set by this XML converter option. These options are saved in blend file. If you want a globally shared option, please uncheck this and use the 'Additional Arguments' option.",
-		default = True
+		default = True,
+		options = {'SKIP_SAVE'}
 	)
 	extremityPoints = IntProperty(
 		name = "Extremity Points",
 		description = "Generate no more than num eXtremes for every submesh. (For submesh render sorting when using alpha materials on submesh)",
 		soft_min = 0,
-		soft_max = 65536
+		soft_max = 65536,
+		options = {'SKIP_SAVE'}
 	)
 	edgeLists = BoolProperty(
 		name = "Edge Lists",
 		description = "Generate edge lists. (Useful for outlining or doing stencil shadows)",
-		default = False
+		default = False,
+		options = {'SKIP_SAVE'}
 	)
 	tangent = BoolProperty(
 		name = "Tangent",
 		description = "Generate tangent.",
-		default = False
+		default = False,
+		options = {'SKIP_SAVE'}
 	)
 	tangentSemantic = EnumProperty(
 		name = "Tangent Semantic",
@@ -152,7 +170,8 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		items=(("uvw", "uvw", "Use UV semantic."),
 				("tangent", "tangent", "Use tangent semantic."),
 				),
-		default= "tangent"
+		default= "tangent",
+		options = {'SKIP_SAVE'}
 	)
 	tangentSize = EnumProperty(
 		name = "Tangent Size",
@@ -160,27 +179,32 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		items=(("4", "4 component (parity)", "Use 4 component tangent where 4th component is parity."),
 				("3", "3 component", "Use 3 component tangent."),
 				),
-		default= "3"
+		default= "3",
+		options = {'SKIP_SAVE'}
 	)
 	splitMirrored = BoolProperty(
 		name = "Split Mirrored",
 		description = "Split tangent vertices at UV mirror points.",
-		default = False
+		default = False,
+		options = {'SKIP_SAVE'}
 	)
 	splitRotated = BoolProperty(
 		name = "Split Rotated",
 		description = "Split tangent vertices where basis is rotated > 90 degrees.",
-		default = False
+		default = False,
+		options = {'SKIP_SAVE'}
 	)
 	reorganiseVertBuff = BoolProperty(
 		name = "Reorganise Vertex Buffers",
 		description = "Reorganise vertex buffer to make it GPU vertex cache friendly.",
-		default = True
+		default = True,
+		options = {'SKIP_SAVE'}
 	)
 	optimiseAnimation = BoolProperty(
 		name = "Optimise Animation",
 		description = "Optimise out redundant tracks & keyframes.",
-		default = True
+		default = True,
+		options = {'SKIP_SAVE'}
 	)
 
 	# ##############################################
@@ -188,13 +212,15 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	logPageSize = IntProperty(
 		name = "Log Page Size",
 		description = "Size of a visible log page",
-		default = 10
+		default = 10,
+		options = {'SKIP_SAVE'}
 	)
 	logPercentage = IntProperty(
 		name = "Log Percentage",
 		description = "Log progress",
 		default = 100, min = 0, max = 100,
-		subtype = 'PERCENTAGE'
+		subtype = 'PERCENTAGE',
+		options = {'SKIP_SAVE'}
 	)
 
 	# ##############################################

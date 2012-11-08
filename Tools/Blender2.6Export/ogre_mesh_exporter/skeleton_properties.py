@@ -1,5 +1,5 @@
 # ##### BEGIN MIT LICENSE BLOCK #####
-# Copyright (C) 2011 by Lih-Hern Pang
+# Copyright (C) 2012 by Lih-Hern Pang
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,25 @@
 import bpy, os, sys, configparser
 from bpy.props import *
 
+def boneGroupList(self, context):
+	pose = context.object.pose
+	return [(group.name, group.name, '') for group in pose.bone_groups]
+
 # ##############################################
-# Material Properties on the material objects
-class MaterialProperties(bpy.types.PropertyGroup):
-	materialExportMode_override = BoolProperty(
-		name = "Material Export Mode Override",
-		description = "Override global setting.",
-		default = True,
-		options = set()
-	)
-	materialExportMode = EnumProperty(
-		name= "Material Export Mode",
-		description= "Diffrent Material Export Modes.",
-		items=(("rend", "Rendering Materials", "Export using rendering materials."),
-				("game", "Game Engine Materials", "Export using game engine materials."),
-				("custom",  "Custom Materials", "Export using custom template based materials."),
+# Skeleton Properties on the armature objects
+class SkeletonProperties(bpy.types.PropertyGroup):
+	exportFilter = EnumProperty(
+		name = "Export Bones Filter",
+		description = "Bone export filtering.",
+		items=(("all", "All", "Export all bones."),
+				("layers", "Layers", "Export bones in layers."),
 				),
-		default= "rend",
-		options = set()
-	)
-	template_name = StringProperty(
-		name = "Template Name",
-		description = "Name of material template.",
-		options = set()
-	)
+		default = 'all',
+		options = set())
+
+	# Export layer mask.
+	# Took me a while to figure this one out.
+	# Blender guys at irc are not helpful too :-(
+	# I wonder how the layer UI in Armature shows the dots on the layer buttons.
+	exportLayerMaskVector = BoolVectorProperty(
+		size = 32, subtype = 'LAYER', options = set())
