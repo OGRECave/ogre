@@ -58,7 +58,17 @@ class MeshExporterPanel(bpy.types.Panel):
 		meshSettings = context.mesh.ogre_mesh_exporter
 		skeletonSettings = getSkeletonSettings(context)
 
-		layout.prop(meshSettings, "exportEnabled", icon = 'MESH_MONKEY', toggle = True)
+		row = layout.row(True)
+		row.prop(meshSettings, "exportEnabled", icon = 'EXPORT', toggle = True)
+
+		row = row.row()
+		row.alignment = 'RIGHT'
+		row.scale_x = 0.3
+		row.enabled = meshSettings.exportEnabled
+		row.prop_enum(meshSettings, "exportTab", 'mesh', text = "", icon = 'MESH_MONKEY')
+		row.prop_enum(meshSettings, "exportTab", 'animation', text = "", icon = 'ANIM')
+		row.prop_enum(meshSettings, "exportTab", 'settings', text = "", icon = 'SETTINGS')
+
 		if (not meshSettings.exportEnabled): return
 
 		# prepare material slot shared vertex info.
@@ -68,193 +78,194 @@ class MeshExporterPanel(bpy.types.Panel):
 		while (len(subMeshProperties) < materialCount): subMeshProperties.add() # add more items if needed.
 		while (len(subMeshProperties) > materialCount): subMeshProperties.remove(0) # remove items if needed.
 
-		layout.label("Submesh Properties:")
-		submeshNames = list()
-		box = layout.box()
-		if (len(subMeshProperties) == 0): box.label("No Materials Defined", icon = 'INFO')
-		for index, subMeshProperty in enumerate(subMeshProperties):
-			row = box.row(True)
+		if (meshSettings.exportTab == 'mesh'):
+			layout.label("Submesh Properties:")
+			submeshNames = list()
+			box = layout.box()
+			if (len(subMeshProperties) == 0): box.label("No Materials Defined", icon = 'INFO')
+			for index, subMeshProperty in enumerate(subMeshProperties):
+				row = box.row(True)
 
-			# Material index & name.
-			material = materialList[index]
-			row.label("[%d]%s" % (index, "NONE" if (material == None) else materialList[index].name), icon = 'ERROR' if (material == None) else 'MATERIAL')
+				# Material index & name.
+				material = materialList[index]
+				row.label("[%d]%s" % (index, "NONE" if (material == None) else materialList[index].name), icon = 'ERROR' if (material == None) else 'MATERIAL')
 
-			# Submesh name.
-			subrow = row.row()
-			if (subMeshProperty.name in submeshNames): subrow.alert = True
-			else: submeshNames.append(subMeshProperty.name)
-			subrow.prop(subMeshProperty, "name", "")
+				# Submesh name.
+				subrow = row.row()
+				if (subMeshProperty.name in submeshNames): subrow.alert = True
+				else: submeshNames.append(subMeshProperty.name)
+				subrow.prop(subMeshProperty, "name", "")
 
-			# Use shared vertices.
-			row.prop(subMeshProperty, "useSharedVertices", "", icon = 'GROUP_VERTEX')
+				# Use shared vertices.
+				row.prop(subMeshProperty, "useSharedVertices", "", icon = 'GROUP_VERTEX')
 
-			# Select vertices under this submesh.
-			if (context.mode == 'EDIT_MESH'):
-				prop = row.operator("ogre3d.select_submesh_vertices", "", icon='MESH_DATA')
-				prop.index = index
-
-		# Animations.
-		layout.separator()
-		row = layout.row(True)
-		row.label("Animations:")
-		row.prop_enum(meshSettings, "animationTab", 'skel', icon = 'POSE_DATA')
-		row.prop_enum(meshSettings, "animationTab", 'pose', icon = 'OUTLINER_DATA_MESH')
-		row.prop_enum(meshSettings, "animationTab", 'morph', icon = 'OUTLINER_DATA_MESH')
-
-		box = layout.box()
-		table = box.column(True)
-		row = table.row()
-		col = row.column()
-		delCol = row.column()
-
-		# draw grid header.
-		row = col.row()
-		row.prop(globalSettings, "dummyTrue", toggle = True, text = "Action")
-		row.prop(globalSettings, "dummyTrue", toggle = True, text = "Name")
-		frameRow = row.row()
-		frameRow.scale_x = 0.5
-		frameRow.prop(globalSettings, "dummyTrue", toggle = True, text = "Start")
-		frameRow.prop(globalSettings, "dummyTrue", toggle = True, text = "End")
-		delCol.prop(globalSettings, "dummyTrue", text = "", icon = 'SCRIPTWIN')
-
-		# Populate skeletal animation action list.
-		if (meshSettings.animationTab == 'skel'):
-			if (skeletonSettings is not None):
-				if (len(skeletonSettings.exportSkeletonActions) == 0):
-					table.prop(globalSettings, "dummyFalse", toggle = True, text = "No Animations")
-				for index, item in enumerate(skeletonSettings.exportSkeletonActions):
-					row = col.row()
-					row.prop(item, "action", text = "", icon = 'ACTION')
-					row.prop(item, "name", text = "")
-					frameRow = row.row()
-					frameRow.scale_x = 0.5
-					frameRow.prop(item, "startFrame", text = "")
-					frameRow.prop(item, "endFrame", text = "")
-					prop = delCol.operator("ogre3d.skeleton_delete_animation", text = "", icon = 'ZOOMOUT')
+				# Select vertices under this submesh.
+				if (context.mode == 'EDIT_MESH'):
+					prop = row.operator("ogre3d.select_submesh_vertices", "", icon='MESH_DATA')
 					prop.index = index
-				box.operator("ogre3d.skeleton_add_animation", icon = 'ZOOMIN')
+
+		elif (meshSettings.exportTab == 'animation'):
+			# Animations.
+			layout.separator()
+			row = layout.row(True)
+			row.label("Animations:")
+			row.prop_enum(meshSettings, "animationTab", 'skel', icon = 'POSE_DATA')
+			row.prop_enum(meshSettings, "animationTab", 'pose', icon = 'OUTLINER_DATA_MESH')
+			row.prop_enum(meshSettings, "animationTab", 'morph', icon = 'OUTLINER_DATA_MESH')
+
+			box = layout.box()
+			table = box.column(True)
+			row = table.row()
+			col = row.column()
+			delCol = row.column()
+
+			# draw grid header.
+			row = col.row()
+			row.prop(globalSettings, "dummyTrue", toggle = True, text = "Action")
+			row.prop(globalSettings, "dummyTrue", toggle = True, text = "Name")
+			frameRow = row.row()
+			frameRow.scale_x = 0.5
+			frameRow.prop(globalSettings, "dummyTrue", toggle = True, text = "Start")
+			frameRow.prop(globalSettings, "dummyTrue", toggle = True, text = "End")
+			delCol.prop(globalSettings, "dummyTrue", text = "", icon = 'SCRIPTWIN')
+
+			# Populate skeletal animation action list.
+			if (meshSettings.animationTab == 'skel'):
+				if (skeletonSettings is not None):
+					if (len(skeletonSettings.exportSkeletonActions) == 0):
+						table.prop(globalSettings, "dummyFalse", toggle = True, text = "No Animations")
+					for index, item in enumerate(skeletonSettings.exportSkeletonActions):
+						row = col.row()
+						row.prop(item, "action", text = "", icon = 'ACTION')
+						row.prop(item, "name", text = "")
+						frameRow = row.row()
+						frameRow.scale_x = 0.5
+						frameRow.prop(item, "startFrame", text = "")
+						frameRow.prop(item, "endFrame", text = "")
+						prop = delCol.operator("ogre3d.skeleton_delete_animation", text = "", icon = 'ZOOMOUT')
+						prop.index = index
+					box.operator("ogre3d.skeleton_add_animation", icon = 'ZOOMIN')
+				else:
+					table.prop(globalSettings, "dummyFalse", toggle = True, text = "No Armature Link")
+			elif (meshSettings.animationTab == 'pose'):
+				table.prop(globalSettings, "dummyFalse", toggle = True, text = "Not Implemented Yet")
 			else:
-				table.prop(globalSettings, "dummyFalse", toggle = True, text = "No Armature Link")
-		elif (meshSettings.animationTab == 'pose'):
-			table.prop(globalSettings, "dummyFalse", toggle = True, text = "Not Implemented Yet")
+				table.prop(globalSettings, "dummyFalse", toggle = True, text = "Not Implemented Yet")
+
 		else:
-			table.prop(globalSettings, "dummyFalse", toggle = True, text = "Not Implemented Yet")
+			# Mesh override settings:
+			layout.label("Mesh Override Settings:")
+			col = layout.column(True)
+			row = col.row()
+			overrideSetting = meshSettings.requireMaterials_override
+			row.prop(meshSettings, "requireMaterials_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "requireMaterials", toggle = True)
 
-		# Mesh override settings:
-		layout.label("Mesh Override Settings:")
-		col = layout.column(True)
+			row = col.row()
+			overrideSetting = meshSettings.skeletonNameFollowMesh_override
+			row.prop(meshSettings, "skeletonNameFollowMesh_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "skeletonNameFollowMesh", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.requireMaterials_override
-		row.prop(meshSettings, "requireMaterials_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "requireMaterials", toggle = True)
+			row = col.row()
+			overrideSetting = meshSettings.applyModifiers_override
+			row.prop(meshSettings, "applyModifiers_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "applyModifiers", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.skeletonNameFollowMesh_override
-		row.prop(meshSettings, "skeletonNameFollowMesh_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "skeletonNameFollowMesh", toggle = True)
+			# XML Converter override settings:
+			layout.label("XML Converter Override Settings:")
+			col = layout.column(True)
+			row = col.row()
+			overrideSetting = meshSettings.extremityPoints_override
+			row.prop(meshSettings, "extremityPoints_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "extremityPoints")
 
-		row = col.row(True)
-		overrideSetting = meshSettings.applyModifiers_override
-		row.prop(meshSettings, "applyModifiers_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "applyModifiers", toggle = True)
+			row = col.row()
+			overrideSetting = meshSettings.edgeLists_override
+			row.prop(meshSettings, "edgeLists_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "edgeLists", toggle = True)
 
-		# XML Converter override settings:
-		layout.label("XML Converter Override Settings:")
-		col = layout.column(True)
+			row = col.row()
+			overrideSetting = meshSettings.tangent_override
+			row.prop(meshSettings, "tangent_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "tangent", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.extremityPoints_override
-		row.prop(meshSettings, "extremityPoints_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "extremityPoints")
+			row = col.row()
+			overrideSetting = meshSettings.tangentSemantic_override
+			row.prop(meshSettings, "tangentSemantic_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "tangentSemantic", "")
 
-		row = col.row(True)
-		overrideSetting = meshSettings.edgeLists_override
-		row.prop(meshSettings, "edgeLists_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "edgeLists", toggle = True)
+			row = col.row()
+			overrideSetting = meshSettings.tangentSize_override
+			row.prop(meshSettings, "tangentSize_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "tangentSize", "")
 
-		row = col.row(True)
-		overrideSetting = meshSettings.tangent_override
-		row.prop(meshSettings, "tangent_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "tangent", toggle = True)
+			row = col.row()
+			overrideSetting = meshSettings.splitMirrored_override
+			row.prop(meshSettings, "splitMirrored_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "splitMirrored", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.tangentSemantic_override
-		row.prop(meshSettings, "tangentSemantic_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "tangentSemantic", "")
+			row = col.row()
+			overrideSetting = meshSettings.splitRotated_override
+			row.prop(meshSettings, "splitRotated_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "splitRotated", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.tangentSize_override
-		row.prop(meshSettings, "tangentSize_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "tangentSize", "")
+			row = col.row()
+			overrideSetting = meshSettings.reorganiseVertBuff_override
+			row.prop(meshSettings, "reorganiseVertBuff_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "reorganiseVertBuff", toggle = True)
 
-		row = col.row(True)
-		overrideSetting = meshSettings.splitMirrored_override
-		row.prop(meshSettings, "splitMirrored_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "splitMirrored", toggle = True)
-
-		row = col.row(True)
-		overrideSetting = meshSettings.splitRotated_override
-		row.prop(meshSettings, "splitRotated_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "splitRotated", toggle = True)
-
-		row = col.row(True)
-		overrideSetting = meshSettings.reorganiseVertBuff_override
-		row.prop(meshSettings, "reorganiseVertBuff_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "reorganiseVertBuff", toggle = True)
-
-		row = col.row(True)
-		overrideSetting = meshSettings.optimiseAnimation_override
-		row.prop(meshSettings, "optimiseAnimation_override", "",
-			icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
-		if (not overrideSetting):
-			row = row.row(True)
-			row.enabled = False
-		row.prop(meshSettings, "optimiseAnimation", toggle = True)
+			row = col.row()
+			overrideSetting = meshSettings.optimiseAnimation_override
+			row.prop(meshSettings, "optimiseAnimation_override", "",
+				icon = 'PINNED' if overrideSetting else 'UNPINNED', toggle = True)
+			if (not overrideSetting):
+				row = row.row()
+				row.enabled = False
+			row.prop(meshSettings, "optimiseAnimation", toggle = True)
 
 class OperatorSelectSubmeshVertices(bpy.types.Operator):
 	bl_idname = "ogre3d.select_submesh_vertices"

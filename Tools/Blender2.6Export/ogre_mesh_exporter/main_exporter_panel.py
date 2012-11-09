@@ -200,7 +200,7 @@ class MainExporterPanel(bpy.types.Panel):
 		if (not exportPathValid or len(selectedObjectList.collection) == 0 or
 			(not globalSettings.exportMeshes and not globalSettings.exportMaterials)):
 			exportRow.enabled = False
-		exportRow.operator("ogre3d.export", icon = 'SCRIPTWIN')
+		exportRow.operator("ogre3d.export", icon = 'EXPORT')
 		subrow.operator("ogre3d.preferences", icon = 'SETTINGS')
 		subrow.operator("ogre3d.help", icon = 'HELP')
 		row = row.row()

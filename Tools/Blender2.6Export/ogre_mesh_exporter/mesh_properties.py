@@ -51,21 +51,29 @@ class MeshProperties(bpy.types.PropertyGroup):
 		options = set()
 	)
 
+	exportTab = EnumProperty(
+		items = (
+			("mesh", "Mesh", "Mesh tab"),
+			("animation", "Animation", "Animation tab"),
+			("settings", "Override Settings", "Override global settings tab")),
+		default = "mesh",
+		options = {'SKIP_SAVE'}
+	)
+
 	subMeshProperties = CollectionProperty(type = SubMeshProperties)
 
 	animationTab = EnumProperty(
 		items = (
 			("skel", "Skeleton", "Skeleton animation tab"),
-			("pose", "Vertex Pose", "Pose vertex animation tab"),
-			("morph", "Vertex Morph", "Morph vertex animation tab")),
+			("pose", "Pose", "Vertex Pose animation tab"),
+			("morph", "Morph", "Vertex Morph animation tab")),
 		default = "skel",
-		options = set()
+		options = {'SKIP_SAVE'}
 	)
 
 
 	# ##############################################
 	# Export override specific Properties
-
 	requireMaterials_override = BoolProperty(
 		name = "Require Materials Override",
 		description = "Override global setting.",
