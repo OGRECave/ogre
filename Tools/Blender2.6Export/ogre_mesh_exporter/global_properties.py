@@ -59,13 +59,13 @@ class GlobalProperties(bpy.types.PropertyGroup):
 		options = set()
 	)
 	materialExportMode = EnumProperty(
-		name= "Material Export Mode",
-		description= "Diffrent Material Export Modes.",
-		items=(("rend", "Rendering Materials", "Export using rendering materials."),
+		name = "Material Export Mode",
+		description = "Diffrent Material Export Modes.",
+		items = (("rend", "Rendering Materials", "Export using rendering materials."),
 				("game", "Game Engine Materials", "Export using game engine materials."),
 				("custom",  "Custom Materials", "Export using custom template based materials."),
 				),
-		default= "rend",
+		default = "rend",
 		options = set()
 	)
 	templatePath = StringProperty(
@@ -226,6 +226,25 @@ class GlobalProperties(bpy.types.PropertyGroup):
 	# ##############################################
 	# temporary collection for listing selected meshes.
 	selectedObjectList = PointerProperty(type = SelectedObjectList)
+
+	def onDummyTrueChanged(self, context):
+		# Never let Dummy change.
+		self.dummyTrue = True
+	def onDummyFalseChanged(self, context):
+		# Never let Dummy change.
+		self.dummyFalse = False
+
+	# Dummy property for tab use. (NEVER SET)
+	dummyTrue = BoolProperty(
+		default = True,
+		update = onDummyTrueChanged,
+		options = {'SKIP_SAVE'})
+
+	# Dummy property for label box use. (NEVER SET)
+	dummyFalse = BoolProperty(
+		default = False,
+		update = onDummyFalseChanged,
+		options = {'SKIP_SAVE'})
 
 # Load static data from config file.
 def loadStaticConfig():

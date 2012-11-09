@@ -53,6 +53,16 @@ class MeshProperties(bpy.types.PropertyGroup):
 
 	subMeshProperties = CollectionProperty(type = SubMeshProperties)
 
+	animationTab = EnumProperty(
+		items = (
+			("skel", "Skeleton", "Skeleton animation tab"),
+			("pose", "Vertex Pose", "Pose vertex animation tab"),
+			("morph", "Vertex Morph", "Morph vertex animation tab")),
+		default = "skel",
+		options = set()
+	)
+
+
 	# ##############################################
 	# Export override specific Properties
 

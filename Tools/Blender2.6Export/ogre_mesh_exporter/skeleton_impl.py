@@ -20,16 +20,32 @@
 # THE SOFTWARE.
 # ##### END MIT LICENSE BLOCK #####
 
-import bpy, mathutils
+import bpy, mathutils, pprint
 
 from ogre_mesh_exporter.log_manager import LogManager, Message
 
-# helper function to convert boolean tuples to integer bitmask
-def tupleBoolVectorToIntBitmask(tupleBool):
-	result = 0
-	for i, bool in enumerate(tupleBool):
-		if (bool): result |= (1 << i)
-	return result
+# ##############################################
+# Bone export filter helpers
+
+class BoneNoFilter():
+	def shouldSkipBone(self, bPoseBone):
+		return False
+
+class BoneLayerFilter():
+	def __init__(self, exportLayerMask):
+		self.exportLayerMask = exportLayerMask
+
+	def shouldSkipBone(self, bPoseBone):
+		for boneLayerFlag, exportLayerFlag in zip(bPoseBone.bone.layers, self.exportLayerMask):
+			if (boneLayerFlag and exportLayerFlag): return False
+		return True
+
+class BoneGroupFilter():
+	def __init__(self, exportGroupMask):
+		self.exportGroupMask = exportGroupMask
+
+	def shouldSkipBone(self, bPoseBone):
+		return not (bPoseBone.bone_group and bPoseBone.bone_group.name in self.exportGroupMask)
 
 class Bone():
 	def __init__(self, name, pos, rot, parentIndex = -1, invMeshSpaceMatrix = None):
@@ -39,6 +55,9 @@ class Bone():
 		self.mParentIndex = parentIndex
 		self.mInvMeshSpaceMatrix = invMeshSpaceMatrix
 
+# ##############################################
+# Skeleton export classes
+
 class Skeleton():
 	def __init__(self, name, armatureObject = None, targetMeshInverseMatrix = mathutils.Matrix.Identity(4), fixUpAxisToY = True):
 		# List of bones.
@@ -47,6 +66,11 @@ class Skeleton():
 
 		# Skip blender armature conversion if not set.
 		if (armatureObject is None): return
+
+		# Make sure we set the armature as active object.
+		# Otherwise the context will be wrong and RNA data will not get proper result for export.
+		lastActiveObject = bpy.context.scene.objects.active
+		bpy.context.scene.objects.active = armatureObject
 
 		# build matrix transform to convert from armature space to mesh space.
 		# NOTE: Blender matrix multiplication order is World = Parent * Child
@@ -59,21 +83,23 @@ class Skeleton():
 		# parent of mesh or mesh position is not at origin relative to Armature.
 		# This method ensures that skeletal animation will always work regardless
 		# of good/bad mesh<->skeletal setup.
-		armature = armatureObject.data
+		pose = armatureObject.pose
 
 		# get skeleton export settings.
-		skeletonSettings = armature.ogre_mesh_exporter
-		exportLayerMask = tupleBoolVectorToIntBitmask(skeletonSettings.exportLayerMaskVector) if (skeletonSettings.exportFilter == 'layers') else -1
+		skeletonSettings = armatureObject.data.ogre_mesh_exporter
+		if (skeletonSettings.exportFilter == 'layers'): exportBoneFilter = BoneLayerFilter(skeletonSettings.exportBoneLayerMask)
+		elif (skeletonSettings.exportFilter == 'groups'): exportBoneFilter = BoneGroupFilter(skeletonSettings.exportBoneGroupMask)
+		else: exportBoneFilter = BoneNoFilter()
 
 		# first we convert all bones to mesh space.
 		boneMatrixMeshSpaceList = list()
 		boneMatrixInvMeshSpaceList = list()
 		bBoneList = list()
-		for bBone in armature.bones:
+		for bPoseBone in pose.bones:
 			# check that the bone is what we want to export.
-			layersBitmask = tupleBoolVectorToIntBitmask(bBone.layers)
-			if ((exportLayerMask & layersBitmask) == 0): continue
+			if (exportBoneFilter.shouldSkipBone(bPoseBone)): continue
 
+			bBone = bPoseBone.bone
 			matrix = self.mArmatureToMeshMatrix * bBone.matrix_local
 			boneMatrixMeshSpaceList.append(matrix)
 			boneMatrixInvMeshSpaceList.append(matrix.inverted())
@@ -98,6 +124,9 @@ class Skeleton():
 			bone = Bone(bBone.name, matrix.translation, matrix.to_quaternion().normalized(),
 				parentIndex, boneMatrixInvMeshSpaceList[index])
 			self.mBones.append(bone)
+
+		# done importing essential armature data. reset active object.
+		bpy.context.scene.objects.active = lastActiveObject
 
 	def getBoneIndex(self, name):
 		index = 0

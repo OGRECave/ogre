@@ -176,7 +176,7 @@ class VertexBuffer():
 		for i, vertex in enumerate(self.mVertexData):
 			if (len(vertex.mBoneWeights) == 0): vertexWithNoBoneAssignements += 1
 			for boneWeight in vertex.mBoneWeights:
-				file.write('%s\t\t<vertexboneassignment vertexindex="%d" boneindex="%d" weight="%f" />\n' %
+				file.write('%s\t\t<vertexboneassignment vertexindex="%d" boneindex="%d" weight="%.6f" />\n' %
 					(indent, i, boneWeight.mBoneIndex, boneWeight.mBoneWeight))
 
 		if (vertexWithNoBoneAssignements > 0):
@@ -241,7 +241,7 @@ class SubMesh():
 				for groupElement in vertex.groups:
 					groupName = blendVertexGroups[groupElement.group].name
 					boneIndex = ogreSkeleton.getBoneIndex(groupName)
-					if (boneIndex == -1): continue
+					if (boneIndex == -1 or abs(groupElement.weight) < 0.000001): continue
 					boneWeight = groupElement.weight
 					boneWeights.append(BoneWeight(boneIndex, boneWeight))
 
