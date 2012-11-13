@@ -95,10 +95,7 @@ namespace Ogre {
         {
             switchFullScreen(false);
         }
-        
-        if(!mUsingExternalView)
-            [mView release];
-        
+
         if(!mUsingExternalViewController)
             [mViewController release];
     }
@@ -232,10 +229,17 @@ namespace Ogre {
         
         CAEAGLLayer *eaglLayer = (CAEAGLLayer *)mView.layer;
         OgreAssert(eaglLayer != nil, "EAGL2Window: Failed to retrieve a pointer to the view's Core Animation layer");
-        
+
+        BOOL retainedBacking = NO;
+        NameValuePairList::const_iterator option;
+        if ((option = miscParams->find("retainedBacking")) != miscParams->end())
+        {
+            retainedBacking = StringConverter::parseBool(option->second);
+        }
+
         eaglLayer.opaque = YES;
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking,
+                                        [NSNumber numberWithBool:retainedBacking], kEAGLDrawablePropertyRetainedBacking,
                                         kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
         // Set up the view controller
         if(!mUsingExternalViewController)
@@ -252,7 +256,6 @@ namespace Ogre {
         if(eaglLayer)
         {
             EAGLSharegroup *group = nil;
-            NameValuePairList::const_iterator option;
             
             if ((option = miscParams->find("externalSharegroup")) != miscParams->end())
             {
@@ -487,9 +490,6 @@ namespace Ogre {
 
     void EAGL2Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if(dst.format != PF_A8R8G8B8)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only PF_A8R8G8B8 is a supported format for OpenGL ES", __FUNCTION__);
-
         if ((dst.right > mWidth) ||
 			(dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
@@ -517,6 +517,7 @@ namespace Ogre {
         // Read pixel data from the framebuffer
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
         GL_CHECK_ERROR
+
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -528,7 +529,7 @@ namespace Ogre {
         CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, data, dataLength, NULL);
         CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
         CGImageRef iref = CGImageCreate(width, height, 8, 32, width * 4, colorspace,
-                                        kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                        kCGBitmapByteOrder32Big | PixelUtil::hasAlpha(dst.format) ? kCGImageAlphaPremultipliedLast : kCGImageAlphaNoneSkipLast,
                                         ref, NULL, true, kCGRenderingIntentDefault);
 
         // OpenGL ES measures data in PIXELS

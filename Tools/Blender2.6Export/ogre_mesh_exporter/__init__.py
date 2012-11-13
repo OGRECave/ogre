@@ -37,18 +37,26 @@ if "bpy" in locals():
 	import imp
 	imp.reload(global_properties)
 	imp.reload(material_properties)
+	imp.reload(skeleton_properties)
 	imp.reload(mesh_properties)
 	imp.reload(main_exporter_panel)
 	imp.reload(log_manager)
+	#~ imp.reload(material_panel)
+	imp.reload(skeleton_panel)
+	imp.reload(skeleton_impl)
 	imp.reload(mesh_panel)
 	imp.reload(mesh_exporter)
 	imp.reload(mesh_impl)
 else:
 	from . import global_properties
 	from . import material_properties
+	from . import skeleton_properties
 	from . import mesh_properties
 	from . import main_exporter_panel
 	from . import log_manager
+	#~ from . import material_panel
+	from . import skeleton_panel
+	from . import skeleton_impl
 	from . import mesh_panel
 	from . import mesh_exporter
 	from . import mesh_impl
@@ -58,6 +66,7 @@ from bpy.props import PointerProperty
 from bpy.app.handlers import persistent
 from ogre_mesh_exporter.global_properties import GlobalProperties, loadStaticConfig
 from ogre_mesh_exporter.material_properties import MaterialProperties
+from ogre_mesh_exporter.skeleton_properties import SkeletonProperties
 from ogre_mesh_exporter.mesh_properties import MeshProperties
 from ogre_mesh_exporter.main_exporter_panel import MainExporterPanel
 
@@ -79,6 +88,12 @@ def register():
 	bpy.types.Material.ogre_mesh_exporter = PointerProperty(
 		name = "Ogre Mesh Exporter properties",
 		type = MaterialProperties,
+		description = "Ogre Mesh Exporter properties"
+	)
+
+	bpy.types.Armature.ogre_mesh_exporter = PointerProperty(
+		name = "Ogre Mesh Exporter properties",
+		type = SkeletonProperties,
 		description = "Ogre Mesh Exporter properties"
 	)
 
