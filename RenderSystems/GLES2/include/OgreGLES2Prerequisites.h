@@ -73,22 +73,32 @@ THE SOFTWARE.
 #       undef GL_OES_mapbuffer
 #	endif
 #else
+#	undef  GL_GLEXT_PROTOTYPES
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
 #   include <EGL/egl.h>
 
-// Function pointers for FBO extension methods
-// Declare them here since we don't have GLEW to do it for us
-
 #	ifndef GL_GLEXT_PROTOTYPES
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 extern PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB;
 extern PFNGLREADBUFFERNVPROC glReadBufferNV;
 extern PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV;
 extern PFNGLGETTEXIMAGENVPROC glGetTexImageNV;
 extern PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV;
 extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
+#		else
+typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOES) (GLuint vertexarray);
+typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOES) (GLsizei n, const GLuint *vertexarrays);
+typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOES) (GLsizei n, GLuint *vertexarrays);
+typedef GLboolean (GL_APIENTRYP PFNGLISVERTEXARRAYOES) (GLuint vertexarray);
+
+extern PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES;
+extern PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES;
+extern PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES;
+extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
+#		endif
 #	endif
 
 // If we are going to use the PVRTC_CODEC make sure we

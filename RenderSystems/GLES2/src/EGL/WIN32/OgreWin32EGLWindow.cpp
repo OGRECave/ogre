@@ -446,7 +446,7 @@ namespace Ogre {
 		}
 
 		mContext = createEGLContext();
-
+		mContext->setCurrent();
         ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
         ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
         ::EGLContext oldContext  = eglGetCurrentContext();

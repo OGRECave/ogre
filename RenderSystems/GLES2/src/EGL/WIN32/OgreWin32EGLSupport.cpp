@@ -70,7 +70,15 @@ namespace Ogre {
 		EGLConfig *glConfigs;
 		int config, nConfigs = 0;
 
-		glConfigs = chooseGLConfig(NULL, &nConfigs);
+		EGLint const attrib_list[] =  {
+			EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+			EGL_BUFFER_SIZE, 32,
+			EGL_DEPTH_SIZE, 24,
+			EGL_STENCIL_SIZE, 8,
+			EGL_NONE
+		};
+
+		glConfigs = chooseGLConfig(attrib_list, &nConfigs);
 
 		for (config = 0; config < nConfigs; config++)
 		{
