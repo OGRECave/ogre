@@ -27,8 +27,8 @@ THE SOFTWARE.
 */
 
 
-#ifndef __SampleBrowser_NACL_H__
-#define __SampleBrowser_NACL_H__
+#ifndef __InputManagerWinRT_H__
+#define __InputManagerWinRT_H__
 
 #include "OgrePlatform.h"
 #include "DirectXMath.h"
