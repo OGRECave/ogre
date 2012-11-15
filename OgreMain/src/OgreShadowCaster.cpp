@@ -54,13 +54,16 @@ namespace Ogre {
 		// Edge groups should be 1:1 with shadow renderables
 		assert(edgeData->edgeGroups.size() == shadowRenderables.size());
 
+		Light::LightTypes lightType = light->getType();
+
 		// Whether to use the McGuire method, a triangle fan covering all silhouette
-		// this won't work properly with multiple separate edge groups
-		bool useMcGuire = edgeData->edgeGroups.size() <= 1;
+		// This won't work properly with multiple separate edge groups (should be one fan per group, not implemented)
+        // or when light position is inside light cap bound as extrusion could be in opposite directions
+        // and McGuire cap could intersect near clip plane of camera frustum without being noticed.
+		bool useMcGuire = edgeData->edgeGroups.size() <= 1 && 
+            (lightType == Light::LT_DIRECTIONAL || !getLightCapBounds().contains(light->getDerivedPosition()));
 		EdgeData::EdgeGroupList::const_iterator egi, egiend;
 		ShadowRenderableList::const_iterator si;
-
-		Light::LightTypes lightType = light->getType();
 
 		// pre-count the size of index data we need since it makes a big perf difference
 		// to GL in particular if we lock a smaller area of the index buffer

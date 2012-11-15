@@ -73,7 +73,7 @@ namespace Ogre {
     void RenderSystemCapabilitiesManager::parseCapabilitiesFromArchive(const String& filename, const String& archiveType, bool recursive)
     {
         // get the list of .rendercaps files
-        Archive* arch = ArchiveManager::getSingleton().load(filename, archiveType);
+        Archive* arch = ArchiveManager::getSingleton().load(filename, archiveType, true);
         StringVectorPtr files = arch->find(mScriptPattern, recursive);
 
         // loop through .rendercaps files and load each one
