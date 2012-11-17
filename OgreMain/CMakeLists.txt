@@ -165,7 +165,6 @@ set (HEADER_FILES
   include/OgreQuaternion.h
   include/OgreRadixSort.h
   include/OgreRay.h
-  include/OgreRectangle.h
   include/OgreRectangle2D.h
   include/OgreRenderable.h
   include/OgreRenderObjectListener.h
