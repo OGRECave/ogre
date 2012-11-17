@@ -32,10 +32,6 @@ set (SOURCE_FILES
 	src/OgreTerrainLayerBlendMap.cpp
 	src/OgreTerrainMaterialGenerator.cpp
 	src/OgreTerrainMaterialGeneratorA.cpp
-    src/OgreTerrainMaterialShaderHelperCg.cpp
-    src/OgreTerrainMaterialShaderHelperGLSL.cpp
-    src/OgreTerrainMaterialShaderHelperGLSLES.cpp
-    src/OgreTerrainMaterialShaderHelperHLSL.cpp
 	src/OgreTerrainQuadTreeNode.cpp
 	src/OgreTerrainAutoUpdateLod.cpp
 	src/OgreTerrainLodManager.cpp
