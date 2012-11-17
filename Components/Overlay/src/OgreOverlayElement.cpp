@@ -482,8 +482,8 @@ namespace Ogre {
 
         if (mParent != 0)
         {
-            Rectangle parent;
-            Rectangle child;
+            RealRect parent;
+            RealRect child;
 
             mParent->_getClippingRegion(parent);
 
@@ -492,7 +492,7 @@ namespace Ogre {
             child.right  = mDerivedLeft + mWidth;
             child.bottom = mDerivedTop + mHeight;
 
-            mClippingRegion = intersect(parent, child);
+            mClippingRegion = parent.intersect(child);
         }
         else
         {
@@ -544,7 +544,7 @@ namespace Ogre {
 		return mHeight;
 	}
     //---------------------------------------------------------------------    
-    void OverlayElement::_getClippingRegion(Rectangle &clippingRegion)
+    void OverlayElement::_getClippingRegion(RealRect &clippingRegion)
     {
         if (mDerivedOutOfDate)
         {

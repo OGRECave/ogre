@@ -37,7 +37,6 @@ THE SOFTWARE.
 #include "OgreOverlayElementCommands.h"
 
 #include "OgreColourValue.h"
-#include "OgreRectangle.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -135,7 +134,7 @@ namespace Ogre {
         MaterialPtr mMaterial;
         DisplayString mCaption;
         ColourValue mColour;
-        Rectangle mClippingRegion;
+        RealRect mClippingRegion;
 
         GuiMetricsMode mMetricsMode;
         GuiHorizontalAlignment mHorzAlign;
@@ -324,7 +323,7 @@ namespace Ogre {
 
 
         /** Gets the clipping region of the element */
-        virtual void _getClippingRegion(Rectangle &clippingRegion);
+        virtual void _getClippingRegion(RealRect &clippingRegion);
 
         /** Internal method to notify the element when Zorder of parent overlay
         has changed.
