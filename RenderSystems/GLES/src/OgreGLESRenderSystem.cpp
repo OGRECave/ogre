@@ -2006,14 +2006,14 @@ namespace Ogre {
     }
 
     void GLESRenderSystem::setStencilBufferParams(CompareFunction func,
-                                                uint32 refValue, uint32 mask,
+                                                uint32 refValue, uint32 compareMask, uint32 writeMask, 
                                                 StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp,
                                                 StencilOperation passOp,
                                                 bool twoSidedOperation)
     {
-        mStateCacheManager->setStencilMask(mask);
-        glStencilFunc(convertCompareFunction(func), refValue, mask);
+        mStateCacheManager->setStencilMask(writeMask);
+        glStencilFunc(convertCompareFunction(func), refValue, compareMask);
         glStencilOp(
             convertStencilOp(stencilFailOp, false),
             convertStencilOp(depthFailOp, false), 

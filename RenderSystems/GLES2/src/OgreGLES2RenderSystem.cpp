@@ -1322,7 +1322,7 @@ namespace Ogre {
     }
 
     void GLES2RenderSystem::setStencilBufferParams(CompareFunction func,
-                                                uint32 refValue, uint32 mask,
+                                                uint32 refValue, uint32 compareMask, uint32 writeMask,
                                                 StencilOperation stencilFailOp,
                                                 StencilOperation depthFailOp,
                                                 StencilOperation passOp,
@@ -1341,9 +1341,9 @@ namespace Ogre {
 			flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
             (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
             // Back
-            glStencilMaskSeparate(GL_BACK, mask);
+            glStencilMaskSeparate(GL_BACK, writeMask);
             GL_CHECK_ERROR;
-            glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, mask);
+            glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask);
             GL_CHECK_ERROR;
             glStencilOpSeparate(GL_BACK, 
                                 convertStencilOp(stencilFailOp, !flip), 
@@ -1352,9 +1352,9 @@ namespace Ogre {
 
             GL_CHECK_ERROR;
             // Front
-            glStencilMaskSeparate(GL_FRONT, mask);
+            glStencilMaskSeparate(GL_FRONT, writeMask);
             GL_CHECK_ERROR;
-            glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, mask);
+            glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask);
             GL_CHECK_ERROR;
             glStencilOpSeparate(GL_FRONT, 
                                 convertStencilOp(stencilFailOp, flip),
@@ -1365,8 +1365,8 @@ namespace Ogre {
 		else
 		{
 			flip = false;
-			mStateCacheManager->setStencilMask(mask);
-			glStencilFunc(convertCompareFunction(func), refValue, mask);
+			mStateCacheManager->setStencilMask(writeMask);
+			glStencilFunc(convertCompareFunction(func), refValue, compareMask);
             GL_CHECK_ERROR;
 			glStencilOp(
                         convertStencilOp(stencilFailOp, flip),

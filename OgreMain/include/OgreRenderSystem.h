@@ -1158,8 +1158,11 @@ namespace Ogre
 		start up too.
 		@param func The comparison function applied.
 		@param refValue The reference value used in the comparison
-		@param mask The bitmask applied to both the stencil value and the reference value 
+		@param compareMask The bitmask applied to both the stencil value and the reference value 
 		before comparison
+		@param writeMask The bitmask the controls which bits from refValue will be written to 
+		stencil buffer (valid for operations such as SOP_REPLACE).
+		the stencil
 		@param stencilFailOp The action to perform when the stencil check fails
 		@param depthFailOp The action to perform when the stencil check passes, but the
 		depth buffer check still fails
@@ -1169,7 +1172,7 @@ namespace Ogre
 		and the inverse of them will happen for back faces (keep remains the same).
 		*/
 		virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-			uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
+			uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
 			StencilOperation stencilFailOp = SOP_KEEP, 
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
