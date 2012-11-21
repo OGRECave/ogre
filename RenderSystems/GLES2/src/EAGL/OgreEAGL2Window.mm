@@ -271,7 +271,8 @@ namespace Ogre {
         
         OgreAssert(mContext != nil, "EAGL2Window: Failed to create OpenGL ES context");
 
-        [mWindow addSubview:mViewController.view];
+        if(!mUsingExternalViewController)
+            [mWindow addSubview:mViewController.view];
         
         mViewController.mGLSupport = mGLSupport;
         
@@ -281,7 +282,8 @@ namespace Ogre {
         if(!mUsingExternalView)
             [mView release];
     
-        [mWindow makeKeyAndVisible];
+        if(!mUsingExternalViewController)
+            [mWindow makeKeyAndVisible];
 
         mContext->createFramebuffer();
         
