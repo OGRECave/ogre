@@ -305,7 +305,7 @@ typedef unsigned short uint16;
 typedef unsigned char uint8;
 typedef int int32;
 typedef short int16;
-typedef char int8;
+typedef signed char int8;
 // define uint64 type
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 	typedef unsigned __int64 uint64;
