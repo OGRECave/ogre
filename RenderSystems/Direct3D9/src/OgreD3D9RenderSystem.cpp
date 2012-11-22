@@ -2722,7 +2722,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setStencilBufferParams(CompareFunction func, 
-		uint32 refValue, uint32 mask, StencilOperation stencilFailOp, 
+		uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
 		StencilOperation depthFailOp, StencilOperation passOp, 
 		bool twoSidedOperation)
 	{
@@ -2784,10 +2784,16 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer reference value.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
-		// mask
-		hr = __SetRenderState(D3DRS_STENCILMASK, mask);
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILMASK, compareMask);
 		if (FAILED(hr))
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer mask.",
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer compare mask.",
+			"D3D9RenderSystem::setStencilBufferParams");
+
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+		if (FAILED(hr))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer write mask.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
 		// fail op

@@ -5773,7 +5773,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+            0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? incrOp : SOP_KEEP, // back face depth fail
             zfail ? SOP_KEEP : decrOp, // back face pass
@@ -5786,7 +5787,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+			0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? decrOp : SOP_KEEP, // front face depth fail
             zfail ? SOP_KEEP : incrOp, // front face pass

@@ -1964,7 +1964,7 @@ bail:
 	}
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
-        uint32 refValue, uint32 mask, StencilOperation stencilFailOp, 
+        uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
         StencilOperation depthFailOp, StencilOperation passOp, 
         bool twoSidedOperation)
     {
@@ -1972,8 +1972,8 @@ bail:
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
 
 		mStencilRef = refValue;
-		mDepthStencilDesc.StencilReadMask = refValue;
-		mDepthStencilDesc.StencilWriteMask = mask;
+		mDepthStencilDesc.StencilReadMask = compareMask;
+		mDepthStencilDesc.StencilWriteMask = writeMask;
 
 		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
 		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
