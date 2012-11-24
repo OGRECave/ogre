@@ -734,15 +734,14 @@ bail:
 			}
 
 			D3D_FEATURE_LEVEL requestedLevels[] = {
-#if OGRE_WINRT_TARGET_TYPE != PHONE
-#	if OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
                 D3D_FEATURE_LEVEL_11_1,
-#	endif // OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#if !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
 				D3D_FEATURE_LEVEL_11_0,
 				D3D_FEATURE_LEVEL_10_1,
 				D3D_FEATURE_LEVEL_10_0,
-#endif // OGRE_WINRT_TARGET_TYPE != PHONE
-// Technically WINRT should only support up to 9_1, however to generate the proper cache file for the phone we need to be running with 9_3 on Win8.
+#endif // !( (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE) )
 				D3D_FEATURE_LEVEL_9_3,
 				D3D_FEATURE_LEVEL_9_2,
 				D3D_FEATURE_LEVEL_9_1
@@ -1027,10 +1026,10 @@ bail:
 		}
 
 		D3D11RenderWindowBase* win = NULL;
-#if OGRE_WINRT_TARGET_TYPE != PHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
  		if(win == NULL && windowType == "SurfaceImageSource")
  			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
-#endif // OGRE_WINRT_TARGET_TYPE != PHONE
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 		if(win == NULL)
 			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
 #endif

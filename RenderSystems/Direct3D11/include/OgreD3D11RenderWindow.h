@@ -187,7 +187,7 @@ namespace Ogre
 		Platform::Agile<Windows::UI::Core::CoreWindow> mCoreWindow;
 	};
 
-#if  OGRE_WINRT_TARGET_TYPE != PHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 
 	class D3D11RenderWindowImageSource
 		: public D3D11RenderWindowBase
@@ -215,7 +215,7 @@ namespace Ogre
 		Windows::UI::Xaml::Media::Imaging::SurfaceImageSource^	mImageSource;		// size depended, can be NULL
 		ISurfaceImageSourceNative*								mImageSourceNative;	// size depended, can be NULL
 	};
-#endif // OGRE_WINRT_TARGET_TYPE != PHONE
+#endif //  (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 
 #endif
 

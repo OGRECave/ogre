@@ -238,24 +238,24 @@ protected:
 		/*-----------------------------------------------------------------------------
 		| init data members needed only by WinRT
 		-----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 		void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
 		{
 			mNativeWindow = nativeWindow;
-#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
+#   if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 			mNativeControl = nullptr;
-#	endif //(OGRE_WINRT_TARGET_TYPE != PHONE)
+#	endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 			mInputContext = inputContext;
 		}
-#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
+#	if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 		void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
 		{
 			mNativeWindow = nullptr;
 			mNativeControl = nativeControl;
 			mInputContext = inputContext;
 		}
-#	endif // (OGRE_WINRT_TARGET_TYPE != PHONE)
-#endif
+#	endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 		/*-----------------------------------------------------------------------------
 		| init data members needed only by NaCl
 		-----------------------------------------------------------------------------*/
@@ -714,7 +714,7 @@ protected:
 
 			if (evt.key == OIS::KC_ESCAPE)
 			{
-#if (OGRE_WINRT_TARGET_TYPE == PHONE)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
 				// If there is a quit button, assume that we intended to press it via 'ESC'.
 				if (mTrayMgr->areTraysVisible())
 				{
@@ -725,7 +725,7 @@ protected:
 						return false;  // now act as if we didn't handle the button to get AppModel to exit.
 					}
 				}
-#endif
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
 				if (mTitleLabel->getTrayLocation() != TL_NONE)
 				{
 					// if we're in the main screen and a sample's running, toggle sample pause state
@@ -1167,7 +1167,7 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void windowMovedOrResized()
 		{
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE != PHONE)
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 
 			if(mNativeControl)
 			{
@@ -1175,7 +1175,7 @@ protected:
 				// applied to native control and we need resize this brush manually
 				mWindow->resize(mNativeControl->ActualWidth, mNativeControl->ActualHeight);
 			}
-#endif
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 			mWindow->windowMovedOrResized();	// notify window
 			windowResized(mWindow);				// notify window event listeners
 		}
@@ -1205,7 +1205,7 @@ protected:
             // create 1x1 window - we will resize later
             return mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 			Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
 			Ogre::NameValuePairList miscParams;
 			if(mNativeWindow.Get())
@@ -1213,7 +1213,7 @@ protected:
 				miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
 				res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
 			}
-#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
+#	if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 			else if(mNativeControl)
 			{
 				miscParams["windowType"] = "SurfaceImageSource";
@@ -1222,7 +1222,7 @@ protected:
 				res->getCustomAttribute("ImageBrush", &pUnk);
 				mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
 			}
-#	endif // (OGRE_WINRT_TARGET_TYPE != PHONE)
+#	endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 
 			return res;
 
@@ -1374,7 +1374,7 @@ protected:
 			char lastChar = sampleDir[sampleDir.length() - 1];
 			if (lastChar != '/' && lastChar != '\\')
 			{
-				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+				#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 				sampleDir += "\\";
 				#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 				sampleDir += "/";
@@ -1915,12 +1915,12 @@ protected:
 		int mLastViewCategory;                         // last sample category viewed
 		int mLastSampleIndex;                          // index of last sample running
 		int mStartSampleIndex;                         // directly starts the sample with the given index
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 		Platform::Agile<Windows::UI::Core::CoreWindow> mNativeWindow;
-#	if (OGRE_WINRT_TARGET_TYPE != PHONE)
+#	if (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 		Windows::UI::Xaml::Shapes::Rectangle^ mNativeControl;
-#	endif //(OGRE_WINRT_TARGET_TYPE != PHONE)
-#endif
+#	endif // (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
         pp::Instance* mNaClInstance;
         pp::CompletionCallback* mNaClSwapCallback;

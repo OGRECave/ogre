@@ -1017,8 +1017,8 @@ namespace Ogre
 		mSwapChainDesc.Stereo				= false;
 
 		// triple buffer if VSync is on
-		mSwapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-#if  OGRE_WINRT_TARGET_TYPE == PHONE
+        mSwapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
 		mSwapChainDesc.BufferCount			= 1;									// WP8: One buffer.
 		mSwapChainDesc.Scaling				= DXGI_SCALING_STRETCH;					// WP8: Must be stretch scaling mode.
 		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;				// WP8: No swap effect.
@@ -1077,7 +1077,7 @@ namespace Ogre
 	// class D3D11RenderWindowImageSource
 	//---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE != PHONE
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 	//---------------------------------------------------------------------
 	D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
 		: D3D11RenderWindowBase(device, pDXGIFactory)
@@ -1245,6 +1245,6 @@ namespace Ogre
 		D3D11RenderWindowBase::getCustomAttribute(name, pData);
 	}
 	//---------------------------------------------------------------------
-#endif
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 #pragma endregion
 }
