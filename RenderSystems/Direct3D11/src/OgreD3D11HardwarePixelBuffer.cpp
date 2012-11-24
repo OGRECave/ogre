@@ -747,12 +747,12 @@ namespace Ogre {
                 if (rsys->_getFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
                 {
                     _genSoftwareMipmaps(src, buf);
-
                 }
-
-#else
-                _genMipmaps();
+                else
 #endif
+                {
+                    _genMipmaps();
+                }
  			}
 		}	
 
