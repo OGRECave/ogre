@@ -316,6 +316,7 @@ protected:
 		{
 			if (mCurrentSample)  // sample quitting
 			{
+                mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
 				mCurrentSample->_shutdown();
 				mCurrentSample = 0;
 				mSamplePaused = false;     // don't pause next sample
@@ -1524,6 +1525,7 @@ protected:
 		-----------------------------------------------------------------------------*/
 		virtual void unloadSamples()
 		{
+            mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
 #ifdef OGRE_STATIC_LIB
             const Ogre::Root::PluginInstanceList pluginList = mRoot->getInstalledPlugins();
             for(unsigned int i = 0; i < pluginList.size(); i++)
