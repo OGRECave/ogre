@@ -35,7 +35,9 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLog.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
+#endif
 
 // Regsiter the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
@@ -206,8 +208,13 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		try {
 			setUpGLRenderSystemOptions(rs);
 			root->setRenderSystem(rs);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-											macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+                             macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+#else
+			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
+                             "../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+#endif
 
 			const RenderSystemCapabilities* caps = rs->getCapabilities();
 

@@ -80,7 +80,7 @@ namespace Ogre
         file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
         file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
         file << "\t" << "tesselation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM)) << endl;
-        file << "\t" << "tessellation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
+        file << "\t" << "tesselation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
         file << "\t" << "compute_program " << StringConverter::toString(caps->hasCapability(RSC_COMPUTE_PROGRAM)) << endl;
         file << "\t" << "scissor_test " << StringConverter::toString(caps->hasCapability(RSC_SCISSOR_TEST)) << endl;
         file << "\t" << "two_sided_stencil " << StringConverter::toString(caps->hasCapability(RSC_TWO_SIDED_STENCIL)) << endl;
@@ -437,6 +437,7 @@ namespace Ogre
         addKeywordType("hwrender_to_texture", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_float", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("non_power_of_2_textures", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_1d", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_3d", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("point_sprites", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("point_extended_parameters", SET_CAPABILITY_ENUM_BOOL);
@@ -467,6 +468,9 @@ namespace Ogre
         addCapabilitiesMapping("vertex_program", RSC_VERTEX_PROGRAM);
 		addCapabilitiesMapping("geometry_program", RSC_GEOMETRY_PROGRAM);
         addCapabilitiesMapping("fragment_program", RSC_FRAGMENT_PROGRAM);
+        addCapabilitiesMapping("tesselation_hull_program", RSC_TESSELATION_HULL_PROGRAM);
+        addCapabilitiesMapping("tesselation_domain_program", RSC_TESSELATION_DOMAIN_PROGRAM);
+        addCapabilitiesMapping("compute_program", RSC_COMPUTE_PROGRAM);
         addCapabilitiesMapping("scissor_test", RSC_SCISSOR_TEST);
         addCapabilitiesMapping("two_sided_stencil", RSC_TWO_SIDED_STENCIL);
         addCapabilitiesMapping("stencil_wrap", RSC_STENCIL_WRAP);
@@ -495,6 +499,7 @@ namespace Ogre
         addCapabilitiesMapping("pbuffer", RSC_PBUFFER);
         addCapabilitiesMapping("gl1_5_nohwocclusion", RSC_GL1_5_NOHWOCCLUSION);
         addCapabilitiesMapping("perstageconstant", RSC_PERSTAGECONSTANT);
+        addCapabilitiesMapping("vao", RSC_VAO);
         addCapabilitiesMapping("separate_shader_objects", RSC_SEPARATE_SHADER_OBJECTS);
 
     }

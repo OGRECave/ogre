@@ -45,7 +45,7 @@ void StreamSerialiserTests::tearDown()
 
 void StreamSerialiserTests::testWriteBasic()
 {
-	FileSystemArchive arch("./", "FileSystem");
+	FileSystemArchive arch("./", "FileSystem", false);
 	arch.load();
 
 	String fileName = "testSerialiser.dat";

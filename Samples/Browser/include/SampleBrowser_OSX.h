@@ -75,7 +75,7 @@
 
 @end
 
-static OgreBites::SampleBrowser sb = 0;
+static OgreBites::SampleBrowser sb;
 
 #if __LP64__
 static id mAppDelegate;

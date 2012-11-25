@@ -255,7 +255,8 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
-			mSceneMgr->addRenderQueueListener(mOverlaySystem);
+            if(mOverlaySystem)
+                mSceneMgr->addRenderQueueListener(mOverlaySystem);
 		}
 
 		/*-----------------------------------------------------------------------------

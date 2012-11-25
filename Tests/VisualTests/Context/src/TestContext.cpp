@@ -41,6 +41,10 @@ THE SOFTWARE.
 #include "windows.h"
 #endif
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
+#include <AppKit/AppKit.h>
+#endif
+
 TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0) 
 {
     Ogre::UnaryOptionList unOpt;
@@ -105,14 +109,14 @@ void TestContext::setup()
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
     // parse for the test sets and plugins that they're made up of
-    for (sections; sections.hasMoreElements(); sections.moveNext())
+    for (; sections.hasMoreElements(); sections.moveNext())
     {
         Ogre::String setName = sections.peekNextKey();
         if (setName != "")
         {
             mTestSets[setName] = Ogre::StringVector();
             Ogre::ConfigFile::SettingsMultiMap::iterator it = sections.peekNextValue()->begin();
-            for (it; it != sections.peekNextValue()->end(); ++it)
+            for (; it != sections.peekNextValue()->end(); ++it)
                 mTestSets[setName].push_back(it->second);
         }
     }
@@ -312,7 +316,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     }
 
     // check if this is a VisualTest
-    mCurrentTest = dynamic_cast<VisualTest*>(sampleToRun);
+    mCurrentTest = static_cast<VisualTest*>(sampleToRun);
 
     // set things up to be deterministic
     if (mCurrentTest)
@@ -346,6 +350,7 @@ void TestContext::createRoot()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.load();
 #endif
+    mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 //-----------------------------------------------------------------------
 
@@ -411,7 +416,7 @@ void TestContext::setupDirectories(Ogre::String batchName)
     // ensure there's a root directory for visual tests
     mOutputDir = mFSLayer->getWritablePath("VisualTests/");
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
-    
+
     // make sure there's a directory for the test set
     mOutputDir += mTestSetName + "/";
     static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
@@ -452,8 +457,8 @@ void TestContext::finishedTests()
             foundReference = false;
             TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
 
-            TestBatchSet::iterator i = batches->begin();
-            for (i; i != batches->end(); ++i)
+            TestBatchSet::iterator i;
+            for (i = batches->begin(); i != batches->end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
                 {
@@ -488,7 +493,7 @@ void TestContext::finishedTests()
             if(mSummaryOutputDir != "NONE")
             {
                 Ogre::String rs;
-                for(int i = 0; i < mRenderSystemName.size(); ++i)
+                for(size_t i = 0; i < mRenderSystemName.size(); ++i)
                     if(mRenderSystemName[i]!=' ')
                         rs += mRenderSystemName[i];
                 

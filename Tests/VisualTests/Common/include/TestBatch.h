@@ -85,14 +85,14 @@ public:
      *        @param resy The height of the render window used 
      *        @param directory The directory this batch is saved to */
     TestBatch(Ogre::String batchName, Ogre::String pluginName,
-        Ogre::String timestamp, size_t resx, size_t resy, Ogre::String directory)
-        :mDirectory(directory)
+        Ogre::String t, size_t resx, size_t resy, Ogre::String directory)
+        :name(batchName)
+        ,plugin(pluginName)
+        ,timestamp(t)
+        ,comment("")
         ,resolutionX(resx)
         ,resolutionY(resy)
-        ,timestamp(timestamp)
-        ,plugin(pluginName)
-        ,comment("")
-        ,name(batchName)
+        ,mDirectory(directory)
     {
         std::stringstream ver;
         ver<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
@@ -178,7 +178,7 @@ public:
     {
         TestBatchSetPtr out(OGRE_NEW_T(TestBatchSet, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
         // use ArchiveManager to get a list of all subdirectories
-        Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem");
+        Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem", true);
         Ogre::StringVectorPtr tests = testDir->list(false, true);
         for (unsigned int i = 0; i < tests->size(); ++i)
         {

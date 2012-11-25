@@ -88,10 +88,23 @@ if (OGRE_BUILD_TESTS)
 	  )
 	endif ()
 	
+    if (OGRE_BUILD_COMPONENT_OVERLAY)
+	  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Components/Overlay/include
+	    ${OGRE_SOURCE_DIR}/Components/Overlay/include)
+	  
+	  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
+	endif ()
 	add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
 	ogre_config_sample_exe(Test_Ogre)
 	target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
-
+	if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+        set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
+        add_custom_command(TARGET Test_Ogre POST_BUILD
+            COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
+            COMMAND ditto 
+            ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities/* ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
+            )
+    endif()
   endif ()
   
   
