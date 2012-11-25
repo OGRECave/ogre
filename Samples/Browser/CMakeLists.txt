@@ -125,7 +125,8 @@ if(ANDROID)
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
     file(MAKE_DIRECTORY "${NDKOUT}")
     file(MAKE_DIRECTORY "${NDKOUT}/jni")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")
+    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
+    file(MAKE_DIRECTORY "${NDKOUT}/res")
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
     file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
@@ -147,6 +148,10 @@ if(ANDROID)
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
     
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
     
 	add_custom_command(
 	                    TARGET SampleBrowserDummy

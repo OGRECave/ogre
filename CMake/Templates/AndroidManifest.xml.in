@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" /> 
 
     <!-- This .apk has no Java code itself, so set hasCode to false. -->
-    <application android:label="OgreSampleBrowser" android:hasCode="false">
+    <application android:label="OgreSampleBrowser" android:icon="@drawable/ic_launcher" android:hasCode="false">
         <activity android:name="android.app.NativeActivity"
                   android:label="OgreSampleBrowser"
                   android:configChanges="orientation|keyboardHidden"
