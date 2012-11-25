@@ -47,7 +47,7 @@ namespace Volume {
         
         /// To give the debug manual object an unique name.
         static size_t mDualGridI;
-
+        
         /// The entity for the debug visualization of the grid.
         Entity* mDualGrid;
 
@@ -57,6 +57,67 @@ namespace Volume {
 
         /// Starting node to generate the grid from.
         OctreeNode const* mRoot;
+        
+        /** Adds a dualcell.
+         @param c0
+            The first corner.
+         @param c1
+            The second corner.
+         @param c2
+            The third corner.
+         @param c3
+            The fourth corner.
+         @param c4
+            The fifth corner.
+         @param c5
+            The sixth corner.
+         @param c6
+            The seventh corner.
+         */
+        inline void addDualCell(const Vector3 &c0, const Vector3 &c1, const Vector3 &c2, const Vector3 &c3, const Vector3 &c4, const Vector3 &c5, const Vector3 &c6, const Vector3 &c7)
+        {
+            mDualCells.push_back(DualCell(c0, c1, c2, c3, c4, c5, c6, c7));
+        }
+        
+        /** Adds a dualcell with precalculated values.
+         @param c0
+            The first corner.
+         @param c1
+            The second corner.
+         @param c2
+            The third corner.
+         @param c3
+            The fourth corner.
+         @param c4
+            The fifth corner.
+         @param c5
+            The sixth corner.
+         @param c6
+            The seventh corner.
+         @param c7
+            The eighth corner.
+         @param v0
+            The first of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v1
+            The second of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v2
+            The third of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v3
+            The fourth of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v4
+            The fifth of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v5
+            The sixth of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v6
+            The seventh of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         @param v7
+            The eighth of the cell, one Vector4 consists of gradient (x, y, z) and density (w).
+         */
+        inline void addDualCell(const Vector3 &c0, const Vector3 &c1, const Vector3 &c2, const Vector3 &c3, const Vector3 &c4, const Vector3 &c5, const Vector3 &c6, const Vector3 &c7,
+            const Vector4 &v0, const Vector4 &v1, const Vector4 &v2, const Vector4 &v3, const Vector4 &v4, const Vector4 &v5, const Vector4 &v6, const Vector4 &v7)
+        {
+            mDualCells.push_back(DualCell(c0, c1, c2, c3, c4, c5, c6, c7, v0, v1, v2, v3, v4, v5, v6, v7));
+        }
 
         /* Startpoint for the creation recursion.
         @param n
