@@ -122,50 +122,10 @@ namespace Volume {
         OctreeNodeSplitPolicy policy(chunkRequest->parameters->src, chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError);
         mError = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError;
         chunkRequest->root->split(&policy, chunkRequest->parameters->src, mError);
-
-        chunkRequest->dualGridGenerator->generateDualGrid(chunkRequest->root);
-
-        IsoSurface *is = OGRE_NEW IsoSurfaceMC(chunkRequest->parameters->src);
-        size_t count = chunkRequest->dualGridGenerator->getDualCellCount();
-        const Vector3 *corners;
-        const Vector4 *values;
         Real maxMSDistance = (Real)chunkRequest->level * chunkRequest->parameters->errorMultiplicator * chunkRequest->parameters->baseError * chunkRequest->parameters->skirtFactor;
-    
-        Vector3 from = chunkRequest->root->getFrom();
-        Vector3 to = chunkRequest->root->getTo();
-
-        for (size_t i = 0; i < count; ++i)
-        {
-            DualCell cell = chunkRequest->dualGridGenerator->getDualCell(i);
-            corners = cell.getCorners();
-            values = cell.hasValues() ? cell.getValues() : 0;
-            is->addMarchingCubesTriangles(corners, values, chunkRequest->mb);
-
-            if (corners[0].z == from.z && corners[0].z != chunkRequest->totalFrom.z)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_BACK, maxMSDistance, chunkRequest->mb);
-            }
-            if (corners[2].z == to.z && corners[2].z != chunkRequest->totalTo.z)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_FRONT, maxMSDistance, chunkRequest->mb);
-            }
-            if (corners[0].x == from.x && corners[0].x != chunkRequest->totalFrom.x)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_LEFT, maxMSDistance, chunkRequest->mb);
-            }
-            if (corners[1].x == to.x && corners[1].x != chunkRequest->totalTo.x)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_RIGHT, maxMSDistance, chunkRequest->mb);
-            }
-            if (corners[5].y == to.y && corners[5].y != chunkRequest->totalTo.y)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_TOP, maxMSDistance, chunkRequest->mb);
-            }
-            if (corners[0].y == from.y && corners[0].y != chunkRequest->totalFrom.y)
-            {
-                is->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_BOTTOM, maxMSDistance, chunkRequest->mb);
-            }
-        }
+        IsoSurface *is = OGRE_NEW IsoSurfaceMC(chunkRequest->parameters->src);
+        chunkRequest->dualGridGenerator->generateDualGrid(chunkRequest->root, is, chunkRequest->mb, maxMSDistance,
+            chunkRequest->totalFrom, chunkRequest->totalTo, chunkRequest->parameters->createDualGridVisualization);
         OGRE_DELETE is;
     }
     

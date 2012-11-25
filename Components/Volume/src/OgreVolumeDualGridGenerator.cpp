@@ -300,10 +300,17 @@ namespace Volume {
                 return;
             }
 
-            mDualCells.push_back(DualCell(n0->getCenter(), n1->getCenter(), n2->getCenter(), n3->getCenter(),
-                n4->getCenter(), n5->getCenter(), n6->getCenter(), n7->getCenter(),
-                n0->getCenterValue(), n1->getCenterValue(), n2->getCenterValue(), n3->getCenterValue(),
-                n4->getCenterValue(), n5->getCenterValue(), n6->getCenterValue(), n7->getCenterValue()));
+            Vector4 values[8];
+            values[0] = n0->getCenterValue();
+            values[1] = n1->getCenterValue();
+            values[2] = n2->getCenterValue();
+            values[3] = n3->getCenterValue();
+            values[4] = n4->getCenterValue();
+            values[5] = n5->getCenterValue();
+            values[6] = n6->getCenterValue();
+            values[7] = n7->getCenterValue();
+            addDualCell(n0->getCenter(), n1->getCenter(), n2->getCenter(), n3->getCenter(),
+                n4->getCenter(), n5->getCenter(), n6->getCenter(), n7->getCenter(), values);
             createBorderCells(n0, n1, n2, n3, n4, n5, n6, n7);
         }
     }
@@ -454,15 +461,22 @@ namespace Volume {
 
     //-----------------------------------------------------------------------
 
-    DualGridGenerator::DualGridGenerator(void): mDualGrid(0)
+    DualGridGenerator::DualGridGenerator(): mDualGrid(0)
     {
     }
     
     //-----------------------------------------------------------------------
 
-    void DualGridGenerator::generateDualGrid(const OctreeNode *root)
+    void DualGridGenerator::generateDualGrid(const OctreeNode *root, IsoSurface *is, MeshBuilder *mb, Real maxMSDistance, const Vector3 &totalFrom, const Vector3 &totalTo, bool saveDualCells)
     {
         mRoot = root;
+        mIs = is;
+        mMb = mb;
+        mMaxMSDistance = maxMSDistance;
+        mTotalFrom = totalFrom;
+        mTotalTo = totalTo;
+        mSaveDualCells = saveDualCells;
+
         nodeProc(root);
 
         // Build up a minimal dualgrid for octrees without children.
@@ -503,7 +517,17 @@ namespace Volume {
             size_t baseIndex = 0;
             for (VecDualCell::iterator it = mDualCells.begin(); it != mDualCells.end(); ++it)
             {
-                it->addToManualObject(manual, baseIndex);
+                MeshBuilder::addCubeToManualObject(
+                    manual,
+                    it->mC0,
+                    it->mC1,
+                    it->mC2,
+                    it->mC3,
+                    it->mC4,
+                    it->mC5,
+                    it->mC6,
+                    it->mC7,
+                    baseIndex);
             }
 
             manual->end();
