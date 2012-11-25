@@ -33,11 +33,34 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 
 #include "OgreVolumeOctreeNode.h"
-#include "OgreVolumeDualCell.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreVolumeIsoSurface.h"
 
 namespace Ogre {
 namespace Volume {
+
+    /** To store the generated dual cells in a vector.
+    */
+    typedef struct _OgreVolumeExport DualCell
+    {
+    public:
+        Vector3 mC0;
+        Vector3 mC1;
+        Vector3 mC2;
+        Vector3 mC3;
+        Vector3 mC4;
+        Vector3 mC5;
+        Vector3 mC6;
+        Vector3 mC7;
+        DualCell(const Vector3 &c0, const Vector3 &c1, const Vector3 &c2, const Vector3 &c3, const Vector3 &c4, const Vector3 &c5, const Vector3 &c6, const Vector3 &c7) :
+            mC0(c0), mC1(c1), mC2(c2), mC3(c3), mC4(c4), mC5(c5), mC6(c6), mC7(c7)
+        {
+        }
+    } DualCell;
+    
+    /** To hold dual cells.
+    */
+    typedef _OgreVolumeExport vector<DualCell>::type VecDualCell;
 
     /** Class for the generation of the DualGrid.
     */
@@ -47,16 +70,121 @@ namespace Volume {
         
         /// To give the debug manual object an unique name.
         static size_t mDualGridI;
-
+        
         /// The entity for the debug visualization of the grid.
         Entity* mDualGrid;
-
-        typedef vector<DualCell>::type VecDualCell;
+        
+        /// Starting node to generate the grid from.
+        OctreeNode const* mRoot;
+        
         /// Holds the generated dual cells of the grid.
         VecDualCell mDualCells;
 
-        /// Starting node to generate the grid from.
-        OctreeNode const* mRoot;
+        /// Whether to store the dualcells for later visualization.
+        bool mSaveDualCells;
+
+        /// To contour the dualcells.
+        IsoSurface *mIs;
+
+        /// To store the triangles of the contour.
+        MeshBuilder *mMb;
+
+        /// The maximum distance where to generate the skirts.
+        Real mMaxMSDistance;
+
+        /// The global from.
+        Vector3 mTotalFrom;
+
+        /// The total to.
+        Vector3 mTotalTo;
+
+        /** Adds a dualcell.
+         @param c0
+            The first corner.
+         @param c1
+            The second corner.
+         @param c2
+            The third corner.
+         @param c3
+            The fourth corner.
+         @param c4
+            The fifth corner.
+         @param c5
+            The sixth corner.
+         @param c6
+            The seventh corner.
+         */
+        inline void addDualCell(const Vector3 &c0, const Vector3 &c1, const Vector3 &c2, const Vector3 &c3, const Vector3 &c4, const Vector3 &c5, const Vector3 &c6, const Vector3 &c7)
+        {
+            addDualCell(c0, c1, c2, c3, c4, c5, c6, c7, 0);
+        }
+        
+        /** Adds a dualcell with precalculated values.
+         @param c0
+            The first corner.
+         @param c1
+            The second corner.
+         @param c2
+            The third corner.
+         @param c3
+            The fourth corner.
+         @param c4
+            The fifth corner.
+         @param c5
+            The sixth corner.
+         @param c6
+            The seventh corner.
+         @param c7
+            The eighth corner.
+         @param values
+            The (possible) values at the corners.
+         */
+        inline void addDualCell(const Vector3 &c0, const Vector3 &c1, const Vector3 &c2, const Vector3 &c3, const Vector3 &c4, const Vector3 &c5, const Vector3 &c6, const Vector3 &c7,
+            Vector4 *values)
+        {
+
+            if (mSaveDualCells)
+            {
+                mDualCells.push_back(DualCell(c0, c1, c2, c3, c4, c5, c6, c7));
+            }
+
+            Vector3 corners[8];
+            corners[0] = c0;
+            corners[1] = c1;
+            corners[2] = c2;
+            corners[3] = c3;
+            corners[4] = c4;
+            corners[5] = c5;
+            corners[6] = c6;
+            corners[7] = c7;
+            mIs->addMarchingCubesTriangles(corners, values, mMb);
+            Vector3 from = mRoot->getFrom();
+            Vector3 to = mRoot->getTo();
+            if (corners[0].z == from.z && corners[0].z != mTotalFrom.z)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_BACK, mMaxMSDistance, mMb);
+            }
+            if (corners[2].z == to.z && corners[2].z != mTotalTo.z)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_FRONT, mMaxMSDistance, mMb);
+            }
+            if (corners[0].x == from.x && corners[0].x != mTotalFrom.x)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_LEFT, mMaxMSDistance, mMb);
+            }
+            if (corners[1].x == to.x && corners[1].x != mTotalTo.x)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_RIGHT, mMaxMSDistance, mMb);
+            }
+            if (corners[5].y == to.y && corners[5].y != mTotalTo.y)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_TOP, mMaxMSDistance, mMb);
+            }
+            if (corners[0].y == from.y && corners[0].y != mTotalFrom.y)
+            {
+                mIs->addMarchingSquaresTriangles(corners, values, IsoSurface::MS_CORNERS_BOTTOM, mMaxMSDistance, mMb);
+            }
+        }
 
         /* Startpoint for the creation recursion.
         @param n
@@ -176,8 +304,20 @@ namespace Volume {
         /** Generates the dualgrid of the given octree root node.
         @param root
             The octree root node.
+        @param is
+            To contour the dualcells.
+        @param mb
+            To store the triangles of the contour.
+        @param maxMSDistance
+            The maximum distance to the isosurface where to generate skirts.
+        @param totalFrom
+            The global from.
+        @param totalTo
+            The global to.
+        @param saveDualCells
+            Whether to save the generated dualcells of the generated dual cells.
         */
-        void generateDualGrid(const OctreeNode *root);
+        void generateDualGrid(const OctreeNode *root, IsoSurface *is, MeshBuilder *mb, Real maxMSDistance, const Vector3 &totalFrom, const Vector3 &totalTo, bool saveDualCells);
 
         /** Gets the lazily created entity of the dualgrid debug visualization.
         @param sceneManager

@@ -17,7 +17,6 @@ PROJECT(OgreVolume)
 set (HEADER_FILES
 	include/OgreVolumeCacheSource.h
 	include/OgreVolumeCSGSource.h
-	include/OgreVolumeDualCell.h
 	include/OgreVolumeDualGridGenerator.h
 	include/OgreVolumeIsoSurface.h
 	include/OgreVolumeIsoSurfaceMC.h
@@ -34,7 +33,6 @@ set (HEADER_FILES
 set(SOURCE_FILES
 	src/OgreVolumeCacheSource.cpp
 	src/OgreVolumeCSGSource.cpp
-	src/OgreVolumeDualCell.cpp
 	src/OgreVolumeDualGridGenerator.cpp
 	src/OgreVolumeIsoSurface.cpp
 	src/OgreVolumeIsoSurfaceMC.cpp
