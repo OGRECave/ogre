@@ -32,12 +32,12 @@ To the command line
 16.	Delete OgreWin32Resources.rc from Sample_CubeMapping
 17.	Open the configuration manager by right clicking the solution in the solution tree, on the right, active solution platform combo, select new, select arm, copy setting from win32
 18.	Add dependencies to solution by right clicking the solution, selecting add existing project, select "solution" in the combo next to the file select edit at the bottom then select the dependencies solution, all the dependencies should be now a part of the solution. Remove OIS Project.
-19.	Add the following project to the solution - Samples\Browser\WinRT\SampleBrowserWinRT.vcxproj
+19.	Add the following project to the solution - Samples\Browser\WinRT\SampleBrowserWP8.vcxproj
 20.	Change to Phone debug or Phone release config.
 21.	Select Win32 or arm platform (win32 for emulation, arm for running on the device)
 22.	You may need to add the references to all of the solution projects for this project, so check by opening the "common properties"->"configuration properties" - and see that you don't have any error icons in the references.
 23. Right click SampleBrowserWP8 -> Properties -> C++ -> General -> Additional Include Directories
-24. Delect debug config, select all projects, right click any project from the selected ones -> Properties -> C++ -> Code generation -> Multi threaded Debug DLL (then do the same to release) 
+24. Select debug config, select all projects, right click any project from the selected ones -> Properties -> C++ -> Code generation -> Multi threaded Debug DLL (then do the same to release ->  Multi threaded DLL) 
 
 25. right click SampleBrowserWP8 -> Properties -> C++ -> General -> Additional Include Directories 
 Add the path of
