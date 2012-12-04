@@ -384,14 +384,15 @@ namespace Ogre {
 			// Pack into 4-element constants offset based on constant data index
 			// If there are more than 4 entries, this will be called more than once
 			Vector4 val(0.0f,0.0f,0.0f,0.0f);
-
+			const VertexData* vd = mHardwareVertexAnimVertexData ? mHardwareVertexAnimVertexData : mParentEntity->mHardwareVertexAnimVertexData;
+			
 			size_t animIndex = constantEntry.data * 4;
 			for (size_t i = 0; i < 4 && 
-				animIndex < mHardwareVertexAnimVertexData->hwAnimationDataList.size();
+				animIndex < vd->hwAnimationDataList.size();
 				++i, ++animIndex)
 			{
 				val[i] = 
-					mHardwareVertexAnimVertexData->hwAnimationDataList[animIndex].parametric;
+					vd->hwAnimationDataList[animIndex].parametric;
 			}
 			// set the parametric morph value
 			params->_writeRawConstant(constantEntry.physicalIndex, val);
