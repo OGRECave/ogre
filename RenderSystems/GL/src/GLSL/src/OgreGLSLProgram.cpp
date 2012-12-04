@@ -209,7 +209,9 @@ namespace Ogre {
 	{
 		if (isSupported())
 		{
-			glDeleteObjectARB(mGLHandle);
+			glDeleteObjectARB(mGLHandle);			
+			mCompiled = 0;
+			mGLHandle = 0;
 		}
 	}
 
