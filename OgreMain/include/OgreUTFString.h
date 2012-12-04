@@ -38,14 +38,14 @@
 #include <string>
 #include <stdexcept>
 
-// Workaround for VC7:
-//      when build with /MD or /MDd, VC7 have both std::basic_string<unsigned short> and
+// Workaround for VC7/7.1/8.0/9.0 (2003 - 2008):
+//      when build with /MD or /MDd, VC have both std::basic_string<unsigned short> and
 // basic_string<__wchar_t> instantiated in msvcprt[d].lib/MSVCP71[D].dll, but the header
 // files tells compiler that only one of them is over there (based on /Zc:wchar_t compile
 // option). And since this file used both of them, causing compiler instantiating another
 // one in user object code, which lead to duplicate symbols with msvcprt.lib/MSVCP71[D].dll.
 //
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC && (1300 <= OGRE_COMP_VER && OGRE_COMP_VER <= 1310)
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && (OGRE_COMP_VER >= 1300 && OGRE_COMP_VER < 1600)
 
 # if defined(_DLL_CPPLIB)
 
