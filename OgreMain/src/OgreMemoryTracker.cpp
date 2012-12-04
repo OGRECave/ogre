@@ -136,10 +136,9 @@ namespace Ogre
 			}
 
 			if (mDumpToStdOut)		
-				std::cout << os.str();		
+				std::cout << os.str();
 
-			std::cout << os.str();
-			std::ofstream of;
+				std::ofstream of;
 			of.open(mLeakFileName.c_str());
 			of << os.str();
 			of.close();
