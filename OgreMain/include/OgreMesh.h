@@ -205,6 +205,8 @@ namespace Ogre {
         /// @copydoc Resource::calculateSize
         size_t calculateSize(void) const;
 
+		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
+									 unsigned short texCoordSetToDestroy, VertexData *vertexData );
 
 
     public:
@@ -582,6 +584,23 @@ namespace Ogre {
             assignments if requested.
         */
         void _updateCompiledBoneAssignments(void);
+
+		/** This method collapses two texcoords into one for all submeshes where this is possible.
+        @remarks
+			Often a submesh can have two tex. coords. (i.e. TEXCOORD0 & TEXCOORD1), being both
+			composed of two floats. There are many practical reasons why it would be more convenient
+			to merge both of them into one TEXCOORD0 of 4 floats. This function does exactly that
+			The finalTexCoordSet must have enough space for the merge, or else the submesh will be
+			skipped. (i.e. you can't merge a tex. coord with 3 floats with one having 2 floats)
+
+			finalTexCoordSet & texCoordSetToDestroy must be in the same buffer source, and must
+			be adjacent.
+		@param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
+			actually work.
+        @param texCoordSetToDestroy The texture coordinate index that will disappear on
+			successfull merges.
+        */
+		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

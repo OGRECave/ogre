@@ -55,6 +55,8 @@ struct XmlOptions
     Real lodPercent;
     size_t lodFixed;
     size_t nuextremityPoints;
+	size_t mergeTexcoordResult;
+	size_t mergeTexcoordToDestroy;
     bool usePercent;
     bool generateEdgeLists;
     bool generateTangents;
@@ -84,6 +86,10 @@ void help(void)
     cout << "-s lodstrategy = LOD strategy to use for this mesh" << endl;
     cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
     cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
+	cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
+	cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
+	cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
+	cout << "                 to each other for the merge to work." << endl;
     cout << "-e             = DON'T generate edge lists (for stencil shadows)" << endl;
     cout << "-r             = DON'T reorganise vertex buffers to OGRE recommended format." << endl;
     cout << "-t             = Generate tangents (for normal mapping)" << endl;
@@ -120,6 +126,8 @@ XmlOptions parseArgs(int numArgs, char **args)
     opts.lodPercent = 20;
     opts.numLods = 0;
     opts.nuextremityPoints = 0;
+	opts.mergeTexcoordResult = 0;
+	opts.mergeTexcoordToDestroy = 0;
     opts.usePercent = true;
     opts.generateEdgeLists = true;
     opts.generateTangents = false;
@@ -161,6 +169,7 @@ XmlOptions parseArgs(int numArgs, char **args)
     binOpt["-log"] = "OgreXMLConverter.log";
 	binOpt["-td"] = "";
 	binOpt["-ts"] = "";
+	binOpt["-merge"] = "0,0";
 
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
     UnaryOptionList::iterator ui;
@@ -259,6 +268,37 @@ XmlOptions parseArgs(int numArgs, char **args)
             opts.lodPercent = StringConverter::parseReal(bi->second);
             opts.usePercent = true;
         }
+
+		bi = binOpt.find("-merge");
+        if (!bi->second.empty())
+        {
+			String::size_type separator = bi->second.find_first_of( "," );
+			if( separator == String::npos )
+			{
+				//Input format was "-merge 2"
+				//Assume we want to merge 2 with 3
+				opts.mergeTexcoordResult	= StringConverter::parseInt( bi->second, 0 );
+				opts.mergeTexcoordToDestroy	= opts.mergeTexcoordResult + 1;
+			}
+			else if( separator + 1 < bi->second.size() )
+			{
+				//Input format was "-merge 1,2"
+				//We want to merge 1 with 2
+				opts.mergeTexcoordResult	= StringConverter::parseInt(
+																bi->second.substr( 0, separator ), 0 );
+				opts.mergeTexcoordToDestroy = StringConverter::parseInt(
+																bi->second.substr( separator+1,
+																bi->second.size() ), 1 );
+			}
+        }
+		else
+		{
+			//Very rare to reach here.
+			//Input format was "-merge"
+			//Assume we want to merge 0 with 1
+			opts.mergeTexcoordResult = 0;
+			opts.mergeTexcoordResult = 1;
+		}
 
 
         bi = binOpt.find("-f");
@@ -769,6 +809,11 @@ void XMLToBinary(XmlOptions opts)
 					opts.tangentSplitMirrored, opts.tangentSplitRotated, opts.tangentUseParity);
             }
         }
+
+		if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
+		{
+			newMesh->mergeAdjacentTexcoords( opts.mergeTexcoordResult, opts.mergeTexcoordToDestroy );
+		}
 
         if (opts.nuextremityPoints)
         {
