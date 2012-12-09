@@ -90,7 +90,6 @@ namespace Ogre {
         {
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-            EGL_CHECK_ERROR
             
             // Notify viewports of resize
             ViewportList::iterator it = mViewportList.begin();
@@ -200,7 +199,12 @@ namespace Ogre {
         }
         
         mContext = createEGLContext();
-        
+        mContext->setCurrent();
+		       
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+        EGL_CHECK_ERROR
+
 		mActive = true;
 		mVisible = true;
 		mClosed = false;
@@ -260,10 +264,6 @@ namespace Ogre {
             bool isLandscape = (int)AConfiguration_getOrientation(config) == 2;
             mGLSupport->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
         }
-        
-        eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-        eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-        EGL_CHECK_ERROR
         
         if(mContext)
         {
