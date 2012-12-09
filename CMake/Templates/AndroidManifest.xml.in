@@ -13,7 +13,7 @@
     <application android:label="OgreSampleBrowser" android:icon="@drawable/ic_launcher" android:hasCode="false">
         <activity android:name="android.app.NativeActivity"
                   android:label="OgreSampleBrowser"
-                  android:configChanges="orientation|screenSize|keyboardHidden"
+                  android:configChanges="orientation@SCREEN_SIZE@|keyboardHidden"
 		   android:debuggable="true"
 		  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <!-- Tell NativeActivity the name of or .so -->
