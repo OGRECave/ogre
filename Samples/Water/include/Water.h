@@ -235,10 +235,15 @@ public:
 	{
 		posnormVertexBuffer = HardwareVertexBufferSharedPtr() ;
 		indexBuffer = HardwareIndexBufferSharedPtr() ;
-		for(int i=0;i<16;i++) {
-			texcoordsVertexBuffers[i] = HardwareVertexBufferSharedPtr() ;
+		if(texcoordsVertexBuffers != NULL)
+		{
+			for(int i=0;i<16;i++) {
+				texcoordsVertexBuffers[i] = HardwareVertexBufferSharedPtr() ;
+			}
+			delete [] texcoordsVertexBuffers;	
+			texcoordsVertexBuffers = NULL;
 		}
-		delete [] texcoordsVertexBuffers;
+		first = true;
 	}
 } ;
 bool WaterCircle::first = true ;
@@ -351,6 +356,7 @@ protected:
         particleSystem = mSceneMgr->createParticleSystem("rain",
                                                          "Examples/Water/Rain");
 		particleEmitter = particleSystem->getEmitter(0);
+		particleEmitter->setEmissionRate(0);
         SceneNode* rNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         rNode->translate(PLANE_SIZE/2.0f, 3000, PLANE_SIZE/2.0f);
         rNode->attachObject(particleSystem);
@@ -406,6 +412,8 @@ protected:
         
 		delete waterMesh;
 		waterMesh = 0;
+
+		WaterCircle::clearStaticBuffers();
 	}
     
 protected:
@@ -547,11 +555,7 @@ public:
     bool frameRenderingQueued(const FrameEvent& evt)
     {
 		if( SdkSample::frameRenderingQueued(evt) == false )
-		{
-			// check if we are exiting, if so, clear static HardwareBuffers to avoid segfault
-			WaterCircle::clearStaticBuffers();
 			return false;
-		}
         
         mAnimState->addTime(evt.timeSinceLastFrame);
         
