@@ -410,7 +410,7 @@ namespace Ogre
             removeSceneNode( sn );
         
             // destroy the node
-            SceneManager::destroySceneNode( sn );
+			SceneManager::destroySceneNode( sn->getName() );
 		}
     }
 
