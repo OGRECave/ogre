@@ -80,6 +80,6 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 endif()
 
 install(FILES ${HEADER_FILES}
-  DESTINATION include/OGRE/OgreOverlay
+  DESTINATION include/OGRE/Overlay
 )
 
