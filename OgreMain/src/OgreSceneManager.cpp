@@ -934,6 +934,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			pass = lateTech->getPass(pass->getIndex());
 		}
+		else
+        {
+            pass = lateTech->getPass(0);
+        }
 		//Should we warn or throw an exception if an illegal state was achieved?
 	}
 
