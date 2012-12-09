@@ -51,7 +51,7 @@ namespace Volume {
         // Set to invisible for now.
         mInvisible = true;
         mVisible  = false;
-
+        
         // Don't generate this chunk if it doesn't contribute to the whole volume.
         Real centralValue = parameters->src->getValue((to - from) / (Real)2.0 + from);
         if (Math::Abs(centralValue) > (to - from).length() * (Real)1.5)
@@ -59,27 +59,34 @@ namespace Volume {
             return;
         }
     
-        mChunksBeingProcessed++;
         mNode = parent->createChildSceneNode();
-        mScale = parameters->scale;
-        mMaxScreenSpaceError = parameters->maxScreenSpaceError;
+        if (parameters->createGeometryFromLevel == 0 || level <= parameters->createGeometryFromLevel)
+        {
+            mChunksBeingProcessed++;
+            mScale = parameters->scale;
+            mMaxScreenSpaceError = parameters->maxScreenSpaceError;
 
-        // Call worker
-        ChunkRequest req;
-        req.totalFrom = totalFrom;
-        req.totalTo = totalTo;
-        req.parameters = parameters;
-        req.level = level;
-        req.maxLevels = maxLevels;
+            // Call worker
+            ChunkRequest req;
+            req.totalFrom = totalFrom;
+            req.totalTo = totalTo;
+            req.parameters = parameters;
+            req.level = level;
+            req.maxLevels = maxLevels;
 
-        req.origin = this;
-        req.root = OGRE_NEW OctreeNode(from, to);
-        req.mb = OGRE_NEW MeshBuilder();
-        req.dualGridGenerator = OGRE_NEW DualGridGenerator();
+            req.origin = this;
+            req.root = OGRE_NEW OctreeNode(from, to);
+            req.mb = OGRE_NEW MeshBuilder();
+            req.dualGridGenerator = OGRE_NEW DualGridGenerator();
 
-        WorkQueue* wq = Root::getSingleton().getWorkQueue();
-        uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
-        wq->addRequest(workQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
+            WorkQueue* wq = Root::getSingleton().getWorkQueue();
+            uint16 workQueueChannel = wq->getChannel("Ogre/VolumeRendering");
+            wq->addRequest(workQueueChannel, WORKQUEUE_LOAD_REQUEST, Any(req));
+        }
+        else
+        {
+            mInvisible = false;
+        }
     
         // Now recursively create the more detailed children
         if (level > 2)
@@ -285,6 +292,7 @@ namespace Volume {
         parameters.src = &textureSource;
         parameters.scale = scale;
         parameters.maxScreenSpaceError = maxPixelError;
+        parameters.createGeometryFromLevel = StringConverter::parseInt(config.getSetting("createGeometryFromLevel"));
         parameters.baseError = StringConverter::parseReal(config.getSetting("baseError"));
         parameters.errorMultiplicator = StringConverter::parseReal(config.getSetting("errorMultiplicator"));
         parameters.createOctreeVisualization = StringConverter::parseBool(config.getSetting("createOctreeVisualization"));
@@ -378,6 +386,23 @@ namespace Volume {
     
         if (mInvisible)
         {
+            return true;
+        }
+
+        // This might be a chunk on a lower LOD level without geometry, so lets just proceed here.
+        if (!mRenderOp.vertexData && mChildren)
+        {
+            mChildren[0]->frameStarted(evt);
+            if (mChildren[1])
+            {
+                mChildren[1]->frameStarted(evt);
+                mChildren[2]->frameStarted(evt);
+                mChildren[3]->frameStarted(evt);
+                mChildren[4]->frameStarted(evt);
+                mChildren[5]->frameStarted(evt);
+                mChildren[6]->frameStarted(evt);
+                mChildren[7]->frameStarted(evt);
+            }
             return true;
         }
 

@@ -81,11 +81,14 @@ namespace Volume {
         /// The maximum accepted screen space error when chosing the LOD levels to render.
         Real maxScreenSpaceError;
         
+        /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
+        size_t createGeometryFromLevel;
+
         /** Constructor.
         */
         ChunkParameters(void) :
             createOctreeVisualization(false), createDualGridVisualization(false), baseError((Real)0.0), errorMultiplicator((Real)1.0),
-            sceneManager(0), src(0), lodCallback(0), lodCallbackLod(0), scale((Real)1.0)
+            sceneManager(0), src(0), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0)
         {
         }
     } ChunkParameters;
