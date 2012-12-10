@@ -92,7 +92,7 @@ void WindowEventUtilities::messagePump()
     if( !targetWindow ) return;
     
     // Grab the next event, process it if it is a window event
-	if( ReceiveNextEvent( 0, NULL, kEventDurationNoWait, true, &event ) == noErr )
+	while( ReceiveNextEvent( 0, NULL, kEventDurationNoWait, true, &event ) == noErr )
 	{
         // Dispatch the event
 		SendEventToEventTarget( event, targetWindow );
