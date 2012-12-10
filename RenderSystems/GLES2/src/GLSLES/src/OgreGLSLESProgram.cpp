@@ -58,7 +58,7 @@ namespace Ogre {
         , mCompiled(0)
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
-        , mOptimiserEnabled(true)
+        , mOptimiserEnabled(false)
 #endif
     {
         if (createParamDictionary("GLSLESProgram"))
@@ -71,7 +71,7 @@ namespace Ogre {
                                             PT_STRING),&msCmdPreprocessorDefines);
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 			dict->addParameter(ParameterDef("use_optimiser", 
-                                            "Should the GLSL optimiser be used. Default is true.",
+                                            "Should the GLSL optimiser be used. Default is false.",
                                             PT_BOOL),&msCmdOptimisation);
 #endif
         }

@@ -125,6 +125,10 @@ if(ANDROID)
 		SET(SCREEN_SIZE "|screenSize")
 	endif()
 	
+	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
+		SET(GLES_OPTIMISER "-lglsl_optimizer -lmesa -lglcpp-library")
+	endif()
+
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
@@ -165,12 +169,21 @@ if(ANDROID)
 	                    WORKING_DIRECTORY ${NDKOUT}
 	                  )
 	
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${NDK_BUILD_EXECUTABLE} all
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+	if(DEBUG)	 
+	 	add_custom_command(
+							TARGET SampleBrowserDummy
+						    POST_BUILD
+					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
+				            WORKING_DIRECTORY ${NDKOUT}
+			              )
+	else()
+		add_custom_command(
+							TARGET SampleBrowserDummy
+						    POST_BUILD
+					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2
+				            WORKING_DIRECTORY ${NDKOUT}
+			              )
+	endif()
 	                  
 	add_custom_command(
 	                    TARGET SampleBrowserDummy

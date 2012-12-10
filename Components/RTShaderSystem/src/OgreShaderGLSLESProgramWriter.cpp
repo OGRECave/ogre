@@ -311,15 +311,6 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << std::endl;
 
-                if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {
-                    os << "\tvec4 outputColor;" << std::endl;
-                }
-                else if (gpuType == GPT_VERTEX_PROGRAM)
-                {
-                    os << "\tvec4 outputPosition;" << std::endl;
-                }
-
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
                 ShaderParameterConstIterator itParam = localParams.begin();
@@ -523,15 +514,6 @@ namespace Ogre {
                     os << localOs.str();
                 }
 
-                if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {
-                    os << "\tgl_FragColor = outputColor;" << std::endl;
-                }
-                else if (gpuType == GPT_VERTEX_PROGRAM)
-                {
-                    os << "\tgl_Position = outputPosition;" << std::endl;
-                }
-
                 os << "}" << std::endl;
             }
             os << std::endl;
@@ -631,7 +613,7 @@ namespace Ogre {
                     // GLSL vertex program has to write always gl_Position
                     if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
                     {
-                        mInputToGLStatesMap[pParam->getName()] = "outputPosition";
+                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
                     }
                     else
                     {
@@ -650,7 +632,7 @@ namespace Ogre {
                         pParam->getSemantic() == Parameter::SPS_COLOR)
                 {					
                     // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "outputColor";
+                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
                 }
             }
         }
