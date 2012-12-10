@@ -116,6 +116,20 @@ namespace Ogre {
                 }
 #endif
 				compileAndLink();
+
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+				// Try it again when we used the optimised versions
+				if(mTriedToLinkAndFailed && 
+					mVertexProgram->getGLSLProgram()->getOptimiserEnabled() && 
+					mFragmentProgram->getGLSLProgram()->getOptimiserEnabled())
+				{
+					LogManager::getSingleton().stream() << "Try not optimised shader.";	
+					mTriedToLinkAndFailed = false;
+					mVertexProgram->getGLSLProgram()->setOptimiserEnabled(false);
+					mFragmentProgram->getGLSLProgram()->setOptimiserEnabled(false);
+					compileAndLink();
+				}
+#endif
 			}
 
             extractLayoutQualifiers();

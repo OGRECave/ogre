@@ -48,8 +48,8 @@ namespace Ogre {
 	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
 		: EGLWindow(glsupport),
 		  mMaxBufferSize(32),
-		  mMaxDepthSize(24),
-		  mMaxStencilSize(8)
+		  mMaxDepthSize(16),
+		  mMaxStencilSize(0)
 	{
 	}
 
@@ -193,8 +193,7 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-
-            _createInternalResources(mWindow, config);
+			_createInternalResources(mWindow, config);
             mHwGamma = false;
         }
         

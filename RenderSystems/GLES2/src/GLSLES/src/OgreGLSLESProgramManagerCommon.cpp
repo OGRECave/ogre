@@ -200,7 +200,7 @@ namespace Ogre {
                 size_t pos = source.find_first_of("\n");
                 os << source.substr(pos+1, source.length()-1);
 
-                gpuProgram->getGLSLProgram()->setSource(os.str());
+                gpuProgram->getGLSLProgram()->setOptimisedSource(os.str());
                 gpuProgram->getGLSLProgram()->setIsOptimised(true);
             }
             else
