@@ -84,23 +84,6 @@ namespace Ogre {
 		HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		assert (numIndexes > 0);
-#if OGRE_D3D_MANAGE_BUFFERS
-		// Override shadow buffer setting; managed buffers are automatically
-		// backed by system memory
-		if (useShadowBuffer)
-		{
-			useShadowBuffer = false;
-			// Also drop any WRITE_ONLY so we can read direct
-			if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_DYNAMIC;
-			}
-			else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_STATIC;
-			}
-		}
-#endif
 		D3D11HardwareIndexBuffer* idx = new D3D11HardwareIndexBuffer(
 			this, itype, numIndexes, usage, mlpD3DDevice, false, useShadowBuffer);
 		{

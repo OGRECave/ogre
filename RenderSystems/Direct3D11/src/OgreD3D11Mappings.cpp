@@ -428,14 +428,7 @@ namespace Ogre
 		DWORD ret = 0;
 		if (usage & HardwareBuffer::HBU_DYNAMIC)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the dynamic flag for default pool, and
-			// we use default pool when buffer is discardable
-			if (usage & HardwareBuffer::HBU_DISCARDABLE)
-				ret |= D3D11_USAGE_DYNAMIC;
-#else
 			ret |= D3D11_USAGE_DYNAMIC;
-#endif
 		}
 		if (usage & HardwareBuffer::HBU_WRITE_ONLY)
 		{
@@ -449,16 +442,9 @@ namespace Ogre
 		D3D11_MAP ret = D3D11_MAP_READ_WRITE;
 		if (options == HardwareBuffer::HBL_DISCARD)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the discard flag for dynamic usgae and default pool
-			if ((usage & HardwareBuffer::HBU_DYNAMIC) &&
-				(usage & HardwareBuffer::HBU_DISCARDABLE))
-				ret = D3D11_MAP_WRITE_DISCARD;
-#else
 			// D3D doesn't like discard or no_overwrite on non-dynamic buffers
 			if (usage & HardwareBuffer::HBU_DYNAMIC)
 				ret = D3D11_MAP_WRITE_DISCARD;
-#endif
 		}
 		if (options == HardwareBuffer::HBL_READ_ONLY)
 		{
@@ -471,16 +457,9 @@ namespace Ogre
 		}
 		if (options == HardwareBuffer::HBL_NO_OVERWRITE)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the nooverwrite flag for dynamic usgae and default pool
-			if ((usage & HardwareBuffer::HBU_DYNAMIC) &&
-				(usage & HardwareBuffer::HBU_DISCARDABLE))
-				ret = D3D11_MAP_WRITE_NO_OVERWRITE;
-#else
 			// D3D doesn't like discard or no_overwrite on non-dynamic buffers
 			if (usage & HardwareBuffer::HBU_DYNAMIC)
 				ret = D3D11_MAP_WRITE_NO_OVERWRITE;
-#endif 
 		}
 
 		return ret;
