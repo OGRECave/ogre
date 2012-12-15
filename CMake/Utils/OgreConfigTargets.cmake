@@ -231,6 +231,8 @@ function(ogre_config_framework LIBNAME)
       set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADERS}")
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+      set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
+      set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
       set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME})
   endif()
