@@ -66,18 +66,7 @@ endif ()
 # install 
 ogre_config_component(OgreOverlay)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
-    # Set the INSTALL_PATH so that Components can be installed in the application package
-    set_target_properties(OgreOverlay
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Components"
-    )
-
-	# Copy headers into the main Ogre framework
-	add_custom_command(TARGET OgreOverlay POST_BUILD
-	  COMMAND ditto ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/
-	)
-endif()
+ogre_config_framework(OgreOverlay)
 
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/Overlay

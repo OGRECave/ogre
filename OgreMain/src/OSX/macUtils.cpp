@@ -93,6 +93,15 @@ namespace Ogre {
         return 1;
     }
 
+    void* mac_loadFramework(std::string name)
+	{
+		std::string fullPath=name + ".framework";
+		if(name[0]!='/')
+			fullPath = macFrameworksPath()+"/"+fullPath+"/"+name;
+
+		return dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+	}
+
 	void* mac_loadDylib(const char* name)
 	{
 		std::string fullPath=name;
@@ -125,5 +134,10 @@ namespace Ogre {
     std::string macPluginPath()
 	{
 		return macBundlePath() + "/Contents/Plugins/";
+	}
+
+    std::string macFrameworksPath()
+	{
+		return macBundlePath() + "/Contents/Frameworks/";
 	}
 }
