@@ -88,7 +88,13 @@ namespace Ogre {
 			name += ".dll";
 #endif
         mInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+        if(!mInst)
+        {
+            // Try again as a framework
+            mInst = (DYNLIB_HANDLE)FRAMEWORK_LOAD( mName );
+        }
+#endif
         if( !mInst )
             OGRE_EXCEPT(
                 Exception::ERR_INTERNAL_ERROR, 

@@ -219,6 +219,24 @@ function(ogre_config_component LIBNAME)
   ogre_config_lib(${LIBNAME} FALSE)
 endfunction(ogre_config_component)
 
+function(ogre_config_framework LIBNAME)
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+      set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
+
+      # Set the INSTALL_PATH so that frameworks can be installed in the application package
+      set_target_properties(${LIBNAME}
+         PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+         INSTALL_NAME_DIR "@executable_path/../Frameworks"
+      )
+      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADERS}")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+      set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
+      set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+      set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME})
+  endif()
+endfunction(ogre_config_framework)
 
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)

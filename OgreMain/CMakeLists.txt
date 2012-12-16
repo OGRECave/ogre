@@ -92,6 +92,7 @@ set (HEADER_FILES
   include/OgreHighLevelGpuProgramManager.h
   include/OgreImage.h
   include/OgreImageCodec.h
+  src/OgreImageResampler.h
   include/OgreInstanceBatch.h
   include/OgreInstanceBatchHW.h
   include/OgreInstanceBatchHW_VTF.h
@@ -148,6 +149,7 @@ set (HEADER_FILES
   include/OgrePass.h
   include/OgrePatchMesh.h
   include/OgrePatchSurface.h
+  src/OgrePixelConversions.h
   include/OgrePixelCountLodStrategy.h
   include/OgrePixelFormat.h
   include/OgrePlane.h
@@ -209,6 +211,7 @@ set (HEADER_FILES
   include/OgreShadowTextureManager.h
   include/OgreShadowVolumeExtrudeProgram.h
   include/OgreSharedPtr.h
+  src/OgreSIMDHelper.h
   include/OgreSimpleRenderable.h
   include/OgreSimpleSpline.h
   include/OgreSingleton.h
@@ -309,7 +312,6 @@ set (SOURCE_FILES
   src/OgreHighLevelGpuProgram.cpp
   src/OgreHighLevelGpuProgramManager.cpp
   src/OgreImage.cpp
-  src/OgreImageResampler.h
   src/OgreInstanceBatch.cpp
   src/OgreInstanceBatchHW.cpp
   src/OgreInstanceBatchHW_VTF.cpp
@@ -358,7 +360,6 @@ set (SOURCE_FILES
   src/OgrePass.cpp
   src/OgrePatchMesh.cpp
   src/OgrePatchSurface.cpp
-  src/OgrePixelConversions.h
   src/OgrePixelCountLodStrategy.cpp
   src/OgrePixelFormat.cpp
   src/OgrePlane.cpp
@@ -407,7 +408,6 @@ set (SOURCE_FILES
   src/OgreShadowCaster.cpp
   src/OgreShadowTextureManager.cpp
   src/OgreShadowVolumeExtrudeProgram.cpp
-  src/OgreSIMDHelper.h
   src/OgreSimpleRenderable.cpp
   src/OgreSimpleSpline.cpp
   src/OgreSkeleton.cpp
@@ -444,7 +444,7 @@ set (SOURCE_FILES
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)
   include_directories("include/NaCl")
-  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_HEADERS
     include/NaCl/OgreConfigDialogImp.h
     include/NaCl/OgreErrorDialogImp.h
     include/NaCl/OgreTimerImp.h
@@ -460,7 +460,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
 elseif (WIN32)
   if (OGRE_BUILD_PLATFORM_WINRT)
     include_directories("include/WIN32")
-    set(PLATFORM_HEADER_FILES
+    set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
       include/WIN32/OgreErrorDialogImpWinRT.h
       include/WIN32/OgreTimerImp.h
@@ -476,7 +476,7 @@ elseif (WIN32)
     set(PLATFORM_HEADER_INSTALL "WIN32")
   else ()
   include_directories("include/WIN32")
-  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_HEADERS
     include/WIN32/OgreConfigDialogImp.h
     include/WIN32/OgreErrorDialogImp.h
     include/WIN32/OgreTimerImp.h
@@ -523,7 +523,7 @@ elseif (WIN32)
 elseif (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     include_directories("include/iOS")
-    set(PLATFORM_HEADER_FILES
+    set(PLATFORM_HEADERS
       include/iOS/OgreConfigDialogImp.h
       include/iOS/OgreErrorDialogImp.h
       include/iOS/OgreTimerImp.h
@@ -540,7 +540,7 @@ elseif (APPLE)
     set(PLATFORM_HEADER_INSTALL "iOS")
   else ()
     include_directories("include/OSX")
-    set(PLATFORM_HEADER_FILES
+    set(PLATFORM_HEADERS
       # Hack around a CMake bug.  The first item has its role set to Project instead of public.
       # including it twice works around the issue
       # In addition, include OgreZip.h because of a similar issue
@@ -569,7 +569,7 @@ elseif (APPLE)
     set(PLATFORM_HEADER_INSTALL "OSX")
   endif ()
 elseif(ANDROID)
-  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_HEADERS
     include/Android/OgreConfigDialogImp.h
     include/Android/OgreErrorDialogImp.h
     include/Android/OgreTimerImp.h
@@ -587,7 +587,7 @@ elseif(ANDROID)
 
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif(FLASHCC)
-  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_HEADERS
     include/FlashCC/OgreTimerImp.h
   )
   set(PLATFORM_SOURCE_FILES
@@ -597,7 +597,7 @@ elseif(FLASHCC)
   set(PLATFORM_HEADER_INSTALL "FlashCC")
 elseif (UNIX)
   include_directories(include/GLX ${X11_INCLUDE_DIR})
-  set(PLATFORM_HEADER_FILES
+  set(PLATFORM_HEADERS
     include/GLX/OgreConfigDialogImp.h
     include/GLX/OgreErrorDialogImp.h
     include/GLX/OgreTimerImp.h
@@ -663,6 +663,7 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 3)
 	)
 endif ()
 
+list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
 # Add needed definitions and nedmalloc include dir
 add_definitions(-DOGRE_NONCLIENT_BUILD -DFREEIMAGE_LIB -D_MT -D_USRDLL)
@@ -703,7 +704,7 @@ if (OGRE_CONFIG_ENABLE_ZIP)
 
   if(ANDROID)
     ADD_DEFINITIONS(-DZZIP_OMIT_CONFIG_H)
-    list(APPEND PLATFORM_HEADER_FILES include/Android/OgreAPKZipArchive.h)
+    list(APPEND PLATFORM_HEADERS include/Android/OgreAPKZipArchive.h)
     list(APPEND PLATFORM_SOURCE_FILES src/Android/OgreAPKZipArchive.cpp)
   endif()
 
@@ -724,10 +725,10 @@ set (TARGET_LINK_FLAGS "")
 # setup OgreMain target
 if (OGRE_BUILD_PLATFORM_WINRT)
 	# exclude OgreTimer.cpp from unity builds; causes problem
-	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
 else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
-	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
+	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")
 endif ()
 # In visual studio 2010 - 64 bit we get this error: "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
 if(WIN32 AND MSVC10 AND CMAKE_CL_64)
@@ -743,24 +744,7 @@ if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     set_target_properties(OgreMain PROPERTIES INSTALL_NAME_DIR "OGRE")
   else ()
-    set_target_properties(OgreMain PROPERTIES FRAMEWORK TRUE)
-    # Set the INSTALL_PATH so that Frameworks can be local
-    set_target_properties(OgreMain
-       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
-       INSTALL_NAME_DIR "@executable_path/../Frameworks"
-    )
-    set_target_properties(OgreMain PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
-	set_target_properties(OgreMain PROPERTIES RESOURCE "${RESOURCE_FILES}")
-	set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
-    set_target_properties(OgreMain PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
-    add_custom_command(TARGET OgreMain POST_BUILD
-      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading
-	  COMMAND ditto ${OGRE_SOURCE_DIR}/OgreMain/include/Threading/* ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/Threading/
-      COMMAND mkdir ARGS -p ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX
-      COMMAND ditto ${OGRE_SOURCE_DIR}/OgreMain/include/OSX/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/OSX/	
-	)
+    ogre_config_framework(OgreMain)
   endif ()
 
   # Framework is called 'Ogre'
@@ -783,7 +767,7 @@ ogre_config_lib(OgreMain TRUE)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE
 )
-install(FILES ${PLATFORM_HEADER_FILES}
+install(FILES ${PLATFORM_HEADERS}
   DESTINATION include/OGRE/${PLATFORM_HEADER_INSTALL}
 )
 install(FILES ${THREAD_HEADER_FILES}

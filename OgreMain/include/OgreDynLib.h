@@ -58,6 +58,7 @@ typedef struct HINSTANCE__* hInstance;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #    define DYNLIB_HANDLE void*
 #    define DYNLIB_LOAD( a ) mac_loadDylib( a )
+#    define FRAMEWORK_LOAD( a ) mac_loadFramework( a )
 #    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
 #    define DYNLIB_UNLOAD( a ) dlclose( a )
 
