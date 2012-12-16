@@ -28,6 +28,22 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace Volume {
+    
+    bool operator==(Vector3 const& a, Vector3 const& b)
+    {
+        return a.x == b.x &&
+            a.y == b.y &&
+            a.z == b.z;
+    }
+    
+    //-----------------------------------------------------------------------
+
+    bool operator<(const Vector3& a, const Vector3& b)
+    {
+         return memcmp(&a, &b, sizeof(Vector3)) < 0;
+    }
+
+    //-----------------------------------------------------------------------
 
     CacheSource::CacheSource(const Source *src) : mSrc(src)
     {
@@ -37,34 +53,14 @@ namespace Volume {
 
     Vector4 CacheSource::getValueAndGradient(const Vector3 &position) const
     {
-        Vector4 result;
-        if (mCache.find(position) == mCache.end())
-        {
-            result = mSrc->getValueAndGradient(position);
-            mCache[position] = result;
-        }
-        else
-        {
-            result = mCache[position];
-        }
-        return result;
+        return getFromCache(position);
     }
     
     //-----------------------------------------------------------------------
 
     Real CacheSource::getValue(const Vector3 &position) const
     {
-        Vector4 result;
-        if (mCache.find(position) == mCache.end())
-        {
-            result = mSrc->getValueAndGradient(position);
-            mCache[position] = result;
-        }
-        else
-        {
-            result = mCache[position];
-        }
-        return result.w;
+        return getFromCache(position).w;
     }
 
 }
