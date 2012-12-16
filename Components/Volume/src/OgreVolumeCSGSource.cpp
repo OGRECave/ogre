@@ -311,9 +311,9 @@ namespace Volume {
     Vector4 CSGNoiseSource::getValueAndGradient(const Vector3 &position) const
     {
         return Vector4(
-            getInternalValue(Vector3(position.x + mGradientOff, position.y, position.z)) - getInternalValue(Vector3(position.x - mGradientOff, position.y, position.z)),
-            getInternalValue(Vector3(position.x, position.y + mGradientOff, position.z)) - getInternalValue(Vector3(position.x, position.y - mGradientOff, position.z)),
-            getInternalValue(Vector3(position.x, position.y, position.z + mGradientOff)) - getInternalValue(Vector3(position.x, position.y, position.z - mGradientOff)),
+            -(getInternalValue(Vector3(position.x + mGradientOff, position.y, position.z)) - getInternalValue(Vector3(position.x - mGradientOff, position.y, position.z))),
+            -(getInternalValue(Vector3(position.x, position.y + mGradientOff, position.z)) - getInternalValue(Vector3(position.x, position.y - mGradientOff, position.z))),
+            -(getInternalValue(Vector3(position.x, position.y, position.z + mGradientOff)) - getInternalValue(Vector3(position.x, position.y, position.z - mGradientOff))),
             getInternalValue(position));
     }
     

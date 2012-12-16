@@ -164,7 +164,7 @@ namespace Volume {
         @param sobelGradient
             Whether to add a bit of blur to the gradient like in a sobel filter.
         */
-        explicit TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue = true, const bool trilinearGradient = true, const bool sobelGradient = false);
+        explicit TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
         
         /** Destructor.
         */
