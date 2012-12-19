@@ -71,7 +71,7 @@
 #   include "Dot3Bump.h"
 #   include "Fresnel.h"
 #   include "Water.h"
-#   include "AtomicCounters.h"
+//#   include "AtomicCounters.h"
 #   include "BezierPatch.h"
 #   include "CameraTrack.h"
 #   include "CharacterSample.h"
@@ -1045,7 +1045,7 @@ protected:
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
             bool hasProgrammableGPU = (profiles.size() != 0);
 
-            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
+//            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
