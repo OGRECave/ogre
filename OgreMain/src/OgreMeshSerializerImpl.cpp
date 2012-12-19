@@ -1543,8 +1543,20 @@ namespace Ogre {
 					case VET_FLOAT1:
 						typeSize = sizeof(float);
 						break;
+					case VET_DOUBLE1:
+						typeSize = sizeof(double);
+						break;
 					case VET_SHORT1:
 						typeSize = sizeof(short);
+						break;
+					case VET_USHORT1:
+						typeSize = sizeof(unsigned short);
+						break;
+					case VET_INT1:
+						typeSize = sizeof(int);
+						break;
+					case VET_UINT1:
+						typeSize = sizeof(unsigned int);
 						break;
 					case VET_COLOUR:
 					case VET_COLOUR_ABGR:

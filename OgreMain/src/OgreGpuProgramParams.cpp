@@ -631,7 +631,8 @@ namespace Ogre
 
 				// Deal with matrix transposition here!!!
 				// transposition is specific to the dest param set, shared params don't do it
-				if (mParams->getTransposeMatrices() && e.dstDefinition->constType == GCT_MATRIX_4X4)
+				if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4 ||
+                                                        e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
 				{
 					for (int row = 0; row < 4; ++row)
 						for (int col = 0; col < 4; ++col)
@@ -762,9 +763,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::_setLogicalIndexes(
 		const GpuLogicalBufferStructPtr& floatIndexMap, 
+        const GpuLogicalBufferStructPtr& doubleIndexMap,
 		const GpuLogicalBufferStructPtr& intIndexMap)
 	{
 		mFloatLogicalToPhysical = floatIndexMap;
+		mDoubleLogicalToPhysical = doubleIndexMap;
 		mIntLogicalToPhysical = intIndexMap;
 
 		// resize the internal buffers
@@ -776,6 +779,11 @@ namespace Ogre
 		{
 			mFloatConstants.insert(mFloatConstants.end(), 
 				floatIndexMap->bufferSize - mFloatConstants.size(), 0.0f);
+		}
+		if (!doubleIndexMap.isNull() && doubleIndexMap->bufferSize > mDoubleConstants.size())
+		{
+			mDoubleConstants.insert(mDoubleConstants.end(),
+                                   doubleIndexMap->bufferSize - mDoubleConstants.size(), 0.0f);
 		}
 		if (!intIndexMap.isNull() &&  intIndexMap->bufferSize > mIntConstants.size())
 		{

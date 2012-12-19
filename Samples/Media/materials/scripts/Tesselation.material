@@ -1,11 +1,23 @@
-vertex_program Ogre/Tesselation/VertexProgram hlsl
+vertex_program Ogre/Tesselation/VertexProgramHLSL hlsl
 {
 	source Tesselation.hlsl
 	entry_point VS
 	target vs_5_0
 }
 
-tesselation_hull_program Ogre/Tesselation/TesselationHullProgram hlsl
+vertex_program Ogre/Tesselation/VertexProgramGLSL glsl
+{
+	source TesselationVp.glsl
+	syntax glsl400
+}
+
+vertex_program Ogre/Tesselation/VertexProgram unified
+{
+    delegate Ogre/Tesselation/VertexProgramHLSL
+    delegate Ogre/Tesselation/VertexProgramGLSL
+}
+
+tesselation_hull_program Ogre/Tesselation/TesselationHullProgramHLSL hlsl
 {
 	source Tesselation.hlsl
 	entry_point HS
@@ -17,7 +29,24 @@ tesselation_hull_program Ogre/Tesselation/TesselationHullProgram hlsl
 	}
 }
 
-tesselation_domain_program Ogre/Tesselation/TesselationDomainProgram hlsl
+tesselation_hull_program Ogre/Tesselation/TesselationHullProgramGLSL glsl
+{
+	source TesselationTh.glsl
+	syntax glsl400
+
+	default_params
+	{
+		param_named g_fTessellationFactor float 16
+	}
+}
+
+tesselation_hull_program Ogre/Tesselation/TesselationHullProgram unified
+{
+    delegate Ogre/Tesselation/TesselationHullProgramHLSL
+    delegate Ogre/Tesselation/TesselationHullProgramGLSL
+}
+
+tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramHLSL hlsl
 {
 	source Tesselation.hlsl
 	entry_point DS
@@ -29,11 +58,40 @@ tesselation_domain_program Ogre/Tesselation/TesselationDomainProgram hlsl
 	}
 }
 
-fragment_program Ogre/Tesselation/FragmentProgram hlsl
+tesselation_domain_program Ogre/Tesselation/TesselationDomainProgramGLSL glsl
+{
+	source TesselationTd.glsl
+	syntax glsl400
+
+	default_params
+	{
+		param_named_auto g_mViewProjection worldviewproj_matrix
+	}
+}
+
+tesselation_domain_program Ogre/Tesselation/TesselationDomainProgram unified
+{
+    delegate Ogre/Tesselation/TesselationDomainProgramHLSL
+    delegate Ogre/Tesselation/TesselationDomainProgramGLSL
+}
+
+fragment_program Ogre/Tesselation/FragmentProgramHLSL hlsl
 {
 	source Tesselation.hlsl
 	entry_point SolidColorPS
 	target ps_5_0
+}
+
+fragment_program Ogre/Tesselation/FragmentProgramGLSL glsl
+{
+	source TesselationFp.glsl
+	syntax glsl400
+}
+
+fragment_program Ogre/Tesselation/FragmentProgram unified
+{
+    delegate Ogre/Tesselation/FragmentProgramHLSL
+    delegate Ogre/Tesselation/FragmentProgramGLSL
 }
 
 material Ogre/TesselationExample
@@ -60,7 +118,7 @@ material Ogre/TesselationExample
 			
 			}
 			
-			fragment_program_ref Ogre/Tesselation/FragmentProgram hlsl
+			fragment_program_ref Ogre/Tesselation/FragmentProgram
 			{
 			
 			}			

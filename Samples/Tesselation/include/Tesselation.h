@@ -27,15 +27,16 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_Tesselation::testCapabilities");
         }
-		if (!(caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
+		if (!caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
 		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports DirectX11. Sorry!",
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
 				"Sample_Tesselation:testCapabilities");
 		}
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("hs_5_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ds_5_0") &&
-			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_5_0"))
+			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_5_0") &&
+   			!GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model 5.0 needed for this sample, "
 						"so you cannot run this sample. Sorry!", "Sample_Tesselation::testCapabilities");

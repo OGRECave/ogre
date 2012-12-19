@@ -72,6 +72,7 @@ namespace Ogre {
 		mVertexBuffers.clear();
 		mIndexBuffers.clear();
 		mUniformBuffers.clear();
+		mCounterBuffers.clear();
 
         // Destroy everything
         destroyAllDeclarations();
@@ -415,6 +416,10 @@ namespace Ogre {
 	}
 	//-----------------------------------------------------------------------
 	void HardwareBufferManagerBase::_notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
+	{
+	}
+	//-----------------------------------------------------------------------
+	void HardwareBufferManagerBase::_notifyCounterBufferDestroyed(HardwareCounterBuffer* buf)
 	{
 	}
     //-----------------------------------------------------------------------

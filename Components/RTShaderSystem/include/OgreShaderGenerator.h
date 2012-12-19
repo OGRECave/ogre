@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
+#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -945,6 +946,8 @@ protected:
 	ProgramManager* mProgramManager;
 	// Shader program writer manager.
 	ProgramWriterManager* mProgramWriterManager;
+        // File system layer manager.
+	FileSystemLayer* mFSLayer;
 	// Fixed Function Render state builder.
 	FFPRenderStateBuilder* mFFPRenderStateBuilder;
 	// Material entries map.

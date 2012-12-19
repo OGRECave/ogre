@@ -135,24 +135,23 @@ namespace Ogre {
         return prg;
     }
     //---------------------------------------------------------------------------
-		const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void) const
-        {
-				// Use the current render system
-			  RenderSystem* rs = Root::getSingleton().getRenderSystem();
+    const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void) const
+    {
+        // Use the current render system
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
-				// Get the supported syntaxed from RenderSystemCapabilities 
-				return rs->getCapabilities()->getSupportedShaderProfiles();
-        }
+        // Get the supported syntaxed from RenderSystemCapabilities 
+        return rs->getCapabilities()->getSupportedShaderProfiles();
+    }
 
     //---------------------------------------------------------------------------
     bool GpuProgramManager::isSyntaxSupported(const String& syntaxCode) const
-        {
-				// Use the current render system
-			  RenderSystem* rs = Root::getSingleton().getRenderSystem();
+    {
+        // Use the current render system
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
-				// Get the supported syntaxed from RenderSystemCapabilities 
-				return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
-
+        // Get the supported syntax from RenderSystemCapabilities 
+        return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
     ResourcePtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)

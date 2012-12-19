@@ -40,7 +40,7 @@ namespace RTShader {
 //-----------------------------------------------------------------------------
 ProgramProcessor::ProgramProcessor()
 {
-	mMaxTexCoordSlots = 8;
+	mMaxTexCoordSlots = 16;
 	mMaxTexCoordFloats = mMaxTexCoordSlots * 4;
 	
 }

@@ -301,7 +301,7 @@ namespace Ogre {
 		if (mSelectedCgProfile == CG_PROFILE_UNKNOWN)
 		{
 			LogManager::getSingleton().logMessage(
-				"Attempted to load Cg program '" + mName + "', but no suported "
+				"Attempted to load Cg program '" + mName + "', but no supported "
 				"profile was found. ");
 			return;
 		}

@@ -11,7 +11,6 @@
 
 set (HEADER_FILES
 	include/SampleBrowser.h
-	include/FileSystemLayerImpl.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
@@ -19,25 +18,9 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
 )
 
 set(SOURCE_FILES src/SampleBrowser.cpp)
-if (OGRE_BUILD_PLATFORM_NACL)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_NaCl.cpp)
-elseif (WIN32)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
-elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iOS.mm)
-elseif (APPLE)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
-  set(OGRE_UNITY_BUILD FALSE) # not working for the Browser, so disable
-elseif (UNIX)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Unix.cpp)
-else ()
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
-endif ()
-
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 
@@ -305,6 +288,8 @@ if (APPLE)
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
         COMMAND ditto 
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
@@ -315,6 +300,12 @@ if (APPLE)
 	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+			)
+	endif ()
+	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL3Plus.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()

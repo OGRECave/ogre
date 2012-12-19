@@ -45,7 +45,7 @@ namespace Ogre {
 	/** \addtogroup RenderSystem
 	*  @{
 	*/
-	/** Specialisation of HardwareBuffer for a vertex buffer. */
+	/** Specialisation of HardwareBuffer for a uniform buffer. */
 	class _OgreExport HardwareUniformBuffer : public HardwareBuffer
     {
 	    protected:
@@ -64,7 +64,7 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share index buffers. */
+    /** Shared pointer implementation used to share uniform buffers. */
     class _OgreExport HardwareUniformBufferSharedPtr : public SharedPtr<HardwareUniformBuffer>
     {
     public:

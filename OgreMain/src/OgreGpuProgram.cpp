@@ -261,7 +261,7 @@ namespace Ogre
 			ret->_setNamedConstants(mConstantDefs);
 		}
 		// link shared logical / physical map for low-level use
-		ret->_setLogicalIndexes(mFloatLogicalToPhysical, mIntLogicalToPhysical);
+		ret->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, mIntLogicalToPhysical);
 
         // Copy in default parameters if present
         if (!mDefaultParams.isNull())

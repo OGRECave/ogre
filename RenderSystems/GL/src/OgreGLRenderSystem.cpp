@@ -1080,6 +1080,11 @@ namespace Ogre {
 					mDriverVersion.release = StringConverter::parseInt(tokens[2]); 
 			}
 			mDriverVersion.build = 0;
+
+            const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+            tokens = StringUtil::split(shadingLangVersion, ". ");
+            mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[0]) * 100) + StringConverter::parseUnsignedInt(tokens[1]);
+
 			// Initialise GL after the first window has been created
 			// TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
 			mRealCapabilities = createRenderSystemCapabilities();
@@ -1088,7 +1093,7 @@ namespace Ogre {
 			if(!mUseCustomCapabilities)
 				mCurrentCapabilities = mRealCapabilities;
 
-      fireEvent("RenderSystemCapabilitiesCreated");
+            fireEvent("RenderSystemCapabilitiesCreated");
 
 			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, win);
 

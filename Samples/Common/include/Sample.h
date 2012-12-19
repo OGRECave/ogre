@@ -33,6 +33,7 @@
 #include <iostream>
 
 #include "InputContext.h"
+#include "OgreFileSystemLayer.h"
 
 #ifdef USE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
@@ -50,8 +51,6 @@
 
 namespace OgreBites
 {
-	class FileSystemLayer;
-
 	/*=============================================================================
 	| Base class responsible for everything specific to one sample.
 	| Designed to be subclassed for each sample.
@@ -138,7 +137,7 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
-		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
 		{
 			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
 			mRoot = Ogre::Root::getSingletonPtr();
@@ -293,7 +292,7 @@ namespace OgreBites
 		Ogre::OverlaySystem* mOverlaySystem; // OverlaySystem
 		Ogre::RenderWindow* mWindow;      // context render window
 		InputContext mInputContext;
-		FileSystemLayer* mFSLayer; 		  // file system abstraction layer
+		Ogre::FileSystemLayer* mFSLayer; 		  // file system abstraction layer
 		Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
 		Ogre::NameValuePairList mInfo;    // custom sample info
 		bool mDone;                       // flag to mark the end of the sample

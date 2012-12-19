@@ -32,9 +32,10 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreSingleton.h"
-#include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreHardwareUniformBuffer.h"
+#include "OgreHardwareVertexBuffer.h"
 #include "OgreRenderToVertexBuffer.h"
 #include "OgreHeaderPrefix.h"
 
@@ -122,9 +123,11 @@ namespace Ogre {
         typedef set<HardwareVertexBuffer*>::type VertexBufferList;
         typedef set<HardwareIndexBuffer*>::type IndexBufferList;
 		typedef set<HardwareUniformBuffer*>::type UniformBufferList;
+		typedef set<HardwareCounterBuffer*>::type CounterBufferList;
         VertexBufferList mVertexBuffers;
         IndexBufferList mIndexBuffers;
 		UniformBufferList mUniformBuffers;
+		CounterBufferList mCounterBuffers;
 
 
         typedef set<VertexDeclaration*>::type VertexDeclarationList;
@@ -136,6 +139,7 @@ namespace Ogre {
         OGRE_MUTEX(mVertexBuffersMutex)
         OGRE_MUTEX(mIndexBuffersMutex)
 		OGRE_MUTEX(mUniformBuffersMutex)
+		OGRE_MUTEX(mCounterBuffersMutex)
         OGRE_MUTEX(mVertexDeclarationsMutex)
         OGRE_MUTEX(mVertexBufferBindingsMutex)
 
@@ -289,6 +293,14 @@ namespace Ogre {
 									HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
 									bool useShadowBuffer = false, const String& name = "") = 0;
 
+        /**
+		 * Create counter buffer.
+		 * The update shall be triggered by GpuProgramParameters, if is dirty
+		 */
+		virtual HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                                                                   HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                                   bool useShadowBuffer = false, const String& name = "") = 0;
+
         /** Creates a new vertex declaration. */
         virtual VertexDeclaration* createVertexDeclaration(void);
         /** Destroys a vertex declaration. */
@@ -409,6 +421,8 @@ namespace Ogre {
         void _notifyIndexBufferDestroyed(HardwareIndexBuffer* buf);
 		/// Notification that at hardware uniform buffer has been destroyed
 		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf);
+		/// Notification that at hardware counter buffer has been destroyed
+		void _notifyCounterBufferDestroyed(HardwareCounterBuffer* buf);
     };
 
     /** Singleton wrapper for hardware buffer manager. */
@@ -443,11 +457,18 @@ namespace Ogre {
             return mImpl->createRenderToVertexBuffer();
         }
 
-        /** @copydoc HardwareBufferManagerBase::createVertexDeclaration */
+        /** @copydoc HardwareBufferManagerBase::createUniformBuffer */
 		HardwareUniformBufferSharedPtr
 				createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
 		{
 			return mImpl->createUniformBuffer(sizeBytes, usage, useShadowBuffer, name);
+		}
+        
+        /** @copydoc HardwareBufferManagerBase::createCounterBuffer */
+		HardwareCounterBufferSharedPtr
+        createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "")
+		{
+			return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
 		}
 
 		/** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
@@ -532,10 +553,15 @@ namespace Ogre {
         {
             mImpl->_notifyIndexBufferDestroyed(buf);
         }
-		/** @copydoc HardwareBufferManagerInterface::_notifyIndexBufferDestroyed */
+		/** @copydoc HardwareBufferManagerInterface::_notifyUniformBufferDestroyed */
 		void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
 		{
 			mImpl->_notifyUniformBufferDestroyed(buf);
+		}
+		/** @copydoc HardwareBufferManagerInterface::_notifyCounterBufferDestroyed */
+		void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
+		{
+			mImpl->_notifyCounterBufferDestroyed(buf);
 		}
 
         /** Override standard Singleton retrieval.

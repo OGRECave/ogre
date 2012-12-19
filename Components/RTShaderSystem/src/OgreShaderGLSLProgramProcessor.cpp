@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -137,6 +138,11 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
 				// Set the source name
 				String sourceName = program->getDependency(i) + "." + TargetLanguage;
 				pSubGpuProgram->setSourceFile(sourceName);
+                pSubGpuProgram->load();
+
+                // Prepend the current GLSL version
+                String versionLine = "#version " + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion()) + "\n";
+                pSubGpuProgram->setSource(versionLine + pSubGpuProgram->getSource());
 
 				// If we have compile errors than stop processing
 				if (pSubGpuProgram->hasCompileError())

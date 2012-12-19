@@ -1256,6 +1256,13 @@ namespace Ogre
 		/** Returns whether or not a Gpu program of the given type is currently bound. */
 		virtual bool isGpuProgramBound(GpuProgramType gptype);
 
+        /**
+         * Gets the native shading language version for this render system.
+         * Formatted so that it can be used within a shading program. 
+         * For example, OpenGL 3.2 would return 150, while 3.3 would return 330
+         */
+        uint16 getNativeShadingLanguageVersion() const { return mNativeShadingLanguageVersion; }
+
 		/** Sets the user clipping region.
 		*/
 		virtual void setClipPlanes(const PlaneList& clipPlanes);
@@ -1614,6 +1621,7 @@ namespace Ogre
 
 
 		DriverVersion mDriverVersion;
+        uint16 mNativeShadingLanguageVersion;
 
 		bool mTexProjRelative;
 		Vector3 mTexProjRelativeOrigin;

@@ -119,9 +119,19 @@ namespace Ogre {
 		GLHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name)
 	{
 		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Uniform buffer not supported in OpenGL RenderSystem.",
-				"GLHardwareBufferManagerBase::createUniformBuffer");
+                    "Uniform buffers not supported in OpenGL RenderSystem.",
+                    "GLHardwareBufferManagerBase::createUniformBuffer");
 	}
+    HardwareCounterBufferSharedPtr
+        GLHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                         HardwareBuffer::Usage usage,
+                                                         bool useShadowBuffer, const String& name)
+	{
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "Counter buffers not supported in OpenGL RenderSystem.",
+                    "GLHardwareBufferManagerBase::createCounterBuffer");
+	}
+
     //---------------------------------------------------------------------
     GLenum GLHardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {

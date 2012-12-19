@@ -75,6 +75,7 @@ set (HEADER_FILES
   include/OgreExternalTextureSourceManager.h
   include/OgreFactoryObj.h
   include/OgreFileSystem.h
+  include/OgreFileSystemLayer.h
   include/OgreFrameListener.h
   include/OgreFrustum.h
   include/OgreGpuProgram.h
@@ -83,6 +84,7 @@ set (HEADER_FILES
   include/OgreGpuProgramUsage.h
   include/OgreHardwareBuffer.h
   include/OgreHardwareBufferManager.h
+  include/OgreHardwareCounterBuffer.h
   include/OgreHardwareIndexBuffer.h
   include/OgreHardwareOcclusionQuery.h
   include/OgreHardwarePixelBuffer.h
@@ -304,6 +306,7 @@ set (SOURCE_FILES
   src/OgreGpuProgramParams.cpp
   src/OgreGpuProgramUsage.cpp
   src/OgreHardwareBufferManager.cpp
+  src/OgreHardwareCounterBuffer.cpp
   src/OgreHardwareIndexBuffer.cpp
   src/OgreHardwareOcclusionQuery.cpp
   src/OgreHardwarePixelBuffer.cpp
@@ -452,6 +455,7 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_SOURCE_FILES
     src/NaCl/OgreConfigDialog.cpp
     src/NaCl/OgreErrorDialog.cpp
+    src/NaCl/OgreFileSystemLayer.cpp
     src/NaCl/OgreTimer.cpp
     src/OgreSearchOps.cpp
   )
@@ -485,6 +489,7 @@ elseif (WIN32)
   set(PLATFORM_SOURCE_FILES
     src/WIN32/OgreConfigDialog.cpp
     src/WIN32/OgreErrorDialog.cpp
+    src/WIN32/OgreFileSystemLayer.cpp
     src/WIN32/OgreTimer.cpp
     src/WIN32/resource.h
     src/WIN32/winres.h
@@ -532,6 +537,7 @@ elseif (APPLE)
     set(PLATFORM_SOURCE_FILES
       src/iOS/OgreConfigDialog.cpp
       src/iOS/OgreErrorDialog.cpp
+      src/iOS/OgreFileSystemLayer.mm
       src/iOS/OgreTimer.cpp
       src/iOS/macUtils.mm
       src/OgreSearchOps.cpp
@@ -554,8 +560,9 @@ elseif (APPLE)
     set(PLATFORM_SOURCE_FILES
       src/OSX/OgreConfigDialog.mm
       src/OSX/OgreErrorDialog.mm
+      src/OSX/OgreFileSystemLayer.cpp
       src/OSX/OgreTimer.cpp
-      src/OSX/macUtils.cpp
+      src/OSX/macUtils.mm
       src/OgreSearchOps.cpp
 	  include/OSX/ogrelogo.png
     )
@@ -606,6 +613,7 @@ elseif (UNIX)
     src/GLX/GLX_backdrop.h
     src/GLX/OgreConfigDialog.cpp
     src/GLX/OgreErrorDialog.cpp
+    src/GLX/OgreFileSystemLayer.cpp
     src/GLX/OgreTimer.cpp
     src/OgreSearchOps.cpp
   )

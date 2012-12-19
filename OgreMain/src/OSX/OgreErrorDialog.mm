@@ -25,9 +25,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreErrorDialog.h"
+#import "OgreErrorDialog.h"
 
-#include <Cocoa/Cocoa.h>
+#import <Cocoa/Cocoa.h>
 
 using namespace Ogre;
 

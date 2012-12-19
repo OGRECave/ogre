@@ -62,7 +62,7 @@ protected:
 /*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
-		if (mShaderGenerator->getTargetLanguage() != "glsles")
+		if (mShaderGenerator->getTargetLanguage() != "glsles" && mShaderGenerator->getTargetLanguage() != "glsl")
 		{
 			//Add the hardware skinning to the shader generator default render state
 			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);

@@ -11,8 +11,15 @@ fragment_program Radial_Blur_GLSLES_ps glsles
 	source Radial_Blur_FP.glsles
 }
 
+fragment_program Radial_Blur_GLSL_ps glsl
+{
+	source Radial_Blur_FP.glsl
+	syntax glsl150
+}
+
 fragment_program Radial_Blur_ps unified
 {
+	delegate Radial_Blur_GLSL_ps
 	delegate Radial_Blur_GLSLES_ps
 	delegate Radial_Blur_Cg_ps
 }

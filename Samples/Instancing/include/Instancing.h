@@ -405,12 +405,6 @@ protected:
 
 		setupControls();
 
-		const GpuProgramManager::SyntaxCodes &syntaxCodes = GpuProgramManager::getSingleton().getSupportedSyntax();
-		for (GpuProgramManager::SyntaxCodes::const_iterator iter = syntaxCodes.begin();iter != syntaxCodes.end();++iter)
-		{
-			LogManager::getSingleton().logMessage("supported syntax : "+(*iter));
-		}
-		
 		mNumMeshes = 160;
 		mNumRendered = 0;
 		mSelectedMesh = 0;

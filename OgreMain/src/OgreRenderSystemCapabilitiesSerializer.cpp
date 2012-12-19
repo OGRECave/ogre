@@ -80,7 +80,7 @@ namespace Ogre
         file << "\t" << "fragment_program " << StringConverter::toString(caps->hasCapability(RSC_FRAGMENT_PROGRAM)) << endl;
         file << "\t" << "geometry_program " << StringConverter::toString(caps->hasCapability(RSC_GEOMETRY_PROGRAM)) << endl;
         file << "\t" << "tesselation_hull_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM)) << endl;
-        file << "\t" << "tesselation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
+        file << "\t" << "tessellation_domain_program " << StringConverter::toString(caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM)) << endl;
         file << "\t" << "compute_program " << StringConverter::toString(caps->hasCapability(RSC_COMPUTE_PROGRAM)) << endl;
         file << "\t" << "scissor_test " << StringConverter::toString(caps->hasCapability(RSC_SCISSOR_TEST)) << endl;
         file << "\t" << "two_sided_stencil " << StringConverter::toString(caps->hasCapability(RSC_TWO_SIDED_STENCIL)) << endl;
@@ -98,10 +98,12 @@ namespace Ogre
         file << "\t" << "point_extended_parameters " << StringConverter::toString(caps->hasCapability(RSC_POINT_EXTENDED_PARAMETERS)) << endl;
         file << "\t" << "vertex_texture_fetch " << StringConverter::toString(caps->hasCapability(RSC_VERTEX_TEXTURE_FETCH)) << endl;
         file << "\t" << "mipmap_lod_bias " << StringConverter::toString(caps->hasCapability(RSC_MIPMAP_LOD_BIAS)) << endl;
+        file << "\t" << "atomic_counters " << StringConverter::toString(caps->hasCapability(RSC_ATOMIC_COUNTERS)) << endl;
         file << "\t" << "texture_compression " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION)) << endl;
         file << "\t" << "texture_compression_dxt " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT)) << endl;
         file << "\t" << "texture_compression_vtc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC)) << endl;
         file << "\t" << "texture_compression_pvrtc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC)) << endl;
+        file << "\t" << "texture_compression_rgtc " << StringConverter::toString(caps->hasCapability(RSC_TEXTURE_COMPRESSION_RGTC)) << endl;
         file << "\t" << "gl1_5_novbo " << StringConverter::toString(caps->hasCapability(RSC_GL1_5_NOVBO)) << endl;
         file << "\t" << "fbo " << StringConverter::toString(caps->hasCapability(RSC_FBO)) << endl;
         file << "\t" << "fbo_arb " << StringConverter::toString(caps->hasCapability(RSC_FBO_ARB)) << endl;
@@ -443,10 +445,12 @@ namespace Ogre
         addKeywordType("point_extended_parameters", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("vertex_texture_fetch", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("mipmap_lod_bias", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("atomic_counters", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_dxt", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_vtc", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("texture_compression_pvrtc", SET_CAPABILITY_ENUM_BOOL);
+        addKeywordType("texture_compression_rgtc", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("gl1_5_novbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo", SET_CAPABILITY_ENUM_BOOL);
         addKeywordType("fbo_arb", SET_CAPABILITY_ENUM_BOOL);
@@ -487,10 +491,12 @@ namespace Ogre
         addCapabilitiesMapping("point_extended_parameters", RSC_POINT_EXTENDED_PARAMETERS);
         addCapabilitiesMapping("vertex_texture_fetch", RSC_VERTEX_TEXTURE_FETCH);
         addCapabilitiesMapping("mipmap_lod_bias", RSC_MIPMAP_LOD_BIAS);
+        addCapabilitiesMapping("atomic_counters", RSC_ATOMIC_COUNTERS);
         addCapabilitiesMapping("texture_compression", RSC_TEXTURE_COMPRESSION);
         addCapabilitiesMapping("texture_compression_dxt", RSC_TEXTURE_COMPRESSION_DXT);
         addCapabilitiesMapping("texture_compression_vtc", RSC_TEXTURE_COMPRESSION_VTC);
         addCapabilitiesMapping("texture_compression_pvrtc", RSC_TEXTURE_COMPRESSION_PVRTC);
+        addCapabilitiesMapping("texture_compression_rgtc", RSC_TEXTURE_COMPRESSION_RGTC);
 		addCapabilitiesMapping("hwrender_to_vertex_buffer", RSC_HWRENDER_TO_VERTEX_BUFFER);
         addCapabilitiesMapping("gl1_5_novbo", RSC_GL1_5_NOVBO);
         addCapabilitiesMapping("fbo", RSC_FBO);

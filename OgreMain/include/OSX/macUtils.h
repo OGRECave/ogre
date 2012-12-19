@@ -38,4 +38,5 @@ namespace Ogre {
     _OgreExport std::string macPluginPath();
     _OgreExport std::string macBundlePath();
     _OgreExport std::string macFrameworksPath();
+    _OgreExport std::string macCachePath();
 }

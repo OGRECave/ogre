@@ -115,9 +115,10 @@ protected:
         if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0") &&
 			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_0") &&
 			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_1") &&
-			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0"))
+			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0") &&
+			!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("glsl"))
 		{
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in cg type shader language, your graphic card must support shader 3 profile or above."
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in Cg or GLSL type shader language, your graphic card must support Shader Profile 3 or above."
                 " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
         }
     }
@@ -159,8 +160,7 @@ protected:
 		SegmentedDynamicLightManager::getSingleton().setSceneManager(mSceneMgr);
 
 		RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-		mGen->setTargetLanguage("cg");
-		
+
 		RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
 		pMainRenderState->reset();

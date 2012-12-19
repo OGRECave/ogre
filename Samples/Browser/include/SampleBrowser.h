@@ -71,6 +71,7 @@
 #   include "Dot3Bump.h"
 #   include "Fresnel.h"
 #   include "Water.h"
+#   include "AtomicCounters.h"
 #   include "BezierPatch.h"
 #   include "CameraTrack.h"
 #   include "CharacterSample.h"
@@ -1044,6 +1045,7 @@ protected:
             RenderSystemCapabilities::ShaderProfiles profiles = caps->getSupportedShaderProfiles();
             bool hasProgrammableGPU = (profiles.size() != 0);
 
+            mPluginNameMap["Sample_AtomicCounters"]     = (OgreBites::SdkSample *) OGRE_NEW Sample_AtomicCounters();
             mPluginNameMap["Sample_BezierPatch"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_BezierPatch();
             mPluginNameMap["Sample_CameraTrack"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CameraTrack();
             mPluginNameMap["Sample_Character"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_Character();
@@ -1278,7 +1280,7 @@ protected:
 			{
 				OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND, 
 					"Shader Generator Initialization failed - Core shader libs path not found", 
-					"Sample::_setup");
+					"SampleBrowser::createDummyScene");
 			}
 			if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
 			{
@@ -1857,6 +1859,8 @@ protected:
 				// Set shader cache path.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 shaderCachePath = Ogre::macCachePath();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+                shaderCachePath = Ogre::macCachePath() + "/org.ogre3d.RTShaderCache";
 #endif
 				mShaderGenerator->setShaderCachePath(shaderCachePath);		
 #endif

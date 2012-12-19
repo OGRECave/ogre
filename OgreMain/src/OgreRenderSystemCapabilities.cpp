@@ -201,6 +201,9 @@ namespace Ogre {
 			pLog->logMessage(
                  "   - PVRTC: "
                  + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), true));
+			pLog->logMessage(
+                 "   - RGTC: "
+                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_RGTC), true));
 		}
 
 		pLog->logMessage(
@@ -279,6 +282,9 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Render to Vertex Buffer : "
 			+ StringConverter::toString(hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER), true));
+        pLog->logMessage(
+            " * Hardware Atomic Counters: "
+            + StringConverter::toString(hasCapability(RSC_ATOMIC_COUNTERS), true));
 
 		if (mCategoryRelevant[CAPS_CATEGORY_GL])
 		{

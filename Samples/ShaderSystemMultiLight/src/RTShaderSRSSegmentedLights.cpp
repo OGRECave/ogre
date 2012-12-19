@@ -578,14 +578,14 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
 	
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 	curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
+	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
 	psMain->addAtomInstance(curFuncInvocation);	
 
 	if (mSpecularEnable)
 	{
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);	
-		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
+		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
 		psMain->addAtomInstance(curFuncInvocation);	
 	}
 	

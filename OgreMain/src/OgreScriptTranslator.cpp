@@ -4675,6 +4675,30 @@ namespace Ogre{
 										"incorrect subroutine declaration");
 								}
 							}
+							else if (atom1->value == "atomic_counter")
+							{
+//								String s;
+//								if (getString(*k, &s))
+//								{
+//									try
+//									{
+//										if (named)
+//											params->setNamedSubroutine(name, s);
+//										else
+//											params->setSubroutine(index, s);
+//									}
+//									catch(...)
+//									{
+//										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+//                                                           "setting subroutine parameter failed");
+//									}
+//								}
+//								else
+//								{
+//									compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+//                                                       "incorrect subroutine declaration");
+//								}
+							}
 							else
 							{
 								// Find the number of parameters

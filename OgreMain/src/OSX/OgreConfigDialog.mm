@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreLogManager.h"
-#include "OgreConfigDialog.h"
+#import "OgreLogManager.h"
+#import "OgreConfigDialog.h"
 
 namespace Ogre {
 

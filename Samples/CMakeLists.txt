@@ -61,6 +61,9 @@ if (OGRE_BUILD_SAMPLES)
   if (OGRE_BUILD_RENDERSYSTEM_GL)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL)
   endif ()
+  if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL3Plus)
+  endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES)
   endif ()
@@ -93,6 +96,10 @@ if (OGRE_BUILD_SAMPLES)
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
 		)
+  	include_directories(
+		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
+		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
+		)
 
 	# Link to all enabled plugins
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
@@ -116,6 +123,7 @@ if (OGRE_BUILD_SAMPLES)
 	endif () 
   endif ()
   
+  add_subdirectory(AtomicCounters)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)

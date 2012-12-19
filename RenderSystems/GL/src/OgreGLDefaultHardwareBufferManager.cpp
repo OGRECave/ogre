@@ -182,4 +182,14 @@ namespace Ogre {
 				"Cannot create UniformBuffer in GLDefaultHardwareBufferManagerBase", 
 				"GLDefaultHardwareBufferManagerBase::createUniformBuffer");
 	}
+	//-----------------------------------------------------------------------
+    HardwareCounterBufferSharedPtr
+        GLDefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                                HardwareBuffer::Usage usage,
+                                                                bool useShadowBuffer, const String& name)
+	{
+		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "Counter buffers not supported in OpenGL RenderSystem.",
+                    "GLDefaultHardwareBufferManagerBase::createCounterBuffer");
+	}
 }

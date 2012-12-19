@@ -10,8 +10,15 @@ fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
 	source GrayScale.glsles
 }
 
+fragment_program Ogre/Compositor/B&W_GLSL_FP glsl
+{
+	source GrayScale.glsl
+	syntax glsl150
+}
+
 fragment_program Ogre/Compositor/B&W_FP unified
 {
+	delegate Ogre/Compositor/B&W_GLSL_FP
 	delegate Ogre/Compositor/B&W_GLSLES_FP
 	delegate Ogre/Compositor/B&W_Cg_FP
 }

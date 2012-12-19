@@ -21,6 +21,8 @@ same license as the rest of the engine.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreTechnique.h"
 
+using namespace Ogre;
+
 //Use this directive to control whether you are writing projective (regular) or linear depth.
 #define WRITE_LINEAR_DEPTH
 
@@ -28,18 +30,20 @@ same license as the rest of the engine.
 class GBufferMaterialGeneratorImpl : public MaterialGenerator::Impl
 {
 public:
-	GBufferMaterialGeneratorImpl(const Ogre::String& baseName) : 
+	GBufferMaterialGeneratorImpl(const String& baseName) : 
       mBaseName(baseName)
       {
-          mIsSm4 = Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+          mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+          mIsGLSL = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
       }
 	
 protected:
-	Ogre::String mBaseName;
+	String mBaseName;
     bool mIsSm4;
-	virtual Ogre::GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
-	virtual Ogre::GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
-	virtual Ogre::MaterialPtr generateTemplateMaterial(MaterialGenerator::Perm permutation);
+    bool mIsGLSL;
+	virtual GpuProgramPtr generateVertexShader(MaterialGenerator::Perm permutation);
+	virtual GpuProgramPtr generateFragmentShader(MaterialGenerator::Perm permutation);
+	virtual MaterialPtr generateTemplateMaterial(MaterialGenerator::Perm permutation);
 
 };
 
@@ -51,280 +55,495 @@ GBufferMaterialGenerator::GBufferMaterialGenerator() {
 	mImpl = new GBufferMaterialGeneratorImpl(materialBaseName);
 }
 
-Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerator::Perm permutation)
+GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerator::Perm permutation)
 {
-	Ogre::StringStream ss;
-	
-	ss << "void ToGBufferVP(" << std::endl;
-	ss << "	float4 iPosition : POSITION," << std::endl;
-	ss << "	float3 iNormal   : NORMAL," << std::endl;
+	StringStream ss;
 
-	Ogre::uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
-	for (Ogre::uint32 i=0; i<numTexCoords; i++) 
-	{
-		ss << "	float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
-	}
-
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
-	{
-        if(mIsSm4)
-        {
-            ss << "	float3 iTangent : TANGENT," << std::endl;
-        }
-        else
-        {
-            ss << "	float3 iTangent : TANGENT0," << std::endl;
-        }
-	}
-
-	//TODO : Skinning inputs
-	ss << std::endl;
-	
-
-
-	ss << "	out float4 oPosition : " ;
-    if(mIsSm4)
+    if(mIsGLSL)
     {
-        ss << "SV_";
-    }
-    ss << "POSITION," << std::endl;
-#ifdef WRITE_LINEAR_DEPTH
-    ss << "	out float3 oViewPos : TEXCOORD0," << std::endl;
-#else
-	ss << "	out float oDepth : TEXCOORD0," << std::endl;
-#endif
-	ss << "	out float3 oNormal : TEXCOORD1," << std::endl;
-	int texCoordNum = 2;
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
-	{
-		ss << "	out float3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-		ss << "	out float3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-	}
-	for (Ogre::uint32 i=0; i<numTexCoords; i++) 
-	{
-		ss << "	out float2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-	}
+        ss << "#version 150" << std::endl;
+        ss << "in vec4 vertex;" << std::endl;
+        ss << "in vec3 normal;" << std::endl;
 
-	ss << std::endl;
+        uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
+        for (uint32 i=0; i<numTexCoords; i++)
+        {
+            ss << "in vec2 uv" << i << ';' << std::endl;
+        }
 
-	ss << "	uniform float4x4 cWorldViewProj," << std::endl;
-	ss << "	uniform float4x4 cWorldView" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "in vec3 tangent;" << std::endl;
+        }
 
-	ss << "	)" << std::endl;
-	
-	
-	ss << "{" << std::endl;
-	ss << "	oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
-	ss << "	oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
-	{
-		ss << "	oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
-		ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
-	}
+        //TODO : Skinning inputs
+        ss << std::endl;
 
 #ifdef WRITE_LINEAR_DEPTH
-    ss << "	oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
+        ss << "out vec3 oViewPos;" << std::endl;
 #else
-	ss << "	oDepth = oPosition.w;" << std::endl;
+        ss << "out float oDepth;" << std::endl;
+#endif
+        ss << "out vec3 oNormal;" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "out vec3 oTangent;" << std::endl;
+            ss << "out vec3 oBiNormal;" << std::endl;
+        }
+        for (uint32 i=0; i<numTexCoords; i++)
+        {
+            ss << "out vec2 oUV" << i << ";" << std::endl;
+        }
+
+        ss << std::endl;
+
+        ss << "uniform mat4 cWorldViewProj;" << std::endl;
+        ss << "uniform mat4 cWorldView;" << std::endl;
+
+        ss << "void main()" << std::endl;
+
+        ss << "{" << std::endl;
+        ss << "	gl_Position = cWorldViewProj * vertex;" << std::endl;
+        ss << "	oNormal = (cWorldView * vec4(normal,0)).xyz;" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "	oTangent = (cWorldView * vec4(tangent,0)).xyz;" << std::endl;
+            ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
+        }
+
+#ifdef WRITE_LINEAR_DEPTH
+        ss << "	oViewPos = (cWorldView * vertex).xyz;" << std::endl;
+#else
+        ss << "	oDepth = oPosition.w;" << std::endl;
 #endif
 
-	for (Ogre::uint32 i=0; i<numTexCoords; i++) {
-		ss << "	oUV" << i << " = iUV" << i << ';' << std::endl;
-	}
+        for (uint32 i=0; i<numTexCoords; i++) {
+            ss << "	oUV" << i << " = uv" << i << ';' << std::endl;
+        }
 
-	ss << "}" << std::endl;
-	
-	Ogre::String programSource = ss.str();
-	Ogre::String programName = mBaseName + "VP_" + Ogre::StringConverter::toString(permutation);
+        ss << "}" << std::endl;
+
+        String programSource = ss.str();
+        String programName = mBaseName + "VP_" + StringConverter::toString(permutation);
 
 #if OGRE_DEBUG_MODE
-	Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
+        LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
 #endif
 
-	// Create shader object
-	Ogre::HighLevelGpuProgramPtr ptrProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(
-		programName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		"cg", Ogre::GPT_VERTEX_PROGRAM);
-	ptrProgram->setSource(programSource);
-	ptrProgram->setParameter("entry_point","ToGBufferVP");
-    if(mIsSm4)
-    {
-        ptrProgram->setParameter("profiles","vs_4_0");
+        // Create shader object
+        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                                                 "glsl", GPT_VERTEX_PROGRAM);
+        ptrProgram->setSource(programSource);
+        ptrProgram->setParameter("syntax", "glsl150");
+
+        const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
+        params->setNamedAutoConstant("cWorldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+        params->setNamedAutoConstant("cWorldView", GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+        ptrProgram->load();
+        
+        return GpuProgramPtr(ptrProgram);
     }
     else
     {
-        ptrProgram->setParameter("profiles","vs_1_1 arbvp1");
+        ss << "void ToGBufferVP(" << std::endl;
+        ss << "	float4 iPosition : POSITION," << std::endl;
+        ss << "	float3 iNormal   : NORMAL," << std::endl;
+
+        uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
+        for (uint32 i=0; i<numTexCoords; i++) 
+        {
+            ss << "	float2 iUV" << i << " : TEXCOORD" << i << ',' << std::endl;
+        }
+
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            if(mIsSm4)
+            {
+                ss << "	float3 iTangent : TANGENT," << std::endl;
+            }
+            else
+            {
+                ss << "	float3 iTangent : TANGENT0," << std::endl;
+            }
+        }
+
+        //TODO : Skinning inputs
+        ss << std::endl;
+        
+
+
+        ss << "	out float4 oPosition : " ;
+        if(mIsSm4)
+        {
+            ss << "SV_";
+        }
+        ss << "POSITION," << std::endl;
+    #ifdef WRITE_LINEAR_DEPTH
+        ss << "	out float3 oViewPos : TEXCOORD0," << std::endl;
+    #else
+        ss << "	out float oDepth : TEXCOORD0," << std::endl;
+    #endif
+        ss << "	out float3 oNormal : TEXCOORD1," << std::endl;
+        int texCoordNum = 2;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
+        {
+            ss << "	out float3 oTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << "	out float3 oBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+        }
+        for (uint32 i=0; i<numTexCoords; i++) 
+        {
+            ss << "	out float2 oUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+        }
+
+        ss << std::endl;
+
+        ss << "	uniform float4x4 cWorldViewProj," << std::endl;
+        ss << "	uniform float4x4 cWorldView" << std::endl;
+
+        ss << "	)" << std::endl;
+        
+        
+        ss << "{" << std::endl;
+        ss << "	oPosition = mul(cWorldViewProj, iPosition);" << std::endl;
+        ss << "	oNormal = mul(cWorldView, float4(iNormal,0)).xyz;" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "	oTangent = mul(cWorldView, float4(iTangent,0)).xyz;" << std::endl;
+            ss << "	oBiNormal = cross(oNormal, oTangent);" << std::endl;
+        }
+
+    #ifdef WRITE_LINEAR_DEPTH
+        ss << "	oViewPos = mul(cWorldView, iPosition).xyz;" << std::endl;
+    #else
+        ss << "	oDepth = oPosition.w;" << std::endl;
+    #endif
+
+        for (uint32 i=0; i<numTexCoords; i++) {
+            ss << "	oUV" << i << " = iUV" << i << ';' << std::endl;
+        }
+
+        ss << "}" << std::endl;
+        
+        String programSource = ss.str();
+        String programName = mBaseName + "VP_" + StringConverter::toString(permutation);
+
+    #if OGRE_DEBUG_MODE
+        LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
+    #endif
+
+        // Create shader object
+        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
+            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            "cg", GPT_VERTEX_PROGRAM);
+        ptrProgram->setSource(programSource);
+        ptrProgram->setParameter("entry_point","ToGBufferVP");
+        if(mIsSm4)
+        {
+            ptrProgram->setParameter("profiles","vs_4_0");
+        }
+        else
+        {
+            ptrProgram->setParameter("profiles","vs_1_1 arbvp1");
+        }
+
+        const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
+        params->setNamedAutoConstant("cWorldViewProj", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+        params->setNamedAutoConstant("cWorldView", GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+        ptrProgram->load();
+
+        return GpuProgramPtr(ptrProgram);
     }
-
-	const Ogre::GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
-	params->setNamedAutoConstant("cWorldViewProj", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-	params->setNamedAutoConstant("cWorldView", Ogre::GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
-	ptrProgram->load();
-
-	return Ogre::GpuProgramPtr(ptrProgram);
 }
 
-Ogre::GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGenerator::Perm permutation)
+GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGenerator::Perm permutation)
 {
-	Ogre::StringStream ss;
-	
-	ss << "void ToGBufferFP(" << std::endl;
-    if(mIsSm4)
+	StringStream ss;
+
+    if(mIsGLSL)
     {
-        ss << "float4 oPosition : SV_POSITION," << std::endl;
-    }
+        ss << "#version 150" << std::endl;
+        ss << "#extension GL_ARB_explicit_attrib_location : require" << std::endl;
+#ifdef WRITE_LINEAR_DEPTH
+        ss << "in vec3 oViewPos;" << std::endl;
+#else
+        ss << "in float oDepth;" << std::endl;
+#endif
+        ss << "in vec3 oNormal;" << std::endl;
+
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "in vec3 oTangent;" << std::endl;
+            ss << "in vec3 oBiNormal;" << std::endl;
+        }
+
+        uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
+        for (uint32 i=0; i<numTexCoords; i++)
+        {
+            ss << "in vec2 oUV" << i << ';' << std::endl;
+        }
+        ss << "layout(location = 0, index = 0) out vec4 oColor0;" << std::endl;
+        ss << "layout(location = 0, index = 1) out vec4 oColor1;" << std::endl;
+
+        ss << std::endl;
+
+
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            ss << "uniform sampler2D sNormalMap;" << std::endl;
+        }
+
+        int numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+        for (int i=0; i<numTextures; i++)
+        {
+            ss << "uniform sampler2D sTex" << i << ";" << std::endl;
+        }
+        if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+        {
+            ss << "uniform vec4 cDiffuseColour;" << std::endl;
+        }
 
 #ifdef WRITE_LINEAR_DEPTH
-    ss << "	float3 iViewPos : TEXCOORD0," << std::endl;
-#else
-    ss << "	float1 iDepth : TEXCOORD0," << std::endl;
+        ss << "uniform float cFarDistance;" << std::endl;
 #endif
-	ss << "	float3 iNormal   : TEXCOORD1," << std::endl;
 
-	int texCoordNum = 2;
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
-	{
-		ss << "	float3 iTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-		ss << "	float3 iBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-	}
+        ss << "uniform float cSpecularity;" << std::endl;
 
-	Ogre::uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
-	for (Ogre::uint32 i=0; i<numTexCoords; i++) 
-	{
-		ss << "	float2 iUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
-	}
+        ss << "void main()" << std::endl;
+        ss << "{" << std::endl;
 
-	ss << std::endl;
-
-	ss << "	out float4 oColor0 : COLOR0," << std::endl;
-	ss << "	out float4 oColor1 : COLOR1," << std::endl;
-
-	ss << std::endl;
-
-	int samplerNum = 0;
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
-	{
-        if(mIsSm4)
+        if (numTexCoords > 0 && numTextures > 0)
         {
-            ss << "	uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+            ss << "	oColor0.rgb = texture(sTex0, oUV0).rgb;" << std::endl;
+            if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+            {
+                ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
+            }
         }
         else
         {
-    		ss << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+            ss << "	oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
         }
-	}
-	Ogre::uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-	for (Ogre::uint32 i=0; i<numTextures; i++) {
-        if(mIsSm4)
+
+        ss << "	oColor0.a = cSpecularity;" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+            ss << "	vec3 texNormal = (texture(sNormalMap, oUV0).rgb-0.5)*2;" << std::endl;
+            ss << "	mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
+            ss << "	oColor1.rgb = normalize(texNormal * normalRotation);" << std::endl;
         }
         else
         {
-    		ss << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+            ss << "	oColor1.rgb = normalize(oNormal);" << std::endl;
         }
-	}
-    if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
-	{
-		ss << "	uniform float4 cDiffuseColour," << std::endl;
-	}
-
 #ifdef WRITE_LINEAR_DEPTH
-    ss << "	uniform float cFarDistance," << std::endl;
-#endif
-	
-	ss << "	uniform float cSpecularity" << std::endl;
-
-	ss << "	)" << std::endl;
-	
-	
-	ss << "{" << std::endl;
-
-	if (numTexCoords > 0 && numTextures > 0) 
-	{
-		ss << "	oColor0.rgb = tex2D(sTex0, iUV0).rgb;" << std::endl;
-        if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
-        {
-            ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
-        }
-	}
-    else
-	{
-		ss << "	oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
-	}
-    
-	
-	ss << "	oColor0.a = cSpecularity;" << std::endl;
-	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
-	{
-		ss << "	float3 texNormal = (tex2D(sNormalMap, iUV0).rgb-0.5)*2;" << std::endl;
-		ss << "	float3x3 normalRotation = float3x3(iTangent, iBiNormal, iNormal);" << std::endl;
-		ss << "	oColor1.rgb = normalize(mul(texNormal, normalRotation));" << std::endl;
-	} else 
-	{
-		ss << "	oColor1.rgb = normalize(iNormal);" << std::endl;
-	}
-#ifdef WRITE_LINEAR_DEPTH
-    ss << "	oColor1.a = length(iViewPos) / cFarDistance;" << std::endl;
+        ss << "	oColor1.a = length(oViewPos) / cFarDistance;" << std::endl;
 #else
-    ss << "	oColor1.a = iDepth;" << std::endl;
+        ss << "	oColor1.a = oDepth;" << std::endl;
 #endif
 
-	ss << "}" << std::endl;
-	
-	Ogre::String programSource = ss.str();
-	Ogre::String programName = mBaseName + "FP_" + Ogre::StringConverter::toString(permutation);
+        ss << "}" << std::endl;
+
+        String programSource = ss.str();
+        String programName = mBaseName + "FP_" + StringConverter::toString(permutation);
 
 #if OGRE_DEBUG_MODE
-	Ogre::LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
+        LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
 #endif
 
-	// Create shader object
-	Ogre::HighLevelGpuProgramPtr ptrProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(
-		programName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		"cg", Ogre::GPT_FRAGMENT_PROGRAM);
-	ptrProgram->setSource(programSource);
-	ptrProgram->setParameter("entry_point","ToGBufferFP");
-    if(mIsSm4)
-    {
-        ptrProgram->setParameter("profiles","ps_4_0");
+        // Create shader object
+        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
+                                                                                                                 programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                                                 "glsl", GPT_FRAGMENT_PROGRAM);
+        ptrProgram->setSource(programSource);
+        ptrProgram->setParameter("syntax", "glsl150");
+
+        const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
+        params->setNamedAutoConstant("cSpecularity", GpuProgramParameters::ACT_SURFACE_SHININESS);
+        if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+        {
+            params->setNamedAutoConstant("cDiffuseColour", GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+        }
+
+        // Bind samplers
+        int samplerNum = 0;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            params->setNamedConstant("sNormalMap", samplerNum++);
+        }
+        for (int i=0; i<numTextures; i++)
+        {
+            params->setNamedConstant("sTex" + StringConverter::toString(i), samplerNum++);
+        }
+
+#ifdef WRITE_LINEAR_DEPTH
+        //TODO : Should this be the distance to the far corner, not the far clip distance?
+        params->setNamedAutoConstant("cFarDistance", GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
+#endif
+        
+        ptrProgram->load();
+        return GpuProgramPtr(ptrProgram);
     }
     else
     {
-        ptrProgram->setParameter("profiles","ps_2_0 arbfp1");
+        ss << "void ToGBufferFP(" << std::endl;
+        if(mIsSm4)
+        {
+            ss << "float4 oPosition : SV_POSITION," << std::endl;
+        }
+
+    #ifdef WRITE_LINEAR_DEPTH
+        ss << "	float3 iViewPos : TEXCOORD0," << std::endl;
+    #else
+        ss << "	float1 iDepth : TEXCOORD0," << std::endl;
+    #endif
+        ss << "	float3 iNormal   : TEXCOORD1," << std::endl;
+
+        int texCoordNum = 2;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
+        {
+            ss << "	float3 iTangent : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+            ss << "	float3 iBiNormal : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+        }
+
+        uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
+        for (uint32 i=0; i<numTexCoords; i++) 
+        {
+            ss << "	float2 iUV" << i << " : TEXCOORD" << texCoordNum++ << ',' << std::endl;
+        }
+
+        ss << std::endl;
+
+        ss << "	out float4 oColor0 : COLOR0," << std::endl;
+        ss << "	out float4 oColor1 : COLOR1," << std::endl;
+
+        ss << std::endl;
+
+        int samplerNum = 0;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
+        {
+            if(mIsSm4)
+            {
+                ss << "	uniform sampler2D sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+            }
+            else
+            {
+                ss << "	uniform sampler sNormalMap : register(s" << samplerNum++ << ")," << std::endl;
+            }
+        }
+        uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+        for (uint32 i=0; i<numTextures; i++) {
+            if(mIsSm4)
+            {
+                ss << "	uniform sampler2D sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+            }
+            else
+            {
+                ss << "	uniform sampler sTex" << i << " : register(s" << samplerNum++ << ")," << std::endl;
+            }
+        }
+        if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+        {
+            ss << "	uniform float4 cDiffuseColour," << std::endl;
+        }
+
+    #ifdef WRITE_LINEAR_DEPTH
+        ss << "	uniform float cFarDistance," << std::endl;
+    #endif
+        
+        ss << "	uniform float cSpecularity" << std::endl;
+
+        ss << "	)" << std::endl;
+        
+        
+        ss << "{" << std::endl;
+
+        if (numTexCoords > 0 && numTextures > 0) 
+        {
+            ss << "	oColor0.rgb = tex2D(sTex0, iUV0).rgb;" << std::endl;
+            if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+            {
+                ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
+            }
+        }
+        else
+        {
+            ss << "	oColor0.rgb = cDiffuseColour.rgb;" << std::endl;
+        }
+        
+        
+        ss << "	oColor0.a = cSpecularity;" << std::endl;
+        if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP) 
+        {
+            ss << "	float3 texNormal = (tex2D(sNormalMap, iUV0).rgb-0.5)*2;" << std::endl;
+            ss << "	float3x3 normalRotation = float3x3(iTangent, iBiNormal, iNormal);" << std::endl;
+            ss << "	oColor1.rgb = normalize(mul(texNormal, normalRotation));" << std::endl;
+        } else 
+        {
+            ss << "	oColor1.rgb = normalize(iNormal);" << std::endl;
+        }
+    #ifdef WRITE_LINEAR_DEPTH
+        ss << "	oColor1.a = length(iViewPos) / cFarDistance;" << std::endl;
+    #else
+        ss << "	oColor1.a = iDepth;" << std::endl;
+    #endif
+
+        ss << "}" << std::endl;
+        
+        String programSource = ss.str();
+        String programName = mBaseName + "FP_" + StringConverter::toString(permutation);
+
+    #if OGRE_DEBUG_MODE
+        LogManager::getSingleton().getDefaultLog()->logMessage(programSource);
+    #endif
+
+        // Create shader object
+        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
+            programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            "cg", GPT_FRAGMENT_PROGRAM);
+        ptrProgram->setSource(programSource);
+        ptrProgram->setParameter("entry_point","ToGBufferFP");
+        if(mIsSm4)
+        {
+            ptrProgram->setParameter("profiles","ps_4_0");
+        }
+        else
+        {
+            ptrProgram->setParameter("profiles","ps_2_0 arbfp1");
+        }
+
+        const GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
+        params->setNamedAutoConstant("cSpecularity", GpuProgramParameters::ACT_SURFACE_SHININESS);
+        if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
+        {
+            params->setNamedAutoConstant("cDiffuseColour", GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
+        }
+
+    #ifdef WRITE_LINEAR_DEPTH
+        //TODO : Should this be the distance to the far corner, not the far clip distance?
+        params->setNamedAutoConstant("cFarDistance", GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
+    #endif
+
+        ptrProgram->load();
+        return GpuProgramPtr(ptrProgram);
     }
-
-	const Ogre::GpuProgramParametersSharedPtr& params = ptrProgram->getDefaultParameters();
-	params->setNamedAutoConstant("cSpecularity", Ogre::GpuProgramParameters::ACT_SURFACE_SHININESS);
-	if (numTextures == 0 || permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
-	{
-		params->setNamedAutoConstant("cDiffuseColour", Ogre::GpuProgramParameters::ACT_SURFACE_DIFFUSE_COLOUR);
-	}
-
-#ifdef WRITE_LINEAR_DEPTH
-    //TODO : Should this be the distance to the far corner, not the far clip distance?
-    params->setNamedAutoConstant("cFarDistance", Ogre::GpuProgramParameters::ACT_FAR_CLIP_DISTANCE);
-#endif
-
-	ptrProgram->load();
-	return Ogre::GpuProgramPtr(ptrProgram);
 }
 
-Ogre::MaterialPtr GBufferMaterialGeneratorImpl::generateTemplateMaterial(MaterialGenerator::Perm permutation)
+MaterialPtr GBufferMaterialGeneratorImpl::generateTemplateMaterial(MaterialGenerator::Perm permutation)
 {
-	Ogre::String matName = mBaseName + "Mat_" + Ogre::StringConverter::toString(permutation);
+	String matName = mBaseName + "Mat_" + StringConverter::toString(permutation);
 
-	Ogre::MaterialPtr matPtr = Ogre::MaterialManager::getSingleton().create
-		(matName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-	Ogre::Pass* pass = matPtr->getTechnique(0)->getPass(0);
-	pass->setName(mBaseName + "Pass_" + Ogre::StringConverter::toString(permutation));
+	MaterialPtr matPtr = MaterialManager::getSingleton().create
+		(matName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	Pass* pass = matPtr->getTechnique(0)->getPass(0);
+	pass->setName(mBaseName + "Pass_" + StringConverter::toString(permutation));
 	pass->setLightingEnabled(false);
 	if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
 	{
 		pass->createTextureUnitState();
 	}
-	Ogre::uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-	for (Ogre::uint32 i=0; i<numTextures; i++)
+	uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+	for (uint32 i=0; i<numTextures; i++)
 	{
 		pass->createTextureUnitState();
 	}

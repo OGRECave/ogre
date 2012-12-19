@@ -117,8 +117,16 @@ namespace Ogre {
         createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "")
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "GLES does not support render to vertex buffer objects",
+                        "GLES does not support uniform buffer objects",
                         "GLESDefaultHardwareBufferManagerBase::createUniformBuffer");
+        }
+		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                                                           HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                           bool useShadowBuffer = false, const String& name = "")
+        {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "GLES does not support atomic counter buffers",
+                        "GLESDefaultHardwareBufferManagerBase::createCounterBuffer");
         }
     };
 

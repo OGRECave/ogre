@@ -89,6 +89,9 @@ namespace Ogre {
 			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
             HardwareUniformBufferSharedPtr 
                 createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
+            HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                                                           HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                           bool useShadowBuffer = false, const String& name = "");
 
     };
 

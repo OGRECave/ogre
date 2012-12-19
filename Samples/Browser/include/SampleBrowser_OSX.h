@@ -43,6 +43,8 @@
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CVDisplayLink.h>
 
+using namespace Ogre;
+
 // All this does is suppress some messages in the run log.  NSApplication does not
 // implement buttonPressed and apps without a NIB have no target for the action.
 @implementation NSApplication (_suppressUnimplementedActionWarning)
@@ -75,7 +77,7 @@
 
 @end
 
-static OgreBites::SampleBrowser sb;
+static OgreBites::SampleBrowser sb = 0;
 
 #if __LP64__
 static id mAppDelegate;
@@ -140,38 +142,40 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 
     try {
         sb.go();
-#if __LP64__ && USE_DISPLAYLINK
-        CVReturn ret = kCVReturnSuccess;
-        // Create a display link capable of being used with all active displays
-        ret = CVDisplayLinkCreateWithActiveCGDisplays(&mDisplayLink);
-        
-        // Set the renderer output callback function
-        ret = CVDisplayLinkSetOutputCallback(mDisplayLink, &MyDisplayLinkCallback, self);
-        
-        // Set the display link for the current renderer
-        NSOpenGLContext *ctx = static_cast<OSXCocoaWindow *>(sb.mWindow)->nsopenGLContext();
-        NSOpenGLPixelFormat *fmt = static_cast<OSXCocoaWindow *>(sb.mWindow)->nsopenGLPixelFormat();
-        CGLContextObj cglContext = (CGLContextObj)[ctx CGLContextObj];
-        CGLPixelFormatObj cglPixelFormat = (CGLPixelFormatObj)[fmt CGLPixelFormatObj];
-        ret = CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext(mDisplayLink, cglContext, cglPixelFormat);
-        
-        // Activate the display link
-        ret = CVDisplayLinkStart(mDisplayLink);
-#endif
         Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
-        
+
         // Clear event times
 		Ogre::Root::getSingleton().clearEventTimes();
     } catch( Ogre::Exception& e ) {
         std::cerr << "An exception has occurred: " <<
         e.getFullDescription().c_str() << std::endl;
     }
-#if !USE_DISPLAYLINK
-    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
-                                              target:self
-                                            selector:@selector(renderOneFrame:)
-                                            userInfo:nil
-                                             repeats:YES];
+#if __LP64__ && USE_DISPLAYLINK
+    CVReturn ret = kCVReturnSuccess;
+    // Create a display link capable of being used with all active displays
+    ret = CVDisplayLinkCreateWithActiveCGDisplays(&mDisplayLink);
+
+    // Set the renderer output callback function
+    ret = CVDisplayLinkSetOutputCallback(mDisplayLink, &MyDisplayLinkCallback, self);
+
+    // Set the display link for the current renderer
+    NSOpenGLContext *ctx = static_cast<OSXCocoaWindow *>(sb.mWindow)->nsopenGLContext();
+    NSOpenGLPixelFormat *fmt = static_cast<OSXCocoaWindow *>(sb.mWindow)->nsopenGLPixelFormat();
+    CGLContextObj cglContext = (CGLContextObj)[ctx CGLContextObj];
+    CGLPixelFormatObj cglPixelFormat = (CGLPixelFormatObj)[fmt CGLPixelFormatObj];
+    ret = CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext(mDisplayLink, cglContext, cglPixelFormat);
+
+    // Activate the display link
+    ret = CVDisplayLinkStart(mDisplayLink);
+#else
+	mTimer = [[NSTimer timerWithTimeInterval: 0.001 target:self selector:@selector(renderOneFrame:) userInfo:self repeats:true] retain];
+	[[NSRunLoop currentRunLoop] addTimer:mTimer forMode: NSDefaultRunLoopMode];
+	[[NSRunLoop currentRunLoop] addTimer:mTimer forMode: NSEventTrackingRunLoopMode]; // Ensure timer fires during resize
+//    mTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)(1.0f / 60.0f) * mLastFrameTime
+//                                              target:self
+//                                            selector:@selector(renderOneFrame:)
+//                                            userInfo:nil
+//                                             repeats:YES];
 #endif
     [pool release];
 }
@@ -198,7 +202,7 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 {
     if(!sb.mIsShuttingDown && Ogre::Root::getSingletonPtr() && Ogre::Root::getSingleton().isInitialised())
     {
-        Ogre::Root::getSingleton().renderOneFrame((Ogre::Real)[mTimer timeInterval]);
+        Ogre::Root::getSingleton().renderOneFrame();//(Ogre::Real)[mTimer timeInterval]);
     }
     else
     {

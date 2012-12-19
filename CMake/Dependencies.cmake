@@ -99,6 +99,10 @@ if(NOT ANDROID AND NOT FLASHCC)
   macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
 endif()
 
+# Find OpenGL 3+
+find_package(OpenGL)
+macro_log_feature(OPENGL_FOUND "OpenGL 3+" "Support for the OpenGL 3+ render system" "http://www.opengl.org/" FALSE "" "")
+
 # Find OpenGL ES 1.x
 find_package(OpenGLES)
 macro_log_feature(OPENGLES_FOUND "OpenGL ES 1.x" "Support for the OpenGL ES 1.x render system (DEPRECATED)" "http://www.khronos.org/opengles/" FALSE "" "")

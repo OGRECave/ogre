@@ -657,6 +657,424 @@ namespace Ogre {
         0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
+        {"PF_R11G11B10_FLOAT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_FLOAT | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_FLOAT32, 1,
+        /* rbits, gbits, bbits, abits */
+        11, 11, 10, 0,
+        /* Masks and shifts */
+        0xFFC00000, 0x03FF800, 0x000007FF, 0,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 1,
+        /* rbits, gbits, bbits, abits */
+        8, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 2,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 0, 0,
+        /* Masks and shifts */
+        0xFF00, 0x00FF, 0, 0,
+        8, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 3,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0,
+        16, 8, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8A8_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 4,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 8,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 1,
+        /* rbits, gbits, bbits, abits */
+        16, 0, 0, 0,
+        /* Masks and shifts */
+        0xFFFF, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 2,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 16, 16, 16,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16A16_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 4,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 16, 16,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 1,
+        /* rbits, gbits, bbits, abits */
+        32, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 2,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0, 0,
+        24, 16, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32B32_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 3,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 32, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32B32A32_UINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_UINT, 4,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 32, 32,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8_SINT",
+        /* Bytes per element */
+        1,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 1,
+        /* rbits, gbits, bbits, abits */
+        8, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8_SINT",
+        /* Bytes per element */
+        2,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 2,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8_SINT",
+        /* Bytes per element */
+        3,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 3,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8A8_SINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 4,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 8,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16_SINT",
+        /* Bytes per element */
+        2,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 1,
+        /* rbits, gbits, bbits, abits */
+        16, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16_SINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 2,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16_SINT",
+        /* Bytes per element */
+        6,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 3,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 16, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16A16_SINT",
+        /* Bytes per element */
+        8,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 4,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 16, 16,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32_SINT",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 1,
+        /* rbits, gbits, bbits, abits */
+        32, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32_SINT",
+        /* Bytes per element */
+        8,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 2,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 0, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32B32_SINT",
+        /* Bytes per element */
+        12,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 3,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 32, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R32G32B32A32_SINT",
+        /* Bytes per element */
+        16,
+        /* Flags */
+        PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 4,
+        /* rbits, gbits, bbits, abits */
+        32, 32, 32, 32,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R9G9B9E5_SHAREDEXP",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        9, 9, 9, 0,
+        /* Masks and shifts */
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_RGTC_RED",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 1,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_RGTC_SIGNED_RED",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 1,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_RGTC_RED_GREEN",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 2,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0x07, 0x38, 0, 0,
+        0, 3, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_RGTC_RED_GREEN_SIGNED",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 2,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0x07, 0x38, 0, 0,
+        0, 3, 0, 0
+        },
+    //-----------------------------------------------------------------------
         {"PF_R8",
         /* Bytes per element */
         1,
@@ -684,6 +1102,119 @@ namespace Ogre {
         0xFF0000, 0x00FF00, 0, 0,
         8, 0, 0, 0
         },
+    //-----------------------------------------------------------------------
+        {"PF_R8_SNORM",
+        /* Bytes per element */
+        1,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 1,
+        /* rbits, gbits, bbits, abits */
+        8, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8_SNORM",
+        /* Bytes per element */
+        2,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 2,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8_SNORM",
+        /* Bytes per element */
+        3,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 3,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R8G8B8A8_SNORM",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 4,
+        /* rbits, gbits, bbits, abits */
+        8, 8, 8, 8,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16_SNORM",
+        /* Bytes per element */
+        2,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 1,
+        /* rbits, gbits, bbits, abits */
+        16, 0, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16_SNORM",
+        /* Bytes per element */
+        4,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 2,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 0, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16_SNORM",
+        /* Bytes per element */
+        6,
+        /* Flags */
+        PFF_INTEGER | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 3,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 16, 0,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_R16G16B16A16_SNORM",
+        /* Bytes per element */
+        8,
+        /* Flags */
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        /* Component type and count */
+        PCT_SINT, 4,
+        /* rbits, gbits, bbits, abits */
+        16, 16, 16, 16,
+        /* Masks and shifts */
+        0xFF0000, 0, 0, 0,
+        0, 0, 0, 0
+        },
+
     //-----------------------------------------------------------------------
 		{"PF_ETC1_RGB8",
         /* Bytes per element */

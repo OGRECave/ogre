@@ -73,7 +73,6 @@ THE SOFTWARE.
 - (NSTableView *)getOptionsTable;
 - (void)setOptionsPopUp:(NSPopUpButton *)button;
 - (NSPopUpButton *)getOptionsPopUp;
-- (void)popUpValueChanged:(id)sender;
 
 @end
 #endif
