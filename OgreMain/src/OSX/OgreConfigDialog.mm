@@ -391,20 +391,27 @@ namespace Ogre {
     [mOptionsPopUp addItemsWithTitles:[mOptions objectForKey:key]];
     
     // Grab a copy of the selected RenderSystem name in Ogre::String format
-    Ogre::String selectedRenderSystemName = Ogre::String([[[mRenderSystemsPopUp selectedItem] title] UTF8String]);
-    const Ogre::ConfigOptionMap& opts = Ogre::Root::getSingleton().getRenderSystemByName(selectedRenderSystemName)->getConfigOptions();
+    if([mRenderSystemsPopUp numberOfItems] > 0)
+    {
+        Ogre::String selectedRenderSystemName = Ogre::String([[[mRenderSystemsPopUp selectedItem] title] UTF8String]);
+        const Ogre::ConfigOptionMap& opts = Ogre::Root::getSingleton().getRenderSystemByName(selectedRenderSystemName)->getConfigOptions();
 
-    // Select the item that is the current config option, if there is no current setting, just pick the top of the list
-    Ogre::ConfigOptionMap::const_iterator it = opts.find([key UTF8String]);
-    if (it != opts.end())
-        [mOptionsPopUp selectItemWithTitle:[NSString stringWithCString:it->second.currentValue.c_str()
-                                 encoding:NSASCIIStringEncoding]];
+        // Select the item that is the current config option, if there is no current setting, just pick the top of the list
+        Ogre::ConfigOptionMap::const_iterator it = opts.find([key UTF8String]);
+        if (it != opts.end())
+            [mOptionsPopUp selectItemWithTitle:[NSString stringWithCString:it->second.currentValue.c_str()
+                                     encoding:NSASCIIStringEncoding]];
 
-    if([mOptionsPopUp indexOfSelectedItem] < 0)
-        [mOptionsPopUp selectItemAtIndex:0];
+        if([mOptionsPopUp indexOfSelectedItem] < 0)
+            [mOptionsPopUp selectItemAtIndex:0];
 
-    // Always allow the new selection
-    return YES;
+        // Always allow the new selection
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
 }
 
 #pragma mark Getters and Setters
