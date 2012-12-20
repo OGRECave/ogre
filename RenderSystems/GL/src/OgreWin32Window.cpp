@@ -315,7 +315,7 @@ namespace Ogre {
 					mWidth = rc.right - rc.left;
 					mHeight = rc.bottom - rc.top;
 
-					// Clamp window rect to the nearest display monitor.
+					// Clamp window rect to the default primary display monitor.
 					if (mLeft < monitorInfoEx.rcWork.left)
 						mLeft = monitorInfoEx.rcWork.left;		
 
