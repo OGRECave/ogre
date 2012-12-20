@@ -21,6 +21,10 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/TestContext.cpp)
 
+if(APPLE)
+  set_source_files_properties(src/TestContext.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Browser/include)
