@@ -21,21 +21,6 @@ set(HEADER_FILES
 set(SOURCE_FILES
     src/TestContext.cpp)
 
-# we also need the file system stuff from the Sample Browser
-if (WIN32)
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_WIN32.cpp)
-elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  set_source_files_properties(src/TestContext.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_iOS.mm)
-elseif (APPLE)
-  set_source_files_properties(src/TestContext.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_OSX.cpp)
-elseif (UNIX)
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_Unix.cpp)
-else ()
-  list(APPEND SOURCE_FILES ${OGRE_SOURCE_DIR}/Samples/Browser/src/FileSystemLayerImpl_Default.cpp)
-endif ()
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Browser/include)
