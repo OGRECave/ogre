@@ -103,17 +103,19 @@ namespace Ogre
     void OctreeZone::removeNode( PCZSceneNode * n )
     {
 		if ( n != 0 )
+        {
 			removeNodeFromOctree( n );
 
-		if (n->getHomeZone() == this)
-		{
-			mHomeNodeList.erase( n );
+            if (n->getHomeZone() == this)
+            {
+                mHomeNodeList.erase( n );
 
-		}
-		else
-		{
-			mVisitorNodeList.erase( n );
-		}
+            }
+            else
+            {
+                mVisitorNodeList.erase( n );
+            }
+        }
     }
 
 	/** Remove all nodes from the node reference list and clear it

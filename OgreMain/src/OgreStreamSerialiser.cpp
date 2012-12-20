@@ -668,7 +668,7 @@ namespace Ogre
 	{
 		for (size_t i = 0; i < count; ++i, ++aabb)
 		{
-			bool infinite;
+			bool infinite = false;
 			read(&infinite);
 			Vector3 tmpMin, tmpMax;
 			read(&tmpMin);

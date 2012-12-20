@@ -91,7 +91,6 @@ namespace Volume {
     
         // Add vertex-normals to the buffer
         decl->addElement(0, offset, VET_FLOAT3, VES_NORMAL);
-        offset += VertexElement::getTypeSize(VET_FLOAT3);
     
         HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
             decl->getVertexSize(MAIN_BINDING),

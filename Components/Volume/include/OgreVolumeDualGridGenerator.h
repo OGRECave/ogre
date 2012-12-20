@@ -60,7 +60,7 @@ namespace Volume {
     
     /** To hold dual cells.
     */
-    typedef _OgreVolumeExport vector<DualCell>::type VecDualCell;
+    typedef vector<DualCell>::type VecDualCell;
 
     /** Class for the generation of the DualGrid.
     */

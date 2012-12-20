@@ -293,7 +293,7 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed) :
-        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes), mNoise(seed)
+        CSGUnarySource(src), mFrequencies(frequencies), mAmplitudes(amplitudes), mNumOctaves(numOctaves), mNoise(seed)
     {
         setData();
     }
@@ -301,7 +301,7 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves) :
-        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes)
+        CSGUnarySource(src), mFrequencies(frequencies), mAmplitudes(amplitudes), mNumOctaves(numOctaves)
     {
         setData();
     }

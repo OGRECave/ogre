@@ -1120,7 +1120,6 @@ namespace Ogre {
 										VertexData *vertexData )
 	{
 		VertexDeclaration *vDecl	= vertexData->vertexDeclaration;
-	    VertexBufferBinding *vBind	= vertexData->vertexBufferBinding;
 
 	    const VertexElement *uv0 = vDecl->findElementBySemantic( VES_TEXTURE_COORDINATES,
 																	finalTexCoordSet );
@@ -1141,7 +1140,6 @@ namespace Ogre {
 				VertexDeclaration::VertexElementList::const_iterator uv0Itor = std::find( veList.begin(),
 																					veList.end(), *uv0 );
 				unsigned short elem_idx		= std::distance( veList.begin(), uv0Itor );
-				size_t newSize				= uv0->getSize() + uv1->getSize();
 				VertexElementType newType	= VertexElement::multiplyTypeCount( baseType0,
 																				totalTypeCount );
 

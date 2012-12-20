@@ -333,7 +333,7 @@ protected:
         TransformKeyFrame *key ;
 		// create a random spline for light
 		track = anim->createNodeTrack(0, lightNode);
-		key = track->createNodeKeyFrame(0);
+		track->createNodeKeyFrame(0);
 		for(int ff=1;ff<=19;ff++) {
 			key = track->createNodeKeyFrame(ff);
 			Vector3 lpos (
@@ -343,7 +343,7 @@ protected:
                           );
 			key->setTranslate(lpos);
 		}
-		key = track->createNodeKeyFrame(20);
+		track->createNodeKeyFrame(20);
         
         // Create a new animation state to track this
         mAnimState = mSceneMgr->createAnimationState("WaterLight");

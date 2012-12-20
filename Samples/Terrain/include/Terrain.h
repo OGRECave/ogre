@@ -467,8 +467,7 @@ protected:
 				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
 				Real height = terrain->getHeightAtTerrainPosition(tx, ty);
 				Real val = (height - minHeight0) / fadeDist0;
-				val = Math::Clamp(val, (Real)0, (Real)1);
-				//*pBlend0++ = val;
+				Math::Clamp(val, (Real)0, (Real)1);
 
 				val = (height - minHeight1) / fadeDist1;
 				val = Math::Clamp(val, (Real)0, (Real)1);

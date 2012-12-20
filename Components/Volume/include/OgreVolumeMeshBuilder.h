@@ -127,11 +127,11 @@ namespace Volume {
 
     /** To hold vertices.
     */
-    typedef _OgreVolumeExport vector<Vertex>::type VecVertex;
+    typedef vector<Vertex>::type VecVertex;
 
     /** To hold indices.
     */
-    typedef _OgreVolumeExport vector<size_t>::type VecIndices;
+    typedef vector<size_t>::type VecIndices;
 
     /** Callback class when the user needs information about the triangles of
         chunks of a LOD level.

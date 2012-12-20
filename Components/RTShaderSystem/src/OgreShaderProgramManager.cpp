@@ -640,38 +640,43 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
 		}
 	}
 
-	// save the pixel program original input parameters
-	const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
+    if(pixelMain)
+    {
+        // save the pixel program original input parameters
+        const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
 
-	// set the pixel Input to be the same as the vertex prog output
-	pixelMain->deleteAllInputParameters();
+        // set the pixel Input to be the same as the vertex prog output
+        pixelMain->deleteAllInputParameters();
 
-	// Loop the vertex shader output parameters and make sure that
-	//   all of them exist in the pixel shader input.
-	// If the parameter type exist in the original output - use it
-	// If the parameter doesn't exist - use the parameter from the 
-	//   vertex shader input.
-	// The order will be based on the vertex shader parameters order 
-	// Write output parameters.
-	ShaderParameterConstIterator it;
-	const ShaderParameterList& outParams = vertexMain->getOutputParameters();
-	for (it=outParams.begin(); it != outParams.end(); ++it)
-	{
-		ParameterPtr curOutParemter = *it;
-		ParameterPtr paramToAdd = Function::getParameterBySemantic(
-			pixelOriginalInParams, 
-			curOutParemter->getSemantic(), 
-			curOutParemter->getIndex());
+        // Loop the vertex shader output parameters and make sure that
+        //   all of them exist in the pixel shader input.
+        // If the parameter type exist in the original output - use it
+        // If the parameter doesn't exist - use the parameter from the 
+        //   vertex shader input.
+        // The order will be based on the vertex shader parameters order 
+        // Write output parameters.
+        ShaderParameterConstIterator it;
+        if(vertexMain)
+        {
+            const ShaderParameterList& outParams = vertexMain->getOutputParameters();
+            for (it=outParams.begin(); it != outParams.end(); ++it)
+            {
+                ParameterPtr curOutParemter = *it;
+                ParameterPtr paramToAdd = Function::getParameterBySemantic(
+                    pixelOriginalInParams, 
+                    curOutParemter->getSemantic(), 
+                    curOutParemter->getIndex());
 
-		if (paramToAdd.isNull())
-		{
-			// param not found - we will add the one from the vertex shader
-			paramToAdd = curOutParemter; 
-		}
+                if (paramToAdd.isNull())
+                {
+                    // param not found - we will add the one from the vertex shader
+                    paramToAdd = curOutParemter; 
+                }
 
-		pixelMain->addInputParameter(paramToAdd);
-
-	}
+                pixelMain->addInputParameter(paramToAdd);
+            }
+        }
+    }
 }
 
 /** @} */

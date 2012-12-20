@@ -1965,30 +1965,30 @@ namespace Ogre
 				tmgr->remove((*i)->getHandle());
 			}
 			mBlendTextureList.clear();
-		}
 
-		if (!mTerrainNormalMap.isNull())
-		{
-			tmgr->remove(mTerrainNormalMap->getHandle());
-			mTerrainNormalMap.setNull();
-		}
+            if (!mTerrainNormalMap.isNull())
+            {
+                tmgr->remove(mTerrainNormalMap->getHandle());
+                mTerrainNormalMap.setNull();
+            }
 
-		if (!mColourMap.isNull())
-		{
-			tmgr->remove(mColourMap->getHandle());
-			mColourMap.setNull();
-		}
+            if (!mColourMap.isNull())
+            {
+                tmgr->remove(mColourMap->getHandle());
+                mColourMap.setNull();
+            }
 
-		if (!mLightmap.isNull())
-		{
-			tmgr->remove(mLightmap->getHandle());
-			mLightmap.setNull();
-		}
+            if (!mLightmap.isNull())
+            {
+                tmgr->remove(mLightmap->getHandle());
+                mLightmap.setNull();
+            }
 
-		if (!mCompositeMap.isNull())
-		{
-			tmgr->remove(mCompositeMap->getHandle());
-			mCompositeMap.setNull();
+            if (!mCompositeMap.isNull())
+            {
+                tmgr->remove(mCompositeMap->getHandle());
+                mCompositeMap.setNull();
+            }
 		}
 
 		if (!mMaterial.isNull())
