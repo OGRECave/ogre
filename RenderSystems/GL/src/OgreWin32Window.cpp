@@ -226,7 +226,7 @@ namespace Ogre {
 				windowAnchorPoint.y = top;
 
 
-				// Get the nearest monitor to this window.
+				// Get the default primary monitor to this window.
 				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTOPRIMARY);
 			}
 
