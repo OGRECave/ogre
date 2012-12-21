@@ -232,7 +232,7 @@ namespace Ogre {
         GpuProgramManager::Microcode cacheMicrocode = 
             GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 
-#define READ_NAMES(list, member) for(int i = 0 ; i < list.size() ; i++){ \
+#define READ_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
     uint16 length = 0;          \
     cacheMicrocode->read(&length, sizeof(uint16));  \
     list[i].member = ""; \
@@ -656,7 +656,7 @@ namespace Ogre {
 #define GET_SIZE_OF_NAMES(result, list, member)                     \
                 uint32 result = 0;                                  \
                 {                                                   \
-                    for(int i = 0 ; i < list.size() ; i++)          \
+                    for(unsigned i = 0 ; i < list.size() ; i++)          \
                     {                                               \
                         if (list[i].member != NULL)                 \
                             result += strlen(list[i].member);       \
@@ -698,7 +698,7 @@ namespace Ogre {
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(sizeOfData);
 
-#define STORE_NAMES(list, member) for(int i = 0 ; i < list.size() ; i++){ \
+#define STORE_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
     uint16 length = 0;                               \
     if(list[i].member != NULL)                       \
         length = strlen(list[i].member);      \

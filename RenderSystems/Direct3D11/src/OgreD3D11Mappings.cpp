@@ -186,30 +186,20 @@ namespace Ogre
 	return 0;
 	}*/
 	//---------------------------------------------------------------------
-	D3D11_BLEND D3D11Mappings::get(SceneBlendFactor sbf)
+	D3D11_BLEND D3D11Mappings::get(SceneBlendFactor sbf, bool forAlpha)
 	{
 		switch( sbf )
 		{
-		case SBF_ONE:
-			return D3D11_BLEND_ONE;
-		case SBF_ZERO:
-			return D3D11_BLEND_ZERO;
-		case SBF_DEST_COLOUR:
-			return D3D11_BLEND_DEST_COLOR;
-		case SBF_SOURCE_COLOUR:
-			return D3D11_BLEND_SRC_COLOR;
-		case SBF_ONE_MINUS_DEST_COLOUR:
-			return D3D11_BLEND_INV_DEST_COLOR;
-		case SBF_ONE_MINUS_SOURCE_COLOUR:
-			return D3D11_BLEND_INV_SRC_COLOR;
-		case SBF_DEST_ALPHA:
-			return D3D11_BLEND_DEST_ALPHA;
-		case SBF_SOURCE_ALPHA:
-			return D3D11_BLEND_SRC_ALPHA;
-		case SBF_ONE_MINUS_DEST_ALPHA:
-			return D3D11_BLEND_INV_DEST_ALPHA;
-		case SBF_ONE_MINUS_SOURCE_ALPHA:
-			return D3D11_BLEND_INV_SRC_ALPHA;
+		case SBF_ONE:						return D3D11_BLEND_ONE;
+		case SBF_ZERO:						return D3D11_BLEND_ZERO;
+		case SBF_DEST_COLOUR:				return forAlpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR;
+		case SBF_SOURCE_COLOUR:				return forAlpha ? D3D11_BLEND_SRC_ALPHA : D3D11_BLEND_SRC_COLOR;
+		case SBF_ONE_MINUS_DEST_COLOUR: 	return forAlpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR;
+		case SBF_ONE_MINUS_SOURCE_COLOUR:   return forAlpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_INV_SRC_COLOR;
+		case SBF_DEST_ALPHA:                return D3D11_BLEND_DEST_ALPHA;
+		case SBF_SOURCE_ALPHA:              return D3D11_BLEND_SRC_ALPHA;
+		case SBF_ONE_MINUS_DEST_ALPHA:      return D3D11_BLEND_INV_DEST_ALPHA;
+		case SBF_ONE_MINUS_SOURCE_ALPHA:    return D3D11_BLEND_INV_SRC_ALPHA;
 		}
 		return D3D11_BLEND_ZERO;
 	}

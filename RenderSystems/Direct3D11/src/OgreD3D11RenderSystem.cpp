@@ -1819,28 +1819,12 @@ bail:
 		else
 		{
 			mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-            mBlendDesc.RenderTarget[0].SrcBlend = mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor);
-            mBlendDesc.RenderTarget[0].DestBlend = mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor);
+            mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor, false);
+            mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor, false);
+            mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactor, true);
+            mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactor, true);
             mBlendDesc.RenderTarget[0].BlendOp = mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(op);
             
-            switch(mBlendDesc.RenderTarget[0].SrcBlendAlpha)
-            {
-                case D3D11_BLEND_DEST_COLOR: 
-                    mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;
-                    break;
-                case D3D11_BLEND_SRC_COLOR: 
-                    mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-                    break;
-                case D3D11_BLEND_INV_DEST_COLOR: 
-                    mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-                    break;
-                case D3D11_BLEND_INV_SRC_COLOR: 
-                    mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-                    break;
-                default:
-                    break;
-            }
-
 			// feature level 9 and below does not support alpha to coverage.
 			if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
 				mBlendDesc.AlphaToCoverageEnable = false;
@@ -1860,12 +1844,12 @@ bail:
 		else
 		{
 			mBlendDesc.RenderTarget[0].BlendEnable = TRUE;
-			mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor);
-			mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor);
+			mBlendDesc.RenderTarget[0].SrcBlend = D3D11Mappings::get(sourceFactor, false);
+			mBlendDesc.RenderTarget[0].DestBlend = D3D11Mappings::get(destFactor, false);
 			mBlendDesc.RenderTarget[0].BlendOp = D3D11Mappings::get(op) ;
+			mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactorAlpha, true);
+			mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactorAlpha, true);
 			mBlendDesc.RenderTarget[0].BlendOpAlpha = D3D11Mappings::get(alphaOp) ;
-			mBlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11Mappings::get(sourceFactorAlpha);
-			mBlendDesc.RenderTarget[0].DestBlendAlpha = D3D11Mappings::get(destFactorAlpha);
 			mBlendDesc.AlphaToCoverageEnable = false;
 
 			mBlendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
