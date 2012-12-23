@@ -136,6 +136,15 @@ namespace Ogre {
 
 		return HardwareUniformBufferSharedPtr(uni);
 	}	
+    //-----------------------------------------------------------------------
+	HardwareCounterBufferSharedPtr
+    D3D11HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	{
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "*** not implemented ***",
+                    "D3D11HardwareBufferManagerBase::createCounterBuffer");
+	}
 	//-----------------------------------------------------------------------
 	VertexDeclaration* D3D11HardwareBufferManagerBase::createVertexDeclarationImpl(void)
 	{
