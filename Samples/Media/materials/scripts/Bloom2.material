@@ -347,7 +347,7 @@ material Ogre/Compositor/BrightPass2
 			{
 			}
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 			

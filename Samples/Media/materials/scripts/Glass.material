@@ -41,7 +41,7 @@ material Ogre/Compositor/GlassPass
 		{
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 

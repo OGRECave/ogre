@@ -41,7 +41,7 @@ material Ogre/Compositor/Radial_Blur
 	            param_named sampleDist float 1.0
 	            param_named sampleStrength float 2.2
 			}
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 			
