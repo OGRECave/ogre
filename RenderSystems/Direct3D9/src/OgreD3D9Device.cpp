@@ -320,7 +320,7 @@ namespace Ogre
 			if (it->first->getWindowHandle() == msSharedFocusWindow)
 				setSharedWindowHandle(NULL);
 
-			OGRE_DELETE(it->second);
+			OGRE_DELETE_T(it->second, RenderWindowResources, MEMCATEGORY_RENDERSYS);
 			++it;
 		}
 		mMapRenderWindowToResources.clear();
