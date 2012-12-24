@@ -4,7 +4,7 @@
 // Program Name: SL_Lighting
 // Program Desc: Per pixel lighting functions.
 // Program Type: Vertex/Pixel shader
-// Language: CG
+// Language: HLSL
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -165,14 +165,14 @@ void SL_Light_Segment_Debug(
 				    inout float3 vColorOut)
 {
 	float widthOffset = invWidth * 0.5;		
-	float heightOffset = invHeight * 0.5;	
+	float heightOffset = invHeight * 0.5;		
 	
 	float2 indexes = (vViewPos.xz - lightBounds.xy) * lightBounds.zw;
 	indexes = clamp(indexes,0,8);
 	int index = (int)indexes.x + (int)(indexes.y) * 9;
 	float4 indexBounds = tex2Dlod(dataTexture, float4(widthOffset,heightOffset,0,0));
-
-	float2 debugColors = vColorOut.xy * 0.5 + ((mod(floor(indexes.xy),2) == 0) ? 0.1 : 0.2);
+	
+	float2 debugColors = vColorOut.xy * 0.5 + ((fmod(floor(indexes.xy),2) == 0) ? 0.1 : 0.2);
 	vColorOut.xy =  debugColors;
 	int toIndex = min(lightIndexLimit.y, indexBounds.x);
 	vColorOut.z = (toIndex - lightIndexLimit.x) / 32;	
