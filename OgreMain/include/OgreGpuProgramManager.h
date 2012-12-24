@@ -213,6 +213,11 @@ namespace Ogre {
         */
 		virtual void addMicrocodeToCache( const String & name, const Microcode & microcode );
 
+		/** Removes a microcode for a program from the microcode cache.
+        @param name The name of the program.
+        */
+		virtual void removeMicrocodeFromCache( const String & name );
+
         /** Saves the microcode cache to disk.
         @param stream The destination stream
         */

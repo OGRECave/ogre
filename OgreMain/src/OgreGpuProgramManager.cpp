@@ -266,12 +266,24 @@ namespace Ogre {
 		}		
 	}
 	//---------------------------------------------------------------------
+	void GpuProgramManager::removeMicrocodeFromCache( const String & name )
+	{
+		String nameWithRenderSystem = addRenderSystemToName(name);
+		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+
+		if (foundIter != mMicrocodeCache.end())
+		{
+			mMicrocodeCache.erase( foundIter );
+			mCacheDirty = true;
+		}
+	}
+	//---------------------------------------------------------------------
 	void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
 	{
 		if (!mCacheDirty)
 			return; 
 
-		if (!stream->isWriteable() )
+		if (!stream->isWriteable())
 		{
 			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
 				"Unable to write to stream " + stream->getName(),
