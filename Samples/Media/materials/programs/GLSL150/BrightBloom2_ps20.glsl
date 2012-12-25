@@ -13,7 +13,7 @@
 
 uniform sampler2D RT;
 out vec4 fragColour;
-in vec2 uv;
+in vec2 oUv0;
 
 void main()
 {
@@ -21,7 +21,7 @@ void main()
     vec4 bright4;
     float bright;
     
-    vec2 texCoord = uv.xy;
+    vec2 texCoord = oUv0.xy;
 
     tex = texture( RT, texCoord);
     tex -= 1.00000;

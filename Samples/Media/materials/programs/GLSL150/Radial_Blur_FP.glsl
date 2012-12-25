@@ -10,7 +10,7 @@ uniform sampler2D tex;
 uniform float sampleDist;
 uniform float sampleStrength;
 
-in vec2 uv;
+in vec2 oUv0;
 out vec4 fragColour;
 
 void main()
@@ -29,7 +29,7 @@ void main()
 	samples[9] = 0.08;
 	
    //Vector from pixel to the center of the screen
-   vec2 dir = 0.5 - uv;
+   vec2 dir = 0.5 - oUv0;
 
    //Distance from pixel to the center (distant pixels have stronger effect)
    //float dist = distance( vec2( 0.5, 0.5 ), texCoord );
@@ -40,12 +40,12 @@ void main()
    dir = normalize( dir );
 
    //Save the color to be used later
-   vec4 color = texture( tex, uv );
+   vec4 color = texture( tex, oUv0 );
    //Average the pixels going along the vector
    vec4 sum = color;
    for (int i = 0; i < 10; i++)
    {
-      vec4 res=texture( tex, uv + dir * samples[i] * sampleDist );
+      vec4 res=texture( tex, oUv0 + dir * samples[i] * sampleDist );
       sum += res;
    }
    sum /= 11.0;
