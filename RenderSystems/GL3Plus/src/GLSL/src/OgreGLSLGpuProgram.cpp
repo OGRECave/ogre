@@ -234,14 +234,14 @@ namespace Ogre {
                 // Activate the program pipeline object
                 GLSLProgramPipeline* programPipeline = GLSLProgramPipelineManager::getSingleton().getActiveProgramPipeline();
                 // Pass on parameters from params to program object uniforms
-                programPipeline->updateUniforms(params, mask, mType);
+                programPipeline->updateUniformBlocks(params, mask, mType);
             }
             else
             {
                 // Activate the link program object
                 GLSLLinkProgram* linkProgram = GLSLLinkProgramManager::getSingleton().getActiveLinkProgram();
                 // Pass on parameters from params to program object uniforms
-                linkProgram->updateUniforms(params, mask, mType);
+                linkProgram->updateUniformBlocks(params, mask, mType);
             }
 		}
 		catch (Exception& e) {}

@@ -486,33 +486,21 @@ namespace Ogre {
 
         GLint blockCount = 0;
 
-        // Get the number of active uniform blocks
-//        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-//        {
-//            glGetProgramPipelineiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &uniformCount);
-//            GL_CHECK_ERROR
-//        }
-//        else
-//        {
-            glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount);
-            GL_CHECK_ERROR
-//        }
+        glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount);
+        GL_CHECK_ERROR
 
         for (int index = 0; index < blockCount; index++)
         {
             glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName);
             GL_CHECK_ERROR
-            LogManager::getSingleton().logMessage("Found Uniform block with name: " + String(uniformName));
 
             GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
-            if(!blockSharedParams.isNull())
-                LogManager::getSingleton().logMessage("Also have a shared params set");
 
-            // TODO: Create a new GL3PlusHardwareUniformBuffer for this block and add to the list
-            // May need to save some info like GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS
             GLint blockSize, blockBinding;
             glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+            GL_CHECK_ERROR
             glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
+            GL_CHECK_ERROR
             HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
 
             GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
@@ -552,7 +540,6 @@ namespace Ogre {
 
 			if (!inLargerString)
 			{
-                bool isBlock = false;
                 String::size_type endPos;
                 GpuSharedParametersPtr blockSharedParams;
 
@@ -564,10 +551,6 @@ namespace Ogre {
                 StringToEnumMap::iterator typei = mTypeEnumMap.find(parts.front());
                 if (typei == mTypeEnumMap.end())
                 {
-                    // Found a block definition
-//                    printf("Found a block!\n");
-                    isBlock = true;
-
                     // Gobble up the external name
                     String externalName = parts.front();
 

@@ -54,7 +54,7 @@ namespace Ogre {
                      GL3PlusHardwareBufferManager::getGLUsage(usage));
         GL_CHECK_ERROR
 
-        std::cerr << "creating uniform buffer = " << mBufferId << std::endl;
+//        std::cerr << "creating uniform buffer = " << mBufferId << std::endl;
     }
     
     GL3PlusHardwareUniformBuffer::~GL3PlusHardwareUniformBuffer()
@@ -150,7 +150,7 @@ namespace Ogre {
     
     void GL3PlusHardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
     {
-        // get data from the real buffer
+        // Get data from the real buffer
         glBindBuffer(GL_UNIFORM_BUFFER, mBufferId);
         GL_CHECK_ERROR
         
