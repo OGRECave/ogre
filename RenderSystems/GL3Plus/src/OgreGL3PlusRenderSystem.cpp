@@ -60,7 +60,7 @@ THE SOFTWARE.
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-static void GLDebugCallback(GLenum source,
+static void APIENTRY GLDebugCallback(GLenum source,
                             GLenum type,
                             GLuint id,
                             GLenum severity,
