@@ -1961,8 +1961,8 @@ bail:
 		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
 		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp);
 
-		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(stencilFailOp);
-		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(stencilFailOp);
+		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp);
+		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp);
 
 		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp);
 		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp);
