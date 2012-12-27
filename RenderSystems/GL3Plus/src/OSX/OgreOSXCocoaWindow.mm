@@ -321,13 +321,13 @@ namespace Ogre {
 
     unsigned int CocoaWindow::getWidth() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow frame]];
+        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
         return (unsigned int) winFrame.size.width;
     }
 
     unsigned int CocoaWindow::getHeight() const
     {
-        NSRect winFrame = [mWindow convertRectToBacking:[mWindow frame]];
+        NSRect winFrame = [mWindow convertRectToBacking:[mWindow contentRectForFrameRect:[mWindow frame]]];
         return (unsigned int) winFrame.size.height;
     }
 
