@@ -90,6 +90,8 @@ set (HEADER_FILES
   include/OgreHardwarePixelBuffer.h
   include/OgreHardwareUniformBuffer.h
   include/OgreHardwareVertexBuffer.h
+  include/OgreHeaderPrefix.h
+  include/OgreHeaderSuffix.h
   include/OgreHighLevelGpuProgram.h
   include/OgreHighLevelGpuProgramManager.h
   include/OgreImage.h
