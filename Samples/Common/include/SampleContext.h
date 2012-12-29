@@ -741,8 +741,10 @@ namespace OgreBites
 				}
 			}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
             arch = Ogre::macBundlePath() + "/Contents/Resources/";
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            arch = Ogre::macBundlePath() + "/";
 #else
             arch = Ogre::StringUtil::replaceAll(arch, "Media/../../Tests/Media", "");
 #endif
