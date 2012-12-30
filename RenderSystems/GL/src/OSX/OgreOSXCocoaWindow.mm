@@ -521,13 +521,14 @@ namespace Ogre {
     {
         if(!mIsFullScreen)
         {
-            NSRect frame = [mView frame];
+            NSRect winFrame = [mWindow frame];
+            NSRect viewFrame = [mView frame];
             NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
-            mWidth = (unsigned int)frame.size.width;
-            mHeight = (unsigned int)frame.size.height;
-            mLeft = (int)frame.origin.x;
-            mTop = screenFrame.size.height - frame.size.height;
-		
+            mWidth = (unsigned int)viewFrame.size.width;
+            mHeight = (unsigned int)viewFrame.size.height;
+            mLeft = (int)winFrame.origin.x;
+            mTop = screenFrame.size.height - winFrame.size.height;
+
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
 
