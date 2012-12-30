@@ -103,7 +103,7 @@ void TestContext::setup()
 
     // get the path and list of test plugins from the config file
     Ogre::ConfigFile testConfig;
-    testConfig.load(mFSLayer->getConfigFilePath("tests.cfg"));
+    testConfig.load(mFSLayer->getConfigFilePath("tests" OGRE_LIB_SUFFIX ".cfg"));
     mPluginDirectory = testConfig.getSetting("TestFolder");
 
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
@@ -340,7 +340,7 @@ void TestContext::createRoot()
 #else
     Ogre::String pluginsPath = Ogre::StringUtil::BLANK;
     #ifndef OGRE_STATIC_LIB
-        pluginsPath = mFSLayer->getConfigFilePath("plugins.cfg");
+        pluginsPath = mFSLayer->getConfigFilePath("plugins" OGRE_LIB_SUFFIX ".cfg");
     #endif
     // we use separate config and log files for the tests
     mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogretests.cfg"), 

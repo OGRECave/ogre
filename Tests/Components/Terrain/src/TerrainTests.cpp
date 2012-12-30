@@ -36,10 +36,11 @@ CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 void TerrainTests::setUp()
 {
 	mRoot = OGRE_NEW Root();
+	mTerrainOpts = OGRE_NEW TerrainGlobalOptions();
 
 	// Load resource paths from config file
 	ConfigFile cf;
-	cf.load("resources.cfg");
+	cf.load("resources" OGRE_LIB_SUFFIX ".cfg");
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();
@@ -66,6 +67,7 @@ void TerrainTests::setUp()
 
 void TerrainTests::tearDown()
 {
+	OGRE_DELETE mTerrainOpts;
 	OGRE_DELETE mRoot;
 }
 
