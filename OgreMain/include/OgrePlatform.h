@@ -114,8 +114,6 @@ namespace Ogre {
 #			endif
 #			if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 #				define OGRE_WINRT_TARGET_TYPE PHONE
-				// For the phone we only support running from the cache file.
-#		        define ENABLE_SHADERS_CACHE_LOAD 1
 #			endif
 #		else
 #			define OGRE_PLATFORM OGRE_PLATFORM_WIN32

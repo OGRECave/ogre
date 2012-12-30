@@ -36,6 +36,14 @@
 #include "macUtils.h"
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+// For the phone we only support running from the cache file.
+#    define ENABLE_SHADERS_CACHE_LOAD 1
+#endif
+
+#define ENABLE_SHADERS_CACHE_SAVE 1
+#define ENABLE_SHADERS_CACHE_LOAD 1
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include <android_native_app_glue.h>
 #include "Android/OgreAPKFileSystemArchive.h"
@@ -1108,9 +1116,6 @@ protected:
 			mTrayMgr->showBackdrop("SdkTrays/Bands");
 			mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
-#if defined(ENABLE_SHADERS_CACHE_SAVE)
-			Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
-#endif
 #if	defined(ENABLE_SHADERS_CACHE_LOAD)
 			// Load for a package version of the shaders.
 			Ogre::String path = getShaderCacheFileName();
@@ -1124,10 +1129,9 @@ protected:
 			}
             if (inFile)
             {
-				OutputDebugStringA("Loading shader cache from ");
-				OutputDebugStringA(path.c_str());
-				OutputDebugStringA("\n");
-            	Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream(path.c_str(), inFile, Ogre::DataStream::READ));                
+                Ogre::LogManager::getSingleton().logMessage("Loading shader cache from ");
+				Ogre::LogManager::getSingleton().logMessage(path.c_str());
+            	Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream(path.c_str(), inFile, Ogre::DataStream::READ));
 				Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
             }
 #endif
@@ -1700,9 +1704,8 @@ protected:
 				FILE * outFile = fopen(path.c_str(), "wb");
 				if (outFile)
 				{
-					OutputDebugStringA("Writing shader cache to ");
-					OutputDebugStringA(path.c_str());
-					OutputDebugStringA("\n");
+					Ogre::LogManager::getSingleton().logMessage("Writing shader cache to ");
+					Ogre::LogManager::getSingleton().logMessage(path.c_str());
             		Ogre::DataStreamPtr ostream(new Ogre::FileHandleDataStream(path.c_str(), outFile, Ogre::DataStream::WRITE));
             		Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
             		ostream->close();
