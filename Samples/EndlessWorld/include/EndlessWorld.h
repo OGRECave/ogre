@@ -139,7 +139,7 @@ public:
 					  );
 				l->setPosition(x, y);
 				l->setDimensions(0.1, 0.1);  // center text in label and its position
-				l->setParameter("font_name", "StarWars");
+				l->setParameter("font_name", "SdkTrays/Value");
 				l->setParameter("char_height", "0.02f");
 				l->setColour(ColourValue(1.0,0.0,0.0));
 
