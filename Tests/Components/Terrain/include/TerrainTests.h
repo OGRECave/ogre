@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "OgreRoot.h"
+#include "OgreTerrain.h"
 
 using namespace Ogre; 
 
@@ -41,6 +42,7 @@ class TerrainTests : public CppUnit::TestFixture
 
 	Root* mRoot;
 	SceneManager* mSceneMgr;
+	TerrainGlobalOptions* mTerrainOpts;
 
 public:
 	void setUp();
