@@ -49,6 +49,7 @@ if (OGRE_BUILD_TESTS)
 	if (OGRE_CONFIG_ENABLE_ZIP)
 	  set(HEADER_FILES ${HEADER_FILES} OgreMain/include/ZipArchiveTests.h)
 	  set(SOURCE_FILES ${SOURCE_FILES} OgreMain/src/ZipArchiveTests.cpp)
+	  file(COPY OgreMain/misc DESTINATION OgreMain/)
 	endif ()
 
 	if (OGRE_BUILD_COMPONENT_PAGING)
