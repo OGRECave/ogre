@@ -258,7 +258,7 @@ namespace Ogre
                 glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding());
                 GL_CHECK_ERROR
 
-                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), paramsPtr->getFloatConstantList().data());
+                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
             }
         }
 	}
