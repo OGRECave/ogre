@@ -33,9 +33,10 @@ include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
+ogre_add_component_include_dir(Overlay)
 
 ogre_add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
+target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay)
 ogre_config_common(TestContext)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

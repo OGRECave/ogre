@@ -26,7 +26,7 @@ ogre_add_component_include_dir(RTShaderSystem)
 
 add_library(PlayPen ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
 
-target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay)
 ogre_config_sample_lib(PlayPen)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
