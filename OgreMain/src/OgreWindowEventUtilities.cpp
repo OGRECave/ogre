@@ -40,7 +40,7 @@ void GLXProc( Ogre::RenderWindow *win, const XEvent &event );
 //using namespace Ogre;
 
 Ogre::WindowEventUtilities::WindowEventListeners Ogre::WindowEventUtilities::_msListeners;
-Ogre::WindowEventUtilities::Windows Ogre::WindowEventUtilities::_msWindows;
+Ogre::RenderWindowList Ogre::WindowEventUtilities::_msWindows;
 
 namespace Ogre {
 //--------------------------------------------------------------------------------//
@@ -131,7 +131,7 @@ void WindowEventUtilities::_addRenderWindow(RenderWindow* window)
 //--------------------------------------------------------------------------------//
 void WindowEventUtilities::_removeRenderWindow(RenderWindow* window)
 {
-	Windows::iterator i = std::find(_msWindows.begin(), _msWindows.end(), window);
+	RenderWindowList::iterator i = std::find(_msWindows.begin(), _msWindows.end(), window);
 	if( i != _msWindows.end() )
 		_msWindows.erase( i );
 }
@@ -370,7 +370,7 @@ namespace Ogre {
 OSStatus WindowEventUtilities::_CarbonWindowHandler(EventHandlerCallRef nextHandler, EventRef event, void* wnd)
 {
     OSStatus status = noErr;
-    
+
     // Only events from our window should make it here
     // This ensures that our user data is our WindowRef
     RenderWindow* curWindow = (RenderWindow*)wnd;
