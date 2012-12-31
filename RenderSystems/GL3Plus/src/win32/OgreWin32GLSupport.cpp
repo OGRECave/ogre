@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -578,7 +578,9 @@ namespace Ogre {
                 // cheating here.  wglChoosePixelFormatARB procc address needed later on
                 // when a valid GL context does not exist and glew is not initialized yet.
 				PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
+
 				PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+
 
                 if (wglChoosePixelFormat(hdc, iattr, 0, 256, formats, &count))
                 {
@@ -660,6 +662,7 @@ namespace Ogre {
 			// since glew hasn't been initialized yet, we have to cheat and use the previously obtained address
 //			if (!WGLEW_GET_FUN(__wglewChoosePixelFormatARB)(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
 			PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormat = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+
 
 			if (!wglChoosePixelFormat(hdc, &(attribList[0]), NULL, 1, &format, &nformats) || nformats <= 0)
 				return false;
