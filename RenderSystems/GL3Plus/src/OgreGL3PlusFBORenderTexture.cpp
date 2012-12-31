@@ -436,7 +436,7 @@ namespace Ogre {
         {
             RBFormat key(format, width, height, fsaa);
             RenderBufferMap::iterator it = mRenderBufferMap.find(key);
-            if(it != mRenderBufferMap.end())
+            if(it != mRenderBufferMap.end() && (it->second.refcount == 0))
             {
                 retval.buffer = it->second.buffer;
                 retval.zoffset = 0;
