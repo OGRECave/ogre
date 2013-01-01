@@ -46,7 +46,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void GL3PlusPlugin::install()
 	{
-		mRenderSystem = new GL3PlusRenderSystem();
+		mRenderSystem = OGRE_NEW GL3PlusRenderSystem();
 
 		Root::getSingleton().addRenderSystem(mRenderSystem);
 	}
@@ -63,7 +63,7 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void GL3PlusPlugin::uninstall()
 	{
-		delete mRenderSystem;
+		OGRE_DELETE mRenderSystem;
 		mRenderSystem = 0;
 
 	}

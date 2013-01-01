@@ -369,7 +369,7 @@ namespace Ogre {
 	RenderWindow* Win32GLSupport::newWindow(const String &name, unsigned int width, 
 		unsigned int height, bool fullScreen, const NameValuePairList *miscParams)
 	{		
-		Win32Window* window = new Win32Window(*this);
+		Win32Window* window = OGRE_NEW Win32Window(*this);
 		NameValuePairList newParams;
 	
 		if (miscParams != NULL)

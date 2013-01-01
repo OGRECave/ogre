@@ -153,6 +153,7 @@ namespace Ogre {
         mCurrentVertexProgram = 0;
 		mCurrentGeometryProgram = 0;
         mCurrentFragmentProgram = 0;
+		mCurrentHullProgram = 0;
         mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
     }
@@ -441,7 +442,6 @@ namespace Ogre {
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
 		{
 			rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
-			Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
 		}
 
         if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
@@ -500,6 +500,9 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
         mRTTManager = new GL3PlusFBOManager();
         caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+
+		// Enable microcache
+		mGpuProgramManager->setSaveMicrocodesToCache(caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER));
 
 		Log* defaultLog = LogManager::getSingleton().getDefaultLog();
 		if (defaultLog)
