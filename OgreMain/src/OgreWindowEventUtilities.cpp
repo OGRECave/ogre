@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreStableHeaders.h"
+#include "OgreCommon.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreRenderWindow.h"
 #include "OgreLogManager.h"
@@ -56,8 +57,8 @@ void WindowEventUtilities::messagePump()
 	}
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 	//GLX Message Pump
-	Windows::iterator win = _msWindows.begin();
-	Windows::iterator end = _msWindows.end();
+	RenderWindowList::iterator win = _msWindows.begin();
+	RenderWindowList::iterator end = _msWindows.end();
 
 	Display* xDisplay = 0; // same for all windows
 	
