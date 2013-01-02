@@ -26,11 +26,56 @@ THE SOFTWARE.
 */
 #include "OgreVolumeSource.h"
 
+#include "OgreRoot.h"
+#include "OgreDeflate.h"
+#include "OgreStreamSerialiser.h"
+#include "OgreBitwise.h"
+
 namespace Ogre {
 namespace Volume {
+    
+    const uint32 Source::VOLUME_CHUNK_ID = StreamSerialiser::makeIdentifier("VOLU");
+    const uint16 Source::VOLUME_CHUNK_VERSION = 1;
 
     Source::~Source(void)
     {
+    }
+
+    void Source::serialize(const Vector3 &from, const Vector3 &to, Real voxelWidth, const String &file)
+    {
+     
+        
+        // Compress
+        DataStreamPtr stream = Root::getSingleton().createFileStream(file);
+        DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
+        StreamSerialiser ser(compressStream);
+        ser.writeChunkBegin(VOLUME_CHUNK_ID, VOLUME_CHUNK_VERSION);
+
+        // Write Metadata
+        ser.write(&from);
+        ser.write(&to);
+        ser.write(&voxelWidth);
+
+        // Go over the volume and write the density data.
+        Vector3 pos;
+        Real max = (from - to).length() / (Real)8.0;
+        uint16 val;
+        Real realVal;
+        for (pos.z = from.z; pos.z <= to.z; pos.z += voxelWidth)
+        {
+            for (pos.x = from.x; pos.x <= to.x; pos.x += voxelWidth)
+            {
+                for (pos.y = from.y; pos.y <= to.y; pos.y += voxelWidth)
+                {
+                    realVal = Math::Clamp<Real>(getValue(pos), -max, max);
+                    val = Bitwise::floatToHalf(realVal);
+                    ser.write(&val);
+                }
+            }
+        }
+
+        ser.writeChunkEnd(VOLUME_CHUNK_ID);
+        
     }
 
 }

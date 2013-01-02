@@ -40,6 +40,9 @@ namespace Volume {
     class _OgreVolumeExport Source
     {
     public:
+
+        static const uint32 VOLUME_CHUNK_ID;
+        static const uint16 VOLUME_CHUNK_VERSION;
         
         /** Destructor.
         */
@@ -60,6 +63,8 @@ namespace Volume {
             The density.
         */
         virtual Real getValue(const Vector3 &position) const = 0;
+
+        void serialize(const Vector3 &from, const Vector3 &to, Real voxelWidth, const String &file);
 
     };
 
