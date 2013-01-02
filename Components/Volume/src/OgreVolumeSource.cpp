@@ -41,7 +41,7 @@ namespace Volume {
     {
     }
 
-    void Source::serialize(const Vector3 &from, const Vector3 &to, Real voxelWidth, const String &file)
+    void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, const String &file)
     {
      
         

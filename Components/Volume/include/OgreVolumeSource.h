@@ -64,7 +64,7 @@ namespace Volume {
         */
         virtual Real getValue(const Vector3 &position) const = 0;
 
-        void serialize(const Vector3 &from, const Vector3 &to, Real voxelWidth, const String &file);
+        void serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, const String &file);
 
     };
 
