@@ -362,6 +362,7 @@ namespace Ogre {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, message,
             "D3D11HLSLProgram::compileMicrocode");
 #else
+#pragma comment(lib, "d3dcompiler.lib")
 
         // include handler
         HLSLIncludeHandler includeHandler(this);
