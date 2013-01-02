@@ -35,8 +35,40 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
+    float TextureSource::getVolumeGridValue(int x, int y, int z) const
+    {
+        if (x >= mWidth)
+        {
+            x = mWidth - 1;
+        }
+        else if (x < 0)
+        {
+            x = 0;
+        }
+
+        if (y >= mHeight)
+        {
+            y = mHeight - 1;
+        } else if (y < 0)
+        {
+            y = 0;
+        }
+
+        if (z >= mDepth)
+        {
+            z = mDepth - 1;
+        } else if (z < 0)
+        {
+            z = 0;
+        }
+
+        return mData[(mDepth - z - 1) * mWidthTimesHeight + y * mWidth + x];
+    }
+    
+    //-----------------------------------------------------------------------
+    
     TextureSource::TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue, const bool trilinearGradient, const bool sobelGradient) :
-        mTrilinearValue(trilinearValue), mTrilinearGradient(trilinearGradient), mSobelGradient(sobelGradient)
+        GridSource(trilinearValue, trilinearGradient, sobelGradient)
     {
     
         Timer t;
@@ -86,141 +118,5 @@ namespace Volume {
         LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }
     
-    //-----------------------------------------------------------------------
-
-    TextureSource::~TextureSource(void)
-    {
-        OGRE_FREE(mData, MEMCATEGORY_GENERAL);
-    }
-    
-    //-----------------------------------------------------------------------
-
-    Vector4 TextureSource::getValueAndGradient(const Vector3 &position) const
-    {
-        Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
-        Vector3 normal;
-        if (mTrilinearGradient)
-        {
-            size_t x0 = (size_t)scaledPosition.x;
-            size_t x1 = (size_t)ceil(scaledPosition.x);
-            size_t y0 = (size_t)scaledPosition.y;
-            size_t y1 = (size_t)ceil(scaledPosition.y);
-            size_t z0 = (size_t)scaledPosition.z;
-            size_t z1 = (size_t)ceil(scaledPosition.z);
-        
-            Real dX = scaledPosition.x - (Real)x0;
-            Real dY = scaledPosition.y - (Real)y0;
-            Real dZ = scaledPosition.z - (Real)z0;
-        
-            Vector3 f000 = getGradient(x0, y0, z0);
-            Vector3 f100 = getGradient(x1, y0, z0);
-            Vector3 f010 = getGradient(x0, y1, z0);
-            Vector3 f001 = getGradient(x0, y0, z1);
-            Vector3 f101 = getGradient(x1, y0, z1);
-            Vector3 f011 = getGradient(x0, y1, z1);
-            Vector3 f110 = getGradient(x1, y1, z0);
-            Vector3 f111 = getGradient(x1, y1, z1);
-
-            Real oneMinX = (Real)1.0 - dX;
-            Real oneMinY = (Real)1.0 - dY;
-            Real oneMinZ = (Real)1.0 - dZ;
-            Real oneMinXoneMinY = oneMinX * oneMinY;
-            Real dXOneMinY = dX * oneMinY;
-
-            normal = oneMinZ * (f000 * oneMinXoneMinY
-                + f100 * dXOneMinY
-                + f010 * oneMinX * dY)
-                + dZ * (f001 * oneMinXoneMinY
-                + f101 * dXOneMinY
-                + f011 * oneMinX * dY)
-                + dX * dY * (f110 * oneMinZ
-                + f111 * dZ);
-
-            normal *= (Real)-1.0;
-        }
-        else
-        {
-            normal = getGradient((size_t)(scaledPosition.x + (Real)0.5), (size_t)(scaledPosition.y + (Real)0.5), (size_t)(scaledPosition.z + (Real)0.5));
-            normal *= (Real)-1.0;
-        }
-        return Vector4(normal.x, normal.y, normal.z, getValue(position));
-    }
-    
-    //-----------------------------------------------------------------------
-
-    Real TextureSource::getValue(const Vector3 &position) const
-    {
-        Vector3 scaledPosition(position.x * mPosXScale, position.y * mPosYScale, position.z * mPosZScale);
-        Real value;
-        if (mTrilinearValue)
-        {
-            size_t x0 = (size_t)scaledPosition.x;
-            size_t x1 = (size_t)ceil(scaledPosition.x);
-            size_t y0 = (size_t)scaledPosition.y;
-            size_t y1 = (size_t)ceil(scaledPosition.y);
-            size_t z0 = (size_t)scaledPosition.z;
-            size_t z1 = (size_t)ceil(scaledPosition.z);
-
-            Real dX = scaledPosition.x - (Real)x0;
-            Real dY = scaledPosition.y - (Real)y0;
-            Real dZ = scaledPosition.z - (Real)z0;
-
-            Real f000 = getVolumeArrayValue(x0, y0, z0);
-            Real f100 = getVolumeArrayValue(x1, y0, z0);
-            Real f010 = getVolumeArrayValue(x0, y1, z0);
-            Real f001 = getVolumeArrayValue(x0, y0, z1);
-            Real f101 = getVolumeArrayValue(x1, y0, z1);
-            Real f011 = getVolumeArrayValue(x0, y1, z1);
-            Real f110 = getVolumeArrayValue(x1, y1, z0);
-            Real f111 = getVolumeArrayValue(x1, y1, z1);
-
-            Real oneMinX = (Real)1.0 - dX;
-            Real oneMinY = (Real)1.0 - dY;
-            Real oneMinZ = (Real)1.0 - dZ;
-            Real oneMinXoneMinY = oneMinX * oneMinY;
-            Real dXOneMinY = dX * oneMinY;
-
-            value = oneMinZ * (f000 * oneMinXoneMinY
-                + f100 * dXOneMinY
-                + f010 * oneMinX * dY)
-                + dZ * (f001 * oneMinXoneMinY
-                + f101 * dXOneMinY
-                + f011 * oneMinX * dY)
-                + dX * dY * (f110 * oneMinZ
-                + f111 * dZ);
-        
-        }
-        else
-        {
-            // Nearest neighbour else
-            size_t x = (size_t)(scaledPosition.x + (Real)0.5);
-            size_t y = (size_t)(scaledPosition.y + (Real)0.5);
-            size_t z = (size_t)(scaledPosition.z + (Real)0.5);
-            value = (Real)getVolumeArrayValue(x, y, z);
-        }
-        return value;
-    }
-    
-    //-----------------------------------------------------------------------
-
-    size_t TextureSource::getWidth(void) const
-    {
-        return mWidth;
-    }
-    
-    //-----------------------------------------------------------------------
-
-    size_t TextureSource::getHeight(void) const
-    {
-        return mHeight;
-    }
-    
-    //-----------------------------------------------------------------------
-
-    size_t TextureSource::getDepth(void) const
-    {
-        return mDepth;
-    }
-
 }
 }

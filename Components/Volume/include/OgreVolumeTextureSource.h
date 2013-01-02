@@ -28,123 +28,24 @@ THE SOFTWARE.
 #ifndef __Ogre_Volume_TextureSource_H__
 #define __Ogre_Volume_TextureSource_H__
 
-#include "OgreVector4.h"
 
-#include "OgreVolumeSource.h"
-#include "OgreVolumePrerequisites.h"
+#include "OgreVolumeGridSource.h"
 
 namespace Ogre {
 namespace Volume {
 
     /** A volume source from a 3D texture.
     */
-    class _OgreVolumeExport TextureSource : public Source
+    class _OgreVolumeExport TextureSource : public GridSource
     {
     protected:
-
+        
         /// The raw volume data.
         float *mData;
-
-        /// The texture width.
-        int mWidth;
-
-        /// The texture height.
-        int mHeight;
-
-        /// To have a little bit faster data access.
-        int mWidthTimesHeight;
-
-        /// The scale of the position based on the world width.
-        Real mPosXScale;
         
-        /// The scale of the position based on the world height.
-        Real mPosYScale;
-        
-        /// The scale of the position based on the world depth.
-        Real mPosZScale;
-
-        /// The texture depth.
-        int mDepth;
-
-        // Whether to use trilinear filtering or not for the value.
-        const bool mTrilinearValue;
-        
-        // Whether to use trilinear filtering or not for the gradient.
-        const bool mTrilinearGradient;
-
-        /// Whether to blur the gradient a bit Sobel like.
-        const bool mSobelGradient;
-
-        /** Gets the volume value of a position.
-        @param x
-            The x position.
-        @param y
-            The y position.
-        @param z
-            The z position.
-        @return
-            The density.
+        /** Overridden from GridSource.
         */
-        inline float getVolumeArrayValue(int x, int y, int z) const
-        {
-            if (x >= mWidth)
-            {
-                x = mWidth - 1;
-            }
-            else if (x < 0)
-            {
-                x = 0;
-            }
-
-            if (y >= mHeight)
-            {
-                y = mHeight - 1;
-            } else if (y < 0)
-            {
-                y = 0;
-            }
-
-            if (z >= mDepth)
-            {
-                z = mDepth - 1;
-            } else if (z < 0)
-            {
-                z = 0;
-            }
-
-            return mData[(mDepth - z - 1) * mWidthTimesHeight + y * mWidth + x];
-        }
-
-        /** Gets a gradient of a point with optional sobel blurring.
-        @param x
-            The x coordinate of the point.
-        @param y
-            The x coordinate of the point.
-        @param z
-            The x coordinate of the point.
-        */
-        inline const Vector3 getGradient(size_t x, size_t y, size_t z) const
-        {
-            if (mSobelGradient)
-            {
-                // Calculate gradient like in the original MC paper but mix a bit of Sobel in
-                return Vector3(
-                (getVolumeArrayValue(x + 1, y - 1, z) - getVolumeArrayValue(x - 1, y - 1, z))
-                        + (Real)2.0 * (getVolumeArrayValue(x + 1, y, z) - getVolumeArrayValue(x - 1, y, z))
-                        + (getVolumeArrayValue(x + 1, y + 1, z) - getVolumeArrayValue(x - 1, y + 1, z)),
-                (getVolumeArrayValue(x, y + 1, z - 1) - getVolumeArrayValue(x, y - 1, z - 1))
-                    + (Real)2.0 * (getVolumeArrayValue(x, y + 1, z) - getVolumeArrayValue(x, y - 1, z))
-                    + (getVolumeArrayValue(x, y + 1, z + 1) - getVolumeArrayValue(x, y - 1, z + 1)),
-                (getVolumeArrayValue(x - 1, y, z + 1) - getVolumeArrayValue(x - 1, y, z - 1))
-                    + (Real)2.0 * (getVolumeArrayValue(x, y, z + 1) - getVolumeArrayValue(x, y, z - 1))
-                    + (getVolumeArrayValue(x + 1, y, z + 1) - getVolumeArrayValue(x + 1, y, z - 1))) / (Real)4.0;
-            }
-            // Calculate gradient like in the original MC paper
-            return Vector3(
-                getVolumeArrayValue(x + 1, y, z) - getVolumeArrayValue(x - 1, y, z),
-                getVolumeArrayValue(x, y + 1, z) - getVolumeArrayValue(x, y - 1, z),
-                getVolumeArrayValue(x, y, z + 1) - getVolumeArrayValue(x, y, z - 1));
-        }
+        virtual float getVolumeGridValue(int x, int y, int z) const;
 
     public:
 
@@ -166,35 +67,6 @@ namespace Volume {
         */
         explicit TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
         
-        /** Destructor.
-        */
-        ~TextureSource(void);
-
-        /** Overridden from VolumeSource.
-        */
-        virtual Vector4 getValueAndGradient(const Vector3 &position) const;
-        
-        /** Overridden from VolumeSource.
-        */
-        virtual Real getValue(const Vector3 &position) const;
-
-        /** Gets the width of the texture.
-        @return
-            The width of the texture.
-        */
-        size_t getWidth(void) const;
-        
-        /** Gets the height of the texture.
-        @return
-            The height of the texture.
-        */
-        size_t getHeight(void) const;
-        
-        /** Gets the depth of the texture.
-        @return
-            The depth of the texture.
-        */
-        size_t getDepth(void) const;
     };
 
 }
