@@ -45,8 +45,7 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
         // Delete warning texture
-        glDeleteTextures(1, &mWarningTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mWarningTextureID));
     }
 
     Resource* GLES2TextureManager::createImpl(const String& name, ResourceHandle handle, 
@@ -75,18 +74,14 @@ namespace Ogre {
             }
         }
 
-		GL_CHECK_ERROR;
         // Create GL resource
-        glGenTextures(1, &mWarningTextureID);
-        GL_CHECK_ERROR;
-        glBindTexture(GL_TEXTURE_2D, mWarningTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
+        OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, mWarningTextureID));
 #if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+        OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0));
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                     GL_UNSIGNED_SHORT_5_6_5, (void*)data);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                                         GL_UNSIGNED_SHORT_5_6_5, (void*)data));
         // Free memory
         delete [] data;
     }

@@ -157,8 +157,9 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 #define ENABLE_GL_CHECK 0
 
 #if ENABLE_GL_CHECK
-#define GL_CHECK_ERROR \
-    { \
+#define OGRE_CHECK_GL_ERROR(glFunc) \
+{ \
+        glFunc; \
         int e = glGetError(); \
         if (e != 0) \
         { \
@@ -172,12 +173,12 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
             default:                                                            break; \
             } \
             char msgBuf[4096]; \
-            sprintf(msgBuf, "OpenGL ES2 error 0x%04X %s in %s at line %i\n", e, errorString, __PRETTY_FUNCTION__, __LINE__); \
+            sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, #glFunc); \
             LogManager::getSingleton().logMessage(msgBuf); \
         } \
     }
 #else
-    #define GL_CHECK_ERROR {}
+#   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
 
 #if ENABLE_GL_CHECK

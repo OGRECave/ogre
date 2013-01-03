@@ -47,7 +47,6 @@ namespace Ogre {
         target->getCustomAttribute("FBO", &fbobj);
 		assert(fbobj);
 		fbo.bindSurface(attachment, fbobj->getSurface(0));
-        GL_CHECK_ERROR;
 
 		// Set width and height
 		mWidth = fbo.getWidth();
@@ -57,7 +56,6 @@ namespace Ogre {
 	void GLES2FBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
 	{
 		fbo.unbindSurface(attachment);
-        GL_CHECK_ERROR;
 
 		// Set width and height
 		mWidth = fbo.getWidth();

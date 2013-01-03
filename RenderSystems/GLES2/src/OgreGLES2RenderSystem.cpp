@@ -224,14 +224,13 @@ namespace Ogre {
 
         // Multitexturing support and set number of texture units
         GLint units;
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units);
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &units));
         rsc->setNumTextureUnits(units);
 
         // Check for hardware stencil support and set bit depth
         GLint stencil;
 
-        glGetIntegerv(GL_STENCIL_BITS, &stencil);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_STENCIL_BITS, &stencil));
 
         if(stencil)
         {
@@ -297,14 +296,12 @@ namespace Ogre {
         
         // Point size
         GLfloat psRange[2] = {0.0, 0.0};
-        glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, psRange);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_ALIASED_POINT_SIZE_RANGE, psRange));
         rsc->setMaxPointSize(psRange[1]);
 
 		// Max anisotropy
 		GLfloat aniso = 0;
-		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &aniso);
-		GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &aniso));
 		rsc->setMaxSupportedAnisotropy(aniso);
 
         // Point sprites
@@ -416,7 +413,6 @@ namespace Ogre {
 			caps->log(defaultLog);
 		}
 
-        GL_CHECK_ERROR;
         mGLInitialised = true;
     }
 
@@ -810,7 +806,6 @@ namespace Ogre {
 
 	void GLES2RenderSystem::_setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op)
 	{
-        GL_CHECK_ERROR;
 		GLenum sourceBlend = getBlendMode(sourceFactor);
 		GLenum destBlend = getBlendMode(destFactor);
 		if(sourceFactor == SBF_ONE && destFactor == SBF_ZERO)
@@ -868,8 +863,7 @@ namespace Ogre {
         else
         {
             mStateCacheManager->setEnabled(GL_BLEND);
-            glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glBlendFuncSeparate(sourceBlend, destBlend, sourceBlendAlpha, destBlendAlpha));
         }
         
         GLint func = GL_FUNC_ADD, alphaFunc = GL_FUNC_ADD;
@@ -920,8 +914,7 @@ namespace Ogre {
                 break;
         }
         
-        glBlendEquationSeparate(func, alphaFunc);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
 	}
 
     void GLES2RenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
@@ -992,12 +985,10 @@ namespace Ogre {
                 }
             }
 #endif
-            glViewport(x, y, w, h);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
             
 			// Configure the viewport clipping
-            glScissor(x, y, w, h);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
             
             vp->_clearUpdatedFlag();
         }
@@ -1125,8 +1116,7 @@ namespace Ogre {
         if (constantBias != 0 || slopeScaleBias != 0)
         {
             mStateCacheManager->setEnabled(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(-slopeScaleBias, -constantBias);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glPolygonOffset(-slopeScaleBias, -constantBias));
         }
         else
         {
@@ -1341,38 +1331,30 @@ namespace Ogre {
 			flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
             (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
             // Back
-            glStencilMaskSeparate(GL_BACK, writeMask);
-            GL_CHECK_ERROR;
-            glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask);
-            GL_CHECK_ERROR;
-            glStencilOpSeparate(GL_BACK, 
-                                convertStencilOp(stencilFailOp, !flip), 
-                                convertStencilOp(depthFailOp, !flip), 
-                                convertStencilOp(passOp, !flip));
+            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, writeMask));
+            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask));
+            OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_BACK,
+                                                    convertStencilOp(stencilFailOp, !flip),
+                                                    convertStencilOp(depthFailOp, !flip), 
+                                                    convertStencilOp(passOp, !flip)));
 
-            GL_CHECK_ERROR;
             // Front
-            glStencilMaskSeparate(GL_FRONT, writeMask);
-            GL_CHECK_ERROR;
-            glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask);
-            GL_CHECK_ERROR;
-            glStencilOpSeparate(GL_FRONT, 
-                                convertStencilOp(stencilFailOp, flip),
-                                convertStencilOp(depthFailOp, flip), 
-                                convertStencilOp(passOp, flip));
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_FRONT, writeMask));
+            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask));
+            OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_FRONT,
+                                                    convertStencilOp(stencilFailOp, flip),
+                                                    convertStencilOp(depthFailOp, flip), 
+                                                    convertStencilOp(passOp, flip)));
 		}
 		else
 		{
 			flip = false;
 			mStateCacheManager->setStencilMask(writeMask);
-			glStencilFunc(convertCompareFunction(func), refValue, compareMask);
-            GL_CHECK_ERROR;
-			glStencilOp(
-                        convertStencilOp(stencilFailOp, flip),
-                        convertStencilOp(depthFailOp, flip), 
-                        convertStencilOp(passOp, flip));
-            GL_CHECK_ERROR;
+			OGRE_CHECK_GL_ERROR(glStencilFunc(convertCompareFunction(func), refValue, compareMask));
+			OGRE_CHECK_GL_ERROR(glStencilOp(
+                                            convertStencilOp(stencilFailOp, flip),
+                                            convertStencilOp(depthFailOp, flip), 
+                                            convertStencilOp(passOp, flip)));
 		}
     }
 
@@ -1483,9 +1465,8 @@ namespace Ogre {
     GLfloat GLES2RenderSystem::_getCurrentAnisotropy(size_t unit)
 	{
 		GLfloat curAniso = 0;
-		glGetTexParameterfv(mTextureTypes[unit], 
-                            GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glGetTexParameterfv(mTextureTypes[unit],
+                                                GL_TEXTURE_MAX_ANISOTROPY_EXT, &curAniso));
 		return curAniso ? curAniso : 1;
 	}
     
@@ -1501,15 +1482,13 @@ namespace Ogre {
 			maxAnisotropy = mCurrentCapabilities->getMaxSupportedAnisotropy() ? 
 			static_cast<uint>(mCurrentCapabilities->getMaxSupportedAnisotropy()) : 1;
 		if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-			glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
-        GL_CHECK_ERROR;
+			OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
 
 		mStateCacheManager->activateGLTextureUnit(0);
     }
 
     void GLES2RenderSystem::_render(const RenderOperation& op)
     {
-        GL_CHECK_ERROR;
         // Call super class
         RenderSystem::_render(op);
 
@@ -1540,7 +1519,6 @@ namespace Ogre {
 
             if (!op.vertexData->vertexBufferBinding->isBufferBound(elemSource))
                 continue; // skip unbound elements
-            GL_CHECK_ERROR;
  
             HardwareVertexBufferSharedPtr vertexBuffer =
                 op.vertexData->vertexBufferBinding->getBuffer(elemSource);
@@ -1599,15 +1577,13 @@ namespace Ogre {
                     break;
                 };
 
-                glVertexAttribPointer(attrib,
+                OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
                                       typeCount,
                                       GLES2HardwareBufferManager::getGLType(elemType),
                                       normalised,
                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                      pBufferData);
-                GL_CHECK_ERROR;
-                glEnableVertexAttribArray(attrib);
-                GL_CHECK_ERROR;
+                                      pBufferData));
+                OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
 
                 mRenderAttribsBound.push_back(attrib);
             }
@@ -1660,8 +1636,7 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
-				glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData);
-                GL_CHECK_ERROR
+				OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
             } while (updatePassIterationRenderState());
         }
         else
@@ -1675,8 +1650,7 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
-                glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount);
-                GL_CHECK_ERROR
+                OGRE_CHECK_GL_ERROR(glDrawArrays((polyMode == GL_FILL) ? primType : polyMode, 0, op.vertexData->vertexCount));
             } while (updatePassIterationRenderState());
         }
 
@@ -1688,15 +1662,14 @@ namespace Ogre {
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
 #   if GL_OES_vertex_array_object
         // Unbind the vertex array object.  Marks the end of what state will be included.
-        glBindVertexArrayOES(0);
+        OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
 #   endif
 #endif
 
  		// Unbind all attributes
 		for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
  		{
- 			glDisableVertexAttribArray(*ai);
-            GL_CHECK_ERROR;
+ 			OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
   		}
 
         mRenderAttribsBound.clear();
@@ -1724,8 +1697,7 @@ namespace Ogre {
                 y = targetHeight - bottom;
             w = right - left;
             h = bottom - top;
-            glScissor(x, y, w, h);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
         }
         else
         {
@@ -1738,8 +1710,7 @@ namespace Ogre {
                 y = mActiveViewport->getActualTop();
             else
                 y = targetHeight - mActiveViewport->getActualTop() - h;
-            glScissor(x, y, w, h);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
         }
     }
 
@@ -1775,8 +1746,7 @@ namespace Ogre {
             flags |= GL_STENCIL_BUFFER_BIT;
 			// Enable buffer for writing if it isn't
             mStateCacheManager->setStencilMask(0xFFFFFFFF);
-            glClearStencil(stencil);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glClearStencil(stencil));
         }
 
 		// Should be enable scissor test due the clear region is
@@ -1785,34 +1755,29 @@ namespace Ogre {
 
 		// Sets the scissor box as same as viewport
         GLint viewport[4], scissor[4];
-        glGetIntegerv(GL_VIEWPORT, viewport);
-        GL_CHECK_ERROR;
-        glGetIntegerv(GL_SCISSOR_BOX, scissor);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_SCISSOR_BOX, scissor));
         bool scissorBoxDifference =
             viewport[0] != scissor[0] || viewport[1] != scissor[1] ||
             viewport[2] != scissor[2] || viewport[3] != scissor[3];
         if (scissorBoxDifference)
         {
-            glScissor(viewport[0], viewport[1], viewport[2], viewport[3]);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
         }
 
         mStateCacheManager->setDiscardBuffers(buffers);
 
 		// Clear buffers
-        glClear(flags);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glClear(flags));
 
         // Restore scissor box
         if (scissorBoxDifference)
         {
-            glScissor(scissor[0], scissor[1], scissor[2], scissor[3]);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glScissor(scissor[0], scissor[1], scissor[2], scissor[3]));
         }
 
         // Restore scissor test
-         mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
+        mStateCacheManager->setDisabled(GL_SCISSOR_TEST);
 
         // Reset buffer write state
         if (!mStateCacheManager->getDepthMask() && (buffers & FBT_DEPTH))

@@ -115,8 +115,7 @@ namespace Ogre {
             mNumMipmaps = maxMips;
         
 		// Generate texture name
-        glGenTextures(1, &mTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
            
 		// Set texture type
 		mGLSupport.getStateCacheManager()->bindGLTexture(getGLES2TextureTarget(), mTextureID);
@@ -175,21 +174,19 @@ namespace Ogre {
 				{
 					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
-                        glCompressedTexImage2D(GL_TEXTURE_2D,
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
                                                internalformat,
                                                width, height,
                                                0,
                                                size,
-                                               tmpdata);
-                        GL_CHECK_ERROR;
+                                               tmpdata));
                         break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
+							OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
 								width, height, 0, 
-								size, tmpdata);
-                            GL_CHECK_ERROR;
+								size, tmpdata));
 						}
 						break;
 					case TEX_TYPE_3D:
@@ -240,20 +237,19 @@ namespace Ogre {
                                 ", internalFormat=" + StringConverter::toString(internalformat));
                         }
 #endif
-                        glTexImage2D(GL_TEXTURE_2D,
+                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
                                      mip,
                                      internalformat,
                                      width, height,
                                      0,
                                      format,
-                                     datatype, 0);
-                        GL_CHECK_ERROR;
+                                     datatype, 0));
                         break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
+							OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
 								width, height, 0, 
-								format, datatype, 0);
+								format, datatype, 0));
 						}
 						break;
 					case TEX_TYPE_3D:
@@ -400,8 +396,7 @@ namespace Ogre {
     void GLES2Texture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        glDeleteTextures(1, &mTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
         mTextureID = 0;
     }
     
@@ -414,8 +409,7 @@ namespace Ogre {
         }
         else
         {
-            glDeleteTextures(1, &mTextureID);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
             mTextureID = 0;
         }
     }

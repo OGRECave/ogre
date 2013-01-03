@@ -52,17 +52,14 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLSLESLinkProgram::~GLSLESLinkProgram(void)
 	{
-		glDeleteProgram(mGLProgramHandle);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
 	}
 
     void GLSLESLinkProgram::_useProgram(void)
     {
 		if (mLinked)
 		{
-            GL_CHECK_ERROR
-            glUseProgram( mGLProgramHandle );
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glUseProgram( mGLProgramHandle ));
 		}
     }
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -85,8 +82,7 @@ namespace Ogre {
 		{
 			glGetError(); // Clean up the error. Otherwise will flood log.
 
-			mGLProgramHandle = glCreateProgram();
- 			GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
 			if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
 				GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
@@ -171,10 +167,8 @@ namespace Ogre {
         mFragmentProgram->getGLSLProgram()->attachToProgramObject(mGLProgramHandle);
         
         // The link
-        glLinkProgram( mGLProgramHandle );
-        GL_CHECK_ERROR
-        glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked );
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glLinkProgram( mGLProgramHandle ));
+        OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));
         mTriedToLinkAndFailed = !mLinked;
 
         logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
@@ -206,8 +200,7 @@ namespace Ogre {
 				// Get buffer size
 				GLint binaryLength = 0;
 #if GL_OES_get_program_binary
-				glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
-                GL_CHECK_ERROR;
+				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 #endif
 
                 // Create microcode
@@ -216,9 +209,8 @@ namespace Ogre {
 
 #if GL_OES_get_program_binary
 				// Get binary
-				glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
-                                      newMicrocode->getPtr() + sizeof(GLenum));
-                GL_CHECK_ERROR;
+				OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
+                                                          newMicrocode->getPtr() + sizeof(GLenum)));
 #endif
 
         		// Add to the microcode to the cache
@@ -274,48 +266,48 @@ namespace Ogre {
 					switch (def->constType)
 					{
 					case GCT_FLOAT1:
-						glUniform1fv(currentUniform->mLocation, glArraySize, 
-							params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, glArraySize, 
+                                                         params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_FLOAT2:
-						glUniform2fv(currentUniform->mLocation, glArraySize, 
-							params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform2fv(currentUniform->mLocation, glArraySize, 
+                                                         params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_FLOAT3:
-						glUniform3fv(currentUniform->mLocation, glArraySize, 
-							params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform3fv(currentUniform->mLocation, glArraySize, 
+                                                         params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_FLOAT4:
-						glUniform4fv(currentUniform->mLocation, glArraySize, 
-							params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform4fv(currentUniform->mLocation, glArraySize, 
+                                                         params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_MATRIX_2X2:
-						glUniformMatrix2fv(currentUniform->mLocation, glArraySize, 
-							GL_FALSE, params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniformMatrix2fv(currentUniform->mLocation, glArraySize, 
+                                                               GL_FALSE, params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_MATRIX_3X3:
-						glUniformMatrix3fv(currentUniform->mLocation, glArraySize, 
-							GL_FALSE, params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniformMatrix3fv(currentUniform->mLocation, glArraySize, 
+                                                               GL_FALSE, params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_MATRIX_4X4:
-						glUniformMatrix4fv(currentUniform->mLocation, glArraySize, 
-							GL_FALSE, params->getFloatPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniformMatrix4fv(currentUniform->mLocation, glArraySize, 
+                                                               GL_FALSE, params->getFloatPointer(def->physicalIndex)));
 						break;
 					case GCT_INT1:
-						glUniform1iv(currentUniform->mLocation, glArraySize, 
-							(GLint*)params->getIntPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize, 
+                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_INT2:
-						glUniform2iv(currentUniform->mLocation, glArraySize, 
-							(GLint*)params->getIntPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform2iv(currentUniform->mLocation, glArraySize, 
+                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_INT3:
-						glUniform3iv(currentUniform->mLocation, glArraySize, 
-							(GLint*)params->getIntPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform3iv(currentUniform->mLocation, glArraySize, 
+                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_INT4:
-						glUniform4iv(currentUniform->mLocation, glArraySize, 
-							(GLint*)params->getIntPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform4iv(currentUniform->mLocation, glArraySize, 
+                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_SAMPLER1D:
 					case GCT_SAMPLER1DSHADOW:
@@ -324,8 +316,8 @@ namespace Ogre {
 					case GCT_SAMPLER3D:
 					case GCT_SAMPLERCUBE:
 						// Samplers handled like 1-element ints
-						glUniform1iv(currentUniform->mLocation, 1, 
-							(GLint*)params->getIntPointer(def->physicalIndex));
+						OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1, 
+                                                         (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_MATRIX_2X3:
 					case GCT_MATRIX_2X4:
@@ -339,7 +331,6 @@ namespace Ogre {
                         break;
 
 					} // End switch
-                    GL_CHECK_ERROR;
 				} // Variability & mask
 			} // fromProgType == currentUniform->mSourceProgType
   
@@ -361,8 +352,7 @@ namespace Ogre {
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-					glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index));
-                    GL_CHECK_ERROR;
+					OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index)));
 					// There will only be one multipass entry
 					return;
 				}

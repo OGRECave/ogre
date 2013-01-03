@@ -166,8 +166,7 @@ namespace Ogre {
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             // Bind the FSAA buffer if we're doing multisampling
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer));
         }
     }
 
@@ -425,32 +424,24 @@ namespace Ogre {
         
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
-            glDisable(GL_SCISSOR_TEST);     
-            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
-            glResolveMultisampleFramebufferAPPLE();
-            GL_CHECK_ERROR
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
-            GL_CHECK_ERROR
-            
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+            OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
+
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments));
         }
         
-        glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
         {
-            GL_CHECK_ERROR
+            glGetError();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Failed to swap buffers in ",
                         __FUNCTION__);
@@ -517,13 +508,11 @@ namespace Ogre {
         GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
 
         // Read pixel data from the framebuffer
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
 
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     GL_RGBA, GL_UNSIGNED_BYTE, data);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+                                         (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                                         GL_RGBA, GL_UNSIGNED_BYTE, data));
 
         // Create a CGImage with the pixel data
         // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel

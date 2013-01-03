@@ -229,8 +229,7 @@ namespace Ogre {
         GLint maxLength = 0;
 		char* uniformName = NULL;
 
-		glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
 
         // If the max length of active uniforms is 0, then there are 0 active.
         // There won't be any to extract so we can return.
@@ -241,8 +240,7 @@ namespace Ogre {
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
-		glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
 		// Loop over each of the active uniforms, and add them to the reference container
 		// only do this for user defined uniforms, ignore built in gl state uniforms
@@ -250,9 +248,9 @@ namespace Ogre {
 		{
 			GLint arraySize = 0;
 			GLenum glType = GL_NONE;
-			glGetActiveUniform(programObject, index, maxLength, NULL, 
-				&arraySize, &glType, uniformName);
-            GL_CHECK_ERROR;
+			OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, maxLength, NULL,
+				&arraySize, &glType, uniformName));
+
 			// Don't add built in uniforms
 			newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
 			if (newGLUniformReference.mLocation >= 0)

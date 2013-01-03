@@ -45,50 +45,35 @@ namespace Ogre {
     
     void GLES2StateCacheManagerImp::initializeCache()
     {
-        glBlendEquation(GL_FUNC_ADD);
-        GL_CHECK_ERROR
-        
-        glBlendFunc(GL_ONE, GL_ZERO);
-        GL_CHECK_ERROR
-        
-        glCullFace(mCullFace);
-        GL_CHECK_ERROR
-        
-        glDepthFunc(mDepthFunc);
-        GL_CHECK_ERROR
-        
-        glDepthMask(mDepthMask);
-        GL_CHECK_ERROR
-        
-        glStencilMask(mStencilMask);
-        GL_CHECK_ERROR
-        
-        glClearDepthf(mClearDepth);
-        GL_CHECK_ERROR
-        
-        glBindTexture(GL_TEXTURE_2D, 0);
-        GL_CHECK_ERROR
-        
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        GL_CHECK_ERROR
-        
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        GL_CHECK_ERROR
-        
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        GL_CHECK_ERROR
-        
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        GL_CHECK_ERROR
-        
-        glActiveTexture(GL_TEXTURE0);
-        GL_CHECK_ERROR
-        
-        glClearColor(mClearColour[0], mClearColour[1], mClearColour[2], mClearColour[3]);
-        GL_CHECK_ERROR
-        
-        glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBlendEquation(GL_FUNC_ADD));
+
+        OGRE_CHECK_GL_ERROR(glBlendFunc(GL_ONE, GL_ZERO));
+
+        OGRE_CHECK_GL_ERROR(glCullFace(mCullFace));
+
+        OGRE_CHECK_GL_ERROR(glDepthFunc(mDepthFunc));
+
+        OGRE_CHECK_GL_ERROR(glDepthMask(mDepthMask));
+
+        OGRE_CHECK_GL_ERROR(glStencilMask(mStencilMask));
+
+        OGRE_CHECK_GL_ERROR(glClearDepthf(mClearDepth));
+
+        OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, 0));
+
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
+        OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+
+        OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0));
+
+        OGRE_CHECK_GL_ERROR(glClearColor(mClearColour[0], mClearColour[1], mClearColour[2], mClearColour[3]));
+
+        OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
     }
     
     void GLES2StateCacheManagerImp::clearCache()
@@ -114,13 +99,17 @@ namespace Ogre {
     {
         // Update GL
         if(target == GL_FRAMEBUFFER)
-            glBindFramebuffer(target, buffer);
+        {
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(target, buffer));
+        }
         else if(target == GL_RENDERBUFFER)
-            glBindRenderbuffer(target, buffer);
+        {
+            OGRE_CHECK_GL_ERROR(glBindRenderbuffer(target, buffer));
+        }
         else
-            glBindBuffer(target, buffer);
-        
-        GL_CHECK_ERROR
+        {
+            OGRE_CHECK_GL_ERROR(glBindBuffer(target, buffer));
+        }
     }
     
     void GLES2StateCacheManagerImp::deleteGLBuffer(GLenum target, GLuint buffer, bool force)
@@ -128,30 +117,32 @@ namespace Ogre {
         // Buffer name 0 is reserved and we should never try to delete it
         if(buffer == 0)
             return;
-        
+
         if(target == GL_FRAMEBUFFER)
-            glDeleteFramebuffers(1, &buffer);
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &buffer));
+        }
         else if(target == GL_RENDERBUFFER)
-            glDeleteRenderbuffers(1, &buffer);
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteRenderbuffers(1, &buffer));
+        }
         else
-            glDeleteBuffers(1, &buffer);
-        
-        GL_CHECK_ERROR
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &buffer));
+        }
     }
     
     void GLES2StateCacheManagerImp::setTexParameteri(GLenum target, GLenum pname, GLint param)
     {
         // Update GL
-        glTexParameteri(target, pname, param);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glTexParameteri(target, pname, param));
     }
     
 
     void GLES2StateCacheManagerImp::bindGLTexture(GLenum target, GLuint texture)
     {
         // Update GL
-        glBindTexture(target, texture);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBindTexture(target, texture));
     }
     
     bool GLES2StateCacheManagerImp::activateGLTextureUnit(unsigned char unit)
@@ -162,8 +153,7 @@ namespace Ogre {
         
         if (unit < dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getCapabilities()->getNumTextureUnits())
         {
-            glActiveTexture(GL_TEXTURE0 + unit);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glActiveTexture(GL_TEXTURE0 + unit));
             
             mActiveTextureUnit = unit;
             
@@ -177,15 +167,13 @@ namespace Ogre {
     
     void GLES2StateCacheManagerImp::setBlendFunc(GLenum source, GLenum dest)
     {
-        glBlendFunc(source, dest);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBlendFunc(source, dest));
     }
     
     void GLES2StateCacheManagerImp::setBlendEquation(GLenum eq)
     {
         mBlendEquation = eq;
-        glBlendEquation(eq);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBlendEquation(eq));
     }
     
     void GLES2StateCacheManagerImp::setDepthMask(GLboolean mask)
@@ -194,8 +182,7 @@ namespace Ogre {
         {
             mDepthMask = mask;
             
-            glDepthMask(mask);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glDepthMask(mask));
         }
     }
     
@@ -205,8 +192,7 @@ namespace Ogre {
         {
             mDepthFunc = func;
             
-            glDepthFunc(func);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glDepthFunc(func));
         }
     }
     
@@ -216,8 +202,7 @@ namespace Ogre {
         {
             mClearDepth = depth;
             
-            glClearDepthf(depth);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glClearDepthf(depth));
         }
     }
     
@@ -233,8 +218,7 @@ namespace Ogre {
             mClearColour[2] = blue;
             mClearColour[3] = alpha;
             
-            glClearColor(mClearColour[0], mClearColour[1], mClearColour[2], mClearColour[3]);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glClearColor(mClearColour[0], mClearColour[1], mClearColour[2], mClearColour[3]));
         }
     }
     
@@ -250,8 +234,7 @@ namespace Ogre {
             mColourMask[2] = blue;
             mColourMask[3] = alpha;
             
-            glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glColorMask(mColourMask[0], mColourMask[1], mColourMask[2], mColourMask[3]));
         }
     }
     
@@ -261,21 +244,18 @@ namespace Ogre {
         {
             mStencilMask = mask;
             
-            glStencilMask(mask);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glStencilMask(mask));
         }
     }
     
     void GLES2StateCacheManagerImp::setEnabled(GLenum flag)
     {
-        glEnable(flag);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glEnable(flag));
     }
     
     void GLES2StateCacheManagerImp::setDisabled(GLenum flag)
     {
-        glDisable(flag);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glDisable(flag));
     }
     
     void GLES2StateCacheManagerImp::setCullFace(GLenum face)
@@ -284,8 +264,7 @@ namespace Ogre {
         {
             mCullFace = face;
             
-            glCullFace(face);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glCullFace(face));
         }
     }
 }
