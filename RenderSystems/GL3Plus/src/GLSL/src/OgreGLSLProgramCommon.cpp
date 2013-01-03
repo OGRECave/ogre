@@ -68,8 +68,7 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLSLProgramCommon::~GLSLProgramCommon(void)
 	{
-		glDeleteProgram(mGLProgramHandle);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
 
         delete mVertexArrayObject;
         mVertexArrayObject = 0;
@@ -154,22 +153,20 @@ namespace Ogre {
 		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
 		{
 			const char * attString = getAttributeSemanticString(semantic);
-			GLint attrib = glGetAttribLocation(mGLProgramHandle, attString);
-            GL_CHECK_ERROR
+			GLint attrib;
+            OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attString));
 
 			// sadly position is a special case 
 			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
 			{
-				attrib = glGetAttribLocation(mGLProgramHandle, "position");
-                GL_CHECK_ERROR
+				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
 			}
 
 			// for uv and other case the index is a part of the name
 			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
 			{
 				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-				attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str());
-                GL_CHECK_ERROR
+				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
 			}
 
 			// update mCustomAttributesIndexes with the index we found (or didn't find) 
@@ -204,15 +201,13 @@ namespace Ogre {
         GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
 
         // load binary
-		glProgramBinary( mGLProgramHandle, 
-                           binaryFormat, 
-                           cacheMicrocode->getPtr(),
-                           binaryLength);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glProgramBinary( mGLProgramHandle,
+                                            binaryFormat, 
+                                            cacheMicrocode->getPtr(),
+                                            binaryLength));
 
 		GLint success = 0;
-		glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
 		if (!success)
 		{
 			//

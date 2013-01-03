@@ -211,16 +211,14 @@ namespace Ogre {
                 shaderType = GL_COMPUTE_SHADER;
                 break;
 			}
-			mGLShaderHandle = glCreateShader(shaderType);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
             if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
                 glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                mGLProgramHandle = glCreateProgram();
-                GL_CHECK_ERROR
+                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
                 if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
                     glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
             }
@@ -230,13 +228,10 @@ namespace Ogre {
 		if (!mSource.empty())
 		{
 			const char *source = mSource.c_str();
-			glShaderSource(mGLShaderHandle, 1, &source, NULL);
-			// Check for load errors
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
 		}
 
-		glCompileShader(mGLShaderHandle);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
 		// Check for compile errors
 		glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled);
@@ -281,13 +276,11 @@ namespace Ogre {
 	{
 		if (isSupported())
 		{
-			glDeleteShader(mGLShaderHandle);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
 
             if(mGLProgramHandle)
             {
-                glDeleteProgram(mGLProgramHandle);
-                GL_CHECK_ERROR
+                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
             }
             
             mGLShaderHandle = 0;
@@ -464,16 +457,14 @@ namespace Ogre {
 
 			++childprogramcurrent;
 		}
-        glAttachShader(programObject, mGLShaderHandle);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
 		logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject );
     }
 
 	//-----------------------------------------------------------------------
 	void GLSLProgram::detachFromProgramObject( const GLuint programObject )
 	{
-        glDetachShader(programObject, mGLShaderHandle);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
 		logObjectInfo( "Error detaching " + mName + " shader object from GLSL Program Object", programObject );
 		// attach child objects
 		GLSLProgramContainerIterator childprogramcurrent = mAttachedGLSLPrograms.begin();
@@ -541,8 +532,7 @@ namespace Ogre {
 			mSource = newSource.str();
 
 			const char *source = mSource.c_str();
-			glShaderSource(mGLShaderHandle, 1, &source, NULL);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
 			// Check for load errors
             if (compile(true))
             {

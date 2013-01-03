@@ -79,14 +79,12 @@ namespace Ogre {
 		mVertexBuffers[1].setNull();
 
         // Create query objects
-		glGenQueries(1, &mPrimitivesDrawnQuery);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glGenQueries(1, &mPrimitivesDrawnQuery));
 	}
 //-----------------------------------------------------------------------------
 	GL3PlusRenderToVertexBuffer::~GL3PlusRenderToVertexBuffer()
 	{
-		glDeleteQueries(1, &mPrimitivesDrawnQuery);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mPrimitivesDrawnQuery));
 	}
 //-----------------------------------------------------------------------------
 	void GL3PlusRenderToVertexBuffer::getRenderOperation(RenderOperation& op)
@@ -147,12 +145,10 @@ namespace Ogre {
         }
 
 		// Bind the target buffer
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer->getGLBufferId());
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vertexBuffer->getGLBufferId()));
 
         // Disable rasterization
-        glEnable(GL_RASTERIZER_DISCARD);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glEnable(GL_RASTERIZER_DISCARD));
 
 		RenderSystem* targetRenderSystem = Root::getSingleton().getRenderSystem();
 		// Draw the object
@@ -174,28 +170,22 @@ namespace Ogre {
 			targetRenderSystem->bindGpuProgramParameters(GPT_GEOMETRY_PROGRAM,
                                                          r2vbPass->getGeometryProgramParameters(), GPV_ALL);
 		}
-        glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, mPrimitivesDrawnQuery));
 
-		glBeginTransformFeedback(getR2VBPrimitiveType(mOperationType));
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glBeginTransformFeedback(getR2VBPrimitiveType(mOperationType)));
 
 		targetRenderSystem->_render(renderOp);
 		
-		glEndTransformFeedback();
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glEndTransformFeedback());
 
 		// Finish the query
-		glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN));
 
-		glDisable(GL_RASTERIZER_DISCARD);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glDisable(GL_RASTERIZER_DISCARD));
 
 		// Read back query results
 		GLuint primitivesWritten;
-		glGetQueryObjectuiv(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mPrimitivesDrawnQuery, GL_QUERY_RESULT, &primitivesWritten));
 		mVertexData->vertexCount = primitivesWritten * getVertexCountPerPrimitive(mOperationType);
 
 		// Switch the vertex binding if necessary
@@ -207,8 +197,7 @@ namespace Ogre {
 		}
 
         // Enable rasterization
-		glDisable(GL_RASTERIZER_DISCARD);
-        GL_CHECK_ERROR
+		OGRE_CHECK_GL_ERROR(glDisable(GL_RASTERIZER_DISCARD));
 
 		// Clear the reset flag
 		mResetRequested = false;
@@ -285,10 +274,8 @@ namespace Ogre {
                 names[e] = varyingName.c_str();
 			}
 
-			glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS);
-            GL_CHECK_ERROR
-            glLinkProgram(linkProgramId);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(glTransformFeedbackVaryings(linkProgramId, elemCount, names, GL_INTERLEAVED_ATTRIBS));
+            OGRE_CHECK_GL_ERROR(glLinkProgram(linkProgramId));
 		}
 	}
 }

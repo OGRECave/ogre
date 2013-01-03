@@ -427,8 +427,7 @@ namespace Ogre {
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
-        glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
 		// Loop over each of the active uniforms, and add them to the reference container
 		// only do this for user defined uniforms, ignore built in gl state uniforms
@@ -436,13 +435,11 @@ namespace Ogre {
 		{
 			GLint arraySize;
 			GLenum glType;
-			glGetActiveUniform(programObject, index, uniformLength, NULL,
-                               &arraySize, &glType, uniformName);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, uniformLength, NULL,
+                                                   &arraySize, &glType, uniformName));
 
 			// Don't add built in uniforms
-			newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
-            GL_CHECK_ERROR
+			OGRE_CHECK_GL_ERROR(newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName));
 			if (newGLUniformReference.mLocation >= 0)
 			{
 				// User defined uniform found, add it to the reference list
@@ -486,21 +483,17 @@ namespace Ogre {
 
         GLint blockCount = 0;
 
-        glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
 
         for (int index = 0; index < blockCount; index++)
         {
-            glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
 
             GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
 
             GLint blockSize, blockBinding;
-            glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-            GL_CHECK_ERROR
-            glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
             HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
 
             GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());

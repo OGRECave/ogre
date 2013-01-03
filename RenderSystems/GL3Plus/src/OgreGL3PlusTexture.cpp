@@ -109,29 +109,22 @@ namespace Ogre {
             mNumMipmaps = maxMips;
 
 		// Generate texture name
-        glGenTextures(1, &mTextureID);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
 
 		// Set texture type
-        glBindTexture(getGL3PlusTextureTarget(), mTextureID);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBindTexture(getGL3PlusTextureTarget(), mTextureID));
 
-        glTexParameteri( getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glTexParameteri( getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps ));
 
         // Set some misc default parameters, these can of course be changed later
-        glTexParameteri(getGL3PlusTextureTarget(),
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR
-        glTexParameteri(getGL3PlusTextureTarget(),
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR
-        glTexParameteri(getGL3PlusTextureTarget(),
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR
-        glTexParameteri(getGL3PlusTextureTarget(),
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
+                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
+                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
+                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
+                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
@@ -163,51 +156,44 @@ namespace Ogre {
 				switch(mTextureType)
 				{
 					case TEX_TYPE_1D:
-						glCompressedTexImage1D(GL_TEXTURE_1D, mip, format, 
+						OGRE_CHECK_GL_ERROR(glCompressedTexImage1D(GL_TEXTURE_1D, mip, format, 
 							width, 0, 
-							size, tmpdata);
-                        GL_CHECK_ERROR
+							size, tmpdata));
 						break;
 					case TEX_TYPE_2D:
-                        glCompressedTexImage2D(GL_TEXTURE_2D,
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
                                                format,
                                                width, height,
                                                0,
                                                size,
-                                               tmpdata);
-                        GL_CHECK_ERROR
+                                               tmpdata));
                         break;
 					case TEX_TYPE_2D_RECT:
-                        glCompressedTexImage2D(GL_TEXTURE_RECTANGLE,
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_RECTANGLE,
                                                mip,
                                                format,
                                                width, height,
                                                0,
                                                size,
-                                               tmpdata);
-                        GL_CHECK_ERROR
+                                               tmpdata));
                         break;
 					case TEX_TYPE_2D_ARRAY:
 					case TEX_TYPE_3D:
-						glCompressedTexImage3D(getGL3PlusTextureTarget(), mip, format,
+						OGRE_CHECK_GL_ERROR(glCompressedTexImage3D(getGL3PlusTextureTarget(), mip, format,
 							width, height, depth, 0, 
-							size, tmpdata);
-
-                        GL_CHECK_ERROR
+							size, tmpdata));
 						break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+							OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
 								width, height, 0, 
-								size, tmpdata);
-                            GL_CHECK_ERROR
+								size, tmpdata));
 						}
 						break;
                     default:
                         break;
                 };
-                GL_CHECK_ERROR
 //                LogManager::getSingleton().logMessage("GL3PlusTexture::create - Mip: " + StringConverter::toString(mip) +
 //                                                      " Width: " + StringConverter::toString(width) +
 //                                                      " Height: " + StringConverter::toString(height) +
@@ -238,44 +224,39 @@ namespace Ogre {
 				switch(mTextureType)
 				{
 					case TEX_TYPE_1D:
-						glTexImage1D(GL_TEXTURE_1D, mip, format,
+						OGRE_CHECK_GL_ERROR(glTexImage1D(GL_TEXTURE_1D, mip, format,
 							width, 0, 
-							GL_RGBA, datatype, 0);
-                        GL_CHECK_ERROR
+							GL_RGBA, datatype, 0));
 						break;
 					case TEX_TYPE_2D:
-                        glTexImage2D(GL_TEXTURE_2D,
+                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
                                      mip,
                                      format,
                                      width, height,
                                      0,
                                      GL_RGBA,
-                                     datatype, 0);
-                        GL_CHECK_ERROR
+                                     datatype, 0));
                         break;
 					case TEX_TYPE_2D_RECT:
-                        glTexImage2D(GL_TEXTURE_RECTANGLE,
+                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_RECTANGLE,
                                      mip,
                                      format,
                                      width, height,
                                      0,
                                      GL_RGBA,
-                                     datatype, 0);
-                        GL_CHECK_ERROR
+                                     datatype, 0));
                         break;
 					case TEX_TYPE_3D:
 					case TEX_TYPE_2D_ARRAY:
-						glTexImage3D(getGL3PlusTextureTarget(), mip, format,
+						OGRE_CHECK_GL_ERROR(glTexImage3D(getGL3PlusTextureTarget(), mip, format,
 							width, height, depth, 0, 
-							GL_RGBA, datatype, 0);
-                        GL_CHECK_ERROR
+							GL_RGBA, datatype, 0));
 						break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+							OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
 								width, height, 0, 
-								GL_RGBA, datatype, 0);
-                            GL_CHECK_ERROR
+								GL_RGBA, datatype, 0));
 						}
 						break;
                     default:
@@ -412,8 +393,7 @@ namespace Ogre {
     void GL3PlusTexture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        glDeleteTextures(1, &mTextureID);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
     }
 
     void GL3PlusTexture::_createSurfaceList()

@@ -50,8 +50,7 @@ namespace Ogre {
 GL3PlusHardwareOcclusionQuery::GL3PlusHardwareOcclusionQuery() 
 { 
 	// Check for hardware occlusion support
-    glGenQueries(1, &mQueryID );
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glGenQueries(1, &mQueryID ));
 }
 //------------------------------------------------------------------
 /**
@@ -59,26 +58,22 @@ GL3PlusHardwareOcclusionQuery::GL3PlusHardwareOcclusionQuery()
   */
 GL3PlusHardwareOcclusionQuery::~GL3PlusHardwareOcclusionQuery() 
 { 
-    glDeleteQueries(1, &mQueryID);
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glDeleteQueries(1, &mQueryID));
 }
 //------------------------------------------------------------------
 void GL3PlusHardwareOcclusionQuery::beginOcclusionQuery() 
 { 
-    glBeginQuery(GL_ANY_SAMPLES_PASSED, mQueryID);
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glBeginQuery(GL_ANY_SAMPLES_PASSED, mQueryID));
 }
 //------------------------------------------------------------------
 void GL3PlusHardwareOcclusionQuery::endOcclusionQuery() 
 { 
-    glEndQuery(GL_ANY_SAMPLES_PASSED);
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glEndQuery(GL_ANY_SAMPLES_PASSED));
 }
 //------------------------------------------------------------------
 bool GL3PlusHardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
-    glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT, (GLuint*)NumOfFragments);
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT, (GLuint*)NumOfFragments));
     mPixelCount = *NumOfFragments;
     return true;
 }
@@ -87,13 +82,10 @@ bool GL3PlusHardwareOcclusionQuery::isStillOutstanding(void)
 {    
     GLuint available = GL_FALSE;
 
-    glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT_AVAILABLE, &available);
-    GL_CHECK_ERROR
+    OGRE_CHECK_GL_ERROR(glGetQueryObjectuiv(mQueryID, GL_QUERY_RESULT_AVAILABLE, &available));
 
 	// GL_TRUE means a wait would occur
     return !(available == GL_TRUE);  
 } 
 
 }
-
-
