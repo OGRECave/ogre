@@ -17,7 +17,7 @@ LOCAL_PATH := $(call my-dir)
     LOCAL_CFLAGS += -fexceptions -frtti -x c++ -D___ANDROID___ -DANDROID -DZZIP_OMIT_CONFIG_H -DUSE_RTSHADER_SYSTEM=1 
     
     LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src
-    LOCAL_SRC_FILES := FileSystemLayerImpl_Android.cpp SampleBrowser.cpp 
+    LOCAL_SRC_FILES := SampleBrowser.cpp 
         
     include $(BUILD_SHARED_LIBRARY) 
       

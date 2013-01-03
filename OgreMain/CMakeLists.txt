@@ -590,6 +590,7 @@ elseif(ANDROID)
     src/OgreSearchOps.cpp
     src/Android/OgreAndroidLogListener.cpp
     src/Android/OgreAPKFileSystemArchive.cpp
+    src/Android/OgreFileSystemLayer.cpp
   )
 
   set(PLATFORM_HEADER_INSTALL "Android")
