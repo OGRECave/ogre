@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreLogManager.h"
+#include <memory>
 
 #if OGRE_DEBUG_MODE 
 #define LOG_PROGRESSIVE_MESH_GENERATION 1
