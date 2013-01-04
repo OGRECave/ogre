@@ -654,13 +654,13 @@ namespace Ogre {
 			String syntax;
 			bool vertexProgramFinite[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{
-				false, false, false, false, false,
-					true, true, true, true, true
+				false, false, false, false,
+				true, true, true, true
 			};
 			bool vertexProgramDebug[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{
-				false, true, false, true, false,
-					true, false, true, false, true
+				false, true, false, true,
+				false, true, false, true
 			};
 			Light::LightTypes vertexProgramLightTypes[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{

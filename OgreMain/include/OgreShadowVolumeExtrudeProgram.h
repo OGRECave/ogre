@@ -187,7 +187,7 @@ namespace Ogre {
 		static bool mInitialised;
 
 	public:
-#define OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS 10
+#define OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS 8
         enum Programs
         {
             // Point light extruder, infinite distance
