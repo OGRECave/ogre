@@ -228,7 +228,7 @@ public:
 		}
 		else if (box == mAutoBox)
 		{
-			if( mTerrainGroup )
+			if(mTerrainGroup)
 			{
 				if(!mAutoLod && mAutoBox->isChecked())
 				{
@@ -327,7 +327,7 @@ protected:
 			0,
 			-(TERRAIN_PAGE_MAX_Y+TERRAIN_PAGE_MIN_Y) / 2 * TERRAIN_WORLD_SIZE
 			);
-		mCamera->setPosition( mTerrainPos+worldCenter );
+		mCamera->setPosition(mTerrainPos+worldCenter);
 		mCamera->lookAt(mTerrainPos);
 		mCamera->setNearClipDistance(0.1);
 		mCamera->setFarClipDistance(50000);
@@ -397,7 +397,6 @@ protected:
 
 		Vector3 lightdir(0.55, -0.3, 0.75);
 		lightdir.normalise();
-
 
 		Light* l = mSceneMgr->createLight("tstLight");
 		l->setType(Light::LT_DIRECTIONAL);

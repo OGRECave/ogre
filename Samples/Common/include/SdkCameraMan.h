@@ -145,7 +145,6 @@ namespace OgreBites
 				mCamera->setFixedYawAxis(true);
 				manualStop();
 				setYawPitchDist(Ogre::Degree(0), Ogre::Degree(15), 150);
-
 			}
 			else if (mStyle != CS_FREELOOK && style == CS_FREELOOK)
 			{

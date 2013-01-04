@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "TestBatch.h"
 #include "TestResultWriter.h"
 
-/** Writes a simple plaintext file with pass/fail result for each test */
+/** Writes a simple plain text file with pass/fail result for each test */
 class SimpleResultWriter : public TestResultWriter
 {
 public:
@@ -50,12 +50,12 @@ protected:
     {
         std::stringstream out;
 
-        for(int i = 0; i < mResults->size(); ++i)
+        for(size_t i = 0; i < mResults->size(); ++i)
         {
             Ogre::String test = (*mResults)[i].testName;
             bool passed = true;
             
-            int j = i;
+            size_t j = i;
 
             // a test may have multiple images, so we check all, and fail the whole test if any one fails
             for(; j < mResults->size() && (*mResults)[j].testName == test; ++j)
@@ -66,12 +66,11 @@ protected:
 
             i = j - 1;
 
-            out<<test<<"="<<(passed ? "Passed" : "Failed")<<"\n";
+            out << test << "=" << (passed ? "Passed" : "Failed") << "\n";
         }
 
         return out.str();
     }
-
 };
 
 #endif
