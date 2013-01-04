@@ -154,7 +154,8 @@ mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
-mGpuParamsDirty((uint16)GPV_ALL)
+mGpuParamsDirty((uint16)GPV_ALL),
+mAmbientLight(ColourValue::Black)
 {
 
     // init sky
