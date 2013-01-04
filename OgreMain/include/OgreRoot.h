@@ -160,7 +160,7 @@ namespace Ogre
                 pluginsfile The file that contains plugins information.
                 Defaults to "plugins.cfg".
         */
-        void loadPlugins( const String& pluginsfile = "plugins.cfg" );
+        void loadPlugins( const String& pluginsfile = "plugins" OGRE_LIB_SUFFIX ".cfg" );
 		/** Initialise all loaded plugins - allows plugins to perform actions
 			once the renderer is initialised.
 		*/
@@ -215,7 +215,7 @@ namespace Ogre
 		@param logFileName The logfile to create, defaults to Ogre.log, may be 
 			left blank if you've already set up LogManager & Log yourself
 		*/
-        Root(const String& pluginFileName = "plugins.cfg", 
+        Root(const String& pluginFileName = "plugins" OGRE_LIB_SUFFIX ".cfg", 
 			const String& configFileName = "ogre.cfg", 
 			const String& logFileName = "Ogre.log");
         ~Root();

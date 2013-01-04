@@ -38,7 +38,7 @@ void ZipArchiveTests::setUp()
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     testPath = "../../../../Tests/OgreMain/misc/ArchiveTest.zip";
 #else
-    testPath = "../../../Tests/OgreMain/misc/ArchiveTest.zip";
+    testPath = "../Tests/OgreMain/misc/ArchiveTest.zip";
 #endif
 }
 void ZipArchiveTests::tearDown()

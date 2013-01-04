@@ -297,6 +297,15 @@ namespace Ogre {
 #    define OGRE_ENDIAN OGRE_ENDIAN_LITTLE
 #endif
 
+//----------------------------------------------------------------------------
+// Library suffixes
+// "_d" for debug builds, nothing otherwise
+#if OGRE_DEBUG_MODE
+#   define OGRE_LIB_SUFFIX "_d"
+#else
+#   define OGRE_LIB_SUFFIX ""
+#endif
+
 // Integer formats of fixed bit width
 typedef unsigned int uint32;
 typedef unsigned short uint16;

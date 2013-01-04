@@ -35,7 +35,9 @@ void PageCoreTests::setUp()
 	mRoot = OGRE_NEW Root();
 	mPageManager = OGRE_NEW PageManager();
 
-	mRoot->addResourceLocation("./", "FileSystem");
+	// make certain the resource location is NOT read-only
+	ResourceGroupManager::getSingleton().addResourceLocation("./", "FileSystem",
+	    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, false, false);
 
 	mSceneMgr = mRoot->createSceneManager(ST_GENERIC);
 
@@ -64,12 +66,10 @@ void PageCoreTests::testSimpleCreateSaveLoadWorld()
 	SimplePageContentCollection* coll = static_cast<SimplePageContentCollection*>(
 		p->createContentCollection("Simple"));
 
-
 	world->save(filename);
 
 	mPageManager->destroyWorld(world);
 	world = 0;
-
 	world = mPageManager->loadWorld(filename);
 
 	CPPUNIT_ASSERT_EQUAL(worldName, world->getName());
