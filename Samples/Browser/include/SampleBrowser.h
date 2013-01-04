@@ -1364,7 +1364,7 @@ protected:
 #else
 			Ogre::ConfigFile cfg;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            cfg.load(openAPKFile("samples.cfg"));
+            cfg.load(openAPKFile(mFSLayer->getConfigFilePath("samples.cfg")));
 #else
 			cfg.load(mFSLayer->getConfigFilePath("samples.cfg"));
 #endif

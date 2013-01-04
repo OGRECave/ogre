@@ -183,7 +183,7 @@ void HDRListener::notifyCompositor(Ogre::CompositorInstance* instance)
 			for(int i = 1; i < 8; ++i)
 			{
 				mBloomTexWeights[i][0] = mBloomTexWeights[i][1] =
-					mBloomTexWeights[i][2] = 1.25f * Ogre::Math::gaussianDistribution(i, 0, deviation);
+                    mBloomTexWeights[i][2] = 1.25f * Ogre::Math::gaussianDistribution((Ogre::Real)i, 0, deviation);
 				mBloomTexWeights[i][3] = 1.0f;
 				mBloomTexOffsetsHorz[i][0] = i * texelSize;
 				mBloomTexOffsetsHorz[i][1] = 0.0f;
@@ -284,7 +284,7 @@ void GaussianListener::notifyViewportSize(int width, int height)
 	for(int i = 1; i < 8; ++i)
 	{
 		mBloomTexWeights[i][0] = mBloomTexWeights[i][1] =
-			mBloomTexWeights[i][2] = Ogre::Math::gaussianDistribution(i, 0, deviation);
+			mBloomTexWeights[i][2] = Ogre::Math::gaussianDistribution((Ogre::Real)i, 0, deviation);
 		mBloomTexWeights[i][3] = 1.0f;
 		mBloomTexOffsetsHorz[i][0] = i * texelSize;
 		mBloomTexOffsetsHorz[i][1] = 0.0f;

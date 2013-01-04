@@ -270,7 +270,7 @@ void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
 				// Update the information of the size of the atlas textures 
 				//
 				std::pair< size_t, size_t > texSizeInt = pass->getTextureUnitState(j)->getTextureDimensions();
-				Vector2 texSize(texSizeInt.first, texSizeInt.second);
+                Vector2 texSize((Ogre::Real)texSizeInt.first, (Ogre::Real)texSizeInt.second);
 				mPSTextureSizes[j]->setGpuParameter(texSize); 
 
 				//

@@ -301,9 +301,9 @@ namespace Ogre {
 // Library suffixes
 // "_d" for debug builds, nothing otherwise
 #if OGRE_DEBUG_MODE
-#   define OGRE_LIB_SUFFIX "_d"
+#   define OGRE_BUILD_SUFFIX "_d"
 #else
-#   define OGRE_LIB_SUFFIX ""
+#   define OGRE_BUILD_SUFFIX ""
 #endif
 
 // Integer formats of fixed bit width

@@ -710,7 +710,7 @@ namespace OgreBites
 			// load resource paths from config file
 			Ogre::ConfigFile cf;
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            cf.load(openAPKFile("resources.cfg"));
+            cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #else
 			cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
 #endif

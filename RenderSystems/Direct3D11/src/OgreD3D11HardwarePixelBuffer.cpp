@@ -909,7 +909,7 @@ namespace Ogre {
             int mipWidth = src.getWidth();
             int mipHeight = src.getHeight();
             int elementJump = 1;
-            for(int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
+            for(unsigned int i = 1 ; i <= mParentTexture->getNumMipmaps() ; i++)
             {
                 mipWidth /= 2;
                 mipHeight /= 2;
