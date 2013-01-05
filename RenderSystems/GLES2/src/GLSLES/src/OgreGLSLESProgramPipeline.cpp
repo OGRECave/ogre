@@ -366,6 +366,20 @@ namespace Ogre
                         case GCT_SAMPLER2DARRAY:
                         case GCT_UNKNOWN:
                         case GCT_SUBROUTINE:
+                        case GCT_DOUBLE1:
+                        case GCT_DOUBLE2:
+                        case GCT_DOUBLE3:
+                        case GCT_DOUBLE4:
+                        case GCT_SAMPLERRECT:
+                        case GCT_MATRIX_DOUBLE_2X2:
+                        case GCT_MATRIX_DOUBLE_2X3:
+                        case GCT_MATRIX_DOUBLE_2X4:
+                        case GCT_MATRIX_DOUBLE_3X2:
+                        case GCT_MATRIX_DOUBLE_3X3:
+                        case GCT_MATRIX_DOUBLE_3X4:
+                        case GCT_MATRIX_DOUBLE_4X2:
+                        case GCT_MATRIX_DOUBLE_4X3:
+                        case GCT_MATRIX_DOUBLE_4X4:
                             break;
                             
 					} // End switch
