@@ -90,6 +90,7 @@ SceneManager::SceneManager(const String& name) :
 mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
+mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
 mSceneRoot(0),
 mSkyPlaneEntity(0),
@@ -154,8 +155,7 @@ mCameraRelativeRendering(false),
 mLastLightHash(0),
 mLastLightLimit(0),
 mLastLightHashGpuProgram(0),
-mGpuParamsDirty((uint16)GPV_ALL),
-mAmbientLight(ColourValue::Black)
+mGpuParamsDirty((uint16)GPV_ALL)
 {
 
     // init sky
