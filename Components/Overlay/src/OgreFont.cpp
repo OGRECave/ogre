@@ -223,7 +223,7 @@ namespace Ogre
 
 		if (!mTexture.isNull())
 		{
-			TextureManager::getSingleton().remove(mTexture->getHandle());
+            mTexture->unload();
 			mTexture.setNull();
 		}
     }
