@@ -68,7 +68,7 @@ THE SOFTWARE
 
 // disable: "conditional expression constant", always occurs on 
 // OGRE_MUTEX_CONDITIONAL when no threading enabled
-#   pragma warning (disable : 4127)
+#   pragma warning (disable : 201)
 
 // disable: "unreferenced formal parameter"
 // Many versions of VC have bugs which generate this error in cases where they shouldn't

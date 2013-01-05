@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreViewport.h"
 #include "OgreTimer.h"
-#include "OgreHeaderPrefix.h"
 
 /* Define the number of priority groups for the render system's render targets. */
 #ifndef OGRE_NUM_RENDERTARGET_GROUPS
@@ -531,7 +530,5 @@ namespace Ogre {
 	/** @} */
 
 } // Namespace
-
-#include "OgreHeaderSuffix.h"
 
 #endif

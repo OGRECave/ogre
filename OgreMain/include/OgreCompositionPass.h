@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreMaterial.h"
 #include "OgreRenderSystem.h"
 #include "OgreRenderQueue.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -353,7 +352,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreAtomicWrappers.h"
 #include "OgreAny.h"
 #include "OgreSharedPtr.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -552,7 +551,6 @@ namespace Ogre
 
 }
 
-#include "OgreHeaderSuffix.h"
 
 #endif
 

@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
-#include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #  if !defined(WIN32_LEAN_AND_MEAN)
@@ -186,7 +185,4 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif

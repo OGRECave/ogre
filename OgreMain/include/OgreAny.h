@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include <algorithm>
 #include <typeinfo>
-#include "OgreHeaderPrefix.h"
+
 
 namespace Ogre
 {
@@ -433,9 +433,8 @@ namespace Ogre
 	/** @} */
 	/** @} */
 
-}
 
-#include "OgreHeaderSuffix.h"
+}
 
 #endif
 

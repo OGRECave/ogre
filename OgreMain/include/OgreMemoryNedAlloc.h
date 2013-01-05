@@ -29,8 +29,6 @@ THE SOFTWARE.
 #ifndef __MemoryNedAlloc_H__
 #define __MemoryNedAlloc_H__
 
-#include "OgreHeaderPrefix.h"
-
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NED
 
 namespace Ogre
@@ -137,8 +135,6 @@ namespace Ogre
 }// namespace Ogre
 
 #endif 
-
-#include "OgreHeaderSuffix.h"
 
 #endif // __MemoryNedAlloc_H__
 

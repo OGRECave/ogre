@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreVector4.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreRenderOperation.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -266,8 +265,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif
 

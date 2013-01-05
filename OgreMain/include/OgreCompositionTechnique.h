@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgrePixelFormat.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreHeaderPRefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -185,7 +184,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

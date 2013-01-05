@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreRectangle2D.h"
 #include "OgreRenderSystem.h"
 #include "OgreCompositionTechnique.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -288,7 +287,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

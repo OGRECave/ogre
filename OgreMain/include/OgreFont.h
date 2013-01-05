@@ -32,7 +32,6 @@ THE SOFTWARE
 #include "OgreTexture.h"
 #include "OgreMaterial.h"
 #include "OgreCommon.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -475,7 +474,5 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgrePredefinedControllers.h"
 #include "OgreTextureUnitState.h"
 #include "OgreSharedPtr.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -292,7 +291,4 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif

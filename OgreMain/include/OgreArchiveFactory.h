@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define _ArchiveFactory_H__
 
 #include "OgrePrerequisites.h"
+
 #include "OgreFactoryObj.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -66,7 +66,5 @@ namespace Ogre {
 	/** @} */
 
 } // namespace
-
-#include "OgreHeaderSuffix.h"
 
 #endif

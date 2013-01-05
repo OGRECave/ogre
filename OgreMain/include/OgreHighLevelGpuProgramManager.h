@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 #include "OgreException.h"
 #include "OgreHighLevelGpuProgram.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -155,7 +154,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreFrameListener.h"
 #include "OgreControllerManager.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -242,7 +241,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

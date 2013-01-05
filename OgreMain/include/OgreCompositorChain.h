@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreCompositorInstance.h"
 #include "OgreCompositor.h"
 #include "OgreViewport.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -238,7 +237,5 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

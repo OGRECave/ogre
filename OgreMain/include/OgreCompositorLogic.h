@@ -29,7 +29,6 @@ THE SOFTWARE.
 #define __CompositorLogic_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -65,7 +64,5 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif
