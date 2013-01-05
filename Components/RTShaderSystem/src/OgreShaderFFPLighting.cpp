@@ -183,12 +183,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 		// Update diffuse colour.
 		if ((mTrackVertexColourType & TVC_DIFFUSE) == 0)
 		{
-			colour = srcLight->getDiffuseColour() * pass->getDiffuse();
+			colour = srcLight->getDiffuseColour() * pass->getDiffuse() * srcLight->getPowerScale();
 			curParams.mDiffuseColour->setGpuParameter(colour);					
 		}
 		else
 		{					
-			colour = srcLight->getDiffuseColour();
+			colour = srcLight->getDiffuseColour() * srcLight->getPowerScale();
 			curParams.mDiffuseColour->setGpuParameter(colour);	
 		}
 
@@ -198,12 +198,12 @@ void FFPLighting::updateGpuProgramsParams(Renderable* rend, Pass* pass, const Au
 			// Update diffuse colour.
 			if ((mTrackVertexColourType & TVC_SPECULAR) == 0)
 			{
-				colour = srcLight->getSpecularColour() * pass->getSpecular();
+				colour = srcLight->getSpecularColour() * pass->getSpecular() * srcLight->getPowerScale();
 				curParams.mSpecularColour->setGpuParameter(colour);					
 			}
 			else
 			{					
-				colour = srcLight->getSpecularColour();
+				colour = srcLight->getSpecularColour() * srcLight->getPowerScale();
 				curParams.mSpecularColour->setGpuParameter(colour);	
 			}
 		}																			
