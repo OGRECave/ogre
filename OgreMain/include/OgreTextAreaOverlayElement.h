@@ -29,6 +29,7 @@ THE SOFTWARE
 
 #include "OgreOverlayElement.h"
 #include "OgreFont.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -253,6 +254,8 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif
 

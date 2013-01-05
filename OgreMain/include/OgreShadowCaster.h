@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreHeaderPrefix.h"
 
-
 namespace Ogre {
 
 

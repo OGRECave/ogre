@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreOverlay.h"
 #include "OgreScriptLoader.h"
 #include "OgreFrustum.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -252,5 +253,6 @@ namespace Ogre {
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif 

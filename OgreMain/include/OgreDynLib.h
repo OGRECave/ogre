@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _DynLib_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #    define DYNLIB_HANDLE hInstance
@@ -120,5 +121,7 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

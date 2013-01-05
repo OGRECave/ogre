@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreSerializer.h"
 #include "OgreMeshSerializerImpl.h"
+#include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
@@ -202,5 +203,6 @@ namespace Ogre {
 	/** @} */
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif

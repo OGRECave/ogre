@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreMesh.h"
 #include "OgrePatchMesh.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -493,5 +494,7 @@ namespace Ogre {
 	/** @} */
 
 } //namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

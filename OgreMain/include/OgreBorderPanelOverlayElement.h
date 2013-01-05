@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __BorderPanelOverlayElement_H__
 
 #include "OgrePanelOverlayElement.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -348,5 +349,7 @@ namespace Ogre {
 	/** @} */
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

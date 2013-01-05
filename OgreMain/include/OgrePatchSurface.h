@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include "OgreRenderOperation.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -227,14 +228,13 @@ namespace Ogre {
 
         AxisAlignedBox mAABB;
         Real mBoundingSphere;
-
-
-
     };
 
 	/** @} */
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

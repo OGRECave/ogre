@@ -27,6 +27,7 @@ THE SOFTWARE
 #define __OgreDefaultWorkQueueStandard_H__
 
 #include "../OgreWorkQueue.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -78,5 +79,7 @@ namespace Ogre
 	};
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

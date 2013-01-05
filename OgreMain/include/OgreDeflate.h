@@ -30,7 +30,7 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreDataStream.h"
-
+#include "OgreHeaderPrefix.h"
 
 /// forward decls
 struct z_stream_s;
@@ -129,5 +129,7 @@ namespace Ogre
 		
 	};
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

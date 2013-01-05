@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
 
-
 namespace Ogre {
 
 

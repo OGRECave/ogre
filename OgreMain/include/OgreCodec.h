@@ -1,5 +1,4 @@
-/*
------------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
@@ -34,6 +33,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreStringVector.h"
 #include "OgreException.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -174,5 +174,7 @@ namespace Ogre {
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

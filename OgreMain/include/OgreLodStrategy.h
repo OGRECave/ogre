@@ -29,11 +29,10 @@ THE SOFTWARE.
 #define __Lod_Strategy_H__
 
 #include "OgrePrerequisites.h"
-
 #include "OgreMesh.h"
-
 #include "OgreMovableObject.h"
 #include "OgreCamera.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -128,5 +127,7 @@ namespace Ogre {
 	/** @} */
 
 } // namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

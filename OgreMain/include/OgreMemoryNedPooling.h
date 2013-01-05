@@ -26,9 +26,10 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-
 #ifndef __MemoryNedPooling_H__
 #define __MemoryNedPooling_H__
+
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_MEMORY_ALLOCATOR == OGRE_MEMORY_ALLOCATOR_NEDPOOLING
 
@@ -138,6 +139,8 @@ namespace Ogre
 }// namespace Ogre
 
 #endif 
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __MemoryNedPooling_H__
 

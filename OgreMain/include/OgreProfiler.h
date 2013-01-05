@@ -45,6 +45,7 @@ Ogre-dependent is in the visualization/logging routines and the use of the Timer
 #include "OgreSingleton.h"
 #include "OgreString.h"
 #include "OgreOverlay.h"
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_PROFILING == 1
 #	define OgreProfile( a ) Ogre::Profile _OgreProfileInstance( (a) )
@@ -545,5 +546,7 @@ namespace Ogre {
 	/** @} */
 
 } // end namespace
+
+#include "OgreHeaderSuffix.h"
 
 #endif

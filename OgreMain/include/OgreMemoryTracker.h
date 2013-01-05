@@ -29,6 +29,8 @@ THE SOFTWARE.
 #ifndef _MemoryTracker_H__
 #define _MemoryTracker_H__
 
+#include "OgreHeaderPrefix.h"
+
 // Don't include prerequisites, can cause a circular dependency
 // This file must be included within another file which already has the prerequisites in it
 //#include "OgrePrerequisites.h"
@@ -185,13 +187,12 @@ namespace Ogre
 
 	};
 
-
-
 #endif
 	/** @} */
 	/** @} */
 
 }
 
-#endif
+#include "OgreHeaderSuffix.h"
 
+#endif

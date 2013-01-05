@@ -29,6 +29,7 @@
 
 
 #include "OgrePrerequisites.h"
+#include "OgreHeaderPrefix.h"
 
 #if OGRE_UNICODE_SUPPORT 
 
@@ -1109,5 +1110,7 @@ namespace Ogre {
 } // namespace Ogre{
 
 #endif // OGRE_UNICODE_SUPPORT
+
+#include "OgreHeaderSuffix.h"
 
 #endif 
