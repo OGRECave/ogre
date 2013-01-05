@@ -115,6 +115,8 @@ namespace Ogre  {
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 return GL_BGRA;
 #endif
+            case PF_A4R4G4B4:
+            case PF_A1R5G5B5:
             case PF_X8B8G8R8:
 			case PF_R8G8B8A8:
             case PF_A2B10G10R10:
