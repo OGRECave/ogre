@@ -67,6 +67,10 @@ namespace Volume {
         */
         explicit TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
         
+        /** Destructor.
+        */
+        ~TextureSource(void);
+
     };
 
 }

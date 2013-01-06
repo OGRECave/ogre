@@ -117,6 +117,13 @@ namespace Volume {
         buffer->unlock();
         LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }
-    
+        
+    //-----------------------------------------------------------------------
+
+    TextureSource::~TextureSource(void)
+    {
+        OGRE_FREE(mData, MEMCATEGORY_GENERAL);
+    }
+
 }
 }
