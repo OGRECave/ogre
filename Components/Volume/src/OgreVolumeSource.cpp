@@ -41,10 +41,16 @@ namespace Volume {
     {
     }
 
+    
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, const String &file)
     {
+        Real maxClampedAbsoluteDensity = (from - to).length() / (Real)16.0;
+        serialize(from, to, voxelWidth, maxClampedAbsoluteDensity, file);
+    }
+
+    void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file)
+    {
      
-        
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
@@ -54,11 +60,10 @@ namespace Volume {
         // Write Metadata
         ser.write(&from);
         ser.write(&to);
-        ser.write(&voxelWidth);
+        ser.write<float>(&voxelWidth);
 
         // Go over the volume and write the density data.
         Vector3 pos;
-        Real max = (from - to).length() / (Real)8.0;
         uint16 val;
         Real realVal;
         for (pos.z = from.z; pos.z <= to.z; pos.z += voxelWidth)
@@ -67,7 +72,7 @@ namespace Volume {
             {
                 for (pos.y = from.y; pos.y <= to.y; pos.y += voxelWidth)
                 {
-                    realVal = Math::Clamp<Real>(getValue(pos), -max, max);
+                    realVal = Math::Clamp<Real>(getValue(pos), -maxClampedAbsoluteDensity, maxClampedAbsoluteDensity);
                     val = Bitwise::floatToHalf(realVal);
                     ser.write(&val);
                 }

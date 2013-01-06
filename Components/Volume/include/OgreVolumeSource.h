@@ -64,7 +64,39 @@ namespace Volume {
         */
         virtual Real getValue(const Vector3 &position) const = 0;
 
+        /** Serializes a volume source to a discrete grid file with deflated
+        compression. To achieve better compression, all density values are clamped
+        within a maximum absolute value of (to - from).length() / 16.0. The values
+        are scanned in this inner-loop-order: z, x, y. y last because there is usually
+        the least isosurface intersection to be expected in the use case of terrain and
+        so more often the maximum density value hit. The values are written as 16 Bit
+        floats to save space. Note that this process is not lossless, the tradeoff is
+        between accuracy of the source-reproduction (smaller voxelWidth) and smaller
+        filesize (bigger voxelWidth).
+        @param from
+            The start point to scan the volume.
+        @param to
+            The end point to scan the volume.
+        @param voxelWidth
+            The width of a single cube in the density grid.
+        @param file
+            The file to write the grid to.
+        */
         void serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, const String &file);
+        
+        /** Same as the other serialize function but with a user definable maximum absolute density value.
+        @param from
+            The start point to scan the volume.
+        @param to
+            The end point to scan the volume.
+        @param voxelWidth
+            The width of a single cube in the density grid.
+        @param maxClampedAbsoluteDensity
+            The maximum absolute density value to be written into the file, influencing the compression rate.
+        @param file
+            The file to write the grid to.
+        */
+        void serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file);
 
     };
 
