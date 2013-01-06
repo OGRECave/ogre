@@ -19,6 +19,7 @@ set (HEADER_FILES
 	include/OgreVolumeCSGSource.h
 	include/OgreVolumeDualGridGenerator.h
 	include/OgreVolumeGridSource.h
+	include/OgreVolumeHalfFloatGridSource.h
 	include/OgreVolumeIsoSurface.h
 	include/OgreVolumeIsoSurfaceMC.h
 	include/OgreVolumeIsoSurfaceTablesMC.h
@@ -36,6 +37,7 @@ set(SOURCE_FILES
 	src/OgreVolumeCSGSource.cpp
 	src/OgreVolumeDualGridGenerator.cpp
 	src/OgreVolumeGridSource.cpp
+	src/OgreVolumeHalfFloatGridSource.cpp
 	src/OgreVolumeIsoSurface.cpp
 	src/OgreVolumeIsoSurfaceMC.cpp
 	src/OgreVolumeMeshBuilder.cpp

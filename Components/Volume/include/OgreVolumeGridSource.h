@@ -48,9 +48,6 @@ namespace Volume {
         /// The texture height.
         int mHeight;
 
-        /// To have a little bit faster data access.
-        int mWidthTimesHeight;
-
         /// The scale of the position based on the world width.
         Real mPosXScale;
         
