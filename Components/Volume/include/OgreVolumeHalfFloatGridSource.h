@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __Ogre_Volume_TextureSource_H__
-#define __Ogre_Volume_TextureSource_H__
+#ifndef __Ogre_Volume_HalfFloatGridSource_H__
+#define __Ogre_Volume_HalfFloatGridSource_H__
 
 
 #include "OgreVolumeGridSource.h"
@@ -34,18 +34,19 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    /** A volume source from a 3D texture.
+    /** A volume source from a 16 Bit float 3D grid capable of loading volume
+    serializations.
     */
-    class _OgreVolumeExport TextureSource : public GridSource
+    class _OgreVolumeExport HalfFloatGridSource : public GridSource
     {
     protected:
         
-        /// To have a little bit faster data access.
-        int mWidthTimesHeight;
-
         /// The raw volume data.
-        float *mData;
+        uint16 *mData;
         
+        /// To have a little bit faster data access.
+        int mDepthTimesHeight;
+
         /** Overridden from GridSource.
         */
         virtual float getVolumeGridValue(int x, int y, int z) const;
@@ -53,14 +54,8 @@ namespace Volume {
     public:
 
         /** Constructur.
-        @param volumeTextureName
-            Which volume texture to get the data from.
-        @param worldWidth
-            The world width.
-        @param worldHeight
-            The world height.
-        @param worldDepth
-            The world depth.
+        @param volumeSerializationName
+            Which volume serialization to get the data from.
         @param trilinearValue
             Whether to use trilinear filtering (true) or nearest neighbour (false) for the value.
         @param trilinearGradient
@@ -68,11 +63,11 @@ namespace Volume {
         @param sobelGradient
             Whether to add a bit of blur to the gradient like in a sobel filter.
         */
-        explicit TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
+        explicit HalfFloatGridSource(const String &serializedVolumeFile, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
         
         /** Destructor.
         */
-        ~TextureSource(void);
+        ~HalfFloatGridSource(void);
 
     };
 
