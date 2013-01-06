@@ -115,18 +115,10 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
 	  endif ()
 	elseif(APPLE)
-	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/libOIS.a)
-	        install(FILES
-	          ${OGRE_DEP_DIR}/lib/debug/libOIS.a
-	          DESTINATION lib/debug CONFIGURATIONS Debug
-	        )
-	  endif ()
-	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/libOIS.a)
-	        install(FILES
-	          ${OGRE_DEP_DIR}/lib/release/libOIS.a
-	          DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-	        )
-	  endif ()
+        install(FILES
+          ${OGRE_DEP_DIR}/lib/$(PLATFORM_NAME)/$(CONFIGURATION)/libOIS.a
+          DESTINATION lib/$(PLATFORM_NAME)/$(CONFIGURATION)
+        )
 	endif ()
 	  endif ()
     
@@ -291,7 +283,7 @@ if (OGRE_COPY_DEPENDENCIES)
       copy_release(libGLESv2.dll)
     endif ()
 
-  elseif(APPLE)
+  elseif(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     # copy the required libs and frameworks to the build directory (configure_file is the only copy-like op I found in CMake)
     copy_debug(libOIS.a)
     copy_release(libOIS.a)
