@@ -41,8 +41,14 @@ namespace Volume {
     {
     public:
 
+        /// The id of volume files.
         static const uint32 VOLUME_CHUNK_ID;
+
+        /// The version of volume files.
         static const uint16 VOLUME_CHUNK_VERSION;
+
+        /// The amount of items being written as one chunk during serialization.
+        static const size_t SERIALIZATION_CHUNK_SIZE;
         
         /** Destructor.
         */

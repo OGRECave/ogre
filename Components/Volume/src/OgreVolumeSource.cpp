@@ -36,6 +36,7 @@ namespace Volume {
     
     const uint32 Source::VOLUME_CHUNK_ID = StreamSerialiser::makeIdentifier("VOLU");
     const uint16 Source::VOLUME_CHUNK_VERSION = 1;
+    const size_t Source::SERIALIZATION_CHUNK_SIZE = 1000;
 
     Source::~Source(void)
     {
@@ -51,6 +52,8 @@ namespace Volume {
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file)
     {
      
+        Timer t;
+
         // Compress
         DataStreamPtr stream = Root::getSingleton().createFileStream(file);
         DataStreamPtr compressStream(OGRE_NEW DeflateStream(file, stream));
@@ -61,23 +64,46 @@ namespace Volume {
         ser.write(&from);
         ser.write(&to);
         ser.write<float>(&voxelWidth);
+        Vector3 diagonal = to - from;
+        size_t gridWidth = (size_t)(diagonal.x / voxelWidth);
+        size_t gridHeight = (size_t)(diagonal.y / voxelWidth);
+        size_t gridDepth = (size_t)(diagonal.z / voxelWidth);
+        ser.write<size_t>(&gridWidth);
+        ser.write<size_t>(&gridHeight);
+        ser.write<size_t>(&gridDepth);
 
         // Go over the volume and write the density data.
         Vector3 pos;
-        uint16 val;
         Real realVal;
-        for (pos.z = from.z; pos.z <= to.z; pos.z += voxelWidth)
+        size_t x;
+        size_t y;
+        uint16 buffer[SERIALIZATION_CHUNK_SIZE];
+        size_t bufferI = 0;
+        for (size_t z = 0; z < gridDepth; ++z)
         {
-            for (pos.x = from.x; pos.x <= to.x; pos.x += voxelWidth)
+            for (x = 0; x < gridWidth; ++x)
             {
-                for (pos.y = from.y; pos.y <= to.y; pos.y += voxelWidth)
+                for (y = 0; y < gridHeight; ++y)
                 {
+                    pos.x = x * voxelWidth + from.x;
+                    pos.y = y * voxelWidth + from.y;
+                    pos.z = z * voxelWidth + from.z;
                     realVal = Math::Clamp<Real>(getValue(pos), -maxClampedAbsoluteDensity, maxClampedAbsoluteDensity);
-                    val = Bitwise::floatToHalf(realVal);
-                    ser.write(&val);
+                    buffer[bufferI] = Bitwise::floatToHalf(realVal);
+                    bufferI++;
+                    if (bufferI == SERIALIZATION_CHUNK_SIZE)
+                    {
+                        ser.write<uint16>(buffer, SERIALIZATION_CHUNK_SIZE);
+                        bufferI = 0;
+                    }
                 }
             }
         }
+        if (bufferI > 0)
+        {
+            ser.write<uint16>(buffer, bufferI);
+        }
+        LogManager::getSingleton().stream() << "Time for serialization: " << t.getMilliseconds() << "ms";
 
         ser.writeChunkEnd(VOLUME_CHUNK_ID);
         
