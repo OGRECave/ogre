@@ -138,7 +138,7 @@ namespace Ogre
 				GLint binaryLength = 0;
 
 #if GL_OES_get_program_binary
-				glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
+				glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength);
                 GL_CHECK_ERROR;
 #endif
 
@@ -148,7 +148,7 @@ namespace Ogre
 
 #if GL_OES_get_program_binary
 				// Get binary
-				glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
+				glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum));
                 GL_CHECK_ERROR;
 #endif
 
