@@ -253,7 +253,7 @@ namespace Volume {
         // Wait for the threads.
         while(mChunksBeingProcessed)
         {
-            OGRE_THREAD_SLEEP(0)
+            OGRE_THREAD_SLEEP(0);
             wq->processResponses();
         }
     
