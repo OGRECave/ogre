@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ namespace Ogre {
     {
         // Bind target to surface 0 and initialise
         mFB.bindSurface(0, target);
-        GL_CHECK_ERROR;
+
         // Get attributes
         mWidth = mFB.getWidth();
         mHeight = mFB.getHeight();
@@ -164,8 +164,7 @@ namespace Ogre {
     {
         detectFBOFormats();
         
-        glGenFramebuffers(1, &mTempFBO);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
 
 	GLES2FBOManager::~GLES2FBOManager()
@@ -175,19 +174,16 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage("GL ES 2: Warning! GLES2FBOManager destructor called, but not all renderbuffers were released.");
 		}
         
-        glDeleteFramebuffers(1, &mTempFBO);      
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
 	}
     
     void GLES2FBOManager::_reload()
     {
-        glDeleteFramebuffers(1, &mTempFBO);      
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO));
         
         detectFBOFormats();
-        
-        glGenFramebuffers(1, &mTempFBO);
-        GL_CHECK_ERROR;
+
+        OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO));
     }
     
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
@@ -322,7 +318,7 @@ namespace Ogre {
 				glBindTexture(target, tid);
 
                 // Set some default parameters
-#if GL_APPLE_texture_max_level
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
                 glTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 #endif
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -402,7 +398,7 @@ namespace Ogre {
         }
 
         // Clear any errors
-        GL_CHECK_ERROR;
+        glGetError();
 
 		String fmtstring;
         for(size_t x=0; x<PF_COUNT; ++x)
@@ -473,11 +469,10 @@ namespace Ogre {
             // Old style context (window/pbuffer) or copying render texture
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             // The screen buffer is 1 on iOS
-            glBindFramebuffer(GL_FRAMEBUFFER, 1);
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 1));
 #else
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 #endif
-        GL_CHECK_ERROR;
     }
     
     GLES2SurfaceDesc GLES2FBOManager::requestRenderBuffer(GLenum format, size_t width, size_t height, uint fsaa)

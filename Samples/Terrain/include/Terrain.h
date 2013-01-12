@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -467,8 +467,7 @@ protected:
 				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
 				Real height = terrain->getHeightAtTerrainPosition(tx, ty);
 				Real val = (height - minHeight0) / fadeDist0;
-				val = Math::Clamp(val, (Real)0, (Real)1);
-				//*pBlend0++ = val;
+				Math::Clamp(val, (Real)0, (Real)1);
 
 				val = (height - minHeight1) / fadeDist1;
 				val = Math::Clamp(val, (Real)0, (Real)1);
@@ -874,6 +873,7 @@ protected:
 			OGRE_DELETE mTerrainGroup;
 
 		OGRE_DELETE mTerrainGlobals;
+        mHouseList.clear();
 
 		SdkSample::_shutdown();
 	}

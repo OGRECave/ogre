@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace Ogre {
                                                        size_t numVertices,
                                                        HardwareBuffer::Usage usage,
                                                        bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, useShadowBuffer)
+        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, true)
     {
         if (!useShadowBuffer)
         {
@@ -46,29 +46,53 @@ namespace Ogre {
                         "Only supported with shadowBuffer",
                         "GLESHardwareVertexBuffer");
         }
+        
+        createBuffer();
+    }
 
+    GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
+    {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareVertexBuffer::createBuffer()
+    {
         glGenBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
-
+        
         if (!mBufferId)
         {
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                         "Cannot create GL ES vertex buffer",
                         "GLESHardwareVertexBuffer::GLESHardwareVertexBuffer");
         }
-
+        
         glBindBuffer(GL_ARRAY_BUFFER, mBufferId);
         GL_CHECK_ERROR;
         glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, NULL,
-                     GLESHardwareBufferManager::getGLUsage(usage));
+                     GLESHardwareBufferManager::getGLUsage(mUsage));
         GL_CHECK_ERROR;
     }
-
-    GLESHardwareVertexBuffer::~GLESHardwareVertexBuffer()
+    
+    void GLESHardwareVertexBuffer::destroyBuffer()
     {
         glDeleteBuffers(1, &mBufferId);
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESHardwareVertexBuffer::notifyOnContextLost()
+    {
+        destroyBuffer();
+    }
+    
+    void GLESHardwareVertexBuffer::notifyOnContextReset()
+    {
+        createBuffer();
+        mShadowUpdated = true;
+        _updateFromShadow();
+    }
+#endif
 
     void* GLESHardwareVertexBuffer::lockImpl(size_t offset,
                                            size_t length,
@@ -250,17 +274,17 @@ namespace Ogre {
             GL_CHECK_ERROR;
 
             // Update whole buffer if possible, otherwise normal
-            if (mLockStart == 0 && mLockSize == mSizeInBytes)
-            {
+//           if (mLockStart == 0 && mLockSize == mSizeInBytes)
+//            {
                 glBufferData(GL_ARRAY_BUFFER, mSizeInBytes, srcData,
                              GLESHardwareBufferManager::getGLUsage(mUsage));
                 GL_CHECK_ERROR;
-            }
-            else
-            {
-                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
-                GL_CHECK_ERROR;
-            }
+//            }
+//            else
+//            {
+//                glBufferSubData(GL_ARRAY_BUFFER, mLockStart, mLockSize, srcData);
+//                GL_CHECK_ERROR;
+//            }
 
             mShadowBuffer->unlock();
             mShadowUpdated = false;

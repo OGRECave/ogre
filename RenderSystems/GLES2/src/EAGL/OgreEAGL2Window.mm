@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -95,10 +95,7 @@ namespace Ogre {
         {
             switchFullScreen(false);
         }
-        
-        if(!mUsingExternalView)
-            [mView release];
-        
+
         if(!mUsingExternalViewController)
             [mViewController release];
     }
@@ -169,8 +166,7 @@ namespace Ogre {
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
             // Bind the FSAA buffer if we're doing multisampling
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mFSAAFramebuffer));
         }
     }
 
@@ -232,10 +228,17 @@ namespace Ogre {
         
         CAEAGLLayer *eaglLayer = (CAEAGLLayer *)mView.layer;
         OgreAssert(eaglLayer != nil, "EAGL2Window: Failed to retrieve a pointer to the view's Core Animation layer");
-        
+
+        BOOL retainedBacking = NO;
+        NameValuePairList::const_iterator option;
+        if ((option = miscParams->find("retainedBacking")) != miscParams->end())
+        {
+            retainedBacking = StringConverter::parseBool(option->second);
+        }
+
         eaglLayer.opaque = YES;
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking,
+                                        [NSNumber numberWithBool:retainedBacking], kEAGLDrawablePropertyRetainedBacking,
                                         kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
         // Set up the view controller
         if(!mUsingExternalViewController)
@@ -252,7 +255,6 @@ namespace Ogre {
         if(eaglLayer)
         {
             EAGLSharegroup *group = nil;
-            NameValuePairList::const_iterator option;
             
             if ((option = miscParams->find("externalSharegroup")) != miscParams->end())
             {
@@ -268,7 +270,8 @@ namespace Ogre {
         
         OgreAssert(mContext != nil, "EAGL2Window: Failed to create OpenGL ES context");
 
-        [mWindow addSubview:mViewController.view];
+        if(!mUsingExternalViewController)
+            [mWindow addSubview:mViewController.view];
         
         mViewController.mGLSupport = mGLSupport;
         
@@ -278,7 +281,8 @@ namespace Ogre {
         if(!mUsingExternalView)
             [mView release];
     
-        [mWindow makeKeyAndVisible];
+        if(!mUsingExternalViewController)
+            [mWindow makeKeyAndVisible];
 
         mContext->createFramebuffer();
         
@@ -420,32 +424,24 @@ namespace Ogre {
         
         if(mContext->mIsMultiSampleSupported && mContext->mNumSamples > 0)
         {
-            glDisable(GL_SCISSOR_TEST);     
-            glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer);
-            GL_CHECK_ERROR
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
-            glResolveMultisampleFramebufferAPPLE();
-            GL_CHECK_ERROR
-            glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments);
-            GL_CHECK_ERROR
-            
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_READ_FRAMEBUFFER_APPLE, mContext->mFSAAFramebuffer));
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER_APPLE, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glResolveMultisampleFramebufferAPPLE());
+            OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, attachmentCount, attachments));
+
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
         }
         else
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer);
-            GL_CHECK_ERROR
-            glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments);
-            GL_CHECK_ERROR
+            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mContext->mViewFramebuffer));
+            OGRE_CHECK_GL_ERROR(glDiscardFramebufferEXT(GL_FRAMEBUFFER, attachmentCount, attachments));
         }
         
-        glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glBindRenderbuffer(GL_RENDERBUFFER, mContext->mViewRenderbuffer));
         if ([mContext->getContext() presentRenderbuffer:GL_RENDERBUFFER] == NO)
         {
-            GL_CHECK_ERROR
+            glGetError();
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Failed to swap buffers in ",
                         __FUNCTION__);
@@ -487,9 +483,6 @@ namespace Ogre {
 
     void EAGL2Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if(dst.format != PF_A8R8G8B8)
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only PF_A8R8G8B8 is a supported format for OpenGL ES", __FUNCTION__);
-
         if ((dst.right > mWidth) ||
 			(dst.bottom > mHeight) ||
 			(dst.front != 0) || (dst.back != 1))
@@ -515,12 +508,11 @@ namespace Ogre {
         GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
 
         // Read pixel data from the framebuffer
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        GL_CHECK_ERROR
-		glReadPixels((GLint)dst.left, (GLint)dst.top,
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     GL_RGBA, GL_UNSIGNED_BYTE, data);
-        GL_CHECK_ERROR
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
+
+		OGRE_CHECK_GL_ERROR(glReadPixels((GLint)dst.left, (GLint)dst.top,
+                                         (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                                         GL_RGBA, GL_UNSIGNED_BYTE, data));
 
         // Create a CGImage with the pixel data
         // If your OpenGL ES content is opaque, use kCGImageAlphaNoneSkipLast to ignore the alpha channel
@@ -528,7 +520,7 @@ namespace Ogre {
         CGDataProviderRef ref = CGDataProviderCreateWithData(NULL, data, dataLength, NULL);
         CGColorSpaceRef colorspace = CGColorSpaceCreateDeviceRGB();
         CGImageRef iref = CGImageCreate(width, height, 8, 32, width * 4, colorspace,
-                                        kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                        kCGBitmapByteOrder32Big | PixelUtil::hasAlpha(dst.format) ? kCGImageAlphaPremultipliedLast : kCGImageAlphaNoneSkipLast,
                                         ref, NULL, true, kCGRenderingIntentDefault);
 
         // OpenGL ES measures data in PIXELS

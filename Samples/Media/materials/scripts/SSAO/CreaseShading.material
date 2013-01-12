@@ -12,8 +12,21 @@ fragment_program SSAO/CreaseShading_fp_cg cg
     profiles ps_2_x arbfp1
 }
 
+fragment_program SSAO/CreaseShading_fp_glsl glsl
+{
+    source CreaseShadingFP.glsl
+	
+	default_params
+	{
+		param_named sNormal int 0
+		param_named sPosition int 1
+		param_named sRandom int 2
+	}
+}
+
 fragment_program SSAO/CreaseShading_fp unified
 {
+	delegate SSAO/CreaseShading_fp_glsl 
 	delegate SSAO/CreaseShading_fp_hlsl 
 	delegate SSAO/CreaseShading_fp_cg
 }
@@ -34,14 +47,14 @@ material SSAO/CreaseShading
 
             texture_unit // normals
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }
 
             texture_unit // view space position
             {
-                content_type compositor SSAO/GBuffer mrt 2
+                content_type compositor SSAO/GBuffer mrt 1
                 tex_address_mode clamp
                 filtering none
             }

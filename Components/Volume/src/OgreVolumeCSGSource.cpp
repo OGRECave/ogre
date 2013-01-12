@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -293,7 +293,7 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed) :
-        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes), mNoise(seed)
+        CSGUnarySource(src), mFrequencies(frequencies), mAmplitudes(amplitudes), mNumOctaves(numOctaves), mNoise(seed)
     {
         setData();
     }
@@ -301,7 +301,7 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     CSGNoiseSource::CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves) :
-        CSGUnarySource(src), mNumOctaves(numOctaves), mFrequencies(frequencies), mAmplitudes(amplitudes)
+        CSGUnarySource(src), mFrequencies(frequencies), mAmplitudes(amplitudes), mNumOctaves(numOctaves)
     {
         setData();
     }

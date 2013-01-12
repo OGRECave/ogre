@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreD3D11HardwareUniformBuffer.h"
+#include "OgreD3D11RenderSystem.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -231,7 +232,7 @@ namespace Ogre {
         GpuProgramManager::Microcode cacheMicrocode = 
             GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
 
-#define READ_NAMES(list, member) for(int i = 0 ; i < list.size() ; i++){ \
+#define READ_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
     uint16 length = 0;          \
     cacheMicrocode->read(&length, sizeof(uint16));  \
     list[i].member = ""; \
@@ -355,15 +356,23 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::compileMicrocode(void)
     {
+		// If we are running from the cache, we should not be trying to compile/reflect on shaders.
+#if defined(ENABLE_SHADERS_CACHE_LOAD) && (ENABLE_SHADERS_CACHE_LOAD == 1)
+		String message = "Cannot assemble/reflect D3D11 shader: " + mName + " in shipping code\n";
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, message,
+            "D3D11HLSLProgram::compileMicrocode");
+#else
+#pragma comment(lib, "d3dcompiler.lib")
+
         // include handler
         HLSLIncludeHandler includeHandler(this);
 
         ID3DBlob * errors = 0;
+        String stringBuffer;
+        vector<D3D_SHADER_MACRO>::type defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
         if (!shaderMacroSet)
         {
-            String stringBuffer;
-            vector<D3D_SHADER_MACRO>::type defines;
             getDefines(stringBuffer, defines, mPreprocessorDefines);
             pDefines = defines.empty() ? NULL : &defines[0];
         }
@@ -375,17 +384,14 @@ namespace Ogre {
 
 
         UINT compileFlags=0;
-#if defined(OGRE_DEBUG_MODE) && (OGRE_PLATFORM != OGRE_PLATFORM_WINRT)
+        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+#if OGRE_DEBUG_MODE
         compileFlags |= D3DCOMPILE_DEBUG;
-        compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
-
-        // There is nasty bug in Intel drivers that causes broken shaders.
-        // Can be reproduced on Samsung Slate PC from \\BUILD conference
-        // with at least Win8 builds 8102(DP), 8250(CP), 8400(RP)
-        const RenderSystemCapabilities* caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
-        if(caps->getVendor() == GPU_INTEL)
-            compileFlags = 0;
+        // Skipping optimization is not reliable for feature level 9.
+        if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
+            compileFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+        compileFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
 
         if (mColumnMajorMatrices)
@@ -402,9 +408,10 @@ namespace Ogre {
             compileFlags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
         }
 
-        const String& target = getCompatibleTarget();
+        const char* target = getCompatibleTarget().c_str();
 
         ID3DBlob * pMicroCode;
+
 
         HRESULT hr = D3DCompile(
             mSource.c_str(),	// [in] Pointer to the shader in memory. 
@@ -413,7 +420,7 @@ namespace Ogre {
             pDefines,			// [in] Optional. Pointer to a NULL-terminated array of macro definitions. See D3D_SHADER_MACRO. If not used, set this to NULL. 
             &includeHandler,	// [in] Optional. Pointer to an ID3DInclude Interface interface for handling include files. Setting this to NULL will cause a compile error if a shader contains a #include. 
             mEntryPoint.c_str(),// [in] Name of the shader-entrypoint function where shader execution begins. 
-            target.c_str(),	// [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
+            target,	// [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
             compileFlags,		// [in] Effect compile flags - no D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
             NULL,				// [in] Effect compile flags
             &pMicroCode,		// [out] A pointer to an ID3DBlob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
@@ -423,14 +430,17 @@ namespace Ogre {
 #if 0 // this is how you disassemble
         LPCSTR commentString = NULL;
         ID3DBlob* pIDisassembly = NULL;
-        char* pDisassembly = NULL;
+        const char* pDisassembly = NULL;
         if( pMicroCode )
         {
             D3DDisassemble( (UINT*) pMicroCode->GetBufferPointer(), 
                 pMicroCode->GetBufferSize(), D3D_DISASM_ENABLE_COLOR_CODE, commentString, &pIDisassembly );
         }
 
-        const char* assemblyCode =  static_cast<const char*>(pIDisassembly->GetBufferPointer());
+        if (pIDisassembly)
+        {
+            pDisassembly = static_cast<const char*>(pIDisassembly->GetBufferPointer());
+        }
 #endif
         if (FAILED(hr))
         {
@@ -647,7 +657,7 @@ namespace Ogre {
 #define GET_SIZE_OF_NAMES(result, list, member)                     \
                 uint32 result = 0;                                  \
                 {                                                   \
-                    for(int i = 0 ; i < list.size() ; i++)          \
+                    for(unsigned i = 0 ; i < list.size() ; i++)          \
                     {                                               \
                         if (list[i].member != NULL)                 \
                             result += strlen(list[i].member);       \
@@ -689,7 +699,7 @@ namespace Ogre {
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode(sizeOfData);
 
-#define STORE_NAMES(list, member) for(int i = 0 ; i < list.size() ; i++){ \
+#define STORE_NAMES(list, member) for(unsigned i = 0 ; i < list.size() ; i++){ \
     uint16 length = 0;                               \
     if(list[i].member != NULL)                       \
         length = strlen(list[i].member);      \
@@ -798,6 +808,8 @@ namespace Ogre {
         }
 
         analizeMicrocode();
+
+#endif // else defined(ENABLE_SHADERS_CACHE_LOAD) && (ENABLE_SHADERS_CACHE_LOAD == 1)
     }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::analizeMicrocode()

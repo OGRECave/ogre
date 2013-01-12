@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,6 @@ namespace Ogre {
         target->getCustomAttribute("FBO", &fbobj);
 		assert(fbobj);
 		fbo.bindSurface(attachment, fbobj->getSurface(0));
-        GL_CHECK_ERROR;
 
 		// Set width and height
 		mWidth = fbo.getWidth();
@@ -57,7 +56,6 @@ namespace Ogre {
 	void GLES2FBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
 	{
 		fbo.unbindSurface(attachment);
-        GL_CHECK_ERROR;
 
 		// Set width and height
 		mWidth = fbo.getWidth();

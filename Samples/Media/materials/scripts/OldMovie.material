@@ -17,8 +17,22 @@ fragment_program Ogre/Compositor/OldMovie_GLSLES_FP glsles
    	}
 }
 
+fragment_program Ogre/Compositor/OldMovie_GLSL_FP glsl
+{
+	source OldMovieFP.glsl
+	syntax glsl150
+   	default_params
+   	{
+   		param_named RT int 0
+   		param_named SplotchesTx int 1
+	   	param_named Texture2 int 2
+	   	param_named SepiaTx int 3
+   	}
+}
+
 fragment_program Ogre/Compositor/OldMovieFP unified
 {
+	delegate Ogre/Compositor/OldMovie_GLSL_FP
 	delegate Ogre/Compositor/OldMovie_GLSLES_FP
 	delegate Ogre/Compositor/OldMovie_Cg_FP
 }

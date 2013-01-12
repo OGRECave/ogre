@@ -1075,56 +1075,183 @@ fragment_program Examples/GrassWaverFpGLSLES glsles
     }
 }
 
+vertex_program Examples/GrassWaverVpGLSL glsl
+{
+	source GrassVp.glsl
+	syntax glsl150
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto camObjPos camera_position_object_space
+        param_named_auto ambient ambient_light_colour
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+        
+        param_named_auto offset custom 999
+    }
+  }
+  
+vertex_program Examples/GrassWaverTexVpGLSL glsl
+{
+	source GrassTexVp.glsl
+	syntax glsl150
+    
+    default_params
+      {
+        param_named_auto worldViewProj worldviewproj_matrix        
+        param_named_auto offset custom 999
+    }
+}
+vertex_program Examples/GrassWaverAmbientVpGLSL glsl
+{
+    source GrassAmbientVp.glsl
+    syntax glsl150
+    
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+        param_named_auto offset custom 999
+    }
+}
+fragment_program Examples/GrassWaverAmbientFpGLSL glsl
+{
+	source GrassAmbientFp.glsl
+	syntax glsl150
+    default_params
+    {
+        param_named diffuseMap int 0
+    }
+}
+
+vertex_program Examples/GrassWaverCasterVpGLSL glsl
+{
+	source GrassCasterVp.glsl
+	syntax glsl150
+    
+    default_params
+    {    
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto offset custom 999
+		param_named_auto texelOffsets texel_offsets
+    }
+}
+fragment_program Examples/GrassWaverCasterFpGLSL glsl
+{
+	source GrassCasterFp.glsl
+	syntax glsl150
+    default_params
+    {
+        param_named diffuseMap int 0
+    }
+}
+
+vertex_program Examples/GrassWaverReceiverVpGLSL glsl
+{
+	source GrassReceiverVp.glsl
+	syntax glsl150
+    
+    default_params
+    {
+        param_named_auto world world_matrix
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto texViewProj texture_viewproj_matrix
+
+        param_named_auto camObjPos camera_position_object_space
+
+        param_named_auto objSpaceLight light_position_object_space 0
+        param_named_auto lightColour light_diffuse_colour 0
+
+        param_named_auto offset custom 999
+	}
+}
+
+
+fragment_program Examples/GrassWaverReceiverFpGLSL glsl
+{
+	source GrassReceiverFp.glsl
+	syntax glsl150
+
+	default_params
+    {
+        param_named shadowMap int 0
+        param_named diffuseMap int 1
+        param_named fixedDepthBias float 0.0005
+        param_named gradientClamp float 0.0098
+        param_named gradientScaleBias float 0
+    }
+}
+
+fragment_program Examples/GrassWaverFpGLSL glsl
+{
+	source GrassFp.glsl
+	syntax glsl150
+    default_params
+    {
+        param_named diffuseMap int 0
+    }
+}
+
 vertex_program Examples/GrassWaverReceiverVp unified
 {
+	delegate Examples/GrassWaverReceiverVpGLSL
 	delegate Examples/GrassWaverReceiverVpGLSLES
 	delegate Examples/GrassWaverReceiverVpCg
 }
 
 fragment_program Examples/GrassWaverReceiverFp unified
 {
+	delegate Examples/GrassWaverReceiverFpGLSL
 	delegate Examples/GrassWaverReceiverFpGLSLES
 	delegate Examples/GrassWaverReceiverFpCg
 }
 
 vertex_program Examples/GrassWaverCasterVp unified
 {
+	delegate Examples/GrassWaverCasterVpGLSL
 	delegate Examples/GrassWaverCasterVpGLSLES
 	delegate Examples/GrassWaverCasterVpCg
 }
 
 fragment_program Examples/GrassWaverCasterFp unified
 {
+	delegate Examples/GrassWaverCasterFpGLSL
 	delegate Examples/GrassWaverCasterFpGLSLES
 	delegate Examples/GrassWaverCasterFpCg
 }
 
 vertex_program Examples/GrassWaverAmbientVp unified
 {
+	delegate Examples/GrassWaverAmbientVpGLSL
 	delegate Examples/GrassWaverAmbientVpGLSLES
 	delegate Examples/GrassWaverAmbientVpCg
 }
 
 fragment_program Examples/GrassWaverAmbientFp unified
 {
+	delegate Examples/GrassWaverAmbientFpGLSL
 	delegate Examples/GrassWaverAmbientFpGLSLES
 	delegate Examples/GrassWaverAmbientFpCg
 }
 
 vertex_program Examples/GrassWaverTexVp unified
 {
+	delegate Examples/GrassWaverTexVpGLSL
 	delegate Examples/GrassWaverTexVpGLSLES
 	delegate Examples/GrassWaverTexVpCg
 }
 
 fragment_program Examples/GrassWaverFp unified
 {
+	delegate Examples/GrassWaverFpGLSL
 	delegate Examples/GrassWaverFpGLSLES
 	delegate Examples/GrassWaverFpCg
 }
 
 vertex_program Examples/GrassWaverVp unified
 {
+	delegate Examples/GrassWaverVpGLSL
 	delegate Examples/GrassWaverVpGLSLES
 	delegate Examples/GrassWaverVpCg
 }
@@ -1426,13 +1553,11 @@ material Examples/GrassBladesAdditiveFloatTransparent
             {
 				tex_address_mode clamp
                 texture gras_02.png 
-      }
+            }
             
 			vertex_program_ref Examples/GrassWaverTexVp
 			{
 			}
-            
-            
         }
     }
 }
@@ -1899,8 +2024,15 @@ fragment_program Examples/ShowUV_pGLSLES glsles
 	profiles glsles
 }
 
+fragment_program Examples/ShowUV_pGLSL glsl
+{
+	source ShowUV.glsl
+	syntax glsl150
+}
+
 fragment_program Examples/ShowUV_p unified
 {
+	delegate Examples/ShowUV_pGLSL
 	delegate Examples/ShowUV_pGLSLES
 	delegate Examples/ShowUV_pCg
 	delegate Examples/ShowUV_pCg_sm4
@@ -1926,8 +2058,15 @@ fragment_program Examples/ShowUVdir3D_pGLSLES glsles
 	profiles glsles
 }
 
+fragment_program Examples/ShowUVdir3D_pGLSL glsl
+{
+	source ShowUVdir3D.glsl
+	syntax glsl150
+}
+
 fragment_program Examples/ShowUVdir3D_p unified
 {
+	delegate Examples/ShowUVdir3D_pGLSL
 	delegate Examples/ShowUVdir3D_pGLSLES
 	delegate Examples/ShowUVdir3D_pCg
 	delegate Examples/ShowUVdir3D_pCg_sm4
@@ -1965,8 +2104,19 @@ vertex_program Examples/ShowTangents_vGLSLES glsles
 	}
 }
 
+vertex_program Examples/ShowTangents_vGLSL glsl
+{
+	source ShowTangents.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
 vertex_program Examples/ShowTangents_v unified
 {
+	delegate Examples/ShowTangents_vGLSL
 	delegate Examples/ShowTangents_vGLSLES
 	delegate Examples/ShowTangents_vCg
 	delegate Examples/ShowTangents_vCg_sm4
@@ -2004,8 +2154,19 @@ vertex_program Examples/ShowNormals_vGLSLES glsles
 	}
 }
 
+vertex_program Examples/ShowNormals_vGLSL glsl
+{
+	source ShowNormals.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
 vertex_program Examples/ShowNormals_v unified
 {
+	delegate Examples/ShowNormals_vGLSL
 	delegate Examples/ShowNormals_vGLSLES
 	delegate Examples/ShowNormals_vCg
 	delegate Examples/ShowNormals_vCg_sm4

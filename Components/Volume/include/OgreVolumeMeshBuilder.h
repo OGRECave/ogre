@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -127,11 +127,11 @@ namespace Volume {
 
     /** To hold vertices.
     */
-    typedef _OgreVolumeExport vector<Vertex>::type VecVertex;
+    typedef vector<Vertex>::type VecVertex;
 
     /** To hold indices.
     */
-    typedef _OgreVolumeExport vector<size_t>::type VecIndices;
+    typedef vector<size_t>::type VecIndices;
 
     /** Callback class when the user needs information about the triangles of
         chunks of a LOD level.

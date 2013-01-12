@@ -555,7 +555,8 @@ void Sample_ShaderSystem::setupUI()
 	mModifierValueSlider = mTrayMgr->createThickSlider(TL_RIGHT, MODIFIER_VALUE_SLIDER, "Modifier", 240, 80, 0, 1, 100);
 	mModifierValueSlider->setValue(0.0,false);	
 	// Update the caption.
-	updateLayerBlendingCaption(mLayerBlendSubRS->getBlendMode(1));
+	if(mLayerBlendSubRS)
+		updateLayerBlendingCaption(mLayerBlendSubRS->getBlendMode(1));
 
 #endif
 

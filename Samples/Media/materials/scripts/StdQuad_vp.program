@@ -61,6 +61,50 @@ vertex_program Ogre/Compositor/StdQuad_Tex4_Cg_vp cg
 vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl
 {
 	source StdQuad_vp.glsl
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex2_GLSL_vp glsl
+{
+	source StdQuad_Tex2_vp.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex2a_GLSL_vp glsl
+{
+	source StdQuad_Tex2a_vp.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex3_GLSL_vp glsl
+{
+	source StdQuad_Tex3_vp.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+vertex_program Ogre/Compositor/StdQuad_Tex4_GLSL_vp glsl
+{
+	source StdQuad_Tex4_vp.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
 }
 
 vertex_program Ogre/Compositor/StdQuad_GLSLES_vp glsles
@@ -125,8 +169,10 @@ vertex_program Ogre/Compositor/StdQuad_HLSL_vp hlsl
 // Unified definitions
 vertex_program Ogre/Compositor/StdQuad_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Cg_vp
+	delegate Ogre/Compositor/StdQuad_HLSL_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_NoCG_vp unified
@@ -138,24 +184,28 @@ vertex_program Ogre/Compositor/StdQuad_NoCG_vp unified
 
 vertex_program Ogre/Compositor/StdQuad_Tex2_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_Tex2_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_Tex2_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Tex2_Cg_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_Tex2a_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_Tex2a_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_Tex2a_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Tex2a_Cg_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_Tex3_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_Tex3_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_Tex3_GLSLES_vp
     delegate Ogre/Compositor/StdQuad_Tex3_Cg_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_Tex4_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_Tex4_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_Tex4_GLSLES_vp
 	delegate Ogre/Compositor/StdQuad_Tex4_Cg_vp
 }

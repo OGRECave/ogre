@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -388,7 +388,7 @@ namespace Ogre
 
 		// copy the the texture to the dest
 		PixelUtil::bulkPixelConversion(
-			PixelBox(mWidth, mHeight, 1, PF_A8B8G8R8, mappedTex2D.pData), 
+			PixelBox(mWidth, mHeight, 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D.pData), 
 			dst);
 
 		// unmap the temp buffer
@@ -481,90 +481,6 @@ namespace Ogre
 
 		_createSizeDependedD3DResources();
 
-mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
-        // Additional swap chains need their own depth buffer
-        // to support resizing them
-
-        HRESULT hr = mpSwapChain->GetBuffer( 0,  __uuidof( ID3D11Texture2D ), (LPVOID*)&mpBackBuffer  );
-        if( FAILED(hr) )
-        {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to Get Back Buffer for swap chain",
-                        "D3D11RenderWindow::windowMovedOrResized");
-        }
-
-        // get the backbuffer desc
-        D3D11_TEXTURE2D_DESC BBDesc;
-        mpBackBuffer->GetDesc( &BBDesc );
-
-        // create the render target view
-        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-        ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
-
-        RTVDesc.Format = BBDesc.Format;
-        RTVDesc.ViewDimension = mFSAA ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        RTVDesc.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
-
-        if( FAILED(hr) )
-        {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to create rendertagert view\nError Description:" + errorDescription,
-                        "D3D11RenderWindow::windowMovedOrResized");
-        }
-
-        if( mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH )
-        {
-                // get the backbuffer
-
-                // Create depth stencil texture
-                ID3D11Texture2D* pDepthStencil = NULL;
-                D3D11_TEXTURE2D_DESC descDepth;
-
-                descDepth.Width = width;
-                descDepth.Height = height;
-                descDepth.MipLevels = 1;
-                descDepth.ArraySize = 1;
-                descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
-                descDepth.SampleDesc.Count = mFSAAType.Count;
-                descDepth.SampleDesc.Quality = mFSAAType.Quality;
-                descDepth.Usage = D3D11_USAGE_DEFAULT;
-                descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-                descDepth.CPUAccessFlags = 0;
-                descDepth.MiscFlags = 0;
-
-                hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-                if( FAILED(hr) || mDevice.isError())
-                {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "Unable to create depth texture\nError Description:" + errorDescription,
-                                "D3D11RenderWindow::windowMovedOrResized");
-                }
-
-                // Create the depth stencil view
-                D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-                ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
-
-                descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-                descDSV.ViewDimension = mFSAA ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-                descDSV.Texture2D.MipSlice = 0;
-                hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
-
-                SAFE_RELEASE(pDepthStencil);
-
-                if( FAILED(hr) )
-                {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "Unable to create depth stencil view\nError Description:" + errorDescription,
-                                "D3D11RenderWindow::windowMovedOrResized");
-                }
-
-                static_cast<D3D11DepthBuffer*>(this->getDepthBuffer())->_resized(mDepthStencilView, width, height);
-        } 
-
 		// Notify viewports of resize
 		_updateViewportsDimensions();
 	}
@@ -630,11 +546,11 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 			// parentWindowHandle		-> parentHWnd
 			opt = miscParams->find("parentWindowHandle");
 			if(opt != miscParams->end())
-				parentHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = (HWND)StringConverter::parseUnsignedInt(opt->second);
+				externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
 			// window border style
 			opt = miscParams->find("border");
 			if(opt != miscParams->end())
@@ -776,7 +692,6 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	{
 		ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
 		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		mSwapChainDesc.OutputWindow			= mHWnd;
 		mSwapChainDesc.BufferDesc.Width		= mWidth;
 		mSwapChainDesc.BufferDesc.Height	= mHeight;
 		mSwapChainDesc.BufferDesc.Format	= format;
@@ -976,7 +891,6 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowHwnd::_finishSwitchingFullscreen()
 	{
-
 		if(mIsFullScreen)
 		{
 			// Need to reset the region on the window sometimes, when the 
@@ -1048,7 +962,7 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = reinterpret_cast<Windows::UI::Core::CoreWindow^>((void*)StringConverter::parseUnsignedInt(opt->second));
+				externalHandle = reinterpret_cast<Windows::UI::Core::CoreWindow^>((void*)StringConverter::parseSizeT(opt->second));
 		}
 
 		// Reset current window if any
@@ -1085,7 +999,7 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	{
 		D3D11RenderWindowSwapChainBased::destroy();
 
-		if (mCoreWindow && !mIsExternal)
+		if (mCoreWindow.Get() && !mIsExternal)
 		{
 			OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Only external window handles are supported."
 				, "D3D11RenderWindow::destroy" );
@@ -1103,10 +1017,16 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 		mSwapChainDesc.Stereo				= false;
 
 		// triple buffer if VSync is on
-		mSwapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        mSwapChainDesc.BufferUsage			= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == PHONE)
+		mSwapChainDesc.BufferCount			= 1;									// WP8: One buffer.
+		mSwapChainDesc.Scaling				= DXGI_SCALING_STRETCH;					// WP8: Must be stretch scaling mode.
+		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_DISCARD;				// WP8: No swap effect.
+#else
 		mSwapChainDesc.BufferCount			= 2;									// Use two buffers to enable flip effect.
 		mSwapChainDesc.Scaling				= DXGI_SCALING_NONE;					// Otherwise stretch would be used by default.
 		mSwapChainDesc.SwapEffect			= DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;		// MS recommends using this swap effect for all applications.
+#endif
 		mSwapChainDesc.AlphaMode			= DXGI_ALPHA_MODE_UNSPECIFIED;
 
 		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -1115,13 +1035,13 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 		mSwapChainDesc.SampleDesc.Quality = mFSAAType.Quality;
 
 		// Create swap chain
-		HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow), &mSwapChainDesc, NULL, &mpSwapChain);
+		HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
     
 		if (FAILED(hr))
 		{
 			// Try a second time, may fail the first time due to back buffer count,
 			// which will be corrected by the runtime
-			hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow), &mSwapChainDesc, NULL, &mpSwapChain);
+			hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
 		}
 		if (FAILED(hr))
 			return hr;
@@ -1135,7 +1055,7 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	//---------------------------------------------------------------------
 	bool D3D11RenderWindowCoreWindow::isVisible() const
 	{
-		return (mCoreWindow && Windows::UI::Core::CoreWindow::GetForCurrentThread() == mCoreWindow);
+		return (mCoreWindow.Get() && Windows::UI::Core::CoreWindow::GetForCurrentThread() == mCoreWindow.Get());
 	}
 	//---------------------------------------------------------------------
 	void D3D11RenderWindowCoreWindow::windowMovedOrResized()
@@ -1157,7 +1077,7 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 	// class D3D11RenderWindowImageSource
 	//---------------------------------------------------------------------
 #pragma region D3D11RenderWindowImageSource
-#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 	//---------------------------------------------------------------------
 	D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
 		: D3D11RenderWindowBase(device, pDXGIFactory)
@@ -1325,6 +1245,6 @@ mDevice.GetImmediateContext()->OMSetRenderTargets(0, 0, 0);
 		D3D11RenderWindowBase::getCustomAttribute(name, pData);
 	}
 	//---------------------------------------------------------------------
-#endif
+#endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT) && (OGRE_WINRT_TARGET_TYPE == DESKTOP_APP)
 #pragma endregion
 }

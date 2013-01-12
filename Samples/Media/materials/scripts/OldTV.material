@@ -1,8 +1,27 @@
-fragment_program Ogre/Compositor/OldTV_FP cg
+fragment_program Ogre/Compositor/OldTV_FPCg cg
 {
 	source OldTV.cg
 	entry_point OldTV_ps
 	profiles ps_2_0 arbfp1
+}
+
+fragment_program Ogre/Compositor/OldTV_FPGLSL glsl
+{
+	source OldTV.glsl
+	syntax glsl150
+    default_params
+	{
+   		param_named Image int 0
+   		param_named Rand int 1
+   		param_named Noise int 2
+	}
+
+}
+
+fragment_program Ogre/Compositor/OldTV_FP unified
+{
+	delegate Ogre/Compositor/OldTV_FPGLSL
+	delegate Ogre/Compositor/OldTV_FPCg
 }
 
 material Ogre/Compositor/OldTV

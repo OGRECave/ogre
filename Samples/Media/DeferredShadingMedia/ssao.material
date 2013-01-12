@@ -1,7 +1,13 @@
 
 // full screen quad with camera-to-pixel ray calculations
 
-vertex_program ssao_vs cg
+vertex_program ssao_vs unified
+{
+	delegate ssao_vs_pGLSL
+	delegate ssao_vs_pCg
+	delegate ssao_vs_pCg_sm4
+}
+vertex_program ssao_vs_pCg cg
 {
     source ssao.cg
     profiles vs_1_1 arbvp1
@@ -11,8 +17,33 @@ vertex_program ssao_vs cg
         param_named_auto wvp worldviewproj_matrix
     }
 }
+vertex_program ssao_vs_pCg_sm4 cg
+{
+    source ssao_sm4.cg
+    profiles vs_4_0
+    entry_point ssao_vs
+    default_params
+    {
+        param_named_auto wvp worldviewproj_matrix
+    }
+}
+vertex_program ssao_vs_pGLSL glsl
+{
+    source ssao_vs.glsl
+    syntax glsl150
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
 
-fragment_program ssao_ps cg
+fragment_program ssao_ps unified
+{
+	delegate ssao_ps_pGLSL
+	delegate ssao_ps_pCg
+	delegate ssao_ps_pCg_sm4
+}
+fragment_program ssao_ps_pCg cg
 {
     source ssao.cg
     entry_point ssao_ps
@@ -22,8 +53,35 @@ fragment_program ssao_ps cg
     {
     }
 }
+fragment_program ssao_ps_pCg_sm4 cg
+{
+    source ssao_sm4.cg
+    entry_point ssao_ps
+    // will run on anything with pixel shader 2.b and up
+    profiles ps_4_0
+    default_params
+    {
+    }
+}
+fragment_program ssao_ps_pGLSL glsl
+{
+    source ssao_ps.glsl
+    // will run on anything with pixel shader 2.b and up
+    syntax glsl150
+	default_params
+	{
+        param_named geomMap int 0
+        param_named randMap int 1
+    }
+}
 
-fragment_program ssaoBlurX_ps cg
+fragment_program ssaoBlurX_ps unified
+{
+	delegate ssaoBlurX_ps_pGLSL
+	delegate ssaoBlurX_ps_pCg
+	delegate ssaoBlurX_ps_pCg_sm4
+}
+fragment_program ssaoBlurX_ps_pCg cg
 {
     source ssao.cg
     entry_point ssaoBlurX_ps
@@ -33,8 +91,35 @@ fragment_program ssaoBlurX_ps cg
         param_named_auto invTexSize inverse_texture_size 0
     }
 }
+fragment_program ssaoBlurX_ps_pCg_sm4 cg
+{
+    source ssao_sm4.cg
+    entry_point ssaoBlurX_ps
+    profiles ps_4_0
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+    }
+}
+fragment_program ssaoBlurX_ps_pGLSL glsl
+{
+    source ssao_blurx_ps.glsl
+    syntax glsl150
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+        param_named map int 0
+        param_named geomMap int 1
+    }
+}
 
-fragment_program ssaoBlurY_ps cg
+fragment_program ssaoBlurY_ps unified
+{
+	delegate ssaoBlurY_ps_pGLSL
+	delegate ssaoBlurY_ps_pCg
+	delegate ssaoBlurY_ps_pCg_sm4
+}
+fragment_program ssaoBlurY_ps_pCg cg
 {
     source ssao.cg
     entry_point ssaoBlurY_ps
@@ -44,7 +129,27 @@ fragment_program ssaoBlurY_ps cg
         param_named_auto invTexSize inverse_texture_size 0
     }
 }
-
+fragment_program ssaoBlurY_ps_pCg_sm4 cg
+{
+    source ssao_sm4.cg
+    entry_point ssaoBlurY_ps
+    profiles ps_4_0
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+    }
+}
+fragment_program ssaoBlurY_ps_pGLSL glsl
+{
+    source ssao_blury_ps.glsl
+    syntax glsl150
+    default_params
+    {
+        param_named_auto invTexSize inverse_texture_size 0
+        param_named map int 0
+        param_named geomMap int 1
+    }
+}
 material ssao
 {
     technique
@@ -80,6 +185,11 @@ material ssaoBlurX
     {
         pass
         {
+
+            vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureWithUV
+            {
+            }
+        
             fragment_program_ref ssaoBlurX_ps
             {
             }
@@ -105,6 +215,10 @@ material ssaoBlurY
     {
         pass
         {
+            vertex_program_ref Ogre/BasicVertexPrograms/AmbientOneTextureWithUV
+            {
+            }
+
             fragment_program_ref ssaoBlurY_ps
             {
             }

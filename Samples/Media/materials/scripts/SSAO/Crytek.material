@@ -12,8 +12,20 @@ fragment_program SSAO/Crytek_fp_cg cg
     profiles ps_3_0 arbfp1 
 }
 
+fragment_program SSAO/Crytek_fp_glsl glsl
+{
+    source CrytekFP.glsl
+	
+	default_params
+	{
+		param_named sSceneDepthSampler int 0
+		param_named sRotSampler4x4 int 1
+	}
+}
+
 fragment_program SSAO/Crytek_fp unified
 {
+	delegate SSAO/Crytek_fp_glsl 
 	delegate SSAO/Crytek_fp_hlsl 
 	delegate SSAO/Crytek_fp_cg
 }
@@ -33,11 +45,18 @@ material SSAO/Crytek
                 param_named_auto farClipDistance far_clip_distance
                 param_named_auto nearClipDistance near_clip_distance
                 param_named_auto cFov fov
+				
+				param_named cSampleInScreenspace float 0
+                param_named cSampleLengthScreenSpace float 0.06
+                param_named cSampleLengthWorldSpace float 2
+				param_named cOffsetScale float 0.05
+				param_named cDefaultAccessibility float 0.5
+				param_named cEdgeHighlight float 2
             }
 
             texture_unit
             {
-                content_type compositor SSAO/GBuffer mrt 1
+                content_type compositor SSAO/GBuffer mrt 0
                 tex_address_mode clamp
                 filtering none
             }

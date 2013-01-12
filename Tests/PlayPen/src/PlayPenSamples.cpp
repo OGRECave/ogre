@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -679,21 +679,21 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_POSE);
 	
 	// Frame 0 - no effect 
-	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(0);
+	vt->createVertexPoseKeyFrame(0);
 
 	// Frame 1 - bring in pose 1 (index 0)
-	kf = vt->createVertexPoseKeyFrame(3);
+	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(3);
 	kf->addPoseReference(0, 1.0f);
 
 	// Frame 2 - remove all 
-	kf = vt->createVertexPoseKeyFrame(6);
+	vt->createVertexPoseKeyFrame(6);
 
 	// Frame 3 - bring in pose 2 (index 1)
 	kf = vt->createVertexPoseKeyFrame(9);
 	kf->addPoseReference(1, 1.0f);
 
 	// Frame 4 - remove all
-	kf = vt->createVertexPoseKeyFrame(12);
+	vt->createVertexPoseKeyFrame(12);
 
 
 	// Frame 5 - bring in pose 1 at 50%, pose 2 at 100% 
@@ -707,7 +707,7 @@ void PlayPen_testPoseAnimationWithNormals::setupContent()
 	kf->addPoseReference(1, 0.5f);
 
 	// Frame 7 - reset
-	kf = vt->createVertexPoseKeyFrame(20);
+	vt->createVertexPoseKeyFrame(20);
 
 
 	// Export the mesh
@@ -813,21 +813,21 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 	VertexAnimationTrack* vt = anim->createVertexTrack(1, sm->vertexData, VAT_POSE);
 	
 	// Frame 0 - no effect 
-	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(0);
+	vt->createVertexPoseKeyFrame(0);
 
 	// Frame 1 - bring in pose 1 (index 0)
-	kf = vt->createVertexPoseKeyFrame(3);
+	VertexPoseKeyFrame* kf = vt->createVertexPoseKeyFrame(3);
 	kf->addPoseReference(0, 1.0f);
 
 	// Frame 2 - remove all 
-	kf = vt->createVertexPoseKeyFrame(6);
+	vt->createVertexPoseKeyFrame(6);
 
 	// Frame 3 - bring in pose 2 (index 1)
 	kf = vt->createVertexPoseKeyFrame(9);
 	kf->addPoseReference(1, 1.0f);
 
 	// Frame 4 - remove all
-	kf = vt->createVertexPoseKeyFrame(12);
+	vt->createVertexPoseKeyFrame(12);
 
 
 	// Frame 5 - bring in pose 1 at 50%, pose 2 at 100% 
@@ -841,7 +841,7 @@ void PlayPen_testPoseAnimationWithoutNormals::setupContent()
 	kf->addPoseReference(1, 0.5f);
 
 	// Frame 7 - reset
-	kf = vt->createVertexPoseKeyFrame(20);
+	vt->createVertexPoseKeyFrame(20);
 
 	// Export the mesh
 	DataStreamPtr stream = Root::getSingleton().createFileStream(newName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, true);

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,10 +42,10 @@ namespace Ogre{
 
 		// Set up some constant characters of interest
 #if OGRE_WCHAR_T_STRINGS
-		const wchar_t varopener = L'$', quote = L'\"', slash = L'/', backslash = L'\\', openbrace = L'{', closebrace = L'}', colon = L':', star = L'*';
+		const wchar_t varopener = L'$', quote = L'\"', slash = L'/', backslash = L'\\', openbrace = L'{', closebrace = L'}', colon = L':', star = L'*', cr = L'\r', lf = L'\n';
 		wchar_t c = 0, lastc = 0;
 #else
-		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*';
+		const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*', cr = '\r', lf = '\n';
 		char c = 0, lastc = 0;
 #endif
 
@@ -206,7 +206,7 @@ namespace Ogre{
 			}
 
 			// Separate check for newlines just to track line numbers
-			if(isNewline(c))
+			if(c == cr || (c == lf && lastc != cr))
 				line++;
 			
 			i++;

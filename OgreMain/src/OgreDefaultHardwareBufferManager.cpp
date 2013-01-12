@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -196,6 +196,62 @@ namespace Ogre {
 		memcpy(mData + offset, pSource, length);
 	}
 	//-----------------------------------------------------------------------
+	DefaultHardwareCounterBuffer::DefaultHardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+    : HardwareCounterBuffer(mgr, sizeBytes, usage, useShadowBuffer, name)
+	{
+		// Allocate aligned memory for better SIMD processing friendly.
+        mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
+	}
+	//-----------------------------------------------------------------------
+	DefaultHardwareCounterBuffer::~DefaultHardwareCounterBuffer()
+	{
+		OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
+	}
+	//-----------------------------------------------------------------------
+    void* DefaultHardwareCounterBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
+	{
+        // Only for use internally, no 'locking' as such
+		return mData + offset;
+	}
+	//-----------------------------------------------------------------------
+	void DefaultHardwareCounterBuffer::unlockImpl(void)
+	{
+        // Nothing to do
+	}
+	/*
+     bool DefaultHardwareCounterBuffer::updateStructure(const Any& renderSystemInfo)
+     {
+     // Nothing to do
+     return true;
+     }
+     */
+	//-----------------------------------------------------------------------
+    void* DefaultHardwareCounterBuffer::lock(size_t offset, size_t length, LockOptions options)
+	{
+        mIsLocked = true;
+		return mData + offset;
+	}
+	//-----------------------------------------------------------------------
+	void DefaultHardwareCounterBuffer::unlock(void)
+	{
+        mIsLocked = false;
+        // Nothing to do
+	}
+	//-----------------------------------------------------------------------
+    void DefaultHardwareCounterBuffer::readData(size_t offset, size_t length, void* pDest)
+	{
+		assert((offset + length) <= mSizeInBytes);
+		memcpy(pDest, mData + offset, length);
+	}
+	//-----------------------------------------------------------------------
+    void DefaultHardwareCounterBuffer::writeData(size_t offset, size_t length, const void* pSource,
+                                                 bool discardWholeBuffer)
+	{
+		assert((offset + length) <= mSizeInBytes);
+		// ignore discard, memory is not guaranteed to be zeroised
+		memcpy(mData + offset, pSource, length);
+	}
+	//-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     DefaultHardwareBufferManagerBase::DefaultHardwareBufferManagerBase()
 	{
@@ -237,5 +293,12 @@ namespace Ogre {
 	{
 		DefaultHardwareUniformBuffer* ub = OGRE_NEW DefaultHardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer);
 		return HardwareUniformBufferSharedPtr(ub);
+	}
+	HardwareCounterBufferSharedPtr
+    DefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	{
+		DefaultHardwareCounterBuffer* ub = OGRE_NEW DefaultHardwareCounterBuffer(this, sizeBytes, usage, useShadowBuffer);
+		return HardwareCounterBufferSharedPtr(ub);
 	}
 }

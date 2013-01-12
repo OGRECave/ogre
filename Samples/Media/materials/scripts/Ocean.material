@@ -53,6 +53,7 @@ vertex_program GLSL/OceanVS glsl
 
 	default_params
 	{
+        param_named_auto worldViewProj worldviewproj_matrix
 		param_named_auto eyePosition camera_position_object_space
 		param_named scale float3 0.012 0.005 0.03
 		param_named_auto time_0_X time_0_x 100.0
@@ -484,6 +485,7 @@ material Ocean2_HLSL_GLSL
 		{
 			vertex_program_ref GLSL/Ocean2VS
 			{
+				param_named_auto worldViewProj worldviewproj_matrix
 				param_named_auto eyePosition camera_position_object_space
 				param_named_auto time time_0_x 100.0
 				param_named BumpScale float 0.2

@@ -2,15 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.ogre3d.browser"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0" 
+	android:installLocation="auto">
 
     <uses-sdk android:minSdkVersion="@ANDROID_NATIVE_API_LEVEL@" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" /> 
 
     <!-- This .apk has no Java code itself, so set hasCode to false. -->
-    <application android:label="OgreSampleBrowser" android:hasCode="false">
+    <application android:label="OgreSampleBrowser" android:icon="@drawable/ic_launcher" android:hasCode="false">
         <activity android:name="android.app.NativeActivity"
                   android:label="OgreSampleBrowser"
-                  android:configChanges="orientation|keyboardHidden">
+                  android:configChanges="orientation@SCREEN_SIZE@|keyboardHidden"
+		   android:debuggable="true"
+		  android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <!-- Tell NativeActivity the name of or .so -->
             <meta-data android:name="android.app.lib_name" android:value="OgreSampleBrowser" />
             <intent-filter>

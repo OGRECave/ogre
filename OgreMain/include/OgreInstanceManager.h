@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreMesh.h"
 #include "OgreRenderOperation.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -118,6 +119,8 @@ namespace Ogre
         SceneManager*           mSceneManager;
 
         size_t                  mMaxLookupTableInstances;
+        unsigned char			mNumCustomParams;		//Number of custom params per instance.
+
         /** Finds a batch with at least one free instanced entity we can use.
             If none found, creates one.
         */
@@ -137,12 +140,18 @@ namespace Ogre
         /** @see defragmentBatches overload, this takes care of an array of batches
             for a specific material */
         void defragmentBatches( bool optimizeCull, vector<InstancedEntity*>::type &entities,
-                                InstanceBatchVec &fragmentedBatches );
+								vector<Ogre::Vector4>::type &usedParams,
+								InstanceBatchVec &fragmentedBatches );
 
         /** @see setSetting. This function helps it by setting the given parameter to all batches
             in container.
         */
         void applySettingToBatches( BatchSettingId id, bool value, const InstanceBatchVec &container );
+
+		/** Called when we you use a mesh which has shared vertices, the function creates separate
+			vertex/index buffers and also recreates the bone assignments.
+		*/
+		void unshareVertices(const Ogre::MeshPtr &mesh);
 
     public:
         InstanceManager( const String &customName, SceneManager *sceneManager,
@@ -171,6 +180,33 @@ namespace Ogre
         @param maxLookupTableInstances New size of the lookup table
         */
         void setMaxLookupTableInstances( size_t maxLookupTableInstances );
+
+		/** Sets the number of custom parameters per instance. Some techniques (i.e. HWInstancingBasic)
+			support this, but not all of them. They also may have limitations to the max number. All
+			instancing implementations assume each instance param is a Vector4 (4 floats).
+		@remarks
+			This function cannot be called after the first batch has been created. Otherwise
+			it will raise an exception. If the technique doesn't support custom params, it will
+			raise an exception at the time of building the first InstanceBatch.
+
+			HWInstancingBasic:
+				* Each custom params adds an additional float4 TEXCOORD.
+			HWInstancingVTF:
+				* Not implemented. (Recommendation: Implement this as an additional float4 VTF fetch)
+			TextureVTF:
+				* Not implemented. (see HWInstancingVTF's recommendation)
+			ShaderBased:
+				* Not supported.
+		@param Number of custom parameters each instance will have. Default: 0
+		*/
+		void setNumCustomParams( unsigned char numCustomParams );
+
+		unsigned char getNumCustomParams() const
+		{ return mNumCustomParams; }
+
+        /** @return Instancing technique this manager was created for. Can't be changed after creation */
+        InstancingTechnique getInstancingTechnique() const
+        { return mInstancingTechnique; }
 
         /** Calculates the maximum (or the best amount, depending on flags) of instances
             per batch given the suggested size for the technique this manager was created for.
@@ -278,5 +314,7 @@ namespace Ogre
         }
     };
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __InstanceManager_H__

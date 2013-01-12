@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreDistanceLodStrategy.h"
 #include "OgreDepthBuffer.h"
+#include "OgreRoot.h"
 
 namespace Ogre{
 	
@@ -2717,9 +2718,17 @@ namespace Ogre{
 									switch(atom->id)
 									{
 									case ID_1D:
-										texType = TEX_TYPE_1D;
-										break;
-									case ID_2D:
+										// fallback to 2d texture if 1d is not supported
+										{
+											// Use the current render system
+											RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+											if (rs->getCapabilities()->hasCapability(RSC_TEXTURE_1D))
+											{
+												texType = TEX_TYPE_1D;
+												break;
+											}
+										}									case ID_2D:
 										texType = TEX_TYPE_2D;
 										break;
 									case ID_3D:
@@ -3176,7 +3185,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							bool enabled;
+							bool enabled = false;
 							switch(atom->id)
 							{
 							case ScriptCompiler::ID_ON:
@@ -3208,7 +3217,7 @@ namespace Ogre{
 						if(prop->values.front()->type == ANT_ATOM)
 						{
 							AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-							CompareFunction func;
+							CompareFunction func = CMPF_GREATER_EQUAL;
 							switch(atom->id)
 							{
 							case ID_ALWAYS_FAIL:
@@ -4665,6 +4674,30 @@ namespace Ogre{
 									compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
 										"incorrect subroutine declaration");
 								}
+							}
+							else if (atom1->value == "atomic_counter")
+							{
+//								String s;
+//								if (getString(*k, &s))
+//								{
+//									try
+//									{
+//										if (named)
+//											params->setNamedSubroutine(name, s);
+//										else
+//											params->setSubroutine(index, s);
+//									}
+//									catch(...)
+//									{
+//										compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+//                                                           "setting subroutine parameter failed");
+//									}
+//								}
+//								else
+//								{
+//									compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+//                                                       "incorrect subroutine declaration");
+//								}
 							}
 							else
 							{

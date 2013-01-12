@@ -1,0 +1,188 @@
+/******************************************************************************
+Copyright (c) W.J. van der Laan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software  and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to use, 
+copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so, subject 
+to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies 
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+******************************************************************************/
+/** Deferred shading framework
+	// W.J. :wumpus: van der Laan 2005 //
+	
+	Post shader: Light geometry material
+*/
+
+#define LIGHT_POINT 		1
+#define LIGHT_SPOT			2
+#define LIGHT_DIRECTIONAL	3
+
+//////////////////////////////////////////////////////////////////////////////
+// Helper function section
+//////////////////////////////////////////////////////////////////////////////
+
+//DirectX needs this to compensate for jitter
+ps_2_x float2 fixUV(float2 texCoord, float2 texSize)
+{
+	return texCoord - (float2(0.5,0.5)/texSize);
+}
+
+float2 fixUV(float2 texCoord, float2 texSize)
+{
+	return texCoord;
+}
+
+
+void checkShadow(
+	sampler2D shadowMap,
+	float3 viewPos,
+	float4x4 invView,
+	float4x4 shadowViewProj,
+	float shadowFarClip,
+#if LIGHT_TYPE == LIGHT_DIRECTIONAL
+	float3 shadowCamPos
+#else
+	float distanceFromLight
+#endif
+	)
+{
+	float3 worldPos = mul(invView, float4(viewPos, 1)).xyz;
+#if LIGHT_TYPE == LIGHT_DIRECTIONAL
+	float distanceFromLight = length(shadowCamPos-worldPos);
+#endif
+	float4 shadowProjPos = mul(shadowViewProj, float4(worldPos,1));
+	shadowProjPos /= shadowProjPos.w;
+	float2 shadowSampleTexCoord = shadowProjPos.xy;
+	float shadowDepth = tex2D(shadowMap, shadowSampleTexCoord).r;
+	float shadowDistance = shadowDepth * shadowFarClip;
+	clip(shadowDistance - distanceFromLight + 0.1);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Main shader section
+//////////////////////////////////////////////////////////////////////////////	
+	
+float4 main(
+
+	float4 oPos: SV_POSITION,
+#if LIGHT_TYPE == LIGHT_DIRECTIONAL
+	float2 texCoord : TEXCOORD0, 
+	float3 ray : TEXCOORD1,
+#else
+	float4 projPos : TEXCOORD0,
+#endif
+	
+	uniform sampler2D Tex0: register(s0),
+	uniform sampler2D Tex1: register(s1),
+
+#if LIGHT_TYPE != LIGHT_POINT
+	uniform float3 lightDir,
+#endif
+
+#if LIGHT_TYPE == LIGHT_SPOT
+	uniform float4 spotParams,
+#endif
+
+#if LIGHT_TYPE != LIGHT_DIRECTIONAL
+	uniform float vpWidth,
+	uniform float vpHeight,
+	uniform float3 farCorner,
+	uniform float flip,
+#endif
+
+#ifdef IS_SHADOW_CASTER
+	uniform float4x4 invView,
+	uniform float4x4 shadowViewProjMat,
+	uniform sampler2D ShadowTex : register(s2),
+	uniform float3 shadowCamPos,
+	uniform float shadowFarClip,
+#endif
+
+	uniform float farClipDistance,
+	// Attributes of light
+	uniform float4 lightDiffuseColor,
+	uniform float4 lightSpecularColor,
+	uniform float4 lightFalloff,
+	uniform float3 lightPos
+	) : COLOR 
+{
+
+	//None directional lights have some calculations to do in the beginning of the pixel shader
+#if LIGHT_TYPE != LIGHT_DIRECTIONAL
+	projPos /= projPos.w;
+	// -1 is because generally +Y is down for textures but up for the screen
+    float2 texCoord = float2(projPos.x, projPos.y * -1 * flip) * 0.5 + 0.5;
+	// Texture coordinate magic, this compensates for jitter
+	texCoord = fixUV(texCoord, float2(vpWidth, vpHeight));
+	float3 ray = float3(projPos.x, projPos.y * flip, 1) * farCorner;
+#endif
+	
+	float4 a0 = tex2D(Tex0, texCoord); // Attribute 0: Diffuse color+shininess
+	float4 a1 = tex2D(Tex1, texCoord); // Attribute 1: Normal+depth
+
+	// Attributes
+	float3 colour = a0.rgb;
+	float specularity = a0.a;
+	float distance = a1.w;  // Distance from viewer (w)
+	float3 normal = a1.xyz;
+
+	// Calculate position of texel in view space
+	float3 viewPos = normalize(ray)*distance*farClipDistance;
+
+	// Calculate light direction and distance
+#if LIGHT_TYPE == LIGHT_DIRECTIONAL
+	float3 objToLightDir = -lightDir.xyz;
+#else
+	float3 objToLightVec = lightPos - viewPos;
+	float len_sq = dot(objToLightVec, objToLightVec);
+	float len = sqrt(len_sq);
+	float3 objToLightDir = objToLightVec/len;
+#endif
+
+#ifdef IS_SHADOW_CASTER
+	#if LIGHT_TYPE == LIGHT_DIRECTIONAL
+		checkShadow(ShadowTex, viewPos, invView, shadowViewProjMat, shadowFarClip, shadowCamPos);
+	#else
+		checkShadow(ShadowTex, viewPos, invView, shadowViewProjMat, shadowFarClip, len);
+	#endif
+#endif
+	
+	// Calculate diffuse colour
+	float3 total_light_contrib;
+	total_light_contrib = max(0.0,dot(objToLightDir, normal)) * lightDiffuseColor.rgb;
+
+#if IS_SPECULAR
+	// Calculate specular component
+	float3 viewDir = -normalize(viewPos);
+	float3 h = normalize(viewDir + objToLightDir);
+	float3 light_specular = pow(dot(normal, h),32.0) * lightSpecularColor.rgb;
+
+	total_light_contrib += specularity * light_specular;
+#endif
+
+#if IS_ATTENUATED
+	clip(lightFalloff.x - len);
+	// Calculate attenuation
+	float attenuation = dot(lightFalloff.yzw, float3(1.0, len, len_sq));
+	total_light_contrib /= attenuation;
+#endif
+
+#if LIGHT_TYPE == LIGHT_SPOT
+	float spotlightAngle = saturate(dot(lightDir.xyz, -objToLightDir));
+	float spotFalloff = saturate((spotlightAngle - spotParams.x) / (spotParams.y - spotParams.x));
+	total_light_contrib *= (1-spotFalloff);
+#endif
+
+	return float4(total_light_contrib*colour, 0.0);
+}

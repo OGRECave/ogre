@@ -11,10 +11,18 @@
 
 # Default build output paths
 if (NOT OGRE_ARCHIVE_OUTPUT)
-  set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib)
+  if(APPLE AND NOT OGRE_BUILD_PLATFORM_ANDROID)
+    set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib/$(PLATFORM_NAME))
+  else()
+    set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib)
+  endif()
 endif ()
 if (NOT OGRE_LIBRARY_OUTPUT)
-  set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib)
+  if(APPLE AND NOT OGRE_BUILD_PLATFORM_ANDROID)
+    set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib/$(PLATFORM_NAME))
+  else()
+    set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib)
+  endif()
 endif ()
 if (NOT OGRE_RUNTIME_OUTPUT)
   set(OGRE_RUNTIME_OUTPUT ${OGRE_BINARY_DIR}/bin)
@@ -154,9 +162,19 @@ function(ogre_config_common TARGETNAME)
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
   endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
 
+  if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX))
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+    # add GCC visibility flags to shared library build
+    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
+    set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN}")
+    #set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
+  endif()
+
   if(OGRE_BUILD_PLATFORM_WINRT)
     # enable WinRT features, support available since CMake 2.8.8
     set_target_properties(${TARGETNAME} PROPERTIES VS_WINRT_EXTENSIONS "YES")
+    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/bigobj")
 
     # WinRT uses precompiled headers by default, that needs to be overriden, but unfortunately CMake can`t do this
     #if(NOT ${TARGET_NAME} STREQUAL "OgreMain")
@@ -174,13 +192,6 @@ function(ogre_config_lib LIBNAME EXPORT)
     # add static prefix, if compiling static version
     set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME}Static)
   else (OGRE_STATIC)
-    if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-      # add GCC visibility flags to shared library build
-      set_target_properties(${LIBNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
-      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
-    endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 	if (MINGW)
 	  # remove lib prefix from DLL outputs
 	  set_target_properties(${LIBNAME} PROPERTIES PREFIX "")
@@ -216,6 +227,24 @@ function(ogre_config_component LIBNAME)
   ogre_config_lib(${LIBNAME} FALSE)
 endfunction(ogre_config_component)
 
+function(ogre_config_framework LIBNAME)
+  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+      set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
+
+      # Set the INSTALL_PATH so that frameworks can be installed in the application package
+      set_target_properties(${LIBNAME}
+         PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+         INSTALL_NAME_DIR "@executable_path/../Frameworks"
+      )
+      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADERS}")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+      set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
+      set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
+      set_source_files_properties("${RESOURCE_FILES}" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+      set_target_properties(${LIBNAME} PROPERTIES OUTPUT_NAME ${LIBNAME})
+  endif()
+endfunction(ogre_config_framework)
 
 # setup plugin build
 function(ogre_config_plugin PLUGINNAME)
@@ -232,11 +261,6 @@ function(ogre_config_plugin PLUGINNAME)
     endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
   else (OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-      # add GCC visibility flags to shared library build
-      set_target_properties(${PLUGINNAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
-      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-      set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
       # disable "lib" prefix on Unix
       set_target_properties(${PLUGINNAME} PROPERTIES PREFIX "")
     endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
@@ -294,11 +318,6 @@ function(ogre_config_sample_common SAMPLENAME)
   endif (APPLE)
   if (NOT OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
-      # add GCC visibility flags to shared library build
-      set_target_properties(${SAMPLENAME} PROPERTIES COMPILE_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS}")
-      set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "${XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN}")
-      set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-      set_target_properties(${SAMPLENAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
       # disable "lib" prefix on Unix
       set_target_properties(${SAMPLENAME} PROPERTIES PREFIX "")
     endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)

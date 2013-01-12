@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,6 +90,37 @@ namespace Ogre {
 
         GL_CHECK_ERROR;
     }
+    
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESFrameBufferObject::notifyOnContextLost()
+    {
+        mManager->releaseRenderBuffer(mDepth);
+        mManager->releaseRenderBuffer(mStencil);
+		mManager->releaseRenderBuffer(mMultisampleColourBuffer);
+        
+        glDeleteFramebuffersOES(1, &mFB);
+        GL_CHECK_ERROR;
+        
+		if (mMultisampleFB)
+			glDeleteFramebuffersOES(1, &mMultisampleFB);
+        
+        GL_CHECK_ERROR;
+    }
+    
+    void GLESFrameBufferObject::notifyOnContextReset(const GLESSurfaceDesc &target)
+    {
+        /// Generate framebuffer object
+        glGenFramebuffersOES(1, &mFB);
+        GL_CHECK_ERROR;
+        
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, mFB);
+        GL_CHECK_ERROR;
+        
+        // Bind target to surface 0 and initialise
+        bindSurface(0, target);
+        GL_CHECK_ERROR;
+    }
+#endif
     
     void GLESFrameBufferObject::bindSurface(size_t attachment, const GLESSurfaceDesc &target)
     {
