@@ -2,7 +2,7 @@
 #define __BSP_H__
 
 #include "SdkSample.h"
-#include "OgreFileSystemLayer.h"
+#include "FileSystemLayer.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -57,11 +57,6 @@ protected:
 	void createSceneManager()
 	{
 		mSceneMgr = mRoot->createSceneManager("BspSceneManager");   // the BSP scene manager is required for this sample
-#ifdef USE_RTSHADER_SYSTEM
-		mShaderGenerator->addSceneManager(mSceneMgr);
-#endif
-		if(mOverlaySystem)
-			mSceneMgr->addRenderQueueListener(mOverlaySystem);
 	}
 
 	void loadResources()

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -423,7 +423,7 @@ Ogre::PixelBox D3D9HardwarePixelBuffer::lockBuffer(BufferResources* bufferResour
 		else
 		{
 			D3DBOX pbox = toD3DBOX(lockBox); // specify range to lock
-			hr = bufferResources->volume->LockBox(&lbox, &pbox, flags);
+			bufferResources->volume->LockBox(&lbox, &pbox, flags);
 		}
 		if (FAILED(hr))		
 		{

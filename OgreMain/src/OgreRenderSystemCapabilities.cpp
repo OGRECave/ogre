@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,6 @@ namespace Ogre {
 		, mNumVertexBlendMatrices(0)
 		, mNumMultiRenderTargets(1)
 		, mNonPOW2TexturesLimited(false)
-		, mMaxSupportedAnisotropy(0)
 	{
 
 		for(int i = 0; i < CAPS_CATEGORY_COUNT; i++)
@@ -65,7 +64,6 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	void RenderSystemCapabilities::log(Log* pLog)
 	{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		pLog->logMessage("RenderSystem capabilities");
 		pLog->logMessage("-------------------------");
 		pLog->logMessage("RenderSystem Name: " + getRenderSystemName());
@@ -143,42 +141,6 @@ namespace Ogre {
 		pLog->logMessage(
              " * Number of boolean constants for geometry programs: "
              + StringConverter::toString(mGeometryProgramConstantBoolCount));
-		pLog->logMessage(
-			" * Tesselation Hull programs: "
-			+ StringConverter::toString(hasCapability(RSC_TESSELATION_HULL_PROGRAM), true));
-		pLog->logMessage(
-             " * Number of floating-point constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantFloatCount));
-		pLog->logMessage(
-             " * Number of integer constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantIntCount));
-		pLog->logMessage(
-             " * Number of boolean constants for tesselation hull programs: "
-             + StringConverter::toString(mTesselationHullProgramConstantBoolCount));
-		pLog->logMessage(
-			" * Tesselation Domain programs: "
-			+ StringConverter::toString(hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM), true));
-		pLog->logMessage(
-             " * Number of floating-point constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantFloatCount));
-		pLog->logMessage(
-             " * Number of integer constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantIntCount));
-		pLog->logMessage(
-             " * Number of boolean constants for tesselation domain programs: "
-             + StringConverter::toString(mTesselationDomainProgramConstantBoolCount));
-		pLog->logMessage(
-			" * Compute programs: "
-			+ StringConverter::toString(hasCapability(RSC_COMPUTE_PROGRAM), true));
-		pLog->logMessage(
-             " * Number of floating-point constants for compute programs: "
-             + StringConverter::toString(mComputeProgramConstantFloatCount));
-		pLog->logMessage(
-             " * Number of integer constants for compute programs: "
-             + StringConverter::toString(mComputeProgramConstantIntCount));
-		pLog->logMessage(
-             " * Number of boolean constants for compute programs: "
-             + StringConverter::toString(mComputeProgramConstantBoolCount));
 		String profileList = "";
 		for(ShaderProfiles::iterator iter = mSupportedShaderProfiles.begin(), end = mSupportedShaderProfiles.end();
 			iter != end; ++iter)
@@ -201,9 +163,6 @@ namespace Ogre {
 			pLog->logMessage(
                  "   - PVRTC: "
                  + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), true));
-			pLog->logMessage(
-                 "   - RGTC: "
-                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_RGTC), true));
 		}
 
 		pLog->logMessage(
@@ -231,9 +190,6 @@ namespace Ogre {
 			" * Non-power-of-two textures: "
 			+ StringConverter::toString(hasCapability(RSC_NON_POWER_OF_2_TEXTURES), true)
 			+ (mNonPOW2TexturesLimited ? " (limited)" : ""));
-		pLog->logMessage(
-			" * 1d textures: "
-			+ StringConverter::toString(hasCapability(RSC_TEXTURE_1D), true));
 		pLog->logMessage(
 			" * Volume textures: "
 			+ StringConverter::toString(hasCapability(RSC_TEXTURE_3D), true));
@@ -282,9 +238,6 @@ namespace Ogre {
 		pLog->logMessage(
 			" * Render to Vertex Buffer : "
 			+ StringConverter::toString(hasCapability(RSC_HWRENDER_TO_VERTEX_BUFFER), true));
-        pLog->logMessage(
-            " * Hardware Atomic Counters: "
-            + StringConverter::toString(hasCapability(RSC_ATOMIC_COUNTERS), true));
 
 		if (mCategoryRelevant[CAPS_CATEGORY_GL])
 		{
@@ -321,7 +274,7 @@ namespace Ogre {
 				" * DirectX per stage constants: "
 				+ StringConverter::toString(hasCapability(RSC_PERSTAGECONSTANT), true));
 		}
-#endif
+
 	}
 	//---------------------------------------------------------------------
 	StringVector RenderSystemCapabilities::msGPUVendorStrings;

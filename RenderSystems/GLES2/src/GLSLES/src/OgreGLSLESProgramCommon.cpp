@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2012 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,8 @@ namespace Ogre {
 	//-----------------------------------------------------------------------
 	GLSLESProgramCommon::~GLSLESProgramCommon(void)
 	{
-		OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+		glDeleteProgram(mGLProgramHandle);
+        GL_CHECK_ERROR;
 	}
     
 	//-----------------------------------------------------------------------
@@ -128,20 +129,22 @@ namespace Ogre {
 		if (res == NULL_CUSTOM_ATTRIBUTES_INDEX)
 		{
 			const char * attString = getAttributeSemanticString(semantic);
-			GLint attrib;
-            OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attString));
+			GLint attrib = glGetAttribLocation(mGLProgramHandle, attString);
+            GL_CHECK_ERROR;
 
 			// sadly position is a special case 
 			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX && semantic == VES_POSITION)
 			{
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, "position"));
+				attrib = glGetAttribLocation(mGLProgramHandle, "position");
+                GL_CHECK_ERROR;
 			}
 
 			// for uv and other case the index is a part of the name
 			if (attrib == NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX)
 			{
 				String attStringWithSemantic = String(attString) + StringConverter::toString(index);
-				OGRE_CHECK_GL_ERROR(attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str()));
+				attrib = glGetAttribLocation(mGLProgramHandle, attStringWithSemantic.c_str());
+                GL_CHECK_ERROR;
 			}
 
 			// update mCustomAttributesIndexes with the index we found (or didn't find) 
@@ -177,14 +180,16 @@ namespace Ogre {
         GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
 
         // load binary
-		OGRE_CHECK_GL_ERROR(glProgramBinaryOES( mGLProgramHandle,
+		glProgramBinaryOES( mGLProgramHandle, 
                            binaryFormat, 
                            cacheMicrocode->getPtr(),
                            binaryLength
-                           ));
+                           );
+        GL_CHECK_ERROR;
 #endif
 		GLint success = 0;
-		OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success));
+		glGetProgramiv(mGLProgramHandle, GL_LINK_STATUS, &success);
+        GL_CHECK_ERROR
 		if (!success)
 		{
 			//

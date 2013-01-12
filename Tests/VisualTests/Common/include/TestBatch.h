@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,14 +85,14 @@ public:
      *        @param resy The height of the render window used 
      *        @param directory The directory this batch is saved to */
     TestBatch(Ogre::String batchName, Ogre::String pluginName,
-        Ogre::String t, size_t resx, size_t resy, Ogre::String directory)
-        :name(batchName)
-        ,plugin(pluginName)
-        ,timestamp(t)
-        ,comment("")
+        Ogre::String timestamp, size_t resx, size_t resy, Ogre::String directory)
+        :mDirectory(directory)
         ,resolutionX(resx)
         ,resolutionY(resy)
-        ,mDirectory(directory)
+        ,timestamp(timestamp)
+        ,plugin(pluginName)
+        ,comment("")
+        ,name(batchName)
     {
         std::stringstream ver;
         ver<<OGRE_VERSION_MAJOR<<"."<<OGRE_VERSION_MINOR<<" ("<<
@@ -178,7 +178,7 @@ public:
     {
         TestBatchSetPtr out(OGRE_NEW_T(TestBatchSet, Ogre::MEMCATEGORY_GENERAL)(), Ogre::SPFM_DELETE_T);
         // use ArchiveManager to get a list of all subdirectories
-        Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem", true);
+        Ogre::Archive* testDir = Ogre::ArchiveManager::getSingleton().load(directory, "FileSystem");
         Ogre::StringVectorPtr tests = testDir->list(false, true);
         for (unsigned int i = 0; i < tests->size(); ++i)
         {

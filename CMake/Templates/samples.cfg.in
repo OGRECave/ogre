@@ -1,5 +1,4 @@
 SampleFolder=@OGRE_SAMPLES_DIR_REL@
-#SamplePlugin=Sample_AtomicCounters
 SamplePlugin=Sample_BezierPatch
 SamplePlugin=Sample_BSP
 SamplePlugin=Sample_CameraTrack
@@ -11,7 +10,6 @@ SamplePlugin=Sample_DeferredShading
 SamplePlugin=Sample_Dot3Bump
 SamplePlugin=Sample_DynTex
 SamplePlugin=Sample_DualQuaternion
-SamplePlugin=Sample_EndlessWorld
 SamplePlugin=Sample_FacialAnimation
 SamplePlugin=Sample_Fresnel
 SamplePlugin=Sample_Grass

@@ -39,17 +39,8 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreRTShaderSystem)
   endif ()
   
-  if (OGRE_BUILD_COMPONENT_OVERLAY)
-	ogre_add_component_include_dir(Overlay)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreOverlay)
-  endif ()
-  
   if (OGRE_BUILD_COMPONENT_TERRAIN)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreTerrain)
-  endif ()
-
-  if (OGRE_BUILD_COMPONENT_VOLUME)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreVolume)
   endif ()
 
   if (OGRE_BUILD_RENDERSYSTEM_D3D9)
@@ -60,9 +51,6 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GL)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL)
-  endif ()
-  if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GL3Plus)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} RenderSystem_GLES)
@@ -89,16 +77,12 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
-  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
+  	include_directories(${CMAKE_SOURCE_DIR}/RenderSystems/GLES2/include)
   	include_directories(
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/include
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
 		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		)
-  	include_directories(
-		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-		${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
 		)
 
 	# Link to all enabled plugins
@@ -118,12 +102,8 @@ if (OGRE_BUILD_SAMPLES)
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
 	endif () 
-	if (OGRE_BUILD_COMPONENT_OVERLAY)	
-  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
-	endif () 
   endif ()
   
-#  add_subdirectory(AtomicCounters)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)
@@ -151,7 +131,6 @@ if (OGRE_BUILD_SAMPLES)
   add_subdirectory(SphereMapping)
 if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
-  add_subdirectory(EndlessWorld)
 endif ()
   add_subdirectory(Tesselation)
   add_subdirectory(TextureFX)

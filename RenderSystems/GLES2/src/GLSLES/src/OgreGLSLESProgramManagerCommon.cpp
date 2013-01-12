@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -189,18 +189,12 @@ namespace Ogre {
                 // Write the current version (this forces the driver to fulfill the glsl es standard)
                 // TODO: Need to insert the current or compatibility version.  This is not future-proof
                 os << "#version 100" << std::endl;
-
+                
                 // Default precision declaration is required in fragment and vertex shaders.
-                os << "precision highp float;" << std::endl;
+                os << "precision mediump float;" << std::endl;
                 os << "precision highp int;" << std::endl;
-                String source = const_cast<char *>(glslopt_get_output(shader));
-
-                // We want to make sure that there are precision qualifiers so strip out the first line
-                // which is the version string. We don't want duplicates since we are adding our own.
-                size_t pos = source.find_first_of("\n");
-                os << source.substr(pos+1, source.length()-1);
-
-                gpuProgram->getGLSLProgram()->setOptimisedSource(os.str());
+                os << glslopt_get_output(shader);
+                gpuProgram->getGLSLProgram()->setSource(os.str());
                 gpuProgram->getGLSLProgram()->setIsOptimised(true);
             }
             else
@@ -229,7 +223,8 @@ namespace Ogre {
         GLint maxLength = 0;
 		char* uniformName = NULL;
 
-		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
+		glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
+        GL_CHECK_ERROR;
 
         // If the max length of active uniforms is 0, then there are 0 active.
         // There won't be any to extract so we can return.
@@ -240,7 +235,8 @@ namespace Ogre {
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
-		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
+		glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount);
+        GL_CHECK_ERROR;
 
 		// Loop over each of the active uniforms, and add them to the reference container
 		// only do this for user defined uniforms, ignore built in gl state uniforms
@@ -248,9 +244,9 @@ namespace Ogre {
 		{
 			GLint arraySize = 0;
 			GLenum glType = GL_NONE;
-			OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, maxLength, NULL,
-				&arraySize, &glType, uniformName));
-
+			glGetActiveUniform(programObject, index, maxLength, NULL, 
+				&arraySize, &glType, uniformName);
+            GL_CHECK_ERROR;
 			// Don't add built in uniforms
 			newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
 			if (newGLUniformReference.mLocation >= 0)

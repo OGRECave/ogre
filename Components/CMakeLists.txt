@@ -31,7 +31,3 @@ endif ()
 if (OGRE_BUILD_COMPONENT_VOLUME)
 	add_subdirectory(Volume)
 endif ()
-
-if (OGRE_BUILD_COMPONENT_OVERLAY)
-	add_subdirectory(Overlay)
-endif ()

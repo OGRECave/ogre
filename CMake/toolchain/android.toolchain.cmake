@@ -471,8 +471,6 @@ if( BUILD_WITH_ANDROID_NDK )
  string( REPLACE "android-" "" ANDROID_SUPPORTED_NATIVE_API_LEVELS "${ANDROID_SUPPORTED_NATIVE_API_LEVELS}" )
  file( GLOB __availableToolchains RELATIVE "${ANDROID_NDK}/toolchains" "${ANDROID_NDK}/toolchains/*" )
  __LIST_FILTER( __availableToolchains "^[.]" )
- __LIST_FILTER( __availableToolchains ".*clang.*") # ignore experimental compilers
- __LIST_FILTER( __availableToolchains ".*llvm.*")
  set( __availableToolchainMachines "" )
  set( __availableToolchainArchs "" )
  set( __availableToolchainCompilerVersions "" )

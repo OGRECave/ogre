@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ THE SOFTWARE.
 
 #include "OgreArchive.h"
 #include "OgreArchiveFactory.h"
-#include "OgreHeaderPrefix.h"
 
 // Forward declaration for zziplib to avoid header file dependency.
 typedef struct zzip_dir		ZZIP_DIR;
@@ -115,11 +114,8 @@ namespace Ogre {
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
         /// @copydoc FactoryObj::createInstance
-        Archive *createInstance( const String& name, bool readOnly ) 
+        Archive *createInstance( const String& name ) 
         {
-			if(!readOnly)
-				return NULL;
-
             return OGRE_NEW ZipArchive(name, "Zip");
         }
         /// @copydoc FactoryObj::destroyInstance
@@ -138,7 +134,7 @@ namespace Ogre {
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
         /// @copydoc FactoryObj::createInstance
-        Archive *createInstance( const String& name, bool readOnly ) 
+        Archive *createInstance( const String& name ) 
         {
             ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, "EmbeddedZip", mPluginIo);
             return resZipArchive;
@@ -196,7 +192,5 @@ namespace Ogre {
 	/** @} */
 
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

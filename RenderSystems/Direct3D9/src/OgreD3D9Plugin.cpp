@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,14 +29,6 @@ THE SOFTWARE.
 #include "OgreD3D9Plugin.h"
 #include "OgreRoot.h"
 
-#ifdef __MINGW32__
-extern "C" {   
-#include "WIN32\OgreMinGWSupport.h"
-void _chkstk();
-void _fastcall __security_check_cookie(intptr_t i);
-} 	
-#endif
-
 namespace Ogre 
 {
 	const String sPluginName = "D3D9 RenderSystem";
@@ -51,18 +43,9 @@ namespace Ogre
 	{
 		return sPluginName;
 	}
-	
 	//---------------------------------------------------------------------
 	void D3D9Plugin::install()
 	{
-		// When building with MinGW, we need to call dummy implementations
-		// of missing MinGW DirectX functions to make sure they are carried over
-		// in dynamic AND static builds
-#ifdef __MINGW32__
-    _chkstk();
-    __security_check_cookie((intptr_t)NULL);    
-#endif
-    
 		// Create the DirectX 9 rendering api
 #ifdef OGRE_STATIC_LIB
 		HINSTANCE hInst = GetModuleHandle( NULL );

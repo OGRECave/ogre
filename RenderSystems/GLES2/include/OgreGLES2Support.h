@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,11 @@ THE SOFTWARE.
 namespace Ogre
 {
     class GLES2RenderSystem;
-    class GLES2StateCacheManager;
 
     class _OgreGLES2Export GLES2Support
     {
         public:
-            GLES2Support() : mStateCacheMgr(0)  { }
+            GLES2Support() { }
             virtual ~GLES2Support() { }
 
             /**
@@ -137,22 +136,6 @@ namespace Ogre
                 return 1;
             }
 
-			/**
-            * Get the state cache manager
-            */
-            GLES2StateCacheManager* getStateCacheManager() const
-            {
-                return mStateCacheMgr;
-            }
-        
-            /**
-            * Set a valid state cache manager
-            */
-            void setStateCacheManager(GLES2StateCacheManager* stateCacheMgr)
-            {
-                mStateCacheMgr = stateCacheMgr;
-            }
-			
             /**
             * Start anything special
             */
@@ -174,9 +157,6 @@ namespace Ogre
 
             // This contains the complete list of supported extensions
             set<String>::type extensionList;
-			
-			// State cache management
-			GLES2StateCacheManager* mStateCacheMgr;
     };
 
 }

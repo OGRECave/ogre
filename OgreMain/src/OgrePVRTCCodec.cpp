@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,14 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
 #include "OgrePVRTCCodec.h"
 #include "OgreImage.h"
 #include "OgreException.h"
+
 #include "OgreLogManager.h"
+#include "OgreStringConverter.h"
 
 #define FOURCC(c0, c1, c2, c3) (c0 | (c1 << 8) | (c2 << 16) | (c3 << 24))
 #define PVR_TEXTURE_FLAG_TYPE_MASK	0xff
@@ -44,47 +48,30 @@ namespace Ogre {
 #pragma pack (1)
 #endif
 
-    const uint32 PVR3_MAGIC = FOURCC('P', 'V', 'R', 3);
+    const uint32 PVR_MAGIC = FOURCC('P', 'V', 'R', '!');
 
     enum
     {
         kPVRTextureFlagTypePVRTC_2 = 24,
         kPVRTextureFlagTypePVRTC_4
     };
-
-    enum
+    
+    typedef struct _PVRTCTexHeader
     {
-        kPVRTC1_PF_2BPP_RGB,
-        kPVRTC1_PF_2BPP_RGBA,
-        kPVRTC1_PF_4BPP_RGB,
-        kPVRTC1_PF_4BPP_RGBA,
-        kPVRTC2_PF_2BPP,
-        kPVRTC2_PF_4BPP
-    };
-
-    typedef struct _PVRTCTexHeaderV3
-    {
-        uint32  version;         //Version of the file header, used to identify it.
-        uint32  flags;           //Various format flags.
-        uint64  pixelFormat;     //The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
-        uint32  colourSpace;     //The Colour Space of the texture, currently either linear RGB or sRGB.
-        uint32  channelType;     //Variable type that the channel is stored in. Supports signed/unsigned int/short/byte or float for now.
-        uint32  height;          //Height of the texture.
-        uint32  width;           //Width of the texture.
-        uint32  depth;           //Depth of the texture. (Z-slices)
-        uint32  numSurfaces;     //Number of members in a Texture Array.
-        uint32  numFaces;        //Number of faces in a Cube Map. Maybe be a value other than 6.
-        uint32  mipMapCount;     //Number of MIP Maps in the texture - NB: Includes top level.
-        uint32  metaDataSize;    //Size of the accompanying meta data.
-    } PVRTCTexHeaderV3;
-
-    typedef struct _PVRTCMetaData
-    {
-        uint32 DevFOURCC;
-        uint32 u32Key;
-        uint32 u32DataSize;
-        uint8* Data;
-    } PVRTCMetadata;
+        uint32 headerLength;
+        uint32 height;
+        uint32 width;
+        uint32 numMipmaps;
+        uint32 flags;
+        uint32 dataLength;
+        uint32 bpp;
+        uint32 bitmaskRed;
+        uint32 bitmaskGreen;
+        uint32 bitmaskBlue;
+        uint32 bitmaskAlpha;
+        uint32 pvrTag;
+        uint32 numSurfs;
+    } PVRTCTexHeader;
 	
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 #pragma pack (pop)
@@ -140,73 +127,52 @@ namespace Ogre {
     //---------------------------------------------------------------------
     Codec::DecodeResult PVRTCCodec::decode(DataStreamPtr& stream) const
     {
-        PVRTCTexHeaderV3 header;
-        PVRTCMetadata metadata;
-        uint32 flags = 0, pvrTag = 0;
+        PVRTCTexHeader header;
+        uint32 flags = 0, pvrTag = 0, formatFlags = 0;
         size_t numFaces = 1; // Assume one face until we know otherwise
 
         ImageData *imgData = OGRE_NEW ImageData();
 		MemoryDataStreamPtr output;
 
         // Read the PVRTC header
-        stream->read(&header, sizeof(PVRTCTexHeaderV3));
+        stream->read(&header, sizeof(PVRTCTexHeader));
 
         // Get the file type identifier
-        // 0x03525650
-        pvrTag = header.version;
+        pvrTag = header.pvrTag;
 
-        // Read the PVRTC metadata
-        if(header.metaDataSize)
+        if (PVR_MAGIC != pvrTag)
         {
-            stream->read(&metadata, sizeof(PVRTCMetadata));
-        }
-
-        if (PVR3_MAGIC != pvrTag)
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "This is not a PVR file!", "PVRTCCodec::decode");
-        }
-
-        // Identify the pixel format
-        switch (header.pixelFormat)
-        {
-            case kPVRTC1_PF_2BPP_RGB:
-                imgData->format = PF_PVRTC_RGB2;
-                break;
-            case kPVRTC1_PF_2BPP_RGBA:
-                imgData->format = PF_PVRTC_RGBA2;
-                break;
-            case kPVRTC1_PF_4BPP_RGB:
-                imgData->format = PF_PVRTC_RGB4;
-                break;
-            case kPVRTC1_PF_4BPP_RGBA:
-                imgData->format = PF_PVRTC_RGBA4;
-                break;
-            case kPVRTC2_PF_2BPP:
-                imgData->format = PF_PVRTC2_2BPP;
-                break;
-            case kPVRTC2_PF_4BPP:
-                imgData->format = PF_PVRTC2_4BPP;
-                break;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
+                    "This is not a PVR file!", "PVRTCCodec::decode");
         }
 
         // Get format flags
         flags = header.flags;
         flipEndian((void *)flags, sizeof(uint32));
+        formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
 
-        imgData->depth = header.depth;
-        imgData->width = header.width;
-        imgData->height = header.height;
-        imgData->num_mipmaps = static_cast<ushort>(header.mipMapCount);
+        uint32 bitmaskAlpha = header.bitmaskAlpha;
+        flipEndian((void *)bitmaskAlpha, sizeof(uint32));
 
-        // PVRTC is a compressed format
-        imgData->flags |= IF_COMPRESSED;
+        if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
+        {
+            if (formatFlags == kPVRTextureFlagTypePVRTC_4)
+            {
+                imgData->format = bitmaskAlpha ? PF_PVRTC_RGBA4 : PF_PVRTC_RGB4;
+            }
+            else if (formatFlags == kPVRTextureFlagTypePVRTC_2)
+            {
+                imgData->format = bitmaskAlpha ? PF_PVRTC_RGBA2 : PF_PVRTC_RGB2;
+            }
 
-        if(header.numFaces == 6)
-            imgData->flags |= IF_CUBEMAP;
+            imgData->depth = 1;
+            imgData->width = header.width;
+            imgData->height = header.height;
+            imgData->num_mipmaps = static_cast<ushort>(header.numMipmaps);
 
-        if(header.depth > 1)
-            imgData->flags |= IF_3D_TEXTURE;
+            // PVRTC is a compressed format
+            imgData->flags |= IF_COMPRESSED;
+        }
 
         // Calculate total size from number of mipmaps, faces and size
 		imgData->size = Image::calculateSize(imgData->num_mipmaps, numFaces, 
@@ -217,32 +183,10 @@ namespace Ogre {
 
 		// Now deal with the data
 		void *destPtr = output->getPtr();
-        
-        size_t width = imgData->width;
-        size_t height = imgData->height;
-        size_t depth = imgData->depth;
+        stream->read(destPtr, imgData->size);
+        destPtr = static_cast<void*>(static_cast<uchar*>(destPtr));
 
-        // All mips for a surface, then each face
-        for(size_t mip = 0; mip <= imgData->num_mipmaps; ++mip)
-		{
-            for(size_t surface = 0; surface < header.numSurfaces; ++surface)
-            {
-                for(size_t i = 0; i < numFaces; ++i)
-                {
-                    // Load directly
-                    size_t pvrSize = PixelUtil::getMemorySize(width, height, depth, imgData->format);
-                    stream->read(destPtr, pvrSize);
-                    destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + pvrSize);
-                }
-            }
-
-            // Next mip
-            if(width!=1) width /= 2;
-            if(height!=1) height /= 2;
-            if(depth!=1) depth /= 2;
-		}
-
-        DecodeResult ret;
+		DecodeResult ret;
 		ret.first = output;
 		ret.second = CodecDataPtr(imgData);
 
@@ -285,7 +229,7 @@ namespace Ogre {
 			memcpy(&fileType, magicNumberPtr, sizeof(uint32));
 			flipEndian(&fileType, sizeof(uint32), 1);
 
-			if (PVR3_MAGIC == fileType)
+			if (PVR_MAGIC == fileType)
 			{
 				return String("pvr");
 			}

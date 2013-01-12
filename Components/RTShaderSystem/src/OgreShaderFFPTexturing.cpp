@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -879,10 +879,6 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
 		curParams.mTextureSamplerType = GCT_SAMPLER2D;
 		curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
 		break;
-    case TEX_TYPE_2D_RECT:
-        curParams.mTextureSamplerType = GCT_SAMPLERRECT;
-        curParams.mVSInTextureCoordinateType = GCT_FLOAT2;
-        break;
     case TEX_TYPE_2D_ARRAY:
         curParams.mTextureSamplerType = GCT_SAMPLER2DARRAY;
         curParams.mVSInTextureCoordinateType = GCT_FLOAT3;

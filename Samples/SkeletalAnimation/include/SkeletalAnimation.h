@@ -62,7 +62,7 @@ protected:
 /*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 		//To make glsles work the program will need to be provided with proper
 		//shadow caster materials
-		if (mShaderGenerator->getTargetLanguage() != "glsles" && mShaderGenerator->getTargetLanguage() != "glsl")
+		if (mShaderGenerator->getTargetLanguage() != "glsles")
 		{
 			//Add the hardware skinning to the shader generator default render state
 			mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
@@ -155,14 +155,17 @@ protected:
 			// create and attach a jaiqua entity
 			ent = mSceneMgr->createEntity("Jaiqua" + StringConverter::toString(i + 1), "jaiqua.mesh");
 
-#ifdef USE_RTSHADER_SYSTEM
+/*#ifdef USE_RTSHADER_SYSTEM
+			if (mShaderGenerator->getTargetLanguage() == "glsles")*/
             if (mShaderGenerator->getTargetLanguage() == "glsles")
             {
                 MaterialPtr mat = MaterialManager::getSingleton().getByName("jaiqua");
                 mat->getTechnique(0)->getPass(0)->setShadowCasterFragmentProgram("Ogre/BasicFragmentPrograms/PassthroughFpGLSLES");
             }
+                ent->setMaterialName("jaiqua");
+/*            else
 #endif
-            ent->setMaterialName("jaiqua"); //"jaiquaDualQuatTest"
+                ent->setMaterialName("jaiquaDualQuatTest");*/
 			sn->attachObject(ent);
 
 /*#if defined(USE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)

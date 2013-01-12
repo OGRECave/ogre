@@ -10,15 +10,8 @@ fragment_program Ogre/Compositor/Invert_GLSLES_FP glsles
 	source InvertFP.glsles
 }
 
-fragment_program Ogre/Compositor/Invert_GLSL_FP glsl
-{
-	source InvertFP.glsl
-	syntax glsl150
-}
-
 fragment_program Ogre/Compositor/InvertFP unified
 {
-	delegate Ogre/Compositor/Invert_GLSL_FP
 	delegate Ogre/Compositor/Invert_GLSLES_FP
 	delegate Ogre/Compositor/Invert_Cg_FP
 }

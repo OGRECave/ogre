@@ -1,4 +1,4 @@
-fragment_program Ogre/Compositor/HalftoneFPCg cg
+fragment_program Ogre/Compositor/HalftoneFP cg
 {
 	source HalftoneFP.cg
 	entry_point Halftone_ps
@@ -11,28 +11,6 @@ fragment_program Ogre/Compositor/HalftoneFPCg cg
 	    param_named iNumTiles2 float2 0.00375375 0.005
 	    param_named lum float4 0.30 0.59 0.11 0.0
 	}
-}
-
-fragment_program Ogre/Compositor/HalftoneFPGLSL glsl
-{
-	source HalftoneFP.glsl
-	syntax glsl150
-	
-	default_params
-	{
-	    param_named numTiles float2 133.3 100
-	    param_named iNumTiles float2 0.00750750 0.01
-	    param_named iNumTiles2 float2 0.00375375 0.005
-	    param_named lum float4 0.30 0.59 0.11 0.0
-	    param_named RT int 0
-	    param_named noise int 1
-	}
-}
-
-fragment_program Ogre/Compositor/HalftoneFP unified
-{
-	delegate Ogre/Compositor/HalftoneFPGLSL
-	delegate Ogre/Compositor/HalftoneFPCg
 }
 
 material Ogre/Compositor/Halftone
@@ -58,7 +36,7 @@ material Ogre/Compositor/Halftone
 
 			texture_unit RT
 			{
-                tex_coord_set 0
+                		tex_coord_set 0
 				tex_address_mode clamp
 				filtering trilinear
 			}

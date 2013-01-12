@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -106,9 +106,7 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		SAFE_RELEASE(mlpD3DBuffer);
-#endif
 		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
 		SAFE_DELETE(mShadowBuffer);
 	}

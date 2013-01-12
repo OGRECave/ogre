@@ -27,16 +27,15 @@ public:
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support vertex and fragment"
                         " programs, so you cannot run this sample. Sorry!", "Sample_Tesselation::testCapabilities");
         }
-		if (!caps->hasCapability(RSC_TESSELATION_HULL_PROGRAM) || !caps->hasCapability(RSC_TESSELATION_DOMAIN_PROGRAM))
+		if (!(caps->getRenderSystemName() == "Direct3D11 Rendering Subsystem"))
 		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Your graphics card does not support tesselation shaders. Sorry!",
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "This demo currently only supports DirectX11. Sorry!",
 				"Sample_Tesselation:testCapabilities");
 		}
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported("vs_5_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("hs_5_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ds_5_0") &&
-			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_5_0") &&
-   			!GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_5_0"))
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model 5.0 needed for this sample, "
 						"so you cannot run this sample. Sorry!", "Sample_Tesselation::testCapabilities");
@@ -57,7 +56,7 @@ protected:
 		// create material and set the texture unit to our texture
         MaterialPtr tMat = MaterialManager::getSingleton().createOrRetrieve("Ogre/TesselationExample", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME).first;
         tMat->compile();
-        tMat->getBestTechnique()->getPass(0);
+        Pass * pass = tMat->getBestTechnique()->getPass(0);
 
 		// create a plain with float3 tex cord
 	    ManualObject* tObject = mSceneMgr->createManualObject("TesselatedObject");

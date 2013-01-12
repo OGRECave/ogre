@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -575,12 +575,8 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
-				if (mAnimationState != targetState) // only copy if lods use different skeleton instances
-				{
-					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
-						mAnimationState->copyMatchingState(targetState);
-				}
+                mAnimationState->copyMatchingState(
+					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
             }
             displayEntity = mLodEntityList[mMeshLodIndex - 1];
         }
@@ -1863,12 +1859,8 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
-				if (mAnimationState != targetState) // only copy if lods have different skeleton instances
-				{
-					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
-						mAnimationState->copyMatchingState(targetState);
-				}
+                mAnimationState->copyMatchingState(
+					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
             }
             return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
                 shadowTechnique, light, indexBuffer, extrude,

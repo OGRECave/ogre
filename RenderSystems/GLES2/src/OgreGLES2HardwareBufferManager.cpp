@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,6 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2VertexDeclaration.h"
-#include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Support.h"
-#include "OgreRoot.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -64,7 +61,6 @@ namespace Ogre {
 #	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 		mMapBufferThreshold = 0;
 #	endif
-		mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
 }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
@@ -274,18 +270,11 @@ namespace Ogre {
 		mMapBufferThreshold = value;
 	}
     //---------------------------------------------------------------------
-    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name /*= ""*/ )
+    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name /*= ""*/ )
     {
         OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-            "GLES2 does not support uniform buffer objects", 
+            "GLES2 does not support render to vertex buffer objects", 
             "GLES2HardwareBufferManagerBase::createUniformBuffer");
-    }
-    //---------------------------------------------------------------------
-    Ogre::HardwareCounterBufferSharedPtr GLES2HardwareBufferManagerBase::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name /*= ""*/ )
-    {
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "GLES2 does not support atomic counter buffers",
-                    "GLES2HardwareBufferManagerBase::createCounterBuffer");
     }
 
 }

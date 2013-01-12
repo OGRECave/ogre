@@ -10,15 +10,8 @@ fragment_program Ogre/Compositor/Tiling_GLSLES_FP glsles
 	source TilingFP.glsles
 }
 
-fragment_program Ogre/Compositor/Tiling_GLSL_FP glsl
-{
-	source TilingFP.glsl
-	syntax glsl150
-}
-
 fragment_program Ogre/Compositor/TilingFP unified
 {
-    delegate Ogre/Compositor/Tiling_GLSL_FP
     delegate Ogre/Compositor/Tiling_GLSLES_FP
     delegate Ogre/Compositor/Tiling_Cg_FP
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,9 +56,9 @@ namespace Ogre {
 		, mGLShaderHandle(0)
         , mGLProgramHandle(0)
         , mCompiled(0)
-#if !OGRE_NO_GLES2_GLSL_OPTIMISER
         , mIsOptimised(false)
-        , mOptimiserEnabled(false)
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        , mOptimiserEnabled(true)
 #endif
     {
         if (createParamDictionary("GLSLESProgram"))
@@ -71,7 +71,7 @@ namespace Ogre {
                                             PT_STRING),&msCmdPreprocessorDefines);
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
 			dict->addParameter(ParameterDef("use_optimiser", 
-                                            "Should the GLSL optimiser be used. Default is false.",
+                                            "Should the GLSL optimiser be used. Default is true.",
                                             PT_BOOL),&msCmdOptimisation);
 #endif
         }
@@ -179,6 +179,8 @@ namespace Ogre {
 		// Only create a shader object if glsl es is supported
 		if (isSupported())
 		{
+            GL_CHECK_ERROR
+
 			// Create shader object
 			GLenum shaderType = 0x0000;
 			if (mType == GPT_VERTEX_PROGRAM)
@@ -189,39 +191,33 @@ namespace Ogre {
             {
 				shaderType = GL_FRAGMENT_SHADER;
 			}
-			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
-
-#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-            glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
-#endif
+			mGLShaderHandle = glCreateShader(shaderType);
+            GL_CHECK_ERROR
 
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-#if GL_EXT_debug_label && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
-#endif
+                mGLProgramHandle = glCreateProgram();
+                GL_CHECK_ERROR
             }
 		}
 
 		// Add preprocessor extras and main source
 		if (!mSource.empty())
 		{
-#if !OGRE_NO_GLES2_GLSL_OPTIMISER
-			const char *source = (getOptimiserEnabled() && getIsOptimised()) ? mOptimisedSource.c_str() : mSource.c_str();
-#else
 			const char *source = mSource.c_str();
-#endif
-			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
+			glShaderSource(mGLShaderHandle, 1, &source, NULL);
+			// Check for load errors
+            GL_CHECK_ERROR
 		}
 
         if (checkErrors)
             logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
 
-		OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
+		glCompileShader(mGLShaderHandle);
+        GL_CHECK_ERROR
 
 		// Check for compile errors
-		OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
+		glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled);
         if(!mCompiled && checkErrors)
 		{
             String message = logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
@@ -232,37 +228,9 @@ namespace Ogre {
         if (mCompiled && checkErrors)
             logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
 
-        if(!mCompiled)
-		{
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        ((mType == GPT_VERTEX_PROGRAM) ? "Vertex Program " : "Fragment Program ") + mName +
-                        " failed to compile. See compile log above for details.",
-                        "GLSLESProgram::compile");
-		}
-
 		return (mCompiled == 1);
 	}
 
-#if !OGRE_NO_GLES2_GLSL_OPTIMISER	
-	//-----------------------------------------------------------------------
-    void GLSLESProgram::setOptimiserEnabled(bool enabled) 
-	{ 
-		if(mOptimiserEnabled != enabled && mOptimiserEnabled && mCompiled == 1)
-		{
-			OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
-
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
-            }
-            
-            mGLShaderHandle = 0;
-            mGLProgramHandle = 0;
-            mCompiled = 0;
-		}
-		mOptimiserEnabled = enabled; 
-	}
-#endif
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::createLowLevelImpl(void)
 	{
@@ -285,11 +253,13 @@ namespace Ogre {
 		{
 //            LogManager::getSingleton().logMessage("Deleting shader " + StringConverter::toString(mGLShaderHandle) +
 //                                                  " and program " + StringConverter::toString(mGLProgramHandle));
-			OGRE_CHECK_GL_ERROR(glDeleteShader(mGLShaderHandle));
+			glDeleteShader(mGLShaderHandle);
+            GL_CHECK_ERROR;
 
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
-                OGRE_CHECK_GL_ERROR(glDeleteProgram(mGLProgramHandle));
+                glDeleteProgram(mGLProgramHandle);
+                GL_CHECK_ERROR;
             }
             
             mGLShaderHandle = 0;
@@ -367,14 +337,16 @@ namespace Ogre {
 	{
 //        LogManager::getSingleton().logMessage("Attaching shader " + StringConverter::toString(mGLShaderHandle) +
 //                                              " to program " + StringConverter::toString(programObject));
-        OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
+        glAttachShader(programObject, mGLShaderHandle);
+        GL_CHECK_ERROR
     }
 	//-----------------------------------------------------------------------
 	void GLSLESProgram::detachFromProgramObject( const GLuint programObject )
 	{
 //        LogManager::getSingleton().logMessage("Detaching shader " + StringConverter::toString(mGLShaderHandle) +
 //                                              " to program " + StringConverter::toString(programObject));
-        OGRE_CHECK_GL_ERROR(glDetachShader(programObject, mGLShaderHandle));
+        glDetachShader(programObject, mGLShaderHandle);
+        GL_CHECK_ERROR
 	}
 
     //-----------------------------------------------------------------------
@@ -432,8 +404,9 @@ namespace Ogre {
 			mSource = newSource.str();
 
 			const char *source = mSource.c_str();
-			OGRE_CHECK_GL_ERROR(glShaderSource(mGLShaderHandle, 1, &source, NULL));
-
+			glShaderSource(mGLShaderHandle, 1, &source, NULL);
+			// Check for load errors
+			GL_CHECK_ERROR
             if (compile())
             {
                 LogManager::getSingleton().logMessage("The removing of the lines fixed the invalid type Type for default precision qualifier error.");

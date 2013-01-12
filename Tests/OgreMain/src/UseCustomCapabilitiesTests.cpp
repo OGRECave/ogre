@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLog.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
-#endif
 
 // Regsiter the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
@@ -197,7 +195,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
 	}
 
-	Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+	Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -208,13 +206,8 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		try {
 			setUpGLRenderSystemOptions(rs);
 			root->setRenderSystem(rs);
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-                             macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
-#else
-			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-                             "../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
-#endif
+											macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
 
 			const RenderSystemCapabilities* caps = rs->getCapabilities();
 
@@ -257,7 +250,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
 	}
 
-    Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{

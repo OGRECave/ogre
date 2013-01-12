@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -72,16 +72,10 @@ namespace Volume {
     {
     
         Timer t;
-        //we to load then read a 3d texture. we cannot load it directly as that will mean we might
-        //not be able to read it. we need to change it's usage from dynamic (default) to a readable static.
-        Ogre::ResourceManager::ResourceCreateOrRetrieveResult res =
-            TextureManager::getSingleton().createOrRetrieve(volumeTextureName,
-            Ogre::ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
-            false,0,0,Ogre::TEX_TYPE_3D);
-        Ogre::TexturePtr tex = res.first;
-        tex->setUsage(TU_DYNAMIC);
-        tex->load();
-       
+        TexturePtr tex = TextureManager::getSingleton().load(volumeTextureName,
+            ResourceGroupManager::getSingleton().getWorldResourceGroupName(),
+            TEX_TYPE_3D,
+            0);
         LogManager::getSingleton().stream() << "Loaded texture in " << t.getMilliseconds() << "ms.";
         t.reset();
 
@@ -119,12 +113,9 @@ namespace Volume {
                 pbptr += pb.rowPitch;
             }
             pbptr += sliceSkip;
-		}
-		buffer->unlock();
-
-		TextureManager::getSingleton().remove(tex->getHandle());
-
-		LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
+        }
+        buffer->unlock();
+        LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }
         
     //-----------------------------------------------------------------------

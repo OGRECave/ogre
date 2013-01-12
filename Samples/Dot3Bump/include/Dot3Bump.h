@@ -26,7 +26,7 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
             names.push_back("Cg Program Manager");
 		return names;
 	}
@@ -42,7 +42,6 @@ public:
 		if (!GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl")   &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "

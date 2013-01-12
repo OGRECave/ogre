@@ -11,20 +11,17 @@
 #define SDL_LIGHT_DATA_SIZE 3 // 12 floats divided by 4 slots (rgba) 
 
 using namespace Ogre;
-namespace Ogre
-{
-    template<> SegmentedDynamicLightManager* Singleton<SegmentedDynamicLightManager>::msSingleton = 0;
-}
+template<> SegmentedDynamicLightManager* Singleton<SegmentedDynamicLightManager>::msSingleton = 0;
 
 const String c_SDLTextureName = "Simigon/SDLTexture";
 
 SegmentedDynamicLightManager::SegmentedDynamicLightManager() :
-    mIsDebugMode(false),
-    mManager(NULL),
-    mSegmentedLightGrid(SDL_SEGMENT_GRID_SIZE),
-    mLightTexture(NULL),
 	mTextureWidth(0),
-	mTextureHeight(SDL_TEXTURE_ROWS)
+	mTextureHeight(SDL_TEXTURE_ROWS),
+	mLightTexture(NULL),
+	mManager(NULL),
+	mIsDebugMode(false),
+	mSegmentedLightGrid(SDL_SEGMENT_GRID_SIZE)
 {
 	//calculate needed texture width
 	mTextureWidth = SDL_LIGHT_DATA_SIZE * SDL_SEGMENT_GRID_SIZE;
@@ -353,7 +350,7 @@ void SegmentedDynamicLightManager::updateTextureFromSegmentedLists(const Camera*
 	}
 
 	//Check for memory overrun
-	if (pBuf->getSizeInBytes() != (size_t)((const char*)(void*)pData - (const char*)pStartPos))
+	if (pBuf->getSizeInBytes() != (const char*)(void*)pData - (const char*)pStartPos)
 	{
 		throw "memory overrun";
 	}

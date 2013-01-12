@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -290,7 +289,7 @@ namespace Ogre {
 			};
 
 			VertexCacheProfiler(unsigned int cachesize = 16, CacheType cachetype = FIFO )
-				: size ( cachesize ), tail (0), buffersize (0), hit (0), miss (0)
+				: size ( cachesize ), type ( cachetype ), tail (0), buffersize (0), hit (0), miss (0)
 			{
 				cache = OGRE_ALLOC_T(uint32, size, MEMCATEGORY_GEOMETRY);
 			}
@@ -310,6 +309,7 @@ namespace Ogre {
 		private:
 			unsigned int size;
 			uint32 *cache;
+			CacheType type;
 
 			unsigned int tail, buffersize;
 			unsigned int hit, miss;
@@ -319,8 +319,5 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif
 

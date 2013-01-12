@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	class HardwareBufferManagerBase;
@@ -82,7 +81,7 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share vertex buffers. */
+    /** Shared pointer implementation used to share index buffers. */
     class _OgreExport HardwareVertexBufferSharedPtr : public SharedPtr<HardwareVertexBuffer>
     {
     public:
@@ -126,33 +125,17 @@ namespace Ogre {
         VET_FLOAT2 = 1,
         VET_FLOAT3 = 2,
         VET_FLOAT4 = 3,
-        VET_DOUBLE1 = 4,
-        VET_DOUBLE2 = 5,
-        VET_DOUBLE3 = 6,
-        VET_DOUBLE4 = 7,
         /// alias to more specific colour type - use the current rendersystem's colour packing
-		VET_COLOUR = 8,
-		VET_SHORT1 = 9,
-		VET_SHORT2 = 10,
-		VET_SHORT3 = 11,
-		VET_SHORT4 = 12,
-        VET_USHORT1 = 13,
-        VET_USHORT2 = 14,
-        VET_USHORT3 = 15,
-        VET_USHORT4 = 16,
-        VET_UBYTE4 = 17,
-        VET_INT1 = 18,
-        VET_INT2 = 19,
-        VET_INT3 = 20,
-        VET_INT4 = 21,
-        VET_UINT1 = 22,
-        VET_UINT2 = 23,
-        VET_UINT3 = 24,
-        VET_UINT4 = 25,
+		VET_COLOUR = 4,
+		VET_SHORT1 = 5,
+		VET_SHORT2 = 6,
+		VET_SHORT3 = 7,
+		VET_SHORT4 = 8,
+        VET_UBYTE4 = 9,
         /// D3D style compact colour
-        VET_COLOUR_ARGB = 26,
+        VET_COLOUR_ARGB = 10,
         /// GL style compact colour
-        VET_COLOUR_ABGR = 27
+        VET_COLOUR_ABGR = 11
     };
 
     /** This class declares the usage of a single vertex buffer as a component
@@ -597,8 +580,5 @@ namespace Ogre {
 
 
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif
 

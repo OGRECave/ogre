@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,8 @@ void GLES2HardwareOcclusionQuery::createQuery()
 {
 	// Check for hardware occlusion support
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGenQueriesEXT(1, &mQueryID ));
+    glGenQueriesEXT(1, &mQueryID );
+    GL_CHECK_ERROR;
 #else
     OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
                 "Cannot allocate a Hardware query. This video card doesn't support it, sorry.", 
@@ -65,7 +66,8 @@ void GLES2HardwareOcclusionQuery::createQuery()
 void GLES2HardwareOcclusionQuery::destroyQuery()
 {
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glDeleteQueriesEXT(1, &mQueryID));
+    glDeleteQueriesEXT(1, &mQueryID);
+    GL_CHECK_ERROR;
 #endif        
 }
 //------------------------------------------------------------------
@@ -84,21 +86,24 @@ void GLES2HardwareOcclusionQuery::notifyOnContextReset()
 void GLES2HardwareOcclusionQuery::beginOcclusionQuery() 
 { 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID));
+    glBeginQueryEXT(GL_ANY_SAMPLES_PASSED_EXT, mQueryID);
+    GL_CHECK_ERROR;
 #endif
 }
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::endOcclusionQuery() 
 { 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT));
+    glEndQueryEXT(GL_ANY_SAMPLES_PASSED_EXT);
+    GL_CHECK_ERROR;
 #endif
 }
 //------------------------------------------------------------------
 bool GLES2HardwareOcclusionQuery::pullOcclusionQuery( unsigned int* NumOfFragments ) 
 {
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments));
+    glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_EXT, (GLuint*)NumOfFragments);
+    GL_CHECK_ERROR;
     mPixelCount = *NumOfFragments;
     return true;
 #else
@@ -111,7 +116,8 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
     GLuint available = GL_FALSE;
 
 #ifdef GL_EXT_occlusion_query_boolean
-    OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
+    glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available);
+    GL_CHECK_ERROR;
 #endif
 
 	// GL_TRUE means a wait would occur
@@ -119,3 +125,5 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
 } 
 
 }
+
+

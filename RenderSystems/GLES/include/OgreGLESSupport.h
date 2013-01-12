@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,12 +38,11 @@ namespace Ogre
 {
     class GLESRenderSystem;
     class GLESPBuffer;
-    class GLESStateCacheManager;
-    
+
     class _OgreGLESExport GLESSupport
     {
         public:
-            GLESSupport() : mStateCacheMgr(0) { }
+            GLESSupport() { }
             virtual ~GLESSupport() { }
 
             /**
@@ -105,23 +104,7 @@ namespace Ogre
             {
                 return 1;
             }
-        
-            /**
-            * Get the state cache manager
-            */
-            GLESStateCacheManager* getStateCacheManager() const
-            {
-                return mStateCacheMgr;
-            }
-        
-            /**
-            * Set a valid state cache manager
-            */
-            void setStateCacheManager(GLESStateCacheManager* stateCacheMgr)
-            {
-                mStateCacheMgr = stateCacheMgr;
-            }
-        
+
             /**
             * Start anything special
             */
@@ -142,8 +125,6 @@ namespace Ogre
 
             // This contains the complete list of supported extensions
             std::set<String> extensionList;
-        
-            GLESStateCacheManager* mStateCacheMgr;
     };
 
 }

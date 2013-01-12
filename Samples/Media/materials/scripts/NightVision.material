@@ -1,4 +1,4 @@
-fragment_program Ogre/Compositor/NightVisionFPCg cg
+fragment_program Ogre/Compositor/NightVisionFP cg
 {
 	source NightVisionFP.cg
 	entry_point NightVision_ps
@@ -9,26 +9,6 @@ fragment_program Ogre/Compositor/NightVisionFPCg cg
 		param_named lum float4 0.30 0.59 0.11 0.0
 		param_named_auto time time_0_1 1
 	}
-}
-
-fragment_program Ogre/Compositor/NightVisionFPGLSL glsl
-{
-	source NightVisionFP.glsl
-	syntax glsl150
-	
-	default_params
-	{
-		param_named lum float4 0.30 0.59 0.11 0.0
-		param_named_auto time time_0_1 1
-		param_named RT int 0
-		param_named noiseVol int 1
-	}
-}
-
-fragment_program Ogre/Compositor/NightVisionFP unified
-{
-	delegate Ogre/Compositor/NightVisionFPGLSL
-	delegate Ogre/Compositor/NightVisionFPCg
 }
 
 material Ogre/Compositor/NightVision

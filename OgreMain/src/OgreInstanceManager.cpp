@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,6 @@ THE SOFTWARE.
 #include "OgreMeshManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreSceneManager.h"
-#include "OgreMeshSerializer.h"
-#include "OgreHardwareBufferManager.h"
 
 namespace Ogre
 {
@@ -52,18 +50,14 @@ namespace Ogre
 				mInstancingFlags( instancingFlags ),
 				mSubMeshIdx( subMeshIdx ),
                 mSceneManager( sceneManager ),
-				mMaxLookupTableInstances(16),
-				mNumCustomParams( 0 )
+				mMaxLookupTableInstances(16)
 	{
 		mMeshReference = MeshManager::getSingleton().load( meshName, groupName );
-
-		if(mMeshReference->sharedVertexData)
-			unshareVertices(mMeshReference);
 
 		if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )
 			mMeshReference->getSubMesh(mSubMeshIdx)->_compileBoneAssignments();
 	}
-				
+
 	InstanceManager::~InstanceManager()
 	{
 		//Remove all batches from all materials we created
@@ -99,23 +93,12 @@ namespace Ogre
 		if( !mInstanceBatches.empty() )
 		{
 			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "Instances per batch can only be changed before"
-				" building the batch.", "InstanceManager::setMaxLookupTableInstances");
+				" building the batch.", "InstanceManager::setInstancesPerBatch");
 		}
 
 		mMaxLookupTableInstances = maxLookupTableInstances;
 	}
 	
-	//----------------------------------------------------------------------
-	void InstanceManager::setNumCustomParams( unsigned char numCustomParams )
-	{
-		if( !mInstanceBatches.empty() )
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALID_STATE, "setNumCustomParams can only be changed before"
-				" building the batch.", "InstanceManager::setNumCustomParams");
-		}
-
-		mNumCustomParams = numCustomParams;
-	}
 	//----------------------------------------------------------------------
 	size_t InstanceManager::getMaxOrBestNumInstancesPerBatch( String materialName, size_t suggestedSize,
 																uint16 flags )
@@ -329,7 +312,6 @@ namespace Ogre
 	//-----------------------------------------------------------------------
 	void InstanceManager::defragmentBatches( bool optimizeCull,
 												InstanceBatch::InstancedEntityVec &usedEntities,
-												InstanceBatch::CustomParamsVec &usedParams,
 												InstanceBatchVec &fragmentedBatches )
 	{
 		InstanceBatchVec::iterator itor = fragmentedBatches.begin();
@@ -338,7 +320,7 @@ namespace Ogre
 		while( itor != end && !usedEntities.empty() )
 		{
 			if( !(*itor)->isStatic() )
-				(*itor)->_defragmentBatch( optimizeCull, usedEntities, usedParams );
+				(*itor)->_defragmentBatch( optimizeCull, usedEntities );
 			++itor;
 		}
 
@@ -380,8 +362,7 @@ namespace Ogre
 
 		while( itor != end )
 		{
-			InstanceBatch::InstancedEntityVec	usedEntities;
-			InstanceBatch::CustomParamsVec		usedParams;
+			InstanceBatch::InstancedEntityVec usedEntities;
 			usedEntities.reserve( itor->second.size() * mInstancesPerBatch );
 
 			//Collect all Instanced Entities being used by _all_ batches from this material
@@ -393,11 +374,11 @@ namespace Ogre
 				//Don't collect instances from static batches, we assume they're correctly set
 				//Plus, we don't want to put InstancedEntities from non-static into static batches
 				if( !(*it)->isStatic() )
-					(*it)->getInstancedEntitiesInUse( usedEntities, usedParams );
+					(*it)->getInstancedEntitiesInUse( usedEntities );
 				++it;
 			}
 
-			defragmentBatches( optimizeCulling, usedEntities, usedParams, itor->second );
+			defragmentBatches( optimizeCulling, usedEntities, itor->second );
 
 			++itor;
 		}
@@ -509,126 +490,4 @@ namespace Ogre
 
 		mDirtyBatches.clear();
 	}
-	//-----------------------------------------------------------------------
-	// Helper functions to unshare the vertices
-	//-----------------------------------------------------------------------
-	typedef map<uint32, uint32>::type IndicesMap;
-
-	template< typename TIndexType >
-	IndicesMap getUsedIndices(IndexData* idxData)
-	{
-		TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
-			idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_READ_ONLY);
-
-		IndicesMap indicesMap;
-		for (size_t i = 0; i < idxData->indexCount; i++) 
-		{
-			TIndexType index = data[i];
-			if (indicesMap.find(index) == indicesMap.end()) 
-			{
-				indicesMap[index] = (uint32)(indicesMap.size());
-			}
-		}
-
-		idxData->indexBuffer->unlock();
-		return indicesMap;
-	}
-	//-----------------------------------------------------------------------
-	template< typename TIndexType >
-	void copyIndexBuffer(IndexData* idxData, IndicesMap& indicesMap)
-	{
-		TIndexType *data = (TIndexType*)idxData->indexBuffer->lock(idxData->indexStart * sizeof(TIndexType), 
-			idxData->indexCount * sizeof(TIndexType), HardwareBuffer::HBL_NORMAL);
-
-		for (uint32 i = 0; i < idxData->indexCount; i++) 
-		{
-			data[i] = (TIndexType)indicesMap[data[i]];
-		}
-
-		idxData->indexBuffer->unlock();
-	}
-	//-----------------------------------------------------------------------
-	void InstanceManager::unshareVertices(const Ogre::MeshPtr &mesh)
-	{
-		// Retrieve data to copy bone assignments
-		const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
-		Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
-		Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
-		size_t curVertexOffset = 0;
-
-		// Access shared vertices
-		VertexData* sharedVertexData = mesh->sharedVertexData;
-
-		for (size_t subMeshIdx = 0; subMeshIdx < mesh->getNumSubMeshes(); subMeshIdx++)
-		{
-			SubMesh *subMesh = mesh->getSubMesh(subMeshIdx);
-
-			IndexData *indexData = subMesh->indexData;
-			HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
-			IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
-																				 getUsedIndices<uint32>(indexData);
-
-
-			VertexData *newVertexData = new VertexData();
-			newVertexData->vertexCount = indicesMap.size();
-			newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
-
-			for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++) 
-			{
-				HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
-				size_t vertexSize = sharedVertexBuffer->getVertexSize();				
-
-				HardwareVertexBufferSharedPtr newVertexBuffer = HardwareBufferManager::getSingleton().createVertexBuffer
-					(vertexSize, newVertexData->vertexCount, sharedVertexBuffer->getUsage(), sharedVertexBuffer->hasShadowBuffer());
-
-				uint8 *oldLock = (uint8*)sharedVertexBuffer->lock(0, sharedVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_READ_ONLY);
-				uint8 *newLock = (uint8*)newVertexBuffer->lock(0, newVertexData->vertexCount * vertexSize, HardwareBuffer::HBL_NORMAL);
-
-				IndicesMap::iterator indIt = indicesMap.begin();
-				IndicesMap::iterator endIndIt = indicesMap.end();
-				for (; indIt != endIndIt; indIt++) 
-				{
-					memcpy(newLock + vertexSize * indIt->second, oldLock + vertexSize * indIt->first, vertexSize);
-				}
-
-				sharedVertexBuffer->unlock();
-				newVertexBuffer->unlock();
-
-				newVertexData->vertexBufferBinding->setBinding(bufIdx, newVertexBuffer);
-			}
-
-			if (idxType == HardwareIndexBuffer::IT_16BIT)
-			{
-				copyIndexBuffer<uint16>(indexData, indicesMap);
-			}
-			else
-			{
-				copyIndexBuffer<uint32>(indexData, indicesMap);
-			}
-
-			// Store new attributes
-			subMesh->useSharedVertices = false;
-			subMesh->vertexData = newVertexData;
-
-			// Transfer bone assignments to the submesh
-			size_t offset = curVertexOffset + newVertexData->vertexCount;
-			for (; it != end; it++)
-			{
-				size_t vertexIdx = (*it).first;
-				if (vertexIdx > offset)
-					break;
-
-				VertexBoneAssignment boneAssignment = (*it).second;
-				boneAssignment.vertexIndex = boneAssignment.vertexIndex - curVertexOffset;
-				subMesh->addBoneAssignment(boneAssignment);
-			}
-			curVertexOffset = newVertexData->vertexCount + 1;
-		}
-
-		// Release shared vertex data
-		delete mesh->sharedVertexData;
-		mesh->sharedVertexData = NULL;
-		mesh->clearBoneAssignments();
-	}
-	//-----------------------------------------------------------------------
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,18 +43,23 @@ namespace Ogre
 
             if(glIsShader(obj))
             {
-                OGRE_CHECK_GL_ERROR(glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
+                glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+                GL_CHECK_ERROR
             }
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if GL_EXT_separate_shader_objects
             else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
                     glIsProgramPipelineEXT(obj))
             {
-                OGRE_CHECK_GL_ERROR(glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength));
+                glValidateProgramPipelineEXT(obj);
+                glGetProgramPipelineivEXT(obj, GL_INFO_LOG_LENGTH, &infologLength);
+                GL_CHECK_ERROR
             }
 #endif
             else if(glIsProgram(obj))
             {
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength));
+                glValidateProgram(obj);
+                glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+                GL_CHECK_ERROR
             }
 
 			if (infologLength > 1)
@@ -66,18 +71,21 @@ namespace Ogre
 
                 if(glIsShader(obj))
                 {
-                    OGRE_CHECK_GL_ERROR(glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog));
+                    glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
+                    GL_CHECK_ERROR
                 }
-#if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if GL_EXT_separate_shader_objects
                 else if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS) &&
                         glIsProgramPipelineEXT(obj))
                 {
-                    OGRE_CHECK_GL_ERROR(glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog));
+                    glGetProgramPipelineInfoLogEXT(obj, infologLength, &charsWritten, infoLog);
+                    GL_CHECK_ERROR
                 }
 #endif
                 else if(glIsProgram(obj))
                 {
-                    OGRE_CHECK_GL_ERROR(glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog));
+                    glGetProgramInfoLog(obj, infologLength, &charsWritten, infoLog);
+                    GL_CHECK_ERROR
                 }
 
 				if (strlen(infoLog) > 0)

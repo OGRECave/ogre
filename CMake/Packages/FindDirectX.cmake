@@ -54,7 +54,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
 	DirectX_INCLUDE_DIR
   )
   
-  find_path(DirectX_INCLUDE_DIR NAMES d3d9.h D3DCommon.h HINTS ${DirectX_INC_SEARCH_PATH})
+  find_path(DirectX_INCLUDE_DIR NAMES d3d9.h HINTS ${DirectX_INC_SEARCH_PATH})
   # dlls are in DirectX_ROOT_DIR/Developer Runtime/x64|x86
   # lib files are in DirectX_ROOT_DIR/Lib/x64|x86
   if(CMAKE_CL_64)
@@ -110,16 +110,5 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
     endif ()
 	mark_as_advanced(DirectX_D3D11_INCLUDE_DIR DirectX_D3D11_LIBRARY DirectX_D3DX11_LIBRARY)
   endif ()
-
-  if (OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
-    set(DirectX_FOUND TRUE) 
-	set(DirectX_D3D11_FOUND TRUE)
-	set(DirectX_INCLUDE_DIR "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/include" CACHE STRING "" FORCE)
-	set(DirectX_D3D11_INCLUDE_DIR "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/include" CACHE STRING "" FORCE)
-	set(DirectX_D3D11_LIBRARIES "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/lib" CACHE STRING "" FORCE)
-	set(CMAKE_CXX_FLAGS "/EHsc"  CACHE STRING "" FORCE)
-  endif ()
-
-
   
 endif(WIN32)

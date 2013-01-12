@@ -1,11 +1,4 @@
-// Ambient_ps
-fragment_program DeferredShading/post/Ambient_ps unified
-{
-	delegate DeferredShading/post/Ambient_ps_pGLSL
-	delegate DeferredShading/post/Ambient_ps_pCg
-	delegate DeferredShading/post/Ambient_ps_pCg_sm4
-}
-fragment_program DeferredShading/post/Ambient_ps_pCg cg
+fragment_program DeferredShading/post/Ambient_ps cg
 {
 	source DeferredShading/post/Ambient_ps.cg
 	profiles ps_2_0 arbfp1
@@ -18,135 +11,52 @@ fragment_program DeferredShading/post/Ambient_ps_pCg cg
 		param_named_auto farClipDistance far_clip_distance
 	}
 }
-fragment_program DeferredShading/post/Ambient_ps_pCg_sm4 cg
-{
-	source DeferredShading/post/Ambient_ps_sm4.cg
-	profiles ps_4_0
-	entry_point main
-	
-	default_params
-	{
-		param_named_auto ambientColor ambient_light_colour 0		
-		param_named_auto proj projection_matrix
-		param_named_auto farClipDistance far_clip_distance
-	}
-}
-fragment_program DeferredShading/post/Ambient_ps_pGLSL glsl
-{
-	source DeferredShading/post/Ambient_ps.glsl
-	syntax glsl150
-	
-	default_params
-	{
-		param_named_auto ambientColor ambient_light_colour 0		
-		param_named_auto proj projection_matrix
-		param_named_auto farClipDistance far_clip_distance
-        param_named Tex0 int 0
-        param_named Tex1 int 1
-	}
-}
 
-
-
-// ShowNormal_ps
-fragment_program DeferredShading/post/ShowNormal_ps unified
-{
-	delegate DeferredShading/post/ShowNormal_ps_pGLSL
-	delegate DeferredShading/post/ShowNormal_ps_pCg
-	delegate DeferredShading/post/ShowNormal_ps_pCg_sm4
-}
-fragment_program DeferredShading/post/ShowNormal_ps_pCg cg
+fragment_program DeferredShading/post/ShowNormal_ps cg
 {
 	source DeferredShading/post/ShowNormal_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowNormal_ps_pCg_sm4 cg
-{
-	source DeferredShading/post/ShowNormal_ps_sm4.cg
-	profiles ps_4_0
-	entry_point main
-}
-fragment_program DeferredShading/post/ShowNormal_ps_pGLSL glsl
-{
-	source DeferredShading/post/ShowNormal_ps.glsl
-	syntax glsl150
-	default_params
-	{
-        param_named Tex0 int 0
-        param_named Tex1 int 1
-    }
-}
 
-// ShowDS_ps
-fragment_program DeferredShading/post/ShowDS_ps unified
-{
-	delegate DeferredShading/post/ShowDS_ps_pGLSL
-	delegate DeferredShading/post/ShowDS_ps_pCg
-	delegate DeferredShading/post/ShowDS_ps_pCg_sm4
-}
-fragment_program DeferredShading/post/ShowDS_ps_pCg cg
+fragment_program DeferredShading/post/ShowDS_ps cg
 {
 	source DeferredShading/post/ShowDS_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowDS_ps_pCg_sm4 cg
-{
-	source DeferredShading/post/ShowDS_ps_sm4.cg
-	profiles ps_4_0
-	entry_point main
-}
-fragment_program DeferredShading/post/ShowDS_ps_pGLSL glsl
-{
-	source DeferredShading/post/ShowDS_ps.glsl
-	syntax glsl150
-	default_params
-	{
-        param_named Tex0 int 0
-        param_named Tex1 int 1
-    }
-}
 
-// ShowColour_ps
-fragment_program DeferredShading/post/ShowColour_ps unified
-{
-	delegate DeferredShading/post/ShowColour_ps_pGLSL
-	delegate DeferredShading/post/ShowColour_ps_pCg
-	delegate DeferredShading/post/ShowColour_ps_pCg_sm4
-}
-fragment_program DeferredShading/post/ShowColour_ps_pCg cg
+fragment_program DeferredShading/post/ShowColour_ps cg
 {
 	source DeferredShading/post/ShowColour_ps.cg
 	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowColour_ps_pCg_sm4 cg
+
+fragment_program DeferredShading/post/ShowNormal_ps cg
 {
-	source DeferredShading/post/ShowColour_ps_sm4.cg
-	profiles ps_4_0
+	source DeferredShading/post/ShowNormal_ps.cg
+	profiles ps_2_0 arbfp1
 	entry_point main
 }
-fragment_program DeferredShading/post/ShowColour_ps_pGLSL glsl
+
+fragment_program DeferredShading/post/ShowDS_ps cg
 {
-	source DeferredShading/post/ShowColour_ps.glsl
-	syntax glsl150
-	default_params
-	{
-        param_named Tex0 int 0
-        param_named Tex1 int 1
-    }
+	source DeferredShading/post/ShowDS_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
+}
+
+fragment_program DeferredShading/post/ShowColour_ps cg
+{
+	source DeferredShading/post/ShowColour_ps.cg
+	profiles ps_2_0 arbfp1
+	entry_point main
 }
 
 // Auxiliary lights
 // cg
-vertex_program DeferredShading/post/LightMaterial_vs unified
-{
-	delegate DeferredShading/post/LightMaterial_vs_pGLSL
-	delegate DeferredShading/post/LightMaterial_vs_pCg
-	delegate DeferredShading/post/LightMaterial_vs_pCg_sm4
-}
-vertex_program DeferredShading/post/LightMaterial_vs_pCg cg
+vertex_program DeferredShading/post/LightMaterial_vs cg
 {
 	source DeferredShading/post/LightMaterial_vs.cg
 	profiles vs_1_1 arbvp1
@@ -159,37 +69,9 @@ vertex_program DeferredShading/post/LightMaterial_vs_pCg cg
 		//param_named_auto vpHeight viewport_height
 	}
 }
-vertex_program DeferredShading/post/LightMaterial_vs_pCg_sm4 cg
-{
-	source DeferredShading/post/LightMaterial_vs_sm4.cg
-	profiles vs_4_0
-	entry_point main
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-		//param_named_auto invProj inverse_projection_matrix
-		//param_named_auto vpWidth viewport_width
-		//param_named_auto vpHeight viewport_height
-	}
-}
-vertex_program DeferredShading/post/LightMaterial_vs_pGLSL glsl
-{
-	source DeferredShading/post/LightMaterial_vs.glsl
-	syntax glsl150
-	default_params
-	{
-		param_named_auto worldViewProj worldviewproj_matrix
-	}
-}
 
 // Post processors
-vertex_program DeferredShading/post/vs unified
-{
-	delegate DeferredShading/post/vs_pGLSL
-	delegate DeferredShading/post/vs_pCg
-	delegate DeferredShading/post/vs_pCg_sm4
-}
-vertex_program DeferredShading/post/vs_pCg cg
+vertex_program DeferredShading/post/vs cg
 {
 	source DeferredShading/post/vs.cg
 	profiles vs_1_1 arbvp1
@@ -197,28 +79,6 @@ vertex_program DeferredShading/post/vs_pCg cg
 	default_params
 	{
 		//param_named_auto invProj inverse_projection_matrix
-		param_named_auto flip render_target_flipping
-		param_named farCorner float3 1 1 1
-	}
-}
-vertex_program DeferredShading/post/vs_pCg_sm4 cg
-{
-	source DeferredShading/post/vs_sm4.cg
-	profiles vs_4_0
-	entry_point main
-	default_params
-	{
-		//param_named_auto invProj inverse_projection_matrix
-		param_named_auto flip render_target_flipping
-		param_named farCorner float3 1 1 1
-	}
-}
-vertex_program DeferredShading/post/vs_pGLSL glsl
-{
-	source DeferredShading/post/vs.glsl
-	syntax glsl150
-	default_params
-	{
 		param_named_auto flip render_target_flipping
 		param_named farCorner float3 1 1 1
 	}

@@ -1,9 +1,9 @@
 syntax: glob
 testTerrain*.dat
 *.dll
+*.filters
 Dependencies/include/FreeImage.h
 #*.vcxproj
-#*.filters
 *.vcxproj.user
 *.pdb
 *.ilk
@@ -15,9 +15,7 @@ Dependencies/*
 build/*
 Samples/Browser/WinRT/Debug
 Samples/Browser/WinRT/Release
-Samples/Browser/WinRT/Generated Files
 Samples/Browser/WinRT/Media
 Samples/Browser/WinRT.Xaml/Debug
 Samples/Browser/WinRT.Xaml/Release
-Samples/Browser/WinRT.Xaml/Generated Files
 Samples/Browser/WinRT.Xaml/Media

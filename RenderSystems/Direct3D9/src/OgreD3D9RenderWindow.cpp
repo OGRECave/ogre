@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -109,11 +109,11 @@ namespace Ogre
 			// parentWindowHandle		-> parentHWnd
 			opt = miscParams->find("parentWindowHandle");
 			if(opt != miscParams->end())
-				parentHWnd = (HWND)StringConverter::parseSizeT(opt->second);
+				parentHWnd = (HWND)StringConverter::parseUnsignedInt(opt->second);
 			// externalWindowHandle		-> externalHandle
 			opt = miscParams->find("externalWindowHandle");
 			if(opt != miscParams->end())
-				externalHandle = (HWND)StringConverter::parseSizeT(opt->second);
+				externalHandle = (HWND)StringConverter::parseUnsignedInt(opt->second);
 			// vsync	[parseBool]
 			opt = miscParams->find("vsync");
 			if(opt != miscParams->end())
@@ -531,9 +531,17 @@ namespace Ogre
 
 		ZeroMemory( presentParams, sizeof(D3DPRESENT_PARAMETERS) );
 		presentParams->Windowed					= !mIsFullScreen;
-		presentParams->SwapEffect				= D3DSWAPEFFECT_DISCARD;
+		
+		DWORD version = GetVersion();
+		DWORD major = (DWORD) (LOBYTE(LOWORD(version)));
+		DWORD minor = (DWORD) (HIBYTE(LOWORD(version)));
+		bool isWindows7 = (major > 6) || ((major == 6) && (minor >= 1));
+
+		bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && mFSAA == 0;
+			
+		presentParams->SwapEffect				= useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
 		// triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
-		presentParams->BackBufferCount			= mVSync ? 2 : 1;
+		presentParams->BackBufferCount			= mVSync || useFlipSwap ? 2 : 1;
 		presentParams->EnableAutoDepthStencil	= (mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH);
 		presentParams->hDeviceWindow			= mHWnd;
 		presentParams->BackBufferWidth			= mWidth;

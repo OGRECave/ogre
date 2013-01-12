@@ -115,10 +115,18 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
 	  endif ()
 	elseif(APPLE)
-        install(FILES
-          ${OGRE_DEP_DIR}/lib/$(PLATFORM_NAME)/$(CONFIGURATION)/libOIS.a
-          DESTINATION lib/$(PLATFORM_NAME)/$(CONFIGURATION)
-        )
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/libOIS.a)
+	        install(FILES
+	          ${OGRE_DEP_DIR}/lib/debug/libOIS.a
+	          DESTINATION lib/debug CONFIGURATIONS Debug
+	        )
+	  endif ()
+	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/libOIS.a)
+	        install(FILES
+	          ${OGRE_DEP_DIR}/lib/release/libOIS.a
+	          DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
+	        )
+	  endif ()
 	endif ()
 	  endif ()
     
@@ -174,6 +182,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "asio" EXCLUDE
       PATTERN "assign" EXCLUDE
       PATTERN "bimap" EXCLUDE
+      PATTERN "chrono" EXCLUDE
       PATTERN "circular_buffer" EXCLUDE
       PATTERN "compatibility" EXCLUDE
       PATTERN "concept_check" EXCLUDE
@@ -182,6 +191,7 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "filesystem" EXCLUDE
       PATTERN "flyweight" EXCLUDE
       PATTERN "format" EXCLUDE
+      PATTERN "functional" EXCLUDE
       PATTERN "fusion" EXCLUDE
       PATTERN "geometry" EXCLUDE
       PATTERN "gil" EXCLUDE
@@ -206,15 +216,18 @@ if (OGRE_INSTALL_DEPENDENCIES)
       PATTERN "ptr_container" EXCLUDE
       PATTERN "python" EXCLUDE
       PATTERN "random" EXCLUDE
+      PATTERN "ratio" EXCLUDE
       PATTERN "regex" EXCLUDE
       PATTERN "serialization" EXCLUDE
       PATTERN "signals" EXCLUDE
       PATTERN "signals2" EXCLUDE
       PATTERN "spirit" EXCLUDE
       PATTERN "statechart" EXCLUDE
+      PATTERN "system" EXCLUDE
       PATTERN "test" EXCLUDE
       PATTERN "timer" EXCLUDE
       PATTERN "tr1" EXCLUDE
+      PATTERN "typeof" EXCLUDE
       PATTERN "units" EXCLUDE
       PATTERN "unordered" EXCLUDE
       PATTERN "uuid" EXCLUDE
@@ -283,7 +296,7 @@ if (OGRE_COPY_DEPENDENCIES)
       copy_release(libGLESv2.dll)
     endif ()
 
-  elseif(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  elseif(APPLE)
     # copy the required libs and frameworks to the build directory (configure_file is the only copy-like op I found in CMake)
     copy_debug(libOIS.a)
     copy_release(libOIS.a)

@@ -1,7 +1,6 @@
 # Resources required by the sample browser and most samples.
 [Essential]
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/SdkTrays.zip
-Zip=@OGRE_MEDIA_DIR_DBG@/packs/profiler.zip
 FileSystem=@OGRE_MEDIA_DIR_DBG@/thumbnails
 
 # Common sample resources needed by many of the samples.

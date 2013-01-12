@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -361,17 +361,6 @@ namespace Ogre {
 		// Use istringstream for direct correspondence with toString
 		StringStream str(val);
 		unsigned long ret = defaultValue;
-        if( !(str >> ret) )
-            return defaultValue;
-
-		return ret;
-    }
-    //-----------------------------------------------------------------------
-    size_t StringConverter::parseSizeT(const String& val, size_t defaultValue)
-    {
-		// Use istringstream for direct correspondence with toString
-		StringStream str(val);
-		size_t ret = defaultValue;
         if( !(str >> ret) )
             return defaultValue;
 

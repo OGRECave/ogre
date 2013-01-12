@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,6 @@ THE SOFTWARE.
 */
 #ifndef __D3D11PREREQUISITES_H__
 #define __D3D11PREREQUISITES_H__
-
-
 
 #include "OgrePrerequisites.h"
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
@@ -65,14 +63,9 @@ THE SOFTWARE.
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #include <d3d11_1.h>
 #endif
+#include <d3d11shader.h>
+#include <D3Dcompiler.h>
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE == PHONE)
-#	include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
-#else
-#	include <d3d11shader.h>
-#	include <D3Dcompiler.h>
-#endif
- 
 
 namespace Ogre
 {
@@ -117,6 +110,11 @@ namespace Ogre
 	class D3D11Device;
 	class D3D11HardwareBuffer;
 	class D3D11HardwarePixelBuffer;
+
+	// Should we ask D3D to manage vertex/index buffers automatically?
+	// Doing so avoids lost devices, but also has a performance impact
+	// which is unacceptably bad when using very large buffers
+#define OGRE_D3D_MANAGE_BUFFERS 1
 
 	//-------------------------------------------
 	// Windows setttings

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -109,6 +109,7 @@ protected:
 
 	//-----------------------------------------------------------------------------
 	typedef map<String, GpuProgramPtr>::type			GpuProgramsMap;
+    typedef map<String, String>::type			        ProgramSourceToNameMap;
 	typedef GpuProgramsMap::iterator					GpuProgramsMapIterator;
 	typedef GpuProgramsMap::const_iterator				GpuProgramsMapConstIterator;
 
@@ -156,13 +157,6 @@ protected:
 	@param programSet The program set container.
 	*/
 	bool createGpuPrograms(ProgramSet* programSet);
-		
-	/** 
-	Generates a unique guid value from a string
-	@param programString string to generate a hash value for
-	@return A string representing a 128 bit hash value of the original string
-	*/
-	String generateGUID(const String& programString);
 
 	/** Create GPU program based on the give CPU program.
 	@param shaderProgram The CPU program instance.
@@ -233,6 +227,8 @@ protected:
 	GpuProgramsMap mFragmentShaderMap;
 	// The default program processors.
 	ProgramProcessorList mDefaultProgramProcessors;
+    // map the source code of the shaders to a name for them
+    ProgramSourceToNameMap mProgramSourceToNameMap;
 
 private:
 	friend class ProgramSet;

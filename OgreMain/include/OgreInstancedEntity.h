@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgreMovableObject.h"
 #include "OgreNode.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -138,12 +137,8 @@ namespace Ogre
 		void createSkeletonInstance();
 		void destroySkeletonInstance();
 
-		/// When this entity is a slave, stopSharingTransform delegates to this function.
-		///	nofityMaster = false is used to prevent iterator invalidation in specific cases.
-		void stopSharingTransformAsSlave( bool notifyMaster );
-
 		/// Just unlinks, and tells our master we're no longer sharing
-		void unlinkTransform( bool notifyMaster=true );
+		void unlinkTransform();
 
 		/// Called when a slave has unlinked from us
 		void notifyUnlink( const InstancedEntity *slave );
@@ -274,22 +269,9 @@ namespace Ogre
 			return mInUse;
 		}
 
-		/** Sets the custom parameter for this instance @see InstanceManager::setNumCustomParams
-			Because not all techniques support custom params, and some users may not need it while
-			using millions of InstancedEntities, the params have been detached from InstancedEntity
-			and stored in it's InstanceBatch instead, to reduce memory overhead.
-		@remarks
-			If this function is never called, all instances default to Vector4::ZERO. Watch out!
-			If you destroy an instanced entity and then create it again (remember! Instanced entities
-			are pre-allocated) it's custom param will contain the old value when it was destroyed.
-		@param Index of the param. In the range [0; InstanceManager::getNumCustomParams())
-		@param New parameter
-		*/
-		void setCustomParam( unsigned char idx, const Vector4 &newParam );
-		const Vector4& getCustomParam( unsigned char idx );
+
+
 	};
 }
-
-#include "OgreHeaderSuffix.h"
 
 #endif

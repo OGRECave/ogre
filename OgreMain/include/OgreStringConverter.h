@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -200,11 +200,6 @@ namespace Ogre {
             0.0 if the value could not be parsed, otherwise the numeric version of the String.
         */
         static unsigned long parseUnsignedLong(const String& val, unsigned long defaultValue = 0);
-        /** Converts a String to size_t. 
-        @return
-            defaultValue if the value could not be parsed, otherwise the numeric version of the String.
-        */
-        static size_t parseSizeT(const String& val, size_t defaultValue = 0);
         /** Converts a String to a boolean. 
         @remarks
             Returns true if case-insensitive match of the start of the string

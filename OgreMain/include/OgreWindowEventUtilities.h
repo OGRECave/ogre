@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
-#include "OgreHeaderPrefix.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #  if !defined(WIN32_LEAN_AND_MEAN)
@@ -179,12 +178,11 @@ namespace Ogre
 		//These are public only so GLXProc can access them without adding Xlib headers header
 		typedef multimap<RenderWindow*, WindowEventListener*>::type WindowEventListeners;
 		static WindowEventListeners _msListeners;
-		static RenderWindowList _msWindows;
+
+		typedef vector<RenderWindow*>::type Windows;
+		static Windows _msWindows;
 	};
 	/** @} */
 	/** @} */
 }
-
-#include "OgreHeaderSuffix.h"
-
 #endif

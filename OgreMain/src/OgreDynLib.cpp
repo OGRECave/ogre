@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "macUtils.h"
-#endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_NACL || OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 #   include <dlfcn.h>
 #endif
 
@@ -88,13 +86,7 @@ namespace Ogre {
 			name += ".dll";
 #endif
         mInst = (DYNLIB_HANDLE)DYNLIB_LOAD( name.c_str() );
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        if(!mInst)
-        {
-            // Try again as a framework
-            mInst = (DYNLIB_HANDLE)FRAMEWORK_LOAD( mName );
-        }
-#endif
+
         if( !mInst )
             OGRE_EXCEPT(
                 Exception::ERR_INTERNAL_ERROR, 

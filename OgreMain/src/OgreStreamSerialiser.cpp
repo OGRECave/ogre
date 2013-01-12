@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,6 @@ THE SOFTWARE.
 #include "OgreNode.h"
 #include "OgreRay.h"
 #include "OgreSphere.h"
-#include "OgreDeflate.h"
 
 namespace Ogre
 {
@@ -668,7 +667,7 @@ namespace Ogre
 	{
 		for (size_t i = 0; i < count; ++i, ++aabb)
 		{
-			bool infinite = false;
+			bool infinite;
 			read(&infinite);
 			Vector3 tmpMin, tmpMax;
 			read(&tmpMin);
@@ -832,19 +831,9 @@ namespace Ogre
 		return c;
 
 	}
-	void StreamSerialiser::startDeflate(size_t avail_in)
-	{
-		assert( mOriginalStream.isNull() && "Don't start (un)compressing twice!" );
-		DataStreamPtr deflateStream(OGRE_NEW DeflateStream(mStream,"",avail_in));
-		mOriginalStream = mStream;
-		mStream = deflateStream;
-	}
-	void StreamSerialiser::stopDeflate()
-	{
-		assert( !mOriginalStream.isNull() && "Must start (un)compressing first!" );
-		mStream = mOriginalStream;
-		mOriginalStream.setNull();
-	}
+
+
+
 }
 
 

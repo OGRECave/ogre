@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreRenderable.h"
 #include "OgreMovableObject.h"
 #include "OgreMesh.h"
-#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -88,8 +87,7 @@ namespace Ogre
     class _OgreExport InstanceBatch : public Renderable, public MovableObject
     {
     public:
-        typedef vector<InstancedEntity*>::type  InstancedEntityVec;
-        typedef vector<Vector4>::type           CustomParamsVec;
+        typedef vector<InstancedEntity*>::type InstancedEntityVec;
     protected:
         RenderOperation     mRenderOperation;
         size_t              mInstancesPerBatch;
@@ -107,11 +105,6 @@ namespace Ogre
         //Note each InstancedEntity has a unique ID ranging from [0; mInstancesPerBatch)
         InstancedEntityVec  mInstancedEntities;
         InstancedEntityVec  mUnusedEntities;
-
-        ///@see InstanceManager::setNumCustomParams(). Because this may not even be used,
-        ///our implementations keep the params separate from the InstancedEntity to lower
-        ///the memory overhead. They default to Vector4::ZERO
-        CustomParamsVec		mCustomParams;
 
         /// This bbox contains all (visible) instanced entities
         AxisAlignedBox      mFullBoundingBox;
@@ -160,14 +153,14 @@ namespace Ogre
         void updateVisibility(void);
 
         /** @see _defragmentBatch */
-        void defragmentBatchNoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );
+        void defragmentBatchNoCull( InstancedEntityVec &usedEntities );
 
         /** @see _defragmentBatch
             This one takes the entity closest to the minimum corner of the bbox, then starts
             gathering entities closest to this entity. There might be much better algorithms (i.e.
             involving space partition), but this one is simple and works well enough
         */
-        void defragmentBatchDoCull( InstancedEntityVec &usedEntities, CustomParamsVec &usedParams );
+        void defragmentBatchDoCull( InstancedEntityVec &usedEntities );
 
     public:
         InstanceBatch( InstanceManager *creator, MeshPtr &meshReference, const MaterialPtr &material,
@@ -249,7 +242,7 @@ namespace Ogre
         /** Fills the input vector with the instances that are currently being used or were requested.
             Used for defragmentation, @see InstanceManager::defragmentBatches
         */
-		void getInstancedEntitiesInUse( InstancedEntityVec &outEntities, CustomParamsVec &outParams );
+        void getInstancedEntitiesInUse( InstancedEntityVec &outEntities );
 
         /** @see InstanceManager::defragmentBatches
             This function takes InstancedEntities and pushes back all entities it can fit here
@@ -258,14 +251,11 @@ namespace Ogre
         @param optimizeCulling true will call the DoCull version, false the NoCull
         @param usedEntities Array of InstancedEntities to parent with this batch. Those reparented
             are removed from this input vector
-			@param Array of Custom parameters correlated with the InstancedEntities in usedEntities.
-			They follow the fate of the entities in that vector.
-		@remarks:
+        @remarks
 			This function assumes caller holds data to mInstancedEntities! Otherwise
 			you can get memory leaks. Don't call this directly if you don't know what you're doing!
 		*/
-		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
-								CustomParamsVec &usedParams );
+		void _defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities );
 
 		/** @see InstanceManager::_defragmentBatchDiscard
 			Destroys unused entities and clears the mInstancedEntity container which avoids leaving
@@ -322,12 +312,6 @@ namespace Ogre
 		/** Tells that the list of entity instances with shared transforms has changed */
 		void _markTransformSharingDirty() { mTransformSharingDirty = true; }
 
-		/** @see InstancedEntity::setCustomParam */
-		void _setCustomParam( InstancedEntity *instancedEntity, unsigned char idx, const Vector4 &newParam );
-
-		/** @see InstancedEntity::getCustomParam */
-		const Vector4& _getCustomParam( InstancedEntity *instancedEntity, unsigned char idx );
-
 		//Renderable overloads
         /** @copydoc Renderable::getMaterial. */
 		const MaterialPtr& getMaterial(void) const		{ return mMaterial; }
@@ -358,7 +342,5 @@ namespace Ogre
         using Renderable::setUserAny;
 	};
 } // namespace Ogre
-
-#include "OgreHeaderSuffix.h"
 
 #endif // __InstanceBatch_H__

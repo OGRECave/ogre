@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -53,14 +53,6 @@ THE SOFTWARE.
 #	ifndef GL_GLEXT_PROTOTYPES
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-#	ifndef GL_GLEXT_PROTOTYPES
-#		define  GL_GLEXT_PROTOTYPES
-#	endif
-#	include <GLES/glplatform.h>
-#	include <GLES/gl.h>
-#	include <GLES/glext.h>
-#   include <EGL/egl.h>
 #else
 #   include <GLES/gl.h>
 #   include <GLES/glext.h>
@@ -113,11 +105,6 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
 #   define GL_BGRA  0x80E1
 #endif
 
-// Used for polygon modes
-#ifndef GL_FILL
-#   define GL_FILL    0x1B02
-#endif
-
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef OGRE_GLESPLUGIN_EXPORTS
 #       define _OgreGLESExport __declspec(dllexport)
@@ -145,42 +132,28 @@ extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
     }
 
 #define ENABLE_GL_CHECK 0
-
 #if ENABLE_GL_CHECK
 #define GL_CHECK_ERROR \
     { \
         int e = glGetError(); \
         if (e != 0) \
         { \
-            const char * errorString = ""; \
-            switch(e) \
-            { \
-            case GL_INVALID_ENUM:       errorString = "GL_INVALID_ENUM";        break; \
-            case GL_INVALID_VALUE:      errorString = "GL_INVALID_VALUE";       break; \
-            case GL_INVALID_OPERATION:  errorString = "GL_INVALID_OPERATION";   break; \
-            case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
-            default:                                                            break; \
-            } \
-            char msgBuf[1024]; \
-            sprintf(msgBuf, "OpenGL ES error 0x%04X %s in %s at line %i in %s \n", e, errorString, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
-            LogManager::getSingleton().logMessage(msgBuf); \
+            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
         } \
     }
 #else
     #define GL_CHECK_ERROR {}
 #endif
 
-#define ENABLE_EGL_CHECK 1
 
-#if ENABLE_EGL_CHECK
+#if ENABLE_GL_CHECK
     #define EGL_CHECK_ERROR \
     { \
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            char msgBuf[1024]; \
-            sprintf(msgBuf, "EGL error 0x%04X in %s at line %i in %s \n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__);\
-            LogManager::getSingleton().logMessage(msgBuf);\
+            fprintf(stderr, "OpenGL error 0x%04X in %s at line %i in %s\n", e, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+            assert(false); \
         } \
     }
 #else

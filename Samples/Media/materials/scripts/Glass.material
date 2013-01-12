@@ -15,20 +15,8 @@ fragment_program Ogre/Compositor/GlassFP_glsles glsles
 	}
 }
 
-fragment_program Ogre/Compositor/GlassFP_glsl glsl
-{
-	source GlassFP.glsl
-	syntax glsl150
-	default_params
-	{
-		param_named RT int 0
-		param_named NormalMap int 1
-	}
-}
-
 fragment_program Ogre/Compositor/GlassFP unified
 {
-	delegate Ogre/Compositor/GlassFP_glsl
 	delegate Ogre/Compositor/GlassFP_glsles
 	delegate Ogre/Compositor/GlassFP_cg
 }
@@ -41,7 +29,7 @@ material Ogre/Compositor/GlassPass
 		{
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 

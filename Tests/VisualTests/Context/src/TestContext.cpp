@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,10 +39,6 @@ THE SOFTWARE.
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE) && __LP64__
-#include <AppKit/AppKit.h>
 #endif
 
 TestContext::TestContext(int argc, char** argv) :mTimestep(0.01f), mBatch(0) 
@@ -109,14 +105,14 @@ void TestContext::setup()
     Ogre::ConfigFile::SectionIterator sections = testConfig.getSectionIterator();
 
     // parse for the test sets and plugins that they're made up of
-    for (; sections.hasMoreElements(); sections.moveNext())
+    for (sections; sections.hasMoreElements(); sections.moveNext())
     {
         Ogre::String setName = sections.peekNextKey();
         if (setName != "")
         {
             mTestSets[setName] = Ogre::StringVector();
             Ogre::ConfigFile::SettingsMultiMap::iterator it = sections.peekNextValue()->begin();
-            for (; it != sections.peekNextValue()->end(); ++it)
+            for (it; it != sections.peekNextValue()->end(); ++it)
                 mTestSets[setName].push_back(it->second);
         }
     }
@@ -316,7 +312,7 @@ void TestContext::runSample(OgreBites::Sample* s)
     }
 
     // check if this is a VisualTest
-    mCurrentTest = static_cast<VisualTest*>(sampleToRun);
+    mCurrentTest = dynamic_cast<VisualTest*>(sampleToRun);
 
     // set things up to be deterministic
     if (mCurrentTest)
@@ -350,7 +346,6 @@ void TestContext::createRoot()
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.load();
 #endif
-    mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 //-----------------------------------------------------------------------
 
@@ -415,11 +410,11 @@ void TestContext::setupDirectories(Ogre::String batchName)
 {
     // ensure there's a root directory for visual tests
     mOutputDir = mFSLayer->getWritablePath("VisualTests/");
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
-
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
+    
     // make sure there's a directory for the test set
     mOutputDir += mTestSetName + "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
     
     // add a directory for the render system
     Ogre::String rsysName = Ogre::Root::getSingleton().getRenderSystem()->getName();
@@ -428,10 +423,10 @@ void TestContext::setupDirectories(Ogre::String batchName)
         if (rsysName[i] != ' ')
             mOutputDir += rsysName[i];
     mOutputDir += "/";
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir);
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir);
 
     // and finally a directory for the test batch itself
-    static_cast<Ogre::FileSystemLayer*>(mFSLayer)->createDirectory(mOutputDir
+    static_cast<OgreBites::FileSystemLayerImpl*>(mFSLayer)->createDirectory(mOutputDir
         + batchName + "/");
 }
 //-----------------------------------------------------------------------
@@ -457,8 +452,8 @@ void TestContext::finishedTests()
             foundReference = false;
             TestBatchSetPtr batches = TestBatch::loadTestBatches(mOutputDir);
 
-            TestBatchSet::iterator i;
-            for (i = batches->begin(); i != batches->end(); ++i)
+            TestBatchSet::iterator i = batches->begin();
+            for (i; i != batches->end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
                 {
@@ -493,7 +488,7 @@ void TestContext::finishedTests()
             if(mSummaryOutputDir != "NONE")
             {
                 Ogre::String rs;
-                for(size_t i = 0; i < mRenderSystemName.size(); ++i)
+                for(int i = 0; i < mRenderSystemName.size(); ++i)
                     if(mRenderSystemName[i]!=' ')
                         rs += mRenderSystemName[i];
                 

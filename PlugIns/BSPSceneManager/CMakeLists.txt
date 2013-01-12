@@ -47,7 +47,18 @@ if (NOT OGRE_STATIC)
   ) 
 endif ()
 
-ogre_config_framework(Plugin_BSPSceneManager)
+if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    # Set the INSTALL_PATH so that Plugins can be installed in the application package
+    set_target_properties(Plugin_BSPSceneManager
+       PROPERTIES BUILD_WITH_INSTALL_RPATH 1
+       INSTALL_NAME_DIR "@executable_path/../Plugins"
+    )
+
+	# Copy headers into the main Ogre framework
+	add_custom_command(TARGET Plugin_BSPSceneManager POST_BUILD
+	  COMMAND ditto ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Ogre.framework/Headers/
+	)
+endif()
 
 install(FILES ${HEADER_FILES} DESTINATION include/OGRE/Plugins/BSPSceneManager)
 

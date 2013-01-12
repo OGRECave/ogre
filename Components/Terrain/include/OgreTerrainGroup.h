@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2012 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "OgreTerrain.h"
 #include "OgreWorkQueue.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreTerrainAutoUpdateLod.h"
 
 namespace Ogre
 {
@@ -329,7 +328,7 @@ namespace Ogre
 			Terrain* instance;
 
 			TerrainSlot(long _x, long _y) : x(_x), y(_y), instance(0) {}
-			virtual ~TerrainSlot();
+			~TerrainSlot();
 			void freeInstance();
 		};
 		
@@ -501,16 +500,6 @@ namespace Ogre
 		static const uint32 CHUNK_ID;
 		static const uint16 CHUNK_VERSION;
 
-		/// Loads terrain's next LOD level.
-		void increaseLodLevel(long x, long y, bool synchronous = false);
-		/// Removes terrain's highest LOD level.
-		void decreaseLodLevel(long x, long y);
-
-		void setAutoUpdateLod(TerrainAutoUpdateLod* updater);
-		/// Automatically checks if terrain's LOD level needs to be updated.
-		void autoUpdateLod(long x, long y, bool synchronous, const Any &data);
-		void autoUpdateLodAll(bool synchronous, const Any &data);
-
 	protected:
 		SceneManager *mSceneManager;
 		Terrain::Alignment mAlignment;
@@ -523,7 +512,6 @@ namespace Ogre
 		String mFilenamePrefix;
 		String mFilenameExtension;
 		String mResourceGroup;
-		TerrainAutoUpdateLod *mAutoUpdateLod;
 		Terrain::DefaultGpuBufferAllocator mBufferAllocator;
 		
 		/// Get the position of a terrain instance
@@ -540,7 +528,6 @@ namespace Ogre
 		{
 			TerrainSlot* slot;
 			TerrainGroup* origin;
-			static uint loadingTaskNum;
 			_OgreTerrainExport friend std::ostream& operator<<(std::ostream& o, const LoadRequest& r)
 			{ return o; }		
 		};

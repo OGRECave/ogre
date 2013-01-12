@@ -502,6 +502,7 @@ private:
 		}
 	}
 
+	Camera* mCamera;
 	SceneNode* mBodyNode;
 	SceneNode* mCameraPivot;
 	SceneNode* mCameraGoal;
