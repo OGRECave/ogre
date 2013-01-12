@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2011 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreAny.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	class HardwareBufferManagerBase;
@@ -44,7 +45,7 @@ namespace Ogre {
 	/** \addtogroup RenderSystem
 	*  @{
 	*/
-	/** Specialisation of HardwareBuffer for a vertex buffer. */
+	/** Specialisation of HardwareBuffer for a uniform buffer. */
 	class _OgreExport HardwareUniformBuffer : public HardwareBuffer
     {
 	    protected:
@@ -63,7 +64,7 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share index buffers. */
+    /** Shared pointer implementation used to share uniform buffers. */
     class _OgreExport HardwareUniformBufferSharedPtr : public SharedPtr<HardwareUniformBuffer>
     {
     public:
@@ -72,4 +73,7 @@ namespace Ogre {
     };
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif

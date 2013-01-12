@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -354,13 +354,13 @@ namespace Ogre
         if (Math::Abs(denom) < std::numeric_limits<Real>::epsilon())
         {
             // Parallel
-            return std::pair<bool, Real>(false, 0);
+            return std::pair<bool, Real>(false, (Real)0);
         }
         else
         {
             Real nom = plane.normal.dotProduct(ray.getOrigin()) + plane.d;
             Real t = -(nom/denom);
-            return std::pair<bool, Real>(t >= 0, t);
+            return std::pair<bool, Real>(t >= 0, (Real)t);
         }
         
     }
@@ -470,7 +470,7 @@ namespace Ogre
         // Check origin inside first
         if (rayorig.squaredLength() <= radius*radius && discardInside)
         {
-            return std::pair<bool, Real>(true, 0);
+            return std::pair<bool, Real>(true, (Real)0);
         }
 
         // Mmm, quadratics
@@ -485,7 +485,7 @@ namespace Ogre
         if (d < 0)
         {
             // No intersection
-            return std::pair<bool, Real>(false, 0);
+            return std::pair<bool, Real>(false, (Real)0);
         }
         else
         {
@@ -495,7 +495,7 @@ namespace Ogre
             Real t = ( -b - Math::Sqrt(d) ) / (2 * a);
             if (t < 0)
                 t = ( -b + Math::Sqrt(d) ) / (2 * a);
-            return std::pair<bool, Real>(true, t);
+            return std::pair<bool, Real>(true, (Real)t);
         }
 
 
@@ -503,8 +503,8 @@ namespace Ogre
     //-----------------------------------------------------------------------
 	std::pair<bool, Real> Math::intersects(const Ray& ray, const AxisAlignedBox& box)
 	{
-		if (box.isNull()) return std::pair<bool, Real>(false, 0);
-		if (box.isInfinite()) return std::pair<bool, Real>(true, 0);
+		if (box.isNull()) return std::pair<bool, Real>(false, (Real)0);
+		if (box.isInfinite()) return std::pair<bool, Real>(true, (Real)0);
 
 		Real lowt = 0.0f;
 		Real t;
@@ -518,7 +518,7 @@ namespace Ogre
 		// Check origin inside first
 		if ( rayorig > min && rayorig < max )
 		{
-			return std::pair<bool, Real>(true, 0);
+			return std::pair<bool, Real>(true, (Real)0);
 		}
 
 		// Check each face in turn, only check closest 3
@@ -625,7 +625,7 @@ namespace Ogre
 			}
 		}
 
-		return std::pair<bool, Real>(hit, lowt);
+		return std::pair<bool, Real>(hit, (Real)lowt);
 
 	} 
     //-----------------------------------------------------------------------
@@ -732,18 +732,18 @@ namespace Ogre
             if (denom > + std::numeric_limits<Real>::epsilon())
             {
                 if (!negativeSide)
-                    return std::pair<bool, Real>(false, 0);
+                    return std::pair<bool, Real>(false, (Real)0);
             }
             else if (denom < - std::numeric_limits<Real>::epsilon())
             {
                 if (!positiveSide)
-                    return std::pair<bool, Real>(false, 0);
+                    return std::pair<bool, Real>(false, (Real)0);
             }
             else
             {
                 // Parallel or triangle area is close to zero when
                 // the plane normal not normalised.
-                return std::pair<bool, Real>(false, 0);
+                return std::pair<bool, Real>(false, (Real)0);
             }
 
             t = normal.dotProduct(a - ray.getOrigin()) / denom;
@@ -751,7 +751,7 @@ namespace Ogre
             if (t < 0)
             {
                 // Intersection is behind origin
-                return std::pair<bool, Real>(false, 0);
+                return std::pair<bool, Real>(false, (Real)0);
             }
         }
 
@@ -798,16 +798,16 @@ namespace Ogre
             if (area > 0)
             {
                 if (alpha < tolerance || beta < tolerance || alpha+beta > area-tolerance)
-                    return std::pair<bool, Real>(false, 0);
+                    return std::pair<bool, Real>(false, (Real)0);
             }
             else
             {
                 if (alpha > tolerance || beta > tolerance || alpha+beta < area-tolerance)
-                    return std::pair<bool, Real>(false, 0);
+                    return std::pair<bool, Real>(false, (Real)0);
             }
         }
 
-        return std::pair<bool, Real>(true, t);
+        return std::pair<bool, Real>(true, (Real)t);
     }
     //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, const Vector3& a,

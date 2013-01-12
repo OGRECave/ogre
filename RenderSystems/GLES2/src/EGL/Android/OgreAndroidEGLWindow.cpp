@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,10 @@ THE SOFTWARE.
 
 namespace Ogre {
 	AndroidEGLWindow::AndroidEGLWindow(AndroidEGLSupport *glsupport)
-		: EGLWindow(glsupport)
+		: EGLWindow(glsupport),
+		  mMaxBufferSize(32),
+		  mMaxDepthSize(16),
+		  mMaxStencilSize(0)
 	{
 	}
 
@@ -83,10 +86,16 @@ namespace Ogre {
 
 	void AndroidEGLWindow::windowMovedOrResized()
 	{
-        // Notify viewports of resize
-        ViewportList::iterator it = mViewportList.begin();
-        while( it != mViewportList.end() )
-            (*it++).second->_updateDimensions();
+        if(mActive)
+        {
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+            eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+            
+            // Notify viewports of resize
+            ViewportList::iterator it = mViewportList.begin();
+            while( it != mViewportList.end() )
+                (*it++).second->_updateDimensions();
+        }
 	}
 	
     void AndroidEGLWindow::switchFullScreen(bool fullscreen)
@@ -143,6 +152,21 @@ namespace Ogre {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);
             }
+			
+			if((opt = miscParams->find("maxColourBufferSize")) != end)
+            {
+                mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
+            }
+			
+			if((opt = miscParams->find("maxDepthBufferSize")) != end)
+            {
+                mMaxDepthSize = Ogre::StringConverter::parseInt(opt->second);
+            }
+			
+			if((opt = miscParams->find("maxStencilBufferSize")) != end)
+            {
+                mMaxStencilSize = Ogre::StringConverter::parseInt(opt->second);
+            }
         }
         
         initNativeCreatedWindow(miscParams);
@@ -169,13 +193,17 @@ namespace Ogre {
         
         if (!mEglConfig)
         {
-
-            _createInternalResources(mWindow, config);
+			_createInternalResources(mWindow, config);
             mHwGamma = false;
         }
         
         mContext = createEGLContext();
-        
+        mContext->setCurrent();
+		       
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
+        eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
+        EGL_CHECK_ERROR
+
 		mActive = true;
 		mVisible = true;
 		mClosed = false;
@@ -206,15 +234,16 @@ namespace Ogre {
         
         int minAttribs[] = {
             EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-            EGL_BLUE_SIZE, 5, 
-            EGL_GREEN_SIZE, 6, 
-            EGL_RED_SIZE, 5,
-            EGL_DEPTH_SIZE, 16, 
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+            EGL_BUFFER_SIZE, 16,
+            EGL_DEPTH_SIZE, 16,
             EGL_NONE
         };
         
         int maxAttribs[] = {
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+			EGL_BUFFER_SIZE, mMaxBufferSize,
+            EGL_DEPTH_SIZE, mMaxDepthSize,
+            EGL_STENCIL_SIZE, mMaxStencilSize,
             EGL_NONE
         };
         
@@ -234,10 +263,6 @@ namespace Ogre {
             bool isLandscape = (int)AConfiguration_getOrientation(config) == 2;
             mGLSupport->setConfigOption("Orientation", isLandscape ? "Landscape" : "Portrait");
         }
-        
-        eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
-        eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
-        EGL_CHECK_ERROR
         
         if(mContext)
         {

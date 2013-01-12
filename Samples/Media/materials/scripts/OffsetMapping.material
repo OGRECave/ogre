@@ -74,22 +74,57 @@ fragment_program Examples/OffsetMappingFPGLSLES glsles
 		param_named normalHeightMap int 0
 		param_named diffuseMap int 1
 	}
-} 
+}
+
+// Bump map with parallax fragment program 
+fragment_program Examples/OffsetMappingPSGLSL glsl
+{ 
+    source OffsetMapping_specular.glsl
+    syntax glsl150
+	default_params
+	{
+        // Parallax Height scale and bias 
+        param_named scaleBias float4 0.04 -0.02 1 0 
+	}
+}
+
+// Bump map with Parallax offset vertex program, support for this is required 
+vertex_program Examples/OffsetMappingVPGLSL glsl
+{ 
+    source OffsetMappingVp.glsl
+    syntax glsl150
+}
+
+// Bump map with parallax fragment program 
+fragment_program Examples/OffsetMappingFPGLSL glsl
+{ 
+    source OffsetMappingFp.glsl
+    syntax glsl150
+	default_params
+	{
+		// assign samplers as required by GLSL
+		param_named normalHeightMap int 0
+		param_named diffuseMap int 1
+	}
+}
 
 vertex_program Examples/OffsetMappingVP unified
 {
+	delegate Examples/OffsetMappingVPGLSL
 	delegate Examples/OffsetMappingVPGLSLES
 	delegate Examples/OffsetMappingVPCg
 }
 
 fragment_program Examples/OffsetMappingFP unified
 {
+	delegate Examples/OffsetMappingFPGLSL
 	delegate Examples/OffsetMappingFPGLSLES
 	delegate Examples/OffsetMappingFPCg
 }
 
 fragment_program Examples/OffsetMappingPS unified
 {
+	delegate Examples/OffsetMappingPSGLSL
 	delegate Examples/OffsetMappingPSGLSLES
 	delegate Examples/OffsetMappingPSAsm
 }
@@ -325,7 +360,12 @@ vertex_program Examples/OffsetMappingIntegratedShadowsVPhlsl hlsl
 } 
 vertex_program Examples/OffsetMappingIntegratedShadowsVPglsl glsl 
 { 
-   source OffsetMappingVp.glsl
+   source OffsetMappingShadowsVp.glsl
+	syntax glsl150
+   default_params
+   {
+        param_named_auto worldViewProj worldviewproj_matrix 
+   }
 } 
 
 vertex_program Examples/OffsetMappingIntegratedShadowsVPglsles glsles
@@ -342,7 +382,8 @@ fragment_program Examples/OffsetMappingIntegratedShadowsFPhlsl hlsl
 } 
 fragment_program Examples/OffsetMappingIntegratedShadowsFPglsl glsl
 {
-	source OffsetMappingFp.glsl
+	source OffsetMappingShadowsFp.glsl
+	syntax glsl150
 	default_params
 	{
 		// assign samplers as required by GLSL

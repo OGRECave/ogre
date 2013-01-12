@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -119,6 +119,14 @@ namespace Ogre {
             // Blitting implementation
             void blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
         
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+        // Friends.
+        protected:
+            friend class GLESTexture;
+        
+            void updateTextureId(GLuint textureID);
+#endif
+        
         protected:
             // In case this is a texture level
             GLenum mTarget;
@@ -131,7 +139,7 @@ namespace Ogre {
             typedef std::vector<RenderTexture*> SliceTRT;
             SliceTRT mSliceTRT;
 
-            static void buildMipmaps(const PixelBox &data);
+            void buildMipmaps(const PixelBox &data);
     };
 
      /** Renderbuffer surface.  Needs FBO extension.

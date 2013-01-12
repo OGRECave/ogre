@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreAtomicWrappers.h"
 #include "OgreAny.h"
 #include "OgreSharedPtr.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -472,7 +473,7 @@ namespace Ogre
 		class _OgreExport RequestHandlerHolder : public UtilityAlloc
 		{
 		protected:
-			OGRE_RW_MUTEX(mRWMutex);
+			OGRE_RW_MUTEX(mRWMutex)
 			RequestHandler* mHandler;
 		public:
 			RequestHandlerHolder(RequestHandler* handler)
@@ -529,7 +530,7 @@ namespace Ogre
 		OGRE_MUTEX(mRequestMutex)
 		OGRE_MUTEX(mProcessMutex)
 		OGRE_MUTEX(mResponseMutex)
-		OGRE_RW_MUTEX(mRequestHandlerMutex);
+		OGRE_RW_MUTEX(mRequestHandlerMutex)
 
 
 		void processRequestResponse(Request* r, bool synchronous);
@@ -551,6 +552,7 @@ namespace Ogre
 
 }
 
+#include "OgreHeaderSuffix.h"
 
 #endif
 

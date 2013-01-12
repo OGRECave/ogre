@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -301,7 +301,7 @@ namespace Ogre {
 		if (mSelectedCgProfile == CG_PROFILE_UNKNOWN)
 		{
 			LogManager::getSingleton().logMessage(
-				"Attempted to load Cg program '" + mName + "', but no suported "
+				"Attempted to load Cg program '" + mName + "', but no supported "
 				"profile was found. ");
 			return;
 		}
@@ -329,6 +329,7 @@ namespace Ogre {
 
 			// get params
 			mParametersMap.clear();
+			mParametersMapSizeAsBuffer = 0;
             mSamplerRegisterMap.clear();
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
@@ -412,12 +413,12 @@ namespace Ogre {
             newMicrocode->write(&samplerMapSize, sizeof(size_t));
 
             // save sampler register mapping
-            map<String,int>::type::const_iterator iter = mSamplerRegisterMap.begin();
-            map<String,int>::type::const_iterator iterE = mSamplerRegisterMap.end();
-            for (; iter != iterE; ++iter)
+            map<String,int>::type::const_iterator sampRegister = mSamplerRegisterMap.begin();
+            map<String,int>::type::const_iterator sampRegisterE = mSamplerRegisterMap.end();
+            for (; sampRegister != sampRegisterE; ++sampRegister)
             {
-                const String& paramName = iter->first;
-                int reg = iter->second;
+                const String& paramName = sampRegister->first;
+                int reg = sampRegister->second;
 
                 size_t stringSize = paramName.size();
                 newMicrocode->write(&stringSize, sizeof(size_t));
@@ -512,8 +513,7 @@ namespace Ogre {
 		// HLSL delegates need a target to compile to.
 		// Return value for GLSL delegates is ignored.
 		GpuProgramManager* gpuMgr = GpuProgramManager::getSingletonPtr();
-		const GpuProgramManager::SyntaxCodes& syntaxes = gpuMgr->getSupportedSyntax();
-
+        
 		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
 		{
 			static const String fpProfiles[] = {

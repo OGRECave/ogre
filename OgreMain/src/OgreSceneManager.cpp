@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,8 +43,6 @@ THE SOFTWARE.
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
 #include "OgreRenderQueueSortingGrouping.h"
-#include "OgreOverlay.h"
-#include "OgreOverlayManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreRenderObjectListener.h"
@@ -92,6 +90,7 @@ SceneManager::SceneManager(const String& name) :
 mName(name),
 mRenderQueue(0),
 mLastRenderQueueInvocationCustom(false),
+mAmbientLight(ColourValue::Black),
 mCurrentViewport(0),
 mSceneRoot(0),
 mSkyPlaneEntity(0),
@@ -936,6 +935,10 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 		{
 			pass = lateTech->getPass(pass->getIndex());
 		}
+		else
+        {
+            pass = lateTech->getPass(0);
+        }
 		//Should we warn or throw an exception if an illegal state was achieved?
 	}
 
@@ -1204,7 +1207,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
 				if (!currentChain)
 				{
 					OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-						"A pass that wishes to reference a compositor texutre "
+						"A pass that wishes to reference a compositor texture "
 						"attempted to render in a pipeline without a compositor",
 						"SceneManager::_setPass");
 				}
@@ -1508,11 +1511,6 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 			firePostFindVisibleObjects(vp);
 
 			mAutoParamDataSource->setMainCamBoundsInfo(&(camVisObjIt->second));
-		}
-		// Add overlays, if viewport deems it
-		if (vp->getOverlaysEnabled() && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
-		{
-			OverlayManager::getSingleton()._queueOverlaysForRendering(camera, getRenderQueue(), vp);
 		}
 		// Queue skies, if viewport seems it
 		if (vp->getSkiesEnabled() && mFindVisibleObjects && mIlluminationStage != IRS_RENDER_TO_TEXTURE)
@@ -3118,7 +3116,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
     unsigned short numMatrices;
     RenderOperation ro;
 
-
+    OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
     // Set up rendering operation
     // I know, I know, const_cast is nasty but otherwise it requires all internal
     // state of the Renderable assigned to the rop to be mutable
@@ -3476,22 +3474,9 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 
 				// Finalise GPU parameter bindings
 				updateGpuProgramParameters(pass);
-                if (rend->preRender(this, mDestRenderSystem))
-                {
-                    try
-                    {
-                        mDestRenderSystem->_render(ro);
-                    }
-                    catch (RenderingAPIException& e)
-                    {
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
-                            "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
-                            "SceneManager::renderSingleObject");
 
-                    }
-
-                }
+				if (rend->preRender(this, mDestRenderSystem))
+					mDestRenderSystem->_render(ro);
 				rend->postRender(this, mDestRenderSystem);
 
 				if (scissored == CLIPPED_SOME)
@@ -3557,21 +3542,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 					updateGpuProgramParameters(pass);
 
 					if (rend->preRender(this, mDestRenderSystem))
-                    {
-                        try
-                        {
-                            mDestRenderSystem->_render(ro);
-                        }
-                        catch (RenderingAPIException& e)
-                        {
-                            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
-                                "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
-                                "SceneManager::renderSingleObject");
-
-                        }
-
-                    }
+						mDestRenderSystem->_render(ro);
 					rend->postRender(this, mDestRenderSystem);
 				}
 				if (scissored == CLIPPED_SOME)
@@ -3595,7 +3566,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
 	
     // Reset view / projection changes if any
     resetViewProjMode(passTransformState);
-
+    OgreProfileEndGPUEvent("Material: " + pass->getParent()->getParent()->getName());
 }
 //-----------------------------------------------------------------------
 void SceneManager::setAmbientLight(const ColourValue& colour)
@@ -5807,7 +5778,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+            0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? incrOp : SOP_KEEP, // back face depth fail
             zfail ? SOP_KEEP : decrOp, // back face pass
@@ -5820,7 +5792,8 @@ void SceneManager::setShadowVolumeStencilState(bool secondpass, bool zfail, bool
         mDestRenderSystem->setStencilBufferParams(
             CMPF_ALWAYS_PASS, // always pass stencil check
             0, // no ref value (no compare)
-            0xFFFFFFFF, // no mask
+			0xFFFFFFFF, // no compare mask
+            0xFFFFFFFF, // no write mask
             SOP_KEEP, // stencil test will never fail
             zfail ? decrOp : SOP_KEEP, // front face depth fail
             zfail ? SOP_KEEP : incrOp, // front face pass

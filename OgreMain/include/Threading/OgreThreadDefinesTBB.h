@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -42,7 +42,7 @@ THE SOFTWARE
 #define OGRE_SET_AUTO_SHARED_MUTEX_NULL OGRE_AUTO_MUTEX_NAME = 0;
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 // Read-write mutex
-#define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
+#define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name;
 #define OGRE_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, false)
 #define OGRE_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, true)
 // Thread-local pointer

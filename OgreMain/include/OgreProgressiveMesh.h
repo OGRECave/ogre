@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreRenderOperation.h"
-#include "OgreSmallVector.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -272,11 +272,16 @@ namespace Ogre {
         class _OgrePrivate PMVertex {
         public:
 			enum BorderStatus { BS_UNKNOWN = 0, BS_NOT_BORDER, BS_BORDER };
-            typedef SmallVector<PMVertex *, 8> NeighborList;
-	        typedef SmallVector<PMTriangle *, 8> FaceList;
+            typedef vector<PMVertex *>::type NeighborList;
+	        typedef vector<PMTriangle *>::type FaceList;
 
 		public:
-            PMVertex() : mBorderStatus(BS_UNKNOWN), removed(false) {}
+            PMVertex() : mBorderStatus(BS_UNKNOWN), removed(false) {
+                neighbor.reserve(8);
+                neighbor.clear();
+                face.reserve(8);
+                face.clear();
+            }
 
 			void setDetails(size_t index, const Vector3& pos, const Vector3& normal, const Vector2& uv);
 		
@@ -389,5 +394,7 @@ namespace Ogre {
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif 

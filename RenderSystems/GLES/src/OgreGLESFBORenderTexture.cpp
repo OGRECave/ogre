@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreGLESHardwarePixelBuffer.h"
 #include "OgreGLESFBOMultiRenderTarget.h"
+#include "OgreGLESRenderSystem.h"
 
 namespace Ogre {
 
@@ -62,6 +63,24 @@ namespace Ogre {
 		mFB.swapBuffers();
 	}
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void GLESFBORenderTexture::notifyOnContextLost()
+    {
+        mFB.notifyOnContextLost();
+    }
+    
+    void GLESFBORenderTexture::notifyOnContextReset()
+    {
+        GLESSurfaceDesc target;
+        target.buffer = static_cast<GLESHardwarePixelBuffer*>(mBuffer);
+        target.zoffset = mZOffset;
+        
+        mFB.notifyOnContextReset(target);
+        
+        static_cast<GLESRenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->_createDepthBufferFor(this);
+    }
+#endif
+    
     //-----------------------------------------------------------------------------
 	bool GLESFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
 	{
@@ -132,6 +151,17 @@ namespace Ogre {
         GL_CHECK_ERROR;
 	}
 
+    void GLESFBOManager::_reload()
+    {
+        glDeleteFramebuffersOES(1, &mTempFBO);
+        GL_CHECK_ERROR;
+        
+        detectFBOFormats();
+        
+        glGenFramebuffersOES(1, &mTempFBO);
+        GL_CHECK_ERROR;
+    }
+    
     /** Try a certain FBO format, and return the status. Also sets mDepthRB and mStencilRB.
         @returns true    if this combo is supported
                  false   if this combo is not supported
@@ -243,8 +273,13 @@ namespace Ogre {
 
 			// Fetch GL format token
 			GLenum fmt = GLESPixelUtil::getGLInternalFormat((PixelFormat)x);
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            if(fmt == GL_NONE)
+                continue;
+#else
             if(fmt == GL_NONE && x!=0)
                 continue;
+#endif
 
 			// No test for compressed formats
 			if(PixelUtil::isCompressed((PixelFormat)x))

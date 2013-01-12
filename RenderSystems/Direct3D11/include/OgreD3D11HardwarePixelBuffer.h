@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,8 @@ namespace Ogre {
 		void _unmap(ID3D11Resource *res);
 		void _unmapstagingbuffer(bool copyback = true);
 		void _unmapstaticbuffer();
+
+        void _genSoftwareMipmaps( const PixelBox &src, const MemoryDataStreamPtr & buf );
 
 	public:
 		D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,

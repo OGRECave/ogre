@@ -11,7 +11,6 @@
 
 set (HEADER_FILES
 	include/SampleBrowser.h
-	include/FileSystemLayerImpl.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
@@ -19,24 +18,9 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/FileSystemLayer.h
 )
 
 set(SOURCE_FILES src/SampleBrowser.cpp)
-if (OGRE_BUILD_PLATFORM_NACL)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_NaCl.cpp)
-elseif (WIN32)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_WIN32.cpp)
-elseif (OGRE_BUILD_PLATFORM_APPLE_IOS)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_iOS.mm)
-elseif (APPLE)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_OSX.cpp)
-elseif (UNIX)
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Unix.cpp)
-else ()
-  list(APPEND SOURCE_FILES src/FileSystemLayerImpl_Default.cpp)
-endif ()
-
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 
@@ -44,11 +28,12 @@ if (OGRE_BUILD_PLATFORM_APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 
   if(OGRE_BUILD_RENDERSYSTEM_GLES AND NOT OGRE_BUILD_RENDERSYSTEM_GLES2)
-    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_Compositor Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_Fresnel Sample_Instancing Sample_Lighting Sample_ShaderSystem Sample_ShaderSystemTexturedFog Sample_ShaderSystemMultiLight Sample_Terrain Sample_VolumeTex Sample_Water)
+    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_BSP Sample_Compositor Sample_CelShading Sample_CubeMapping Sample_Dot3Bump Sample_EndlessWorld Sample_Fresnel Sample_Instancing Sample_Lighting Sample_ShaderSystem Sample_ShaderSystemTexturedFog Sample_ShaderSystemMultiLight Sample_Terrain Sample_VolumeTex Sample_Water)
   endif()
 
   if(NOT OGRE_BUILD_COMPONENT_TERRAIN AND NOT OGRE_SDK_BUILD)
     list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_Terrain)
+    list(REMOVE_ITEM OGRE_SAMPLES_LIST Sample_EndlessWorld)
   endif()
 
   if(NOT OGRE_BUILD_COMPONENT_RTSHADERSYSTEM AND NOT OGRE_SDK_BUILD)
@@ -61,6 +46,10 @@ endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_iOS.h
+  )
+elseif (OGRE_BUILD_PLATFORM_NACL)
+  set(HEADER_FILES ${HEADER_FILES}
+    include/SampleBrowser_NaCl.h
   )
 else ()
   set(HEADER_FILES ${HEADER_FILES}
@@ -88,6 +77,7 @@ if (OGRE_STATIC)
 	
 	ogre_add_component_include_dir(Paging)
 	ogre_add_component_include_dir(Terrain)
+	ogre_add_component_include_dir(Volume)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
@@ -98,23 +88,50 @@ if(ANDROID)
     target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
     add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
 
-    SET(ANDROID_EXECUTABLE "android")
-    SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    if(APPLE OR WIN32)
+      SET(ANDROID_EXECUTABLE "android")
+    else()
+      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
+    endif()
+
+    if(APPLE OR WIN32)
+      SET(NDK_BUILD_EXECUTABLE "ndk-build")
+    else()
+      SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
+    endif()
+
     SET(ANT_EXECUTABLE "ant")
-    SET(ANDROID_TARGET "android-15")
+	if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
+		MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
+	else()
+		SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
+		SET(SCREEN_SIZE "|screenSize")
+	endif()
+	
+	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
+		SET(GLES_OPTIMISER "-lglsl_optimizer -lmesa -lglcpp-library")
+	endif()
+
+    SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
     file(MAKE_DIRECTORY "${NDKOUT}")
     file(MAKE_DIRECTORY "${NDKOUT}/jni")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")
+    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
+    file(MAKE_DIRECTORY "${NDKOUT}/res")
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
     file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-    configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+
+    if(NOT ANDROID_GLES_ONLY)
+     configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+    else()
+     configure_file("${OGRE_TEMPLATES_DIR}/AndroidGLES1.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+    endif()
+
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
     configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
     
-    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/fonts" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib" DESTINATION "${NDKOUT}/assets")
@@ -122,6 +139,10 @@ if(ANDROID)
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
     file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
     
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
     
 	add_custom_command(
 	                    TARGET SampleBrowserDummy
@@ -130,12 +151,21 @@ if(ANDROID)
 	                    WORKING_DIRECTORY ${NDKOUT}
 	                  )
 	
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${NDK_BUILD_EXECUTABLE} all
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+	if(DEBUG)	 
+	 	add_custom_command(
+							TARGET SampleBrowserDummy
+						    POST_BUILD
+					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
+				            WORKING_DIRECTORY ${NDKOUT}
+			              )
+	else()
+		add_custom_command(
+							TARGET SampleBrowserDummy
+						    POST_BUILD
+					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2
+				            WORKING_DIRECTORY ${NDKOUT}
+			              )
+	endif()
 	                  
 	add_custom_command(
 	                    TARGET SampleBrowserDummy
@@ -257,6 +287,8 @@ if (APPLE)
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
+		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
         COMMAND ditto 
 		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
@@ -264,72 +296,88 @@ if (APPLE)
 	# now plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
-	add_custom_command(TARGET SampleBrowser POST_BUILD
-		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Components)
 	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+			)
+	endif ()
+	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL3Plus.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()
 	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_BSPSceneManager.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_BSPSceneManager.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_CgProgramManager.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_CgProgramManager.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeSceneManager.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeSceneManager.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_PCZSceneManager.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/    
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_PCZSceneManager.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/    
 			)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeZone.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeZone.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_PFX OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_ParticleFX.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_ParticleFX.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	
 	# Components
 	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgrePaging.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgrePaging.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_PROPERTY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreProperty.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreProperty.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreRTShaderSystem.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreRTShaderSystem.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}libOgreTerrain.dylib 
-			${OGRE_SAMPLE_CONTENTS_PATH}/Components/
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreTerrain.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_VOLUME OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreVolume.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+			)
+	endif()
+	if (OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_SDK_BUILD)
+		add_custom_command(TARGET SampleBrowser POST_BUILD
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreOverlay.framework 
+			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 

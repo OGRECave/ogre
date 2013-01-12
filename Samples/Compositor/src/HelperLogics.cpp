@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -183,7 +183,7 @@ void HDRListener::notifyCompositor(Ogre::CompositorInstance* instance)
 			for(int i = 1; i < 8; ++i)
 			{
 				mBloomTexWeights[i][0] = mBloomTexWeights[i][1] =
-					mBloomTexWeights[i][2] = 1.25f * Ogre::Math::gaussianDistribution(i, 0, deviation);
+                    mBloomTexWeights[i][2] = 1.25f * Ogre::Math::gaussianDistribution((Ogre::Real)i, 0, deviation);
 				mBloomTexWeights[i][3] = 1.0f;
 				mBloomTexOffsetsHorz[i][0] = i * texelSize;
 				mBloomTexOffsetsHorz[i][1] = 0.0f;
@@ -284,7 +284,7 @@ void GaussianListener::notifyViewportSize(int width, int height)
 	for(int i = 1; i < 8; ++i)
 	{
 		mBloomTexWeights[i][0] = mBloomTexWeights[i][1] =
-			mBloomTexWeights[i][2] = Ogre::Math::gaussianDistribution(i, 0, deviation);
+			mBloomTexWeights[i][2] = Ogre::Math::gaussianDistribution((Ogre::Real)i, 0, deviation);
 		mBloomTexWeights[i][3] = 1.0f;
 		mBloomTexOffsetsHorz[i][0] = i * texelSize;
 		mBloomTexOffsetsHorz[i][1] = 0.0f;

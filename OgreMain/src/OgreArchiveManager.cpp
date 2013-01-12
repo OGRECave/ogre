@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ namespace Ogre {
 	{
 	}
     //-----------------------------------------------------------------------
-    Archive* ArchiveManager::load( const String& filename, const String& archiveType)
+    Archive* ArchiveManager::load( const String& filename, const String& archiveType, bool readOnly)
     {
         ArchiveMap::iterator i = mArchives.find(filename);
         Archive* pArch = 0;
@@ -66,7 +66,7 @@ namespace Ogre {
                 OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot find an archive factory "
                     "to deal with archive of type " + archiveType, "ArchiveManager::load");
 
-            pArch = it->second->createInstance(filename);
+            pArch = it->second->createInstance(filename, readOnly);
             pArch->load();
             mArchives[filename] = pArch;
 

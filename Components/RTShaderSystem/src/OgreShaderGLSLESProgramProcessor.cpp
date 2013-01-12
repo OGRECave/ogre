@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -90,6 +90,11 @@ bool GLSLESProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 
 	// Bind texture samplers for the fragment shader.
 	bindTextureSamplers(fsCpuProgram, fsGpuProgram);
+
+#if !OGRE_NO_GLES2_GLSL_OPTIMISER
+	vsGpuProgram->setParameter("use_optimiser", "true");
+	fsGpuProgram->setParameter("use_optimiser", "true");
+#endif
 
 	return true;
 }

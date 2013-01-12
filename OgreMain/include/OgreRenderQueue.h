@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,9 @@ THE SOFTWARE.
 #ifndef __RenderQueue_H__
 #define __RenderQueue_H__
 
-#include "OgreHeaderPrefix.h"
 #include "OgrePrerequisites.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
@@ -93,216 +93,10 @@ namespace Ogre {
     {
     public:
 
-		class RenderQueueGroupMap
-		{
-		public:
-			class value_type
-			{
-			public:
-				value_type(uint8 _f, RenderQueueGroup* _g) : first(_f), second(_g)
-				{
-
-				}
-				value_type() : first(0), second(0)
-				{
-
-				}
-				uint8 first;
-				RenderQueueGroup* second;
-			};
-
-			typedef uint8 key_type;
-			typedef RenderQueueGroup* mapped_type;
-			typedef value_type& reference;
-			typedef value_type* pointer;
-			typedef const value_type& const_reference;
-			typedef const value_type* const_pointer;
-			typedef vector<value_type >::type GroupVector;
-
-			class iterator
-			{
-				friend class RenderQueueGroupMap;
-			public:
-
-				iterator() : mRenderQueueGroupMap(0), mIndex(RENDER_QUEUE_MAX)
-				{
-				}
-
-				iterator(const RenderQueueGroupMap* _mRenderQueueGroupMap, uint8 _index) : mRenderQueueGroupMap(_mRenderQueueGroupMap), mIndex(_index)
-				{
-				}
-
-				const_reference operator*() const
-				{	
-					assert(this->mRenderQueueGroupMap);
-
-					return mRenderQueueGroupMap->mGroupVector[mIndex];
-				}
-
-				const_pointer operator->() const
-				{
-					assert(this->mRenderQueueGroupMap);
-
-					return &(mRenderQueueGroupMap->mGroupVector[mIndex]);
-				}
-
-				iterator& operator++()
-				{
-					assert(this->mRenderQueueGroupMap);
-
-					while(mIndex < mRenderQueueGroupMap->mMaxID)
-					{
-						++mIndex;
-						if(mRenderQueueGroupMap->mGroupVector[mIndex].second != 0)
-						{
-							break;
-						}
-					}
-					return (*this);
-				}
-
-				const iterator& operator++()const
-				{
-					assert(this->mRenderQueueGroupMap);
-
-					while(mIndex < mRenderQueueGroupMap->mMaxID)
-					{
-						++mIndex;
-						if(mRenderQueueGroupMap->mGroupVector[mIndex].second != 0)
-						{
-							break;
-						}
-					}
-					return (*this);
-				}
-
-				iterator operator++(int)
-				{
-					assert(this->mRenderQueueGroupMap);
-
-					iterator temp = *this;
-					while(mIndex < mRenderQueueGroupMap->mMaxID)
-					{
-						++mIndex;
-						if(mRenderQueueGroupMap->mGroupVector[mIndex].second != 0)
-						{
-							break;
-						}
-					}
-					return (temp);
-				}
-
-				const iterator operator++(int)const
-				{
-					assert(this->mRenderQueueGroupMap);
-
-					const_iterator temp = *this;
-					while(mIndex < mRenderQueueGroupMap->mMaxID)
-					{
-						++mIndex;
-						if(mRenderQueueGroupMap->mGroupVector[mIndex].second != 0)
-						{
-							break;
-						}
-					}
-					return (temp);
-				}
-
-				bool operator !=(const iterator& o)const
-				{
-					assert(mRenderQueueGroupMap);
-					assert(o.mRenderQueueGroupMap);
-					assert(o.mRenderQueueGroupMap == this->mRenderQueueGroupMap);
-					if( o.mIndex != this->mIndex)
-						return true;
-					return false;
-				}
-
-				bool operator ==(const iterator& o)const
-				{
-					assert(this->mRenderQueueGroupMap);
-					assert(o.mRenderQueueGroupMap);
-					assert(o.mRenderQueueGroupMap == this->mRenderQueueGroupMap);
-					if(o.mIndex == this->mIndex)
-					{
-						return true;
-					}
-					return false;
-				}
-			protected:
-				const RenderQueueGroupMap* mRenderQueueGroupMap;
-				mutable uint8 mIndex;
-			};
-
-			typedef const iterator const_iterator;
-			
-			RenderQueueGroupMap() : mMinID(RENDER_QUEUE_MAX), mMaxID(RENDER_QUEUE_MAX)
-			{
-				mGroupVector.resize(RENDER_QUEUE_MAX + 2);
-			}
-
-			void insert(value_type v)
-			{
-				mGroupVector[v.first] = v;
-				if(v.first < mMinID)
-				{
-					mMinID = v.first;
-				}
-
-				if(v.first >= mMaxID || mMaxID == RENDER_QUEUE_MAX)
-				{
-					mMaxID = v.first + 1;
-				}
-			}
-
-			iterator find(uint8 key)
-			{
-				if(mGroupVector[key].second == 0)
-				{
-					return iterator(this, mMaxID);
-				}
-				else
-				{
-					return iterator(this, key);
-				}
-			}
-
-			iterator begin()
-			{
-				return iterator(this, mMinID);
-			}
-
-			iterator end()
-			{
-				return iterator(this, mMaxID);
-			}
-
-			const_iterator begin() const
-			{
-				return iterator(this, mMinID);
-			}
-
-			const_iterator end() const
-			{
-				return iterator(this, mMaxID);
-			}
-			
-			void clear()
-			{
-				mGroupVector.reserve(RENDER_QUEUE_MAX + 2);
-				mGroupVector.clear();
-				mGroupVector.resize(RENDER_QUEUE_MAX + 2);
-				mMinID = RENDER_QUEUE_MAX;
-				mMaxID = RENDER_QUEUE_MAX;
-			}
-		protected:
-			uint8 mMinID;
-			uint8 mMaxID;
-			GroupVector mGroupVector;
-		};
-
-		typedef MapIterator<RenderQueueGroupMap> QueueGroupIterator;
-		typedef ConstMapIterator<RenderQueueGroupMap> ConstQueueGroupIterator;
+        typedef map< uint8, RenderQueueGroup* >::type RenderQueueGroupMap;
+        /// Iterator over queue groups
+        typedef MapIterator<RenderQueueGroupMap> QueueGroupIterator;
+        typedef ConstMapIterator<RenderQueueGroupMap> ConstQueueGroupIterator;
 
 		/** Class to listen in on items being added to the render queue. 
 		@remarks
@@ -513,4 +307,5 @@ namespace Ogre {
 }
 
 #include "OgreHeaderSuffix.h"
+
 #endif

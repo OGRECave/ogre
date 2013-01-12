@@ -21,8 +21,21 @@ fragment_program Ogre/Compositor/Combine_GLSLES_fp glsles
 	}
 }
 
+fragment_program Ogre/Compositor/Combine_GLSL_fp glsl
+{
+	source Combine_fp.glsl
+	syntax glsl150
+	default_params
+	{
+		param_named blur float 0.8
+   		param_named RT int 0
+   		param_named Sum int 1
+	}
+}
+
 fragment_program Ogre/Compositor/Combine_fp unified
 {
+	delegate Ogre/Compositor/Combine_GLSL_fp
 	delegate Ogre/Compositor/Combine_GLSLES_fp
 	delegate Ogre/Compositor/Combine_Cg_fp
 }
@@ -39,7 +52,7 @@ material Ogre/Compositor/Combine
 			{
 			}
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
 
@@ -50,7 +63,7 @@ material Ogre/Compositor/Combine
                 tex_coord_set 0
 			}
 
-			texture_unit SUM
+			texture_unit Sum
 			{
 				tex_address_mode clamp
 				filtering linear linear none

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,7 +90,7 @@ namespace Ogre {
 
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         /// Sets if the GLSL optimiser is enabled.
-		void setOptimiserEnabled(bool enabled) { mOptimiserEnabled = enabled; }
+		void setOptimiserEnabled(bool enabled);
 		/// Gets if the GLSL optimiser is enabled.
 		bool getOptimiserEnabled(void) const { return mOptimiserEnabled; }
         
@@ -98,6 +98,11 @@ namespace Ogre {
         void setIsOptimised(bool flag) { mIsOptimised = flag; }
         /// Gets if the GLSL source has been optimised successfully
         bool getIsOptimised(void) { return mIsOptimised; }
+
+		/// Sets the optimised GLSL source 
+        void setOptimisedSource(const String& src) { mOptimisedSource = src; }
+        /// Gets he optimised GLSL source 
+        String getOptimisedSource(void) { return mOptimisedSource; }
 #endif
 
         /// Overridden from GpuProgram
@@ -150,12 +155,14 @@ namespace Ogre {
         GLuint mGLProgramHandle;
 		/// Flag indicating if shader object successfully compiled
 		GLint mCompiled;
-        /// Flag indicating if shader has been successfully optimised
-        bool mIsOptimised;
 		/// Preprocessor options
 		String mPreprocessorDefines;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
+        /// Flag indicating if shader has been successfully optimised
+        bool mIsOptimised;
         bool mOptimiserEnabled;
+		/// The optmised source of the program (may be blank until the shader is optmisied)
+        String mOptimisedSource;
 #endif
     };
 }

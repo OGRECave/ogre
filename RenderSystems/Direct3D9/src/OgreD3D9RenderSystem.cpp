@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -909,6 +909,7 @@ namespace Ogre
 		rsc->setCapability(RSC_HWOCCLUSION);		
 		rsc->setCapability(RSC_USER_CLIP_PLANES);			
 		rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);			
+		rsc->setCapability(RSC_TEXTURE_1D);			
 		rsc->setCapability(RSC_TEXTURE_3D);			
 		rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 		rsc->setNonPOW2TexturesLimited(false);
@@ -2721,7 +2722,7 @@ namespace Ogre
 	}
 	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setStencilBufferParams(CompareFunction func, 
-		uint32 refValue, uint32 mask, StencilOperation stencilFailOp, 
+		uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
 		StencilOperation depthFailOp, StencilOperation passOp, 
 		bool twoSidedOperation)
 	{
@@ -2783,10 +2784,16 @@ namespace Ogre
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer reference value.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
-		// mask
-		hr = __SetRenderState(D3DRS_STENCILMASK, mask);
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILMASK, compareMask);
 		if (FAILED(hr))
-			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer mask.",
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer compare mask.",
+			"D3D9RenderSystem::setStencilBufferParams");
+
+		// compare mask
+		hr = __SetRenderState(D3DRS_STENCILWRITEMASK, writeMask);
+		if (FAILED(hr))
+			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error setting stencil buffer write mask.",
 			"D3D9RenderSystem::setStencilBufferParams");
 
 		// fail op
@@ -4235,6 +4242,34 @@ namespace Ogre
 	{
 		return mD3D->GetAdapterCount();
 	}
+
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::beginProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_BeginEvent(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
+
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::endProfileEvent( void )
+    {
+        (void)D3DPERF_EndEvent();
+    }
+
+    //---------------------------------------------------------------------
+    void D3D9RenderSystem::markProfileEvent( const String &eventName )
+    {
+        if( eventName.empty() )
+            return;
+
+        vector<wchar_t>::type result(eventName.length() + 1, '\0');
+        (void)MultiByteToWideChar(CP_ACP, 0, eventName.data(), eventName.length(), &result[0], result.size());
+        (void)D3DPERF_SetMarker(D3DCOLOR_ARGB(1, 0, 1, 0), &result[0]);
+    }
 
 	//---------------------------------------------------------------------
 	DWORD D3D9RenderSystem::getSamplerId(size_t unit) 

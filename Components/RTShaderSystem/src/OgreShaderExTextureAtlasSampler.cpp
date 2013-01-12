@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -270,7 +270,7 @@ void TextureAtlasSampler::updateGpuProgramsParams(Renderable* rend, Pass* pass, 
 				// Update the information of the size of the atlas textures 
 				//
 				std::pair< size_t, size_t > texSizeInt = pass->getTextureUnitState(j)->getTextureDimensions();
-				Vector2 texSize(texSizeInt.first, texSizeInt.second);
+                Vector2 texSize((Ogre::Real)texSizeInt.first, (Ogre::Real)texSizeInt.second);
 				mPSTextureSizes[j]->setGpuParameter(texSize); 
 
 				//

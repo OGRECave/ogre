@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,7 @@ namespace Ogre {
 		// Resource type
 		mResourceType = "GpuProgram";
 		mSaveMicrocodesToCache = false;
+		mCacheDirty = false;
 
 		// subclasses should register with resource group manager
 	}
@@ -134,24 +135,23 @@ namespace Ogre {
         return prg;
     }
     //---------------------------------------------------------------------------
-		const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void) const
-        {
-				// Use the current render system
-			  RenderSystem* rs = Root::getSingleton().getRenderSystem();
+    const GpuProgramManager::SyntaxCodes& GpuProgramManager::getSupportedSyntax(void) const
+    {
+        // Use the current render system
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
-				// Get the supported syntaxed from RenderSystemCapabilities 
-				return rs->getCapabilities()->getSupportedShaderProfiles();
-        }
+        // Get the supported syntaxed from RenderSystemCapabilities 
+        return rs->getCapabilities()->getSupportedShaderProfiles();
+    }
 
     //---------------------------------------------------------------------------
     bool GpuProgramManager::isSyntaxSupported(const String& syntaxCode) const
-        {
-				// Use the current render system
-			  RenderSystem* rs = Root::getSingleton().getRenderSystem();
+    {
+        // Use the current render system
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
 
-				// Get the supported syntaxed from RenderSystemCapabilities 
-				return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
-
+        // Get the supported syntax from RenderSystemCapabilities 
+        return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
     ResourcePtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
@@ -221,6 +221,11 @@ namespace Ogre {
 		mSaveMicrocodesToCache = val;		
 	}
 	//---------------------------------------------------------------------
+	bool GpuProgramManager::isCacheDirty( void ) const
+	{
+		return mCacheDirty;		
+	}
+	//---------------------------------------------------------------------
 	String GpuProgramManager::addRenderSystemToName( const String & name )
 	{
 		// Use the current render system
@@ -251,6 +256,8 @@ namespace Ogre {
 		if ( foundIter == mMicrocodeCache.end() )
 		{
 			mMicrocodeCache.insert(make_pair(nameWithRenderSystem, microcode));
+			// if cache is modified, mark it as dirty.
+			mCacheDirty = true;
 		}
 		else
 		{
@@ -259,8 +266,23 @@ namespace Ogre {
 		}		
 	}
 	//---------------------------------------------------------------------
+	void GpuProgramManager::removeMicrocodeFromCache( const String & name )
+	{
+		String nameWithRenderSystem = addRenderSystemToName(name);
+		MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+
+		if (foundIter != mMicrocodeCache.end())
+		{
+			mMicrocodeCache.erase( foundIter );
+			mCacheDirty = true;
+		}
+	}
+	//---------------------------------------------------------------------
 	void GpuProgramManager::saveMicrocodeCache( DataStreamPtr stream ) const
 	{
+		if (!mCacheDirty)
+			return; 
+
 		if (!stream->isWriteable())
 		{
 			OGRE_EXCEPT(Exception::ERR_CANNOT_WRITE_TO_FILE,
@@ -323,6 +345,10 @@ namespace Ogre {
 
 			mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
 		}
+
+		// if cache is not modified, mark it as clean.
+		mCacheDirty = false;
+		
 	}
 	//---------------------------------------------------------------------
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,22 +73,32 @@ THE SOFTWARE.
 #       undef GL_OES_mapbuffer
 #	endif
 #else
+#	undef  GL_GLEXT_PROTOTYPES
 #   include <GLES2/gl2.h>
 #   include <GLES2/gl2ext.h>
 #   include <EGL/egl.h>
 
-// Function pointers for FBO extension methods
-// Declare them here since we don't have GLEW to do it for us
-
 #	ifndef GL_GLEXT_PROTOTYPES
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+#		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 extern PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB;
 extern PFNGLREADBUFFERNVPROC glReadBufferNV;
 extern PFNGLGETCOMPRESSEDTEXIMAGENVPROC glGetCompressedTexImageNV;
 extern PFNGLGETTEXIMAGENVPROC glGetTexImageNV;
 extern PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV;
 extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
+#		else
+typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOES) (GLuint vertexarray);
+typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOES) (GLsizei n, const GLuint *vertexarrays);
+typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOES) (GLsizei n, GLuint *vertexarrays);
+typedef GLboolean (GL_APIENTRYP PFNGLISVERTEXARRAYOES) (GLuint vertexarray);
+
+extern PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES;
+extern PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES;
+extern PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES;
+extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
+#		endif
 #	endif
 
 // If we are going to use the PVRTC_CODEC make sure we
@@ -106,10 +116,15 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 #endif
 
 
+// Copy this definition from desktop GL.  Used for polygon modes.
+#ifndef GL_FILL
+#   define GL_FILL    0x1B02
+#endif
+
 // Define GL_NONE for convenience
 #define GL_NONE 0
 
-#ifndef GL_BGRA
+#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 #   define GL_BGRA  0x80E1
 #endif
 
@@ -139,10 +154,12 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         fprintf(stderr, "%s:%d: %s\n", __FUNCTION__, __LINE__, text); \
     }
 
-#define ENABLE_GL_CHECK 1
+#define ENABLE_GL_CHECK 0
+
 #if ENABLE_GL_CHECK
-#define GL_CHECK_ERROR \
-    { \
+#define OGRE_CHECK_GL_ERROR(glFunc) \
+{ \
+        glFunc; \
         int e = glGetError(); \
         if (e != 0) \
         { \
@@ -155,13 +172,13 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
             case GL_OUT_OF_MEMORY:      errorString = "GL_OUT_OF_MEMORY";       break; \
             default:                                                            break; \
             } \
-            char msgBuf[10000]; \
-            sprintf(msgBuf, "OpenGL ES2 error 0x%04X %s in %s at line %i\n", e, errorString, __PRETTY_FUNCTION__, __LINE__); \
+            char msgBuf[4096]; \
+            sprintf(msgBuf, "OpenGL error 0x%04X %s in %s at line %i for %s\n", e, errorString, __PRETTY_FUNCTION__, __LINE__, #glFunc); \
             LogManager::getSingleton().logMessage(msgBuf); \
         } \
     }
 #else
-    #define GL_CHECK_ERROR {}
+#   define OGRE_CHECK_GL_ERROR(glFunc) { glFunc; }
 #endif
 
 #if ENABLE_GL_CHECK
@@ -170,7 +187,7 @@ extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
         int e = eglGetError(); \
         if ((e != 0) && (e != EGL_SUCCESS))\
         { \
-            char msgBuf[10000]; \
+            char msgBuf[4096]; \
             sprintf(msgBuf, "EGL error 0x%04X in %s at line %i\n", e, __PRETTY_FUNCTION__, __LINE__); \
             LogManager::getSingleton().logMessage(msgBuf); \
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msgBuf, __PRETTY_FUNCTION__); \

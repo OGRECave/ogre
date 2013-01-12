@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,6 +74,8 @@ namespace Ogre
 		mFullBoundingBox.setExtents( -Vector3::ZERO, Vector3::ZERO );
 
 		mName = batchName;
+
+		mCustomParams.resize( mCreator->getNumCustomParams() * mInstancesPerBatch, Ogre::Vector4::ZERO );
 	}
 
 	InstanceBatch::~InstanceBatch()
@@ -111,6 +113,16 @@ namespace Ogre
 		if( baseSubMesh->operationType != RenderOperation::OT_TRIANGLE_LIST )
 		{
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Only meshes with OT_TRIANGLE_LIST are supported",
+						"InstanceBatch::checkSubMeshCompatibility");
+		}
+
+		if( !mCustomParams.empty() && mCreator->getInstancingTechnique() != InstanceManager::HWInstancingBasic )
+		{
+			//Implementing this for ShaderBased is impossible. All other variants can be.
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Custom parameters not supported for this "
+														"technique. Do you dare implementing it?"
+														"See InstanceManager::setNumCustomParams "
+														"documentation.",
 						"InstanceBatch::checkSubMeshCompatibility");
 		}
 
@@ -276,6 +288,12 @@ namespace Ogre
 						" with a different InstanceBatch",
 						"InstanceBatch::removeInstancedEntity()");
 		}
+		if( !instancedEntity->isInUse() )
+		{
+			OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+						"Trying to remove an InstancedEntity that is already removed!",
+						"InstanceBatch::removeInstancedEntity()");
+		}
 
 		if( instancedEntity->getParentSceneNode() )
 			instancedEntity->getParentSceneNode()->detachObject( instancedEntity );
@@ -287,7 +305,8 @@ namespace Ogre
 		mUnusedEntities.push_back( instancedEntity );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities )
+	void InstanceBatch::getInstancedEntitiesInUse( InstancedEntityVec &outEntities,
+													CustomParamsVec &outParams )
 	{
 		InstancedEntityVec::const_iterator itor = mInstancedEntities.begin();
 		InstancedEntityVec::const_iterator end  = mInstancedEntities.end();
@@ -295,23 +314,35 @@ namespace Ogre
 		while( itor != end )
 		{
 			if( (*itor)->isInUse() )
+			{
 				outEntities.push_back( *itor );
+
+				for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
+					outParams.push_back( _getCustomParam( *itor, i ) );
+			}
+
 			++itor;
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::defragmentBatchNoCull( InstancedEntityVec &usedEntities )
+	void InstanceBatch::defragmentBatchNoCull( InstancedEntityVec &usedEntities,
+												CustomParamsVec &usedParams )
 	{
 		const size_t maxInstancesToCopy = std::min( mInstancesPerBatch, usedEntities.size() );
 		InstancedEntityVec::iterator first = usedEntities.end() - maxInstancesToCopy;
+		CustomParamsVec::iterator firstParams = usedParams.end() - maxInstancesToCopy *
+																	mCreator->getNumCustomParams();
 
 		//Copy from the back to front, into m_instancedEntities
 		mInstancedEntities.insert( mInstancedEntities.begin(), first, usedEntities.end() );
 		//Remove them from the array
 		usedEntities.resize( usedEntities.size() - maxInstancesToCopy );	
+
+		mCustomParams.insert( mCustomParams.begin(), firstParams, usedParams.end() );
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities )
+	void InstanceBatch::defragmentBatchDoCull( InstancedEntityVec &usedEntities,
+												CustomParamsVec &usedParams )
 	{
 		//Get the the entity closest to the minimum bbox edge and put into "first"
 		InstancedEntityVec::const_iterator itor   = usedEntities.begin();
@@ -367,23 +398,37 @@ namespace Ogre
 			}
 
 			mInstancedEntities.push_back( *closest );
+			//Now the custom params
+			const size_t idx = closest - usedEntities.begin();	
+			for( unsigned char i=0; i<mCreator->getNumCustomParams(); ++i )
+			{
+				mCustomParams.push_back( usedParams[idx + i] );
+			}
 
-			//Remove 'closest' from usedEntities using swap and pop_back trick
+			//Remove 'closest' from usedEntities & usedParams using swap and pop_back trick
 			*closest = *(usedEntities.end() - 1);
 			usedEntities.pop_back();
+
+			for( unsigned char i=1; i<=mCreator->getNumCustomParams(); ++i )
+			{
+				usedParams[idx + mCreator->getNumCustomParams() - i] = *(usedParams.end() - 1);
+				usedParams.pop_back();
+			}
 		}
 	}
 	//-----------------------------------------------------------------------
-	void InstanceBatch::_defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities )
+	void InstanceBatch::_defragmentBatch( bool optimizeCulling, InstancedEntityVec &usedEntities,
+											CustomParamsVec &usedParams )
 	{
 		//Remove and clear what we don't need
 		mInstancedEntities.clear();
+		mCustomParams.clear();
 		deleteUnusedInstancedEntities();
 
 		if( !optimizeCulling )
-			defragmentBatchNoCull( usedEntities );
+			defragmentBatchNoCull( usedEntities, usedParams );
 		else
-			defragmentBatchDoCull( usedEntities );
+			defragmentBatchDoCull( usedEntities, usedParams );
 
 		//Reassign instance IDs and tell we're the new parent
 		uint32 instanceId = 0;
@@ -401,11 +446,13 @@ namespace Ogre
 		assert( (signed)(mInstancesPerBatch) - (signed)(mInstancedEntities.size()) >= 0 );
 		mInstancedEntities.reserve( mInstancesPerBatch );
 		mUnusedEntities.reserve( mInstancesPerBatch );
+		mCustomParams.reserve( mCreator->getNumCustomParams() * mInstancesPerBatch );
 		for( size_t i=mInstancedEntities.size(); i<mInstancesPerBatch; ++i )
 		{
 			InstancedEntity *instance = generateInstancedEntity(i);
 			mInstancedEntities.push_back( instance );
 			mUnusedEntities.push_back( instance );
+			mCustomParams.push_back( Ogre::Vector4::ZERO );
 		}
 
 		//We've potentially changed our bounds
@@ -441,10 +488,10 @@ namespace Ogre
 		//We use our own because our SceneNode is just filled with zeroes, and updating it
 		//with real values is expensive, plus we would need to make sure it doesn't get to
 		//the shader
-		Real squaredDepth = getSquaredViewDepth(cam) -
-							Math::Sqr( mMeshReference->getBoundingSphereRadius() );
-        squaredDepth = std::max( squaredDepth, Real(0) );
-        Real lodValue = squaredDepth * cam->_getLodBiasInverse();
+		Real depth = Math::Sqrt( getSquaredViewDepth(cam) ) -
+					 mMeshReference->getBoundingSphereRadius();
+        depth = std::max( depth, Real(0) );
+        Real lodValue = depth * cam->_getLodBiasInverse();
 
 		//Now calculate Material LOD
         /*const LodStrategy *materialStrategy = m_material->getLodStrategy();
@@ -494,7 +541,8 @@ namespace Ogre
 
 			while( itor != end )
 			{
-				mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
+				if( (*itor)->isVisible() )
+					mCachedCameraDist = std::min( mCachedCameraDist, (*itor)->getSquaredViewDepth( cam ) );
 				++itor;
 			}
 
@@ -538,7 +586,7 @@ namespace Ogre
 				}
 			}
 
-			queue->addRenderable( this );
+			queue->addRenderable( this, mRenderQueueID, mRenderQueuePriority );
 		}
 
 		//Reset visibility once we skipped addRenderable (which saves GPU time), because OGRE for some
@@ -549,5 +597,16 @@ namespace Ogre
 	void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )
 	{
 		visitor->visit( this, 0, false );
+	}
+	//-----------------------------------------------------------------------
+	void InstanceBatch::_setCustomParam( InstancedEntity *instancedEntity, unsigned char idx,
+										 const Vector4 &newParam )
+	{
+		mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx] = newParam;
+	}
+	//-----------------------------------------------------------------------
+	const Vector4& InstanceBatch::_getCustomParam( InstancedEntity *instancedEntity, unsigned char idx )
+	{
+		return mCustomParams[instancedEntity->mInstanceId * mCreator->getNumCustomParams() + idx];
 	}
 }

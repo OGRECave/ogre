@@ -21,7 +21,7 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
             names.push_back("Cg Program Manager");
 		return names;
 	}
@@ -38,7 +38,8 @@ public:
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
             !GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
 			!GpuProgramManager::getSingleton().isSyntaxSupported("ps_1_4") &&
-            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsles") &&
+            !GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
         {
 			OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your graphics card does not support advanced fragment"
 				" programs, so you cannot run this sample. Sorry!", "FresnelSample::testCapabilities");

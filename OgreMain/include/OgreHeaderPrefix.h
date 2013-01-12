@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,10 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE
 -------------------------------------------------------------------------*/
-#ifndef __OgreHeaderPrefix_H__
-#define __OgreHeaderPrefix_H__
-
-#include "OgrePrerequisites.h"
+// ATTENTION: No header guard as this header is meant to be included
+// multiple times.
+//#ifndef __OgreHeaderPrefix_H__
+//#define __OgreHeaderPrefix_H__
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 
@@ -68,7 +68,7 @@ THE SOFTWARE
 
 // disable: "conditional expression constant", always occurs on 
 // OGRE_MUTEX_CONDITIONAL when no threading enabled
-#   pragma warning (disable : 201)
+#   pragma warning (disable : 4127)
 
 // disable: "unreferenced formal parameter"
 // Many versions of VC have bugs which generate this error in cases where they shouldn't
@@ -77,6 +77,6 @@ THE SOFTWARE
 #endif
 
 
-#endif
+//#endif
 
 
