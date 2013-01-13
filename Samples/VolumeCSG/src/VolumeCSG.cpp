@@ -84,9 +84,7 @@ void Sample_VolumeCSG::setupContent(void)
     CSGUnionSource union5(&union4, &intersection1);
     CSGUnionSource union6(&union5, &noise1);
     Source *src = &union6;
-
-    src->serialize(Vector3::ZERO, to, (Real)0.12109375, "volume.dat");
-
+    
     mVolumeRoot = OGRE_NEW Chunk();
     SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
 
