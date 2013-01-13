@@ -30,27 +30,27 @@ IF (WIN32)
     IF(BORLAND)
       SET (OPENGLES2_gl_LIBRARY import32 CACHE STRING "OpenGL ES 2.x library for win32")
     ELSE(BORLAND)
-		#MS compiler - todo - fix the following line:
-		SET (OPENGLES2_gl_LIBRARY ${OGRE_DEPENDENCIES_DIR}/lib/release/libGLESv2.lib CACHE STRING "OpenGL ES 2.x library for win32")
-		SET (EGL_egl_LIBRARY      ${OGRE_DEPENDENCIES_DIR}/lib/release/libEGL.lib CACHE STRING "EGL library for win32")	
-
-		SET(POWERVR_SDK_PATH "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2")
+		SET(POWERVR_SDK_PATH "C:/Imagination/PowerVR/GraphicsSDK/SDK_3.0/Builds/OGLES2")
 		FIND_PATH(OPENGLES2_INCLUDE_DIR GLES2/gl2.h
 			${POWERVR_SDK_PATH}/Include
-		)	  
-		
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
+		)
+
 	    FIND_PATH(EGL_INCLUDE_DIR EGL/egl.h
-			${POWERVR_SDK_PATH}/Include			
+			${POWERVR_SDK_PATH}/Include
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/Include"
 		)
-		
+
 		FIND_LIBRARY(OPENGLES2_gl_LIBRARY
-			NAMES GLESv2
-			PATHS ${POWERVR_SDK_PATH}/WindowsX86/Lib
+			NAMES libGLESv2
+			PATHS ${POWERVR_SDK_PATH}/Windows_x86_32/Lib
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
 		)
-		    
+
 		FIND_LIBRARY(EGL_egl_LIBRARY
-			NAMES EGL
-			PATHS ${POWERVR_SDK_PATH}/WindowsX86/Lib
+			NAMES libEGL
+			PATHS ${POWERVR_SDK_PATH}/Windows_x86_32/Lib
+            "C:/Imagination Technologies/PowerVR Insider SDK/OGLES2_WINDOWS_X86EMULATION_2.10/Builds/OGLES2/WindowsX86/Lib"
 		)
     ENDIF(BORLAND)
 
