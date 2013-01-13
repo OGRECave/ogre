@@ -515,7 +515,19 @@ namespace Ogre {
                     mDriverVersion.release = StringConverter::parseInt(tokens[2]);
             }
             mDriverVersion.build = 0;
-			
+
+            // Get the shader language version
+            const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+            tokens = StringUtil::split(shadingLangVersion, ". ");
+            size_t i = 0;
+            // iOS reports the GLSL version with a whole bunch of non-digit characters so we have to find where the version starts.
+            for(; i < tokens.size(); i++)
+            {
+                if (std::isdigit(*tokens[i].c_str()))
+                    break;
+            }
+            mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[i]) * 100) + StringConverter::parseUnsignedInt(tokens[i+1]);
+
 			// Initialise GL after the first window has been created
 			// TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
             mRealCapabilities = createRenderSystemCapabilities();

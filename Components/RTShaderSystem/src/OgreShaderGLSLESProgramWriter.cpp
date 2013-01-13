@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreShaderFunctionAtom.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     namespace RTShader {
@@ -52,7 +53,7 @@ namespace Ogre {
         //-----------------------------------------------------------------------
         GLSLESProgramWriter::GLSLESProgramWriter()
         {
-            mGLSLVersion = 100;
+            mGLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
             initializeStringMaps();
             mFunctionCacheMap.clear();
         }
