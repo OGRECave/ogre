@@ -461,10 +461,10 @@ namespace Ogre {
             }
         }
         // Restore defaults
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0);
-        glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0));
+        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
     }
     
     //-----------------------------------------------------------------------------  
@@ -504,10 +504,10 @@ namespace Ogre {
                                               GL3PlusPixelUtil::getGLOriginDataType(data.format),
                                               data.data));
             // Restore defaults
-            glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-            glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0);
-            glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-            glPixelStorei(GL_PACK_ALIGNMENT, 4);
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_IMAGE_HEIGHT, 0));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_SKIP_PIXELS, 0));
+            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
         }
     }
     //-----------------------------------------------------------------------------  
@@ -861,20 +861,20 @@ namespace Ogre {
         GLenum target = (src.getDepth() != 1) ? GL_TEXTURE_3D : GL_TEXTURE_2D;
         
         // Generate texture name
-        glGenTextures(1, &id);
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &id));
         
         // Set texture type
-        glBindTexture(target, id);
+        OGRE_CHECK_GL_ERROR(glBindTexture(target, id));
         
         // Set automatic mipmap generation; nice for minimisation
-        glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 );
+        OGRE_CHECK_GL_ERROR(glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 1000 ));
         //    glTexParameteri(target, GL_GENERATE_MIPMAP, GL_TRUE );
         
         // Allocate texture memory
         if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
-            glTexImage3D(target, 0, src.format, src.getWidth(), src.getHeight(), src.getDepth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, src.format, src.getWidth(), src.getHeight(), src.getDepth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
         else
-            glTexImage2D(target, 0, src.format, src.getWidth(), src.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+            OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, src.format, src.getWidth(), src.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
         
         // GL texture buffer
         GL3PlusTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
@@ -887,7 +887,7 @@ namespace Ogre {
         blitFromTexture(&tex, tempTarget, dstBox);
         
         // Delete temp texture
-        glDeleteTextures(1, &id);
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &id));
     }
     
     RenderTexture *GL3PlusTextureBuffer::getRenderTarget(size_t zoffset)
