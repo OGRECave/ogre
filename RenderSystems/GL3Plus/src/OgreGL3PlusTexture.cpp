@@ -128,10 +128,13 @@ namespace Ogre {
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
         // Set up texture swizzling
-        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
+        if(getGLSupport()->checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
+        {
+            OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
+        }
 
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
