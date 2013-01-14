@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
+#include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreLogManager.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
@@ -199,7 +200,7 @@ namespace Ogre {
 
 				// Get buffer size
 				GLint binaryLength = 0;
-#if GL_OES_get_program_binary
+#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
 				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 #endif
 
@@ -207,7 +208,7 @@ namespace Ogre {
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode((ulong)binaryLength + sizeof(GLenum));
 
-#if GL_OES_get_program_binary
+#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
 				// Get binary
 				OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
                                                           newMicrocode->getPtr() + sizeof(GLenum)));
@@ -236,7 +237,7 @@ namespace Ogre {
 			}
 
 			GLSLESLinkProgramManager::getSingleton().extractUniforms(
-				mGLProgramHandle, vertParams, fragParams, mGLUniformReferences);
+				mGLProgramHandle, vertParams, fragParams, mGLUniformReferences, mGLUniformBufferReferences);
 
 			mUniformRefsBuilt = true;
 		}
@@ -293,8 +294,43 @@ namespace Ogre {
 						OGRE_CHECK_GL_ERROR(glUniformMatrix4fv(currentUniform->mLocation, glArraySize, 
                                                                GL_FALSE, params->getFloatPointer(def->physicalIndex)));
 						break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+                    case GCT_MATRIX_2X3:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix2x3fv(currentUniform->mLocation, glArraySize,
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+                    case GCT_MATRIX_2X4:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix2x4fv(currentUniform->mLocation, glArraySize,
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+                    case GCT_MATRIX_3X2:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix3x2fv(currentUniform->mLocation, glArraySize,
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+                    case GCT_MATRIX_3X4:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix3x4fv(currentUniform->mLocation, glArraySize,
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+                    case GCT_MATRIX_4X2:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix4x2fv(currentUniform->mLocation, glArraySize,
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+                    case GCT_MATRIX_4X3:
+                        OGRE_CHECK_GL_ERROR(glUniformMatrix4x3fv(currentUniform->mLocation, glArraySize, 
+                                                                 GL_FALSE, params->getFloatPointer(def->physicalIndex)));
+                        break;
+#else
+					case GCT_MATRIX_2X3:
+					case GCT_MATRIX_2X4:
+					case GCT_MATRIX_3X2:
+					case GCT_MATRIX_3X4:
+					case GCT_MATRIX_4X2:
+					case GCT_MATRIX_4X3:
+						break;
+
+#endif
 					case GCT_INT1:
-						OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize, 
+						OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, glArraySize,
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
 					case GCT_INT2:
@@ -319,12 +355,6 @@ namespace Ogre {
 						OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1, 
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
 						break;
-					case GCT_MATRIX_2X3:
-					case GCT_MATRIX_2X4:
-					case GCT_MATRIX_3X2:
-					case GCT_MATRIX_3X4:
-					case GCT_MATRIX_4X2:
-					case GCT_MATRIX_4X3:
                     case GCT_SAMPLER2DARRAY:
                     case GCT_UNKNOWN:
                     case GCT_SUBROUTINE:
@@ -349,6 +379,35 @@ namespace Ogre {
 			} // fromProgType == currentUniform->mSourceProgType
   
   		} // End for
+	}
+	//-----------------------------------------------------------------------
+	void GLSLESLinkProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
+                                              uint16 mask, GpuProgramType fromProgType)
+	{
+#if OGRE_NO_GLES3_SUPPORT == 0
+        // Iterate through the list of uniform buffers and update them as needed
+		GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
+		GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
+
+        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
+
+		GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
+		for (it = sharedParams.begin(); it != end; ++it)
+        {
+            for (;currentBuffer != endBuffer; ++currentBuffer)
+            {
+                GLES2HardwareUniformBuffer* hwGlBuffer = static_cast<GLES2HardwareUniformBuffer*>(currentBuffer->get());
+                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
+
+                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
+                GLint UniformTransform;
+                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
+                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
+
+                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
+            }
+        }
+#endif
 	}
 	//-----------------------------------------------------------------------
 	void GLSLESLinkProgram::updatePassIterationUniforms(GpuProgramParametersSharedPtr params)

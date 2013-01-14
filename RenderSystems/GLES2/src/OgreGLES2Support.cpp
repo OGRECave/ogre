@@ -92,7 +92,7 @@ namespace Ogre {
         }
 
     		// Get function pointers on platforms that don't have prototypes
-#ifndef GL_GLEXT_PROTOTYPES
+#if !defined(GL_GLEXT_PROTOTYPES) && OGRE_NO_GLES3_SUPPORT == 1
 
 		// define the GL types if they are not defined
 #	ifndef PFNGLMAPBUFFEROES

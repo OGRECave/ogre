@@ -174,6 +174,30 @@ namespace Ogre {
 		}
 		catch (Exception& e) {}
 	}
+    
+    //-----------------------------------------------------------------------------
+	void GLSLESGpuProgram::bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask)
+	{
+		// Link can throw exceptions, ignore them at this point
+		try
+		{
+            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            {
+                // Activate the program pipeline object
+                GLSLESProgramPipeline* programPipeline = GLSLESProgramPipelineManager::getSingleton().getActiveProgramPipeline();
+                // Pass on parameters from params to program object uniforms
+                programPipeline->updateUniformBlocks(params, mask, mType);
+            }
+            else
+            {
+                // Activate the link program object
+                GLSLESLinkProgram* linkProgram = GLSLESLinkProgramManager::getSingleton().getActiveLinkProgram();
+                // Pass on parameters from params to program object uniforms
+                linkProgram->updateUniformBlocks(params, mask, mType);
+            }
+		}
+		catch (Exception& e) {}
+	}
 
 	//-----------------------------------------------------------------------------
 	void GLSLESGpuProgram::bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params)

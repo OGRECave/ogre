@@ -89,6 +89,12 @@ namespace Ogre {
                 return GL_TEXTURE_2D;
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            case TEX_TYPE_3D:
+                return GL_TEXTURE_3D;
+            case TEX_TYPE_2D_ARRAY:
+                return GL_TEXTURE_2D_ARRAY;
+#endif
             default:
                 return 0;
         };
@@ -126,6 +132,28 @@ namespace Ogre {
         
 #if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+#elif OGRE_NO_GLES3_SUPPORT == 0
+		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+
+        // Set up texture swizzling
+        switch(mFormat)
+		{
+		case PF_A8R8G8B8:
+		case PF_X8R8G8B8:
+		case PF_R8G8B8:
+	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			break;
+
+		default:
+	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			break;
+		}
 #endif
 
 		// Set some misc default parameters, these can of course be changed later
@@ -137,7 +165,7 @@ namespace Ogre {
                                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        
+
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
         GLenum format = GLES2PixelUtil::getGLOriginFormat(mFormat);
@@ -211,6 +239,23 @@ namespace Ogre {
         }
         else
         {
+#if OGRE_NO_GLES3_SUPPORT == 0
+            switch(mTextureType)
+            {
+                case TEX_TYPE_1D:
+                case TEX_TYPE_2D:
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLint(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
+                    break;
+                case TEX_TYPE_2D_RECT:
+                case TEX_TYPE_2D_ARRAY:
+                case TEX_TYPE_3D:
+                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLint(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    break;
+                case TEX_TYPE_CUBE_MAP:
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                    break;
+            }
+#else
             // Run through this process to pregenerate mipmap pyramid
             for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -252,7 +297,6 @@ namespace Ogre {
 								format, datatype, 0));
 						}
 						break;
-					case TEX_TYPE_3D:
                     default:
                         break;
                 };
@@ -266,6 +310,7 @@ namespace Ogre {
                     height = height / 2;
                 }
             }
+#endif
         }
     }
     

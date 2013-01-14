@@ -22,12 +22,14 @@ set(HEADER_FILES
   include/OgreGLES2HardwareIndexBuffer.h
   include/OgreGLES2HardwareOcclusionQuery.h
   include/OgreGLES2HardwarePixelBuffer.h
+  include/OgreGLES2HardwareUniformBuffer.h
   include/OgreGLES2HardwareVertexBuffer.h
   include/OgreGLES2PixelFormat.h
   include/OgreGLES2Plugin.h
   include/OgreGLES2Prerequisites.h
   include/OgreGLES2RenderSystem.h
   include/OgreGLES2RenderTexture.h
+  include/OgreGLES2RenderToVertexBuffer.h
   include/OgreGLES2Support.h
   include/OgreGLES2Texture.h
   include/OgreGLES2TextureManager.h
@@ -50,11 +52,13 @@ set(SOURCE_FILES
   src/OgreGLES2HardwareIndexBuffer.cpp
   src/OgreGLES2HardwareOcclusionQuery.cpp
   src/OgreGLES2HardwarePixelBuffer.cpp
+  src/OgreGLES2HardwareUniformBuffer.cpp
   src/OgreGLES2HardwareVertexBuffer.cpp
   src/OgreGLES2PixelFormat.cpp
   src/OgreGLES2Plugin.cpp
   src/OgreGLES2RenderSystem.cpp
   src/OgreGLES2RenderTexture.cpp
+  src/OgreGLES2RenderToVertexBuffer.cpp
   src/OgreGLES2Support.cpp
   src/OgreGLES2Texture.cpp
   src/OgreGLES2TextureManager.cpp
@@ -154,7 +158,11 @@ elseif (WIN32)
     src/EGL/OgreEGLWindow.cpp
   )
   include_directories(src/EGL/WIN32 include/EGL/WIN32)
-  link_directories(${OPENGLES2_LIBRARY_PATH})
+  if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+    link_directories(${OPENGLES3_LIBRARY_PATH})
+  else()
+    link_directories(${OPENGLES2_LIBRARY_PATH})
+  endif()
   set(PLATFORM_HEADER_INSTALL "WIN32")
 elseif (ANDROID)
   set(PLATFORM_HEADERS 
@@ -182,7 +190,11 @@ elseif (ANDROID)
   )
 
   include_directories(src/EGL/Android include/EGL/Android)
-  link_directories(${OPENGLES2_LIBRARY_PATH})
+  if(OGRE_CONFIG_ENABLE_GLES3_SUPPORT)
+    link_directories(${OPENGLES3_LIBRARY_PATH})
+  else()
+    link_directories(${OPENGLES2_LIBRARY_PATH})
+  endif()
   set(PLATFORM_HEADER_INSTALL "ANDROID")
 elseif (APPLE)
   set(PLATFORM_HEADERS 
@@ -239,11 +251,11 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include
   ${CMAKE_SOURCE_DIR}/Components/RTShaderSystem/include
-  ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
+  ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
 ogre_add_library(RenderSystem_GLES2 ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${GLSLES_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
-target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
+target_link_libraries(RenderSystem_GLES2 OgreMain ${OPENGLES3_LIBRARIES} ${OPENGLES2_LIBRARIES} ${EGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_GLES2 PROPERTIES

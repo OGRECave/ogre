@@ -134,7 +134,7 @@ namespace Ogre {
                         "GLES2HardwareVertexBuffer::lock");
         }
 
-#if GL_OES_mapbuffer
+#if GL_OES_mapbuffer || (OGRE_NO_GLES3_SUPPORT == 0)
         if (!retPtr)
 		{
             GLenum access = 0;
@@ -151,7 +151,11 @@ namespace Ogre {
 				access = GL_WRITE_ONLY_OES;
 
 			void* pBuffer;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, access));
+#else
             OGRE_CHECK_GL_ERROR(pBuffer = glMapBufferOES(GL_ARRAY_BUFFER, access));
+#endif
 
 			if(pBuffer == 0)
 			{
@@ -188,10 +192,18 @@ namespace Ogre {
         }
         else
         {
-#if GL_OES_mapbuffer
+#if GL_OES_mapbuffer || (OGRE_NO_GLES3_SUPPORT == 0)
 			static_cast<GLES2HardwareBufferManagerBase*>(mMgr)->getStateCacheManager()->bindGLBuffer(GL_ARRAY_BUFFER, mBufferId);
 
-			if(!glUnmapBufferOES(GL_ARRAY_BUFFER))
+#if OGRE_NO_GLES3_SUPPORT == 0
+            if (mUsage & HBU_WRITE_ONLY)
+            {
+                OGRE_CHECK_GL_ERROR(glFlushMappedBufferRange(GL_ARRAY_BUFFER, mLockStart, mLockSize));
+            }
+#endif
+            GLboolean mapped;
+            OGRE_CHECK_GL_ERROR(mapped = glUnmapBufferOES(GL_ARRAY_BUFFER));
+			if(!mapped)
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
 					"Buffer data corrupted, please reload", 
@@ -256,6 +268,36 @@ namespace Ogre {
         }
     }
 
+#if OGRE_NO_GLES3_SUPPORT == 0
+    void GLES2HardwareVertexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
+                                               size_t dstOffset, size_t length, bool discardWholeBuffer)
+    {
+        // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
+        if (srcBuffer.isSystemMemory())
+        {
+			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+        }
+        else
+        {
+            // Unbind the current buffer
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
+            // Zero out this(destination) buffer
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, mBufferId));
+            OGRE_CHECK_GL_ERROR(glBufferData(GL_ARRAY_BUFFER, length, 0, GLES2HardwareBufferManager::getGLUsage(mUsage)));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
+            // Do it the fast way.
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, static_cast<GLES2HardwareVertexBuffer &>(srcBuffer).getGLBufferId()));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, mBufferId));
+
+            OGRE_CHECK_GL_ERROR(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, srcOffset, dstOffset, length));
+
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_READ_BUFFER, 0));
+            OGRE_CHECK_GL_ERROR(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
+        }
+    }
+#endif
     void GLES2HardwareVertexBuffer::_updateFromShadow(void)
     {
         if (mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)

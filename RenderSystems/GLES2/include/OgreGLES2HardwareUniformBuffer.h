@@ -25,64 +25,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-#ifndef __GLES2HardwareIndexBuffer_H__
-#define __GLES2HardwareIndexBuffer_H__
+#ifndef __GLES2HARDWAREUNIFORMBUFFER_H__
+#define __GLES2HARDWAREUNIFORMBUFFER_H__
 
 #include "OgreGLES2Prerequisites.h"
-#include "OgreHardwareIndexBuffer.h"
-#include "OgreGLES2ManagedResource.h"
+#include "OgreHardwareUniformBuffer.h"
 
 namespace Ogre {
-    class _OgreGLES2Export GLES2HardwareIndexBuffer : public HardwareIndexBuffer MANAGED_RESOURCE
+
+    /// Specialisation of HardwareUniformBuffer for OpenGL
+    class _OgreGLES2Export GLES2HardwareUniformBuffer : public HardwareUniformBuffer
     {
         private:
             GLuint mBufferId;
-            // Scratch buffer handling
-            bool mLockedToScratch;
-            size_t mScratchOffset;
-            size_t mScratchSize;
-            void* mScratchPtr;
-            bool mScratchUploadOnUnlock;
-        
+            GLint mBinding;
+
         protected:
             /** See HardwareBuffer. */
             void* lockImpl(size_t offset, size_t length, LockOptions options);
             /** See HardwareBuffer. */
             void unlockImpl(void);
-        
-            void createBuffer();
-        
-            void destroyBuffer();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            /** See AndroidResource. */
-            virtual void notifyOnContextLost();
-        
-            /** See AndroidResource. */
-            virtual void notifyOnContextReset();
-#endif
-        
         public:
-            GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes,
-                                  HardwareBuffer::Usage usage,
-                                  bool useShadowBuffer);
-            virtual ~GLES2HardwareIndexBuffer();
+            GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
+                                         bool useShadowBuffer, const String& name);
+            ~GLES2HardwareUniformBuffer();
+
             /** See HardwareBuffer. */
             void readData(size_t offset, size_t length, void* pDest);
+
             /** See HardwareBuffer. */
             void writeData(size_t offset, size_t length, 
-                const void* pSource, bool discardWholeBuffer = false);
-#if OGRE_NO_GLES3_SUPPORT == 0
+                           const void* pSource, bool discardWholeBuffer = false);
+
             /** See HardwareBuffer. */
-            void copyData(HardwareBuffer& srcBuffer, size_t srcOffset,
-                      size_t dstOffset, size_t length, bool discardWholeBuffer = false);
-#endif
-            /** See HardwareBuffer. */
-            void _updateFromShadow(void);
+            void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+                          size_t dstOffset, size_t length, bool discardWholeBuffer = false);
 
             inline GLuint getGLBufferId(void) const { return mBufferId; }
+            void setGLBufferBinding(GLint binding);
+            inline GLint getGLBufferBinding(void) const { return mBinding; }
     };
 }
-
-#endif
+#endif // __GLES2HARDWAREUNIFORMBUFFER_H__

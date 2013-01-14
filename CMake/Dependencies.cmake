@@ -111,6 +111,10 @@ macro_log_feature(OPENGLES_FOUND "OpenGL ES 1.x" "Support for the OpenGL ES 1.x 
 find_package(OpenGLES2)
 macro_log_feature(OPENGLES2_FOUND "OpenGL ES 2.x" "Support for the OpenGL ES 2.x render system" "http://www.khronos.org/opengles/" FALSE "" "")
 
+# Find OpenGL ES 3.x
+find_package(OpenGLES3)
+macro_log_feature(OPENGLES3_FOUND "OpenGL ES 3.x" "Support for the OpenGL ES 2.x render system with OpenGL ES 3 support" "http://www.khronos.org/opengles/" FALSE "" "")
+
 # Find DirectX
 if(WIN32)
 	find_package(DirectX)
@@ -261,6 +265,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIRS}
   ${OPENGLES_INCLUDE_DIRS}
   ${OPENGLES2_INCLUDE_DIRS}
+  ${OPENGLES3_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
@@ -277,6 +282,7 @@ link_directories(
   ${OPENGL_LIBRARY_DIRS}
   ${OPENGLES_LIBRARY_DIRS}
   ${OPENGLES2_LIBRARY_DIRS}
+  ${OPENGLES3_LIBRARY_DIRS}
   ${Cg_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}

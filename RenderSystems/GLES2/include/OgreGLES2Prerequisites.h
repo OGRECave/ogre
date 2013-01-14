@@ -59,9 +59,14 @@ THE SOFTWARE.
 #	ifndef GL_GLEXT_PROTOTYPES
 #		define  GL_GLEXT_PROTOTYPES
 #	endif
-#	include <GLES2/gl2platform.h>
-#	include <GLES2/gl2.h>
-#	include <GLES2/gl2ext.h>
+#   if OGRE_NO_GLES3_SUPPORT == 0
+#       include <GLES3/gl3platform.h>
+#	    include <GLES3/gl3.h>
+#   else
+#       include <GLES2/gl2platform.h>
+#	    include <GLES2/gl2.h>
+#       include <GLES2/gl2ext.h>
+#   endif
 #	if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #		include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
@@ -74,13 +79,20 @@ THE SOFTWARE.
 #	endif
 #else
 #	undef  GL_GLEXT_PROTOTYPES
-#   include <GLES2/gl2.h>
-#   include <GLES2/gl2ext.h>
+#   if OGRE_NO_GLES3_SUPPORT == 0
+#       include <GLES3/gl3platform.h>
+#       include <GLES3/gl3.h>
+#   else
+#       include <GLES2/gl2.h>
+#       include <GLES2/gl2ext.h>
+#   endif
 #   include <EGL/egl.h>
 
 #	ifndef GL_GLEXT_PROTOTYPES
+#       if OGRE_NO_GLES3_SUPPORT == 1
 extern PFNGLMAPBUFFEROESPROC glMapBufferOES;
 extern PFNGLUNMAPBUFFEROESPROC glUnmapBufferOES;
+#       endif
 #		if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 extern PFNGLDRAWBUFFERSARBPROC glDrawBuffersARB;
 extern PFNGLREADBUFFERNVPROC glReadBufferNV;
@@ -89,6 +101,7 @@ extern PFNGLGETTEXIMAGENVPROC glGetTexImageNV;
 extern PFNGLGETTEXLEVELPARAMETERFVNVPROC glGetTexLevelParameterfvNV;
 extern PFNGLGETTEXLEVELPARAMETERiVNVPROC glGetTexLevelParameterivNV;
 #		else
+#           if OGRE_NO_GLES3_SUPPORT == 1
 typedef void (GL_APIENTRYP PFNGLBINDVERTEXARRAYOES) (GLuint vertexarray);
 typedef void (GL_APIENTRYP PFNGLDELETEVERTEXARRAYSOES) (GLsizei n, const GLuint *vertexarrays);
 typedef void (GL_APIENTRYP PFNGLGENVERTEXARRAYSOES) (GLsizei n, GLuint *vertexarrays);
@@ -98,6 +111,7 @@ extern PFNGLBINDVERTEXARRAYOES glBindVertexArrayOES;
 extern PFNGLDELETEVERTEXARRAYSOES glDeleteVertexArraysOES;
 extern PFNGLGENVERTEXARRAYSOES glGenVertexArraysOES;
 extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
+#           endif
 #		endif
 #	endif
 
@@ -124,8 +138,29 @@ extern PFNGLISVERTEXARRAYOES glIsVertexArrayOES;
 // Define GL_NONE for convenience
 #define GL_NONE 0
 
-#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if !defined(GL_BGRA) && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_NO_GLES3_SUPPORT == 1
 #   define GL_BGRA  0x80E1
+#endif
+
+// Defines for extensions that were made core in OpenGL ES 3
+#if OGRE_NO_GLES3_SUPPORT == 0
+#define glProgramBinaryOES glProgramBinary
+#define glGetProgramBinaryOES glGetProgramBinary
+#define glUnmapBufferOES glUnmapBuffer
+#define GL_WRITE_ONLY_OES GL_MAP_WRITE_BIT
+#define GL_HALF_FLOAT_OES GL_HALF_FLOAT
+#define GL_RGB8_OES GL_RGB8
+#define GL_RGBA8_OES GL_RGBA8
+#define GL_RG8_EXT GL_RG8
+#define GL_RED_EXT GL_RED
+#define GL_RG_EXT GL_RG
+#define GL_R8_EXT GL_R8
+#define GL_PROGRAM_BINARY_LENGTH_OES GL_PROGRAM_BINARY_LENGTH
+#define GL_MIN_EXT GL_MIN
+#define GL_MAX_EXT GL_MAX
+#define GL_DEPTH_COMPONENT24_OES GL_DEPTH_COMPONENT24
+#define GL_DEPTH_COMPONENT32_OES GL_DEPTH_COMPONENT32F
+#define GL_DEPTH24_STENCIL8_OES GL_DEPTH24_STENCIL8
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)

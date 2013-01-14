@@ -32,6 +32,8 @@
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2HardwareUniformBuffer.h"
+#include "OgreHardwareBufferManager.h"
 
 namespace Ogre
 {
@@ -127,7 +129,7 @@ namespace Ogre
 				// Get buffer size
 				GLint binaryLength = 0;
 
-#if GL_OES_get_program_binary
+#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
 				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 #endif
 
@@ -135,7 +137,7 @@ namespace Ogre
                 GpuProgramManager::Microcode newMicrocode = 
                     GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
 
-#if GL_OES_get_program_binary
+#if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
 				// Get binary
 				OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
 #endif
@@ -261,13 +263,13 @@ namespace Ogre
 			{
 				vertParams = &(mVertexProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLESProgramPipelineManager::getSingleton().extractUniforms(mVertexProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                         vertParams, NULL, mGLUniformReferences);
+					vertParams, NULL, mGLUniformReferences, mGLUniformBufferReferences);
 			}
 			if (mFragmentProgram)
 			{
 				fragParams = &(mFragmentProgram->getGLSLProgram()->getConstantDefinitions().map);
                 GLSLESProgramPipelineManager::getSingleton().extractUniforms(mFragmentProgram->getGLSLProgram()->getGLProgramHandle(),
-                                                                         NULL, fragParams, mGLUniformReferences);
+                                                                         NULL, fragParams, mGLUniformReferences, mGLUniformBufferReferences);
 			}
 
 			mUniformRefsBuilt = true;
@@ -387,6 +389,35 @@ namespace Ogre
 			} // fromProgType == currentUniform->mSourceProgType
             
   		} // End for
+#endif
+	}
+    //-----------------------------------------------------------------------
+	void GLSLESProgramPipeline::updateUniformBlocks(GpuProgramParametersSharedPtr params,
+                                                  uint16 mask, GpuProgramType fromProgType)
+	{
+#if OGRE_NO_GLES3_SUPPORT == 0
+        // Iterate through the list of uniform buffers and update them as needed
+		GLUniformBufferIterator currentBuffer = mGLUniformBufferReferences.begin();
+		GLUniformBufferIterator endBuffer = mGLUniformBufferReferences.end();
+
+        const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
+
+		GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
+		for (it = sharedParams.begin(); it != end; ++it)
+        {
+            for (;currentBuffer != endBuffer; ++currentBuffer)
+            {
+                GLES2HardwareUniformBuffer* hwGlBuffer = static_cast<GLES2HardwareUniformBuffer*>(currentBuffer->get());
+                GpuSharedParametersPtr paramsPtr = it->getSharedParams();
+
+                // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
+                GLint UniformTransform;
+                OGRE_CHECK_GL_ERROR(UniformTransform = glGetUniformBlockIndex(mGLProgramHandle, it->getName().c_str()));
+                OGRE_CHECK_GL_ERROR(glUniformBlockBinding(mGLProgramHandle, UniformTransform, hwGlBuffer->getGLBufferBinding()));
+
+                hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
+            }
+        }
 #endif
 	}
 	//-----------------------------------------------------------------------

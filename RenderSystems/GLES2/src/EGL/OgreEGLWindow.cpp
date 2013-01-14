@@ -219,7 +219,9 @@ namespace Ogre {
 		// Must change the packing to ensure no overruns!
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-		//glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+#if OGRE_NO_GLES3_SUPPORT == 0
+		glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
+#endif
 		glReadPixels((GLint)dst.left, (GLint)dst.top,
 			(GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
 			format, type, dst.data);

@@ -52,6 +52,8 @@ namespace Ogre {
 		virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 		/// Bind just the pass iteration parameters
 		virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
+		/// Execute the shared param binding functions for this program
+		virtual void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
 
 
         /// Get the assigned GL program id
