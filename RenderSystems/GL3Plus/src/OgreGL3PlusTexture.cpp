@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
+#include "OgreGL3PlusUtil.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
 
@@ -114,7 +115,7 @@ namespace Ogre {
 		// Set texture type
         OGRE_CHECK_GL_ERROR(glBindTexture(getGL3PlusTextureTarget(), mTextureID));
 
-        OGRE_CHECK_GL_ERROR(glTexParameteri( getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps ));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
 
         // Set some misc default parameters, these can of course be changed later
         OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
@@ -125,6 +126,12 @@ namespace Ogre {
                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+
+        // Set up texture swizzling
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE));
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA));
 
 		// If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
@@ -217,68 +224,93 @@ namespace Ogre {
         }
         else
         {
-            // Run through this process to pregenerate mipmap pyramid
-            for(size_t mip = 0; mip <= mNumMipmaps; mip++)
+            if(getGLSupport()->checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
             {
-				// Normal formats
-				switch(mTextureType)
-				{
-					case TEX_TYPE_1D:
-						OGRE_CHECK_GL_ERROR(glTexImage1D(GL_TEXTURE_1D, mip, format,
-							width, 0, 
-							GL_RGBA, datatype, 0));
-						break;
-					case TEX_TYPE_2D:
-                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
-                                     mip,
-                                     format,
-                                     width, height,
-                                     0,
-                                     GL_RGBA,
-                                     datatype, 0));
+                switch(mTextureType)
+                {
+                    case TEX_TYPE_1D:
+                        OGRE_CHECK_GL_ERROR(glTexStorage1D(GL_TEXTURE_1D, GLint(mNumMipmaps+1), format, GLsizei(width)));
                         break;
-					case TEX_TYPE_2D_RECT:
-                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_RECTANGLE,
-                                     mip,
-                                     format,
-                                     width, height,
-                                     0,
-                                     GL_RGBA,
-                                     datatype, 0));
+                    case TEX_TYPE_2D:
+                        OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
                         break;
-					case TEX_TYPE_3D:
-					case TEX_TYPE_2D_ARRAY:
-						OGRE_CHECK_GL_ERROR(glTexImage3D(getGL3PlusTextureTarget(), mip, format,
-							width, height, depth, 0, 
-							GL_RGBA, datatype, 0));
-						break;
-					case TEX_TYPE_CUBE_MAP:
-						for(int face = 0; face < 6; face++) {
-							OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
-								width, height, 0, 
-								GL_RGBA, datatype, 0));
-						}
-						break;
-                    default:
+                    case TEX_TYPE_2D_RECT:
+                        OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_RECTANGLE, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
                         break;
-                };
-//                LogManager::getSingleton().logMessage("GL3PlusTexture::create - Mip: " + StringConverter::toString(mip) +
-//                                                      " Width: " + StringConverter::toString(width) +
-//                                                      " Height: " + StringConverter::toString(height) +
-//                                                      " Internal Format: " + StringConverter::toString(format)
-//                                                      );
+                    case TEX_TYPE_2D_ARRAY:
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                        break;
+                    case TEX_TYPE_CUBE_MAP:
+                        OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                        break;
+                }
+            }
+            else
+            {
+                // Run through this process to pregenerate mipmap pyramid
+                for(size_t mip = 0; mip <= mNumMipmaps; mip++)
+                {
+                    // Normal formats
+                    switch(mTextureType)
+                    {
+                        case TEX_TYPE_1D:
+                            OGRE_CHECK_GL_ERROR(glTexImage1D(GL_TEXTURE_1D, mip, format,
+                                width, 0, 
+                                GL_RGBA, datatype, 0));
+                            break;
+                        case TEX_TYPE_2D:
+                            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
+                                         mip,
+                                         format,
+                                         width, height,
+                                         0,
+                                         GL_RGBA,
+                                         datatype, 0));
+                            break;
+                        case TEX_TYPE_2D_RECT:
+                            OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_RECTANGLE,
+                                         mip,
+                                         format,
+                                         width, height,
+                                         0,
+                                         GL_RGBA,
+                                         datatype, 0));
+                            break;
+                        case TEX_TYPE_3D:
+                        case TEX_TYPE_2D_ARRAY:
+                            OGRE_CHECK_GL_ERROR(glTexImage3D(getGL3PlusTextureTarget(), mip, format,
+                                width, height, depth, 0, 
+                                GL_RGBA, datatype, 0));
+                            break;
+                        case TEX_TYPE_CUBE_MAP:
+                            for(int face = 0; face < 6; face++) {
+                                OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                                    width, height, 0, 
+                                    GL_RGBA, datatype, 0));
+                            }
+                            break;
+                        default:
+                            break;
+                    };
+//                    LogManager::getSingleton().logMessage("GL3PlusTexture::create - Mip: " + StringConverter::toString(mip) +
+//                                                          " Width: " + StringConverter::toString(width) +
+//                                                          " Height: " + StringConverter::toString(height) +
+//                                                          " Internal Format: " + StringConverter::toString(format)
+//                                                          );
 
-                if (width > 1)
-                {
-                    width = width / 2;
-                }
-                if (height > 1)
-                {
-                    height = height / 2;
-                }
-                if (depth > 1)
-                {
-                    depth = depth / 2;
+                    if (width > 1)
+                    {
+                        width = width / 2;
+                    }
+                    if (height > 1)
+                    {
+                        height = height / 2;
+                    }
+                    if (depth > 1)
+                    {
+                        depth = depth / 2;
+                    }
                 }
             }
         }
