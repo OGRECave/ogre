@@ -872,9 +872,13 @@ namespace Ogre {
         
         // Allocate texture memory
         if(target == GL_TEXTURE_3D || target == GL_TEXTURE_2D_ARRAY)
+        {
             OGRE_CHECK_GL_ERROR(glTexImage3D(target, 0, src.format, src.getWidth(), src.getHeight(), src.getDepth(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+        }
         else
+        {
             OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, src.format, src.getWidth(), src.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+        }
         
         // GL texture buffer
         GL3PlusTextureBuffer tex(StringUtil::BLANK, target, id, 0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
