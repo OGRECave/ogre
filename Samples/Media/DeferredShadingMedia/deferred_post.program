@@ -1,9 +1,9 @@
 // Ambient_ps
 fragment_program DeferredShading/post/Ambient_ps unified
 {
-	delegate DeferredShading/post/Ambient_ps_pGLSL
 	delegate DeferredShading/post/Ambient_ps_pCg
 	delegate DeferredShading/post/Ambient_ps_pCg_sm4
+	delegate DeferredShading/post/Ambient_ps_pGLSL
 }
 fragment_program DeferredShading/post/Ambient_ps_pCg cg
 {
@@ -51,9 +51,9 @@ fragment_program DeferredShading/post/Ambient_ps_pGLSL glsl
 // ShowNormal_ps
 fragment_program DeferredShading/post/ShowNormal_ps unified
 {
-	delegate DeferredShading/post/ShowNormal_ps_pGLSL
 	delegate DeferredShading/post/ShowNormal_ps_pCg
 	delegate DeferredShading/post/ShowNormal_ps_pCg_sm4
+	delegate DeferredShading/post/ShowNormal_ps_pGLSL
 }
 fragment_program DeferredShading/post/ShowNormal_ps_pCg cg
 {
@@ -81,9 +81,9 @@ fragment_program DeferredShading/post/ShowNormal_ps_pGLSL glsl
 // ShowDS_ps
 fragment_program DeferredShading/post/ShowDS_ps unified
 {
-	delegate DeferredShading/post/ShowDS_ps_pGLSL
 	delegate DeferredShading/post/ShowDS_ps_pCg
 	delegate DeferredShading/post/ShowDS_ps_pCg_sm4
+	delegate DeferredShading/post/ShowDS_ps_pGLSL
 }
 fragment_program DeferredShading/post/ShowDS_ps_pCg cg
 {
@@ -111,9 +111,9 @@ fragment_program DeferredShading/post/ShowDS_ps_pGLSL glsl
 // ShowColour_ps
 fragment_program DeferredShading/post/ShowColour_ps unified
 {
-	delegate DeferredShading/post/ShowColour_ps_pGLSL
 	delegate DeferredShading/post/ShowColour_ps_pCg
 	delegate DeferredShading/post/ShowColour_ps_pCg_sm4
+	delegate DeferredShading/post/ShowColour_ps_pGLSL
 }
 fragment_program DeferredShading/post/ShowColour_ps_pCg cg
 {
@@ -142,9 +142,9 @@ fragment_program DeferredShading/post/ShowColour_ps_pGLSL glsl
 // cg
 vertex_program DeferredShading/post/LightMaterial_vs unified
 {
-	delegate DeferredShading/post/LightMaterial_vs_pGLSL
 	delegate DeferredShading/post/LightMaterial_vs_pCg
 	delegate DeferredShading/post/LightMaterial_vs_pCg_sm4
+	delegate DeferredShading/post/LightMaterial_vs_pGLSL
 }
 vertex_program DeferredShading/post/LightMaterial_vs_pCg cg
 {
@@ -185,9 +185,9 @@ vertex_program DeferredShading/post/LightMaterial_vs_pGLSL glsl
 // Post processors
 vertex_program DeferredShading/post/vs unified
 {
-	delegate DeferredShading/post/vs_pGLSL
 	delegate DeferredShading/post/vs_pCg
 	delegate DeferredShading/post/vs_pCg_sm4
+	delegate DeferredShading/post/vs_pGLSL
 }
 vertex_program DeferredShading/post/vs_pCg cg
 {

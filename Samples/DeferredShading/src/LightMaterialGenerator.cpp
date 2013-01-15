@@ -380,10 +380,10 @@ LightMaterialGenerator::LightMaterialGenerator()
 				LightMaterialGenerator::MI_SHADOW_CASTER;
 	
 	materialBaseName = "DeferredShading/LightMaterial/";
-    if (GpuProgramManager::getSingleton().isSyntaxSupported("cg"))
-        mImpl = new LightMaterialGeneratorCG("DeferredShading/LightMaterial/");
-    else if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+    if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl") && !(GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_x") ||GpuProgramManager::getSingleton().isSyntaxSupported("arbfp1")))
         mImpl = new LightMaterialGeneratorGLSL("DeferredShading/LightMaterial/");
+    else
+        mImpl = new LightMaterialGeneratorCG("DeferredShading/LightMaterial/");
 }
 
 LightMaterialGenerator::~LightMaterialGenerator()

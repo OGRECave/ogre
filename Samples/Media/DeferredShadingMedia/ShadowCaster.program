@@ -1,9 +1,9 @@
 // Auxiliary lights
 vertex_program DeferredShading/Shadows/CasterVP unified
 {
-	delegate DeferredShading/Shadows/CasterVP_pGLSL
 	delegate DeferredShading/Shadows/CasterVP_pCg
 	delegate DeferredShading/Shadows/CasterVP_pCg_sm4
+	delegate DeferredShading/Shadows/CasterVP_pGLSL
 }
 vertex_program DeferredShading/Shadows/CasterVP_pCg cg
 {
@@ -40,9 +40,9 @@ vertex_program DeferredShading/Shadows/CasterVP_pGLSL glsl
 
 fragment_program DeferredShading/Shadows/CasterFP unified
 {
-	delegate DeferredShading/Shadows/CasterFP_pGLSL
 	delegate DeferredShading/Shadows/CasterFP_pCg
 	delegate DeferredShading/Shadows/CasterFP_pCg_sm4
+	delegate DeferredShading/Shadows/CasterFP_pGLSL
 }
 fragment_program DeferredShading/Shadows/CasterFP_pCg cg
 {

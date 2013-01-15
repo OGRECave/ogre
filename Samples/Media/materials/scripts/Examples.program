@@ -97,6 +97,9 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV unified
 {
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSL
     delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified

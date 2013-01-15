@@ -34,7 +34,7 @@ public:
       mBaseName(baseName)
       {
           mIsSm4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-          mIsGLSL = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
+          mIsGLSL = GpuProgramManager::getSingleton().isSyntaxSupported("glsl") && !(GpuProgramManager::getSingleton().isSyntaxSupported("vs_1_1") || GpuProgramManager::getSingleton().isSyntaxSupported("arbvp1"));
       }
 	
 protected:
