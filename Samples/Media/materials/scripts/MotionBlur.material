@@ -1,7 +1,7 @@
 fragment_program Ogre/Compositor/Combine_Cg_fp cg
 {
 	source Combine_fp.cg
-	profiles ps_2_0 arbfp1
+	profiles ps_4_0 ps_2_0 arbfp1
 	entry_point Combine_fp
 
 	default_params

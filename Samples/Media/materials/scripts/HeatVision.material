@@ -7,14 +7,14 @@ vertex_program Fury/HeatVision/HeatCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/HeatCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/HeatCaster_GLSLES_vp glsles
