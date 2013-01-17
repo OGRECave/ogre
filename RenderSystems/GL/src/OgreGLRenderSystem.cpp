@@ -1048,7 +1048,7 @@ namespace Ogre {
 		if(miscParams)
 		{
 			ss << " miscParams: ";
-			NameValuePairList::const_iterator it;
+			NameValuePairList::const_iterator it(NULL);
 			for(it=miscParams->begin(); it!=miscParams->end(); ++it)
 			{
 				ss << it->first << "=" << it->second << " ";
