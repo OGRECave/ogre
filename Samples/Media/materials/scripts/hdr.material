@@ -3,7 +3,7 @@ fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale2x2Luminence
-	target ps_2_0
+	target ps_4_0 ps_2_0
 }
 fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp glsl
 {
@@ -42,7 +42,7 @@ material Ogre/Compositor/HDR/Downsample2x2Luminence
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale2x2Luminence_fp
@@ -64,7 +64,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3HLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale3x3
-	target ps_2_0
+	target ps_4_0 ps_2_0
 }
 fragment_program Ogre/Compositor/HDR/downscale3x3GLSLES_fp glsles
 {
@@ -104,7 +104,7 @@ material Ogre/Compositor/HDR/Downsample3x3
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale3x3_fp
@@ -126,7 +126,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale3x3brightpass
-	target ps_2_0
+	target ps_4_0 ps_2_0
 }
 fragment_program Ogre/Compositor/HDR/utils_fp glsl
 {
@@ -174,7 +174,7 @@ material Ogre/Compositor/HDR/Downsample3x3Brightpass
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/downscale3x3brightpass_fp
@@ -203,7 +203,7 @@ fragment_program Ogre/Compositor/HDR/bloomHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point bloom
-	target ps_2_0
+	target ps_4_0 ps_2_0
 }
 fragment_program Ogre/Compositor/HDR/bloomGLSL_fp glsl
 {
@@ -239,7 +239,7 @@ material Ogre/Compositor/HDR/GaussianBloom
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/bloom_fp
@@ -263,7 +263,7 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point finalToneMapping
-	target ps_2_0
+	target ps_5_0 ps_4_0 ps_2_0
 }
 fragment_program Ogre/Compositor/HDR/finaltonemappingGLSL_fp glsl
 {
@@ -305,7 +305,7 @@ material Ogre/Compositor/HDR/ToneMapping
 			cull_software none
 			depth_check off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
+			vertex_program_ref Ogre/Compositor/StdQuad_vp
 			{
 			}
 			fragment_program_ref Ogre/Compositor/HDR/finaltonemapping_fp

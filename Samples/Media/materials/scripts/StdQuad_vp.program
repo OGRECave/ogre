@@ -156,7 +156,7 @@ vertex_program Ogre/Compositor/StdQuad_HLSL_vp hlsl
 {
 	source StdQuad_vp.hlsl
 	entry_point StdQuad_vp
-	target vs_2_0
+	target vs_4_0 vs_2_0
 
 	default_params
 	{
@@ -177,9 +177,9 @@ vertex_program Ogre/Compositor/StdQuad_vp unified
 
 vertex_program Ogre/Compositor/StdQuad_NoCG_vp unified
 {
+	delegate Ogre/Compositor/StdQuad_HLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSL_vp
 	delegate Ogre/Compositor/StdQuad_GLSLES_vp
-	delegate Ogre/Compositor/StdQuad_HLSL_vp
 }
 
 vertex_program Ogre/Compositor/StdQuad_Tex2_vp unified
