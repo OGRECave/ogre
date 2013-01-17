@@ -213,14 +213,14 @@ namespace Ogre {
 			}
 			OGRE_CHECK_GL_ERROR(mGLShaderHandle = glCreateShader(shaderType));
 
-            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-                glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
+//            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+//                glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
             if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-                if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-                    glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
+//                if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+//                    glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
             }
 		}
 

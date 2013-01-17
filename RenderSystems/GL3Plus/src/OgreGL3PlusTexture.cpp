@@ -54,7 +54,7 @@ namespace Ogre {
                              ResourceHandle handle, const String& group, bool isManual,
                              ManualResourceLoader* loader, GL3PlusSupport& support)
         : Texture(creator, name, handle, group, isManual, loader),
-          mTextureID(0)
+          mTextureID(0), mGLSupport(support)
     {
     }
 
@@ -115,6 +115,7 @@ namespace Ogre {
 		// Set texture type
         OGRE_CHECK_GL_ERROR(glBindTexture(getGL3PlusTextureTarget(), mTextureID));
 
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_BASE_LEVEL, 0));
         OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
 
         // Set some misc default parameters, these can of course be changed later
@@ -128,7 +129,7 @@ namespace Ogre {
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
         // Set up texture swizzling
-        if(getGLSupport()->checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
+        if(mGLSupport.checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED));
             OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN));
@@ -227,7 +228,7 @@ namespace Ogre {
         }
         else
         {
-            if(getGLSupport()->checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
+            if(mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
             {
                 switch(mTextureType)
                 {
@@ -333,7 +334,8 @@ namespace Ogre {
 
     void GL3PlusTexture::prepareImpl()
     {
-        if (mUsage & TU_RENDERTARGET) return;
+        if (mUsage & TU_RENDERTARGET)
+            return;
 
         String baseName, ext;
         size_t pos = mName.find_last_of(".");

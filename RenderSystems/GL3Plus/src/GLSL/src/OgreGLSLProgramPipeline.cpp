@@ -111,9 +111,9 @@ namespace Ogre
             // Validate pipeline
             logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 
-            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
-                glObjectLabel(GL_PROGRAM_PIPELINE, mGLProgramPipelineHandle, 0,
-                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
+//            if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+//                glObjectLabel(GL_PROGRAM_PIPELINE, mGLProgramPipelineHandle, 0,
+//                                 (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
 		}
 	}
 
