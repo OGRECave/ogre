@@ -135,7 +135,7 @@ namespace Ogre {
         
 		// This needs to be set otherwise the texture doesn't get rendered
 		if (GLEW_VERSION_1_2)
-			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps );
+			glTexParameteri( getGLTextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
         
         // Set some misc default parameters so NVidia won't complain, these can of course be changed later
         glTexParameteri(getGLTextureTarget(), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -304,6 +304,18 @@ namespace Ogre {
             // If this is a volumetric texture set the texture type flag accordingly.
             if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
+            // If compressed and 0 custom mipmaps disable auto mip generation and disable software mipmap creation
+            PixelFormat imageFormat = (*loadedImages)[0].getFormat();
+			if (PixelUtil::isCompressed(imageFormat))
+			{
+                size_t imageMips = (*loadedImages)[0].getNumMipmaps();
+                if (imageMips == 0)
+                {
+                    mNumMipmaps = mNumRequestedMipmaps = imageMips;
+                    // Disable flag for auto mip generation
+                    mUsage &= ~TU_AUTOMIPMAP;
+                }
+			}
 
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
