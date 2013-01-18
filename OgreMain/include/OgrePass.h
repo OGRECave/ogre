@@ -218,17 +218,17 @@ namespace Ogre {
 		GpuProgramUsage *mTesselationDomainProgramUsage;
 		// Compute program details
 		GpuProgramUsage *mComputeProgramUsage;
-        // Is this pass queued for deletion?
+        /// Is this pass queued for deletion?
         bool mQueuedForDeletion;
-        // number of pass iterations to perform
+        /// Number of pass iterations to perform
         size_t mPassIterationCount;
-		// point size, applies when not using per-vertex point size
+		/// Point size, applies when not using per-vertex point size
 		Real mPointSize;
 		Real mPointMinSize;
 		Real mPointMaxSize;
 		bool mPointSpritesEnabled;
 		bool mPointAttenuationEnabled;
-		// constant, linear, quadratic coeffs
+		/// Constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
 		typedef vector<unsigned short>::type ContentTypeLookup;
@@ -240,11 +240,11 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
-		// User objects binding.
+		/// User objects binding.
 		UserObjectBindings	mUserObjectBindings;
 		
 
-		// Used to get scene blending flags from a blending type
+		/// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
 	public:
@@ -303,7 +303,7 @@ namespace Ogre {
         from another material and only want to modify a particular pass.
         */
         void setName(const String& name);
-        /// get the name of the pass
+        /// Get the name of the pass
         const String& getName(void) const { return mName; }
 
         /** Sets the ambient colour reflectance properties of this pass.
