@@ -1,113 +1,127 @@
-void StdQuad_vp
+struct VS_OUTPUT {
+    float4 Pos : SV_Position;
+    float2 texCoord : TEXCOORD0;
+};
+
+struct VS_OUTPUT2 {
+    float4 Pos : SV_Position;
+    float2 texCoord : TEXCOORD0;
+	float2 texCoord2 : TEXCOORD1;
+};
+
+struct VS_OUTPUT3 {
+    float4 Pos : SV_Position;
+    float2 texCoord : TEXCOORD0;
+	float2 texCoord2 : TEXCOORD1;
+	float2 texCoord3 : TEXCOORD2;
+};
+
+struct VS_OUTPUT4 {
+    float4 Pos : SV_Position;
+    float2 texCoord : TEXCOORD0;
+	float2 texCoord2 : TEXCOORD1;
+	float2 texCoord3 : TEXCOORD2;
+	float2 texCoord4 : TEXCOORD3;
+};
+
+VS_OUTPUT StdQuad_vp
 (
-    in float4 inPos : POSITION,
-
-    out float4 pos : POSITION,
-    out float2 uv0 : TEXCOORD0,
-
+    float4 inPos : POSITION,
     uniform float4x4 worldViewProj
 )
 {
+	VS_OUTPUT Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    pos = mul(worldViewProj, inPos);
+    Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+	
+	return Out;		
 }
 
-void StdQuad_Tex2_vp
+VS_OUTPUT2 StdQuad_Tex2_vp
 (
-    in float4 inPos : POSITION,
-
-    out float4 pos : POSITION,
-    out float2 uv0 : TEXCOORD0,
-    out float2 uv1 : TEXCOORD1,
-
+    float4 inPos : POSITION,
     uniform float4x4 worldViewProj
 )
 {
+	VS_OUTPUT2 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    pos = mul(worldViewProj, inPos);
+    Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    uv1 = uv0;
+    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord2 = Out.texCoord;
+	
+	return Out;		
 }
 
-void StdQuad_Tex2a_vp
+VS_OUTPUT2 StdQuad_Tex2a_vp
 (
-    in float4 inPos : POSITION,
-
-    out float4 pos : POSITION,
-    out float2 uv0 : TEXCOORD0,
-    out float2 uv1 : TEXCOORD1,
-
+    float4 inPos : POSITION,
     uniform float4x4 worldViewProj
 )
 {
+	VS_OUTPUT2 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    pos = mul(worldViewProj, inPos);
+    Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    uv1 = inPos.xy;
+    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord2 = inPos.xy;
+	
+	return Out;	
 }
 
-void StdQuad_Tex3_vp
+VS_OUTPUT3 StdQuad_Tex3_vp
 (
-    in float4 inPos : POSITION,
-
-    out float4 pos : POSITION,
-    out float2 uv0 : TEXCOORD0,
-    out float2 uv1 : TEXCOORD1,
-    out float2 uv2 : TEXCOORD2,
-
+    float4 inPos : POSITION,
     uniform float4x4 worldViewProj
 )
 {
+	VS_OUTPUT3 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    pos = mul(worldViewProj, inPos);
+    Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    uv1 = uv0;
-    uv2 = uv0;
+    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord2 = Out.texCoord;
+    Out.texCoord3 = Out.texCoord;
+	
+	return Out;	
 }
 
-void StdQuad_Tex4_vp
+VS_OUTPUT4 StdQuad_Tex4_vp
 (
-    in float4 inPos : POSITION,
-
-    out float4 pos : POSITION,
-    out float2 uv0 : TEXCOORD0,
-    out float2 uv1 : TEXCOORD1,
-    out float2 uv2 : TEXCOORD2,
-    out float2 uv3 : TEXCOORD3,
-
+    float4 inPos : POSITION,
     uniform float4x4 worldViewProj
 )
 {
+	VS_OUTPUT4 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
-    pos = mul(worldViewProj, inPos);
+    Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
     inPos.xy = sign(inPos.xy);
 
     // Convert to image-space
-    uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
-    uv1 = uv0;
-    uv2 = uv0;
-    uv3 = uv0;
+    Out.texCoord = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;
+    Out.texCoord2 = Out.texCoord;
+    Out.texCoord3 = Out.texCoord;
+    Out.texCoord4 = Out.texCoord;
+	
+	return Out;	
 }

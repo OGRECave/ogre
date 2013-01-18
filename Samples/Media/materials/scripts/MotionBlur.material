@@ -1,7 +1,7 @@
 fragment_program Ogre/Compositor/Combine_Cg_fp cg
 {
 	source Combine_fp.cg
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_2_0 arbfp1
 	entry_point Combine_fp
 
 	default_params
@@ -33,10 +33,23 @@ fragment_program Ogre/Compositor/Combine_GLSL_fp glsl
 	}
 }
 
+fragment_program Ogre/Compositor/Combine_HLSL_fp hlsl
+{
+	source Combine_fp_ps40.hlsl
+	target ps_4_0
+	entry_point Combine_fp_ps40
+
+	default_params
+	{
+		param_named blur float 0.8
+	}
+}
+
 fragment_program Ogre/Compositor/Combine_fp unified
 {
 	delegate Ogre/Compositor/Combine_GLSL_fp
 	delegate Ogre/Compositor/Combine_GLSLES_fp
+	delegate Ogre/Compositor/Combine_HLSL_fp
 	delegate Ogre/Compositor/Combine_Cg_fp
 }
 

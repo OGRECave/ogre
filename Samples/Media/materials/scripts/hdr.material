@@ -225,7 +225,7 @@ fragment_program Ogre/Compositor/HDR/bloom_fp unified
 {
 	delegate Ogre/Compositor/HDR/bloomGLSL_fp
 	delegate Ogre/Compositor/HDR/bloomGLSLES_fp
-	delegate Ogre/Compositor/HDR/bloomHLSL_fp
+	delegate Ogre/Compositor/HDR/bloomHLSL_fp	
 }
 
 
