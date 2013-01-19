@@ -1,6 +1,10 @@
-Texture2D g_frostTexture : register( t0 );  
-Texture2D g_thawTexture : register( t1 );  
-SamplerState SampleType;
+Texture2D g_textures[2];  
+SamplerState SampleType
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
 
 cbuffer MatrixBuffer
 {
@@ -42,12 +46,13 @@ float4 main_ps( v2p input ) : SV_TARGET
 	float4 l_color0;
 	float4 l_color1;
 		
-	l_color0 = g_frostTexture.Sample(SampleType, input.texCoord);
+	l_color0 = g_textures[0].Sample(SampleType, input.texCoord);
 	
-	l_color1 = g_thawTexture.Sample(SampleType, input.texCoord);
-	l_color1 = float4( l_color1.rrr, 1.0f);
+	l_color1 = g_textures[1].Sample(SampleType, input.texCoord);
+	//l_color1 = float4( l_color1.rrr, 1.0f);
 	
-	return l_color0 * l_color1;
+	//return l_color0 * l_color1;
+	return l_color1;
 	
 	/*float4 l_color0;
 	l_color0 = g_frostTexture.Sample(SampleType, input.texCoord);
