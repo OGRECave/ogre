@@ -1,9 +1,37 @@
+vertex_program Dyn_Text_VS hlsl
+{
+	source Dyn-Text.hlsl
+	entry_point main_vs
+	target vs_5_0
+	default_params
+	{
+		param_named_auto worldViewprojMatrix worldviewproj_matrix
+	}
+}
+
+fragment_program Dyn_Text_PS hlsl
+{
+	source Dyn-Text.hlsl
+	entry_point main_ps
+	target ps_5_0
+}
+
 material Examples/Frost
 {
 	technique
 	{
 		pass
 		{
+			vertex_program_ref Dyn_Text_VS
+			{
+			
+			}
+			
+			fragment_program_ref Dyn_Text_PS hlsl
+			{
+			
+			}
+		
 			lighting off
 			depth_write off
 			scene_blend colour_blend
