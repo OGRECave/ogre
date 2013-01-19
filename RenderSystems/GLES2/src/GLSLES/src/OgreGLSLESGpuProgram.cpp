@@ -59,13 +59,18 @@ namespace Ogre {
         mSkeletalAnimation = mGLSLProgram->isSkeletalAnimationIncluded();
 		// There is nothing to load
 		mLoadFromFile = false;
+
+        // Initialise uniform cache
+		mUniformCache = new GLES2UniformCache();
     }
     //-----------------------------------------------------------------------
     GLSLESGpuProgram::~GLSLESGpuProgram()
     {
         // Have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
-        unload(); 
+        unload();
+
+        delete mUniformCache;
     }
 	//-----------------------------------------------------------------------------
     void GLSLESGpuProgram::loadImpl(void)

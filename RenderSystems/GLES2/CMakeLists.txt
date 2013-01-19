@@ -30,9 +30,11 @@ set(HEADER_FILES
   include/OgreGLES2RenderSystem.h
   include/OgreGLES2RenderTexture.h
   include/OgreGLES2RenderToVertexBuffer.h
+  include/OgreGLES2StateCacheManager.h
   include/OgreGLES2Support.h
   include/OgreGLES2Texture.h
   include/OgreGLES2TextureManager.h
+  include/OgreGLES2UniformCache.h
   include/OgreGLES2VertexDeclaration.h
   include/OgreGLES2Context.h
   include/OgreGLES2StateCacheManager.h
@@ -59,9 +61,11 @@ set(SOURCE_FILES
   src/OgreGLES2RenderSystem.cpp
   src/OgreGLES2RenderTexture.cpp
   src/OgreGLES2RenderToVertexBuffer.cpp
+  src/OgreGLES2StateCacheManager.cpp
   src/OgreGLES2Support.cpp
   src/OgreGLES2Texture.cpp
   src/OgreGLES2TextureManager.cpp
+  src/OgreGLES2UniformCache.cpp
   src/OgreGLES2VertexDeclaration.cpp
   src/OgreGLES2StateCacheManager.cpp
 )
@@ -71,19 +75,23 @@ if(OGRE_CONFIG_ENABLE_GLES2_STATE_CACHE_SUPPORT)
   set(HEADER_FILES
       ${HEADER_FILES} 
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.h
+      src/StateCacheManager/OgreGLES2UniformCacheImp.h
   )
   set(SOURCE_FILES 
       ${SOURCE_FILES}
       src/StateCacheManager/OgreGLES2StateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLES2UniformCacheImp.cpp
   )
 else()
   set(HEADER_FILES 
       ${HEADER_FILES} 
       src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.h
+      src/StateCacheManager/OgreGLES2NullUniformCacheImp.h
   )
   set(SOURCE_FILES 
       ${SOURCE_FILES}
       src/StateCacheManager/OgreGLES2NullStateCacheManagerImp.cpp
+      src/StateCacheManager/OgreGLES2NullUniformCacheImp.cpp
   )
 endif()
 

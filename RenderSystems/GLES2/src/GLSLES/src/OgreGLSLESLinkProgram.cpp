@@ -251,6 +251,16 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
+        GLSLESGpuProgram *prog;
+        if(fromProgType == GPT_VERTEX_PROGRAM)
+        {
+            prog = mVertexProgram;
+        }
+        else if(fromProgType == GPT_FRAGMENT_PROGRAM)
+        {
+            prog = mFragmentProgram;
+        }
+
 		for (;currentUniform != endUniform; ++currentUniform)
 		{
 			// Only pull values from buffer it's supposed to be in (vertex or fragment)
@@ -262,6 +272,34 @@ namespace Ogre {
 				if (def->variability & mask)
 				{
 					GLsizei glArraySize = (GLsizei)def->arraySize;
+                    bool shouldUpdate = true;
+
+                    switch (def->constType)
+                    {
+                        case GCT_INT1:
+                        case GCT_INT2:
+                        case GCT_INT3:
+                        case GCT_INT4:
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                                  params->getIntPointer(def->physicalIndex),
+                                                                                  def->elementSize * def->arraySize * sizeof(int));
+                            break;
+                        default:
+                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                                  params->getFloatPointer(def->physicalIndex),
+                                                                                  def->elementSize * def->arraySize * sizeof(float));
+                            break;
+
+                    }
+
+                    if(!shouldUpdate)
+                        continue;
 
 					// Get the index in the parameter real list
 					switch (def->constType)
@@ -425,7 +463,24 @@ namespace Ogre {
 				// Get the index in the parameter real list
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
-					OGRE_CHECK_GL_ERROR(glUniform1fv(currentUniform->mLocation, 1, params->getFloatPointer(index)));
+                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
+                     {
+                         if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                              params->getFloatPointer(index),
+                                                                              currentUniform->mConstantDef->elementSize *
+                                                                              currentUniform->mConstantDef->arraySize *
+                                                                              sizeof(float)))
+                             return;
+                     }
+                     else
+                     {
+                         if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                              params->getFloatPointer(index),
+                                                                              currentUniform->mConstantDef->elementSize *
+                                                                              currentUniform->mConstantDef->arraySize *
+                                                                              sizeof(float)))
+                             return;
+                     }
 					// There will only be one multipass entry
 					return;
 				}

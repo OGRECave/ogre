@@ -127,6 +127,9 @@ namespace Ogre {
 
 			// Mipmap count of the actual bounded texture
 			size_t mCurTexMipCount;
+            GLint mViewport[4];
+            GLint mScissor[4];
+
         public:
             // Default constructor / destructor
             GLES2RenderSystem();

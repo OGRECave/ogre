@@ -1036,10 +1036,22 @@ namespace Ogre {
                 }
             }
 #endif
-            OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
-            
-			// Configure the viewport clipping
-            OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            if(mViewport[0] != x || mViewport[1] != y ||
+               mViewport[2] != w || mViewport[3] != h)
+            {
+                mViewport[0] = x; mViewport[1] = y;
+                mViewport[2] = w; mViewport[3] = h;
+                OGRE_CHECK_GL_ERROR(glViewport(x, y, w, h));
+            }
+
+            if(mScissor[0] != x || mScissor[1] != y ||
+               mScissor[2] != w || mScissor[3] != h)
+            {
+                // Configure the viewport clipping
+                mScissor[0] = x; mScissor[1] = y;
+                mScissor[2] = w; mScissor[3] = h;
+                OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
+            }
             
             vp->_clearUpdatedFlag();
         }
@@ -1582,6 +1594,7 @@ namespace Ogre {
         if(useVAO)
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
 
+        uint boundAttrCount = 0;
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
@@ -1605,8 +1618,57 @@ namespace Ogre {
                 const VertexElement & elem = *elemIter;
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
                                        mRenderAttribsBound, mRenderInstanceAttribsBound, true);
+                        continue;
+                    }
+                    
+                    attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
+                }
+
+                switch(elemType)
+                {
+                case VET_COLOUR:
+                case VET_COLOUR_ABGR:
+                case VET_COLOUR_ARGB:
+                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
+                    // VertexElement::getTypeCount treats them as 1 (RGBA)
+                    // Also need to normalise the fixed-point data
+                    typeCount = 4;
+                    normalised = GL_TRUE;
+                    break;
+                default:
+                    break;
+                };
+
+                OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
+                                      typeCount,
+                                      GLES2HardwareBufferManager::getGLType(elemType),
+                                      normalised,
+                                      static_cast<GLsizei>(vertexBuffer->getVertexSize()),
+                                      pBufferData));
+
+                // Keep track of how many attributes have been enabled
+                boundAttrCount++;
+
+                vector<GLuint>::type::iterator ai = std::find(mRenderAttribsBound.begin(), mRenderAttribsBound.end(), attrib);
+                if(ai == mRenderAttribsBound.end())
+                {
+                    // If this attribute hasn't been enabled, do so and keep a record of it.
+                    OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
+
+                    mRenderAttribsBound.push_back(attrib);
+                }
             }
         }
+
+        // Sort the list of bound attributes
+        std::sort(mRenderAttribsBound.begin(), mRenderAttribsBound.end());
+
+  		// Unbind all attributes that are not needed
+        for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin() + boundAttrCount; ai != mRenderAttribsBound.end(); ++ai)
+        {
+            OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
+        }
+        mRenderAttribsBound.erase(mRenderAttribsBound.begin() + boundAttrCount, mRenderAttribsBound.end());
 #endif
 
         // Find the correct type to render
@@ -1799,11 +1861,11 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_VIEWPORT, viewport));
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_SCISSOR_BOX, scissor));
         bool scissorBoxDifference =
-            viewport[0] != scissor[0] || viewport[1] != scissor[1] ||
-            viewport[2] != scissor[2] || viewport[3] != scissor[3];
+            mViewport[0] != mScissor[0] || mViewport[1] != mScissor[1] ||
+            mViewport[2] != mScissor[2] || mViewport[3] != mScissor[3];
         if (scissorBoxDifference)
         {
-            OGRE_CHECK_GL_ERROR(glScissor(viewport[0], viewport[1], viewport[2], viewport[3]));
+            OGRE_CHECK_GL_ERROR(glScissor(mViewport[0], mViewport[1], mViewport[2], mViewport[3]));
         }
 
         mStateCacheManager->setDiscardBuffers(buffers);
@@ -1814,7 +1876,7 @@ namespace Ogre {
         // Restore scissor box
         if (scissorBoxDifference)
         {
-            OGRE_CHECK_GL_ERROR(glScissor(scissor[0], scissor[1], scissor[2], scissor[3]));
+            OGRE_CHECK_GL_ERROR(glScissor(mScissor[0], mScissor[1], mScissor[2], mScissor[3]));
         }
 
         // Restore scissor test

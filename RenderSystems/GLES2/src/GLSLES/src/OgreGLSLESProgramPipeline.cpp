@@ -32,6 +32,7 @@
 #include "OgreGLSLESProgram.h"
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGpuProgramManager.h"
+#include "OgreGLES2UniformCache.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
 
@@ -285,11 +286,18 @@ namespace Ogre
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
         GLuint progID = 0;
+        GLSLESGpuProgram *prog;
         if(fromProgType == GPT_VERTEX_PROGRAM)
+        {
             progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
+            prog = mVertexProgram;
+        }
         else if(fromProgType == GPT_FRAGMENT_PROGRAM)
+        {
             progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
-        
+            prog = mFragmentProgram;
+        }
+
 		for (;currentUniform != endUniform; ++currentUniform)
 		{
 			// Only pull values from buffer it's supposed to be in (vertex or fragment)
@@ -301,7 +309,35 @@ namespace Ogre
 				if (def->variability & mask)
 				{
 					GLsizei glArraySize = (GLsizei)def->arraySize;
-                    
+                    bool shouldUpdate = true;
+
+                    switch (def->constType)
+                    {
+                        case GCT_INT1:
+                        case GCT_INT2:
+                        case GCT_INT3:
+                        case GCT_INT4:
+                        case GCT_SAMPLER1D:
+                        case GCT_SAMPLER1DSHADOW:
+                        case GCT_SAMPLER2D:
+                        case GCT_SAMPLER2DSHADOW:
+                        case GCT_SAMPLER3D:
+                        case GCT_SAMPLERCUBE:
+                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                        params->getIntPointer(def->physicalIndex),
+                                                                        def->elementSize * def->arraySize * sizeof(int));
+                            break;
+                        default:
+                            shouldUpdate = prog->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                        params->getFloatPointer(def->physicalIndex),
+                                                                        def->elementSize * def->arraySize * sizeof(float));
+                            break;
+
+                    }
+
+                    if(!shouldUpdate)
+                        continue;
+
 					// Get the index in the parameter real list
 					switch (def->constType)
 					{
@@ -437,15 +473,29 @@ namespace Ogre
 				if (index == currentUniform->mConstantDef->physicalIndex)
 				{
 #if GL_EXT_separate_shader_objects && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+
                     GLuint progID = 0;
                     if (mVertexProgram && currentUniform->mSourceProgType == GPT_VERTEX_PROGRAM)
                     {
+                        if(!mVertexProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                             params->getFloatPointer(index),
+                                                                             currentUniform->mConstantDef->elementSize *
+                                                                             currentUniform->mConstantDef->arraySize *
+                                                                             sizeof(float)))
+                            return;
+                        
                         progID = mVertexProgram->getGLSLProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
                     
                     if (mFragmentProgram && currentUniform->mSourceProgType == GPT_FRAGMENT_PROGRAM)
                     {
+                        if(!mFragmentProgram->getUniformCache()->updateUniform(currentUniform->mLocation,
+                                                                               params->getFloatPointer(index),
+                                                                               currentUniform->mConstantDef->elementSize *
+                                                                               currentUniform->mConstantDef->arraySize *
+                                                                               sizeof(float)))
+                            return;
                         progID = mFragmentProgram->getGLSLProgram()->getGLProgramHandle();
                         OGRE_CHECK_GL_ERROR(glProgramUniform1fvEXT(progID, currentUniform->mLocation, 1, params->getFloatPointer(index)));
                     }
