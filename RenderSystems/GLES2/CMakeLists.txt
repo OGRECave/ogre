@@ -36,8 +36,6 @@ set(HEADER_FILES
   include/OgreGLES2TextureManager.h
   include/OgreGLES2UniformCache.h
   include/OgreGLES2VertexDeclaration.h
-  include/OgreGLES2Context.h
-  include/OgreGLES2StateCacheManager.h
 )
 
 set(SOURCE_FILES
@@ -67,7 +65,6 @@ set(SOURCE_FILES
   src/OgreGLES2TextureManager.cpp
   src/OgreGLES2UniformCache.cpp
   src/OgreGLES2VertexDeclaration.cpp
-  src/OgreGLES2StateCacheManager.cpp
 )
 
 include_directories(src/StateCacheManager)
