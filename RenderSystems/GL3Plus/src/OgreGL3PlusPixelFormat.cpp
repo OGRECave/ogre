@@ -53,7 +53,7 @@ namespace Ogre  {
             case PF_L8:
                 return GL_RED;
             case PF_L16:
-                return GL_R16;
+                return GL_RED;
 //			case PF_BYTE_LA:
 //				return GL_RG;
 			case PF_R3G3B2:
@@ -162,14 +162,20 @@ namespace Ogre  {
                 return GL_RGB16_SNORM;
             case PF_R16G16B16A16_SNORM:
                 return GL_RGBA16_SNORM;
-            case PF_RGTC_RED:
+            case PF_BC4_UNORM:
                 return GL_COMPRESSED_RED_RGTC1;
-            case PF_RGTC_SIGNED_RED:
+            case PF_BC4_SNORM:
                 return GL_COMPRESSED_SIGNED_RED_RGTC1;
-            case PF_RGTC_RED_GREEN:
+            case PF_BC5_UNORM:
                 return GL_COMPRESSED_RG_RGTC2;
-            case PF_RGTC_RED_GREEN_SIGNED:
-                return GL_COMPRESSED_SIGNED_RG_RGTC2;
+            case PF_BC6H_SF16:
+                return GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB;
+            case PF_BC6H_UF16:
+                return GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
+            case PF_BC7_UNORM:
+                return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
+            case PF_BC7_UNORM_SRGB:
+                return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
 
             default:
                 return 0;
@@ -292,11 +298,10 @@ namespace Ogre  {
             case PF_DEPTH:
                 return GL_DEPTH_COMPONENT;
             case PF_L8:
+            case PF_A8:
                 return GL_R8;
             case PF_L16:
                 return GL_R16;
-            case PF_A8:
-                return GL_R8;
 //            case PF_A4L4:
 //                return GL_LUMINANCE4_ALPHA4;
 //			case PF_BYTE_LA:
@@ -434,14 +439,22 @@ namespace Ogre  {
                 return GL_RGB16_SNORM;
             case PF_R16G16B16A16_SNORM:
                 return GL_RGBA16_SNORM;
-            case PF_RGTC_RED:
-                return GL_COMPRESSED_RED_RGTC1;//GL_COMPRESSED_RED
-            case PF_RGTC_SIGNED_RED:
+            case PF_BC4_UNORM:
+                return GL_COMPRESSED_RED_RGTC1;
+            case PF_BC4_SNORM:
                 return GL_COMPRESSED_SIGNED_RED_RGTC1;
-            case PF_RGTC_RED_GREEN:
-                return GL_COMPRESSED_RG;//GL_COMPRESSED_RG_RGTC2;
-            case PF_RGTC_RED_GREEN_SIGNED:
+            case PF_BC5_UNORM:
+                return GL_COMPRESSED_RG_RGTC2;
+            case PF_BC5_SNORM:
                 return GL_COMPRESSED_SIGNED_RG_RGTC2;
+            case PF_BC6H_SF16:
+                return GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB;
+            case PF_BC6H_UF16:
+                return GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB;
+            case PF_BC7_UNORM:
+                return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
+            case PF_BC7_UNORM_SRGB:
+                return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
 
             default:
                 return GL_NONE;
@@ -470,7 +483,6 @@ namespace Ogre  {
         case GL_DEPTH_COMPONENT:
             return PF_DEPTH;
 		case GL_R8:
-        case GL_RED:
 			return PF_L8;
 		case GL_R16:
 			return PF_L16;
@@ -601,13 +613,21 @@ namespace Ogre  {
         case GL_RGBA16_SNORM:
             return PF_R16G16B16A16_SNORM;
         case GL_COMPRESSED_RED_RGTC1:
-            return PF_RGTC_RED;
+            return PF_BC4_UNORM;
         case GL_COMPRESSED_SIGNED_RED_RGTC1:
-            return PF_RGTC_SIGNED_RED;
+            return PF_BC4_SNORM;
         case GL_COMPRESSED_RG_RGTC2:
-            return PF_RGTC_RED_GREEN;
+            return PF_BC5_UNORM;
         case GL_COMPRESSED_SIGNED_RG_RGTC2:
-            return PF_RGTC_RED_GREEN_SIGNED;
+            return PF_BC5_SNORM;
+        case GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT_ARB:
+            return PF_BC6H_SF16;
+        case GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT_ARB:
+            return PF_BC6H_UF16;
+        case GL_COMPRESSED_RGBA_BPTC_UNORM_ARB:
+            return PF_BC7_UNORM;
+        case GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB:
+            return PF_BC7_UNORM_SRGB;
 
 		default:
 			return PF_A8R8G8B8;

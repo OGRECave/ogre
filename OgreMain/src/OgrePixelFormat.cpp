@@ -59,10 +59,10 @@ namespace Ogre {
         unsigned char componentCount;
         /* Number of bits for red(or luminance), green, blue, alpha
         */
-        unsigned char rbits,gbits,bbits,abits; /*, ibits, dbits, ... */
+        unsigned char rbits, gbits, bbits, abits; /*, ibits, dbits, ... */
 
         /* Masks and shifts as used by packers/unpackers */
-        uint32 rmask, gmask, bmask, amask;
+        uint64 rmask, gmask, bmask, amask;
         unsigned char rshift, gshift, bshift, ashift;
     };
     //-----------------------------------------------------------------------
@@ -673,7 +673,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
         {"PF_R8_UINT",
         /* Bytes per element */
-        4,
+        1,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -687,7 +687,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
         {"PF_R8G8_UINT",
         /* Bytes per element */
-        4,
+        2,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -701,7 +701,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
         {"PF_R8G8B8_UINT",
         /* Bytes per element */
-        4,
+        3,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -709,7 +709,7 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         8, 8, 8, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0,
+        0xFF0000, 0x00FF00, 0x0000FF, 0,
         16, 8, 0, 0
         },
     //-----------------------------------------------------------------------
@@ -729,7 +729,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
         {"PF_R16_UINT",
         /* Bytes per element */
-        4,
+        2,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -751,27 +751,27 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF0000, 0x0000FFFF, 0, 0,
+        16, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16_UINT",
         /* Bytes per element */
-        4,
+        6,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
         PCT_UINT, 3,
         /* rbits, gbits, bbits, abits */
-        0, 16, 16, 16,
+        16, 16, 16, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF00000000, 0x0000FFFF0000, 0x00000000FFFF, 0,
+        32, 16, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16A16_UINT",
         /* Bytes per element */
-        4,
+        8,
         /* Flags */
         PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -779,8 +779,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 16, 16,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF000000000000, 0x0000FFFF00000000, 0x00000000FFFF0000, 0x000000000000FFFF,
+        48, 32, 16, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32_UINT",
@@ -793,13 +793,13 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 0, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0, 0, 0,
+        0xFFFFFFFF, 0, 0, 0,
         0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32_UINT",
         /* Bytes per element */
-        4,
+        8,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -807,13 +807,13 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 32, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0, 0,
-        24, 16, 0, 0
+        0xFFFFFFFF00000000, 0xFFFFFFFF, 0, 0,
+        32, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32B32_UINT",
         /* Bytes per element */
-        4,
+        12,
         /* Flags */
         PFF_INTEGER | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -821,13 +821,13 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 32, 32, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0, 0, 0, 0,
+        64, 32, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32B32A32_UINT",
         /* Bytes per element */
-        4,
+        16,
         /* Flags */
         PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
         /* Component type and count */
@@ -835,8 +835,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 32, 32, 32,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0, 0, 0, 0,
+        96, 64, 32, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8_SINT",
@@ -849,8 +849,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         8, 0, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFF, 0, 0, 0,
+        0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8G8_SINT",
@@ -863,8 +863,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         8, 8, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFF00, 0x00FF, 0, 0,
+        8, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8G8B8_SINT",
@@ -877,8 +877,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         8, 8, 8, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFF0000, 0x00FF00, 0x0000FF, 0,
+        16, 8, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8G8B8A8_SINT",
@@ -905,8 +905,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 0, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF, 0, 0, 0,
+        0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16_SINT",
@@ -919,8 +919,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF0000, 0x0000FFFF, 0, 0,
+        16, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16_SINT",
@@ -933,8 +933,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 16, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF00000000, 0x0000FFFF0000, 0x00000000FFFF, 0,
+        32, 16, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16A16_SINT",
@@ -947,8 +947,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         16, 16, 16, 16,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFF000000000000, 0x0000FFFF00000000, 0x00000000FFFF0000, 0x000000000000FFFF,
+        48, 32, 16, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32_SINT",
@@ -961,8 +961,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 0, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFFFFFF, 0, 0, 0,
+        0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32_SINT",
@@ -975,8 +975,8 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 32, 0, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0xFFFFFFFF00000000, 0xFFFFFFFF, 0, 0,
+        32, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32B32_SINT",
@@ -989,22 +989,22 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         32, 32, 32, 0,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0, 0, 0, 0,
+        64, 32, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R32G32B32A32_SINT",
         /* Bytes per element */
         16,
         /* Flags */
-        PFF_HASALPHA | PFF_NATIVEENDIAN,
+        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
         /* Component type and count */
         PCT_SINT, 4,
         /* rbits, gbits, bbits, abits */
         32, 32, 32, 32,
         /* Masks and shifts */
-        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
-        24, 16, 8, 0
+        0, 0, 0, 0,
+        96, 64, 32, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R9G9B9E5_SHAREDEXP",
@@ -1021,58 +1021,108 @@ namespace Ogre {
         24, 16, 8, 0
         },
     //-----------------------------------------------------------------------
-        {"PF_RGTC_RED",
+        {"PF_BC4_UNORM",
         /* Bytes per element */
         0,
         /* Flags */
         PFF_COMPRESSED,
         /* Component type and count */
-        PCT_BYTE, 1,
+        PCT_BYTE, 1, // Red only
         /* rbits, gbits, bbits, abits */
         0, 0, 0, 0,
         /* Masks and shifts */
         0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
-        {"PF_RGTC_SIGNED_RED",
+        {"PF_BC4_SNORM",
         /* Bytes per element */
         0,
         /* Flags */
         PFF_COMPRESSED,
         /* Component type and count */
-        PCT_BYTE, 1,
+        PCT_BYTE, 1, // Red only
         /* rbits, gbits, bbits, abits */
         0, 0, 0, 0,
         /* Masks and shifts */
         0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
-        {"PF_RGTC_RED_GREEN",
+        {"PF_BC5_UNORM",
         /* Bytes per element */
         0,
         /* Flags */
         PFF_COMPRESSED,
         /* Component type and count */
-        PCT_BYTE, 2,
+        PCT_BYTE, 2, // Red-Green only
         /* rbits, gbits, bbits, abits */
         0, 0, 0, 0,
         /* Masks and shifts */
-        0x07, 0x38, 0, 0,
-        0, 3, 0, 0
+        0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
-        {"PF_RGTC_RED_GREEN_SIGNED",
+        {"PF_BC5_SNORM",
         /* Bytes per element */
         0,
         /* Flags */
         PFF_COMPRESSED,
         /* Component type and count */
-        PCT_BYTE, 2,
+        PCT_BYTE, 2, // Red-Green only
         /* rbits, gbits, bbits, abits */
         0, 0, 0, 0,
         /* Masks and shifts */
-        0x07, 0x38, 0, 0,
-        0, 3, 0, 0
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_BC6H_UF16",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_BC6H_SF16",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED,
+        /* Component type and count */
+        PCT_BYTE, 3,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_BC7_UNORM",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
+        },
+    //-----------------------------------------------------------------------
+        {"PF_BC7_UNORM_SRGB",
+        /* Bytes per element */
+        0,
+        /* Flags */
+        PFF_COMPRESSED | PFF_HASALPHA,
+        /* Component type and count */
+        PCT_BYTE, 4,
+        /* rbits, gbits, bbits, abits */
+        0, 0, 0, 0,
+        /* Masks and shifts */
+        0, 0, 0, 0, 0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8",
@@ -1085,7 +1135,7 @@ namespace Ogre {
         /* rbits, gbits, bbits, abits */
         8, 0, 0, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
+        0xFF, 0, 0, 0,
         0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
@@ -1107,13 +1157,13 @@ namespace Ogre {
         /* Bytes per element */
         1,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 1,
+        PCT_BYTE, 1,
         /* rbits, gbits, bbits, abits */
         8, 0, 0, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
+        0xFF, 0, 0, 0,
         0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
@@ -1121,55 +1171,55 @@ namespace Ogre {
         /* Bytes per element */
         2,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 2,
+        PCT_BYTE, 2,
         /* rbits, gbits, bbits, abits */
         8, 8, 0, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFF00, 0x00FF, 0, 0,
+        8, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8G8B8_SNORM",
         /* Bytes per element */
         3,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 3,
+        PCT_BYTE, 3,
         /* rbits, gbits, bbits, abits */
         8, 8, 8, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFF0000, 0x00FF00, 0x0000FF, 0,
+        16, 8, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R8G8B8A8_SNORM",
         /* Bytes per element */
         4,
         /* Flags */
-        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        PFF_HASALPHA | PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 4,
+        PCT_BYTE, 4,
         /* rbits, gbits, bbits, abits */
         8, 8, 8, 8,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
+        24, 16, 8, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16_SNORM",
         /* Bytes per element */
         2,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 1,
+        PCT_BYTE, 1,
         /* rbits, gbits, bbits, abits */
         16, 0, 0, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
+        0xFFFF, 0, 0, 0,
         0, 0, 0, 0
         },
     //-----------------------------------------------------------------------
@@ -1177,42 +1227,42 @@ namespace Ogre {
         /* Bytes per element */
         4,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 2,
+        PCT_BYTE, 2,
         /* rbits, gbits, bbits, abits */
         16, 16, 0, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFFFF0000, 0x0000FFFF, 0, 0,
+        16, 0, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16_SNORM",
         /* Bytes per element */
         6,
         /* Flags */
-        PFF_INTEGER | PFF_NATIVEENDIAN,
+        PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 3,
+        PCT_BYTE, 3,
         /* rbits, gbits, bbits, abits */
         16, 16, 16, 0,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFFFF00000000, 0x0000FFFF0000, 0x00000000FFFF, 0,
+        32, 16, 0, 0
         },
     //-----------------------------------------------------------------------
         {"PF_R16G16B16A16_SNORM",
         /* Bytes per element */
         8,
         /* Flags */
-        PFF_INTEGER | PFF_HASALPHA | PFF_NATIVEENDIAN,
+        PFF_HASALPHA | PFF_NATIVEENDIAN,
         /* Component type and count */
-        PCT_SINT, 4,
+        PCT_BYTE, 4,
         /* rbits, gbits, bbits, abits */
         16, 16, 16, 16,
         /* Masks and shifts */
-        0xFF0000, 0, 0, 0,
-        0, 0, 0, 0
+        0xFFFF000000000000, 0x0000FFFF00000000, 0x00000000FFFF0000, 0x000000000000FFFF,
+        48, 32, 16, 0
         },
 
     //-----------------------------------------------------------------------
@@ -1298,6 +1348,16 @@ namespace Ogre {
 				case PF_DXT4:
 				case PF_DXT5:
 					return ((width+3)/4)*((height+3)/4)*16 * depth;
+                case PF_BC4_SNORM:
+                case PF_BC4_UNORM:
+                    return ceilf(width/4.0f)*ceilf(height/4.0f)*8.0f;
+                case PF_BC5_SNORM:
+                case PF_BC5_UNORM:
+                case PF_BC6H_SF16:
+                case PF_BC6H_UF16:
+                case PF_BC7_UNORM:
+                case PF_BC7_UNORM_SRGB:
+                    return ceilf(width/4.0f)*ceilf(height/4.0f)*16.0f;
 
                 // Size calculations from the PVRTC OpenGL extension spec
                 // http://www.khronos.org/registry/gles/extensions/IMG/IMG_texture_compression_pvrtc.txt
@@ -1345,6 +1405,11 @@ namespace Ogre {
         return (PixelUtil::getFlags(format) & PFF_FLOAT) > 0;
     }
     //-----------------------------------------------------------------------
+    bool PixelUtil::isInteger(PixelFormat format)
+    {
+        return (PixelUtil::getFlags(format) & PFF_INTEGER) > 0;
+    }
+    //-----------------------------------------------------------------------
     bool PixelUtil::isCompressed(PixelFormat format)
     {
         return (PixelUtil::getFlags(format) & PFF_COMPRESSED) > 0;
@@ -1376,6 +1441,14 @@ namespace Ogre {
 				case PF_DXT3:
 				case PF_DXT4:
 				case PF_DXT5:
+                case PF_BC4_SNORM:
+                case PF_BC4_UNORM:
+                case PF_BC5_SNORM:
+                case PF_BC5_UNORM:
+                case PF_BC6H_SF16:
+                case PF_BC6H_UF16:
+                case PF_BC7_UNORM:
+                case PF_BC7_UNORM_SRGB:
 					return ((width&3)==0 && (height&3)==0 && depth==1);
 				default:
 					return true;

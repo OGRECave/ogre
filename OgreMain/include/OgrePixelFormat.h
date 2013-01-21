@@ -206,38 +206,46 @@ namespace Ogre {
         PF_R32G32B32A32_SINT = 68,
         /// 32-bit pixel format, 9 bits for blue, green, red plus a 5 bit exponent.
         PF_R9G9B9E5_SHAREDEXP = 69,
-        /// RGTC Unsigned red pixel format
-        PF_RGTC_RED = 70,
-        /// RGTC Signed red pixel format
-        PF_RGTC_SIGNED_RED = 71,
-        /// RGTC Unsigned red-green pixel format
-        PF_RGTC_RED_GREEN = 72,
-        /// RGTC Signed red pixel format
-        PF_RGTC_RED_GREEN_SIGNED = 73,
+        /// DDS (DirectDraw Surface) BC4 format (unsigned normalised)
+        PF_BC4_UNORM = 70,
+        /// DDS (DirectDraw Surface) BC4 format (signed normalised)
+        PF_BC4_SNORM = 71,
+        /// DDS (DirectDraw Surface) BC5 format (unsigned normalised)
+        PF_BC5_UNORM = 72,
+        /// DDS (DirectDraw Surface) BC5 format (signed normalised)
+        PF_BC5_SNORM = 73,
+        /// DDS (DirectDraw Surface) BC6H format (unsigned 16 bit float)
+        PF_BC6H_UF16 = 74,
+        /// DDS (DirectDraw Surface) BC6H format (signed 16 bit float)
+        PF_BC6H_SF16 = 75,
+        /// DDS (DirectDraw Surface) BC7 format (unsigned normalised)
+        PF_BC7_UNORM = 76,
+        /// DDS (DirectDraw Surface) BC7 format (unsigned normalised sRGB)
+        PF_BC7_UNORM_SRGB = 77,
         /// 8-bit pixel format, all bits red.
-        PF_R8 = 74,
+        PF_R8 = 78,
         /// 16-bit pixel format, 8 bits red, 8 bits green.
-        PF_RG8 = 75,
-        /// 8-bit pixel format, 8 bits red (signed normalized int).
-        PF_R8_SNORM = 76,
-        /// 16-bit pixel format, 8 bits red (signed normalized int), 8 bits blue (signed normalized int).
-        PF_R8G8_SNORM = 77,
-        /// 24-bit pixel format, 8 bits red (signed normalized int), 8 bits blue (signed normalized int), 8 bits green (signed normalized int).
-        PF_R8G8B8_SNORM = 78,
-        /// 32-bit pixel format, 8 bits red (signed normalized int), 8 bits blue (signed normalized int), 8 bits green (signed normalized int), 8 bits alpha (signed normalized int).
-        PF_R8G8B8A8_SNORM = 79,
-        /// 16-bit pixel format, 16 bits red (signed normalized int).
-        PF_R16_SNORM = 80,
-        /// 32-bit pixel format, 16 bits red (signed normalized int), 16 bits blue (signed normalized int).
-        PF_R16G16_SNORM = 81,
-        /// 48-bit pixel format, 16 bits red (signed normalized int), 16 bits blue (signed normalized int), 16 bits green (signed normalized int).
-        PF_R16G16B16_SNORM = 82,
-        /// 64-bit pixel format, 16 bits red (signed normalized int), 16 bits blue (signed normalized int), 16 bits green (signed normalized int), 16 bits alpha (signed normalized int).
-        PF_R16G16B16A16_SNORM = 83,
+        PF_RG8 = 79,
+        /// 8-bit pixel format, 8 bits red (signed normalised int).
+        PF_R8_SNORM = 80,
+        /// 16-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int).
+        PF_R8G8_SNORM = 81,
+        /// 24-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int), 8 bits green (signed normalised int).
+        PF_R8G8B8_SNORM = 82,
+        /// 32-bit pixel format, 8 bits red (signed normalised int), 8 bits blue (signed normalised int), 8 bits green (signed normalised int), 8 bits alpha (signed normalised int).
+        PF_R8G8B8A8_SNORM = 83,
+        /// 16-bit pixel format, 16 bits red (signed normalised int).
+        PF_R16_SNORM = 84,
+        /// 32-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int).
+        PF_R16G16_SNORM = 85,
+        /// 48-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int), 16 bits green (signed normalised int).
+        PF_R16G16B16_SNORM = 86,
+        /// 64-bit pixel format, 16 bits red (signed normalised int), 16 bits blue (signed normalised int), 16 bits green (signed normalised int), 16 bits alpha (signed normalised int).
+        PF_R16G16B16A16_SNORM = 87,
         /// ETC1 (Ericsson Texture Compression)
-        PF_ETC1_RGB8 = 84,
+        PF_ETC1_RGB8 = 88,
 		// Number of pixel formats currently defined
-        PF_COUNT = 85
+        PF_COUNT = 89
     };
 	typedef vector<PixelFormat>::type PixelFormatList;
 
@@ -439,6 +447,8 @@ namespace Ogre {
         static bool hasAlpha(PixelFormat format);
         /** Shortcut method to determine if the format is floating point */
         static bool isFloatingPoint(PixelFormat format);
+        /** Shortcut method to determine if the format is integer */
+        static bool isInteger(PixelFormat format);
         /** Shortcut method to determine if the format is compressed */
         static bool isCompressed(PixelFormat format);
         /** Shortcut method to determine if the format is a depth format. */

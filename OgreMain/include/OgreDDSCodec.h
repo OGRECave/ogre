@@ -56,7 +56,8 @@ namespace Ogre {
 	    void flipEndian(void * pData, size_t size) const;
 
 		PixelFormat convertFourCCFormat(uint32 fourcc) const;
-		PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask, 
+		PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
+		PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
 			uint32 gMask, uint32 bMask, uint32 aMask) const;
 
 		/// Unpack DXT colours into array of 16 colour values
