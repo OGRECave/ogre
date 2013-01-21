@@ -28,7 +28,7 @@ material Ogre/Skin
 
 			texture_unit
 			{
-				texture kueken2-bc4.dds
+				texture GreenSkin.jpg
 				tex_address_mode mirror
 			}
 		}
