@@ -41,12 +41,11 @@ namespace Ogre {
 
 	void GL3PlusFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
 	{
-		/// Check if the render target is in the rendertarget->FBO map
+		// Check if the render target is in the rendertarget->FBO map
         GL3PlusFrameBufferObject *fbobj = 0;
         target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbobj);
 		assert(fbobj);
 		fbo.bindSurface(attachment, fbobj->getSurface(0));
-		// Initialise?
 
 		// Set width and height
 		mWidth = fbo.getWidth();

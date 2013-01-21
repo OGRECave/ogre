@@ -42,19 +42,6 @@ namespace Ogre
         HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
         String progName = getVertexProgramName(prof, terrain, tt);
 
-        switch(tt)
-        {
-        case HIGH_LOD:
-            progName += "/hlod";
-            break;
-        case LOW_LOD:
-            progName += "/llod";
-            break;
-        case RENDER_COMPOSITE_MAP:
-            progName += "/comp";
-            break;
-        }
-
         HighLevelGpuProgramPtr ret = mgr.getByName(progName);
         if (ret.isNull())
         {
@@ -257,8 +244,7 @@ namespace Ogre
             "vec4 lit(float NdotL, float NdotH, float m) {\n"
             "    float ambient = 1.0;\n"
             "    float diffuse = max(0.0, NdotL);\n"
-//            "    float specular = step(0.0, NdotL) * (max(0.0, NdotH) * m);\n"
-        "    float specular = step(0.0, NdotL) * max(NdotH, 0.0);//pow(max(NdotH, 0.0), m);\n"
+            "    float specular = step(0.0, NdotL) * max(NdotH, 0.0);\n"
             "    return vec4(ambient, diffuse, specular, 1.0);\n"
             "}\n\n";
 
@@ -576,7 +562,7 @@ namespace Ogre
             }
 
             // diffuse lighting
-//            outStream << "    fragColour.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            outStream << "    fragColour.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
@@ -799,7 +785,7 @@ namespace Ogre
         for (uint i = 0; i < numTextures; ++i)
         {
             outStream <<
-                "uniform vec4 lightSpacePos" << i << ";\n" <<
+                "in vec4 oLightSpacePos" << i << ";\n" <<
                 "uniform sampler2D shadowMap" << i << ";\n";
             *sampler = *sampler + 1;
             *texCoord = *texCoord + 1;
@@ -835,7 +821,7 @@ namespace Ogre
             outStream << "\n        ";
 
             for (uint i = 0; i < numTextures; ++i)
-                outStream << "lightSpacePos" << i << ", ";
+                outStream << "oLightSpacePos" << i << ", ";
             if (prof->getReceiveDynamicShadowsDepth())
             {
                 outStream << "\n        ";
@@ -850,12 +836,12 @@ namespace Ogre
             if (prof->getReceiveDynamicShadowsDepth())
             {
                 outStream <<
-                    "    float rtshadow = calcDepthShadow(shadowMap0, lightSpacePos0, inverseShadowmapSize0);";
+                    "    float rtshadow = calcDepthShadow(shadowMap0, oLightSpacePos0, inverseShadowmapSize0);";
             }
             else
             {
                 outStream <<
-                    "    float rtshadow = calcSimpleShadow(shadowMap0, lightSpacePos0);";
+                    "    float rtshadow = calcSimpleShadow(shadowMap0, oLightSpacePos0);";
             }
         }
 

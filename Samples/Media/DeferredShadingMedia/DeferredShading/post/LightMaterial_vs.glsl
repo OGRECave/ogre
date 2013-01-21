@@ -28,9 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 in vec4 vertex;
 
 out vec4 oPos;
-#if LIGHT_TYPE == LIGHT_DIRECTIONAL
 out vec2 oUv0;
-#endif
 
 uniform mat4 worldViewProj;
 
@@ -38,8 +36,5 @@ void main()
 {
 	gl_Position = worldViewProj * vertex;
 	oPos = gl_Position;
-
-#if LIGHT_TYPE == LIGHT_DIRECTIONAL
 	oUv0 = gl_Position.xy;
-#endif
 }

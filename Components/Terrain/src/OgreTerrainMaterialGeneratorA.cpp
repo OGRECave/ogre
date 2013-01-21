@@ -655,6 +655,16 @@ namespace Ogre
                 params->setNamedConstant("difftex" + StringConverter::toString(i), (int)numSamplers++);
                 params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
             }
+
+            uint numShadowTextures = 1;
+            if (prof->getReceiveDynamicShadowsPSSM())
+                numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+
+            for (uint i = 0; i < numShadowTextures; ++i)
+            {
+                if (prof->isShadowingEnabled(tt, terrain))
+                    params->setNamedConstant("shadowMap" + StringConverter::toString(i), (int)numSamplers++);
+            }
         }
 	}
 	//---------------------------------------------------------------------

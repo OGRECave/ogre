@@ -126,9 +126,9 @@ namespace Ogre
 	protected:
 		BoundSufaceList mBoundSurfaces;
 
-		/// implementation of bindSurface, must be provided
+		/// Implementation of bindSurface, must be provided
 		virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target) = 0;
-		/// implementation of unbindSurface, must be provided
+		/// Implementation of unbindSurface, must be provided
 		virtual void unbindSurfaceImpl(size_t attachment) = 0;
 
 

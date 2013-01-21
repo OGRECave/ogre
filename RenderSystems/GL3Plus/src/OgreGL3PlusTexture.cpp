@@ -116,8 +116,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glBindTexture(getGL3PlusTextureTarget(), mTextureID));
 
         OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_BASE_LEVEL, 0));
-        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, mNumMipmaps));
-
+        OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps ));
         // Set some misc default parameters, these can of course be changed later
         OGRE_CHECK_GL_ERROR(glTexParameteri(getGL3PlusTextureTarget(),
                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST));
@@ -361,6 +360,12 @@ namespace Ogre {
             if((*loadedImages)[0].getDepth() > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
                 mTextureType = TEX_TYPE_3D;
 
+            // If compressed, disable auto mip generation
+			if (PixelUtil::isCompressed((*loadedImages)[0].getFormat()))
+			{
+                // Disable flag for auto mip generation
+                mUsage &= ~TU_AUTOMIPMAP;
+			}
         }
         else if (mTextureType == TEX_TYPE_CUBE_MAP)
         {
@@ -440,7 +445,7 @@ namespace Ogre {
         // For all faces and mipmaps, store surfaces as HardwarePixelBufferSharedPtr
         bool wantGeneratedMips = (mUsage & TU_AUTOMIPMAP)!=0;
 
-        // Do mipmapping in software? (uses GLU) For some cards, this is still needed. Of course,
+        // Do mipmapping in software? For some cards, this is still needed. Of course,
         // only when mipmap generation is desired.
         bool doSoftware = wantGeneratedMips && !mMipmapsHardwareGenerated && getNumMipmaps();
 

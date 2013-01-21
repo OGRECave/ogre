@@ -25,24 +25,22 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #version 150
-#extension GL_ARB_explicit_attrib_location : require
 
 in vec2 oUv0;
 in vec3 oRay;
 
-layout(location = 0) out vec4 oColour;
+out vec4 oColour;
 
 uniform sampler2D Tex0;
 uniform sampler2D Tex1;
 uniform mat4 proj;
 uniform vec4 ambientColor;
-uniform vec3 farCorner;
 uniform float farClipDistance;
 
 float finalDepth(vec4 p)
 {
-    // normally it's in [-1..1]
-    return p.z / p.w;
+    // GL needs it in [0..1]
+    return (p.z / p.w) * 0.5 + 0.5;
 }
 
 void main()
@@ -55,7 +53,7 @@ void main()
         discard;
 
 	// Calculate ambient colour of fragment
-	oColour = vec4(ambientColor * vec4(a0.rgb ,0));
+	oColour = vec4(ambientColor * vec4(a1.rgb,0));
 
 	// Calculate depth of fragment;
 	vec3 viewPos = normalize(oRay) * farClipDistance * a1.w;

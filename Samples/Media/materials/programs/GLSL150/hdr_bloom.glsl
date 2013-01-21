@@ -5,7 +5,7 @@ uniform sampler2D inRTT;
 uniform vec4 sampleOffsets[15];
 uniform vec4 sampleWeights[15];
 
-in vec2 uv;
+in vec2 oUv0;
 out vec4 fragColour;
 
 void main(void)
@@ -16,7 +16,7 @@ void main(void)
     for( int i = 0; i < 15; i++ )
     {
         // Sample from adjacent points, 7 each side and central
-        sampleUV = uv + sampleOffsets[i].xy;
+        sampleUV = oUv0 + sampleOffsets[i].xy;
         accum += sampleWeights[i] * texture(inRTT, sampleUV);
     }
 

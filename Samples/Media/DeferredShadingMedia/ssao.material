@@ -66,7 +66,7 @@ fragment_program ssao_ps_pCg_sm4 cg
 fragment_program ssao_ps_pGLSL glsl
 {
     source ssao_ps.glsl
-    // will run on anything with pixel shader 2.b and up
+    // will run on anything with GLSL 1.50 and up
     syntax glsl150
 	default_params
 	{

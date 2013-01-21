@@ -32,11 +32,10 @@ in vec2 oUv0;
 in vec2 projCoord;
 
 out vec4 fragColour;
+
 void main()
 {
-	vec4 a0 = texture(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
 	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
 
     fragColour = vec4((a1.xyz+1)*0.5,0);
 }
-

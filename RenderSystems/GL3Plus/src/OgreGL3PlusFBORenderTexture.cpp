@@ -272,6 +272,7 @@ namespace Ogre {
 				glBindTexture(target, tid);
 				
                 // Set some default parameters
+                glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
                 glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -280,9 +281,9 @@ namespace Ogre {
 
 				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt2, type, 0);
                 if(x == PF_DEPTH)
-                    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, tid, 0);
+                    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tid, 0);
                 else
-                    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, tid, 0);
+                    glFramebufferTexture(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tid, 0);
             }
 			else
 			{
@@ -350,12 +351,12 @@ namespace Ogre {
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             glDeleteFramebuffers(1, &fb);
 			
-            if (fmt!=GL_NONE)
+            if (fmt != GL_NONE)
                 glDeleteTextures(1, &tid);
         }
 
 		String fmtstring = "";
-        for(size_t x=0; x<PF_COUNT; ++x)
+        for(size_t x = 0; x < PF_COUNT; ++x)
         {
             if(mProps[x].valid)
                 fmtstring += PixelUtil::getFormatName((PixelFormat)x)+" ";

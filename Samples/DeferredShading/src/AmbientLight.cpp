@@ -41,6 +41,13 @@ AmbientLight::AmbientLight()
 	assert(mMatPtr.isNull()==false);
 	mMatPtr->load();
 
+    // Explicitly bind samplers for OpenGL
+    if(Root::getSingleton().getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
+    {
+        mMatPtr->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("Tex0", 0);
+        mMatPtr->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("Tex1", 1);
+    }
+
     //This shader needs to be aware if its running under OpenGL or DirectX.
     //Real depthFactor = (Root::getSingleton().getRenderSystem()->getName() ==
     //    "OpenGL Rendering Subsystem") ? 2.0 : 1.0;

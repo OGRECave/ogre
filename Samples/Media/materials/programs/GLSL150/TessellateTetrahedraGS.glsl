@@ -22,7 +22,10 @@ out vec3 oNormal;
 uniform float IsoValue;
 
 layout(lines_adjacency) in;
-layout(points, max_vertices = 4) out;
+layout(triangle_strip, max_vertices = 4) out;
+
+// TODO: Change this from outputting triangles to a triangle strip
+
 
 // Estimate where isosurface intersects grid edge with endpoints v0, v1
 void CalcIntersection(vec4 Pos0,
@@ -33,15 +36,9 @@ void CalcIntersection(vec4 Pos0,
 					  vec2 Field1)
 {
 	float t = (IsoValue - Field0.x) / (Field1.x - Field0.x);
-	if ((Field0.x < IsoValue) && (Field1.x > Field0.x))
-	{
-		if (t > 0 && t < 1)
-		{
-			gl_Position = mix(Pos0, Pos1, t);
-			oNormal = mix(N0, N1, t);
-			EmitVertex();
-		}
-	}
+	gl_Position = mix(Pos0, Pos1, t);
+	oNormal = mix(N0, N1, t);
+    EmitVertex();
 }
 
 // Geometry shader
@@ -50,22 +47,22 @@ void CalcIntersection(vec4 Pos0,
 void main()
 {
 	// construct index for this tetrahedron
-	int index = int((int(VertexIn[0].Field.y) << 3) |
-                    (int(VertexIn[1].Field.y) << 2) |
-                    (int(VertexIn[2].Field.y) << 1) |
-                     int(VertexIn[3].Field.y));
+	uint index = uint((int(VertexIn[0].Field.y) << 3) |
+                      (int(VertexIn[1].Field.y) << 2) |
+                      (int(VertexIn[2].Field.y) << 1) |
+                       int(VertexIn[3].Field.y));
 	
 	// don't bother if all vertices out or all vertices inside isosurface
-	if (index > 0 && index < 15)
+	if (index > uint(0) && index < uint(15))
 	{
-		//Uber-compressed version of the edge table.
+		// Uber-compressed version of the edge table.
 		uint edgeListHex[8] = 
 			uint[8](uint(0x0001cde0), uint(0x98b08c9d), uint(0x674046ce), uint(0x487bc480), 
                     uint(0x21301d2e), uint(0x139bd910), uint(0x26376e20), uint(0x3b700000));
-		
-		uint edgeValFull = edgeListHex[int(index)/2];
+
+		uint edgeValFull = edgeListHex[index/uint(2)];
 		uint three = uint(0x3);
-		uint edgeVal = (index % 2 == 1) ? (edgeValFull & uint(0xFFFF)) : ((edgeValFull >> 16) & uint(0xFFFF));
+		uint edgeVal = (index % uint(2) == uint(1)) ? (edgeValFull & uint(0xFFFF)) : ((edgeValFull >> 16) & uint(0xFFFF));
 		ivec4 e0 = ivec4((edgeVal >> 14) & three, (edgeVal >> 12) & three, (edgeVal >> 10) & three, (edgeVal >> 8) & three);
 		ivec4 e1 = ivec4((edgeVal >> 6) & three, (edgeVal >> 4) & three, (edgeVal >> 2) & three, (edgeVal >> 0) & three);
 
@@ -81,6 +78,6 @@ void main()
 			CalcIntersection(gl_in[e1.z].gl_Position, VertexIn[e1.z].N, VertexIn[e1.z].Field,
 			                 gl_in[e1.w].gl_Position, VertexIn[e1.w].N, VertexIn[e1.w].Field);
 		}
+        EndPrimitive();
 	}
-    EndPrimitive();
 }

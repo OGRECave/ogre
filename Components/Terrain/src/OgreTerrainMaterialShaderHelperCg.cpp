@@ -600,7 +600,7 @@ namespace Ogre
 			}
 
 			// diffuse lighting
-			outStream << "	outputCol.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+			outStream << "	outputCol.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
 			// specular default
 			if (!prof->isLayerSpecularMappingEnabled())

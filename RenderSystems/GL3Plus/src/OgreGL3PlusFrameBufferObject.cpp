@@ -38,7 +38,7 @@ namespace Ogre {
     GL3PlusFrameBufferObject::GL3PlusFrameBufferObject(GL3PlusFBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
-        /// Generate framebuffer object
+        // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
         // Check samples supported
@@ -46,10 +46,9 @@ namespace Ogre {
 
         GLint maxSamples;
         OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_SAMPLES, &maxSamples));
-
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-
         mNumSamples = std::min(mNumSamples, (GLsizei)maxSamples);
+
 		// Will we need a second FBO to do multisampling?
 		if (mNumSamples)
 		{
@@ -59,7 +58,8 @@ namespace Ogre {
 		{
 			mMultisampleFB = 0;
 		}
-        /// Initialise state
+
+        // Initialise state
         mDepth.buffer=0;
         mStencil.buffer=0;
         for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
@@ -117,7 +117,7 @@ namespace Ogre {
 		// FBO afterwards to perform the multisample resolve. In that case, the 
 		// mMultisampleFB is bound during rendering and is the one with a depth/stencil
 
-        /// Store basic stats
+        // Store basic stats
         size_t width = mColour[0].buffer->getWidth();
         size_t height = mColour[0].buffer->getHeight();
         GLuint format = mColour[0].buffer->getGLFormat();
@@ -191,7 +191,7 @@ namespace Ogre {
 		// Do glDrawBuffer calls
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 		GLsizei n=0;
-		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
+		for(size_t x=0; x<maxSupportedMRTs; ++x)
 		{
 			// Fill attached colour buffers
 			if(mColour[x].buffer)
@@ -282,17 +282,12 @@ namespace Ogre {
 			GL3PlusRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
 			GL3PlusRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
 
-            //Attach depth buffer, if it has one.
+            // Attach depth buffer, if it has one.
             if( depthBuf )
                 depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
-            //Attach stencil buffer, if it has one.
+            // Attach stencil buffer, if it has one.
             if( stencilBuf )
 				stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
-			else
-			{
-				OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
-                                                              GL_RENDERBUFFER, 0));
-			}
 		}
 		else
 		{

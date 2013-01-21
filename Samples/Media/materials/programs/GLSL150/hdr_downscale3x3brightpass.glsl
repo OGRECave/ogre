@@ -4,7 +4,7 @@ uniform sampler2D inRTT;
 uniform sampler2D inLum;
 uniform vec2 texelSize;
 
-in vec2 uv;
+in vec2 oUv0;
 out vec4 fragColour;
 const vec4 BRIGHT_LIMITER = vec4(0.6, 0.6, 0.6, 0.0);
 
@@ -15,15 +15,15 @@ void main(void)
 {
     vec4 accum = vec4(0.0);
 
-    accum += texture(inRTT, uv + texelSize * vec2(-1.0, -1.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 0.0, -1.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 1.0, -1.0));
-    accum += texture(inRTT, uv + texelSize * vec2(-1.0,  0.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 0.0,  0.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 1.0,  0.0));
-    accum += texture(inRTT, uv + texelSize * vec2(-1.0,  1.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 0.0,  1.0));
-    accum += texture(inRTT, uv + texelSize * vec2( 1.0,  1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2(-1.0, -1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 0.0, -1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 1.0, -1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2(-1.0,  0.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 0.0,  0.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 1.0,  0.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2(-1.0,  1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 0.0,  1.0));
+    accum += texture(inRTT, oUv0 + texelSize * vec2( 1.0,  1.0));
     
 	// take average of 9 samples
 	accum *= 0.1111111111111111;

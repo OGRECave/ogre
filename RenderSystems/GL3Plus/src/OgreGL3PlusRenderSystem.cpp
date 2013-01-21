@@ -499,7 +499,7 @@ namespace Ogre {
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
         mRTTManager = new GL3PlusFBOManager();
-        caps->setCapability(RSC_RTT_SEPARATE_DEPTHBUFFER);
+        caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
 		// Enable microcache
 		mGpuProgramManager->setSaveMicrocodesToCache(caps->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER));
@@ -719,7 +719,7 @@ namespace Ogre {
 			}
 
 			// No "custom-quality" multisample for now in GL
-			retVal = OGRE_NEW GL3PlusDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
+			retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
 										fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0, false );
 		}
 
@@ -795,10 +795,6 @@ namespace Ogre {
 
     String GL3PlusRenderSystem::getErrorDescription(long errorNumber) const
     {
-        // TODO find a way to get error string
-//        const GLubyte *errString = gluErrorString (errCode);
-//        return (errString != 0) ? String((const char*) errString) : StringUtil::BLANK;
-
         return StringUtil::BLANK;
     }
 
@@ -1748,7 +1744,7 @@ namespace Ogre {
             }
         }
 
-        activateGLTextureUnit(GL_TEXTURE0);
+        activateGLTextureUnit(0);
 
         // Find the correct type to render
         GLint primType;

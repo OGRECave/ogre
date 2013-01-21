@@ -3,7 +3,7 @@
 in vec4 vertex;
 uniform mat4 worldViewProj;
 
-out vec2 uv;
+out vec2 oUv0;
 
 void main()                    
 {
@@ -11,6 +11,6 @@ void main()
 	
 	vec2 inPos = sign(vertex.xy);
 	
-	uv = (vec2(inPos.x, -inPos.y) + 1.0) * 0.5;
+	oUv0 = (vec2(inPos.x, -inPos.y) + 1.0) * 0.5;
 }
 

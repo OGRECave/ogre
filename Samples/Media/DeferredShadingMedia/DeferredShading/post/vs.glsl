@@ -39,8 +39,6 @@ void main()
 	vec2 Pos = sign(vertex.xy);
 
 	// Image-space
-//	oUv0.x = 0.5 * (1 + Pos.x);
-//	oUv0.y = 0.5 * (1 - Pos.y);
     oUv0 = (vec2(Pos.x, -Pos.y) + 1.0) * 0.5;
 
 	// This ray will be interpolated and will be the ray from the camera

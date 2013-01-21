@@ -13,12 +13,11 @@ in float edge;
 
 out vec4 fragColour;
 
-/*uniform lighting
+uniform lighting
 {
 	vec4 diffuse;
 	vec4 specular;
 } LightingParams;
-*/
 
 void main()
 {
@@ -27,8 +26,8 @@ void main()
 	float specularStep = texture(specularRamp, specularIn).x;
 	float edgeStep = texture(edgeRamp, edge).x;
 
-	fragColour = edgeStep * ((diffuse * diffuseStep) + 
-                            (specular * specularStep));
-//	fragColour = edgeStep.x * ((LightingParams.diffuse * diffuseStep.x) + 
-//                        (LightingParams.specular * specularStep.x));
+//	fragColour = edgeStep * ((diffuse * diffuseStep) + 
+//                            (specular * specularStep));
+	fragColour = edgeStep * ((LightingParams.diffuse * diffuseStep) + 
+                        (LightingParams.specular * specularStep));
 }

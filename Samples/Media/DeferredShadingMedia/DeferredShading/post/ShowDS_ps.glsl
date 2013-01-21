@@ -41,4 +41,3 @@ void main()
 	//Get the 3rd root of the depth to show up-close differences
 	fragColour = vec4(pow(a1.w,0.33), 0, a0.w, 0);
 }
-

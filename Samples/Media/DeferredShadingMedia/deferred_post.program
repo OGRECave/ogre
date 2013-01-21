@@ -134,7 +134,6 @@ fragment_program DeferredShading/post/ShowColour_ps_pGLSL glsl
 	default_params
 	{
         param_named Tex0 int 0
-        param_named Tex1 int 1
     }
 }
 

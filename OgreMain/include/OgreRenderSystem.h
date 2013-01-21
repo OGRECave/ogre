@@ -1221,7 +1221,7 @@ namespace Ogre
 
         /** Returns the default material scheme used by the render system.
             Systems that use the RTSS to emulate a fixed function pipeline 
-            (e.g. OpenGL ES 2, DX11) need to override this function to return
+            (e.g. OpenGL ES 2, GL3+, DX11) need to override this function to return
             the default material scheme of the RTSS ShaderGenerator.
          
             This is currently only used to set the default material scheme for

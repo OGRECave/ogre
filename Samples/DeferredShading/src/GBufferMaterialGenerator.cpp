@@ -92,7 +92,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
         }
         for (uint32 i=0; i<numTexCoords; i++)
         {
-            ss << "out vec2 oUV" << i << ";" << std::endl;
+            ss << "out vec2 oUv" << i << ";" << std::endl;
         }
 
         ss << std::endl;
@@ -114,11 +114,11 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 #ifdef WRITE_LINEAR_DEPTH
         ss << "	oViewPos = (cWorldView * vertex).xyz;" << std::endl;
 #else
-        ss << "	oDepth = oPosition.w;" << std::endl;
+        ss << "	oDepth = gl_Position.w;" << std::endl;
 #endif
 
         for (uint32 i=0; i<numTexCoords; i++) {
-            ss << "	oUV" << i << " = uv" << i << ';' << std::endl;
+            ss << "	oUv" << i << " = uv" << i << ';' << std::endl;
         }
 
         ss << "}" << std::endl;
@@ -132,8 +132,8 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateVertexShader(MaterialGenerat
 
         // Create shader object
         HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
-                                                                                                                 ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                                                                 "glsl", GPT_VERTEX_PROGRAM);
+                                                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                                     "glsl", GPT_VERTEX_PROGRAM);
         ptrProgram->setSource(programSource);
         ptrProgram->setParameter("syntax", "glsl150");
 
@@ -280,21 +280,20 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         uint32 numTexCoords = (permutation & GBufferMaterialGenerator::GBP_TEXCOORD_MASK) >> 8;
         for (uint32 i=0; i<numTexCoords; i++)
         {
-            ss << "in vec2 oUV" << i << ';' << std::endl;
+            ss << "in vec2 oUv" << i << ';' << std::endl;
         }
-        ss << "layout(location = 0, index = 0) out vec4 oColor0;" << std::endl;
-        ss << "layout(location = 0, index = 1) out vec4 oColor1;" << std::endl;
+        ss << "layout(location = 0) out vec4 oColor0;" << std::endl;
+        ss << "layout(location = 1) out vec4 oColor1;" << std::endl;
 
         ss << std::endl;
-
 
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
             ss << "uniform sampler2D sNormalMap;" << std::endl;
         }
 
-        int numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
-        for (int i=0; i<numTextures; i++)
+        uint32 numTextures = permutation & GBufferMaterialGenerator::GBP_TEXTURE_MASK;
+        for (uint32 i=0; i<numTextures; i++)
         {
             ss << "uniform sampler2D sTex" << i << ";" << std::endl;
         }
@@ -314,7 +313,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 
         if (numTexCoords > 0 && numTextures > 0)
         {
-            ss << "	oColor0.rgb = texture(sTex0, oUV0).rgb;" << std::endl;
+            ss << "	oColor0.rgb = texture(sTex0, oUv0).rgb;" << std::endl;
             if (permutation & GBufferMaterialGenerator::GBP_HAS_DIFFUSE_COLOUR)
             {
                 ss << "	oColor0.rgb *= cDiffuseColour.rgb;" << std::endl;
@@ -328,7 +327,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         ss << "	oColor0.a = cSpecularity;" << std::endl;
         if (permutation & GBufferMaterialGenerator::GBP_NORMAL_MAP)
         {
-            ss << "	vec3 texNormal = (texture(sNormalMap, oUV0).rgb-0.5)*2;" << std::endl;
+            ss << "	vec3 texNormal = (texture(sNormalMap, oUv0).rgb-0.5)*2;" << std::endl;
             ss << "	mat3 normalRotation = mat3(oTangent, oBiNormal, oNormal);" << std::endl;
             ss << "	oColor1.rgb = normalize(texNormal * normalRotation);" << std::endl;
         }
@@ -336,6 +335,7 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             ss << "	oColor1.rgb = normalize(oNormal);" << std::endl;
         }
+        ss << "	oColor1.rgb = normalize(oNormal);" << std::endl;
 #ifdef WRITE_LINEAR_DEPTH
         ss << "	oColor1.a = length(oViewPos) / cFarDistance;" << std::endl;
 #else
@@ -352,9 +352,9 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
 #endif
 
         // Create shader object
-        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(
-                                                                                                                 programName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                                                                                                 "glsl", GPT_FRAGMENT_PROGRAM);
+        HighLevelGpuProgramPtr ptrProgram = HighLevelGpuProgramManager::getSingleton().createProgram(programName,
+                                                                                                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                                                                     "glsl", GPT_FRAGMENT_PROGRAM);
         ptrProgram->setSource(programSource);
         ptrProgram->setParameter("syntax", "glsl150");
 
@@ -371,9 +371,9 @@ GpuProgramPtr GBufferMaterialGeneratorImpl::generateFragmentShader(MaterialGener
         {
             params->setNamedConstant("sNormalMap", samplerNum++);
         }
-        for (int i=0; i<numTextures; i++)
+        for (uint32 i=0; i<numTextures; i++, samplerNum++)
         {
-            params->setNamedConstant("sTex" + StringConverter::toString(i), samplerNum++);
+            params->setNamedConstant("sTex" + StringConverter::toString(i), samplerNum);
         }
 
 #ifdef WRITE_LINEAR_DEPTH

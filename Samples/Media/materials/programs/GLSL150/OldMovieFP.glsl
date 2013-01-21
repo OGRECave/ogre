@@ -1,7 +1,6 @@
 #version 150
 
 in vec2 oUv0;
-in vec2 oUv1;
 out vec4 fragColour;
 
 uniform sampler2D RT;

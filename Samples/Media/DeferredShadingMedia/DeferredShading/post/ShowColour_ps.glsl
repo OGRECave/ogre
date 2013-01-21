@@ -23,7 +23,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	Post shader: Debug, show colour channel
 */
-
 #version 150
 
 uniform sampler2D Tex0;
@@ -37,8 +36,6 @@ out vec4 fragColour;
 void main()
 {
 	vec4 a0 = texture(Tex0, oUv0); // Attribute 0: Diffuse color+shininess
-	vec4 a1 = texture(Tex1, oUv0); // Attribute 1: Normal+depth
 
 	fragColour = vec4(a0.xyz, 0);
 }
-
