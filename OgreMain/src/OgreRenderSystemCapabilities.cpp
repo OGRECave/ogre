@@ -202,8 +202,11 @@ namespace Ogre {
                  "   - PVRTC: "
                  + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), true));
 			pLog->logMessage(
-                 "   - RGTC: "
-                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_RGTC), true));
+                 "   - BC4/BC5: "
+                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), true));
+			pLog->logMessage(
+                 "   - BC6H/BC7: "
+                 + StringConverter::toString(hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), true));
 		}
 
 		pLog->logMessage(

@@ -305,8 +305,14 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_VTC);
         }
 
-        // RGTC is supported by the 3.0 spec
-        rsc->setCapability(RSC_TEXTURE_COMPRESSION_RGTC);
+        // RGTC(BC4/BC5) is supported by the 3.0 spec
+        rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
+
+        // BPTC(BC6H/BC7) is supported by the extension or OpenGL 4.2 or higher
+        if(mGLSupport->checkExtension("GL_ARB_texture_compression_bptc") || gl3wIsSupported(4, 2))
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+        }
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
