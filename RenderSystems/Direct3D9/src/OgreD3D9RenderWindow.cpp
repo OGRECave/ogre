@@ -454,25 +454,6 @@ namespace Ogre
 		AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
 		*winWidth = rc.right - rc.left;
 		*winHeight = rc.bottom - rc.top;
-
-		// adjust to monitor
-		HMONITOR hMonitor = MonitorFromWindow(mHWnd, MONITOR_DEFAULTTONEAREST);
-
-		// Get monitor info	
-		MONITORINFO monitorInfo;
-
-		memset(&monitorInfo, 0, sizeof(MONITORINFO));
-		monitorInfo.cbSize = sizeof(MONITORINFO);
-		GetMonitorInfo(hMonitor, &monitorInfo);
-
-		LONG maxW = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-		LONG maxH = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
-
-		if (*winWidth > (unsigned int)maxW)
-			*winWidth = maxW;
-		if (*winHeight > (unsigned int)maxH)
-			*winHeight = maxH;
-
 	}
 
 	void D3D9RenderWindow::_finishSwitchingFullscreen()
