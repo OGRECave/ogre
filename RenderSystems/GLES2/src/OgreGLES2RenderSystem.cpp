@@ -1724,12 +1724,14 @@ namespace Ogre {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstanced((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData, numberOfInstances));
 				}
 				else
+                {
+                    GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
+                    OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
+                }
+#else
+                OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
 #endif
-				{
-                    OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
-				}
 
-				OGRE_CHECK_GL_ERROR(glDrawElements((polyMode == GL_FILL) ? primType : polyMode, op.indexData->indexCount, indexType, pBufferData));
             } while (updatePassIterationRenderState());
         }
         else
