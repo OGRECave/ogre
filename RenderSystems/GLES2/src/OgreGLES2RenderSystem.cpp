@@ -1594,7 +1594,7 @@ namespace Ogre {
         if(useVAO)
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
 
-        uint boundAttrCount = 0;
+//        uint boundAttrCount = 0;
         for (elemIter = decl.begin(); elemIter != elemEnd; ++elemIter)
         {
             const VertexElement & elem = *elemIter;
@@ -1607,7 +1607,10 @@ namespace Ogre {
                 op.vertexData->vertexBufferBinding->getBuffer(elemSource);
             bindVertexElementToGpu(elem, vertexBuffer, op.vertexData->vertexStart,
                                    mRenderAttribsBound, mRenderInstanceAttribsBound, true);
-        }	
+
+            // Keep track of how many attributes have been enabled
+//            boundAttrCount++;
+        }
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
@@ -1618,58 +1621,20 @@ namespace Ogre {
                 const VertexElement & elem = *elemIter;
                 bindVertexElementToGpu(elem, globalInstanceVertexBuffer, 0,
                                        mRenderAttribsBound, mRenderInstanceAttribsBound, true);
-                        continue;
-                    }
-                    
-                    attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
-                }
-
-                switch(elemType)
-                {
-                case VET_COLOUR:
-                case VET_COLOUR_ABGR:
-                case VET_COLOUR_ARGB:
-                    // Because GL takes these as a sequence of single unsigned bytes, count needs to be 4
-                    // VertexElement::getTypeCount treats them as 1 (RGBA)
-                    // Also need to normalise the fixed-point data
-                    typeCount = 4;
-                    normalised = GL_TRUE;
-                    break;
-                default:
-                    break;
-                };
-
-                OGRE_CHECK_GL_ERROR(glVertexAttribPointer(attrib,
-                                      typeCount,
-                                      GLES2HardwareBufferManager::getGLType(elemType),
-                                      normalised,
-                                      static_cast<GLsizei>(vertexBuffer->getVertexSize()),
-                                      pBufferData));
-
-                // Keep track of how many attributes have been enabled
-                boundAttrCount++;
-
-                vector<GLuint>::type::iterator ai = std::find(mRenderAttribsBound.begin(), mRenderAttribsBound.end(), attrib);
-                if(ai == mRenderAttribsBound.end())
-                {
-                    // If this attribute hasn't been enabled, do so and keep a record of it.
-                    OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-
-                    mRenderAttribsBound.push_back(attrib);
-                }
+                continue;
             }
         }
+#endif
 
         // Sort the list of bound attributes
-        std::sort(mRenderAttribsBound.begin(), mRenderAttribsBound.end());
-
-  		// Unbind all attributes that are not needed
-        for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin() + boundAttrCount; ai != mRenderAttribsBound.end(); ++ai)
-        {
-            OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
-        }
-        mRenderAttribsBound.erase(mRenderAttribsBound.begin() + boundAttrCount, mRenderAttribsBound.end());
-#endif
+//        std::sort(mRenderAttribsBound.begin(), mRenderAttribsBound.end());
+//
+//        // Unbind all attributes that are not needed
+//        for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin() + boundAttrCount; ai != mRenderAttribsBound.end(); ++ai)
+//        {
+//            OGRE_CHECK_GL_ERROR(glDisableVertexAttribArray(*ai));
+//        }
+//        mRenderAttribsBound.erase(mRenderAttribsBound.begin() + boundAttrCount, mRenderAttribsBound.end());
 
         // Find the correct type to render
         GLint primType;
@@ -2359,9 +2324,15 @@ namespace Ogre {
                                                       static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                                                       pBufferData));
             
-            // If this attribute hasn't been enabled, do so and keep a record of it.
-            OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
-            
+            vector<GLuint>::type::iterator ai = std::find(mRenderAttribsBound.begin(), mRenderAttribsBound.end(), attrib);
+            if(ai == mRenderAttribsBound.end())
+            {
+                // If this attribute hasn't been enabled, do so and keep a record of it.
+                OGRE_CHECK_GL_ERROR(glEnableVertexAttribArray(attrib));
+
+                mRenderAttribsBound.push_back(attrib);
+            }
+
             attribsBound.push_back(attrib);
         }
     }

@@ -358,11 +358,7 @@ namespace Ogre {
 
                         
 			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
-            PixelFormat imageFormat = (*loadedImages)[0].getFormat();
-			if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
-                imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4 ||
-                imageFormat == PF_PVRTC2_2BPP || imageFormat == PF_PVRTC2_4BPP ||
-                imageFormat == PF_ETC1_RGB8)
+			if (PixelUtil::isCompressed((*loadedImages)[0].getFormat()))
 			{
                 size_t imageMips = (*loadedImages)[0].getNumMipmaps();
                 if (imageMips == 0)
