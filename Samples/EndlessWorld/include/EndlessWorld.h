@@ -14,13 +14,13 @@ same license as the rest of the engine.
 #ifndef __EndlessWorld_H__
 #define __EndlessWorld_H__
 
-#define PAGING
+#define ENDLESS_PAGING
 
 // max range for a int16
-#define TERRAIN_PAGE_MIN_X (-0x7FFF)
-#define TERRAIN_PAGE_MIN_Y (-0x7FFF)
-#define TERRAIN_PAGE_MAX_X 0x7FFF
-#define TERRAIN_PAGE_MAX_Y 0x7FFF
+#define ENDLESS_PAGE_MIN_X (-0x7FFF)
+#define ENDLESS_PAGE_MIN_Y (-0x7FFF)
+#define ENDLESS_PAGE_MAX_X 0x7FFF
+#define ENDLESS_PAGE_MAX_Y 0x7FFF
 
 #include "SdkSample.h"
 #include "OgreTerrain.h"
@@ -31,8 +31,8 @@ same license as the rest of the engine.
 #include "OgreTerrainPaging.h"
 #include "PerlinNoiseTerrainGenerator.h"
 
-#define TERRAIN_FILE_PREFIX String("EndlessWorldTerrain")
-#define TERRAIN_FILE_SUFFIX String("dat")
+#define ENDLESS_TERRAIN_FILE_PREFIX String("EndlessWorldTerrain")
+#define ENDLESS_TERRAIN_FILE_SUFFIX String("dat")
 #define TERRAIN_WORLD_SIZE 12000.0f
 #define TERRAIN_SIZE 513
 #define HOLD_LOD_DISTANCE 3000.0
@@ -323,9 +323,9 @@ protected:
 		SdkSample::setupView();
 		// put camera at world center, so that it's difficult to reach the edge
 		Vector3 worldCenter(
-			(TERRAIN_PAGE_MAX_X+TERRAIN_PAGE_MIN_X) / 2 * TERRAIN_WORLD_SIZE,
+			(ENDLESS_PAGE_MAX_X+ENDLESS_PAGE_MIN_X) / 2 * TERRAIN_WORLD_SIZE,
 			0,
-			-(TERRAIN_PAGE_MAX_Y+TERRAIN_PAGE_MIN_Y) / 2 * TERRAIN_WORLD_SIZE
+			-(ENDLESS_PAGE_MAX_Y+ENDLESS_PAGE_MIN_Y) / 2 * TERRAIN_WORLD_SIZE
 			);
 		mCamera->setPosition(mTerrainPos+worldCenter);
 		mCamera->lookAt(mTerrainPos);
@@ -407,7 +407,7 @@ protected:
 		mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
-		mTerrainGroup->setFilenameConvention(TERRAIN_FILE_PREFIX, TERRAIN_FILE_SUFFIX);
+		mTerrainGroup->setFilenameConvention(ENDLESS_TERRAIN_FILE_PREFIX, ENDLESS_TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
 		mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
 
@@ -423,8 +423,8 @@ protected:
 		mTerrainPaging = OGRE_NEW TerrainPaging(mPageManager);
 		mPagedWorld = mPageManager->createWorld();
 		mTerrainPagedWorldSection = mTerrainPaging->createWorldSection(mPagedWorld, mTerrainGroup, 400, 500, 
-			TERRAIN_PAGE_MIN_X, TERRAIN_PAGE_MIN_Y, 
-			TERRAIN_PAGE_MAX_X, TERRAIN_PAGE_MAX_Y);
+			ENDLESS_PAGE_MIN_X, ENDLESS_PAGE_MIN_Y, 
+			ENDLESS_PAGE_MAX_X, ENDLESS_PAGE_MAX_Y);
 
 		mPerlinNoiseTerrainGenerator = OGRE_NEW PerlinNoiseTerrainGenerator;
 		mTerrainPagedWorldSection->setDefiner( mPerlinNoiseTerrainGenerator );

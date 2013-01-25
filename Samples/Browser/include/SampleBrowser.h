@@ -70,6 +70,7 @@
 #			include "VolumeTerrain.h"
 #		endif
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
+#           include "EndlessWorld.h"
 #           include "Terrain.h"
 #       endif
 #   endif
@@ -1102,7 +1103,7 @@ protected:
                 mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
                 mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
-                mPluginNameMap["Sample_EndlessWorld"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_EndlessWorld();
+                mPluginNameMap["Sample_EndlessWorld"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_EndlessWorld();
 #       endif
 #   endif
                 mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();

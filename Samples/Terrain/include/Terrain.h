@@ -505,7 +505,16 @@ protected:
 		//mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
 		//mTerrainGlobals->setLightMapSize(256);
 
-		//matProfile->setLightmapEnabled(false);
+#if OGRE_NO_GLES3_SUPPORT == 1
+        // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on desktop).
+        // Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            TerrainMaterialGeneratorA::SM2Profile* matProfile =
+                static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+            matProfile->setLightmapEnabled(false);
+        }
+#endif
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
 		mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
 		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
