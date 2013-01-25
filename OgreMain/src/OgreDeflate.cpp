@@ -28,6 +28,9 @@
 #include "OgreStableHeaders.h"
 #include "OgreDeflate.h"
 #include "OgreException.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "macUtils.h"
+#endif
 
 #include <zlib.h>
 
@@ -148,6 +151,8 @@ namespace Ogre
                     mTempFileName = tmpname;
                     free(tmpname);
                 }
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                mTempFileName = macTempFileName();
 #else
                 char tmpname[L_tmpnam];
                 tmpnam(tmpname);

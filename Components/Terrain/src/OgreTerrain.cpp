@@ -49,6 +49,9 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreDeflate.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#include "macUtils.h"
+#endif
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
 // we do lots of conversions here, casting them all is tedious & cluttered, we know what we're doing
@@ -264,7 +267,13 @@ namespace Ogre
 		// force to load highest lod, or quadTree may contain hole
 		load(0,true);
 
-		DataStreamPtr stream = Root::getSingleton().createFileStream(filename, _getDerivedResourceGroup(), true);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+		DataStreamPtr stream = Root::getSingleton().createFileStream(macBundlePath() + "/../Documents/" + filename,
+                                                                   _getDerivedResourceGroup(), true);
+#else
+		DataStreamPtr stream = Root::getSingleton().createFileStream(filename,
+                                                                   _getDerivedResourceGroup(), true);
+#endif
 		StreamSerialiser ser(stream);
 		save(ser);
 	}
@@ -588,8 +597,13 @@ namespace Ogre
 		freeLodData();
 		mLodManager = OGRE_NEW TerrainLodManager( this, filename );
 
-		DataStreamPtr stream = Root::getSingleton().openFileStream(filename, 
-			_getDerivedResourceGroup());
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+		DataStreamPtr stream = Root::getSingleton().openFileStream(macBundlePath() + "/../Documents/" + filename,
+                                                                   _getDerivedResourceGroup());
+#else
+		DataStreamPtr stream = Root::getSingleton().openFileStream(filename,
+                                                                   _getDerivedResourceGroup());
+#endif
 		
 		StreamSerialiser ser(stream);
 		return prepare(ser);

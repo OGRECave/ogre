@@ -271,7 +271,8 @@ namespace Ogre
 		// We do this rather than having a specific technique for it since it's simpler
 		GpuProgramManager& gmgr = GpuProgramManager::getSingleton();
 		if (!gmgr.isSyntaxSupported("ps_4_0") && !gmgr.isSyntaxSupported("ps_3_0") && !gmgr.isSyntaxSupported("ps_2_x")
-			&& !gmgr.isSyntaxSupported("fp40") && !gmgr.isSyntaxSupported("arbfp1") && !gmgr.isSyntaxSupported("glsl"))
+			&& !gmgr.isSyntaxSupported("fp40") && !gmgr.isSyntaxSupported("arbfp1") && !gmgr.isSyntaxSupported("glsl")
+            && !gmgr.isSyntaxSupported("glsles"))
 		{
 			setLayerNormalMappingEnabled(false);
 			setLayerParallaxMappingEnabled(false);
@@ -622,48 +623,51 @@ namespace Ogre
 		}
 
         // Explicitly bind samplers for GLSL
-        int numSamplers = 0;
-		if (tt == LOW_LOD)
+        if ((prof->_getShaderLanguage() == "glsl") || (prof->_getShaderLanguage() == "glsles"))
         {
-            params->setNamedConstant("compositeMap", (int)numSamplers++);
-        }
-        else
-        {
-            params->setNamedConstant("globalNormal", (int)numSamplers++);
-
-            if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
+            int numSamplers = 0;
+            if (tt == LOW_LOD)
             {
-                params->setNamedConstant("globalColourMap", (int)numSamplers++);
+                params->setNamedConstant("compositeMap", (int)numSamplers++);
             }
-            if (prof->isLightmapEnabled())
+            else
             {
-                params->setNamedConstant("lightMap", (int)numSamplers++);
-            }
+                params->setNamedConstant("globalNormal", (int)numSamplers++);
 
-            uint maxLayers = prof->getMaxLayers(terrain);
-            uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
-            uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-            // Blend textures - sampler definitions
-            for (uint i = 0; i < numBlendTextures; ++i)
-            {
-                params->setNamedConstant("blendTex", (int)numSamplers++);
-            }
+                if (terrain->getGlobalColourMapEnabled() && prof->isGlobalColourMapEnabled())
+                {
+                    params->setNamedConstant("globalColourMap", (int)numSamplers++);
+                }
+                if (prof->isLightmapEnabled())
+                {
+                    params->setNamedConstant("lightMap", (int)numSamplers++);
+                }
 
-            // Layer textures - sampler definitions & UV multipliers
-            for (uint i = 0; i < numLayers; ++i)
-            {
-                params->setNamedConstant("difftex" + StringConverter::toString(i), (int)numSamplers++);
-                params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
-            }
+                uint maxLayers = prof->getMaxLayers(terrain);
+                uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
+                uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+                // Blend textures - sampler definitions
+                for (uint i = 0; i < numBlendTextures; ++i)
+                {
+                    params->setNamedConstant("blendTex", (int)numSamplers++);
+                }
 
-            uint numShadowTextures = 1;
-            if (prof->getReceiveDynamicShadowsPSSM())
-                numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+                // Layer textures - sampler definitions & UV multipliers
+                for (uint i = 0; i < numLayers; ++i)
+                {
+                    params->setNamedConstant("difftex" + StringConverter::toString(i), (int)numSamplers++);
+                    params->setNamedConstant("normtex" + StringConverter::toString(i), (int)numSamplers++);
+                }
 
-            for (uint i = 0; i < numShadowTextures; ++i)
-            {
-                if (prof->isShadowingEnabled(tt, terrain))
-                    params->setNamedConstant("shadowMap" + StringConverter::toString(i), (int)numSamplers++);
+                uint numShadowTextures = 1;
+                if (prof->getReceiveDynamicShadowsPSSM())
+                    numShadowTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+
+                for (uint i = 0; i < numShadowTextures; ++i)
+                {
+                    if (prof->isShadowingEnabled(tt, terrain))
+                        params->setNamedConstant("shadowMap" + StringConverter::toString(i), (int)numSamplers++);
+                }
             }
         }
 	}
@@ -791,63 +795,4 @@ namespace Ogre
 
 		return progName;
 	}
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	HighLevelGpuProgramPtr
-	TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createVertexProgram(
-		const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
-	{
-		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
-		String progName = getVertexProgramName(prof, terrain, tt);
-
-		switch(tt)
-		{
-		case HIGH_LOD:
-			progName += "/hlod";
-			break;
-		case LOW_LOD:
-			progName += "/llod";
-			break;
-		case RENDER_COMPOSITE_MAP:
-			progName += "/comp";
-			break;
-		}
-
-		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
-		if (ret.isNull())
-		{
-			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				"glsles", GPT_VERTEX_PROGRAM);
-		}
-		else
-		{
-			ret->unload();
-		}
-
-		return ret;
-
-	}
-	//---------------------------------------------------------------------
-	HighLevelGpuProgramPtr
-		TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSLES::createFragmentProgram(
-			const SM2Profile* prof, const Terrain* terrain, TechniqueType tt)
-	{
-		HighLevelGpuProgramManager& mgr = HighLevelGpuProgramManager::getSingleton();
-		String progName = getFragmentProgramName(prof, terrain, tt);
-
-		HighLevelGpuProgramPtr ret = mgr.getByName(progName);
-		if (ret.isNull())
-		{
-			ret = mgr.createProgram(progName, ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, 
-				"glsles", GPT_FRAGMENT_PROGRAM);
-		}
-		else
-		{
-			ret->unload();
-		}
-
-		return ret;
-
-	}
-
 }
