@@ -40,6 +40,19 @@ namespace Ogre {
         return NULL;
     }
 
+    std::string macTempFileName()
+    {
+        NSString *tempFilePath;
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        for (;;) {
+            NSString *baseName = [NSString stringWithFormat:@"tmp-%x", arc4random()];
+            tempFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:baseName];
+            if (![fileManager fileExistsAtPath:tempFilePath])
+                break;
+        }
+        return std::string([tempFilePath cStringUsingEncoding:NSASCIIStringEncoding]);
+    }
+
     std::string macBundlePath()
     {
         char path[PATH_MAX];
