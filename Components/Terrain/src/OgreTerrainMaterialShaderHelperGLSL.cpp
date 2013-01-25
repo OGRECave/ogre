@@ -290,11 +290,11 @@ namespace Ogre
         outStream <<
             // Only 1 light supported in this version
             // deferred shading profile / generator later, ok? :)
-            "uniform vec3 ambient;\n"
             "uniform vec4 lightPosObjSpace;\n"
             "uniform vec3 lightDiffuseColour;\n"
             "uniform vec3 lightSpecularColour;\n"
             "uniform vec3 eyePosObjSpace;\n"
+            "uniform vec4 ambient;\n"
             // pack scale, bias and specular
             "uniform vec4 scaleBiasSpecular;\n";
 
@@ -562,7 +562,7 @@ namespace Ogre
             }
 
             // diffuse lighting
-            outStream << "    fragColour.rgb += ambient * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
+            outStream << "    fragColour.rgb += ambient.rgb * diffuse + litRes.y * lightDiffuseColour * diffuse * shadow;\n";
 
             // specular default
             if (!prof->isLayerSpecularMappingEnabled())
