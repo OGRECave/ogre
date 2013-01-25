@@ -400,10 +400,12 @@ void Sample_ShaderSystem::setupContent()
 	childNode->setPosition(-300.0, 100.0, -100.0);
 	childNode->attachObject(entity);
 
-    // OpenGL ES 2.0 does not support texture atlases
+    // OpenGL ES 2.0 does not support texture atlases. But ES 3.0 does!
+#if OGRE_NO_GLES3_SUPPORT == 1
 	if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") == String::npos)
+#endif
     {
-        RTShader::RenderState* pMainRenderState = 
+        RTShader::RenderState* pMainRenderState =
             RTShader::ShaderGenerator::getSingleton().createOrRetrieveRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
         pMainRenderState->addTemplateSubRenderState(
             Ogre::RTShader::ShaderGenerator::getSingleton().createSubRenderState(
