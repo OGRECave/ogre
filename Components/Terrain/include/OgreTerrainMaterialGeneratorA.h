@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ namespace Ogre
 	{
 	public:
 		TerrainMaterialGeneratorA();
-		~TerrainMaterialGeneratorA();
+		virtual ~TerrainMaterialGeneratorA();
 
 		/** Shader model 2 profile target. 
 		*/
@@ -62,7 +62,7 @@ namespace Ogre
 		{
 		public:
 			SM2Profile(TerrainMaterialGenerator* parent, const String& name, const String& desc);
-			~SM2Profile();
+			virtual ~SM2Profile();
 			MaterialPtr generate(const Terrain* terrain);
 			MaterialPtr generateForCompositeMap(const Terrain* terrain);
 			uint8 getMaxLayers(const Terrain* terrain) const;
@@ -146,6 +146,7 @@ namespace Ogre
 			/// Internal
 			bool _isSM3Available() const { return mSM3Available; }
 			bool _isSM4Available() const { return mSM4Available; }
+            String _getShaderLanguage() const { return mShaderLanguage; }
 		
 		protected:
 
@@ -187,7 +188,6 @@ namespace Ogre
 
 				size_t mShadowSamplerStartHi;
 				size_t mShadowSamplerStartLo;
-
 			};
 
 			/// Utility class to help with generating shaders for Cg / HLSL.
@@ -222,12 +222,17 @@ namespace Ogre
 			protected:
 				HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
 				HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-				void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream) {}
-				void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream) {}
-				void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
+				void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream);
+				void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream);
+				void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				uint generateVpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadowsParams(uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
 			};
 
             /// Utility class to help with generating shaders for GLSL ES.
@@ -236,12 +241,17 @@ namespace Ogre
 			protected:
 				HighLevelGpuProgramPtr createVertexProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
 				HighLevelGpuProgramPtr createFragmentProgram(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt);
-				void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream) {}
-				void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream) {}
-				void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
-				void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream) {}
+				void generateVpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpHeader(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateVpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream);
+				void generateFpLayer(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream);
+				void generateVpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpFooter(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				uint generateVpDynamicShadowsParams(uint texCoordStart, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateVpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadowsHelpers(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadowsParams(uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
+				void generateFpDynamicShadows(const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream);
 			};
 
 			ShaderHelper* mShaderGen;
@@ -257,22 +267,13 @@ namespace Ogre
 			bool mLowLodShadows;
 			bool mSM3Available;
 			bool mSM4Available;
+            String mShaderLanguage;
 
 			bool isShadowingEnabled(TechniqueType tt, const Terrain* terrain) const;
-
 		};
-
-
-
-
 	};
-
-
-
 	/** @} */
 	/** @} */
-
-
 }
 
 #endif

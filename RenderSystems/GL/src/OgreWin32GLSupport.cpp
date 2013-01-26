@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -419,7 +419,7 @@ namespace Ogre {
 
 
 				// Get the nearest monitor to this window.
-				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);				
+				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTOPRIMARY);				
 			}
 
 			newParams["monitorHandle"] = StringConverter::toString((size_t)hMonitor);																
@@ -658,7 +658,7 @@ namespace Ogre {
 			attribList.push_back(WGL_DEPTH_BITS_ARB); attribList.push_back(24);
 			attribList.push_back(WGL_STENCIL_BITS_ARB); attribList.push_back(8);
 			attribList.push_back(WGL_SAMPLES_ARB); attribList.push_back(multisample);
-			if (useHwGamma && checkExtension("WGL_EXT_framebuffer_sRGB"))
+			if (useHwGamma && mHasHardwareGamma)
 			{
 				attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);
 			}

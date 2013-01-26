@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,8 @@ namespace Ogre {
     GLES2TextureManager::GLES2TextureManager(GLES2Support& support)
         : TextureManager(), mGLSupport(support), mWarningTextureID(0)
     {
-        GL_CHECK_ERROR;
         // Register with group manager
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
-
-        createWarningTexture();
     }
 
     GLES2TextureManager::~GLES2TextureManager()
@@ -48,8 +45,7 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterResourceManager(mResourceType);
 
         // Delete warning texture
-        glDeleteTextures(1, &mWarningTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mWarningTextureID));
     }
 
     Resource* GLES2TextureManager::createImpl(const String& name, ResourceHandle handle, 
@@ -74,21 +70,20 @@ namespace Ogre {
         {
             for(size_t x = 0; x < width; ++x)
             {
-                data[y * width + x] = (((x + y) % 8) < 4) ? 0x000000 : 0xFFFF00;
+                data[y * width + x] = (((x + y) % 8) < 4) ? 0x0000 : 0xFFF0;
             }
         }
 
         // Create GL resource
-        glGenTextures(1, &mWarningTextureID);
-        GL_CHECK_ERROR;
-        glBindTexture(GL_TEXTURE_2D, mWarningTextureID);
-        GL_CHECK_ERROR;
-#if GL_APPLE_texture_max_level
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mWarningTextureID));
+        OGRE_CHECK_GL_ERROR(glBindTexture(GL_TEXTURE_2D, mWarningTextureID));
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0));
+#elif OGRE_NO_GLES3_SUPPORT == 0
+        OGRE_CHECK_GL_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0));
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                     GL_UNSIGNED_SHORT_5_6_5, (void*)data);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+                                         GL_UNSIGNED_SHORT_5_6_5, (void*)data));
         // Free memory
         delete [] data;
     }

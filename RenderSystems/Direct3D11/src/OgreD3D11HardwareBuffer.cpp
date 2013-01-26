@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ namespace Ogre {
 		BufferType btype, size_t sizeBytes,
 		HardwareBuffer::Usage usage, D3D11Device & device, 
 		bool useSystemMemory, bool useShadowBuffer, bool streamOut)
-		: HardwareBuffer(usage, useSystemMemory,  false /* TODO: useShadowBuffer*/),
+		: HardwareBuffer(usage, useSystemMemory,  useShadowBuffer),
 		mlpD3DBuffer(0),
 		mpTempStagingBuffer(0),
 		mUseTempStagingBuffer(false),
@@ -46,6 +46,7 @@ namespace Ogre {
 		mSizeInBytes = sizeBytes;
 		mDesc.ByteWidth = static_cast<UINT>(sizeBytes);
 		mDesc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage); 
+		mDesc.MiscFlags = 0;
 
 		if (useSystemMemory)
 		{
@@ -58,15 +59,16 @@ namespace Ogre {
 		else
 		{
 			mDesc.Usage = D3D11Mappings::_getUsage(mUsage);
-			mDesc.BindFlags = btype == VERTEX_BUFFER ? D3D11_BIND_VERTEX_BUFFER : D3D11_BIND_INDEX_BUFFER;
-
+			mDesc.BindFlags = btype == VERTEX_BUFFER ? D3D11_BIND_VERTEX_BUFFER : 
+							  btype == INDEX_BUFFER  ? D3D11_BIND_INDEX_BUFFER  :
+													   D3D11_BIND_CONSTANT_BUFFER;
 		}
-		if (streamOut)
+		// Better check of stream out flag
+		if (streamOut && btype != CONSTANT_BUFFER)
 		{
-			mDesc.BindFlags |= D3D10_BIND_STREAM_OUTPUT;
+			mDesc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;
 		}
 
-		mDesc.MiscFlags = 0;
 		if (!useSystemMemory && (usage & HardwareBuffer::HBU_DYNAMIC))
 		{
 			// We want to be able to map this buffer
@@ -84,7 +86,7 @@ namespace Ogre {
 
 		// TODO: we can explicitly initialise the buffer contents here if we like
 		// not doing this since OGRE doesn't support this model yet
-		HRESULT hr = device->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
+		HRESULT hr = device->CreateBuffer( &mDesc, NULL, &mlpD3DBuffer );
 		if (FAILED(hr) || mDevice.isError())
 		{
 			String msg = device.getErrorDescription(hr);
@@ -93,14 +95,22 @@ namespace Ogre {
 				"D3D11HardwareBuffer::D3D11HardwareBuffer");
 		}
 
+		// Create shadow buffer
+		if (mUseShadowBuffer)
+		{
+			mShadowBuffer = new D3D11HardwareBuffer(mBufferType, 
+					mSizeInBytes, mUsage, mDevice, true, false, false);
+		}
 
 	}
 	//---------------------------------------------------------------------
 	D3D11HardwareBuffer::~D3D11HardwareBuffer()
 	{
+#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 		SAFE_RELEASE(mlpD3DBuffer);
+#endif
 		SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
-
+		SAFE_DELETE(mShadowBuffer);
 	}
 	//---------------------------------------------------------------------
 	void* D3D11HardwareBuffer::lockImpl(size_t offset, 
@@ -308,7 +318,7 @@ namespace Ogre {
 		memcpy(pDst, pSource, length);
 		this->unlock();
 
-
+		//What if we try UpdateSubresource
 		//mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer, 0, NULL, pSource, offset, length);
 	}
 	//---------------------------------------------------------------------

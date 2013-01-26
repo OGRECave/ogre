@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgrePlane.h"
 #include "OgreIteratorWrappers.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -203,15 +204,19 @@ namespace Ogre
 		automatically, based on settings chosen so far. This saves
 		an extra call to _createRenderWindow
 		for the main render window.
-		@par
-		If an application has more specific window requirements,
-		however (e.g. a level design app), it should specify false
-		for this parameter and do it manually.
+		@param
+		windowTitle Sets the app window title
 		@return
 		A pointer to the automatically created window, if requested, otherwise null.
 		*/
 		virtual RenderWindow* _initialise(bool autoCreateWindow, const String& windowTitle = "OGRE Render Window");
 
+		/*
+		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
+		@remarks
+		Needed in the implementation of DirectX9 with DirectX9Ex driver
+		*/
+		virtual bool isStaticBufferLockable() const { return true; }
 
 		/** Query the real capabilities of the GPU and driver in the RenderSystem*/
 		virtual RenderSystemCapabilities* createRenderSystemCapabilities() const = 0;
@@ -796,6 +801,20 @@ namespace Ogre
 		*/
 		virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
 
+		/** Sets wether the compare func is enabled or not for this texture unit 
+		@param unit The texture unit to set the filtering options for
+		@param compare The state (enabled/disabled)
+		*/
+		virtual void _setTextureUnitCompareEnabled(size_t unit, bool compare) = 0;
+
+
+		/** Sets the compare function to use for a given texture unit
+		@param unit The texture unit to set the filtering options for
+		@param function The comparison function
+		*/
+		virtual void _setTextureUnitCompareFunction(size_t unit, CompareFunction function) = 0;
+
+
 		/** Sets the maximal anisotropy for the specified texture unit.*/
 		virtual void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy) = 0;
 
@@ -1139,8 +1158,11 @@ namespace Ogre
 		start up too.
 		@param func The comparison function applied.
 		@param refValue The reference value used in the comparison
-		@param mask The bitmask applied to both the stencil value and the reference value 
+		@param compareMask The bitmask applied to both the stencil value and the reference value 
 		before comparison
+		@param writeMask The bitmask the controls which bits from refValue will be written to 
+		stencil buffer (valid for operations such as SOP_REPLACE).
+		the stencil
 		@param stencilFailOp The action to perform when the stencil check fails
 		@param depthFailOp The action to perform when the stencil check passes, but the
 		depth buffer check still fails
@@ -1150,7 +1172,7 @@ namespace Ogre
 		and the inverse of them will happen for back faces (keep remains the same).
 		*/
 		virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-			uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
+			uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
 			StencilOperation stencilFailOp = SOP_KEEP, 
 			StencilOperation depthFailOp = SOP_KEEP,
 			StencilOperation passOp = SOP_KEEP, 
@@ -1199,7 +1221,7 @@ namespace Ogre
 
         /** Returns the default material scheme used by the render system.
             Systems that use the RTSS to emulate a fixed function pipeline 
-            (e.g. OpenGL ES 2, DX11) need to override this function to return
+            (e.g. OpenGL ES 2, GL3+, DX11) need to override this function to return
             the default material scheme of the RTSS ShaderGenerator.
          
             This is currently only used to set the default material scheme for
@@ -1233,6 +1255,13 @@ namespace Ogre
 
 		/** Returns whether or not a Gpu program of the given type is currently bound. */
 		virtual bool isGpuProgramBound(GpuProgramType gptype);
+
+        /**
+         * Gets the native shading language version for this render system.
+         * Formatted so that it can be used within a shading program. 
+         * For example, OpenGL 3.2 would return 150, while 3.3 would return 330
+         */
+        uint16 getNativeShadingLanguageVersion() const { return mNativeShadingLanguageVersion; }
 
 		/** Sets the user clipping region.
 		*/
@@ -1453,6 +1482,34 @@ namespace Ogre
 		@see Root::getDisplayMonitorCount
 		*/
 		virtual unsigned int getDisplayMonitorCount() const = 0;
+
+        /**
+        * This marks the beginning of an event for GPU profiling.
+        */
+        virtual void beginProfileEvent( const String &eventName ) = 0;
+
+        /**
+        * Ends the currently active GPU profiling event.
+        */
+        virtual void endProfileEvent( void ) = 0;
+
+        /**
+        * Marks an instantaneous event for graphics profilers.  
+        * This is equivalent to calling @see beginProfileEvent and @see endProfileEvent back to back.
+        */
+        virtual void markProfileEvent( const String &event ) = 0;
+
+		/** Determines if the system has anisotropic mip map filter support
+		*/
+		virtual bool hasAnisotropicMipMapFilter() const = 0;
+
+		/** Gets a custom (maybe platform-specific) attribute.
+        @remarks This is a nasty way of satisfying any API's need to see platform-specific details.
+        @param name The name of the attribute.
+        @param pData Pointer to memory of the right kind of structure to receive the info.
+        */
+		virtual void getCustomAttribute(const String& name, void* pData);
+
 	protected:
 
 		/** DepthBuffers to be attached to render targets */
@@ -1469,6 +1526,9 @@ namespace Ogre
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTesselationHullGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveTesselationDomainGpuProgramParameters;
+		GpuProgramParametersSharedPtr mActiveComputeGpuProgramParameters;
 
 		// Texture manager
 		// A concrete class of this will be created and
@@ -1539,6 +1599,9 @@ namespace Ogre
 		bool mVertexProgramBound;
 		bool mGeometryProgramBound;
 		bool mFragmentProgramBound;
+		bool mTesselationHullProgramBound;
+		bool mTesselationDomainProgramBound;
+		bool mComputeProgramBound;
 
 		// Recording user clip planes
 		PlaneList mClipPlanes;
@@ -1558,6 +1621,7 @@ namespace Ogre
 
 
 		DriverVersion mDriverVersion;
+        uint16 mNativeShadingLanguageVersion;
 
 		bool mTexProjRelative;
 		Vector3 mTexProjRelativeOrigin;
@@ -1568,5 +1632,7 @@ namespace Ogre
 	/** @} */
 	/** @} */
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

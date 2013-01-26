@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -91,6 +91,24 @@ namespace Ogre {
 		"    return output;\n"
 		"}\n";
 
+    String ShadowVolumeExtrudeProgram::mPointVs_glsl = 
+        "#version 150\n"
+        "// Point light shadow volume extrude\n"
+        "in vec4 uv0;\n"
+        "in vec4 vertex;\n\n"
+        "uniform mat4 worldviewproj_matrix;\n"
+        "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
+        "void main()\n"
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "    vec4 newpos = \n"
+        "        (uv0.xxxx * light_position_object_space) + \n"
+        "        vec4(vertex.xyz - light_position_object_space.xyz, 0.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
+
     String ShadowVolumeExtrudeProgram::mPointVs_glsles = 
         "#version 100\n"
         "precision highp float;\n"
@@ -163,6 +181,23 @@ namespace Ogre {
 		"    return output;\n"
 		"}\n";
 
+    String ShadowVolumeExtrudeProgram::mDirVs_glsl = 
+        "#version 150\n"
+        "// Directional light extrude\n"
+        "in vec4 uv0;\n"
+        "in vec4 vertex;\n\n"
+        "uniform mat4 worldviewproj_matrix;\n"
+        "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
+        "void main()\n"
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "    vec4 newpos = \n"
+        "        (uv0.xxxx * (vertex + light_position_object_space)) - light_position_object_space;\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
+
     String ShadowVolumeExtrudeProgram::mDirVs_glsles = 
         "#version 100\n"
         "precision highp float;\n"
@@ -220,6 +255,7 @@ namespace Ogre {
         "mov oD0, c6.x\n";
 
 	String ShadowVolumeExtrudeProgram::mPointVs_4_0Debug = mPointVs_4_0;
+	String ShadowVolumeExtrudeProgram::mPointVs_glslDebug = mPointVs_glsl;
 	String ShadowVolumeExtrudeProgram::mPointVs_glslesDebug = mPointVs_glsles;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Debug = 
@@ -253,6 +289,7 @@ namespace Ogre {
         "mov oD0, c5.x\n";
 
 	String ShadowVolumeExtrudeProgram::mDirVs_4_0Debug = mDirVs_4_0;
+	String ShadowVolumeExtrudeProgram::mDirVs_glslDebug = mDirVs_glsl;
 	String ShadowVolumeExtrudeProgram::mDirVs_glslesDebug = mDirVs_glsles;
 
 
@@ -327,6 +364,27 @@ namespace Ogre {
 
 		"\n"
 		"}\n";
+
+    String ShadowVolumeExtrudeProgram::mPointVs_glslFinite = 
+        "#version 150\n"
+        "// Point light shadow volume extrude - FINITE\n"
+        "in vec4 uv0;\n"
+        "in vec4 vertex;\n\n"
+        "uniform mat4 worldviewproj_matrix;\n"
+        "uniform vec4 light_position_object_space; // homogenous, object space\n"
+        "uniform float shadow_extrusion_distance; // how far to extrude\n\n"
+        "void main()\n"
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "	vec3 extrusionDir = vertex.xyz - light_position_object_space.xyz;\n"
+        "	extrusionDir = normalize(extrusionDir);\n"
+        "	\n"
+        "    vec4 newpos = vec4(vertex.xyz +  \n"
+        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mPointVs_glslesFinite = 
         "#version 100\n"
@@ -412,6 +470,26 @@ namespace Ogre {
 		"\n"
 		"}\n";
 
+    String ShadowVolumeExtrudeProgram::mDirVs_glslFinite = 
+        "#version 150\n"
+        "// Directional light extrude - FINITE\n"
+        "in vec4 uv0;\n"
+        "in vec4 vertex;\n\n"
+        "uniform mat4 worldviewproj_matrix;\n"
+        "uniform vec4 light_position_object_space; // homogenous, object space\n"
+        "uniform float shadow_extrusion_distance;  // how far to extrude\n\n"
+        "void main()\n"
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "	 // -ve light_position_object_space is direction\n"
+        "    vec4 newpos = vec4(vertex.xyz - \n"
+        "        (uv0.x * shadow_extrusion_distance * light_position_object_space.xyz), 1.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "\n"
+        "}\n";
+
 	String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = 
         "#version 100\n"
         "precision highp float;\n"
@@ -479,6 +557,7 @@ namespace Ogre {
         "dp4 oPos.w, c3, r0\n";
 
 	String ShadowVolumeExtrudeProgram::mPointVs_4_0FiniteDebug = mPointVs_4_0Finite;
+	String ShadowVolumeExtrudeProgram::mPointVs_glslFiniteDebug = mPointVs_glslFinite;
 	String ShadowVolumeExtrudeProgram::mPointVs_glslesFiniteDebug = mPointVs_glslesFinite;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1FiniteDebug = 
@@ -517,6 +596,7 @@ namespace Ogre {
 
 
 	String ShadowVolumeExtrudeProgram::mDirVs_4_0FiniteDebug = mDirVs_4_0Finite;
+	String ShadowVolumeExtrudeProgram::mDirVs_glslFiniteDebug = mDirVs_glslFinite;
 	String ShadowVolumeExtrudeProgram::mDirVs_glslesFiniteDebug = mDirVs_glslesFinite;
 
 
@@ -530,6 +610,14 @@ namespace Ogre {
 		"    float4 finalColor = float4(1,1,1,1);\n"
 		"    return finalColor;\n"
 		"}\n";
+
+    String ShadowVolumeExtrudeProgram::mGeneralFs_glsl = 
+        "#version 150\n"
+        "out vec4 fragColour;\n"
+        "void main()\n"
+        "{\n"
+        "    fragColour = vec4(1.0);\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mGeneralFs_glsles = 
         "#version 100\n"
@@ -566,13 +654,13 @@ namespace Ogre {
 			String syntax;
 			bool vertexProgramFinite[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{
-				false, false, false, false, 
-					true, true, true, true
+				false, false, false, false,
+				true, true, true, true
 			};
 			bool vertexProgramDebug[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{
-				false, true, false, true, 
-					false, true, false, true
+				false, true, false, true,
+				false, true, false, true
 			};
 			Light::LightTypes vertexProgramLightTypes[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
 			{
@@ -592,7 +680,11 @@ namespace Ogre {
 			{
 				syntax = "vs_1_1";
 			}
-			else if (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
+			else if (
+                        (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
+                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1"))
+                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
+                    )
 			{
 				syntax = "vs_4_0";
 			}
@@ -600,11 +692,15 @@ namespace Ogre {
 			{
 				syntax = "glsles";
 			}
+			else if (GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+			{
+				syntax = "glsl";
+			}
 			else
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
 					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
 					"SceneManager::initShadowVolumeMaterials");
 			}
 			// Create all programs
@@ -623,7 +719,21 @@ namespace Ogre {
 						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
 							vertexProgramLightTypes[v], syntax, 
 							vertexProgramFinite[v], vertexProgramDebug[v]));
-						vp->setParameter("target", syntax);
+
+                        String targetSuffix = "s_4_0";
+                        if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") == false)
+                        {
+                            if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
+                            {
+                                targetSuffix = "s_4_0_level_9_3";
+                            }
+                            else
+                            {
+                                targetSuffix = "s_4_0_level_9_1";
+                            }
+                        }
+
+						vp->setParameter("target", "v" + targetSuffix);
 						vp->setParameter("entry_point", "vs_main");			
 						vp->load();
 
@@ -635,7 +745,7 @@ namespace Ogre {
 								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"hlsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_4_0);
-							fp->setParameter("target", "ps_4_0");
+							fp->setParameter("target", "p" + targetSuffix);
 							fp->setParameter("entry_point", "fs_main");			
 							fp->load();
 						}
@@ -664,6 +774,30 @@ namespace Ogre {
 							fp->load();
 						}
 					}
+					else if (syntax == "glsl")
+					{
+						HighLevelGpuProgramPtr vp = 
+                        HighLevelGpuProgramManager::getSingleton().createProgram(
+                             programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                             "glsl", GPT_VERTEX_PROGRAM);
+						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
+                               vertexProgramLightTypes[v], syntax, 
+                               vertexProgramFinite[v], vertexProgramDebug[v]));
+						vp->setParameter("target", syntax);
+						vp->load();
+                        
+						if (frgProgramName.empty())
+						{
+							frgProgramName = "Ogre/ShadowFrgProgram";
+							HighLevelGpuProgramPtr fp = 
+                            HighLevelGpuProgramManager::getSingleton().createProgram(
+                                 frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                 "glsl", GPT_FRAGMENT_PROGRAM);
+							fp->setSource(mGeneralFs_glsl);
+							fp->setParameter("target", "glsl");
+							fp->load();
+						}
+					}
 					else
 					{
 						GpuProgramPtr vp = 
@@ -675,7 +809,6 @@ namespace Ogre {
 							GPT_VERTEX_PROGRAM, syntax);
 						vp->load();
 					}
-
 				}
 			}
 			mInitialised = true;
@@ -775,6 +908,31 @@ namespace Ogre {
 					}
 				}
 			}
+            else if (syntax == "glsl")
+            {
+                if (finite)
+                {
+                    if (debug)
+                    {
+                        return getDirectionalLightExtruderVs_glslFiniteDebug();
+                    }
+                    else
+                    {
+                        return getDirectionalLightExtruderVs_glslFinite();
+                    }
+                }
+                else
+                {
+                    if (debug)
+                    {
+                        return getDirectionalLightExtruderVs_glslDebug();
+                    }
+                    else
+                    {
+                        return getDirectionalLightExtruderVs_glsl();
+                    }
+                }
+            }
             else if (syntax == "glsles")
             {
                 if (finite)
@@ -804,7 +962,7 @@ namespace Ogre {
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
 					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
 					"SceneManager::getProgramSource");
 			}
 
@@ -886,6 +1044,31 @@ namespace Ogre {
 					}
 				}
 			}
+			else if (syntax == "glsl")
+			{
+				if (finite)
+				{
+					if (debug)
+					{
+						return getPointLightExtruderVs_glslFiniteDebug();
+					}
+					else
+					{
+						return getPointLightExtruderVs_glslFinite();
+					}
+				}
+				else
+				{
+					if (debug)
+					{
+						return getPointLightExtruderVs_glslDebug();
+					}
+					else
+					{
+						return getPointLightExtruderVs_glsl();
+					}
+				}
+			}
 			else if (syntax == "glsles")
 			{
 				if (finite)
@@ -915,7 +1098,7 @@ namespace Ogre {
 			{
 				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
 					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
 					"SceneManager::getProgramSource");
 			}
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -273,7 +273,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
 	//  shader models 4 and 5.
 	// This change may incrase the number of register used in older shader
 	//  models - this is why the check is present here.
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 	if (isVs4)
 	{
 		synchronizePixelnToBeVertexOut(programSet);
@@ -380,19 +380,25 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 											   const StringVector& profilesList,
 											   const String& cachePath)
 {
-	std::stringstream sourceCodeStringStream;
-	_StringHash stringHash;
-	uint32 programHashCode;
+    stringstream sourceCodeStringStream;
 	String programName;
 
 	// Generate source code.
 	programWriter->writeSourceCode(sourceCodeStringStream, shaderProgram);
+    String source = sourceCodeStringStream.str();
 
-	// Generate program hash code.
-	programHashCode = static_cast<uint32>(stringHash(sourceCodeStringStream.str()));
-
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+	
 	// Generate program name.
-	programName = StringConverter::toString(programHashCode);
+	programName = generateGUID(source);
+
+#else // Disable caching on android devices 
+
+    // Generate program name.
+    static int gpuProgramID = 0;
+    programName = "RTSS_"  + StringConverter::toString(++gpuProgramID);
+   
+#endif
 	
 	if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
 	{
@@ -403,10 +409,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		programName += "_FS";
 	}
 
-	HighLevelGpuProgramPtr pGpuProgram;
-
 	// Try to get program by name.
-	pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
+	HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
 
 	// Case the program doesn't exist yet.
 	if (pGpuProgram.isNull())
@@ -446,7 +450,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 				if (!outFile)
 					return GpuProgramPtr();
 
-				outFile << sourceCodeStringStream.str();
+				outFile << source;
 				outFile.close();
 			}
 
@@ -456,7 +460,7 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 		// No cache directory specified -> create program from system memory.
 		else
 		{
-			pGpuProgram->setSource(sourceCodeStringStream.str());
+			pGpuProgram->setSource(source);
 		}
 		
 		
@@ -476,6 +480,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 					break;
 				}
 			}
+
+			pGpuProgram->setParameter("enable_backwards_compatibility", "true");
 		}
 		
 		pGpuProgram->setParameter("profiles", profiles);
@@ -501,6 +507,61 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 	
 	return GpuProgramPtr(pGpuProgram);
 }
+
+
+//-----------------------------------------------------------------------------
+String ProgramManager::generateGUID(const String& programString)
+{
+	//To generate a unique value this component used to use _StringHash class.
+	//However when this generates a hash value it selects a maximum of 10 places within the string
+	//and bases the hash value on those position. This is not good enough for this situation.
+	//
+	//Different programs must have unique hash values. Some programs only differ in the size of array parameters.
+	//This means that only 1 or 2 letters will be changed. Using the _StringHash class in these case will, in all 
+	//likelihood, produce the same values.
+
+	unsigned int val1 = 0x9e3779b9;
+	unsigned int val2 = 0x61C88646;
+	unsigned int val3 = 0x9e3779b9;
+	unsigned int val4 = 0x61C88646;
+
+	//instead of generating the hash from the individual characters we will treat this string as a long 
+	//integer value for faster processing. We dismiss the last non-full int.
+	size_t sizeInInts = (programString.size() - 3) / 4;
+	const uint32* intBuffer = (const uint32*)programString.c_str();
+
+	size_t i = 0;
+	for( ; i < sizeInInts - 2 ; i += 3) 
+	{
+		uint32 bufVal0 = *(intBuffer + i);
+		uint32 bufVal1 = *(intBuffer + i + 1);
+		uint32 bufVal2 = *(intBuffer + i + 2);
+		val1 ^= (val1<<6) + (val1>>2) + bufVal0;
+		val2 ^= (val2<<6) + (val2>>2) + bufVal1;
+		val3 ^= (val3<<6) + (val3>>2) + bufVal2;
+		//ensure greater uniqueness by having the forth int value dependent on the entire string
+		val4 ^= (val4<<6) + (val4>>2) + bufVal0 + bufVal1 + bufVal2;
+	}
+	//read the end of the string we missed
+	if (i < sizeInInts - 1)
+		val1 ^= (val1<<6) + (val1>>2) + *(intBuffer + i - 1);
+	if (i < sizeInInts)
+		val2 ^= (val2<<6) + (val2>>2) + *(intBuffer + i);
+
+	//Generate the guid string
+	stringstream stream;
+	stream.fill('0');
+	stream.setf(std::ios::fixed);
+	stream.setf(std::ios::hex, std::ios::basefield);
+	stream.width(8); stream << val1 << "-";
+	stream.width(4); stream << (uint16)(val2 >> 16) << "-";
+	stream.width(4); stream << (uint16)(val2) << "-";
+	stream.width(4); stream << (uint16)(val3 >> 16) << "-";
+	stream.width(4); stream << (uint16)(val3);
+	stream.width(8); stream << val4;
+	return stream.str();
+}
+
 
 //-----------------------------------------------------------------------------
 void ProgramManager::addProgramProcessor(ProgramProcessor* processor)
@@ -579,38 +640,43 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
 		}
 	}
 
-	// save the pixel program original input parameters
-	const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
+    if(pixelMain)
+    {
+        // save the pixel program original input parameters
+        const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
 
-	// set the pixel Input to be the same as the vertex prog output
-	pixelMain->deleteAllInputParameters();
+        // set the pixel Input to be the same as the vertex prog output
+        pixelMain->deleteAllInputParameters();
 
-	// Loop the vertex shader output parameters and make sure that
-	//   all of them exist in the pixel shader input.
-	// If the parameter type exist in the original output - use it
-	// If the parameter doesn't exist - use the parameter from the 
-	//   vertex shader input.
-	// The order will be based on the vertex shader parameters order 
-	// Write output parameters.
-	ShaderParameterConstIterator it;
-	const ShaderParameterList& outParams = vertexMain->getOutputParameters();
-	for (it=outParams.begin(); it != outParams.end(); ++it)
-	{
-		ParameterPtr curOutParemter = *it;
-		ParameterPtr paramToAdd = Function::getParameterBySemantic(
-			pixelOriginalInParams, 
-			curOutParemter->getSemantic(), 
-			curOutParemter->getIndex());
+        // Loop the vertex shader output parameters and make sure that
+        //   all of them exist in the pixel shader input.
+        // If the parameter type exist in the original output - use it
+        // If the parameter doesn't exist - use the parameter from the 
+        //   vertex shader input.
+        // The order will be based on the vertex shader parameters order 
+        // Write output parameters.
+        ShaderParameterConstIterator it;
+        if(vertexMain)
+        {
+            const ShaderParameterList& outParams = vertexMain->getOutputParameters();
+            for (it=outParams.begin(); it != outParams.end(); ++it)
+            {
+                ParameterPtr curOutParemter = *it;
+                ParameterPtr paramToAdd = Function::getParameterBySemantic(
+                    pixelOriginalInParams, 
+                    curOutParemter->getSemantic(), 
+                    curOutParemter->getIndex());
 
-		if (paramToAdd.isNull())
-		{
-			// param not found - we will add the one from the vertex shader
-			paramToAdd = curOutParemter; 
-		}
+                if (paramToAdd.isNull())
+                {
+                    // param not found - we will add the one from the vertex shader
+                    paramToAdd = curOutParemter; 
+                }
 
-		pixelMain->addInputParameter(paramToAdd);
-
-	}
+                pixelMain->addInputParameter(paramToAdd);
+            }
+        }
+    }
 }
 
 /** @} */

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -87,6 +87,62 @@ namespace Ogre {
 		void unloadImpl(void);
 		void loadFromMicrocode(ID3D10Blob *  microcode);
 	};
+
+	/** Direct3D implementation of low-level vertex programs. */
+	class D3D11GpuDomainProgram : public D3D11GpuProgram
+	{
+	protected:
+		ID3D11DomainShader * mDomainShader;
+	public:
+		D3D11GpuDomainProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+		~D3D11GpuDomainProgram();
+		/// Gets the vertex shader
+		ID3D11DomainShader * getDomainShader(void) const;
+	protected:
+		/** @copydoc Resource::unloadImpl */
+		void unloadImpl(void);
+		void loadFromMicrocode(ID3D10Blob *  microcode);
+	};
+
+	/** Direct3D implementation of low-level vertex programs. */
+	class D3D11GpuHullProgram : public D3D11GpuProgram
+	{
+	protected:
+		ID3D11HullShader * mHullShader;
+	public:
+		D3D11GpuHullProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+		~D3D11GpuHullProgram();
+		/// Gets the vertex shader
+		ID3D11HullShader * getHullShader() const;
+	protected:
+		/** @copydoc Resource::unloadImpl */
+		void unloadImpl(void);
+		void loadFromMicrocode(ID3D10Blob *  microcode);
+	};
+
+
+	/** 
+		Direct3D implementation of low-level geometry programs. 
+		Added due to need to accept geometry programs came from other profiles (nvgp4, for example)
+	*/
+	class D3D11GpuGeometryProgram : public D3D11GpuProgram
+	{
+	protected:
+		ID3D11GeometryShader * mGeometryShader;
+	public:
+		D3D11GpuGeometryProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+			const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
+		~D3D11GpuGeometryProgram();
+		/// Gets the geometry shader
+		ID3D11GeometryShader * getGeometryShader(void) const;
+	protected:
+		/** @copydoc Resource::unloadImpl */
+		void unloadImpl(void);
+		void loadFromMicrocode(ID3D10Blob *  microcode);
+	};
+
 	/** Specialisation of SharedPtr to allow SharedPtr to be assigned to D3D11GpuProgramPtr 
 	@note Has to be a subclass since we need operator=.
 	We could templatise this instead of repeating per Resource subclass, 

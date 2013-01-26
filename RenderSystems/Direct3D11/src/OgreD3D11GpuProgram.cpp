@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -171,6 +171,161 @@ namespace Ogre {
 		return mPixelShader;
 	}
 	//-----------------------------------------------------------------------------
+	D3D11GpuGeometryProgram::D3D11GpuGeometryProgram(ResourceManager* creator, 
+		const String& name, ResourceHandle handle, const String& group, 
+		bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
+		: D3D11GpuProgram(creator, name, handle, group, isManual, loader, device)
+		, mGeometryShader(NULL)
+	{
+		mType = GPT_GEOMETRY_PROGRAM;
+	}
+	//-----------------------------------------------------------------------------
+	D3D11GpuGeometryProgram::~D3D11GpuGeometryProgram()
+	{
+		// have to call this here reather than in Resource destructor
+		// since calling virtual methods in base destructors causes crash
+		unload(); 
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuGeometryProgram::loadFromMicrocode(ID3D10Blob *  microcode)
+	{
+		if (isSupported())
+		{
+			// Create the shader
+			HRESULT hr = mDevice->CreateGeometryShader(
+				static_cast<DWORD*>(microcode->GetBufferPointer()), 
+				microcode->GetBufferSize(),
+				NULL,
+				&mGeometryShader);
 
+			if (FAILED(hr) || mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Cannot create D3D11 geometry shader " + mName + " from microcode.\nError Description:" + errorDescription,
+					"D3D11GpuGeometryProgram::loadFromMicrocode");
+			}
+		}
+		else
+		{
+			LogManager::getSingleton().logMessage(
+				"Unsupported D3D11 geometry shader '" + mName + "' was not loaded.");
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuGeometryProgram::unloadImpl(void)
+	{
+		SAFE_RELEASE(mGeometryShader);
+	}
+	//-----------------------------------------------------------------------------
+	ID3D11GeometryShader * D3D11GpuGeometryProgram::getGeometryShader( void ) const
+	{
+		return mGeometryShader;
+	}
+	//-----------------------------------------------------------------------------
+	D3D11GpuDomainProgram::D3D11GpuDomainProgram(ResourceManager* creator, 
+		const String& name, ResourceHandle handle, const String& group, 
+		bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
+		: D3D11GpuProgram(creator, name, handle, group, isManual, loader, device)
+		, mDomainShader(NULL)
+	{
+		mType = GPT_DOMAIN_PROGRAM;
+	}
+	//-----------------------------------------------------------------------------
+	D3D11GpuDomainProgram::~D3D11GpuDomainProgram()
+	{
+		// have to call this here reather than in Resource destructor
+		// since calling virtual methods in base destructors causes crash
+		unload(); 
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuDomainProgram::loadFromMicrocode(ID3D10Blob *  microcode)
+	{
+		if (isSupported())
+		{
+			// Create the shader
+			HRESULT hr = mDevice->CreateDomainShader(
+				static_cast<DWORD*>(microcode->GetBufferPointer()), 
+				microcode->GetBufferSize(),
+				NULL,
+				&mDomainShader);
+
+			if (FAILED(hr) || mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Cannot create D3D11 domain shader " + mName + " from microcode.\nError Description:" + errorDescription,
+					"D3D11GpuFragmentProgram::loadFromMicrocode");
+			}
+		}
+		else
+		{
+			LogManager::getSingleton().logMessage(
+				"Unsupported D3D11 domain shader '" + mName + "' was not loaded.");
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuDomainProgram::unloadImpl(void)
+	{
+		SAFE_RELEASE(mDomainShader);
+	}
+	//-----------------------------------------------------------------------------
+	ID3D11DomainShader * D3D11GpuDomainProgram::getDomainShader( void ) const
+	{
+		return mDomainShader;
+	}
+	//-----------------------------------------------------------------------------
+	D3D11GpuHullProgram::D3D11GpuHullProgram(ResourceManager* creator, 
+		const String& name, ResourceHandle handle, const String& group, 
+		bool isManual, ManualResourceLoader* loader, D3D11Device & device) 
+		: D3D11GpuProgram(creator, name, handle, group, isManual, loader, device)
+		, mHullShader(NULL)
+	{
+		mType = GPT_HULL_PROGRAM;
+	}
+	//-----------------------------------------------------------------------------
+	D3D11GpuHullProgram::~D3D11GpuHullProgram()
+	{
+		// have to call this here reather than in Resource destructor
+		// since calling virtual methods in base destructors causes crash
+		unload(); 
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuHullProgram::loadFromMicrocode(ID3D10Blob *  microcode)
+	{
+		if (isSupported())
+		{
+			// Create the shader
+			HRESULT hr = mDevice->CreateHullShader(
+				static_cast<DWORD*>(microcode->GetBufferPointer()), 
+				microcode->GetBufferSize(),
+				NULL,
+				&mHullShader);
+
+			if (FAILED(hr) || mDevice.isError())
+			{
+				String errorDescription = mDevice.getErrorDescription(hr);
+				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+					"Cannot create D3D11 hull shader " + mName + " from microcode.\nError Description:" + errorDescription,
+					"D3D11GpuFragmentProgram::loadFromMicrocode");
+			}
+		}
+		else
+		{
+			LogManager::getSingleton().logMessage(
+				"Unsupported D3D11 hull shader '" + mName + "' was not loaded.");
+		}
+	}
+	//-----------------------------------------------------------------------------
+	void D3D11GpuHullProgram::unloadImpl(void)
+	{
+		SAFE_RELEASE(mHullShader);
+	}
+	//-----------------------------------------------------------------------------
+	ID3D11HullShader * D3D11GpuHullProgram::getHullShader( void ) const
+	{
+		return mHullShader;
+	}
+	//-----------------------------------------------------------------------------
 }
 

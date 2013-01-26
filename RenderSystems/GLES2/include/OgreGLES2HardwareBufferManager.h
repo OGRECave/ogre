@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,8 @@ namespace Ogre {
     // Default threshold at which glMapBuffer becomes more efficient than glBufferSubData (32k?)
     #   define OGRE_GL_DEFAULT_MAP_BUFFER_THRESHOLD (1024 * 32)
 
+	class GLES2StateCacheManager;
+
     /** Implementation of HardwareBufferManager for OpenGL ES. */
     class _OgreGLES2Export GLES2HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
@@ -43,6 +45,7 @@ namespace Ogre {
             char* mScratchBufferPool;
             OGRE_MUTEX(mScratchMutex)
             size_t mMapBufferThreshold;
+			GLES2StateCacheManager* mStateCacheManager;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
             /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
@@ -60,6 +63,14 @@ namespace Ogre {
                 HardwareBuffer::Usage usage, bool useShadowBuffer = false);
 	        /// Create a render to vertex buffer
     	    RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+            HardwareUniformBufferSharedPtr
+            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name = "");
+            /// Create a uniform buffer
+            HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
+                                                               bool useShadowBuffer, size_t binding, const String& name = "");
+            HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                                                               HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                               bool useShadowBuffer = false, const String& name = "");
 
             /// Utility function to get the correct GL usage based on HBU's
             static GLenum getGLUsage(unsigned int usage);
@@ -83,6 +94,7 @@ namespace Ogre {
             */
             size_t getGLMapBufferThreshold() const;
             void setGLMapBufferThreshold( const size_t value );
+			GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
     };
 
 	/// GLES2HardwareBufferManagerBase as a Singleton
@@ -135,7 +147,6 @@ namespace Ogre {
 		{
 			static_cast<GLES2HardwareBufferManagerBase*>(mImpl)->setGLMapBufferThreshold(value);
 		}
-
 	};
 
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
 #include "OgreD3D11RenderToVertexBuffer.h"
+#include "OgreD3D11HardwareUniformBuffer.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreD3D11Device.h"
@@ -83,23 +84,6 @@ namespace Ogre {
 		HardwareBuffer::Usage usage, bool useShadowBuffer)
 	{
 		assert (numIndexes > 0);
-#if OGRE_D3D_MANAGE_BUFFERS
-		// Override shadow buffer setting; managed buffers are automatically
-		// backed by system memory
-		if (useShadowBuffer)
-		{
-			useShadowBuffer = false;
-			// Also drop any WRITE_ONLY so we can read direct
-			if (usage == HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_DYNAMIC;
-			}
-			else if (usage == HardwareBuffer::HBU_STATIC_WRITE_ONLY)
-			{
-				usage = HardwareBuffer::HBU_STATIC;
-			}
-		}
-#endif
 		D3D11HardwareIndexBuffer* idx = new D3D11HardwareIndexBuffer(
 			this, itype, numIndexes, usage, mlpD3DDevice, false, useShadowBuffer);
 		{
@@ -116,6 +100,52 @@ namespace Ogre {
 		return RenderToVertexBufferSharedPtr(new D3D11RenderToVertexBuffer(mlpD3DDevice, this));
 	}
 	//-----------------------------------------------------------------------
+	HardwareUniformBufferSharedPtr 
+		D3D11HardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	{
+		assert (sizeBytes > 0);
+		D3D11HardwareUniformBuffer* uni = 0;
+		/*
+		if (name != "")
+		{
+			SharedUniformBufferMap::iterator it = mSharedUniformBuffers.find(name);
+			if (it != mSharedUniformBuffers.end())
+			{
+				uni = static_cast<D3D11HardwareUniformBuffer*>(it->second);
+				assert (uni->getSizeInBytes() == sizeBytes);
+				assert (uni->getUsage() == usage);
+			}
+			else
+			{
+				uni = new D3D11HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, mlpD3DDevice);
+				{
+					OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+					mUniformBuffers.insert(uni);
+					//mSharedUniformBuffers.insert(std::make_pair(name, uni));
+				}
+			}
+		}
+		else
+		{*/
+			uni = new D3D11HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name, mlpD3DDevice);
+			{
+				OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+				mUniformBuffers.insert(uni);
+			}
+		//}
+
+		return HardwareUniformBufferSharedPtr(uni);
+	}	
+    //-----------------------------------------------------------------------
+	HardwareCounterBufferSharedPtr
+    D3D11HardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
+                                                          HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+	{
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "*** not implemented ***",
+                    "D3D11HardwareBufferManagerBase::createCounterBuffer");
+	}
+	//-----------------------------------------------------------------------
 	VertexDeclaration* D3D11HardwareBufferManagerBase::createVertexDeclarationImpl(void)
 	{
 		return new D3D11VertexDeclaration(mlpD3DDevice);
@@ -130,7 +160,7 @@ namespace Ogre {
 	{
 		size_t iCount = 0;
 		size_t vCount = 0;
-
+		size_t uCount = 0;
 
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
@@ -159,17 +189,34 @@ namespace Ogre {
 			}
 		}
 
+		{
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+				UniformBufferList::iterator i, iend;
+			iend = mUniformBuffers.end();
+			for (i = mUniformBuffers.begin(); i != iend; ++i)
+			{
+				D3D11HardwareUniformBuffer* ubuf = 
+					static_cast<D3D11HardwareUniformBuffer*>(*i);
+				if (ubuf->releaseIfDefaultPool())
+					uCount++;
+
+			}
+		}
+
 		LogManager::getSingleton().logMessage("D3D11HardwareBufferManagerBase released:");
 		LogManager::getSingleton().logMessage(
 			StringConverter::toString(vCount) + " unmanaged vertex buffers");
 		LogManager::getSingleton().logMessage(
 			StringConverter::toString(iCount) + " unmanaged index buffers");
+		LogManager::getSingleton().logMessage(
+			StringConverter::toString(uCount) + " unmanaged uniform buffers");
 	}
 	//-----------------------------------------------------------------------
 	void D3D11HardwareBufferManagerBase::recreateDefaultPoolResources(void)
 	{
 		size_t iCount = 0;
 		size_t vCount = 0;
+		size_t uCount = 0;
 
 		{
 			OGRE_LOCK_MUTEX(mVertexBuffersMutex)
@@ -198,11 +245,27 @@ namespace Ogre {
 			}
 		}
 
+		{
+			OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+				UniformBufferList::iterator i, iend;
+			iend = mUniformBuffers.end();
+			for (i = mUniformBuffers.begin(); i != iend; ++i)
+			{
+				D3D11HardwareUniformBuffer* ubuf = 
+					static_cast<D3D11HardwareUniformBuffer*>(*i);
+				if (ubuf->releaseIfDefaultPool())
+					uCount++;
+
+			}
+		}
+
 		LogManager::getSingleton().logMessage("D3D11HardwareBufferManagerBase recreated:");
 		LogManager::getSingleton().logMessage(
 			StringConverter::toString(vCount) + " unmanaged vertex buffers");
 		LogManager::getSingleton().logMessage(
 			StringConverter::toString(iCount) + " unmanaged index buffers");
+		LogManager::getSingleton().logMessage(
+			StringConverter::toString(uCount) + " unmanaged uniform buffers");
 	}
 	//-----------------------------------------------------------------------
 

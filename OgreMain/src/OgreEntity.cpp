@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -575,8 +575,12 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                mAnimationState->copyMatchingState(
-					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
+                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
+				if (mAnimationState != targetState) // only copy if lods use different skeleton instances
+				{
+					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
+						mAnimationState->copyMatchingState(targetState);
+				}
             }
             displayEntity = mLodEntityList[mMeshLodIndex - 1];
         }
@@ -1859,8 +1863,12 @@ namespace Ogre {
             {
                 // Copy the animation state set to lod entity, we assume the lod
                 // entity only has a subset animation states
-                mAnimationState->copyMatchingState(
-					mLodEntityList[mMeshLodIndex - 1]->mAnimationState);
+                AnimationStateSet* targetState = mLodEntityList[mMeshLodIndex - 1]->mAnimationState;
+				if (mAnimationState != targetState) // only copy if lods have different skeleton instances
+				{
+					if (mAnimationState->getDirtyFrameNumber() != targetState->getDirtyFrameNumber()) // only copy if animation was updated
+						mAnimationState->copyMatchingState(targetState);
+				}
             }
             return mLodEntityList[mMeshLodIndex-1]->getShadowVolumeRenderableIterator(
                 shadowTechnique, light, indexBuffer, extrude,
@@ -1892,6 +1900,9 @@ namespace Ogre {
         Vector4 lightPos = light->getAs4DVector();
         Matrix4 world2Obj = mParentNode->_getFullTransform().inverseAffine();
         lightPos = world2Obj.transformAffine(lightPos);
+        Matrix3 world2Obj3x3;
+        world2Obj.extract3x3Matrix(world2Obj3x3);
+        extrusionDistance *= Math::Sqrt(std::min(std::min(world2Obj3x3.GetColumn(0).squaredLength(), world2Obj3x3.GetColumn(1).squaredLength()), world2Obj3x3.GetColumn(2).squaredLength()));
 
         // We need to search the edge list for silhouette edges
         EdgeData* edgeList = getEdgeList();

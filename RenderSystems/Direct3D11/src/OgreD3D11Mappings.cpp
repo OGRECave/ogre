@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -186,32 +186,40 @@ namespace Ogre
 	return 0;
 	}*/
 	//---------------------------------------------------------------------
-	D3D11_BLEND D3D11Mappings::get(SceneBlendFactor sbf)
+	D3D11_BLEND D3D11Mappings::get(SceneBlendFactor sbf, bool forAlpha)
 	{
 		switch( sbf )
 		{
-		case SBF_ONE:
-			return D3D11_BLEND_ONE;
-		case SBF_ZERO:
-			return D3D11_BLEND_ZERO;
-		case SBF_DEST_COLOUR:
-			return D3D11_BLEND_DEST_COLOR;
-		case SBF_SOURCE_COLOUR:
-			return D3D11_BLEND_SRC_COLOR;
-		case SBF_ONE_MINUS_DEST_COLOUR:
-			return D3D11_BLEND_INV_DEST_COLOR;
-		case SBF_ONE_MINUS_SOURCE_COLOUR:
-			return D3D11_BLEND_INV_SRC_COLOR;
-		case SBF_DEST_ALPHA:
-			return D3D11_BLEND_DEST_ALPHA;
-		case SBF_SOURCE_ALPHA:
-			return D3D11_BLEND_SRC_ALPHA;
-		case SBF_ONE_MINUS_DEST_ALPHA:
-			return D3D11_BLEND_INV_DEST_ALPHA;
-		case SBF_ONE_MINUS_SOURCE_ALPHA:
-			return D3D11_BLEND_INV_SRC_ALPHA;
+		case SBF_ONE:						return D3D11_BLEND_ONE;
+		case SBF_ZERO:						return D3D11_BLEND_ZERO;
+		case SBF_DEST_COLOUR:				return forAlpha ? D3D11_BLEND_DEST_ALPHA : D3D11_BLEND_DEST_COLOR;
+		case SBF_SOURCE_COLOUR:				return forAlpha ? D3D11_BLEND_SRC_ALPHA : D3D11_BLEND_SRC_COLOR;
+		case SBF_ONE_MINUS_DEST_COLOUR: 	return forAlpha ? D3D11_BLEND_INV_DEST_ALPHA : D3D11_BLEND_INV_DEST_COLOR;
+		case SBF_ONE_MINUS_SOURCE_COLOUR:   return forAlpha ? D3D11_BLEND_INV_SRC_ALPHA : D3D11_BLEND_INV_SRC_COLOR;
+		case SBF_DEST_ALPHA:                return D3D11_BLEND_DEST_ALPHA;
+		case SBF_SOURCE_ALPHA:              return D3D11_BLEND_SRC_ALPHA;
+		case SBF_ONE_MINUS_DEST_ALPHA:      return D3D11_BLEND_INV_DEST_ALPHA;
+		case SBF_ONE_MINUS_SOURCE_ALPHA:    return D3D11_BLEND_INV_SRC_ALPHA;
 		}
 		return D3D11_BLEND_ZERO;
+	}
+	//---------------------------------------------------------------------
+	D3D11_BLEND_OP D3D11Mappings::get(SceneBlendOperation sbo)
+	{
+		switch( sbo )
+		{
+		case SBO_ADD:
+			return D3D11_BLEND_OP_ADD;
+		case SBO_SUBTRACT:
+			return D3D11_BLEND_OP_SUBTRACT;
+		case SBO_REVERSE_SUBTRACT:
+			return D3D11_BLEND_OP_REV_SUBTRACT;
+		case SBO_MIN:
+			return D3D11_BLEND_OP_MIN;
+		case SBO_MAX:
+			return D3D11_BLEND_OP_MAX;
+		}
+		return D3D11_BLEND_OP_ADD;
 	}
 	//---------------------------------------------------------------------
 	D3D11_COMPARISON_FUNC D3D11Mappings::get(CompareFunction cf)
@@ -365,7 +373,9 @@ namespace Ogre
 		case MARGE_FOR_SWITCH(true, FO_ANISOTROPIC, FO_ANISOTROPIC, FO_ANISOTROPIC):
 			res = D3D11_FILTER_COMPARISON_ANISOTROPIC;
 			break;
-
+		case MARGE_FOR_SWITCH(true, FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR):
+			res = D3D11_FILTER_COMPARISON_ANISOTROPIC;
+			break;
 		case MARGE_FOR_SWITCH(false, FO_POINT, FO_POINT, FO_POINT):
 			res = D3D11_FILTER_MIN_MAG_MIP_POINT;
 			break;
@@ -393,6 +403,9 @@ namespace Ogre
 		case MARGE_FOR_SWITCH(false, FO_ANISOTROPIC, FO_ANISOTROPIC, FO_ANISOTROPIC):
 			res = D3D11_FILTER_ANISOTROPIC;
 			break;
+		case MARGE_FOR_SWITCH(false, FO_ANISOTROPIC, FO_ANISOTROPIC, FO_LINEAR):
+			res = D3D11_FILTER_ANISOTROPIC;
+			break;
 		default:
 			res = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		}	
@@ -405,14 +418,7 @@ namespace Ogre
 		DWORD ret = 0;
 		if (usage & HardwareBuffer::HBU_DYNAMIC)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the dynamic flag for default pool, and
-			// we use default pool when buffer is discardable
-			if (usage & HardwareBuffer::HBU_DISCARDABLE)
-				ret |= D3D11_USAGE_DYNAMIC;
-#else
 			ret |= D3D11_USAGE_DYNAMIC;
-#endif
 		}
 		if (usage & HardwareBuffer::HBU_WRITE_ONLY)
 		{
@@ -426,16 +432,9 @@ namespace Ogre
 		D3D11_MAP ret = D3D11_MAP_READ_WRITE;
 		if (options == HardwareBuffer::HBL_DISCARD)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the discard flag for dynamic usgae and default pool
-			if ((usage & HardwareBuffer::HBU_DYNAMIC) &&
-				(usage & HardwareBuffer::HBU_DISCARDABLE))
-				ret = D3D11_MAP_WRITE_DISCARD;
-#else
 			// D3D doesn't like discard or no_overwrite on non-dynamic buffers
 			if (usage & HardwareBuffer::HBU_DYNAMIC)
 				ret = D3D11_MAP_WRITE_DISCARD;
-#endif
 		}
 		if (options == HardwareBuffer::HBL_READ_ONLY)
 		{
@@ -448,16 +447,9 @@ namespace Ogre
 		}
 		if (options == HardwareBuffer::HBL_NO_OVERWRITE)
 		{
-#if OGRE_D3D_MANAGE_BUFFERS
-			// Only add the nooverwrite flag for dynamic usgae and default pool
-			if ((usage & HardwareBuffer::HBU_DYNAMIC) &&
-				(usage & HardwareBuffer::HBU_DISCARDABLE))
-				ret = D3D11_MAP_WRITE_NO_OVERWRITE;
-#else
 			// D3D doesn't like discard or no_overwrite on non-dynamic buffers
 			if (usage & HardwareBuffer::HBU_DYNAMIC)
 				ret = D3D11_MAP_WRITE_NO_OVERWRITE;
-#endif 
 		}
 
 		return ret;
@@ -598,187 +590,127 @@ namespace Ogre
 	{
 		switch(d3dPF)
 		{
+		case DXGI_FORMAT_UNKNOWN:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32A32_TYPELESS:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:		return PF_FLOAT32_RGBA;
+		case DXGI_FORMAT_R32G32B32A32_UINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32A32_SINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32_TYPELESS:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32_FLOAT:			return PF_FLOAT32_RGB;
+		case DXGI_FORMAT_R32G32B32_UINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32B32_SINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16B16A16_TYPELESS:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:		return PF_FLOAT16_RGBA;
+		case DXGI_FORMAT_R16G16B16A16_UNORM:		return PF_SHORT_RGBA;
+		case DXGI_FORMAT_R16G16B16A16_UINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16B16A16_SNORM:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16B16A16_SINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32_TYPELESS:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32_FLOAT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32_UINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G32_SINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R32G8X24_TYPELESS:			return PF_UNKNOWN;
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:	return PF_UNKNOWN;
+		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT:	return PF_UNKNOWN;
+		case DXGI_FORMAT_R10G10B10A2_TYPELESS:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R10G10B10A2_UNORM:			return PF_A2B10G10R10;
+		case DXGI_FORMAT_R10G10B10A2_UINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R11G11B10_FLOAT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8B8A8_UNORM:			return PF_A8B8G8R8;
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:		return PF_A8B8G8R8;
+		case DXGI_FORMAT_R8G8B8A8_UINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8B8A8_SNORM:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8B8A8_SINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_TYPELESS:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_FLOAT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_UNORM:				return PF_SHORT_GR;
+		case DXGI_FORMAT_R16G16_UINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_SNORM:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16G16_SINT:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R32_TYPELESS:				return PF_UNKNOWN;
+		case DXGI_FORMAT_D32_FLOAT:					return PF_DEPTH;
+		case DXGI_FORMAT_R32_FLOAT:					return PF_FLOAT32_R;
+		case DXGI_FORMAT_R32_UINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R32_SINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R24G8_TYPELESS:			return PF_UNKNOWN;
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:			return PF_UNKNOWN;
+		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:		return PF_UNKNOWN;
+		case DXGI_FORMAT_X24_TYPELESS_G8_UINT:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_TYPELESS:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_UNORM:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_UINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_SNORM:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_SINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R16_TYPELESS:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R16_FLOAT:					return PF_FLOAT16_R;
+		case DXGI_FORMAT_D16_UNORM:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R16_UNORM:					return PF_L16;
+		case DXGI_FORMAT_R16_UINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R16_SNORM:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R16_SINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R8_TYPELESS:				return PF_UNKNOWN;
+		case DXGI_FORMAT_R8_UNORM:					return PF_L8;
+		case DXGI_FORMAT_R8_UINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R8_SNORM:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R8_SINT:					return PF_UNKNOWN;
+		case DXGI_FORMAT_A8_UNORM:					return PF_A8;
+		case DXGI_FORMAT_R1_UNORM:					return PF_UNKNOWN;
+		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:		return PF_UNKNOWN;
+		case DXGI_FORMAT_R8G8_B8G8_UNORM:			return PF_UNKNOWN;
+		case DXGI_FORMAT_G8R8_G8B8_UNORM:			return PF_UNKNOWN;
+		case DXGI_FORMAT_BC1_TYPELESS:				return PF_DXT1;
+		case DXGI_FORMAT_BC1_UNORM:					return PF_DXT1;
+		case DXGI_FORMAT_BC1_UNORM_SRGB:			return PF_DXT1;
+		case DXGI_FORMAT_BC2_TYPELESS:				return PF_DXT2;
+		case DXGI_FORMAT_BC2_UNORM:					return PF_DXT2;
+		case DXGI_FORMAT_BC2_UNORM_SRGB:			return PF_DXT2;
+		case DXGI_FORMAT_BC3_TYPELESS:				return PF_DXT3;
+		case DXGI_FORMAT_BC3_UNORM:					return PF_DXT3;
+		case DXGI_FORMAT_BC3_UNORM_SRGB:			return PF_DXT3;
+		case DXGI_FORMAT_BC4_TYPELESS:				return PF_DXT4;
+		case DXGI_FORMAT_BC4_UNORM:					return PF_DXT4;
+		case DXGI_FORMAT_BC4_SNORM:					return PF_DXT4;
+		case DXGI_FORMAT_BC5_TYPELESS:				return PF_DXT5;
+		case DXGI_FORMAT_BC5_UNORM:					return PF_DXT5;
+		case DXGI_FORMAT_BC5_SNORM:					return PF_DXT5;
+		case DXGI_FORMAT_B5G6R5_UNORM:				return PF_R5G6B5;
+		case DXGI_FORMAT_B5G5R5A1_UNORM:			return PF_A1R5G5B5;
+		case DXGI_FORMAT_B8G8R8A8_UNORM:			return PF_A8R8G8B8;
+		case DXGI_FORMAT_B8G8R8X8_UNORM:			return PF_X8R8G8B8;
 
-		case DXGI_FORMAT_UNKNOWN	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32B32A32_TYPELESS	:
-			return PF_FLOAT32_RGBA;
-		case DXGI_FORMAT_R32G32B32A32_FLOAT	:
-			return PF_FLOAT32_RGBA;
-		case DXGI_FORMAT_R32G32B32A32_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32B32A32_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32B32_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32B32_FLOAT	:
-			return PF_FLOAT32_RGB;
-		case DXGI_FORMAT_R32G32B32_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32B32_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16B16A16_TYPELESS	:
-			return PF_FLOAT16_RGBA;
-		case DXGI_FORMAT_R16G16B16A16_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16B16A16_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16B16A16_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16B16A16_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16B16A16_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G32_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32G8X24_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R10G10B10A2_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R10G10B10A2_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R10G10B10A2_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R11G11B10_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8B8A8_TYPELESS	:
-			return PF_R8G8B8A8;
-		case DXGI_FORMAT_R8G8B8A8_UNORM	:
-			return PF_R8G8B8A8;
-		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8B8A8_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8B8A8_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8B8A8_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16G16_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_D32_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R32_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R24G8_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_D24_UNORM_S8_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_X24_TYPELESS_G8_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_FLOAT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_D16_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R16_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8_UINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8_SNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8_SINT	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_A8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R1_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_R8G8_B8G8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_G8R8_G8B8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_BC1_TYPELESS	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_BC1_UNORM	:
-			return PF_DXT1;
-		case DXGI_FORMAT_BC1_UNORM_SRGB	:
-			return PF_DXT1;
-		case DXGI_FORMAT_BC2_TYPELESS	:
-			return PF_DXT2;
-		case DXGI_FORMAT_BC2_UNORM	:
-			return PF_DXT2;
-		case DXGI_FORMAT_BC2_UNORM_SRGB	:
-			return PF_DXT2;
-		case DXGI_FORMAT_BC3_TYPELESS	:
-			return PF_DXT3;
-		case DXGI_FORMAT_BC3_UNORM	:
-			return PF_DXT3;
-		case DXGI_FORMAT_BC3_UNORM_SRGB	:
-			return PF_DXT3;
-		case DXGI_FORMAT_BC4_TYPELESS	:
-			return PF_DXT4;
-		case DXGI_FORMAT_BC4_UNORM	:
-			return PF_DXT4;
-		case DXGI_FORMAT_BC4_SNORM	:
-			return PF_DXT4;
-		case DXGI_FORMAT_BC5_TYPELESS	:
-			return PF_DXT5;
-		case DXGI_FORMAT_BC5_UNORM	:
-			return PF_DXT5;
-		case DXGI_FORMAT_BC5_SNORM	:
-			return PF_DXT5;
-		case DXGI_FORMAT_B5G6R5_UNORM	:
-			return PF_DXT5;
-		case DXGI_FORMAT_B5G5R5A1_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_B8G8R8A8_UNORM	:
-			return PF_UNKNOWN;
-		case DXGI_FORMAT_B8G8R8X8_UNORM	:
-			return PF_UNKNOWN;
-		default:
-			return PF_UNKNOWN;
+#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8)
+		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:return PF_UNKNOWN;
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:         return PF_UNKNOWN;
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:       return PF_A8R8G8B8;
+		case DXGI_FORMAT_B8G8R8X8_TYPELESS:         return PF_UNKNOWN;
+		case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:       return PF_X8R8G8B8;
+		case DXGI_FORMAT_BC6H_TYPELESS:             return PF_UNKNOWN;
+		case DXGI_FORMAT_BC6H_UF16:                 return PF_UNKNOWN;
+		case DXGI_FORMAT_BC6H_SF16:                 return PF_UNKNOWN;
+		case DXGI_FORMAT_BC7_TYPELESS:              return PF_UNKNOWN;
+		case DXGI_FORMAT_BC7_UNORM:                 return PF_UNKNOWN;
+		case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_UNKNOWN;
+		case DXGI_FORMAT_AYUV:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_Y410:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_Y416:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_NV12:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_P010:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_P016:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_420_OPAQUE:                return PF_UNKNOWN;
+		case DXGI_FORMAT_YUY2:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_Y210:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_Y216:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_NV11:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_AI44:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_IA44:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_P8:                        return PF_UNKNOWN;
+		case DXGI_FORMAT_A8P8:                      return PF_UNKNOWN;
+		case DXGI_FORMAT_B4G4R4A4_UNORM:            return PF_A4R4G4B4;
+#endif
+
+		default:									return PF_UNKNOWN;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -786,61 +718,35 @@ namespace Ogre
 	{
 		switch(ogrePF)
 		{
-		case PF_L8:
-			return DXGI_FORMAT_R8_UNORM;
-		case PF_L16:
-			return DXGI_FORMAT_R16_UNORM;
-		case PF_A8:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A4L4:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_BYTE_LA:
-			return DXGI_FORMAT_UNKNOWN; 
-		case PF_R3G3B2:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A1R5G5B5:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_R5G6B5:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A4R4G4B4:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_R8G8B8:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A8R8G8B8:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A8B8G8R8:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case PF_X8R8G8B8:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_X8B8G8R8:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_A2B10G10R10:
-			return DXGI_FORMAT_R10G10B10A2_TYPELESS;
-		case PF_A2R10G10B10:
-			return DXGI_FORMAT_UNKNOWN;
-		case PF_FLOAT16_R:
-			return DXGI_FORMAT_R16_FLOAT;
-		case PF_FLOAT16_RGBA:
-			return DXGI_FORMAT_R16G16B16A16_FLOAT;
-		case PF_FLOAT32_R:
-			return DXGI_FORMAT_R32_FLOAT;
-		case PF_FLOAT32_RGBA:
-			return DXGI_FORMAT_R32G32B32A32_FLOAT;
-		case PF_SHORT_RGBA:
-			return DXGI_FORMAT_R16G16B16A16_UNORM;
-		case PF_DXT1:
-			return DXGI_FORMAT_BC1_UNORM;
-		case PF_DXT2:
-			return DXGI_FORMAT_BC2_UNORM;
-		case PF_DXT3:
-			return DXGI_FORMAT_BC3_UNORM;
-		case PF_DXT4:
-			return DXGI_FORMAT_BC4_UNORM;
-		case PF_DXT5:
-			return DXGI_FORMAT_BC5_UNORM;
+		case PF_L8:				return DXGI_FORMAT_R8_UNORM;
+		case PF_L16:			return DXGI_FORMAT_R16_UNORM;
+		case PF_A8:				return DXGI_FORMAT_UNKNOWN;
+		case PF_A4L4:			return DXGI_FORMAT_UNKNOWN;
+		case PF_BYTE_LA:		return DXGI_FORMAT_UNKNOWN; 
+		case PF_R3G3B2:			return DXGI_FORMAT_UNKNOWN;
+		case PF_A1R5G5B5:		return DXGI_FORMAT_UNKNOWN;
+		case PF_R5G6B5:			return DXGI_FORMAT_UNKNOWN;
+		case PF_A4R4G4B4:		return DXGI_FORMAT_UNKNOWN;
+		case PF_R8G8B8:			return DXGI_FORMAT_UNKNOWN;
+		case PF_A8R8G8B8:		return DXGI_FORMAT_UNKNOWN;
+		case PF_A8B8G8R8:		return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case PF_X8R8G8B8:		return DXGI_FORMAT_UNKNOWN;
+		case PF_X8B8G8R8:		return DXGI_FORMAT_UNKNOWN;
+		case PF_A2B10G10R10:	return DXGI_FORMAT_R10G10B10A2_TYPELESS;
+		case PF_A2R10G10B10:	return DXGI_FORMAT_UNKNOWN;
+		case PF_FLOAT16_R:		return DXGI_FORMAT_R16_FLOAT;
+		case PF_FLOAT16_RGBA:	return DXGI_FORMAT_R16G16B16A16_FLOAT;
+		case PF_FLOAT32_R:		return DXGI_FORMAT_R32_FLOAT;
+		case PF_FLOAT32_RGBA:	return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case PF_SHORT_RGBA:		return DXGI_FORMAT_R16G16B16A16_UNORM;
+		case PF_DXT1:			return DXGI_FORMAT_BC1_UNORM;
+		case PF_DXT2:			return DXGI_FORMAT_BC2_UNORM;
+		case PF_DXT3:			return DXGI_FORMAT_BC3_UNORM;
+		case PF_DXT4:			return DXGI_FORMAT_BC4_UNORM;
+		case PF_DXT5:			return DXGI_FORMAT_BC5_UNORM;
+
 		case PF_UNKNOWN:
-		default:
-			return DXGI_FORMAT_UNKNOWN;
+		default:				return DXGI_FORMAT_UNKNOWN;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -887,26 +793,27 @@ namespace Ogre
 		return false;
 	}
 	//---------------------------------------------------------------------
+	bool D3D11Mappings::_isDynamic(int mUsage)
+	{
+		return _isDynamic(static_cast<HardwareBuffer::Usage>(mUsage));
+	}
+	//---------------------------------------------------------------------
 	D3D11_USAGE D3D11Mappings::_getUsage(int mUsage)
 	{
-		return D3D11_USAGE_DEFAULT;
+		return _getUsage(static_cast<HardwareBuffer::Usage>(mUsage));
 	}
 	//---------------------------------------------------------------------
 	UINT D3D11Mappings::_getAccessFlags(int mUsage)
 	{
-		return 0;
+		return _getAccessFlags(static_cast<HardwareBuffer::Usage>(mUsage));
 	}
 	//---------------------------------------------------------------------
 	UINT D3D11Mappings::_getAccessFlags(HardwareBuffer::Usage mUsage)
 	{
-		if (_isDynamic(mUsage))
-		{
+		if(_isDynamic(mUsage))
 			return D3D11_CPU_ACCESS_WRITE;
-		}
 		else
-		{
 			return 0;
-		}
 	}
 	//---------------------------------------------------------------------
 	DXGI_FORMAT D3D11Mappings::get(HardwareIndexBuffer::IndexType itype)
@@ -922,4 +829,130 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	TextureType D3D11Mappings::_getTexType(D3D11_SRV_DIMENSION type)
+	{
+		switch(type)
+		{
+		case D3D_SRV_DIMENSION_TEXTURE1D:
+			return TEX_TYPE_1D;
+		case D3D_SRV_DIMENSION_TEXTURE2D:
+		case D3D_SRV_DIMENSION_TEXTURE2DMS:
+			return TEX_TYPE_2D;
+		case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
+		case D3D_SRV_DIMENSION_TEXTURE2DMSARRAY:
+			return TEX_TYPE_2D_ARRAY;
+		case D3D_SRV_DIMENSION_TEXTURE3D:
+			return TEX_TYPE_3D;
+		case D3D_SRV_DIMENSION_TEXTURECUBE:
+			return TEX_TYPE_CUBE_MAP;
+		default:
+			// unknown
+			return static_cast<TextureType>(0);
+		}
+	}
+	//---------------------------------------------------------------------
+	size_t D3D11Mappings::_getSizeInBytes(PixelFormat pf, size_t xcount, size_t ycount)
+	{
+		if(xcount == 0 || ycount == 0)
+			return 0;
+
+		if(PixelUtil::isCompressed(pf))
+		{
+			// D3D wants the width of one row of cells in bytes
+			if (pf == PF_DXT1)
+			{
+				// 64 bits (8 bytes) per 4x4 block
+				return std::max<size_t>(1, xcount / 4) * std::max<size_t>(1, ycount / 4) * 8;
+			}
+			else
+			{
+				// 128 bits (16 bytes) per 4x4 block
+				return std::max<size_t>(1, xcount / 4) * std::max<size_t>(1, ycount / 4) * 16;
+			}
+		}
+		else
+		{
+			return xcount * ycount * PixelUtil::getNumElemBytes(pf);
+		}
+	}
+
+	UINT D3D11Mappings::_getTextureBindFlags(DXGI_FORMAT format, bool isdynamic)
+	{
+		if(isdynamic)
+			return D3D11_BIND_SHADER_RESOURCE; 
+
+		switch(format)
+		{
+		case DXGI_FORMAT_R32G32B32A32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_TYPELESS:
+		case DXGI_FORMAT_R32G32B32_FLOAT:
+		case DXGI_FORMAT_R32G32B32_UINT:
+		case DXGI_FORMAT_R32G32B32_SINT:
+		case DXGI_FORMAT_R16G16B16A16_TYPELESS:
+		case DXGI_FORMAT_R32G32_TYPELESS:
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
+		case DXGI_FORMAT_X32_TYPELESS_G8X24_UINT:
+		case DXGI_FORMAT_R10G10B10A2_TYPELESS:
+		case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
+		case DXGI_FORMAT_R8G8B8A8_TYPELESS:
+		case DXGI_FORMAT_R16G16_TYPELESS:
+		case DXGI_FORMAT_R32_TYPELESS:
+		case DXGI_FORMAT_D32_FLOAT:
+		case DXGI_FORMAT_R24G8_TYPELESS:
+		case DXGI_FORMAT_D24_UNORM_S8_UINT:
+		case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
+		case DXGI_FORMAT_X24_TYPELESS_G8_UINT:
+		case DXGI_FORMAT_R8G8_TYPELESS:
+		case DXGI_FORMAT_R16_TYPELESS:
+		case DXGI_FORMAT_D16_UNORM:
+		case DXGI_FORMAT_R8_TYPELESS:
+		case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:
+		case DXGI_FORMAT_R8G8_B8G8_UNORM:
+		case DXGI_FORMAT_G8R8_G8B8_UNORM:
+		case DXGI_FORMAT_BC1_TYPELESS:
+		case DXGI_FORMAT_BC1_UNORM:
+		case DXGI_FORMAT_BC1_UNORM_SRGB:
+		case DXGI_FORMAT_BC2_TYPELESS:
+		case DXGI_FORMAT_BC2_UNORM:
+		case DXGI_FORMAT_BC2_UNORM_SRGB:
+		case DXGI_FORMAT_BC3_TYPELESS:
+		case DXGI_FORMAT_BC3_UNORM:
+		case DXGI_FORMAT_BC3_UNORM_SRGB:
+		case DXGI_FORMAT_BC4_TYPELESS:
+		case DXGI_FORMAT_BC4_UNORM:
+		case DXGI_FORMAT_BC4_SNORM:
+		case DXGI_FORMAT_BC5_TYPELESS:
+		case DXGI_FORMAT_BC5_UNORM:
+		case DXGI_FORMAT_BC5_SNORM:
+		case DXGI_FORMAT_B8G8R8A8_TYPELESS:
+		case DXGI_FORMAT_B8G8R8X8_TYPELESS:
+		case DXGI_FORMAT_BC6H_TYPELESS:
+		case DXGI_FORMAT_BC6H_UF16:
+		case DXGI_FORMAT_BC6H_SF16:
+		case DXGI_FORMAT_BC7_TYPELESS:
+		case DXGI_FORMAT_BC7_UNORM:
+		case DXGI_FORMAT_BC7_UNORM_SRGB:
+			return D3D11_BIND_SHADER_RESOURCE;
+		default:
+			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		}
+	}
+
+	UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic)
+	{
+		if(isdynamic)
+			return 0;
+
+		UINT flags = 0;
+
+		if(bindflags & D3D11_BIND_RENDER_TARGET)
+			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+		if(textype == TEX_TYPE_CUBE_MAP)
+			flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
+
+		return flags;
+	}
 }

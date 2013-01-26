@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,12 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2HardwareIndexBuffer.h"
+#include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreGLES2VertexDeclaration.h"
+#include "OgreGLES2RenderToVertexBuffer.h"
+#include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Support.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -61,6 +66,7 @@ namespace Ogre {
 #	if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
 		mMapBufferThreshold = 0;
 #	endif
+		mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
 }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
@@ -104,8 +110,12 @@ namespace Ogre {
 
 	RenderToVertexBufferSharedPtr GLES2HardwareBufferManagerBase::createRenderToVertexBuffer()
 	{
+#if OGRE_NO_GLES3_SUPPORT == 0
+		return RenderToVertexBufferSharedPtr(new GLES2RenderToVertexBuffer);
+#else
 		// not supported
 		return RenderToVertexBufferSharedPtr();
+#endif
 	}
 
 	VertexDeclaration* GLES2HardwareBufferManagerBase::createVertexDeclarationImpl(void)
@@ -155,6 +165,23 @@ namespace Ogre {
             case VET_COLOUR_ARGB:
             case VET_UBYTE4:
                 return GL_UNSIGNED_BYTE;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            case VET_INT1:
+            case VET_INT2:
+            case VET_INT3:
+            case VET_INT4:
+                return GL_INT;
+            case VET_UINT1:
+            case VET_UINT2:
+            case VET_UINT3:
+            case VET_UINT4:
+                return GL_UNSIGNED_INT;
+            case VET_USHORT1:
+            case VET_USHORT2:
+            case VET_USHORT3:
+            case VET_USHORT4:
+                return GL_UNSIGNED_SHORT;
+#endif
             default:
                 return 0;
         };
@@ -269,4 +296,29 @@ namespace Ogre {
 	{
 		mMapBufferThreshold = value;
 	}
+    //---------------------------------------------------------------------
+    Ogre::HardwareUniformBufferSharedPtr GLES2HardwareBufferManagerBase::createUniformBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
+    {
+#if OGRE_NO_GLES3_SUPPORT == 0
+        GLES2HardwareUniformBuffer* buf =
+        new GLES2HardwareUniformBuffer(this, sizeBytes, usage, useShadowBuffer, name);
+        {
+            OGRE_LOCK_MUTEX(mUniformBuffersMutex)
+            mUniformBuffers.insert(buf);
+        }
+        return HardwareUniformBufferSharedPtr(buf);
+#else
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+            "GLES2 does not support uniform buffer objects", 
+            "GLES2HardwareBufferManagerBase::createUniformBuffer");
+#endif
+    }
+    //---------------------------------------------------------------------
+    Ogre::HardwareCounterBufferSharedPtr GLES2HardwareBufferManagerBase::createCounterBuffer( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name )
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "GLES2 does not support atomic counter buffers",
+                    "GLES2HardwareBufferManagerBase::createCounterBuffer");
+    }
+
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,13 +36,14 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11MultiRenderTarget::D3D11MultiRenderTarget(const String &name) :
 	//---------------------------------------------------------------------
-	MultiRenderTarget(name)
+	MultiRenderTarget(name), mNumberOfViews(0)
 	{
 		/// Clear targets
 		for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
 		{
 			targets[x] = 0;
 			mRenderTargetViews[x] = 0;
+			mRenderTargets[x] = 0;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -79,6 +80,7 @@ namespace Ogre
 		}
 
 		targets[attachment] = buffer;
+		mRenderTargets[attachment] = target;
 
 		ID3D11RenderTargetView** v;
 		target->getCustomAttribute( "ID3D11RenderTargetView", &v );
@@ -124,14 +126,33 @@ namespace Ogre
 		}
 		else if(name == "ID3D11RenderTargetView")
 		{
-			*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
+			//*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;
+			ID3D11RenderTargetView ** pRTView = (ID3D11RenderTargetView**)pData;
+
+			memset(pRTView,0,sizeof(pRTView));
+
+			for(int y=0; y<OGRE_MAX_MULTIPLE_RENDER_TARGETS && mRenderTargets[y]; ++y)
+			{
+				ID3D11RenderTargetView * view;
+				mRenderTargets[y]->getCustomAttribute("ID3D11RenderTargetView",&view);
+				pRTView[y]=view;
+			}
 			return;
 		}
 		else if( name == "numberOfViews" )
 		{
 			uint* n = reinterpret_cast<unsigned int*>(pData);
 			*n = mNumberOfViews;
+			return;
 		}
+		else if(name == "isTexture")
+		{
+			bool *b = reinterpret_cast< bool * >( pData );
+			*b = false;
+			return;
+		}
+
+		MultiRenderTarget::getCustomAttribute(name, pData);
 	}
 	//---------------------------------------------------------------------
 	void D3D11MultiRenderTarget::checkAndUpdate()

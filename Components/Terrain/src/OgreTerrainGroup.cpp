@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,8 @@ namespace Ogre
 	const uint16 TerrainGroup::WORKQUEUE_LOAD_REQUEST = 1;
 	const uint32 TerrainGroup::CHUNK_ID = StreamSerialiser::makeIdentifier("TERG");
 	const uint16 TerrainGroup::CHUNK_VERSION = 1;
+	uint TerrainGroup::LoadRequest::loadingTaskNum = 0;
+
 	//---------------------------------------------------------------------
 	TerrainGroup::TerrainGroup(SceneManager* sm, Terrain::Alignment align, 
 		uint16 terrainSize, Real terrainWorldSize)
@@ -46,6 +48,7 @@ namespace Ogre
 		, mFilenamePrefix("terrain")
 		, mFilenameExtension("dat")
 		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		, mAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(NONE) )
 	{
 		mDefaultImportData.terrainAlign = align;
 		mDefaultImportData.terrainSize = terrainSize;
@@ -70,6 +73,7 @@ namespace Ogre
 		, mFilenamePrefix("terrain")
 		, mFilenameExtension("dat")
 		, mResourceGroup(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		, mAutoUpdateLod(0)
 	{
 		mDefaultImportData.terrainAlign = mAlignment;
 		mDefaultImportData.terrainSize = 0;
@@ -86,6 +90,19 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	TerrainGroup::~TerrainGroup()
 	{
+		if(mAutoUpdateLod)
+		{
+			OGRE_DELETE mAutoUpdateLod;
+			mAutoUpdateLod = 0;
+		}
+
+		// waiting for terrain preparing finished
+		while(LoadRequest::loadingTaskNum>0)
+		{
+			OGRE_THREAD_SLEEP(50);
+			Root::getSingleton().getWorkQueue()->processResponses();
+		}
+
 		removeAllTerrains();
 
 		WorkQueue* wq = Root::getSingleton().getWorkQueue();
@@ -289,10 +306,59 @@ namespace Ogre
 			LoadRequest req;
 			req.slot = slot;
 			req.origin = this;
+			++LoadRequest::loadingTaskNum;
 			Root::getSingleton().getWorkQueue()->addRequest(
 				mWorkQueueChannel, WORKQUEUE_LOAD_REQUEST, 
 				Any(req), 0, synchronous);
 
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::increaseLodLevel(long x, long y, bool synchronous /* = false */)
+	{
+		TerrainSlot* slot = getTerrainSlot(x, y, false);
+		if (slot && slot->instance)
+		{
+			slot->instance->increaseLodLevel(synchronous);
+		}
+	}
+	void TerrainGroup::decreaseLodLevel(long x, long y)
+	{
+		TerrainSlot* slot = getTerrainSlot(x, y, false);
+		if (slot && slot->instance)
+		{
+			slot->instance->decreaseLodLevel();
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::setAutoUpdateLod(TerrainAutoUpdateLod* updater)
+	{
+		if(mAutoUpdateLod)
+			OGRE_DELETE mAutoUpdateLod;
+		mAutoUpdateLod = updater;
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::autoUpdateLod(long x, long y, bool synchronous, const Any &data)
+	{
+		if(mAutoUpdateLod)
+		{
+			TerrainSlot* slot = getTerrainSlot(x, y, synchronous);
+			if (slot)
+			{
+				mAutoUpdateLod->autoUpdateLod(slot->instance, synchronous, data);
+			}
+		}
+	}
+	//---------------------------------------------------------------------
+	void TerrainGroup::autoUpdateLodAll(bool synchronous, const Any &data)
+	{
+		if(mAutoUpdateLod)
+		{
+			for (TerrainSlotMap::iterator i = mTerrainSlots.begin(); i != mTerrainSlots.end(); ++i)
+			{
+				TerrainSlot* slot = i->second;
+				mAutoUpdateLod->autoUpdateLod(slot->instance, synchronous, data);
+			}
 		}
 	}
 	//---------------------------------------------------------------------
@@ -631,6 +697,7 @@ namespace Ogre
 	{
 		// No response data, just request
 		LoadRequest lreq = any_cast<LoadRequest>(res->getRequest()->getData());
+		--LoadRequest::loadingTaskNum;
 
 		if (res->succeeded())
 		{
@@ -642,7 +709,11 @@ namespace Ogre
 				// we must set the position
 				terrain->setPosition(getTerrainSlotPosition(slot->x, slot->y));
 
-				terrain->load();
+				// the LOD will be auto-updated, then load lowest LOD
+				if(mAutoUpdateLod)
+					terrain->load(-1,false);
+				else
+					terrain->load(0,true);
 
 				// hook up with neighbours
 				for (int i = -1; i <= 1; ++i)
@@ -821,6 +892,9 @@ namespace Ogre
 		ser.write(&mResourceGroup);
 		ser.write(&mOrigin);
 
+		uint32 autoUpdateLodStrategyId = (mAutoUpdateLod) ? mAutoUpdateLod->getStrategyId() : 0;
+		ser.write(&autoUpdateLodStrategyId);
+
 		// Default import settings (those not duplicated by the above)
 		ser.write(&mDefaultImportData.constantHeight);
 		ser.write(&mDefaultImportData.inputBias);
@@ -856,6 +930,9 @@ namespace Ogre
 		ser.read(&mFilenameExtension);
 		ser.read(&mResourceGroup);
 		ser.read(&mOrigin);
+		uint32 autoUpdateLodStrategyId;
+		ser.read(&autoUpdateLodStrategyId);
+		mAutoUpdateLod = TerrainAutoUpdateLodFactory::getAutoUpdateLod( autoUpdateLodStrategyId );
 
 		// Default import settings (those not duplicated by the above)
 		ser.read(&mDefaultImportData.constantHeight);

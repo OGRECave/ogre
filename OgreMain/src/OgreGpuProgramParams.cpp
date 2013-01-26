@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -599,7 +599,7 @@ namespace Ogre
 			{
 				// Check that the definitions are the same 
 				if (instdef->constType == shareddef.constType && 
-					instdef->arraySize == shareddef.arraySize)
+					instdef->arraySize <= shareddef.arraySize)
 				{
 					CopyDataEntry e;
 					e.srcDefinition = &shareddef;
@@ -631,11 +631,18 @@ namespace Ogre
 
 				// Deal with matrix transposition here!!!
 				// transposition is specific to the dest param set, shared params don't do it
-				if (mParams->getTransposeMatrices() && e.dstDefinition->constType == GCT_MATRIX_4X4)
+				if (mParams->getTransposeMatrices() && (e.dstDefinition->constType == GCT_MATRIX_4X4 ||
+                                                        e.dstDefinition->constType == GCT_MATRIX_DOUBLE_4X4))
 				{
-					for (int row = 0; row < 4; ++row)
-						for (int col = 0; col < 4; ++col)
-							pDst[row * 4 + col] = pSrc[col * 4 + row];
+                    // for each matrix that needs to be transposed and copied,
+                    for (size_t iMat = 0; iMat < e.dstDefinition->arraySize; ++iMat)
+                    {
+                        for (int row = 0; row < 4; ++row)
+                            for (int col = 0; col < 4; ++col)
+                                pDst[row * 4 + col] = pSrc[col * 4 + row];
+                        pSrc += 16;
+                        pDst += 16;
+                    }
 				}
 				else
 				{
@@ -651,7 +658,7 @@ namespace Ogre
 						size_t iterations = e.dstDefinition->elementSize / 4 
 							* e.dstDefinition->arraySize;
                         assert(iterations > 0);
-						size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
+						size_t valsPerIteration = e.srcDefinition->elementSize;
 						for (size_t l = 0; l < iterations; ++l)
 						{
 							memcpy(pDst, pSrc, sizeof(float) * valsPerIteration);
@@ -678,7 +685,7 @@ namespace Ogre
 					size_t iterations = (e.dstDefinition->elementSize / 4)
 						* e.dstDefinition->arraySize;
 					assert(iterations > 0);
-					size_t valsPerIteration = e.srcDefinition->elementSize / iterations;
+					size_t valsPerIteration = e.srcDefinition->elementSize;
 					for (size_t l = 0; l < iterations; ++l)
 					{
 						memcpy(pDst, pSrc, sizeof(int) * valsPerIteration);
@@ -762,9 +769,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void GpuProgramParameters::_setLogicalIndexes(
 		const GpuLogicalBufferStructPtr& floatIndexMap, 
+        const GpuLogicalBufferStructPtr& doubleIndexMap,
 		const GpuLogicalBufferStructPtr& intIndexMap)
 	{
 		mFloatLogicalToPhysical = floatIndexMap;
+		mDoubleLogicalToPhysical = doubleIndexMap;
 		mIntLogicalToPhysical = intIndexMap;
 
 		// resize the internal buffers
@@ -776,6 +785,11 @@ namespace Ogre
 		{
 			mFloatConstants.insert(mFloatConstants.end(), 
 				floatIndexMap->bufferSize - mFloatConstants.size(), 0.0f);
+		}
+		if (!doubleIndexMap.isNull() && doubleIndexMap->bufferSize > mDoubleConstants.size())
+		{
+			mDoubleConstants.insert(mDoubleConstants.end(),
+                                   doubleIndexMap->bufferSize - mDoubleConstants.size(), 0.0f);
 		}
 		if (!intIndexMap.isNull() &&  intIndexMap->bufferSize > mIntConstants.size())
 		{
@@ -1083,6 +1097,7 @@ namespace Ogre
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX:
 		case ACT_TEXTURE_WORLDVIEWPROJ_MATRIX_ARRAY:
 		case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX:
+		case ACT_SHADOW_EXTRUSION_DISTANCE:
 
 			// These depend on BOTH lights and objects
 			return ((uint16)GPV_PER_OBJECT) | ((uint16)GPV_LIGHTS);
@@ -1094,7 +1109,6 @@ namespace Ogre
 		case ACT_LIGHT_DIRECTION:
 		case ACT_LIGHT_POSITION_VIEW_SPACE:
 		case ACT_LIGHT_DIRECTION_VIEW_SPACE:
-		case ACT_SHADOW_EXTRUSION_DISTANCE:
 		case ACT_SHADOW_SCENE_DEPTH_RANGE:
 		case ACT_SHADOW_COLOUR:
 		case ACT_LIGHT_POWER_SCALE:
@@ -1218,8 +1232,9 @@ namespace Ogre
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
+                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
 					if (i->physicalIndex > physicalIndex &&
-						getAutoConstantDefinition(i->paramType)->elementType == ET_REAL)
+						def && def->elementType == ET_REAL)
 					{
 						i->physicalIndex += insertCount;
 					}
@@ -1324,8 +1339,9 @@ namespace Ogre
 				for (AutoConstantList::iterator i = mAutoConstants.begin();
 					i != mAutoConstants.end(); ++i)
 				{
+                    const GpuProgramParameters::AutoConstantDefinition* def = getAutoConstantDefinition(i->paramType);
 					if (i->physicalIndex > physicalIndex &&
-						getAutoConstantDefinition(i->paramType)->elementType == ET_INT)
+						def && def->elementType == ET_INT)
 					{
 						i->physicalIndex += insertCount;
 					}
@@ -2366,6 +2382,21 @@ namespace Ogre
 		if (def)
 			_writeRawConstants(def->physicalIndex, val, rawCount);
 	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::setNamedSubroutine(const String& subroutineSlot, const String& subroutine)
+	{
+		const GpuConstantDefinition* def = 
+			_findNamedConstantDefinition(subroutineSlot, !mIgnoreMissingParams);
+		if (def)
+		{
+			setSubroutine(def->logicalIndex, subroutine);
+		}
+	}
+	//---------------------------------------------------------------------
+	void GpuProgramParameters::setSubroutine(size_t index, const String& subroutine)
+	{
+		mSubroutineMap.insert(std::make_pair(index, subroutine));
+	}
 	//---------------------------------------------------------------------------
 	void GpuProgramParameters::setNamedAutoConstant(const String& name, 
 		AutoConstantType acType, size_t extraInfo)
@@ -2707,7 +2738,6 @@ namespace Ogre
 		}
 
 	}
-
 
 
 

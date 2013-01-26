@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -206,7 +206,7 @@ namespace Ogre {
 
         GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
         OSXCocoaContext *mainContext = (OSXCocoaContext*)rs->_getMainContext();
-        NSOpenGLContext *shareContext = mainContext == 0? nil : mainContext->getContext();
+        NSOpenGLContext *shareContext = mainContext == 0 ? nil : mainContext->getContext();
         mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
         
         // Set vsync by default to save battery and reduce tearing
@@ -234,7 +234,7 @@ namespace Ogre {
         {
             NameValuePairList::const_iterator param_useNSView_pair(NULL);
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
-            
+
             if(param_useNSView_pair != miscParams->end())
                 if(param_useNSView_pair->second == "true")
                     mUseNSView = true;
@@ -256,19 +256,31 @@ namespace Ogre {
                 mHeight = (int)b.size.height;
             }
 
-            [mGLContext setView:mView];
-            
+            mWindow = [mView window];
+
             // Add our window to the window event listener class
             WindowEventUtilities::_addRenderWindow(this);
         }
-
-        [mGLContext makeCurrentContext];
 
         // Create register the context with the rendersystem and associate it with this window
         mContext = OGRE_NEW OSXCocoaContext(mGLContext, mGLPixelFormat);
 
 		// Create the window delegate instance to handle window resizing and other window events
         mWindowDelegate = [[OSXCocoaWindowDelegate alloc] initWithNSWindow:mWindow ogreWindow:this];
+
+        CGLLockContext((CGLContextObj)[mGLContext CGLContextObj]);
+
+        [mView setNeedsDisplay:YES];
+
+        if([mGLContext view] != mView)
+            [mGLContext setView:mView];
+        [mGLContext makeCurrentContext];
+        [mGLContext update];
+
+        rs->clearFrameBuffer(FBT_COLOUR);
+
+        [mGLContext flushBuffer];
+        CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
 
         [pool drain];
     }
@@ -341,8 +353,8 @@ namespace Ogre {
 
         mContext->endCurrent();
         
-            if(mGLContext != [NSOpenGLContext currentContext])
-                [mGLContext makeCurrentContext];
+        if(mGLContext != [NSOpenGLContext currentContext])
+            [mGLContext makeCurrentContext];
 	}
     
 	bool OSXCocoaWindow::isVSyncEnabled() const
@@ -417,15 +429,18 @@ namespace Ogre {
             return;
 
 		NSRect frame = [mWindow frame];
+        NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 		frame.origin.x = left;
-		frame.origin.y = top-frame.size.height;
+		frame.origin.y = screenFrame.size.height - frame.size.height - top;
         mWindowOrigin = frame.origin;
 		[mWindow setFrame:frame display:YES];
     }
 
     void OSXCocoaWindow::resize(unsigned int width, unsigned int height)
     {
-		if(!mWindow) return;
+		if(!mWindow)
+            return;
+        
         if(mIsFullScreen)
             return;
 
@@ -473,6 +488,7 @@ namespace Ogre {
         {
             NSRect viewFrame = [mView frame];
             NSRect windowFrame = [[mView window] frame];
+            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
 
             GLint bufferRect[4];
             bufferRect[0] = viewFrame.origin.x; // 0 = left edge 
@@ -482,9 +498,10 @@ namespace Ogre {
             CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
             CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
             [mGLContext update];
+
             
             mLeft = viewFrame.origin.x; 
-            mTop = bufferRect[1]; 
+            mTop = screenFrame.size.height - viewFrame.size.height;
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
         
@@ -504,12 +521,14 @@ namespace Ogre {
     {
         if(!mIsFullScreen)
         {
-            NSRect frame = [mView frame];
-            mWidth = (unsigned int)frame.size.width;
-            mHeight = (unsigned int)frame.size.height;
-            mLeft = (int)frame.origin.x;
-            mTop = (int)frame.origin.y+(unsigned int)frame.size.height;
-		
+            NSRect winFrame = [mWindow frame];
+            NSRect viewFrame = [mView frame];
+            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
+            mWidth = (unsigned int)viewFrame.size.width;
+            mHeight = (unsigned int)viewFrame.size.height;
+            mLeft = (int)winFrame.origin.x;
+            mTop = screenFrame.size.height - winFrame.size.height;
+
             mWindowOrigin = NSMakePoint(mLeft, mTop);
         }
 
@@ -614,7 +633,7 @@ namespace Ogre {
         bufferRect[3] = viewBounds.size.height;   // height of buffer rect 
         CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
         CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-        
+
         mIsExternal = true;
     }
 
@@ -626,7 +645,7 @@ namespace Ogre {
             {
                 // Set the backing store size to the viewport dimensions
                 // This ensures that it will scale to the full screen size
-                GLint backingStoreDimensions[2] = { mWidth, mHeight };
+                GLint backingStoreDimensions[2] = { (GLint)mWidth, (GLint)mHeight };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 

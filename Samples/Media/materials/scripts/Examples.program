@@ -21,7 +21,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCg cg
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4 cg
 {
-    source Example_Basic.cg
+    source Example_Basic_sm4.cg
     entry_point ambientOneTexture_vp
     profiles vs_4_0
 
@@ -54,6 +54,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
     default_params
     {
         param_named_auto ambient ambient_light_colour
+        param_named_auto worldViewProj worldviewproj_matrix
     }
 }
 
@@ -69,7 +70,7 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSLES glsles
     }
 }
 
-vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV glsles
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES glsles
 {
     source AmbientOneTextureWithUV.glsles
 
@@ -78,6 +79,27 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV glsles
         param_named_auto worldViewProj worldviewproj_matrix
         param_named_auto ambient ambient_light_colour
     }
+}
+
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSL glsl
+{
+    source AmbientOneTextureWithUV.glsl
+    syntax glsl150
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+        param_named_auto ambient ambient_light_colour
+    }
+}
+
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureWithUV unified
+{
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSL
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureWithUVGLSLES
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureHLSL
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCg
+    delegate Ogre/BasicVertexPrograms/AmbientOneTextureCgSm4
 }
 
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureUnified unified
@@ -105,8 +127,18 @@ fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES glsles
     }
 }
 
+fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSL glsl
+{
+    source DiffuseOneTexture.glsl
+    default_params
+    {
+        param_named texMap int 0
+    }
+}
+
 fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTexture unified
 {
+	delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSL
     delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureGLSLES
     delegate Ogre/BasicFragmentPrograms/DiffuseOneTextureCg
 }
@@ -114,6 +146,7 @@ fragment_program Ogre/BasicFragmentPrograms/DiffuseOneTexture unified
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 {
+    delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSL
     delegate Ogre/BasicFragmentPrograms/PassthroughFpGLSLES
     delegate Ogre/BasicFragmentPrograms/PassthroughFpCgSm4
     delegate Ogre/BasicFragmentPrograms/PassthroughFpCg
@@ -123,7 +156,7 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFP unified
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4 cg
 {
     entry_point main
-    source PassthroughFP.cg
+    source PassthroughFP_sm4.cg
     profiles ps_4_0
 }
 
@@ -131,14 +164,14 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCg cg
 {
     entry_point mainCg
     source PassthroughFP.cg
-    profiles ps_4_0 ps_2_0 arbfp1
+    profiles ps_2_0 arbfp1
 }
 
 // A really basic ambient pass program, support for one texture coordinate set
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTexture cg
 {
     entry_point mainForAmbientOneTexture
-    source PassthroughFP.cg
+    source PassthroughFP_sm4.cg
     profiles ps_4_0
 }
 
@@ -147,6 +180,11 @@ fragment_program Ogre/BasicFragmentPrograms/PassthroughFpCgSm4ForAmbientOneTextu
 fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSLES glsles
 {
     source PassthroughFP.glsles
+}
+
+fragment_program Ogre/BasicFragmentPrograms/PassthroughFpGLSL glsl
+{
+    source PassthroughFP.glsl
 }
 
 // Same as below, but for use when rendering texture shadows

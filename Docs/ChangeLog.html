@@ -31,6 +31,94 @@ Engine)</p>
 <p class="header" align="center">Change Log</p>
 
 
+<p class="mainheader">
+    v1.8.1 [Byatis] (02 September 2012) - MAINTENANCE RELEASE</p>
+<ul>
+<li>[GLES2] Add missing shader for skeletal sample</li>
+<li>Fix crashes in OS X template code.</li>
+<li>[OS X] Resolve some issues with visibility of symbols preventing universal builds.</li>
+<li>[GLES] Improvements to pixel format selection. Reduces conversions at runtime and enables more formats.</li>
+<li>Fix a couple defines in GLEW headers that I mistakenly altered during a batch replace. Resolves issues with FSAA on Windows using OpenGL</li>
+<li>Disabling X11 check for all Apple platforms. Because it may not always be available on the system.</li>
+<li>Fix a bug with OctreeNodes that are not in the scene graph being updated improperly. As reported in viewtopic.php?f=4&t=70617&p=461051</li>
+<li>Patch 3517455 - Rename the COPYING file due to CPack not allowing files without extensions.</li>
+<li>Patch 3526568 - Fix for when a listener object unreferences itself from the listened object while in a callback</li>
+<li>Patch 3525902 - SceneManager - Fix for when a listener object unreferences itself from the listened object while in a callback</li>
+<li>Bug 521 - Copy the flag to control auto edge list building when cloning a mesh.</li>
+<li>Bug 532 - Default values not being returned on invalid input to StringConverter::parse* functions</li>
+<li>Patch 3519819 - Add missing setRenderQueueGroupAndPriority functions to ParticleSystem and BillboardParticleRenderer.</li>
+<li>OS X - Fix the "invalid drawable" error that pops up in the log when a window is created.</li>
+<li>Patch 3324815 - Fix incorrect zip archive behavior. This also fixes a few of our unit tests.</li>
+<li>Add a missing capabilities mapping</li>
+<li>Fix up the Xcode 4 template</li>
+<li>iOS: Fix crash caused by missing GL function pointers with GLES 2 on iOS 4</li>
+<li>Revert part of a change that I made several months ago that was causing problems with texture shadows without edge lists.</li>
+<li>Bug 538 - Support for boost 1.50</li>
+<li>Bug 536 - Freetype 2.4.10</li>
+<li>Fix [3538257]: Listener was never actually removed in SceneManager::removeListener</li>
+<li>added check for icon existance in bool GLXGLSupport
+</li>
+<li>Made SimpleRenderable::setMaterial virtual.
+</li>
+<li>[OS X]  Use the path from the FindCg script to create the framework symlink instead of assuming the prebuilt dependencies are being used.</li>
+<li>Add a missing semicolon that has been causing some compile errors when using boost for threading.</li>
+<li>Moved call to wglShareLists before call to wglMakeCurrent to help Wine emulation</li>
+<li>[D3D9] Catch texture load exception in D3D9Texture::notifyOnDeviceCreate to prevent Ogre from crashing when moved to a new display</li>
+<li>[Papercut] Resolve ambiguity of get/setUserAny in InstanceBatch</li>
+<li>Fix [3545669]: Submesh operation type is not passed to tangent calculator causing triangle strips and fans to have improper tangents</li>
+<li>Fix [3542148] Properly set texture coordinate index in D3D9 if vertex program is used with projective texturing</li>
+<li>Fix [3538259]: Use _tempnam on Windows to generate temporary file name in OgreDeflate.cpp</li>
+<li>Fix [3535939]: In CompositorInstance::getTargetForTex search also for referenced texture name if referencing another compositor's texture</li>
+<li>[3531905] Fix a bug in LOD generation of XSI exporter</li>
+<li>[3531904] Update FindSoftimage.cmake to find Softimage 2013</li>
+<li>Applied and enhanced masterfalcon's patch to prevent BillboardChains from
+updating their vertex buffer except when they are actually being rendered.</li>
+<li>Fixed ParticleSystem's emitted emitters 'sputtering' when emission rate per frame near 1/2.</li>
+<li>Fix [522]: D3D9 / D3D11 destroyRenderTarget caused dangling pointer inside RS's</li>
+<li>Fix [504]: D3D9 Prevent infinite loop when CheckDeviceMultiSampleType fails when
+fsaa is 0</li>
+<li>Fix [454]: D3D9 add more error details when we can not create a vertex shader</li>
+<li>[3484580] Fix a potential crash when loading materials referencing non-existent shadow caster/receiver materials</li>
+<li>Increased size of GLX config dialog to accomodate for additional GL RenderSystem option</li>
+<li>TerrainGroup did not pass along parameters to underlying Terrain in update and updateDerivedData</li>
+<li>Fix [541]: In Rev 3513 the warning texture is created with a invalid context so
+the gl id was 0 - this broke materials without valid textures (if no texture is
+bounded the warning texture is bound)</li>
+<li>Fix for possible endless loop if requesting max number of mipmaps with 0 depth. Affects all GL render systems.</li>
+<li>Fixed -msse flag when building with MinGW.</li>
+<li>[OS X] Fix displaying garbage on first frame when using Cocoa windows.
+Also fixing the "invalid drawable" error.</li>
+<li>Fix incorrect header guard.</li>
+<li>Replace an ugly hack for GCC that was trying to force 16-byte stack alignment in OgreOptimisedUtilSSE, but causes trouble with recent GCC versions</li>
+<li>GLES/GLES2 move error checks into the right place</li>
+<li>Fixed bug: D3D9 can now be compiled in static with MinGW.</li>
+<li>Get PlayPen and VTests running with static builds like iOS. Also some minor code cleanup.</li>
+<li>Patches 3506252 & 3535295 - Profiler enhancements and support for GPU profile events.</li>
+<li>Fix [541]: viewportDestroyed were never called</li>
+<li>Fix a crash when starting/stopping the terrain sample with shadowing enabled. House entities need to be freed.</li>
+<li>Fix [549]: When ogre is compiled with profiler support link dx9 to dx11 so we can
+use D3DPERF_BeginEvent/D3DPERF_EndEvent/D3DPERF_SetMarker
+Fix some profiler crashes</li>
+<li>Bugfix: Instancing LOD distance strategy was considering entities that were not in the scene.
+Bugfix: Instancing LOD distance strategy was using very inaccurate distance formula.</li>
+<li>Bug 545: ScriptLexer is counting \r\n as 2 newlines</li>
+<li>Patch 3505652 - Fix for compositors recompiling every frame</li>
+<li>Patch 3489471 - Entity LOD animation bugfix</li>
+<li>Fixed a bug in the CMakeLists.txt that would cause an error when the user
+influences CMAKE_CXX_FLAGS manually in CMake.</li>
+<li>[GLES2] Attempt to resolve the isAttributeValid crash when shaders are either missing or have failed to compile/link. Also do a little more logging when reporting compile errors.</li>
+<li>Calling removeInstancedEntity on the same InstancedEntity more than once will now raise an exception.</li>
+<li>[iOS] Remove old GCC define to disable thumb and use a compiler flag instead. More reliable across gcc and clang.</li>
+<li>Make it possible to call Viewport::removeListener during viewportDestroyed event</li>
+<li>[OS X] Correctly compute Cocoa window origins and fix repositioning.</li>
+<li>HW-Instancing: Add support for meshes which use a shared vertex buffer</li>
+<li>Fixed the NaCl compile and link for the latest code changed in 1.8</li>
+<li>Fixed texture loading issues in GLES2 RS for NaCl.</li>
+<li>Changed RenderSystems on Windows to interpret externalWindowHandle and parentWindowHandle parameters as size_t instead of unsigned int, which has the wrong size on 64bit platforms</li>
+<li>Fix Unity builds for OSX (SampleBrowser did not compile)</li>
+</ul>
+</p>
+
 
 <p class="mainheader">
     v1.8.0 [Byatis] (25 May 2012) - MAJOR RELEASE</p>

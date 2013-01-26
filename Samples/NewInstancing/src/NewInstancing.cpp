@@ -705,7 +705,10 @@ void Sample_NewInstancing::testCapabilities( const RenderSystemCapabilities* cap
 	if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("fp40") &&
 		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_2_0") &&
-		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") )
+		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_3_0") &&
+		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0") &&
+		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_1") &&
+		!GpuProgramManager::getSingleton().isSyntaxSupported("ps_5_0"))
 	{
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Your card does not support the shader model needed for this sample, "
                     "so you cannot run this sample. Sorry!", "NewInstancing::testCapabilities");

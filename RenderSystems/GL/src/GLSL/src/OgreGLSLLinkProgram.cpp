@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,7 +116,6 @@ namespace Ogre {
 		, mUniformRefsBuilt(false)
         , mLinked(false)
 		, mTriedToLinkAndFailed(false)
-        , mColumnMajorMatrices(true)
 	{
 	}
 
@@ -133,25 +132,6 @@ namespace Ogre {
 		if (!mLinked && !mTriedToLinkAndFailed)
 		{			
 			glGetError(); //Clean up the error. Otherwise will flood log.
-
-            // test if all linked programs use the same matrix ordering
-            bool vertexOrder = true, fragmentOrder = true, geometryOrder = true;
-            if (mVertexProgram)
-                vertexOrder = mVertexProgram->getGLSLProgram()->getColumnMajorMatrices();
-            if (mFragmentProgram)
-                fragmentOrder = mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices();
-            if (mGeometryProgram)
-                geometryOrder = mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices();
-            if ((mVertexProgram && mFragmentProgram && vertexOrder != fragmentOrder) || 
-                (mVertexProgram && mGeometryProgram && vertexOrder != geometryOrder) ||
-                (mFragmentProgram && mGeometryProgram && fragmentOrder != geometryOrder))
-            {
-                mTriedToLinkAndFailed = true;
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
-                    "Trying to link GLSL programs with different matrix ordering.", 
-                    "GLSLLinkProgram::activate");
-            }
-            mColumnMajorMatrices = vertexOrder;
 
 			mGLHandle = glCreateProgramObjectARB();
 
@@ -282,6 +262,15 @@ namespace Ogre {
 		GLUniformReferenceIterator currentUniform = mGLUniformReferences.begin();
 		GLUniformReferenceIterator endUniform = mGLUniformReferences.end();
 
+        // determine if we need to transpose matrices when binding
+        int transpose = GL_TRUE;
+        if ((fromProgType == GPT_FRAGMENT_PROGRAM && mVertexProgram && (!mVertexProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_VERTEX_PROGRAM && mFragmentProgram && (!mFragmentProgram->getGLSLProgram()->getColumnMajorMatrices())) ||
+            (fromProgType == GPT_GEOMETRY_PROGRAM && mGeometryProgram && (!mGeometryProgram->getGLSLProgram()->getColumnMajorMatrices())))
+        {
+            transpose = GL_FALSE;
+        }
+
 		for (;currentUniform != endUniform; ++currentUniform)
 		{
 			// Only pull values from buffer it's supposed to be in (vertex or fragment)
@@ -294,7 +283,6 @@ namespace Ogre {
 				{
 
 					GLsizei glArraySize = (GLsizei)def->arraySize;
-                    int transpose = mColumnMajorMatrices ? GL_TRUE : GL_FALSE;
 
 					// get the index in the parameter real list
 					switch (def->constType)

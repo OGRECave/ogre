@@ -1,0 +1,12 @@
+void Modulate_fp
+(
+    in float2 uv: TEXCOORD0, 
+    
+    out float4 oColor0 : COLOR0,
+
+    uniform sampler ssao : register(s0),
+	uniform sampler scene: register(s1)
+)
+{
+    oColor0 = float4((tex2D(scene, uv) * tex2D(ssao, uv)).rgb, 1);
+}

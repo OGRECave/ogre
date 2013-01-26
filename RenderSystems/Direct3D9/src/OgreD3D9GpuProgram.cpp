@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -299,8 +299,24 @@ namespace Ogre {
 
 			if (FAILED(hr))
 			{
+				String errMsg = "Cannot create D3D9 vertex shader " + mName + " from microcode ";
+				switch (hr)
+				{
+				case D3DERR_INVALIDCALL:
+					errMsg += "(D3DERR_INVALIDCALL)";
+					break;
+				case D3DERR_OUTOFVIDEOMEMORY:
+					errMsg += "(D3DERR_OUTOFVIDEOMEMORY)";
+					break;
+				case E_OUTOFMEMORY:
+					errMsg += "(E_OUTOFMEMORY)";
+					break;
+				default:
+					break;
+				}				
+
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-					"Cannot create D3D9 vertex shader " + mName + " from microcode",
+					errMsg,
 					"D3D9GpuVertexProgram::loadFromMicrocode");
 	            
 			}

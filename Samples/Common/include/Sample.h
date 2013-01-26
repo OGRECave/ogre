@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,11 @@
 #define __Sample_H__
 
 #include "Ogre.h"
+#include "OgreOverlaySystem.h"
 #include <iostream>
 
-#include "OIS.h"
+#include "InputContext.h"
+#include "OgreFileSystemLayer.h"
 
 #ifdef USE_RTSHADER_SYSTEM
 #	include "OgreRTShaderSystem.h"
@@ -41,11 +43,14 @@
 #	include "macUtils.h"
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(USE_RTSHADER_SYSTEM)
+#   define USE_RTSHADER_SYSTEM
+#include "OgreShaderGenerator.h"
+#endif
+
 
 namespace OgreBites
 {
-	class FileSystemLayer;
-
 	/*=============================================================================
 	| Base class responsible for everything specific to one sample.
 	| Designed to be subclassed for each sample.
@@ -53,7 +58,6 @@ namespace OgreBites
 	class Sample : public Ogre::GeneralAllocatedObject
     {
     public:
-
 		/*=============================================================================
 		| Utility comparison structure for sorting samples using SampleSet.
 		=============================================================================*/
@@ -83,13 +87,6 @@ namespace OgreBites
 			mResourcesLoaded = false;
 			mContentSetup = false;
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-			mMouse = 0;
-			mAccelerometer = 0;
-#else
-			mKeyboard = 0;
-			mMouse = 0;
-#endif
 			mFSLayer = 0;
         }
 
@@ -140,19 +137,13 @@ namespace OgreBites
 		/*-----------------------------------------------------------------------------
 		| Sets up a sample. Used by the SampleContext class. Do not call directly.
 		-----------------------------------------------------------------------------*/
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		virtual void _setup(Ogre::RenderWindow* window, OIS::MultiTouch* mouse, FileSystemLayer* fsLayer)
-#else
-		virtual void _setup(Ogre::RenderWindow* window, OIS::Keyboard* keyboard, OIS::Mouse* mouse, FileSystemLayer* fsLayer)
-#endif
+		virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
 		{
 			// assign mRoot here in case Root was initialised after the Sample's constructor ran.
 			mRoot = Ogre::Root::getSingletonPtr();
+			mOverlaySystem = overlaySys;
 			mWindow = window;
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-			mKeyboard = keyboard;
-#endif
-			mMouse = mouse;
+			mInputContext = inputContext;
 			mFSLayer = fsLayer;
 
 			locateResources();
@@ -187,6 +178,7 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 				mShaderGenerator->removeSceneManager(mSceneMgr);
 #endif
+				mSceneMgr->removeRenderQueueListener(mOverlaySystem);
 				mRoot->destroySceneManager(mSceneMgr);				
 			}
 			mSceneMgr = 0;
@@ -262,6 +254,8 @@ namespace OgreBites
 #ifdef USE_RTSHADER_SYSTEM
 			mShaderGenerator->addSceneManager(mSceneMgr);
 #endif
+            if(mOverlaySystem)
+                mSceneMgr->addRenderQueueListener(mOverlaySystem);
 		}
 
 		/*-----------------------------------------------------------------------------
@@ -295,15 +289,10 @@ namespace OgreBites
 		}	
 
 		Ogre::Root* mRoot;                // OGRE root object
+		Ogre::OverlaySystem* mOverlaySystem; // OverlaySystem
 		Ogre::RenderWindow* mWindow;      // context render window
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-		OIS::MultiTouch* mMouse;          // context multitouch device
-		OIS::JoyStick* mAccelerometer;    // context accelerometer device
-#else
-		OIS::Keyboard* mKeyboard;         // context keyboard device
-		OIS::Mouse* mMouse;               // context mouse device
-#endif
-		FileSystemLayer* mFSLayer; 		  // file system abstraction layer
+		InputContext mInputContext;
+		Ogre::FileSystemLayer* mFSLayer; 		  // file system abstraction layer
 		Ogre::SceneManager* mSceneMgr;    // scene manager for this sample
 		Ogre::NameValuePairList mInfo;    // custom sample info
 		bool mDone;                       // flag to mark the end of the sample

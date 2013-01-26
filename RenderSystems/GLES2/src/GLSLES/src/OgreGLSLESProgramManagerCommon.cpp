@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,9 @@ THE SOFTWARE.
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
+#include "OgreGpuProgramManager.h"
+#include "OgreGLES2HardwareUniformBuffer.h"
+#include "OgreHardwareBufferManager.h"
 #include "OgreGLSLESProgram.h"
 
 // Apple doesn't define this in their extension.  We'll do it just for convenience.
@@ -61,6 +64,34 @@ namespace Ogre {
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat2", GL_FLOAT_MAT2));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3", GL_FLOAT_MAT3));
 		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4", GL_FLOAT_MAT4));
+#if OGRE_NO_GLES3_SUPPORT == 0
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x3", GL_FLOAT_MAT2x3));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x2", GL_FLOAT_MAT3x2));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat3x4", GL_FLOAT_MAT3x4));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4x3", GL_FLOAT_MAT4x3));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat2x4", GL_FLOAT_MAT2x4));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("mat4x2", GL_FLOAT_MAT4x2));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("bvec2", GL_BOOL_VEC2));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("bvec3", GL_BOOL_VEC3));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("bvec4", GL_BOOL_VEC4));
+        mTypeEnumMap.insert(StringToEnumMap::value_type("uint", GL_UNSIGNED_INT));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("uvec2", GL_UNSIGNED_INT_VEC2));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("uvec3", GL_UNSIGNED_INT_VEC3));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("uvec4", GL_UNSIGNED_INT_VEC4));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler3D", GL_SAMPLER_3D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DShadow", GL_SAMPLER_2D_SHADOW));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("samplerCubeShadow", GL_SAMPLER_CUBE_SHADOW));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArray", GL_SAMPLER_2D_ARRAY));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("sampler2DArrayShadow", GL_SAMPLER_2D_ARRAY_SHADOW));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("isampler2D", GL_INT_SAMPLER_2D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("isampler3D", GL_INT_SAMPLER_3D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("isamplerCube", GL_INT_SAMPLER_CUBE));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("isampler2DArray", GL_INT_SAMPLER_2D_ARRAY));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("usampler2D", GL_UNSIGNED_INT_SAMPLER_2D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("usampler3D", GL_UNSIGNED_INT_SAMPLER_3D));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("usamplerCube", GL_UNSIGNED_INT_SAMPLER_CUBE));
+		mTypeEnumMap.insert(StringToEnumMap::value_type("usampler2DArray", GL_UNSIGNED_INT_SAMPLER_2D_ARRAY));
+#endif
         
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
         mGLSLOptimiserContext = glslopt_initialize(true);
@@ -99,12 +130,32 @@ namespace Ogre {
 		case GL_FLOAT_VEC4:
 			defToUpdate.constType = GCT_FLOAT4;
 			break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+        case GL_SAMPLER_3D:
+        case GL_INT_SAMPLER_3D:
+        case GL_UNSIGNED_INT_SAMPLER_3D:
+            defToUpdate.constType = GCT_SAMPLER3D;
+            break;
+        case GL_UNSIGNED_INT_SAMPLER_2D:
+        case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
+        case GL_INT_SAMPLER_2D:
+        case GL_INT_SAMPLER_2D_ARRAY:
+        case GL_SAMPLER_2D_ARRAY:
+#endif
 		case GL_SAMPLER_2D:
 			defToUpdate.constType = GCT_SAMPLER2D;
 			break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+        case GL_SAMPLER_CUBE_SHADOW:
+        case GL_INT_SAMPLER_CUBE:
+        case GL_UNSIGNED_INT_SAMPLER_CUBE:
+#endif
 		case GL_SAMPLER_CUBE:
 			defToUpdate.constType = GCT_SAMPLERCUBE;
 			break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+        case GL_SAMPLER_2D_SHADOW:
+#endif
 #if GL_EXT_shadow_samplers
         case GL_SAMPLER_2D_SHADOW_EXT:
             defToUpdate.constType = GCT_SAMPLER2DSHADOW;
@@ -131,6 +182,26 @@ namespace Ogre {
 		case GL_FLOAT_MAT4:
 			defToUpdate.constType = GCT_MATRIX_4X4;
 			break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+        case GL_FLOAT_MAT2x3:
+            defToUpdate.constType = GCT_MATRIX_2X3;
+            break;
+        case GL_FLOAT_MAT3x2:
+            defToUpdate.constType = GCT_MATRIX_3X2;
+            break;
+        case GL_FLOAT_MAT2x4:
+            defToUpdate.constType = GCT_MATRIX_2X4;
+            break;
+        case GL_FLOAT_MAT4x2:
+            defToUpdate.constType = GCT_MATRIX_4X2;
+            break;
+        case GL_FLOAT_MAT3x4:
+            defToUpdate.constType = GCT_MATRIX_3X4;
+            break;
+        case GL_FLOAT_MAT4x3:
+            defToUpdate.constType = GCT_MATRIX_4X3;
+            break;
+#endif
 		default:
 			defToUpdate.constType = GCT_UNKNOWN;
 			break;
@@ -189,12 +260,18 @@ namespace Ogre {
                 // Write the current version (this forces the driver to fulfill the glsl es standard)
                 // TODO: Need to insert the current or compatibility version.  This is not future-proof
                 os << "#version 100" << std::endl;
-                
+
                 // Default precision declaration is required in fragment and vertex shaders.
-                os << "precision mediump float;" << std::endl;
+                os << "precision highp float;" << std::endl;
                 os << "precision highp int;" << std::endl;
-                os << glslopt_get_output(shader);
-                gpuProgram->getGLSLProgram()->setSource(os.str());
+                String source = const_cast<char *>(glslopt_get_output(shader));
+
+                // We want to make sure that there are precision qualifiers so strip out the first line
+                // which is the version string. We don't want duplicates since we are adding our own.
+                size_t pos = source.find_first_of("\n");
+                os << source.substr(pos+1, source.length()-1);
+
+                gpuProgram->getGLSLProgram()->setOptimisedSource(os.str());
                 gpuProgram->getGLSLProgram()->setIsOptimised(true);
             }
             else
@@ -216,15 +293,15 @@ namespace Ogre {
 	void GLSLESProgramManagerCommon::extractUniforms(GLuint programObject, 
 		const GpuConstantDefinitionMap* vertexConstantDefs, 
 		const GpuConstantDefinitionMap* fragmentConstantDefs,
-		GLUniformReferenceList& list)
+		GLUniformReferenceList& list, GLUniformBufferList& sharedList)
 	{
 		// Scan through the active uniforms and add them to the reference list
 		GLint uniformCount = 0;
         GLint maxLength = 0;
 		char* uniformName = NULL;
+		#define uniformLength 200
 
-		glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
 
         // If the max length of active uniforms is 0, then there are 0 active.
         // There won't be any to extract so we can return.
@@ -235,8 +312,7 @@ namespace Ogre {
 		GLUniformReference newGLUniformReference;
 
 		// Get the number of active uniforms
-		glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount);
-        GL_CHECK_ERROR;
+		OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORMS, &uniformCount));
 
 		// Loop over each of the active uniforms, and add them to the reference container
 		// only do this for user defined uniforms, ignore built in gl state uniforms
@@ -244,9 +320,9 @@ namespace Ogre {
 		{
 			GLint arraySize = 0;
 			GLenum glType = GL_NONE;
-			glGetActiveUniform(programObject, index, maxLength, NULL, 
-				&arraySize, &glType, uniformName);
-            GL_CHECK_ERROR;
+			OGRE_CHECK_GL_ERROR(glGetActiveUniform(programObject, index, maxLength, NULL,
+				&arraySize, &glType, uniformName));
+
 			// Don't add built in uniforms
 			newGLUniformReference.mLocation = glGetUniformLocation(programObject, uniformName);
 			if (newGLUniformReference.mLocation >= 0)
@@ -286,7 +362,31 @@ namespace Ogre {
 		{
 			delete uniformName;
 		}
-	}
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+        // Now deal with uniform blocks
+
+        GLint blockCount = 0;
+
+        OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_UNIFORM_BLOCKS, &blockCount));
+
+        for (int index = 0; index < blockCount; index++)
+        {
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockName(programObject, index, uniformLength, NULL, uniformName));
+
+            GpuSharedParametersPtr blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(uniformName);
+
+            GLint blockSize, blockBinding;
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
+            OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
+            HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
+
+            GLES2HardwareUniformBuffer* hwGlBuffer = static_cast<GLES2HardwareUniformBuffer*>(newUniformBuffer.get());
+            hwGlBuffer->setGLBufferBinding(blockBinding);
+            sharedList.push_back(newUniformBuffer);
+        }
+#endif
+    }
 	//---------------------------------------------------------------------
 	void GLSLESProgramManagerCommon::extractConstantDefs(const String& src,
 		GpuNamedConstants& defs, const String& filename)
@@ -322,102 +422,107 @@ namespace Ogre {
 
 			if (!inLargerString)
 			{
-				// find terminating semicolon
-				String::size_type endPos = src.find(";", currPos);
-				if (endPos == String::npos)
-				{
-					// problem, missing semicolon, abort
-					break;
-				}
-				line = src.substr(currPos, endPos - currPos);
+                String::size_type endPos;
+                GpuSharedParametersPtr blockSharedParams;
 
-				// Remove spaces before opening square braces, otherwise
-				// the following split() can split the line at inappropriate
-				// places (e.g. "vec3 something [3]" won't work).
-				for (String::size_type sqp = line.find (" ["); sqp != String::npos;
-					 sqp = line.find (" ["))
-					line.erase (sqp, 1);
-				// Split into tokens
-				StringVector parts = StringUtil::split(line, ", \t\r\n");
+                // Check for a type. If there is one, then the semicolon is missing
+                // otherwise treat as if it is a uniform block
+				String::size_type lineEndPos = src.find_first_of("\n\r", currPos);
+				line = src.substr(currPos, lineEndPos - currPos);
+                StringVector parts = StringUtil::split(line, " \t");
+                StringToEnumMap::iterator typei = mTypeEnumMap.find(parts.front());
+                if (typei == mTypeEnumMap.end())
+                {
+                    // Gobble up the external name
+                    String externalName = parts.front();
 
-				for (StringVector::iterator i = parts.begin(); i != parts.end(); ++i)
-				{
-					// Is this a type?
-					StringToEnumMap::iterator typei = mTypeEnumMap.find(*i);
-					if (typei != mTypeEnumMap.end())
-					{
-						completeDefInfo(typei->second, def);
-					}
-					else
-					{
-						// if this is not a type, and not empty, it should be a name
-						StringUtil::trim(*i);
-						if (i->empty()) continue;
+                    // Now there should be an opening brace
+                    String::size_type openBracePos = src.find("{", currPos);
+                    if (openBracePos != String::npos)
+                    {
+                        currPos = openBracePos + 1;
+                    }
+                    else
+                    {
+                        LogManager::getSingleton().logMessage("Missing opening brace in GLSL Uniform Block in file "
+                                                              + filename);
+                        break;
+                    }
 
-                        // Skip over precision keywords
-                        if(StringUtil::match((*i), "lowp") ||
-                           StringUtil::match((*i), "mediump") ||
-                           StringUtil::match((*i), "highp"))
-                            continue;
+                    // First we need to find the internal name for the uniform block
+                    String::size_type endBracePos = src.find("}", currPos);
 
-						String::size_type arrayStart = i->find("[", 0);
-						if (arrayStart != String::npos)
-						{
-							// potential name (if butted up to array)
-							String name = i->substr(0, arrayStart);
-							StringUtil::trim(name);
-							if (!name.empty())
-								paramName = name;
+                    // Find terminating semicolon
+                    currPos = endBracePos + 1;
+                    endPos = src.find(";", currPos);
+                    if (endPos == String::npos)
+                    {
+                        // problem, missing semicolon, abort
+                        break;
+                    }
 
-							String::size_type arrayEnd = i->find("]", arrayStart);
-							String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
-							StringUtil::trim(arrayDimTerm);
-							// the array term might be a simple number or it might be
-							// an expression (e.g. 24*3) or refer to a constant expression
-							// we'd have to evaluate the expression which could get nasty
-							// TODO
-							def.arraySize = StringConverter::parseUnsignedLong(arrayDimTerm);
+                    // TODO: We don't need the internal name. Just skip over to the end of the block
+                    // But we do need to know if this is an array of blocks. Is that legal?
 
-						}
-						else
-						{
-							paramName = *i;
-							def.arraySize = 1;
-						}
-
-						// Name should be after the type, so complete def and add
-						// We do this now so that comma-separated params will do
-						// this part once for each name mentioned 
-						if (def.constType == GCT_UNKNOWN)
-						{
-							LogManager::getSingleton().logMessage(
-								"Problem parsing the following GLSL Uniform: '"
-								+ line + "' in file " + filename);
-							// next uniform
-							break;
-						}
-
-						// Complete def and add
-						// increment physical buffer location
-						def.logicalIndex = 0; // not valid in GLSL
-						if (def.isFloat())
-						{
-							def.physicalIndex = defs.floatBufferSize;
-							defs.floatBufferSize += def.arraySize * def.elementSize;
-						}
-						else
-						{
-							def.physicalIndex = defs.intBufferSize;
-							defs.intBufferSize += def.arraySize * def.elementSize;
-						}
-						defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
-
-						// Generate array accessors
-						defs.generateConstantDefinitionArrayEntries(paramName, def);
-					}
-
-				}
-
+                    // Find the internal name.
+                    // This can be an array.
+                    //                    line = src.substr(currPos, endPos - currPos);
+                    //                    StringVector internalParts = StringUtil::split(line, ", \t\r\n");
+                    //                    String internalName = "";
+                    //                    uint16 arraySize = 0;
+                    //                    for (StringVector::iterator i = internalParts.begin(); i != internalParts.end(); ++i)
+                    //                    {
+                    //                        StringUtil::trim(*i);
+                    //                        String::size_type arrayStart = i->find("[", 0);
+                    //                        if (arrayStart != String::npos)
+                    //                        {
+                    //                            // potential name (if butted up to array)
+                    //                            String name = i->substr(0, arrayStart);
+                    //                            StringUtil::trim(name);
+                    //                            if (!name.empty())
+                    //                                internalName = name;
+                    //
+                    //                            String::size_type arrayEnd = i->find("]", arrayStart);
+                    //                            String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
+                    //                            StringUtil::trim(arrayDimTerm);
+                    //                            arraySize = StringConverter::parseUnsignedInt(arrayDimTerm);
+                    //                        }
+                    //                        else
+                    //                        {
+                    //                            internalName = *i;
+                    //                        }
+                    //                    }
+                    //
+                    //                    // Ok, now rewind and parse the individual uniforms in this block
+                    //                    currPos = openBracePos + 1;
+                    //                    blockSharedParams = GpuProgramManager::getSingleton().getSharedParameters(externalName);
+                    //                    if(blockSharedParams.isNull())
+                    //                        blockSharedParams = GpuProgramManager::getSingleton().createSharedParameters(externalName);
+                    //                    do
+                    //                    {
+                    //                        lineEndPos = src.find_first_of("\n\r", currPos);
+                    //                        endPos = src.find(";", currPos);
+                    //                        line = src.substr(currPos, endPos - currPos);
+                    //
+                    //                        // TODO: Give some sort of block id
+                    //                        // Parse the normally structured uniform
+                    //                        parseIndividualConstant(src, defs, currPos, filename, blockSharedParams);
+                    //                        currPos = lineEndPos + 1;
+                    //                    } while (endBracePos > currPos);
+                }
+                else
+                {
+                    // find terminating semicolon
+                    endPos = src.find(";", currPos);
+                    if (endPos == String::npos)
+                    {
+                        // problem, missing semicolon, abort
+                        break;
+                    }
+                    
+                    parseIndividualConstant(src, defs, currPos, filename, blockSharedParams);
+                }
+                line = src.substr(currPos, endPos - currPos);
 			} // not commented or a larger symbol
 
 			// Find next one
@@ -425,5 +530,115 @@ namespace Ogre {
 		}
 		
 	}
+    //---------------------------------------------------------------------
+	void GLSLESProgramManagerCommon::parseIndividualConstant(const String& src, GpuNamedConstants& defs,
+                                                           String::size_type currPos,
+                                                           const String& filename, GpuSharedParametersPtr sharedParams)
+    {
+        GpuConstantDefinition def;
+        String paramName = "";
+        String::size_type endPos = src.find(";", currPos);
+        String line = src.substr(currPos, endPos - currPos);
 
+        // Remove spaces before opening square braces, otherwise
+        // the following split() can split the line at inappropriate
+        // places (e.g. "vec3 something [3]" won't work).
+        for (String::size_type sqp = line.find (" ["); sqp != String::npos;
+             sqp = line.find (" ["))
+            line.erase (sqp, 1);
+        // Split into tokens
+        StringVector parts = StringUtil::split(line, ", \t\r\n");
+
+        for (StringVector::iterator i = parts.begin(); i != parts.end(); ++i)
+        {
+            // Is this a type?
+            StringToEnumMap::iterator typei = mTypeEnumMap.find(*i);
+            if (typei != mTypeEnumMap.end())
+            {
+                completeDefInfo(typei->second, def);
+            }
+            else
+            {
+                // if this is not a type, and not empty, it should be a name
+                StringUtil::trim(*i);
+                if (i->empty()) continue;
+
+                // Skip over precision keywords
+                if(StringUtil::match((*i), "lowp") ||
+                   StringUtil::match((*i), "mediump") ||
+                   StringUtil::match((*i), "highp"))
+                    continue;
+
+                String::size_type arrayStart = i->find("[", 0);
+                if (arrayStart != String::npos)
+                {
+                    // potential name (if butted up to array)
+                    String name = i->substr(0, arrayStart);
+                    StringUtil::trim(name);
+                    if (!name.empty())
+                        paramName = name;
+
+                    String::size_type arrayEnd = i->find("]", arrayStart);
+                    String arrayDimTerm = i->substr(arrayStart + 1, arrayEnd - arrayStart - 1);
+                    StringUtil::trim(arrayDimTerm);
+                    // the array term might be a simple number or it might be
+                    // an expression (e.g. 24*3) or refer to a constant expression
+                    // we'd have to evaluate the expression which could get nasty
+                    // TODO
+                    def.arraySize = StringConverter::parseInt(arrayDimTerm);
+                }
+                else
+                {
+                    paramName = *i;
+                    def.arraySize = 1;
+                }
+
+                // Name should be after the type, so complete def and add
+                // We do this now so that comma-separated params will do
+                // this part once for each name mentioned
+                if (def.constType == GCT_UNKNOWN)
+                {
+                    LogManager::getSingleton().logMessage("Problem parsing the following GLSL Uniform: '"
+                                                          + line + "' in file " + filename);
+                    // next uniform
+                    break;
+                }
+
+                // Special handling for shared parameters
+                if(sharedParams.isNull())
+                {
+                    // Complete def and add
+                    // increment physical buffer location
+                    def.logicalIndex = 0; // not valid in GLSL
+                    if (def.isFloat())
+                    {
+                        def.physicalIndex = defs.floatBufferSize;
+                        defs.floatBufferSize += def.arraySize * def.elementSize;
+                    }
+                    else
+                    {
+                        def.physicalIndex = defs.intBufferSize;
+                        defs.intBufferSize += def.arraySize * def.elementSize;
+                    }
+                    defs.map.insert(GpuConstantDefinitionMap::value_type(paramName, def));
+
+                    // Generate array accessors
+                    defs.generateConstantDefinitionArrayEntries(paramName, def);
+                }
+                else
+                {
+                    try
+                    {
+                        const GpuConstantDefinition &sharedDef = sharedParams->getConstantDefinition(paramName);
+                        (void)sharedDef;    // Silence warning
+                    }
+                    catch (Exception& e)
+                    {
+                        // This constant doesn't exist so we'll create a new one
+                        sharedParams->addConstantDefinition(paramName, def.constType);
+                    }
+                }
+            }
+        }
+    }
 }

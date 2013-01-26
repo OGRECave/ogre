@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,12 +116,10 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
 	{
 		Function* curFunction = *itFunction;
-		bool needToTranslateHlsl4Color = false;
-		ParameterPtr colorParameter;
 
 		writeFunctionTitle(os, curFunction);
 
-		writeFunctionDeclaration(os, curFunction, needToTranslateHlsl4Color, colorParameter);
+		writeFunctionDeclaration(os, curFunction);
 
 		os << "{" << std::endl;
 
@@ -134,15 +132,6 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 			os << "\t";
 			writeLocalParameter(os, *itParam);			
 			os << ";" << std::endl;						
-		}
-
-		//  translate hlsl 4 color parameter if needed
-		if(needToTranslateHlsl4Color)
-		{
-			os << "\t";
-			writeLocalParameter(os, colorParameter);			
-			os << ";" << std::endl;						
-			os << std::endl <<"\tFFP_Assign(iHlsl4Color_0, " << colorParameter->getName() << ");" << std::endl;
 		}
 
 		// Sort and write function atoms.
@@ -198,7 +187,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
 {
 
 	os << mGpuConstTypeMap[parameter->getType()];
@@ -210,7 +199,11 @@ void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr pa
 		os << "[" << parameter->getSize() << "]";	
 	}
 
-	if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
+	if(forcedSemantic)
+	{
+		os << " : " << forcedSemantic;
+	}
+	else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
 	{
 		os << " : ";
 		
@@ -241,7 +234,7 @@ void HLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr param
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, bool & needToTranslateHlsl4Color, ParameterPtr & colorParameter)
+void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();
@@ -257,28 +250,17 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 	size_t paramsCount = inParams.size() + outParams.size();
 	size_t curParamIndex = 0;
 
-	// for shader model 4 - we need to get the color as unsigned int
-	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
+	bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 
 	// Write input parameters.
 	for (it=inParams.begin(); it != inParams.end(); ++it)
 	{					
 		os << "\t in ";
 
-		if (isVs4 &&
-			function->getFunctionType() == Function::FFT_VS_MAIN &&
-			(*it)->getSemantic() == Parameter::SPS_COLOR 
-			)
-		{
-			os << "unsigned int iHlsl4Color_0 : COLOR";
-			needToTranslateHlsl4Color = true;
-			colorParameter = *it;
-		}
-		else
-		{
-			writeFunctionParameter(os, *it);
-		}
-		
+		const char* forcedSemantic = 
+			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+
+		writeFunctionParameter(os, *it, forcedSemantic);
 
 		if (curParamIndex + 1 != paramsCount)		
 			os << ", " << std::endl;
@@ -290,14 +272,12 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 	for (it=outParams.begin(); it != outParams.end(); ++it)
 	{
 		os << "\t out ";
-		if (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN)
-		{
-			os << mGpuConstTypeMap[(*it)->getType()] << " " << (*it)->getName() << " : SV_Target" << std::endl;
-		}
-		else
-		{
-			writeFunctionParameter(os, *it);
-		}
+
+		const char* forcedSemantic = 
+			(isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
+			(isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+
+		writeFunctionParameter(os, *it, forcedSemantic);
 
 		if (curParamIndex + 1 != paramsCount)				
 			os << ", " << std::endl;

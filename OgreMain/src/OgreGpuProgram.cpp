@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -261,7 +261,7 @@ namespace Ogre
 			ret->_setNamedConstants(mConstantDefs);
 		}
 		// link shared logical / physical map for low-level use
-		ret->_setLogicalIndexes(mFloatLogicalToPhysical, mIntLogicalToPhysical);
+		ret->_setLogicalIndexes(mFloatLogicalToPhysical, mDoubleLogicalToPhysical, mIntLogicalToPhysical);
 
         // Copy in default parameters if present
         if (!mDefaultParams.isNull())
@@ -334,6 +334,18 @@ namespace Ogre
 		{
 			return "geometry_program";
 		}
+		else if (t->getType() == GPT_DOMAIN_PROGRAM)
+		{
+			return "domain_program";
+		}
+		else if (t->getType() == GPT_HULL_PROGRAM)
+		{
+			return "hull_program";
+		}
+		else if (t->getType() == GPT_COMPUTE_PROGRAM)
+		{
+			return "compute_program";
+		}
 		else
         {
             return "fragment_program";
@@ -349,6 +361,18 @@ namespace Ogre
         else if (val == "geometry_program")
 		{
 			t->setType(GPT_GEOMETRY_PROGRAM);
+		}
+		else if (val == "domain_program")
+		{
+			t->setType(GPT_DOMAIN_PROGRAM);
+		}
+		else if (val == "hull_program")
+		{
+			t->setType(GPT_HULL_PROGRAM);
+		}
+		else if (val == "compute_program")
+		{
+			t->setType(GPT_COMPUTE_PROGRAM);
 		}
 		else
         {

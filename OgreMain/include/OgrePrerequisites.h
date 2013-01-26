@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -53,11 +53,11 @@ THE SOFTWARE
 
 namespace Ogre {
     // Define ogre version
-    #define OGRE_VERSION_MAJOR 2
-    #define OGRE_VERSION_MINOR 1
+    #define OGRE_VERSION_MAJOR 1
+    #define OGRE_VERSION_MINOR 9
     #define OGRE_VERSION_PATCH 0
 	#define OGRE_VERSION_SUFFIX "unstable"
-    #define OGRE_VERSION_NAME "unnamed"
+    #define OGRE_VERSION_NAME "Ghadamon"
 
     #define OGRE_VERSION    ((OGRE_VERSION_MAJOR << 16) | (OGRE_VERSION_MINOR << 8) | OGRE_VERSION_PATCH)
 
@@ -159,9 +159,6 @@ namespace Ogre {
     class ErrorDialog;
     class ExternalTextureSourceManager;
     class Factory;
-    class Font;
-    class FontPtr;
-    class FontManager;
     struct FrameEvent;
     class FrameListener;
     class Frustum;
@@ -215,11 +212,6 @@ namespace Ogre {
 	class NodeKeyFrame;
 	class NumericAnimationTrack;
 	class NumericKeyFrame;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
     class Particle;
     class ParticleAffector;
     class ParticleAffectorFactory;

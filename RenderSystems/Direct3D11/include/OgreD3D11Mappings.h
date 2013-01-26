@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,9 @@ namespace Ogre
 		/// return a D3D11 equivalent for a Ogre LayerBlendSource value
 		//static DWORD get(LayerBlendSource lbs);
 		/// return a D3D11 equivalent for a Ogre SceneBlendFactor value
-		static D3D11_BLEND get(SceneBlendFactor sbf);
+		static D3D11_BLEND get(SceneBlendFactor sbf, bool forAlpha);
+		/// return a D3D11 equivalent for a Ogre SceneBlendOperation value
+		static D3D11_BLEND_OP get(SceneBlendOperation sbo);
 		/// return a D3D11 equivalent for a Ogre CompareFunction value
 		static D3D11_COMPARISON_FUNC get(CompareFunction cf);
 		/// return a D3D11 equivalent for a Ogre CillingMode value
@@ -105,8 +107,18 @@ namespace Ogre
 		static UINT _getAccessFlags(HardwareBuffer::Usage mUsage);
 		static UINT _getAccessFlags(int mUsage);
 		static bool _isDynamic(HardwareBuffer::Usage mUsage);
+
+		static bool _isDynamic(int mUsage);
+
 		/// utility method, find closest Ogre pixel format that D3D11 can support
 		static PixelFormat _getClosestSupportedPF(PixelFormat ogrePF);
+
+		static TextureType _getTexType(D3D11_SRV_DIMENSION type);
+
+		static size_t _getSizeInBytes(PixelFormat pf, size_t xcount = 1, size_t ycount = 1);
+
+		static UINT _getTextureBindFlags(DXGI_FORMAT format, bool isdynamic);
+		static UINT _getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic);
 	};
 }
 #endif

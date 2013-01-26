@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,15 +47,17 @@ namespace Ogre
 		D3D11VideoModeList* mVideoModeList;
 		unsigned int tempNo;
 		static unsigned int driverCount;
-		IDXGIAdapter1*	mDXGIAdapter;
+		IDXGIAdapterN*	mDXGIAdapter;
 
 
 	public:
 		// Constructors
 		D3D11Driver();		// Default
 		D3D11Driver( const D3D11Driver &ob );	// Copy
-		D3D11Driver( unsigned int adapterNumber,  IDXGIAdapter1* pDXGIAdapter );
+		D3D11Driver( unsigned int adapterNumber,  IDXGIAdapterN* pDXGIAdapter );
 		~D3D11Driver();
+
+		D3D11Driver& operator=(const D3D11Driver& r);
 
 		// Information accessors
 		String DriverName() const;
@@ -65,7 +67,7 @@ namespace Ogre
 		unsigned int getAdapterNumber() const;
 		const DXGI_ADAPTER_DESC1& getAdapterIdentifier() const;
 		const DXGI_MODE_DESC& getDesktopMode() const;
-		IDXGIAdapter1* getDeviceAdapter() const;
+		IDXGIAdapterN* getDeviceAdapter() const;
 		D3D11VideoModeList* getVideoModeList();
 	};
 }

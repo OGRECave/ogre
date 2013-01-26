@@ -60,6 +60,9 @@ if (WIN32 AND MSVC)
   if (MSVC_VERSION EQUAL 1600)
     set(COMPILER_PREFIX "vc10")
   endif ()
+  if (MSVC_VERSION EQUAL 1700)
+    set(COMPILER_PREFIX "vc11")
+  endif ()
   
   # for each prefix path, add ia32/64\${COMPILER_PREFIX}\lib to the lib search path
   foreach (dir ${TBB_PREFIX_PATH})

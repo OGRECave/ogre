@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -78,8 +78,17 @@ namespace Ogre {
         optFSAA.immutable = false;
 
         optRTTMode.name = "RTT Preferred Mode";
+#if GL_OES_packed_depth_stencil
+        optRTTMode.possibleValues.push_back("FBO");
+        optRTTMode.possibleValues.push_back("Copy");
+        optRTTMode.currentValue = "FBO";
+#else
+        optRTTMode.possibleValues.push_back("Copy");
+        optRTTMode.currentValue = "Copy";
+#endif
         optRTTMode.immutable = false;
-
+        optRTTMode.currentValue = optRTTMode.possibleValues[0];
+        
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.possibleValues.push_back("Yes");
 
@@ -110,9 +119,6 @@ namespace Ogre {
 
             optFSAA.currentValue = optFSAA.possibleValues[0];
         }
-
-        optRTTMode.possibleValues.push_back("Copy");
-        optRTTMode.currentValue = optRTTMode.possibleValues[0];
 
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;

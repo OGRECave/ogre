@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,11 +63,17 @@ namespace Ogre
 			while( itor.hasMoreElements() )
 			{
 				const GpuConstantDefinition &constDef = itor.getNext();
-				if((constDef.constType == GCT_MATRIX_3X4 ||
-					constDef.constType == GCT_MATRIX_4X3 ||		//OGL GLSL bitches without this
+				if(((constDef.constType == GCT_MATRIX_3X4 ||
+					constDef.constType == GCT_MATRIX_4X3 ||             //OGL GLSL bitches without this
 					constDef.constType == GCT_MATRIX_2X4 ||
-					constDef.constType == GCT_FLOAT4)			//OGL GLSL bitches without this
-					&& constDef.isFloat() )
+					constDef.constType == GCT_FLOAT4)                   //OGL GLSL bitches without this
+					&& constDef.isFloat()) ||
+                   ((constDef.constType == GCT_MATRIX_DOUBLE_3X4 ||
+					constDef.constType == GCT_MATRIX_DOUBLE_4X3 ||		//OGL GLSL bitches without this
+					constDef.constType == GCT_MATRIX_DOUBLE_2X4 ||
+					constDef.constType == GCT_DOUBLE4)                  //OGL GLSL bitches without this
+                    && constDef.isDouble())
+                   )
 				{
 					const GpuProgramParameters::AutoConstantEntry *entry =
 									vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );

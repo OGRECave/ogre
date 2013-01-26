@@ -1,0 +1,29 @@
+fragment_program Ogre/RasterizationOrderFp glsl
+{
+	source RasterizationOrderFp.glsl
+	syntax glsl400
+	
+	default_params
+	{
+	    param_named ac atomic_counter 0
+	}
+}
+
+material Example/RasterizationOrder
+{
+    technique
+    {
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+
+			fragment_program_ref Ogre/RasterizationOrderFp
+			{
+
+			}
+		}
+	}
+}
+

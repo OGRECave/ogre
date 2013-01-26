@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,8 @@ namespace Ogre {
 	{
 		uint32 caps1;
 		uint32 caps2;
-		uint32 reserved[2];
+		uint32 caps3;
+		uint32 caps4;
 	};
 	// Main header, note preceded by 'DDS '
 	struct DDSHeader
@@ -83,6 +84,17 @@ namespace Ogre {
 		DDSCaps caps;
 		uint32 reserved2;
 	};
+
+    // Extended header
+    struct DDSExtendedHeader
+    {
+        uint32 dxgiFormat;
+        uint32 resourceDimension;
+        uint32 miscFlag; // see D3D11_RESOURCE_MISC_FLAG
+        uint32 arraySize;
+        uint32 reserved;
+    };
+    
 
 	// An 8-byte DXT colour block, represents a 4x4 texel area. Used by all DXT formats
 	struct DXTColourBlock
@@ -347,8 +359,8 @@ namespace Ogre {
 
 			ddsHeader.caps.caps1 = ddsHeaderCaps1;
 			ddsHeader.caps.caps2 = ddsHeaderCaps2;
-			ddsHeader.caps.reserved[0] = 0;
-			ddsHeader.caps.reserved[1] = 0;
+//			ddsHeader.caps.reserved[0] = 0;
+//			ddsHeader.caps.reserved[1] = 0;
 
 			// Swap endian
 			flipEndian(&ddsMagic, sizeof(uint32), 1);
@@ -365,6 +377,32 @@ namespace Ogre {
 		}
 	}
 	//---------------------------------------------------------------------
+	PixelFormat DDSCodec::convertDXToOgreFormat(uint32 dxfmt) const
+	{
+        switch (dxfmt) {
+            case 80: // DXGI_FORMAT_BC4_UNORM
+                return PF_BC4_UNORM;
+            case 81: // DXGI_FORMAT_BC4_SNORM
+                return PF_BC4_SNORM;
+            case 83: // DXGI_FORMAT_BC5_UNORM
+                return PF_BC5_UNORM;
+            case 84: // DXGI_FORMAT_BC5_SNORM
+                return PF_BC5_SNORM;
+            case 95: // DXGI_FORMAT_BC6H_UF16
+                return PF_BC6H_UF16;
+            case 96: // DXGI_FORMAT_BC6H_SF16
+                return PF_BC6H_SF16;
+            case 98: // DXGI_FORMAT_BC7_UNORM
+                return PF_BC7_UNORM;
+            case 99: // DXGI_FORMAT_BC7_UNORM_SRGB
+                return PF_BC7_UNORM_SRGB;
+            default:
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
+                            "Unsupported DirectX format found in DDS file",
+                            "DDSCodec::decode");
+        }
+    }
+	//---------------------------------------------------------------------
 	PixelFormat DDSCodec::convertFourCCFormat(uint32 fourcc) const
 	{
 		// convert dxt pixel format
@@ -380,6 +418,16 @@ namespace Ogre {
 			return PF_DXT4;
 		case FOURCC('D','X','T','5'):
 			return PF_DXT5;
+        case FOURCC('A','T','I','1'):
+        case FOURCC('B','C','4','U'):
+            return PF_BC4_UNORM;
+        case FOURCC('B','C','4','S'):
+            return PF_BC4_SNORM;
+        case FOURCC('A','T','I','2'):
+        case FOURCC('B','C','5','U'):
+            return PF_BC5_UNORM;
+        case FOURCC('B','C','5','S'):
+            return PF_BC5_SNORM;
 		case D3DFMT_R16F:
 			return PF_FLOAT16_R;
 		case D3DFMT_G16R16F:
@@ -427,7 +475,6 @@ namespace Ogre {
 
 		OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Cannot determine pixel format",
 			"DDSCodec::convertPixelFormat");
-
 	}
 	//---------------------------------------------------------------------
 	void DDSCodec::unpackDXTColour(PixelFormat pf, const DXTColourBlock& block, 
@@ -639,7 +686,20 @@ namespace Ogre {
 
 		if (header.pixelFormat.flags & DDPF_FOURCC)
 		{
-			sourceFormat = convertFourCCFormat(header.pixelFormat.fourCC);
+            // Check if we have an DX10 style extended header and read it. This is necessary for B6H and B7 formats
+            if(header.pixelFormat.fourCC == FOURCC('D', 'X', '1', '0'))
+            {
+                DDSExtendedHeader extHeader;
+                stream->read(&extHeader, sizeof(DDSExtendedHeader));
+
+                // Endian flip if required, all 32-bit values
+                flipEndian(&header, sizeof(DDSExtendedHeader));
+                sourceFormat = convertDXToOgreFormat(extHeader.dxgiFormat);
+            }
+            else
+            {
+                sourceFormat = convertFourCCFormat(header.pixelFormat.fourCC);
+            }
 		}
 		else
 		{
@@ -718,7 +778,7 @@ namespace Ogre {
 		// Bind output buffer
 		output.bind(OGRE_NEW MemoryDataStream(imgData->size));
 
-		
+
 		// Now deal with the data
 		void* destPtr = output->getPtr();
 

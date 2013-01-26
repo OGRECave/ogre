@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreMemoryTracker.h"
 #include "OgreString.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #   include <windows.h>
 #	define Ogre_OutputCString(str) ::OutputDebugStringA(str)
 #	define Ogre_OutputWString(str) ::OutputDebugStringW(str)
@@ -136,10 +136,9 @@ namespace Ogre
 			}
 
 			if (mDumpToStdOut)		
-				std::cout << os.str();		
+				std::cout << os.str();
 
-			std::cout << os.str();
-			std::ofstream of;
+				std::ofstream of;
 			of.open(mLeakFileName.c_str());
 			of << os.str();
 			of.close();

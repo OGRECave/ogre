@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -75,8 +75,10 @@ namespace Ogre {
 		mBuffersNeedRecreating(true),
 		mBoundsDirty(true),
 		mIndexContentDirty(true),
+        mVertexContentDirty(true),
 		mRadius(0.0f),
 		mTexCoordDir(TCD_U),
+        mVertexCameraUsed(0),
 		mFaceCamera(true),
 		mNormalBase(Vector3::UNIT_X)
 	{
@@ -187,45 +189,47 @@ namespace Ogre {
 	{
 		mMaxElementsPerChain = maxElements;
 		setupChainContainers();
-        mBuffersNeedRecreating = mIndexContentDirty = true;
+        mBuffersNeedRecreating = mIndexContentDirty = mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setNumberOfChains(size_t numChains)
 	{
 		mChainCount = numChains;
 		setupChainContainers();
-        mBuffersNeedRecreating = mIndexContentDirty = true;
+        mBuffersNeedRecreating = mIndexContentDirty = mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setUseTextureCoords(bool use)
 	{
 		mUseTexCoords = use;
 		mVertexDeclDirty = mBuffersNeedRecreating = true;
-        mIndexContentDirty = true;
+        mIndexContentDirty = mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setTextureCoordDirection(BillboardChain::TexCoordDirection dir)
 	{
 		mTexCoordDir = dir;
+        mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setOtherTextureCoordRange(Real start, Real end)
 	{
 		mOtherTexCoordRange[0] = start;
 		mOtherTexCoordRange[1] = end;
+        mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setUseVertexColours(bool use)
 	{
 		mUseVertexColour = use;
 		mVertexDeclDirty = mBuffersNeedRecreating = true;
-        mIndexContentDirty = true;
+        mIndexContentDirty = mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::setDynamic(bool dyn)
 	{
 		mDynamic = dyn;
-		mBuffersNeedRecreating = mIndexContentDirty = true;
+		mBuffersNeedRecreating = mIndexContentDirty = mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::addChainElement(size_t chainIndex,
@@ -244,7 +248,6 @@ namespace Ogre {
 			// Tail starts at end, head grows backwards
 			seg.tail = mMaxElementsPerChain - 1;
 			seg.head = seg.tail;
-			mIndexContentDirty = true;
 		}
 		else
 		{
@@ -273,6 +276,7 @@ namespace Ogre {
 		// Set the details
 		mChainElementList[seg.start + seg.head] = dtls;
 
+        mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
 		// tell parent node to update bounds
@@ -309,6 +313,7 @@ namespace Ogre {
 		}
 
 		// we removed an entry so indexes need updating
+        mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
 		// tell parent node to update bounds
@@ -331,6 +336,7 @@ namespace Ogre {
 		seg.tail = seg.head = SEGMENT_EMPTY;
 
 		// we removed an entry so indexes need updating
+        mVertexContentDirty = true;
 		mIndexContentDirty = true;
 		mBoundsDirty = true;
 		// tell parent node to update bounds
@@ -352,6 +358,7 @@ namespace Ogre {
 	{
 		mFaceCamera = faceCamera;
 		mNormalBase = normalVector.normalisedCopy();
+        mVertexContentDirty = true;
 	}
 	//-----------------------------------------------------------------------
 	void BillboardChain::updateChainElement(size_t chainIndex, size_t elementIndex,
@@ -377,6 +384,7 @@ namespace Ogre {
 
 		mChainElementList[idx] = dtls;
 
+        mVertexContentDirty = true;
 		mBoundsDirty = true;
 		// tell parent node to update bounds
 		if (mParentNode)
@@ -477,6 +485,13 @@ namespace Ogre {
 	void BillboardChain::updateVertexBuffer(Camera* cam)
 	{
 		setupBuffers();
+        
+        // The contents of the vertex buffer are correct if they are not dirty
+        // and the camera used to build the vertex buffer is still the current 
+        // camera.
+        if (!mVertexContentDirty && mVertexCameraUsed == cam)
+            return;
+
 		HardwareVertexBufferSharedPtr pBuffer =
 			mVertexData->vertexBufferBinding->getBuffer(0);
 		void* pBufferStart = pBuffer->lock(HardwareBuffer::HBL_DISCARD);
@@ -621,7 +636,8 @@ namespace Ogre {
 
 
 		pBuffer->unlock();
-
+        mVertexCameraUsed = cam;
+        mVertexContentDirty = false;
 
 	}
 	//-----------------------------------------------------------------------
@@ -681,11 +697,6 @@ namespace Ogre {
 			mIndexContentDirty = false;
 		}
 
-	}
-	//-----------------------------------------------------------------------
-	void BillboardChain::_notifyCurrentCamera(Camera* cam)
-	{
-		updateVertexBuffer(cam);
 	}
 	//-----------------------------------------------------------------------
 	Real BillboardChain::getSquaredViewDepth(const Camera* cam) const
@@ -768,6 +779,18 @@ namespace Ogre {
 		op.useIndexes = true;
 		op.vertexData = mVertexData;
 	}
+	//-----------------------------------------------------------------------
+    bool BillboardChain::preRender(SceneManager* sm, RenderSystem* rsys)
+    {
+        // Retrieve the current viewport from the scene manager.
+        // The viewport is only valid during a viewport update.
+        Viewport *currentViewport = sm->getCurrentViewport();
+        if( !currentViewport )
+            return false;
+
+        updateVertexBuffer(currentViewport->getCamera());
+        return true;
+    }
 	//-----------------------------------------------------------------------
 	void BillboardChain::getWorldTransforms(Matrix4* xform) const
 	{

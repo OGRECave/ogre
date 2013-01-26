@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -212,17 +212,23 @@ namespace Ogre {
 		GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
 		// Geometry program details
 		GpuProgramUsage *mGeometryProgramUsage;
-        // Is this pass queued for deletion?
+		// Tesselation hull program details
+		GpuProgramUsage *mTesselationHullProgramUsage;
+		// Tesselation domain program details
+		GpuProgramUsage *mTesselationDomainProgramUsage;
+		// Compute program details
+		GpuProgramUsage *mComputeProgramUsage;
+        /// Is this pass queued for deletion?
         bool mQueuedForDeletion;
-        // number of pass iterations to perform
+        /// Number of pass iterations to perform
         size_t mPassIterationCount;
-		// point size, applies when not using per-vertex point size
+		/// Point size, applies when not using per-vertex point size
 		Real mPointSize;
 		Real mPointMinSize;
 		Real mPointMaxSize;
 		bool mPointSpritesEnabled;
 		bool mPointAttenuationEnabled;
-		// constant, linear, quadratic coeffs
+		/// Constant, linear, quadratic coeffs
 		Real mPointAttenuationCoeffs[3];
 		// TU Content type lookups
 		typedef vector<unsigned short>::type ContentTypeLookup;
@@ -234,11 +240,11 @@ namespace Ogre {
 		bool mLightClipPlanes;
 		/// Illumination stage?
 		IlluminationStage mIlluminationStage;
-		// User objects binding.
+		/// User objects binding.
 		UserObjectBindings	mUserObjectBindings;
 		
 
-		// Used to get scene blending flags from a blending type
+		/// Used to get scene blending flags from a blending type
 		void _getBlendFlags(SceneBlendType type, SceneBlendFactor& source, SceneBlendFactor& dest);
 
 	public:
@@ -264,15 +270,23 @@ namespace Ogre {
         virtual ~Pass();
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
-        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage; }
+        bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
+												 mTesselationHullProgramUsage || mTesselationDomainProgramUsage || mComputeProgramUsage; }
+        
         /// Returns true if this pass uses a programmable vertex pipeline
         bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a programmable fragment pipeline
         bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
         /// Returns true if this pass uses a programmable geometry pipeline
         bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
-        /// Returns true if this pass uses a shadow caster vertex program
-        bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
+    	/// Returns true if this pass uses a programmable tesselation control pipeline
+        bool hasTesselationHullProgram(void) const { return mTesselationHullProgramUsage != NULL; }
+		/// Returns true if this pass uses a programmable tesselation control pipeline
+        bool hasTesselationDomainProgram(void) const { return mTesselationDomainProgramUsage != NULL; }
+		/// Returns true if this pass uses a programmable compute pipeline
+        bool hasComputeProgram(void) const { return mComputeProgramUsage != NULL; }
+		/// Returns true if this pass uses a shadow caster vertex program
+	    bool hasShadowCasterVertexProgram(void) const { return mShadowCasterVertexProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster fragment program
         bool hasShadowCasterFragmentProgram(void) const { return mShadowCasterFragmentProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow receiver vertex program
@@ -289,7 +303,7 @@ namespace Ogre {
         from another material and only want to modify a particular pass.
         */
         void setName(const String& name);
-        /// get the name of the pass
+        /// Get the name of the pass
         const String& getName(void) const { return mName; }
 
         /** Sets the ambient colour reflectance properties of this pass.
@@ -1741,6 +1755,94 @@ namespace Ogre {
 		@see UserObjectBindings::setUserAny.		
 		*/
 		const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
+
+		/// Support for shader model 5.0, hull and domain shaders
+		/** Sets the details of the tesselation control program to use.
+		@remarks
+			Only applicable to programmable passes, this sets the details of
+			the Tesselation Hull program to use in this pass. The program will not be
+			loaded until the parent Material is loaded.
+		@param name The name of the program - this must have been
+			created using GpuProgramManager by the time that this Pass
+			is loaded. If this parameter is blank, any Tesselation Hull program in this pass is disabled.
+        @param resetParams
+            If true, this will create a fresh set of parameters from the
+            new program being linked, so if you had previously set parameters
+            you will have to set them again. If you set this to false, you must
+            be absolutely sure that the parameters match perfectly, and in the
+            case of named parameters refers to the indexes underlying them,
+            not just the names.
+		*/
+		void setTesselationHullProgram(const String& name, bool resetParams = true);
+		/** Sets the Tesselation Hull program parameters.
+		@remarks
+			Only applicable to programmable passes.
+		*/
+		void setTesselationHullProgramParameters(GpuProgramParametersSharedPtr params);
+		/** Gets the name of the Tesselation Hull program used by this pass. */
+		const String& getTesselationHullProgramName(void) const;
+		/** Gets the Tesselation Hull program parameters used by this pass. */
+		GpuProgramParametersSharedPtr getTesselationHullProgramParameters(void) const;
+		/** Gets the Tesselation Hull program used by this pass, only available after _load(). */
+		const GpuProgramPtr& getTesselationHullProgram(void) const;
+
+		/** Sets the details of the tesselation domain program to use.
+		@remarks
+			Only applicable to programmable passes, this sets the details of
+			the Tesselation domain program to use in this pass. The program will not be
+			loaded until the parent Material is loaded.
+		@param name The name of the program - this must have been
+			created using GpuProgramManager by the time that this Pass
+			is loaded. If this parameter is blank, any Tesselation domain program in this pass is disabled.
+        @param resetParams
+            If true, this will create a fresh set of parameters from the
+            new program being linked, so if you had previously set parameters
+            you will have to set them again. If you set this to false, you must
+            be absolutely sure that the parameters match perfectly, and in the
+            case of named parameters refers to the indexes underlying them,
+            not just the names.
+		*/
+		void setTesselationDomainProgram(const String& name, bool resetParams = true);
+		/** Sets the Tesselation Domain program parameters.
+		@remarks
+			Only applicable to programmable passes.
+		*/
+		void setTesselationDomainProgramParameters(GpuProgramParametersSharedPtr params);
+		/** Gets the name of the Domain Evaluation program used by this pass. */
+		const String& getTesselationDomainProgramName(void) const;
+		/** Gets the Tesselation Domain program parameters used by this pass. */
+		GpuProgramParametersSharedPtr getTesselationDomainProgramParameters(void) const;
+		/** Gets the Tesselation Domain program used by this pass, only available after _load(). */
+		const GpuProgramPtr& getTesselationDomainProgram(void) const;
+
+		/** Sets the details of the compute program to use.
+		@remarks
+			Only applicable to programmable passes, this sets the details of
+			the compute program to use in this pass. The program will not be
+			loaded until the parent Material is loaded.
+		@param name The name of the program - this must have been
+			created using GpuProgramManager by the time that this Pass
+			is loaded. If this parameter is blank, any compute program in this pass is disabled.
+        @param resetParams
+            If true, this will create a fresh set of parameters from the
+            new program being linked, so if you had previously set parameters
+            you will have to set them again. If you set this to false, you must
+            be absolutely sure that the parameters match perfectly, and in the
+            case of named parameters refers to the indexes underlying them,
+            not just the names.
+		*/
+		void setComputeProgram(const String& name, bool resetParams = true);
+		/** Sets the Tesselation Evaluation program parameters.
+		@remarks
+			Only applicable to programmable passes.
+		*/
+		void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
+		/** Gets the name of the Tesselation Hull program used by this pass. */
+		const String& getComputeProgramName(void) const;
+		/** Gets the Tesselation Hull program parameters used by this pass. */
+		GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
+		/** Gets the Tesselation EHull program used by this pass, only available after _load(). */
+		const GpuProgramPtr& getComputeProgram(void) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

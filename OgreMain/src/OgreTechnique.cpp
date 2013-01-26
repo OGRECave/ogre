@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -129,7 +129,24 @@ namespace Ogre {
 					}
 				}
 			}
+			if (currPass->hasComputeProgram())
+			{
+				// Check fragment program version
+				if (!currPass->getComputeProgram()->isSupported())
+				{
+					// Can't do this one
+					compileErrors << "Pass " << passNum << 
+						": Compute program " << currPass->getComputeProgram()->getName()
+						<< " cannot be used - ";
+					if (currPass->getComputeProgram()->hasCompileError())
+						compileErrors << "compile error.";
+					else
+						compileErrors << "not supported.";
 
+					compileErrors << std::endl;
+					return false;
+				}
+			}
 			if (currPass->hasVertexProgram())
 			{
 				// Check vertex program version
@@ -140,6 +157,42 @@ namespace Ogre {
 						": Vertex program " << currPass->getVertexProgram()->getName()
 						<< " cannot be used - ";
 					if (currPass->getVertexProgram()->hasCompileError())
+						compileErrors << "compile error.";
+					else
+						compileErrors << "not supported.";
+
+					compileErrors << std::endl;
+					return false;
+				}
+			}
+			if (currPass->hasTesselationHullProgram())
+			{
+				// Check tesselation control program version
+				if (!currPass->getTesselationHullProgram()->isSupported() )
+				{
+					// Can't do this one
+					compileErrors << "Pass " << passNum << 
+						": Tesselation Hull program " << currPass->getTesselationHullProgram()->getName()
+						<< " cannot be used - ";
+					if (currPass->getTesselationHullProgram()->hasCompileError())
+						compileErrors << "compile error.";
+					else
+						compileErrors << "not supported.";
+
+					compileErrors << std::endl;
+					return false;
+				}
+			}
+			if (currPass->hasTesselationDomainProgram())
+			{
+				// Check tesselation control program version
+				if (!currPass->getTesselationDomainProgram()->isSupported() )
+				{
+					// Can't do this one
+					compileErrors << "Pass " << passNum << 
+						": Tesselation Domain program " << currPass->getTesselationDomainProgram()->getName()
+						<< " cannot be used - ";
+					if (currPass->getTesselationDomainProgram()->hasCompileError())
 						compileErrors << "compile error.";
 					else
 						compileErrors << "not supported.";
@@ -611,7 +664,8 @@ namespace Ogre {
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
 			mShadowCasterMaterial = MaterialManager::getSingleton().getByName(mShadowCasterMaterialName);
-			mShadowCasterMaterial->load();
+            if (!mShadowCasterMaterial.isNull())
+			    mShadowCasterMaterial->load();
 		}
 		if (!mShadowReceiverMaterial.isNull())
 		{
@@ -621,7 +675,8 @@ namespace Ogre {
 		{
 			// in case we could not get material as it wasn't yet parsed/existent at that time.
 			mShadowReceiverMaterial = MaterialManager::getSingleton().getByName(mShadowReceiverMaterialName);
-			mShadowReceiverMaterial->load();
+            if (!mShadowReceiverMaterial.isNull())
+			    mShadowReceiverMaterial->load();
 		}
     }
     //-----------------------------------------------------------------------------

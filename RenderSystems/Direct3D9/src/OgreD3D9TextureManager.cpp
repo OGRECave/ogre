@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,10 @@ namespace Ogre
 		// Calculate usage
 		DWORD d3dusage = 0;
 		D3DPOOL pool = D3DPOOL_MANAGED;
+		if (D3D9RenderSystem::isDirectX9Ex())
+		{
+			pool = D3DPOOL_DEFAULT;
+		}
 		if (usage & TU_RENDERTARGET) 
 		{
 			d3dusage |= D3DUSAGE_RENDERTARGET;

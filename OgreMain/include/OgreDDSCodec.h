@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,8 @@ namespace Ogre {
 	    void flipEndian(void * pData, size_t size) const;
 
 		PixelFormat convertFourCCFormat(uint32 fourcc) const;
-		PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask, 
+		PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
+		PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
 			uint32 gMask, uint32 bMask, uint32 aMask) const;
 
 		/// Unpack DXT colours into array of 16 colour values

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreLogManager.h"
+#include <cctype>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -67,7 +68,16 @@ namespace Ogre {
             if (syntaxSupported)
             {
                 mSelectedProfile = *i;
-                mSelectedCgProfile = cgGetProfile(mSelectedProfile.c_str());
+                String selectedProfileForFind = mSelectedProfile;
+                if(StringUtil::startsWith(mSelectedProfile,"vs_4_0_", true))
+                {
+                    selectedProfileForFind = "vs_4_0";
+                }
+                if(StringUtil::startsWith(mSelectedProfile,"ps_4_0_", true))
+                {
+                    selectedProfileForFind = "ps_4_0";
+                }
+                mSelectedCgProfile = cgGetProfile(selectedProfileForFind.c_str());
                 // Check for errors
                 checkForCgError("CgProgram::selectProfile", 
                     "Unable to find CG profile enum for program " + mName + ": ", mCgContext);
@@ -80,7 +90,7 @@ namespace Ogre {
 								mName+"/Delegate", mGroup, getHighLevelLanguage(), mType);
 					mDelegate->setParameter("target", getHighLevelTarget());
 					mDelegate->setParameter("entry_point", "main");
-					// HLSL output uses row major matrices, so need to tell Ogre that
+					// HLSL/GLSL output uses row major matrices, so need to tell Ogre that
 					mDelegate->setParameter("column_major_matrices", "false");
 					// HLSL output requires backwards compatibility to be enabled
 					mDelegate->setParameter("backwards_compatibility", "true");
@@ -212,9 +222,7 @@ namespace Ogre {
                 // not what we want.
                 GpuProgramParametersSharedPtr params = mDelegate->getDefaultParameters();
                 for (map<String,int>::type::iterator i = mSamplerRegisterMap.begin(); i != mSamplerRegisterMap.end(); ++i)
-                {
                     params->setNamedConstant(i->first, i->second);
-                }
             }
             mDelegate->load();
         }
@@ -293,7 +301,7 @@ namespace Ogre {
 		if (mSelectedCgProfile == CG_PROFILE_UNKNOWN)
 		{
 			LogManager::getSingleton().logMessage(
-				"Attempted to load Cg program '" + mName + "', but no suported "
+				"Attempted to load Cg program '" + mName + "', but no supported "
 				"profile was found. ");
 			return;
 		}
@@ -321,6 +329,7 @@ namespace Ogre {
 
 			// get params
 			mParametersMap.clear();
+			mParametersMapSizeAsBuffer = 0;
             mSamplerRegisterMap.clear();
 			recurseParams(cgGetFirstParameter(cgProgram, CG_PROGRAM));
 			recurseParams(cgGetFirstParameter(cgProgram, CG_GLOBAL));
@@ -328,9 +337,7 @@ namespace Ogre {
             if (!mDelegate.isNull())
             {
                 // Delegating to HLSL or GLSL, need to clean up Cg's output
-                LogManager::getSingleton().getDefaultLog()->logMessage("Cg output for " + mName + ": \n" + mProgramString);
                 fixHighLevelOutput(mProgramString);
-                LogManager::getSingleton().getDefaultLog()->logMessage("Cleaned Cg output for " + mName + ": \n" + mProgramString);
                 if (mSelectedCgProfile == CG_PROFILE_GLSLG)
                 {
                     // need to determine input and output operations
@@ -406,12 +413,12 @@ namespace Ogre {
             newMicrocode->write(&samplerMapSize, sizeof(size_t));
 
             // save sampler register mapping
-            map<String,int>::type::const_iterator iter = mSamplerRegisterMap.begin();
-            map<String,int>::type::const_iterator iterE = mSamplerRegisterMap.end();
-            for (; iter != iterE; ++iter)
+            map<String,int>::type::const_iterator sampRegister = mSamplerRegisterMap.begin();
+            map<String,int>::type::const_iterator sampRegisterE = mSamplerRegisterMap.end();
+            for (; sampRegister != sampRegisterE; ++sampRegister)
             {
-                const String& paramName = iter->first;
-                int reg = iter->second;
+                const String& paramName = sampRegister->first;
+                int reg = sampRegister->second;
 
                 size_t stringSize = paramName.size();
                 newMicrocode->write(&stringSize, sizeof(size_t));
@@ -441,7 +448,13 @@ namespace Ogre {
 // the hlsl 4 profiles are only supported in OGRE from CG 2.2
 #if(CG_VERSION_NUM >= 2200)
 				|| mSelectedCgProfile == CG_PROFILE_VS_4_0
-				 || mSelectedCgProfile == CG_PROFILE_PS_4_0
+				|| mSelectedCgProfile == CG_PROFILE_PS_4_0
+#endif
+#if(CG_VERSION_NUM >= 3000)
+				|| mSelectedCgProfile == CG_PROFILE_VS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_PS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_DS_5_0
+				|| mSelectedCgProfile == CG_PROFILE_HS_5_0
 #endif
 				 )
 			{
@@ -485,6 +498,7 @@ namespace Ogre {
 			case CG_PROFILE_GLSLF:
 			case CG_PROFILE_GLSLV:
 			case CG_PROFILE_GLSLG:
+			case CG_PROFILE_GLSLC:
 				return "glsl";
 			case CG_PROFILE_HLSLF:
 			case CG_PROFILE_HLSLV:
@@ -499,11 +513,17 @@ namespace Ogre {
 		// HLSL delegates need a target to compile to.
 		// Return value for GLSL delegates is ignored.
 		GpuProgramManager* gpuMgr = GpuProgramManager::getSingletonPtr();
-		const GpuProgramManager::SyntaxCodes& syntaxes = gpuMgr->getSupportedSyntax();
-
+        
 		if (mSelectedCgProfile == CG_PROFILE_HLSLF)
 		{
-			static const String fpProfiles[] = {"ps_3_0", "ps_2_x", "ps_2_0", "ps_1_4", "ps_1_3", "ps_1_2", "ps_1_1"};
+			static const String fpProfiles[] = {
+#if(CG_VERSION_NUM >= 3000)
+			"ps_5_0",
+#endif
+#if(CG_VERSION_NUM >= 2200)
+			"ps_4_0",
+#endif
+			"ps_3_0", "ps_2_x", "ps_2_0", "ps_1_4", "ps_1_3", "ps_1_2", "ps_1_1"};
 			static const size_t numFpProfiles = sizeof(fpProfiles)/sizeof(String);
 			// find the highest profile available
 			for (size_t i = 0; i < numFpProfiles; ++i)
@@ -514,7 +534,14 @@ namespace Ogre {
 		}
 		else if (mSelectedCgProfile == CG_PROFILE_HLSLV)
 		{
-			static const String vpProfiles[] = {"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
+			static const String vpProfiles[] = {
+#if(CG_VERSION_NUM >= 3000)
+			"vs_5_0",
+#endif
+#if(CG_VERSION_NUM >= 2200)
+			"vs_4_0",
+#endif				
+			"vs_3_0", "vs_2_x", "vs_2_0", "vs_1_4", "vs_1_3", "vs_1_2", "vs_1_1"};
 			static const size_t numVpProfiles = sizeof(vpProfiles)/sizeof(String);
 			// find the highest profile available
 			for (size_t i = 0; i < numVpProfiles; ++i)
@@ -527,30 +554,45 @@ namespace Ogre {
 		return "unknown";
     }
     //-----------------------------------------------------------------------
-    void CgProgram::fixHighLevelOutput(String& hlSource)
+    struct HighLevelOutputFixer
     {
-		// for some unknown reason Cg chooses to change parameter names when
-		// translating to another high level language. We need to revert that,
-		// otherwise Ogre parameter mappings fail.
-		// Cg logs its renamings in the comments at the beginning of the
-		// processed source file. We can get them from there.
-        // We'll also get rid of those comments to trim down source code size.
-		vector<String>::type lines = StringUtil::split(hlSource, "\n");
-        hlSource.clear();
-        for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
+        const String& source;
+        const GpuConstantDefinitionMap& paramMap;
+        const map<String,int>::type samplerMap;
+        bool glsl;
+        String output;
+        map<String,String>::type paramNameMap;
+        String::size_type start;
+        struct ReplacementMark
         {
-            String& line = *i;
-            if (line.substr(0,2) != "//")
-                hlSource.append(line+'\n');
+            String::size_type pos, len;
+            String replaceWith;
+            bool operator<(const ReplacementMark& o) const { return pos < o.pos; }
+        };
+        vector<ReplacementMark>::type replacements;
+
+        HighLevelOutputFixer(const String& src, const GpuConstantDefinitionMap& params, 
+            const map<String,int>::type& samplers, bool isGLSL) 
+            : source(src), paramMap(params), samplerMap(samplers), glsl(isGLSL), start(0)
+        {
+            findNameMappings();
+            replaceParameterNames();
+            buildOutput();
         }
 
-		for (vector<String>::type::iterator i = lines.begin(); i != lines.end(); ++i)
-		{
-			String& line = *i;
-			// comment format: //var type parameter : [something] : new name : [something] : [something]
-			if (line.substr(0, 5) == "//var")
-			{
-				vector<String>::type cols = StringUtil::split(line, ":");
+        void findNameMappings()
+        {
+            String::size_type cur = 0, end = 0;
+            while (cur < source.size())
+            {
+                // look for a comment line describing a parameter name mapping
+    			// comment format: //var type parameter : [something] : new name : [something] : [something]
+                cur = source.find("//var", cur);
+                if (cur == String::npos)
+                    break;
+                end = source.find('\n', cur);
+				vector<String>::type cols = StringUtil::split(source.substr(cur, end-cur), ":");
+                cur = end;
 				if (cols.size() < 3)
 					continue;
 				vector<String>::type def = StringUtil::split(cols[0], "[ ");
@@ -564,38 +606,134 @@ namespace Ogre {
 				StringUtil::trim(newName);
 				if (newName.empty() || newName[0] != '_')
 					continue;
+				// if that name is present in our lists, mark in name translation map
+                GpuConstantDefinitionMap::const_iterator it = paramMap.find(oldName);
+				if (it != paramMap.end() || samplerMap.find(oldName) != samplerMap.end())
+                {
+                    LogManager::getSingleton().stream() << "Replacing parameter name: " << newName << " -> " << oldName;
+					paramNameMap.insert(std::make_pair(oldName, newName));
+                }
+            }
+            // end now points at the end of the last comment, so we can strip anything before
+            start = (end == String::npos ? end : end+1);
+        }
 
-				// if that name is present in our lists, replace all occurences with original name
-                GpuConstantDefinitionMap::iterator it = mParametersMap.find(oldName);
-				if (it != mParametersMap.end() || mSamplerRegisterMap.find(oldName) != mSamplerRegisterMap.end())
-				{
-					hlSource = StringUtil::replaceAll(hlSource, newName, oldName);
-                    if (it != mParametersMap.end() && (mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || mSelectedCgProfile == CG_PROFILE_GLSLG))
+        void replaceParameterNames()
+        {
+            for (GpuConstantDefinitionMap::const_iterator it = paramMap.begin(); it != paramMap.end(); ++it)
+            {
+                const String& oldName = it->first;
+                map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+                if (pi != paramNameMap.end())
+                {
+                    const String& newName = pi->second;
+                    String::size_type beg = start;
+                    // do we need to replace the definition of the parameter? (GLSL only)
+                    if (glsl)
                     {
-                        // determine if the param is a matrix type, in which case we need
-                        // to revert the declaration, too.
                         if (it->second.constType == GCT_MATRIX_2X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[2]", "uniform mat2 "+oldName);
+                            beg = findAndMark("uniform vec2 "+newName+"[2]", "uniform mat2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[3]", "uniform mat3 "+oldName);
+                            beg = findAndMark("uniform vec3 "+newName+"[3]", "uniform mat3 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[4]", "uniform mat4 "+oldName);
+                            beg = findAndMark("uniform vec4 "+newName+"[4]", "uniform mat4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_2X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[2]", "uniform mat2x3 "+oldName);
+                            beg = findAndMark("uniform vec3 "+newName+"[2]", "uniform mat2x3 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_2X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[2]", "uniform mat2x4 "+oldName);
+                            beg = findAndMark("uniform vec4 "+newName+"[2]", "uniform mat2x4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[3]", "uniform mat3x2 "+oldName);
+                            beg = findAndMark("uniform vec2 "+newName+"[3]", "uniform mat3x2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_3X4)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec4 "+oldName+"[3]", "uniform mat3x4 "+oldName);
+                            beg = findAndMark("uniform vec4 "+newName+"[3]", "uniform mat3x4 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X2)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec2 "+oldName+"[4]", "uniform mat4x2 "+oldName);
+                            beg = findAndMark("uniform vec2 "+newName+"[4]", "uniform mat4x2 "+oldName, beg);
                         else if (it->second.constType == GCT_MATRIX_4X3)
-                            hlSource = StringUtil::replaceAll(hlSource, "uniform vec3 "+oldName+"[4]", "uniform mat4x3 "+oldName);
+                            beg = findAndMark("uniform vec3 "+newName+"[4]", "uniform mat4x3 "+oldName, beg);
                     }
-				}
-			}
-		}
+
+                    // mark all occurences of the parameter name for replacement
+                    findAndMark(newName, oldName, beg);
+                }
+            }
+
+            for (map<String,int>::type::const_iterator it = samplerMap.begin(); it != samplerMap.end(); ++it)
+            {
+                const String& oldName = it->first;
+                map<String,String>::type::const_iterator pi = paramNameMap.find(oldName);
+                if (pi != paramNameMap.end())
+                {
+                    const String& newName = pi->second;
+                    findAndMark(newName, oldName, start);
+                }
+            }
+        }
+
+        String::size_type findAndMark(const String& search, const String& replaceWith, String::size_type cur)
+        {
+            ReplacementMark mark;
+            mark.pos = String::npos;
+            mark.len = search.size();
+            mark.replaceWith = replaceWith;
+            while (cur < source.size())
+            {
+                cur = source.find(search, cur);
+                if (cur == String::npos)
+                    break;
+                mark.pos = cur;
+                cur += search.size();
+                // check if previous or following character continue an identifier
+                // in that case, skip this occurence as it's part of a longer identifier
+                if (mark.pos > 0)
+                {
+                    char c = source[mark.pos-1];
+                    if (c == '_' || std::isalnum(c))
+                        continue;
+                }
+                if (mark.pos+1 < search.size())
+                {
+                    char c = source[mark.pos+1];
+                    if (c == '_' || std::isalnum(c))
+                        continue;
+                }
+                replacements.push_back(mark);
+            }
+            if (mark.pos != String::npos)
+                return mark.pos + search.size();
+            else
+                return String::npos;
+        }
+
+        void buildOutput()
+        {
+            // sort replacements in order of occurence
+            std::sort(replacements.begin(), replacements.end());
+            String::size_type cur = start;
+            for (vector<ReplacementMark>::type::iterator it = replacements.begin(); it != replacements.end(); ++it)
+            {
+                ReplacementMark& mark = *it;
+                if (mark.pos > cur)
+                    output.append(source, cur, mark.pos-cur);
+                output.append(mark.replaceWith);
+                cur = mark.pos+mark.len;
+            }
+            if (cur < source.size())
+                output.append(source, cur, String::npos);
+        }
+    };
+    //-----------------------------------------------------------------------
+    void CgProgram::fixHighLevelOutput(String& hlSource)
+    {
+		// Cg chooses to change parameter names when translating to another 
+        // high level language, possibly to avoid clashes with reserved keywords. 
+        // We need to revert that, otherwise Ogre parameter mappings fail.
+		// Cg logs its renamings in the comments at the beginning of the
+		// processed source file. We can get them from there.
+        // We'll also get rid of those comments to trim down source code size.
+        LogManager::getSingleton().stream() << "Cg high level output for " << getName() << ":\n" << hlSource;
+        hlSource = HighLevelOutputFixer(hlSource, mParametersMap, mSamplerRegisterMap, 
+            mSelectedCgProfile == CG_PROFILE_GLSLV || mSelectedCgProfile == CG_PROFILE_GLSLF || 
+            mSelectedCgProfile == CG_PROFILE_GLSLG).output;
+        LogManager::getSingleton().stream() << "Cleaned high level output for " << getName() << ":\n" << hlSource;
     }
 
 
@@ -609,9 +747,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr CgProgram::createParameters()
     {
-		loadHighLevelSafe();
-		if (!mDelegate.isNull())
-			return mDelegate->createParameters();
+        loadHighLevelSafe();
+        if (!mDelegate.isNull())
+            return mDelegate->createParameters();
 		else
 			return HighLevelGpuProgram::createParameters();
     }
@@ -658,7 +796,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr CgProgram::getDefaultParameters(void)
     {
-		loadHighLevelSafe();
+        loadHighLevelSafe();
 		if (!mDelegate.isNull())
 			return mDelegate->getDefaultParameters();
 		else
@@ -908,7 +1046,7 @@ namespace Ogre {
 
             // now handle uniform samplers. This is needed to fix their register positions
             // if delegating to a GLSL shader.
-            if (cgGetParameterVariability(parameter) == CG_UNIFORM && (
+            if (!mDelegate.isNull() && cgGetParameterVariability(parameter) == CG_UNIFORM && (
                 paramType == CG_SAMPLER1D ||
                 paramType == CG_SAMPLER2D ||
                 paramType == CG_SAMPLER3D ||
@@ -938,6 +1076,7 @@ namespace Ogre {
                 case CG_TEXUNIT13: pos = 13; break;
                 case CG_TEXUNIT14: pos = 14; break;
                 case CG_TEXUNIT15: pos = 15; break;
+#if(CG_VERSION_NUM >= 3000)
                 case CG_TEXUNIT16: pos = 16; break;
                 case CG_TEXUNIT17: pos = 17; break;
                 case CG_TEXUNIT18: pos = 18; break;
@@ -954,6 +1093,7 @@ namespace Ogre {
                 case CG_TEXUNIT29: pos = 29; break;
                 case CG_TEXUNIT30: pos = 30; break;
                 case CG_TEXUNIT31: pos = 31; break;
+#endif
                 }
                 if (pos != -1)
                 {

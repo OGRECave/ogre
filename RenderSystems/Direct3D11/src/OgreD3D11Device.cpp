@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,19 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	D3D11Device::eExceptionsErrorLevel D3D11Device::mExceptionsErrorLevel = D3D11Device::D3D_NO_EXCEPTION;
 	//---------------------------------------------------------------------
-	D3D11Device::D3D11Device( ID3D11Device * D3D11device ) : mD3D11Device(D3D11device), mInfoQueue(NULL)
+	D3D11Device::D3D11Device( ID3D11DeviceN * D3D11device )
+		: mD3D11Device(D3D11device)
+		, mImmediateContext(0)
+		, mInfoQueue(NULL)
+		, mClassLinkage(0)
 	{
         if (D3D11device)
         {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 		    D3D11device->GetImmediateContext(&mImmediateContext);
-
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		    D3D11device->GetImmediateContext1(&mImmediateContext);
+#endif
             HRESULT hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&mInfoQueue);
 
 		    if (SUCCEEDED(hr))
@@ -75,11 +82,17 @@ namespace Ogre
 			    mInfoQueue->AddStorageFilterEntries(&filter);
 			    mInfoQueue->AddRetrievalFilterEntries(&filter);
 		    }
-        }
 
+			// If feature level is 11, create class linkage
+			SAFE_RELEASE(mClassLinkage)
+			if (mD3D11Device->GetFeatureLevel() == D3D_FEATURE_LEVEL_11_0)
+			{
+				HRESULT hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
+			}
+        }	
 	}
 	//---------------------------------------------------------------------
-	D3D11Device::D3D11Device() : mD3D11Device(0), mImmediateContext(0)
+	D3D11Device::D3D11Device() : mD3D11Device(0), mImmediateContext(0), mClassLinkage(0)
 	{
 	}
 	//---------------------------------------------------------------------
@@ -87,12 +100,24 @@ namespace Ogre
 	{
 	}
 	//---------------------------------------------------------------------
-	ID3D11Device * D3D11Device::operator=( ID3D11Device * D3D11device )
+	ID3D11DeviceN * D3D11Device::operator=( ID3D11DeviceN * D3D11device )
 	{
 		mD3D11Device = D3D11device; 
 		if (D3D11device)
 		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 			D3D11device->GetImmediateContext(&mImmediateContext);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		    D3D11device->GetImmediateContext1(&mImmediateContext);
+#endif			
+			
+			// If feature level is 11, create class linkage
+			SAFE_RELEASE(mClassLinkage);
+			if (mD3D11Device->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+			{
+				HRESULT hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
+			}
+			
 		}
 		return mD3D11Device;
 	}
@@ -124,7 +149,7 @@ namespace Ogre
 			res = res + "invalid parameters were passed.\n";
 			break;
 		default:
-			assert(false); // unknown HRESULT
+			;//assert(false); // unknown HRESULT
 		}
 
 		if (mInfoQueue != NULL)
@@ -148,12 +173,19 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Device::release()
 	{
+		// Clear state
+		if (mImmediateContext)
+		{
+			mImmediateContext->Flush();
+			mImmediateContext->ClearState();
+		}
         SAFE_RELEASE(mInfoQueue);
 		SAFE_RELEASE(mD3D11Device);
         SAFE_RELEASE(mImmediateContext);
+		SAFE_RELEASE(mClassLinkage);
 	}
 	//---------------------------------------------------------------------
-	ID3D11Device * D3D11Device::get()
+	ID3D11DeviceN * D3D11Device::get()
 	{
 		return mD3D11Device;
 	}

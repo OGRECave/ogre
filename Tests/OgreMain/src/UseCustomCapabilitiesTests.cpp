@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,9 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreLog.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
+#endif
 
 // Regsiter the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
@@ -116,12 +118,16 @@ void checkCaps(const Ogre::RenderSystemCapabilities* caps)
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_VTC), false);
+    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_PVRTC), false);
+    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5), false);
+    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO), true);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ARB), false);
 
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_FBO_ATI), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PBUFFER), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_PERSTAGECONSTANT), false);
+    CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_VAO), false);
     CPPUNIT_ASSERT_EQUAL(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS), false);
 
     CPPUNIT_ASSERT(caps->isShaderProfileSupported("arbfp1"));
@@ -195,7 +201,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
 	}
 
-	Root* root = OGRE_NEW Root("plugins.cfg");
+	Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -206,8 +212,13 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		try {
 			setUpGLRenderSystemOptions(rs);
 			root->setRenderSystem(rs);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
-											macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+                             macBundlePath() + "/Contents/Resources/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+#else
+			root->initialise(true, "OGRE testCustomCapabilitiesGL Window",
+                             "../Tests/Media/CustomCapabilities/customCapabilitiesTest.cfg");
+#endif
 
 			const RenderSystemCapabilities* caps = rs->getCapabilities();
 
@@ -250,7 +261,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
 	}
 
-    Root* root = OGRE_NEW Root("plugins.cfg");
+    Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreIteratorWrappers.h"
 #include "OgreString.h"
 #include "OgreTexture.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
     /** \addtogroup Core
@@ -469,7 +470,15 @@ namespace Ogre {
             /** Vertex processing unit - indicates this unit will be used for 
                 a vertex texture fetch.
             */
-            BT_VERTEX = 1
+            BT_VERTEX = 1,			
+			/// Geometry processing unit		
+			BT_GEOMETRY = 2,
+			/// Tesselation control processing unit
+			BT_TESSELATION_HULL = 3,
+			/// Tesselation evaluation processing unit
+			BT_TESSELATION_DOMAIN = 4,
+			/// Compute processing unit
+			BT_COMPUTE = 5
         };
         /** Enum identifying the type of content this texture unit contains.
         */
@@ -1065,6 +1074,12 @@ namespace Ogre {
         /// Get the texture filtering for the given type.
         FilterOptions getTextureFiltering(FilterType ftpye) const;
 
+		void setTextureCompareEnabled(bool enabled);
+		bool getTextureCompareEnabled() const;
+	
+		void setTextureCompareFunction(CompareFunction function);
+		CompareFunction getTextureCompareFunction() const;
+
         /** Sets the anisotropy level to be used for this texture level.
         @param maxAniso
             The maximal anisotropy level, should be between 2 and the maximum
@@ -1222,6 +1237,10 @@ protected:
         FilterOptions mMagFilter;
         /// Texture filtering - mipmapping.
         FilterOptions mMipFilter;
+
+		bool			mCompareEnabled;
+		CompareFunction mCompareFunc;
+
         /// Texture anisotropy.
         unsigned int mMaxAniso;
         /// Mipmap bias (always float, not Real).
@@ -1283,5 +1302,7 @@ protected:
     /** @} */
 
 } // namespace Ogre
+
+#include "OgreHeaderSuffix.h"
 
 #endif // __TextureUnitState_H__

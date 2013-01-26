@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,7 @@ CompositorInstance::CompositorInstance(CompositionTechnique *technique,
 		mEnabled(false),
 		mAlive(false)
 {
+	mEnabled = false;
 	const String& logicName = mTechnique->getCompositorLogicName();
 	if (!logicName.empty())
 	{
@@ -161,7 +162,7 @@ public:
 	virtual void execute(SceneManager *sm, RenderSystem *rs)
 	{
 		rs->setStencilCheckEnabled(stencilCheck);
-		rs->setStencilBufferParams(func, refValue, mask, stencilFailOp, depthFailOp, passOp, twoSidedOperation);
+		rs->setStencilBufferParams(func, refValue, mask, 0xFFFFFFFF, stencilFailOp, depthFailOp, passOp, twoSidedOperation);
 	}
 };
 
@@ -996,8 +997,14 @@ RenderTarget *CompositorInstance::getTargetForTex(const String &name)
  			CompositorInstance* refCompInst = mChain->getCompositor(texDef->refCompName);
  			if(refCompInst)
  			{
- 				refTexDef = refCompInst->getCompositor()->
-                getSupportedTechnique(refCompInst->getScheme())->getTextureDefinition(name);
+                refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
+                    refCompInst->getScheme())->getTextureDefinition(texDef->refTexName);
+                // if the texture with the reference name can not be found, try the name
+                if (refTexDef == 0)
+                {
+ 				    refTexDef = refCompInst->getCompositor()->getSupportedTechnique(
+                        refCompInst->getScheme())->getTextureDefinition(name);
+                }
  			}
 			else
 			{

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 #include "OgreSharedPtr.h"
 #include "OgreColourValue.h"
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 	class HardwareBufferManagerBase;
@@ -81,7 +82,7 @@ namespace Ogre {
 
     };
 
-    /** Shared pointer implementation used to share index buffers. */
+    /** Shared pointer implementation used to share vertex buffers. */
     class _OgreExport HardwareVertexBufferSharedPtr : public SharedPtr<HardwareVertexBuffer>
     {
     public:
@@ -90,6 +91,9 @@ namespace Ogre {
 
 
     };
+
+    /** Locking helper. */    
+    typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> HardwareVertexBufferLockGuard;
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
 	enum VertexElementSemantic {
@@ -115,8 +119,8 @@ namespace Ogre {
         VES_COUNT = 9
 	};
 
-    /// Vertex element type, used to identify the base types of the vertex contents
-    enum VertexElementType
+	/// Vertex element type, used to identify the base types of the vertex contents
+	enum VertexElementType
     {
         VET_FLOAT1 = 0,
         VET_FLOAT2 = 1,
@@ -132,7 +136,23 @@ namespace Ogre {
         /// D3D style compact colour
         VET_COLOUR_ARGB = 10,
         /// GL style compact colour
-        VET_COLOUR_ABGR = 11
+        VET_COLOUR_ABGR = 11,
+		VET_DOUBLE1 = 12,
+        VET_DOUBLE2 = 13,
+        VET_DOUBLE3 = 14,
+        VET_DOUBLE4 = 15,
+        VET_USHORT1 = 16,
+        VET_USHORT2 = 17,
+        VET_USHORT3 = 18,
+        VET_USHORT4 = 19,      
+        VET_INT1 = 20,
+        VET_INT2 = 21,
+        VET_INT3 = 22,
+        VET_INT4 = 23,
+        VET_UINT1 = 24,
+        VET_UINT2 = 25,
+        VET_UINT3 = 26,
+        VET_UINT4 = 27
     };
 
     /** This class declares the usage of a single vertex buffer as a component
@@ -577,5 +597,8 @@ namespace Ogre {
 
 
 }
+
+#include "OgreHeaderSuffix.h"
+
 #endif
 

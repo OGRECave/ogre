@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -40,6 +40,13 @@ AmbientLight::AmbientLight()
 	mMatPtr = MaterialManager::getSingleton().getByName("DeferredShading/AmbientLight");
 	assert(mMatPtr.isNull()==false);
 	mMatPtr->load();
+
+    // Explicitly bind samplers for OpenGL
+    if(Root::getSingleton().getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
+    {
+        mMatPtr->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("Tex0", 0);
+        mMatPtr->getTechnique(0)->getPass(0)->getFragmentProgramParameters()->setNamedConstant("Tex1", 1);
+    }
 
     //This shader needs to be aware if its running under OpenGL or DirectX.
     //Real depthFactor = (Root::getSingleton().getRenderSystem()->getName() ==

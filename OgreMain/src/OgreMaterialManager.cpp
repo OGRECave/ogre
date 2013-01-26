@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,9 @@ namespace Ogre {
 	    mDefaultMinFilter = FO_LINEAR;
 	    mDefaultMagFilter = FO_LINEAR;
 	    mDefaultMipFilter = FO_POINT;
+		mDefaultCompareEnabled	= false;
+		mDefaultCompareFunction = CMPF_GREATER_EQUAL;
+
 		mDefaultMaxAniso = 1;
 
 		// Create primary thread copies of script compiler / serializer

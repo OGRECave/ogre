@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 #include <algorithm>
 #include <typeinfo>
-
+#include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
@@ -214,7 +214,29 @@ namespace Ogre
 			}
 		}
 
-		
+		template <typename ValueType>
+		ValueType get(void) const
+		{
+			if (!mContent) 
+			{
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					"Bad cast from uninitialised Any", 
+					"Any::operator()");
+			}
+			else if(getType() == typeid(ValueType))
+			{
+             	return static_cast<Any::holder<ValueType> *>(mContent)->held;
+			}
+			else
+			{
+				StringUtil::StrStreamType str;
+				str << "Bad cast from type '" << getType().name() << "' "
+					<< "to '" << typeid(ValueType).name() << "'";
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+					 str.str(), 
+					"Any::operator()");
+			}
+		}
 
     };
 
@@ -413,6 +435,8 @@ namespace Ogre
 
 
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif
 

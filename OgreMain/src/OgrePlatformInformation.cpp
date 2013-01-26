@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -203,7 +203,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     // Detect whether or not os support Streaming SIMD Extension.
 #if (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-    #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
+    #if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32 && OGRE_CPU == OGRE_CPU_X86
     static jmp_buf sIllegalJmpBuf;
     static void _illegalHandler(int x)
     {
@@ -548,29 +548,14 @@ namespace Ogre {
 
         switch(cpusubtype)
         {
-            case CPU_SUBTYPE_ARM_V4T:
-                cpuID = "ARMv4T";
-                break;
-            case CPU_SUBTYPE_ARM_V5TEJ:
-                cpuID = "ARMv5TEJ";
-                break;
             case CPU_SUBTYPE_ARM_V6:
                 cpuID = "ARMv6";
-                break;
-            case CPU_SUBTYPE_ARM_XSCALE:
-                cpuID = "ARM XScale";
                 break;
             case CPU_SUBTYPE_ARM_V7:
                 cpuID = "ARMv7";
                 break;
             case CPU_SUBTYPE_ARM_V7F:
                 cpuID = "ARM Cortex-A9";
-                break;
-            case CPU_SUBTYPE_ARM_V7S:
-                cpuID = "ARM Swift";
-                break;
-            case CPU_SUBTYPE_ARM_V7K:
-                cpuID = "ARM Kirkwood 40";
                 break;
             default:
                 cpuID = "Unknown ARM";

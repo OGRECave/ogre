@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,12 @@ namespace Ogre
 		bool mPerStageConstantSupport;
 		/// Fast singleton access.
 		static D3D9RenderSystem* msD3D9RenderSystem;
+		/// Tells whether to attempt to initialize the system with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mAllowDirectX9Ex;
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		bool mIsDirectX9Ex;
 
 		/// structure holding texture unit settings for every stage
 		struct sD3DTextureStageDesc
@@ -146,6 +152,7 @@ namespace Ogre
         void convertVertexShaderCaps(RenderSystemCapabilities* rsc) const;
         void convertPixelShaderCaps(RenderSystemCapabilities* rsc) const;
 		bool checkVertexTextureFormats(D3D9RenderWindow* renderWindow) const;
+		void detachRenderTargetImpl(const String& name);
 		
         HashMap<IDirect3DDevice9*, unsigned short> mCurrentLights;
         /// Saved last view matrix
@@ -225,6 +232,9 @@ namespace Ogre
 		/// @copydoc RenderSystem::createMultiRenderTarget
 		virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 
+		/// @copydoc RenderSystem::detachRenderTarget
+		virtual RenderTarget * detachRenderTarget(const String &name);
+
 		String getErrorDescription( long errorNumber ) const;
 		const String& getName() const;
 		// Low-level overridden members
@@ -238,7 +248,7 @@ namespace Ogre
 		VertexElementType getColourVertexElementType() const;
 		void setStencilCheckEnabled(bool enabled);
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 mask = 0xFFFFFFFF, 
+            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
             StencilOperation stencilFailOp = SOP_KEEP, 
             StencilOperation depthFailOp = SOP_KEEP,
             StencilOperation passOp = SOP_KEEP, 
@@ -293,6 +303,8 @@ namespace Ogre
             bool forGpuProgram);
 		void _setPolygonMode(PolygonMode level);
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
+		void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
+		void _setTextureUnitCompareEnabled(size_t unit, bool compare);
 		void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
 		void setVertexDeclaration(VertexDeclaration* decl);
 		void setVertexDeclaration(VertexDeclaration* decl, bool useGlobalInstancingVertexBufferIsAvailable);
@@ -329,6 +341,15 @@ namespace Ogre
 		void unregisterThread();
 		void preExtraThreadsStarted();
 		void postExtraThreadsStarted();		
+				
+		/*
+		Returns whether under the current render system buffers marked as TU_STATIC can be locked for update
+		*/
+		virtual bool isStaticBufferLockable() const { return !mIsDirectX9Ex; }
+		
+		/// Tells whether the system is initialized with DirectX 9Ex driver
+		/// Read more in http://msdn.microsoft.com/en-us/library/windows/desktop/ee890072(v=vs.85).aspx
+		static bool isDirectX9Ex()  { return msD3D9RenderSystem->mIsDirectX9Ex; }
 		
 		static D3D9ResourceManager* getResourceManager();
 		static D3D9DeviceManager* getDeviceManager();
@@ -353,7 +374,19 @@ namespace Ogre
 
 		/// @copydoc RenderSystem::getDisplayMonitorCount
 		unsigned int getDisplayMonitorCount() const;
-		
+
+		/// @copydoc RenderSystem::hasAnisotropicMipMapFilter
+		virtual bool hasAnisotropicMipMapFilter() const { return false; }
+
+		/// @copydoc RenderSystem::beginProfileEvent
+        virtual void beginProfileEvent( const String &eventName );
+
+		/// @copydoc RenderSystem::endProfileEvent
+        virtual void endProfileEvent( void );
+
+		/// @copydoc RenderSystem::markProfileEvent
+        virtual void markProfileEvent( const String &eventName );
+		 	
 		/// fires a device releated event
 		void fireDeviceEvent( D3D9Device* device, const String & name );
 

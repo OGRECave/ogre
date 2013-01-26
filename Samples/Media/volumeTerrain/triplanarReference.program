@@ -1,0 +1,272 @@
+// high quality triplanar mapping
+vertex_program TriplanarReferenceHigh_VSCg cg
+{
+	source triplanarReferenceVS.cg
+	default_params
+	{
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldviewproj worldviewproj_matrix
+	}
+	// Supported defines: -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	entry_point main_triplanar_reference_vp
+	profiles vs_2_x arbvp1
+}
+
+fragment_program TriplanarReferenceHigh_PSCg cg
+{
+	source triplanarReferencePS.cg
+	default_params 
+	{
+		
+		param_named_auto lightSpecular0 light_specular_colour 0
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
+		param_named_auto lightPosition0 light_position_object_space 0
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
+		param_named_auto world world_matrix
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
+		param_named exponent float 2000
+		param_named texScale float 0.1
+		param_named plateauSize float 0.2
+		param_named transitionSpeed float 2.0
+		param_named ambient float4 0.41 0.41 0.41 1.0
+	}
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	compile_arguments -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0
+	entry_point main_triplanar_reference_fp
+	profiles ps_2_x arbfp1
+}
+
+// low quality triplanar mapping
+
+vertex_program TriplanarReferenceLow_VSCg cg
+{
+	source triplanarReferenceVS.cg
+	default_params
+	{
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldviewproj worldviewproj_matrix
+	}
+	// Supported defines: -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	entry_point main_triplanar_reference_vp
+	profiles vs_2_x arbvp1
+}
+
+fragment_program TriplanarReferenceLow_PSCg cg
+{
+	source triplanarReferencePS.cg
+	default_params 
+	{
+		param_named_auto lightSpecular0 light_specular_colour 0
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
+		param_named_auto lightPosition0 light_position_object_space 0
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
+		param_named_auto world world_matrix
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
+		param_named exponent float 2000
+		param_named texScale float 0.1
+		param_named plateauSize float 0.2
+		param_named transitionSpeed float 2.0
+		param_named ambient float4 0.41 0.41 0.41 1.0
+	}
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	compile_arguments -DUSESPECULARMAP -DLIGHT0
+	entry_point main_triplanar_reference_fp
+	profiles ps_2_x arbfp1
+}
+
+// high quality triplanar mapping
+vertex_program TriplanarReferenceHigh_VSGLSL glsl
+{
+	source triplanarReferenceVS.glsl
+	syntax glsl150
+	default_params
+	{
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldviewproj worldviewproj_matrix
+	}
+	// Supported defines: -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+}
+
+fragment_program TriplanarReferenceHigh_PSGLSL glsl
+{
+	source triplanarReferencePS.glsl
+	syntax glsl150
+	default_params 
+	{
+		
+		param_named_auto lightSpecular0 light_specular_colour 0
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
+		param_named_auto lightPosition0 light_position_object_space 0
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
+		param_named_auto world world_matrix
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
+		param_named exponent float 2000
+		param_named texScale float 0.1
+		param_named plateauSize float 0.2
+		param_named transitionSpeed float 2.0
+		param_named ambient float4 0.41 0.41 0.41 1.0
+	}
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	preprocessor_defines LIGHTNORMALMAPPING=1,USESPECULARMAP-1,LIGHT0=1
+}
+
+// low quality triplanar mapping
+
+vertex_program TriplanarReferenceLow_VSGLSL glsl
+{
+	source triplanarReferenceVS.glsl
+	syntax glsl150
+	default_params
+	{
+		// Uncomment for Fog
+		// param_named_auto fogParams fog_params
+		param_named_auto eyePosition camera_position_object_space
+		param_named_auto worldviewproj worldviewproj_matrix
+	}
+	// Supported defines: -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+}
+
+fragment_program TriplanarReferenceLow_PSGLSL glsl
+{
+	source triplanarReferencePS.glsl
+	syntax glsl150
+	default_params 
+	{
+		param_named_auto lightSpecular0 light_specular_colour 0
+		param_named_auto lightDiffuse0 light_diffuse_colour 0
+		param_named_auto lightPosition0 light_position_object_space 0
+		param_named_auto lightSpotlight0 spotlight_params 0
+        param_named_auto spotlightDir0 light_direction_object_space 0
+		// Uncomment if the attenuation of light one is set
+		//param_named_auto lightAttenuation0 light_attenuation 0
+		
+		// Uncomment for second light
+		//param_named_auto lightSpecular1 light_specular_colour 1
+		//param_named_auto lightDiffuse1 light_diffuse_colour 1
+		//param_named_auto lightPosition1 light_position_object_space 1
+		//param_named_auto lightSpotlight1 spotlight_params 1
+        //param_named_auto spotlightDir1 light_direction_object_space 1
+		//param_named_auto lightAttenuation1 light_attenuation 1
+		
+		// Uncomment for third light
+		//param_named_auto lightDiffuse2 light_diffuse_colour 2
+		//param_named_auto lightSpecular2 light_specular_colour 2
+		//param_named_auto lightPosition2 light_position_object_space 2
+		//param_named_auto lightSpotlight2 spotlight_params 2
+        //param_named_auto spotlightDir2 light_direction_object_space 2
+		//param_named_auto lightAttenuation2 light_attenuation 2
+		
+		param_named_auto world world_matrix
+		
+		// Uncomment for fog
+		//param_named_auto fogColour fog_colour
+		
+		param_named exponent float 2000
+		param_named texScale float 0.1
+		param_named plateauSize float 0.2
+		param_named transitionSpeed float 2.0
+		param_named ambient float4 0.41 0.41 0.41 1.0
+	}
+	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
+	preprocessor_defines USESPECULARMAP=1,LIGHT0=1
+}
+
+fragment_program TriplanarReferenceLow_PS unified
+{
+    delegate TriplanarReferenceLow_PSGLSL
+    delegate TriplanarReferenceLow_PSCg
+}
+
+fragment_program TriplanarReferenceHigh_PS unified
+{
+    delegate TriplanarReferenceHigh_PSGLSL
+    delegate TriplanarReferenceHigh_PSCg
+}
+
+vertex_program TriplanarReferenceLow_VS unified
+{
+    delegate TriplanarReferenceLow_VSGLSL
+    delegate TriplanarReferenceLow_VSCg
+}
+
+vertex_program TriplanarReferenceHigh_VS unified
+{
+    delegate TriplanarReferenceHigh_VSGLSL
+    delegate TriplanarReferenceHigh_VSCg
+}
+

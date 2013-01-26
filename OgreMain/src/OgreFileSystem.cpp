@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,13 +38,14 @@ THE SOFTWARE.
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || \
     OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || \
     OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || \
-    OGRE_PLATFORM == OGRE_PLATFORM_NACL
+    OGRE_PLATFORM == OGRE_PLATFORM_NACL || \
+    OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
 #   include "OgreSearchOps.h"
 #   include <sys/param.h>
 #   define MAX_PATH MAXPATHLEN
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #  define WIN32_LEAN_AND_MEAN
 #  if !defined(NOMINMAX) && defined(_MSC_VER)
 #	define NOMINMAX // required to stop windows.h messing up std::min
@@ -59,14 +60,18 @@ namespace Ogre {
 	bool FileSystemArchive::msIgnoreHidden = true;
 
     //-----------------------------------------------------------------------
-    FileSystemArchive::FileSystemArchive(const String& name, const String& archType )
+    FileSystemArchive::FileSystemArchive(const String& name, const String& archType, bool readOnly )
         : Archive(name, archType)
     {
+		// Even failed attempt to write to read only location violates Apple AppStore validation process.
+		// And successfull writing to some probe file does not prove that whole location with subfolders 
+		// is writable. Therefore we accept read only flag from outside and do not try to be too smart.
+		mReadOnly = readOnly;
     }
     //-----------------------------------------------------------------------
     bool FileSystemArchive::isCaseSensitive(void) const
     {
-        #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
             return false;
         #else
             return true;
@@ -81,7 +86,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     static bool is_absolute_path(const char* path)
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         if (isalpha(uchar(path[0])) && path[1] == ':')
             return true;
 #endif
@@ -190,19 +195,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void FileSystemArchive::load()
     {
-		OGRE_LOCK_AUTO_MUTEX
-        // test to see if this folder is writeable
-		String testPath = concatenate_path(mName, "__testwrite.ogre");
-		std::ofstream writeStream;
-		writeStream.open(testPath.c_str());
-		if (writeStream.fail())
-			mReadOnly = true;
-		else
-		{
-			mReadOnly = false;
-			writeStream.close();
-			::remove(testPath.c_str());
-		}
+		// nothing to do here
     }
     //-----------------------------------------------------------------------
     void FileSystemArchive::unload()
@@ -228,7 +221,14 @@ namespace Ogre {
 		std::ifstream* roStream = 0;
 		std::fstream* rwStream = 0;
 
-		if (!readOnly && isReadOnly())
+        if (!readOnly && isReadOnly())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Cannot open a file in read-write mode in a read-only archive",
+                        "FileSystemArchive::open");
+        }
+
+		if (!readOnly)
 		{
 			mode |= std::ios::out;
 			rwStream = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
@@ -372,7 +372,7 @@ namespace Ogre {
         if (ret && is_absolute_path(filename.c_str()))
 		{
 			// only valid if full path starts with our base
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 			// case insensitive on windows
 			String lowerCaseName = mName;
 			StringUtil::toLowerCase(lowerCaseName);

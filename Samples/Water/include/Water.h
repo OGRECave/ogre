@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -101,7 +101,6 @@ private:
 	static HardwareIndexBufferSharedPtr indexBuffer ; // indices for 2 faces
 	static HardwareVertexBufferSharedPtr *texcoordsVertexBuffers ;
     
-	float *texBufData;
 	void _prepareMesh()
 	{
 		int i,texLvl ;
@@ -236,10 +235,15 @@ public:
 	{
 		posnormVertexBuffer = HardwareVertexBufferSharedPtr() ;
 		indexBuffer = HardwareIndexBufferSharedPtr() ;
-		for(int i=0;i<16;i++) {
-			texcoordsVertexBuffers[i] = HardwareVertexBufferSharedPtr() ;
+		if(texcoordsVertexBuffers != NULL)
+		{
+			for(int i=0;i<16;i++) {
+				texcoordsVertexBuffers[i] = HardwareVertexBufferSharedPtr() ;
+			}
+			delete [] texcoordsVertexBuffers;	
+			texcoordsVertexBuffers = NULL;
 		}
-		delete [] texcoordsVertexBuffers;
+		first = true;
 	}
 } ;
 bool WaterCircle::first = true ;
@@ -329,7 +333,7 @@ protected:
         TransformKeyFrame *key ;
 		// create a random spline for light
 		track = anim->createNodeTrack(0, lightNode);
-		key = track->createNodeKeyFrame(0);
+		track->createNodeKeyFrame(0);
 		for(int ff=1;ff<=19;ff++) {
 			key = track->createNodeKeyFrame(ff);
 			Vector3 lpos (
@@ -339,7 +343,7 @@ protected:
                           );
 			key->setTranslate(lpos);
 		}
-		key = track->createNodeKeyFrame(20);
+		track->createNodeKeyFrame(20);
         
         // Create a new animation state to track this
         mAnimState = mSceneMgr->createAnimationState("WaterLight");
@@ -352,6 +356,7 @@ protected:
         particleSystem = mSceneMgr->createParticleSystem("rain",
                                                          "Examples/Water/Rain");
 		particleEmitter = particleSystem->getEmitter(0);
+		particleEmitter->setEmissionRate(0);
         SceneNode* rNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
         rNode->translate(PLANE_SIZE/2.0f, 3000, PLANE_SIZE/2.0f);
         rNode->attachObject(particleSystem);
@@ -407,6 +412,8 @@ protected:
         
 		delete waterMesh;
 		waterMesh = 0;
+
+		WaterCircle::clearStaticBuffers();
 	}
     
 protected:
@@ -548,23 +555,16 @@ public:
     bool frameRenderingQueued(const FrameEvent& evt)
     {
 		if( SdkSample::frameRenderingQueued(evt) == false )
-		{
-			// check if we are exiting, if so, clear static HardwareBuffers to avoid segfault
-			WaterCircle::clearStaticBuffers();
 			return false;
-		}
         
         mAnimState->addTime(evt.timeSinceLastFrame);
         
 		// rain
 		processCircles(evt.timeSinceLastFrame);
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
-			particleEmitter->setEmissionRate(20.0f);
-		} else {
-			particleEmitter->setEmissionRate(0.0f);
+		if(mInputContext.mKeyboard)
+		{
+			particleEmitter->setEmissionRate(mInputContext.mKeyboard->isKeyDown(OIS::KC_SPACE) ? 20.0f : 0.0f);
 		}
-#endif
 		processParticles();
         
         

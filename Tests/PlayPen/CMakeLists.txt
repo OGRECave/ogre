@@ -20,12 +20,13 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/Samples/Common/include)
 ogre_add_component_include_dir(Terrain)
+ogre_add_component_include_dir(Overlay)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
 
 add_library(PlayPen ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
 
-target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay)
 ogre_config_sample_lib(PlayPen)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

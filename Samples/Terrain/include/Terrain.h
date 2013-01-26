@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -85,8 +85,8 @@ public:
 		Vector3 tsPos;
 		terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-		if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD) ||
-				mKeyboard->isKeyDown(OIS::KC_MINUS) || mKeyboard->isKeyDown(OIS::KC_SUBTRACT))
+		if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD) ||
+				mInputContext.isKeyDown(OIS::KC_MINUS) || mInputContext.isKeyDown(OIS::KC_SUBTRACT))
 		{
 			switch(mMode)
 			{
@@ -115,7 +115,7 @@ public:
 
 							float addedHeight = weight * 250.0 * timeElapsed;
 							float newheight;
-							if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD))
+							if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD))
 								newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
 							else
 								newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -154,7 +154,7 @@ public:
 							float paint = weight * timeElapsed;
 							size_t imgY = imgSize - y;
 							float val;
-							if (mKeyboard->isKeyDown(OIS::KC_EQUALS) || mKeyboard->isKeyDown(OIS::KC_ADD))
+							if (mInputContext.isKeyDown(OIS::KC_EQUALS) || mInputContext.isKeyDown(OIS::KC_ADD))
 								val = layer->getBlendValue(x, imgY) + paint;
 							else
 								val = layer->getBlendValue(x, imgY) - paint;
@@ -286,7 +286,7 @@ public:
 		{
 		case OIS::KC_S:
 			// CTRL-S to save
-			if (mKeyboard->isKeyDown(OIS::KC_LCONTROL) || mKeyboard->isKeyDown(OIS::KC_RCONTROL))
+			if (mInputContext.isKeyDown(OIS::KC_LCONTROL) || mInputContext.isKeyDown(OIS::KC_RCONTROL))
 			{
 				saveTerrains(true);
 			}
@@ -467,8 +467,7 @@ protected:
 				blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
 				Real height = terrain->getHeightAtTerrainPosition(tx, ty);
 				Real val = (height - minHeight0) / fadeDist0;
-				val = Math::Clamp(val, (Real)0, (Real)1);
-				//*pBlend0++ = val;
+				Math::Clamp(val, (Real)0, (Real)1);
 
 				val = (height - minHeight1) / fadeDist1;
 				val = Math::Clamp(val, (Real)0, (Real)1);
@@ -506,7 +505,16 @@ protected:
 		//mTerrainGlobals->getDefaultMaterialGenerator()->setDebugLevel(1);
 		//mTerrainGlobals->setLightMapSize(256);
 
-		//matProfile->setLightmapEnabled(false);
+#if OGRE_NO_GLES3_SUPPORT == 1
+        // Disable the lightmap for OpenGL ES 2.0. The minimum number of samplers allowed is 8(as opposed to 16 on desktop).
+        // Otherwise we will run over the limit by just one. The minimum was raised to 16 in GL ES 3.0.
+        if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL ES 2") != String::npos)
+        {
+            TerrainMaterialGeneratorA::SM2Profile* matProfile =
+                static_cast<TerrainMaterialGeneratorA::SM2Profile*>(mTerrainGlobals->getDefaultMaterialGenerator()->getActiveProfile());
+            matProfile->setLightmapEnabled(false);
+        }
+#endif
 		// Important to set these so that the terrain knows what to use for derived (non-realtime) data
 		mTerrainGlobals->setLightMapDirection(l->getDerivedDirection());
 		mTerrainGlobals->setCompositeMapAmbient(mSceneMgr->getAmbientLight());
@@ -874,6 +882,7 @@ protected:
 			OGRE_DELETE mTerrainGroup;
 
 		OGRE_DELETE mTerrainGlobals;
+        mHouseList.clear();
 
 		SdkSample::_shutdown();
 	}

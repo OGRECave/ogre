@@ -111,8 +111,7 @@ protected:
 	void setupShaderGenerator()
 	{
 		RTShader::ShaderGenerator* mGen = RTShader::ShaderGenerator::getSingletonPtr();
-		mGen->setTargetLanguage("cg");
-		
+
 		RTShader::RenderState* pMainRenderState = 
             mGen->createOrRetrieveRenderState(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME).first;
 		pMainRenderState->reset();

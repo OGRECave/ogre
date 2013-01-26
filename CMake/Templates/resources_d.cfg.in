@@ -1,6 +1,7 @@
 # Resources required by the sample browser and most samples.
 [Essential]
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/SdkTrays.zip
+Zip=@OGRE_MEDIA_DIR_DBG@/packs/profiler.zip
 FileSystem=@OGRE_MEDIA_DIR_DBG@/thumbnails
 
 # Common sample resources needed by many of the samples.
@@ -20,6 +21,7 @@ FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib
 FileSystem=@OGRE_MEDIA_DIR_DBG@/RTShaderLib/materials
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/scripts/SSAO
 FileSystem=@OGRE_MEDIA_DIR_DBG@/materials/textures/SSAO
+FileSystem=@OGRE_MEDIA_DIR_DBG@/volumeTerrain
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemap.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/cubemapsJS.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/dragon.zip
@@ -28,6 +30,7 @@ Zip=@OGRE_MEDIA_DIR_DBG@/packs/ogretestmap.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/ogredance.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/Sinbad.zip
 Zip=@OGRE_MEDIA_DIR_DBG@/packs/skybox.zip
+Zip=@OGRE_MEDIA_DIR_DBG@/volumeTerrain/volumeTerrainBig.zip
 
 [General]
 FileSystem=@OGRE_MEDIA_DIR_DBG@

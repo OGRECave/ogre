@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,26 +36,28 @@ namespace Ogre
 	class D3D11Device
 	{
 	private:
-		ID3D11Device * mD3D11Device;
-		ID3D11DeviceContext * mImmediateContext;
+		ID3D11DeviceN * mD3D11Device;
+		ID3D11DeviceContextN * mImmediateContext;
         ID3D11InfoQueue * mInfoQueue; 
+
+		// Storing class linkage
+		ID3D11ClassLinkage* mClassLinkage;
 
 		struct ThreadInfo
 		{
-			ID3D11DeviceContext* mContext;
+			ID3D11DeviceContextN* mContext;
 			void* mEventHandle;
 
-			ThreadInfo(ID3D11DeviceContext* context)
+			ThreadInfo(ID3D11DeviceContextN* context)
 				: mContext(context)
 				, mEventHandle(0)
 			{
-				mEventHandle = CreateEvent(0, false, false, "ThreadContextEvent");
+				mEventHandle = CreateEventEx(0, TEXT("ThreadContextEvent"), 0, EVENT_ALL_ACCESS);
 			}
 
 			~ThreadInfo()
 			{
-				mContext->Release();
-				mContext = 0;
+				SAFE_RELEASE(mContext);
 
 				CloseHandle(mEventHandle);
 			}
@@ -65,16 +67,21 @@ namespace Ogre
     public:
 
 
-		D3D11Device(ID3D11Device * device);
+		D3D11Device(ID3D11DeviceN * device);
 
 		~D3D11Device();
 
-		inline ID3D11DeviceContext * GetImmediateContext()
+		inline ID3D11DeviceContextN * GetImmediateContext()
 		{
 			return mImmediateContext;
 		}
 		
-		inline ID3D11Device * operator->() const
+		inline ID3D11ClassLinkage* GetClassLinkage()
+		{
+			return mClassLinkage;
+		}
+		
+		inline ID3D11DeviceN * operator->() const
 		{
 			assert(mD3D11Device); 
 			if (D3D_NO_EXCEPTION != mExceptionsErrorLevel)
@@ -86,7 +93,7 @@ namespace Ogre
 
 		const void clearStoredErrorMessages(  ) const;
 
-		ID3D11Device * operator=(ID3D11Device * device);
+		ID3D11DeviceN * operator=(ID3D11DeviceN * device);
 		const bool isNull();
 		const String getErrorDescription(const HRESULT hr = NO_ERROR) const;
 
@@ -102,7 +109,7 @@ namespace Ogre
 
 		const bool _getErrorsFromQueue() const;
 		void release();
-		ID3D11Device * get();
+		ID3D11DeviceN * get();
 
 		enum eExceptionsErrorLevel
 		{

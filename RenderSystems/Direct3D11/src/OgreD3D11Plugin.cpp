@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,13 +45,8 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	void D3D11Plugin::install()
 	{
-		// Create the DirectX 10 rendering api
-#ifdef OGRE_STATIC_LIB
-		HINSTANCE hInst = GetModuleHandle( NULL );
-#else
-		HINSTANCE hInst = GetModuleHandle( "RenderSystem_Direct3D11.dll" );
-#endif
-		mRenderSystem = new D3D11RenderSystem( hInst );
+		// Create the DirectX 11 rendering api
+		mRenderSystem = new D3D11RenderSystem();
 		// Register the render system
 		Root::getSingleton().addRenderSystem( mRenderSystem );
 	}

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #include "OgreShaderFunctionAtom.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     namespace RTShader {
@@ -52,7 +53,7 @@ namespace Ogre {
         //-----------------------------------------------------------------------
         GLSLESProgramWriter::GLSLESProgramWriter()
         {
-            mGLSLVersion = 100;
+            mGLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
             initializeStringMaps();
             mFunctionCacheMap.clear();
         }
@@ -311,15 +312,6 @@ namespace Ogre {
                 // The function name must always main.
                 os << "void main() {" << std::endl;
 
-                if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {
-                    os << "\tvec4 outputColor;" << std::endl;
-                }
-                else if (gpuType == GPT_VERTEX_PROGRAM)
-                {
-                    os << "\tvec4 outputPosition;" << std::endl;
-                }
-
                 // Write local parameters.
                 const ShaderParameterList& localParams = curFunction->getLocalParameters();
                 ShaderParameterConstIterator itParam = localParams.begin();
@@ -523,15 +515,6 @@ namespace Ogre {
                     os << localOs.str();
                 }
 
-                if (gpuType == GPT_FRAGMENT_PROGRAM)
-                {
-                    os << "\tgl_FragColor = outputColor;" << std::endl;
-                }
-                else if (gpuType == GPT_VERTEX_PROGRAM)
-                {
-                    os << "\tgl_Position = outputPosition;" << std::endl;
-                }
-
                 os << "}" << std::endl;
             }
             os << std::endl;
@@ -631,7 +614,7 @@ namespace Ogre {
                     // GLSL vertex program has to write always gl_Position
                     if(pParam->getContent() == Parameter::SPC_POSITION_PROJECTIVE_SPACE)
                     {
-                        mInputToGLStatesMap[pParam->getName()] = "outputPosition";
+                        mInputToGLStatesMap[pParam->getName()] = "gl_Position";
                     }
                     else
                     {
@@ -650,7 +633,7 @@ namespace Ogre {
                         pParam->getSemantic() == Parameter::SPS_COLOR)
                 {					
                     // GLSL ES fragment program has to always write gl_FragColor
-                    mInputToGLStatesMap[pParam->getName()] = "outputColor";
+                    mInputToGLStatesMap[pParam->getName()] = "gl_FragColor";
                 }
             }
         }

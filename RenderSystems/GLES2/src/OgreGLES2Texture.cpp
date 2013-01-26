@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "OgreGLES2PixelFormat.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreGLES2HardwarePixelBuffer.h"
+#include "OgreGLES2Support.h"
+#include "OgreGLES2StateCacheManager.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -87,6 +89,12 @@ namespace Ogre {
                 return GL_TEXTURE_2D;
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            case TEX_TYPE_3D:
+                return GL_TEXTURE_3D;
+            case TEX_TYPE_2D_ARRAY:
+                return GL_TEXTURE_2D_ARRAY;
+#endif
             default:
                 return 0;
         };
@@ -113,35 +121,50 @@ namespace Ogre {
             mNumMipmaps = maxMips;
         
 		// Generate texture name
-        glGenTextures(1, &mTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
            
 		// Set texture type
-        glBindTexture(getGLES2TextureTarget(), mTextureID);
-        GL_CHECK_ERROR;
+		mGLSupport.getStateCacheManager()->bindGLTexture(getGLES2TextureTarget(), mTextureID);
         
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
         Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
         
-#if GL_APPLE_texture_max_level
-        glTexParameteri( getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+#if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
+		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+#elif OGRE_NO_GLES3_SUPPORT == 0
+		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+
+        // Set up texture swizzling
+        switch(mFormat)
+		{
+		case PF_A8R8G8B8:
+		case PF_X8R8G8B8:
+		case PF_R8G8B8:
+	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			break;
+
+		default:
+	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			break;
+		}
 #endif
-        
-        // Set some misc default parameters, these can of course be changed later
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        glTexParameteri(getGLES2TextureTarget(),
-                        GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GL_CHECK_ERROR;
-        
+
+		// Set some misc default parameters, these can of course be changed later
+		mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+                                                            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
@@ -179,21 +202,19 @@ namespace Ogre {
 				{
 					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
-                        glCompressedTexImage2D(GL_TEXTURE_2D,
+                        OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_2D,
                                                mip,
                                                internalformat,
                                                width, height,
                                                0,
                                                size,
-                                               tmpdata);
-                        GL_CHECK_ERROR;
+                                               tmpdata));
                         break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
+							OGRE_CHECK_GL_ERROR(glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
 								width, height, 0, 
-								size, tmpdata);
-                            GL_CHECK_ERROR;
+								size, tmpdata));
 						}
 						break;
 					case TEX_TYPE_3D:
@@ -218,6 +239,23 @@ namespace Ogre {
         }
         else
         {
+#if OGRE_NO_GLES3_SUPPORT == 0
+            switch(mTextureType)
+            {
+                case TEX_TYPE_1D:
+                case TEX_TYPE_2D:
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_2D, GLint(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height)));
+                    break;
+                case TEX_TYPE_2D_RECT:
+                case TEX_TYPE_2D_ARRAY:
+                case TEX_TYPE_3D:
+                    OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, GLint(mNumMipmaps+1), internalformat, GLsizei(width), GLsizei(height), GLsizei(depth)));
+                    break;
+                case TEX_TYPE_CUBE_MAP:
+                    OGRE_CHECK_GL_ERROR(glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(mNumMipmaps+1), format, GLsizei(width), GLsizei(height)));
+                    break;
+            }
+#else
             // Run through this process to pregenerate mipmap pyramid
             for(size_t mip = 0; mip <= mNumMipmaps; mip++)
             {
@@ -236,23 +274,29 @@ namespace Ogre {
 				{
 					case TEX_TYPE_1D:
 					case TEX_TYPE_2D:
-                        glTexImage2D(GL_TEXTURE_2D,
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
+                        if(internalformat != format)
+                        {
+                            LogManager::getSingleton().logMessage("glTexImage2D: format != internalFormat, "
+                                "format=" + StringConverter::toString(format) + 
+                                ", internalFormat=" + StringConverter::toString(internalformat));
+                        }
+#endif
+                        OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D,
                                      mip,
                                      internalformat,
                                      width, height,
                                      0,
                                      format,
-                                     datatype, 0);
-                        GL_CHECK_ERROR;
+                                     datatype, 0));
                         break;
 					case TEX_TYPE_CUBE_MAP:
 						for(int face = 0; face < 6; face++) {
-							glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
+							OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
 								width, height, 0, 
-								format, datatype, 0);
+								format, datatype, 0));
 						}
 						break;
-					case TEX_TYPE_3D:
                     default:
                         break;
                 };
@@ -266,6 +310,7 @@ namespace Ogre {
                     height = height / 2;
                 }
             }
+#endif
         }
     }
     
@@ -313,10 +358,7 @@ namespace Ogre {
 
                         
 			// If PVRTC and 0 custom mipmap disable auto mip generation and disable software mipmap creation
-            PixelFormat imageFormat = (*loadedImages)[0].getFormat();
-			if (imageFormat == PF_PVRTC_RGB2 || imageFormat == PF_PVRTC_RGBA2 ||
-                imageFormat == PF_PVRTC_RGB4 || imageFormat == PF_PVRTC_RGBA4 ||
-                imageFormat == PF_ETC1_RGB8)
+			if (PixelUtil::isCompressed((*loadedImages)[0].getFormat()))
 			{
                 size_t imageMips = (*loadedImages)[0].getNumMipmaps();
                 if (imageMips == 0)
@@ -395,8 +437,7 @@ namespace Ogre {
     void GLES2Texture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();
-        glDeleteTextures(1, &mTextureID);
-        GL_CHECK_ERROR;
+        OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
         mTextureID = 0;
     }
     
@@ -409,8 +450,7 @@ namespace Ogre {
         }
         else
         {
-            glDeleteTextures(1, &mTextureID);
-            GL_CHECK_ERROR;
+            OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &mTextureID));
             mTextureID = 0;
         }
     }

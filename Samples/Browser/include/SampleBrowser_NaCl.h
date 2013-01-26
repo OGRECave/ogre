@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2012 Torus Knot Software Ltd
+ Copyright (c) 2000-2013 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -61,6 +61,7 @@
 #include "ppapi/c/pp_file_info.h"
 #include "ppapi/c/ppb_file_io.h"
 #include "ppapi/cpp/completion_callback.h"
+#include "ppapi/utility/completion_callback_factory.h"
 #include "ppapi/cpp/input_event.h"
 #include "OgreZip.h"
 #include <GLES2\gl2.h>

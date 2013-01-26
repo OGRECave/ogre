@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,14 +33,14 @@ THE SOFTWARE.
 namespace Ogre 
 {
 	//-----------------------------------------------------------------------
-	D3D11DriverList::D3D11DriverList( IDXGIFactory1*	pDXGIFactory ) 
+	D3D11DriverList::D3D11DriverList( IDXGIFactoryN*	pDXGIFactory ) 
 	{
 		enumerate(pDXGIFactory);
 	}
 	//-----------------------------------------------------------------------
 	D3D11DriverList::~D3D11DriverList(void)
 	{
-		for(int i=0;i<0;i++)
+		for(unsigned i = 0; i < mDriverList.size(); i++)
 		{
 			delete (mDriverList[i]);
 		}
@@ -48,14 +48,14 @@ namespace Ogre
 
 	}
 	//-----------------------------------------------------------------------
-	BOOL D3D11DriverList::enumerate(IDXGIFactory1*	pDXGIFactory)
+	BOOL D3D11DriverList::enumerate(IDXGIFactoryN*	pDXGIFactory)
 	{
 		LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
 		// Create the DXGI Factory
 
 		for( UINT iAdapter=0; ; iAdapter++ )
 		{
-			IDXGIAdapter1*					pDXGIAdapter;
+			IDXGIAdapterN* pDXGIAdapter = NULL;
 			HRESULT hr = pDXGIFactory->EnumAdapters1( iAdapter, &pDXGIAdapter );
 			if( DXGI_ERROR_NOT_FOUND == hr )
 			{
@@ -64,7 +64,7 @@ namespace Ogre
 			}
 			if( FAILED(hr) )
 			{
-				delete pDXGIAdapter;
+				SAFE_RELEASE(pDXGIAdapter);
 				return false;
 			}
 
@@ -82,6 +82,7 @@ namespace Ogre
 
 			mDriverList.push_back(new D3D11Driver(iAdapter,pDXGIAdapter) );
 
+			SAFE_RELEASE(pDXGIAdapter);
 		}
 
 		LogManager::getSingleton().logMessage( "D3D11: Driver Detection Ends" );

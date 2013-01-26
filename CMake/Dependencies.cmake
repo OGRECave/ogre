@@ -18,8 +18,6 @@ include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
-    ${OGRE_DEPENDENCIES_DIR}
-    ${ENV_OGRE_DEPENDENCIES_DIR}
     "${OGRE_BINARY_DIR}/iOSDependencies"
     "${OGRE_SOURCE_DIR}/iOSDependencies"
     "${OGRE_BINARY_DIR}/../iOSDependencies"
@@ -78,10 +76,10 @@ macro_log_feature(FreeImage_FOUND "freeimage" "Support for commonly used graphic
 
 # Find FreeType
 find_package(Freetype)
-macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.freetype.org" TRUE "" "")
+macro_log_feature(FREETYPE_FOUND "freetype" "Portable font engine" "http://www.freetype.org" FALSE "" "")
 
 # Find X11
-if (UNIX AND NOT APPLE AND NOT ANDROID)
+if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT FLASHCC)
   find_package(X11)
   macro_log_feature(X11_FOUND "X11" "X Window system" "http://www.x.org" TRUE "" "")
   macro_log_feature(X11_Xt_FOUND "Xt" "X Toolkit" "http://www.x.org" TRUE "" "")
@@ -96,10 +94,14 @@ endif ()
 #######################################################################
 
 # Find OpenGL
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT FLASHCC)
   find_package(OpenGL)
   macro_log_feature(OPENGL_FOUND "OpenGL" "Support for the OpenGL render system" "http://www.opengl.org/" FALSE "" "")
 endif()
+
+# Find OpenGL 3+
+find_package(OpenGL)
+macro_log_feature(OPENGL_FOUND "OpenGL 3+" "Support for the OpenGL 3+ render system" "http://www.opengl.org/" FALSE "" "")
 
 # Find OpenGL ES 1.x
 find_package(OpenGLES)
@@ -108,6 +110,10 @@ macro_log_feature(OPENGLES_FOUND "OpenGL ES 1.x" "Support for the OpenGL ES 1.x 
 # Find OpenGL ES 2.x
 find_package(OpenGLES2)
 macro_log_feature(OPENGLES2_FOUND "OpenGL ES 2.x" "Support for the OpenGL ES 2.x render system" "http://www.khronos.org/opengles/" FALSE "" "")
+
+# Find OpenGL ES 3.x
+find_package(OpenGLES3)
+macro_log_feature(OPENGLES3_FOUND "OpenGL ES 3.x" "Support for the OpenGL ES 2.x render system with OpenGL ES 3 support" "http://www.khronos.org/opengles/" FALSE "" "")
 
 # Find DirectX
 if(WIN32)
@@ -120,10 +126,10 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
+if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR OGRE_BUILD_PLATFORM_WINRT OR ANDROID OR FLASHCC))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
-endif (NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND NOT ANDROID)
+endif ()
 
 # Find Boost
 # Prefer static linking in all cases
@@ -134,19 +140,20 @@ else ()
 	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 endif ()
 if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
-	set(Boost_COMPILER "-xgcc42")
+    set(Boost_USE_MULTITHREADED OFF)
 endif()
-set(Boost_ADDITIONAL_VERSIONS "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
+set(Boost_ADDITIONAL_VERSIONS "1.53" "1.53.0" "1.52" "1.52.0" "1.51" "1.51.0" "1.50" "1.50.0" "1.49" "1.49.0" "1.48" "1.48.0" "1.47" "1.47.0" "1.46" "1.46.0" "1.45" "1.45.0" "1.44" "1.44.0" "1.42" "1.42.0" "1.41.0" "1.41" "1.40.0" "1.40")
 # Components that need linking (NB does not include header-only components like bind)
 set(OGRE_BOOST_COMPONENTS thread date_time)
 find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 if (NOT Boost_FOUND)
-        if(Boost_USE_STATIC_LIBS)
-                set(Boost_USE_STATIC_LIBS OFF)
-        else()
-                set(Boost_USE_STATIC_LIBS ON)
-        endif()
-        find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
+	# Try again with the other type of libs
+	if(Boost_USE_STATIC_LIBS)
+		set(Boost_USE_STATIC_LIBS OFF)
+	else()
+		set(Boost_USE_STATIC_LIBS ON)
+	endif()
+	find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
 if(Boost_FOUND AND Boost_VERSION GREATER 104900)
@@ -185,8 +192,16 @@ macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.
 #######################################################################
 
 # Find OIS
-find_package(OIS)
-macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+if (OGRE_BUILD_PLATFORM_WINRT)
+	# for WinRT we need only includes
+	set(OIS_FIND_QUIETLY TRUE)
+        find_package(OIS)
+	set(OIS_INCLUDE_DIRS ${OIS_INCLUDE_DIR})
+	macro_log_feature(OIS_INCLUDE_DIRS "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+else ()
+	find_package(OIS)
+	macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
+endif ()
 
 #######################################################################
 # Tools
@@ -209,10 +224,7 @@ macro_log_feature(CppUnit_FOUND "CppUnit" "Library for performing unit tests" "h
 #######################################################################
 # Apple-specific
 #######################################################################
-if (APPLE)
-  find_package(iOSSDK)
-  macro_log_feature(iOSSDK_FOUND "iOS SDK" "iOS SDK" "http://developer.apple.com/ios" FALSE "" "")
-  
+if (APPLE)  
   if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
     find_package(Carbon)
     macro_log_feature(Carbon_FOUND "Carbon" "Carbon" "http://developer.apple.com/mac" TRUE "" "")
@@ -253,6 +265,7 @@ include_directories(
   ${OPENGL_INCLUDE_DIRS}
   ${OPENGLES_INCLUDE_DIRS}
   ${OPENGLES2_INCLUDE_DIRS}
+  ${OPENGLES3_INCLUDE_DIRS}
   ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
@@ -269,6 +282,7 @@ link_directories(
   ${OPENGL_LIBRARY_DIRS}
   ${OPENGLES_LIBRARY_DIRS}
   ${OPENGLES2_LIBRARY_DIRS}
+  ${OPENGLES3_LIBRARY_DIRS}
   ${Cg_LIBRARY_DIRS}
   ${X11_LIBRARY_DIRS}
   ${DirectX_LIBRARY_DIRS}

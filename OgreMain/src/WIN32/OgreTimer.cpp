@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,9 @@ using namespace Ogre;
 
 //-------------------------------------------------------------------------
 Timer::Timer()
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	: mTimerMask( 0 )
+#endif
 {
 	reset();
 }
@@ -46,6 +48,7 @@ Timer::~Timer()
 //-------------------------------------------------------------------------
 bool Timer::setOption( const String & key, const void * val )
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	if ( key == "QueryAffinityMask" )
 	{
 		// Telling timer what core to use for a timer read
@@ -66,6 +69,7 @@ bool Timer::setOption( const String & key, const void * val )
 			return true;
 		}
 	}
+#endif
 
 	return false;
 }
@@ -73,6 +77,7 @@ bool Timer::setOption( const String & key, const void * val )
 //-------------------------------------------------------------------------
 void Timer::reset()
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
     // Get the current process core mask
 	DWORD_PTR procMask;
 	DWORD_PTR sysMask;
@@ -97,6 +102,7 @@ void Timer::reset()
 
 	// Set affinity to the first core
 	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
+#endif
 
 	// Get the constant frequency
 	QueryPerformanceFrequency(&mFrequency);
@@ -105,8 +111,10 @@ void Timer::reset()
 	QueryPerformanceCounter(&mStartTime);
 	mStartTick = GetTickCount();
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	// Reset affinity
 	SetThreadAffinityMask(thread, oldMask);
+#endif
 
 	mLastTime = 0;
 	mZeroClock = clock();
@@ -117,16 +125,20 @@ unsigned long Timer::getMilliseconds()
 {
     LARGE_INTEGER curTime;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	HANDLE thread = GetCurrentThread();
 
 	// Set affinity to the first core
 	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
+#endif
 
 	// Query the timer
 	QueryPerformanceCounter(&curTime);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	// Reset affinity
 	SetThreadAffinityMask(thread, oldMask);
+#endif
 
     LONGLONG newTime = curTime.QuadPart - mStartTime.QuadPart;
     
@@ -159,16 +171,20 @@ unsigned long Timer::getMicroseconds()
 {
     LARGE_INTEGER curTime;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	HANDLE thread = GetCurrentThread();
 
 	// Set affinity to the first core
 	DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
+#endif
 
 	// Query the timer
 	QueryPerformanceCounter(&curTime);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	// Reset affinity
 	SetThreadAffinityMask(thread, oldMask);
+#endif
 
 	LONGLONG newTime = curTime.QuadPart - mStartTime.QuadPart;
     

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -68,6 +68,9 @@ namespace Ogre
 			}
 			else //Success!
 			{
+				DXGI_OUTPUT_DESC OutputDesc;
+				pOutput->GetDesc(&OutputDesc);
+
 				const DXGI_FORMAT allowedAdapterFormatArray[] = 
 				{
 					DXGI_FORMAT_R8G8B8A8_UNORM,			//This is DXUT's preferred mode
@@ -84,8 +87,28 @@ namespace Ogre
 					0,
 					&NumModes,
 					pDesc );
-				DXGI_OUTPUT_DESC OutputDesc;
-				pOutput->GetDesc(&OutputDesc);
+				
+				SAFE_RELEASE(pOutput);
+
+				// display mode list can not be obtained when working over terminal session
+				if(FAILED(hr))
+				{
+					NumModes = 0;
+
+					if(hr == DXGI_ERROR_NOT_CURRENTLY_AVAILABLE)
+					{
+						pDesc[0].Width = 800;
+						pDesc[0].Height = 600;
+						pDesc[0].RefreshRate.Numerator = 60;
+						pDesc[0].RefreshRate.Denominator = 1;
+						pDesc[0].Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+						pDesc[0].ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_PROGRESSIVE;
+						pDesc[0].Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+						NumModes = 1;
+					}
+				}
+
 				for( UINT m=0; m<NumModes; m++ )
 				{
 					DXGI_MODE_DESC displayMode=pDesc[m];

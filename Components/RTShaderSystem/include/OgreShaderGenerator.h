@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "OgreShaderPrerequisites.h"
 #include "OgreSingleton.h"
+#include "OgreFileSystemLayer.h"
 #include "OgreRenderObjectListener.h"
 #include "OgreSceneManager.h"
 #include "OgreShaderRenderState.h"
@@ -820,7 +821,7 @@ protected:
 	void _finalize();
 
 	/** Find source technique to generate shader based technique based on it. */
-	Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName);
+	Technique* findSourceTechnique(const String& materialName, const String& groupName, const String& srcTechniqueSchemeName, bool allowProgrammable);
 
 	/** Checks if a given technique has passes with shaders. */
 	bool isProgrammable(Technique* tech) const;
@@ -945,6 +946,8 @@ protected:
 	ProgramManager* mProgramManager;
 	// Shader program writer manager.
 	ProgramWriterManager* mProgramWriterManager;
+        // File system layer manager.
+	FileSystemLayer* mFSLayer;
 	// Fixed Function Render state builder.
 	FFPRenderStateBuilder* mFFPRenderStateBuilder;
 	// Material entries map.

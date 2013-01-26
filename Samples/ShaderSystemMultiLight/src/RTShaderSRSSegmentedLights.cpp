@@ -385,11 +385,7 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
 //-----------------------------------------------------------------------
 bool RTShaderSRSSegmentedLights::resolvePerLightParameters(ProgramSet* programSet)
 {
-	Program* vsProgram = programSet->getCpuVertexProgram();
 	Program* psProgram = programSet->getCpuFragmentProgram();
-	Function* vsMain = vsProgram->getEntryPointFunction();
-	Function* psMain = psProgram->getEntryPointFunction();
-
 
 	// Resolve per light parameters.
 	for (unsigned int i=0; i < mLightParamsList.size(); ++i)
@@ -582,14 +578,14 @@ bool RTShaderSRSSegmentedLights::addPSGlobalIlluminationInvocationBegin(Function
 	
 	curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 	curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);	
-	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_IN, Operand::OPM_XYZ);
+	curFuncInvocation->pushOperand(mPSTempDiffuseColour, Operand::OPS_OUT, Operand::OPM_XYZ);
 	psMain->addAtomInstance(curFuncInvocation);	
 
 	if (mSpecularEnable)
 	{
 		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, groupOrder, internalCounter++); 
 		curFuncInvocation->pushOperand(pZeroParam, Operand::OPS_IN);	
-		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_IN, Operand::OPM_XYZ);
+		curFuncInvocation->pushOperand(mPSTempSpecularColour, Operand::OPS_OUT, Operand::OPM_XYZ);
 		psMain->addAtomInstance(curFuncInvocation);	
 	}
 	
@@ -752,8 +748,6 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
 	ParameterPtr paramInvWidth = ParameterFactory::createConstParamFloat(invWidth);
 	ParameterPtr paramInvHeight = ParameterFactory::createConstParamFloat(invHeight);
 
-	int gridDiv = SegmentedDynamicLightManager::getSingleton().getGridDivision();
-	
 	FunctionInvocation* curFuncInvocation = NULL;	
 	curFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_TEXTURE_AMBIENT_DIFFUSE, groupOrder, internalCounter++); 						
 	curFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_IN);
@@ -770,18 +764,18 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
 	{
 		ParameterPtr psOutColor = psMain->resolveOutputParameter(Parameter::SPS_COLOR, -1, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
-		FunctionInvocation* curFuncInvocation = NULL;	
-		curFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_DEBUG, FFP_PS_COLOUR_END + 1, internalCounter++); 						
-		curFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSInWorldPos, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSSegmentedLightTexture, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSLightTextureIndexLimit, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(mPSLightTextureLightBounds, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(paramInvWidth, Operand::OPS_IN);
-		curFuncInvocation->pushOperand(paramInvHeight, Operand::OPS_IN);	
+		FunctionInvocation* curDebugFuncInvocation = NULL;
+		curDebugFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_DEBUG, FFP_PS_COLOUR_END + 1, internalCounter++); 						
+		curDebugFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(mPSInWorldPos, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(mPSSegmentedLightTexture, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(mPSLightTextureIndexLimit, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(mPSLightTextureLightBounds, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(paramInvWidth, Operand::OPS_IN);
+		curDebugFuncInvocation->pushOperand(paramInvHeight, Operand::OPS_IN);	
 
-		curFuncInvocation->pushOperand(psOutColor, Operand::OPS_INOUT, Operand::OPM_XYZ);	
-		psMain->addAtomInstance(curFuncInvocation);	
+		curDebugFuncInvocation->pushOperand(psOutColor, Operand::OPS_INOUT, Operand::OPM_XYZ);	
+		psMain->addAtomInstance(curDebugFuncInvocation);	
 	}
 
 	return true;

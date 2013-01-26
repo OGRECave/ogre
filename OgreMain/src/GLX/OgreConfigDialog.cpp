@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,10 +62,10 @@ You can easily generate your own backdrop with the following python script:
 #!/usr/bin/python
 import sys
 pngstring=open(sys.argv[2], "rb").read()
-print "char %s[%i]={%s};" % (sys.argv[1],len(pngstring), ",".join([str(ord(x)) for x in pngstring]))
+print "const unsigned char %s[%i]={%s};" % (sys.argv[1],len(pngstring), ",".join([str(ord(x)) for x in pngstring]))
 
 Call this with
-$ bintoheader.py GLX_backdrop GLX_backdrop.png > GLX_backdrop.h
+$ bintoheader.py GLX_backdrop_data GLX_backdrop.png > GLX_backdrop.h
 
 */
 #include "GLX_backdrop.h"
@@ -86,7 +86,7 @@ namespace Ogre {
 class GLXConfigurator {
 	/* GUI constants */
 	static const int wWidth = 400;		// Width of window
-	static const int wHeight = 320;		// Height of window
+	static const int wHeight = 340;		// Height of window
 	static const int col1x = 20;		// Starting x of column 1 (labels)
 	static const int col2x = 180;		// Starting x of column 2 (options)
 	static const int col1w = 150;		// Width of column 1 (labels)

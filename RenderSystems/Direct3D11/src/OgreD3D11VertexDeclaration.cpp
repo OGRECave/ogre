@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -120,7 +120,7 @@ namespace Ogre {
             ZeroMemory(D3delems, sizeof(D3D11_INPUT_ELEMENT_DESC) * iNumElements);
 
 			unsigned int idx;
-       		for (unsigned int idx = 0; idx < iNumElements; ++idx)
+       		for (idx = 0; idx < iNumElements; ++idx)
 			{
                 D3D11_SIGNATURE_PARAMETER_DESC inputDesc = boundVertexProgram->getInputParamDesc(idx);
        			VertexElementList::const_iterator i, iend;
@@ -144,7 +144,7 @@ namespace Ogre {
                 {
                     // find by pos
                     i = mElementList.begin();
-                    for (int count = 0; count < idx && i != iend; count++, ++i)
+                    for (unsigned int count = 0; count < idx && i != iend; count++, ++i)
                     {
                     }
                     if (i != iend)
@@ -218,6 +218,7 @@ namespace Ogre {
 			if (FAILED(hr)|| mlpD3DDevice.isError())
 			{
 				String errorDescription = mlpD3DDevice.getErrorDescription();
+                errorDescription += "\nBound shader name: " + boundVertexProgram->getName();
 
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration"+errorDescription , 
 					"D3D11VertexDeclaration::getILayoutByShader");

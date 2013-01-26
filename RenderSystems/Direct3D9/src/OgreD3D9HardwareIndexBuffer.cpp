@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ namespace Ogre {
 		// Allocate the system memory buffer for restoring after device lost.
 		(((usage & HardwareBuffer::HBU_WRITE_ONLY) != 0) && 
 			D3D9RenderSystem::getResourceManager()->getAutoHardwareBufferManagement()))
-    {
+   {
 		D3D9_DEVICE_ACCESS_CRITICAL_SECTION
 
 		D3DPOOL eResourcePool;
@@ -54,7 +54,7 @@ namespace Ogre {
 		eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : 
 			// If not system mem, use managed pool UNLESS buffer is discardable
 			// if discardable, keeping the software backing is expensive
-			(usage & HardwareBuffer::HBU_DISCARDABLE)? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+			((usage & HardwareBuffer::HBU_DISCARDABLE) || (D3D9RenderSystem::isDirectX9Ex())) ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 #else
 		eResourcePool = useSystemMemory? D3DPOOL_SYSTEMMEM : D3DPOOL_DEFAULT;
 #endif

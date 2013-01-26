@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ namespace Ogre
 	class D3D11DepthBuffer : public DepthBuffer
 	{
 	public:
-		D3D11DepthBuffer( uint16 poolId,
+		D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
 							ID3D11DepthStencilView *depthBufferView,
 							uint32 width, uint32 height,
 							uint32 fsaa, uint32 multiSampleQuality, bool isManual );
@@ -46,10 +46,13 @@ namespace Ogre
 		virtual bool isCompatible( RenderTarget *renderTarget ) const;
 
 		ID3D11DepthStencilView* getDepthStencilView() const;
+		/// internal method, gets called when the renderwindow was resized
+		void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
 
 	protected:
 		ID3D11DepthStencilView		*mDepthStencilView; //aka. actual "DepthBuffer"
 		uint32						mMultiSampleQuality;
+		D3D11RenderSystem			*mRenderSystem;
 	};
 }
 #endif

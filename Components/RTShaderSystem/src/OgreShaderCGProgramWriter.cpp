@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -116,10 +116,9 @@ void CGProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 	for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
 	{
 		Function* curFunction = *itFunction;
-		ParameterPtr colorParameter;
 
 		writeFunctionTitle(os, curFunction);
-		writeFunctionDeclaration(os, curFunction, colorParameter);
+		writeFunctionDeclaration(os, curFunction);
 
 		os << "{" << std::endl;
 
@@ -230,7 +229,7 @@ void CGProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr paramet
 }
 
 //-----------------------------------------------------------------------
-void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function, ParameterPtr & colorParameter)
+void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
 	const ShaderParameterList& inParams  = function->getInputParameters();
 	const ShaderParameterList& outParams = function->getOutputParameters();

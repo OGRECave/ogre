@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,10 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreHardwareVertexBuffer.h"
+#include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareUniformBuffer.h"
+#include "OgreHardwareVertexBuffer.h"
 
 namespace Ogre {
 	/** \addtogroup Core
@@ -93,6 +95,58 @@ namespace Ogre {
 
     };
 
+	/// Specialisation of HardwareUniformBuffer for emulation
+	class _OgreExport DefaultHardwareUniformBuffer : public HardwareUniformBuffer
+	{
+	protected:
+		unsigned char* mData;
+		/** See HardwareBuffer. */
+        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        /** See HardwareBuffer. */
+		void unlockImpl(void);
+		/**  */
+		//bool updateStructure(const Any& renderSystemInfo);
+
+	public:
+		DefaultHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
+		~DefaultHardwareUniformBuffer();
+		/** See HardwareBuffer. */
+        void readData(size_t offset, size_t length, void* pDest);
+        /** See HardwareBuffer. */
+        void writeData(size_t offset, size_t length, const void* pSource,
+				bool discardWholeBuffer = false);
+        /** Override HardwareBuffer to turn off all shadowing. */
+        void* lock(size_t offset, size_t length, LockOptions options);
+        /** Override HardwareBuffer to turn off all shadowing. */
+		void unlock(void);
+	};
+
+    /// Specialisation of HardwareCounterBuffer for emulation
+	class _OgreExport DefaultHardwareCounterBuffer : public HardwareCounterBuffer
+	{
+	protected:
+		unsigned char* mData;
+		/** See HardwareBuffer. */
+        void* lockImpl(size_t offset, size_t length, LockOptions options);
+        /** See HardwareBuffer. */
+		void unlockImpl(void);
+		/**  */
+		//bool updateStructure(const Any& renderSystemInfo);
+
+	public:
+		DefaultHardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer = false, const String& name = "");
+		~DefaultHardwareCounterBuffer();
+		/** See HardwareBuffer. */
+        void readData(size_t offset, size_t length, void* pDest);
+        /** See HardwareBuffer. */
+        void writeData(size_t offset, size_t length, const void* pSource,
+                       bool discardWholeBuffer = false);
+        /** Override HardwareBuffer to turn off all shadowing. */
+        void* lock(size_t offset, size_t length, LockOptions options);
+        /** Override HardwareBuffer to turn off all shadowing. */
+		void unlock(void);
+	};
+
 	/** Specialisation of HardwareBufferManagerBase to emulate hardware buffers.
 	@remarks
 		You might want to instantiate this class if you want to utilise
@@ -115,6 +169,14 @@ namespace Ogre {
 				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
 		/// Create a hardware vertex buffer
 		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+		/// Create a hardware uniform buffer
+		HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, 
+									HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, 
+									bool useShadowBuffer = false, const String& name = "");
+		/// Create a hardware counter buffer
+		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                                                           HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                                                           bool useShadowBuffer = false, const String& name = "");
     };
 
 	/// DefaultHardwareBufferManager as a Singleton
