@@ -501,22 +501,14 @@ namespace Ogre {
         switch(mTarget)
         {
             case GL_TEXTURE_1D:
-                OGRE_CHECK_GL_ERROR(glFramebufferTexture1D(GL_FRAMEBUFFER, attachment,
-                                                           mFaceTarget, mTextureID, mLevel));
-                break;
             case GL_TEXTURE_2D:
-            case GL_TEXTURE_CUBE_MAP:
             case GL_TEXTURE_RECTANGLE:
-                if(mFormat == PF_DEPTH)
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                                               mFaceTarget, mTextureID, mLevel));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                               mFaceTarget, mTextureID, mLevel));
-                }
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_FRAMEBUFFER, attachment,
+                                                         mTextureID, mLevel));
+                break;
+            case GL_TEXTURE_CUBE_MAP:
+                OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                                           mFaceTarget, mTextureID, mLevel));
                 break;
             case GL_TEXTURE_3D:
             case GL_TEXTURE_2D_ARRAY:
@@ -656,8 +648,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
                          dstBox.getWidth(), dstBox.getHeight(),
                          0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
-            OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                       GL_TEXTURE_2D, tempTex, 0));
+            OGRE_CHECK_GL_ERROR(glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                                     tempTex, 0));
 
             // Set viewport to size of destination slice
             OGRE_CHECK_GL_ERROR(glViewport(0, 0, dstBox.getWidth(), dstBox.getHeight()));
