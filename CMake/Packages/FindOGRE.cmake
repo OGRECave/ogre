@@ -28,7 +28,9 @@
 #  Plugin_BSPSceneManager, Plugin_CgProgramManager,
 #  Plugin_OctreeSceneManager, Plugin_OctreeZone,
 #  Plugin_ParticleFX, Plugin_PCZSceneManager,
-#  RenderSystem_GL, RenderSystem_Direct3D9,
+#  RenderSystem_GL, RenderSystem_GL3Plus,
+#  RenderSystem_GLES, RenderSystem_GLES2,
+#  RenderSystem_Direct3D9, RenderSystem_Direct3D11
 #  Paging, Terrain, Volume, Overlay
 #
 # For each of these components, the following variables are defined:
@@ -130,7 +132,7 @@ endif ()
 set(OGRE_COMPONENTS Paging Terrain Volume Overlay 
   Plugin_BSPSceneManager Plugin_CgProgramManager Plugin_OctreeSceneManager
   Plugin_OctreeZone Plugin_PCZSceneManager Plugin_ParticleFX
-  RenderSystem_Direct3D11 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GLES RenderSystem_GLES2)
+  RenderSystem_Direct3D11 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GL3Plus RenderSystem_GLES RenderSystem_GLES2)
 set(OGRE_RESET_VARS 
   OGRE_CONFIG_INCLUDE_DIR OGRE_INCLUDE_DIR 
   OGRE_LIBRARY_FWK OGRE_LIBRARY_REL OGRE_LIBRARY_DBG
@@ -472,6 +474,7 @@ ogre_find_plugin(Plugin_CgProgramManager OgreCgProgram.h PlugIns/CgProgramManage
 ogre_find_plugin(Plugin_OctreeSceneManager OgreOctreeSceneManager.h PlugIns/OctreeSceneManager/include)
 ogre_find_plugin(Plugin_ParticleFX OgreParticleFXPrerequisites.h PlugIns/ParticleFX/include)
 ogre_find_plugin(RenderSystem_GL OgreGLRenderSystem.h RenderSystems/GL/include)
+ogre_find_plugin(RenderSystem_GL3Plus OgreGL3PlusRenderSystem.h RenderSystems/GL3Plus/include)
 ogre_find_plugin(RenderSystem_GLES OgreGLESRenderSystem.h RenderSystems/GLES/include)
 ogre_find_plugin(RenderSystem_GLES2 OgreGLES2RenderSystem.h RenderSystems/GLES2/include)
 ogre_find_plugin(RenderSystem_Direct3D9 OgreD3D9RenderSystem.h RenderSystems/Direct3D9/include)
@@ -487,6 +490,9 @@ if (OGRE_STATIC)
   endif ()
   if (NOT OPENGL_FOUND)
     set(OGRE_RenderSystem_GL_FOUND FALSE)
+  endif ()
+  if (NOT OPENGL_FOUND)
+    set(OGRE_RenderSystem_GL3Plus_FOUND FALSE)
   endif ()
   if (NOT OPENGLES_FOUND)
     set(OGRE_RenderSystem_GLES_FOUND FALSE)
@@ -506,6 +512,9 @@ if (OGRE_STATIC)
     ${DirectX_D3D11_LIBRARIES}
   )
   set(OGRE_RenderSystem_GL_LIBRARIES ${OGRE_RenderSystem_GL_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+  )
+  set(OGRE_RenderSystem_GL3Plus_LIBRARIES ${OGRE_RenderSystem_GL3Plus_LIBRARIES}
     ${OPENGL_LIBRARIES}
   )
   set(OGRE_RenderSystem_GLES_LIBRARIES ${OGRE_RenderSystem_GLES_LIBRARIES}
