@@ -565,7 +565,7 @@ namespace Ogre {
 						varRefType = varRef->GetType();
 
 						// Recursively descend through the structure levels
-						processParamElement( "", curVar.Name, i, varRefType);
+						processParamElement( "", curVar.Name, varRefType);
 					}
 
 					switch (constantBufferDesc.Type)
@@ -1062,8 +1062,7 @@ namespace Ogre {
 
 	}
     //-----------------------------------------------------------------------
-    void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, 
-        size_t paramIndex, ID3D11ShaderReflectionType* varRefType)
+	void D3D11HLSLProgram::processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType)
     {
         D3D11_SHADER_TYPE_DESC varRefTypeDesc;
         HRESULT hr = varRefType->GetDesc(&varRefTypeDesc);
@@ -1095,7 +1094,7 @@ namespace Ogre {
             // Cascade into struct
             for (unsigned int i = 0; i < varRefTypeDesc.Members; ++i)
             {
-                processParamElement(prefix, varRefType->GetMemberTypeName(i), i,  varRefType->GetMemberTypeByIndex(i));
+                processParamElement(prefix, varRefType->GetMemberTypeName(i), varRefType->GetMemberTypeByIndex(i));
             }
         }
         else
@@ -1108,7 +1107,8 @@ namespace Ogre {
                 mSerStrings.push_back(name);
                 def.Name = &(*name)[0]; 
 
-                def.logicalIndex = paramIndex;
+				GpuConstantDefinitionWithName* prev_def = mD3d11ShaderVariableSubparts.empty() ? NULL : &mD3d11ShaderVariableSubparts.back();
+				def.logicalIndex = prev_def ? prev_def->logicalIndex + prev_def->elementSize / 4 : 0;
                 // populate type, array size & element size
                 populateDef(varRefTypeDesc, def);
 
