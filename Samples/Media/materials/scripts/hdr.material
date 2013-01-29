@@ -3,8 +3,16 @@ fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale2x2Luminence
-	target ps_4_0 ps_2_0
+	target ps_2_0
 }
+
+fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp4 hlsl
+{
+	source hdrfp4.hlsl
+	entry_point downscale2x2Luminencefp4
+	target ps_4_0
+}
+
 fragment_program Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp glsl
 {
 	source hdr_downscale2x2luminence.glsl
@@ -25,6 +33,7 @@ fragment_program Ogre/Compositor/HDR/downscale2x2Luminence_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale2x2LuminenceGLSL_fp
 	delegate Ogre/Compositor/HDR/downscale2x2LuminenceGLSLES_fp
+	delegate Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp4
 	delegate Ogre/Compositor/HDR/downscale2x2LuminenceHLSL_fp
 	default_params
 	{
@@ -64,7 +73,13 @@ fragment_program Ogre/Compositor/HDR/downscale3x3HLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale3x3
-	target ps_4_0 ps_2_0
+	target ps_2_0
+}
+fragment_program Ogre/Compositor/HDR/downscale3x3HLSL_fp4 hlsl
+{
+	source hdrfp4.hlsl
+	entry_point downscale3x3fp4
+	target ps_4_0
 }
 fragment_program Ogre/Compositor/HDR/downscale3x3GLSLES_fp glsles
 {
@@ -86,6 +101,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale3x3GLSL_fp
 	delegate Ogre/Compositor/HDR/downscale3x3GLSLES_fp
+	delegate Ogre/Compositor/HDR/downscale3x3HLSL_fp4
 	delegate Ogre/Compositor/HDR/downscale3x3HLSL_fp
 	default_params
 	{
@@ -126,8 +142,15 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point downscale3x3brightpass
-	target ps_4_0 ps_2_0
+	target ps_2_0
 }
+fragment_program Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp4 hlsl
+{
+	source hdrfp4.hlsl
+	entry_point downscale3x3brightpassfp4
+	target ps_4_0
+}
+
 fragment_program Ogre/Compositor/HDR/utils_fp glsl
 {
 	source hdr_tonemap_util.glsl
@@ -156,6 +179,7 @@ fragment_program Ogre/Compositor/HDR/downscale3x3brightpass_fp unified
 {
 	delegate Ogre/Compositor/HDR/downscale3x3brightpassGLSL_fp
 	delegate Ogre/Compositor/HDR/downscale3x3brightpassGLSLES_fp
+	delegate Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp4
 	delegate Ogre/Compositor/HDR/downscale3x3brightpassHLSL_fp
 	default_params
 	{
@@ -203,7 +227,13 @@ fragment_program Ogre/Compositor/HDR/bloomHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point bloom
-	target ps_4_0 ps_2_0
+	target ps_2_0
+}
+fragment_program Ogre/Compositor/HDR/bloomHLSL_fp4 hlsl
+{
+	source hdrfp4.hlsl
+	entry_point bloomfp4
+	target ps_4_0
 }
 fragment_program Ogre/Compositor/HDR/bloomGLSL_fp glsl
 {
@@ -223,9 +253,10 @@ fragment_program Ogre/Compositor/HDR/bloomGLSLES_fp glsles
 }
 fragment_program Ogre/Compositor/HDR/bloom_fp unified
 {
+	delegate Ogre/Compositor/HDR/bloomHLSL_fp4
+	delegate Ogre/Compositor/HDR/bloomHLSL_fp
 	delegate Ogre/Compositor/HDR/bloomGLSL_fp
-	delegate Ogre/Compositor/HDR/bloomGLSLES_fp
-	delegate Ogre/Compositor/HDR/bloomHLSL_fp	
+	delegate Ogre/Compositor/HDR/bloomGLSLES_fp	
 }
 
 
@@ -263,8 +294,15 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingHLSL_fp hlsl
 {
 	source hdr.hlsl
 	entry_point finalToneMapping
-	target ps_5_0 ps_4_0 ps_2_0
+	target ps_2_0
 }
+fragment_program Ogre/Compositor/HDR/finaltonemappingHLSL_fp4 hlsl
+{
+	source hdrfp4.hlsl
+	entry_point finalToneMappingfp4
+	target ps_4_0
+}
+
 fragment_program Ogre/Compositor/HDR/finaltonemappingGLSL_fp glsl
 {
 	source hdr_finalToneMapping.glsl
@@ -290,9 +328,10 @@ fragment_program Ogre/Compositor/HDR/finaltonemappingGLSLES_fp glsles
 }
 fragment_program Ogre/Compositor/HDR/finaltonemapping_fp unified
 {
+	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp4
+	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp
 	delegate Ogre/Compositor/HDR/finaltonemappingGLSL_fp
 	delegate Ogre/Compositor/HDR/finaltonemappingGLSLES_fp
-	delegate Ogre/Compositor/HDR/finaltonemappingHLSL_fp
 }
 
 material Ogre/Compositor/HDR/ToneMapping

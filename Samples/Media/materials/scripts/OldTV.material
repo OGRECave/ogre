@@ -40,7 +40,6 @@ material Ogre/Compositor/OldTV
 		pass
 		{
 			depth_check off
-
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}
