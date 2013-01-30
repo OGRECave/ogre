@@ -86,9 +86,7 @@ namespace Ogre {
 		OGRE_LOCK_AUTO_MUTEX
         if (!mZzipDir)
         {
-            zzip_error_t zzipError;
-            mZzipDir = zzip_dir_open_ext_io(mName.c_str(), &zzipError, 0, mPluginIo);
-            checkZzipError(zzipError, "opening archive");
+			mZzipDir = _getNewZipDirHandle();
 
             // Cache names
             ZZIP_DIRENT zzipEntry;
@@ -137,9 +135,11 @@ namespace Ogre {
 		OGRE_LOCK_AUTO_MUTEX
         String lookUpFileName = filename;
 
+		ZZIP_DIR* zzipDir = _getNewZipDirHandle();
+
         // Format not used here (always binary)
         ZZIP_FILE* zzipFile = 
-            zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS);
+            zzip_file_open(zzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS);
         if (!zzipFile) // Try if we find the file
         {
             const Ogre::FileInfoListPtr fileNfo = findFileInfo(lookUpFileName, true);
@@ -147,13 +147,13 @@ namespace Ogre {
             {
                 Ogre::FileInfo info = fileNfo->at(0);
                 lookUpFileName = info.path + info.basename;
-                zzipFile = zzip_file_open(mZzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS); // When an error happens here we will catch it below
+                zzipFile = zzip_file_open(zzipDir, lookUpFileName.c_str(), ZZIP_ONLYZIP | ZZIP_CASELESS); // When an error happens here we will catch it below
             }
         }
 
         if (!zzipFile)
 		{
-            int zerr = zzip_error(mZzipDir);
+            int zerr = zzip_error(zzipDir);
             String zzDesc = getZzipErrorDescription((zzip_error_t)zerr);
             LogManager::getSingleton().logMessage(
                 mName + " - Unable to open file " + lookUpFileName + ", error was '" + zzDesc + "'");
@@ -164,10 +164,10 @@ namespace Ogre {
 
 		// Get uncompressed size too
 		ZZIP_STAT zstat;
-		zzip_dir_stat(mZzipDir, lookUpFileName.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
+		zzip_dir_stat(zzipDir, lookUpFileName.c_str(), &zstat, ZZIP_CASEINSENSITIVE);
 
         // Construct & return stream
-        return DataStreamPtr(OGRE_NEW ZipDataStream(lookUpFileName, zzipFile, static_cast<size_t>(zstat.st_size)));
+        return DataStreamPtr(OGRE_NEW ZipDataStream(lookUpFileName, zzipDir, zzipFile, static_cast<size_t>(zstat.st_size)));
 
     }
 	//---------------------------------------------------------------------
@@ -293,17 +293,26 @@ namespace Ogre {
                 "ZipArchive::checkZzipError");
         }
     }
+	//-----------------------------------------------------------------------
+	ZZIP_DIR* ZipArchive::_getNewZipDirHandle() const
+	{
+		ZZIP_DIR* zzipDir = 0;
+        zzip_error_t zzipError;
+        zzipDir = zzip_dir_open_ext_io(mName.c_str(), &zzipError, 0, mPluginIo);
+        checkZzipError(zzipError, "opening archive");
+		return zzipDir;
+	}
+	//-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    //-----------------------------------------------------------------------
-    ZipDataStream::ZipDataStream(ZZIP_FILE* zzipFile, size_t uncompressedSize)
-        : mZzipFile(zzipFile)
+    ZipDataStream::ZipDataStream(ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize)
+        : mZzipFile(zzipFile), mZzipDir( zzipDir )
     {
 		mSize = uncompressedSize;
     }
     //-----------------------------------------------------------------------
-    ZipDataStream::ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize)
-        :DataStream(name), mZzipFile(zzipFile)
+    ZipDataStream::ZipDataStream(const String& name, ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize)
+        :DataStream(name), mZzipFile(zzipFile), mZzipDir( zzipDir )
     {
 		mSize = uncompressedSize;
     }
@@ -391,6 +400,12 @@ namespace Ogre {
 			mZzipFile = 0;
 		}
 		mCache.clear();
+
+		if (mZzipDir)
+		{
+			zzip_dir_close(mZzipDir);
+			mZzipDir = 0;
+		}
     }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
