@@ -41,7 +41,7 @@ v2p main_vs( a2v input )
 }
 
 // Pixel Shader
-float4 main_ps( v2p input ) : SV_TARGET
+float4 main_ps( v2p input ) : SV_Target
 {
 	float4 l_color0;
 	float4 l_color1;

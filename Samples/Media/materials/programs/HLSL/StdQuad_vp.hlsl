@@ -31,8 +31,7 @@ struct VS_OUTPUT4 {
 
 VS_OUTPUT StdQuad_vp
 (
-    float4 inPos : POSITION,
-    uniform float4x4 worldViewProj
+    float4 inPos : POSITION
 )
 {
 	VS_OUTPUT Out;
@@ -51,8 +50,7 @@ VS_OUTPUT StdQuad_vp
 
 VS_OUTPUT2 StdQuad_Tex2_vp
 (
-    float4 inPos : POSITION,
-    uniform float4x4 worldViewProj
+    float4 inPos : POSITION
 )
 {
 	VS_OUTPUT2 Out;
@@ -72,8 +70,7 @@ VS_OUTPUT2 StdQuad_Tex2_vp
 
 VS_OUTPUT2 StdQuad_Tex2a_vp
 (
-    float4 inPos : POSITION,
-    uniform float4x4 worldViewProj
+    float4 inPos : POSITION
 )
 {
 	VS_OUTPUT2 Out;
@@ -93,8 +90,7 @@ VS_OUTPUT2 StdQuad_Tex2a_vp
 
 VS_OUTPUT3 StdQuad_Tex3_vp
 (
-    float4 inPos : POSITION,
-    uniform float4x4 worldViewProj
+    float4 inPos : POSITION
 )
 {
 	VS_OUTPUT3 Out;
@@ -115,8 +111,7 @@ VS_OUTPUT3 StdQuad_Tex3_vp
 
 VS_OUTPUT4 StdQuad_Tex4_vp
 (
-    float4 inPos : POSITION,
-    uniform float4x4 worldViewProj
+    float4 inPos : POSITION
 )
 {
 	VS_OUTPUT4 Out;
