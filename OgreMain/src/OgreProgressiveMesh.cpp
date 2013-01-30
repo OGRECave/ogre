@@ -1486,10 +1486,10 @@ namespace Ogre {
     ProgressiveMesh::CostIndexPair* ProgressiveMesh::getNextCollapser()
     {
 		// as array is sorted by cost and only partially invalidated  - return first valid cost, it would be the best
-		for(CostIndexPair* ptr = &mWorstCosts.front() + mNextWorstCostHint; mNextWorstCostHint  < mWorstCostsSize; ++ptr, ++mNextWorstCostHint)
-			if(!mInvalidCostMask.getBit(ptr->second))
-				return ptr;
-		
+		for( ; mNextWorstCostHint < mWorstCostsSize; ++mNextWorstCostHint)
+			if(!mInvalidCostMask.getBit(mWorstCosts[ mNextWorstCostHint ].second ) )
+				return &mWorstCosts[ mNextWorstCostHint ];
+
 		// no valid costs
 		static CostIndexPair dontCollapse(NEVER_COLLAPSE_COST, 0);
 		return &dontCollapse;
