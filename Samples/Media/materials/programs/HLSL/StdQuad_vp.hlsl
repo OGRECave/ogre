@@ -1,3 +1,8 @@
+cbuffer MatrixBuffer
+{
+	matrix worldViewProj;
+};
+
 struct VS_OUTPUT {
     float4 Pos : SV_Position;
     float2 texCoord : TEXCOORD0;
@@ -32,6 +37,7 @@ VS_OUTPUT StdQuad_vp
 {
 	VS_OUTPUT Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
@@ -51,6 +57,7 @@ VS_OUTPUT2 StdQuad_Tex2_vp
 {
 	VS_OUTPUT2 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
@@ -71,6 +78,7 @@ VS_OUTPUT2 StdQuad_Tex2a_vp
 {
 	VS_OUTPUT2 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
@@ -91,6 +99,7 @@ VS_OUTPUT3 StdQuad_Tex3_vp
 {
 	VS_OUTPUT3 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
@@ -112,6 +121,7 @@ VS_OUTPUT4 StdQuad_Tex4_vp
 {
 	VS_OUTPUT4 Out;
     // Use standardise transform, so work accord with render system specific (RS depth, requires texture flipping, etc)
+	inPos.w = 1.0f;
     Out.Pos = mul(worldViewProj, inPos);
 
     // The input positions adjusted by texel offsets, so clean up inaccuracies
