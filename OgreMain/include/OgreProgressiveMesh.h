@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreHardwareIndexBuffer.h"
 #include "OgreRenderOperation.h"
 #include "OgreHeaderPrefix.h"
+#include "OgreSmallVector.h"
 
 namespace Ogre {
 
@@ -272,16 +273,11 @@ namespace Ogre {
         class _OgrePrivate PMVertex {
         public:
 			enum BorderStatus { BS_UNKNOWN = 0, BS_NOT_BORDER, BS_BORDER };
-            typedef vector<PMVertex *>::type NeighborList;
-	        typedef vector<PMTriangle *>::type FaceList;
+            typedef SmallVector<PMVertex *, 8> NeighborList;
+	        typedef SmallVector<PMTriangle *, 8> FaceList;
 
 		public:
-            PMVertex() : mBorderStatus(BS_UNKNOWN), removed(false) {
-                neighbor.reserve(8);
-                neighbor.clear();
-                face.reserve(8);
-                face.clear();
-            }
+            PMVertex() : mBorderStatus(BS_UNKNOWN), removed(false) {}
 
 			void setDetails(size_t index, const Vector3& pos, const Vector3& normal, const Vector2& uv);
 		
