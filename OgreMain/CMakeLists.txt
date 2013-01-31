@@ -110,6 +110,7 @@ set (HEADER_FILES
   include/OgreIteratorWrappers.h
   include/OgreKeyFrame.h
   include/OgreLight.h
+  include/OgreLodConfig.h
   include/OgreLodListener.h
   include/OgreLodStrategy.h
   include/OgreLodStrategyManager.h
@@ -168,7 +169,9 @@ set (HEADER_FILES
   include/OgrePrerequisites.h
   include/OgreProfiler.h
   include/OgreProgressiveMesh.h
+  include/OgreProgressiveMeshGenerator.h
   include/OgreQuaternion.h
+  include/OgreQueuedProgressiveMeshGenerator.h
   include/OgreRadixSort.h
   include/OgreRay.h
   include/OgreRectangle2D.h
@@ -376,7 +379,9 @@ set (SOURCE_FILES
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
   src/OgreProgressiveMesh.cpp
+  src/OgreProgressiveMeshGenerator.cpp
   src/OgreQuaternion.cpp
+  src/OgreQueuedProgressiveMeshGenerator.cpp
   src/OgreRectangle2D.cpp
   src/OgreRenderQueue.cpp
   src/OgreRenderQueueInvocation.cpp
