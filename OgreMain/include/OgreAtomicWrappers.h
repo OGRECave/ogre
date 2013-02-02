@@ -172,22 +172,22 @@ namespace Ogre {
             
         T operator++ (void)
         {
-            __sync_add_and_fetch (&mField, 1);
+            return __sync_add_and_fetch (&mField, 1);
         }
             
         T operator-- (void)
         {
-            __sync_add_and_fetch (&mField, -1);
+            return __sync_add_and_fetch (&mField, -1);
         }
 
         T operator++ (int)
         {
-            __sync_fetch_and_add (&mField, 1);
+            return __sync_fetch_and_add (&mField, 1);
         }
             
         T operator-- (int)
         {
-            __sync_fetch_and_add (&mField, -1);
+            return __sync_fetch_and_add (&mField, -1);
         }
 
 		T operator+=(const T &add)
