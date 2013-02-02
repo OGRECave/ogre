@@ -35,8 +35,6 @@
 #include "OgreMesh.h"
 #include "OgreLodConfig.h"
 
-#include <boost/unordered_set.hpp>
-
 namespace Ogre
 {
 
@@ -92,7 +90,7 @@ protected:
 
 	typedef std::vector<PMVertex> VertexList;
 	typedef std::vector<PMTriangle> TriangleList;
-	typedef boost::unordered_set<PMVertex*, PMVertexHash, PMVertexEqual> UniqueVertexSet;
+	typedef HashSet<PMVertex*, PMVertexHash, PMVertexEqual> UniqueVertexSet;
 	typedef std::multimap<Real, PMVertex*> CollapseCostHeap;
 	typedef std::vector<PMVertex*> VertexLookupList;
 
