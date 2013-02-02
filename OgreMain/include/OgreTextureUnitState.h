@@ -1206,11 +1206,11 @@ protected:
 
         /// Duration of animation in seconds.
         Real mAnimDuration;
-        bool mCubic; ///< Is this a series of 6 2D textures to make up a cube?
+        bool mCubic; /// Is this a series of 6 2D textures to make up a cube?
         
         TextureType mTextureType; 
         PixelFormat mDesiredFormat;
-        int mTextureSrcMipmaps; ///< Request number of mipmaps.
+        int mTextureSrcMipmaps; /// Request number of mipmaps.
 
         unsigned int mTextureCoordSetIndex;
         UVWAddressingMode mAddressMode;
@@ -1238,7 +1238,7 @@ protected:
         /// Texture filtering - mipmapping.
         FilterOptions mMipFilter;
 
-		bool			mCompareEnabled;
+		bool mCompareEnabled;
 		CompareFunction mCompareFunc;
 
         /// Texture anisotropy.

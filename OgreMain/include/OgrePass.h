@@ -98,10 +98,10 @@ namespace Ogre {
 		};
     protected:
         Technique* mParent;
-        unsigned short mIndex; // pass index
-        String mName; // optional name for the pass
-        uint32 mHash; // pass hash
-		bool mHashDirtyQueued; // needs to be dirtied when next loaded
+        unsigned short mIndex; /// Pass index
+        String mName; /// Optional name for the pass
+        uint32 mHash; /// Pass hash
+		bool mHashDirtyQueued; /// Needs to be dirtied when next loaded
         //-------------------------------------------------------------------------
         // Colour properties, only applicable in fixed-function passes
         ColourValue mAmbient;
@@ -127,7 +127,7 @@ namespace Ogre {
 		SceneBlendOperation mBlendOperation;
 		SceneBlendOperation mAlphaBlendOperation;
 
-		// Determines if we should use separate blending operations for color and alpha channels
+		/// Determines if we should use separate blending operations for color and alpha channels
 		bool mSeparateBlendOperation;
 
         //-------------------------------------------------------------------------
@@ -141,7 +141,7 @@ namespace Ogre {
 		float mDepthBiasSlopeScale;
 		float mDepthBiasPerIteration;
 
-        // Colour buffer settings
+        /// Colour buffer settings
         bool mColourWrite;
 
 		// Alpha reject settings
@@ -149,9 +149,9 @@ namespace Ogre {
 		unsigned char mAlphaRejectVal;
 		bool mAlphaToCoverageEnabled;
 
-		// Transparent depth sorting
+		/// Transparent depth sorting
 		bool mTransparentSorting;
-		// Transparent depth sorting forced
+		/// Transparent depth sorting forced
 		bool mTransparentSortingForced;
         //-------------------------------------------------------------------------
 
@@ -171,10 +171,10 @@ namespace Ogre {
 		bool mIteratePerLight;
 		/// Iterate per how many lights?
 		unsigned short mLightsPerIteration;
-        // Should it only be run for a certain light type?
+        /// Should it only be run for a certain light type?
         bool mRunOnlyForOneLightType;
         Light::LightTypes mOnlyLightType;
-		// With a specific light mask?
+		/// With a specific light mask?
 		uint32 mLightMask;
 
         /// Shading options
@@ -198,25 +198,25 @@ namespace Ogre {
         typedef vector<TextureUnitState*>::type TextureUnitStates;
         TextureUnitStates mTextureUnitStates;
 
-		// Vertex program details
+		/// Vertex program details
 		GpuProgramUsage *mVertexProgramUsage;
-        // Vertex program details
+        /// Vertex program details
         GpuProgramUsage *mShadowCasterVertexProgramUsage;
-        // Fragment program details
+        /// Fragment program details
         GpuProgramUsage *mShadowCasterFragmentProgramUsage;
-        // Vertex program details
+        /// Vertex program details
         GpuProgramUsage *mShadowReceiverVertexProgramUsage;
-		// Fragment program details
+		/// Fragment program details
 		GpuProgramUsage *mFragmentProgramUsage;
-		// Fragment program details
+		/// Fragment program details
 		GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
-		// Geometry program details
+		/// Geometry program details
 		GpuProgramUsage *mGeometryProgramUsage;
-		// Tesselation hull program details
+		/// Tesselation hull program details
 		GpuProgramUsage *mTesselationHullProgramUsage;
-		// Tesselation domain program details
+		/// Tesselation domain program details
 		GpuProgramUsage *mTesselationDomainProgramUsage;
-		// Compute program details
+		/// Compute program details
 		GpuProgramUsage *mComputeProgramUsage;
         /// Is this pass queued for deletion?
         bool mQueuedForDeletion;
