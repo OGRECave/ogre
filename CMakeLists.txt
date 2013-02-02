@@ -272,7 +272,7 @@ elseif (FLASHCC)
   set(OGRE_STATIC TRUE CACHE BOOL "Forcing static buil for FlashCC" FORCE)  
 elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
 
-  # Set 10.5 as the base SDK by default
+  # Set 10.6 as the base SDK by default
   set(XCODE_ATTRIBUTE_SDKROOT macosx)
   set(CMAKE_OSX_SYSROOT macosx)
 
@@ -281,7 +281,7 @@ elseif (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
       set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
       set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_64_BIT))
     else()
-      set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
+      set(CMAKE_OSX_DEPLOYMENT_TARGET 10.6)
       set(CMAKE_OSX_ARCHITECTURES $(ARCHS_STANDARD_32_64_BIT))
     endif()
   endif()
