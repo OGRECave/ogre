@@ -264,8 +264,8 @@ if (APPLE)
 	  set(OGRE_OSX_BUILD_CONFIGURATION "")
 	  set(OGRE_BUILT_FRAMEWORK "Release/")
 	else()
-	  set(OGRE_OSX_BUILD_CONFIGURATION "$(CONFIGURATION)/")
-	  set(OGRE_BUILT_FRAMEWORK "$(CONFIGURATION)/")
+	  set(OGRE_OSX_BUILD_CONFIGURATION "$(PLATFORM_NAME)/$(CONFIGURATION)")
+	  set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
 	endif()
 	set (OGRE_SAMPLE_CONTENTS_PATH 
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
@@ -298,47 +298,47 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
 	if (OGRE_BUILD_RENDERSYSTEM_GL OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()
 	if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}RenderSystem_GL3Plus.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/RenderSystem_GL3Plus.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif ()
 	if (OGRE_BUILD_PLUGIN_BSP OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_BSPSceneManager.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_BSPSceneManager.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_CG OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_CgProgramManager.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_CgProgramManager.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_OCTREE OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeSceneManager.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeSceneManager.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_PCZ OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_PCZSceneManager.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_PCZSceneManager.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/    
 			)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_OctreeZone.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_OctreeZone.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_PLUGIN_PFX OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}Plugin_ParticleFX.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Plugin_ParticleFX.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
@@ -346,49 +346,49 @@ if (APPLE)
 	# Components
 	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgrePaging.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgrePaging.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_PROPERTY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreProperty.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreProperty.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreRTShaderSystem.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreRTShaderSystem.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_TERRAIN OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreTerrain.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreTerrain.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_VOLUME OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreVolume.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreVolume.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 	if (OGRE_BUILD_COMPONENT_OVERLAY OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET SampleBrowser POST_BUILD
-			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}OgreOverlay.framework 
+			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreOverlay.framework 
 			${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 			)
 	endif()
 
 	# Add links for the sample plugins
 	add_custom_command(TARGET SampleBrowser POST_BUILD
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/Sample_*.dylib 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Sample_*.dylib 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
 	if (OGRE_BUILD_TESTS)
 	  add_custom_command(TARGET SampleBrowser POST_BUILD
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/$(CONFIGURATION)/PlayPen.dylib 
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/PlayPen.dylib 
 		${OGRE_SAMPLE_CONTENTS_PATH}/Plugins/
 		)
 	endif()
