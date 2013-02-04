@@ -115,10 +115,12 @@ if (OGRE_INSTALL_DEPENDENCIES)
 		install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)		
 	  endif ()
 	elseif(APPLE)
-        install(FILES
-          ${OGRE_DEP_DIR}/lib/$(PLATFORM_NAME)/$(CONFIGURATION)/libOIS.a
-          DESTINATION lib/$(PLATFORM_NAME)/$(CONFIGURATION)
-        )
+#        install(FILES
+#          ${OGRE_DEP_DIR}/lib/$(PLATFORM_NAME)/$(CONFIGURATION)/libOIS.a
+#          DESTINATION lib/$(PLATFORM_NAME)/$(CONFIGURATION)
+#        )
+      install_debug(libOIS.a)
+      install_release(libOIS.a)
 	endif ()
 	  endif ()
     

@@ -51,27 +51,30 @@ echo API generation done.
 
 echo Building for simulator...
 xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphonesimulator IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
-mkdir -p sdk/lib/Release-iphonesimulator
-mv -v lib/Release/*.a sdk/lib/Release-iphonesimulator
+mkdir -p sdk/lib/iphonesimulator/Release
+mv -v lib/iphonesimulator/Release/*.a sdk/lib/iphonesimulator/Release
 
 echo Building for devices...
 xcodebuild -project OGRE.xcodeproj -target install -parallelizeTargets -configuration Release -sdk iphoneos IPHONEOS_DEPLOYMENT_TARGET=4.0 DEFAULT_COMPILER=com.apple.compilers.llvm.clang.1_0
-mkdir -p sdk/lib/Release-iphoneos
-mv -v lib/Release/*.a sdk/lib/Release-iphoneos
+mkdir -p sdk/lib/iphoneos/Release
+mv -v lib/iphoneos/Release/*.a sdk/lib/iphoneos/Release
 
 # Frameworks
 echo Copying frameworks...
 
 # Stuff we've built
 # Cram them together so we have a 'fat' library for device and simulator
-for LIBNAME in $SDKBUILDDIR/build/sdk/lib/Release-iphoneos/lib*
+for LIBNAME in $SDKBUILDDIR/build/sdk/lib/iphoneos/Release/lib*
 do
 	echo lipo $LIBNAME
 	BASELIBNAME=`basename $LIBNAME`
-	$LIPO $SDKBUILDDIR/build/sdk/lib/Release-iphoneos/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/sdk/lib/Release-iphonesimulator/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
+	$LIPO $SDKBUILDDIR/build/sdk/lib/iphoneos/Release/$BASELIBNAME -arch i386 $SDKBUILDDIR/build/sdk/lib/iphonesimulator/Release/$BASELIBNAME -create -output $SDKBUILDDIR/build/sdk/lib/Release/$BASELIBNAME
 done
 
-rm -rf $SDKBUILDDIR/build/sdk/lib/Release-*
+# Remove some unnecessary files. Single arch libs and duplicate headers.
+rm -rf $SDKBUILDDIR/build/sdk/lib/iphoneos $SDKBUILDDIR/build/sdk/lib/iphonesimulator
+rm -rf $SDKBUILDDIR/build/sdk/lib/Debug
+rm -rf $SDKBUILDDIR/build/sdk/include/boost
 
 echo Frameworks copied.
 
@@ -138,9 +141,6 @@ echo End Copying SDK
 
 # Remove DS_Store files to avoid increasing the size of the SDK with duplicates
 find sdk_contents -iname .DS_Store -exec rm -rf \{\} \;
-
-# Also remove build directories.
-find sdk_contents -iname *.build -exec rm -rf \{\} \;
 
 echo Building DMG...
 

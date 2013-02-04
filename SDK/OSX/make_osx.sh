@@ -22,13 +22,13 @@ OGRE_VERSION=`cat version.txt`
 echo Building API docs...
 
 # Build docs explicitly since INSTALL doesn't include it
-xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx ARCHS=i386 MACOSX_DEPLOYMENT_TARGET=10.6
+# xcodebuild -project OGRE.xcodeproj -target doc -configuration Release -sdk macosx ARCHS=i386 MACOSX_DEPLOYMENT_TARGET=10.6
 
-pushd api/html
+# pushd api/html
 
 # Delete unnecessary files
-rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
-popd
+# rm -f *.hhk *.hhc *.map *.md5 *.dot *.hhp *.plist ../*.tmp
+# popd
 
 # Build the Xcode docset and zip it up to save space
 #make

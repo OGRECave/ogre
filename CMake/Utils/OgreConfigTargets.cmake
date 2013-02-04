@@ -8,18 +8,25 @@
 #-------------------------------------------------------------------
 
 # Configure settings and install targets
+if(APPLE)
+  if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set(PLATFORM_NAME "macosx")
+  elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+    set(PLATFORM_NAME "$(PLATFORM_NAME)")
+  endif()
+endif()
 
 # Default build output paths
 if (NOT OGRE_ARCHIVE_OUTPUT)
   if(APPLE AND NOT OGRE_BUILD_PLATFORM_ANDROID)
-    set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib/$(PLATFORM_NAME))
+    set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib/${PLATFORM_NAME})
   else()
     set(OGRE_ARCHIVE_OUTPUT ${OGRE_BINARY_DIR}/lib)
   endif()
 endif ()
 if (NOT OGRE_LIBRARY_OUTPUT)
   if(APPLE AND NOT OGRE_BUILD_PLATFORM_ANDROID)
-    set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib/$(PLATFORM_NAME))
+    set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib/${PLATFORM_NAME})
   else()
     set(OGRE_LIBRARY_OUTPUT ${OGRE_BINARY_DIR}/lib)
   endif()
