@@ -632,7 +632,7 @@ namespace Ogre {
 			A type flag is like a query flag, except that it applies to all instances
 			of a certain type of object.
 		*/
-		uint32 getTypeFlags(void) const { return mTypeFlag; }
+		unsigned long getTypeFlags(void) const { return mTypeFlag; }
 
 	};
 	/** @} */
