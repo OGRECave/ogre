@@ -14,6 +14,7 @@
 
 set(OGRE_THREAD_SUPPORT_AVAILABLE FALSE)
 set(OGRE_THREAD_DEFAULT_PROVIDER "none")
+set(OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER "standard")
 
 if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
 	set(Boost_THREADING TRUE)
@@ -32,6 +33,7 @@ endif ()
 if (TBB_FOUND AND NOT OGRE_THREAD_SUPPORT_AVAILABLE)
 	set(OGRE_THREAD_SUPPORT_AVAILABLE TRUE)
 	set(OGRE_THREAD_DEFAULT_PROVIDER "tbb")
+  set(OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER "tbb")
 endif ()
 
 if (OGRE_THREAD_SUPPORT_AVAILABLE)
@@ -50,6 +52,7 @@ if (OGRE_THREAD_SUPPORT_AVAILABLE)
 else ()
 	set(OGRE_CONFIG_THREADS 0)
 	set(OGRE_CONFIG_THREAD_PROVIDER "none")
+  set(OGRE_CONFIG_THREAD_WORKQUEUE_PROVIDER "standard")
 endif ()
 
 
@@ -76,4 +79,24 @@ else ()
 	else ()
 		message(STATUS "Warning: Unknown thread provider chosen. Defaulting to ${OGRE_THREAD_DEFAULT_PROVIDER}.")
 	endif ()	
+endif ()
+
+# Make work queue options available for MSVC 10 +
+#MSVC_VERSION is empty
+if (OGRE_CONFIG_THREADS AND MSVC10)
+	set(OGRE_CONFIG_THREAD_WORKQUEUE_PROVIDER ${OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER} CACHE STRING
+		"Select the default WorkQueue implementation. Possible values:
+		standard - Default workqueue for the chosen thread provider.
+		concrt   - Workqueue implementation utilising Microsoft Concurrency Runtime."
+	)
+endif ()
+
+# Sanitise work queue choices
+if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "tbb")
+	# Force standard WorkQueue usage for thread provider tbb
+	if (OGRE_CONFIG_THREAD_WORKQUEUE_PROVIDER STREQUAL "concrt")
+		message(STATUS "Warning: concrt is set as default WorkQueue implementation, while tbb is chosen as thread provider.
+			Using ${OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER} as default WorkQueue provider.")
+		set(OGRE_CONFIG_THREAD_WORKQUEUE_PROVIDER ${OGRE_THREAD_DEFAULT_WORKQUEUE_PROVIDER})
+	endif ()
 endif ()
