@@ -36,7 +36,7 @@ using namespace Ogre;
 
 - (id)init
 {
-    if ((self = [super init]))
+    if ((self = [super initWithNibName:nil bundle:nil]))
     {
     }
     return self;
@@ -59,6 +59,11 @@ using namespace Ogre;
 {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
+}
+
+- (void)loadView
+{
+    [super loadView];
 }
 
 - (void)viewDidLoad
