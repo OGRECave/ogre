@@ -204,7 +204,7 @@ void ProgressiveMeshGenerator::addIndexDataImpl(IndexType* iPos, const IndexType
 		}
 		if (tri->isMalformed()) {
 #ifndef NDEBUG
-			std::stringstream str;
+			stringstream str;
 			str << "In " << mMeshName << " malformed triangle found with ID: " << getTriangleID(tri) << ". " <<
 			std::endl;
 			printTriangle(tri, str);
@@ -305,7 +305,7 @@ void ProgressiveMeshGenerator::removeTriangleFromEdges(PMTriangle* triangle, PMV
 	}
 }
 
-void ProgressiveMeshGenerator::printTriangle(PMTriangle* triangle, std::stringstream& str)
+void ProgressiveMeshGenerator::printTriangle(PMTriangle* triangle, stringstream& str)
 {
 	for (int i = 0; i < 3; i++) {
 		str << (i + 1) << ". vertex position: ("
@@ -356,7 +356,7 @@ void ProgressiveMeshGenerator::addTriangleToEdges(PMTriangle* triangle)
 	PMTriangle* duplicate = isDuplicateTriangle(triangle);
 	if (duplicate != NULL) {
 #ifndef NDEBUG
-		std::stringstream str;
+		stringstream str;
 		str << "In " << mMeshName << " duplicate triangle found." << std::endl;
 		str << "Triangle " << getTriangleID(triangle) << " positions:" << std::endl;
 		printTriangle(triangle, str);

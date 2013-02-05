@@ -88,17 +88,17 @@ protected:
 	struct PMCollapsedEdge;
 	struct PMIndexBufferInfo;
 
-	typedef std::vector<PMVertex> VertexList;
-	typedef std::vector<PMTriangle> TriangleList;
+	typedef vector<PMVertex>::type VertexList;
+	typedef vector<PMTriangle>::type TriangleList;
 	typedef HashSet<PMVertex*, PMVertexHash, PMVertexEqual> UniqueVertexSet;
-	typedef std::multimap<Real, PMVertex*> CollapseCostHeap;
-	typedef std::vector<PMVertex*> VertexLookupList;
+	typedef multimap<Real, PMVertex*>::type CollapseCostHeap;
+	typedef vector<PMVertex*>::type VertexLookupList;
 
 	typedef VectorSet<PMEdge, 8> VEdges;
 	typedef VectorSet<PMTriangle*, 7> VTriangles;
 
-	typedef std::vector<PMCollapsedEdge> CollapsedEdges;
-	typedef std::vector<PMIndexBufferInfo> IndexBufferInfoList;
+	typedef vector<PMCollapsedEdge>::type CollapsedEdges;
+	typedef vector<PMIndexBufferInfo>::type IndexBufferInfoList;
 
 	// Hash function for UniqueVertexSet.
 	struct _OgrePrivate PMVertexHash {
@@ -183,7 +183,7 @@ protected:
 	 *
 	 * This is separate from mMesh in order to allow for access from background threads.
 	 */
-	std::string mMeshName;
+	String mMeshName;
 #endif
 	Real mMeshBoundingSphereRadius;
 	Real mCollapseCostLimit;
@@ -220,7 +220,7 @@ protected:
 	void removeTriangleFromEdges(PMTriangle* triangle, PMVertex* skip = NULL);
 	void addEdge(PMVertex* v, const PMEdge& edge);
 	void removeEdge(PMVertex* v, const PMEdge& edge);
-	void printTriangle(PMTriangle* triangle, std::stringstream& str);
+	void printTriangle(PMTriangle* triangle, stringstream& str);
 	PMTriangle* findSideTriangle(const PMVertex* v1, const PMVertex* v2);
 	bool isDuplicateTriangle(PMTriangle* triangle, PMTriangle* triangle2);
 	PMTriangle* isDuplicateTriangle(PMTriangle* triangle);
