@@ -253,7 +253,6 @@ protected:
 	}
 	String buildInstancedMaterial(const String &originalMaterialName)
 	{
-
 		// already instanced ?
 		if (StringUtil::endsWith (originalMaterialName, "/instanced"))
 			return originalMaterialName;

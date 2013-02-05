@@ -69,7 +69,7 @@ vertex_program Ogre/Instancing/ShaderBased_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER
 
@@ -80,7 +80,7 @@ vertex_program Ogre/Instancing/shadow_caster_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER
 
@@ -91,7 +91,7 @@ vertex_program Ogre/Instancing/ShaderBased_dq_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION
 
@@ -102,7 +102,7 @@ vertex_program Ogre/Instancing/shadow_caster_dq_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION
 
@@ -113,7 +113,7 @@ vertex_program Ogre/Instancing/ShaderBased_dq_two_weights_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 
 	compile_arguments -DDEPTH_SHADOWRECEIVER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
@@ -124,7 +124,7 @@ vertex_program Ogre/Instancing/shadow_caster_dq_two_weights_cg_vs cg
 {
 	source ShaderInstancing.cg
 	entry_point main_vs
-	profiles vs_3_0 vs_2_0 vp40
+	profiles  vs_3_0 vs_2_0 vp40
 	
 	compile_arguments -DDEPTH_SHADOWCASTER -DST_DUAL_QUATERNION -DBONE_TWO_WEIGHTS
 
