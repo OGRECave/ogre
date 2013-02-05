@@ -33,7 +33,7 @@ public:
 
 	Sample_MeshLod() : 
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-		mWorker(0), mInjector(0), mOutdated(false), mBusy(false),
+		mWorker(0), mInjector(0),
 #endif
 		mHeadEntity(0), mUserReductionValue(0.5)
 	{
@@ -65,8 +65,6 @@ protected:
 		mWorker = new PMWorker();
 		mInjector = new PMInjector();
 		mInjector->setInjectorListener(this);
-		mOutdated = false;
-		mBusy = false;
 #endif
 		// load mesh
 		changeSelectedMesh("sinbad.mesh");
@@ -195,15 +193,16 @@ protected:
 		mesh->setLodStrategy(lodStrategy);
 
 		if(mNewAlgorithm->isChecked()){
-			mLodConfig.levels.clear();
-			mLodConfig.mesh = mesh;
+			Ogre::LodConfig lodConfig;
+			lodConfig.levels.clear();
+			lodConfig.mesh = mesh;
 			LodLevel lodLevel;
 			lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 			lodLevel.distance = 1;
 			lodLevel.reductionValue = reductionValue;
-			mLodConfig.levels.push_back(lodLevel);
+			lodConfig.levels.push_back(lodLevel);
 
-			generateLod(mLodConfig);
+			generateLod(lodConfig);
 		} else {
 			mHeadMesh->removeLodLevels();
 			ProgressiveMesh::VertexReductionQuota reductionMethod = ProgressiveMesh::VRQ_PROPORTIONAL;
@@ -216,8 +215,8 @@ protected:
 	// This produces acceptable output on any kind of mesh.
 	void loadAutomaticLod(Ogre::MeshPtr& mesh)
 	{
-		mLodConfig.levels.clear();
-		mLodConfig.mesh = mesh;
+		Ogre::LodConfig lodConfig;
+		lodConfig.mesh = mesh;
 		Ogre::LodStrategy* lodStrategy = PixelCountLodStrategy::getSingletonPtr();
 		assert(lodStrategy);
 		mesh->setLodStrategy(lodStrategy);
@@ -245,36 +244,21 @@ protected:
 			// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means agressive reduction for furthest away lod.
 			// current values: 3125, 411, 97, 32
 			lodLevel.reductionValue = radius / 100000.f * i5;
-			mLodConfig.levels.push_back(lodLevel);
+			lodConfig.levels.push_back(lodLevel);
 		}
-		generateLod(mLodConfig);
+		generateLod(lodConfig);
 	}
 
 	void generateLod(LodConfig& lodConfig){
-		// TODO: check function constness.
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-		// TODO: implement WorkQueue::removePendingTasksOnChannel, which would remove the need for this.
-		if(mBusy){
-			mOutdated = true;
-			// Process mLodConfig later, when current processing is ready.
-			return;
-		}
-		mBusy = true;
+		// Remove outdated Lod requests to reduce delay.
+		Ogre::WorkQueue* wq = Root::getSingleton().getWorkQueue();
+		unsigned short workQueueChannel = wq->getChannel("PMGen");
+		wq->abortPendingRequestsByChannel(workQueueChannel);
 #endif
 		PMGenType pm;
 		pm.build(lodConfig);
 	}
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-	void injectionCompleted(PMGenRequest* request){
-		// TODO: implement WorkQueue::removePendingTasksOnChannel, which would remove the need for this.
-		mBusy = mOutdated;
-		if(mOutdated){
-			PMGenType pm;
-			pm.build(mLodConfig);
-			mOutdated = false;
-		}
-	}
-#endif
 
 	MeshPtr mHeadMesh;
 	Entity* mHeadEntity;
@@ -283,12 +267,8 @@ protected:
 	OgreBites::CheckBox* mWireframe;
 	OgreBites::CheckBox* mAutoconfig;
 	OgreBites::CheckBox* mNewAlgorithm;
-	
-	LodConfig mLodConfig;
 
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-	bool mOutdated;
-	bool mBusy;
 	PMWorker* mWorker;
 	PMInjector* mInjector;
 #endif

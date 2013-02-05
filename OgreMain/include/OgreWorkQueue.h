@@ -277,9 +277,18 @@ namespace Ogre
 		/** Abort all previously issued requests in a given channel.
 		Any requests still waiting to be processed of the given channel, will be 
 		removed from the queue.
+		Requests which are processed, but response handler is not called will also be removed.
 		@param channel The type of request to be aborted
 		*/
 		virtual void abortRequestsByChannel(uint16 channel) = 0;
+
+		/** Abort all previously issued requests in a given channel.
+		Any requests still waiting to be processed of the given channel, will be 
+		removed from the queue.
+		It will not remove requests, where the request handler is already called.
+		@param channel The type of request to be aborted
+		*/
+		virtual void abortPendingRequestsByChannel(uint16 channel) = 0;
 
 		/** Abort all previously issued requests.
 		Any requests still waiting to be processed will be removed from the queue.
@@ -423,6 +432,8 @@ namespace Ogre
 		virtual void abortRequest(RequestID id);
 		/// @copydoc WorkQueue::abortRequestsByChannel
 		virtual void abortRequestsByChannel(uint16 channel);
+		/// @copydoc WorkQueue::abortPendingRequestsByChannel
+		virtual void abortPendingRequestsByChannel(uint16 channel);
 		/// @copydoc WorkQueue::abortAllRequests
 		virtual void abortAllRequests();
 		/// @copydoc WorkQueue::setPaused

@@ -346,6 +346,18 @@ namespace Ogre {
 		}
 	}
 	//---------------------------------------------------------------------
+	void DefaultWorkQueueBase::abortPendingRequestsByChannel(uint16 channel)
+	{
+		OGRE_LOCK_MUTEX(mRequestMutex)
+		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+		{
+			if ((*i)->getChannel() == channel)
+			{
+				(*i)->abortRequest();
+			}
+		}
+	}
+	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortAllRequests()
 	{
 		OGRE_LOCK_MUTEX(mProcessMutex)
