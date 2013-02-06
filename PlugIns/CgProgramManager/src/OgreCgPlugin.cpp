@@ -53,7 +53,7 @@ namespace Ogre
 	void CgPlugin::initialise()
 	{
         // Cg is also not supported on OpenGL 3+
-        if(Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") == String::npos)
+        if(Root::getSingletonPtr()->getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
         {
             LogManager::getSingleton().logMessage("Disabling Cg Plugin for GL3+");
             return;
