@@ -1,7 +1,7 @@
 vertex_program InstancingCg cg
 {
 	source instancing.cg
-	profiles vs_2_0
+	profiles vs_4_0 vs_2_0
 	entry_point instancing_vp
 
 	default_params
@@ -16,7 +16,7 @@ vertex_program InstancingCg cg
 vertex_program InstancingShadowCasterCg cg
 {
    	source instancing.cg
-	profiles vs_2_0
+	profiles vs_4_0 vs_2_0
 	entry_point instancingCaster_vp
 	default_params
 	{
@@ -28,7 +28,7 @@ vertex_program InstancingShadowCasterCg cg
 vertex_program CrowdCg cg
 {
 	source instancing.cg
-	profiles vs_2_0
+	profiles vs_4_0 vs_2_0
 	entry_point crowd_vp
 	default_params
 	{
@@ -43,7 +43,7 @@ vertex_program CrowdCg cg
 vertex_program CrowdShadowCasterCg cg
 {
 	source instancing.cg
-	profiles vs_2_0
+	profiles vs_4_0 vs_2_0
 	entry_point crowdCaster_vp
 	default_params
 	{
@@ -273,34 +273,34 @@ vertex_program CrowdShadowCasterGLSLES glsles
 
 vertex_program Instancing unified
 {
-	//delegate InstancingGLSL150
-	//delegate InstancingGLSL
-	//delegate InstancingGLSLES
-	delegate Instancinghlsl
-	//delegate InstancingCg
+	delegate InstancingGLSL150
+	delegate InstancingGLSL
+	delegate InstancingGLSLES
+	//delegate Instancinghlsl
+	delegate InstancingCg
 }
 vertex_program InstancingShadowCaster unified
 {
-	//delegate InstancingShadowCasterGLSL150
-	//delegate InstancingShadowCasterGLSL
-	//delegate InstancingShadowCasterGLSLES
-	delegate InstancingShadowCasterhlsl
-	//delegate InstancingShadowCasterCg
+	delegate InstancingShadowCasterGLSL150
+	delegate InstancingShadowCasterGLSL
+	delegate InstancingShadowCasterGLSLES
+	//delegate InstancingShadowCasterhlsl
+	delegate InstancingShadowCasterCg
 }
 vertex_program Crowd unified
 {
-	//delegate CrowdGLSL150
-	//delegate CrowdGLSL
-	//delegate CrowdGLSLES
-	delegate Crowdhlsl
-	//delegate CrowdCg
+	delegate CrowdGLSL150
+	delegate CrowdGLSL
+	delegate CrowdGLSLES
+	//delegate Crowdhlsl
+	delegate CrowdCg
 }
 vertex_program CrowdShadowCaster unified
 {
-	//delegate CrowdShadowCasterGLSL150
-	//delegate CrowdShadowCasterGLSL
-	//delegate CrowdShadowCasterGLSLES
-	delegate CrowdShadowCasterhlsl
-	//delegate CrowdShadowCasterCg
+	delegate CrowdShadowCasterGLSL150
+	delegate CrowdShadowCasterGLSL
+	delegate CrowdShadowCasterGLSLES
+	//delegate CrowdShadowCasterhlsl
+	delegate CrowdShadowCasterCg
 }
 
