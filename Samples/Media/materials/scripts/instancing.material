@@ -273,34 +273,34 @@ vertex_program CrowdShadowCasterGLSLES glsles
 
 vertex_program Instancing unified
 {
-	delegate InstancingGLSL150
-	delegate InstancingGLSL
-	delegate InstancingGLSLES
+	//delegate InstancingGLSL150
+	//delegate InstancingGLSL
+	//delegate InstancingGLSLES
 	delegate Instancinghlsl
-	delegate InstancingCg
+	//delegate InstancingCg
 }
 vertex_program InstancingShadowCaster unified
 {
-	delegate InstancingShadowCasterGLSL150
-	delegate InstancingShadowCasterGLSL
-	delegate InstancingShadowCasterGLSLES
+	//delegate InstancingShadowCasterGLSL150
+	//delegate InstancingShadowCasterGLSL
+	//delegate InstancingShadowCasterGLSLES
 	delegate InstancingShadowCasterhlsl
-	delegate InstancingShadowCasterCg
+	//delegate InstancingShadowCasterCg
 }
 vertex_program Crowd unified
 {
-	delegate CrowdGLSL150
-	delegate CrowdGLSL
-	delegate CrowdGLSLES
+	//delegate CrowdGLSL150
+	//delegate CrowdGLSL
+	//delegate CrowdGLSLES
 	delegate Crowdhlsl
-	delegate CrowdCg
+	//delegate CrowdCg
 }
 vertex_program CrowdShadowCaster unified
 {
-	delegate CrowdShadowCasterGLSL150
-	delegate CrowdShadowCasterGLSL
-	delegate CrowdShadowCasterGLSLES
+	//delegate CrowdShadowCasterGLSL150
+	//delegate CrowdShadowCasterGLSL
+	//delegate CrowdShadowCasterGLSLES
 	delegate CrowdShadowCasterhlsl
-	delegate CrowdShadowCasterCg
+	//delegate CrowdShadowCasterCg
 }
 

@@ -3,12 +3,20 @@
 
 #define SHADOW_SAMPLES NUM_SHADOW_SAMPLES_1D*NUM_SHADOW_SAMPLES_1D
 
+SamplerState samplerstate
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+	AddressW = Wrap;
+};
+
 float4 offsetSample(float4 uv, float2 offset, float invMapSize)
 {
 	return float4(uv.xy + offset * invMapSize * uv.w, uv.z, uv.w);
 }
 
-float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
+float calcDepthShadow(Texture2D shadowMap, float4 uv, float invShadowMapSize)
 {
 	// 4-sample PCF
 	
@@ -17,7 +25,8 @@ float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
 	for (float y = -offset; y <= offset; y += SHADOW_FILTER_SCALE)
 		for (float x = -offset; x <= offset; x += SHADOW_FILTER_SCALE)
 		{
-			float depth = tex2Dproj(shadowMap, offsetSample(uv, float2(x, y), invShadowMapSize)).x;
+			float4 tmpTexcoord = offsetSample(uv, float2(x, y), invShadowMapSize);
+			float depth = shadowMap.Sample(samplerstate, tmpTexcoord.xy / tmpTexcoord.w).x;
 			if (depth >= 1 || depth >= uv.z)
 				shadow += 1.0;
 		}
@@ -28,12 +37,12 @@ float calcDepthShadow(sampler2D shadowMap, float4 uv, float invShadowMapSize)
 }
 
 
-float calcSimpleShadow(sampler2D shadowMap, float4 shadowMapPos)
+float calcSimpleShadow(Texture2D shadowMap, float4 shadowMapPos)
 {
-	return tex2Dproj(shadowMap, shadowMapPos).x;
+	return shadowMap.Sample(samplerstate, shadowMapPos.xy / shadowMapPos.w ).x;
 }
 
-float calcPSSMDepthShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D shadowMap2, 
+float calcPSSMDepthShadow(Texture2D shadowMap0, Texture2D shadowMap1, Texture2D shadowMap2, 
 						   float4 lsPos0, float4 lsPos1, float4 lsPos2,
 						   float invShadowmapSize0, float invShadowmapSize1, float invShadowmapSize2,
 						   float4 pssmSplitPoints, float camDepth)
@@ -61,7 +70,7 @@ float calcPSSMDepthShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D 
 	return shadow;
 }
 
-float calcPSSMSimpleShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D shadowMap2, 
+float calcPSSMSimpleShadow(Texture2D shadowMap0, Texture2D shadowMap1, Texture2D shadowMap2, 
 						   float4 lsPos0, float4 lsPos1, float4 lsPos2,
 						   float4 pssmSplitPoints, float camDepth)
 {
@@ -90,7 +99,7 @@ float calcPSSMSimpleShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D
 
 
 
-float3 calcPSSMDebugShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D shadowMap2, 
+float3 calcPSSMDebugShadow(Texture2D shadowMap0, Texture2D shadowMap1, Texture2D shadowMap2, 
 						   float4 lsPos0, float4 lsPos1, float4 lsPos2,
 						   float invShadowmapSize0, float invShadowmapSize1, float invShadowmapSize2,
 						   float4 pssmSplitPoints, float camDepth)
@@ -102,21 +111,21 @@ float3 calcPSSMDebugShadow(sampler2D shadowMap0, sampler2D shadowMap1, sampler2D
 	{
 		//splitColour = float4(0.3, 0.0, 0, 0);
 		//splitColour = lsPos0 / lsPos0.w;
-		splitColour.rgb = tex2Dproj(shadowMap0, lsPos0).xxx;
+		splitColour.rgb = shadowMap0.Sample(samplerstate, lsPos0.xy / lsPos0.w).xxx;
 		//splitColour = tex2Dproj(shadowMap0, lsPos0);
 	}
 	else if (camDepth <= pssmSplitPoints.z)
 	{
 		//splitColour = float4(0, 0.3, 0, 0);
 		//splitColour = lsPos1 / lsPos1.w;
-		splitColour.rgb = tex2Dproj(shadowMap1, lsPos1).xxx;
+		splitColour.rgb = shadowMap1.Sample(samplerstate, lsPos1.xy / lsPos1.w).xxx;
 		//splitColour = tex2Dproj(shadowMap1, lsPos1);
 	}
 	else
 	{
 		//splitColour = float4(0.0, 0.0, 0.3, 0);
 		//splitColour = lsPos2 / lsPos2.w;
-		splitColour.rgb = tex2Dproj(shadowMap2, lsPos2).xxx;
+		splitColour.rgb = shadowMap2.Sample(samplerstate, lsPos2.xy / lsPos2.w).xxx;
 		//splitColour = tex2Dproj(shadowMap2, lsPos2);
 	}
 

@@ -87,9 +87,9 @@ fragment_program Ogre/Instancing/shadow_caster_hlsl_ps hlsl
 //--------------------------------------------------------------
 fragment_program Ogre/Instancing_ps unified
 {
-	delegate Ogre/Instancing_glsl_ps
+	//delegate Ogre/Instancing_glsl_ps
 	delegate Ogre/Instancing_hlsl_ps
-	delegate Ogre/Instancing_cg_ps
+	//delegate Ogre/Instancing_cg_ps
 	
 	default_params
 	{
@@ -106,7 +106,7 @@ fragment_program Ogre/Instancing_ps unified
 
 fragment_program Ogre/Instancing/shadow_caster_ps unified
 {
-	delegate Ogre/Instancing/shadow_caster_glsl_ps
+	//delegate Ogre/Instancing/shadow_caster_glsl_ps
 	delegate Ogre/Instancing/shadow_caster_hlsl_ps
-	delegate Ogre/Instancing/shadow_caster_cg_ps
+	//delegate Ogre/Instancing/shadow_caster_cg_ps
 }

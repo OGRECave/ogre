@@ -1,5 +1,7 @@
 struct PS_INPUT
 {
+    float4 oPosition : SV_POSITION;
+    float4 Colour : COLOR;
 #ifdef DEPTH_SHADOWCASTER
 	float3 unused	:	TEXCOORD0;
 	float depth		:	TEXCOORD1;
@@ -15,15 +17,6 @@ struct PS_INPUT
 };
 
 #define SHADOW_BIAS 0
-
-//---------------------------------------------
-//Vertex Shader Output
-//---------------------------------------------
-struct VS_OUTPUT
-{
-	float4 Position	:	POSITION;
-	PS_INPUT	ps;
-};
 
 SamplerState g_samLinear
 {
