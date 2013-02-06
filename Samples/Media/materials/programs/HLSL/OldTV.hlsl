@@ -2,11 +2,12 @@ Texture2D Image;
 Texture3D Rand;
 Texture3D Noise;
 
-SamplerState g_samLinear
+SamplerState g_samVolume
 {
-    Filter = MIN_MAG_MIP_LINEAR;
+    Filter = MIN_MAG_LINEAR_MIP_POINT;
     AddressU = Wrap;
     AddressV = Wrap;
+    AddressW = Wrap; 
 };
 
 struct v3p
@@ -33,11 +34,11 @@ float4 OldTV_ps(v3p input,
    float frame = saturate(frameSharpness * (pow(f, frameShape) - frameLimit));
 
    // Interference ... just a texture filled with rand()
-   float4 rand = Rand.Sample(g_samLinear, float3(1.5 * input.texCoord2, time_0_X));
+   float4 rand = Rand.Sample(g_samVolume, float3(1.5 * input.texCoord2, time_0_X));
    rand -= float4(0.2,0.2,0.2,0.2);
 
    // Some signed noise for the distortion effect
-   float4 noisy = Noise.Sample(g_samLinear, float3(0, 0.5 * input.texCoord2.y, 0.1 * time_0_X));
+   float4 noisy = Noise.Sample(g_samVolume, float3(0, 0.5 * input.texCoord2.y, 0.1 * time_0_X));
    noisy -= float4(0.5,0.5,0.5,0.5);
 
    // Repeat a 1 - x^2 (0 < x < 1) curve and roll it with sinus.
@@ -48,7 +49,7 @@ float4 OldTV_ps(v3p input,
 
    // ... and finally distort
    input.texCoord.x += distortionScale * noisy.x * dst;
-   float4 image = Image.Sample(g_samLinear, input.texCoord);
+   float4 image = Image.Sample(g_samVolume, input.texCoord);
 
    // Combine frame, distorted image and interference
    return frame * (inerference * rand + image);

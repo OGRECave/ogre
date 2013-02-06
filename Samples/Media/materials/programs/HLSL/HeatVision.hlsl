@@ -82,11 +82,12 @@ v2p LightToHeat_vp(
 	return output;
 }
 
-SamplerState g_samLinear
+SamplerState g_samVolume
 {
-    Filter = MIN_MAG_MIP_LINEAR;
+    Filter = MIN_MAG_LINEAR_MIP_POINT;
     AddressU = Wrap;
     AddressV = Wrap;
+    AddressW = Wrap; 
 };
 
 float4 LightToHeat_fp(
@@ -105,14 +106,14 @@ float4 LightToHeat_fp(
    float  depth, heat, interference;
 
    //  Output constant color:
-   depth = Input.Sample(g_samLinear, inp.texCoord );
+   depth = Input.Sample(g_samVolume, inp.texCoord );
    depth *= (depth * depth_modulator.x);
 
    heat  = (depth * heatBiasScale.y);
 
 //   if (depth > 0)
    {
-		interference = -0.5 + NoiseMap.Sample(g_samLinear, inp.texCoord.xy + float2( random_fractions.x, random_fractions.y ) );
+		interference = -0.5 + NoiseMap.Sample(g_samVolume, inp.texCoord.xy + float2( random_fractions.x, random_fractions.y ) );
 		interference *= interference;
 		interference *= 1 - heat;
 		heat += interference;//+ heatBiasScale.x;
@@ -126,7 +127,7 @@ float4 LightToHeat_fp(
 
    // Clamp UVs
    heat  = max( 0.005, min( 0.995, heat ) );
-   float4 outColor = HeatLookup.Sample(g_samLinear, float2( heat, 0.f ) );
+   float4 outColor = HeatLookup.Sample(g_samVolume, float2( heat, 0.f ) );
    return outColor;
 }
 
@@ -190,14 +191,14 @@ float4 Blur_fp(
 
    };
 
-   tmpOutColor = Input.Sample(g_samLinear, input.texCoord );	// UV coords are in image space
+   tmpOutColor = Input.Sample(g_samVolume, input.texCoord );	// UV coords are in image space
 
    // calculate glow amount
    diffuseGlowFactor = 0.0113f * (2.0 - max( tmpOutColor.r, tmpOutColor.g ));
 
    // basic blur filter
    for (i = 0; i < 4; i++) {
-      tmpOutColor += Input.Sample(g_samLinear, input.texCoord.xy + blurAmount.x * diffuseGlowFactor * offsets[i] );
+      tmpOutColor += Input.Sample(g_samVolume, input.texCoord.xy + blurAmount.x * diffuseGlowFactor * offsets[i] );
    }
 
    tmpOutColor *= 0.25;

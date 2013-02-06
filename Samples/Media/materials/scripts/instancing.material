@@ -59,7 +59,7 @@ vertex_program Instancinghlsl hlsl
 	source Instancing.hlsl
 	target vs_4_0
 	entry_point instancing_vp
-
+	preprocessor_defines SHADOW_CASTER=0
 	default_params
 	{
 		param_named_auto ambient ambient_light_colour
@@ -74,6 +74,7 @@ vertex_program InstancingShadowCasterhlsl hlsl
    	source Instancing.hlsl
 	target vs_4_0
 	entry_point instancingCaster_vp
+	preprocessor_defines SHADOW_CASTER=1
 	default_params
 	{
 		param_named_auto ambient ambient_light_colour
@@ -86,6 +87,7 @@ vertex_program Crowdhlsl hlsl
 	source Instancing.hlsl
 	target vs_4_0
 	entry_point crowd_vp
+	preprocessor_defines SHADOW_CASTER=0
 	default_params
 	{
 		param_named_auto viewProjectionMatrix viewproj_matrix
@@ -101,6 +103,7 @@ vertex_program CrowdShadowCasterhlsl hlsl
 	source Instancing.hlsl
 	target vs_4_0
 	entry_point crowdCaster_vp
+	preprocessor_defines SHADOW_CASTER=1
 	default_params
 	{
 		param_named_auto viewProjectionMatrix viewproj_matrix
