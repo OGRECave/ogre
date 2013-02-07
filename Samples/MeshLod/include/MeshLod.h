@@ -184,14 +184,11 @@ protected:
 	
 	void loadUserLod(Ogre::MeshPtr& mesh, Real reductionValue)
 	{
-		Ogre::LodStrategy* lodStrategy = DistanceLodStrategy::getSingletonPtr();
-		assert(lodStrategy);
-		mesh->setLodStrategy(lodStrategy);
-
 		if(mNewAlgorithm->isChecked()){
 			Ogre::LodConfig lodConfig;
 			lodConfig.levels.clear();
 			lodConfig.mesh = mesh;
+			lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
 			LodLevel lodLevel;
 			lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 			lodLevel.distance = 1;
@@ -200,6 +197,11 @@ protected:
 
 			generateLod(lodConfig);
 		} else {
+
+			Ogre::LodStrategy* lodStrategy = DistanceLodStrategy::getSingletonPtr();
+			assert(lodStrategy);
+			mesh->setLodStrategy(lodStrategy);
+
 			mHeadMesh->removeLodLevels();
 			ProgressiveMesh::VertexReductionQuota reductionMethod = ProgressiveMesh::VRQ_PROPORTIONAL;
 			Mesh::LodValueList valueList;
@@ -213,9 +215,7 @@ protected:
 	{
 		Ogre::LodConfig lodConfig;
 		lodConfig.mesh = mesh;
-		Ogre::LodStrategy* lodStrategy = PixelCountLodStrategy::getSingletonPtr();
-		assert(lodStrategy);
-		mesh->setLodStrategy(lodStrategy);
+		lodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
 		LodLevel lodLevel;
 		lodLevel.reductionMethod = LodLevel::VRM_COLLAPSE_COST;
 		Real radius = mesh->getBoundingSphereRadius();

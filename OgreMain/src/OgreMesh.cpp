@@ -2293,23 +2293,24 @@ namespace Ogre {
 
     }
     //--------------------------------------------------------------------
-    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfigs )
+    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
     {
         // In theory every mesh should have a submesh.
         assert(getNumSubMeshes() > 0);
+        setLodStrategy(lodConfig.strategy);
         Ogre::SubMesh* submesh = getSubMesh(0);
         mNumLods = submesh->mLodFaceList.size() + 1;
         mMeshLodUsageList.resize(mNumLods);
-        for (size_t n = 0, i = 0; i < lodConfigs.levels.size(); i++) {
+        for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
             // Record usages. First Lod usage is the mesh itself.
 
             // Skip lods, which have the same amount of vertices. No buffer generated for them.
-            if (!lodConfigs.levels[i].outSkipped) {
+            if (!lodConfig.levels[i].outSkipped) {
                 // Generated buffers are less then the reported by ProgressiveMesh.
                 // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before lod generation completes.
                 assert(mMeshLodUsageList.size() > n + 1);
                 Ogre::MeshLodUsage& lod = mMeshLodUsageList[++n];
-                lod.userValue = lodConfigs.levels[i].distance;
+                lod.userValue = lodConfig.levels[i].distance;
                 lod.value = getLodStrategy()->transformUserValue(lod.userValue);
                 lod.edgeData = 0;
                 lod.manualMesh.setNull();

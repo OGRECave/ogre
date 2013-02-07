@@ -358,7 +358,7 @@ void QueuedProgressiveMeshGenerator::build(LodConfig& lodConfig)
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);
 	}
-	lodConfig.mesh->getLodStrategy()->assertSorted(values);
+	lodConfig.strategy->assertSorted(values);
 #endif // if ifndef NDEBUG
 
 	PMGenRequest* req = new PMGenRequest();

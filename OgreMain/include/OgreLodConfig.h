@@ -31,6 +31,7 @@
 
 #include "OgrePrerequisites.h"
 #include "OgreMesh.h"
+#include "OgreLodStrategy.h"
 
 namespace Ogre
 {
@@ -102,6 +103,7 @@ struct LodLevel {
 
 struct LodConfig {
 	MeshPtr mesh;
+	LodStrategy* strategy;
 	typedef std::vector<LodLevel> LodLevelList;
 	LodLevelList levels;
 };

@@ -603,7 +603,7 @@ namespace Ogre {
         */
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
-		void _configureMeshLodUsage(const LodConfig& lodConfigs);
+		void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

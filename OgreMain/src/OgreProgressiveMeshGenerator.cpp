@@ -670,7 +670,7 @@ void ProgressiveMeshGenerator::build(LodConfig& lodConfig)
 	for (size_t i = 0; i < lodConfig.levels.size(); i++) {
 		values.push_back(lodConfig.levels[i].distance);
 	}
-	lodConfig.mesh->getLodStrategy()->assertSorted(values);
+	lodConfig.strategy->assertSorted(values);
 #endif
 	mMesh = lodConfig.mesh;
 	mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
