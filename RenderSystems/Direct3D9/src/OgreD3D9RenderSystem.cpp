@@ -4445,6 +4445,9 @@ namespace Ogre
 						// ran out of options, no FSAA
 						fsaa = 0;
 						ok = true;
+
+						*outMultisampleType = D3DMULTISAMPLE_NONE;
+						*outMultisampleQuality = 0;
 					}
 				}
 			}
