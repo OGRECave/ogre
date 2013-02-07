@@ -80,6 +80,7 @@ public:
 	PMWorker();
 	virtual ~PMWorker();
 	void addRequestToQueue(PMGenRequest* request);
+	void clearPendingLodRequests();
 private:
 	PMGenRequest* mRequest; // This is a copy of the current processed request from stack. This is needed to pass it to overloaded functions like bakeLods().
 	ushort mChannelID;

@@ -212,9 +212,7 @@ protected:
 	void clearLodQueue(){
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
 		// Remove outdated Lod requests to reduce delay.
-		Ogre::WorkQueue* wq = Root::getSingleton().getWorkQueue();
-		unsigned short workQueueChannel = wq->getChannel("PMGen");
-		wq->abortPendingRequestsByChannel(workQueueChannel);
+		PMWorker::getSingleton().clearPendingLodRequests();
 #endif
 	}
 

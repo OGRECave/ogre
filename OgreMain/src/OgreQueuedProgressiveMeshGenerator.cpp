@@ -83,6 +83,12 @@ void PMWorker::addRequestToQueue( PMGenRequest* request )
 	wq->addRequest(mChannelID, 0, Any(request),0,false,true);
 }
 
+void PMWorker::clearPendingLodRequests()
+{
+	Ogre::WorkQueue* wq = Root::getSingleton().getWorkQueue();
+	wq->abortPendingRequestsByChannel(mChannelID);
+}
+
 WorkQueue::Response* PMWorker::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 {
 	// Called on worker thread by WorkQueue.
