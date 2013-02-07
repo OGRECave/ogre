@@ -24,9 +24,6 @@ using namespace Ogre;
 using namespace OgreBites;
 
 class _OgreSampleClassExport Sample_MeshLod :
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-	public PMInjectorListener,
-#endif
 	public SdkSample
 {
 public:
@@ -64,7 +61,6 @@ protected:
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
 		mWorker = new PMWorker();
 		mInjector = new PMInjector();
-		mInjector->setInjectorListener(this);
 #endif
 		// load mesh
 		changeSelectedMesh("sinbad.mesh");

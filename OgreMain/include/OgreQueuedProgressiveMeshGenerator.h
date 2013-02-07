@@ -94,8 +94,8 @@ class _OgreExport PMInjectorListener
 public:
 	PMInjectorListener(){}
 	virtual ~PMInjectorListener(){}
-	virtual bool shouldInject(PMGenRequest* request){ return true; }
-	virtual void injectionCompleted(PMGenRequest* request){}
+	virtual bool shouldInject(PMGenRequest* request) = 0;
+	virtual void injectionCompleted(PMGenRequest* request) = 0;
 };
 
 /**
