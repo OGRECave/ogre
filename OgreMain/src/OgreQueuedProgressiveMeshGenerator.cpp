@@ -38,6 +38,9 @@
 namespace Ogre
 {
 
+template<> PMWorker* Singleton<PMWorker>::msSingleton = 0;
+template<> PMInjector* Singleton<PMInjector>::msSingleton = 0;
+
 PMGenRequest::~PMGenRequest()
 {
 	std::vector<SubmeshInfo>::iterator it = submesh.begin();
@@ -58,8 +61,8 @@ PMWorker::PMWorker() :
 		mRequest(0)
 {
 	WorkQueue* wq = Root::getSingleton().getWorkQueue();
-	unsigned short workQueueChannel = wq->getChannel("PMGen");
-	wq->addRequestHandler(workQueueChannel, this);
+	mChannelID = wq->getChannel("PMGen");
+	wq->addRequestHandler(mChannelID, this);
 }
 
 
@@ -69,10 +72,15 @@ PMWorker::~PMWorker()
 	if (root) {
 		WorkQueue* wq = root->getWorkQueue();
 		if (wq) {
-			unsigned short workQueueChannel = wq->getChannel("PMGen");
-			wq->removeRequestHandler(workQueueChannel, this);
+			wq->removeRequestHandler(mChannelID, this);
 		}
 	}
+}
+
+void PMWorker::addRequestToQueue( PMGenRequest* request )
+{
+	WorkQueue* wq = Root::getSingleton().getWorkQueue();
+	wq->addRequest(mChannelID, 0, Any(request),0,false,true);
 }
 
 WorkQueue::Response* PMWorker::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
@@ -275,7 +283,6 @@ void PMWorker::bakeLods()
 	}
 }
 
-
 PMInjector::PMInjector() :
 	mInjectorListener(0)
 {
@@ -365,9 +372,7 @@ void QueuedProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 	req->meshName = lodConfig.mesh->getName();
 	req->config = lodConfig;
 	copyBuffers(lodConfig.mesh.get(), req);
-	WorkQueue* wq = Root::getSingleton().getWorkQueue();
-	unsigned short workQueueChannel = wq->getChannel("PMGen");
-	wq->addRequest(workQueueChannel, 0, Any(req),0,false,true);
+	PMWorker::getSingleton().addRequestToQueue(req);
 }
 
 void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out)

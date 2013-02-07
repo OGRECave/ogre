@@ -58,10 +58,7 @@ protected:
 
 		// setup gui
 		setupControls();
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-		mWorker = new PMWorker();
-		mInjector = new PMInjector();
-#endif
+
 		// load mesh
 		changeSelectedMesh("sinbad.mesh");
 	}
@@ -120,13 +117,6 @@ protected:
 			mSceneMgr->destroyEntity(mHeadEntity);
 			mHeadEntity = 0;
 		}
-		
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-		delete mWorker;
-		mWorker = 0;
-		delete mInjector;
-		mInjector = 0;
-#endif
 	}
 	
 	void sliderMoved(Slider* slider)
