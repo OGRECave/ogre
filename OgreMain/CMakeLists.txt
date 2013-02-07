@@ -168,7 +168,6 @@ set (HEADER_FILES
   include/OgrePrefabFactory.h
   include/OgrePrerequisites.h
   include/OgreProfiler.h
-  include/OgreProgressiveMesh.h
   include/OgreProgressiveMeshGenerator.h
   include/OgreQuaternion.h
   include/OgreQueuedProgressiveMeshGenerator.h
@@ -378,7 +377,6 @@ set (SOURCE_FILES
   src/OgrePredefinedControllers.cpp
   src/OgrePrefabFactory.cpp
   src/OgreProfiler.cpp
-  src/OgreProgressiveMesh.cpp
   src/OgreProgressiveMeshGenerator.cpp
   src/OgreQuaternion.cpp
   src/OgreQueuedProgressiveMeshGenerator.cpp

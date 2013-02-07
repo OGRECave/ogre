@@ -7,18 +7,8 @@
 #include "OgreDistanceLodStrategy.h"
 #include "OgrePixelCountLodStrategy.h"
 
-#include "OgreProgressiveMesh.h"
-
-//Should we generate Lods in a worker thread?
-#define USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
 #include "OgreQueuedProgressiveMeshGenerator.h"
-typedef Ogre::QueuedProgressiveMeshGenerator PMGenType;
-#else
 #include "OgreProgressiveMeshGenerator.h"
-typedef Ogre::ProgressiveMeshGenerator PMGenType;
-#endif
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -28,10 +18,7 @@ class _OgreSampleClassExport Sample_MeshLod :
 {
 public:
 
-	Sample_MeshLod() : 
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-		mWorker(0), mInjector(0),
-#endif
+	Sample_MeshLod() :
 		mHeadEntity(0), mUserReductionValue(0.5)
 	{
 		mInfo["Title"] = "MeshLod";
@@ -87,8 +74,9 @@ protected:
 
 		mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "wireframe", "Show wireframe");
 		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
-		mNewAlgorithm = mTrayMgr->createCheckBox(TL_TOPLEFT, "newalgorithm", "New algorithm");
-		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Percentage", 200, 50, 0, 100, 11);
+		mThreaded = mTrayMgr->createCheckBox(TL_TOPLEFT, "threaded", "Background thread");
+		mThreaded->setChecked(true, false);
+		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Percentage", 200, 50, 0, 100, 101);
 		slider->setValue(50, false); // 50%
 		mUserReductionValue = 0.5; // 50%
 
@@ -106,8 +94,8 @@ protected:
 		mHeadNode->attachObject(mHeadEntity);
 		mCamera->setPosition(Ogre::Vector3(0, 0, 0));
 		mCamera->moveRelative(Ogre::Vector3(0, 0, mHeadMesh->getBoundingSphereRadius() * 2));
-		mCamera->setNearClipDistance(mHeadMesh->getBoundingSphereRadius() / 32);
-		mCamera->setFarClipDistance(mHeadMesh->getBoundingSphereRadius() * 128);
+		mCamera->setNearClipDistance(mHeadMesh->getBoundingSphereRadius() / 16);
+		mCamera->setFarClipDistance(mHeadMesh->getBoundingSphereRadius() * 256);
 
 		updateLod();
 	}
@@ -136,11 +124,6 @@ protected:
 	}
 	void checkBoxToggled(OgreBites::CheckBox * box)
 	{
-		if(box == mAutoconfig){
-			mNewAlgorithm->setChecked(true, false);
-		} else if(box == mNewAlgorithm && !mNewAlgorithm->isChecked()) {
-			mAutoconfig ->setChecked(false, false);
-		}
 		updateLod();
 	}
 
@@ -174,46 +157,41 @@ protected:
 	
 	void loadUserLod(Ogre::MeshPtr& mesh, Real reductionValue)
 	{
-		if(mNewAlgorithm->isChecked()){
-			Ogre::LodConfig lodConfig;
-			lodConfig.levels.clear();
-			lodConfig.mesh = mesh;
-			lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
-			LodLevel lodLevel;
-			lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-			lodLevel.distance = 1;
-			lodLevel.reductionValue = reductionValue;
-			lodConfig.levels.push_back(lodLevel);
-
+		Ogre::LodConfig lodConfig;
+		lodConfig.levels.clear();
+		lodConfig.mesh = mesh;
+		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		LodLevel lodLevel;
+		lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
+		lodLevel.distance = 1;
+		lodLevel.reductionValue = reductionValue;
+		lodConfig.levels.push_back(lodLevel);
+		if(mThreaded->isChecked()){
 			clearLodQueue();
-			PMGenType pm;
+			QueuedProgressiveMeshGenerator pm;
 			pm.generateLodLevels(lodConfig);
 		} else {
-			Ogre::LodStrategy* lodStrategy = DistanceLodStrategy::getSingletonPtr();
-			assert(lodStrategy);
-			mesh->setLodStrategy(lodStrategy);
-
-			mHeadMesh->removeLodLevels();
-			ProgressiveMesh::VertexReductionQuota reductionMethod = ProgressiveMesh::VRQ_PROPORTIONAL;
-			Mesh::LodValueList valueList;
-			valueList.push_back(1);
-			ProgressiveMesh::generateLodLevels(mesh.get(), valueList, reductionMethod, reductionValue);
+			ProgressiveMeshGenerator pm;
+			pm.generateLodLevels(lodConfig);
 		}
 	}
 
 	// This produces acceptable output on any kind of mesh.
 	void loadAutomaticLod(Ogre::MeshPtr& mesh)
 	{
-		clearLodQueue();
-		PMGenType pm;
-		pm.generateAutoconfiguredLodLevels(mesh);
+		if(mThreaded->isChecked()){
+			clearLodQueue();
+			QueuedProgressiveMeshGenerator pm;
+			pm.generateAutoconfiguredLodLevels(mesh);
+		} else {
+			ProgressiveMeshGenerator pm;
+			pm.generateAutoconfiguredLodLevels(mesh);
+		}
 	}
 
 	void clearLodQueue(){
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
 		// Remove outdated Lod requests to reduce delay.
 		PMWorker::getSingleton().clearPendingLodRequests();
-#endif
 	}
 
 	MeshPtr mHeadMesh;
@@ -222,12 +200,7 @@ protected:
 	Real mUserReductionValue;
 	OgreBites::CheckBox* mWireframe;
 	OgreBites::CheckBox* mAutoconfig;
-	OgreBites::CheckBox* mNewAlgorithm;
-
-#ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
-	PMWorker* mWorker;
-	PMInjector* mInjector;
-#endif
+	OgreBites::CheckBox* mThreaded;
 };
 
 #endif
