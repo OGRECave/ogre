@@ -123,11 +123,16 @@ protected:
 /**
  * @brief Creates a request for the worker. The interface is compatible with ProgressiveMeshGenerator.
  */
-class _OgreExport QueuedProgressiveMeshGenerator
+class _OgreExport QueuedProgressiveMeshGenerator :
+	public ProgressiveMeshGeneratorBase
 {
 public:
-	void build(LodConfig& lodConfig);
+
+	/// @copydoc ProgressiveMeshGeneratorBase::generateLodLevels
+	void generateLodLevels(LodConfig& lodConfig);
+
 	virtual ~QueuedProgressiveMeshGenerator();
+
 private:
 	void copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out);
 	void copyIndexBuffer(IndexData* data, PMGenRequest::IndexBuffer& out);

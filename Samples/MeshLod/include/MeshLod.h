@@ -195,9 +195,10 @@ protected:
 			lodLevel.reductionValue = reductionValue;
 			lodConfig.levels.push_back(lodLevel);
 
-			generateLod(lodConfig);
+			clearLodQueue();
+			PMGenType pm;
+			pm.generateLodLevels(lodConfig);
 		} else {
-
 			Ogre::LodStrategy* lodStrategy = DistanceLodStrategy::getSingletonPtr();
 			assert(lodStrategy);
 			mesh->setLodStrategy(lodStrategy);
@@ -213,47 +214,18 @@ protected:
 	// This produces acceptable output on any kind of mesh.
 	void loadAutomaticLod(Ogre::MeshPtr& mesh)
 	{
-		Ogre::LodConfig lodConfig;
-		lodConfig.mesh = mesh;
-		lodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
-		LodLevel lodLevel;
-		lodLevel.reductionMethod = LodLevel::VRM_COLLAPSE_COST;
-		Real radius = mesh->getBoundingSphereRadius();
-		for (int i = 2; i < 6; i++) {
-			Real i4 = (Real) (i * i * i * i);
-			Real i5 = i4 * (Real) i;
-			// Distance = pixel count
-			// Constant: zoom of the Lod. This could be scaled based on resolution.
-			//     Higher constant means first Lod is nearer to camera. Smaller constant means the first Lod is further away from camera.
-			// i4: The stretching. Normally you want to have more Lods in the near, then in far away.
-			//     i4 means distance is divided by 16=(2*2*2*2), 81, 256, 625=(5*5*5*5).
-			//     if 16 would be smaller, the first Lod would be nearer. if 625 would be bigger, the last Lod would be further awaay.
-			// if you increase 16 and decrease 625, first and Last Lod distance would be smaller.
-			lodLevel.distance = 3388608.f / i4;
-
-			// reductionValue = collapse cost
-			// Radius: Edges are multiplied by the length, when calculating collapse cost. So as a base value we use radius, which should help in balancing collapse cost to any mesh size.
-			// The constant and i5 are playing together. 1/(1/100k*i5)
-			// You need to determine the quality of nearest Lod and the furthest away first.
-			// I have choosen 1/(1/100k*(2^5)) = 3125 for nearest Lod and 1/(1/100k*(5^5)) = 32 for nearest Lod.
-			// if you divide radius by a bigger number, it means smaller reduction. So radius/3125 is very small reduction for nearest Lod.
-			// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means agressive reduction for furthest away lod.
-			// current values: 3125, 411, 97, 32
-			lodLevel.reductionValue = radius / 100000.f * i5;
-			lodConfig.levels.push_back(lodLevel);
-		}
-		generateLod(lodConfig);
+		clearLodQueue();
+		PMGenType pm;
+		pm.generateAutoconfiguredLodLevels(mesh);
 	}
 
-	void generateLod(LodConfig& lodConfig){
+	void clearLodQueue(){
 #ifdef USE_QUEUED_PROGRESSIVE_MESH_GENERATOR
 		// Remove outdated Lod requests to reduce delay.
 		Ogre::WorkQueue* wq = Root::getSingleton().getWorkQueue();
 		unsigned short workQueueChannel = wq->getChannel("PMGen");
 		wq->abortPendingRequestsByChannel(workQueueChannel);
 #endif
-		PMGenType pm;
-		pm.build(lodConfig);
 	}
 
 	MeshPtr mHeadMesh;

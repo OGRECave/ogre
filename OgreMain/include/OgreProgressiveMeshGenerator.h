@@ -38,25 +38,48 @@
 namespace Ogre
 {
 
+class _OgreExport ProgressiveMeshGeneratorBase
+{
+public:
+	/**
+	 * @brief Generates the Lod levels for a mesh.
+	 * 
+	 * @param lodConfig Specification of the requested Lod levels.
+	 */
+	virtual void generateLodLevels(LodConfig& lodConfig) = 0;
+
+	/**
+	 * @brief Generates the Lod levels for a mesh without configuring it.
+	 *
+	 * @param mesh Generate the Lod for this mesh.
+	 */
+	virtual void generateAutoconfiguredLodLevels(MeshPtr& mesh);
+
+	/**
+	 * @brief Fills Lod Config with a config, which works on any mesh.
+	 *
+	 * @param inMesh Optimize for this mesh.
+	 * @param outLodConfig Lod configuration storing the output.
+	 */
+	virtual void getAutoconfig(MeshPtr& inMesh, LodConfig& outLodConfig);
+
+	virtual ~ProgressiveMeshGeneratorBase() { }
+};
+
 /**
  * @brief Improved version of ProgressiveMesh.
  */
-class _OgreExport ProgressiveMeshGenerator
+class _OgreExport ProgressiveMeshGenerator :
+	public ProgressiveMeshGeneratorBase
 {
 public:
 
-	/**
-	 * @brief Ctor.
-	 */
 	ProgressiveMeshGenerator();
 	virtual ~ProgressiveMeshGenerator();
 
-	/**
-	 * @brief Builds the Lod levels for a submesh based on a LodConfigList.
-	 *
-	 * @param lodConfigs Specification of the requested Lod levels.
-	 */
-	void build(LodConfig& lodConfigs);
+	/// @copydoc ProgressiveMeshGeneratorBase::generateLodLevels
+	void generateLodLevels(LodConfig& lodConfig);
+
 protected:
 
 	// VectorSet is basically a helper to use a vector as a small set container.

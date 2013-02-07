@@ -49,12 +49,52 @@
 #include "OgreMesh.h"
 #include "OgreLodStrategy.h"
 #include "OgreLogManager.h"
+#include "OgrePixelCountLodStrategy.h"
 
 namespace Ogre
 {
 
 #define NEVER_COLLAPSE_COST std::numeric_limits<Real>::max()
 #define UNINITIALIZED_COLLAPSE_COST (std::numeric_limits<Real>::infinity())
+
+void ProgressiveMeshGeneratorBase::getAutoconfig( MeshPtr& inMesh, LodConfig& outLodConfig )
+{
+	outLodConfig.mesh = inMesh;
+	outLodConfig.strategy = PixelCountLodStrategy::getSingletonPtr();
+	LodLevel lodLevel;
+	lodLevel.reductionMethod = LodLevel::VRM_COLLAPSE_COST;
+	Real radius = inMesh->getBoundingSphereRadius();
+	for (int i = 2; i < 6; i++) {
+	Real i4 = (Real) (i * i * i * i);
+	Real i5 = i4 * (Real) i;
+		// Distance = pixel count
+		// Constant: zoom of the Lod. This could be scaled based on resolution.
+		//     Higher constant means first Lod is nearer to camera. Smaller constant means the first Lod is further away from camera.
+		// i4: The stretching. Normally you want to have more Lods in the near, then in far away.
+		//     i4 means distance is divided by 16=(2*2*2*2), 81, 256, 625=(5*5*5*5).
+		//     if 16 would be smaller, the first Lod would be nearer. if 625 would be bigger, the last Lod would be further awaay.
+		// if you increase 16 and decrease 625, first and Last Lod distance would be smaller.
+		lodLevel.distance = 3388608.f / i4;
+		
+		// reductionValue = collapse cost
+		// Radius: Edges are multiplied by the length, when calculating collapse cost. So as a base value we use radius, which should help in balancing collapse cost to any mesh size.
+		// The constant and i5 are playing together. 1/(1/100k*i5)
+		// You need to determine the quality of nearest Lod and the furthest away first.
+		// I have choosen 1/(1/100k*(2^5)) = 3125 for nearest Lod and 1/(1/100k*(5^5)) = 32 for nearest Lod.
+		// if you divide radius by a bigger number, it means smaller reduction. So radius/3125 is very small reduction for nearest Lod.
+		// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means agressive reduction for furthest away lod.
+		// current values: 3125, 411, 97, 32
+		lodLevel.reductionValue = radius / 100000.f * i5;
+		outLodConfig.levels.push_back(lodLevel);
+	}
+}
+
+void ProgressiveMeshGeneratorBase::generateAutoconfiguredLodLevels( MeshPtr& mesh )
+{
+	LodConfig lodConfig;
+	getAutoconfig(mesh, lodConfig);
+	generateLodLevels(lodConfig);
+}
 
 ProgressiveMeshGenerator::ProgressiveMeshGenerator() :
 	mMesh(NULL), mMeshBoundingSphereRadius(0.0f), mCollapseCostLimit(NEVER_COLLAPSE_COST),
@@ -655,7 +695,7 @@ void ProgressiveMeshGenerator::updateVertexCollapseCost(PMVertex* vertex)
 	}
 }
 
-void ProgressiveMeshGenerator::build(LodConfig& lodConfig)
+void ProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 {
 #ifndef NDEBUG
 

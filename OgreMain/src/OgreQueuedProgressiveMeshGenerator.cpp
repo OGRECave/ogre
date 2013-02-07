@@ -344,7 +344,7 @@ void PMInjector::inject(PMGenRequest* request)
 }
 
 
-void QueuedProgressiveMeshGenerator::build(LodConfig& lodConfig)
+void QueuedProgressiveMeshGenerator::generateLodLevels(LodConfig& lodConfig)
 {
 #ifndef NDEBUG
 	// Do not call this with empty Lod.
