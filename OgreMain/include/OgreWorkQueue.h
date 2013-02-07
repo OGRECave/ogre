@@ -262,10 +262,15 @@ namespace Ogre
 			if it fails.
 		@param forceSynchronous Forces the request to be processed immediately
 			even if threading is enabled.
+		@param idleThread Request should be processed on the idle thread.
+		    Idle requests will be processed on a single worker thread. You should use this in the following situations:
+			1. If a request handler can't process multiple requests in parallel.
+			2. If you add lot of requests, but you want to keep the game fast.
+			3. If you have lot of more important threads. (example: physics).
 		@return The ID of the request that has been added
 		*/
 		virtual RequestID addRequest(uint16 channel, uint16 requestType, const Any& rData, uint8 retryCount = 0, 
-			bool forceSynchronous = false) = 0;
+			bool forceSynchronous = false, bool idleThread = false) = 0;
 
 		/** Abort a previously issued request.
 		If the request is still waiting to be processed, it will be 
@@ -427,7 +432,7 @@ namespace Ogre
 
 		/// @copydoc WorkQueue::addRequest
 		virtual RequestID addRequest(uint16 channel, uint16 requestType, const Any& rData, uint8 retryCount = 0, 
-			bool forceSynchronous = false);
+			bool forceSynchronous = false, bool idleThread = false);
 		/// @copydoc WorkQueue::abortRequest
 		virtual void abortRequest(RequestID id);
 		/// @copydoc WorkQueue::abortRequestsByChannel
@@ -459,9 +464,9 @@ namespace Ogre
 
 		typedef deque<Request*>::type RequestQueue;
 		typedef deque<Response*>::type ResponseQueue;
-		RequestQueue mRequestQueue;
-		RequestQueue mProcessQueue;
-		ResponseQueue mResponseQueue;
+		RequestQueue mRequestQueue; // Guarded by mRequestMutex
+		RequestQueue mProcessQueue; // Guarded by mProcessMutex
+		ResponseQueue mResponseQueue; // Guarded by mResponseMutex
 
 		/// Thread function
 		struct WorkerFunc OGRE_THREAD_WORKER_INHERIT
@@ -533,11 +538,16 @@ namespace Ogre
 
 		RequestHandlerListByChannel mRequestHandlers;
 		ResponseHandlerListByChannel mResponseHandlers;
-		RequestID mRequestCount;
+		RequestID mRequestCount; // Guarded by mRequestMutex
 		bool mPaused;
 		bool mAcceptRequests;
 		bool mShuttingDown;
 
+		//NOTE: If you lock multiple mutexes at the same time, the order is important!
+		// For example if threadA locks mIdleMutex first then tries to lock mProcessMutex,
+		// and threadB locks mProcessMutex first, then mIdleMutex. In this case you can get livelock and the system is dead!
+		//RULE: Lock mProcessMutex before other mutex, to prevent livelocks
+		OGRE_MUTEX(mIdleMutex)
 		OGRE_MUTEX(mRequestMutex)
 		OGRE_MUTEX(mProcessMutex)
 		OGRE_MUTEX(mResponseMutex)
@@ -551,7 +561,13 @@ namespace Ogre
 		virtual void notifyWorkers() = 0;
 		/// Put a Request on the queue with a specific RequestID.
 		void addRequestWithRID(RequestID rid, uint16 channel, uint16 requestType, const Any& rData, uint8 retryCount);
+		
+		RequestQueue mIdleRequestQueue; // Guarded by mIdleMutex
+		bool mIdleThreadRunning; // Guarded by mIdleMutex
+		Request* mIdleProcessed; // Guarded by mProcessMutex
+		
 
+		bool processIdleRequests();
 	};
 
 

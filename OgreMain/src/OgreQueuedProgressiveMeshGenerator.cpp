@@ -78,7 +78,6 @@ PMWorker::~PMWorker()
 WorkQueue::Response* PMWorker::handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ)
 {
 	// Called on worker thread by WorkQueue.
-	OGRE_LOCK_MUTEX(this->OGRE_AUTO_MUTEX_NAME);
 	mRequest = any_cast<PMGenRequest*>(req->getData());
 	buildRequest(mRequest->config);
 	return OGRE_NEW WorkQueue::Response(req, true, req->getData());
@@ -368,7 +367,7 @@ void QueuedProgressiveMeshGenerator::build(LodConfig& lodConfig)
 	copyBuffers(lodConfig.mesh.get(), req);
 	WorkQueue* wq = Root::getSingleton().getWorkQueue();
 	unsigned short workQueueChannel = wq->getChannel("PMGen");
-	wq->addRequest(workQueueChannel, 0, Any(req));
+	wq->addRequest(workQueueChannel, 0, Any(req),0,false,true);
 }
 
 void QueuedProgressiveMeshGenerator::copyVertexBuffer(VertexData* data, PMGenRequest::VertexBuffer& out)

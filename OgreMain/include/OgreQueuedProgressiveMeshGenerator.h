@@ -78,7 +78,6 @@ public:
 	PMWorker();
 	virtual ~PMWorker();
 private:
-	OGRE_AUTO_MUTEX; // Mutex to force processing one mesh at a time.
 	PMGenRequest* mRequest; // This is a copy of the current processed request from stack. This is needed to pass it to overloaded functions like bakeLods().
 
 	WorkQueue::Response* handleRequest(const WorkQueue::Request* req, const WorkQueue* srcQ);

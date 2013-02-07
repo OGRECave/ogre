@@ -197,7 +197,7 @@ namespace Ogre {
 	}
 	//---------------------------------------------------------------------
 	WorkQueue::RequestID DefaultWorkQueueBase::addRequest(uint16 channel, uint16 requestType, 
-		const Any& rData, uint8 retryCount, bool forceSynchronous)
+		const Any& rData, uint8 retryCount, bool forceSynchronous, bool idleThread)
 	{
 		Request* req = 0;
 		RequestID rid = 0;
@@ -222,7 +222,7 @@ namespace Ogre {
 				<< "): ID=" << rid
 			    << " channel=" << channel << " requestType=" << requestType;
 #if OGRE_THREAD_SUPPORT
-			if (!forceSynchronous)
+			if (!forceSynchronous&& !idleThread)
 			{
 				mRequestQueue.push_back(req);
 				notifyWorkers();
@@ -230,10 +230,16 @@ namespace Ogre {
 			}
 #endif
 		}
-		
-
-		processRequestResponse(req, true);
-
+		if(idleThread){
+			OGRE_LOCK_MUTEX(mIdleMutex);
+			mIdleRequestQueue.push_back(req);
+			if(!mIdleThreadRunning)
+			{
+				notifyWorkers();
+			}
+		} else { //forceSynchronous
+			processRequestResponse(req, true);
+		}
 		return rid;
 
 	}
@@ -296,6 +302,19 @@ namespace Ogre {
 		}
 
 		{
+			if(mIdleProcessed)
+			{
+				mIdleProcessed->abortRequest();
+			}
+
+			OGRE_LOCK_MUTEX(mIdleMutex)
+			for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
+			{
+				(*i)->abortRequest();
+			}
+		}
+
+		{
 			OGRE_LOCK_MUTEX(mResponseMutex)
 
 			for (ResponseQueue::iterator i = mResponseQueue.begin(); i != mResponseQueue.end(); ++i)
@@ -332,6 +351,22 @@ namespace Ogre {
 				}
 			}
 		}
+		{
+			if (mIdleProcessed && mIdleProcessed->getChannel() == channel)
+			{
+				mIdleProcessed->abortRequest();
+			}
+
+			OGRE_LOCK_MUTEX(mIdleMutex)
+
+			for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
+			{
+				if ((*i)->getChannel() == channel)
+				{
+					(*i)->abortRequest();
+				}
+			}
+		}
 
 		{
 			OGRE_LOCK_MUTEX(mResponseMutex)
@@ -348,29 +383,59 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortPendingRequestsByChannel(uint16 channel)
 	{
-		OGRE_LOCK_MUTEX(mRequestMutex)
-		for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
 		{
-			if ((*i)->getChannel() == channel)
+			OGRE_LOCK_MUTEX(mRequestMutex)
+			for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
 			{
-				(*i)->abortRequest();
+				if ((*i)->getChannel() == channel)
+				{
+					(*i)->abortRequest();
+				}
 			}
+		}
+		{
+			OGRE_LOCK_MUTEX(mIdleMutex)
+
+				for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
+				{
+					if ((*i)->getChannel() == channel)
+					{
+						(*i)->abortRequest();
+					}
+				}
 		}
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::abortAllRequests()
 	{
 		OGRE_LOCK_MUTEX(mProcessMutex)
-
-		for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
 		{
-			(*i)->abortRequest();
+			for (RequestQueue::iterator i = mProcessQueue.begin(); i != mProcessQueue.end(); ++i)
+			{
+				(*i)->abortRequest();
+			}
 		}
+		
 
 		{
 			OGRE_LOCK_MUTEX(mRequestMutex)
 
 			for (RequestQueue::iterator i = mRequestQueue.begin(); i != mRequestQueue.end(); ++i)
+			{
+				(*i)->abortRequest();
+			}
+		}
+
+		{
+
+			if(mIdleProcessed)
+			{
+				mIdleProcessed->abortRequest();
+			}
+
+			OGRE_LOCK_MUTEX(mIdleMutex)
+
+			for (RequestQueue::iterator i = mIdleRequestQueue.begin(); i != mIdleRequestQueue.end(); ++i)
 			{
 				(*i)->abortRequest();
 			}
@@ -384,6 +449,7 @@ namespace Ogre {
 				(*i)->abortRequest();
 			}
 		}
+
 	}
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::setPaused(bool pause)
@@ -412,6 +478,10 @@ namespace Ogre {
 	//---------------------------------------------------------------------
 	void DefaultWorkQueueBase::_processNextRequest()
 	{
+		if(processIdleRequests()){
+			// Found idle requests.
+			return;
+		}
 		Request* request = 0;
 		{
 			// scoped to only lock while retrieving the next request
@@ -451,7 +521,10 @@ namespace Ogre {
 				break;
 			}
 		}
-
+		if( mIdleProcessed == r )
+		{
+			mIdleProcessed = 0;
+		}
 		if (response)
 		{
 			if (!response->succeeded())
@@ -617,6 +690,55 @@ namespace Ogre {
 			"DefaultWorkQueueBase('" << mName << "') - PROCESS_RESPONSE_END(" << dbgMsg.str();
 
 	}
+
+	bool DefaultWorkQueueBase::processIdleRequests()
+	{
+		{
+			OGRE_LOCK_MUTEX(mIdleMutex)
+			if(mIdleRequestQueue.empty() || mIdleThreadRunning){
+				return false;
+			} else {
+				mIdleThreadRunning = true;
+			}
+		}
+		try {
+			while(1){
+				{
+					OGRE_LOCK_MUTEX(mProcessMutex) // mProcessMutex needs to be the top mutex to prevent livelocks
+					{
+						OGRE_LOCK_MUTEX(mIdleMutex)
+						if(!mIdleRequestQueue.empty()){
+							mIdleProcessed = mIdleRequestQueue.front();
+							mIdleRequestQueue.pop_front();
+						} else {
+							mIdleProcessed = 0;
+							mIdleThreadRunning = false;
+							return true;
+						}
+					}
+				}
+				processRequestResponse(mIdleProcessed, false);
+			}
+		} catch (...) { // Normally this should not happen.
+			{
+				// It is very important to clean up or the idle thread will be locked forever!
+				OGRE_LOCK_MUTEX(mProcessMutex)
+				{
+					OGRE_LOCK_MUTEX(mIdleMutex)
+					if(mIdleProcessed){
+						mIdleProcessed->abortRequest();
+					}
+					mIdleProcessed = 0;
+					mIdleThreadRunning = false;
+				}
+			}
+			Ogre::LogManager::getSingleton().stream() << "Exception caught in top of worker thread!";
+
+			return true;
+		}
+	}
+
+
 	//---------------------------------------------------------------------
 
 	void DefaultWorkQueueBase::WorkerFunc::operator()()
