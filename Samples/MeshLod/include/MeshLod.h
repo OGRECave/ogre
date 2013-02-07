@@ -69,7 +69,7 @@ protected:
 	void setupControls()
 	{
 		
-		SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "ObjectType", "Object : ", 200, 4);
+		SelectMenu* objectType = mTrayMgr->createThickSelectMenu(TL_TOPLEFT, "ObjectType", "Object:", 200, 4);
 		objectType->addItem("sinbad.mesh");
 		objectType->addItem("ogrehead.mesh");
 		objectType->addItem("knot.mesh");
@@ -91,8 +91,8 @@ protected:
 		mWireframe = mTrayMgr->createCheckBox(TL_TOPLEFT, "wireframe", "Show wireframe");
 		mAutoconfig = mTrayMgr->createCheckBox(TL_TOPLEFT, "autoconfig", "Autoconfigure");
 		mNewAlgorithm = mTrayMgr->createCheckBox(TL_TOPLEFT, "newalgorithm", "New algorithm");
-		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Reduction value", 200, 50, 0, 1000, 101);
-		slider->setValue(500, false); // 50%
+		OgreBites::Slider* slider = mTrayMgr->createThickSlider(TL_TOPLEFT, "ReductionSlider", "Percentage", 200, 50, 0, 100, 11);
+		slider->setValue(50, false); // 50%
 		mUserReductionValue = 0.5; // 50%
 
 		mTrayMgr->showCursor();
@@ -132,7 +132,7 @@ protected:
 	void sliderMoved(Slider* slider)
 	{
 		if (slider->getName() == "ReductionSlider") {
-			mUserReductionValue = slider->getValue() / 1000.0f;
+			mUserReductionValue = slider->getValue() / 100.0f;
 			mAutoconfig->setChecked(false, false);
 			updateLod();
 		}
