@@ -4,7 +4,7 @@ sampler2D Image: register(s0);
 sampler3D Rand: register(s1);
 sampler3D Noise: register(s2);
 
-float4 OldTV_ps(float2 pos: TEXCOORD1, float2 img: TEXCOORD0,
+float4 OldTV_ps(float4 posIn : POSITION , float2 img: TEXCOORD0,
     uniform float distortionFreq: register(c3),
     uniform float distortionScale: register(c4),
     uniform float distortionRoll: register(c5),
@@ -16,6 +16,8 @@ float4 OldTV_ps(float2 pos: TEXCOORD1, float2 img: TEXCOORD0,
     uniform float sin_time_0_X: register(c6)
 
 ) : COLOR {
+
+   float2 pos = abs((img - 0.5) * 2.0) ;
    // Define a frame shape
    float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);
    float frame = saturate(frameSharpness * (pow(f, frameShape) - frameLimit));
