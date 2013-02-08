@@ -191,6 +191,8 @@ namespace Ogre {
                 " using the OgreMeshUpgrade tool.");
         }
 
+		if(mListener)
+			mListener->processMeshCompleted(pDest);
     }
     //---------------------------------------------------------------------
 	void MeshSerializer::setListener(Ogre::MeshSerializerListener *listener)

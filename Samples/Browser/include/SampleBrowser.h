@@ -88,6 +88,7 @@
 #   include "FacialAnimation.h"
 #   include "Grass.h"
 #   include "Lighting.h"
+#   include "MeshLod.h"
 #   include "ParticleFX.h"
 #   include "Shadows.h"
 #   include "SkeletalAnimation.h"
@@ -1075,6 +1076,7 @@ protected:
 #		endif // OGRE_PLATFORM_ANDROID
             mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
+            mPluginNameMap["Sample_MeshLod"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_MeshLod();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
             mPluginNameMap["Sample_Smoke"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Smoke();
 #	endif // OGRE_PLATFORM_WINRT
@@ -1353,7 +1355,8 @@ protected:
 #   ifdef USE_RTSHADER_SYSTEM
             sampleList.push_back("Sample_ShaderSystem");
 #	endif
-            sampleList.push_back("Sample_Lighting");       
+            sampleList.push_back("Sample_Lighting");
+            sampleList.push_back("Sample_MeshLod");
             sampleList.push_back("Sample_SkyBox"); 
             sampleList.push_back("Sample_SkyDome"); 
             sampleList.push_back("Sample_SkyPlane"); 

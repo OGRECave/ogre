@@ -306,13 +306,13 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     ZipDataStream::ZipDataStream(ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize)
-        : mZzipFile(zzipFile), mZzipDir( zzipDir )
+        : mZzipDir( zzipDir ), mZzipFile(zzipFile)
     {
 		mSize = uncompressedSize;
     }
     //-----------------------------------------------------------------------
     ZipDataStream::ZipDataStream(const String& name, ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize)
-        :DataStream(name), mZzipFile(zzipFile), mZzipDir( zzipDir )
+        :DataStream(name), mZzipDir( zzipDir ), mZzipFile(zzipFile)
     {
 		mSize = uncompressedSize;
     }
