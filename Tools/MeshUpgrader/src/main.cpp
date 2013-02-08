@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreProgressiveMesh.h"
+//#include "OgreProgressiveMesh.h"
 #include "OgreHardwareVertexBuffer.h"
 
 #include <iostream>
@@ -595,7 +595,7 @@ void vertexBufferReorg(Mesh& mesh)
 void buildLod(Mesh* mesh)
 {	
 	String response;
-
+#if 0
 	// Prompt for LOD generation?
 	bool genLod = false;
 	bool askLodDtls = false;
@@ -730,7 +730,7 @@ void buildLod(Mesh* mesh)
 
 		ProgressiveMesh::generateLodLevels(mesh, distanceList, quota, reduction);
 	}
-
+#endif
 }
 
 void checkColour(VertexData* vdata, bool &hasColour, bool &hasAmbiguousColour,

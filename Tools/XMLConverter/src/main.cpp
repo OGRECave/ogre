@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreSkeletonSerializer.h"
 #include "OgreXMLPrerequisites.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreProgressiveMesh.h"
+//#include "OgreProgressiveMesh.h"
 #include <iostream>
 #include <sys/stat.h>
 
@@ -552,7 +552,7 @@ void XMLToBinary(XmlOptions opts)
             }
 
         }
-
+#if 0
         // Prompt for LOD generation?
         bool genLod = false;
         bool askLodDtls = false;
@@ -704,7 +704,7 @@ void XMLToBinary(XmlOptions opts)
             newMesh->setLodStrategy(LodStrategyManager::getSingleton().getStrategy(opts.lodStrategy));
 			ProgressiveMesh::generateLodLevels(newMesh.get(), valueList, quota, reduction);
         }
-
+#endif
         if (opts.interactiveMode)
         {
             std::cout << "\nWould you like to include edge lists to enable stencil shadows with this mesh? (y/n)";
