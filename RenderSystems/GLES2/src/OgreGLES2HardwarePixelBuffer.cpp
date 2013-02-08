@@ -912,15 +912,38 @@ namespace Ogre {
         {
             GLenum glFormat = GLES2PixelUtil::getGLOriginFormat(scaled.format);
             GLenum dataType = GLES2PixelUtil::getGLOriginDataType(scaled.format);
-
-            OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
-                         mip,
-                         glFormat,
-                         width, height,
-                         0,
-                         glFormat,
-                         dataType,
-                         scaled.data));
+            GLenum internalFormat = glFormat;
+#if OGRE_NO_GLES3_SUPPORT == 0
+            // In GL ES 3, the internalformat and format parameters do not need to be identical
+            internalFormat = GLES2PixelUtil::getClosestGLInternalFormat(scaled.format);
+#endif
+            switch(mTarget)
+            {
+                case GL_TEXTURE_2D:
+                case GL_TEXTURE_CUBE_MAP:
+                    OGRE_CHECK_GL_ERROR(glTexImage2D(mFaceTarget,
+                                                     mip,
+                                                     internalFormat,
+                                                     width, height,
+                                                     0,
+                                                     glFormat,
+                                                     dataType,
+                                                     scaled.data));
+                    break;
+#if OGRE_NO_GLES3_SUPPORT == 0
+                case GL_TEXTURE_3D:
+                case GL_TEXTURE_2D_ARRAY:
+                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
+                                                     mip,
+                                                     internalFormat,
+                                                     width, height, depth,
+                                                     0,
+                                                     glFormat,
+                                                     dataType,
+                                                     scaled.data));
+                    break;
+#endif
+            }
 
             if (mip != 0)
             {
