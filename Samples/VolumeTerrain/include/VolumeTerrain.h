@@ -53,6 +53,9 @@ private:
     /// Holds the volume root.
     Chunk *mVolumeRoot;
 
+    /// Holds the volume source for later ray intersections.
+    Source *mSource;
+
 protected:
     
     /// To show or hide everything.
@@ -75,7 +78,19 @@ public:
     */
     Sample_VolumeTerrain(void);
     
+    /** Overridden from SdkSample.
+    */
     virtual bool keyPressed(const OIS::KeyEvent& evt);
+
+    /** Intersects a ray with the volume and adds a sphere at the intersection.
+    @param ray
+        The ray.
+    */
+    void shootRay(Ray ray);
+    
+    /** Overridden from SdkSample.
+    */
+    virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
 };
 
 #endif

@@ -87,8 +87,8 @@ namespace Volume {
         /** Constructor.
         */
         ChunkParameters(void) :
-            sceneManager(0), src(0), baseError((Real)0.0), errorMultiplicator((Real)1.0), createOctreeVisualization(false),
-            createDualGridVisualization(false), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0)
+            createOctreeVisualization(false), createDualGridVisualization(false), baseError((Real)0.0), errorMultiplicator((Real)1.0),
+            sceneManager(0), src(0), lodCallback(0), lodCallbackLod(0), scale((Real)1.0), createGeometryFromLevel(0)
         {
         }
     } ChunkParameters;
@@ -305,6 +305,10 @@ namespace Volume {
             The scenemanager to construct the entity with.
         @param filename
             The filename of the configuration file.
+        @param sourceResult
+            If you want to use the loaded source afterwards, give this parameter.  Beware, that you
+            will have to free the pointer on your own then! On null here, it internally frees the
+            memory for you
         @param lodCallback
             Callback for a specific LOD level.
         @param lodCallbackLod
@@ -312,7 +316,7 @@ namespace Volume {
         @param resourceGroup
             The resource group where to search for the configuration file.
         */
-        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         
         /** Shows the debug visualization entity of the dualgrid.
         @param visible
