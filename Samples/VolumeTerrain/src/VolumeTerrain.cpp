@@ -81,7 +81,7 @@ void Sample_VolumeTerrain::setupControls(void)
 void Sample_VolumeTerrain::cleanupContent(void)
 {   
     OGRE_DELETE mVolumeRoot;
-    OGRE_DELETE mSource;
+    delete mSource;
     mVolumeRoot = 0;
 }
     
