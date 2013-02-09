@@ -178,7 +178,8 @@ else()
 
 if (OGRE_BUILD_TESTS)
 	add_definitions(-DSAMPLES_INCLUDE_PLAYPEN)
-	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include)
+	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include
+	${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
 endif()
 ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
