@@ -307,7 +307,7 @@ namespace Volume {
             The filename of the configuration file.
         @param sourceResult
             If you want to use the loaded source afterwards, give this parameter.  Beware, that you
-            will have to free the pointer on your own then! On null here, it internally frees the
+            will have to delete the pointer on your own then! On null here, it internally frees the
             memory for you
         @param lodCallback
             Callback for a specific LOD level.
