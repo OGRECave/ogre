@@ -2,6 +2,7 @@
 // the issue is with the array initializers
 // no card supports GL_3DL_array_objects but it does work on nvidia, not on ATI
 //#extension GL_3DL_array_objects : enable
+#version 120
 
 //-------------------------------
 //BlurV_ps20.glsl
