@@ -278,7 +278,7 @@ namespace Volume {
         bool trilinearGradient = StringConverter::parseBool(config.getSetting("trilinearGradient"));
         bool sobelGradient = StringConverter::parseBool(config.getSetting("sobelGradient"));
 
-        TextureSource *textureSource = OGRE_NEW TextureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
+        TextureSource *textureSource = new TextureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
     
         Vector3 from = StringConverter::parseVector3(config.getSetting("scanFrom"));
         Vector3 to = StringConverter::parseVector3(config.getSetting("scanTo"));
@@ -308,7 +308,7 @@ namespace Volume {
         }
         else
         {
-            OGRE_DELETE textureSource;
+            delete textureSource;
         }
 
         String material = config.getSetting("material");
