@@ -35,6 +35,7 @@ material Ogre/Compositor/Radial_Blur
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Radial_Blur_ps
 			{

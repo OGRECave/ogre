@@ -47,6 +47,7 @@ material Ogre/Compositor/Combine
 		pass
 		{
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Ogre/Compositor/Combine_fp
 			{
@@ -81,6 +82,7 @@ material Ogre/Compositor/Copyback
 		{
 			lighting off
 			depth_check off
+            polygon_mode_overrideable false
 
 			texture_unit Temp
 			{
@@ -101,6 +103,7 @@ material Ogre/Compositor/MotionBlur
 		{
 			lighting off
 			depth_check off
+            polygon_mode_overrideable false
 
 			texture_unit Sum
 			{

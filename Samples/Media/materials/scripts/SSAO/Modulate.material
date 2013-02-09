@@ -40,7 +40,8 @@ material SSAO/Post/Modulate
 
 			vertex_program_ref Ogre/Compositor/StdQuad_vp {}
             fragment_program_ref SSAO/Post/Modulate_fp {}
-			
+            polygon_mode_overrideable false
+
 			texture_unit
             {
 				content_type compositor SSAO/Post/Modulate ssao
