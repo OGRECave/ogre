@@ -146,7 +146,7 @@ namespace Volume {
         Real densityCur = getValue(cur);
         Vector3 dir = ray.getDirection().normalisedCopy();
 
-        int count = 0;
+        size_t count = 0;
         Vector3 prev, prevPrev;
         bool atEnd = false;
         Real totalLength = (start - end).length();
