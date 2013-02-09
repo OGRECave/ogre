@@ -27,11 +27,7 @@ THE SOFTWARE.
 #include "SamplePlugin.h"
 #include "VolumeTerrain.h"
 
-#include "OgreVolumeCSGSource.h"
-#include "OgreVolumeCacheSource.h"
-#include "OgreVolumeTextureSource.h"
-#include "OgreVolumeMeshBuilder.h"
-#include "OgreVolumeSimplexNoise.h"
+#include "OgreRay.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -44,12 +40,6 @@ void Sample_VolumeTerrain::setupContent(void)
     // Skydome
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
-    SimplexNoise sn(100);
-    LogManager::getSingleton().stream() << sn.noise((Real)1.3, (Real)2.3, (Real)3.3);
-    //LogManager::getSingleton().stream() << sn.noise(2, 3, 4);
-    //LogManager::getSingleton().stream() << sn.noise(3, 4, 5);
-    //LogManager::getSingleton().stream() << sn.noise(4, 5, 6);
-
     // Light
     Light* directionalLight0 = mSceneMgr->createLight("directionalLight0");
     directionalLight0->setType(Light::LT_DIRECTIONAL);
@@ -60,7 +50,7 @@ void Sample_VolumeTerrain::setupContent(void)
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
     SceneNode *volumeRootNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("VolumeParent");
-    mVolumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg");
+    mVolumeRoot->load(volumeRootNode, mSceneMgr, "volumeTerrain.cfg", &mSource);
 
     // Camera
     mCamera->setPosition((Real)(2560 - 384), (Real)2000, (Real)(2560 - 384));
@@ -83,7 +73,7 @@ void Sample_VolumeTerrain::setupControls(void)
     mTrayMgr->showFrameStats(TL_TOPRIGHT);
     mTrayMgr->toggleAdvancedFrameStats();
 
-    mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "To move arround:\n\nHold the left mouse button,\n press wasd for movement\nand move the mouse\n for the direction.", 245, 115);
+    mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "Usage:\n\nHold the left mouse button,\n press wasd for movement\nand move the mouse for\n the direction.\nYou can place white spheres\nwith the middle mouse\nbutton like in an ego-shooter.", 265, 160);
 }
     
 //-----------------------------------------------------------------------
@@ -91,6 +81,7 @@ void Sample_VolumeTerrain::setupControls(void)
 void Sample_VolumeTerrain::cleanupContent(void)
 {   
     OGRE_DELETE mVolumeRoot;
+    OGRE_DELETE mSource;
     mVolumeRoot = 0;
 }
     
@@ -99,7 +90,7 @@ void Sample_VolumeTerrain::cleanupContent(void)
 Sample_VolumeTerrain::Sample_VolumeTerrain(void) : mVolumeRoot(0), mHideAll(false)
 {
     mInfo["Title"] = "Volume Terrain";
-    mInfo["Description"] = "Demonstrates a volumetric terrain defined by an 3D texture.";
+    mInfo["Description"] = "Demonstrates a volumetric terrain defined by an 3D texture and ray intersection with a volume.";
     mInfo["Thumbnail"] = "thumb_volumeterrain.png";
     mInfo["Category"] = "Geometry";
 }
@@ -134,7 +125,40 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
     }
     return SdkSample::keyPressed(evt);
 }
-    
+
+//-----------------------------------------------------------------------
+
+void Sample_VolumeTerrain::shootRay(Ray ray)
+{
+        Vector3 intersection;
+        bool intersects = mSource->getFirstRayIntersection(ray, intersection);
+        static int intersectionName = 0;
+        if (intersects)
+        {
+            intersectionName++;
+            SceneNode *n = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+            n->translate(intersection * mVolumeRoot->getScale());
+            n->scale(Vector3((Real)0.05));
+            Entity * mcSphere = mSceneMgr->createEntity("intersection" + StringConverter::toString(intersectionName), "sphere.mesh");
+            n->attachObject(mcSphere);
+        }
+}
+
+//-----------------------------------------------------------------------
+
+bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
+{
+
+    if (id == OIS::MB_Middle)
+    {
+            LogManager::getSingleton().stream() << "SCALE: " << mVolumeRoot->getScale();
+        Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
+        shootRay(ray);
+    }
+
+    return SdkSample::mousePressed(evt, id);
+}
+
 //-----------------------------------------------------------------------
 
 #ifndef OGRE_STATIC_LIB
