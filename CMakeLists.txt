@@ -98,7 +98,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
   endif ()
   # This is a set of sensible warnings that provide meaningful output
-  set(OGRE_WARNING_FLAGS "-Wno-deprecated -Wall -Wctor-dtor-privacy -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
+  # TheSHEEEP: Removed "-Wctor-dtor-privacy" as it was going mad with uneccessary warnings when using boost.
+  set(OGRE_WARNING_FLAGS "-Wno-deprecated -Wall -Winit-self -Wno-overloaded-virtual -Wcast-qual -Wwrite-strings -Wextra -Wno-unused-parameter -Wshadow -Wno-missing-field-initializers -Wno-long-long")
   if (NOT APPLE)
       set(OGRE_WARNING_FLAGS "${OGRE_WARNING_FLAGS} -Wno-unused-but-set-parameter")
   endif ()
@@ -131,6 +132,8 @@ if (MINGW)
   # set architecture to i686, since otherwise some versions of MinGW can't link 
   # the atomic primitives
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=i686")
+  # Fpermissive required to let some "non-standard" casting operations in the plugins pass
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
   # disable this optimisation because it breaks release builds (reason unknown)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-tree-slp-vectorize")
 endif ()
