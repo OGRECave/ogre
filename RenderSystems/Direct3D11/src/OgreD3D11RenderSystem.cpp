@@ -1069,6 +1069,8 @@ bail:
 			if(!mUseCustomCapabilities)
 				mCurrentCapabilities = mRealCapabilities;
 
+			fireEvent("RenderSystemCapabilitiesCreated");
+
 			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
 
 		}

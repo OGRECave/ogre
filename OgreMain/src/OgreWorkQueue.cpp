@@ -77,6 +77,7 @@ namespace Ogre {
 		, mResposeTimeLimitMS(8)
 		, mWorkerFunc(0)
 		, mRequestCount(0)
+		, mIdleProcessed(0)
 		, mPaused(false)
 		, mAcceptRequests(true)
 	{
