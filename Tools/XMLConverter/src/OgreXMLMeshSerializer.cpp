@@ -728,7 +728,7 @@ namespace Ogre {
                 else if (!strcmp(optype, "line_list"))
                 {
                     sm->operationType = RenderOperation::OT_LINE_LIST;
-                    //readFaces = false;
+                    readFaces = false;
                 }
                 else if (!strcmp(optype, "point_list"))
                 {
