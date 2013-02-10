@@ -648,7 +648,8 @@ void Sample_Compositor::createTextures(void)
 		TEX_TYPE_3D,
 		64,64,64,
 		0,
-		PF_A8
+		PF_L8, 
+        TU_DYNAMIC_WRITE_ONLY
 	);
 
 	HardwarePixelBufferSharedPtr ptr = tex->getBuffer(0,0);
@@ -688,7 +689,8 @@ void Sample_Compositor::createTextures(void)
 		TEX_TYPE_2D,
 		vp->getActualWidth(),vp->getActualHeight(),1,
 		0,
-		PF_A8
+		PF_L8,
+        TU_DYNAMIC_WRITE_ONLY
 	);
 
 	HardwarePixelBufferSharedPtr ptr2 = tex2->getBuffer(0,0);

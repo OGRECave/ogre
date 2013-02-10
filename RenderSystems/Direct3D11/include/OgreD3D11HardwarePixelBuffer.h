@@ -73,7 +73,7 @@ namespace Ogre {
 		bool mUsingStagingBuffer;
 		ID3D11Resource *mStagingBuffer;
 		
-		void *_map(ID3D11Resource *res, D3D11_MAP flags);
+		void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
 		void *_mapstagingbuffer(D3D11_MAP flags);
 		void *_mapstaticbuffer(PixelBox lock);
 		void _unmap(ID3D11Resource *res);

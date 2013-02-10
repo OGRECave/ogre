@@ -14,6 +14,6 @@ float4 Halftone_ps(	float4 pos : POSITION,
 	local.xy = local.xy * numTiles;
 	middle +=  iNumTiles2;
 	local.z = dot(tex2D(RT, middle ) , lum);
-	float4 c = tex3D(pattern,local).a;
+	float4 c = tex3D(pattern,local).r;
 	return c;
 }
