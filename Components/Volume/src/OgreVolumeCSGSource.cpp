@@ -134,7 +134,47 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
+    CSGOperationSource::CSGOperationSource(void) : mA(0), mB(0)
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
+    const Source* CSGOperationSource::getSourceA(void) const
+    {
+        return mA;
+    }
+
+    //-----------------------------------------------------------------------
+
+    void CSGOperationSource::setSourceA(Source *a)
+    {
+        mA = a;
+    }
+
+    //-----------------------------------------------------------------------
+
+    const Source* CSGOperationSource::getSourceB(void) const
+    {
+        return mB;
+    }
+
+    //-----------------------------------------------------------------------
+
+    void CSGOperationSource::setSourceB(Source *b)
+    {
+        mB = b;
+    }
+
+    //-----------------------------------------------------------------------
+
     CSGIntersectionSource::CSGIntersectionSource(const Source *a, const Source *b) : CSGOperationSource(a, b)
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
+    CSGIntersectionSource::CSGIntersectionSource(void) : CSGOperationSource()
     {
     }
     
@@ -172,6 +212,12 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
+    CSGUnionSource::CSGUnionSource(void) : CSGOperationSource()
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
     Vector4 CSGUnionSource::getValueAndGradient(const Vector3 &position) const
     {
         Vector4 valueA = mA->getValueAndGradient(position);
@@ -199,6 +245,12 @@ namespace Volume {
     //-----------------------------------------------------------------------
 
     CSGDifferenceSource::CSGDifferenceSource(const Source *a, const Source *b) : CSGOperationSource(a, b)
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
+    CSGDifferenceSource::CSGDifferenceSource(void) : CSGOperationSource()
     {
     }
     
@@ -236,7 +288,33 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
+    CSGUnarySource::CSGUnarySource(void) : mSrc(0)
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
+    const Source* CSGUnarySource::getSource(void) const
+    {
+        return mSrc;
+    }
+    
+    //-----------------------------------------------------------------------
+
+    void CSGUnarySource::setSource(Source *a)
+    {
+        mSrc = a;
+    }
+    
+    //-----------------------------------------------------------------------
+
     CSGNegateSource::CSGNegateSource(const Source *src) : CSGUnarySource(src)
+    {
+    }
+    
+    //-----------------------------------------------------------------------
+
+    CSGNegateSource::CSGNegateSource(void) : CSGUnarySource()
     {
     }
     
