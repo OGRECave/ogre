@@ -131,7 +131,7 @@ namespace Ogre
 				GLint binaryLength = 0;
 
 #if GL_OES_get_program_binary || OGRE_NO_GLES3_SUPPORT == 0
-				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
+				OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
 #endif
 
                 // Create microcode
