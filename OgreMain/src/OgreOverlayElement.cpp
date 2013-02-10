@@ -147,7 +147,6 @@ namespace Ogre {
         }
         mDerivedOutOfDate = true;
         _positionsOutOfDate();
-
     }
     //---------------------------------------------------------------------
     void OverlayElement::setWidth(Real width)
@@ -316,7 +315,6 @@ namespace Ogre {
     const String& OverlayElement::getMaterialName(void) const
     {
         return mMaterialName;
-
     }
     //---------------------------------------------------------------------
     void OverlayElement::setMaterialName(const String& matName)
@@ -337,7 +335,6 @@ namespace Ogre {
 		{
 			mMaterial.setNull();
 		}
-
     }
     //---------------------------------------------------------------------
     const MaterialPtr& OverlayElement::getMaterial(void) const
@@ -354,51 +351,43 @@ namespace Ogre {
 	{
 		mGeomPositionsOutOfDate = true;
 	}
-
     //---------------------------------------------------------------------
     void OverlayElement::_update(void)
     {
-        // Check size if pixel-based
+        Real vpWidth, vpHeight;
+        OverlayManager& oMgr = OverlayManager::getSingleton();
+        vpWidth = (Real) (oMgr.getViewportWidth());
+        vpHeight = (Real) (oMgr.getViewportHeight());
+
+        // Check size if pixel-based or relative-aspect-adjusted
         switch (mMetricsMode)
         {
         case GMM_PIXELS :
             if (OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
-            {
-                Real vpWidth, vpHeight;
-                OverlayManager& oMgr = OverlayManager::getSingleton();
-                vpWidth = (Real) (oMgr.getViewportWidth());
-                vpHeight = (Real) (oMgr.getViewportHeight());
-
+            {               
                 mPixelScaleX = 1.0f / vpWidth;
-                mPixelScaleY = 1.0f / vpHeight;
-
-                mLeft = mPixelLeft * mPixelScaleX;
-                mTop = mPixelTop * mPixelScaleY;
-                mWidth = mPixelWidth * mPixelScaleX;
-                mHeight = mPixelHeight * mPixelScaleY;
+                mPixelScaleY = 1.0f / vpHeight; 
             }
             break;
 
         case GMM_RELATIVE_ASPECT_ADJUSTED :
             if (OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
             {
-                Real vpWidth, vpHeight;
-                OverlayManager& oMgr = OverlayManager::getSingleton();
-                vpWidth = (Real) (oMgr.getViewportWidth());
-                vpHeight = (Real) (oMgr.getViewportHeight());
-				
                 mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
                 mPixelScaleY = 1.0f /  10000.0f;
-
-                mLeft = mPixelLeft * mPixelScaleX;
-                mTop = mPixelTop * mPixelScaleY;
-                mWidth = mPixelWidth * mPixelScaleX;
-                mHeight = mPixelHeight * mPixelScaleY;
             }
             break;
+
         default:
             break;
         }
+
+        mLeft   = mPixelLeft   * mPixelScaleX;
+        mTop    = mPixelTop    * mPixelScaleY;
+        mWidth  = mPixelWidth  * mPixelScaleX;
+        mHeight = mPixelHeight * mPixelScaleY;
+
+        Real tmpPixelWidth = mPixelWidth;
 
         _updateFromParent();
         // NB container subclasses will update children too
@@ -407,14 +396,24 @@ namespace Ogre {
         if (mGeomPositionsOutOfDate && mInitialised)
         {
             updatePositionGeometry();
-            mGeomPositionsOutOfDate = false;
+
+            // Within updatePositionGeometry() of TextOverlayElements,
+            // the needed pixel width is calculated and as a result a new 
+            // second update call is needed, so leave the dirty flag on 'true'
+            // so that that in a second call in the next frame, the element
+            // width can be correctly set and the text gets displayed.
+            if(mMetricsMode == GMM_PIXELS && tmpPixelWidth != mPixelWidth)
+                mGeomPositionsOutOfDate = true;
+            else
+                mGeomPositionsOutOfDate = false;
         }
-		// Tell self to update own texture geometry
-		if (mGeomUVsOutOfDate && mInitialised)
-		{
-			updateTextureGeometry();
-			mGeomUVsOutOfDate = false;
-		}
+
+        // Tell self to update own texture geometry
+        if (mGeomUVsOutOfDate && mInitialised)
+        {
+            updateTextureGeometry();
+            mGeomUVsOutOfDate = false;
+        } 
     }
     //---------------------------------------------------------------------
     void OverlayElement::_updateFromParent(void)
@@ -433,7 +432,6 @@ namespace Ogre {
             {
                 parentBottom = parentTop + mParent->_getRelativeHeight();
             }
-
         }
         else
         {
@@ -559,13 +557,11 @@ namespace Ogre {
         mZOrder = newZOrder;
 		return mZOrder + 1;
     }
-
     //---------------------------------------------------------------------
     void OverlayElement::_notifyWorldTransforms(const Matrix4& xform)
     {
         mXForm = xform;
     }
-
     //---------------------------------------------------------------------
     void OverlayElement::_notifyViewport()
     {
@@ -612,15 +608,13 @@ namespace Ogre {
 
         mGeomPositionsOutOfDate = true;
     }
-
     //---------------------------------------------------------------------
     void OverlayElement::_updateRenderQueue(RenderQueue* queue)
     {
         if (mVisible)
         {
             queue->addRenderable(this, RENDER_QUEUE_OVERLAY, mZOrder);
-        }
-      
+        }      
     }
 	//---------------------------------------------------------------------
 	void OverlayElement::visitRenderables(Renderable::Visitor* visitor, 
@@ -790,15 +784,11 @@ namespace Ogre {
     {
         return mVertAlign;
     }
-    //-----------------------------------------------------------------------
-
-
-    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------    
 	bool OverlayElement::contains(Real x, Real y) const
 	{
         return mClippingRegion.inside(x, y);
 	}
-
     //-----------------------------------------------------------------------
 	OverlayElement* OverlayElement::findElementAt(Real x, Real y) 		// relative to parent
 	{
@@ -809,20 +799,19 @@ namespace Ogre {
 		}
 		return ret;
 	}
-
     //-----------------------------------------------------------------------
 	OverlayContainer* OverlayElement::getParent() 
 	{ 
 		return mParent;		
 	}
-
+    //-----------------------------------------------------------------------
     void OverlayElement::copyFromTemplate(OverlayElement* templateOverlay)
 	{
 		templateOverlay->copyParametersTo(this);
-    mSourceTemplate = templateOverlay ;
+        mSourceTemplate = templateOverlay ;
 		return;
 	}
-
+    //-----------------------------------------------------------------------
     OverlayElement* OverlayElement::clone(const String& instanceName)
     {
         OverlayElement* newElement;
@@ -833,19 +822,17 @@ namespace Ogre {
 
         return newElement;
     }
-
     //-----------------------------------------------------------------------
 	bool OverlayElement::isEnabled() const
 	{ 
 		return mEnabled;
 	}
-
     //-----------------------------------------------------------------------
 	void OverlayElement::setEnabled(bool b) 
 	{
 		mEnabled = b;
 	}
-
+    //-----------------------------------------------------------------------
 
 }
 
