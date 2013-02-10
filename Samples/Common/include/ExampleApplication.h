@@ -24,6 +24,8 @@ Description: Base class for all the OGRE examples
 #include "Ogre.h"
 #include "OgreConfigFile.h"
 #include "ExampleFrameListener.h"
+#include "OgreOverlaySystem.h"
+
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
@@ -123,6 +125,8 @@ public:
     {
         mFrameListener = 0;
         mRoot = 0;
+		mOverlaySystem=0;
+
 		// Provide a nice cross platform solution for locating the configuration files
 		// On windows files are searched for in the current working directory, on OS X however
 		// you must provide the full path, the helper function macBundlePath does this for us.
@@ -147,6 +151,12 @@ public:
     {
         if (mFrameListener)
             delete mFrameListener;
+		if (mOverlaySystem)
+		{
+			if(mSceneMgr) mSceneMgr->removeRenderQueueListener(mOverlaySystem);
+            OGRE_DELETE mOverlaySystem;
+		}
+
         if (mRoot)
             OGRE_DELETE mRoot;
 
@@ -175,6 +185,7 @@ public:
 
 protected:
     Root *mRoot;
+	OverlaySystem* mOverlaySystem;
 #ifdef OGRE_STATIC_LIB
 	StaticPluginLoader mStaticPluginLoader;
 #endif
@@ -206,6 +217,7 @@ protected:
 		
         mRoot = OGRE_NEW Root(pluginsPath, 
             mConfigPath + "ogre.cfg", mResourcePath + "Ogre.log");
+		mOverlaySystem = OGRE_NEW OverlaySystem();
 #ifdef OGRE_STATIC_LIB
 		mStaticPluginLoader.load();
 #endif
@@ -334,6 +346,9 @@ protected:
     {
         // Create the SceneManager, in this case a generic one
         mSceneMgr = mRoot->createSceneManager(ST_GENERIC, "ExampleSMInstance");
+
+		if(mOverlaySystem)
+			 mSceneMgr->addRenderQueueListener(mOverlaySystem);
     }
     virtual void createCamera(void)
     {
