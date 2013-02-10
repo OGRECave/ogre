@@ -27,7 +27,8 @@ THE SOFTWARE.
 */
 #include <stdio.h>
 #include "Ogre.h"
-#include "OgreProgressiveMesh.h"
+#include "OgreProgressiveMeshGenerator.h"
+#include "OgreDistanceLodStrategy.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreFileSystem.h"
 #include "OgreArchiveManager.h"
@@ -459,9 +460,17 @@ void MeshWithoutIndexDataTests::testGenerateLodLevels()
     createMeshWithMaterial(fileName);
     MeshPtr mesh = mMeshMgr->getByName(fileName);
 
-    Mesh::LodValueList lodDistanceList;
-    lodDistanceList.push_back(600.0);
-    ProgressiveMesh::generateLodLevels(mesh.get(), lodDistanceList, ProgressiveMesh::VRQ_CONSTANT, 2);
+	LodConfig lodConfig;
+    lodConfig.levels.clear();
+    lodConfig.mesh = MeshPtr(mesh);
+    lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+    LodLevel lodLevel;
+    lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
+    lodLevel.distance = 600.0;
+    lodLevel.reductionValue = 2;
+    lodConfig.levels.push_back(lodLevel);
+    ProgressiveMeshGenerator pm;
+    pm.generateLodLevels(lodConfig);
     // FAIL: Levels == 1
     CPPUNIT_ASSERT(mesh->getNumLodLevels() == 2);
     for (ushort i = 0; i < mesh->getNumSubMeshes(); ++i)

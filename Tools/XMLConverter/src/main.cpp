@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include "OgreSkeletonSerializer.h"
 #include "OgreXMLPrerequisites.h"
 #include "OgreDefaultHardwareBufferManager.h"
-//#include "OgreProgressiveMesh.h"
+#include "OgreProgressiveMeshGenerator.h"
+#include "OgreDistanceLodStrategy.h"
 #include <iostream>
 #include <sys/stat.h>
 
@@ -552,7 +553,7 @@ void XMLToBinary(XmlOptions opts)
             }
 
         }
-#if 0
+
         // Prompt for LOD generation?
         bool genLod = false;
         bool askLodDtls = false;
@@ -627,9 +628,13 @@ void XMLToBinary(XmlOptions opts)
         if (genLod)
         {
             unsigned short numLod;
-            ProgressiveMesh::VertexReductionQuota quota = ProgressiveMesh::VRQ_PROPORTIONAL;
-            Real reduction;
-            Mesh::LodValueList valueList;
+            LodConfig lodConfig;
+            lodConfig.levels.clear();
+            lodConfig.mesh = MeshPtr(newMesh);
+            lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+            LodLevel lodLevel;
+
+            lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 
             if (askLodDtls)
             {
@@ -647,12 +652,12 @@ void XMLToBinary(XmlOptions opts)
                     StringUtil::toLowerCase(response);
                     if (response == "f")
                     {
-                        quota = ProgressiveMesh::VRQ_CONSTANT;
+                        lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
                         cout << "\nHow many vertices should be removed at each LOD?";
                     }
                     else if (response == "p")
                     {
-                        quota = ProgressiveMesh::VRQ_PROPORTIONAL;
+                        lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
                         cout << "\nWhat percentage of remaining vertices should be removed "
                             "\at each LOD (e.g. 50)?";
                     }
@@ -661,50 +666,51 @@ void XMLToBinary(XmlOptions opts)
                             response = "";
                     }
                 }
-                cin >> reduction;
-                if (quota == ProgressiveMesh::VRQ_PROPORTIONAL)
+                cin >> lodLevel.reductionValue;
+                if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
                 {
                     // Percentage -> parametric
-                    reduction = reduction * 0.01f;
+                    lodLevel.reductionValue *= 0.01f;
                 }
 
                 cout << "\nEnter the distance for each LOD to come into effect.";
 
-                Real distance;
                 for (unsigned short iLod = 0; iLod < numLod; ++iLod)
                 {
                     cout << "\nLOD Level " << (iLod+1) << ":";
-                    cin >> distance;
-                    valueList.push_back(distance);
+                    cin >> lodLevel.distance;
+                    lodConfig.levels.push_back(lodLevel);
                 }
             }
             else
             {
                 numLod = opts.numLods;
-                quota = opts.usePercent? 
-                    ProgressiveMesh::VRQ_PROPORTIONAL : ProgressiveMesh::VRQ_CONSTANT;
+                lodLevel.reductionMethod = opts.usePercent? 
+                    LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
                 if (opts.usePercent)
                 {
-                    reduction = opts.lodPercent * 0.01f;
+                    lodLevel.reductionValue = opts.lodPercent * 0.01f;
                 }
                 else
                 {
-                    reduction = opts.lodFixed;
+                    lodLevel.reductionValue = opts.lodFixed;
                 }
                 Real currDist = 0;
                 for (unsigned short iLod = 0; iLod < numLod; ++iLod)
                 {
                     currDist += opts.lodValue;
                     Real currDistSq = Ogre::Math::Sqr(currDist);
-                    valueList.push_back(currDistSq);
+                    lodLevel.distance = currDistSq;
+                    lodConfig.levels.push_back(lodLevel);
                 }
 
             }
 
             newMesh->setLodStrategy(LodStrategyManager::getSingleton().getStrategy(opts.lodStrategy));
-			ProgressiveMesh::generateLodLevels(newMesh.get(), valueList, quota, reduction);
+            ProgressiveMeshGenerator pm;
+            pm.generateLodLevels(lodConfig);
         }
-#endif
+
         if (opts.interactiveMode)
         {
             std::cout << "\nWould you like to include edge lists to enable stencil shadows with this mesh? (y/n)";

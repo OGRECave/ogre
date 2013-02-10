@@ -31,7 +31,8 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
-//#include "OgreProgressiveMesh.h"
+#include "OgreProgressiveMeshGenerator.h"
+#include "OgreDistanceLodStrategy.h"
 #include "OgreHardwareVertexBuffer.h"
 
 #include <iostream>
@@ -433,7 +434,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 			}
 			else
 			{
-				response == "";
+				response = "";
 			}
 			
 		}
@@ -595,7 +596,7 @@ void vertexBufferReorg(Mesh& mesh)
 void buildLod(Mesh* mesh)
 {	
 	String response;
-#if 0
+
 	// Prompt for LOD generation?
 	bool genLod = false;
 	bool askLodDtls = false;
@@ -664,9 +665,11 @@ void buildLod(Mesh* mesh)
 	if (genLod)
 	{
 		unsigned short numLod;
-		ProgressiveMesh::VertexReductionQuota quota;
-		Real reduction;
-		Mesh::LodValueList distanceList;
+        LodConfig lodConfig;
+		lodConfig.levels.clear();
+		lodConfig.mesh = MeshPtr(mesh);
+		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
+		LodLevel lodLevel;
 
 		if (askLodDtls)
 		{
@@ -679,58 +682,58 @@ void buildLod(Mesh* mesh)
 			StringUtil::toLowerCase(response);
 			if (response == "f")
 			{
-				quota = ProgressiveMesh::VRQ_CONSTANT;
+				lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 				cout << "\nHow many vertices should be removed at each LOD?";
 			}
 			else
 			{
-				quota = ProgressiveMesh::VRQ_PROPORTIONAL;
+				lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 				cout << "\nWhat percentage of remaining vertices should be removed "
 					"\at each LOD (e.g. 50)?";
 			}
-			cin >> reduction;
-			if (quota == ProgressiveMesh::VRQ_PROPORTIONAL)
+			cin >> lodLevel.reductionValue;
+			if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
 			{
 				// Percentage -> parametric
-				reduction = reduction * 0.01f;
+				lodLevel.reductionValue = lodLevel.reductionValue * 0.01f;
 			}
 
 			cout << "\nEnter the distance for each LOD to come into effect.";
 
-			Real distance;
 			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
 				cout << "\nLOD Level " << (iLod+1) << ":";
-				cin >> distance;
-				distanceList.push_back(distance);
+				cin >> lodLevel.distance;
+                lodConfig.levels.push_back(lodLevel);
 			}
 		}
 		else
 		{
 			numLod = opts.numLods;
-			quota = opts.usePercent? 
-				ProgressiveMesh::VRQ_PROPORTIONAL : ProgressiveMesh::VRQ_CONSTANT;
+			lodLevel.reductionMethod = opts.usePercent ? 
+				LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
 			if (opts.usePercent)
 			{
-				reduction = opts.lodPercent * 0.01f;
+				lodLevel.reductionValue = opts.lodPercent * 0.01f;
 			}
 			else
 			{
-				reduction = opts.lodFixed;
+				lodLevel.reductionValue = opts.lodFixed;
 			}
 			Real currDist = 0;
 			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
 				currDist += opts.lodDist;
                 Real currDistSq = Ogre::Math::Sqr(currDist);
-				distanceList.push_back(currDistSq);
+                lodLevel.distance = currDistSq;
+                lodConfig.levels.push_back(lodLevel);
 			}
-
 		}
 
-		ProgressiveMesh::generateLodLevels(mesh, distanceList, quota, reduction);
+        ProgressiveMeshGenerator pm;
+        pm.generateLodLevels(lodConfig);
 	}
-#endif
+
 }
 
 void checkColour(VertexData* vdata, bool &hasColour, bool &hasAmbiguousColour,
