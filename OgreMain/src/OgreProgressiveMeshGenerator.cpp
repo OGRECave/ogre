@@ -149,7 +149,8 @@ void ProgressiveMeshGenerator::initialize()
 		const SubMesh* submesh = mMesh->getSubMesh(i);
 		VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
 		addVertexData(vertexData, submesh->useSharedVertices);
-		addIndexData(submesh->indexData, submesh->useSharedVertices, i);
+        if(submesh->indexData->indexCount > 0)
+            addIndexData(submesh->indexData, submesh->useSharedVertices, i);
 	}
 
 	// These were only needed for addIndexData() and addVertexData().

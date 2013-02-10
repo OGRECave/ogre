@@ -231,7 +231,7 @@ namespace Ogre {
     class PMWorker;
     class PMInjector;
     class Pose;
-    class ProgressiveMesh;
+    class ProgressiveMeshGenerator;
     class Profile;
 	class Profiler;
     class Quaternion;
