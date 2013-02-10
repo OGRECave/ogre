@@ -65,9 +65,6 @@ namespace Ogre {
         /// A pointer to file io alternative implementation 
         zzip_plugin_io_handlers* mPluginIo;
 
-		/// get a new handle to the zip file.
-		ZZIP_DIR* _getNewZipDirHandle() const;
-
 		OGRE_AUTO_MUTEX
     public:
         ZipArchive(const String& name, const String& archType, zzip_plugin_io_handlers* pluginIo = NULL);
@@ -168,15 +165,14 @@ namespace Ogre {
     class _OgrePrivate ZipDataStream : public DataStream
     {
     protected:
-		ZZIP_DIR* mZzipDir;
         ZZIP_FILE* mZzipFile;
 		/// We need caching because sometimes serializers step back in data stream and zziplib behaves slow
 		StaticCache<2 * OGRE_STREAM_TEMP_SIZE> mCache;
     public:
         /// Unnamed constructor
-        ZipDataStream(ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize);
+        ZipDataStream(ZZIP_FILE* zzipFile, size_t uncompressedSize);
         /// Constructor for creating named streams
-        ZipDataStream(const String& name, ZZIP_DIR* zzipDir, ZZIP_FILE* zzipFile, size_t uncompressedSize);
+        ZipDataStream(const String& name, ZZIP_FILE* zzipFile, size_t uncompressedSize);
 		~ZipDataStream();
         /// @copydoc DataStream::read
         size_t read(void* buf, size_t count);
