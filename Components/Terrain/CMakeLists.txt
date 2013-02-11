@@ -68,7 +68,7 @@ if (OGRE_BUILD_COMPONENT_PAGING)
 	target_link_libraries(OgreTerrain OgrePaging)
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreTerrain ${Boost_LIBRARIES})
+  target_link_libraries(OgreTerrain ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 

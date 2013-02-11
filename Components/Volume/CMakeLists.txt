@@ -62,7 +62,7 @@ ogre_add_library(OgreVolume ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES
 set_target_properties(OgreVolume PROPERTIES VERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreVolume OgreMain)
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreVolume ${Boost_LIBRARIES})
+  target_link_libraries(OgreVolume ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 

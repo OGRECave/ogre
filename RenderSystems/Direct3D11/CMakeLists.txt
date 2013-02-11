@@ -89,7 +89,7 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_Direct3D11 ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_Direct3D11 ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_plugin(RenderSystem_Direct3D11)

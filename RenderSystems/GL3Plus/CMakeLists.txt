@@ -96,7 +96,7 @@ set(GLSL_SOURCE
 
 # Add system specific settings
 if (WIN32)
-  set(PLATFORM_HEADERS 
+  set(PLATFORM_HEADERS
     include/win32/OgreWin32Context.h
     include/win32/OgreWin32GLSupport.h
     include/win32/OgreWin32Prerequisites.h
@@ -167,7 +167,7 @@ if (NOT OGRE_STATIC)
   )
 endif ()
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(RenderSystem_GL3Plus ${Boost_LIBRARIES})
+  target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 ogre_config_framework(RenderSystem_GL3Plus)

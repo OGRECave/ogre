@@ -58,7 +58,7 @@ ogre_add_library(OgrePaging ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES
 set_target_properties(OgrePaging PROPERTIES VERSION ${OGRE_SOVERSION})
 target_link_libraries(OgrePaging OgreMain)
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgrePaging ${Boost_LIBRARIES})
+  target_link_libraries(OgrePaging ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 
