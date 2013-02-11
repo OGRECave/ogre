@@ -446,7 +446,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 		while (response.empty())
 		{
 			displayVertexBuffers(elemList);
-			cout << "Really reorganise the vertex buffers this way?";
+			cout << "Really reorganise the vertex buffers this way? ";
 			cin >> response;
 			StringUtil::toLowerCase(response);
 			if (response == "y")
@@ -567,7 +567,7 @@ void vertexBufferReorg(Mesh& mesh)
 	{
 
 		// Check to see whether we would like to reorganise vertex buffers
-		std::cout << "\nWould you like to reorganise the vertex buffers for this mesh?";
+		std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? ";
 		while (response.empty())
 		{
 			cin >> response;
@@ -617,7 +617,7 @@ void buildLod(Mesh* mesh)
 		if (mesh->getNumLodLevels() > 1)
 		{
 			std::cout << "\nXML already contains level-of detail information.\n"
-				"Do you want to: (u)se it, (r)eplace it, or (d)rop it?";
+				"Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
 			while (response == "")
 			{
 				cin >> response;
@@ -644,7 +644,7 @@ void buildLod(Mesh* mesh)
 		}
 		else // no existing LOD
 		{
-			std::cout << "\nWould you like to generate LOD information? (y/n)";
+			std::cout << "\nWould you like to generate LOD information? (y/n) ";
 			while (response == "")
 			{
 				cin >> response;
@@ -667,62 +667,66 @@ void buildLod(Mesh* mesh)
 		unsigned short numLod;
         LodConfig lodConfig;
 		lodConfig.levels.clear();
-		lodConfig.mesh = MeshPtr(mesh);
+		lodConfig.mesh = mesh->clone(mesh->getName());
 		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
-		LodLevel lodLevel;
 
 		if (askLodDtls)
 		{
-			cout << "\nHow many extra LOD levels would you like to generate?";
+            LodLevel lodLevel;
+			cout << "\nHow many extra LOD levels would you like to generate? ";
 			cin >> numLod;
 
 			cout << "\nWhat unit of reduction would you like to use:" <<
-				"\n(f)ixed or (p)roportional?";
+				"\n(f)ixed or (p)roportional? ";
 			cin >> response;
 			StringUtil::toLowerCase(response);
 			if (response == "f")
 			{
 				lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-				cout << "\nHow many vertices should be removed at each LOD?";
 			}
 			else
 			{
 				lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
-				cout << "\nWhat percentage of remaining vertices should be removed "
-					"\at each LOD (e.g. 50)?";
-			}
-			cin >> lodLevel.reductionValue;
-			if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
-			{
-				// Percentage -> parametric
-				lodLevel.reductionValue = lodLevel.reductionValue * 0.01f;
 			}
 
-			cout << "\nEnter the distance for each LOD to come into effect.";
-
-			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
+            for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
-				cout << "\nLOD Level " << (iLod+1) << ":";
+                if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
+                {
+                    cout << "\nWhat percentage of remaining vertices should be removed "
+                    "at each LOD (e.g. 50)? ";
+                }
+                else
+                {
+                    cout << "\nHow many vertices should be removed at each LOD? ";
+                }
+                cin >> lodLevel.reductionValue;
+
+                cout << "\nEnter the distance for each LOD to come into effect. ";
+
+				cout << "\nLOD Level " << (iLod+1) << ": ";
 				cin >> lodLevel.distance;
                 lodConfig.levels.push_back(lodLevel);
 			}
 		}
 		else
 		{
-			numLod = opts.numLods;
-			lodLevel.reductionMethod = opts.usePercent ? 
-				LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
-			if (opts.usePercent)
-			{
-				lodLevel.reductionValue = opts.lodPercent * 0.01f;
-			}
-			else
-			{
-				lodLevel.reductionValue = opts.lodFixed;
-			}
 			Real currDist = 0;
+            numLod = opts.numLods;
 			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
+                LodLevel lodLevel;
+                lodLevel.reductionMethod = opts.usePercent ?
+                    LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
+                if (opts.usePercent)
+                {
+                    lodLevel.reductionValue = opts.lodPercent * 0.01f;
+                }
+                else
+                {
+                    lodLevel.reductionValue = opts.lodFixed;
+                }
+
 				currDist += opts.lodDist;
                 Real currDistSq = Ogre::Math::Sqr(currDist);
                 lodLevel.distance = currDistSq;
@@ -1033,7 +1037,7 @@ int main(int numargs, char** args)
 				{
 					std::cout << "\nThis mesh appears to already have a set of tangents, " <<
 						"which would suggest tangent vectors have already been calculated. Do you really " <<
-						"want to generate new tangent vectors (may duplicate)? (y/n)";
+						"want to generate new tangent vectors (may duplicate)? (y/n) ";
 					while (response == "")
 					{
 						cin >> response;

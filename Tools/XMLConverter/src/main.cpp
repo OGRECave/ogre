@@ -511,7 +511,7 @@ void XMLToBinary(XmlOptions opts)
 		newMesh->_determineAnimationTypes();
         if (opts.reorganiseBuffers)
         {
-            logMgr->logMessage("Reorganising vertex buffers to automatic layout..");
+            logMgr->logMessage("Reorganising vertex buffers to automatic layout...");
             // Shared geometry
             if (newMesh->sharedVertexData)
             {
@@ -574,7 +574,7 @@ void XMLToBinary(XmlOptions opts)
             if (newMesh->getNumLodLevels() > 1)
             {
                 std::cout << "\nXML already contains level-of detail information.\n"
-                    "Do you want to: (u)se it, (r)eplace it, or (d)rop it?";
+                    "Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
                 while (response == "")
                 {
                     cin >> response;
@@ -602,7 +602,7 @@ void XMLToBinary(XmlOptions opts)
             }
             else // no existing LOD
             {
-                std::cout << "\nWould you like to generate LOD information? (y/n)";
+                std::cout << "\nWould you like to generate LOD information? (y/n) ";
                 while (response == "")
                 {
                     cin >> response;
@@ -630,22 +630,22 @@ void XMLToBinary(XmlOptions opts)
             unsigned short numLod;
             LodConfig lodConfig;
             lodConfig.levels.clear();
-            lodConfig.mesh = MeshPtr(newMesh);
+            lodConfig.mesh = mesh->clone(mesh->getName());
             lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
-            LodLevel lodLevel;
 
+            LodLevel lodLevel;
             lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 
             if (askLodDtls)
             {
-                cout << "\nHow many extra LOD levels would you like to generate?";
+                cout << "\nHow many extra LOD levels would you like to generate? ";
                 cin >> numLod;
 
-                cout << "\nWhat lod strategy should be used?";
+                cout << "\nWhat lod strategy should be used? ";
                 cin >> opts.lodStrategy;
 
                 cout << "\nWhat unit of reduction would you like to use:" <<
-                    "\n(f)ixed or (p)roportional?";
+                    "\n(f)ixed or (p)roportional? ";
                 response = "";
                 while (response == "") {
                     cin >> response;
@@ -653,13 +653,13 @@ void XMLToBinary(XmlOptions opts)
                     if (response == "f")
                     {
                         lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
-                        cout << "\nHow many vertices should be removed at each LOD?";
+                        cout << "\nHow many vertices should be removed at each LOD? ";
                     }
                     else if (response == "p")
                     {
                         lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
                         cout << "\nWhat percentage of remaining vertices should be removed "
-                            "\at each LOD (e.g. 50)?";
+                            "\at each LOD (e.g. 50)? ";
                     }
                     else {
                             std::cout << "Did not understand \"" << response << "\" please try again:" << std::endl;
@@ -673,11 +673,11 @@ void XMLToBinary(XmlOptions opts)
                     lodLevel.reductionValue *= 0.01f;
                 }
 
-                cout << "\nEnter the distance for each LOD to come into effect.";
+                cout << "\nEnter the distance for each LOD to come into effect. ";
 
                 for (unsigned short iLod = 0; iLod < numLod; ++iLod)
                 {
-                    cout << "\nLOD Level " << (iLod+1) << ":";
+                    cout << "\nLOD Level " << (iLod+1) << ": ";
                     cin >> lodLevel.distance;
                     lodConfig.levels.push_back(lodLevel);
                 }
@@ -713,7 +713,7 @@ void XMLToBinary(XmlOptions opts)
 
         if (opts.interactiveMode)
         {
-            std::cout << "\nWould you like to include edge lists to enable stencil shadows with this mesh? (y/n)";
+            std::cout << "\nWould you like to include edge lists to enable stencil shadows with this mesh? (y/n) ";
             while (response == "")
             {
                 cin >> response;
@@ -734,7 +734,7 @@ void XMLToBinary(XmlOptions opts)
             }
 
 
-            std::cout << "\nWould you like to generate tangents to enable normal mapping with this mesh? (y/n)";
+            std::cout << "\nWould you like to generate tangents to enable normal mapping with this mesh? (y/n) ";
             while (response == "")
             {
                 cin >> response;
