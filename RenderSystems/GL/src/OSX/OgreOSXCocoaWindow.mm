@@ -118,8 +118,11 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
+#if OGRE_NO_LIBCPP_SUPPORT == 0
         NameValuePairList::const_iterator opt{};
-		
+#else
+        NameValuePairList::const_iterator opt;
+#endif
         mIsFullScreen = fullScreen;
 		
 		if(miscParams)
@@ -232,7 +235,11 @@ namespace Ogre {
         }
         else
         {
+#if OGRE_NO_LIBCPP_SUPPORT == 0
             NameValuePairList::const_iterator param_useNSView_pair{};
+#else
+            NameValuePairList::const_iterator param_useNSView_pair;
+#endif
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
 
             if(param_useNSView_pair != miscParams->end())
