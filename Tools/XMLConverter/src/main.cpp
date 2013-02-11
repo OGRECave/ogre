@@ -630,7 +630,7 @@ void XMLToBinary(XmlOptions opts)
             unsigned short numLod;
             LodConfig lodConfig;
             lodConfig.levels.clear();
-            lodConfig.mesh = mesh->clone(mesh->getName());
+            lodConfig.mesh = newMesh->clone(newMesh->getName());
             lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
 
             LodLevel lodLevel;
