@@ -72,6 +72,9 @@ namespace Volume {
             nX(n.x), nY(n.y), nZ(n.z)
         {
         }
+        Vertex()
+        {
+        }
     } Vertex;
 
     /** Leightweight triangle.

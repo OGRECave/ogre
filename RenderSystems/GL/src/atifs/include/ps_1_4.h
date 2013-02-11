@@ -198,9 +198,9 @@ private:
 
 	};
 
-	#define R_BASE  (sid_R0 - GL_REG_0_ATI)
-	#define C_BASE  (sid_C0 - GL_CON_0_ATI)
-	#define T_BASE  (sid_1T0 - GL_REG_0_ATI)
+	#define R_BASE  static_cast<unsigned int>((sid_R0 - GL_REG_0_ATI))
+	#define C_BASE  static_cast<unsigned int>((sid_C0 - GL_CON_0_ATI))
+	#define T_BASE  static_cast<unsigned int>((sid_1T0 - GL_REG_0_ATI))
 
 	// static library database for tokens and BNF rules
 	static SymbolDef PS_1_4_SymbolTypeLib[];

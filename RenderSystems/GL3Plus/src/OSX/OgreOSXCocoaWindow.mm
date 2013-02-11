@@ -122,7 +122,7 @@ namespace Ogre {
         NSString *windowTitle = [NSString stringWithCString:name.c_str() encoding:NSUTF8StringEncoding];
 		int winx = 0, winy = 0;
 		int depth = 32;
-        NameValuePairList::const_iterator opt(NULL);
+        NameValuePairList::const_iterator opt;
 		
         mIsFullScreen = fullScreen;
 
@@ -247,7 +247,7 @@ namespace Ogre {
         }
         else
         {
-            NameValuePairList::const_iterator param_useNSView_pair(NULL);
+            NameValuePairList::const_iterator param_useNSView_pair;
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
             
             if(param_useNSView_pair != miscParams->end())
@@ -691,7 +691,7 @@ namespace Ogre {
                 // This ensures that it will scale to the full screen size
                 NSRect mainDisplayRect = [[NSScreen mainScreen] frame];
                 NSRect backingRect = [[NSScreen mainScreen] convertRectToBacking:mainDisplayRect];
-                GLint backingStoreDimensions[2] = { backingRect.size.width, backingRect.size.height };
+                GLint backingStoreDimensions[2] = { static_cast<GLint>(backingRect.size.width), static_cast<GLint>(backingRect.size.height) };
                 CGLSetParameter((CGLContextObj)[mGLContext CGLContextObj], kCGLCPSurfaceBackingSize, backingStoreDimensions);
                 CGLEnable((CGLContextObj)[mGLContext CGLContextObj], kCGLCESurfaceBackingSize);
 

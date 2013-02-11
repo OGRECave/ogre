@@ -69,11 +69,11 @@ namespace Ogre
 
         if( miscParams )
         {
-            NameValuePairList::const_iterator opt(NULL);
+            NameValuePairList::const_iterator opt{};
             NameValuePairList::const_iterator end = miscParams->end();
 
             // Full screen anti aliasing
-            if((opt = miscParams->find("FSAA")) != end) 
+            if((opt = miscParams->find("FSAA")) != end)
                 fsaa_samples = StringConverter::parseUnsignedInt( opt->second );
 
             if((opt = miscParams->find("left")) != end) 
@@ -112,7 +112,7 @@ namespace Ogre
         {
             createAGLContext(fsaa_samples, depth);
 
-            NameValuePairList::const_iterator opt(NULL);
+            NameValuePairList::const_iterator opt{};
             if(miscParams)
                 opt = miscParams->find("externalWindowHandle");
 
