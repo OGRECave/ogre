@@ -15,7 +15,6 @@ using namespace std;
 namespace
 {
 	void LoadProgram( GLenum target, GLuint id, char *instring );
-	void StrToUpper(char * string);
 	GLint vpid;
 }
 
@@ -168,16 +167,4 @@ namespace
 			errors.set(str);
 		}
 	}
-	
-	
-	//.----------------------------------------------------------------------------.
-	//|   Function   : StrToUpper                                                  |
-	//|   Description: Converts all lowercase chars in a string to uppercase.      |
-	//.----------------------------------------------------------------------------.
-	void StrToUpper(char *string)
-	{
-		for (unsigned int i = 0; i < strlen(string); i++)
-			string[i] = toupper(string[i]);
-	}
-	
 }

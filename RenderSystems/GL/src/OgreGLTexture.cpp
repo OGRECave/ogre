@@ -61,7 +61,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, GLSupport& support) 
         : Texture(creator, name, handle, group, isManual, loader),
-        mTextureID(0), mGLSupport(support)
+        mTextureID(0)
     {
     }
 
@@ -201,6 +201,8 @@ namespace Ogre {
 								size, tmpdata);
 						}
 						break;
+                    case TEX_TYPE_2D_RECT:
+                        break;
 				};
 				if(width>1)
                     width = width/2;
@@ -243,6 +245,8 @@ namespace Ogre {
 								GL_RGBA, GL_UNSIGNED_BYTE, 0);
 						}
 						break;
+                    case TEX_TYPE_2D_RECT:
+                        break;
 				};
 				if(width>1)
                     width = width/2;

@@ -252,7 +252,6 @@ private:
 	MachineInstContainer mPhase2TEX_mi; /// machine instructions for phase two texture section
 	MachineInstContainer mPhase2ALU_mi; /// machine instructions for phase two ALU section
 
-	MachineInstContainer* mActivePhaseMachineInstructions;
 	// vars used during pass 2
 	MachineInstID mOpType;
 	uint mOpInst;
