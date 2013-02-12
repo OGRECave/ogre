@@ -5,8 +5,8 @@ out vec4 fragColour;
 
 uniform sampler2D RT;
 uniform sampler2D SplotchesTx;
-uniform sampler2D Texture2;
-uniform sampler2D SepiaTx;
+uniform sampler1D Texture2;
+uniform sampler1D SepiaTx;
 uniform float time_cycle_period;
 uniform float flicker;
 uniform float DirtFrequency;
@@ -16,7 +16,7 @@ uniform float lumiShift;
 
 vec2 calcSpriteAddr(vec2 texCoord, float DirtFrequency1, float period)
 {
-   return texCoord + texture(Texture2, vec2(period * DirtFrequency1, 0.0)).xy;
+   return texCoord + texture(Texture2, period * DirtFrequency1).xy;
 }
 
 vec4 getSplotches(vec2 spriteAddr)
@@ -25,7 +25,8 @@ vec4 getSplotches(vec2 spriteAddr)
    spriteAddr = spriteAddr / 6.3;
    spriteAddr = spriteAddr - (spriteAddr / 33.3);
 
-   return texture(SplotchesTx, spriteAddr);
+//   return texture(SplotchesTx, spriteAddr);
+   return vec4(1.0) * texture(SplotchesTx, spriteAddr).r;
 }
 
 void main()
@@ -43,7 +44,7 @@ void main()
    // randomly shift luminance
    lumi -= spriteAddr.x * lumiShift;
    // tone map luminance
-   base.rgb = texture(SepiaTx, vec2(lumi, 0.0)).rgb;
+   base.rgb = texture(SepiaTx, lumi).rgb;
 
    // calc flicker speed
    float darken = fract(flicker * time_cycle_period);
