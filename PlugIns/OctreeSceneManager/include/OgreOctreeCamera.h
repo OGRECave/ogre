@@ -77,7 +77,7 @@ public:
     /* Standard destructor */
     ~OctreeCamera();
 
-    /** Returns the visiblity of the box
+    /** Returns the visibility of the box
     */
     OctreeCamera::Visibility getVisibility( const AxisAlignedBox &bound );
 

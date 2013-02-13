@@ -458,7 +458,7 @@ namespace Ogre {
         /** Shortcut method to determine if the format is a luminance format. */
         static bool isLuminance(PixelFormat format);
 		
-		/** Return wether a certain image extent is valid for this image format.
+		/** Return whether a certain image extent is valid for this image format.
 			@param width
 				The width of the area
 			@param height
@@ -491,7 +491,7 @@ namespace Ogre {
         */
         static String getFormatName(PixelFormat srcformat);
 
-        /** Returns wether the format can be packed or unpacked with the packColour()
+        /** Returns whether the format can be packed or unpacked with the packColour()
         and unpackColour() functions. This is generally not true for compressed and
         depth formats as they are special. It can only be true for formats with a
         fixed element size.

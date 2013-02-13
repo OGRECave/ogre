@@ -40,7 +40,7 @@ THE SOFTWARE.
 #include "macUtils.h"
 #endif
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( RenderSystemCapabilitiesTests );
 
 void RenderSystemCapabilitiesTests::setUp()

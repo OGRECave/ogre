@@ -112,7 +112,7 @@ namespace Volume {
         @param geometricError
             The accepted geometric error.
         @return
-            true if the node should be splitted.
+            true if the node should be split.
         */
         bool doSplit(OctreeNode *node, const Real geometricError) const;
     };

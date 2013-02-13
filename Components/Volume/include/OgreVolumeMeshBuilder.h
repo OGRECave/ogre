@@ -39,7 +39,7 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
 
-    /** Leightweight struct to represent a mesh vertex.
+    /** Lightweight struct to represent a mesh vertex.
     */
     typedef struct _OgreVolumeExport Vertex
     {
@@ -61,7 +61,7 @@ namespace Volume {
         /// Z component of the normal
         Real nZ;
 
-        /** Convinience constructor.
+        /** Convenience constructor.
         @param v
             The vertex position.
         @param n
@@ -77,7 +77,7 @@ namespace Volume {
         }
     } Vertex;
 
-    /** Leightweight triangle.
+    /** Lightweight triangle.
     */
     typedef struct _OgreVolumeExport Triangle
     {
@@ -90,7 +90,7 @@ namespace Volume {
         /// The third triangle corner.
         const Vertex mV2;
         
-        /** Convinience constructor.
+        /** Convenience constructor.
         @param v0
             The first vertex of the triangle.
         @param n0

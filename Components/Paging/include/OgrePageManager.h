@@ -390,7 +390,7 @@ namespace Ogre
 
 		/** Tells the paging system to start tracking a given camera. 
 		@remarks
-			In order for the paging system to funciton it needs to know which
+			In order for the paging system to function it needs to know which
 			Cameras to track. You may not want to have all your cameras affect
 			the paging system, so just add the cameras you want it to keep track of
 			here. 

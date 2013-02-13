@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreFileSystem.h"
 #include "OgreException.h"
 
-// Regsiter the suite
+// Register the suite
 //CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemArchiveTests );
 
 void FileSystemArchiveTests::setUp()

@@ -362,7 +362,7 @@ void CompositorChain::preTargetOperation(CompositorInstance::TargetOperation &op
 		mOurListener.notifyViewport(vp);
 		/// Register it
 		sm->addRenderQueueListener(&mOurListener);
-		/// Set visiblity mask
+		/// Set visibility mask
 		mOldVisibilityMask = sm->getVisibilityMask();
 		sm->setVisibilityMask(op.visibilityMask);
 		/// Set whether we find visibles

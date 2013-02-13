@@ -662,7 +662,7 @@ namespace Ogre
         /** Retrieves a pointer to the window that was created automatically
             @remarks
                 When Root is initialised an optional window is created. This
-                method retreives a pointer to that window.
+                method retrieves a pointer to that window.
             @note
                 returns a null pointer when Root has not been initialised with
                 the option of creating a window.

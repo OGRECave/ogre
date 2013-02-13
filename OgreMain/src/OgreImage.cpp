@@ -112,7 +112,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT( 
 				Exception::ERR_INTERNAL_ERROR,
-				"Can not flip an unitialized texture",
+				"Can not flip an uninitialised texture",
 				"Image::flipAroundY" );
 		}
         
@@ -207,7 +207,7 @@ namespace Ogre {
 		{
 			OGRE_EXCEPT( 
 				Exception::ERR_INTERNAL_ERROR,
-				"Can not flip an unitialized texture",
+				"Can not flip an uninitialised texture",
 				"Image::flipAroundX" );
 		}
         

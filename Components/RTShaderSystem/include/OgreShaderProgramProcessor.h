@@ -140,7 +140,7 @@ protected:
 	struct _OgreRTSSExport MergeCombination
 	{		
 		// The count of each source type. I.E (1 FLOAT1, 0 FLOAT2, 1 FLOAT3, 0 FLOAT4).
-		size_t srcParamterTypeCount[4];
+		size_t srcParameterTypeCount[4];
 		// Source parameters mask. OPM_ALL means all fields used, otherwise it is split source parameter.
 		int srcParameterMask[4];
 
@@ -150,10 +150,10 @@ protected:
 			int float3Count, int float3Mask,
 			int float4Count, int float4Mask)
 		{
-			srcParamterTypeCount[0] = float1Count;
-			srcParamterTypeCount[1] = float2Count;
-			srcParamterTypeCount[2] = float3Count;
-			srcParamterTypeCount[3] = float4Count;
+			srcParameterTypeCount[0] = float1Count;
+			srcParameterTypeCount[1] = float2Count;
+			srcParameterTypeCount[2] = float3Count;
+			srcParameterTypeCount[3] = float4Count;
 			srcParameterMask[0] 	= float1Mask;
 			srcParameterMask[1] 	= float2Mask;
 			srcParameterMask[2] 	= float3Mask;

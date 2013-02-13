@@ -722,7 +722,7 @@ namespace Ogre {
 					//update the material bucket map of the material bucket
 					matBucket->updateContainers(geomBucket, geomBucket->getFormatString() );
 
-					//copy bounding informations
+					//copy bounding information
 					geomBucket->getAABB()=geom->getAABB();
 					geomBucket->setBoundingBox(	geom->getBoundingBox());
 					//now setups the news InstancedObjects.

@@ -77,9 +77,9 @@ void ProgressiveMeshGeneratorBase::getAutoconfig( MeshPtr& inMesh, LodConfig& ou
 		// Radius: Edges are multiplied by the length, when calculating collapse cost. So as a base value we use radius, which should help in balancing collapse cost to any mesh size.
 		// The constant and i5 are playing together. 1/(1/100k*i5)
 		// You need to determine the quality of nearest Lod and the furthest away first.
-		// I have choosen 1/(1/100k*(2^5)) = 3125 for nearest Lod and 1/(1/100k*(5^5)) = 32 for nearest Lod.
+		// I have chosen 1/(1/100k*(2^5)) = 3125 for nearest Lod and 1/(1/100k*(5^5)) = 32 for nearest Lod.
 		// if you divide radius by a bigger number, it means smaller reduction. So radius/3125 is very small reduction for nearest Lod.
-		// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means agressive reduction for furthest away lod.
+		// if you divide radius by a smaller number, it means bigger reduction. So radius/32 means aggressive reduction for furthest away lod.
 		// current values: 3125, 411, 97, 32
 		lodLevel.reductionValue = radius / 100000.f * i5;
 		outLodConfig.levels.push_back(lodLevel);

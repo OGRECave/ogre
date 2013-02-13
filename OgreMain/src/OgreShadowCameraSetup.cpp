@@ -75,7 +75,7 @@ namespace Ogre
 
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane
-			// 0.5 is a litle too close for angles
+			// 0.5 is a little too close for angles
 			Vector3 target = cam->getDerivedPosition() + 
 				(cam->getDerivedDirection() * shadowOffset);
 
@@ -155,7 +155,7 @@ namespace Ogre
 
 			// Calculate look at position
 			// We want to look at a spot shadowOffset away from near plane
-			// 0.5 is a litle too close for angles
+			// 0.5 is a little too close for angles
 			Vector3 target = cam->getDerivedPosition() + 
 				(cam->getDerivedDirection() * shadowOffset);
 

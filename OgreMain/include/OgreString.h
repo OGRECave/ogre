@@ -80,7 +80,7 @@ namespace Ogre {
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
             @remarks
-                The user may specify wether they want to trim only the
+                The user may specify whether they want to trim only the
                 beginning or the end of the String ( the default action is
                 to trim both).
         */

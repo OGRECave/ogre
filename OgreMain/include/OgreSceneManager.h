@@ -749,7 +749,7 @@ namespace Ogre {
 		bool mShadowUseInfiniteFarPlane;
 		bool mShadowCasterRenderBackFaces;
 		bool mShadowAdditiveLightClip;
-		/// Struct for cacheing light clipping information for re-use in a frame
+		/// Struct for caching light clipping information for re-use in a frame
 		struct LightClippingInfo
 		{
 			RealRect scissorRect;
@@ -1760,7 +1760,7 @@ namespace Ogre {
         virtual bool getOption( const String& strKey, void* pDestValue )
         { (void)strKey; (void)pDestValue; return false; }
 
-        /** Method for verifying wether the scene manager has an implementation-specific
+        /** Method for verifying whether the scene manager has an implementation-specific
             option.
             @param
                 strKey The name of the option to check for.
@@ -1793,7 +1793,7 @@ namespace Ogre {
             @param
                 refKeys A reference to a list that will be filled with all the available options.
             @return
-                On success, true is returned. On failiure, false is returned.
+                On success, true is returned. On failure, false is returned.
         */
         virtual bool getOptionKeys( StringVector& refKeys )
         { (void)refKeys; return false; }

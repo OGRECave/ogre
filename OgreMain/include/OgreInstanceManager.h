@@ -49,7 +49,7 @@ namespace Ogre
         must have a unique name. It's wasteless to create two InstanceManagers with the same
         mesh reference, instancing technique and instances per batch count.
         This class takes care of managing batches automatically, so that more are created when
-        needed, and reuse existing ones as much as posible; thus the user doesn't have to worry
+        needed, and reuse existing ones as much as possible; thus the user doesn't have to worry
         of managing all those low level issues.
         @see InstanceBatch & @see InstanceEntity for more information.
 

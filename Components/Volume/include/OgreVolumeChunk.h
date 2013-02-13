@@ -78,7 +78,7 @@ namespace Volume {
         /// The scale of the volume with 1.0 as default.
         Real scale;
 
-        /// The maximum accepted screen space error when chosing the LOD levels to render.
+        /// The maximum accepted screen space error when choosing the LOD levels to render.
         Real maxScreenSpaceError;
         
         /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
@@ -97,7 +97,7 @@ namespace Volume {
     */
     class Chunk;
 
-    /** Data being passed arround while loading.
+    /** Data being passed around while loading.
     */
     typedef struct ChunkRequest
     {

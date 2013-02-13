@@ -269,7 +269,7 @@ namespace Ogre
         */
         virtual void setAspectRatio(Real ratio);
 
-        /** Retreives the current aspect ratio.
+        /** Retrieves the current aspect ratio.
         */
         virtual Real getAspectRatio(void) const;
 

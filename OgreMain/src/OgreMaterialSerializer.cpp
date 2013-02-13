@@ -5044,7 +5044,7 @@ namespace Ogre
         writeValue(quoteWord(program->getName()));
         beginSection(3);
         {
-            // write out paramters
+            // write out parameters
             GpuProgramParameters* defaultParams= 0;
             // does the GPU program have default parameters?
             if (program->hasDefaultParameters())

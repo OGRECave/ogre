@@ -2225,7 +2225,7 @@ namespace Ogre
 			{
 				/* FIXME: The actually input texture coordinate dimensions should
 				be determine by texture coordinate vertex element. Now, just trust
-				user supplied texture type matchs texture coordinate vertex element.
+				user supplied texture type matches texture coordinate vertex element.
 				*/
 				if (mTexStageDesc[stage].texType == D3D9Mappings::D3D_TEX_TYPE_NORMAL)
 				{
@@ -3441,7 +3441,7 @@ namespace Ogre
 		   ) 
 		{
 			OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Attempted to render using the fixed pipeline when it is diabled.",
+				"Attempted to render using the fixed pipeline when it is disabled.",
 				"D3D9RenderSystem::_render");
 		}
 #endif

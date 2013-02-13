@@ -411,10 +411,10 @@ namespace Ogre {
 		static uint32 getDefaultQueryFlags() { return msDefaultQueryFlags; }
 
 		
-        /** Sets the visiblity flags for this object.
+        /** Sets the visibility flags for this object.
         @remarks
 			As well as a simple true/false value for visibility (as seen in setVisible), 
-			you can also set visiblity flags which when 'and'ed with the SceneManager's
+			you can also set visibility flags which when 'and'ed with the SceneManager's
 			visibility mask can also make an object invisible.
         */
         virtual void setVisibilityFlags(uint32 flags) { mVisibilityFlags = flags; }

@@ -23,7 +23,7 @@ The following example shows a different approach to rendering lights in RTSS. A 
 	- Sample requires shader model 3 or higher to run in order
 	- The world is divided into a grid of 9x9 cells (can be easily increased). Each cell receives it's own list of lights appropriate 
 		only for it. This can be increased depending on your situation.
-	- The information of the lights in the grid is transfered onto a texture. Which is sent to the shader.
+	- The information of the lights in the grid is transferred onto a texture. Which is sent to the shader.
 	- The list of lights is iterated over in the shader through a dynamic loop.
 
 

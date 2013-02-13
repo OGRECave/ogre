@@ -85,7 +85,7 @@ namespace Ogre {
 		void setOperationType(RenderOperation::OperationType operationType) { mOperationType = operationType; }
 
         /**
-            Set wether this object resets its buffers each time it updates.
+            Set whether this object resets its buffers each time it updates.
         */
 		void setResetsEveryUpdate(bool resetsEveryUpdate) { mResetsEveryUpdate = resetsEveryUpdate; }
 

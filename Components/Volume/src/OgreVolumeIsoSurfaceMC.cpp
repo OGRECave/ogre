@@ -155,7 +155,7 @@ namespace Volume {
             }
         }
     
-        // Don't generate triangles if we are completly inside and far enough away from the surfacec
+        // Don't generate triangles if we are completely inside and far enough away from the surface
         if (squareIndex == 15 && values[0].w >= maxDistance && values[1].w >= maxDistance && values[2].w >= maxDistance && values[3].w >= maxDistance)
         {
             return;

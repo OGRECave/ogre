@@ -62,7 +62,7 @@ void StencilShadowTest::setupContent()
     light->setCastShadows(true);
     light->setType(Light::LT_POINT);
     
-    // create a ground plane to recieve some shadows
+    // create a ground plane to receive some shadows
     Plane pln = MovablePlane("plane");
     pln.normal = Vector3::UNIT_Y;
     pln.d = 107;

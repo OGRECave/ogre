@@ -143,9 +143,9 @@ namespace Ogre {
         void prepareImpl(void);
         /// @copydoc Resource::unprepareImpl
         void unprepareImpl(void);
-		/// overriden from Resource
+		/// overridden from Resource
 		void loadImpl();
-		/// overriden from Resource
+		/// overridden from Resource
 		void postLoadImpl();
 
         /** Vector of pointers to streams that were pulled from disk by
@@ -164,9 +164,9 @@ namespace Ogre {
 		/// destructor
 		~D3D11Texture();
 
-		/// overriden from Texture
+		/// overridden from Texture
 		void copyToTexture( TexturePtr& target );
-		/// overriden from Texture
+		/// overridden from Texture
 		void loadImage( const Image &img );
 
 

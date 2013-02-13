@@ -36,3 +36,4 @@ if (OGRE_BUILD_PLUGIN_PCZ)
   add_subdirectory(OctreeZone)
 endif (OGRE_BUILD_PLUGIN_PCZ)
 
+add_subdirectory(ManualSceneManager)

@@ -114,7 +114,7 @@ namespace Ogre {
 		// When true, mDirPositionRef is used instead of mDirection to generate particles
 		bool mUseDirPositionRef;
 		// Center position to tell in which direction will particles be emitted according to their position,
-		// usefull for explosions & implosions, some emitters (i.e. point emitter) may not need it.
+		// useful for explosions & implosions, some emitters (i.e. point emitter) may not need it.
         Vector3 mDirPositionRef;
         /// Angle around direction which particles may be emitted, internally radians but angleunits for interface
         Radian mAngle;

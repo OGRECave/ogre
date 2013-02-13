@@ -2073,7 +2073,7 @@ namespace Ogre {
             (normalsAlso && mSoftwareAnimationNormalsRequests == 0))
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Attempt to remove nonexistant request.",
+                        "Attempt to remove nonexistent request.",
                         "Entity::removeSoftwareAnimationRequest");
         }
         mSoftwareAnimationRequests--;

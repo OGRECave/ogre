@@ -55,7 +55,7 @@ protected:
         
         // add the head
         HtmlElement* head = html.appendElement("head");
-        head->appendElement("title")->appendText("OGRE Visual Testing Ouput");
+        head->appendElement("title")->appendText("OGRE Visual Testing Output");
 
         // link the stylesheet
         HtmlElement* css = head->appendElement("link");
