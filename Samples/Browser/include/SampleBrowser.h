@@ -207,7 +207,7 @@ protected:
 
 	/*=============================================================================
 	| The OGRE Sample Browser. Features a menu accessible from all samples,
-	| dynamic configuration, resource reloading, node labelling, and more.
+	| dynamic configuration, resource reloading, node labeling, and more.
 	=============================================================================*/
 	class SampleBrowser : public SampleContext, public SdkTrayListener
 	{
