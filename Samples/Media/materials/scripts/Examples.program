@@ -50,6 +50,13 @@ vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureHLSL hlsl
 vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
 {
     source AmbientOneTexture.glsl
+}
+
+// A really basic ambient pass program, support for one texture coordinate set
+vertex_program Ogre/BasicVertexPrograms/AmbientOneTextureGLSL glsl
+{
+    source AmbientOneTexture.glsl
+    syntax glsl150
 
     default_params
     {
