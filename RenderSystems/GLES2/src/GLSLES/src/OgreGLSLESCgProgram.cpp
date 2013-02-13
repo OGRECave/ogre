@@ -365,7 +365,7 @@ namespace Ogre {
 
        
         int options = 0;
-          //  options |= ETranslateOpUsePrecision; this option doesn't work good with the ogre glsl paramter parser
+          //  options |= ETranslateOpUsePrecision; this option doesn't work good with the ogre glsl parameter parser
 
         // create the parser
         ShHandle  parser = Hlsl2Glsl_ConstructCompiler(lang);

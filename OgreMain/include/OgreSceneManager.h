@@ -1724,7 +1724,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual ViewPoint getSuggestedViewpoint(bool random = false);
 
@@ -1739,7 +1739,7 @@ namespace Ogre {
             @return
                 On success, true is returned.
             @par
-                On failiure, false is returned.
+                On failure, false is returned.
         */
         virtual bool setOption( const String& strKey, const void* pValue )
         { (void)strKey; (void)pValue; return false; }
@@ -1755,7 +1755,7 @@ namespace Ogre {
                 On success, true is returned and pDestValue points to the value of the given
                 option.
             @par
-                On failiure, false is returned and pDestValue is set to NULL.
+                On failure, false is returned and pDestValue is set to NULL.
         */
         virtual bool getOption( const String& strKey, void* pDestValue )
         { (void)strKey; (void)pDestValue; return false; }

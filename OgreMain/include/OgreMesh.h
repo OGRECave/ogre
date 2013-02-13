@@ -599,7 +599,7 @@ namespace Ogre {
 		@param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
 			actually work.
         @param texCoordSetToDestroy The texture coordinate index that will disappear on
-			successfull merges.
+			successful merges.
         */
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
 
