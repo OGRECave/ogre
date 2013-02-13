@@ -66,6 +66,13 @@ namespace Volume {
     }
     
     //-----------------------------------------------------------------------
+
+    void TextureSource::setVolumeGridValue(int x, int y, int z, float value)
+    {
+        mData[(mDepth - z - 1) * mWidthTimesHeight + y * mWidth + x] = value;
+    }
+
+    //-----------------------------------------------------------------------
     
     TextureSource::TextureSource(const String &volumeTextureName, const Real worldWidth, const Real worldHeight, const Real worldDepth, const bool trilinearValue, const bool trilinearGradient, const bool sobelGradient) :
         GridSource(trilinearValue, trilinearGradient, sobelGradient)
@@ -119,12 +126,12 @@ namespace Volume {
                 pbptr += pb.rowPitch;
             }
             pbptr += sliceSkip;
-		}
-		buffer->unlock();
+        }
+        buffer->unlock();
 
-		TextureManager::getSingleton().remove(tex->getHandle());
+        TextureManager::getSingleton().remove(tex->getHandle());
 
-		LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
+        LogManager::getSingleton().stream() << "Processed texture in " << t.getMilliseconds() << "ms.";
     }
         
     //-----------------------------------------------------------------------

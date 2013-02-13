@@ -217,6 +217,43 @@ namespace Volume {
     {
         return mDepth;
     }
+    
+    //-----------------------------------------------------------------------
+    
+    void GridSource::combineWithSource(CSGOperationSource *operation, Source *source, const Vector3 &center, Real radius)
+    {
+        Real worldWidthScale = (Real)1.0 / mPosXScale;
+        Real worldHeightScale = (Real)1.0 / mPosYScale;
+        Real worldDepthScale = (Real)1.0 / mPosZScale;
 
+        operation->setSourceA(this);
+        operation->setSourceB(source);
+        // No need for trilineaer interpolation here as we iterate over the
+        // cells anyway.
+        bool oldTrilinearValue = mTrilinearValue;
+        mTrilinearValue = false;
+        float value;
+        int x, y;
+        int xStart = Math::Clamp((int)(center.x - radius), 0, mWidth);
+        int xEnd = Math::Clamp((int)(center.x + radius), 0, mWidth);
+        int yStart = Math::Clamp((int)(center.y - radius), 0, mHeight);
+        int yEnd = Math::Clamp((int)(center.y + radius), 0, mHeight);
+        int zStart = Math::Clamp((int)(center.z - radius), 0, mDepth);
+        int zEnd = Math::Clamp((int)(center.z + radius), 0, mDepth);
+
+        for (int z = zStart; z < zEnd; ++z)
+        {
+            for (y = yStart; y < yEnd; ++y)
+            {
+                for (x = xStart; x < xEnd; ++x)
+                {
+                    value = operation->getValue(Vector3(x * worldWidthScale, y * worldHeightScale, z * worldDepthScale));
+                    setVolumeGridValue(x, z, y, value);
+                }
+            }
+        }
+
+        mTrilinearValue = oldTrilinearValue;
+    }
 }
 }
