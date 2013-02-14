@@ -46,6 +46,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
 	GLSLProgram::CmdPreprocessorDefines GLSLProgram::msCmdPreprocessorDefines;
     GLSLProgram::CmdAttach GLSLProgram::msCmdAttach;
+    GLSLProgram::CmdColumnMajorMatrices GLSLProgram::msCmdColumnMajorMatrices;
 	GLSLProgram::CmdInputOperationType GLSLProgram::msInputOperationTypeCmd;
 	GLSLProgram::CmdOutputOperationType GLSLProgram::msOutputOperationTypeCmd;
 	GLSLProgram::CmdMaxOutputVertices GLSLProgram::msMaxOutputVerticesCmd;
@@ -59,6 +60,7 @@ namespace Ogre {
 		, mGLShaderHandle(0)
         , mGLProgramHandle(0)
         , mCompiled(0)
+        , mColumnMajorMatrices(true)
     {
         if (createParamDictionary("GLSLProgram"))
         {
@@ -71,6 +73,9 @@ namespace Ogre {
             dict->addParameter(ParameterDef("attach", 
                 "name of another GLSL program needed by this program",
                 PT_STRING),&msCmdAttach);
+            dict->addParameter(ParameterDef("column_major_matrices",
+                                            "Whether matrix packing in column-major order.",
+                                            PT_BOOL),&msCmdColumnMajorMatrices);
 			dict->addParameter(
 				ParameterDef("input_operation_type",
 				"The input operation type for this geometry program. \
@@ -366,6 +371,15 @@ namespace Ogre {
 		{
 	        static_cast<GLSLProgram*>(target)->attachChildShader(vecShaderNames[i]);
 		}
+    }
+    //-----------------------------------------------------------------------
+    String GLSLProgram::CmdColumnMajorMatrices::doGet(const void *target) const
+    {
+        return StringConverter::toString(static_cast<const GLSLProgram*>(target)->getColumnMajorMatrices());
+    }
+    void GLSLProgram::CmdColumnMajorMatrices::doSet(void *target, const String& val)
+    {
+        static_cast<GLSLProgram*>(target)->setColumnMajorMatrices(StringConverter::parseBool(val));
     }
 	//-----------------------------------------------------------------------
 	String GLSLProgram::CmdPreprocessorDefines::doGet(const void *target) const

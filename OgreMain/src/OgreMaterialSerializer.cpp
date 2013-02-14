@@ -1939,6 +1939,21 @@ namespace Ogre
             }
             isReal = true;
         }
+        else if ((start = vecparams[1].find("double")) != String::npos)
+        {
+            // find the dimensionality
+            start = vecparams[1].find_first_not_of("double");
+            // Assume 1 if not specified
+            if (start == String::npos)
+            {
+                dims = 1;
+            }
+            else
+            {
+                dims = StringConverter::parseInt(vecparams[1].substr(start));
+            }
+            isReal = true;
+        }
         else if ((start = vecparams[1].find("int")) != String::npos)
         {
             // find the dimensionality
@@ -5107,7 +5122,7 @@ namespace Ogre
 			}
 
 			writeGpuProgramParameter("param_named", 
-				paramName, autoEntry, defaultAutoEntry, def.isFloat(), 
+				paramName, autoEntry, defaultAutoEntry, def.isFloat(), def.isDouble(),
 				def.physicalIndex, def.elementSize * def.arraySize,
 				params, defaultParams, level, useMainBuffer);
 		}
@@ -5144,9 +5159,37 @@ namespace Ogre
 
 				writeGpuProgramParameter("param_indexed", 
 					StringConverter::toString(logicalIndex), autoEntry, 
-					defaultAutoEntry, true, logicalUse.physicalIndex, 
+					defaultAutoEntry, true, false, logicalUse.physicalIndex,
 					logicalUse.currentSize,
 					params, defaultParams, level, useMainBuffer);
+			}
+		}
+
+        // double params
+		GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
+        if( !doubleLogical.isNull() )
+		{
+			OGRE_LOCK_MUTEX(floatLogical->mutex)
+
+			for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
+				i != doubleLogical->map.end(); ++i)
+			{
+				size_t logicalIndex = i->first;
+				const GpuLogicalIndexUse& logicalUse = i->second;
+
+				const GpuProgramParameters::AutoConstantEntry* autoEntry =
+                params->findDoubleAutoConstantEntry(logicalIndex);
+				const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
+				if (defaultParams)
+				{
+					defaultAutoEntry = defaultParams->findDoubleAutoConstantEntry(logicalIndex);
+				}
+
+				writeGpuProgramParameter("param_indexed",
+                                         StringConverter::toString(logicalIndex), autoEntry,
+                                         defaultAutoEntry, false, true, logicalUse.physicalIndex,
+                                         logicalUse.currentSize,
+                                         params, defaultParams, level, useMainBuffer);
 			}
 		}
 
@@ -5172,7 +5215,7 @@ namespace Ogre
 
 				writeGpuProgramParameter("param_indexed", 
 					StringConverter::toString(logicalIndex), autoEntry, 
-					defaultAutoEntry, false, logicalUse.physicalIndex, 
+					defaultAutoEntry, false, false, logicalUse.physicalIndex,
 					logicalUse.currentSize,
 					params, defaultParams, level, useMainBuffer);
 			}
@@ -5185,7 +5228,7 @@ namespace Ogre
 		const String& commandName, const String& identifier, 
 		const GpuProgramParameters::AutoConstantEntry* autoEntry, 
 		const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-		bool isFloat, size_t physicalIndex, size_t physicalSize,
+		bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
 		const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
 		const ushort level, const bool useMainBuffer)
 	{
@@ -5225,6 +5268,13 @@ namespace Ogre
 						params->getFloatPointer(physicalIndex), 
 						defaultParams->getFloatPointer(physicalIndex),
 						sizeof(float) * physicalSize) != 0;
+				}
+				else if (isDouble)
+				{
+					different = memcmp(
+						params->getDoublePointer(physicalIndex),
+						defaultParams->getDoublePointer(physicalIndex),
+						sizeof(double) * physicalSize) != 0;
 				}
 				else
 				{
@@ -5290,6 +5340,18 @@ namespace Ogre
 					for (size_t f = 0 ; f < physicalSize; ++f)
 					{
 						writeValue(StringConverter::toString(*pFloat++), useMainBuffer);
+					}
+				}
+				else if (isDouble)
+				{
+					// Get pointer to start of values
+					const double* pDouble = params->getDoublePointer(physicalIndex);
+
+					writeValue("double" + countLabel, useMainBuffer);
+					// iterate through real constants
+					for (size_t f = 0 ; f < physicalSize; ++f)
+					{
+						writeValue(StringConverter::toString(*pDouble++), useMainBuffer);
 					}
 				}
 				else
