@@ -307,6 +307,8 @@ namespace OgreBites
 
             if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
 
+            mLastRun = true;  // assume this is our last run
+
             setup();
 
             if (!mFirstRun) recoverLastSample();
@@ -569,6 +571,10 @@ namespace OgreBites
 		}
 #endif
 
+        bool isFirstRun() { return mFirstRun; }
+        void setFirstRun(bool flag) { mFirstRun = flag; }
+        bool isLastRun() { return mLastRun; }
+        void setLastRun(bool flag) { mLastRun = flag; }
 	protected:
 
         /*-----------------------------------------------------------------------------
