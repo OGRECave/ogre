@@ -198,15 +198,15 @@ namespace Ogre {
 		RenderOperation::OperationType mOutputOperationType;
 		/// The maximum amount of vertices that this (geometry) program can output
 		int mMaxOutputVertices;
-		/// attached Shader names
+		/// Attached Shader names
 		String mAttachedShaderNames;
 		/// Preprocessor options
 		String mPreprocessorDefines;
-		/// container of attached programs
+		/// Container of attached programs
 		typedef vector< GLSLProgram* >::type GLSLProgramContainer;
 		typedef GLSLProgramContainer::iterator GLSLProgramContainerIterator;
 		GLSLProgramContainer mAttachedGLSLPrograms;
-        /// matrix in column major pack format?
+        /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
 
     };
