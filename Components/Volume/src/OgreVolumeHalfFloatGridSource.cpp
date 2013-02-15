@@ -65,7 +65,21 @@ namespace Volume {
 
         return Bitwise::halfToFloat(mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y]);
     }
-    
+
+    //-----------------------------------------------------------------------
+
+    void HalfFloatGridSource::setVolumeGridValue(int x, int y, int z, float value)
+    {
+
+        // Clamp if wanted.
+        if (mMaxClampedAbsoluteDensity != (Real)0.0 && Math::Abs(value) > mMaxClampedAbsoluteDensity)
+        {
+            value = mMaxClampedAbsoluteDensity;
+        }
+        
+        mData[(mDepth - z - 1) * mDepthTimesHeight + x * mHeight + y] = Bitwise::floatToHalf(value);
+    }
+
     //-----------------------------------------------------------------------
     
     HalfFloatGridSource::HalfFloatGridSource(const String &serializedVolumeFile, const bool trilinearValue, const bool trilinearGradient, const bool sobelGradient) :
@@ -113,6 +127,21 @@ namespace Volume {
         LogManager::getSingleton().stream() << "Processed serialization in " << t.getMilliseconds() << "ms.";
     }
         
+    //-----------------------------------------------------------------------
+
+    void HalfFloatGridSource::setMaxClampedAbsoluteDensity(Real maxClampedAbsoluteDensity)
+    {
+        mMaxClampedAbsoluteDensity = maxClampedAbsoluteDensity;
+    }
+
+    //-----------------------------------------------------------------------
+
+
+    Real HalfFloatGridSource::getMaxClampedAbsoluteDensity(void) const
+    {
+        return mMaxClampedAbsoluteDensity;
+    }
+
     //-----------------------------------------------------------------------
 
     HalfFloatGridSource::~HalfFloatGridSource(void)

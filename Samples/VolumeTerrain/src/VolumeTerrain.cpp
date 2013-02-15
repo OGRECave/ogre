@@ -151,7 +151,6 @@ bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseBu
 
     if (id == OIS::MB_Middle)
     {
-            LogManager::getSingleton().stream() << "SCALE: " << mVolumeRoot->getScale();
         Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
         shootRay(ray);
     }
