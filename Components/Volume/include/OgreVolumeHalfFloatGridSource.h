@@ -47,9 +47,17 @@ namespace Volume {
         /// To have a little bit faster data access.
         int mDepthTimesHeight;
 
+        /// The maximum absolute density value to be written into the data when combining,
+        /// influencing the compression rate on serialization.
+        Real mMaxClampedAbsoluteDensity;
+        
         /** Overridden from GridSource.
         */
         virtual float getVolumeGridValue(int x, int y, int z) const;
+
+        /** Overridden from GridSource.
+        */
+        virtual void setVolumeGridValue(int x, int y, int z, float value);
 
     public:
 
@@ -65,6 +73,20 @@ namespace Volume {
         */
         explicit HalfFloatGridSource(const String &serializedVolumeFile, const bool trilinearValue = true, const bool trilinearGradient = false, const bool sobelGradient = false);
         
+        /** Sets the maximum absolute density value to be written into the data when combining,
+        influencing the compression rate on serialization. Set it to 0.0 to deactivate.
+        @param maxClampedAbsoluteDensity
+            The maximum absolute density value.
+        */
+        void setMaxClampedAbsoluteDensity(Real maxClampedAbsoluteDensity);
+        
+        /** Gets the maximum absolute density value to be written into the data when combining,
+        influencing the compression rate on serialization.
+        @return
+            The maximum absolute density value, 0.0 when deactivated.
+        */
+        Real getMaxClampedAbsoluteDensity(void) const;
+
         /** Destructor.
         */
         ~HalfFloatGridSource(void);

@@ -30,8 +30,9 @@ THE SOFTWARE.
 
 #include "OgreVector4.h"
 
-#include "OgreVolumeSource.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreVolumeSource.h"
+#include "OgreVolumeCSGSource.h"
 
 namespace Ogre {
 namespace Volume {
@@ -61,7 +62,7 @@ namespace Volume {
         int mDepth;
 
         // Whether to use trilinear filtering or not for the value.
-        const bool mTrilinearValue;
+        bool mTrilinearValue;
         
         // Whether to use trilinear filtering or not for the gradient.
         const bool mTrilinearGradient;
@@ -88,6 +89,18 @@ namespace Volume {
             The density.
         */
         virtual float getVolumeGridValue(int x, int y, int z) const = 0;
+        
+        /** Sets the volume value of a position.
+        @param x
+            The x position.
+        @param y
+            The y position.
+        @param z
+            The z position.
+        @param value
+            The density to be set.
+        */
+        virtual void setVolumeGridValue(int x, int y, int z, float value) = 0;
 
         /** Gets a gradient of a point with optional sobel blurring.
         @param x
@@ -153,6 +166,22 @@ namespace Volume {
             The depth of the texture.
         */
         size_t getDepth(void) const;
+
+        /** Updates this grid with another source in a certain area. Use
+        it for example to add spheres as a brush.
+        @param operation
+            The operation to use, will use this source and the other given one as operands. Beware that
+            this function overrides the maybe existing sources in the operation.
+        @param source
+            The other source to combine this one with.
+        @param center
+            The rough center of the affected area by the operation. If the other source is a sphere, take
+            its center for example.
+        @param radius
+            The radius of the affected area. For the example sphere, you might use its radius times two
+            because the density outside of the sphere is needed, too.
+        */
+        virtual void combineWithSource(CSGOperationSource *operation, Source *source, const Vector3 &center, Real radius);
     };
 
 }
