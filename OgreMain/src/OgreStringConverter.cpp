@@ -49,6 +49,47 @@ namespace Ogre {
         return stream.str();
 #endif
     }
+#if OGRE_DOUBLE_PRECISION == 1
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(float val, unsigned short precision,
+                                     unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		static char buffer[128] = "";
+		int n = snprintf(buffer, 128, "%f", val);
+		return String(buffer, n);
+#else
+        stringstream stream;
+        stream.precision(precision);
+        stream.width(width);
+        stream.fill(fill);
+        if (flags)
+            stream.setf(flags);
+        stream << val;
+        return stream.str();
+#endif
+    }
+#else
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(double val, unsigned short precision,
+                                     unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		static char buffer[128] = "";
+		int n = snprintf(buffer, 128, "%f", val);
+		return String(buffer, n);
+#else
+        stringstream stream;
+        stream.precision(precision);
+        stream.width(width);
+        stream.fill(fill);
+        if (flags)
+            stream.setf(flags);
+        stream << val;
+        return stream.str();
+#endif
+    }
+#endif
     //-----------------------------------------------------------------------
     String StringConverter::toString(int val, 
         unsigned short width, char fill, std::ios::fmtflags flags)

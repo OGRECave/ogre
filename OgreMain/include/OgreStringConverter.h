@@ -73,6 +73,17 @@ namespace Ogre {
         static String toString(Real val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0) );
+#if OGRE_DOUBLE_PRECISION == 1
+        /** Converts a float to a String. */
+        static String toString(float val, unsigned short precision = 6,
+                               unsigned short width = 0, char fill = ' ',
+                               std::ios::fmtflags flags = std::ios::fmtflags(0) );
+#else
+        /** Converts a double to a String. */
+        static String toString(double val, unsigned short precision = 6,
+                               unsigned short width = 0, char fill = ' ',
+                               std::ios::fmtflags flags = std::ios::fmtflags(0) );
+#endif
         /** Converts a Radian to a String. */
         static String toString(Radian val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
