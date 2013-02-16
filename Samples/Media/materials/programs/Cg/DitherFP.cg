@@ -4,7 +4,7 @@ sampler2D pattern : register(s1);
 half4 Dither_ps(float4 pos : POSITION, float2 TexCoord : TEXCOORD0) : COLOR
 {	
 	half c = dot(tex2D(RT, TexCoord),half4(0.30,0.11,0.59,0.00));
-	half n = tex2D(pattern, TexCoord).a*2 - 1.0;
+	half n = tex2D(pattern, TexCoord).r*2 - 1.0;
 	c += n;
 	if (c > 0.5)
 	{
