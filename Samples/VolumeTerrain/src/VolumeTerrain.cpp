@@ -146,9 +146,19 @@ void Sample_VolumeTerrain::shootRay(Ray ray)
 
 //-----------------------------------------------------------------------
 
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+bool Sample_VolumeTerrain::touchPressed(const OIS::MultiTouchEvent& evt)
+{
+    Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
+    shootRay(ray);
+
+    return SdkSample::touchPressed(evt);
+}
+
+#else
+
 bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)
 {
-
     if (id == OIS::MB_Middle)
     {
         Ray ray(mCamera->getPosition() / mVolumeRoot->getScale(), -mCamera->getOrientation().zAxis());
@@ -157,7 +167,7 @@ bool Sample_VolumeTerrain::mousePressed(const OIS::MouseEvent& evt, OIS::MouseBu
 
     return SdkSample::mousePressed(evt, id);
 }
-
+#endif
 //-----------------------------------------------------------------------
 
 #ifndef OGRE_STATIC_LIB

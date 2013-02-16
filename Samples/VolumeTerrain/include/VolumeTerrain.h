@@ -90,7 +90,11 @@ public:
     
     /** Overridden from SdkSample.
     */
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+    virtual bool touchPressed(const OIS::MultiTouchEvent& evt);
+#else
     virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id);
+#endif
 };
 
 #endif
