@@ -2931,9 +2931,8 @@ namespace Ogre {
     {
         LogManager::getSingleton().logMessage("********************************************");
         LogManager::getSingleton().logMessage("*** OpenGL ES 1.x Reset Renderer Started ***");
-        LogManager::getSingleton().logMessage("********************************************");
+        LogManager::getSingleton().logMessage("********************************************");        
         
-        mStateCacheManager->clearCache();
         initialiseContext(win);
         
         mGLSupport->initialiseExtensions();
@@ -2952,6 +2951,7 @@ namespace Ogre {
         
         GLESRenderSystem::mResourceManager->notifyOnContextReset();
         
+		mStateCacheManager->clearCache();
         _setViewport(NULL);
         _setRenderTarget(win);
     }

@@ -2218,6 +2218,7 @@ namespace Ogre {
         
         GLES2RenderSystem::mResourceManager->notifyOnContextReset();
         
+		mStateCacheManager->clearCache();
         _setViewport(NULL);
         _setRenderTarget(win);
     }
