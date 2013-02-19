@@ -668,7 +668,6 @@ namespace Ogre {
                 [mWindow setContentView:mView];
                 [mWindow setFrameOrigin:NSZeroPoint];
                 [mWindow setLevel:NSMainMenuWindowLevel+1];
-                [NSApp activateIgnoringOtherApps:YES];
 
                 mWindowOrigin = mWindow.frame.origin;
                 mLeft = mTop = 0;
@@ -699,6 +698,7 @@ namespace Ogre {
             
             // Even though OgreCocoaView doesn't accept first responder, it will get passed onto the next in the chain
             [mWindow makeFirstResponder:mView];
+            [NSApp activateIgnoringOtherApps:YES];
         }
     }
 
