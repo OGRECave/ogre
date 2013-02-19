@@ -196,11 +196,6 @@ namespace Ogre {
             }
         }
 
-        if ((opt = mGLSupport->getConfigOptions().find("Content Scaling Factor")) != end)
-        {
-            mContentScalingFactor = StringConverter::parseReal(opt->second.currentValue);
-        }
-
         // Set us up with an external window, or create our own.
         if(!mIsExternal)
         {
@@ -314,6 +309,14 @@ namespace Ogre {
         mWidth = width;
         mHeight = height;
 
+        // Check the configuration. This may be overridden later by the value sent via miscParams
+        ConfigOptionMap::const_iterator configOpt;
+        ConfigOptionMap::const_iterator configEnd = mGLSupport->getConfigOptions().end();
+        if ((configOpt = mGLSupport->getConfigOptions().find("Content Scaling Factor")) != configEnd)
+        {
+            mContentScalingFactor = StringConverter::parseReal(configOpt->second.currentValue);
+        }
+
         if (miscParams)
         {
             NameValuePairList::const_iterator opt;
@@ -329,7 +332,7 @@ namespace Ogre {
             {
                 frequency = (short)StringConverter::parseInt(opt->second);
             }
-            
+
             if ((opt = miscParams->find("contentScalingFactor")) != end)
             {
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
