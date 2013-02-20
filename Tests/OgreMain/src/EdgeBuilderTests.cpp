@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreVertexIndexData.h"
 #include "OgreEdgeListBuilder.h"
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( EdgeBuilderTests );
 
 void EdgeBuilderTests::setUp()

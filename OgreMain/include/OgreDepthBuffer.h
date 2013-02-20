@@ -50,7 +50,7 @@ namespace Ogre
 		and have the same bit depth and same multisample settings. Depth Buffers are created automatically
 		for new RTs when needed, and stored in the pool where the RenderTarget should have drawn from.
 		By default, all RTs have the Id POOL_DEFAULT, which means all depth buffers are stored by default
-		in that pool. By chosing a different Pool Id for a specific RenderTarget, that RT will only
+		in that pool. By choosing a different Pool Id for a specific RenderTarget, that RT will only
 		retrieve depth buffers from _that_ pool, therefore not conflicting with sharing depth buffers
 		with other RTs (such as shadows maps).
 		Setting an RT to POOL_MANUAL_USAGE means Ogre won't manage the DepthBuffer for you (not recommended)

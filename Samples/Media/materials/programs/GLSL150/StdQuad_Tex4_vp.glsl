@@ -2,10 +2,10 @@
 
 uniform mat4 worldViewProj;
 in vec4 vertex;
-out vec2 uv0;
-out vec2 uv1;
-out vec2 uv2;
-out vec2 uv3;
+out vec2 oUv0;
+out vec2 oUv1;
+out vec2 oUv2;
+out vec2 oUv3;
 out vec4 pos;
 
 void main()
@@ -18,7 +18,8 @@ void main()
 
     // Convert to image-space
     uv0 = (vec2(inPos.x, -inPos.y) + 1.0) * 0.5;
-    uv1 = uv0;
-    uv2 = uv0;
-    uv3 = uv0;
+    oUv1 = oUv0;
+    oUv2 = oUv0;
+    oUv3 = oUv0;
+    pos = gl_Position;
 }

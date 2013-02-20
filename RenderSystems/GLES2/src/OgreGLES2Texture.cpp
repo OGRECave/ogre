@@ -109,7 +109,8 @@ namespace Ogre {
         
 		// Adjust format if required
         mFormat = TextureManager::getSingleton().getNativeFormat(mTextureType, mFormat, mUsage);
-        
+        GLenum texTarget = getGLES2TextureTarget();
+
 		// Check requested number of mipmaps
         size_t maxMips = GLES2PixelUtil::getMaxMipmaps(mWidth, mHeight, mDepth, mFormat);
         
@@ -124,16 +125,16 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGenTextures(1, &mTextureID));
            
 		// Set texture type
-		mGLSupport.getStateCacheManager()->bindGLTexture(getGLES2TextureTarget(), mTextureID);
+		mGLSupport.getStateCacheManager()->bindGLTexture(texTarget, mTextureID);
         
         // If we can do automip generation and the user desires this, do so
         mMipmapsHardwareGenerated =
         Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_AUTOMIPMAP) && !PixelUtil::isCompressed(mFormat);
         
 #if GL_APPLE_texture_max_level && OGRE_PLATFORM != OGRE_PLATFORM_NACL
-		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+		 mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL_APPLE, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 #elif OGRE_NO_GLES3_SUPPORT == 0
-		 mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
+		 mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_MAX_LEVEL, (mMipmapsHardwareGenerated && (mUsage & TU_AUTOMIPMAP)) ? maxMips : mNumMipmaps );
 
         // Set up texture swizzling
         switch(mFormat)
@@ -141,29 +142,29 @@ namespace Ogre {
 		case PF_A8R8G8B8:
 		case PF_X8R8G8B8:
 		case PF_R8G8B8:
-	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_RED);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 			break;
 
 		default:
-	        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_R, GL_RED);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		    mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(), GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		    mGLSupport.getStateCacheManager()->setTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 			break;
 		}
 #endif
 
 		// Set some misc default parameters, these can of course be changed later
-		mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+		mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        mGLSupport.getStateCacheManager()->setTexParameteri(getGLES2TextureTarget(),
+        mGLSupport.getStateCacheManager()->setTexParameteri(texTarget,
                                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         // Allocate internal buffer so that glTexSubImageXD can be used

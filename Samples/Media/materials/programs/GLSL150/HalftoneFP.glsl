@@ -20,6 +20,6 @@ void main()
 	local.xy = local.xy * numTiles;
 	middle +=  iNumTiles2;
 	local.z = dot(texture(RT, middle), lum);
-	vec4 c = vec4(texture(noise,local).a);
+	vec4 c = vec4(texture(noise,local).r);
 	fragColour = c;
 }

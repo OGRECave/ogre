@@ -98,6 +98,7 @@ material Ogre/Compositor/Blur0
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Blur0_ps20
 			{
@@ -121,6 +122,7 @@ material Ogre/Compositor/Blur0
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Blur_ps_gl_unified
 			{
@@ -149,6 +151,7 @@ material Ogre/Compositor/Blur1
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Blur1_ps20
 			{
@@ -173,6 +176,7 @@ material Ogre/Compositor/Blur1
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			fragment_program_ref Blur_ps_gl_unified
 			{
@@ -205,6 +209,7 @@ material Ogre/Compositor/BloomBlend
             cull_hardware none
             depth_check off
             scene_blend alpha_blend
+            polygon_mode_overrideable false
 
             texture_unit
             {

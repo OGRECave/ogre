@@ -182,6 +182,36 @@ namespace Volume {
             The second operator.
         */
         CSGOperationSource(const Source *a, const Source *b);
+
+        /** Constructor, sets the sources to null.
+        Protected to be callable from child classes.
+        */
+        CSGOperationSource(void);
+    public:
+        
+        /** Gets the first operator source.
+        @return
+            The first operator source.
+        */
+        virtual const Source* getSourceA() const;
+        
+        /** Sets the first operator source.
+        @param a
+            The first operator source.
+        */
+        virtual void setSourceA(Source *a);
+
+        /** Gets the second operator source.
+        @return
+            The second operator source.
+        */
+        virtual const Source* getSourceB(void) const;
+        
+        /** Sets the second operator source.
+        @param a
+            The second operator source.
+        */
+        virtual void setSourceB(Source *b);
     };
 
     /** Builds the intersection between two sources.
@@ -197,6 +227,10 @@ namespace Volume {
             The second operator.
         */
         CSGIntersectionSource(const Source *a, const Source *b);
+
+        /** Constructor, sets the sources to null.
+        */
+        CSGIntersectionSource(void);
         
         /** Overridden from Source.
         */
@@ -220,6 +254,10 @@ namespace Volume {
             The second operator.
         */
         CSGUnionSource(const Source *a, const Source *b);
+
+        /** Constructor, sets the sources to null.
+        */
+        CSGUnionSource(void);
         
         /** Overridden from Source.
         */
@@ -244,6 +282,10 @@ namespace Volume {
             The second operator.
         */
         CSGDifferenceSource(const Source *a, const Source *b);
+
+        /** Constructor, sets the sources to null.
+        */
+        CSGDifferenceSource(void);
         
         /** Overridden from Source.
         */
@@ -268,6 +310,25 @@ namespace Volume {
             The operator.
         */
         CSGUnarySource(const Source *src);
+
+        /** Constructor. Sets the source to null.
+        Protected to be callable from child classes.
+        */
+        CSGUnarySource(void);
+
+    public:
+
+        /** Gets the source.
+        @return
+            The  source.
+        */
+        virtual const Source* getSource(void) const;
+        
+        /** Sets the source.
+        @param src
+            The source.
+        */
+        virtual void setSource(Source *a);
     };
 
     /** Negates the given volume.
@@ -281,6 +342,10 @@ namespace Volume {
             The source to negate.
         */
         explicit CSGNegateSource(const Source *src);
+        
+        /** Constructor. Sets the source to null.
+        */
+        CSGNegateSource(void);
         
         /** Overridden from Source.
         */
@@ -374,7 +439,7 @@ namespace Volume {
             The seed to initialize the random number generator with.
         */
         CSGNoiseSource(const Source *src, Real *frequencies, Real *amplitudes, size_t numOctaves, long seed);
-        
+                
         /** Constructor with current time as seed.
         @param src
             The source to add the noise to.

@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( RadixSortTests );
 
 void RadixSortTests::setUp()

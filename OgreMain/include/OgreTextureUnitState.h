@@ -919,7 +919,7 @@ namespace Ogre {
             is a 'fish-eye' lens view of a scene, or a 3D cubic environment map which requires 6 textures
             for each side of the inside of a cube. The type depends on what texture you set up - if you use the
             setTextureName method then a 2D fisheye lens texture is required, whereas if you used setCubicTextureName
-            then a cubic environemnt map will be used.
+            then a cubic environment map will be used.
         @par
             This effect works best if the object has lots of gradually changing normals. The texture also
             has to be designed for this effect - see the example spheremap.png included with the sample

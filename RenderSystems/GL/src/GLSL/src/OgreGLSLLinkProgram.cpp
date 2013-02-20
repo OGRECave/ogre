@@ -497,7 +497,7 @@ namespace Ogre {
                             foundAttr = true;
                         }
 					}
-                    // Find the position of the next occurance if needed
+                    // Find the position of the next occurrence if needed
                     pos = vpSource.find(a.name, pos + a.name.length());
 				}
 			}

@@ -1,7 +1,6 @@
 syntax: glob
 testTerrain*.dat
 *.dll
-Dependencies/include/FreeImage.h
 #*.vcxproj
 #*.filters
 *.vcxproj.user
@@ -12,7 +11,10 @@ Dependencies/include/FreeImage.h
 *.rule
 *.sdf
 Dependencies/*
+iOSDependencies
 build/*
+SDK/OSX/sdk_contents
+SDK/iOS/sdk_contents
 Samples/Browser/WinRT/Debug
 Samples/Browser/WinRT/Release
 Samples/Browser/WinRT/Generated Files

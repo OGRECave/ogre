@@ -31,7 +31,8 @@ THE SOFTWARE.
 #include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreProgressiveMesh.h"
+#include "OgreProgressiveMeshGenerator.h"
+#include "OgreDistanceLodStrategy.h"
 #include "OgreHardwareVertexBuffer.h"
 
 #include <iostream>
@@ -433,7 +434,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 			}
 			else
 			{
-				response == "";
+				response = "";
 			}
 			
 		}
@@ -445,7 +446,7 @@ void reorganiseVertexBuffers(const String& desc, Mesh& mesh, SubMesh* sm, Vertex
 		while (response.empty())
 		{
 			displayVertexBuffers(elemList);
-			cout << "Really reorganise the vertex buffers this way?";
+			cout << "Really reorganise the vertex buffers this way? ";
 			cin >> response;
 			StringUtil::toLowerCase(response);
 			if (response == "y")
@@ -566,7 +567,7 @@ void vertexBufferReorg(Mesh& mesh)
 	{
 
 		// Check to see whether we would like to reorganise vertex buffers
-		std::cout << "\nWould you like to reorganise the vertex buffers for this mesh?";
+		std::cout << "\nWould you like to reorganise the vertex buffers for this mesh? ";
 		while (response.empty())
 		{
 			cin >> response;
@@ -616,7 +617,7 @@ void buildLod(Mesh* mesh)
 		if (mesh->getNumLodLevels() > 1)
 		{
 			std::cout << "\nXML already contains level-of detail information.\n"
-				"Do you want to: (u)se it, (r)eplace it, or (d)rop it?";
+				"Do you want to: (u)se it, (r)eplace it, or (d)rop it? ";
 			while (response == "")
 			{
 				cin >> response;
@@ -643,7 +644,7 @@ void buildLod(Mesh* mesh)
 		}
 		else // no existing LOD
 		{
-			std::cout << "\nWould you like to generate LOD information? (y/n)";
+			std::cout << "\nWould you like to generate LOD information? (y/n) ";
 			while (response == "")
 			{
 				cin >> response;
@@ -664,71 +665,77 @@ void buildLod(Mesh* mesh)
 	if (genLod)
 	{
 		unsigned short numLod;
-		ProgressiveMesh::VertexReductionQuota quota;
-		Real reduction;
-		Mesh::LodValueList distanceList;
+        LodConfig lodConfig;
+		lodConfig.levels.clear();
+		lodConfig.mesh = mesh->clone(mesh->getName());
+		lodConfig.strategy = DistanceLodStrategy::getSingletonPtr();
 
 		if (askLodDtls)
 		{
-			cout << "\nHow many extra LOD levels would you like to generate?";
+            LodLevel lodLevel;
+			cout << "\nHow many extra LOD levels would you like to generate? ";
 			cin >> numLod;
 
 			cout << "\nWhat unit of reduction would you like to use:" <<
-				"\n(f)ixed or (p)roportional?";
+				"\n(f)ixed or (p)roportional? ";
 			cin >> response;
 			StringUtil::toLowerCase(response);
 			if (response == "f")
 			{
-				quota = ProgressiveMesh::VRQ_CONSTANT;
-				cout << "\nHow many vertices should be removed at each LOD?";
+				lodLevel.reductionMethod = LodLevel::VRM_CONSTANT;
 			}
 			else
 			{
-				quota = ProgressiveMesh::VRQ_PROPORTIONAL;
-				cout << "\nWhat percentage of remaining vertices should be removed "
-					"\at each LOD (e.g. 50)?";
-			}
-			cin >> reduction;
-			if (quota == ProgressiveMesh::VRQ_PROPORTIONAL)
-			{
-				// Percentage -> parametric
-				reduction = reduction * 0.01f;
+				lodLevel.reductionMethod = LodLevel::VRM_PROPORTIONAL;
 			}
 
-			cout << "\nEnter the distance for each LOD to come into effect.";
-
-			Real distance;
-			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
+            for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
-				cout << "\nLOD Level " << (iLod+1) << ":";
-				cin >> distance;
-				distanceList.push_back(distance);
+                if (lodLevel.reductionMethod == LodLevel::VRM_PROPORTIONAL)
+                {
+                    cout << "\nWhat percentage of remaining vertices should be removed "
+                    "at each LOD (e.g. 50)? ";
+                }
+                else
+                {
+                    cout << "\nHow many vertices should be removed at each LOD? ";
+                }
+                cin >> lodLevel.reductionValue;
+
+                cout << "\nEnter the distance for each LOD to come into effect. ";
+
+				cout << "\nLOD Level " << (iLod+1) << ": ";
+				cin >> lodLevel.distance;
+                lodConfig.levels.push_back(lodLevel);
 			}
 		}
 		else
 		{
-			numLod = opts.numLods;
-			quota = opts.usePercent? 
-				ProgressiveMesh::VRQ_PROPORTIONAL : ProgressiveMesh::VRQ_CONSTANT;
-			if (opts.usePercent)
-			{
-				reduction = opts.lodPercent * 0.01f;
-			}
-			else
-			{
-				reduction = opts.lodFixed;
-			}
 			Real currDist = 0;
+            numLod = opts.numLods;
 			for (unsigned short iLod = 0; iLod < numLod; ++iLod)
 			{
+                LodLevel lodLevel;
+                lodLevel.reductionMethod = opts.usePercent ?
+                    LodLevel::VRM_PROPORTIONAL : LodLevel::VRM_CONSTANT;
+                if (opts.usePercent)
+                {
+                    lodLevel.reductionValue = opts.lodPercent * 0.01f;
+                }
+                else
+                {
+                    lodLevel.reductionValue = opts.lodFixed;
+                }
+
 				currDist += opts.lodDist;
                 Real currDistSq = Ogre::Math::Sqr(currDist);
-				distanceList.push_back(currDistSq);
+                lodLevel.distance = currDistSq;
+                lodConfig.levels.push_back(lodLevel);
 			}
-
 		}
 
-		ProgressiveMesh::generateLodLevels(mesh, distanceList, quota, reduction);
+        ProgressiveMeshGenerator pm;
+        pm.generateLodLevels(lodConfig);
 	}
 
 }
@@ -1030,7 +1037,7 @@ int main(int numargs, char** args)
 				{
 					std::cout << "\nThis mesh appears to already have a set of tangents, " <<
 						"which would suggest tangent vectors have already been calculated. Do you really " <<
-						"want to generate new tangent vectors (may duplicate)? (y/n)";
+						"want to generate new tangent vectors (may duplicate)? (y/n) ";
 					while (response == "")
 					{
 						cin >> response;

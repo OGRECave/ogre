@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2012 Torus Knot Software Ltd
+Copyright (c) 2000-2013 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -36,6 +36,48 @@ THE SOFTWARE.
 namespace Ogre {
 namespace Volume {
     
+    Vector3 GridSource::getIntersectionStart(const Ray &ray, Real maxDistance) const
+    {
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        
+        // Inside the grid
+        if (box.intersects(ray.getOrigin()))
+        {
+            return ray.getOrigin();
+        }
+        
+        // Outside the grid, ray intersects it
+        std::pair<bool, Real> intersection = ray.intersects(box);
+        if (intersection.first)
+        {
+            Vector3 direction = ray.getDirection().normalisedCopy();
+            return ray.getOrigin() + direction * intersection.second;
+        }
+
+        // Outside the grid, ray doesn't intersect it
+        return ray.getOrigin();
+    }
+
+    //-----------------------------------------------------------------------
+
+    Vector3 GridSource::getIntersectionEnd(const Ray &ray, Real maxDistance) const
+    {
+        AxisAlignedBox box((Real)0, (Real)0, (Real)0, (Real)mWidth, (Real)mHeight, (Real)mDepth);
+        Vector3 direction = ray.getDirection().normalisedCopy();
+        Vector3 invertedDirection = (Real)-1.0 * direction;
+        Vector3 origin = ray.getOrigin() + direction * box.getSize().length();
+
+        Ray inverted(origin, invertedDirection);
+        std::pair<bool, Real> intersection = inverted.intersects(box);
+        if (intersection.first)
+        {
+            return origin + invertedDirection * intersection.second;
+        }
+        return ray.getOrigin() + direction * maxDistance;
+    }
+
+    //-----------------------------------------------------------------------
+
     GridSource::GridSource(bool trilinearValue, bool trilinearGradient, bool sobelGradient) :
         mTrilinearValue(trilinearValue), mTrilinearGradient(trilinearGradient), mSobelGradient(sobelGradient)
     {
@@ -175,6 +217,43 @@ namespace Volume {
     {
         return mDepth;
     }
+    
+    //-----------------------------------------------------------------------
+    
+    void GridSource::combineWithSource(CSGOperationSource *operation, Source *source, const Vector3 &center, Real radius)
+    {
+        Real worldWidthScale = (Real)1.0 / mPosXScale;
+        Real worldHeightScale = (Real)1.0 / mPosYScale;
+        Real worldDepthScale = (Real)1.0 / mPosZScale;
 
+        operation->setSourceA(this);
+        operation->setSourceB(source);
+        // No need for trilineaer interpolation here as we iterate over the
+        // cells anyway.
+        bool oldTrilinearValue = mTrilinearValue;
+        mTrilinearValue = false;
+        float value;
+        int x, y;
+        int xStart = Math::Clamp((int)(center.x - radius), 0, mWidth);
+        int xEnd = Math::Clamp((int)(center.x + radius), 0, mWidth);
+        int yStart = Math::Clamp((int)(center.y - radius), 0, mHeight);
+        int yEnd = Math::Clamp((int)(center.y + radius), 0, mHeight);
+        int zStart = Math::Clamp((int)(center.z - radius), 0, mDepth);
+        int zEnd = Math::Clamp((int)(center.z + radius), 0, mDepth);
+
+        for (int z = zStart; z < zEnd; ++z)
+        {
+            for (y = yStart; y < yEnd; ++y)
+            {
+                for (x = xStart; x < xEnd; ++x)
+                {
+                    value = operation->getValue(Vector3(x * worldWidthScale, y * worldHeightScale, z * worldDepthScale));
+                    setVolumeGridValue(x, z, y, value);
+                }
+            }
+        }
+
+        mTrilinearValue = oldTrilinearValue;
+    }
 }
 }

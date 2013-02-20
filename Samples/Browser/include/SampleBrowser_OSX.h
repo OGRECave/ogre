@@ -200,11 +200,12 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
 
 - (void)renderOneFrame:(id)sender
 {
-    if(!sb.mIsShuttingDown && Ogre::Root::getSingletonPtr() && Ogre::Root::getSingleton().isInitialised())
+    if(!sb.mIsShuttingDown && Ogre::Root::getSingletonPtr() &&
+       Ogre::Root::getSingleton().isInitialised() && !Ogre::Root::getSingleton().endRenderingQueued())
     {
-        Ogre::Root::getSingleton().renderOneFrame();//(Ogre::Real)[mTimer timeInterval]);
+        Ogre::Root::getSingleton().renderOneFrame();
     }
-    else
+    else if(sb.mIsShuttingDown)
     {
         if(mTimer)
         {
@@ -213,6 +214,16 @@ static CVReturn MyDisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTime
         }
 
         [NSApp performSelector:@selector(terminate:) withObject:nil afterDelay:0.0];
+    }
+    else if(!sb.isLastRun() && sb.isFirstRun())
+    {
+        sb.closeApp();
+
+        sb.setFirstRun(false);
+
+        sb.initApp();
+        sb.loadStartUpSample();
+        sb.setFirstRun(true);
     }
 }
 

@@ -157,7 +157,7 @@ namespace OgreBites
 					mDetailsPanel->hide();
 				}
 			}
-			else if (evt.key == OIS::KC_T)   // cycle polygon rendering mode
+			else if (evt.key == OIS::KC_T)   // cycle texture filtering mode
 			{
 				Ogre::String newVal;
 				Ogre::TextureFilterOptions tfo;

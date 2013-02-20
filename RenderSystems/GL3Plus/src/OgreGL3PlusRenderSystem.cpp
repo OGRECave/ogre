@@ -154,6 +154,8 @@ namespace Ogre {
 		mCurrentGeometryProgram = 0;
         mCurrentFragmentProgram = 0;
 		mCurrentHullProgram = 0;
+        mCurrentDomainProgram = 0;
+        mCurrentComputeProgram = 0;
         mPolygonMode = GL_FILL;
         mEnableFixedPipeline = false;
     }
@@ -1800,11 +1802,13 @@ namespace Ogre {
                                   mDerivedDepthBiasMultiplier * mCurrentPassIterationNum,
                                   mDerivedDepthBiasSlopeScale);
                 }
+
+                GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
 				if(hasInstanceData)
 				{
                     if(mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.indexData->indexStart));
+                        OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
                     }
                     else
                     {
@@ -1815,11 +1819,11 @@ namespace Ogre {
 				{
                     if(mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawElementsBaseVertex((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexCount, indexType, pBufferData, op.indexData->indexStart));
+                        OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                     }
                     else
                     {
-                        OGRE_CHECK_GL_ERROR(glDrawElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexCount, indexType, pBufferData));
+                        OGRE_CHECK_GL_ERROR(glDrawRangeElements((_getPolygonMode() == GL_FILL) ? primType : _getPolygonMode(), op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData));
                     }
 				}
             } while (updatePassIterationRenderState());
@@ -2176,7 +2180,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
-                        "GL3PlusRenderSystem::_initialise");
+                        "GL3PlusRenderSystem::initialiseContext");
         }
 
 		// Setup GL3PlusSupport

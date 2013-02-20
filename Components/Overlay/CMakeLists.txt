@@ -60,7 +60,7 @@ ogre_add_library(OgreOverlay ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILE
 set_target_properties(OgreOverlay PROPERTIES VERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreOverlay OgreMain ${FREETYPE_LIBRARIES})
 if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreOverlay ${Boost_LIBRARIES})
+  target_link_libraries(OgreOverlay ${OGRE_THREAD_LIBRARIES})
 endif ()
 
 # install 

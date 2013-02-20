@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <float.h>
 #include "OgreVector3.h"
 #include "OgreVolumePrerequisites.h"
+#include "OgreRay.h"
 
 namespace Ogre {
 namespace Volume {
@@ -39,6 +40,30 @@ namespace Volume {
     */
     class _OgreVolumeExport Source
     {
+    protected:
+
+        /** Gets the start vector of an intersection. This is needed for restricted volumes
+        like discreet grids.
+        @param ray
+            The ray of the intersection.
+        @param maxDistance
+            The maximum distance to query the ray for intersections.
+        @return
+            The start point of the intersection ray.
+        */
+        virtual Vector3 getIntersectionStart(const Ray &ray, Real maxDistance) const;
+        
+        /** Gets the end vector of an intersection. This is needed for restricted volumes
+        like discreet grids.
+        @param ray
+            The ray of the intersection.
+        @param maxDistance
+            The maximum distance to query the ray for intersections.
+        @return
+            The end point of the intersection ray.
+        */
+        virtual Vector3 getIntersectionEnd(const Ray &ray, Real maxDistance) const;
+
     public:
 
         /// The id of volume files.
@@ -103,6 +128,21 @@ namespace Volume {
             The file to write the grid to.
         */
         void serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file);
+
+        /** Gets the first intersection of a ray with the volume.
+        If you are using this together with the VolumeChunk:
+        Beware of the possible scaling or other transformations you did on the Chunk! Do the inverse first
+        on the ray origin. Example of a scaling with the factor 10: ray.setOrigin(ray.getOrigin() / (Real)10.0);
+        @param ray
+            The ray.
+        @param result
+            Will hold the intersection point if there is an intersection.
+        @param maxIterations
+            The maximum amount of iterations on the ray before giving up.
+        @param maxDistance
+            The maximum distance of the intersection point.
+        */
+        bool getFirstRayIntersection(const Ray &ray, Vector3 &result, size_t maxIterations = 5000, Real maxDistance = (Real)10000.0) const;
 
     };
 

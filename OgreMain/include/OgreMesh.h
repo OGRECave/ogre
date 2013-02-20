@@ -55,6 +55,7 @@ namespace Ogre {
     */
 
     struct MeshLodUsage;
+    struct LodConfig;
     class LodStrategy;
 
     /** Resource holding data about 3D mesh.
@@ -598,9 +599,11 @@ namespace Ogre {
 		@param finalTexCoordSet The tex. coord index to merge to. Should have enough space to
 			actually work.
         @param texCoordSetToDestroy The texture coordinate index that will disappear on
-			successfull merges.
+			successful merges.
         */
 		void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
+
+		void _configureMeshLodUsage(const LodConfig& lodConfig);
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "macUtils.h"
 #endif
 
-// Regsiter the suite
+// Register the suite
 CPPUNIT_TEST_SUITE_REGISTRATION( UseCustomCapabilitiesTests );
 
 void UseCustomCapabilitiesTests::setUp()
@@ -201,7 +201,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 		logManager->createLog("testCustomCapabilitiesGL.log", true, false);
 	}
 
-	Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+	Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
 	if(rs == 0)
 	{
@@ -261,7 +261,7 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 		logManager->createLog("testCustomCapabilitiesD3D9.log", true, false);
 	}
 
-    Root* root = OGRE_NEW Root("plugins" OGRE_LIB_SUFFIX ".cfg");
+    Root* root = OGRE_NEW Root("plugins.cfg");
 	RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	if(rs == 0)
 	{

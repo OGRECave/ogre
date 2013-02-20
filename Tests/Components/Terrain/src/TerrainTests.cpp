@@ -40,7 +40,7 @@ void TerrainTests::setUp()
 
 	// Load resource paths from config file
 	ConfigFile cf;
-	cf.load("resources" OGRE_LIB_SUFFIX ".cfg");
+	cf.load("resources.cfg");
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();

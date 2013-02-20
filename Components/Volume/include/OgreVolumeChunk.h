@@ -78,7 +78,7 @@ namespace Volume {
         /// The scale of the volume with 1.0 as default.
         Real scale;
 
-        /// The maximum accepted screen space error when chosing the LOD levels to render.
+        /// The maximum accepted screen space error when choosing the LOD levels to render.
         Real maxScreenSpaceError;
         
         /// The first LOD level to create geometry for. For scenarios where the lower levels won't be visible anyway. 0 is the default and switches this off.
@@ -97,7 +97,7 @@ namespace Volume {
     */
     class Chunk;
 
-    /** Data being passed arround while loading.
+    /** Data being passed around while loading.
     */
     typedef struct ChunkRequest
     {
@@ -305,6 +305,10 @@ namespace Volume {
             The scenemanager to construct the entity with.
         @param filename
             The filename of the configuration file.
+        @param sourceResult
+            If you want to use the loaded source afterwards, give this parameter.  Beware, that you
+            will have to delete the pointer on your own then! On null here, it internally frees the
+            memory for you
         @param lodCallback
             Callback for a specific LOD level.
         @param lodCallbackLod
@@ -312,7 +316,7 @@ namespace Volume {
         @param resourceGroup
             The resource group where to search for the configuration file.
         */
-        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual void load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult = 0, MeshBuilderCallback *lodCallback = 0, size_t lodCallbackLod = 0, const String& resourceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
         
         /** Shows the debug visualization entity of the dualgrid.
         @param visible

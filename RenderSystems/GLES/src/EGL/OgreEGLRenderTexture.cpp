@@ -113,7 +113,7 @@ namespace Ogre {
             EGL_WIDTH, mWidth,
 			// ...then the height of the surface...
             EGL_HEIGHT, mHeight,
-			/* ... then we specifiy the target for the texture
+			/* ... then we specify the target for the texture
 			that will be created when the pbuffer is created...*/
 			EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
 			/*..then the format of the texture that will be created

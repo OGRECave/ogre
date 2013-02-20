@@ -138,12 +138,12 @@ namespace Ogre {
                 }
                 else
                 {
-                    /* Find the first seperator character and split the string there */
+                    /* Find the first separator character and split the string there */
 					Ogre::String::size_type separator_pos = line.find_first_of(separators, 0);
                     if (separator_pos != Ogre::String::npos)
                     {
                         optName = line.substr(0, separator_pos);
-                        /* Find the first non-seperator character following the name */
+                        /* Find the first non-separator character following the name */
                         Ogre::String::size_type nonseparator_pos = line.find_first_not_of(separators, separator_pos);
                         /* ... and extract the value */
                         /* Make sure we don't crash on an empty setting (it might be a valid value) */

@@ -137,6 +137,7 @@ namespace Ogre {
             RBFormat(GLenum inFormat, size_t inWidth, size_t inHeight, uint fsaa):
                 format(inFormat), width(inWidth), height(inHeight), samples(fsaa)
             {}
+            RBFormat() {}
             GLenum format;
             size_t width;
             size_t height;

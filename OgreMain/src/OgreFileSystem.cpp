@@ -64,7 +64,7 @@ namespace Ogre {
         : Archive(name, archType)
     {
 		// Even failed attempt to write to read only location violates Apple AppStore validation process.
-		// And successfull writing to some probe file does not prove that whole location with subfolders 
+		// And successful writing to some probe file does not prove that whole location with subfolders 
 		// is writable. Therefore we accept read only flag from outside and do not try to be too smart.
 		mReadOnly = readOnly;
     }

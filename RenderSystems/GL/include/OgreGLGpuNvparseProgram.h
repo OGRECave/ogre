@@ -61,7 +61,6 @@ protected:
 
 private:
     GLuint mProgramID;
-    GLenum mProgramType;
 };
 
 } // namespace Ogre

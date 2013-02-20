@@ -261,7 +261,7 @@ namespace Ogre {
 			const String& commandName, const String& identifier, 
 			const GpuProgramParameters::AutoConstantEntry* autoEntry, 
 			const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry, 
-			bool isFloat, size_t physicalIndex, size_t physicalSize,
+			bool isFloat, bool isDouble, size_t physicalIndex, size_t physicalSize,
 			const GpuProgramParametersSharedPtr& params, GpuProgramParameters* defaultParams,
 			const unsigned short level, const bool useMainBuffer);
 		void writeTextureUnit(const TextureUnitState *pTex);

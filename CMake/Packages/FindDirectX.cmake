@@ -8,25 +8,25 @@
 #-------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
-# Find DirectX SDK
+# Find DirectX9 SDK
 # Define:
-# DirectX_FOUND
-# DirectX_INCLUDE_DIR
-# DirectX_LIBRARY
-# DirectX_ROOT_DIR
+# DirectX9_FOUND
+# DirectX9_INCLUDE_DIR
+# DirectX9_LIBRARY
+# DirectX9_ROOT_DIR
 
-if(WIN32) # The only platform it makes sense to check for DirectX SDK
+if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
   include(FindPkgMacros)
-  findpkg_begin(DirectX)
+  findpkg_begin(DirectX9)
   
   # Get path, convert backslashes as ${ENV_DXSDK_DIR}
   getenv_path(DXSDK_DIR)
-  getenv_path(DIRECTX_HOME)
-  getenv_path(DIRECTX_ROOT)
-  getenv_path(DIRECTX_BASE)
+  getenv_path(DirectX_HOME)
+  getenv_path(DirectX_ROOT)
+  getenv_path(DirectX_BASE)
   
   # construct search paths
-  set(DirectX_PREFIX_PATH 
+  set(DirectX9_PREFIX_PATH 
     "${DXSDK_DIR}" "${ENV_DXSDK_DIR}"
     "${DIRECTX_HOME}" "${ENV_DIRECTX_HOME}"
     "${DIRECTX_ROOT}" "${ENV_DIRECTX_ROOT}"
@@ -38,88 +38,35 @@ if(WIN32) # The only platform it makes sense to check for DirectX SDK
 	"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
   )
 
-  # Windows 8 SDK has custom layout
-  set(DirectX_INC_SEARCH_PATH 
-    "C:/Program Files (x86)/Windows Kits/8.0/Include/shared"
-    "C:/Program Files (x86)/Windows Kits/8.0/Include/um"
-  )
-  set(DirectX_LIB_SEARCH_PATH 
-    "C:/Program Files (x86)/Windows Kits/8.0/Lib/win8/um"
-  )
-
-  create_search_paths(DirectX)
+  create_search_paths(DirectX9)
   # redo search if prefix path changed
-  clear_if_changed(DirectX_PREFIX_PATH
-    DirectX_LIBRARY
-	DirectX_INCLUDE_DIR
+  clear_if_changed(DirectX9_PREFIX_PATH
+    DirectX9_LIBRARY
+	DirectX9_INCLUDE_DIR
   )
   
-  find_path(DirectX_INCLUDE_DIR NAMES d3d9.h D3DCommon.h HINTS ${DirectX_INC_SEARCH_PATH})
-  # dlls are in DirectX_ROOT_DIR/Developer Runtime/x64|x86
-  # lib files are in DirectX_ROOT_DIR/Lib/x64|x86
+  find_path(DirectX9_INCLUDE_DIR NAMES d3d9.h D3DCommon.h HINTS ${DirectX9_INC_SEARCH_PATH})
+  # dlls are in DirectX9_ROOT_DIR/Developer Runtime/x64|x86
+  # lib files are in DirectX9_ROOT_DIR/Lib/x64|x86
   if(CMAKE_CL_64)
-    set(DirectX_LIBPATH_SUFFIX "x64")
+    set(DirectX9_LIBPATH_SUFFIX "x64")
   else(CMAKE_CL_64)
-    set(DirectX_LIBPATH_SUFFIX "x86")
+    set(DirectX9_LIBPATH_SUFFIX "x86")
   endif(CMAKE_CL_64)
-  find_library(DirectX_LIBRARY NAMES d3d9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-  find_library(DirectX_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-  find_library(DirectX_DXERR_LIBRARY NAMES DxErr HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-  find_library(DirectX_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
+  find_library(DirectX9_LIBRARY NAMES d3d9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
+  find_library(DirectX9_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
+  find_library(DirectX9_DXERR_LIBRARY NAMES DxErr HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
+  find_library(DirectX9_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
   
-
-  # look for dxgi (needed by both 10 and 11)
-  find_library(DirectX_DXGI_LIBRARY NAMES dxgi HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-  
-  # look for d3dcompiler (needed by 11)
-  find_library(DirectX_D3DCOMPILER_LIBRARY NAMES d3dcompiler HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-
-  findpkg_finish(DirectX)
-  set(DirectX_LIBRARIES ${DirectX_LIBRARIES} 
-    ${DirectX_D3DX9_LIBRARY}
-    ${DirectX_DXERR_LIBRARY}
-    ${DirectX_DXGUID_LIBRARY}
+  findpkg_finish(DirectX9)
+  set(DirectX9_LIBRARIES ${DirectX9_LIBRARIES} 
+    ${DirectX9_D3DX9_LIBRARY}
+    ${DirectX9_DXERR_LIBRARY}
+    ${DirectX9_DXGUID_LIBRARY}
   )
   
-  mark_as_advanced(DirectX_D3DX9_LIBRARY DirectX_DXERR_LIBRARY DirectX_DXGUID_LIBRARY
-    DirectX_DXGI_LIBRARY DirectX_D3DCOMPILER_LIBRARY)
-  
-
-  # look for D3D11 components
-  if (DirectX_FOUND)
-    find_path(DirectX_D3D11_INCLUDE_DIR NAMES D3D11Shader.h HINTS ${DirectX_INC_SEARCH_PATH})
-	get_filename_component(DirectX_LIBRARY_DIR "${DirectX_LIBRARY}" PATH)
-	message(STATUS "DX lib dir: ${DirectX_LIBRARY_DIR}")
-    find_library(DirectX_D3D11_LIBRARY NAMES d3d11 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})
-    find_library(DirectX_D3DX11_LIBRARY NAMES d3dx11 HINTS ${DirectX_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX_LIBPATH_SUFFIX})	
-	if (DirectX_D3D11_INCLUDE_DIR AND DirectX_D3D11_LIBRARY)
-	  set(DirectX_D3D11_FOUND TRUE)
-	  set(DirectX_D3D11_INCLUDE_DIR ${DirectX_D3D11_INCLUDE_DIR})
-	  set(DirectX_D3D11_LIBRARIES ${DirectX_D3D11_LIBRARIES}
-	    ${DirectX_D3D11_LIBRARY}
-	    ${DirectX_DXGI_LIBRARY}
-        ${DirectX_DXGUID_LIBRARY}
-        ${DirectX_D3DCOMPILER_LIBRARY}        	  
-      )	
-    endif ()
-    if (DirectX_D3DX11_LIBRARY)
-        set(DirectX_D3D11_LIBRARIES ${DirectX_D3D11_LIBRARIES} ${DirectX_D3DX11_LIBRARY})
-    endif ()
-    if (DirectX_DXERR_LIBRARY)
-        set(DirectX_D3D11_LIBRARIES ${DirectX_D3D11_LIBRARIES} ${DirectX_DXERR_LIBRARY})
-    endif ()
-	mark_as_advanced(DirectX_D3D11_INCLUDE_DIR DirectX_D3D11_LIBRARY DirectX_D3DX11_LIBRARY)
-  endif ()
-
-  if (OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
-    set(DirectX_FOUND TRUE) 
-	set(DirectX_D3D11_FOUND TRUE)
-	set(DirectX_INCLUDE_DIR "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/include" CACHE STRING "" FORCE)
-	set(DirectX_D3D11_INCLUDE_DIR "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/include" CACHE STRING "" FORCE)
-	set(DirectX_D3D11_LIBRARIES "C:/Program Files (x86)/Microsoft Visual Studio 11.0/VC/WPSDK/WP80/lib" CACHE STRING "" FORCE)
-	set(CMAKE_CXX_FLAGS "/EHsc"  CACHE STRING "" FORCE)
-  endif ()
-
+  mark_as_advanced(DirectX9_D3DX9_LIBRARY DirectX9_DXERR_LIBRARY DirectX9_DXGUID_LIBRARY
+    DirectX9_DXGI_LIBRARY DirectX9_D3DCOMPILER_LIBRARY) 
 
   
 endif(WIN32)

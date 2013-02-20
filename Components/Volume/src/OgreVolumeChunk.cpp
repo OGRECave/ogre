@@ -241,6 +241,7 @@ namespace Volume {
         mGeneratedTriangles = 0;
         Timer t;
 
+        mScale = parameters->scale;
         parent->scale(Vector3(parameters->scale));
 
         WorkQueue* wq = Root::getSingleton().getWorkQueue();
@@ -266,7 +267,7 @@ namespace Volume {
     
     //-----------------------------------------------------------------------
 
-    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
+    void Chunk::load(SceneNode *parent, SceneManager *sceneManager, const String& filename, Source **sourceResult, MeshBuilderCallback *lodCallback, size_t lodCallbackLod, const String& resourceGroup)
     {
         ConfigFile config;
         config.loadFromResourceSystem(filename, resourceGroup);
@@ -277,21 +278,21 @@ namespace Volume {
         bool trilinearGradient = StringConverter::parseBool(config.getSetting("trilinearGradient"));
         bool sobelGradient = StringConverter::parseBool(config.getSetting("sobelGradient"));
 
-        TextureSource textureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
+        TextureSource *textureSource = new TextureSource(source, dimensions.x, dimensions.y, dimensions.z, trilinearValue, trilinearGradient, sobelGradient);
     
         Vector3 from = StringConverter::parseVector3(config.getSetting("scanFrom"));
         Vector3 to = StringConverter::parseVector3(config.getSetting("scanTo"));
         size_t level = StringConverter::parseUnsignedInt(config.getSetting("level"));
         Real scale = StringConverter::parseReal(config.getSetting("scale"));
-        Real maxPixelError = StringConverter::parseReal(config.getSetting("maxScreenSpaceError"));
+        Real maxScreenSpaceError = StringConverter::parseReal(config.getSetting("maxScreenSpaceError"));
     
         ChunkParameters parameters;
         parameters.sceneManager = sceneManager;
         parameters.lodCallback = lodCallback;
         parameters.lodCallbackLod = lodCallbackLod;
-        parameters.src = &textureSource;
+        parameters.src = textureSource;
         parameters.scale = scale;
-        parameters.maxScreenSpaceError = maxPixelError;
+        parameters.maxScreenSpaceError = maxScreenSpaceError;
         parameters.createGeometryFromLevel = StringConverter::parseInt(config.getSetting("createGeometryFromLevel"));
         parameters.baseError = StringConverter::parseReal(config.getSetting("baseError"));
         parameters.errorMultiplicator = StringConverter::parseReal(config.getSetting("errorMultiplicator"));
@@ -300,6 +301,15 @@ namespace Volume {
         parameters.skirtFactor = StringConverter::parseReal(config.getSetting("skirtFactor"));
     
         load(parent, from, to, level, &parameters);
+        
+        if (sourceResult)
+        {
+            *sourceResult = textureSource;
+        }
+        else
+        {
+            delete textureSource;
+        }
 
         String material = config.getSetting("material");
         setMaterial(material);

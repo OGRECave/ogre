@@ -185,7 +185,7 @@ namespace Ogre
 
         /** Returns true if this technique supports skeletal animation
         @remarks
-            A virtual function could have been used, but using a simple variable overriden
+            A virtual function could have been used, but using a simple variable overridden
             by the derived class is faster than virtual call overhead. And both are clean
             ways of implementing it.
         */

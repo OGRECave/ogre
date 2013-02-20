@@ -367,7 +367,7 @@ namespace Ogre {
             'compatible' here means identically bones will have same hierarchy,
             but skeletons are not necessary to have same number of bones (if
             number bones of source skeleton's more than this skeleton, they will
-            copied as is, except that duplicate names are unallowed; and in the
+            copied as is, except that duplicate names are disallowed; and in the
             case of bones missing in source skeleton, nothing happen for those
             bones).
         @par

@@ -46,6 +46,7 @@ material Ogre/Compositor/SharpenEdges
 			cull_hardware none
 			cull_software none
 			depth_func always_pass
+            polygon_mode_overrideable false
 
 			//DirectX 9.0 HLSL Vertex Shader vs_1_1
 			//vertex_program_ref PostFilters/SharpenEdgesVP

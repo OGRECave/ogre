@@ -43,7 +43,8 @@ THE SOFTWARE.
 #include "OgreOptimisedUtil.h"
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
-
+#include "OgreLodConfig.h"
+#include "OgrePixelCountLodStrategy.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -924,7 +925,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
-        assert(index < mMeshLodUsageList.size());
+        index = std::min(index, (ushort)(mMeshLodUsageList.size() - 1));
         if (mIsLodManual && index > 0 && mMeshLodUsageList[index].manualMesh.isNull())
         {
             // Load the mesh now
@@ -2291,7 +2292,43 @@ namespace Ogre {
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
     }
-    //---------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    void Mesh::_configureMeshLodUsage( const LodConfig& lodConfig )
+    {
+        // In theory every mesh should have a submesh.
+        assert(getNumSubMeshes() > 0);
+        setLodStrategy(lodConfig.strategy);
+        SubMesh* submesh = getSubMesh(0);
+        mNumLods = submesh->mLodFaceList.size() + 1;
+        mMeshLodUsageList.resize(mNumLods);
+        for (size_t n = 0, i = 0; i < lodConfig.levels.size(); i++) {
+            // Record usages. First Lod usage is the mesh itself.
 
+            // Skip lods, which have the same amount of vertices. No buffer generated for them.
+            if (!lodConfig.levels[i].outSkipped) {
+                // Generated buffers are less then the reported by ProgressiveMesh.
+                // This would fail if you use QueuedProgressiveMesh and the MeshPtr is force unloaded before lod generation completes.
+                assert(mMeshLodUsageList.size() > n + 1);
+                MeshLodUsage& lod = mMeshLodUsageList[++n];
+                lod.userValue = lodConfig.levels[i].distance;
+                lod.value = getLodStrategy()->transformUserValue(lod.userValue);
+                lod.edgeData = 0;
+                lod.manualMesh.setNull();
+            }
+        }
+
+        // TODO: Fix this in PixelCountLodStrategy::getIndex()
+        // Fix bug in Ogre with pixel count Lod strategy.
+        // Changes [0, 20, 15, 10, 5] to [max, 20, 15, 10, 5].
+        // Fixes PixelCountLodStrategy::getIndex() function, which returned always 0 index.
+        if (lodConfig.strategy == PixelCountLodStrategy::getSingletonPtr()) {
+            mMeshLodUsageList[0].userValue = std::numeric_limits<Real>::max();
+            mMeshLodUsageList[0].value = std::numeric_limits<Real>::max();
+        } else {
+            mMeshLodUsageList[0].userValue = 0;
+            mMeshLodUsageList[0].value = 0;
+        }
+    }
+    //---------------------------------------------------------------------
 }
 

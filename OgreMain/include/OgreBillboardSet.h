@@ -347,7 +347,7 @@ namespace Ogre {
             On success, a pointer to a newly created Billboard is
             returned.
         @par
-            On failiure (i.e. no more space and can't autoextend),
+            On failure (i.e. no more space and can't autoextend),
             @c NULL is returned.
         @see
             BillboardSet::setAutoextend

@@ -53,7 +53,7 @@ namespace Ogre {
         if (createParamDictionary("LinearForceAffector"))
         {
             addBaseParameters();
-            // Add extra paramaters
+            // Add extra parameters
             ParamDictionary* dict = getParamDictionary();
             dict->addParameter(ParameterDef("force_vector", 
                 "The vector representing the force to apply.",

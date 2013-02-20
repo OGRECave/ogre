@@ -2,10 +2,11 @@
 //BlurH_ps20.glsl
 // Horizontal Gaussian-Blur pass
 //-------------------------------
+#version 120
 
 uniform sampler2D Blur0;
-vec2 pos[11] = 
-{
+vec2 pos[11] = vec2[11]
+(
 	vec2( -5, 0),
 	vec2( -4, 0),
 	vec2( -3, 0),
@@ -17,12 +18,12 @@ vec2 pos[11] =
 	vec2( 3, 0),
 	vec2( 4, 0),
 	vec2( 5, 0)
-};
+);
 
 //We use the Normal-gauss distribution formula
 //f(x) being the formula, we used f(0.5)-f(-0.5); f(1.5)-f(0.5)...
-float samples[11] =
-{//stddev=2.0
+float samples[11] = float[11]
+(//stddev=2.0
 0.01222447,
 0.02783468,
 0.06559061,
@@ -36,7 +37,7 @@ float samples[11] =
 0.06559061,
 0.02783468,
 0.01222447
-};
+);
 
 void main()
 {

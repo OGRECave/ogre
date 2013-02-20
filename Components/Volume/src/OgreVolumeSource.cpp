@@ -38,16 +38,36 @@ namespace Volume {
     const uint16 Source::VOLUME_CHUNK_VERSION = 1;
     const size_t Source::SERIALIZATION_CHUNK_SIZE = 1000;
 
+    //-----------------------------------------------------------------------
+
+    Vector3 Source::getIntersectionStart(const Ray &ray, Real maxDistance) const
+    {
+        return ray.getOrigin();
+    }
+
+    //-----------------------------------------------------------------------
+
+    Vector3 Source::getIntersectionEnd(const Ray &ray, Real maxDistance) const
+    {
+        Vector3 dir = ray.getDirection().normalisedCopy();
+        return ray.getOrigin() + dir * maxDistance;
+    }
+
+    //-----------------------------------------------------------------------
+
     Source::~Source(void)
     {
     }
 
-    
+    //-----------------------------------------------------------------------
+
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, const String &file)
     {
         Real maxClampedAbsoluteDensity = (from - to).length() / (Real)16.0;
         serialize(from, to, voxelWidth, maxClampedAbsoluteDensity, file);
     }
+
+    //-----------------------------------------------------------------------
 
     void Source::serialize(const Vector3 &from, const Vector3 &to, float voxelWidth, Real maxClampedAbsoluteDensity, const String &file)
     {
@@ -107,6 +127,62 @@ namespace Volume {
 
         ser.writeChunkEnd(VOLUME_CHUNK_ID);
         
+    }
+
+    //-----------------------------------------------------------------------
+
+    bool Source::getFirstRayIntersection(const Ray &ray, Vector3 &result, size_t maxIterations, Real maxDistance) const
+    {
+        Vector3 start = getIntersectionStart(ray, maxDistance);
+        Vector3 cur = start;
+        Vector3 end = getIntersectionEnd(ray, maxDistance);
+     
+        Vector4 startVal = getValueAndGradient(start);
+        Vector3 scaleSampleGradient(startVal.x, startVal.y, startVal.z);
+        Vector3 scaleSampleEnd = start + scaleSampleGradient.normalisedCopy();
+        Real scaleSample = getValue(scaleSampleEnd);
+        Real scale = (Real)1.0 / Math::Abs(scaleSample - startVal.w) * (Real)2.0;
+
+        Real densityCur = getValue(cur);
+        Vector3 dir = ray.getDirection().normalisedCopy();
+
+        size_t count = 0;
+        Vector3 prev, prevPrev;
+        bool atEnd = false;
+        Real totalLength = (start - end).length();
+        while (Math::Abs(densityCur) > (Real)0.01 && !atEnd)
+        {
+            cur += dir * (Real)-1.0 * (densityCur / scale);
+            
+            // Increase the scaling a bit if we jump forth and back due to bad depth data.
+            if ((cur - prevPrev).length() < (Real)0.0001)
+            {
+                scale *= (Real)2.0;
+            }
+            prevPrev = prev;
+            prev = cur;
+
+            densityCur = getValue(cur);
+
+            // Check if we are out of range
+            if ((start - cur).length() >= totalLength) {
+                atEnd = true;
+            }
+
+            // We have a limit here...
+            count++;
+            if (count > maxIterations)
+            {
+                break;
+            }
+        }
+
+        if (Math::Abs(densityCur) <= (Real)0.01)
+        {
+            result = cur;
+            return true;
+        }
+        return false;
     }
 
 }

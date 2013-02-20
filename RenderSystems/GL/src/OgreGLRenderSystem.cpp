@@ -3163,6 +3163,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 				mCurrentGeometryProgram = glprg;
 			}
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 
 		// Bind the program
@@ -3220,6 +3224,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 			mActiveFragmentGpuProgramParameters = params;
 			mCurrentFragmentProgram->bindProgramParameters(params, mask);
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 	}
 	//---------------------------------------------------------------------
@@ -3236,6 +3244,10 @@ GL_RGB_SCALE : GL_ALPHA_SCALE, 1);
 		case GPT_FRAGMENT_PROGRAM:
 			mCurrentFragmentProgram->bindProgramPassIterationParameters(mActiveFragmentGpuProgramParameters);
 			break;
+        case GPT_COMPUTE_PROGRAM:
+        case GPT_DOMAIN_PROGRAM:
+        case GPT_HULL_PROGRAM:
+            break;
 		}
 	}
 	//---------------------------------------------------------------------

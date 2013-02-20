@@ -68,6 +68,14 @@ THE SOFTWARE.
 
 //---------------------------------------------------------------------
 #define FLOAT2DWORD(f) *((DWORD*)&f)
+
+#ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
+#	define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
+#endif
+
+#ifndef D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT
+#	define D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT 1
+#endif
 //---------------------------------------------------------------------
 #include <d3d10.h>
 
@@ -871,7 +879,7 @@ bail:
 				temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
 
 				// In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
-				// match exacly, but in windowed mode we can allow for arbitrary window sized, so we only need
+				// match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
 				// to match the colour values
 				if(fullScreen && (temp == opt->second.currentValue) ||
 				  !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
@@ -1061,6 +1069,8 @@ bail:
 			if(!mUseCustomCapabilities)
 				mCurrentCapabilities = mRealCapabilities;
 
+			fireEvent("RenderSystemCapabilitiesCreated");
+
 			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
 
 		}
@@ -1182,9 +1192,14 @@ bail:
 		rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
 		rsc->setCapability(RSC_TEXTURE_FLOAT);
 
+#ifdef D3D_FEATURE_LEVEL_9_3
 		int numMultiRenderTargets = (mFeatureLevel > D3D_FEATURE_LEVEL_9_3) ? D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT :		// 8
 									(mFeatureLevel == D3D_FEATURE_LEVEL_9_3) ? D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT :	// 4
 									D3D_FL9_1_SIMULTANEOUS_RENDER_TARGET_COUNT;												// 1
+#else
+        int numMultiRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;		// 8
+#endif
+
 		rsc->setNumMultiRenderTargets(std::min(numMultiRenderTargets, (int)OGRE_MAX_MULTIPLE_RENDER_TARGETS));
 		rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
 

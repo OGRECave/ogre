@@ -252,6 +252,7 @@ material Ogre/Compositor/BlurH
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref BlurH_ps
 			{
@@ -279,6 +280,7 @@ material Ogre/Compositor/BlurV
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref BlurV_ps
 			{
@@ -306,6 +308,7 @@ material Ogre/Compositor/BloomBlend2
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref Bloom2_ps
 			{
@@ -342,6 +345,7 @@ material Ogre/Compositor/BrightPass2
 			cull_hardware none
 			cull_software none
 			depth_check off
+            polygon_mode_overrideable false
 
 			fragment_program_ref BrightBloom2_ps
 			{

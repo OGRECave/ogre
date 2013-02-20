@@ -240,7 +240,7 @@ namespace Ogre {
 			multiImage = false;
 		}
 		
-		// Check wether number of faces in images exceeds number of faces
+		// Check whether number of faces in images exceeds number of faces
 		// in this texture. If so, clamp it.
 		if(faces > getNumFaces())
 			faces = getNumFaces();
