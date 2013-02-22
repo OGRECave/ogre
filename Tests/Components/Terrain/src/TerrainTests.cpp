@@ -30,6 +30,9 @@ THE SOFTWARE.
 #include "OgreConfigFile.h"
 #include "OgreResourceGroupManager.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TerrainTests );
 
@@ -51,7 +54,11 @@ void TerrainTests::setUp()
 
 	// Load resource paths from config file
 	ConfigFile cf;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+	cf.load(macBundlePath() + "/Contents/Resources/resources.cfg");
+#else
 	cf.load("resources.cfg");
+#endif
 
 	// Go through all sections & settings in the file
 	ConfigFile::SectionIterator seci = cf.getSectionIterator();

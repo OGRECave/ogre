@@ -106,6 +106,25 @@ if (OGRE_BUILD_TESTS)
             COMMAND ditto 
             ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities/* ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/CustomCapabilities
             )
+            
+        add_custom_command(TARGET Test_Ogre POST_BUILD
+            COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Resources
+            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg 
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/
+            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg 
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/
+            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg 
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/
+            COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/
+            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media/materials
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/materials
+            COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media/models
+            ${OGRE_TEST_CONTENTS_PATH}/Resources/Media/models
+            COMMAND ditto 
+            ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_TEST_CONTENTS_PATH}/Resources
+		)
+
         add_custom_command(TARGET Test_Ogre POST_BUILD
             COMMAND mkdir ARGS -p ${OGRE_TEST_CONTENTS_PATH}/Frameworks
             COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework
