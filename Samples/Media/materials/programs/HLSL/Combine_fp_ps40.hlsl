@@ -11,7 +11,7 @@ SamplerState g_samLinear
 
 float4 Combine_fp_ps40
 (
-	float4 Pos: SV_POSITION ,
+	float4 posIn: SV_Position ,
     float2 texCoord: TEXCOORD0,
 
     uniform float blur

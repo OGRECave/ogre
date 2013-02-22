@@ -33,7 +33,7 @@ float4 HeatCaster_fp(
                         v2p input
                      ) : SV_Target
 {
-   return float4(input.texCoord.x,input.texCoord.x,input.texCoord.x,1.0f);
+   return float4(input.texCoord.x,input.texCoord.x,input.texCoord.x,input.texCoord.x);
 }
 
 //////////////////////////////////////////////
@@ -61,7 +61,7 @@ float4 ColdCaster_fp(
                         v2p input
                      ) : SV_Target
 {
-   return float4(input.texCoord.x / 2,input.texCoord.x / 2,input.texCoord.x / 2,1.0f);
+   return float4(input.texCoord.x / 2,input.texCoord.x / 2,input.texCoord.x / 2,input.texCoord.x / 2);
 }
 
 
@@ -82,12 +82,19 @@ v2p LightToHeat_vp(
 	return output;
 }
 
+SamplerState g_samLinear
+{
+    Filter = MIN_MAG_LINEAR_MIP_POINT;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+
 SamplerState g_samVolume
 {
     Filter = MIN_MAG_LINEAR_MIP_POINT;
     AddressU = Wrap;
     AddressV = Wrap;
-    AddressW = Wrap; 
+	AddressW = Wrap;
 };
 
 float4 LightToHeat_fp(
@@ -106,7 +113,7 @@ float4 LightToHeat_fp(
    float  depth, heat, interference;
 
    //  Output constant color:
-   depth = Input.Sample(g_samVolume, inp.texCoord );
+   depth = Input.Sample(g_samLinear, inp.texCoord );
    depth *= (depth * depth_modulator.x);
 
    heat  = (depth * heatBiasScale.y);
@@ -127,7 +134,7 @@ float4 LightToHeat_fp(
 
    // Clamp UVs
    heat  = max( 0.005, min( 0.995, heat ) );
-   float4 outColor = HeatLookup.Sample(g_samVolume, float2( heat, 0.f ) );
+   float4 outColor = HeatLookup.Sample(g_samLinear, float2( heat, 0.f ) );
    return outColor;
 }
 
@@ -152,7 +159,7 @@ v2p Blur_vp(
 // ps_2_0
 float4 Blur_fp(
                     // input from vp
-                    v2p input,
+                    v2p inp,
                     // parameters
 					uniform Texture2D Input,
                     uniform float4 blurAmount
@@ -191,14 +198,14 @@ float4 Blur_fp(
 
    };
 
-   tmpOutColor = Input.Sample(g_samVolume, input.texCoord );	// UV coords are in image space
+   tmpOutColor = Input.Sample(g_samLinear, inp.texCoord );	// UV coords are in image space
 
    // calculate glow amount
    diffuseGlowFactor = 0.0113f * (2.0 - max( tmpOutColor.r, tmpOutColor.g ));
 
    // basic blur filter
    for (i = 0; i < 4; i++) {
-      tmpOutColor += Input.Sample(g_samVolume, input.texCoord.xy + blurAmount.x * diffuseGlowFactor * offsets[i] );
+      tmpOutColor += Input.Sample(g_samLinear, inp.texCoord.xy + blurAmount.x * diffuseGlowFactor * offsets[i] );
    }
 
    tmpOutColor *= 0.25;

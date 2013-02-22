@@ -1,8 +1,8 @@
-Texture2D Image;
-Texture3D Rand;
-Texture3D Noise;
+Texture2D Image: register(s0);
+Texture3D Rand: register(s1);
+Texture3D Noise: register(s2);
 
-SamplerState g_samVolume
+SamplerState g_sam3D
 {
     Filter = MIN_MAG_LINEAR_MIP_POINT;
     AddressU = Wrap;
@@ -10,14 +10,14 @@ SamplerState g_samVolume
     AddressW = Wrap; 
 };
 
-struct v3p
+SamplerState g_sam2D
 {
-    float4 position : SV_POSITION;
-    float2 texCoord : TEXCOORD0;
-	float2 texCoord2 : TEXCOORD1;
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap; 
 };
 
-float4 OldTV_ps(v3p input, 
+float4 OldTV_ps(float4 posIn: SV_POSITION, float2 img: TEXCOORD0,
     uniform float distortionFreq: register(c3),
     uniform float distortionScale: register(c4),
     uniform float distortionRoll: register(c5),
@@ -30,27 +30,28 @@ float4 OldTV_ps(v3p input,
 
 ) : SV_Target {
    // Define a frame shape
-   float f = (1 - input.texCoord2.x * input.texCoord2.x) * (1 - input.texCoord2.y * input.texCoord2.y);
-   float frame = saturate(frameSharpness * (pow(f, frameShape) - frameLimit));
+   float2 pos = abs((img - 0.5) * 2.0);
+   float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);
+   float frame = saturate(frameSharpness * (pow(abs(f), frameShape) - frameLimit));
 
    // Interference ... just a texture filled with rand()
-   float4 rand = Rand.Sample(g_samVolume, float3(1.5 * input.texCoord2, time_0_X));
+   float4 rand = Rand.Sample(g_sam2D, float3(1.5 * pos, time_0_X));
    rand -= float4(0.2,0.2,0.2,0.2);
 
    // Some signed noise for the distortion effect
-   float4 noisy = Noise.Sample(g_samVolume, float3(0, 0.5 * input.texCoord2.y, 0.1 * time_0_X));
+   float4 noisy = Noise.Sample(g_sam3D, float3(0, 0.5 * pos.y, 0.1 * time_0_X));
    noisy -= float4(0.5,0.5,0.5,0.5);
 
    // Repeat a 1 - x^2 (0 < x < 1) curve and roll it with sinus.
-   float dst = frac(input.texCoord2.y * distortionFreq + distortionRoll * sin_time_0_X);
+   float dst = frac(pos.y * distortionFreq + distortionRoll * sin_time_0_X);
    dst *= (1 - dst);
    // Make sure distortion is highest in the center of the image
-   dst /= 1 + distortionScale * abs(input.texCoord2.y);
+   dst /= 1 + distortionScale * abs(pos.y);
 
    // ... and finally distort
-   input.texCoord.x += distortionScale * noisy.x * dst;
-   float4 image = Image.Sample(g_samVolume, input.texCoord);
+   img.x += distortionScale * noisy.x * dst;
+   float4 image = Image.Sample(g_sam2D, img);
 
    // Combine frame, distorted image and interference
-   return frame * (inerference * rand + image);
+   return frame * (inerference * rand.x + image);
 }

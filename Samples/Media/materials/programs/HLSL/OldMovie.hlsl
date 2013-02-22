@@ -22,7 +22,7 @@ float4 getSplotches(float2 spriteAddr)
    //spriteAddr = spriteAddr - frac(spriteAddr);
    spriteAddr = spriteAddr - (spriteAddr /33.3f);
 
-   return SplotchesTx.Sample(g_samLinear, spriteAddr);
+   return float4(1,1,1,1) * SplotchesTx.Sample(g_samLinear, spriteAddr).r;
 }
 
 float4 OldMovie_ps (float4 pos : SV_Position, 

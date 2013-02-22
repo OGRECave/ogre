@@ -7,14 +7,14 @@ vertex_program Fury/HeatVision/HeatCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/HeatCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point HeatCaster_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/HeatCaster_HLSL_vp hlsl
@@ -97,14 +97,14 @@ vertex_program Fury/HeatVision/ColdCaster_Cg_vp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 }
 
 fragment_program Fury/HeatVision/ColdCaster_Cg_fp cg
 {
    source HeatVision.cg
    entry_point ColdCaster_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/ColdCaster_HLSL_vp hlsl
@@ -187,7 +187,7 @@ vertex_program Fury/HeatVision/LightToHeat_Cg_vp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 
     default_params
     {
@@ -199,7 +199,7 @@ fragment_program Fury/HeatVision/LightToHeat_Cg_fp cg
 {
    source HeatVision.cg
    entry_point LightToHeat_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/LightToHeat_HLSL_vp hlsl
@@ -344,7 +344,7 @@ vertex_program Fury/HeatVision/Blur_Cg_vp cg
 {
    source HeatVision.cg
    entry_point Blur_vp
-   profiles vs_1_1 arbvp1
+   profiles vs_4_0 vs_1_1 arbvp1
 
     default_params
     {
@@ -356,7 +356,7 @@ fragment_program Fury/HeatVision/Blur_Cg_fp cg
 {
    source HeatVision.cg
    entry_point Blur_fp
-   profiles ps_2_0 arbfp1
+   profiles ps_4_0 ps_2_0 arbfp1
 }
 
 vertex_program Fury/HeatVision/Blur_HLSL_vp hlsl
